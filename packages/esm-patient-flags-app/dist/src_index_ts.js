@@ -52,7 +52,7 @@ function setupOpenMRS() {
                 name: "patient-flag",
                 slot: "patient-banner-tags-slot",
                 load: (0,_openmrs_esm_framework__WEBPACK_IMPORTED_MODULE_0__.getAsyncLifecycle)(function() {
-                    return Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_carbon-components-react_es_components_InlineLoading_InlineLoading_js-nod-d3dbbb"), __webpack_require__.e("webpack_sharing_consume_default_react_react"), __webpack_require__.e("src_patient-flags_patient-flags_component_tsx-webpack_sharing_consume_default_carbon-componen-86dc48")]).then(__webpack_require__.bind(__webpack_require__, /*! ./patient-flags/patient-flags.component */ "./src/patient-flags/patient-flags.component.tsx"));
+                    return Promise.all(/*! import() */[__webpack_require__.e("vendors-node_modules_carbon-components-react_es_components_Tag_Tag_js-node_modules_swr_dist_i-3d901a"), __webpack_require__.e("webpack_sharing_consume_default_react_react"), __webpack_require__.e("src_patient-flags_patient-flags_component_tsx-webpack_sharing_consume_default_carbon-componen-86dc48")]).then(__webpack_require__.bind(__webpack_require__, /*! ./patient-flags/patient-flags.component */ "./src/patient-flags/patient-flags.component.tsx"));
                 }, options),
                 online: true,
                 offline: false

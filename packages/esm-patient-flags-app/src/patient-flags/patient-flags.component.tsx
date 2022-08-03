@@ -9,14 +9,10 @@ interface PatientFlagsProps {
 
 const PatientFlags: React.FC<PatientFlagsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { patientFlags, isLoading, error } = usePatientFlags(patientUuid);
-
-  if (isLoading) {
-    return <InlineLoading description={t('loading', 'Loading...')} />;
-  }
+  const { patientFlags, error } = usePatientFlags(patientUuid);
 
   if (error) {
-    return <span>{t('errorPatientFlags', 'Patient flags error')}</span>;
+    return <span>{t('errorPatientFlags', 'Error loading patient flags')}</span>;
   }
 
   return (

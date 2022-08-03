@@ -8,17 +8,6 @@ describe('<PatientFlags/>', () => {
     jest.resetAllMocks();
   });
 
-  test('should display loading spinner, while loading flags', () => {
-    spyOn(mockUsePatientFlags, 'usePatientFlags').and.returnValue({
-      isLoading: true,
-      patientFlags: [],
-      error: null,
-    });
-
-    render(<PatientFlags patientUuid="some-patient-uuid" />);
-    expect(screen.getByText(/^loading$/i)).toBeInTheDocument();
-  });
-
   test('should display patient flags', () => {
     spyOn(mockUsePatientFlags, 'usePatientFlags').and.returnValue({
       isLoading: false,
