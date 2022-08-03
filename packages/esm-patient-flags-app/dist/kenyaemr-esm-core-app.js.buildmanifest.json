@@ -1,0 +1,281 @@
+{
+  "chunks": [
+    {
+      "rendered": true,
+      "initial": true,
+      "entry": true,
+      "recorded": false,
+      "size": 209768,
+      "sizes": {
+        "javascript": 164921,
+        "share-init": 210,
+        "runtime": 44637
+      },
+      "names": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "idHints": [],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "kenyaemr-esm-core-app.js",
+        "@kenyaemr/esm-patient-flags-app.4b53aaa931f092a69591.hot-update.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "4396f85939bd78670643",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 1205,
+      "sizes": {
+        "javascript": 1163,
+        "consume-shared": 42
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "src_index_ts.js",
+        "src_index_ts.4b53aaa931f092a69591.hot-update.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "1288ce145d5ee1820155",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 2168,
+      "sizes": {
+        "javascript": 2084,
+        "consume-shared": 84
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "src_patient-flags_patient-flags_component_tsx-webpack_sharing_consume_default_carbon-componen-86dc48.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "eb7439a4001925d95451",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 12,
+      "sizes": {
+        "javascript": 12
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "translations_en_json.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "0b9c2add7219d4887f15",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 12,
+      "sizes": {
+        "javascript": 12
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "translations_sw_json.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "88b85c3d682c61dc20b3",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "split chunk (cache group: defaultVendors)",
+      "size": 589616,
+      "sizes": {
+        "javascript": 589616
+      },
+      "names": [],
+      "idHints": [
+        "vendors"
+      ],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "vendors-node_modules_carbon-components-react_es_components_InlineLoading_InlineLoading_js-nod-d3dbbb.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "9289f0e5f7be51888142",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "reused as split chunk (cache group: defaultVendors)",
+      "size": 586941,
+      "sizes": {
+        "javascript": 586941
+      },
+      "names": [],
+      "idHints": [
+        "vendors"
+      ],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "vendors-node_modules_carbon-components_es_index_js.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "646e8fcdd5cfd91d5ec2",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "reused as split chunk (cache group: defaultVendors)",
+      "size": 109242,
+      "sizes": {
+        "javascript": 109242
+      },
+      "names": [],
+      "idHints": [
+        "vendors"
+      ],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "vendors-node_modules_carbon-icons_dist_carbon-icons_es_js.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "8f617f5755f94c7c1d77",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "split chunk (cache group: defaultVendors)",
+      "size": 761616,
+      "sizes": {
+        "javascript": 761616
+      },
+      "names": [],
+      "idHints": [
+        "vendors"
+      ],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "vendors-node_modules_openmrs_esm-framework_src_internal_ts.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "92f539dd148ae120a47f",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "reused as split chunk (cache group: defaultVendors)",
+      "size": 40327,
+      "sizes": {
+        "javascript": 40327
+      },
+      "names": [],
+      "idHints": [
+        "vendors"
+      ],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "vendors-node_modules_react-i18next_dist_es_index_js.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "029eec15572547cfbf69",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "reused as split chunk (cache group: defaultVendors)",
+      "size": 67195,
+      "sizes": {
+        "javascript": 67195
+      },
+      "names": [],
+      "idHints": [
+        "vendors"
+      ],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [
+        "vendors-node_modules_react_index_js.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "62d911900d52f83779c4",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": false,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "reused as split chunk (cache group: default)",
+      "size": 42,
+      "sizes": {
+        "consume-shared": 42
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "@kenyaemr/esm-patient-flags-app"
+      ],
+      "files": [],
+      "auxiliaryFiles": [],
+      "hash": "f34a8c1ee382e4c400e9",
+      "childrenByOrder": {}
+    }
+  ]
+}
