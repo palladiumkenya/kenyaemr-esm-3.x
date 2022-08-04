@@ -22,7 +22,7 @@ function setupOpenMRS() {
     extensions: [
       {
         name: 'patient-flag',
-        slot: 'patient-banner-tags-slot',
+        slot: 'patient-flags-slot',
         load: getAsyncLifecycle(() => import('./patient-flags/patient-flags.component'), options),
         online: true,
         offline: false,

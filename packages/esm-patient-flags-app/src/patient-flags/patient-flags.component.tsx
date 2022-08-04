@@ -1,7 +1,8 @@
 import React from 'react';
-import { InlineLoading, Tag } from 'carbon-components-react';
+import { Tag } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { usePatientFlags } from '../hooks/usePatientFlags';
+import styles from './patient-flags.scss';
 
 interface PatientFlagsProps {
   patientUuid: string;
@@ -16,13 +17,13 @@ const PatientFlags: React.FC<PatientFlagsProps> = ({ patientUuid }) => {
   }
 
   return (
-    <>
+    <div className={styles.flagContainer}>
       {patientFlags.map((patientFlag) => (
         <Tag key={patientFlag} type="magenta">
           {patientFlag}
         </Tag>
       ))}
-    </>
+    </div>
   );
 };
 
