@@ -36,7 +36,7 @@ yarn start --sources 'packages/esm-<insert-package-name>-app'
 You could provide `yarn start` with as many `sources` arguments as you require. For example, to run the patient registration and patient search modules only, use:
 
 ```bash
-yarn start --sources 'packages/esm-patient-search-app' --sources 'packages/esm-patient-registration-app'
+yarn start --sources 'packages/esm-patient-flags-app'
 ```
 
 ## Contributing
@@ -53,7 +53,7 @@ yarn test
 
 ## Deployment
 
-The `main` branch of this repo is deployed in a [demo environment](https://openmrs-spa.org/openmrs/spa).
+The `main` branch of this repo is deployed in a [demo](https://data.kenyahmis.org:8500/openmrs/spa).
 
 ## Configuration
 
