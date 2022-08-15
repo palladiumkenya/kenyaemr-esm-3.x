@@ -1,7 +1,14 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import PatientFlags from './patient-flags.component';
-import * as mockUsePatientFlags from '../hooks/usePatientFlags';
+import { usePatientFlags } from '../hooks/usePatientFlags';
+
+const mockUsePatientFlags = usePatientFlags as jest.Mock;
+
+jest.mock('../hooks/usePatientFlags', () => {
+  const originalModule = jest.requireActual('../hooks/usePatientFlags');
+  return { ...originalModule, usePatientFlags: jest.fn() };
+});
 
 describe('<PatientFlags/>', () => {
   afterEach(() => {
@@ -9,12 +16,7 @@ describe('<PatientFlags/>', () => {
   });
 
   test('should display patient flags', () => {
-    spyOn(mockUsePatientFlags, 'usePatientFlags').and.returnValue({
-      isLoading: false,
-      patientFlags: ['hiv', 'cancer'],
-      error: null,
-    });
-
+    mockUsePatientFlags.mockReturnValue({ isLoading: false, patientFlags: ['hiv', 'cancer'], error: null });
     render(<PatientFlags patientUuid="some-patient-uuid" />);
     expect(screen.getByText(/^hiv$/i)).toBeInTheDocument();
     expect(screen.getByText(/^cancer$/i)).toBeInTheDocument();
