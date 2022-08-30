@@ -19,6 +19,7 @@
     "extract-translations": "lerna run extract-translations -- --config ../../tools/i18next-parser.config.js"
   },
   "dependencies": {
+    "css-loader": "^6.7.1",
     "swr": "^1.0.1"
   },
   "devDependencies": {
@@ -72,5 +73,6 @@
     "typedoc": "^0.22.15",
     "typescript": "^4.0.3",
     "webpack": "^5.74.0"
-  }
+  },
+  "packageManager": "yarn@3.2.3"
 }
