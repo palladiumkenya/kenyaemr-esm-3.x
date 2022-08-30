@@ -10,7 +10,7 @@
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
-    "verify": "turbo run lint && turbo run typescript",
+    "verify": "npx turbo run lint && turbo run typescript",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\"",
     "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
     "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.json",
@@ -19,6 +19,7 @@
     "extract-translations": "lerna run extract-translations -- --config ../../tools/i18next-parser.config.js"
   },
   "dependencies": {
+    "css-loader": "^6.7.1",
     "swr": "^1.0.1"
   },
   "devDependencies": {
@@ -72,5 +73,6 @@
     "typedoc": "^0.22.15",
     "typescript": "^4.0.3",
     "webpack": "^5.74.0"
-  }
+  },
+  "packageManager": "yarn@3.2.3"
 }
