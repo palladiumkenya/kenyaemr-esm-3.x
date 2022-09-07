@@ -2,7 +2,7 @@
   "name": "@kenyaemr/esm-patient-flags-app",
   "version": "3.1.0",
   "description": "Patient search microfrontend for the OpenMRS SPA",
-  "browser": "dist/kenyaemr-esm-core-app.js",
+  "browser": "dist/kenyaemr-esm-patient-flags.js",
   "main": "src/index.ts",
   "source": true,
   "license": "MPL-2.0",
