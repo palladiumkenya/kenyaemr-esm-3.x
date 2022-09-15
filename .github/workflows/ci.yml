@@ -45,8 +45,8 @@ jobs:
       - name: Run lint and typechecking
         run: yarn run verify 
       
-     # - name: Run build
-       # run: yarn turbo run build --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
+      - name: Run build
+        run: yarn turbo run build --color --team="${{ github.repository_owner }}"
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
