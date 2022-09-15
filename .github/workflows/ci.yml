@@ -124,6 +124,11 @@ jobs:
         run: yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: see directory
+        shell: bash
+        run: |
+          ls -alh
+          
 
   release:
     runs-on: ubuntu-latest
