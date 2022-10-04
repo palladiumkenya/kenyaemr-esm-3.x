@@ -41,7 +41,15 @@ typings/
 
 # Optional npm cache directory
 .npm
-.yarn
+
+# ignores for Yarn v3 w/o PNP
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # Optional eslint cache
 .eslintcache
@@ -69,3 +77,4 @@ dist
 .DS_Store
 
 .turbo/
+~

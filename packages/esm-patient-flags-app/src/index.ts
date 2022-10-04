@@ -27,6 +27,14 @@ function setupOpenMRS() {
         online: true,
         offline: false,
       },
+      {
+        name: 'kenyaemr-home-link',
+        slot: 'app-menu-slot',
+        load: getAsyncLifecycle(() => import('./kenyaemr-link/kenyaemr-link.component'), options),
+        online: true,
+        offline: false,
+        order: 0,
+      },
     ],
   };
 }

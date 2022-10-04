@@ -28,10 +28,12 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      
+      - name: Set yarn version
+        run: yarn set version berry
+        
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap
+        run: yarn install --immutable
 
       - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v1
@@ -46,7 +48,7 @@ jobs:
         run: yarn run verify 
       
       - name: Run build
-        run: yarn turbo run build --color --team="${{ github.repository_owner }}"
+        run: yarn turbo run build --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
@@ -56,7 +58,7 @@ jobs:
             packages/**/dist
 
 
-  deploy_esm_patient_flas_app:
+  deploy_esm_patient_flags_app:
     runs-on: ubuntu-latest
 
     env:
