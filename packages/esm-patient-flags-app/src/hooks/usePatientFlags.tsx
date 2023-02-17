@@ -15,7 +15,10 @@ interface PatientFlagsReturnType {
  */
 export const usePatientFlags = (patientUuid: string): PatientFlagsReturnType => {
   const patientFlagsUrl = `/ws/rest/v1/kenyaemr/flags?patientUuid=${patientUuid}`;
-  const { data, mutate, error } = useSWR<{ data: { results: Array<string> } }>(patientFlagsUrl, openmrsFetch);
+  const { data, mutate, error, isLoading } = useSWR<{ data: { results: Array<string> } }>(
+    patientFlagsUrl,
+    openmrsFetch,
+  );
   const patientFlags = typeof data?.data === 'string' ? [] : data?.data?.results ?? [];
-  return { patientFlags, isLoading: !data && !error, error };
+  return { patientFlags, isLoading, error };
 };
