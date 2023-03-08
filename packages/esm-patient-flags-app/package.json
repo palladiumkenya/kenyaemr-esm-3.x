@@ -1,7 +1,7 @@
 {
   "name": "@kenyaemr/esm-patient-flags-app",
-  "version": "3.1.0",
-  "description": "Patient search microfrontend for the OpenMRS SPA",
+  "version": "4.1.0",
+  "description": "Patient flags microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-flags-app.js",
   "main": "src/index.ts",
   "source": true,
@@ -28,14 +28,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/palladiumkenya/kenyaemr-esm-core.git"
+    "url": "git+https://github.com/palladiumkenya/kenyaemr-esm-core#readme"
   },
   "bugs": {
     "url": "https://github.com/palladiumkenya/kenyaemr-esm-core/issues"
   },
   "dependencies": {
-    "@carbon/colors": "^11.2.0",
-    "@carbon/react": "^1.8.0",
+    "@carbon/react": "^1.12.0",
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
@@ -43,5 +42,8 @@
     "react": "^18.1.0",
     "react-i18next": "11.x",
     "react-router-dom": "6.x"
+  },
+  "devDependencies": {
+    "webpack": "^5.74.0"
   }
 }

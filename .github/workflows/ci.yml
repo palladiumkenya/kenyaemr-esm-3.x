@@ -33,7 +33,7 @@ jobs:
         
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install --immutable
+        run: yarn install 
 
       - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v1

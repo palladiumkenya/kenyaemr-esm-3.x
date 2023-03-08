@@ -35,6 +35,13 @@ function setupOpenMRS() {
         offline: false,
         order: 0,
       },
+      {
+        id: 'kenyaemr-2.x-chart-link',
+        slot: 'visit-header-right-slot',
+        load: getAsyncLifecycle(() => import('./kenyaemr-link/kenyaemr-chart-link.component'), options),
+        online: true,
+        offline: true,
+      },
     ],
   };
 }
