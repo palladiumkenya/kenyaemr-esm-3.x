@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: "16"
       
@@ -33,7 +33,7 @@ jobs:
         
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn install 
+        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
 
       - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v1
