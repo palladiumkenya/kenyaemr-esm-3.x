@@ -12,7 +12,7 @@ const KenyaEMRChartLink = () => {
 
   return (
     <Button
-      onClick={() => navigate({ to: `/openmrs/kenyaemr/userHome.page?patientId=${patient?.patientId}` })}
+      onClick={() => navigate({ to: `/openmrs/kenyaemr/chart/chartViewPatient.page?patientId=${patient?.patientId}&` })}
       renderIcon={Home}
       style={{ margin: ' 0 0.25rem' }}>
       {t('2xChart', '2.x Chart')}
