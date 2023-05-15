@@ -84,6 +84,32 @@ jobs:
           mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
           ls dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
 
+  deploy_esm_version_app:
+    runs-on: ubuntu-latest
+
+    env:
+      DIR_NAME: "esm-version-app"
+      ESM_NAME: "@kenyaemr/esm-version-app"
+      JS_NAME: "kenyaemr-esm-version-app.js"
+
+    needs: build
+
+    if: ${{ github.event_name == 'push' }}
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+      
+      - name: Compute Timestamp
+        run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      
+      - name: Prepare Directory
+        shell: bash
+        run: |
+          mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
+          mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+          ls dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+
   pre_release:
     runs-on: ubuntu-latest
 

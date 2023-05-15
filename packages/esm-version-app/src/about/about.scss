@@ -1,0 +1,51 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
+
+.aboutPage {
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  margin: 1rem;
+  flex-direction: column;
+  align-items: center;
+  border: 0.5px solid colors.$gray-30;
+  width: 23rem;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 0.5px solid colors.$gray-30;
+  width: 100%;
+  justify-content: center;
+
+  h3 {
+    @include type.type-style('body-compact-02');
+  }
+
+  h4 {
+    @include type.type-style('body-compact-01');
+  }
+
+  img {
+    margin-left: 0.25rem;
+  }
+}
+
+.aboutBody {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0.25rem;
+
+  & p {
+    @include type.type-style('label-01');
+    margin-bottom: 0.25rem;
+  }
+}

@@ -1,0 +1,19 @@
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.container {
+  position: fixed;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  margin: 0.5rem;
+  background-color: transparent;
+
+  & p {
+    @include type.type-style('label-01');
+    & > span {
+      @include type.type-style('helper-text-01');
+      color: colors.$gray-50;
+    }
+  }
+}

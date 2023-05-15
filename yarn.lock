@@ -2690,6 +2690,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kenyaemr/esm-version-app@workspace:packages/esm-version-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-version-app@workspace:packages/esm-version-app"
+  dependencies:
+    "@carbon/react": ^1.12.0
+    git-describe: ^4.1.1
+    lodash-es: ^4.17.15
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 4.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@leichtgewicht/ip-codec@npm:^2.0.1":
   version: 2.0.4
   resolution: "@leichtgewicht/ip-codec@npm:2.0.4"
@@ -4895,6 +4911,13 @@ __metadata:
   version: 0.16.2
   resolution: "@types/scheduler@npm:0.16.2"
   checksum: b6b4dcfeae6deba2e06a70941860fb1435730576d3689225a421280b7742318d1548b3d22c1f66ab68e414f346a9542f29240bc955b6332c5b11e561077583bc
+  languageName: node
+  linkType: hard
+
+"@types/semver@npm:^7.3.8":
+  version: 7.5.0
+  resolution: "@types/semver@npm:7.5.0"
+  checksum: 0a64b9b9c7424d9a467658b18dd70d1d781c2d6f033096a6e05762d20ebbad23c1b69b0083b0484722aabf35640b78ccc3de26368bcae1129c87e9df028a22e2
   languageName: node
   linkType: hard
 
@@ -10742,6 +10765,20 @@ __metadata:
     image-q: ^4.0.0
     omggif: ^1.0.10
   checksum: f06d74d72d5fd5cfef78935471da06334c23305328fcaa5b1740c6c93b7ce7f775c28e75e166ecb4d7bc9848f767d4d191c8e18a74187543076a44123002f918
+  languageName: node
+  linkType: hard
+
+"git-describe@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "git-describe@npm:4.1.1"
+  dependencies:
+    "@types/semver": ^7.3.8
+    lodash: ^4.17.21
+    semver: ^5.6.0
+  dependenciesMeta:
+    semver:
+      optional: true
+  checksum: 6da8fc43c0de89f328e29194473e5ef19e557dd44405e8ec7685a3464dd06263cb752dc5c60542a4c8531230f46f9d714f675dceb17e1077d9a33b91329f06bb
   languageName: node
   linkType: hard
 
