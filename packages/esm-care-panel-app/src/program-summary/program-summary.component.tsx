@@ -4,18 +4,14 @@ import { useProgramSummary } from '../hooks/useProgramSummary';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { StructuredListSkeleton } from '@carbon/react';
+import { ProgramType } from '../types';
+
 interface ProgramSummaryProps {
   patientUuid: string;
+  programName: string;
 }
 
-enum Program {
-  HIV = 'HIV',
-  TB = 'TB',
-  MCHMOTHER = 'mchMother',
-  MCHCHILD = 'mchChild',
-}
-
-const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid }) => {
+const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programName }) => {
   const { data, isError, isLoading } = useProgramSummary(patientUuid);
   const { t } = useTranslation();
   const isTablet = useLayoutType() == 'tablet';
@@ -36,10 +32,10 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid }) => {
     return (
       <>
         {Object.entries(data).map(([key, val]) =>
-          key == Program.HIV ? (
+          key == ProgramType.HIV && programName == ProgramType.HIV ? (
             <div className={styles.card}>
               <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-                <h4 className={styles.title}> {t('hivCare', 'HIV care')}</h4>
+                <h4 className={styles.title}> {t('currentStatus', 'Current status')}</h4>
               </div>
               <div className={styles.container}>
                 <div className={styles.content}>
@@ -92,7 +88,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid }) => {
                 </div>
               </div>
             </div>
-          ) : key == Program.TB ? (
+          ) : key == ProgramType.TB && programName == ProgramType.TB ? (
             <div className={styles.card}>
               <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
                 <h4 className={styles.title}> {t('tbCare', 'TB care')}</h4>
@@ -138,7 +134,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid }) => {
                 </div>
               </div>
             </div>
-          ) : key == Program.MCHMOTHER ? (
+          ) : key == ProgramType.MCHMOTHER && programName == ProgramType.MCHMOTHER ? (
             <div className={styles.card}>
               <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
                 <h4 className={styles.title}> {t('mchMotherCare', 'MCH Mother care')}</h4>
@@ -163,7 +159,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid }) => {
                 </div>
               </div>
             </div>
-          ) : key == Program.MCHCHILD ? (
+          ) : key == ProgramType.MCHCHILD && programName == ProgramType.MCHCHILD ? (
             <div className={styles.card}>
               <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
                 <h4 className={styles.title}> {t('mchChildCare', 'MCH Child care')}</h4>

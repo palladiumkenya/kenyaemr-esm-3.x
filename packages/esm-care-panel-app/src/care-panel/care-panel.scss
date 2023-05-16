@@ -1,0 +1,50 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.header {
+  @include type.type-style("heading-03");
+  margin: 1rem 0rem 1rem 1.3125rem;
+}
+
+.card {
+  background-color: $ui-02;
+  margin: spacing.$spacing-03;
+}
+
+.tabs {
+  grid-column: 'span 2';
+}
+
+.tab {
+  min-width: 12rem;
+
+  &:active,
+  &:focus {
+    outline: 2px solid var(--brand-03) !important;
+  }
+
+  &[aria-selected='true'] {
+    box-shadow: inset 0 2px 0 0 var(--brand-03) !important;
+  }
+}
+
+.tabPanel {
+  padding: 0;
+  margin: 1rem;
+}
+
+.btnEdit {
+  float: right;
+}
+
+.btnDiscontinue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label {
+  @include type.type-style('heading-02');
+  margin: spacing.$spacing-02;
+}

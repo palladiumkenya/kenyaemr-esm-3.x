@@ -24,7 +24,7 @@ function setupOpenMRS() {
         name: 'patient-program-summary',
         slot: 'top-of-all-patient-dashboards-slot',
         order: 1,
-        load: getAsyncLifecycle(() => import('./program-summary/program-summary.component'), options),
+        load: getAsyncLifecycle(() => import('./care-panel/care-panel.component'), options),
         online: true,
         offline: false,
       },

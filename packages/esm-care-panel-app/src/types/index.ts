@@ -63,3 +63,13 @@ export type ProgramSummary = {
   mchMother?: MCHMotherData;
   mchChild?: MCHChildData;
 };
+
+export enum ProgramType {
+  HIV = 'HIV',
+  TB = 'TB',
+  TPT = 'TPT',
+  MCH_MOTHER = 'MCH - Mother Services',
+  MCH_CHILD = 'MCH - Child Services',
+  MCHMOTHER = 'mchMother',
+  MCHCHILD = 'mchChild',
+}
