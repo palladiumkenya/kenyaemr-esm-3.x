@@ -23,6 +23,7 @@ function setupOpenMRS() {
       {
         name: 'patient-flag',
         slot: 'top-of-all-patient-dashboards-slot',
+        order: 0,
         load: getAsyncLifecycle(() => import('./patient-flags/patient-flags.component'), options),
         online: true,
         offline: false,
