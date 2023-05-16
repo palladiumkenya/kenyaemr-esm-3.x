@@ -2675,6 +2675,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kenyaemr/esm-care-panels-app@workspace:packages/esm-care-panels-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-care-panels-app@workspace:packages/esm-care-panels-app"
+  dependencies:
+    "@carbon/react": ^1.12.0
+    lodash-es: ^4.17.15
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 4.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app":
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app"
