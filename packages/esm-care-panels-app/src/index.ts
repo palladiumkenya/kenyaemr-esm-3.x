@@ -22,8 +22,15 @@ function setupOpenMRS() {
     extensions: [
       {
         name: 'patient-care-panels',
-        slot: 'top-of-all-patient-dashboards-slot',
+        slot: '1',
         load: getAsyncLifecycle(() => import('./care-panels/care-panels.component'), options),
+        online: true,
+        offline: false
+      },
+      {
+        name: 'patient-hiv-summary',
+        slot: 'top-of-all-patient-dashboards-slot',
+        load: getAsyncLifecycle(() => import('./hiv-summary/hiv-summary.component'), options),
         online: true,
         offline: false
       }

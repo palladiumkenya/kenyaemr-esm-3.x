@@ -1,0 +1,28 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.title {
+  @include type.type-style("heading-03");
+  padding: 1rem 0rem 1rem 1.3125rem;
+}
+
+.card {
+  background-color: $ui-02;
+  padding: spacing.$spacing-03;
+}
+
+.list {
+  li {
+    padding: spacing.$spacing-03;
+  }
+}
+
+ul li span {
+  float: left;
+  width: 9rem;
+}
+
+.label {
+  font-weight: bold;
+}
