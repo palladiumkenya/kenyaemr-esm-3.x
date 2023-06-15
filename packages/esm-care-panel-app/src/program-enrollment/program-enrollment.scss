@@ -21,7 +21,8 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-02;
+  margin-top: spacing.$spacing-02;
 
   h4:after {
     content: '';
@@ -42,16 +43,20 @@
 
 .card {
   background-color: $ui-02;
-  padding-bottom: spacing.$spacing-04;
+  margin-top: spacing.$spacing-03;
+  background-color: #f4f4f4;
 }
 
-.label {
-  font-weight: bold;
-  @include type.type-style('label-01');
-  color: colors.$gray-70;
+.btnEdit {
+  margin-left: auto;
 }
 
-.container {
+.btnDiscontinue {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.labelContainer {
   display: flex;
   flex-direction: row;
   padding-left: 1rem;
