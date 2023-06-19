@@ -3,6 +3,10 @@ import { configSchema } from './config-schema';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const backendDependencies = {
   kenyaemr: '^18.2.0',
 };
@@ -37,4 +41,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };
