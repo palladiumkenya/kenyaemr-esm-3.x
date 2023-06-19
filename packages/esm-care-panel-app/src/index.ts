@@ -28,6 +28,14 @@ function setupOpenMRS() {
         online: true,
         offline: false,
       },
+      {
+        name: 'patient-summary',
+        slot: 'top-of-all-patient-dashboards-slot',
+        order: 2,
+        load: getAsyncLifecycle(() => import('./patient-summary/patient-summary.component'), options),
+        online: true,
+        offline: false,
+      }
     ],
   };
 }

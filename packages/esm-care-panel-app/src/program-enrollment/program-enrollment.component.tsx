@@ -65,7 +65,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
                           program.enrollmentEncounterUuid,
                         )
                       }
-                      kind="ghost"
+                      kind="tertiary"
                       renderIcon={(props) => <Edit size={16} {...props} />}>
                       {t('edit', 'Edit')}{' '}
                     </Button>
