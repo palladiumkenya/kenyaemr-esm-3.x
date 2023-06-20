@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './patient-summary.scss';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, useSession } from '@openmrs/esm-framework';
 import { StructuredListSkeleton, Button } from '@carbon/react';
 import { usePatientSummary } from '../hooks/usePatientSummary';
 import { Printer } from '@carbon/react/icons';
+import { useReactToPrint } from 'react-to-print';
+import PrintComponent from '../print-layout/print.component';
 
 interface PatientSummaryProps {
   patientUuid: string;
@@ -12,10 +14,26 @@ interface PatientSummaryProps {
 
 const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
   const { data, isError, isLoading } = usePatientSummary(patientUuid);
+  const currentUserSession = useSession();
+  const componentRef = useRef(null);
+  const [printMode, setPrintMode] = useState(false);
 
-  console.log('data', data);
   const { t } = useTranslation();
   const isTablet = useLayoutType() == 'tablet';
+
+  const printRef = useReactToPrint({
+    content: () => componentRef.current,
+    onBeforeGetContent: () => setPrintMode(true),
+    onAfterPrint: () => setPrintMode(false),
+    pageStyle: styles.pageStyle,
+    documentTitle: data?.patientName,
+  });
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const handlePrint = async () => {
+    await delay(500);
+    printRef();
+  };
 
   if (isLoading) {
     return <StructuredListSkeleton role="progressbar" />;
@@ -31,17 +49,24 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
 
   if (Object.keys(data).length > 0) {
     return (
-      <div className={styles.bodyContainer}>
+      <div className={styles.bodyContainer} ref={componentRef}>
+        {printMode === true && <PrintComponent />}
         <div className={styles.card}>
           <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
             <h4 className={styles.title}> {t('patientSummary', 'Patient summary')}</h4>
-            <Button
-              size="sm"
-              kind="tertiary"
-              renderIcon={(props) => <Printer size={16} {...props} />}
-              iconDescription={t('print', 'Print')}>
-              {t('print', 'Print')}
-            </Button>
+            {printMode === false && (
+              <Button
+                size="sm"
+                className={styles.btnShow}
+                onClick={() => {
+                  handlePrint(), setPrintMode(true);
+                }}
+                kind="tertiary"
+                renderIcon={(props) => <Printer size={16} {...props} />}
+                iconDescription={t('print', 'Print')}>
+                {t('print', 'Print')}
+              </Button>
+            )}
           </div>
           <div className={styles.container}>
             <div className={styles.content}>
@@ -72,20 +97,28 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               </p>
             </div>
             <div className={styles.content}>
+              <p className={styles.label}>
+                {t('nationalUniquePatientIdentifier', 'National unique patient identifier')}
+              </p>
+              <p>
+                <span className={styles.value}>{data?.nationalUniquePatientIdentifier}</span>
+              </p>
+            </div>
+            <div className={styles.content}>
               <p className={styles.label}>{t('patientName', 'Patient name')}</p>
               <p>
                 <span className={styles.value}>{data?.patientName}</span>
               </p>
             </div>
+          </div>
+
+          <div className={styles.container}>
             <div className={styles.content}>
               <p className={styles.label}>{t('birthDate', 'Birth date')}</p>
               <p>
                 <span className={styles.value}>{data?.birthDate}</span>
               </p>
             </div>
-          </div>
-
-          <div className={styles.container}>
             <div className={styles.content}>
               <p className={styles.label}>{t('age', 'Age')}</p>
               <p>
@@ -100,6 +133,9 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                 </span>
               </p>
             </div>
+          </div>
+
+          <div className={styles.container}>
             <div className={styles.content}>
               <p className={styles.label}>{t('maritalStatus', 'Marital status')}</p>
               <p>
@@ -270,20 +306,20 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             )}
 
             <div className={styles.content}>
-              <p>{t('dateEnrolledInTb', 'TPT start date')}</p>
+              <p className={styles.label}>{t('dateEnrolledInTb', 'TPT start date')}</p>
               <p>
                 <span className={styles.value}>{data?.dateEnrolledInTb}</span>
               </p>
             </div>
             <div className={styles.content}>
-              <p>{t('dateCompletedInTb', 'TPT completion date')}</p>
+              <p className={styles.label}>{t('dateCompletedInTb', 'TPT completion date')}</p>
               <p>
                 <span className={styles.value}>{data?.dateCompletedInTb}</span>
               </p>
             </div>
             {data?.gender === 'F' && (
               <div className={styles.content}>
-                <p>{t('lmp', 'LMP')}</p>
+                <p className={styles.label}>{t('lmp', 'LMP')}</p>
                 <p>
                   <span className={styles.value}>{data?.lmp}</span>
                 </p>
@@ -343,7 +379,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('clinicalStageART', 'Clinical stage at ART')}</p>
               <p>
-                <span className={styles.value}>{data?.whoStageAtArtStart}</span>
+                <span className={styles.value}>{data?.whoStageAtArtStart ? data?.whoStageAtArtStart : '--'}</span>
               </p>
             </div>
           </div>
@@ -364,7 +400,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('cd4AtArtStart', 'CD4 at ART start')}</p>
               <p>
-                <span className={styles.value}>{data?.cd4AtArtStart}</span>
+                <span className={styles.value}>{data?.cd4AtArtStart ? data?.cd4AtArtStart : '--'}</span>
               </p>
             </div>
           </div>
@@ -380,6 +416,153 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               <p className={styles.label}>{t('currentArtRegimen', 'Current Art regimen')}</p>
               <p>
                 <span className={styles.value}>{data?.currentArtRegimen}</span>
+              </p>
+            </div>
+          </div>
+
+          <hr />
+
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('artInterruptionReason', 'ART interruptions reason')}</p>
+              <p>
+                <span className={styles.value}>--</span>
+                <span className={styles.label}> </span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>
+                {t('substitutionWithin1stLineRegimen', 'Substitution within 1st line regimen')}
+              </p>
+              <p>
+                <span className={styles.value}>--</span>
+                <span className={styles.label}> </span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('switchTo2ndLineRegimen', 'Switch to 2nd line regimen')}</p>
+              <p>
+                <span className={styles.value}>--</span>
+                <span className={styles.label}> </span>
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('Dapsone', 'Dapsone')}</p>
+              <p>
+                <span className={styles.value}>{data?.dapsone}</span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('tpt', 'TPT')}</p>
+              <p>
+                <span className={styles.value}>{data?.onIpt}</span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('clinicsEnrolled', 'Clinics enrolled')}</p>
+              <p>
+                <span className={styles.value}>{data?.clinicsEnrolled}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('transferOutDate', 'Transfer out date')}</p>
+              <p>
+                <span className={styles.value}>{data?.transferOutDate}</span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('transferOutFacility', 'Transfer out facility')}</p>
+              <p>
+                <span className={styles.value}>{data?.transferOutFacility}</span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('deathDate', 'Death date')}</p>
+              <p>
+                <span className={styles.value}>{data?.deathDate}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('mostRecentCD4', 'Most recent CD4')}</p>
+              <p>
+                <span className={styles.value}>{data?.mostRecentCd4 ? data?.mostRecentCd4 : '--'}</span>
+                <span> {data?.mostRecentCd4Date ? data?.mostRecentCd4Date : null} </span> <br />
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('mostRecentVL', 'Most recent VL')}</p>
+              <p>
+                <span className={styles.value}>{data?.viralLoadValue}</span>{' '}
+                <span className={styles.label}> ({data?.viralLoadDate})</span> <br />
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('nextAppointmentDate', '	Next appointment')}</p>
+              <p>
+                <span className={styles.value}>{data?.nextAppointmentDate}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('viralLoadTrends', 'Viral load trends')}</p>
+              {data?.allVlResults?.value?.length > 0
+                ? data?.allVlResults?.value?.map((vl) => {
+                    return (
+                      <>
+                        <span className={styles.value}> {vl.vl} </span>
+                        <span className={styles.label}> ({vl.vlDate}) </span>
+                        <br />
+                      </>
+                    );
+                  })
+                : '--'}
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('cd4Trends', 'CD4 Trends')}</p>
+              {data?.allCd4CountResults?.length > 0
+                ? data?.allCd4CountResults?.map((cd4) => {
+                    return (
+                      <>
+                        <span className={styles.value}> {cd4.cd4Count} </span>
+                        <span> {cd4.cd4CountDate}</span>
+                        <br />
+                      </>
+                    );
+                  })
+                : '--'}
+            </div>
+          </div>
+
+          <hr />
+
+          <div className={styles.container}>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('clinicalNotes', 'Clinical notes')}</p>
+              <p>
+                <span className={styles.value}>--</span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('clinicianName', 'Clinician name')}</p>
+              <p>
+                <span className={styles.value}>{currentUserSession?.user?.person?.display}</span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('clinicianSignature', 'Clinician signature')}</p>
+              <p>
+                <span className={styles.value}>{currentUserSession?.user?.person?.display}</span>
               </p>
             </div>
           </div>

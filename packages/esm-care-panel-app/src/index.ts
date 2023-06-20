@@ -35,7 +35,7 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(() => import('./patient-summary/patient-summary.component'), options),
         online: true,
         offline: false,
-      }
+      },
     ],
   };
 }

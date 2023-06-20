@@ -83,6 +83,7 @@ export type PatientSummary = {
   age: string;
   gender: string;
   uniquePatientIdentifier: string;
+  nationalUniquePatientIdentifier: string;
   maritalStatus: string;
   height: string;
   weight: string;
@@ -136,6 +137,20 @@ export type PatientSummary = {
   transferOutFacility: string;
   viralLoadValue: string;
   viralLoadDate: string;
-  allCd4CountResults: string[];
+  allCd4CountResults: Array<cd4Results>;
+  allVlResults: vlResults;
 };
 
+type cd4Results = {
+  cd4Count: string;
+  cd4CountDate: string;
+};
+
+type vlResults = {
+  value: Array<vl>;
+};
+
+type vl = {
+  vl?: string;
+  vlDate?: string;
+};
