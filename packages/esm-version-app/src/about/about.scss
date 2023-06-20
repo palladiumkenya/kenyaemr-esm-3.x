@@ -2,9 +2,16 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/colors';
 
+.main {
+  display: flex;
+  justify-items: center;
+  flex-direction: column;
+}
+
 .aboutPage {
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .container {
