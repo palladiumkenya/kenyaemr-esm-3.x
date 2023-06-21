@@ -2675,6 +2675,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@kenyaemr/esm-care-panel-app@workspace:packages/esm-care-panel-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-care-panel-app@workspace:packages/esm-care-panel-app"
+  dependencies:
+    "@carbon/react": ^1.12.0
+    lodash-es: ^4.17.15
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 4.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app":
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app"
@@ -3972,6 +3987,7 @@ __metadata:
     react-dom: ^18.1.0
     react-i18next: ^11.0.0
     react-router-dom: ^6.3.0
+    react-to-print: ^2.14.13
     sass: ^1.29.0
     sass-loader: ^10.1.0
     swr: ^2.0.1
@@ -16857,6 +16873,16 @@ __metadata:
   peerDependencies:
     react: ">=16.8"
   checksum: b89c0495c6837b1457915c08c5acc4eb7a2e9e3fae0420faf9bfc6311ecdfe78627cc1034c0e975bccd9aeeb70d1dcc5021322779dd3053d94c47e37339d77eb
+  languageName: node
+  linkType: hard
+
+"react-to-print@npm:^2.14.13":
+  version: 2.14.13
+  resolution: "react-to-print@npm:2.14.13"
+  peerDependencies:
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: b233eda519f34ee030529e41c1421bdfb40c454562439f5c3af8a8052cb4a285c30066aebf0cb34b9733be7d7afc250927fa27cb7c52e2fc5ff9f2eddee47e88
   languageName: node
   linkType: hard
 
