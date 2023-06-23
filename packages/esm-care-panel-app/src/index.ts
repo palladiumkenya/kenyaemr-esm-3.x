@@ -22,17 +22,23 @@ function setupOpenMRS() {
     extensions: [
       {
         name: 'patient-program-summary',
-        slot: 'top-of-all-patient-dashboards-slot',
+        slot: 'patient-chart-summary-dashboard-slot',
         order: 1,
         load: getAsyncLifecycle(() => import('./care-panel/care-panel.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
         online: true,
         offline: false,
       },
       {
         name: 'patient-summary',
-        slot: 'top-of-all-patient-dashboards-slot',
+        slot: 'patient-chart-summary-dashboard-slot',
         order: 2,
         load: getAsyncLifecycle(() => import('./patient-summary/patient-summary.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
         online: true,
         offline: false,
       },
