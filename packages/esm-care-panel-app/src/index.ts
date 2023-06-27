@@ -1,38 +1,19 @@
-import { getAsyncLifecycle, defineConfigSchema } from '@openmrs/esm-framework';
+import { getAsyncLifecycle, defineConfigSchema, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+const moduleName = '@kenyaemr/esm-care-panel-app';
 
-const backendDependencies = {
-  kenyaemr: '^18.2.0',
+const options = {
+  featureName: 'patient-care-panels',
+  moduleName,
 };
+export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-function setupOpenMRS() {
-  const moduleName = '@kenyaemr/esm-care-panel-app';
+export const patientProgramSummary = getAsyncLifecycle(() => import('./care-panel/care-panel.component'), options);
 
-  const options = {
-    featureName: 'patient-care-panels',
-    moduleName,
-  };
+export const patientSummary = getAsyncLifecycle(() => import('./patient-summary/patient-summary.component'), options);
 
+export function startupApp() {
+  registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
-
-  return {
-    pages: [],
-    extensions: [
-      {
-        name: 'patient-program-summary',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 1,
-        load: getAsyncLifecycle(() => import('./care-panel/care-panel.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: true,
-        offline: false,
-      },
-    ],
-  };
 }
-
-export { backendDependencies, importTranslation, setupOpenMRS };

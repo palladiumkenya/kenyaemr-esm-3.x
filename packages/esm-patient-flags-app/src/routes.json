@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "kenyaemr": "^18.2.0"
+  },
+  "pages": [],
+  "extensions": [
+    {
+      "name": "patient-flag",
+      "slot": "top-of-all-patient-dashboards-slot",
+      "component": "patientFlag",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "kenyaemr-home-link",
+      "slot": "app-menu-slot",
+      "component": "kenyaemrHomeLink",
+      "online": true,
+      "offline": false,
+      "order": 0
+    },
+    {
+      "name": "kenyaemr-2.x-chart-link",
+      "slot": "visit-header-right-slot",
+      "component": "kenyaemr2ChartLink",
+      "online": true,
+      "offline": true
+    }
+  ]
+}
