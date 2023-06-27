@@ -6,7 +6,6 @@ import { Edit } from '@carbon/react/icons';
 import { useLayoutType, useVisit } from '@openmrs/esm-framework';
 import isNull from 'lodash-es/isNull';
 import { ProgramType } from '../types';
-
 interface ProgramEnrollmentProps {
   patientUuid: string;
   programName: string;
@@ -14,7 +13,6 @@ interface ProgramEnrollmentProps {
   formEntrySub: any;
   launchPatientWorkspace: Function;
 }
-
 const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
   patientUuid,
   programName,
@@ -36,11 +34,9 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
       visit: currentVisit,
     });
   };
-
   if (isNull(data)) {
     return;
   }
-
   return (
     <div>
       <section>
@@ -88,13 +84,13 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
                         <div className={styles.content}>
                           <p>{t('whoStage', 'WHO Stage')}</p>
                           <p>
-                            <span className={styles.value}>{program?.whoStage}</span>
+                            <span className={styles.value}>{program?.whoStage ? program?.whoStage : '--'}</span>
                           </p>
                         </div>
                         <div className={styles.content}>
                           <p>{t('entryPoint', 'Entry point')}</p>
                           <p>
-                            <span className={styles.value}>{program?.entryPoint}</span>
+                            <span className={styles.value}>{program?.entryPoint ? program?.entryPoint : '--'}</span>
                           </p>
                         </div>
                       </>
@@ -177,7 +173,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
                   <div className={styles.labelContainer}>
                     <div className={styles.content}>
                       <p className={styles.label}>{t('completed', 'Completed')}</p>
-                      <span className={styles.value}>{program?.dateCompleted}</span>
+                      <span className={styles.value}>{program?.dateCompleted ? program?.dateCompleted : '--'}</span>
                     </div>
                     {program.programName === ProgramType.HIV ? (
                       <>
@@ -239,5 +235,4 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
     </div>
   );
 };
-
 export default ProgramEnrollment;
