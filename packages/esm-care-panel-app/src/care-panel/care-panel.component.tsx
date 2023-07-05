@@ -6,6 +6,7 @@ import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import isNull from 'lodash-es/isNull';
 import ProgramSummary from '../program-summary/program-summary.component';
 import ProgramEnrollment from '../program-enrollment/program-enrollment.component';
+import PatientSummary from '../patient-summary/patient-summary.component';
 
 interface CarePanelProps {
   patientUuid: string;
@@ -17,7 +18,8 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   const { t } = useTranslation();
   const { data, isLoading, isError } = useEnrollmentHistory(patientUuid);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  const patientPrograms = [...new Set(data?.map((program) => program.programName))];
+  let patientPrograms = [...new Set(data?.map((program) => program.programName))];
+  patientPrograms.unshift('Summary');
 
   useEffect(() => {
     setActiveTabIndex(activeTabIndex);
@@ -51,14 +53,20 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
           : null}
       </ContentSwitcher>
       <Tile className={styles.card}>
-        <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
-        <ProgramEnrollment
-          patientUuid={patientUuid}
-          programName={patientPrograms[activeTabIndex]}
-          data={data}
-          formEntrySub={formEntrySub}
-          launchPatientWorkspace={launchPatientWorkspace}
-        />
+        {activeTabIndex === 0 ? (
+          <PatientSummary patientUuid={patientUuid} />
+        ) : (
+          <div>
+            <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
+            <ProgramEnrollment
+              patientUuid={patientUuid}
+              programName={patientPrograms[activeTabIndex]}
+              data={data}
+              formEntrySub={formEntrySub}
+              launchPatientWorkspace={launchPatientWorkspace}
+            />
+          </div>
+        )}
       </Tile>
     </div>
   );
