@@ -31,17 +31,6 @@ function setupOpenMRS() {
         online: true,
         offline: false,
       },
-      {
-        name: 'patient-summary',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 2,
-        load: getAsyncLifecycle(() => import('./patient-summary/patient-summary.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: true,
-        offline: false,
-      },
     ],
   };
 }
