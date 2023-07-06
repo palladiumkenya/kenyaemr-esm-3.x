@@ -1,17 +1,14 @@
 :wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher: 
 
-![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-management/actions/workflows/ci.yml/badge.svg)
+![Node.js CI](https://github.com/palladiumkenya/kenyaemr-esm-3.x/actions/workflows/ci.yml/badge.svg)
 
-# OpenMRS Patient Management
+# KenyaEMR 3.x custom packages
 
-This repository contains frontend modules for the OpenMRS SPA. These modules relate to registering and editing patients, searching for existing patients, creating and managing patient lists, managing patient queues in an outpatient setting and creating, editing and managing patient appointments. The modules within this repository include:
+This repository contains frontend modules for the KenyaEMR 3.x. These modules relate to patient-flags, versioning and care-panels. The modules within this repository include:
 
-- [Active visits app](packages/esm-active-visits-app/)
-- [Appointments app](packages/esm-appointments-app/)
-- [Outpatient app](packages/esm-outpatient-app/README.md)
-- [Patient search](packages/esm-patient-search-app)
-- [Patient registration](packages/esm-patient-registration-app)
-- [Patient list](packages/esm-patient-list-app)
+- [Patient flags](packages/esm-patient-flags-app/)
+- [Care panels](packages/esm-care-panel-app/)
+- [Version](packages/esm-version-app)
 
 ## Setup
 
