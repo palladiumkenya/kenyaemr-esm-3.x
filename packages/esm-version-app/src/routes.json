@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "kenyaemr": "^18.2.0"
+  },
+  "pages": [
+    {
+      "component": "about",
+      "route": "about",
+      "online": true,
+      "offline": true
+    }
+  ],
+  "extensions": [
+    {
+      "name": "about--link",
+      "slot": "app-menu-slot",
+      "component": "aboutLink",
+      "order": 0
+    }
+  ]
+}
