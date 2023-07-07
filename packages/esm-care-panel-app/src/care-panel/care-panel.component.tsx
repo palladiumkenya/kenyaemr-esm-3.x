@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Tile, StructuredListSkeleton, ContentSwitcher, Switch } from '@carbon/react';
 import styles from './care-panel.scss';
 import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
-import isNull from 'lodash-es/isNull';
 import ProgramSummary from '../program-summary/program-summary.component';
 import ProgramEnrollment from '../program-enrollment/program-enrollment.component';
 import PatientSummary from '../patient-summary/patient-summary.component';
@@ -33,7 +32,7 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
     return <span>{t('errorProgramEnrollment', 'Error loading program enrollments')}</span>;
   }
 
-  if (isNull(data)) {
+  if (data?.length === 0) {
     return;
   }
 
