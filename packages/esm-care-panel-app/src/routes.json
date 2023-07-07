@@ -13,15 +13,6 @@
       "meta": {
         "columnSpan": 4
       }
-    },
-    {
-      "name": "patient-summary",
-      "slot": "patient-chart-summary-dashboard-slot",
-      "component": "patientSummary",
-      "order": 2,
-      "meta": {
-        "columnSpan": 4
-      }
     }
   ]
 }
