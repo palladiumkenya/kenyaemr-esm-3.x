@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
-    "ci:publish": "lerna publish from-package --yes",
+    "ci:publish": "lerna publish from-package --yes --no-git-reset --yes",
     "coverage": "yarn test --coverage",
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
