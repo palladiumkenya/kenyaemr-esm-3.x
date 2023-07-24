@@ -6,6 +6,28 @@
   "pages": [],
   "extensions": [
     {
+      "name": "care-panel-patient-summary",
+      "component": "carePanelPatientSummary",
+      "slot": "patient-chart-care-panel-dashboard-slot",
+      "order": 10,
+      "meta": {
+        "columnSpan": 4
+      }
+    },
+    {
+      "name": "care-panel-summary-dashboard-link",
+      "component": "carePanelSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 11,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-care-panel-dashboard-slot",
+        "title": "Care panel summary",
+        "path": "Care panel"
+      }
+    },
+    {
       "name": "patient-program-summary",
       "slot": "patient-chart-summary-dashboard-slot",
       "component": "patientProgramSummary",

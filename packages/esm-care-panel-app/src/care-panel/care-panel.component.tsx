@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile, StructuredListSkeleton, ContentSwitcher, Switch } from '@carbon/react';
+import { Tile, StructuredListSkeleton, ContentSwitcher, Switch, InlineLoading } from '@carbon/react';
 import styles from './care-panel.scss';
 import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import ProgramSummary from '../program-summary/program-summary.component';
 import ProgramEnrollment from '../program-enrollment/program-enrollment.component';
 import PatientSummary from '../patient-summary/patient-summary.component';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 
 interface CarePanelProps {
   patientUuid: string;
@@ -17,8 +18,7 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   const { t } = useTranslation();
   const { data, isLoading, isError } = useEnrollmentHistory(patientUuid);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  let patientPrograms = [...new Set(data?.map((program) => program.programName))];
-  patientPrograms.unshift('Summary');
+  const patientPrograms = [...new Set(data?.map((program) => program.programName))];
 
   useEffect(() => {
     setActiveTabIndex(activeTabIndex);
@@ -37,36 +37,36 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   }
 
   return (
-    <div>
-      <h1 className={styles.header}>{t('carePanels', 'Care panels')}</h1>
-      <ContentSwitcher
-        size="sm"
-        selectedIndex={0}
-        onChange={({ index }) => {
-          setActiveTabIndex(index as number);
-        }}>
-        {patientPrograms?.length > 0
-          ? patientPrograms.map((index, val) => {
-              return <Switch name={index} text={index} key={val} value={val} />;
-            })
-          : null}
-      </ContentSwitcher>
-      <Tile className={styles.card}>
-        {activeTabIndex === 0 ? (
-          <PatientSummary patientUuid={patientUuid} />
-        ) : (
-          <div>
-            <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
-            <ProgramEnrollment
-              patientUuid={patientUuid}
-              programName={patientPrograms[activeTabIndex]}
-              data={data}
-              formEntrySub={formEntrySub}
-              launchPatientWorkspace={launchPatientWorkspace}
-            />
-          </div>
-        )}
-      </Tile>
+    <div className={styles.widgetCard}>
+      <CardHeader title={t('carePanel', 'Care Panel')}>
+        {isLoading ? (
+          <span>
+            <InlineLoading />
+          </span>
+        ) : null}
+        <div className={styles.contextSwitcherContainer}>
+          <ContentSwitcher
+            size="sm"
+            selectedIndex={0}
+            onChange={({ index }) => {
+              setActiveTabIndex(index as number);
+            }}>
+            {patientPrograms?.length > 0
+              ? patientPrograms.map((index, val) => <Switch name={index} text={index} key={val} value={val} />)
+              : null}
+          </ContentSwitcher>
+        </div>
+      </CardHeader>
+      <div style={{ width: '100%' }}>
+        <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
+        <ProgramEnrollment
+          patientUuid={patientUuid}
+          programName={patientPrograms[activeTabIndex]}
+          data={data}
+          formEntrySub={formEntrySub}
+          launchPatientWorkspace={launchPatientWorkspace}
+        />
+      </div>
     </div>
   );
 };

@@ -1,5 +1,7 @@
-import { getAsyncLifecycle, defineConfigSchema, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { getAsyncLifecycle, defineConfigSchema, registerBreadcrumbs, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import { dashboardMeta } from './dashboard.meta';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 const moduleName = '@kenyaemr/esm-care-panel-app';
 
@@ -11,7 +13,15 @@ export const importTranslation = require.context('../translations', false, /.jso
 
 export const patientProgramSummary = getAsyncLifecycle(() => import('./care-panel/care-panel.component'), options);
 
-export const patientSummary = getAsyncLifecycle(() => import('./patient-summary/patient-summary.component'), options);
+export const carePanelPatientSummary = getAsyncLifecycle(
+  () => import('./patient-summary/patient-summary.component'),
+  options,
+);
+// t('carePanel', 'Care panel')
+export const carePanelSummaryDashboardLink = getSyncLifecycle(
+  createDashboardLink({ ...dashboardMeta, moduleName }),
+  options,
+);
 
 export function startupApp() {
   registerBreadcrumbs([]);
