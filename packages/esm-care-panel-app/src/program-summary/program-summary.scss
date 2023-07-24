@@ -21,15 +21,6 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
-  margin-bottom: spacing.$spacing-05;
-
-  h4:after {
-    content: '';
-    display: block;
-    width: 2rem;
-    padding-top: 0.188rem;
-    border-bottom: 0.375rem solid var(--brand-03);
-  }
 }
 
 .heading:after {
@@ -43,6 +34,12 @@
 .card {
   background-color: $ui-02;
   padding-bottom: spacing.$spacing-04;
+}
+
+.title {
+  @include type.type-style('productive-heading-03');
+  color: colors.$gray-100;
+  margin-left: spacing.$spacing-05;
 }
 
 .label {
@@ -59,12 +56,22 @@
 }
 
 .value {
-  @include type.type-style('productive-heading-03');
+  @include type.type-style('body-short-02');
   color: colors.$gray-100;
 }
 
 .content {
-  margin-top: spacing.$spacing-05;
   width: 30%;
-  margin-left: spacing.$spacing-03;
+  margin: spacing.$spacing-03 0;
+
+  & > p:first-child {
+    @include type.type-style('label-01');
+    color: colors.$gray-70;
+    margin-bottom: spacing.$spacing-02;
+  }
+
+  & span {
+    @include type.type-style('body-short-02');
+    color: colors.$gray-100;
+  }
 }
