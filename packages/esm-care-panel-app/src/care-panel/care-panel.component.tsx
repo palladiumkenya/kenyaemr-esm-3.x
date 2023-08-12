@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile, StructuredListSkeleton, ContentSwitcher, Switch, InlineLoading } from '@carbon/react';
+import { StructuredListSkeleton, ContentSwitcher, Switch, InlineLoading } from '@carbon/react';
 import styles from './care-panel.scss';
 import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import ProgramSummary from '../program-summary/program-summary.component';
 import ProgramEnrollment from '../program-enrollment/program-enrollment.component';
-import PatientSummary from '../patient-summary/patient-summary.component';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 
 interface CarePanelProps {

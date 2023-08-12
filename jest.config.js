@@ -11,6 +11,7 @@ module.exports = {
     '@openmrs/esm-framework': '@openmrs/esm-framework/mock',
     '^lodash-es/(.*)$': 'lodash/$1',
     '^dexie$': require.resolve('dexie'),
+    '^uuid$': '<rootDir>/node_modules/@openmrs/esm-patient-common-lib/node_modules/uuid/dist/index.js',
   },
   collectCoverageFrom: [
     '**/src/**/*.component.tsx',

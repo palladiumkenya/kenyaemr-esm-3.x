@@ -7,6 +7,12 @@ declare global {
   }
 }
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, defaultNameSpace: string) => defaultNameSpace,
+  }),
+}));
+
 window.openmrsBase = '/openmrs';
 window.spaBase = '/spa';
 window.getOpenmrsSpaBase = () => '/openmrs/spa/';
