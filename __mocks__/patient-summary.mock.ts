@@ -10,6 +10,15 @@ export const mockPatient = {
   birthDate: '1990-01-01',
   gender: 'M',
   maritalStatus: 'Married',
+  weight: '70 kg',
+  height: '180 cm',
+  bmi: '24.5',
+  bloodPressure: '120/80 mmHg',
+  oxygenSaturation: '98%',
+  respiratoryRate: '16 breaths per minute',
+  pulseRate: '72 beats per minute',
+  familyProtection: 'Intrauterine Device (IUD)',
+  tbScreeningOutcome: 'Negative',
   allVlResults: {
     value: [
       { vl: '120', vlDate: '2023-06-01' },

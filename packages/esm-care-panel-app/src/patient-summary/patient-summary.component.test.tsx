@@ -42,9 +42,22 @@ describe('PatientSummary', () => {
     render(<PatientSummary patientUuid={mockPatient.uuid} />);
     expect(screen.getByText(mockPatient.patientName)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.birthDate)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.reportDate)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.age)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.maritalStatus)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.mflCode)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.clinicName)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.nationalUniquePatientIdentifier)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.weight)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.height)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.bmi)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.bloodPressure)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.oxygenSaturation)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.pulseRate)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.familyProtection)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.respiratoryRate)).toBeInTheDocument();
+    expect(screen.getByText(mockPatient.tbScreeningOutcome)).toBeInTheDocument();
+    // TODO: Extend the test to check all the values
   });
 
   it('triggers print when print button is clicked', async () => {
