@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import styles from './patient-summary.scss';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType, useSession } from '@openmrs/esm-framework';

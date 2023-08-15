@@ -6,7 +6,7 @@ import { Edit, TrashCan, Add } from '@carbon/react/icons';
 import { useLayoutType, useVisit } from '@openmrs/esm-framework';
 import isNull from 'lodash-es/isNull';
 import { ProgramType } from '../types';
-interface ProgramEnrollmentProps {
+export interface ProgramEnrollmentProps {
   patientUuid: string;
   programName: string;
   data: Array<any>;

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { StructuredListSkeleton } from '@carbon/react';
 import { ProgramType } from '../types';
-interface ProgramSummaryProps {
+export interface ProgramSummaryProps {
   patientUuid: string;
   programName: string;
 }
