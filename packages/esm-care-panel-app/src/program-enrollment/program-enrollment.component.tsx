@@ -78,7 +78,11 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
                 </div>
                 <div className={styles.labelContainer}>
                   <div className={styles.content}>
-                    <p>{t('enrolled', 'Enrolled')}</p>
+                    {program.programName === ProgramType.TPT ? (
+                      <p>{t('initiated', 'Initiated')}</p>
+                    ) : (
+                      <p>{t('enrolled', 'Enrolled')}</p>
+                    )}
                     <span className={styles.value}>{program?.dateEnrolled}</span>
                   </div>
                   {program.programName === ProgramType.HIV ? (
@@ -93,6 +97,30 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
                         <p>{t('entryPoint', 'Entry point')}</p>
                         <p>
                           <span className={styles.value}>{program?.entryPoint ? program?.entryPoint : '--'}</span>
+                        </p>
+                      </div>
+                      <div className={styles.content}>
+                        <p>{t('dateStartedOnArt', 'Date started on ART')}</p>
+                        <p>
+                          <span className={styles.value}>{program?.artStartDate ? program?.artStartDate : '--'}</span>
+                        </p>
+                      </div>
+                      <div className={styles.content}>
+                        <p>{t('regimen', 'Regimen')}</p>
+                        <p>
+                          <span className={styles.value}>
+                            {program?.firstEncounter?.regimenShortDisplay
+                              ? program?.firstEncounter?.regimenShortDisplay
+                              : '--'}{' '}
+                          </span>
+                        </p>
+                      </div>
+                      <div className={styles.content}>
+                        <p>{t('regimenStartDate', ' Date started regimen')}</p>
+                        <p>
+                          <span className={styles.value}>
+                            {program?.firstEncounter?.startDate ? program?.firstEncounter?.startDate : '--'}
+                          </span>
                         </p>
                       </div>
                     </>
@@ -130,12 +158,47 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
                     </div>
                   ) : null}
                   {program.programName === ProgramType.TPT ? (
-                    <div className={styles.content}>
-                      <p>{t('indicationForTpt', 'Indication for TPT')} </p>
-                      <span className={styles.value}>
-                        {program?.tptIndication ? program?.tptIndication : '--'}
-                      </span>{' '}
-                    </div>
+                    <>
+                      <div className={styles.content}>
+                        <p>{t('indicationForTpt', 'Indication for TPT')} </p>
+                        <span className={styles.value}>
+                          {program?.tptIndication ? program?.tptIndication : '--'}
+                        </span>{' '}
+                      </div>
+                      <div className={styles.content}>
+                        <p>{t('regimen', 'Regimen')}</p>
+                        <span className={styles.value}>{program?.tptDrugName ? program?.tptDrugName : '--'}</span>
+                      </div>
+                      <div className={styles.content}>
+                        <p>{t('regimenStartDate', ' Date started regimen')}</p>
+                        <span className={styles.value}>
+                          {program?.tptDrugStartDate ? program?.tptDrugStartDate : '--'}
+                        </span>
+                      </div>
+                    </>
+                  ) : null}
+                  {program.programName === ProgramType.TB ? (
+                    <>
+                      <div className={styles.content}>
+                        <p>{t('regimen', 'Regimen')}</p>
+                        <p>
+                          <span className={styles.value}>
+                            {program?.firstEncounter?.regimenShortDisplay
+                              ? program?.firstEncounter?.regimenShortDisplay
+                              : '--'}{' '}
+                          </span>{' '}
+                        </p>
+                      </div>
+                      <div className={styles.content}>
+                        <p>{t('regimenStartDate', ' Date started regimen')}</p>
+                        <p>
+                          {' '}
+                          <span className={styles.value}>
+                            {program?.firstEncounter?.startDate ? program?.firstEncounter?.startDate : '--'}
+                          </span>
+                        </p>
+                      </div>
+                    </>
                   ) : null}
                 </div>
               </Tile>
