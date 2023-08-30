@@ -27,6 +27,13 @@
       "component": "kenyaemr2ChartLink",
       "online": true,
       "offline": true
+    },
+    {
+      "name": "clear-cache-button",
+      "slot": "app-menu-slot",
+      "component": "clearCacheButton",
+      "online": true,
+      "offline": false
     }
   ]
 }

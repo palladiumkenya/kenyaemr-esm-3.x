@@ -1,0 +1,14 @@
+@use "@carbon/styles/scss/type";
+@use "@carbon/styles/scss/spacing";
+@import "~@openmrs/esm-styleguide/src/vars";
+
+.clearCacheButton {
+  padding-right: 0rem;
+  @include brand-02(background-color);
+  @include type.type-style("heading-compact-01");
+  width: 16rem;
+
+  &:hover {
+    @include brand-01(background-color);
+  }
+}
