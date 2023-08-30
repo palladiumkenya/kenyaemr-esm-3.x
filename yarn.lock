@@ -2682,7 +2682,7 @@ __metadata:
   resolution: "@kenyaemr/esm-care-panel-app@workspace:packages/esm-care-panel-app"
   dependencies:
     "@carbon/react": ^1.12.0
-    "@openmrs/esm-patient-common-lib": ^5.0.0
+    "@openmrs/esm-patient-common-lib": next
     lodash-es: ^4.17.15
     react-to-print: ^2.14.13
     webpack: ^5.74.0
@@ -4031,9 +4031,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-patient-common-lib@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@openmrs/esm-patient-common-lib@npm:5.0.0"
+"@openmrs/esm-patient-common-lib@npm:next":
+  version: 5.0.1-pre.2342
+  resolution: "@openmrs/esm-patient-common-lib@npm:5.0.1-pre.2342"
   dependencies:
     "@carbon/react": ^1.12.0
     lodash-es: ^4.17.15
@@ -4042,7 +4042,7 @@ __metadata:
     "@openmrs/esm-framework": 5.x
     react: 18.x
     single-spa: 5.x
-  checksum: e4d172c6c737deda8d291e9d7d9d42a12e4a0fed69416be9f484d046ff68a0c8e041dfee7f7bfd639fa452bdc7fe5a63b9f611fc65af59e12d872b53f2cb791b
+  checksum: 05790da24b70e4f71032c4bb098e9546655f8ad7c2cafead8281ac369d167bb9d2d8f8f15b55f895cf4665763d4521f34a04c5e3b99795b473811fa62e8926b8
   languageName: node
   linkType: hard
 
