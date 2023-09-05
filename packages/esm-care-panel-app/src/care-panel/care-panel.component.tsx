@@ -6,6 +6,7 @@ import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import ProgramSummary from '../program-summary/program-summary.component';
 import ProgramEnrollment from '../program-enrollment/program-enrollment.component';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
+import RegimenHistory from '../regimen/regimen-history.component';
 
 interface CarePanelProps {
   patientUuid: string;
@@ -65,6 +66,7 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
           formEntrySub={formEntrySub}
           launchPatientWorkspace={launchPatientWorkspace}
         />
+        <RegimenHistory patientUuid={patientUuid} category={patientPrograms[activeTabIndex]} />
       </div>
     </div>
   );
