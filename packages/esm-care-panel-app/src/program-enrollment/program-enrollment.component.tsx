@@ -286,10 +286,16 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
                     </div>
                   ) : null}
                   {program.programName === ProgramType.TPT ? (
-                    <div className={styles.content}>
-                      <p>{t('indicationForTpt', 'Indication for TPT')} </p>
-                      <span className={styles.value}>{program?.tptIndication ? program?.tptIndication : '--'} </span>
-                    </div>
+                    <>
+                      <div className={styles.content}>
+                        <p>{t('initiated', 'Initiated')}</p>
+                        <span className={styles.value}>{program?.dateEnrolled}</span>
+                      </div>
+                      <div className={styles.content}>
+                        <p>{t('indicationForTpt', 'Indication for TPT')} </p>
+                        <span className={styles.value}>{program?.tptIndication ? program?.tptIndication : '--'} </span>
+                      </div>
+                    </>
                   ) : null}
                 </div>
               </Tile>
