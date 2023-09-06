@@ -116,10 +116,20 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                 </div>
                 <div className={styles.content}>
                   <p>{t('regimen', 'Regimen')}</p>
-                  <p className={styles.value}>
-                    {data?.TB?.lastTbEncounter
-                      ? data?.TB?.lastTbEncounter?.regimenShortDisplay
-                      : t('neverOnTbRegimen', 'Never on TB regimen')}
+                  <p>
+                    <span className={styles.value}>
+                      {data?.TB?.lastTbEncounter
+                        ? data?.TB?.lastTbEncounter?.regimenShortDisplay
+                        : t('neverOnTbRegimen', 'Never on TB regimen')}
+                    </span>
+                  </p>
+                </div>
+                <div className={styles.content}>
+                  <p>{t('regimenStartDate', ' Date started regimen')}</p>
+                  <p>
+                    <span className={styles.value}>
+                      {data?.HIV?.lastEncDetails?.startDate ? data?.HIV?.lastEncDetails?.startDate : '--'}
+                    </span>
                   </p>
                 </div>
               </div>
