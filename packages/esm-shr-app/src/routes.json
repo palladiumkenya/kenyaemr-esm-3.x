@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "kenyaemr": "^18.6.2"
+  },
+  "pages": [],
+  "extensions": [
+    {
+      "name": "shr-patient-summary",
+      "component": "shrPatientSummary",
+      "slot": "patient-chart-shr-dashboard-slot",
+      "meta": {
+        "columnSpan": 4
+      }
+    },
+    {
+      "name": "shr-summary-dashboard-link",
+      "component": "shrSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 21,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-shr-dashboard-slot",
+        "title": "SHARED HEALTH RECORDS",
+        "path": "SHR panel"
+      }
+    }
+  ]
+}
