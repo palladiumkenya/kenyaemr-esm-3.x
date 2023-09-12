@@ -2824,6 +2824,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app"
+  dependencies:
+    "@carbon/react": ^1.12.0
+    "@openmrs/esm-patient-common-lib": next
+    lodash-es: ^4.17.15
+    react-to-print: ^2.14.13
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@kenyaemr/esm-version-app@workspace:packages/esm-version-app":
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-version-app@workspace:packages/esm-version-app"
