@@ -16,10 +16,7 @@ export const shrPatientSummary = getAsyncLifecycle(
   options,
 );
 // t('sharedhealthrecords', 'Shared Health Records')
-export const shrSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...dashboardMeta, moduleName }),
-  options,
-);
+export const shrSummaryDashboardLink = getSyncLifecycle(createDashboardLink({ ...dashboardMeta, moduleName }), options);
 
 export function startupApp() {
   registerBreadcrumbs([]);

@@ -144,18 +144,18 @@ export type PatientSummary = {
 export type SHRSummary = {
   vitals: Array<itemDetails>;
   labResults: Array<itemDetails>;
-	complaints: Array<itemDetails>;
-	diagnosis: Array<itemDetails>;
-	allergies: Array<itemDetails>;
-	conditions: Array<itemDetails>;
-	medications: Array<itemDetails>;
+  complaints: Array<itemDetails>;
+  diagnosis: Array<itemDetails>;
+  allergies: Array<itemDetails>;
+  conditions: Array<itemDetails>;
+  medications: Array<itemDetails>;
 };
 
 export type itemDetails = {
   uuid: string;
-	name: string;
-	dateRecorded: string;
-	value: string;
+  name: string;
+  dateRecorded: string;
+  value: string;
 };
 
 type cd4Results = {
