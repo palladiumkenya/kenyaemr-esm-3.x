@@ -154,3 +154,8 @@ type vl = {
   vl?: string;
   vlDate?: string;
 };
+
+export enum RegimenType {
+  HIV = 'ARV',
+  TB = 'TB',
+}

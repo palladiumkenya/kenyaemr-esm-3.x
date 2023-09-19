@@ -1,0 +1,35 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.bodyShort01 {
+  @include type.type-style('body-compact-01');
+}
+
+.desktopHeading {
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+}
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+}
+.structuredList {
+  padding: 0.5rem 0.5rem 0.5rem;
+}
+
+.title {
+  @include type.type-style('productive-heading-03');
+  color: colors.$gray-100;
+  margin-left: spacing.$spacing-05;
+}
+
+.structuredListBody {
+  :global(.cds--structured-list-td) {
+    padding: 0.2rem 0.2rem 0.5rem
+  }
+}
