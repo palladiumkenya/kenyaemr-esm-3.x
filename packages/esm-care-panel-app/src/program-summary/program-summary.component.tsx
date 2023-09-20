@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { StructuredListSkeleton } from '@carbon/react';
 import { ProgramType } from '../types';
+import RegimenButton from '../regimen-editor/regimen-button.component';
 export interface ProgramSummaryProps {
   patientUuid: string;
   programName: string;
@@ -69,6 +70,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                     {data?.HIV?.lastEncDetails?.regimenShortDisplay
                       ? data?.HIV?.lastEncDetails?.regimenShortDisplay
                       : '--'}{' '}
+                    <RegimenButton patientUuid={patientUuid} category={'ARV'} />
                   </p>
                 </div>
                 <div className={styles.content}>
