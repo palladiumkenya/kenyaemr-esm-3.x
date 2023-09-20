@@ -7,7 +7,13 @@ import { useSHRSummary } from '../hooks/useSHRSummary';
 import { Printer } from '@carbon/react/icons';
 import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print-layout/print.component';
-import SHRDataTable from './shrDataTable.component';
+import SHRVitalsDataTable from './shrVitalsDataTable.component';
+import SHRLabResultsDataTable from './shrLabResultsDataTable.component';
+import SHRComplaintsDataTable from './shrComplaintsDataTable.component';
+import SHRDiagnosisDataTable from './shrDiagnosisDataTable.component';
+import SHRAllergiesDataTable from './shrAllergiesDataTable.component';
+import SHRConditionsDataTable from './shrConditionsDataTable.component';
+import SHRMedicationsDataTable from './shrMedicationsDataTable.component';
 
 interface SHRSummaryProps {
   patientUuid: string;
@@ -125,37 +131,37 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
               <TabPanels>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.vitals} />
+                    <SHRVitalsDataTable data={data?.vitals} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.labResults} />
+                    <SHRLabResultsDataTable data={data?.labResults} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.complaints} />
+                    <SHRComplaintsDataTable data={data?.complaints} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.diagnosis} />
+                    <SHRDiagnosisDataTable data={data?.diagnosis} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.allergies} />
+                    <SHRAllergiesDataTable data={data?.allergies} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.conditions} />
+                    <SHRConditionsDataTable data={data?.conditions} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.medications} />
+                    <SHRMedicationsDataTable data={data?.medications} />
                   </div>
                 </TabPanel>
               </TabPanels>

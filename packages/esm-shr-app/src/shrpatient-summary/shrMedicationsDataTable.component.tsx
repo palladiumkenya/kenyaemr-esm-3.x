@@ -10,7 +10,7 @@ interface SHRDataTableProps {
   data: itemDetails[];
 }
 
-const SHRDataTable: React.FC<SHRDataTableProps> = ({ data }) => {
+const SHRVitalsDataTable: React.FC<SHRDataTableProps> = ({ data }) => {
   const { t } = useTranslation();
   const tableHeaders = ['Name', 'Value', 'Date Recorded'];
   const urlLabel = t('seeAll', 'See all');
@@ -60,4 +60,4 @@ const SHRDataTable: React.FC<SHRDataTableProps> = ({ data }) => {
   );
 };
 
-export default SHRDataTable;
+export default SHRVitalsDataTable;

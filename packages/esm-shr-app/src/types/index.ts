@@ -156,6 +156,11 @@ export type itemDetails = {
   name: string;
   dateRecorded: string;
   value: string;
+  onsetDate: string;
+  allergen: string;
+  reaction: string;
+  severity: string;
+  status: string;
 };
 
 type cd4Results = {
