@@ -124,9 +124,9 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
                 <Tab className={styles.tab} id="conditions-tab" disabled={data?.conditions.length <= 0}>
                   {t('conditions', 'Conditions')}
                 </Tab>
-                <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
+                {/* <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
                   {t('medications', 'Medications')}
-                </Tab>
+                </Tab> */}
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -159,11 +159,11 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
                     <SHRConditionsDataTable data={data?.conditions} />
                   </div>
                 </TabPanel>
-                <TabPanel>
+                {/* <TabPanel>
                   <div>
                     <SHRMedicationsDataTable data={data?.medications} />
                   </div>
-                </TabPanel>
+                </TabPanel> */}
               </TabPanels>
             </Tabs>
           </div>

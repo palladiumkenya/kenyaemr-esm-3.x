@@ -12,7 +12,7 @@ interface SHRDataTableProps {
 
 const SHRAllergiesDataTable: React.FC<SHRDataTableProps> = ({ data }) => {
   const { t } = useTranslation();
-  const tableHeaders = ['Name', 'Value', 'Date Recorded'];
+  const tableHeaders = ['Allergen', 'Reaction', 'Severity', 'Onset Date', 'Date Recorded'];
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/test/chart/SHR`;
 
