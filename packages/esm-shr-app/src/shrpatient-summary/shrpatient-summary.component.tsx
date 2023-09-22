@@ -51,7 +51,7 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
     return;
   }
 
-  const tableHeaders = [
+  const vitalsHeaders = [
     {
       key: 'name',
       header: t('name', 'Name'),
@@ -62,12 +62,127 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
     },
     {
       key: 'dateRecorded',
-      header: t('daterecorded', 'Date Recorded'),
+      header: t('dateRecorded', 'Date Recorded'),
     },
   ];
 
-  const headers = ['Name', 'Value', 'Date Recorded'];
-  // const [selectedTab, setSelectedTab] = useState(0);
+  const labResultsHeaders = [
+    {
+      key: 'name',
+      header: t('name', 'Name'),
+    },
+    {
+      key: 'value',
+      header: t('value', 'Value'),
+    },
+    {
+      key: 'dateRecorded',
+      header: t('dateRecorded', 'Date Recorded'),
+    },
+  ];
+
+  const complaintsHeaders = [
+    {
+      key: 'name',
+      header: t('name', 'Name'),
+    },
+    {
+      key: 'value',
+      header: t('value', 'Value'),
+    },
+    {
+      key: 'onsetDate',
+      header: t('onsetDate', 'Onset Date'),
+    },
+    {
+      key: 'dateRecorded',
+      header: t('dateRecorded', 'Date Recorded'),
+    },
+  ];
+
+  const diagnosisHeaders = [
+    {
+      key: 'name',
+      header: t('name', 'Name'),
+    },
+    {
+      key: 'value',
+      header: t('value', 'Value'),
+    },
+    {
+      key: 'dateRecorded',
+      header: t('dateRecorded', 'Date Recorded'),
+    },
+  ];
+
+  const allergiesHeaders = [
+    {
+      key: 'allergen',
+      header: t('allergen', 'Allergen'),
+    },
+    {
+      key: 'reaction',
+      header: t('reaction', 'Reaction'),
+    },
+    {
+      key: 'severity',
+      header: t('severity', 'Severity'),
+    },
+    {
+      key: 'onsetDate',
+      header: t('onsetDate', 'Onset Date'),
+    },
+    {
+      key: 'dateRecorded',
+      header: t('dateRecorded', 'Date Recorded'),
+    },
+  ];
+
+  const conditionsHeaders = [
+    {
+      key: 'name',
+      header: t('name', 'Name'),
+    },
+    {
+      key: 'onsetDate',
+      header: t('onsetDate', 'Onset Date'),
+    },
+    {
+      key: 'value',
+      header: t('value', 'Value'),
+    },
+    {
+      key: 'status',
+      header: t('status', 'Status'),
+    },
+    {
+      key: 'dateRecorded',
+      header: t('dateRecorded', 'Date Recorded'),
+    },
+  ];
+
+  const medicationsHeaders = [
+    {
+      key: 'name',
+      header: t('name', 'Name'),
+    },
+    {
+      key: 'onsetDate',
+      header: t('onsetDate', 'Onset Date'),
+    },
+    {
+      key: 'value',
+      header: t('value', 'Value'),
+    },
+    {
+      key: 'status',
+      header: t('status', 'Status'),
+    },
+    {
+      key: 'dateRecorded',
+      header: t('dateRecorded', 'Date Recorded'),
+    },
+  ];
 
   if (Object.keys(data).length > 0) {
     return (
@@ -77,19 +192,6 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
         <div className={styles.card}>
           <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
             <h4 className={styles.title}> {t('shrPatientSHRSummary', 'Patient SHR Summary')}</h4>
-            {printMode === false && (
-              <Button
-                size="sm"
-                className={styles.btnShow}
-                onClick={() => {
-                  handlePrint(), setPrintMode(true);
-                }}
-                kind="tertiary"
-                renderIcon={(props) => <Printer size={16} {...props} />}
-                iconDescription={t('print', 'Print')}>
-                {t('print', 'Print')}
-              </Button>
-            )}
           </div>
 
           <hr />
@@ -118,46 +220,46 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
                 <Tab className={styles.tab} id="conditions-tab" disabled={data?.conditions.length <= 0}>
                   {t('conditions', 'Conditions')}
                 </Tab>
-                <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
+                {/* <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
                   {t('medications', 'Medications')}
-                </Tab>
+                </Tab> */}
               </TabList>
               <TabPanels>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.vitals} />
+                    <SHRDataTable data={data?.vitals} tableHeaders={vitalsHeaders} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.labResults} />
+                    <SHRDataTable data={data?.labResults} tableHeaders={labResultsHeaders} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.complaints} />
+                    <SHRDataTable data={data?.complaints} tableHeaders={complaintsHeaders} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.diagnosis} />
+                    <SHRDataTable data={data?.diagnosis} tableHeaders={diagnosisHeaders} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.allergies} />
+                    <SHRDataTable data={data?.allergies} tableHeaders={allergiesHeaders} />
                   </div>
                 </TabPanel>
                 <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.conditions} />
+                    <SHRDataTable data={data?.conditions} tableHeaders={conditionsHeaders} />
                   </div>
                 </TabPanel>
-                <TabPanel>
+                {/* <TabPanel>
                   <div>
-                    <SHRDataTable data={data?.medications} />
+                    <SHRDataTable data={data?.medications} tableHeaders={medicationsHeaders} />
                   </div>
-                </TabPanel>
+                </TabPanel> */}
               </TabPanels>
             </Tabs>
           </div>
