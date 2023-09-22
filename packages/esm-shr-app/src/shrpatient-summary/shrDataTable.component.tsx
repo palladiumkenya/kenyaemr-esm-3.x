@@ -2,47 +2,45 @@ import React, { useMemo } from 'react';
 import styles from './shr-summary.scss';
 import { useTranslation } from 'react-i18next';
 import { DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
-import { itemDetails } from '../types';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 
 interface SHRDataTableProps {
-  data: itemDetails[];
+  data: Array<any>;
+  tableHeaders: Array<any>;
 }
 
-const SHRVitalsDataTable: React.FC<SHRDataTableProps> = ({ data }) => {
+const SHRDataTable: React.FC<SHRDataTableProps> = ({ data, tableHeaders }) => {
   const { t } = useTranslation();
-  const tableHeaders = ['Name', 'Value', 'Date Recorded'];
-  const urlLabel = t('seeAll', 'See all');
-  const pageUrl = `\${openmrsSpaBase}/patient/test/chart/SHR`;
 
   const pagesize = 5;
   const { results: paginatedData, goTo, currentPage } = usePagination(data ?? [], pagesize);
 
   const tableRows = useMemo(() => {
     return paginatedData?.map((payload) => ({
-      ...[payload],
+      id: `${payload.uuid}`,
+      ...payload,
     }));
   }, [paginatedData]);
 
   return (
     <div className={styles.widgetCard}>
       <DataTable rows={tableRows} headers={tableHeaders}>
-        {({ rows, headers, getHeaderProps, getRowProps }) => (
-          <Table>
+        {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+          <Table {...getTableProps()}>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (
-                  <TableHeader {...getHeaderProps({ header })}>{header}</TableHeader>
+                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {tableRows.map((row) => (
+              {rows.map((row) => (
                 <TableRow {...getRowProps({ row })}>
-                  <TableCell>{row[0].name}</TableCell>
-                  <TableCell>{row[0].value}</TableCell>
-                  <TableCell>{row[0].dateRecorded}</TableCell>
+                  {row.cells.map((cell) => (
+                    <TableCell key={cell.id}>{cell.value}</TableCell>
+                  ))}
                 </TableRow>
               ))}
             </TableBody>
@@ -60,4 +58,4 @@ const SHRVitalsDataTable: React.FC<SHRDataTableProps> = ({ data }) => {
   );
 };
 
-export default SHRVitalsDataTable;
+export default SHRDataTable;
