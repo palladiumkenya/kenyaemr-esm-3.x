@@ -54,134 +54,134 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
   const vitalsHeaders = [
     {
       key: 'name',
-      header: t('name','Name'),
+      header: t('name', 'Name'),
     },
     {
       key: 'value',
-      header: t('value','Value'),
+      header: t('value', 'Value'),
     },
     {
       key: 'dateRecorded',
-      header: t('dateRecorded','Date Recorded'),
-    }
+      header: t('dateRecorded', 'Date Recorded'),
+    },
   ];
 
   const labResultsHeaders = [
     {
       key: 'name',
-      header: t('name','Name'),
+      header: t('name', 'Name'),
     },
     {
       key: 'value',
-      header: t('value','Value'),
+      header: t('value', 'Value'),
     },
     {
       key: 'dateRecorded',
-      header: t('dateRecorded','Date Recorded'),
-    }
+      header: t('dateRecorded', 'Date Recorded'),
+    },
   ];
 
   const complaintsHeaders = [
     {
       key: 'name',
-      header: t('name','Name'),
+      header: t('name', 'Name'),
     },
     {
       key: 'value',
-      header: t('value','Value'),
+      header: t('value', 'Value'),
     },
     {
       key: 'onsetDate',
-      header: t('onsetDate','Onset Date'),
+      header: t('onsetDate', 'Onset Date'),
     },
     {
       key: 'dateRecorded',
-      header: t('dateRecorded','Date Recorded'),
-    }
+      header: t('dateRecorded', 'Date Recorded'),
+    },
   ];
 
   const diagnosisHeaders = [
     {
       key: 'name',
-      header: t('name','Name'),
+      header: t('name', 'Name'),
     },
     {
       key: 'value',
-      header: t('value','Value'),
+      header: t('value', 'Value'),
     },
     {
       key: 'dateRecorded',
-      header: t('dateRecorded','Date Recorded'),
-    }
+      header: t('dateRecorded', 'Date Recorded'),
+    },
   ];
 
   const allergiesHeaders = [
     {
       key: 'allergen',
-      header: t('allergen','Allergen'),
+      header: t('allergen', 'Allergen'),
     },
     {
       key: 'reaction',
-      header: t('reaction','Reaction'),
+      header: t('reaction', 'Reaction'),
     },
     {
       key: 'severity',
-      header: t('severity','Severity'),
+      header: t('severity', 'Severity'),
     },
     {
       key: 'onsetDate',
-      header: t('onsetDate','Onset Date'),
+      header: t('onsetDate', 'Onset Date'),
     },
     {
       key: 'dateRecorded',
-      header: t('dateRecorded','Date Recorded'),
-    }
+      header: t('dateRecorded', 'Date Recorded'),
+    },
   ];
 
   const conditionsHeaders = [
     {
       key: 'name',
-      header: t('name','Name'),
+      header: t('name', 'Name'),
     },
     {
       key: 'onsetDate',
-      header: t('onsetDate','Onset Date'),
+      header: t('onsetDate', 'Onset Date'),
     },
     {
       key: 'value',
-      header: t('value','Value'),
+      header: t('value', 'Value'),
     },
     {
       key: 'status',
-      header: t('status','Status'),
+      header: t('status', 'Status'),
     },
     {
       key: 'dateRecorded',
-      header: t('dateRecorded','Date Recorded'),
-    }
+      header: t('dateRecorded', 'Date Recorded'),
+    },
   ];
 
   const medicationsHeaders = [
     {
       key: 'name',
-      header: t('name','Name'),
+      header: t('name', 'Name'),
     },
     {
       key: 'onsetDate',
-      header: t('onsetDate','Onset Date'),
+      header: t('onsetDate', 'Onset Date'),
     },
     {
       key: 'value',
-      header: t('value','Value'),
+      header: t('value', 'Value'),
     },
     {
       key: 'status',
-      header: t('status','Status'),
+      header: t('status', 'Status'),
     },
     {
       key: 'dateRecorded',
-      header: t('dateRecorded','Date Recorded'),
-    }
+      header: t('dateRecorded', 'Date Recorded'),
+    },
   ];
 
   if (Object.keys(data).length > 0) {
