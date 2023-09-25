@@ -6,9 +6,11 @@ import styles from './standard-regimen.scss';
 
 interface StandardRegimenProps {
   category: string;
+  setStandardRegimen: (value: any) => void;
+  setStandardRegimenLine: (value: any) => void;
 }
 
-const StandardRegimen: React.FC<StandardRegimenProps> = ({ category }) => {
+const StandardRegimen: React.FC<StandardRegimenProps> = ({ category, setStandardRegimen, setStandardRegimenLine }) => {
   const { t } = useTranslation();
   const { standardRegimen, isLoading, error } = useStandardRegimen();
 
@@ -30,11 +32,13 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({ category }) => {
 
   const handleRegimenLineChange = (e) => {
     setSelectedRegimenLine(e.target.value);
+    setStandardRegimenLine(e.target.value);
     setSelectedRegimen(''); // Reset selected regimen when regimen line changes
   };
 
   const handleRegimenChange = (e) => {
     setSelectedRegimen(e.target.value);
+    setStandardRegimen(e.target.value);
   };
 
   return (

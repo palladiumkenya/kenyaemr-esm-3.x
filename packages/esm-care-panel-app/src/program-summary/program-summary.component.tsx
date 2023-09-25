@@ -70,7 +70,15 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                     {data?.HIV?.lastEncDetails?.regimenShortDisplay
                       ? data?.HIV?.lastEncDetails?.regimenShortDisplay
                       : '--'}{' '}
-                    <RegimenButton patientUuid={patientUuid} category={'ARV'} />
+                    <RegimenButton
+                      patientUuid={patientUuid}
+                      category={programName}
+                      onRegimen={
+                        data?.HIV?.lastEncDetails?.regimenShortDisplay
+                          ? data?.HIV?.lastEncDetails?.regimenShortDisplay
+                          : ''
+                      }
+                    />
                   </p>
                 </div>
                 <div className={styles.content}>
@@ -124,6 +132,11 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                         ? data?.TB?.lastTbEncounter?.regimenShortDisplay
                         : t('neverOnTbRegimen', 'Never on TB regimen')}
                     </span>
+                    <RegimenButton
+                      patientUuid={patientUuid}
+                      category={programName}
+                      onRegimen={data?.TB?.lastTbEncounter ? data?.TB?.lastTbEncounter?.regimenShortDisplay : ''}
+                    />
                   </p>
                 </div>
                 <div className={styles.content}>

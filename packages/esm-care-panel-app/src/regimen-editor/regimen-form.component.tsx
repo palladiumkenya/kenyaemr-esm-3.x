@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import dayjs from 'dayjs';
-import { first } from 'rxjs/operators';
 import {
   Button,
   ButtonSet,
@@ -10,8 +9,6 @@ import {
   Layer,
   SelectItem,
   Stack,
-  TimePicker,
-  TimePickerSelect,
   RadioButtonGroup,
   RadioButton,
 } from '@carbon/react';
@@ -20,52 +17,44 @@ import {
   useLocations,
   useSession,
   useLayoutType,
-  saveVisit,
   toOmrsIsoString,
   toDateObjectStrict,
   showNotification,
   showToast,
   useConfig,
-  ConfigObject,
 } from '@openmrs/esm-framework';
 import styles from './standard-regimen.scss';
-import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { closeOverlay } from '../hooks/useOverlay';
 import StandardRegimen from './standard-regimen.component';
 import RegimenReason from './regimen-reason.component';
+import { Encounter, Regimen, UpdateObs } from '../types';
+import { saveEncounter, updateEncounter } from './regimen.resource';
+import { useRegimenEncounter } from '../hooks/useRegimenEncounter';
+import { CarePanelConfig } from '../config-schema';
+import { mutate } from 'swr';
 
 interface RegimenFormProps {
   patientUuid: string;
-  //closePanel?: () => void;
   category: string;
-}
-export interface NewVisitPayload {
-  uuid?: string;
-  location: string;
-  patient?: string;
-  startDatetime: Date;
-  visitType: string;
-  stopDatetime?: Date;
-  attributes?: Array<{
-    attributeType: string;
-    value: string;
-  }>;
+  onRegimen: string;
 }
 
-const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category }) => {
+const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegimen }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSession();
-
-  const config = useConfig() as ConfigObject;
+  const config = useConfig() as CarePanelConfig;
+  const { regimenEncounter, isLoading, error } = useRegimenEncounter(category, patientUuid);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
-  const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
-  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const [regimenEvent, setRegimenEvent] = useState('');
-  const [selectedLocation, setSelectedLocation] = useState('');
+  const [standRegimen, setStandardRegimen] = useState('');
+  const [standRegimenLine, setStandardRegimenLine] = useState('');
+  const [regimenReason, setRegimenReason] = useState('');
+  const [obsArray, setObsArray] = useState([]);
+  const [obsArrayForPrevEncounter, setObsArrayForPrevEncounter] = useState([]);
+
   const regimenType = [
     {
       display: 'Use standard regimen',
@@ -76,29 +65,73 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category }) => {
       uuid: 'uuid',
     },
   ];
+  const addObjectOrUpdate = (objectToAdd) => {
+    if (doesObjectExistInArray(obsArray, objectToAdd)) {
+      setObsArray((prevObsArrayForPrevEncounter) =>
+        prevObsArrayForPrevEncounter.map((obs) => (obs.concept === objectToAdd.concept ? objectToAdd : obs)),
+      );
+    } else {
+      setObsArray((prevObsArray) => [...prevObsArray, objectToAdd]);
+    }
+  };
 
-  const regimenEvents = [
-    {
-      display: 'Change regimen',
-      uuid: 'uuid',
-    },
-    {
-      display: 'Stop regimen',
-      uuid: 'uuid',
-    },
-    {
-      display: 'Start regimen',
-      uuid: 'uuid',
-    },
-    {
-      display: 'Restart regimen',
-      uuid: 'uuid',
-    },
-    {
-      display: 'Stop regimen',
-      uuid: 'uuid',
-    },
-  ];
+  const addObjectToUpdatePreviousEnc = (objectToAdd) => {
+    if (doesObjectExistInArray(obsArrayForPrevEncounter, objectToAdd)) {
+      setObsArrayForPrevEncounter((prevObsArrayForPrevEncounter) =>
+        prevObsArrayForPrevEncounter.map((obs) => (obs.concept === objectToAdd.concept ? objectToAdd : obs)),
+      );
+    } else {
+      setObsArrayForPrevEncounter((prevObsArrayForPrevEncounter) => [...prevObsArrayForPrevEncounter, objectToAdd]);
+    }
+  };
+
+  const doesObjectExistInArray = (obsArray, objectToCheck) =>
+    obsArray.some((obs) => obs.concept === objectToCheck.concept);
+
+  useEffect(() => {
+    if (standRegimenLine && regimenEvent !== Regimen.stopRegimenConcept) {
+      const regimenLineObs = {
+        concept: Regimen.RegimenLineConcept,
+        value: standRegimenLine,
+      };
+      addObjectOrUpdate(regimenLineObs);
+    }
+
+    if (standRegimen && regimenEvent !== Regimen.stopRegimenConcept) {
+      const standRegimenObs = {
+        concept: Regimen.standardRegimenConcept,
+        value: standRegimen,
+      };
+      addObjectOrUpdate(standRegimenObs);
+    }
+
+    if (
+      regimenReason &&
+      (regimenEvent === Regimen.stopRegimenConcept || regimenEvent === Regimen.changeRegimenConcept)
+    ) {
+      const regimenReasonObs = {
+        concept: Regimen.reasonCodedConcept,
+        value: regimenReason,
+      };
+      addObjectToUpdatePreviousEnc(regimenReasonObs);
+    }
+    if (visitDate && (regimenEvent === Regimen.stopRegimenConcept || regimenEvent === Regimen.changeRegimenConcept)) {
+      const dateStoppedRegObs = {
+        concept: Regimen.dateDrugStoppedCon,
+        value: toDateObjectStrict(
+          toOmrsIsoString(new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date())),
+        ),
+      };
+      addObjectToUpdatePreviousEnc(dateStoppedRegObs);
+    }
+    if (regimenEvent && category === 'ARV') {
+      const categoryObs = {
+        concept: Regimen.arvCategoryConcept,
+        value: regimenEvent,
+      };
+      addObjectOrUpdate(categoryObs);
+    }
+  }, [standRegimenLine, regimenReason, standRegimen, category, regimenEvent, visitDate]);
 
   useEffect(() => {}, [locations, sessionUser]);
 
@@ -108,37 +141,67 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category }) => {
 
       setIsSubmitting(true);
 
-      const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
-
-      const payload: NewVisitPayload = {
-        patient: patientUuid,
-        startDatetime: toDateObjectStrict(
-          toOmrsIsoString(
-            new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
-          ),
+      const encounterToSave: Encounter = {
+        encounterDatetime: toDateObjectStrict(
+          toOmrsIsoString(new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date())),
         ),
-        location: selectedLocation,
-        attributes: [],
-        visitType: '',
+        patient: patientUuid,
+        encounterType: Regimen.regimenEncounterType,
+        location: sessionUser?.sessionLocation?.uuid,
+        encounterProviders: [
+          {
+            provider: sessionUser?.currentProvider?.uuid,
+            encounterRole: config.regimenObs.encounterProviderRoleUuid,
+          },
+        ],
+        form: Regimen.regimenForm,
+        obs: obsArray,
       };
-
-      const abortController = new AbortController();
-
-      saveVisit(payload, abortController)
-        .pipe(first())
-        .subscribe(
-          (response) => {},
+      const encounterToUpdate: UpdateObs = {
+        obs: obsArrayForPrevEncounter,
+      };
+      if (regimenEncounter.uuid) {
+        updateEncounter(encounterToUpdate, regimenEncounter.uuid);
+      }
+      if (obsArray.length > 0) {
+        saveEncounter(encounterToSave).then(
+          (response) => {
+            if (response.status === 201) {
+              showToast({
+                kind: 'success',
+                title: t('regimenUpdated', 'Regimen updated'),
+                description: t('regimenUpdatedSuccessfully', `Regimen updated successfully.`),
+              });
+              setIsSubmitting(false);
+              mutate(`/ws/rest/v1/kenyaemr/currentProgramDetails?patientUuid=${patientUuid}`);
+              mutate(`/ws/rest/v1/kenyaemr/patientSummary?patientUuid=${patientUuid}`);
+              mutate(`/ws/rest/v1/kenyaemr/regimenHistory?patientUuid=${patientUuid}&category=${category}`);
+              closeOverlay();
+            }
+          },
           (error) => {
             showNotification({
-              title: t('startVisitError', 'Error starting visit'),
+              title: t('regimenError', 'Error updating regimen'),
               kind: 'error',
               critical: true,
               description: error?.message,
             });
           },
         );
+      }
     },
-    [patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime],
+    [
+      patientUuid,
+      t,
+      category,
+      visitDate,
+      obsArray,
+      obsArrayForPrevEncounter,
+      sessionUser?.currentProvider?.uuid,
+      regimenEncounter.uuid,
+      sessionUser?.sessionLocation?.uuid,
+      config.regimenObs.encounterProviderRoleUuid,
+    ],
   );
 
   const handleOnChange = () => {
@@ -157,68 +220,76 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category }) => {
               onChange={(uuid) => {
                 setRegimenEvent(uuid);
               }}>
-              <RadioButton key={'start-regimen'} labelText={t('startRegimen', 'Start')} value={'uuid'} />
-              <RadioButton key={'restart-regimen'} labelText={t('restartRegimen', 'Restart')} value={''} />
-              <RadioButton key={'change-regimen'} labelText={t('changeRegimen', 'Change')} value={'uuid'} />
-              <RadioButton key={'stop-regimen'} labelText={t('stopRegimen', 'Stop')} value={'stop'} />
+              <RadioButton
+                key={'start-regimen'}
+                labelText={t('startRegimen', 'Start')}
+                value={Regimen.startOrRestartConcept}
+              />
+
+              <RadioButton
+                key={'restart-regimen'}
+                labelText={t('restartRegimen', 'Restart')}
+                value={Regimen.startOrRestartConcept}
+              />
+
+              <RadioButton
+                key={'change-regimen'}
+                labelText={t('changeRegimen', 'Change')}
+                value={Regimen.changeRegimenConcept}
+              />
+              <RadioButton
+                key={'stop-regimen'}
+                labelText={t('stopRegimen', 'Stop')}
+                value={Regimen.stopRegimenConcept}
+              />
+              <RadioButton
+                key={'undo-regimen'}
+                labelText={t('undoRegimen', 'Undo')}
+                value={'undo'}
+                onClick={closeOverlay}
+              />
             </RadioButtonGroup>
             {regimenEvent ? (
               <>
-                <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time')}</div>
                 <div className={styles.dateTimeSection}>
                   <DatePicker
                     dateFormat="d/m/Y"
                     datePickerType="single"
-                    id="visitDate"
+                    id="regimenDate"
                     style={{ paddingBottom: '1rem' }}
                     maxDate={new Date().toISOString()}
                     onChange={([date]) => setVisitDate(date)}
                     value={visitDate}>
                     <DatePickerInput
-                      id="visitStartDateInput"
+                      id="regimenDateInput"
                       labelText={t('date', 'Date')}
                       placeholder="dd/mm/yyyy"
                       style={{ width: '100%' }}
                     />
                   </DatePicker>
-                  <ResponsiveWrapper isTablet={isTablet}>
-                    <TimePicker
-                      id="visitStartTime"
-                      labelText={t('time', 'Time')}
-                      onChange={(event) => setVisitTime(event.target.value as amPm)}
-                      pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                      style={{ marginLeft: '0.125rem', flex: 'none' }}
-                      value={visitTime}>
-                      <TimePickerSelect
-                        id="visitStartTimeSelect"
-                        onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                        value={timeFormat}
-                        labelText={t('time', 'Time')}
-                        aria-label={t('time', 'Time')}>
-                        <SelectItem value="AM" text="AM" />
-                        <SelectItem value="PM" text="PM" />
-                      </TimePickerSelect>
-                    </TimePicker>
-                  </ResponsiveWrapper>
                 </div>
-                {regimenEvent && regimenEvent !== 'stop' ? (
+                {regimenEvent && regimenEvent !== Regimen.stopRegimenConcept ? (
                   <>
                     <RadioButtonGroup
                       className={styles.radioButtonWrapper}
-                      name="priority"
+                      name="regimenType"
                       onChange={(uuid) => {
-                        // setPriority(uuid);
+                        // setRegimenType(uuid);
                       }}>
                       {regimenType?.length > 0 &&
                         regimenType.map(({ uuid, display }) => (
                           <RadioButton key={uuid} labelText={display} value={uuid} />
                         ))}
                     </RadioButtonGroup>
-                    <StandardRegimen category={'ARV'} />
+                    <StandardRegimen
+                      category={category}
+                      setStandardRegimen={setStandardRegimen}
+                      setStandardRegimenLine={setStandardRegimenLine}
+                    />
                   </>
                 ) : null}
 
-                <RegimenReason category={'ARV'} />
+                <RegimenReason category={category} setRegimenReason={setRegimenReason} />
               </>
             ) : null}
           </section>
@@ -235,9 +306,5 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category }) => {
     </Form>
   );
 };
-
-function ResponsiveWrapper({ children, isTablet }) {
-  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
-}
 
 export default RegimenForm;
