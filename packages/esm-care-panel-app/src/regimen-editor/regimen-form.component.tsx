@@ -22,6 +22,7 @@ import {
   showNotification,
   showToast,
   useConfig,
+  showModal,
 } from '@openmrs/esm-framework';
 import styles from './standard-regimen.scss';
 import { closeOverlay } from '../hooks/useOverlay';
@@ -133,8 +134,6 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
     }
   }, [standRegimenLine, regimenReason, standRegimen, category, regimenEvent, visitDate]);
 
-  useEffect(() => {}, [locations, sessionUser]);
-
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
@@ -207,6 +206,14 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
   const handleOnChange = () => {
     // setIgnoreChanges((prevState) => !prevState);
   };
+  const launchCancelAppointmentDialog = () => {
+    const dispose = showModal('delete-regimen-confirmation-dialog', {
+      closeCancelModal: () => dispose(),
+      regimenEncounterUuid: regimenEncounter.uuid,
+      patientUuid: patientUuid,
+      category: category,
+    });
+  };
 
   return (
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
@@ -246,12 +253,12 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
                 key={'undo-regimen'}
                 labelText={t('undoRegimen', 'Undo')}
                 value={'undo'}
-                onClick={closeOverlay}
+                onClick={launchCancelAppointmentDialog}
               />
             </RadioButtonGroup>
             {regimenEvent ? (
               <>
-                <div className={styles.dateTimeSection}>
+                {regimenEvent !== 'undo' ? (
                   <DatePicker
                     dateFormat="d/m/Y"
                     datePickerType="single"
@@ -267,8 +274,9 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
                       style={{ width: '100%' }}
                     />
                   </DatePicker>
-                </div>
-                {regimenEvent && regimenEvent !== Regimen.stopRegimenConcept ? (
+                ) : null}
+
+                {regimenEvent && regimenEvent !== Regimen.stopRegimenConcept && regimenEvent !== 'undo' ? (
                   <>
                     <RadioButtonGroup
                       className={styles.radioButtonWrapper}
@@ -289,7 +297,9 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
                   </>
                 ) : null}
 
-                <RegimenReason category={category} setRegimenReason={setRegimenReason} />
+                {regimenEvent !== 'undo' ? (
+                  <RegimenReason category={category} setRegimenReason={setRegimenReason} />
+                ) : null}
               </>
             ) : null}
           </section>

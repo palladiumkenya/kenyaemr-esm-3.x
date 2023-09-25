@@ -17,6 +17,11 @@ export const carePanelPatientSummary = getAsyncLifecycle(
   () => import('./patient-summary/patient-summary.component'),
   options,
 );
+export const deleteRegimenConfirmationDialog = getAsyncLifecycle(
+  () => import('./regimen-editor/delete-regimen-modal.component'),
+  options,
+);
+
 // t('carePanel', 'Care panel')
 export const carePanelSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),

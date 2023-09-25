@@ -35,6 +35,10 @@
       "meta": {
         "columnSpan": 4
       }
+    },
+    {
+      "name": "delete-regimen-confirmation-dialog",
+      "component": "deleteRegimenConfirmationDialog"
     }
   ]
 }
