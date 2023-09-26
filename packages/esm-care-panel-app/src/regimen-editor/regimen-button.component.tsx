@@ -12,9 +12,15 @@ interface RegimenButtonProps {
   patientUuid: string;
   category: string;
   onRegimen: string;
+  lastRegimenEncounterUuid: string;
 }
 
-const RegimenButton: React.FC<RegimenButtonProps> = ({ category, patientUuid, onRegimen }) => {
+const RegimenButton: React.FC<RegimenButtonProps> = ({
+  category,
+  patientUuid,
+  onRegimen,
+  lastRegimenEncounterUuid,
+}) => {
   const { t } = useTranslation();
   return (
     <>
@@ -22,7 +28,12 @@ const RegimenButton: React.FC<RegimenButtonProps> = ({ category, patientUuid, on
         onClick={() =>
           launchOverlay(
             t('regimen', 'Regimen'),
-            <RegimenForm patientUuid={patientUuid} category={RegimenType[category]} onRegimen={onRegimen} />,
+            <RegimenForm
+              patientUuid={patientUuid}
+              category={RegimenType[category]}
+              onRegimen={onRegimen}
+              lastRegimenEncounterUuid={lastRegimenEncounterUuid}
+            />,
           )
         }
         style={{ cursor: 'pointer' }}

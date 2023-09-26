@@ -8,9 +8,15 @@ interface StandardRegimenProps {
   category: string;
   setStandardRegimen: (value: any) => void;
   setStandardRegimenLine: (value: any) => void;
+  selectedRegimenType: string;
 }
 
-const StandardRegimen: React.FC<StandardRegimenProps> = ({ category, setStandardRegimen, setStandardRegimenLine }) => {
+const StandardRegimen: React.FC<StandardRegimenProps> = ({
+  category,
+  setStandardRegimen,
+  setStandardRegimenLine,
+  selectedRegimenType,
+}) => {
   const { t } = useTranslation();
   const { standardRegimen, isLoading, error } = useStandardRegimen();
 
@@ -44,22 +50,24 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({ category, setStandard
   return (
     <div>
       <>
-        <Select
-          id="regimenLine"
-          invalidText="Required"
-          labelText={t('selectRegimenLine', 'Select Regimen Line')}
-          className={styles.inputContainer}
-          value={selectedRegimenLine}
-          onChange={handleRegimenLineChange}>
-          {!selectedRegimenLine || selectedRegimenLine == '--' ? (
-            <SelectItem text={t('selectRegimenLine', 'Select Regimen Line')} value="" />
-          ) : null}
-          {matchingCategory?.category.map((line) => (
-            <SelectItem key={line.regimenline} text={line.regimenline} value={line.regimenLineValue}>
-              {line.regimenline}
-            </SelectItem>
-          ))}
-        </Select>
+        {selectedRegimenType === 'standardUuid' ? (
+          <Select
+            id="regimenLine"
+            invalidText="Required"
+            labelText={t('selectRegimenLine', 'Select Regimen Line')}
+            className={styles.inputContainer}
+            value={selectedRegimenLine}
+            onChange={handleRegimenLineChange}>
+            {!selectedRegimenLine || selectedRegimenLine == '--' ? (
+              <SelectItem text={t('selectRegimenLine', 'Select Regimen Line')} value="" />
+            ) : null}
+            {matchingCategory?.category.map((line) => (
+              <SelectItem key={line.regimenline} text={line.regimenline} value={line.regimenLineValue}>
+                {line.regimenline}
+              </SelectItem>
+            ))}
+          </Select>
+        ) : null}
 
         {selectedRegimenLine && (
           <Select

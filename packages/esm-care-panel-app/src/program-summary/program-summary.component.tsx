@@ -4,8 +4,9 @@ import { useProgramSummary } from '../hooks/useProgramSummary';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { StructuredListSkeleton } from '@carbon/react';
-import { ProgramType } from '../types';
+import { ProgramType, RegimenType } from '../types';
 import RegimenButton from '../regimen-editor/regimen-button.component';
+import { useRegimenEncounter } from '../hooks/useRegimenEncounter';
 export interface ProgramSummaryProps {
   patientUuid: string;
   programName: string;
@@ -13,6 +14,8 @@ export interface ProgramSummaryProps {
 const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programName }) => {
   const { data, isError, isLoading } = useProgramSummary(patientUuid);
   const { t } = useTranslation();
+  const { regimenEncounter } = useRegimenEncounter(RegimenType[programName], patientUuid);
+
   const isTablet = useLayoutType() == 'tablet';
   if (isLoading) {
     return <StructuredListSkeleton role="progressbar" />;
@@ -78,6 +81,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                           ? data?.HIV?.lastEncDetails?.regimenShortDisplay
                           : ''
                       }
+                      lastRegimenEncounterUuid={regimenEncounter.uuid}
                     />
                   </p>
                 </div>
@@ -136,6 +140,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                       patientUuid={patientUuid}
                       category={programName}
                       onRegimen={data?.TB?.lastTbEncounter ? data?.TB?.lastTbEncounter?.regimenShortDisplay : ''}
+                      lastRegimenEncounterUuid={regimenEncounter.uuid}
                     />
                   </p>
                 </div>

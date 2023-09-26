@@ -33,17 +33,18 @@ import { saveEncounter, updateEncounter } from './regimen.resource';
 import { useRegimenEncounter } from '../hooks/useRegimenEncounter';
 import { CarePanelConfig } from '../config-schema';
 import { mutate } from 'swr';
+import NonStandardRegimen from './non-standard-regimen.component';
 
 interface RegimenFormProps {
   patientUuid: string;
   category: string;
   onRegimen: string;
+  lastRegimenEncounterUuid: string;
 }
 
-const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegimen }) => {
+const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegimen, lastRegimenEncounterUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
   const sessionUser = useSession();
   const config = useConfig() as CarePanelConfig;
   const { regimenEncounter, isLoading, error } = useRegimenEncounter(category, patientUuid);
@@ -52,20 +53,23 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
   const [regimenEvent, setRegimenEvent] = useState('');
   const [standRegimen, setStandardRegimen] = useState('');
   const [standRegimenLine, setStandardRegimenLine] = useState('');
+  const [nonStandardRegimens, setNonStandardRegimens] = useState([]);
   const [regimenReason, setRegimenReason] = useState('');
+  const [selectedRegimenType, setSelectedRegimenType] = useState('');
   const [obsArray, setObsArray] = useState([]);
   const [obsArrayForPrevEncounter, setObsArrayForPrevEncounter] = useState([]);
 
   const regimenType = [
     {
       display: 'Use standard regimen',
-      uuid: 'uuid',
+      uuid: 'standardUuid',
     },
     {
       display: 'Use non standard regimen',
-      uuid: 'uuid',
+      uuid: 'nonStandardUuid',
     },
   ];
+
   const addObjectOrUpdate = (objectToAdd) => {
     if (doesObjectExistInArray(obsArray, objectToAdd)) {
       setObsArray((prevObsArrayForPrevEncounter) =>
@@ -133,6 +137,24 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
       addObjectOrUpdate(categoryObs);
     }
   }, [standRegimenLine, regimenReason, standRegimen, category, regimenEvent, visitDate]);
+
+  useEffect(() => {
+    if (selectedRegimenType === 'nonStandardUuid' && nonStandardRegimens.length > 0) {
+      setObsArray((prevObsArray) => {
+        // Create a map to track distinct values based on the 'value' key
+        const distinctValuesMap = new Map();
+        prevObsArray.forEach((item) => {
+          distinctValuesMap.set(item.value, item);
+        });
+        // Add or update items from nonStandardRegimens to the map based on the 'value' key
+        nonStandardRegimens.forEach((item) => {
+          distinctValuesMap.set(item.value, item);
+        });
+        const uniqueObsArray = Array.from(distinctValuesMap.values());
+        return uniqueObsArray;
+      });
+    }
+  }, [selectedRegimenType, nonStandardRegimens]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -227,11 +249,13 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
               onChange={(uuid) => {
                 setRegimenEvent(uuid);
               }}>
+              {/* {lastRegimenEncounterUuid === '' && ( */}
               <RadioButton
                 key={'start-regimen'}
                 labelText={t('startRegimen', 'Start')}
                 value={Regimen.startOrRestartConcept}
               />
+              {/* )} */}
 
               <RadioButton
                 key={'restart-regimen'}
@@ -282,22 +306,32 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
                       className={styles.radioButtonWrapper}
                       name="regimenType"
                       onChange={(uuid) => {
-                        // setRegimenType(uuid);
+                        setSelectedRegimenType(uuid);
                       }}>
                       {regimenType?.length > 0 &&
                         regimenType.map(({ uuid, display }) => (
                           <RadioButton key={uuid} labelText={display} value={uuid} />
                         ))}
                     </RadioButtonGroup>
-                    <StandardRegimen
-                      category={category}
-                      setStandardRegimen={setStandardRegimen}
-                      setStandardRegimenLine={setStandardRegimenLine}
-                    />
+                    {selectedRegimenType === 'standardUuid' ? (
+                      <StandardRegimen
+                        category={category}
+                        setStandardRegimen={setStandardRegimen}
+                        setStandardRegimenLine={setStandardRegimenLine}
+                        selectedRegimenType={selectedRegimenType}
+                      />
+                    ) : (
+                      <NonStandardRegimen
+                        category={category}
+                        setNonStandardRegimens={setNonStandardRegimens}
+                        setStandardRegimenLine={setStandardRegimenLine}
+                        selectedRegimenType={selectedRegimenType}
+                      />
+                    )}
                   </>
                 ) : null}
 
-                {regimenEvent !== 'undo' ? (
+                {regimenEvent !== 'undo' && selectedRegimenType ? (
                   <RegimenReason category={category} setRegimenReason={setRegimenReason} />
                 ) : null}
               </>
