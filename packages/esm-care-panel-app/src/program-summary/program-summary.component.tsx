@@ -81,7 +81,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                           ? data?.HIV?.lastEncDetails?.regimenShortDisplay
                           : ''
                       }
-                      lastRegimenEncounterUuid={regimenEncounter.uuid}
+                      lastRegimenEncounter={regimenEncounter}
                     />
                   </p>
                 </div>
@@ -140,7 +140,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                       patientUuid={patientUuid}
                       category={programName}
                       onRegimen={data?.TB?.lastTbEncounter ? data?.TB?.lastTbEncounter?.regimenShortDisplay : ''}
-                      lastRegimenEncounterUuid={regimenEncounter.uuid}
+                      lastRegimenEncounter={regimenEncounter}
                     />
                   </p>
                 </div>

@@ -1,40 +1,34 @@
 import React from 'react';
-import { Button } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 
 import { useTranslation } from 'react-i18next';
-
-import { launchOverlay } from '../hooks/useOverlay';
-import RegimenForm from './regimen-form.component';
 import { RegimenType } from '../types';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface RegimenButtonProps {
   patientUuid: string;
   category: string;
   onRegimen: string;
-  lastRegimenEncounterUuid: string;
+  lastRegimenEncounter: {
+    uuid: string;
+    startDate: string;
+    endDate: string;
+    event: string;
+  };
 }
 
-const RegimenButton: React.FC<RegimenButtonProps> = ({
-  category,
-  patientUuid,
-  onRegimen,
-  lastRegimenEncounterUuid,
-}) => {
+const RegimenButton: React.FC<RegimenButtonProps> = ({ category, patientUuid, onRegimen, lastRegimenEncounter }) => {
   const { t } = useTranslation();
   return (
     <>
       <Edit
         onClick={() =>
-          launchOverlay(
-            t('regimen', 'Regimen'),
-            <RegimenForm
-              patientUuid={patientUuid}
-              category={RegimenType[category]}
-              onRegimen={onRegimen}
-              lastRegimenEncounterUuid={lastRegimenEncounterUuid}
-            />,
-          )
+          launchPatientWorkspace('patient-regimen-workspace', {
+            category: RegimenType[category],
+            patientUuid: patientUuid,
+            onRegimen: onRegimen,
+            lastRegimenEncounter: lastRegimenEncounter,
+          })
         }
         style={{ cursor: 'pointer' }}
       />

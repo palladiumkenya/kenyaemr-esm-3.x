@@ -7,7 +7,6 @@ import ProgramSummary from '../program-summary/program-summary.component';
 import ProgramEnrollment from '../program-enrollment/program-enrollment.component';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import RegimenHistory from '../regimen/regimen-history.component';
-import Overlay from '../overlay.component';
 
 interface CarePanelProps {
   patientUuid: string;
@@ -71,7 +70,6 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
           <RegimenHistory patientUuid={patientUuid} category={patientPrograms[activeTabIndex]} />
         </div>
       </div>
-      <Overlay />
     </>
   );
 };

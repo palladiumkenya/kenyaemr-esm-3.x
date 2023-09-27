@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -6,15 +6,12 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
-  Layer,
-  SelectItem,
   Stack,
   RadioButtonGroup,
   RadioButton,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
-  useLocations,
   useSession,
   useLayoutType,
   toOmrsIsoString,
@@ -25,7 +22,6 @@ import {
   showModal,
 } from '@openmrs/esm-framework';
 import styles from './standard-regimen.scss';
-import { closeOverlay } from '../hooks/useOverlay';
 import StandardRegimen from './standard-regimen.component';
 import RegimenReason from './regimen-reason.component';
 import { Encounter, Regimen, UpdateObs } from '../types';
@@ -34,15 +30,28 @@ import { useRegimenEncounter } from '../hooks/useRegimenEncounter';
 import { CarePanelConfig } from '../config-schema';
 import { mutate } from 'swr';
 import NonStandardRegimen from './non-standard-regimen.component';
+import { addOrUpdateObsObject } from './utils';
 
 interface RegimenFormProps {
   patientUuid: string;
   category: string;
   onRegimen: string;
-  lastRegimenEncounterUuid: string;
+  lastRegimenEncounter: {
+    uuid: string;
+    startDate: string;
+    endDate: string;
+    event: string;
+  };
+  closeWorkspace: () => void;
 }
 
-const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegimen, lastRegimenEncounterUuid }) => {
+const RegimenForm: React.FC<RegimenFormProps> = ({
+  patientUuid,
+  category,
+  onRegimen,
+  lastRegimenEncounter,
+  closeWorkspace,
+}) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
@@ -70,36 +79,13 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
     },
   ];
 
-  const addObjectOrUpdate = (objectToAdd) => {
-    if (doesObjectExistInArray(obsArray, objectToAdd)) {
-      setObsArray((prevObsArrayForPrevEncounter) =>
-        prevObsArrayForPrevEncounter.map((obs) => (obs.concept === objectToAdd.concept ? objectToAdd : obs)),
-      );
-    } else {
-      setObsArray((prevObsArray) => [...prevObsArray, objectToAdd]);
-    }
-  };
-
-  const addObjectToUpdatePreviousEnc = (objectToAdd) => {
-    if (doesObjectExistInArray(obsArrayForPrevEncounter, objectToAdd)) {
-      setObsArrayForPrevEncounter((prevObsArrayForPrevEncounter) =>
-        prevObsArrayForPrevEncounter.map((obs) => (obs.concept === objectToAdd.concept ? objectToAdd : obs)),
-      );
-    } else {
-      setObsArrayForPrevEncounter((prevObsArrayForPrevEncounter) => [...prevObsArrayForPrevEncounter, objectToAdd]);
-    }
-  };
-
-  const doesObjectExistInArray = (obsArray, objectToCheck) =>
-    obsArray.some((obs) => obs.concept === objectToCheck.concept);
-
   useEffect(() => {
     if (standRegimenLine && regimenEvent !== Regimen.stopRegimenConcept) {
       const regimenLineObs = {
         concept: Regimen.RegimenLineConcept,
         value: standRegimenLine,
       };
-      addObjectOrUpdate(regimenLineObs);
+      addOrUpdateObsObject(regimenLineObs, obsArray, setObsArray);
     }
 
     if (standRegimen && regimenEvent !== Regimen.stopRegimenConcept) {
@@ -107,7 +93,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
         concept: Regimen.standardRegimenConcept,
         value: standRegimen,
       };
-      addObjectOrUpdate(standRegimenObs);
+      addOrUpdateObsObject(standRegimenObs, obsArray, setObsArray);
     }
 
     if (
@@ -118,7 +104,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
         concept: Regimen.reasonCodedConcept,
         value: regimenReason,
       };
-      addObjectToUpdatePreviousEnc(regimenReasonObs);
+      addOrUpdateObsObject(regimenReasonObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
     }
     if (visitDate && (regimenEvent === Regimen.stopRegimenConcept || regimenEvent === Regimen.changeRegimenConcept)) {
       const dateStoppedRegObs = {
@@ -127,19 +113,36 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
           toOmrsIsoString(new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date())),
         ),
       };
-      addObjectToUpdatePreviousEnc(dateStoppedRegObs);
+      addOrUpdateObsObject(dateStoppedRegObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
     }
     if (regimenEvent && category === 'ARV') {
       const categoryObs = {
         concept: Regimen.arvCategoryConcept,
         value: regimenEvent,
       };
-      addObjectOrUpdate(categoryObs);
+      if (regimenEvent === Regimen.stopRegimenConcept) {
+        addOrUpdateObsObject(categoryObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
+      } else {
+        addOrUpdateObsObject(categoryObs, obsArray, setObsArray);
+      }
     }
-  }, [standRegimenLine, regimenReason, standRegimen, category, regimenEvent, visitDate]);
+  }, [
+    standRegimenLine,
+    regimenReason,
+    standRegimen,
+    category,
+    regimenEvent,
+    visitDate,
+    obsArray,
+    obsArrayForPrevEncounter,
+  ]);
 
   useEffect(() => {
-    if (selectedRegimenType === 'nonStandardUuid' && nonStandardRegimens.length > 0) {
+    if (
+      selectedRegimenType === 'nonStandardUuid' &&
+      nonStandardRegimens.length > 0 &&
+      regimenEvent !== Regimen.stopRegimenConcept
+    ) {
       setObsArray((prevObsArray) => {
         // Create a map to track distinct values based on the 'value' key
         const distinctValuesMap = new Map();
@@ -154,7 +157,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
         return uniqueObsArray;
       });
     }
-  }, [selectedRegimenType, nonStandardRegimens]);
+  }, [selectedRegimenType, nonStandardRegimens, regimenEvent]);
 
   const handleSubmit = useCallback(
     (event) => {
@@ -183,6 +186,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
       };
       if (regimenEncounter.uuid) {
         updateEncounter(encounterToUpdate, regimenEncounter.uuid);
+        closeWorkspace();
       }
       if (obsArray.length > 0) {
         saveEncounter(encounterToSave).then(
@@ -197,7 +201,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
               mutate(`/ws/rest/v1/kenyaemr/currentProgramDetails?patientUuid=${patientUuid}`);
               mutate(`/ws/rest/v1/kenyaemr/patientSummary?patientUuid=${patientUuid}`);
               mutate(`/ws/rest/v1/kenyaemr/regimenHistory?patientUuid=${patientUuid}&category=${category}`);
-              closeOverlay();
+              closeWorkspace();
             }
           },
           (error) => {
@@ -222,6 +226,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
       regimenEncounter.uuid,
       sessionUser?.sessionLocation?.uuid,
       config.regimenObs.encounterProviderRoleUuid,
+      closeWorkspace,
     ],
   );
 
@@ -241,6 +246,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
       <div>
         <Stack gap={8} className={styles.container}>
+          <h4>Current Regimen {onRegimen}</h4>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('regimenEvent', 'Regimen event')}</div>
             <RadioButtonGroup
@@ -249,34 +255,37 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
               onChange={(uuid) => {
                 setRegimenEvent(uuid);
               }}>
-              {/* {lastRegimenEncounterUuid === '' && ( */}
               <RadioButton
                 key={'start-regimen'}
                 labelText={t('startRegimen', 'Start')}
                 value={Regimen.startOrRestartConcept}
+                disabled={lastRegimenEncounter.uuid}
               />
-              {/* )} */}
 
               <RadioButton
                 key={'restart-regimen'}
                 labelText={t('restartRegimen', 'Restart')}
                 value={Regimen.startOrRestartConcept}
+                disabled={!lastRegimenEncounter.endDate && lastRegimenEncounter.event !== 'STOP ALL'}
               />
 
               <RadioButton
                 key={'change-regimen'}
                 labelText={t('changeRegimen', 'Change')}
                 value={Regimen.changeRegimenConcept}
+                disabled={!lastRegimenEncounter.startDate || lastRegimenEncounter.event === 'STOP ALL'}
               />
               <RadioButton
                 key={'stop-regimen'}
                 labelText={t('stopRegimen', 'Stop')}
                 value={Regimen.stopRegimenConcept}
+                disabled={lastRegimenEncounter.endDate}
               />
               <RadioButton
                 key={'undo-regimen'}
                 labelText={t('undoRegimen', 'Undo')}
                 value={'undo'}
+                disabled={!lastRegimenEncounter.uuid}
                 onClick={launchCancelAppointmentDialog}
               />
             </RadioButtonGroup>
@@ -331,7 +340,8 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
                   </>
                 ) : null}
 
-                {regimenEvent !== 'undo' && selectedRegimenType ? (
+                {(regimenEvent !== 'undo' && selectedRegimenType) ||
+                (regimenEvent === Regimen.stopRegimenConcept && !selectedRegimenType) ? (
                   <RegimenReason category={category} setRegimenReason={setRegimenReason} />
                 ) : null}
               </>
@@ -340,7 +350,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({ patientUuid, category, onRegi
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closeOverlay}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
