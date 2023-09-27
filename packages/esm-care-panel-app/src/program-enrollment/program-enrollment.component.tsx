@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Tile, Button, ButtonSet } from '@carbon/react';
 import styles from './program-enrollment.scss';
 import { Edit, TrashCan, Add } from '@carbon/react/icons';
-import { useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { showNotification, useLayoutType } from '@openmrs/esm-framework';
 import isNull from 'lodash-es/isNull';
 import { ProgramType } from '../types';
 export interface ProgramEnrollmentProps {
@@ -14,25 +14,27 @@ export interface ProgramEnrollmentProps {
   launchPatientWorkspace: Function;
 }
 const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({
-  patientUuid,
   programName,
   data,
-  formEntrySub,
+
   launchPatientWorkspace,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() == 'tablet';
-  const { currentVisit } = useVisit(patientUuid);
   const handleOpenWorkspace = (formUuid, formName, encounterUuid) => {
-    const mutateForm = () => {};
-    formEntrySub.next({ formUuid, encounterUuid });
-    launchPatientWorkspace('patient-form-entry-workspace', {
-      workspaceTitle: formName,
-      mutateForm,
-      formUuid,
-      encounterUuid,
-      visit: currentVisit,
-    });
+    !encounterUuid
+      ? showNotification({
+          title: t('editEnrollment', 'Edit enrollment'),
+          description: t(
+            'editEnrollmentMessage',
+            'The enrollment form does not have an encounter associated with it, Please contact your system administrator to add an encounter to the enrollment',
+          ),
+          kind: 'error',
+        })
+      : launchPatientWorkspace('patient-form-entry-workspace', {
+          workspaceTitle: formName,
+          formInfo: { formUuid, encounterUuid: encounterUuid ?? '' },
+        });
   };
   if (isNull(data)) {
     return;
