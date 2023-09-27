@@ -68,17 +68,6 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
   const [obsArray, setObsArray] = useState([]);
   const [obsArrayForPrevEncounter, setObsArrayForPrevEncounter] = useState([]);
 
-  const regimenType = [
-    {
-      display: 'Use standard regimen',
-      uuid: 'standardUuid',
-    },
-    {
-      display: 'Use non standard regimen',
-      uuid: 'nonStandardUuid',
-    },
-  ];
-
   useEffect(() => {
     if (standRegimenLine && regimenEvent !== Regimen.stopRegimenConcept) {
       const regimenLineObs = {
@@ -118,6 +107,16 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
     if (regimenEvent && category === 'ARV') {
       const categoryObs = {
         concept: Regimen.arvCategoryConcept,
+        value: regimenEvent,
+      };
+      if (regimenEvent === Regimen.stopRegimenConcept) {
+        addOrUpdateObsObject(categoryObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
+      } else {
+        addOrUpdateObsObject(categoryObs, obsArray, setObsArray);
+      }
+    } else {
+      const categoryObs = {
+        concept: Regimen.tbCategoryConcept,
         value: regimenEvent,
       };
       if (regimenEvent === Regimen.stopRegimenConcept) {
@@ -246,7 +245,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
       <div>
         <Stack gap={8} className={styles.container}>
-          <h4>Current Regimen {onRegimen}</h4>
+          <h4>Current Regimen: {onRegimen}</h4>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('regimenEvent', 'Regimen event')}</div>
             <RadioButtonGroup
@@ -317,10 +316,13 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                       onChange={(uuid) => {
                         setSelectedRegimenType(uuid);
                       }}>
-                      {regimenType?.length > 0 &&
-                        regimenType.map(({ uuid, display }) => (
-                          <RadioButton key={uuid} labelText={display} value={uuid} />
-                        ))}
+                      <RadioButton key={'standardUuid'} labelText={'Use standard regimen'} value={'standardUuid'} />
+                      <RadioButton
+                        key={'nonStandardUuid'}
+                        labelText={'Use non standard regimen'}
+                        value={'nonStandardUuid'}
+                        disabled={category !== 'ARV'}
+                      />
                     </RadioButtonGroup>
                     {selectedRegimenType === 'standardUuid' ? (
                       <StandardRegimen
@@ -340,8 +342,8 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                   </>
                 ) : null}
 
-                {(regimenEvent !== 'undo' && selectedRegimenType) ||
-                (regimenEvent === Regimen.stopRegimenConcept && !selectedRegimenType) ? (
+                {regimenEvent === Regimen.stopRegimenConcept ||
+                (regimenEvent === Regimen.changeRegimenConcept && selectedRegimenType) ? (
                   <RegimenReason category={category} setRegimenReason={setRegimenReason} />
                 ) : null}
               </>
