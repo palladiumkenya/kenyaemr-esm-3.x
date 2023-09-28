@@ -114,7 +114,8 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
       } else {
         addOrUpdateObsObject(categoryObs, obsArray, setObsArray);
       }
-    } else {
+    }
+    if (regimenEvent && category === 'TB') {
       const categoryObs = {
         concept: Regimen.tbCategoryConcept,
         value: regimenEvent,
