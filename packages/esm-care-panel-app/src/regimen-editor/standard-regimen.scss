@@ -1,0 +1,46 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.inputContainer {
+  margin: spacing.$spacing-05 0;
+}
+.container {
+  margin: spacing.$spacing-05 0rem;
+  background-color: $ui-background;
+
+  & section {
+    margin: spacing.$spacing-02 spacing.$spacing-05 0;
+  }
+}
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-05;
+}
+
+.dateTimeSection {
+  display: flex;
+}
+
+.tablet {
+  padding: spacing.$spacing-06 spacing.$spacing-05;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: spacing.$spacing-06 spacing.$spacing-05;
+  background-color: $ui-02;
+}

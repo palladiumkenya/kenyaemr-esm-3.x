@@ -37,38 +37,40 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   }
 
   return (
-    <div className={styles.widgetCard}>
-      <CardHeader title={t('carePanel', 'Care Panel')}>
-        {isLoading ? (
-          <span>
-            <InlineLoading />
-          </span>
-        ) : null}
-        <div className={styles.contextSwitcherContainer}>
-          <ContentSwitcher
-            size="sm"
-            selectedIndex={0}
-            onChange={({ index }) => {
-              setActiveTabIndex(index as number);
-            }}>
-            {patientPrograms?.length > 0
-              ? patientPrograms.map((index, val) => <Switch name={index} text={index} key={val} value={val} />)
-              : null}
-          </ContentSwitcher>
+    <>
+      <div className={styles.widgetCard}>
+        <CardHeader title={t('carePanel', 'Care Panel')}>
+          {isLoading ? (
+            <span>
+              <InlineLoading />
+            </span>
+          ) : null}
+          <div className={styles.contextSwitcherContainer}>
+            <ContentSwitcher
+              size="sm"
+              selectedIndex={0}
+              onChange={({ index }) => {
+                setActiveTabIndex(index as number);
+              }}>
+              {patientPrograms?.length > 0
+                ? patientPrograms.map((index, val) => <Switch name={index} text={index} key={val} value={val} />)
+                : null}
+            </ContentSwitcher>
+          </div>
+        </CardHeader>
+        <div style={{ width: '100%' }}>
+          <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
+          <ProgramEnrollment
+            patientUuid={patientUuid}
+            programName={patientPrograms[activeTabIndex]}
+            data={data}
+            formEntrySub={formEntrySub}
+            launchPatientWorkspace={launchPatientWorkspace}
+          />
+          <RegimenHistory patientUuid={patientUuid} category={patientPrograms[activeTabIndex]} />
         </div>
-      </CardHeader>
-      <div style={{ width: '100%' }}>
-        <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
-        <ProgramEnrollment
-          patientUuid={patientUuid}
-          programName={patientPrograms[activeTabIndex]}
-          data={data}
-          formEntrySub={formEntrySub}
-          launchPatientWorkspace={launchPatientWorkspace}
-        />
-        <RegimenHistory patientUuid={patientUuid} category={patientPrograms[activeTabIndex]} />
       </div>
-    </div>
+    </>
   );
 };
 

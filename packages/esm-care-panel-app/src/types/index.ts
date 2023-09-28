@@ -159,3 +159,45 @@ export enum RegimenType {
   HIV = 'ARV',
   TB = 'TB',
 }
+
+export type RegimenEncounter = {
+  uuid: string;
+};
+
+export enum Regimen {
+  RegimenLineConcept = '163104AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  reasonCodedConcept = '1252AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  reasonNonCodedConcept = '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  standardRegimenConcept = '1193AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  nonStandardRegimenConcept = '1088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  arvCategoryConcept = '1255AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  tbCategoryConcept = '1268AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  changeRegimenConcept = '1259AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  stopRegimenConcept = '1260AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  startOrRestartConcept = '1256AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  regimenForm = 'da687480-e197-11e8-9f32-f2801f1b9fd1',
+  regimenEncounterType = '7dffc392-13e7-11e9-ab14-d663bd873d93',
+  dateDrugStoppedCon = '1191AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+}
+
+export interface Encounter {
+  encounterDatetime: Date;
+  patient: string;
+  encounterType: string;
+  location: string;
+  encounterProviders: Array<{
+    provider: string;
+    encounterRole: string;
+  }>;
+  form: string;
+  obs: Array<{
+    concept: string;
+    value: string | number;
+  }>;
+}
+export interface UpdateObs {
+  obs: Array<{
+    concept: string;
+    value: string | number;
+  }>;
+}
