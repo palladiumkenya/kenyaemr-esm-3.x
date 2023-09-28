@@ -72,7 +72,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                   <p className={styles.value}>
                     {data?.HIV?.lastEncDetails?.regimenShortDisplay
                       ? data?.HIV?.lastEncDetails?.regimenShortDisplay
-                      : '--'}{' '}
+                      : t('neverOnArvRegimen', 'Never on ARVs')}
                     <RegimenButton
                       patientUuid={patientUuid}
                       category={programName}
