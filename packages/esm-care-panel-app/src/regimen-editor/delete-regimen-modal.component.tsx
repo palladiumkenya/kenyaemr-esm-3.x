@@ -4,7 +4,6 @@ import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
 import { deleteEncounter } from './regimen.resource';
 import { mutate } from 'swr';
-import { closeOverlay } from '../hooks/useOverlay';
 
 interface deleteRegimenModalProps {
   closeCancelModal: () => void;
