@@ -233,12 +233,13 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
   const handleOnChange = () => {
     // setIgnoreChanges((prevState) => !prevState);
   };
-  const launchCancelAppointmentDialog = () => {
+  const launchDeleteRegimenDialog = () => {
     const dispose = showModal('delete-regimen-confirmation-dialog', {
       closeCancelModal: () => dispose(),
       regimenEncounterUuid: regimenEncounter.uuid,
       patientUuid: patientUuid,
       category: category,
+      closeWorkspace,
     });
   };
 
@@ -286,7 +287,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                 labelText={t('undoRegimen', 'Undo')}
                 value={'undo'}
                 disabled={!lastRegimenEncounter.uuid}
-                onClick={launchCancelAppointmentDialog}
+                onClick={launchDeleteRegimenDialog}
               />
             </RadioButtonGroup>
             {regimenEvent ? (

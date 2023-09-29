@@ -5,18 +5,20 @@ import { showNotification, showToast } from '@openmrs/esm-framework';
 import { deleteEncounter } from './regimen.resource';
 import { mutate } from 'swr';
 
-interface deleteRegimenModalProps {
+interface DeleteRegimenModalProps {
   closeCancelModal: () => void;
   regimenEncounterUuid: string;
   patientUuid: string;
   category: string;
+  closeWorkspace: () => void;
 }
 
-const DeleteRegimenModal: React.FC<deleteRegimenModalProps> = ({
+const DeleteRegimenModal: React.FC<DeleteRegimenModalProps> = ({
   closeCancelModal,
   regimenEncounterUuid,
   patientUuid,
   category,
+  closeWorkspace,
 }) => {
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,6 +41,7 @@ const DeleteRegimenModal: React.FC<deleteRegimenModalProps> = ({
             mutate(`/ws/rest/v1/kenyaemr/regimenHistory?patientUuid=${patientUuid}&category=${category}`);
             mutate(`/ws/rest/v1/kenyaemr/currentProgramDetails?patientUuid=${patientUuid}`);
             mutate(`/ws/rest/v1/kenyaemr/patientSummary?patientUuid=${patientUuid}`);
+            closeWorkspace?.();
           }
         })
         .catch((err) => {
@@ -50,7 +53,7 @@ const DeleteRegimenModal: React.FC<deleteRegimenModalProps> = ({
           });
         });
     },
-    [t, regimenEncounterUuid, closeCancelModal, category, patientUuid],
+    [t, regimenEncounterUuid, closeCancelModal, category, patientUuid, closeWorkspace],
   );
 
   return (
