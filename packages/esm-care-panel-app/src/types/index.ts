@@ -14,7 +14,7 @@ type HIVData = {
     regimenShortDisplay: string;
     regimenLine: string;
     regimenLongDisplay: string;
-    changeReasons: string[];
+    changeReasons: Array<string>;
     regimenUuid: string;
     current: boolean;
   };
@@ -30,7 +30,7 @@ type TBData = {
     regimenShortDisplay: string;
     regimenLine: string;
     regimenLongDisplay: string;
-    changeReasons: string[];
+    changeReasons: Array<string>;
     regimenUuid: string;
     current: boolean;
   };
@@ -118,11 +118,29 @@ export type PatientSummary = {
   whoStageAtArtStart: string;
   cd4AtArtStart: string;
   heightArtInitiation: string;
-  firstRegimen: string;
+  firstRegimen: {
+    startDate: string;
+    endDate: string;
+    regimenShortDisplay: string;
+    regimenLine: string;
+    regimenLongDisplay: string;
+    changeReasons: Array<string>;
+    regimenUuid: string;
+    current: boolean;
+  };
   purposeDrugs: string;
   purposeDate: string;
   iosResults: string;
-  currentArtRegimen: string;
+  currentArtRegimen: {
+    startDate: string;
+    endDate: string;
+    regimenShortDisplay: string;
+    regimenLine: string;
+    regimenLongDisplay: string;
+    changeReasons: Array<string>;
+    regimenUuid: string;
+    current: boolean;
+  };
   currentWhoStaging: string;
   ctxValue: string;
   dapsone: string;
