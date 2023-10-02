@@ -201,6 +201,8 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
               mutate(`/ws/rest/v1/kenyaemr/currentProgramDetails?patientUuid=${patientUuid}`);
               mutate(`/ws/rest/v1/kenyaemr/patientSummary?patientUuid=${patientUuid}`);
               mutate(`/ws/rest/v1/kenyaemr/regimenHistory?patientUuid=${patientUuid}&category=${category}`);
+              mutate(`/ws/rest/v1/kenyaemr/lastRegimenEncounter?patientUuid=${patientUuid}&category=${category}`);
+
               closeWorkspace();
             }
           },
@@ -280,7 +282,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                 key={'stop-regimen'}
                 labelText={t('stopRegimen', 'Stop')}
                 value={Regimen.stopRegimenConcept}
-                disabled={lastRegimenEncounter.endDate}
+                disabled={lastRegimenEncounter.endDate || (!lastRegimenEncounter.uuid && !lastRegimenEncounter.endDate)}
               />
               <RadioButton
                 key={'undo-regimen'}
