@@ -41,6 +41,7 @@ const DeleteRegimenModal: React.FC<DeleteRegimenModalProps> = ({
             mutate(`/ws/rest/v1/kenyaemr/regimenHistory?patientUuid=${patientUuid}&category=${category}`);
             mutate(`/ws/rest/v1/kenyaemr/currentProgramDetails?patientUuid=${patientUuid}`);
             mutate(`/ws/rest/v1/kenyaemr/patientSummary?patientUuid=${patientUuid}`);
+            mutate(`/ws/rest/v1/kenyaemr/lastRegimenEncounter?patientUuid=${patientUuid}&category=${category}`);
             closeWorkspace?.();
           }
         })
