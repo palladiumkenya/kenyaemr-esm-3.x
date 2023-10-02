@@ -60,8 +60,8 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [visitDate, setVisitDate] = useState(new Date());
   const [regimenEvent, setRegimenEvent] = useState('');
-  const [standRegimen, setStandardRegimen] = useState('');
-  const [standRegimenLine, setStandardRegimenLine] = useState('');
+  const [standardRegimen, setStandardRegimen] = useState('');
+  const [standardRegimenLine, setStandardRegimenLine] = useState('');
   const [nonStandardRegimens, setNonStandardRegimens] = useState([]);
   const [regimenReason, setRegimenReason] = useState('');
   const [selectedRegimenType, setSelectedRegimenType] = useState('');
@@ -69,20 +69,20 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
   const [obsArrayForPrevEncounter, setObsArrayForPrevEncounter] = useState([]);
 
   useEffect(() => {
-    if (standRegimenLine && regimenEvent !== Regimen.stopRegimenConcept) {
+    if (standardRegimenLine && regimenEvent !== Regimen.stopRegimenConcept) {
       const regimenLineObs = {
         concept: Regimen.RegimenLineConcept,
-        value: standRegimenLine,
+        value: standardRegimenLine,
       };
       addOrUpdateObsObject(regimenLineObs, obsArray, setObsArray);
     }
 
-    if (standRegimen && regimenEvent !== Regimen.stopRegimenConcept) {
-      const standRegimenObs = {
+    if (standardRegimen && regimenEvent !== Regimen.stopRegimenConcept) {
+      const standardRegimenObs = {
         concept: Regimen.standardRegimenConcept,
-        value: standRegimen,
+        value: standardRegimen,
       };
-      addOrUpdateObsObject(standRegimenObs, obsArray, setObsArray);
+      addOrUpdateObsObject(standardRegimenObs, obsArray, setObsArray);
     }
 
     if (
@@ -127,9 +127,9 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
       }
     }
   }, [
-    standRegimenLine,
+    standardRegimenLine,
     regimenReason,
-    standRegimen,
+    standardRegimen,
     category,
     regimenEvent,
     visitDate,
