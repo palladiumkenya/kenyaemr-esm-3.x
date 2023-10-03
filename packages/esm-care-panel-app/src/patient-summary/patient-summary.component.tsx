@@ -421,15 +421,33 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
 
           <div className={styles.container}>
             <div className={styles.content}>
-              <p className={styles.label}>{t('firstRegimen', 'First regimen')}</p>
+              <p className={styles.label}>{t('initialRegimen', 'Initial regimen')}</p>
               <p>
-                <span className={styles.value}>{data?.firstRegimen ? data?.firstRegimen : '--'}</span>
+                <span className={styles.value}>
+                  {data?.firstRegimen ? data?.firstRegimen?.regimenShortDisplay : '--'}
+                </span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('initialRegimenDate', 'Initial regimen date')}</p>
+              <p>
+                <span className={styles.value}>{data?.firstRegimen ? data?.firstRegimen?.startDate : '--'}</span>
               </p>
             </div>
             <div className={styles.content}>
               <p className={styles.label}>{t('currentArtRegimen', 'Current Art regimen')}</p>
               <p>
-                <span className={styles.value}>{data?.currentArtRegimen ? data?.currentArtRegimen : '--'}</span>
+                <span className={styles.value}>
+                  {data?.currentArtRegimen ? data?.currentArtRegimen?.regimenShortDisplay : '--'}
+                </span>
+              </p>
+            </div>
+            <div className={styles.content}>
+              <p className={styles.label}>{t('currentArtRegimenDate', 'Current Art regimen date')}</p>
+              <p>
+                <span className={styles.value}>
+                  {data?.currentArtRegimen ? data?.currentArtRegimen?.startDate : '--'}
+                </span>
               </p>
             </div>
           </div>
