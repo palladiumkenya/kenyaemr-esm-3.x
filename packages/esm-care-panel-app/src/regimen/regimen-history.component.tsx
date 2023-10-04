@@ -7,6 +7,7 @@ import {
   StructuredListWrapper,
   StructuredListHead,
   StructuredListBody,
+  Tile,
 } from '@carbon/react';
 import styles from './regimen-history.scss';
 import { useRegimenHistory } from '../hooks/useRegimenHistory';
@@ -52,27 +53,29 @@ const RegimenHistory: React.FC<RegimenHistoryProps> = ({ patientUuid, category }
     };
 
     return (
-      <>
-        <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-          <h4 className={styles.title}>{t('regimenHistory', 'Regimen History')}</h4>
-        </div>
-        <div className={styles.structuredListBody}>
-          <StructuredListWrapper>
-            <StructuredListHead>
-              <StructuredListRow head>
-                <StructuredListCell head>{t('start', 'Start')}</StructuredListCell>
-                <StructuredListCell head>{t('end', 'End')}</StructuredListCell>
-                <StructuredListCell head>{t('regimen', 'Regimen')}</StructuredListCell>
-                <StructuredListCell head>{t('regimenLine', 'Regimen line')}</StructuredListCell>
-                <StructuredListCell head>{t('changeReason', 'Change reason')}</StructuredListCell>
-              </StructuredListRow>
-            </StructuredListHead>
-            <StructuredListBody className={styles.structuredListBody}>
-              {structuredListBodyRowGenerator()}
-            </StructuredListBody>
-          </StructuredListWrapper>
-        </div>
-      </>
+      <section>
+        <Tile className={styles.whiteBackground}>
+          <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+            <h4 className={styles.title}>{t('regimenHistory', 'Regimen History')}</h4>
+          </div>
+          <div className={styles.structuredListBody}>
+            <StructuredListWrapper>
+              <StructuredListHead>
+                <StructuredListRow head>
+                  <StructuredListCell head>{t('start', 'Start')}</StructuredListCell>
+                  <StructuredListCell head>{t('end', 'End')}</StructuredListCell>
+                  <StructuredListCell head>{t('regimen', 'Regimen')}</StructuredListCell>
+                  <StructuredListCell head>{t('regimenLine', 'Regimen line')}</StructuredListCell>
+                  <StructuredListCell head>{t('changeReason', 'Change reason')}</StructuredListCell>
+                </StructuredListRow>
+              </StructuredListHead>
+              <StructuredListBody className={styles.structuredListBody}>
+                {structuredListBodyRowGenerator()}
+              </StructuredListBody>
+            </StructuredListWrapper>
+          </div>
+        </Tile>
+      </section>
     );
   }
 };

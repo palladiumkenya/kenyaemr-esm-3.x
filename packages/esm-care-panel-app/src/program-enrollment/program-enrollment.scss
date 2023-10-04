@@ -7,6 +7,8 @@
   h4 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
+    background-color: $ui-background;
+    padding-top: spacing.$spacing-02;
   }
 }
 
@@ -21,6 +23,8 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
+  background-color: $ui-background;
+  padding-top: spacing.$spacing-02;
 }
 
 .title {
@@ -37,11 +41,9 @@
   margin-left: auto;
 }
 
-.buttonSet {
+.buttonContainer {
+  display: flex;
   justify-content: flex-end;
-  & > button {
-    width: 50% !important;
-  }
 }
 
 .labelContainer {
@@ -80,4 +82,8 @@
     @include type.type-style('productive-heading-02');
     color: colors.$gray-80;
   }
+}
+
+.tileWrapper {
+  gap: spacing.$spacing-05;
 }

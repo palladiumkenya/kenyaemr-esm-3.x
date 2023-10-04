@@ -44,3 +44,16 @@
   padding: spacing.$spacing-06 spacing.$spacing-05;
   background-color: $ui-02;
 }
+
+.linkName {
+  padding-left: 2rem;
+
+  &:active {
+    text-decoration: none;
+  }
+
+  &:hover {
+    text-decoration: none;
+    cursor: pointer;
+  }
+}

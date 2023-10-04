@@ -1,9 +1,10 @@
 import React from 'react';
-import { Edit } from '@carbon/react/icons';
+import { Link } from '@carbon/react';
 
 import { useTranslation } from 'react-i18next';
 import { RegimenType } from '../types';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import styles from './standard-regimen.scss';
 
 interface RegimenButtonProps {
   patientUuid: string;
@@ -20,19 +21,18 @@ interface RegimenButtonProps {
 const RegimenButton: React.FC<RegimenButtonProps> = ({ category, patientUuid, onRegimen, lastRegimenEncounter }) => {
   const { t } = useTranslation();
   return (
-    <>
-      <Edit
-        onClick={() =>
-          launchPatientWorkspace('patient-regimen-workspace', {
-            category: RegimenType[category],
-            patientUuid: patientUuid,
-            onRegimen: onRegimen,
-            lastRegimenEncounter: lastRegimenEncounter,
-          })
-        }
-        style={{ cursor: 'pointer' }}
-      />
-    </>
+    <Link
+      className={styles.linkName}
+      onClick={() =>
+        launchPatientWorkspace('patient-regimen-workspace', {
+          category: RegimenType[category],
+          patientUuid: patientUuid,
+          onRegimen: onRegimen,
+          lastRegimenEncounter: lastRegimenEncounter,
+        })
+      }>
+      {t('editRegimen', 'Edit')}
+    </Link>
   );
 };
 

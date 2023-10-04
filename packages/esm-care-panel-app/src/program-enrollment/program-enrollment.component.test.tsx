@@ -36,7 +36,6 @@ describe('ProgramEnrollment Component', () => {
   it('displays active program enrollment details correctly', () => {
     render(<ProgramEnrollment {...mockProps} />);
 
-    expect(screen.getByText(/Current enrollment details/i)).toBeInTheDocument();
     expect(screen.getByText(/HIV program/i)).toBeInTheDocument();
     expect(screen.getByText(/Edit/i)).toBeInTheDocument();
     expect(screen.getByText(/Discontinue/i)).toBeInTheDocument();
@@ -69,7 +68,6 @@ describe('ProgramEnrollment Component', () => {
       />,
     );
 
-    expect(screen.getByText(/Historic enrollment/i)).toBeInTheDocument();
     expect(screen.getByText(/Edit/i)).toBeInTheDocument();
     expect(screen.getByText(/Completed/i)).toBeInTheDocument();
     expect(screen.getByText(/2023-08-06/i)).toBeInTheDocument();

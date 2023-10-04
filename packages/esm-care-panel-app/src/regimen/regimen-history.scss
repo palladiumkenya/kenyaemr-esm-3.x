@@ -11,12 +11,16 @@
   h4 {
     @include type.type-style('heading-compact-02');
     color: $text-02;
+    background-color: $ui-background;
+    padding-top: spacing.$spacing-02;
   }
 }
 .desktopHeading,
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
+  background-color: $ui-background;
+  padding-top: spacing.$spacing-02;
 }
 .structuredList {
   padding: 0.5rem 0.5rem 0.5rem;
@@ -30,6 +34,7 @@
 
 .structuredListBody {
   :global(.cds--structured-list-td) {
-    padding: 0.2rem 0.2rem 0.5rem
+    padding: 0.2rem 0.2rem 0.5rem;
   }
+  background-color: $ui-background;
 }
