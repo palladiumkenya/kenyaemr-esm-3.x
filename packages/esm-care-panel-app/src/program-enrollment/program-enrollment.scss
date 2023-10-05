@@ -21,6 +21,8 @@
 
 .desktopHeading,
 .tabletHeading {
+  display: flex;
+  justify-content: space-between;
   text-align: left;
   text-transform: capitalize;
   background-color: $ui-background;
@@ -35,6 +37,7 @@
 
 .card {
   background-color: $ui-02;
+  padding: spacing.$spacing-03;
 }
 
 .btnEdit {
@@ -59,7 +62,7 @@
 
 .content {
   width: 30%;
-  margin: spacing.$spacing-03 0;
+  margin: spacing.$spacing-01 0;
 
   & > p:first-child {
     @include type.type-style('label-01');
