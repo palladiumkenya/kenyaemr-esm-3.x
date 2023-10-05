@@ -60,6 +60,7 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
         </CardHeader>
         <div style={{ width: '100%' }}>
           <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
+          <RegimenHistory patientUuid={patientUuid} category={patientPrograms[activeTabIndex]} />
           <ProgramEnrollment
             patientUuid={patientUuid}
             programName={patientPrograms[activeTabIndex]}
@@ -67,7 +68,6 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
             formEntrySub={formEntrySub}
             launchPatientWorkspace={launchPatientWorkspace}
           />
-          <RegimenHistory patientUuid={patientUuid} category={patientPrograms[activeTabIndex]} />
         </div>
       </div>
     </>
