@@ -35,7 +35,8 @@ describe('ProgramEnrollment Component', () => {
 
   it('displays active program enrollment details correctly', () => {
     render(<ProgramEnrollment {...mockProps} />);
-
+    const overflowMenu = screen.getByRole('button', { name: 'Open and close list of options' });
+    fireEvent.click(overflowMenu);
     expect(screen.getByText(/HIV program/i)).toBeInTheDocument();
     expect(screen.getByText(/Edit/i)).toBeInTheDocument();
     expect(screen.getByText(/Discontinue/i)).toBeInTheDocument();
@@ -67,7 +68,8 @@ describe('ProgramEnrollment Component', () => {
         ]}
       />,
     );
-
+    const overflowMenu = screen.getByRole('button', { name: 'Open and close list of options' });
+    fireEvent.click(overflowMenu);
     expect(screen.getByText(/Edit/i)).toBeInTheDocument();
     expect(screen.getByText(/Completed/i)).toBeInTheDocument();
     expect(screen.getByText(/2023-08-06/i)).toBeInTheDocument();
@@ -79,6 +81,8 @@ describe('ProgramEnrollment Component', () => {
 
   test('should show notification error when there is no encounter when launching forms', () => {
     render(<ProgramEnrollment {...mockProps} />);
+    const overflowMenu = screen.getByRole('button', { name: 'Open and close list of options' });
+    fireEvent.click(overflowMenu);
 
     const editButton = screen.getByText(/Edit/i);
     const deleteButton = screen.getByText(/Discontinue/i);
@@ -116,6 +120,8 @@ describe('ProgramEnrollment Component', () => {
     };
     render(<ProgramEnrollment {...updatedMockProps} />);
 
+    const overflowMenu = screen.getByRole('button', { name: 'Open and close list of options' });
+    fireEvent.click(overflowMenu);
     // Trigger the edit button
     const editButton = screen.getByText(/Edit/i);
 
