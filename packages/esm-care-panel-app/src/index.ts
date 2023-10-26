@@ -41,3 +41,8 @@ export function startupApp() {
   registerBreadcrumbs([]);
   defineConfigSchema(moduleName, configSchema);
 }
+
+export const patientCareProgram = getAsyncLifecycle(() => import('./care-programs/care-programs.component'), {
+  moduleName: 'patient-care-programs',
+  featureName: 'care-programs',
+});
