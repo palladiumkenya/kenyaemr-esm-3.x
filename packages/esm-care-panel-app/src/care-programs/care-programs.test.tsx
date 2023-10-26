@@ -4,6 +4,7 @@ import CarePrograms from './care-programs.component';
 import * as careProgramsHook from '../hooks/useCarePrograms';
 import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { useVisit } from '@openmrs/esm-framework';
+import { PatientCarePrograms } from '../hooks/useCarePrograms';
 
 const mockUseVisit = useVisit as jest.Mock;
 
@@ -15,7 +16,7 @@ const testProps = {
   mutate: jest.fn(),
 };
 
-const mockAPIResponse = [
+const mockAPIResponse: Array<PatientCarePrograms> = [
   {
     uuid: 'dfdc6d40-2f2f-463d-ba90-cc97350441a8',
     display: 'HIV',
@@ -35,7 +36,6 @@ const mockAPIResponse = [
     enrollmentFormUuid: '89994550-9939-40f3-afa6-173bce445c79',
     discontinuationFormUuid: '4b296dd0-f6be-4007-9eb8-d0fd4e94fb3a',
     enrollmentStatus: 'eligible',
-    enrollmentDetails: {},
   },
 ];
 
@@ -98,24 +98,30 @@ describe('CarePrograms', () => {
 
     fireEvent.click(enrollButton);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      formInfo: { encounterUuid: '', enrollmentDetails: {}, formUuid: '89994550-9939-40f3-afa6-173bce445c79' },
-      mutateForm: expect.any(Function),
+      formInfo: {
+        additionalProps: { enrollmenrDetails: undefined },
+        encounterUuid: '',
+        formUuid: '89994550-9939-40f3-afa6-173bce445c79',
+      },
+      mutateForm: expect.anything(),
       workspaceTitle: 'TB Enrollment form',
     });
 
     fireEvent.click(discontinueButton);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
-        encounterUuid: '',
-        enrollmentDetails: {
-          dateCompleted: '',
-          dateEnrolled: '2023-10-25 03:27:15.0',
-          location: 'Moi Teaching Refferal Hospital',
-          uuid: '561f0766-6496-4f59-abc2-a4030788b3cc',
+        additionalProps: {
+          enrollmenrDetails: {
+            dateCompleted: '',
+            dateEnrolled: '2023-10-25 03:27:15.0',
+            location: 'Moi Teaching Refferal Hospital',
+            uuid: '561f0766-6496-4f59-abc2-a4030788b3cc',
+          },
         },
+        encounterUuid: '',
         formUuid: 'e3237ede-fa70-451f-9e6c-0908bc39f8b9',
       },
-      mutateForm: expect.any(Function),
+      mutateForm: expect.anything(),
       workspaceTitle: 'HIV Discontinuation form',
     });
   });

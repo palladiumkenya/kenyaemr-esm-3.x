@@ -48,7 +48,11 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
         ? launchPatientWorkspace('patient-form-entry-workspace', {
             workspaceTitle: workspaceTitle,
             mutateForm: mutate,
-            formInfo: { encounterUuid: '', formUuid, enrollmentDetails: careProgram.enrollmentDetails ?? {} },
+            formInfo: {
+              encounterUuid: '',
+              formUuid,
+              additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails } ?? {},
+            },
           })
         : launchStartVisitPrompt();
     },
@@ -66,7 +70,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
               <span>
                 {capitalize(
                   `${careProgram.enrollmentStatus} ${
-                    careProgram.enrollmentDetails?.dateEnrolled
+                    careProgram.enrollmentDetails?.dateEnrolled && careProgram.enrollmentStatus === 'active'
                       ? `Since (${formatDate(new Date(careProgram.enrollmentDetails.dateEnrolled))})`
                       : ''
                   }`,
