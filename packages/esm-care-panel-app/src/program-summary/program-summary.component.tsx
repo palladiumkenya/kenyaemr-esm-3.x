@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './program-summary.scss';
 import { useProgramSummary } from '../hooks/useProgramSummary';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { formatDate, useLayoutType } from '@openmrs/esm-framework';
 import { StructuredListSkeleton, Tile } from '@carbon/react';
 import { ProgramType, RegimenType } from '../types';
 import RegimenButton from '../regimen-editor/regimen-button.component';
@@ -23,10 +23,10 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
   if (isError) {
     return <span>{t('errorProgramSummary', 'Error loading HIV summary')}</span>;
   }
-  if (Object.keys(data)?.length === 0) {
+  if (Object.keys(data ?? {})?.length === 0) {
     return;
   }
-  if (Object.keys(data).length > 0) {
+  if (Object.keys(data ?? {}).length > 0) {
     return (
       <>
         {Object.entries(data).map(([key, val]) =>
@@ -65,7 +65,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                       <span className={styles.value}>
                         {t('whoStage', 'WHO STAGE')} {data?.HIV?.whoStage ? data?.HIV?.whoStage : '--'}
                       </span>
-                      {data?.HIV?.whoStageDate ? <span> ({data?.HIV?.whoStageDate}) </span> : ''}
+                      {data?.HIV?.whoStageDate ? <span> ({formatDate(new Date(data?.HIV?.whoStageDate))}) </span> : ''}
                     </p>
                   </div>
                   <div className={styles.content}>
@@ -119,7 +119,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                         {data?.TB?.tbDiseaseClassification ? data?.TB?.tbDiseaseClassification : '--'}
                       </span>
                       {data?.TB?.tbDiseaseClassificationDate ? (
-                        <span> ({data?.TB?.tbDiseaseClassificationDate}) </span>
+                        <span> ({formatDate(new Date(data?.TB?.tbDiseaseClassificationDate.toString()))}) </span>
                       ) : (
                         ''
                       )}

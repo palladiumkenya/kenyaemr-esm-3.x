@@ -27,6 +27,7 @@
   text-transform: capitalize;
   background-color: $ui-background;
   padding-top: spacing.$spacing-02;
+  padding-bottom: spacing.$spacing-03;
 }
 
 .title {
@@ -64,7 +65,7 @@
   width: 30%;
   margin: spacing.$spacing-01 0;
 
-  & > p:first-child {
+  &>p:first-child {
     @include type.type-style('label-01');
     color: colors.$gray-70;
     margin-bottom: spacing.$spacing-02;
@@ -81,7 +82,7 @@
   align-items: center;
   justify-content: space-between;
 
-  & > h4 {
+  &>h4 {
     @include type.type-style('productive-heading-02');
     color: colors.$gray-80;
   }
@@ -89,4 +90,16 @@
 
 .tileWrapper {
   gap: spacing.$spacing-05;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
+}
+
+.menuItem {
+  max-width: none;
 }

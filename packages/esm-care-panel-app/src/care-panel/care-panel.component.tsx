@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListSkeleton, ContentSwitcher, Switch, InlineLoading } from '@carbon/react';
 import styles from './care-panel.scss';
 import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import ProgramSummary from '../program-summary/program-summary.component';
 import ProgramEnrollment from '../program-enrollment/program-enrollment.component';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import RegimenHistory from '../regimen/regimen-history.component';
+import first from 'lodash/first';
+import sortBy from 'lodash/sortBy';
+import { ErrorState } from '@openmrs/esm-framework';
+import CarePrograms from '../care-programs/care-programs.component';
 
 interface CarePanelProps {
   patientUuid: string;
@@ -14,60 +18,65 @@ interface CarePanelProps {
   launchPatientWorkspace: Function;
 }
 
+type SwitcherItem = {
+  index: number;
+  name?: string;
+  text?: string;
+};
+
 const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launchPatientWorkspace }) => {
   const { t } = useTranslation();
-  const { data, isLoading, isError } = useEnrollmentHistory(patientUuid);
-  const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  const patientPrograms = [...new Set(data?.map((program) => program.programName))];
-
-  useEffect(() => {
-    setActiveTabIndex(activeTabIndex);
-  }, [activeTabIndex]);
+  const { isLoading, error, enrollments } = useEnrollmentHistory(patientUuid);
+  const switcherHeaders = sortBy(Object.keys(enrollments || {}));
+  const [switchItem, setSwitcherItem] = useState<SwitcherItem>({ index: 0 });
+  const patientEnrollments = useMemo(
+    () => (isLoading ? [] : enrollments[switchItem?.name || first(switcherHeaders)]),
+    [enrollments, isLoading, switchItem?.name, switcherHeaders],
+  );
 
   if (isLoading) {
     return <StructuredListSkeleton role="progressbar" />;
   }
 
-  if (isError) {
-    return <span>{t('errorProgramEnrollment', 'Error loading program enrollments')}</span>;
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('carePanelError', 'Care panel')} />;
   }
 
-  if (data?.length === 0) {
-    return;
+  if (Object.keys(enrollments).length === 0) {
+    return (
+      <>
+        <EmptyState displayText={t('carePanel', 'care panel')} headerTitle={t('carePanel', 'Care panel')} />
+        <div className={styles.careProgramContainer}>
+          <CarePrograms patientUuid={patientUuid} />
+        </div>
+      </>
+    );
   }
 
   return (
     <>
       <div className={styles.widgetCard}>
         <CardHeader title={t('carePanel', 'Care Panel')}>
-          {isLoading ? (
-            <span>
-              <InlineLoading />
-            </span>
-          ) : null}
           <div className={styles.contextSwitcherContainer}>
-            <ContentSwitcher
-              size="sm"
-              selectedIndex={0}
-              onChange={({ index }) => {
-                setActiveTabIndex(index as number);
-              }}>
-              {patientPrograms?.length > 0
-                ? patientPrograms.map((index, val) => <Switch name={index} text={index} key={val} value={val} />)
-                : null}
+            <ContentSwitcher selectedIndex={switchItem?.index} onChange={setSwitcherItem}>
+              {switcherHeaders?.map((enrollment) => (
+                <Switch key={enrollment} name={enrollment} text={enrollment} />
+              ))}
             </ContentSwitcher>
           </div>
         </CardHeader>
-        <div style={{ width: '100%' }}>
-          <ProgramSummary patientUuid={patientUuid} programName={patientPrograms[activeTabIndex]} />
-          <RegimenHistory patientUuid={patientUuid} category={patientPrograms[activeTabIndex]} />
+        <div style={{ width: '100%', minHeight: '20rem' }}>
+          <ProgramSummary patientUuid={patientUuid} programName={switcherHeaders[switchItem?.index]} />
+          <RegimenHistory patientUuid={patientUuid} category={switcherHeaders[switchItem?.index]} />
           <ProgramEnrollment
             patientUuid={patientUuid}
-            programName={patientPrograms[activeTabIndex]}
-            data={data}
+            programName={switcherHeaders[switchItem?.index]}
+            enrollments={patientEnrollments}
             formEntrySub={formEntrySub}
             launchPatientWorkspace={launchPatientWorkspace}
           />
+
+          <CarePrograms patientUuid={patientUuid} />
         </div>
       </div>
     </>

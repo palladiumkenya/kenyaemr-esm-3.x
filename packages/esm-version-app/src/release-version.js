@@ -3,14 +3,14 @@
 /* tslint:disable */
 export const VERSION = {
     "dirty": true,
-    "raw": "v5.0.0.0-7-ge6e8bae-dirty",
-    "hash": "ge6e8bae",
-    "distance": 7,
+    "raw": "v5.0.0.0-24-g4a5d634-dirty",
+    "hash": "g4a5d634",
+    "distance": 24,
     "tag": "v5.0.0.0",
     "semver": null,
-    "suffix": "7-ge6e8bae-dirty",
+    "suffix": "24-g4a5d634-dirty",
     "semverString": "",
     "version": "5.1.0",
-    "buildDate": "2023-09-08T02:29:36.059Z"
+    "buildDate": "2023-11-03T07:30:28.475Z"
 };
 /* tslint:enable */
