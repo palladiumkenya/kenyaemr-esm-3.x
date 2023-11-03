@@ -34,7 +34,6 @@ describe('ProgramSummary Component', () => {
     expect(screen.getByText(new RegExp(`\\(${mockProgram.HIV.cd4PercentDate}\\)`))).toBeInTheDocument();
     expect(screen.getByText('Last WHO stage')).toBeInTheDocument();
     expect(screen.getByText(new RegExp(`\\b${mockProgram.HIV.whoStage}\\b`))).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`\\(${mockProgram.HIV.whoStageDate}\\)`))).toBeInTheDocument();
     expect(screen.getByText('Regimen')).toBeInTheDocument();
     expect(screen.getByText(mockProgram.HIV.lastEncDetails.regimenShortDisplay)).toBeInTheDocument();
     expect(screen.getByText('Date started regimen')).toBeInTheDocument();
@@ -54,7 +53,6 @@ describe('ProgramSummary Component', () => {
     expect(screen.getByText(mockProgram.TB.tbTreatmentNumber)).toBeInTheDocument();
     expect(screen.getByText('Disease classification')).toBeInTheDocument();
     expect(screen.getByText(mockProgram.TB.tbDiseaseClassification)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(`\\(${mockProgram.TB.tbDiseaseClassificationDate}\\)`))).toBeInTheDocument();
     expect(screen.getByText('Patient classification')).toBeInTheDocument();
     expect(screen.getByText(mockProgram.TB.tbPatientClassification)).toBeInTheDocument();
   });

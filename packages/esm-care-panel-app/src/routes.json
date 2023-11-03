@@ -39,15 +39,6 @@
     {
       "name": "delete-regimen-confirmation-dialog",
       "component": "deleteRegimenConfirmationDialog"
-    },
-    {
-      "name":"patient-care-programs",
-      "component": "patientCareProgram",
-      "slot": "patient-chart-summary-dashboard-slot",
-      "order": 4,
-      "meta": {
-        "columnSpan": 4
-      }
     }
   ]
 }

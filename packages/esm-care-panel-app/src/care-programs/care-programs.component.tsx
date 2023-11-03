@@ -10,6 +10,7 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  Tile,
 } from '@carbon/react';
 import { Close, DocumentAdd } from '@carbon/react/icons';
 import {
@@ -23,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
 import { formatDate, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
+import { mutate } from 'swr';
 
 import styles from './care-programs.scss';
 
@@ -33,7 +35,7 @@ type CareProgramsProps = {
 const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
-  const { carePrograms, isLoading, isValidating, error, mutate } = useCarePrograms(patientUuid);
+  const { carePrograms, isLoading, isValidating, error } = useCarePrograms(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
 
   const handleCareProgramClick = useCallback(
@@ -47,7 +49,11 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       currentVisit
         ? launchPatientWorkspace('patient-form-entry-workspace', {
             workspaceTitle: workspaceTitle,
-            mutateForm: mutate,
+            mutateForm: () => {
+              mutate((key) => true, undefined, {
+                revalidate: true,
+              });
+            },
             formInfo: {
               encounterUuid: '',
               formUuid,
@@ -56,7 +62,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
           })
         : launchStartVisitPrompt();
     },
-    [currentVisit, mutate],
+    [currentVisit],
   );
 
   const rows = useMemo(
@@ -91,6 +97,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       }),
     [carePrograms, handleCareProgramClick],
   );
+
   const headers = [
     {
       key: 'programName',
@@ -121,8 +128,8 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   }
 
   return (
-    <>
-      <CardHeader title={t('carePrograms', 'Care Programs')}>{isValidating && <InlineLoading />}</CardHeader>
+    <Tile>
+      <CardHeader title={t('carePrograms', 'Care Programs')}>{isValidating && <h2>Loading...</h2>}</CardHeader>
       <DataTable size={isTablet ? 'lg' : 'sm'} useZebraStyles rows={rows} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <TableContainer>
@@ -147,7 +154,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
           </TableContainer>
         )}
       </DataTable>
-    </>
+    </Tile>
   );
 };
 
