@@ -42,21 +42,25 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                     <p>
                       {' '}
                       <span className={styles.value}>{data?.HIV?.ldlValue ? data?.HIV?.ldlValue : '--'}</span>
-                      {data?.HIV?.ldlDate ? <span>({data?.HIV?.ldlDate})</span> : ''}
+                      {data?.HIV?.ldlDate ? <span>({formatDate(new Date(data?.HIV?.ldlDate))})</span> : ''}
                     </p>
                   </div>
                   <div className={styles.content}>
                     <p>{t('lastCd4Count', 'Last CD4 count')}</p>
                     <p>
                       <span className={styles.value}>{data?.HIV?.cd4 ? data?.HIV?.cd4 : '--'}</span>
-                      {data?.HIV?.cd4Date ? <span> ({data?.HIV?.cd4Date}) </span> : ''}
+                      {data?.HIV?.cd4Date ? <span> ({formatDate(new Date(data?.HIV?.cd4Date))}) </span> : ''}
                     </p>
                   </div>
                   <div className={styles.content}>
                     <p>{t('CD4Percentage', 'CD4 percentage')}</p>
                     <p>
                       <span className={styles.value}>{data?.HIV?.cd4Percent ? data?.HIV?.cd4Percent : '--'}</span>
-                      {data?.HIV?.cd4PercentDate ? <span>({data?.HIV?.cd4PercentDate}) </span> : ''}
+                      {data?.HIV?.cd4PercentDate ? (
+                        <span>({formatDate(new Date(data?.HIV?.cd4PercentDate))}) </span>
+                      ) : (
+                        ''
+                      )}
                     </p>
                   </div>
                   <div className={styles.content}>
@@ -91,7 +95,9 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                   <div className={styles.content}>
                     <p>{t('regimenStartDate', ' Date started regimen')}</p>
                     <p className={styles.value}>
-                      {data?.HIV?.lastEncDetails?.startDate ? data?.HIV?.lastEncDetails?.startDate : '--'}
+                      {data?.HIV?.lastEncDetails?.startDate
+                        ? formatDate(new Date(data?.HIV?.lastEncDetails?.startDate))
+                        : '--'}
                     </p>
                   </div>
                 </div>
@@ -153,7 +159,9 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                     <p>{t('regimenStartDate', ' Date started regimen')}</p>
                     <p>
                       <span className={styles.value}>
-                        {data?.HIV?.lastEncDetails?.startDate ? data?.HIV?.lastEncDetails?.startDate : '--'}
+                        {data?.HIV?.lastEncDetails?.startDate
+                          ? formatDate(new Date(data?.HIV?.lastEncDetails?.startDate))
+                          : '--'}
                       </span>
                     </p>
                   </div>
@@ -173,14 +181,22 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                       <span className={styles.value}>
                         {data?.mchMother?.hivStatus ? data?.mchMother?.hivStatus : '--'}
                       </span>
-                      {data?.mchMother?.hivStatusDate ? <span>({data?.mchMother?.hivStatusDate})</span> : ''}
+                      {data?.mchMother?.hivStatusDate ? (
+                        <span>({formatDate(new Date(data?.mchMother?.hivStatusDate))})</span>
+                      ) : (
+                        ''
+                      )}
                     </p>
                   </div>
                   <div className={styles.content}>
                     <p>{t('onART', 'On ART')}</p>
                     <p>
                       <span className={styles.value}>{data?.mchMother?.onHaart ? data?.mchMother?.onHaart : '--'}</span>
-                      {data?.mchMother?.onHaartDate ? <span> ({data?.mchMother?.onHaartDate}) </span> : ''}
+                      {data?.mchMother?.onHaartDate ? (
+                        <span> ({formatDate(new Date(data?.mchMother?.onHaartDate))}) </span>
+                      ) : (
+                        ''
+                      )}
                     </p>
                   </div>
                 </div>
@@ -200,7 +216,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                         {data?.mchChild?.currentProphylaxisUsed ? data?.mchChild?.currentProphylaxisUsed : '--'}
                       </span>
                       {data?.mchChild?.currentProphylaxisUsedDate ? (
-                        <span>{data?.mchChild?.currentProphylaxisUsedDate}</span>
+                        <span>{formatDate(new Date(data?.mchChild?.currentProphylaxisUsedDate))}</span>
                       ) : (
                         ''
                       )}
@@ -213,7 +229,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                         {data?.mchChild?.currentFeedingOption ? data?.mchChild?.currentFeedingOption : '--'}
                       </span>
                       {data?.mchChild?.currentFeedingOptionDate ? (
-                        <span> {data?.mchChild?.currentFeedingOptionDate} </span>
+                        <span> {formatDate(new Date(data?.mchChild?.currentFeedingOptionDate))} </span>
                       ) : (
                         ''
                       )}
@@ -226,7 +242,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                         {data?.mchChild?.milestonesAttained ? data?.mchChild?.milestonesAttained : '--'}
                       </span>
                       {data?.mchChild?.milestonesAttainedDate ? (
-                        <span>{data?.mchChild?.milestonesAttainedDate} </span>
+                        <span>{formatDate(new Date(data?.mchChild?.milestonesAttainedDate))} </span>
                       ) : (
                         ''
                       )}
@@ -238,7 +254,11 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                       <span className={styles.value}>
                         {data?.mchChild?.heiOutcome ? data?.mchChild?.heiOutcome : '--'}
                       </span>
-                      {data?.mchChild?.heiOutcomeDate ? <span> ({data?.mchChild?.heiOutcomeDate}) </span> : ''}
+                      {data?.mchChild?.heiOutcomeDate ? (
+                        <span> ({formatDate(new Date(data?.mchChild?.heiOutcomeDate))}) </span>
+                      ) : (
+                        ''
+                      )}
                     </p>
                   </div>
                   <div className={styles.content}>
@@ -247,7 +267,11 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
                       <span className={styles.value}>
                         {data?.mchChild?.hivStatus ? data?.mchChild?.hivStatus : '--'}
                       </span>
-                      {data?.mchChild?.hivStatusDate ? <span> ({data?.mchChild?.hivStatusDate}) </span> : ''}
+                      {data?.mchChild?.hivStatusDate ? (
+                        <span> ({formatDate(new Date(data?.mchChild?.hivStatusDate))}) </span>
+                      ) : (
+                        ''
+                      )}
                     </p>
                   </div>
                 </div>
