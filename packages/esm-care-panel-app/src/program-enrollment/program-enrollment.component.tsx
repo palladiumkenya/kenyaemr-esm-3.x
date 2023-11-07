@@ -79,11 +79,13 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
     () =>
       orderedEnrollments?.map((enrollment) => {
         const firstEncounter = enrollment?.firstEncounter ?? {};
+        const enrollmentEncounterUuid = enrollment?.enrollmentEncounterUuid;
         return {
           id: `${enrollment.enrollmentUuid}`,
           ...enrollment,
           ...firstEncounter,
           changeReasons: enrollment?.firstEncounter?.changeReasons?.join(', '),
+          enrollmentEncounterUuid: enrollmentEncounterUuid,
         };
       }),
     [orderedEnrollments],
@@ -100,6 +102,24 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
       formInfo: {
         encounterUuid: '',
         formUuid: enrollment?.discontinuationFormUuid,
+        additionalProps:
+          { enrollmenrDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
+          {},
+      },
+    });
+  };
+
+  const handleEditEnrollment = (enrollment) => {
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: enrollment?.enrollmentFormName,
+      mutateForm: () => {
+        mutate((key) => true, undefined, {
+          revalidate: true,
+        });
+      },
+      formInfo: {
+        encounterUuid: enrollment?.enrollmentEncounterUuid,
+        formUuid: enrollment?.enrollmentFormUuid,
         additionalProps:
           { enrollmenrDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
           {},
@@ -152,9 +172,14 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
                         {isEmpty(orderedEnrollments[index]?.dateCompleted) && (
                           <OverflowMenu size="sm" flipped>
                             <OverflowMenuItem
+                              hasDivider
+                              itemText={t('edit', 'Edit')}
+                              onClick={() => handleEditEnrollment(orderedEnrollments[index])}
+                            />
+                            <OverflowMenuItem
                               isDelete
                               hasDivider
-                              itemText="Discontinue"
+                              itemText={t('discontinue', 'Discontinue')}
                               onClick={() => handleDiscontinue(orderedEnrollments[index])}
                             />
                           </OverflowMenu>
