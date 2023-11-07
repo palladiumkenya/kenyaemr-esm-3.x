@@ -129,7 +129,15 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
 
   return (
     <Tile>
-      <CardHeader title={t('carePrograms', 'Care Programs')}>{isValidating && <h2>Loading...</h2>}</CardHeader>
+      <CardHeader title={t('carePrograms', 'Care Programs')}>
+        {isValidating && (
+          <InlineLoading
+            status="active"
+            iconDescription={t('validating', 'Loading')}
+            description={t('validating', 'Validating data...')}
+          />
+        )}
+      </CardHeader>
       <DataTable size={isTablet ? 'lg' : 'sm'} useZebraStyles rows={rows} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <TableContainer>
