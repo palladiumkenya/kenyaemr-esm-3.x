@@ -7,7 +7,7 @@
   margin: spacing.$spacing-05 0;
 }
 .container {
-  margin: spacing.$spacing-05 0rem;
+  margin: spacing.$spacing-05;
   background-color: $ui-background;
 
   & section {
@@ -56,4 +56,14 @@
     text-decoration: none;
     cursor: pointer;
   }
+}
+
+.radioButtonWrapper {
+  margin-bottom: spacing.$spacing-05;
+}
+
+.regimenTitle {
+  @include type.type-style('productive-heading-02');
+  color: colors.$gray-80;
+  margin-left: 1rem;
 }

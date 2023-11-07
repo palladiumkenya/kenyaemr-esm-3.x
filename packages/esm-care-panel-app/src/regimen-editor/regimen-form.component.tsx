@@ -249,7 +249,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
       <div>
         <Stack gap={8} className={styles.container}>
-          <h4>Current Regimen: {onRegimen}</h4>
+          <h4 className={styles.regimenTitle}>Current Regimen: {onRegimen}</h4>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('regimenEvent', 'Regimen event')}</div>
             <RadioButtonGroup
