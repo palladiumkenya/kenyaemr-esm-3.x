@@ -1,13 +1,13 @@
 export const mockPatient = {
   uuid: '330c0ec6-0ac7-4b86-9c70-29d76f0ae20a',
   patientName: 'John Doe',
-  reportDate: '2023-08-06',
+  reportDate: '06-Aug-2023',
   clinicName: 'Example Clinic',
   mflCode: '12345',
   age: 40,
   uniquePatientIdentifier: 'ABC123',
   nationalUniquePatientIdentifier: 'XYZ456',
-  birthDate: '1990-01-01',
+  birthDate: '01-Jan-1990',
   gender: 'M',
   maritalStatus: 'Married',
   weight: '70 kg',
@@ -21,12 +21,12 @@ export const mockPatient = {
   tbScreeningOutcome: 'Negative',
   allVlResults: {
     value: [
-      { vl: '120', vlDate: '2023-06-01' },
-      { vl: '150', vlDate: '2023-07-01' },
+      { vl: '120', vlDate: '01-June-2023' },
+      { vl: '150', vlDate: '01-July-2023' },
     ],
   },
   allCd4CountResults: [
-    { cd4Count: '300', cd4CountDate: '2023-06-01' },
-    { cd4Count: '320', cd4CountDate: '2023-07-01' },
+    { cd4Count: '300', cd4CountDate: '01-June-2023' },
+    { cd4Count: '320', cd4CountDate: '01-July-2023' },
   ],
 };
