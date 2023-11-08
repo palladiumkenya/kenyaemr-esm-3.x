@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import styles from './patient-summary.scss';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType, useSession } from '@openmrs/esm-framework';
+import { formatDate, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { StructuredListSkeleton, Button } from '@carbon/react';
 import { usePatientSummary } from '../hooks/usePatientSummary';
 import { Printer } from '@carbon/react/icons';
@@ -72,7 +72,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('reportDate', 'Report date')}</p>
               <p>
-                <span className={styles.value}>{data?.reportDate ? data?.reportDate : '--'}</span>
+                <span className={styles.value}>{data?.reportDate ? formatDate(new Date(data?.reportDate)) : '--'}</span>
               </p>
             </div>
             <div className={styles.content}>
@@ -120,7 +120,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('birthDate', 'Birth date')}</p>
               <p>
-                <span className={styles.value}>{data?.birthDate ? data?.birthDate : '--'}</span>
+                <span className={styles.value}>{data?.birthDate ? formatDate(new Date(data?.birthDate)) : '--'}</span>
               </p>
             </div>
             <div className={styles.content}>
@@ -155,7 +155,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               <p className={styles.label}>{t('dateConfirmedPositive', 'Date confirmed HIV positive')}</p>
               <p>
                 <span className={styles.value}>
-                  {data?.dateConfirmedHIVPositive ? data?.dateConfirmedHIVPositive : '--'}
+                  {data?.dateConfirmedHIVPositive ? formatDate(new Date(data?.dateConfirmedHIVPositive)) : '--'}
                 </span>
               </p>
             </div>
@@ -168,7 +168,13 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('dateFirstCD4', 'Date first CD4')}</p>
               <p>
-                <span className={styles.value}>{data?.firstCd4Date ? data?.firstCd4Date : '--'}</span>
+                <span className={styles.value}>
+                  {data?.firstCd4Date === 'N/A' || data?.firstCd4Date === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{formatDate(new Date(data?.firstCd4Date))}</span>
+                  )}
+                </span>
               </p>
             </div>
           </div>
@@ -177,7 +183,9 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('dateEnrolledToCare', 'Date enrolled into care')}</p>
               <p>
-                <span className={styles.value}>{data?.dateEnrolledIntoCare ? data?.dateEnrolledIntoCare : '--'}</span>
+                <span className={styles.value}>
+                  {data?.dateEnrolledIntoCare ? formatDate(new Date(data?.dateEnrolledIntoCare)) : '--'}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
@@ -191,7 +199,13 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('transferInDate', 'Transfer in date')}</p>
               <p>
-                <span className={styles.value}>{data?.transferInDate ? data?.transferInDate : '--'}</span>
+                <span className={styles.value}>
+                  {data?.transferInDate === 'N/A' || data?.transferInDate === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{data?.transferInDate}</span>
+                  )}
+                </span>
               </p>
             </div>
           </div>
@@ -206,7 +220,9 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('dateOfEntryPoint', 'Date of entry point')}</p>
               <p>
-                <span className={styles.value}>{data?.patientEntryPointDate ? data?.patientEntryPointDate : '--'}</span>
+                <span className={styles.value}>
+                  {data?.patientEntryPointDate ? formatDate(new Date(data?.patientEntryPointDate)) : '--'}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
@@ -316,20 +332,32 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('dateEnrolledInTb', 'TPT start date')}</p>
               <p>
-                <span className={styles.value}>{data?.dateEnrolledInTb ? data?.dateEnrolledInTb : '--'}</span>
+                <span className={styles.value}>
+                  {data?.dateEnrolledInTb === 'None' || data?.dateEnrolledInTb === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{formatDate(new Date(data?.dateEnrolledInTb))}</span>
+                  )}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
               <p className={styles.label}>{t('dateCompletedInTb', 'TPT completion date')}</p>
               <p>
-                <span className={styles.value}>{data?.dateCompletedInTb ? data?.dateCompletedInTb : '--'}</span>
+                <span className={styles.value}>
+                  {data?.dateCompletedInTb === 'None' || data?.dateCompletedInTb === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{formatDate(new Date(data?.dateCompletedInTb))}</span>
+                  )}
+                </span>
               </p>
             </div>
             {data?.gender === 'F' && (
               <div className={styles.content}>
                 <p className={styles.label}>{t('lmp', 'LMP')}</p>
                 <p>
-                  <span className={styles.value}>{data?.lmp ? data?.lmp : '--'}</span>
+                  <span className={styles.value}>{data?.lmp ? formatDate(new Date(data?.lmp)) : '--'}</span>
                 </p>
               </div>
             )}
@@ -387,7 +415,9 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('dateStartedART', 'Date started ART')}</p>
               <p>
-                <span className={styles.value}>{data?.dateStartedArt ? data?.dateStartedArt : '--'}</span>
+                <span className={styles.value}>
+                  {data?.dateStartedArt ? formatDate(new Date(data?.dateStartedArt)) : '--'}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
@@ -408,7 +438,9 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('purposeDate', 'Purpose drugs date')}</p>
               <p>
-                <span className={styles.value}>{data?.purposeDate ? data?.purposeDate : 'None'}</span>
+                <span className={styles.value}>
+                  {data?.purposeDate ? formatDate(new Date(data?.purposeDate)) : 'None'}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
@@ -446,7 +478,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               <p className={styles.label}>{t('currentArtRegimenDate', 'Current Art regimen date')}</p>
               <p>
                 <span className={styles.value}>
-                  {data?.currentArtRegimen ? data?.currentArtRegimen?.startDate : '--'}
+                  {data?.currentArtRegimen ? formatDate(new Date(data?.currentArtRegimen?.startDate)) : '--'}
                 </span>
               </p>
             </div>
@@ -505,7 +537,13 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('transferOutDate', 'Transfer out date')}</p>
               <p>
-                <span className={styles.value}>{data?.transferOutDate ? data?.transferOutDate : '--'}</span>
+                <span className={styles.value}>
+                  {data?.transferOutDate === 'N/A' || data?.transferOutDate === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{formatDate(new Date(data?.transferOutDate))}</span>
+                  )}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
@@ -517,7 +555,13 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('deathDate', 'Death date')}</p>
               <p>
-                <span className={styles.value}>{data?.deathDate ? data?.deathDate : '--'}</span>
+                <span className={styles.value}>
+                  {data?.deathDate === 'N/A' || data?.deathDate === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{formatDate(new Date(data?.deathDate))}</span>
+                  )}
+                </span>
               </p>
             </div>
           </div>
@@ -526,21 +570,35 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('mostRecentCD4', 'Most recent CD4')}</p>
               <p>
-                <span className={styles.value}>{data?.mostRecentCd4 ? data?.mostRecentCd4 : '--'}</span>
-                <span> {data?.mostRecentCd4Date ? data?.mostRecentCd4Date : null} </span> <br />
+                <span className={styles.value}>{data?.mostRecentCd4 ? data?.mostRecentCd4 : ''}</span>
+                <span className={styles.label}>
+                  {data?.mostRecentCd4Date === 'N/A' || data?.mostRecentCd4Date === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{formatDate(new Date(data?.mostRecentCd4Date))}</span>
+                  )}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
               <p className={styles.label}>{t('mostRecentVL', 'Most recent VL')}</p>
               <p>
                 <span className={styles.value}>{data?.viralLoadValue ? data?.viralLoadValue : '--'}</span>
-                <span className={styles.label}> {data?.viralLoadDate}</span> <br />
+                <span className={styles.label}>
+                  {data?.viralLoadDate === 'N/A' || data?.viralLoadDate === '' ? (
+                    <span>None</span>
+                  ) : (
+                    <span>{data?.viralLoadDate}</span>
+                  )}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
               <p className={styles.label}>{t('nextAppointmentDate', ' Next appointment')}</p>
               <p>
-                <span className={styles.value}>{data?.nextAppointmentDate ? data?.nextAppointmentDate : '--'}</span>
+                <span className={styles.value}>
+                  {data?.nextAppointmentDate ? formatDate(new Date(data?.nextAppointmentDate)) : '--'}
+                </span>
               </p>
             </div>
           </div>
@@ -553,7 +611,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                     return (
                       <>
                         <span className={styles.value}> {vl.vl} </span>
-                        <span className={styles.label}> ({vl.vlDate}) </span>
+                        {vl?.vlDate === 'N/A' || vl?.vlDate === '' ? <span>None</span> : <span>{vl.vlDate}</span>}
                         <br />
                       </>
                     );
@@ -567,7 +625,10 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                     return (
                       <>
                         <span className={styles.value}> {cd4.cd4Count} </span>
-                        <span> {cd4.cd4CountDate}</span>
+                        <span className={styles.label}>
+                          {' '}
+                          {cd4.cd4CountDate ? formatDate(new Date(cd4.cd4CountDate)) : '--'}
+                        </span>
                         <br />
                       </>
                     );
