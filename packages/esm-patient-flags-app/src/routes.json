@@ -14,9 +14,9 @@
       "offline": false
     },
     {
-      "name": "kenyaemr-home-link",
+      "name": "kenyaemr-home-page",
       "slot": "app-menu-slot",
-      "component": "kenyaemrHomeLink",
+      "component": "kenyaemrHomePage",
       "online": true,
       "offline": false,
       "order": 0

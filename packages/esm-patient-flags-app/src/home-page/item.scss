@@ -1,0 +1,30 @@
+@use '@carbon/styles/scss/colors';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.itemContainer {
+  margin: 2rem;
+}
+
+.itemLink {
+  padding: 0 !important;
+  height: 2rem !important;
+  width: 3rem !important;
+}
+
+.tileItems {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.itemText {
+  word-wrap: break-word;
+  color: #f0f0f0;
+  text-align: center;
+}
+
+.itemImg > svg > path {
+  fill: $ui-01 !important;
+}
