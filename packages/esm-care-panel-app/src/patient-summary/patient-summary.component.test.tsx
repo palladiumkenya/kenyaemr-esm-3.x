@@ -4,8 +4,16 @@ import { act } from 'react-dom/test-utils';
 import PatientSummary from './patient-summary.component';
 import { useConfig } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient-summary.mock';
+import dayjs from 'dayjs';
 
 const mockUseConfig = useConfig as jest.Mock;
+
+jest.mock('@openmrs/esm-framework', () => {
+  return {
+    ...jest.requireActual('@openmrs/esm-framework'),
+    formatDate: jest.fn().mockImplementation((mockDate) => `${dayjs(mockDate).format('DD-MMM-YYYY')}`),
+  };
+});
 
 describe('PatientSummary', () => {
   it('renders skeleton loader when loading', () => {
@@ -33,7 +41,7 @@ describe('PatientSummary', () => {
   });
 
   it('renders patient summary data when loaded', () => {
-    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValue({
+    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValueOnce({
       data: mockPatient,
       isError: false,
       isLoading: false,
@@ -61,7 +69,7 @@ describe('PatientSummary', () => {
   });
 
   it('triggers print when print button is clicked', async () => {
-    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValue({
+    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValueOnce({
       data: mockPatient,
       isError: false,
       isLoading: false,

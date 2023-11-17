@@ -39,7 +39,7 @@ const RegimenHistory: React.FC<RegimenHistoryProps> = ({ patientUuid, category }
   if (regimen?.length) {
     const structuredListBodyRowGenerator = () => {
       return regimen.map((regimen, i) => (
-        <StructuredListRow label key={`row-${i}`} className={styles.structuredList}>
+        <StructuredListRow key={`row-${i}`} className={styles.structuredList}>
           <StructuredListCell>{formatDate(parseDate(regimen.startDate), { mode: 'wide' })}</StructuredListCell>
           <StructuredListCell>
             {regimen.endDate ? formatDate(parseDate(regimen.endDate), { mode: 'wide' }) : ''}

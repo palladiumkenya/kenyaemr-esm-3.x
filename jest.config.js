@@ -1,6 +1,9 @@
 /**
  * @returns {Promise<import('jest').Config>}
  */
+
+const path = require('path');
+
 module.exports = {
   transform: {
     '^.+\\.(j|t)sx?$': '@swc/jest',
@@ -9,8 +12,9 @@ module.exports = {
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
     '@openmrs/esm-framework': '@openmrs/esm-framework/mock',
-    '^lodash-es/(.*)$': 'lodash/$1',
     '^dexie$': require.resolve('dexie'),
+    '^lodash-es/(.*)$': 'lodash/$1',
+    '^react-i18next$': path.resolve(__dirname, 'react-i18next.js'),
     '^uuid$': '<rootDir>/node_modules/@openmrs/esm-patient-common-lib/node_modules/uuid/dist/index.js',
   },
   collectCoverageFrom: [
@@ -18,7 +22,7 @@ module.exports = {
     '!**/node_modules/**',
     '!**/vendor/**',
     '!**/src/**/*.test.*',
-    '!**/src/declarations.d.tsx',
+    '!**/src/declarations.d.ts',
     '!**/e2e/**',
   ],
   coverageThreshold: {
