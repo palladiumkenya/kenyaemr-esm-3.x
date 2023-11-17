@@ -1,5 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const moduleName = '@kenyaemr/esm-patient-flags-app';
 
