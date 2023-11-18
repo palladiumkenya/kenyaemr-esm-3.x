@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StructuredListSkeleton, ContentSwitcher, Switch, InlineLoading } from '@carbon/react';
+import { StructuredListSkeleton, ContentSwitcher, Switch } from '@carbon/react';
 import styles from './care-panel.scss';
 import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import ProgramSummary from '../program-summary/program-summary.component';
@@ -35,7 +35,11 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   );
 
   if (isLoading) {
-    return <StructuredListSkeleton role="progressbar" />;
+    return (
+      <div className={styles.widgetCard}>
+        <StructuredListSkeleton role="progressbar" />
+      </div>
+    );
   }
 
   if (error) {
