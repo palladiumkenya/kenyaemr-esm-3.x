@@ -3,10 +3,14 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react-dom/test-utils';
 import PatientSummary from './patient-summary.component';
 import { useConfig } from '@openmrs/esm-framework';
+import { usePatientSummary } from '../hooks/usePatientSummary';
 import { mockPatient } from '../../../../__mocks__/patient-summary.mock';
 import dayjs from 'dayjs';
 
-const mockUseConfig = useConfig as jest.Mock;
+jest.mock('../hooks/usePatientSummary');
+
+const mockedUseConfig = useConfig as jest.Mock;
+const mockedUsePatientSummary = usePatientSummary as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   return {
@@ -16,20 +20,24 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('PatientSummary', () => {
-  it('renders skeleton loader when loading', () => {
-    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValue({
+  beforeEach(() => {
+    mockedUsePatientSummary.mockReturnValue({
       data: null,
       isError: false,
       isLoading: true,
     });
+  });
 
+  afterEach(() => mockedUsePatientSummary.mockReset());
+
+  it('renders a skeleton loader when loading', () => {
     render(<PatientSummary patientUuid={mockPatient.uuid} />);
     const skeletonLoader = screen.getByRole('progressbar');
     expect(skeletonLoader).toBeInTheDocument();
   });
 
-  it('renders error message when data retrieval fails', () => {
-    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValue({
+  it('renders an error message when data retrieval fails', () => {
+    mockedUsePatientSummary.mockReturnValue({
       data: null,
       isError: true,
       isLoading: false,
@@ -41,7 +49,7 @@ describe('PatientSummary', () => {
   });
 
   it('renders patient summary data when loaded', () => {
-    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValueOnce({
+    mockedUsePatientSummary.mockReturnValue({
       data: mockPatient,
       isError: false,
       isLoading: false,
@@ -69,16 +77,17 @@ describe('PatientSummary', () => {
   });
 
   it('triggers print when print button is clicked', async () => {
-    jest.spyOn(require('../hooks/usePatientSummary'), 'usePatientSummary').mockReturnValueOnce({
+    mockedUsePatientSummary.mockReturnValue({
       data: mockPatient,
       isError: false,
       isLoading: false,
     });
+
     const printFunction = jest.fn();
     const useReactToPrintSpy = jest.spyOn(require('react-to-print'), 'useReactToPrint');
 
     useReactToPrintSpy.mockReturnValue(printFunction);
-    mockUseConfig.mockReturnValue({ logo: {} });
+    mockedUseConfig.mockReturnValue({ logo: {} });
 
     render(<PatientSummary patientUuid={mockPatient.uuid} />);
     const printButton = screen.getByText('Print', { exact: true });

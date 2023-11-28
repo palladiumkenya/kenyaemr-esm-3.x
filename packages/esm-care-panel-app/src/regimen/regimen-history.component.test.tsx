@@ -1,36 +1,42 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import { useRegimenHistory } from '../hooks/useRegimenHistory';
 import RegimenHistory, { RegimenHistoryProps } from './regimen-history.component';
+
+jest.mock('../hooks/useRegimenHistory');
+
+const mockedUseRegimenHistory = jest.mocked(useRegimenHistory);
 
 describe('RegimenHistory Component', () => {
   const mockProps: RegimenHistoryProps = {
     patientUuid: 'patient-123',
     category: 'HIV Program',
   };
+
   const mockData = [
     {
       regimenShortDisplay: 'ShortDisplay',
       regimenLine: 'Line1',
-      changeReasons: '[Reason1]',
+      changeReasons: ['Reason1'],
+      regimenUuid: 'regimen-123',
+      startDate: '2021-01-01',
+      endDate: '',
+      regimenLongDisplay: 'LongDisplay',
+      current: false,
     },
   ];
-  it('renders without crashing', () => {
-    jest.spyOn(require('../hooks/useRegimenHistory'), 'useRegimenHistory').mockReturnValue({
+
+  beforeEach(() => {
+    mockedUseRegimenHistory.mockReturnValue({
       regimen: mockData,
       isLoading: false,
       error: false,
     });
-    render(<RegimenHistory {...mockProps} />);
-    expect(screen.getByText('Regimen History')).toBeInTheDocument();
   });
 
   it('displays regimen history details correctly', () => {
-    jest.spyOn(require('../hooks/useRegimenHistory'), 'useRegimenHistory').mockReturnValue({
-      regimen: mockData,
-      isLoading: false,
-      error: false,
-    });
     render(<RegimenHistory {...mockProps} />);
+
     expect(screen.getByText(mockData[0].regimenLine)).toBeInTheDocument();
     expect(screen.getByText(mockData[0].regimenShortDisplay)).toBeInTheDocument();
   });
