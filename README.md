@@ -9,6 +9,7 @@ This repository contains frontend modules for the KenyaEMR 3.x. These modules re
 - [Patient flags](packages/esm-patient-flags-app/)
 - [Care panels](packages/esm-care-panel-app/)
 - [Version](packages/esm-version-app)
+- [Billing](packages/esm-billing-app/)
 
 ## Setup
 
