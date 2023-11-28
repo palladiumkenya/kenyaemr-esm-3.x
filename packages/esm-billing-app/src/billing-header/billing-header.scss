@@ -11,6 +11,7 @@
   border-bottom: 1px solid $ui-03;
   display: flex;
   justify-content: space-between;
+  padding: spacing.$spacing-05;
 }
 
 .left-justified-items {
@@ -18,12 +19,15 @@
   flex-direction: row;
   align-items: center;
   cursor: pointer;
+  align-items: center;
 }
 
 .right-justified-items {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  margin: spacing.$spacing-03;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .page-name {
@@ -31,7 +35,7 @@
 }
 
 .page-labels {
-  margin: spacing.$spacing-05 0;
+  margin: spacing.$spacing-05;
 
   p:first-of-type {
     margin-bottom: spacing.$spacing-02;
@@ -47,8 +51,7 @@
 .userContainer {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: spacing.$spacing-03;
-  gap: spacing.$spacing-05; 
+  gap: spacing.$spacing-05;
 }
 
 .value {
