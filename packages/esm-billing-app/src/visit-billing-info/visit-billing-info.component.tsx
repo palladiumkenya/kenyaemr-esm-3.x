@@ -1,12 +1,9 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RadioButtonGroup, RadioButton, Form, Stack, Select, SelectItem, TextInput } from '@carbon/react';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { RadioButtonGroup, RadioButton, Stack, Select, SelectItem, TextInput } from '@carbon/react';
 import styles from './visit-billing-info.scss';
-import { useForm, Controller, FormProvider, useWatch } from 'react-hook-form';
 
-type VisitBillingInfoProps = {};
+type VisitBillingInfoProps = { setBillingComponent: Function };
 
 type BillingInfoData = {
   patientType: string;
@@ -16,106 +13,104 @@ type BillingInfoData = {
   nonPayingPatientCategory: string;
 };
 
-const BillingVisitSchema = z.object({
-  patientType: z.string().optional(),
-  paymentMethod: z.string(),
-  insuranceSchema: z.string(),
-  policyNumber: z.string(),
-  nonPayingPatientCategory: z.string(),
-});
+const initialValue = {
+  patientType: '',
+  paymentMethod: '',
+  insuranceSchema: '',
+  policyNumber: '',
+  nonPayingPatientCategory: '',
+};
 
-const VisitBillingInfo: React.FC<VisitBillingInfoProps> = () => {
-  const defaultValues = {};
-  const methods = useForm<BillingInfoData>({
-    mode: 'all',
-    resolver: zodResolver(BillingVisitSchema),
-    defaultValues,
-  });
+function billingInfoReducer(state: BillingInfoData, action): BillingInfoData {
+  switch (action.type) {
+    case 'SET_PATIENT_TYPE':
+      return { ...state, patientType: action.payload };
+    case 'SET_PAYMENT_METHOD':
+      return { ...state, paymentMethod: action.payload };
+    case 'SET_INSURANCE_SCHEMA':
+      return { ...state, insuranceSchema: action.payload };
+    case 'SET_POLICY_NUMBER':
+      return { ...state, policyNumber: action.payload };
+    case 'SET_NON_PAYING_PATIENT_CATEGORY':
+      return {
+        patientType: state.patientType,
+        insuranceSchema: '',
+        paymentMethod: '',
+        policyNumber: '',
+        nonPayingPatientCategory: action.payload,
+      };
+    default:
+      throw new Error('Unhandled action type');
+  }
+}
 
-  const { handleSubmit, control, getValues, formState, setError } = methods;
-
+const VisitBillingInfo: React.FC<VisitBillingInfoProps> = ({ setBillingComponent }) => {
   const { t } = useTranslation();
+  const [state, dispatch] = useReducer(billingInfoReducer, initialValue);
+
   return (
-    <Form>
-      <Stack>
+    <>
+      <Stack className={styles.stackSection}>
         <div className={styles.sectionTitle}>{t('patientType', 'Patient type')}</div>
-        <Controller
-          name="patientType"
-          control={control}
-          render={({ field: { onChange } }) => (
-            <RadioButtonGroup
-              legendText={t('selectPatientType', 'Select patient type')}
-              orientation="vertical"
-              onChange={(e) => onChange(e)}
-              name="patientType">
-              <RadioButton labelText={t('paying', 'Paying')} value="payingPatientType" id="payingPatientType" />
-              <RadioButton
-                labelText={t('nonPaying', 'Non paying')}
-                value="nonPayingPatientType"
-                id="nonPayingPatientType"
-              />
-            </RadioButtonGroup>
-          )}
-        />
-
-        <Controller
-          name="paymentMethod"
-          control={control}
-          render={({ field: { onChange } }) => (
-            <Select id={`paymentMethod`} onChange={onChange} labelText="Payment method">
-              <SelectItem value="" text="" />
-              <SelectItem value="option-1" text="Cash" />
-              <SelectItem value="option-2" text="MPESA" />
-              <SelectItem value="option-3" text="Insuarance" />
-            </Select>
-          )}
-        />
-
-        <Controller
-          name="insuranceSchema"
-          control={control}
-          render={({ field: { onChange } }) => (
-            <Select id={`insuranceScheme`} onChange={onChange} labelText="Insurance scheme">
+        <RadioButtonGroup
+          legendText={t('selectPatientType', 'Select patient type')}
+          orientation="vertical"
+          onChange={(e) => dispatch({ type: 'SET_PATIENT_TYPE', payload: e })}
+          name="patientType">
+          <RadioButton labelText={t('paying', 'Paying')} value="payingPatientType" id="payingPatientType" />
+          <RadioButton
+            labelText={t('nonPaying', 'Non paying')}
+            value="nonPayingPatientType"
+            id="nonPayingPatientType"
+          />
+        </RadioButtonGroup>
+        {state.patientType === 'payingPatientType' && (
+          <Select
+            onChange={(e) => dispatch({ type: 'SET_PAYMENT_METHOD', payload: e.target.value })}
+            id={`paymentMethod`}
+            labelText="Payment method">
+            <SelectItem value="" text="" />
+            <SelectItem id="cash" value="cash" text="Cash" />
+            <SelectItem id="mpesa" value="mpesa" text="MPESA" />
+            <SelectItem id="insurance" value="insurance" text="Insurance" />
+          </Select>
+        )}
+        {state.paymentMethod === 'insurance' && state.patientType === 'payingPatientType' && (
+          <>
+            <Select
+              id={`insuranceScheme`}
+              onChange={(e) => dispatch({ type: 'SET_INSURANCE_SCHEMA', payload: e.target.value })}
+              labelText="Insurance scheme">
               <SelectItem value="" text="" />
               <SelectItem value="option-1" text="NHIF" />
               <SelectItem value="option-2" text="Jubilee Insurance" />
               <SelectItem value="option-3" text="Old mutual" />
             </Select>
-          )}
-        />
-
-        {/* Insurance details */}
-        <Controller
-          name="policyNumber"
-          control={control}
-          render={({ field: { onChange } }) => (
             <TextInput
+              onChange={(e) => dispatch({ type: 'SET_POLICY_NUMBER', payload: e })}
               id="policyNumber"
-              onChange={onChange}
               type="text"
               labelText={t('policyNumber', 'Policy Number')}
             />
-          )}
-        />
+          </>
+        )}
 
         {/* Non paying patient section */}
-        <Controller
-          name="nonPayingPatientCategory"
-          control={control}
-          render={({ field: { onChange } }) => (
-            <Select id={`patientCategory`} onChange={onChange} labelText={t('patientCategory', 'Patient catergory')}>
-              <SelectItem value="" text="" />
-              <SelectItem value="option-1" text="Refugee" />
-              <SelectItem value="option-2" text="Under 5 years old" />
-              <SelectItem value="option-3" text="Senior citizen" />
-              <SelectItem value="option-4" text="Prision inmate" />
-              <SelectItem value="option-5" text="Other" />
-            </Select>
-          )}
-        />
+        {state.patientType === 'nonPayingPatientType' && (
+          <Select
+            id={`patientCategory`}
+            onChange={(e) => dispatch({ type: 'SET_NON_PAYING_PATIENT_CATEGORY', payload: e })}
+            labelText={t('patientCategory', 'Patient catergory')}>
+            <SelectItem value="" text="" />
+            <SelectItem value="option-1" text="Refugee" />
+            <SelectItem value="option-2" text="Under 5 years old" />
+            <SelectItem value="option-3" text="Senior citizen" />
+            <SelectItem value="option-4" text="Prision inmate" />
+            <SelectItem value="option-5" text="Other" />
+          </Select>
+        )}
       </Stack>
-      <input type="submit" />
-    </Form>
+    </>
   );
 };
 
