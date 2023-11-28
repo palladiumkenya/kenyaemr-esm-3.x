@@ -19,6 +19,11 @@
       "component": "root",
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
+    },
+    {
+      "component": "visitBillingInfo",
+      "slot": "billing-slot",
+      "name": "visit-billing-info"
     }
   ]
 }
