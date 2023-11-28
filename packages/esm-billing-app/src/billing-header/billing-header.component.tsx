@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, useSession } from '@openmrs/esm-framework';
-import styles from './billing-header.scss';
-import BillingIllustration from './billing-illustration.component';
 import { Calendar, Location, UserFollow } from '@carbon/react/icons';
+import { formatDate, useSession } from '@openmrs/esm-framework';
+import BillingIllustration from './billing-illustration.component';
+import styles from './billing-header.scss';
 
 interface BillingHeaderProps {
   title: string;

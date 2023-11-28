@@ -2,7 +2,7 @@ import React from 'react';
 
 const BillingIllustration: React.FC = () => {
   return (
-    <svg width="92" height="94" viewBox="0 0 92 94" xmlns="http://www.w3.org/2000/svg">
+    <svg width="64" height="64" viewBox="10 10 60 60.02">
       <title>Billing module illustration</title>
       <g fill="none" fillRule="evenodd">
         <path

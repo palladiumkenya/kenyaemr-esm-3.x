@@ -1,16 +1,16 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layer, Tile } from '@carbon/react';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import BillingHeader from '../billing-header/billing-header.component';
 import styles from './billing-dashboard.scss';
-import BillingHeader from './billing-header/billing-header.component';
-import { useTranslation } from 'react-i18next';
 
 export function BillingDashboard() {
   const { t } = useTranslation();
 
   return (
     <>
-      <BillingHeader title={t('billing', 'Billing')} />
+      <BillingHeader title={t('home', 'Home')} />
       <Layer className={styles.emptyStateContainer}>
         <Tile className={styles.tile}>
           <div className={styles.illo}>
