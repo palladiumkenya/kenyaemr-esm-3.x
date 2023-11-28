@@ -1,0 +1,81 @@
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.header {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  height: spacing.$spacing-12;
+  background-color: $ui-02;
+  border-bottom: 1px solid $ui-03;
+  display: flex;
+  justify-content: space-between;
+}
+
+.left-justified-items {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+}
+
+.right-justified-items {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  margin: spacing.$spacing-03;
+}
+
+.page-name {
+  @include type.type-style('heading-04');
+}
+
+.page-labels {
+  margin: spacing.$spacing-05 0;
+
+  p:first-of-type {
+    margin-bottom: spacing.$spacing-02;
+  }
+}
+
+.date-and-location {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.userContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: spacing.$spacing-03;
+  gap: spacing.$spacing-05; 
+}
+
+.value {
+  margin-left: spacing.$spacing-02;
+}
+
+.middot {
+  margin: 0 spacing.$spacing-03;
+}
+
+.view {
+  @include type.type-style('label-01');
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .date-and-location {
+    & > svg {
+      order: -1;
+    }
+    & > span:nth-child(2) {
+      order: -2;
+    }
+  }
+}
+
+.userIcon {
+  fill: $ui-05;
+  margin: spacing.$spacing-01;
+}
