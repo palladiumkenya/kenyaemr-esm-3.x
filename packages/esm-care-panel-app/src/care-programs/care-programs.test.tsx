@@ -6,6 +6,8 @@ import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-pat
 import { useVisit } from '@openmrs/esm-framework';
 import { PatientCarePrograms } from '../hooks/useCarePrograms';
 
+jest.mock('../hooks/useCarePrograms');
+
 const mockUseVisit = useVisit as jest.Mock;
 
 const testProps = {
