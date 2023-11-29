@@ -1,17 +1,16 @@
-@use '@carbon/colors';
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .header {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  height: spacing.$spacing-12;
+  height: layout.$spacing-12;
   background-color: $ui-02;
   border-bottom: 1px solid $ui-03;
   display: flex;
   justify-content: space-between;
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
 }
 
 .left-justified-items {
@@ -35,10 +34,10 @@
 }
 
 .page-labels {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 
   p:first-of-type {
-    margin-bottom: spacing.$spacing-02;
+    margin-bottom: layout.$spacing-02;
   }
 }
 
@@ -51,15 +50,15 @@
 .userContainer {
   display: flex;
   justify-content: flex-end;
-  gap: spacing.$spacing-05;
+  gap: layout.$spacing-05;
 }
 
 .value {
-  margin-left: spacing.$spacing-02;
+  margin-left: layout.$spacing-02;
 }
 
 .middot {
-  margin: 0 spacing.$spacing-03;
+  margin: 0 layout.$spacing-03;
 }
 
 .view {
@@ -80,5 +79,5 @@ html[dir='rtl'] {
 
 .userIcon {
   fill: $ui-05;
-  margin: spacing.$spacing-01;
+  margin: layout.$spacing-01;
 }

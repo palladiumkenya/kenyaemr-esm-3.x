@@ -3,11 +3,7 @@
 @use '@carbon/type';
 
 .container {
-  margin: 1rem;
-}
-
-.emptyStateContainer {
-  @extend .container;
+  margin: 2rem 1rem;
 }
 
 .illo {
