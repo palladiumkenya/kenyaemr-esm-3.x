@@ -1436,7 +1436,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carbon/react@npm:^1.12.0, @carbon/react@npm:^1.37.0":
+"@carbon/react@npm:^1.12.0, @carbon/react@npm:^1.37.0, @carbon/react@npm:^1.42.1":
   version: 1.42.1
   resolution: "@carbon/react@npm:1.42.1"
   dependencies:
@@ -2511,7 +2511,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-billing-app@workspace:packages/esm-billing-app"
   dependencies:
-    "@carbon/react": "npm:^1.12.0"
+    "@carbon/react": "npm:^1.42.1"
     "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
@@ -2530,7 +2530,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-care-panel-app@workspace:packages/esm-care-panel-app"
   dependencies:
-    "@carbon/react": "npm:^1.12.0"
+    "@carbon/react": "npm:^1.42.1"
     "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
@@ -2549,7 +2549,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app"
   dependencies:
-    "@carbon/react": "npm:^1.12.0"
+    "@carbon/react": "npm:^1.42.1"
     lodash-es: "npm:^4.17.15"
     webpack: "npm:^5.74.0"
   peerDependencies:
@@ -2564,7 +2564,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app"
   dependencies:
-    "@carbon/react": "npm:^1.12.0"
+    "@carbon/react": "npm:^1.42.1"
     "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
@@ -2581,7 +2581,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-version-app@workspace:packages/esm-version-app"
   dependencies:
-    "@carbon/react": "npm:^1.12.0"
+    "@carbon/react": "npm:^1.42.1"
     git-describe: "npm:^4.1.1"
     lodash-es: "npm:^4.17.15"
     webpack: "npm:^5.74.0"
