@@ -1,19 +1,19 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { useConfig, usePagination } from '@openmrs/esm-framework';
-import { useActiveBills } from '../../hooks/useActiveBills';
+import { useBills } from '../billing.resource';
 import BillsTable from './bills-table.component';
 
-const mockActiveBills = useActiveBills as jest.Mock;
+const mockbills = useBills as jest.Mock;
 
 const mockBillsData = [
   { id: '1', patientName: 'John Doe', identifier: '12345678', visitType: 'Checkup', patientUuid: 'uuid1' },
 ];
 
-jest.mock('./../../hooks/useActiveBills', () => ({
-  ...jest.requireActual('../../hooks/useActiveBills'),
-  useActiveBills: jest.fn(() => ({
-    activeBills: mockBillsData,
+jest.mock('../billing.resource', () => ({
+  ...jest.requireActual('../billing.resource'),
+  useBills: jest.fn(() => ({
+    bills: mockBillsData,
     isLoading: false,
     isValidating: false,
     error: null,
@@ -28,7 +28,7 @@ jest.mock('@openmrs/esm-framework', () => ({
       administrator and quote the error code above.
     </div>
   )),
-  useConfig: jest.fn(() => ({ activeBills: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
+  useConfig: jest.fn(() => ({ bills: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
   usePagination: jest.fn().mockImplementation((data) => ({
     currentPage: 1,
     goTo: () => {},
@@ -61,7 +61,7 @@ describe('BillsTable', () => {
   });
 
   it.skip('filters active visits based on search input', () => {
-    mockActiveBills.mockImplementationOnce(() => ({
+    mockbills.mockImplementationOnce(() => ({
       activeVisits: [
         {
           id: '1',
@@ -94,8 +94,8 @@ describe('BillsTable', () => {
   });
 
   it('displays empty state when there are no bills', () => {
-    mockActiveBills.mockImplementationOnce(() => ({
-      activeBills: [],
+    mockbills.mockImplementationOnce(() => ({
+      bills: [],
       isLoading: false,
       isValidating: false,
       error: null,
@@ -103,12 +103,12 @@ describe('BillsTable', () => {
 
     render(<BillsTable />);
 
-    expect(screen.getByText('There are no bills to display for this location.')).toBeInTheDocument();
+    expect(screen.getByText(/there are no bills to display/i)).toBeInTheDocument();
   });
 
   it('should not display the table when the data is loading', () => {
-    mockActiveBills.mockImplementationOnce(() => ({
-      activeBills: undefined,
+    mockbills.mockImplementationOnce(() => ({
+      bills: undefined,
       isLoading: true,
       isValidating: false,
       error: null,
@@ -130,7 +130,7 @@ describe('BillsTable', () => {
   });
 
   it('should display the error state when there is error', () => {
-    mockActiveBills.mockImplementationOnce(() => ({
+    mockbills.mockImplementationOnce(() => ({
       activeVisits: undefined,
       isLoading: false,
       isValidating: false,

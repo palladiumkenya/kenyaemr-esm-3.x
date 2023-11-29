@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react';
+import classNames from 'classnames';
 import {
   DataTable,
   DataTableSkeleton,
@@ -24,18 +25,19 @@ import {
   ErrorState,
   ConfigurableLink,
 } from '@openmrs/esm-framework';
-import { useActiveBills } from '../../hooks/useActiveBills';
+import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { useBills } from '../billing.resource';
 import styles from './bills-table.scss';
-import { EmptyDataIllustration } from './empty-data-illustration.component';
 
 const BillsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
-  const pageSizes = config?.activeVisits?.pageSizes ?? [10, 20, 30, 40, 50];
-  const [pageSize, setPageSize] = useState(config?.activeVisits?.pageSize ?? 10);
-  const { activeBills, isLoading, isValidating, error } = useActiveBills();
+  const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
+  const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
+  const { bills, isLoading, isValidating, error } = useBills();
   const [searchString, setSearchString] = useState('');
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
   const headerData = [
     {
@@ -65,10 +67,10 @@ const BillsTable = () => {
   ];
 
   const searchResults = useMemo(() => {
-    if (activeBills !== undefined && activeBills.length > 0) {
+    if (bills !== undefined && bills.length > 0) {
       if (searchString && searchString.trim() !== '') {
         const search = searchString.toLowerCase();
-        return activeBills?.filter((activeBillRow) =>
+        return bills?.filter((activeBillRow) =>
           Object.entries(activeBillRow).some(([header, value]) => {
             if (header === 'patientUuid') {
               return false;
@@ -79,8 +81,8 @@ const BillsTable = () => {
       }
     }
 
-    return activeBills;
-  }, [searchString, activeBills]);
+    return bills;
+  }, [searchString, bills]);
 
   const { paginated, goTo, results, currentPage } = usePagination(searchResults, pageSize);
 
@@ -90,11 +92,11 @@ const BillsTable = () => {
     patientName: (
       <ConfigurableLink
         style={{ textDecoration: 'none', maxWidth: '50%' }}
-        to={`\${openmrsSpaBase}/patient/${bill.patientUuid}/chart`}>
+        to={`${window.getOpenmrsSpaBase()}patient/${bill.patientUuid}/chart`}>
         {bill.patientName}
       </ConfigurableLink>
     ),
-    visitTime: '--',
+    visitTime: bill.dateCreated,
     identifier: bill.identifier,
     department: '--',
     billingService: '--',
@@ -111,21 +113,12 @@ const BillsTable = () => {
 
   if (isLoading) {
     return (
-      <div className={styles.activeVisitsContainer}>
-        <div className={styles.activeVisitsDetailHeaderContainer}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('billsList', 'Bills list')}</h4>
-          </div>
-          <div className={styles.backgroundDataFetchingIndicator}>
-            <span>{isValidating ? <InlineLoading /> : null}</span>
-          </div>
-        </div>
-        <Search
-          labelText=""
-          placeholder={t('filterTable', 'Filter table')}
-          onChange={handleSearch}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
-          disabled
+      <div className={styles.loaderContainer}>
+        <FilterableTableHeader
+          handleSearch={handleSearch}
+          isValidating={isValidating}
+          responsiveSize={responsiveSize}
+          t={t}
         />
         <DataTableSkeleton
           rowCount={pageSize}
@@ -133,7 +126,7 @@ const BillsTable = () => {
           showToolbar={false}
           zebra
           columnCount={headerData?.length}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
+          size={responsiveSize}
         />
       </div>
     );
@@ -141,52 +134,28 @@ const BillsTable = () => {
 
   if (error) {
     return (
-      <div className={styles.activeVisitsContainer}>
+      <div className={styles.errorContainer}>
         <Layer>
-          <ErrorState error={error} headerTitle={t('billsList', 'Bills list')} />
+          <ErrorState error={error} headerTitle={t('billsList', 'Bill list')} />
         </Layer>
       </div>
     );
   }
 
-  if (!activeBills.length && isLoading === false) {
+  if (bills?.length > 0) {
     return (
-      <div className={styles.activeVisitsContainer}>
-        <Layer>
-          <Tile className={styles.tile}>
-            <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('billsList', 'Bills list')}</h4>
-            </div>
-            <EmptyDataIllustration />
-            <p className={styles.content}>
-              {t('noBillsForLocation', 'There are no bills to display for this location.')}
-            </p>
-          </Tile>
-        </Layer>
-      </div>
-    );
-  } else {
-    return (
-      <div className={styles.activeVisitsContainer}>
-        <div className={styles.activeVisitsDetailHeaderContainer}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('billList', 'Bills list')}</h4>
-          </div>
-          <div className={styles.backgroundDataFetchingIndicator}>
-            <span>{isValidating ? <InlineLoading /> : null}</span>
-          </div>
-        </div>
-        <Search
-          labelText=""
-          placeholder={t('filterTable', 'Filter table')}
-          onChange={handleSearch}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
+      <div className={styles.billListContainer}>
+        <FilterableTableHeader
+          handleSearch={handleSearch}
+          isValidating={isValidating}
+          responsiveSize={responsiveSize}
+          t={t}
         />
         <DataTable
           isSortable
           rows={rowData}
           headers={headerData}
-          size={isDesktop(layout) ? 'sm' : 'lg'}
+          size={responsiveSize}
           useZebraStyles={rowData?.length > 1 ? true : false}>
           {({ rows, headers, getRowProps, getTableProps }) => (
             <TableContainer>
@@ -219,7 +188,9 @@ const BillsTable = () => {
           <div className={styles.filterEmptyState}>
             <Layer level={0}>
               <Tile className={styles.filterEmptyStateTile}>
-                <p className={styles.filterEmptyStateContent}>{t('noBillsToDisplay', 'No bills to display')}</p>
+                <p className={styles.filterEmptyStateContent}>
+                  {t('noMatchingBillsToDisplay', 'No matching bills to display')}
+                </p>
                 <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
               </Tile>
             </Layer>
@@ -234,7 +205,7 @@ const BillsTable = () => {
             pageSizes={pageSizes}
             totalItems={searchResults?.length}
             className={styles.pagination}
-            size={isDesktop(layout) ? 'sm' : 'lg'}
+            size={responsiveSize}
             onChange={({ pageSize: newPageSize, page: newPage }) => {
               if (newPageSize !== pageSize) {
                 setPageSize(newPageSize);
@@ -248,6 +219,44 @@ const BillsTable = () => {
       </div>
     );
   }
+
+  return (
+    <Layer className={styles.emptyStateContainer}>
+      <Tile className={styles.tile}>
+        <div className={styles.illo}>
+          <EmptyDataIllustration />
+        </div>
+        <p className={styles.content}>There are no bills to display.</p>
+      </Tile>
+    </Layer>
+  );
 };
 
 export default BillsTable;
+
+function FilterableTableHeader({ handleSearch, isValidating, responsiveSize, t }) {
+  const layout = useLayoutType();
+
+  return (
+    <>
+      <div className={styles.headerContainer}>
+        <div
+          className={classNames({
+            [styles.tabletHeading]: !isDesktop(layout),
+            [styles.desktopHeading]: isDesktop(layout),
+          })}>
+          <h4>{t('billList', 'Bill list')}</h4>
+        </div>
+        <div className={styles.backgroundDataFetchingIndicator}>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
+        </div>
+      </div>
+      <Search
+        labelText=""
+        placeholder={t('filterTable', 'Filter table')}
+        onChange={handleSearch}
+        size={responsiveSize}
+      />
+    </>
+  );
+}

@@ -11,6 +11,7 @@ export interface MappedBill {
   receiptNumber: string;
   status: string;
   identifier: string;
+  dateCreated: string;
 }
 
 interface LocationLink {

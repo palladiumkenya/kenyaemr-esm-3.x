@@ -1,8 +1,8 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { MappedBill, PatientInvoice } from '../types';
+import { formatDate, parseDate, openmrsFetch } from '@openmrs/esm-framework';
+import { MappedBill, PatientInvoice } from './types';
 
-export const useActiveBills = () => {
+export const useBills = () => {
   const url = `/ws/rest/v1/cashier/bill?v=full`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     url,
@@ -27,6 +27,7 @@ export const useActiveBills = () => {
       cashPointName: bill?.cashPoint?.name,
       cashPointLocation: bill?.cashPoint?.location?.display,
       totalPrice: bill.id,
+      dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
     };
 
     return mappedBill;
@@ -35,7 +36,7 @@ export const useActiveBills = () => {
   const formattedBills = data?.data ? data?.data?.results?.map((res) => mapBillProperties(res)) : [];
 
   return {
-    activeBills: formattedBills,
+    bills: formattedBills,
     error,
     isLoading,
     isValidating,
