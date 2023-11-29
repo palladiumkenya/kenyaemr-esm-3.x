@@ -46,7 +46,7 @@ interface Provider {
   links: ProviderLink[];
 }
 
-interface LineItem {
+export interface LineItem {
   uuid: string;
   display: string;
   voided: boolean;
@@ -103,7 +103,7 @@ interface PaymentInstanceType {
   retired: boolean;
 }
 
-interface Payment {
+export interface Payment {
   uuid: string;
   instanceType: PaymentInstanceType;
   attributes: Attribute[];

@@ -70,7 +70,6 @@ export const billsSummary = [
           description: 'Mpesa',
           retired: false,
         },
-
         attributes: [
           {
             uuid: '84aacfcc-9788-4f7b-a56a-407d84af1b54',
