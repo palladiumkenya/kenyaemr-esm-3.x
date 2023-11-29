@@ -1,6 +1,5 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { useConfig, usePagination } from '@openmrs/esm-framework';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useBills } from '../billing.resource';
 import BillsTable from './bills-table.component';
 

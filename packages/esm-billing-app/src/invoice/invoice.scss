@@ -1,6 +1,52 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '@carbon/type';
 
 .invoiceContainer {
-  margin: layout.$spacing-03 layout.$spacing-05;
+  background-color: colors.$gray-10;
+  height: calc(100vh - 3rem);
+}
+
+.loader {
+  display: flex;
+  min-height: layout.$spacing-09;
+  justify-content: center;
+}
+
+.details {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: layout.$spacing-05;
+}
+
+.label {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-70;
+}
+
+.value {
+  @include type.type-style('heading-03');
+  display: inline-block;
+  margin-top: layout.$spacing-04;
+}
+
+.backButton {
+  margin: layout.$spacing-04;
+
+  button {
+    display: flex;
+    padding-left: 0 !important;
+
+    svg {
+      order: 1;
+      margin-right: layout.$spacing-03;
+      margin-left: 0 !important;
+    }
+
+    span {
+      order: 2;
+    }
+  }
 }
