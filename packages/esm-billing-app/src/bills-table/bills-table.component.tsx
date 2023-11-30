@@ -56,10 +56,6 @@ const BillsTable = () => {
       header: t('billingService', 'Billing service'),
       key: 'billingService',
     },
-    {
-      header: t('department', 'Department'),
-      key: 'department',
-    },
   ];
 
   const searchResults = useMemo(() => {
@@ -95,7 +91,8 @@ const BillsTable = () => {
     visitTime: bill.dateCreated,
     identifier: bill.identifier,
     department: '--',
-    billingService: '--',
+    billingService: bill.billingService,
+    billingPrice: '--',
   }));
 
   const handleSearch = useCallback(

@@ -30,3 +30,6 @@ export function calculateTotalAmount(lineItems: Array<LineItem>) {
       }, 0)
     : 0;
 }
+
+export const convertToCurreny = (amountToConvert: number) =>
+  new Intl.NumberFormat('en-KE', { currency: 'KSH', style: 'currency' }).format(amountToConvert);

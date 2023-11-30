@@ -1,14 +1,37 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Card from './card.component';
 import styles from './metrics-cards.scss';
+import { useBills } from '../billing.resource';
+import { useBillMetrics } from './metrics.resource';
+import { useTranslation } from 'react-i18next';
+import { ErrorState } from '@openmrs/esm-framework';
+import { InlineLoading } from '@carbon/react';
 
 export default function MetricsCards() {
-  const cards = [
-    { title: 'Cumulative Bills', count: 0 },
-    { title: 'Pending Bills', count: 0 },
-    { title: 'Fulfilled Bills', count: 0 },
-  ];
+  const { t } = useTranslation();
+  const { bills = [], isLoading, error } = useBills();
+  const { cumulativeBills, pendingBills, paidBills } = useBillMetrics(bills);
 
+  const cards = useMemo(
+    () => [
+      { title: 'Cumulative Bills', count: cumulativeBills },
+      { title: 'Pending Bills', count: pendingBills },
+      { title: 'Paid Bills', count: paidBills },
+    ],
+    [cumulativeBills, pendingBills, paidBills],
+  );
+
+  if (isLoading) {
+    return (
+      <section className={styles.container}>
+        <InlineLoading status="active" iconDescription="Loading" description="Loading bills metrics..." />
+      </section>
+    );
+  }
+
+  if (error) {
+    return <ErrorState headerTitle={t('billMetrics', 'Bill metrics')} error={error} />;
+  }
   return (
     <section className={styles.container}>
       {cards.map((card) => (
