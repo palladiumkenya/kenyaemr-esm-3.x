@@ -4,6 +4,8 @@ import { ArrowLeft } from '@carbon/react/icons';
 import { ExtensionSlot, isDesktop, navigate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import styles from './invoice.scss';
+import InvoiceTable from './invoice-table.component';
+import Payments from './payments/payments.component';
 
 type InvoiceProps = {};
 
@@ -59,6 +61,11 @@ const Invoice: React.FC<InvoiceProps> = () => {
           </Button>
         </div>
       )}
+
+      <div>
+        <InvoiceTable />
+        <Payments />
+      </div>
     </div>
   );
 };
