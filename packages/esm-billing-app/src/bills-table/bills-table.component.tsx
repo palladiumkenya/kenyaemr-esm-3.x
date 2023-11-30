@@ -117,6 +117,7 @@ const BillsTable = () => {
         <FilterableTableHeader
           handleSearch={handleSearch}
           isValidating={isValidating}
+          layout={layout}
           responsiveSize={responsiveSize}
           t={t}
         />
@@ -148,6 +149,7 @@ const BillsTable = () => {
         <FilterableTableHeader
           handleSearch={handleSearch}
           isValidating={isValidating}
+          layout={layout}
           responsiveSize={responsiveSize}
           t={t}
         />
@@ -159,7 +161,7 @@ const BillsTable = () => {
           useZebraStyles={rowData?.length > 1 ? true : false}>
           {({ rows, headers, getRowProps, getTableProps }) => (
             <TableContainer>
-              <Table {...getTableProps()} aria-label="sample table">
+              <Table {...getTableProps()} aria-label="bill list">
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -232,11 +234,7 @@ const BillsTable = () => {
   );
 };
 
-export default BillsTable;
-
-function FilterableTableHeader({ handleSearch, isValidating, responsiveSize, t }) {
-  const layout = useLayoutType();
-
+function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveSize, t }) {
   return (
     <>
       <div className={styles.headerContainer}>
@@ -260,3 +258,5 @@ function FilterableTableHeader({ handleSearch, isValidating, responsiveSize, t }
     </>
   );
 }
+
+export default BillsTable;
