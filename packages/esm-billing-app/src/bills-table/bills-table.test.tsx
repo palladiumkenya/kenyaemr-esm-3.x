@@ -42,14 +42,7 @@ describe('BillsTable', () => {
 
     expect(screen.getByText('Visit time')).toBeInTheDocument();
     expect(screen.getByText('Identifier')).toBeInTheDocument();
-    const expectedColumnHeaders = [
-      /Visit time/,
-      /Identifier/,
-      /Name/,
-      /Billing service/,
-      /Billing price/,
-      /Department/,
-    ];
+    const expectedColumnHeaders = [/Visit time/, /Identifier/, /Name/, /Billing service/, /Department/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
@@ -67,7 +60,6 @@ describe('BillsTable', () => {
           patientName: 'John Doe',
           visitTime: '12:59',
           billingService: '',
-          billingPrice: 'Checkup',
           department: 'uuid1',
         },
         {
@@ -75,7 +67,6 @@ describe('BillsTable', () => {
           patientName: 'Some One',
           visitTime: '12:12',
           billingService: '',
-          billingPrice: 'Checkup',
           department: 'uuid2',
         },
       ],
@@ -115,14 +106,7 @@ describe('BillsTable', () => {
 
     render(<BillsTable />);
 
-    const expectedColumnHeaders = [
-      /Visit time/,
-      /Identifier/,
-      /Name/,
-      /Billing service/,
-      /Billing price/,
-      /Department/,
-    ];
+    const expectedColumnHeaders = [/Visit time/, /Identifier/, /Name/, /Billing service/, /Department/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.queryByRole('columnheader', { name: new RegExp(header, 'i') })).not.toBeInTheDocument();
     });

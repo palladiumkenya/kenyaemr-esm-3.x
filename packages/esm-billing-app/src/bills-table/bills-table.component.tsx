@@ -57,10 +57,6 @@ const BillsTable = () => {
       key: 'billingService',
     },
     {
-      header: t('billingPrice', 'Billing price'),
-      key: 'billingPrice',
-    },
-    {
       header: t('department', 'Department'),
       key: 'department',
     },
@@ -100,7 +96,6 @@ const BillsTable = () => {
     identifier: bill.identifier,
     department: '--',
     billingService: '--',
-    billingPrice: '--',
   }));
 
   const handleSearch = useCallback(
