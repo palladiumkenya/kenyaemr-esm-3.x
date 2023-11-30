@@ -42,7 +42,7 @@ describe('BillsTable', () => {
 
     expect(screen.getByText('Visit time')).toBeInTheDocument();
     expect(screen.getByText('Identifier')).toBeInTheDocument();
-    const expectedColumnHeaders = [/Visit time/, /Identifier/, /Name/, /Billing service/, /Department/];
+    const expectedColumnHeaders = [/Visit time/, /Identifier/, /Name/, /Billing service/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });

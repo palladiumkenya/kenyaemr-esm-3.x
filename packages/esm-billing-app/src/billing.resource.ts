@@ -28,6 +28,9 @@ export const useBills = () => {
       cashPointLocation: bill?.cashPoint?.location?.display,
       totalPrice: bill.id,
       dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
+      lineItems: bill.lineItems,
+      billingService: bill.lineItems.map((bill) => bill.item).join(' '),
+      payments: bill.payments,
     };
 
     return mappedBill;

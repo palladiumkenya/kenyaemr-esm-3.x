@@ -12,6 +12,9 @@ export interface MappedBill {
   status: string;
   identifier: string;
   dateCreated: string;
+  lineItems: Array<LineItem>;
+  billingService: string;
+  payments: Array<Payment>;
 }
 
 interface LocationLink {
