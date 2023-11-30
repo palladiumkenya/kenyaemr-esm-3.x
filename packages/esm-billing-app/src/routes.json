@@ -19,6 +19,27 @@
       "component": "root",
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
+    },
+    {
+      "name": "billing-patient-summary",
+      "component": "billingPatientSummary",
+      "slot": "patient-chart-billing-dashboard-slot",
+      "order": 10,
+      "meta": {
+        "columnSpan": 4
+      }
+    },
+    {
+      "name": "billing-summary-dashboard-link",
+      "component": "billingSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 11,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-billing-dashboard-slot",
+        "path": "Billing history"
+      }
     }
   ]
 }

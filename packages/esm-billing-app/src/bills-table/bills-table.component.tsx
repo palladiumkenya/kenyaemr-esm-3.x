@@ -35,7 +35,7 @@ const BillsTable = () => {
   const layout = useLayoutType();
   const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
-  const { bills, isLoading, isValidating, error } = useBills();
+  const { bills, isLoading, isValidating, error } = useBills('');
   const [searchString, setSearchString] = useState('');
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
