@@ -31,6 +31,7 @@ export const useBillMetrics = (bills: Array<MappedBill>) => {
 
   const cumulativeBills = calculateTotals();
   const pendingBills = cumulativeBills - paidBills;
+
   return {
     cumulativeBills: convertToCurrency(cumulativeBills),
     pendingBills: convertToCurrency(pendingBills),

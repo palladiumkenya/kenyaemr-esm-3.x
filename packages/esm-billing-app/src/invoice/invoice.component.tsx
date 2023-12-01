@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import styles from './invoice.scss';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
+import { useBills } from '../billing.resource';
 
 type InvoiceProps = {};
 
@@ -13,13 +14,21 @@ const Invoice: React.FC<InvoiceProps> = () => {
   const params = useParams();
   const layout = useLayoutType();
   const { patient, patientUuid, isLoading } = usePatient(params?.patientUuid);
+  const { bills } = useBills('');
+  const patientBills = bills?.filter((bill) => bill.patientUuid === params?.patientUuid) ?? [];
 
-  const invoiceDetails = {
-    'Invoice Number': '#105986',
-    'Billing Date & Time': 'Thu 04 Nov, 2023 01:20 pm',
-    'Total Amount': 'Ksh. 1000',
-    'Invoice Status': 'Pending',
-  };
+  const invoiceDetails = patientBills
+    .map((bill, index) => {
+      return {
+        'Total Amount': patientBills
+          .flatMap((bill) => bill.lineItems.map((item) => item.price * item.quantity))
+          .reduce((prev, curr) => prev + curr, 0),
+        'Invoice Number': '#105986',
+        'Date And Time': bill.dateCreated,
+        'Invoice Status': bill.status,
+      };
+    })
+    .slice(-1);
 
   const navigateToDashboard = () =>
     navigate({
@@ -44,23 +53,21 @@ const Invoice: React.FC<InvoiceProps> = () => {
       <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />
 
       <section className={styles.details}>
-        {Object.entries(invoiceDetails).map(([label, value]) => (
-          <InvoiceDetails key={label} label={label} value={value} />
-        ))}
+        {invoiceDetails.map((details, index) =>
+          Object.entries(details).map(([key, val]) => <InvoiceDetails key={key} label={key} value={val} />),
+        )}
       </section>
 
-      {isDesktop(layout) && (
-        <div className={styles.backButton}>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-            iconDescription="Return to billing dashboard"
-            size="sm"
-            onClick={navigateToDashboard}>
-            <span>Back to dashboard</span>
-          </Button>
-        </div>
-      )}
+      <div className={styles.backButton}>
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+          iconDescription="Return to billing dashboard"
+          size="sm"
+          onClick={navigateToDashboard}>
+          <span>Back to dashboard</span>
+        </Button>
+      </div>
 
       <div>
         <InvoiceTable />
@@ -72,7 +79,7 @@ const Invoice: React.FC<InvoiceProps> = () => {
 
 interface InvoiceDetailsProps {
   label: string;
-  value: string;
+  value: string | number;
 }
 
 function InvoiceDetails({ label, value }: InvoiceDetailsProps) {
