@@ -3,7 +3,7 @@ import { formatDate, parseDate, openmrsFetch } from '@openmrs/esm-framework';
 import { MappedBill, PatientInvoice } from './types';
 import isEmpty from 'lodash-es/isEmpty';
 
-export const useBills = (patientUuid) => {
+export const useBills = (patientUuid?: string) => {
   const url = `/ws/rest/v1/cashier/bill?v=full`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     url,

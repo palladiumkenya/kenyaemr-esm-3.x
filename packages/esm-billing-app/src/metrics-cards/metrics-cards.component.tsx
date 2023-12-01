@@ -24,7 +24,7 @@ export default function MetricsCards() {
   if (isLoading) {
     return (
       <section className={styles.container}>
-        <InlineLoading status="active" iconDescription="Loading" description="Loading bills metrics..." />
+        <InlineLoading status="active" iconDescription="Loading" description="Loading bill metrics..." />
       </section>
     );
   }
