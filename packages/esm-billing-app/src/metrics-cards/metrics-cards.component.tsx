@@ -9,7 +9,7 @@ import { InlineLoading } from '@carbon/react';
 
 export default function MetricsCards() {
   const { t } = useTranslation();
-  const { bills = [], isLoading, error } = useBills();
+  const { bills = [], isLoading, error } = useBills('');
   const { cumulativeBills, pendingBills, paidBills } = useBillMetrics(bills);
 
   const cards = useMemo(

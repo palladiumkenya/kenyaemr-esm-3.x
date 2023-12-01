@@ -3,6 +3,9 @@ import { configSchema } from './config-schema';
 
 import rootComponent from './root.component';
 import { createLeftPanelLink } from './left-panel-link.component';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { dashboardMeta } from './dashboard.meta';
+import BillHistory from './bill-history/bill-history.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -27,3 +30,10 @@ export const root = getSyncLifecycle(rootComponent, options);
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
+
+export const billingSummaryDashboardLink = getSyncLifecycle(
+  createDashboardLink({ ...dashboardMeta, moduleName }),
+  options,
+);
+
+export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
