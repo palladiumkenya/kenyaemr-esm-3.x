@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { formatDate, parseDate, openmrsFetch } from '@openmrs/esm-framework';
 import { MappedBill, PatientInvoice } from './types';
+import isEmpty from 'lodash-es/isEmpty';
 
 export const useBills = (patientUuid?: string) => {
   const url = `/ws/rest/v1/cashier/bill?v=full`;
@@ -37,7 +38,7 @@ export const useBills = (patientUuid?: string) => {
 
   const mappedResults = data?.data ? data?.data?.results?.map((res) => mapBillProperties(res)) : [];
   const filteredResults = mappedResults?.filter((res) => res.patientUuid === patientUuid);
-  const formattedBills = patientUuid ? mappedResults : filteredResults || [];
+  const formattedBills = isEmpty(patientUuid) ? mappedResults : filteredResults || [];
 
   return {
     bills: formattedBills,
