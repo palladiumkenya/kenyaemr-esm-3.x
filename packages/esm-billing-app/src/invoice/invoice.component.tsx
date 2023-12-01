@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 import styles from './invoice.scss';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
+import { useTranslation } from 'react-i18next';
 import { useBills } from '../billing.resource';
 
 type InvoiceProps = {};
@@ -23,12 +24,26 @@ const Invoice: React.FC<InvoiceProps> = () => {
         'Total Amount': patientBills
           .flatMap((bill) => bill.lineItems.map((item) => item.price * item.quantity))
           .reduce((prev, curr) => prev + curr, 0),
+        'Amount Tendered': patientBills
+          .flatMap((bill) => bill.payments.map((item) => item.amountTendered))
+          .reduce((prev, curr) => prev + curr, 0),
         'Invoice Number': '#105986',
         'Date And Time': bill.dateCreated,
         'Invoice Status': bill.status,
       };
     })
     .slice(-1);
+
+  const invoiceTotal = patientBills.map((bill, index) => {
+    return {
+      totalAmount: patientBills
+        .flatMap((bill) => bill.lineItems.map((item) => item.price * item.quantity))
+        .reduce((prev, curr) => prev + curr, 0),
+      amountTendered: patientBills
+        .flatMap((bill) => bill.payments.map((item) => item.amountTendered))
+        .reduce((prev, curr) => prev + curr, 0),
+    };
+  });
 
   const navigateToDashboard = () =>
     navigate({
@@ -71,7 +86,15 @@ const Invoice: React.FC<InvoiceProps> = () => {
 
       <div>
         <InvoiceTable />
-        <Payments />
+        <div className={styles.paymentSection}>
+          <Payments />
+          <InvoicePaymentBreakdown
+            totalBill={invoiceTotal[0]?.totalAmount}
+            tenderedBill={invoiceTotal[0]?.amountTendered}
+            amount={invoiceTotal[0]?.totalAmount}
+            discount={0}
+          />
+        </div>
       </div>
     </div>
   );
@@ -92,3 +115,31 @@ function InvoiceDetails({ label, value }: InvoiceDetailsProps) {
 }
 
 export default Invoice;
+
+interface InvoicePaymentBreakdown {
+  totalBill: number;
+  tenderedBill: number;
+  discount: number;
+  amount: number;
+}
+
+function InvoicePaymentBreakdown({ totalBill, tenderedBill, discount, amount }: InvoicePaymentBreakdown) {
+  const { t } = useTranslation();
+
+  return (
+    <div className={styles.invoicePaymentBreakdownContainer}>
+      <div className={styles.label}>
+        {t('totalBill', 'Total bill')} : <span className={styles.billDetail}>{totalBill}</span>
+      </div>
+      <div className={styles.label}>
+        {t('tenderedBill', 'Tendered bill')} : <span className={styles.billDetail}>{tenderedBill}</span>
+      </div>
+      <div className={styles.label}>
+        {t('discount', 'Discount')} : <span className={styles.billDetail}>{discount}</span>
+      </div>
+      <div className={styles.label}>
+        {t('amountDue', 'Amount due')} : <span className={styles.billDetail}>{amount}</span>
+      </div>
+    </div>
+  );
+}

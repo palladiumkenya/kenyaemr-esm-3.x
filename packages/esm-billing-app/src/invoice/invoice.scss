@@ -24,6 +24,7 @@
 .label {
   @include type.type-style('body-compact-02');
   color: colors.$gray-70;
+  margin: layout.$spacing-01;
 }
 
 .value {
@@ -49,4 +50,22 @@
       order: 2;
     }
   }
+}
+
+.paymentSection {
+  display: flex;
+  flex-direction: row;
+}
+
+.invoicePaymentBreakdownContainer {
+  display: flex;
+  flex-direction: column;
+  margin: layout.$spacing-04;
+  padding: layout.$spacing-05;
+  border-left: 1px solid colors.$cool-gray-40;
+}
+
+.billDetail {
+  font-weight: bold;
+  color: colors.$cool-gray-90;
 }
