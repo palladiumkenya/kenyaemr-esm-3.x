@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import {
   DataTable,
   Table,
@@ -10,16 +11,15 @@ import {
   TableCell,
 } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import styles from './invoice-table.scss';
 import { useBills } from '../billing.resource';
-import { useParams } from 'react-router-dom';
+import styles from './invoice-table.scss';
 
 type InvoiceTableProps = {};
 
 const InvoiceTable: React.FC<InvoiceTableProps> = () => {
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const { bills } = useBills('');
+  const { bills } = useBills();
   const params = useParams();
   const patientBills = bills?.filter((bill) => bill.patientUuid === params?.patientUuid) ?? [];
   const headerData = [
