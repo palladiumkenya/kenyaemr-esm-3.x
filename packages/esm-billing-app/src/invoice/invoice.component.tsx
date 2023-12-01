@@ -58,18 +58,16 @@ const Invoice: React.FC<InvoiceProps> = () => {
         )}
       </section>
 
-      {isDesktop(layout) && (
-        <div className={styles.backButton}>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-            iconDescription="Return to billing dashboard"
-            size="sm"
-            onClick={navigateToDashboard}>
-            <span>Back to dashboard</span>
-          </Button>
-        </div>
-      )}
+      <div className={styles.backButton}>
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+          iconDescription="Return to billing dashboard"
+          size="sm"
+          onClick={navigateToDashboard}>
+          <span>Back to dashboard</span>
+        </Button>
+      </div>
 
       <div>
         <InvoiceTable />
