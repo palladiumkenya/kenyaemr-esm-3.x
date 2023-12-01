@@ -19,7 +19,7 @@ type InvoiceTableProps = {};
 const InvoiceTable: React.FC<InvoiceTableProps> = () => {
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const { bills } = useBills();
+  const { bills } = useBills('');
   const params = useParams();
   const patientBills = bills?.filter((bill) => bill.patientUuid === params?.patientUuid) ?? [];
   const headerData = [
