@@ -1,4 +1,4 @@
-import { calculateTotalAmount, convertToCurreny } from '../helpers';
+import { calculateTotalAmount, convertToCurrency } from '../helpers';
 import { MappedBill } from '../types';
 
 /**
@@ -32,8 +32,8 @@ export const useBillMetrics = (bills: Array<MappedBill>) => {
   const cumulativeBills = calculateTotals();
   const pendingBills = cumulativeBills - paidBills;
   return {
-    cumulativeBills: convertToCurreny(cumulativeBills),
-    pendingBills: convertToCurreny(pendingBills),
-    paidBills: convertToCurreny(paidBills),
+    cumulativeBills: convertToCurrency(cumulativeBills),
+    pendingBills: convertToCurrency(pendingBills),
+    paidBills: convertToCurrency(paidBills),
   };
 };

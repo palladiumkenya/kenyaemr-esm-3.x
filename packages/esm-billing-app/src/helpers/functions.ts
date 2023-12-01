@@ -31,5 +31,9 @@ export function calculateTotalAmount(lineItems: Array<LineItem>) {
     : 0;
 }
 
-export const convertToCurreny = (amountToConvert: number) =>
-  new Intl.NumberFormat('en-KE', { currency: 'KSH', style: 'currency' }).format(amountToConvert);
+export const convertToCurrency = (amountToConvert: number) => {
+  if (amountToConvert === 0) {
+    return '--';
+  }
+  return new Intl.NumberFormat('en-KE', { currency: 'KSH', style: 'currency' }).format(amountToConvert);
+};
