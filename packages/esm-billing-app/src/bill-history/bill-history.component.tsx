@@ -1,11 +1,4 @@
-import {
-  ConfigurableLink,
-  ErrorState,
-  isDesktop,
-  useConfig,
-  useLayoutType,
-  usePagination,
-} from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBills } from '../billing.resource';
@@ -28,6 +21,7 @@ import {
 } from '@carbon/react';
 import styles from './bill-history.scss';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import InvoiceTable from '../invoice/invoice-table.component';
 
 interface BillHistoryProps {
   patientUuid: string;
@@ -53,24 +47,19 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
       key: 'identifier',
     },
     {
-      header: t('name', 'Name'),
-      key: 'patientName',
-    },
-    {
       header: t('billingService', 'Billing service'),
       key: 'billingService',
+    },
+    {
+      header: t('billTotal', 'Bill total'),
+      key: 'billTotal',
     },
   ];
 
   const rowData = results?.map((bill, index) => ({
     id: `${index}`,
-    patientName: (
-      <ConfigurableLink
-        style={{ textDecoration: 'none', maxWidth: '50%' }}
-        to={`${window.getOpenmrsSpaBase()}home/billing/patient/${bill.patientUuid}`}>
-        {bill.patientName}
-      </ConfigurableLink>
-    ),
+    uuid: bill.uuid,
+    billTotal: bill.totalAmount,
     visitTime: bill.dateCreated,
     identifier: bill.identifier,
     billingService: bill.billingService,
@@ -103,12 +92,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   if (bills?.length > 0) {
     return (
       <div className={styles.billHistoryContainer}>
-        <DataTable
-          isSortable
-          rows={rowData}
-          headers={headerData}
-          size={responsiveSize}
-          useZebraStyles={rowData?.length > 1 ? true : false}>
+        <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles={true}>
           {({
             rows,
             headers,
@@ -144,7 +128,9 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
                       </TableExpandRow>
                       {row.isExpanded ? (
                         <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
-                          <div className={styles.container} key={i}></div>
+                          <div className={styles.container} key={i}>
+                            <InvoiceTable billUuid={rowData?.[i].uuid} />
+                          </div>
                         </TableExpandedRow>
                       ) : (
                         <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
