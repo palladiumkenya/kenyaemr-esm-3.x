@@ -7,7 +7,7 @@ import styles from './invoice.scss';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
 import { useTranslation } from 'react-i18next';
-import { useBills } from '../billing.resource';
+import { useBill } from '../billing.resource';
 
 type InvoiceProps = {};
 
@@ -15,35 +15,22 @@ const Invoice: React.FC<InvoiceProps> = () => {
   const params = useParams();
   const layout = useLayoutType();
   const { patient, patientUuid, isLoading } = usePatient(params?.patientUuid);
-  const { bills } = useBills('');
-  const patientBills = bills?.filter((bill) => bill.patientUuid === params?.patientUuid) ?? [];
+  const { bill } = useBill(params?.billUuid);
 
-  const invoiceDetails = patientBills
-    .map((bill, index) => {
-      return {
-        'Total Amount': patientBills
-          .flatMap((bill) => bill.lineItems.map((item) => item.price * item.quantity))
-          .reduce((prev, curr) => prev + curr, 0),
-        'Amount Tendered': patientBills
-          .flatMap((bill) => bill.payments.map((item) => item.amountTendered))
-          .reduce((prev, curr) => prev + curr, 0),
-        'Invoice Number': '#105986',
-        'Date And Time': bill.dateCreated,
-        'Invoice Status': bill.status,
-      };
-    })
-    .slice(-1);
+  const invoiceDetails = {
+    'Total Amount': bill?.totalAmount,
+    'Amount Tendered': bill?.tenderedAmount,
+    'Invoice Number': bill.receiptNumber,
+    'Date And Time': bill?.dateCreated,
+    'Invoice Status': bill?.status,
+  };
 
-  const invoiceTotal = patientBills.map((bill, index) => {
-    return {
-      totalAmount: patientBills
-        .flatMap((bill) => bill.lineItems.map((item) => item.price * item.quantity))
-        .reduce((prev, curr) => prev + curr, 0),
-      amountTendered: patientBills
-        .flatMap((bill) => bill.payments.map((item) => item.amountTendered))
-        .reduce((prev, curr) => prev + curr, 0),
-    };
-  });
+  const invoiceTotal = {
+    'Total Amount': bill?.totalAmount,
+    'Amount Tendered': bill?.tenderedAmount,
+    'Discount Amount': 0,
+    'Amount due': bill?.totalAmount - bill?.tenderedAmount,
+  };
 
   const navigateToDashboard = () =>
     navigate({
@@ -66,11 +53,10 @@ const Invoice: React.FC<InvoiceProps> = () => {
   return (
     <div className={styles.invoiceContainer}>
       <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />
-
       <section className={styles.details}>
-        {invoiceDetails.map((details, index) =>
-          Object.entries(details).map(([key, val]) => <InvoiceDetails key={key} label={key} value={val} />),
-        )}
+        {Object.entries(invoiceDetails).map(([key, val]) => (
+          <InvoiceDetails key={key} label={key} value={val} />
+        ))}
       </section>
 
       <div className={styles.backButton}>
@@ -88,12 +74,11 @@ const Invoice: React.FC<InvoiceProps> = () => {
         <InvoiceTable />
         <div className={styles.paymentSection}>
           <Payments />
-          <InvoicePaymentBreakdown
-            totalBill={invoiceTotal[0]?.totalAmount}
-            tenderedBill={invoiceTotal[0]?.amountTendered}
-            amount={invoiceTotal[0]?.totalAmount}
-            discount={0}
-          />
+          <div className={styles.invoicePaymentsContainer}>
+            {Object.entries(invoiceTotal).map(([key, val]) => (
+              <InvoicePaymentBreakdown label={key} value={val} />
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -117,18 +102,17 @@ function InvoiceDetails({ label, value }: InvoiceDetailsProps) {
 export default Invoice;
 
 interface InvoicePaymentBreakdown {
-  totalBill: number;
-  tenderedBill: number;
-  discount: number;
-  amount: number;
+  label: string;
+  value: number;
 }
 
-function InvoicePaymentBreakdown({ totalBill, tenderedBill, discount, amount }: InvoicePaymentBreakdown) {
+function InvoicePaymentBreakdown({ label, value }: InvoicePaymentBreakdown) {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.invoicePaymentBreakdownContainer}>
-      <div className={styles.label}>
+    <div className={styles.label}>
+      {label} : <span className={styles.billDetail}>{value}</span>
+      {/* <div className={styles.label}>
         {t('totalBill', 'Total bill')} : <span className={styles.billDetail}>{totalBill}</span>
       </div>
       <div className={styles.label}>
@@ -139,7 +123,7 @@ function InvoicePaymentBreakdown({ totalBill, tenderedBill, discount, amount }: 
       </div>
       <div className={styles.label}>
         {t('amountDue', 'Amount due')} : <span className={styles.billDetail}>{amount}</span>
-      </div>
+      </div> */}
     </div>
   );
 }

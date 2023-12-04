@@ -52,17 +52,15 @@
   }
 }
 
+.invoicePaymentsContainer {
+  display: flex;
+  flex-direction: column;
+  margin: layout.$spacing-05;
+}
+
 .paymentSection {
   display: flex;
   flex-direction: row;
-}
-
-.invoicePaymentBreakdownContainer {
-  display: flex;
-  flex-direction: column;
-  margin: layout.$spacing-04;
-  padding: layout.$spacing-05;
-  border-left: 1px solid colors.$cool-gray-40;
 }
 
 .billDetail {

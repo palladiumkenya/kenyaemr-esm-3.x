@@ -9,9 +9,10 @@ import {
   TableBody,
   TableHeader,
   TableCell,
+  DataTableSkeleton,
 } from '@carbon/react';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import { useBills } from '../billing.resource';
+import { useBill } from '../billing.resource';
 import styles from './invoice-table.scss';
 
 type InvoiceTableProps = {};
@@ -19,9 +20,8 @@ type InvoiceTableProps = {};
 const InvoiceTable: React.FC<InvoiceTableProps> = () => {
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const { bills } = useBills('');
   const params = useParams();
-  const patientBills = bills?.filter((bill) => bill.patientUuid === params?.patientUuid) ?? [];
+  const { bill, isLoading } = useBill(params?.billUuid);
   const headerData = [
     { header: 'No', key: 'no' },
     { header: 'Bill item', key: 'billItem' },
@@ -32,27 +32,36 @@ const InvoiceTable: React.FC<InvoiceTableProps> = () => {
     { header: 'Total', key: 'total' },
   ];
 
-  const rowData = patientBills.map((bill, index) => {
+  const rowData = bill?.lineItems?.map((item, index) => {
     return {
       no: `${index + 1}`,
-      id: `${bill.uuid}`,
-      billItem: bill.lineItems.flatMap((bill) => bill.item).join(' '),
+      id: `${item.uuid}`,
+      billItem: item.item,
       billCode: bill.receiptNumber,
       status: bill.status,
-      quantity: bill.lineItems.flatMap((item) => item.quantity).reduce((prev, curr) => prev + curr, 0),
-      price: bill.lineItems.flatMap((item) => item.price).reduce((prev, curr) => prev + curr, 0),
-      total: bill.lineItems.map((bill) => bill.price * bill.quantity).reduce((prev, curr) => prev + curr, 0),
+      quantity: item.quantity,
+      price: item.price,
+      total: item.price * item.quantity,
     };
   });
 
+  if (isLoading) {
+    return (
+      <div className={styles.loaderContainer}>
+        <DataTableSkeleton
+          showHeader={false}
+          showToolbar={false}
+          zebra
+          columnCount={headerData?.length}
+          size={responsiveSize}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className={styles.invoiceContainer}>
-      <DataTable
-        isSortable
-        rows={rowData}
-        headers={headerData}
-        size={responsiveSize}
-        useZebraStyles={rowData?.length > 1 ? true : false}>
+      <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles={true}>
         {({ rows, headers, getRowProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()} aria-label="Invoice line items">

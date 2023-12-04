@@ -14,6 +14,8 @@ export interface MappedBill {
   lineItems: Array<LineItem>;
   billingService: string;
   payments: Array<Payment>;
+  totalAmount?: number;
+  tenderedAmount?: number;
 }
 
 interface LocationLink {
