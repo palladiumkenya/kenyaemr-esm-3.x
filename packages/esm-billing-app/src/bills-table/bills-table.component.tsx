@@ -84,7 +84,7 @@ const BillsTable = () => {
     patientName: (
       <ConfigurableLink
         style={{ textDecoration: 'none', maxWidth: '50%' }}
-        to={`${window.getOpenmrsSpaBase()}home/billing/patient/${bill.patientUuid}`}>
+        to={`${window.getOpenmrsSpaBase()}home/billing/patient/${bill.patientUuid}/${bill.uuid}`}>
         {bill.patientName}
       </ConfigurableLink>
     ),

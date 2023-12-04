@@ -4,7 +4,9 @@
 
 .paymentContainer {
   margin: layout.$layout-01;
+  padding: layout.$layout-01;
   width: 70%;
+  border-right: 1px solid colors.$cool-gray-40;
 }
 
 .paymentButtons {

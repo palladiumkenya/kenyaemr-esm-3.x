@@ -48,3 +48,45 @@ export const useBills = (patientUuid?: string) => {
     mutate,
   };
 };
+
+export const useBill = (billUuid: string) => {
+  const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PatientInvoice }>(url, openmrsFetch, {
+    errorRetryCount: 2,
+  });
+
+  const mapBillProperties = (bill: PatientInvoice): MappedBill => {
+    // create base object
+    const mappedBill: MappedBill = {
+      id: bill?.id,
+      uuid: bill?.uuid,
+      patientName: bill?.patient?.display.split('-')?.[1],
+      identifier: bill?.patient?.display.split('-')?.[0],
+      patientUuid: bill?.patient?.uuid,
+      status: bill?.status,
+      receiptNumber: bill?.receiptNumber,
+      cashierName: bill?.cashier?.display,
+      cashPointUuid: bill?.cashPoint?.uuid,
+      cashPointName: bill?.cashPoint?.name,
+      cashPointLocation: bill?.cashPoint?.location?.display,
+      dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
+      lineItems: bill.lineItems,
+      billingService: bill.lineItems.map((bill) => bill.item).join(' '),
+      payments: bill.payments,
+      totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
+      tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
+    };
+
+    return mappedBill;
+  };
+
+  const formattedBill = data?.data ? mapBillProperties(data?.data) : ({} as MappedBill);
+
+  return {
+    bill: formattedBill,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  };
+};

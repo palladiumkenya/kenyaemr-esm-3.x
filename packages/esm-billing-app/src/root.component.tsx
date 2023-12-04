@@ -10,7 +10,7 @@ const RootComponent: React.FC = () => {
     <BrowserRouter basename={baseName}>
       <Routes>
         <Route path="/" element={<BillingDashboard />} />
-        <Route path="/patient/:patientUuid" element={<Invoice />} />
+        <Route path="/patient/:patientUuid/:billUuid" element={<Invoice />} />
       </Routes>
     </BrowserRouter>
   );
