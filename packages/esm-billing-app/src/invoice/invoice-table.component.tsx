@@ -1,5 +1,4 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import {
   DataTable,
   Table,
@@ -15,13 +14,14 @@ import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { useBill } from '../billing.resource';
 import styles from './invoice-table.scss';
 
-type InvoiceTableProps = {};
+type InvoiceTableProps = {
+  billUuid: string;
+};
 
-const InvoiceTable: React.FC<InvoiceTableProps> = () => {
+const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const params = useParams();
-  const { bill, isLoading } = useBill(params?.billUuid);
+  const { bill, isLoading } = useBill(billUuid);
   const headerData = [
     { header: 'No', key: 'no' },
     { header: 'Bill item', key: 'billItem' },

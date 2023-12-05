@@ -29,8 +29,9 @@ export const useBills = (patientUuid?: string) => {
       cashPointLocation: bill?.cashPoint?.location?.display,
       dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
       lineItems: bill.lineItems,
-      billingService: bill.lineItems.map((bill) => bill.item).join(' '),
+      billingService: bill.lineItems.map((bill) => bill.item).join(' & '),
       payments: bill.payments,
+      totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
     };
 
     return mappedBill;

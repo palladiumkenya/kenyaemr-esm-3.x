@@ -71,7 +71,7 @@ const Invoice: React.FC<InvoiceProps> = () => {
       </div>
 
       <div>
-        <InvoiceTable />
+        <InvoiceTable billUuid={bill?.uuid} />
         <div className={styles.paymentSection}>
           <Payments />
           <div className={styles.invoicePaymentsContainer}>
@@ -112,18 +112,6 @@ function InvoicePaymentBreakdown({ label, value }: InvoicePaymentBreakdown) {
   return (
     <div className={styles.label}>
       {label} : <span className={styles.billDetail}>{value}</span>
-      {/* <div className={styles.label}>
-        {t('totalBill', 'Total bill')} : <span className={styles.billDetail}>{totalBill}</span>
-      </div>
-      <div className={styles.label}>
-        {t('tenderedBill', 'Tendered bill')} : <span className={styles.billDetail}>{tenderedBill}</span>
-      </div>
-      <div className={styles.label}>
-        {t('discount', 'Discount')} : <span className={styles.billDetail}>{discount}</span>
-      </div>
-      <div className={styles.label}>
-        {t('amountDue', 'Amount due')} : <span className={styles.billDetail}>{amount}</span>
-      </div> */}
     </div>
   );
 }
