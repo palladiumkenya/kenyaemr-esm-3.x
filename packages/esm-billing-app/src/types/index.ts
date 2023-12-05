@@ -6,7 +6,7 @@ export interface MappedBill {
   cashPointUuid: string;
   cashPointName: string;
   cashPointLocation: string;
-  cashierName: string;
+  cashier: Provider;
   receiptNumber: string;
   status: string;
   identifier: string;

@@ -1,7 +1,6 @@
 import React from 'react';
-import { Button, InlineLoading } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, navigate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { InlineLoading } from '@carbon/react';
+import { ExtensionSlot, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import styles from './invoice.scss';
 import InvoiceTable from './invoice-table.component';
@@ -13,9 +12,8 @@ type InvoiceProps = {};
 
 const Invoice: React.FC<InvoiceProps> = () => {
   const params = useParams();
-  const layout = useLayoutType();
   const { patient, patientUuid, isLoading } = usePatient(params?.patientUuid);
-  const { bill } = useBill(params?.billUuid);
+  const { bill, isLoading: isLoadingBilling } = useBill(params?.billUuid);
 
   const invoiceDetails = {
     'Total Amount': bill?.totalAmount,
@@ -25,19 +23,7 @@ const Invoice: React.FC<InvoiceProps> = () => {
     'Invoice Status': bill?.status,
   };
 
-  const invoiceTotal = {
-    'Total Amount': bill?.totalAmount,
-    'Amount Tendered': bill?.tenderedAmount,
-    'Discount Amount': 0,
-    'Amount due': bill?.totalAmount - bill?.tenderedAmount,
-  };
-
-  const navigateToDashboard = () =>
-    navigate({
-      to: window.getOpenmrsSpaBase() + 'home/billing',
-    });
-
-  if (isLoading) {
+  if (isLoading && isLoadingBilling) {
     return (
       <div className={styles.invoiceContainer}>
         <InlineLoading
@@ -52,34 +38,16 @@ const Invoice: React.FC<InvoiceProps> = () => {
 
   return (
     <div className={styles.invoiceContainer}>
-      <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />
+      {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
       <section className={styles.details}>
         {Object.entries(invoiceDetails).map(([key, val]) => (
           <InvoiceDetails key={key} label={key} value={val} />
         ))}
       </section>
 
-      <div className={styles.backButton}>
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-          iconDescription="Return to billing dashboard"
-          size="sm"
-          onClick={navigateToDashboard}>
-          <span>Back to dashboard</span>
-        </Button>
-      </div>
-
       <div>
         <InvoiceTable billUuid={bill?.uuid} />
-        <div className={styles.paymentSection}>
-          <Payments />
-          <div className={styles.invoicePaymentsContainer}>
-            {Object.entries(invoiceTotal).map(([key, val]) => (
-              <InvoicePaymentBreakdown label={key} value={val} />
-            ))}
-          </div>
-        </div>
+        <Payments bill={bill} />
       </div>
     </div>
   );
