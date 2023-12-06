@@ -1,0 +1,51 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.printableInvoiceContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.itemsContainer {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  border: 0.1pt solid colors.$cool-gray-30;
+  padding: layout.$spacing-05;
+  margin: layout.$spacing-05;
+  border-radius: 20px;
+}
+
+.detailsContainer {
+  margin: layout.$spacing-05;
+  width: 20%;
+}
+
+.tableContainer {
+  min-height: 50vh;
+}
+
+.totalContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.item {
+  margin: layout.$spacing-04;
+}
+
+.itemHeading {
+  @include type.type-style('body-compact-02');
+  font-weight: bold;
+  color: colors.$cool-gray-90;
+}
+
+.itemTotal {
+  border-top: solid 0.1pt colors.$cool-gray-30;
+  padding: layout.$spacing-02;
+}
+
+.itemLabel {
+  float: right;
+}

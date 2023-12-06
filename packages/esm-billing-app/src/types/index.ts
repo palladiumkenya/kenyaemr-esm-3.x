@@ -137,3 +137,17 @@ export interface PatientInvoice {
   id: number;
   resourceVersion: string;
 }
+
+export interface PatientDetails {
+  name: string;
+  age: string;
+  gender: string;
+  city: string;
+  county: string;
+  subCounty: string;
+}
+
+export interface FacilityDetail {
+  uuid: string;
+  display: string;
+}

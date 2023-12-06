@@ -67,3 +67,14 @@
   font-weight: bold;
   color: colors.$cool-gray-90;
 }
+
+.printContainer {
+  background-color: colors.$white !important;
+  display: none;
+}
+
+@media print {
+  html,body {
+    background-color: colors.$white !important;
+  }
+}

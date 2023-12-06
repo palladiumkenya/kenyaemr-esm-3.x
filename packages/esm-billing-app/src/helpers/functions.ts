@@ -44,3 +44,18 @@ export const convertToCurrency = (amountToConvert: number) => {
 
   return formattedAmount;
 };
+
+export const getGender = (gender: string, t) => {
+  switch (gender) {
+    case 'male':
+      return t('male', 'Male');
+    case 'female':
+      return t('female', 'Female');
+    case 'other':
+      return t('other', 'Other');
+    case 'unknown':
+      return t('unknown', 'Unknown');
+    default:
+      return gender;
+  }
+};
