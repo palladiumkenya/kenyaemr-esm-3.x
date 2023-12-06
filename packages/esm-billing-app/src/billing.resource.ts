@@ -92,7 +92,7 @@ export const useBill = (billUuid: string) => {
   };
 };
 
-export const makeBillPayment = (payload, billUuid: string) => {
+export const processBillPayment = (payload, billUuid: string) => {
   const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
   return openmrsFetch(url, {
     method: 'POST',

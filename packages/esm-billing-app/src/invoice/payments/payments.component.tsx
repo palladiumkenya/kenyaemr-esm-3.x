@@ -1,124 +1,85 @@
 import React from 'react';
-import { Button, Dropdown, TextInput } from '@carbon/react';
-import { Add, TrashCan } from '@carbon/react/icons';
-import styles from './payments.scss';
+import { Button } from '@carbon/react';
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { convertToCurrency } from '../../helpers';
-import { InvoiceBreakDown } from './invoice-breakdown.component';
+import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
 import { MappedBill } from '../../types';
-import { navigate, showSnackbar } from '@openmrs/esm-framework';
-import { processPayments } from './utils';
-import PaymentHistory from './payment-history.component';
-import { makeBillPayment } from '../../billing.resource';
+import PaymentHistory from './payment-history/payment-history.component';
+import styles from './payments.scss';
+import PaymentForm from './payment-form/payment-form.component';
+import { createPaymentPayload } from './utils';
+import { processBillPayment } from '../../billing.resource';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const paymentSchema = z.object({
+  method: z.string().refine((value) => !!value, 'Payment method is required'),
+  amount: z.union([
+    z.number().refine((value) => !!value, 'Amount is required'),
+    z.string().refine((value) => !!value, 'Amount is required'),
+  ]),
+  referenceCode: z.union([z.number(), z.string()]).optional(),
+});
+const paymentFormSchema = z.object({ payment: z.array(paymentSchema) });
 
 type PaymentProps = { bill: MappedBill };
-export type Payment = { method: string; amount: number; referenceCode?: number | string };
+export type Payment = { method: string; amount: string | number; referenceCode?: number | string };
 export type PaymentFormValue = {
   payment: Array<Payment>;
 };
 
 const Payments: React.FC<PaymentProps> = ({ bill }) => {
   const { t } = useTranslation();
-  const { register, control, handleSubmit, formState } = useForm<PaymentFormValue>();
-  const { fields, append, remove } = useFieldArray({ name: 'payment', control });
+  const methods = useForm<PaymentFormValue>({
+    mode: 'all',
+    defaultValues: {},
+    resolver: zodResolver(paymentFormSchema),
+  });
 
   const formValues = useWatch({
     name: 'payment',
-    control,
+    control: methods.control,
   });
 
-  const totalAmountTendered = formValues?.reduce((curr, prev) => curr + prev.amount ?? 0, 0) ?? 0;
-  const amountDue = bill.totalAmount - (bill.tenderedAmount + totalAmountTendered);
+  const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount) ?? 0, 0) ?? 0;
+  const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + Number(totalAmountTendered));
+  const handleNavigateToBillingDashboard = () =>
+    navigate({
+      to: window.getOpenmrsSpaBase() + 'home/billing',
+    });
 
-  const handleProcessPayment = async () => {
-    const payload = processPayments(bill, bill.patientUuid, formValues);
-
-    const paymentStatus = bill.totalAmount - totalAmountTendered > 0 ? 'PENDING' : 'PAID';
-    payload.status = paymentStatus;
-    const response = await makeBillPayment(payload, bill.uuid);
-    if (response.ok) {
-      showSnackbar({
-        kind: 'sucess',
-        subtitle: t('billProcessedSuccesfully', 'Bill processed successfully'),
-        title: 'Bill payment',
-      });
-    }
-    if (!response.ok) {
-      showSnackbar({
-        kind: 'error',
-        subtitle: t('unableToProcessBill', response.statusText),
-        title: 'Bill payment error',
-      });
-    }
+  const handleProcessPayment = () => {
+    const paymentPayload = createPaymentPayload(bill, bill.patientUuid, formValues, amountDue);
+    processBillPayment(paymentPayload, bill.uuid).then(
+      (resp) => {
+        showSnackbar({
+          title: t('Bill payment'),
+          subtitle: 'Bill payment processing has been successful',
+          kind: 'success',
+          timeoutInMs: 3000,
+        });
+        handleNavigateToBillingDashboard();
+      },
+      (error) => {
+        showSnackbar({ title: 'Bill payment error', kind: 'error', subtitle: error });
+      },
+    );
   };
 
   return (
-    <>
+    <FormProvider {...methods}>
       <div className={styles.wrapper}>
         <div className={styles.paymentContainer}>
           <CardHeader title={t('payments', 'Payments')}>
             <span></span>
           </CardHeader>
           <div>
-            <PaymentHistory bill={bill} />
-            {fields.map((field, index) => (
-              <div key={field.id} className={styles.paymentMethodContainer}>
-                <Controller
-                  control={control}
-                  name={`payment.${index}.method`}
-                  render={({ field: { onChange } }) => (
-                    <Dropdown
-                      light
-                      onChange={({ selectedItem }) => onChange(selectedItem.id)}
-                      titleText={t('paymentMethod', 'Payment method')}
-                      label={t('selectPaymentMethod', 'Select payment method')}
-                      items={[
-                        { id: 'mpesa', text: 'MPESA' },
-                        { id: 'cash', text: 'Cash' },
-                        { id: 'bankDeposit', text: 'Bank Deposit' },
-                      ]}
-                      itemToString={(item) => (item ? item.text : '')}
-                    />
-                  )}
-                />
-
-                <TextInput
-                  light
-                  {...register(`payment.${index}.amount`, { required: true })}
-                  type="number"
-                  labelText={t('amount', 'Amount')}
-                />
-
-                {formValues && formValues[index]?.method !== '' && formValues[index]?.method !== 'cash' && (
-                  <TextInput
-                    light
-                    {...register(`payment.${index}.referenceCode`, { required: true })}
-                    type="text"
-                    labelText={t('referenceNumber', 'Reference number')}
-                  />
-                )}
-
-                <Button
-                  onClick={() => remove(index)}
-                  size="sm"
-                  renderIcon={(props) => <TrashCan size={24} {...props} />}
-                  kind="danger--tertiary"
-                  iconDescription="TrashCan">
-                  {t('delete', 'Delete')}
-                </Button>
-              </div>
-            ))}
+            {bill && <PaymentHistory bill={bill} />}
+            <PaymentForm disablePayment={amountDue <= 0} />
           </div>
-          <Button
-            size="md"
-            onClick={() => append({ method: '', amount: 0, referenceCode: '' })}
-            className={styles.paymentButtons}
-            renderIcon={(props) => <Add size={24} {...props} />}
-            iconDescription="Add">
-            {t('addPaymentOptions', 'Add payment option')}
-          </Button>
         </div>
         <div className={styles.paymentTotals}>
           <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill.totalAmount)} />
@@ -131,20 +92,14 @@ const Payments: React.FC<PaymentProps> = ({ bill }) => {
         </div>
       </div>
       <div className={styles.processPayments}>
-        <Button
-          onClick={() =>
-            navigate({
-              to: window.getOpenmrsSpaBase() + 'home/billing',
-            })
-          }
-          kind="danger">
+        <Button onClick={handleNavigateToBillingDashboard} kind="danger">
           {t('discardPayment', 'Discard Payment')}
         </Button>
-        <Button onClick={handleProcessPayment} disabled={!formValues?.length}>
+        <Button onClick={() => handleProcessPayment()} disabled={!formValues?.length || !methods.formState.isValid}>
           {t('processPayment', 'Process Payment')}
         </Button>
       </div>
-    </>
+    </FormProvider>
   );
 };
 

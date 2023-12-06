@@ -26,7 +26,7 @@ export const useBillMetrics = (bills: Array<MappedBill>) => {
 
   const paidBills = bills
     .flatMap((bill) => bill.payments)
-    .flatMap((payment) => payment.amount)
+    .flatMap((payment) => payment.amountTendered)
     .reduce((prev, curr) => curr + prev, 0);
 
   const cumulativeBills = calculateTotals();

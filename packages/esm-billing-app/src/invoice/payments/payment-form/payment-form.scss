@@ -1,0 +1,44 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.paymentContainer {
+  margin: layout.$layout-01;
+  padding: layout.$layout-01;
+  width: 70%;
+  border-right: 1px solid colors.$cool-gray-40;
+}
+
+.paymentButtons {
+  margin: layout.$layout-01 0;
+}
+
+.paymentMethodContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: flex-start;
+  column-gap: 1rem;
+  margin: 0.625rem 0;
+  width: 100%;
+}
+
+.paymentTotals {
+  margin-top: layout.$spacing-01;
+}
+
+.processPayments {
+  display: flex;
+  justify-content: flex-end;
+  margin: layout.$spacing-05;
+  column-gap: layout.$spacing-04;
+}
+
+.errorPaymentContainer {
+  margin: layout.$spacing-04;
+  min-height: layout.$spacing-09;
+}
+
+.removeButton {
+  align-self: center;
+  margin-top: layout.$spacing-03;
+}

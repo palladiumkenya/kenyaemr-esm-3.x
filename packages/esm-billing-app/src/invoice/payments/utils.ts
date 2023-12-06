@@ -1,23 +1,28 @@
-/* eslint-disable prettier/prettier */
 import { MappedBill } from '../../types';
 import { Payment } from './payments.component';
 
-export const processPayments = (bill: MappedBill, patientUuid: string, formValues: Array<Payment>) => {
-  const { cashier, lineItems } = bill;
+export const createPaymentPayload = (
+  bill: MappedBill,
+  patientUuid: string,
+  formValues: Array<Payment>,
+  amountDue: number,
+) => {
+  const { cashier } = bill;
   const totalAmount = bill?.totalAmount;
+  const paymentStatus = amountDue <= 0 ? 'PAID' : 'PENDING';
 
   const billPayment = formValues.map((formValue) => ({
-    amount: totalAmount,
-    amountTendered: formValue.amount,
+    amount: parseFloat(totalAmount.toFixed(2)),
+    amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
     attributes: [],
-    instanceType: '5920ccd6-5ee7-432e-8335-fddf048611c8',
+    instanceType: formValue.method,
   }));
   const processedPayment = {
     cashPoint: bill.cashPointUuid,
     cashier: cashier.uuid,
-    payments: [...bill.payments, ...billPayment],
+    payments: [...billPayment],
     patient: patientUuid,
-    status: 'PENDING',
+    status: paymentStatus,
   };
 
   return processedPayment;

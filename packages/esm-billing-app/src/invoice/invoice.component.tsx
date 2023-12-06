@@ -1,23 +1,26 @@
 import React from 'react';
 import { InlineLoading } from '@carbon/react';
-import { ExtensionSlot, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import styles from './invoice.scss';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
-import { useTranslation } from 'react-i18next';
 import { useBill } from '../billing.resource';
+import { convertToCurrency } from '../helpers';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 
 type InvoiceProps = {};
 
 const Invoice: React.FC<InvoiceProps> = () => {
   const params = useParams();
+  const { t } = useTranslation();
   const { patient, patientUuid, isLoading } = usePatient(params?.patientUuid);
-  const { bill, isLoading: isLoadingBilling } = useBill(params?.billUuid);
+  const { bill, isLoading: isLoadingBilling, error } = useBill(params?.billUuid);
 
   const invoiceDetails = {
-    'Total Amount': bill?.totalAmount,
-    'Amount Tendered': bill?.tenderedAmount,
+    'Total Amount': convertToCurrency(bill?.totalAmount),
+    'Amount Tendered': convertToCurrency(bill?.tenderedAmount),
     'Invoice Number': bill.receiptNumber,
     'Date And Time': bill?.dateCreated,
     'Invoice Status': bill?.status,
@@ -36,6 +39,10 @@ const Invoice: React.FC<InvoiceProps> = () => {
     );
   }
 
+  if (error) {
+    return <ErrorState headerTitle={t('invoiceError', 'Invoice error')} error={error} />;
+  }
+
   return (
     <div className={styles.invoiceContainer}>
       {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
@@ -47,7 +54,7 @@ const Invoice: React.FC<InvoiceProps> = () => {
 
       <div>
         <InvoiceTable billUuid={bill?.uuid} />
-        <Payments bill={bill} />
+        {bill && <Payments bill={bill} />}
       </div>
     </div>
   );
@@ -68,18 +75,3 @@ function InvoiceDetails({ label, value }: InvoiceDetailsProps) {
 }
 
 export default Invoice;
-
-interface InvoicePaymentBreakdown {
-  label: string;
-  value: number;
-}
-
-function InvoicePaymentBreakdown({ label, value }: InvoicePaymentBreakdown) {
-  const { t } = useTranslation();
-
-  return (
-    <div className={styles.label}>
-      {label} : <span className={styles.billDetail}>{value}</span>
-    </div>
-  );
-}

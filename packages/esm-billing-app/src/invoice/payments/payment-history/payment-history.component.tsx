@@ -1,16 +1,14 @@
 import React from 'react';
 import { DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
-import { MappedBill } from '../../types';
+import { MappedBill } from '../../../types';
 import { formatDate } from '@openmrs/esm-framework';
-import { convertToCurrency } from '../../helpers';
-import isEmpty from 'lodash/isEmpty';
+import { convertToCurrency } from '../../../helpers';
 
 type PaymentHistoryProps = {
   bill: MappedBill;
 };
 
 const PaymentHistory: React.FC<PaymentHistoryProps> = ({ bill }) => {
-  const { payments } = bill;
   const headers = [
     {
       key: 'dateCreated',
@@ -29,7 +27,7 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = ({ bill }) => {
       header: 'Payment method',
     },
   ];
-  const rows = payments?.map((payment) => ({
+  const rows = bill?.payments?.map((payment) => ({
     id: `${payment.uuid}`,
     dateCreated: formatDate(new Date(payment.dateCreated)),
     amountTendered: convertToCurrency(payment.amountTendered),
@@ -37,7 +35,7 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = ({ bill }) => {
     paymentMethod: payment.instanceType.name,
   }));
 
-  if (!isEmpty(bill) && payments?.length === 0) {
+  if (Object.values(bill?.payments ?? {}).length === 0) {
     return;
   }
 

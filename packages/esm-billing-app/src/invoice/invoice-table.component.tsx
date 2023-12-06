@@ -10,9 +10,11 @@ import {
   TableCell,
   DataTableSkeleton,
 } from '@carbon/react';
+import { Information } from '@carbon/react/icons';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { useBill } from '../billing.resource';
 import styles from './invoice-table.scss';
+import { useTranslation } from 'react-i18next';
 
 type InvoiceTableProps = {
   billUuid: string;
@@ -20,7 +22,15 @@ type InvoiceTableProps = {
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
   const layout = useLayoutType();
+  const { t } = useTranslation();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+  const tableTitle = t('lineItems', 'Line items');
+  const tableDescription = (
+    <p className={styles.tableDescription}>
+      <span>{t('lineItemsToBeBilled', 'Line items to be billed')}</span>
+      <Information />
+    </p>
+  );
   const { bill, isLoading } = useBill(billUuid);
   const headerData = [
     { header: 'No', key: 'no' },
@@ -32,18 +42,19 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
     { header: 'Total', key: 'total' },
   ];
 
-  const rowData = bill?.lineItems?.map((item, index) => {
-    return {
-      no: `${index + 1}`,
-      id: `${item.uuid}`,
-      billItem: item.item,
-      billCode: bill.receiptNumber,
-      status: bill.status,
-      quantity: item.quantity,
-      price: item.price,
-      total: item.price * item.quantity,
-    };
-  });
+  const rowData =
+    bill?.lineItems?.map((item, index) => {
+      return {
+        no: `${index + 1}`,
+        id: `${item.uuid}`,
+        billItem: item.item,
+        billCode: bill.receiptNumber,
+        status: bill.status,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity,
+      };
+    }) ?? [];
 
   if (isLoading) {
     return (
@@ -62,8 +73,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
   return (
     <div className={styles.invoiceContainer}>
       <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles={true}>
-        {({ rows, headers, getRowProps, getTableProps }) => (
-          <TableContainer>
+        {({ rows, headers, getRowProps, getTableProps, getToolbarProps }) => (
+          <TableContainer title={tableTitle} description={tableDescription}>
             <Table {...getTableProps()} aria-label="Invoice line items">
               <TableHead>
                 <TableRow>
