@@ -23,7 +23,7 @@ export const useBills = (patientUuid?: string) => {
       patientUuid: bill?.patient?.uuid,
       status: bill?.status,
       receiptNumber: bill?.receiptNumber,
-      cashierName: bill?.cashier?.display,
+      cashier: bill?.cashier,
       cashPointUuid: bill?.cashPoint?.uuid,
       cashPointName: bill?.cashPoint?.name,
       cashPointLocation: bill?.cashPoint?.location?.display,
@@ -66,7 +66,7 @@ export const useBill = (billUuid: string) => {
       patientUuid: bill?.patient?.uuid,
       status: bill?.status,
       receiptNumber: bill?.receiptNumber,
-      cashierName: bill?.cashier?.display,
+      cashier: bill?.cashier,
       cashPointUuid: bill?.cashPoint?.uuid,
       cashPointName: bill?.cashPoint?.name,
       cashPointLocation: bill?.cashPoint?.location?.display,
@@ -90,4 +90,15 @@ export const useBill = (billUuid: string) => {
     isValidating,
     mutate,
   };
+};
+
+export const processBillPayment = (payload, billUuid: string) => {
+  const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: payload,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };

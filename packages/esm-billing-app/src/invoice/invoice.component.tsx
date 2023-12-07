@@ -1,43 +1,32 @@
 import React from 'react';
-import { Button, InlineLoading } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, navigate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { InlineLoading } from '@carbon/react';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import styles from './invoice.scss';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
-import { useTranslation } from 'react-i18next';
 import { useBill } from '../billing.resource';
+import { convertToCurrency } from '../helpers';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 
 type InvoiceProps = {};
 
 const Invoice: React.FC<InvoiceProps> = () => {
   const params = useParams();
-  const layout = useLayoutType();
+  const { t } = useTranslation();
   const { patient, patientUuid, isLoading } = usePatient(params?.patientUuid);
-  const { bill } = useBill(params?.billUuid);
+  const { bill, isLoading: isLoadingBilling, error } = useBill(params?.billUuid);
 
   const invoiceDetails = {
-    'Total Amount': bill?.totalAmount,
-    'Amount Tendered': bill?.tenderedAmount,
+    'Total Amount': convertToCurrency(bill?.totalAmount),
+    'Amount Tendered': convertToCurrency(bill?.tenderedAmount),
     'Invoice Number': bill.receiptNumber,
     'Date And Time': bill?.dateCreated,
     'Invoice Status': bill?.status,
   };
 
-  const invoiceTotal = {
-    'Total Amount': bill?.totalAmount,
-    'Amount Tendered': bill?.tenderedAmount,
-    'Discount Amount': 0,
-    'Amount due': bill?.totalAmount - bill?.tenderedAmount,
-  };
-
-  const navigateToDashboard = () =>
-    navigate({
-      to: window.getOpenmrsSpaBase() + 'home/billing',
-    });
-
-  if (isLoading) {
+  if (isLoading && isLoadingBilling) {
     return (
       <div className={styles.invoiceContainer}>
         <InlineLoading
@@ -50,36 +39,22 @@ const Invoice: React.FC<InvoiceProps> = () => {
     );
   }
 
+  if (error) {
+    return <ErrorState headerTitle={t('invoiceError', 'Invoice error')} error={error} />;
+  }
+
   return (
     <div className={styles.invoiceContainer}>
-      <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />
+      {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
       <section className={styles.details}>
         {Object.entries(invoiceDetails).map(([key, val]) => (
           <InvoiceDetails key={key} label={key} value={val} />
         ))}
       </section>
 
-      <div className={styles.backButton}>
-        <Button
-          kind="ghost"
-          renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-          iconDescription="Return to billing dashboard"
-          size="sm"
-          onClick={navigateToDashboard}>
-          <span>Back to dashboard</span>
-        </Button>
-      </div>
-
       <div>
         <InvoiceTable billUuid={bill?.uuid} />
-        <div className={styles.paymentSection}>
-          <Payments />
-          <div className={styles.invoicePaymentsContainer}>
-            {Object.entries(invoiceTotal).map(([key, val]) => (
-              <InvoicePaymentBreakdown label={key} value={val} />
-            ))}
-          </div>
-        </div>
+        {bill && <Payments bill={bill} />}
       </div>
     </div>
   );
@@ -100,18 +75,3 @@ function InvoiceDetails({ label, value }: InvoiceDetailsProps) {
 }
 
 export default Invoice;
-
-interface InvoicePaymentBreakdown {
-  label: string;
-  value: number;
-}
-
-function InvoicePaymentBreakdown({ label, value }: InvoicePaymentBreakdown) {
-  const { t } = useTranslation();
-
-  return (
-    <div className={styles.label}>
-      {label} : <span className={styles.billDetail}>{value}</span>
-    </div>
-  );
-}

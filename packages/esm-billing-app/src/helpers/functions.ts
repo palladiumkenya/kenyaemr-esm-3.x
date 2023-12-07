@@ -32,8 +32,15 @@ export function calculateTotalAmount(lineItems: Array<LineItem>) {
 }
 
 export const convertToCurrency = (amountToConvert: number) => {
-  if (amountToConvert === 0) {
-    return '--';
+  const formatter = new Intl.NumberFormat('en-KE', {
+    style: 'currency',
+    currency: 'KES',
+    minimumFractionDigits: 2,
+  });
+  let formattedAmount = formatter.format(Math.abs(amountToConvert));
+  if (amountToConvert < 0) {
+    formattedAmount = `(${formattedAmount})`;
   }
-  return new Intl.NumberFormat('en-KE', { currency: 'KSH', style: 'currency' }).format(amountToConvert);
+
+  return formattedAmount;
 };
