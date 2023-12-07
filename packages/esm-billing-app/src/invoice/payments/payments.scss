@@ -33,5 +33,7 @@
   display: flex;
   justify-content: flex-end;
   margin: layout.$spacing-05;
+  padding-top: layout.$spacing-05;
   column-gap: layout.$spacing-04;
+  border-top: 1px solid colors.$cool-gray-40;
 }
