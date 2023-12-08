@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import { formatDate, parseDate, openmrsFetch } from '@openmrs/esm-framework';
-import { MappedBill, PatientInvoice } from './types';
+import { formatDate, parseDate, openmrsFetch, useSession, OpenmrsResource } from '@openmrs/esm-framework';
+import { FacilityDetail, MappedBill, PatientInvoice } from './types';
 import isEmpty from 'lodash-es/isEmpty';
 
 export const useBills = (patientUuid?: string) => {
@@ -102,3 +102,10 @@ export const processBillPayment = (payload, billUuid: string) => {
     },
   });
 };
+
+export function useDefaultFacility() {
+  const { authenticated } = useSession();
+  const url = '/ws/rest/v1/kenyaemr/default-facility';
+  const { data, isLoading } = useSWR<{ data: FacilityDetail }>(authenticated ? url : null, openmrsFetch, {});
+  return { data: data?.data, isLoading: isLoading };
+}

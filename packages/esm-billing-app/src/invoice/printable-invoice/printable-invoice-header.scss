@@ -1,0 +1,51 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  margin: 0 1rem 5rem 1rem;
+}
+
+.printableBody {
+  display: flex;
+  flex-direction: row;
+}
+
+.printableHeader {
+  display: flex;
+  flex-direction: row;
+}
+
+.img {
+  display: flex;
+  margin-left: auto;
+}
+
+.billDetails {
+  display: flex;
+  width: 50%;
+  flex-direction: column;
+}
+
+.heading {
+  font-size: 40px;
+  text-transform: uppercase;
+  margin-bottom: layout.$spacing-05;
+}
+
+.facilityName {
+  @include type.type-style('heading-compact-02');
+  font-weight: bold;
+  color: colors.$green-70;
+}
+
+.itemHeading {
+  @include type.type-style('body-compact-02');
+  font-weight: bold;
+  color: colors.$cool-gray-90;
+}
+
+.itemLabel {
+  @include type.type-style('body-compact-02');
+  color: colors.$cool-gray-90;
+}

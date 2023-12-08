@@ -1,6 +1,7 @@
-import React from 'react';
-import { InlineLoading } from '@carbon/react';
-import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, InlineLoading } from '@carbon/react';
+import { ArrowLeft, Printer } from '@carbon/react/icons';
+import { ExtensionSlot, isDesktop, navigate, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import styles from './invoice.scss';
 import InvoiceTable from './invoice-table.component';
@@ -9,14 +10,43 @@ import { useBill } from '../billing.resource';
 import { convertToCurrency } from '../helpers';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
+import { useReactToPrint } from 'react-to-print';
+import PrintableInvoice from './printable-invoice/printable-invoice.component';
 
 type InvoiceProps = {};
 
 const Invoice: React.FC<InvoiceProps> = () => {
-  const params = useParams();
   const { t } = useTranslation();
+  const params = useParams();
   const { patient, patientUuid, isLoading } = usePatient(params?.patientUuid);
   const { bill, isLoading: isLoadingBilling, error } = useBill(params?.billUuid);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const contentToPrintRef = useRef(null);
+  const onBeforeGetContentResolve = useRef(null);
+
+  const handlePrint = useReactToPrint({
+    content: () => contentToPrintRef.current,
+    documentTitle: `Invoice ${bill?.receiptNumber} - ${patient?.name?.[0]?.given?.join(' ')} ${
+      patient?.name?.[0].family
+    }`,
+    onBeforeGetContent: () =>
+      new Promise((resolve) => {
+        if (patient && bill) {
+          onBeforeGetContentResolve.current = resolve;
+          setIsPrinting(true);
+        }
+      }),
+    onAfterPrint: () => {
+      onBeforeGetContentResolve.current = null;
+      setIsPrinting(false);
+    },
+  });
+
+  useEffect(() => {
+    if (isPrinting && onBeforeGetContentResolve.current) {
+      onBeforeGetContentResolve.current();
+    }
+  }, [isPrinting]);
 
   const invoiceDetails = {
     'Total Amount': convertToCurrency(bill?.totalAmount),
@@ -50,11 +80,22 @@ const Invoice: React.FC<InvoiceProps> = () => {
         {Object.entries(invoiceDetails).map(([key, val]) => (
           <InvoiceDetails key={key} label={key} value={val} />
         ))}
+        <Button
+          onClick={handlePrint}
+          renderIcon={(props) => <Printer size={24} {...props} />}
+          iconDescription="Print bill"
+          size="md">
+          {t('printBill', 'Print bill')}
+        </Button>
       </section>
 
       <div>
         <InvoiceTable billUuid={bill?.uuid} />
         {bill && <Payments bill={bill} />}
+      </div>
+
+      <div ref={contentToPrintRef} className={isPrinting === true ? '' : styles.printContainer}>
+        <PrintableInvoice bill={bill} patient={patient} isLoading={isLoading} />
       </div>
     </div>
   );
