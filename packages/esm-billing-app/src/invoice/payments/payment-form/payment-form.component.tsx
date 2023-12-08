@@ -73,19 +73,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
             name={`payment.${index}.referenceCode`}
             control={control}
             render={({ field }) => (
-              <TextInput light {...field} type="text" labelText={t('referenceNumber', 'Reference number')} />
+              <TextInput light {...field} type="text" labelText={t('referenceNumber', 'Ref number')} />
             )}
           />
-
-          <Button
-            className={styles.removeButton}
-            onClick={handleRemovePaymentMode}
-            size="sm"
-            renderIcon={(props) => <TrashCan size={24} {...props} />}
-            kind="danger--tertiary"
-            iconDescription="TrashCan">
-            {t('delete', 'Delete')}
-          </Button>
+          <div className={styles.removeButtonContainer}>
+            <TrashCan onClick={handleRemovePaymentMode} className={styles.removeButton} size={24} />
+          </div>
         </div>
       ))}
       <Button

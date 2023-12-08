@@ -89,15 +89,19 @@ const Payments: React.FC<PaymentProps> = ({ bill }) => {
           />
           <InvoiceBreakDown label={t('discount', 'Discount')} value={'--'} />
           <InvoiceBreakDown label={t('amountDue', 'Amount due')} value={convertToCurrency(amountDue ?? 0)} />
+          <div>
+            <div className={styles.processPayments}>
+              <Button onClick={handleNavigateToBillingDashboard} kind="secondary">
+                {t('discard', 'Discard')}
+              </Button>
+              <Button
+                onClick={() => handleProcessPayment()}
+                disabled={!formValues?.length || !methods.formState.isValid}>
+                {t('processPayment', 'Process Payment')}
+              </Button>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className={styles.processPayments}>
-        <Button onClick={handleNavigateToBillingDashboard} kind="danger">
-          {t('discardPayment', 'Discard Payment')}
-        </Button>
-        <Button onClick={() => handleProcessPayment()} disabled={!formValues?.length || !methods.formState.isValid}>
-          {t('processPayment', 'Process Payment')}
-        </Button>
       </div>
     </FormProvider>
   );
