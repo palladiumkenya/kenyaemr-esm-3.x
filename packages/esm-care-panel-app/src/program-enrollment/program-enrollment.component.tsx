@@ -20,6 +20,7 @@ import dayjs from 'dayjs';
 import { formatDate } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
+import { empty } from 'rxjs';
 
 export interface ProgramEnrollmentProps {
   patientUuid: string;
@@ -36,6 +37,7 @@ const programDetailsMap = {
     entryPoint: 'Entry Point',
     regimenShortDisplay: 'Regimen',
     changeReasons: 'Reason for regimen change',
+    reason: 'Reason for discontinuation',
   },
   TB: {
     ...shareObjProperty,
