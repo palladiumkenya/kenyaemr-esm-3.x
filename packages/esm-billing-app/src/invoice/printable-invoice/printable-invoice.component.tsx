@@ -35,15 +35,16 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
     { header: 'Total', key: 'total' },
   ];
 
-  const rowData = bill?.lineItems?.map((item, index) => {
-    return {
-      id: `${item.uuid}`,
-      billItem: item.item,
-      quantity: item.quantity,
-      price: item.price,
-      total: item.price * item.quantity,
-    };
-  });
+  const rowData =
+    bill?.lineItems?.map((item, index) => {
+      return {
+        id: `${item.uuid}`,
+        billItem: item.item,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity,
+      };
+    }) ?? [];
 
   const invoiceTotal = {
     'Total Amount': bill?.totalAmount,
@@ -76,7 +77,7 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
           showHeader={false}
           showToolbar={false}
           zebra
-          columnCount={headerData?.length}
+          columnCount={headerData?.length ?? 0}
           size={responsiveSize}
         />
       </div>
@@ -84,7 +85,7 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
   }
   return (
     <div className={styles.container}>
-      <PrintableInvoiceHeader patientDetails={patientDetails} />
+      {/* <PrintableInvoiceHeader patientDetails={patientDetails} /> */}
       <div className={styles.printableInvoiceContainer}>
         <div className={styles.detailsContainer}>
           {Object.entries(invoiceDetails).map(([key, val]) => (
