@@ -53,7 +53,7 @@ jobs:
         run: yarn run verify
 
       - name: Run build
-        run: yarn turbo run build --color"
+        run: yarn turbo run build --color
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
