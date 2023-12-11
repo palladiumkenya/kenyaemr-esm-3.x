@@ -14,11 +14,14 @@
 .billListContainer {
   background-color: $ui-02;
   border: 1px solid $ui-03;
-  border-bottom: none;
   width: 100%;
   margin: 0 auto;
   max-width: 95vw;
   padding-bottom: 0;
+
+  :has(.filterEmptyState) {
+    border-bottom: none;
+  }
 }
 
 .headerContainer {
