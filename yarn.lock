@@ -2546,6 +2546,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kenyaemr/esm-patient-clinical-view-app@workspace:packages/esm-patient-clinical-view-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-patient-clinical-view-app@workspace:packages/esm-patient-clinical-view-app"
+  dependencies:
+    "@carbon/react": "npm:^1.42.1"
+    lodash-es: "npm:^4.17.15"
+    webpack: "npm:^5.74.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app":
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app"
