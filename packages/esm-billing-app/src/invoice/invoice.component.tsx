@@ -1,17 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, InlineLoading } from '@carbon/react';
-import { ArrowLeft, Printer } from '@carbon/react/icons';
-import { ExtensionSlot, isDesktop, navigate, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { Printer } from '@carbon/react/icons';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import { convertToCurrency } from '../helpers';
+import { useBill } from '../billing.resource';
 import { useParams } from 'react-router-dom';
-import styles from './invoice.scss';
+import { useReactToPrint } from 'react-to-print';
+import { useTranslation } from 'react-i18next';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
-import { useBill } from '../billing.resource';
-import { convertToCurrency } from '../helpers';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
-import { useReactToPrint } from 'react-to-print';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
+import styles from './invoice.scss';
 
 type InvoiceProps = {};
 
@@ -76,18 +76,22 @@ const Invoice: React.FC<InvoiceProps> = () => {
   return (
     <div className={styles.invoiceContainer}>
       {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
-      <section className={styles.details}>
-        {Object.entries(invoiceDetails).map(([key, val]) => (
-          <InvoiceDetails key={key} label={key} value={val} />
-        ))}
-        <Button
-          onClick={handlePrint}
-          renderIcon={(props) => <Printer size={24} {...props} />}
-          iconDescription="Print bill"
-          size="md">
-          {t('printBill', 'Print bill')}
-        </Button>
-      </section>
+      <div className={styles.detailsContainer}>
+        <section className={styles.details}>
+          {Object.entries(invoiceDetails).map(([key, val]) => (
+            <InvoiceDetails key={key} label={key} value={val} />
+          ))}
+        </section>
+        <div className={styles.buttonContainer}>
+          <Button
+            onClick={handlePrint}
+            renderIcon={(props) => <Printer size={24} {...props} />}
+            iconDescription="Print bill"
+            size="md">
+            {t('printBill', 'Print bill')}
+          </Button>
+        </div>
+      </div>
 
       <div>
         <InvoiceTable billUuid={bill?.uuid} />

@@ -13,12 +13,22 @@
   justify-content: center;
 }
 
+.detailsContainer {
+  display: flex;
+}
+
 .details {
   display: flex;
-  flex-direction: row;
+  flex: 3;
+  flex-flow: row wrap;
   align-items: center;
   justify-content: space-between;
   margin: layout.$spacing-05;
+  row-gap: 1.5rem;
+}
+
+.buttonContainer {
+  margin-left: 1rem;
 }
 
 .label {
@@ -74,7 +84,8 @@
 }
 
 @media print {
-  html,body {
+  html,
+  body {
     background-color: colors.$white !important;
   }
 }
