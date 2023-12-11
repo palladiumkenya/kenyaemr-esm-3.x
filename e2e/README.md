@@ -1,42 +1,44 @@
 # E2E Tests
 
 This directory contains an E2E test suite using the [Playwright](https://playwright.dev)
-framework. 
+framework.
 
 ## Getting Started
 
-Please ensure that you have followed the basic installation guide in the
-[root README](../README.md).
-Once everything is set up, make sure the dev server is running by using:
+Please ensure that you have followed the basic installation guide in the [root README](../README.md). Once everything is set up, make sure the dev server is running by using:
 
 ```sh
 yarn start 
 ```
+
 Then, in a separate terminal, run:
 
 ```sh
 yarn test-e2e --headed
 ```
 
-By default, the test suite will run against the http://localhost:8080.
-You can override this by exporting `E2E_BASE_URL` environment variables beforehand:
+By default, the test suite will run against the http://localhost:8080. You can override this by exporting `E2E_BASE_URL` environment variables beforehand:
 
 ```sh
 # Ex: Set the server URL to dev3:
 export E2E_BASE_URL=https://dev3.openmrs.org/openmrs
 
 # Run all e2e tests:
+
+```sh
 yarn test-e2e --headed
 ```
+
 To run a specific test by title:
+
 ```sh
 yarn test-e2e --headed -g "title of the test"
 ```
+
 Check [this documentation](https://playwright.dev/docs/running-tests#command-line) for more running options.  
 
 It is also highly recommended to install the companion VS Code extension:
 https://playwright.dev/docs/getting-started-vscode
-
 
 ## Writing New Tests
 
@@ -92,8 +94,8 @@ This is very much underdeveloped/WIP. At the moment, there exists a (git-shared)
 file which can be used for configuring certain test attributes. This is most likely
 about to change in the future. Stay tuned for updates!
 
+## Github Actions integration
 
-## Github Action integration
 The e2e.yml workflow is made up of two jobs: one for running on pull requests (PRs) and
 one for running on commits.
 
