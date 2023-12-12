@@ -1,11 +1,12 @@
 import React, { useCallback } from 'react';
-import { ComboBox, InlineLoading, InlineNotification } from '@carbon/react';
+import { Dropdown, InlineLoading, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import styles from './billing-checkin-form.scss';
 
 const DEFAULT_PRICE = 500.00001;
+const PENDING_PAYMENT_STATUS = 'PENDING';
 
 type BillingCheckInFormProps = {
   patientUuid: string;
@@ -35,6 +36,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const handleBillingService = ({ selectedItem }) => {
     const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
     const itemUuid = selectedItem?.uuid ?? '';
+
     // TODO: This line list should come from backend to avoid hard coding prices in the frontend
     const createBillPayload = {
       lineItems: [
@@ -45,19 +47,19 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
           priceName: 'Default',
           priceUuid: '',
           lineItemOrder: 0,
-          paymentStatus: 'PENDING',
+          paymentStatus: PENDING_PAYMENT_STATUS,
         },
       ],
       cashPoint: cashPointUuid,
       patient: patientUuid,
-      status: 'PENDING',
+      status: PENDING_PAYMENT_STATUS,
       payments: [],
     };
 
     setBillingInfo({ createBillPayload, handleCreateBill: () => handleCreateBill(createBillPayload) });
   };
 
-  if (isLoadingLineItems && isLoadingCashPoints) {
+  if (isLoadingLineItems || isLoadingCashPoints) {
     return (
       <InlineLoading
         status="active"
@@ -82,7 +84,8 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     <section className={styles.sectionContainer}>
       <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
       <div className={styles.sectionField}></div>
-      <ComboBox
+      <Dropdown
+        label={t('selectBillableService', 'Select a billable service...')}
         onChange={handleBillingService}
         id="billable-items"
         items={lineItems}
