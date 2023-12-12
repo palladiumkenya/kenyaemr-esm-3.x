@@ -22,3 +22,4 @@ export const patientFlag = getSyncLifecycle(patientFlagsComponent, options);
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
+export const kenyaemrFacilityDashboard = getAsyncLifecycle(() => import('./dashboard-analytics/dashboard-analytics.components'), options);
