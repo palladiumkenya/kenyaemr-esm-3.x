@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
+import { useReactToPrint } from 'react-to-print';
+import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading } from '@carbon/react';
 import { Printer } from '@carbon/react/icons';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -6,8 +9,6 @@ import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import { convertToCurrency } from '../helpers';
 import { useBill } from '../billing.resource';
 import { useParams } from 'react-router-dom';
-import { useReactToPrint } from 'react-to-print';
-import { useTranslation } from 'react-i18next';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
@@ -70,7 +71,11 @@ const Invoice: React.FC<InvoiceProps> = () => {
   }
 
   if (error) {
-    return <ErrorState headerTitle={t('invoiceError', 'Invoice error')} error={error} />;
+    return (
+      <div className={styles.errorContainer}>
+        <ErrorState headerTitle={t('invoiceError', 'Invoice error')} error={error} />
+      </div>
+    );
   }
 
   return (
@@ -93,12 +98,14 @@ const Invoice: React.FC<InvoiceProps> = () => {
         </div>
       </div>
 
-      <div>
-        <InvoiceTable billUuid={bill?.uuid} />
-        {bill && <Payments bill={bill} />}
-      </div>
+      <InvoiceTable billUuid={bill?.uuid} />
+      {bill && <Payments bill={bill} />}
 
-      <div ref={contentToPrintRef} className={isPrinting === true ? '' : styles.printContainer}>
+      <div
+        className={classNames({
+          [styles.printContainer]: isPrinting !== true,
+        })}
+        ref={contentToPrintRef}>
         <PrintableInvoice bill={bill} patient={patient} isLoading={isLoading} />
       </div>
     </div>

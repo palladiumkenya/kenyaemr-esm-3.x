@@ -37,7 +37,9 @@ export const convertToCurrency = (amountToConvert: number) => {
     currency: 'KES',
     minimumFractionDigits: 2,
   });
+
   let formattedAmount = formatter.format(Math.abs(amountToConvert));
+
   if (amountToConvert < 0) {
     formattedAmount = `(${formattedAmount})`;
   }

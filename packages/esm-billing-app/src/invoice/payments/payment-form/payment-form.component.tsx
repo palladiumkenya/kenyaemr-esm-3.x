@@ -1,12 +1,12 @@
 import React, { useCallback } from 'react';
+import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TrashCan, Add } from '@carbon/react/icons';
-import { Button, Dropdown, TextInput, NumberInputSkeleton } from '@carbon/react';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
-import styles from './payment-form.scss';
-import { usePaymentModes } from '../payment.resource';
+import { Button, Dropdown, NumberInputSkeleton, TextInput } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { PaymentFormValue } from '../payments.component';
+import { usePaymentModes } from '../payment.resource';
+import styles from './payment-form.scss';
 
 type PaymentFormProps = { disablePayment: boolean };
 
@@ -35,7 +35,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
   }
 
   return (
-    <div>
+    <div className={styles.container}>
       {fields.map((field, index) => (
         <div key={field.id} className={styles.paymentMethodContainer}>
           <Controller
@@ -59,25 +59,30 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
             name={`payment.${index}.amount`}
             render={({ field }) => (
               <TextInput
+                {...field}
                 invalid={!!errors?.payment?.[index]?.amount}
                 invalidText={errors?.payment?.[index]?.amount?.message}
-                light
-                {...field}
-                type="number"
                 labelText={t('amount', 'Amount')}
+                light
+                type="number"
               />
             )}
           />
-
           <Controller
             name={`payment.${index}.referenceCode`}
             control={control}
             render={({ field }) => (
-              <TextInput light {...field} type="text" labelText={t('referenceNumber', 'Ref number')} />
+              <TextInput
+                {...field}
+                labelText={t('referenceNumber', 'Ref number')}
+                light
+                placeholder={t('enterReferenceNumber', 'Enter ref. number')}
+                type="text"
+              />
             )}
           />
           <div className={styles.removeButtonContainer}>
-            <TrashCan onClick={handleRemovePaymentMode} className={styles.removeButton} size={24} />
+            <TrashCan onClick={handleRemovePaymentMode} className={styles.removeButton} size={20} />
           </div>
         </div>
       ))}

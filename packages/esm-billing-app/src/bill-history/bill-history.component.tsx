@@ -92,7 +92,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   if (bills?.length > 0) {
     return (
       <div className={styles.billHistoryContainer}>
-        <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles={true}>
+        <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
           {({
             rows,
             headers,

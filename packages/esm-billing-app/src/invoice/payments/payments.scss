@@ -6,11 +6,17 @@
   display: flex;
 }
 
+.divider {
+  background: colors.$gray-20;
+  height: 12rem;
+  margin: 2rem;
+  width: 1px;
+}
+
 .paymentContainer {
-  margin: layout.$layout-01;
+  margin: layout.$layout-01 0;
   padding: layout.$layout-01;
   width: 70%;
-  border-right: 1px solid colors.$cool-gray-40;
 }
 
 .paymentButtons {
@@ -26,7 +32,8 @@
 }
 
 .paymentTotals {
-  margin-top: layout.$spacing-01;
+  margin: layout.$spacing-05 0;
+  padding: layout.$spacing-07 layout.$spacing-05;
 }
 
 .processPayments {

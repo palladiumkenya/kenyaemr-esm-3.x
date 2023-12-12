@@ -5,6 +5,7 @@ import isEmpty from 'lodash-es/isEmpty';
 
 export const useBills = (patientUuid?: string) => {
   const url = `/ws/rest/v1/cashier/bill?v=full`;
+
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     url,
     openmrsFetch,
@@ -52,9 +53,13 @@ export const useBills = (patientUuid?: string) => {
 
 export const useBill = (billUuid: string) => {
   const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PatientInvoice }>(url, openmrsFetch, {
-    errorRetryCount: 2,
-  });
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PatientInvoice }>(
+    billUuid ? url : null,
+    openmrsFetch,
+    {
+      errorRetryCount: 2,
+    },
+  );
 
   const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     // create base object
