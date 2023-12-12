@@ -1,6 +1,7 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import aboutLinkComponent from './about-link.component';
+import rootComponent from './root.component';
 
 const moduleName = '@kenyaemr/esm-version-app';
 
@@ -11,9 +12,8 @@ const options = {
 
 export const importTranslations = require.context('../translations', false, /.json$/, 'lazy');
 
-export const about = getAsyncLifecycle(() => import('./root.component'), options);
-
-export const aboutLink = getAsyncLifecycle(() => import('./about-link.component'), options);
+export const about = getSyncLifecycle(rootComponent, options);
+export const aboutLink = getSyncLifecycle(aboutLinkComponent, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
