@@ -1,0 +1,121 @@
+import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { EncounterList, EncounterListColumn } from '../../../../encounter-list/encounter-list.component';
+import { getObsFromEncounter } from '../../../../encounter-list/encounter-list-utils';
+import {
+  hivTestResultConcept,
+  artUniqueNoConcept,
+  hivTestStatus,
+  MotherHivStatus,
+  MotherNextVisitDate,
+  motherPostnatalEncounterType,
+  MotherViralLoadDate,
+  MotherViralLoadResult,
+  MothervisitDate,
+  ancVisitNumberConcept,
+  recenctViralLoad,
+  visitDate,
+  motherGeneralConditionConcept,
+  pphConditionConcept,
+} from '../../../constants';
+import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
+
+interface PostnatalCareListProps {
+  patientUuid: string;
+}
+
+const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) => {
+  const { t } = useTranslation();
+  const headerTitle = t('postnatalCare', 'Postnatal Care');
+  const MotherPNCEncounterTypeUUID = useConfig().encounterTypes.mchMotherConsultation;
+  const MotherPNCEncounterFormUUID = useConfig().formsList.postNatal;
+
+
+  const columns: EncounterListColumn[] = useMemo(
+    () => [
+      {
+        key: 'visitDate',
+        header: t('visitDate', 'Visit Date'),
+        getValue: (encounter) => {
+          return formatDate(parseDate(encounter.encounterDatetime));
+        },
+      },
+      {
+        key: 'hivTestResults',
+        header: t('hivTestResults', 'HIV Status'),
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, hivTestResultConcept);
+        },
+      },
+      {
+        key: 'motherGeneralCondition',
+        header: t('motherGeneralCondition', 'General condition'),
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, motherGeneralConditionConcept, true);
+        },
+      },
+      {
+        key: 'pphCondition',
+        header: t('pphCondition', 'PPH present'),
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, pphConditionConcept);
+        },
+      },
+      {
+        key: 'uterusCondition',
+        header: t('uterusCondition', 'PPH Condition of uterus'),
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, pphConditionConcept);
+        },
+      },
+      {
+        key: 'nextVisitDate',
+        header: t('nextVisitDate', 'Next visit date'),
+        getValue: (encounter) => {
+          return getObsFromEncounter(encounter, MotherNextVisitDate, true);
+        },
+      },
+      {
+        key: 'actions',
+        header: t('actions', 'Actions'),
+        getValue: (encounter) => [
+          {
+            form: { name: 'Mother - Postnatal Form', package: 'maternal_health' },
+            encounterUuid: encounter.uuid,
+            intent: '*',
+            label: t('viewDetails', 'View Details'),
+            mode: 'view',
+          },
+          {
+            form: { name: 'Mother - Postnatal Form', package: 'maternal_health' },
+            encounterUuid: encounter.uuid,
+            intent: '*',
+            label: t('editForm', 'Edit Form'),
+            mode: 'edit',
+          },
+        ],
+      },
+    ],
+    [],
+  );
+
+  return (
+    <EncounterList
+      patientUuid={patientUuid}
+      encounterType={MotherPNCEncounterTypeUUID}
+      formList={[{ name: 'Mother - Postnatal Form' }]}
+      columns={columns}
+      description={headerTitle}
+      headerTitle={headerTitle}
+      launchOptions={{
+        displayText: t('add', 'Add'),
+        moduleName: 'MCH Clinical View',
+      }}
+      filter={(encounter) => {
+        return encounter.form.uuid == MotherPNCEncounterFormUUID;
+      }}
+    />
+  );
+};
+
+export default PostnatalCareList;

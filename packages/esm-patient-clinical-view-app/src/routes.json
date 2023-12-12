@@ -5,6 +5,13 @@
   },
   "pages": [],
   "extensions": [
-    
+    {
+      "name": "mch-clinical-view",
+      "slot": "top-of-all-patient-dashboards-slot", 
+      "component": "mchClinicalView",
+      "order": 0,
+      "online": true,
+      "offline": false
+    }
   ]
 }

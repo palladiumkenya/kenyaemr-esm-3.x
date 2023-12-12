@@ -9,7 +9,10 @@ const options = {
 };
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
+export const mchClinicalView = getAsyncLifecycle(
+  () => import('./esm-mch-app/views/maternal-health/maternal-health.component'),
+  options,
+);
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
