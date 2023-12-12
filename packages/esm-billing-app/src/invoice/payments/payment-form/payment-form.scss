@@ -2,6 +2,10 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
+.container {
+  margin: 1rem;
+}
+
 .paymentContainer {
   margin: layout.$layout-01;
   padding: layout.$layout-01;
@@ -15,7 +19,7 @@
 
 .paymentMethodContainer {
   display: grid;
-  grid-template-columns: repeat(4, minmax(100px, 1fr));
+  grid-template-columns: repeat(4, minmax(auto, 1fr));
   align-items: flex-start;
   column-gap: 1rem;
   margin: 0.625rem 0;
@@ -37,14 +41,14 @@
   margin: layout.$spacing-04;
   min-height: layout.$spacing-09;
 }
-.removeButtonContainer{
+
+.removeButtonContainer {
   display: flex;
-  align-items: center;
-  height: layout.$spacing-09;
   align-self: center;
   cursor: pointer;
+  margin-left: layout.$spacing-07;
 }
+
 .removeButton {
-  align-self: center;
   color: colors.$red-60;
 }

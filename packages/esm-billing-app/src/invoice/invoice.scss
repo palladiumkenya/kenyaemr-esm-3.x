@@ -7,6 +7,10 @@
   height: calc(100vh - 3rem);
 }
 
+.errorContainer {
+  margin: layout.$spacing-05;
+}
+
 .loader {
   display: flex;
   min-height: layout.$spacing-09;

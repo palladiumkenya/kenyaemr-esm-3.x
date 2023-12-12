@@ -6,19 +6,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: flex-end;
+  margin: layout.$spacing-02 0;
 }
 
 .label {
-  @include type.type-style('heading-02');
-  color: colors.$gray-70;
-  margin: layout.$spacing-01;
+  @include type.type-style('heading-03');
+  color: colors.$gray-100;
   text-align: end;
 }
 
 .value {
-  @include type.type-style('heading-02');
-  margin-top: layout.$spacing-04;
+  @extend .label;
+  font-weight: bold;
+  margin-left: layout.$spacing-03;
   text-align: start;
-  margin-left: layout.$spacing-02;
-  color: colors.$black;
 }

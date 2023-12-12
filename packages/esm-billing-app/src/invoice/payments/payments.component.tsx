@@ -1,19 +1,19 @@
 import React from 'react';
+import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@carbon/react';
 import { navigate, showSnackbar } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import { type MappedBill } from '../../types';
 import { convertToCurrency } from '../../helpers';
-import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
-import { MappedBill } from '../../types';
-import PaymentHistory from './payment-history/payment-history.component';
-import styles from './payments.scss';
-import PaymentForm from './payment-form/payment-form.component';
 import { createPaymentPayload } from './utils';
 import { processBillPayment } from '../../billing.resource';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
+import PaymentHistory from './payment-history/payment-history.component';
+import PaymentForm from './payment-form/payment-form.component';
+import styles from './payments.scss';
 
 const paymentSchema = z.object({
   method: z.string().refine((value) => !!value, 'Payment method is required'),
@@ -23,6 +23,7 @@ const paymentSchema = z.object({
   ]),
   referenceCode: z.union([z.number(), z.string()]).optional(),
 });
+
 const paymentFormSchema = z.object({ payment: z.array(paymentSchema) });
 
 type PaymentProps = { bill: MappedBill };
@@ -81,6 +82,7 @@ const Payments: React.FC<PaymentProps> = ({ bill }) => {
             <PaymentForm disablePayment={amountDue <= 0} />
           </div>
         </div>
+        <div className={styles.divider} />
         <div className={styles.paymentTotals}>
           <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill.totalAmount)} />
           <InvoiceBreakDown
@@ -89,17 +91,13 @@ const Payments: React.FC<PaymentProps> = ({ bill }) => {
           />
           <InvoiceBreakDown label={t('discount', 'Discount')} value={'--'} />
           <InvoiceBreakDown label={t('amountDue', 'Amount due')} value={convertToCurrency(amountDue ?? 0)} />
-          <div>
-            <div className={styles.processPayments}>
-              <Button onClick={handleNavigateToBillingDashboard} kind="secondary">
-                {t('discard', 'Discard')}
-              </Button>
-              <Button
-                onClick={() => handleProcessPayment()}
-                disabled={!formValues?.length || !methods.formState.isValid}>
-                {t('processPayment', 'Process Payment')}
-              </Button>
-            </div>
+          <div className={styles.processPayments}>
+            <Button onClick={handleNavigateToBillingDashboard} kind="secondary">
+              {t('discard', 'Discard')}
+            </Button>
+            <Button onClick={() => handleProcessPayment()} disabled={!formValues?.length || !methods.formState.isValid}>
+              {t('processPayment', 'Process Payment')}
+            </Button>
           </div>
         </div>
       </div>
