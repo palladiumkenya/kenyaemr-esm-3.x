@@ -40,6 +40,11 @@
         "slot": "patient-chart-billing-dashboard-slot",
         "path": "Billing history"
       }
+    },
+    {
+      "name": "billing-checkin-form",
+      "slot": "billing-checkin-slot",
+      "component": "billingCheckInForm"
     }
   ]
 }
