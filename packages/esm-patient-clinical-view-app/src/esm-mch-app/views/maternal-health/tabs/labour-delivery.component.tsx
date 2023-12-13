@@ -82,7 +82,7 @@ const LabourDeliveryList: React.FC<LabourDeliveryListProps> = ({ patientUuid }) 
         ],
       },
     ],
-    [],
+    [t],
   );
 
   return (

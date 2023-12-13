@@ -30,7 +30,6 @@ const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) =>
   const MotherPNCEncounterTypeUUID = useConfig().encounterTypes.mchMotherConsultation;
   const MotherPNCEncounterFormUUID = useConfig().formsList.postNatal;
 
-
   const columns: EncounterListColumn[] = useMemo(
     () => [
       {
@@ -96,7 +95,7 @@ const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) =>
         ],
       },
     ],
-    [],
+    [t],
   );
 
   return (

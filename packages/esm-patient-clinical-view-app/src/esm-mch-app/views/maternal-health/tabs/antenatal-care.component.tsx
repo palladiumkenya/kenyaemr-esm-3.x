@@ -24,7 +24,6 @@ const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) =>
   const ANCEncounterTypeUUID = useConfig().encounterTypes.mchMotherConsultation;
   const ANCEncounterFormUUID = useConfig().formsList.antenatal;
 
-
   const columns: EncounterListColumn[] = useMemo(
     () => [
       {
@@ -90,7 +89,7 @@ const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) =>
         ],
       },
     ],
-    [],
+    [t],
   );
 
   return (
