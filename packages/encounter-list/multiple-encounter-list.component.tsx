@@ -2,11 +2,11 @@ import { openmrsFetch, navigate } from '@openmrs/esm-framework';
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './encounter-list.scss';
-import { encounterRepresentation } from '../../constants';
-import { EmptyState } from '../empty-state/empty-state.component';
+import { encounterRepresentation } from '../utils/constants';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { DataTableSkeleton, Link, Pagination } from '@carbon/react';
 import { OTable } from '../data-table/o-table.component';
-import { getObsFromEncounter } from '../../utils/encounter-list-utils';
+import { getObsFromEncounter } from './encounter-list-utils';
 
 export interface MultipleEncounterListColumn {
   key: string;

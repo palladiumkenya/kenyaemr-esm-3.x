@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react';
 import { usePatientTracing } from '../hooks/usePatientTracing';
 import { useTranslation } from 'react-i18next';
-import { getObsFromEncounter } from '../../../utils/encounter-list-utils';
+import { formatDateTime, getObsFromEncounter } from '../../../encounter-list/encounter-list-utils';
 import { EncounterList, EncounterListColumn } from '../../../encounter-list/encounter-list.component';
+import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import {
   Contacted_UUID,
+  MissedAppointmentDate_UUID,
   PatientTracingEncounterType_UUID,
-  TracingDate_UUID,
   TracingNumber_UUID,
   TracingOutcome_UUID,
   TracingType_UUID,
@@ -20,24 +21,25 @@ interface PatientTracingProps {
 const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounterTypeUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('defaulterTracing', 'Defaulter Tracing');
+
   const { encounters, isLoading, isValidating, error } = usePatientTracing(patientUuid, encounterTypeUuid);
 
   const columns: EncounterListColumn[] = useMemo(
     () => [
       {
-        key: 'tracingDate',
-        header: t('date', 'Tracing Date'),
+        key: 'missedAppointmentDate',
+        header: t('missedAppointmentDate', 'Date Missed Appointment'),
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, TracingDate_UUID);
+          return formatDate(parseDate(getObsFromEncounter(encounter, MissedAppointmentDate_UUID)));
         },
       },
-      /*  {
+      {
         key: 'visitDate',
-        header: t('visitDate', 'Visit Date'),
+        header: t('visitDate', 'Tracing Date'),
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, visitDate, true);
+          return formatDate(parseDate(encounter.encounterDatetime));
         },
-      },*/
+      },
       {
         key: 'tracingType',
         header: t('tracingType', 'Tracing Type'),
@@ -70,41 +72,6 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
     [],
   );
 
-  /*  const headers = [
-      {
-        header: t('date', 'Date'),
-        key: 'date',
-      },
-      {
-        header: t('tracingType', 'Tracing Type'),
-        key: 'tracingType',
-      },
-      {
-        header: t('tracingNumber', 'Tracing No.'),
-        key: 'tracingNumber',
-      },
-      {
-        header: t('contacted', 'Contacted'),
-        key: 'contacted',
-      },
-      {
-        header: t('finalOutcome', 'Final Outcome'),
-        key: 'finalOutcome',
-      },
-    ];*/
-
-  /*  const rowData = encounters.map((encounters) => {
-    return {
-      id: `${encounters.uuid}`,
-      date: encounters?.encounterDatetime
-        ? formatDate(parseDate(encounters?.encounterDatetime), { mode: 'wide' })
-        : '--',
-      tracingType: encounters.value,
-      tracingNumber: encounters.value,
-      contacted: encounters.value,
-      finalOutcome: encounters.value,
-    };
-  });*/
   return (
     <EncounterList
       patientUuid={patientUuid}

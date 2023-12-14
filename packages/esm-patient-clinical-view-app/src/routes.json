@@ -16,7 +16,10 @@
     {
       "name": "defaulter-tracing-dashboard",
       "component": "defaulterTracing",
-      "slot": "patient-chart-summary-dashboard-slot"
+      "slot": "patient-chart-summary-dashboard-slot",
+      "meta": {
+        "columnSpan": 4
+      }
     }
   ]
 }

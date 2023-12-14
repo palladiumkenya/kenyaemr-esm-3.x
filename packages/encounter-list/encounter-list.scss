@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import "../../root.scss";
+@import "../esm-patient-clinical-view-app/src/root.scss";
 
 .widgetContainer {
   background-color: $ui-background;

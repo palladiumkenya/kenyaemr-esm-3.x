@@ -17,6 +17,11 @@ export const configSchema = {
       labourAndDelivery: '496c7cc3-0eea-4e84-a04c-2292949e2f7f',
     },
   },
+  defaulterTracingEncounterUuid: {
+    _type: Type.String,
+    _description: 'Encounter UUID for defaulter tracing',
+    _default: '1495edf8-2df2-11e9-b210-d663bd873d93',
+  },
 };
 
 export interface ConfigObject {
@@ -24,10 +29,3 @@ export interface ConfigObject {
   formsList: { labourAndDelivery: string; antenatal: string; postnatal: string };
   defaulterTracingEncounterUuid: string;
 }
-export const configSchema = {
-  defaulterTracingEncounterUuid: {
-    _type: Type.String,
-    _description: 'Encounter UUID for defaulter tracing',
-    _default: '1495edf8-2df2-11e9-b210-d663bd873d93',
-  },
-};

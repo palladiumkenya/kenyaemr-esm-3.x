@@ -1,19 +1,42 @@
 import { navigate } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState } from '../empty-state/empty-state.component';
-import { OHRIFormLauncherWithIntent } from '../ohri-form-launcher/ohri-form-launcher.component';
 import styles from './encounter-list.scss';
 import { OTable } from '../data-table/o-table.component';
-import { Button, Link, OverflowMenu, OverflowMenuItem, Pagination, DataTableSkeleton } from '@carbon/react';
+import {
+  Button,
+  Link,
+  OverflowMenu,
+  OverflowMenuItem,
+  Pagination,
+  DataTableSkeleton,
+  Layer,
+  Tile,
+} from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
-import { launchEncounterForm } from './helpers';
-import { useEncounterRows } from '../../hooks/useEncounterRows';
-import { OpenmrsEncounter } from '../../api/types';
-import { useFormsJson } from '../../hooks/useFormsJson';
-import { usePatientDeathStatus } from '../../hooks/usePatientDeathStatus';
+import { useEncounterRows } from '../esm-patient-clinical-view-app/src/hooks/useEncounterRows';
+import { OpenmrsEncounter } from '../esm-patient-clinical-view-app/src/type/types';
+import { EmptyDataIllustration,launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
+export interface O3FormSchema {
+  name: string;
+  pages: Array<any>;
+  processor: string;
+  uuid: string;
+  referencedForms: [];
+  encounterType: string;
+  encounter?: string | OpenmrsEncounter;
+  allowUnspecifiedAll?: boolean;
+  defaultPage?: string;
+  readonly?: string | boolean;
+  inlineRendering?: 'single-line' | 'multiline' | 'automatic';
+  markdown?: any;
+  postSubmissionActions?: Array<{ actionId: string; config?: Record<string, any> }>;
+  formOptions?: {
+    usePreviousValueDisabled: boolean;
+  };
+  version?: string;
+}
 export interface EncounterListColumn {
   key: string;
   header: string;
@@ -54,13 +77,10 @@ export const EncounterList: React.FC<EncounterListProps> = ({
 }) => {
   const { t } = useTranslation();
   const [paginatedRows, setPaginatedRows] = useState([]);
-  const [forms, setForms] = useState<OHRIFormSchema[]>([]);
+  const [forms, setForms] = useState<O3FormSchema[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [isLoadingForms, setIsLoadingForms] = useState(true);
-  const { isDead } = usePatientDeathStatus(patientUuid);
-  const formNames = useMemo(() => formList.map((form) => form.name), []);
-  const { formsJson, isLoading: isLoadingFormsJson } = useFormsJson(formNames);
+  //  const formNames = useMemo(() => formList.map((form) => form.name), []);
   const {
     encounters,
     isLoading: isLoadingEncounters,
@@ -90,29 +110,6 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     [forms, t],
   );
 
-  useEffect(() => {
-    if (!isLoadingFormsJson) {
-      const formsWithFilteredIntents = formsJson.map((form) => {
-        const descriptor = formList.find((formDescriptor) => formDescriptor.name === form.name);
-        // handle excluded intents
-        if (descriptor?.excludedIntents?.length) {
-          form['availableIntents'] = form['availableIntents'].filter(
-            (intentEntry) => !descriptor.excludedIntents.includes(intentEntry.intent),
-          );
-        }
-        // handle fixed intent
-        if (descriptor?.fixedIntent) {
-          form['availableIntents'] = form['availableIntents'].filter(
-            (intentEntry) => intentEntry.intent == descriptor.fixedIntent,
-          );
-        }
-        return form;
-      });
-      setIsLoadingForms(false);
-      setForms(formsWithFilteredIntents);
-    }
-  }, [formsJson, formList, isLoadingFormsJson]);
-
   const headers = useMemo(() => {
     if (columns) {
       return columns.map((column) => {
@@ -121,7 +118,22 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     }
     return [];
   }, [columns]);
-
+  const handleOpenTracingForm = () => {
+    // launchPatientWorkspace('patient-form-entry-workspace', {
+    //   workspaceTitle: 'Defaulter Tracing',
+    //   formInfo: {
+    //     encounterUuid: '',
+    //     formUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93',
+    //     patientUuid,
+    //     visitTypeUuid: '',
+    //     visitUuid: '',
+    //   },
+    // });
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'Defaulter Tracing',
+      formInfo: { formUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93', encounterUuid: '' },
+    });
+  };
   const constructPaginatedTableRows = useCallback(
     (encounters: OpenmrsEncounter[], currentPage: number, pageSize: number) => {
       const startIndex = (currentPage - 1) * pageSize;
@@ -135,28 +147,8 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         const tableRow: { id: string; actions: any } = { id: encounter.uuid, actions: null };
         // inject launch actions
         encounter['launchFormActions'] = {
-          editEncounter: () =>
-            launchEncounterForm(
-              forms[0],
-              moduleName,
-              'edit',
-              onFormSave,
-              null,
-              encounter.uuid,
-              null,
-              workspaceWindowSize,
-            ),
-          viewEncounter: () =>
-            launchEncounterForm(
-              forms[0],
-              moduleName,
-              'view',
-              onFormSave,
-              null,
-              encounter.uuid,
-              null,
-              workspaceWindowSize,
-            ),
+          editEncounter: () => {},
+          viewEncounter: () => {},
         };
         // process columns
         columns.forEach((column) => {
@@ -187,16 +179,6 @@ export const EncounterList: React.FC<EncounterListProps> = ({
                 itemText={actionItem.label}
                 onClick={(e) => {
                   e.preventDefault();
-                  launchEncounterForm(
-                    forms.find((form) => form.name == actionItem?.form?.name),
-                    moduleName,
-                    actionItem.mode == 'enter' ? 'add' : actionItem.mode,
-                    onFormSave,
-                    null,
-                    encounter.uuid,
-                    actionItem.intent,
-                    workspaceWindowSize,
-                  );
                 }}
               />
             ))}
@@ -215,45 +197,16 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     }
   }, [encounters, pageSize, constructPaginatedTableRows, currentPage]);
 
-  const formLauncher = useMemo(() => {
-    if (forms.length == 1 && !forms[0]['availableIntents']?.length) {
-      // we only have one form with no intents
-      // just return the "Add" button
-      return (
-        <Button
-          kind="ghost"
-          renderIcon={Add}
-          iconDescription="Add "
-          onClick={(e) => {
-            e.preventDefault();
-            launchEncounterForm(forms[0], moduleName, 'add', onFormSave, null, null, null, workspaceWindowSize);
-          }}>
-          {displayText}
-        </Button>
-      );
-    } else if (forms.length && !(hideFormLauncher ?? isDead)) {
-      return (
-        <OHRIFormLauncherWithIntent
-          formJsonList={forms}
-          launchForm={(formJson, intent) =>
-            launchEncounterForm(formJson, moduleName, 'add', onFormSave, null, null, intent, workspaceWindowSize)
-          }
-          title={displayText}
-        />
-      );
-    }
-  }, [forms, hideFormLauncher, isDead, displayText, moduleName, workspaceWindowSize]);
-
   return (
     <>
-      {isLoadingEncounters || isLoadingForms ? (
+      {isLoadingEncounters ? (
         <DataTableSkeleton rowCount={5} />
       ) : encounters.length > 0 ? (
         <>
           <div className={styles.widgetContainer}>
             <div className={styles.widgetHeaderContainer}>
               <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-              {!(hideFormLauncher ?? isDead) && <div className={styles.toggleButtons}>{formLauncher}</div>}
+              <Button onClick={handleOpenTracingForm}>Add</Button>
             </div>
             <OTable tableHeaders={headers} tableRows={paginatedRows} />
             <Pagination
@@ -269,15 +222,19 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           </div>
         </>
       ) : (
-        <EmptyState
-          displayText={description}
-          headerTitle={headerTitle}
-          launchForm={() =>
-            launchEncounterForm(forms[0], moduleName, 'add', onFormSave, null, null, '*', workspaceWindowSize)
-          }
-          launchFormComponent={formLauncher}
-          hideFormLauncher={hideFormLauncher ?? isDead}
-        />
+        <div className={styles.widgetContainer}>
+          <div className={styles.widgetHeaderContainer}>
+            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          </div>
+          <Layer className={styles.emptyStateContainer}>
+            <Tile className={styles.tile}>
+              <div>
+                <EmptyDataIllustration />
+              </div>
+              <p className={styles.content}>There are no encounters to display.</p>
+            </Tile>
+          </Layer>
+        </div>
       )}
     </>
   );

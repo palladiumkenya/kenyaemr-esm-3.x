@@ -1,16 +1,11 @@
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import { OpenmrsEncounter } from '../types';
-import { useCallback, useEffect, useMemo, useState } from 'react';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject, configSchema } from '../config-schema';
-import groupBy from 'lodash/groupBy';
+import { ConfigObject } from '../config-schema';
+import { encounterRepresentation, MissedAppointmentDate_UUID } from '../../../utils/constants';
 
-export const encounterRepresentation =
-  'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),' +
-  'patient:(uuid,display),encounterProviders:(uuid,provider:(uuid,name)),' +
-  'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,name:(uuid,name)),value:(uuid,name:(uuid,name),' +
-  'names:(uuid,conceptNameType,name))),form:(uuid,name))';
 export const defaulterTracingEncounterUuid = '1495edf8-2df2-11e9-b210-d663bd873d93';
+
 export function usePatientTracing(patientUuid: string, encounterType: string) {
   const config = useConfig() as ConfigObject;
   const url = `/ws/rest/v1/encounter?encounterType=${config.defaulterTracingEncounterUuid}&patient=${patientUuid}&v=${encounterRepresentation}`;
@@ -19,9 +14,28 @@ export function usePatientTracing(patientUuid: string, encounterType: string) {
     url,
     openmrsFetch,
   );
+
+  const responseData = data?.data ? data?.data?.results : [];
+  const results = responseData.flatMap((el) => el.obs).filter((obs) => obs.concept.uuid === MissedAppointmentDate_UUID);
+
+  const uniqueSessionDates = results.map((el) => el.value);
+  const hashTableTable = new Map<string | number, Array<any>>();
+  responseData.forEach((encounter) => {
+    const groupDate = encounter.obs.find((obs) => obs.concept.uuid === MissedAppointmentDate_UUID)?.value;
+
+    if (hashTableTable.has(groupDate)) {
+      const existingEncounter = hashTableTable.get(groupDate);
+      if (uniqueSessionDates.includes(groupDate)) {
+        hashTableTable.set(groupDate, [encounter].concat(existingEncounter));
+      }
+    }
+    if (uniqueSessionDates.includes(groupDate)) {
+      hashTableTable.set(groupDate, [encounter]);
+    }
+  });
+
   // eslint-disable-next-line no-console
-  console.log('response', data);
-  //   const { chege } = usePatientTracing('patientuuid', 'encounteryTypeUuid');
+  console.log(Array.from(hashTableTable)[0]);
 
   return {
     encounters: data?.data ? data?.data?.results : [],
