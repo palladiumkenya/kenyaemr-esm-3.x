@@ -13,7 +13,6 @@ import {
   TableExpandedRow,
 } from '@carbon/react';
 import styles from './o-table.scss';
-import { LazyCell } from '../lazy-cell/lazy-cell.component';
 import EncounterObservations from '../encounter-observation/encounter-observation.component';
 
 interface TableProps {
