@@ -2,8 +2,9 @@ import useSWR from 'swr';
 import { formatDate, parseDate, openmrsFetch, useSession, OpenmrsResource } from '@openmrs/esm-framework';
 import { FacilityDetail, MappedBill, PatientInvoice } from './types';
 import isEmpty from 'lodash-es/isEmpty';
+import sortBy from 'lodash-es/sortBy';
 
-export const useBills = (patientUuid?: string) => {
+export const useBills = (patientUuid: string = '', billStatus: string = '') => {
   const url = `/ws/rest/v1/cashier/bill?v=full`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
@@ -38,7 +39,9 @@ export const useBills = (patientUuid?: string) => {
     return mappedBill;
   };
 
-  const mappedResults = data?.data ? data?.data?.results?.map((res) => mapBillProperties(res)) : [];
+  const sortBills = sortBy(data?.data?.results ?? [], ['dateCreated']).reverse();
+  const filteredBills = billStatus === '' ? sortBills : sortBills?.filter((bill) => bill.status === billStatus);
+  const mappedResults = filteredBills?.map((bill) => mapBillProperties(bill));
   const filteredResults = mappedResults?.filter((res) => res.patientUuid === patientUuid);
   const formattedBills = isEmpty(patientUuid) ? mappedResults : filteredResults || [];
 
