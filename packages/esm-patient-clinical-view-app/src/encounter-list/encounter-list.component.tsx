@@ -119,6 +119,15 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     return [];
   }, [columns]);
 
+  const expandedHeaderProps = useMemo(() => {
+    if (columns) {
+      return columns.map((column) => {
+        return { key: column.key, header: column.header };
+      });
+    }
+    return [];
+  }, [columns]);
+
   const constructPaginatedTableRows = useCallback(
     (encounters: OpenmrsEncounter[], currentPage: number, pageSize: number) => {
       const startIndex = (currentPage - 1) * pageSize;
@@ -129,7 +138,11 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         }
       }
       const rows = paginatedEncounters.map((encounter) => {
-        const tableRow: { id: string; actions: any } = { id: encounter.uuid, actions: null };
+        const tableRow: { id: string; actions: any; obs: any } = {
+          id: encounter.uuid,
+          actions: null,
+          obs: encounter.obs,
+        };
         // inject launch actions
         encounter['launchFormActions'] = {
           editEncounter: () => {},
@@ -190,7 +203,6 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         <>
           <div className={styles.widgetContainer}>
             <div className={styles.widgetHeaderContainer}>
-              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
               {!hideFormLauncher && <div className={styles.toggleButtons}>{}</div>}
             </div>
             <OTable tableHeaders={headers} tableRows={paginatedRows} />
@@ -208,15 +220,12 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         </>
       ) : (
         <div className={styles.widgetContainer}>
-          <div className={styles.widgetHeaderContainer}>
-            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-          </div>
           <Layer className={styles.emptyStateContainer}>
             <Tile className={styles.tile}>
               <div>
                 <EmptyDataIllustration />
               </div>
-              <p className={styles.content}>There are no encounters to display.</p>
+              <p className={styles.content}>There are no {headerTitle} encounters to display.</p>
             </Tile>
           </Layer>
         </div>

@@ -69,13 +69,6 @@ const LabourDeliveryList: React.FC<LabourDeliveryListProps> = ({ patientUuid }) 
             form: { name: 'Labour & Delivery Form', package: 'maternal_health' },
             encounterUuid: encounter.uuid,
             intent: '*',
-            label: t('viewDetails', 'View Details'),
-            mode: 'view',
-          },
-          {
-            form: { name: 'Labour & Delivery Form', package: 'maternal_health' },
-            encounterUuid: encounter.uuid,
-            intent: '*',
             label: t('editForm', 'Edit Form'),
             mode: 'edit',
           },

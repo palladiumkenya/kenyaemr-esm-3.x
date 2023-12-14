@@ -82,13 +82,6 @@ const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) =>
             form: { name: 'Mother - Postnatal Form', package: 'maternal_health' },
             encounterUuid: encounter.uuid,
             intent: '*',
-            label: t('viewDetails', 'View Details'),
-            mode: 'view',
-          },
-          {
-            form: { name: 'Mother - Postnatal Form', package: 'maternal_health' },
-            encounterUuid: encounter.uuid,
-            intent: '*',
             label: t('editForm', 'Edit Form'),
             mode: 'edit',
           },
