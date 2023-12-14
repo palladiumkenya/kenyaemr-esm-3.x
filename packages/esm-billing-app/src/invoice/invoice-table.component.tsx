@@ -98,8 +98,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
           <TableContainer
             description={
               <p className={styles.tableDescription}>
-                <span>{t('lineItemsToBeBilled', 'Line items to be billed')}</span>
-                <Information />
+                <span>{t('itemsToBeBilled', 'Items to be billed')}</span>
+                <Information className={styles.infoIcon} />
               </p>
             }
             title={t('lineItems', 'Line items')}>
