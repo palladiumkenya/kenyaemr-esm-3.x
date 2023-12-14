@@ -16,7 +16,7 @@ import {
 import { Add } from '@carbon/react/icons';
 import { useEncounterRows } from '../../src/hooks/useEncounterRows';
 import { OpenmrsEncounter } from '../type/types';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
 
 export interface O3FormSchema {
   name: string;
@@ -225,7 +225,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
               <div>
                 <EmptyDataIllustration />
               </div>
-              <p className={styles.content}>There are no {headerTitle} encounters to display.</p>
+              <p className={styles.content}>There are no encounters to display</p>
             </Tile>
           </Layer>
         </div>

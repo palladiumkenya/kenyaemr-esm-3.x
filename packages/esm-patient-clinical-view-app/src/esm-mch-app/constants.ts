@@ -1,26 +1,17 @@
-export const mnchEncounterType_UUID = '3eb24129-9f7d-4372-a14e-c2cf577e5db1';
-export const clientsEnrolledToCare = '51bec6f7-df43-426e-a83e-c1ae5501372f';
 export const vLResultsConcept = '1305AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const PTrackerIdentifierType = '4da0a3fe-e546-463f-81fa-084f098ff06c';
-export const artUniqueNumberType = '9d6d1eec-2cd6-4637-a981-4a46b4b8b41f';
 
 export const ancVisitNumberConcept = '1425AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 //Labour & Delivery
-export const labourAndDeliveryEncounterType = '2678423c-0523-4d76-b0da-18177b439eed';
 export const infantStatusAtBirthConcept = '159917AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const dateOfDeliveryConcept = '5599AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const deliveryOutcomeConcept = '159949AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const ancHivResultConcept = 'c5f74c86-62cd-4d22-9260-4238f1e45fe0';
 export const hivStatusAtDeliveryConcept = 'c5f74c86-62cd-4d22-9260-4238f1e45fe0';
 export const artInitiationConcept = '6e62bf7e-2107-4d09-b485-6e60cbbb2d08';
 export const birthCountConcept = '1568AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const visitDate = '163260AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const hivTestStatus = '164401AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const artLinkage = '6e62bf7e-2107-4d09-b485-6e60cbbb2d08';
 export const recenctViralLoad = '163310AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const motherStatusConcept = '1856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const ancVisitConcept = '160446AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const hivTestAtMaternityResults = '1396AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const placeOfDeliveryConcept = '1572AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 

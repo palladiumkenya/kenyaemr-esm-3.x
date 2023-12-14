@@ -39,5 +39,15 @@
 
 .tile {
   text-align: center;
-  border: 1px solid $ui-03;
+}
+
+.emptyStateContainer {
+  margin: 2rem 0;
+}
+
+.content {
+  @extend .productiveHeading01;
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }

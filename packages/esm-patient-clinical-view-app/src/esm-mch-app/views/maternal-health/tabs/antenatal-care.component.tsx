@@ -13,6 +13,7 @@ import {
   partnerHivStatus,
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ConfigObject } from '../../../../config-schema';
 
 interface AntenatalCareListProps {
   patientUuid: string;
@@ -21,8 +22,13 @@ interface AntenatalCareListProps {
 const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('antenatalCare', 'Antenatal Care');
-  const ANCEncounterTypeUUID = useConfig().encounterTypes.mchMotherConsultation;
-  const ANCEncounterFormUUID = useConfig().formsList.antenatal;
+  const {
+    encounterTypes: { mchMotherConsultation },
+    formsList: { antenatal },
+  } = useConfig<ConfigObject>();
+
+  const ANCEncounterTypeUUID = mchMotherConsultation;
+  const ANCEncounterFormUUID = antenatal;
 
   const columns: EncounterListColumn[] = useMemo(
     () => [

@@ -1,13 +1,6 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
-  identifiers: {
-    _type: Type.Object,
-    _description: 'Identifier sources',
-    _default: {
-      preferredIdentifierSource: 'dfacd928-0370-4315-99d7-6ec1c9f7ae76',
-    },
-  },
   encounterTypes: {
     _type: Type.Object,
     _description: 'List of MCH encounter type UUIDs',
@@ -27,7 +20,6 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
-  identifiers: Object;
-  encounterTypes: Object;
-  formsList: Object;
+  encounterTypes: { mchMotherConsultation: string };
+  formsList: { labourAndDelivery: string; antenatal: string; postnatal: string };
 }

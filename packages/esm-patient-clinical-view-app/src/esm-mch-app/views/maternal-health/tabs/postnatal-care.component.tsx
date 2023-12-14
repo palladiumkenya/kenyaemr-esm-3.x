@@ -14,11 +14,11 @@ import {
   MothervisitDate,
   ancVisitNumberConcept,
   recenctViralLoad,
-  visitDate,
   motherGeneralConditionConcept,
   pphConditionConcept,
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ConfigObject } from '../../../../config-schema';
 
 interface PostnatalCareListProps {
   patientUuid: string;
@@ -27,8 +27,14 @@ interface PostnatalCareListProps {
 const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('postnatalCare', 'Postnatal Care');
-  const MotherPNCEncounterTypeUUID = useConfig().encounterTypes.mchMotherConsultation;
-  const MotherPNCEncounterFormUUID = useConfig().formsList.postNatal;
+
+  const {
+    encounterTypes: { mchMotherConsultation },
+    formsList: { postnatal },
+  } = useConfig<ConfigObject>();
+
+  const MotherPNCEncounterTypeUUID = mchMotherConsultation;
+  const MotherPNCEncounterFormUUID = postnatal;
 
   const columns: EncounterListColumn[] = useMemo(
     () => [

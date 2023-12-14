@@ -1,5 +1,3 @@
-import { PedestrianChild } from '@carbon/react/icons';
-
 export const mchFolderMeta = {
   title: 'Maternal & Child Health',
   slotName: 'mch-slot',
@@ -43,7 +41,7 @@ export const motherChildDashboardMeta = {
     type: 'grid',
     programme: 'pmtct',
     dashboardTitle: 'Mother Child Health Home Page',
-    icon: PedestrianChild,
+    icon: '',
   },
   isLink: true,
   title: 'Maternal & Child Health',

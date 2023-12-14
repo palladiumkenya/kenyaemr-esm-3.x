@@ -13,6 +13,7 @@ import {
   visitDateConcept,
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ConfigObject } from '../../../../config-schema';
 
 interface LabourDeliveryListProps {
   patientUuid: string;
@@ -21,9 +22,14 @@ interface LabourDeliveryListProps {
 const LabourDeliveryList: React.FC<LabourDeliveryListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('labourAndDelivery', 'Labour and Delivery');
-  const LNDEncounterTypeUUID = useConfig().encounterTypes.mchMotherConsultation;
-  const LNDEncounterFormUUID = useConfig().formsList.labourAndDelivery;
 
+  const {
+    encounterTypes: { mchMotherConsultation },
+    formsList: { labourAndDelivery },
+  } = useConfig<ConfigObject>();
+
+  const LNDEncounterTypeUUID = mchMotherConsultation;
+  const LNDEncounterFormUUID = labourAndDelivery;
   const columns: EncounterListColumn[] = useMemo(
     () => [
       {
