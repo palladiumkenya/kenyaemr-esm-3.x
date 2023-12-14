@@ -1,0 +1,105 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.desktopHeading {
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+    background-color: $ui-background;
+    padding-top: spacing.$spacing-02;
+  }
+}
+
+.tabletHeading {
+  h4 {
+    @include type.type-style('heading-03');
+    color: $text-02;
+  }
+}
+
+.desktopHeading,
+.tabletHeading {
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+  text-transform: capitalize;
+  background-color: $ui-background;
+  padding-top: spacing.$spacing-02;
+  padding-bottom: spacing.$spacing-03;
+}
+
+.title {
+  @include type.type-style('productive-heading-03');
+  color: colors.$gray-100;
+  margin-left: spacing.$spacing-05;
+}
+
+.card {
+  background-color: $ui-02;
+  padding: spacing.$spacing-03;
+}
+
+.btnEdit {
+  margin-left: auto;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.labelContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.value {
+  @include type.type-style('productive-heading-03');
+  color: colors.$gray-100;
+}
+
+.content {
+  width: 30%;
+  margin: spacing.$spacing-01 0;
+
+  &>p:first-child {
+    @include type.type-style('label-01');
+    color: colors.$gray-70;
+    margin-bottom: spacing.$spacing-02;
+  }
+
+  & span {
+    @include type.type-style('body-short-02');
+    color: colors.$gray-100;
+  }
+}
+
+.programTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &>h4 {
+    @include type.type-style('productive-heading-02');
+    color: colors.$gray-80;
+  }
+}
+
+.tileWrapper {
+  gap: spacing.$spacing-05;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
+}
+
+.menuItem {
+  max-width: none;
+}
