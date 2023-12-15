@@ -99,7 +99,6 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
             description={
               <p className={styles.tableDescription}>
                 <span>{t('itemsToBeBilled', 'Items to be billed')}</span>
-                <Information className={styles.infoIcon} />
               </p>
             }
             title={t('lineItems', 'Line items')}>
