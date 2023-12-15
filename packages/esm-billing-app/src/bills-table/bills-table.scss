@@ -71,7 +71,7 @@
   margin: 1rem auto;
 }
 
-.expandedActiveVisitRow>td>div {
+.expandedActiveVisitRow > td > div {
   max-height: max-content !important;
 }
 
@@ -79,7 +79,7 @@
   padding: 0 2rem;
 }
 
-.expandedActiveVisitRow th[colspan] td[colspan]>div:first-child {
+.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
   padding: 0 1rem;
 }
 
@@ -121,6 +121,10 @@
 .tile {
   text-align: center;
   border: 1px solid $ui-03;
+}
+
+.menuitem {
+  max-width: none;
 }
 
 .filterEmptyState {
