@@ -265,9 +265,18 @@ function FilterableTableHeader({
               {billPaymentStatus === '' ? 'ALL' : billPaymentStatus}
             </Tag>
             <OverflowMenu flipped renderIcon={Filter}>
-              <OverflowMenuItem onClick={() => handleSetBillPaymentStatus('')} itemText={t('all', 'ALL')} />
-              <OverflowMenuItem onClick={() => handleSetBillPaymentStatus('PAID')} itemText={t('paid', 'PAID')} />
               <OverflowMenuItem
+                className={styles.menuitem}
+                onClick={() => handleSetBillPaymentStatus('')}
+                itemText={t('all', 'ALL')}
+              />
+              <OverflowMenuItem
+                className={styles.menuitem}
+                onClick={() => handleSetBillPaymentStatus('PAID')}
+                itemText={t('paid', 'PAID')}
+              />
+              <OverflowMenuItem
+                className={styles.menuitem}
                 onClick={() => handleSetBillPaymentStatus('PENDING')}
                 itemText={t('pending', 'PENDING')}
               />
