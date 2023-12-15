@@ -1,7 +1,5 @@
-import { ErrorState, isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useBills } from '../billing.resource';
 import {
   DataTableSkeleton,
   Layer,
@@ -19,9 +17,11 @@ import {
   TableExpandRow,
   TableExpandedRow,
 } from '@carbon/react';
-import styles from './bill-history.scss';
+import { ErrorState, isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
+import styles from './bill-history.scss';
 
 interface BillHistoryProps {
   patientUuid: string;
