@@ -34,6 +34,15 @@
       "component": "clearCacheButton",
       "online": true,
       "offline": false
+    },
+    {
+      "name": "kenyaemr-facility-dashboard",
+      "slot": "app-menu-slot",
+      "component": "kenyaemrFacilityDashboard",
+      "online": true,
+      "offline": false,
+      "order": 0
+
     }
   ]
 }
