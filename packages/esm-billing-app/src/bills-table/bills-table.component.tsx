@@ -15,7 +15,11 @@ import {
   TableHeader,
   TableCell,
   Tile,
+  OverflowMenu,
+  OverflowMenuItem,
+  Tag,
 } from '@carbon/react';
+import { Filter } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
   useLayoutType,
@@ -28,14 +32,16 @@ import {
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import styles from './bills-table.scss';
+import { PENDING } from '../constants';
 
 const BillsTable = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
+  const [billPaymentStatus, setBillPaymentStatus] = useState(PENDING);
   const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
-  const { bills, isLoading, isValidating, error } = useBills('');
+  const { bills, isLoading, isValidating, error } = useBills('', billPaymentStatus);
   const [searchString, setSearchString] = useState('');
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
@@ -112,6 +118,8 @@ const BillsTable = () => {
           layout={layout}
           responsiveSize={responsiveSize}
           t={t}
+          billPaymentStatus={billPaymentStatus}
+          setBillPaymentStatus={setBillPaymentStatus}
         />
         <DataTableSkeleton
           rowCount={pageSize}
@@ -143,6 +151,8 @@ const BillsTable = () => {
           isValidating={isValidating}
           layout={layout}
           responsiveSize={responsiveSize}
+          billPaymentStatus={billPaymentStatus}
+          setBillPaymentStatus={setBillPaymentStatus}
           t={t}
         />
         <DataTable
@@ -226,7 +236,18 @@ const BillsTable = () => {
   );
 };
 
-function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveSize, t }) {
+function FilterableTableHeader({
+  layout,
+  handleSearch,
+  isValidating,
+  responsiveSize,
+  t,
+  billPaymentStatus,
+  setBillPaymentStatus,
+}) {
+  const handleSetBillPaymentStatus = (status) => {
+    setBillPaymentStatus(status);
+  };
   return (
     <>
       <div className={styles.headerContainer}>
@@ -239,6 +260,19 @@ function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveS
         </div>
         <div className={styles.backgroundDataFetchingIndicator}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
+          <div>
+            <Tag type="red" title={billPaymentStatus}>
+              {billPaymentStatus === '' ? 'ALL' : billPaymentStatus}
+            </Tag>
+            <OverflowMenu flipped renderIcon={Filter}>
+              <OverflowMenuItem onClick={() => handleSetBillPaymentStatus('')} itemText={t('all', 'ALL')} />
+              <OverflowMenuItem onClick={() => handleSetBillPaymentStatus('PAID')} itemText={t('paid', 'PAID')} />
+              <OverflowMenuItem
+                onClick={() => handleSetBillPaymentStatus('PENDING')}
+                itemText={t('pending', 'PENDING')}
+              />
+            </OverflowMenu>
+          </div>
         </div>
       </div>
       <Search
