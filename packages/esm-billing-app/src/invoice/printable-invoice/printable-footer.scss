@@ -11,7 +11,8 @@
 }
 
 .itemFooter {
-  margin: 1rem;
+  padding: 1rem;
   @include type.type-style('body-compact-02');
   color: colors.$cool-gray-90;
+  border-top: 1px solid #ebedf2;
 }

@@ -11,12 +11,12 @@ import {
   DataTableSkeleton,
 } from '@carbon/react';
 import { age, isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import styles from './printable-invoice.scss';
+import { getGender } from '../../helpers';
 import { MappedBill } from '../../types';
 import { useTranslation } from 'react-i18next';
-import { getGender } from '../../helpers';
-import PrintableInvoiceHeader from './printable-invoice-header.component';
 import PrintableFooter from './printable-footer.component';
+import PrintableInvoiceHeader from './printable-invoice-header.component';
+import styles from './printable-invoice.scss';
 
 type PrintableInvoiceProps = {
   bill: MappedBill;
@@ -36,7 +36,7 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
   ];
 
   const rowData =
-    bill?.lineItems?.map((item, index) => {
+    bill?.lineItems?.map((item) => {
       return {
         id: `${item.uuid}`,
         billItem: item.item,
@@ -74,18 +74,19 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
     return (
       <div className={styles.loaderContainer}>
         <DataTableSkeleton
+          columnCount={headerData?.length ?? 0}
           showHeader={false}
           showToolbar={false}
-          zebra
-          columnCount={headerData?.length ?? 0}
           size={responsiveSize}
+          zebra
         />
       </div>
     );
   }
+
   return (
     <div className={styles.container}>
-      {/* <PrintableInvoiceHeader patientDetails={patientDetails} /> */}
+      <PrintableInvoiceHeader patientDetails={patientDetails} />
       <div className={styles.printableInvoiceContainer}>
         <div className={styles.detailsContainer}>
           {Object.entries(invoiceDetails).map(([key, val]) => (
@@ -130,11 +131,9 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
 
           <div className={styles.totalContainer}>
             {Object.entries(invoiceTotal).map(([key, val]) => (
-              <>
-                <p className={styles.itemTotal}>
-                  <span className={styles.itemHeading}>{key}</span> : <span className={styles.itemLabel}>{val}</span>
-                </p>
-              </>
+              <p className={styles.itemTotal}>
+                <span className={styles.itemHeading}>{key}</span>: <span className={styles.itemLabel}>{val}</span>
+              </p>
             ))}
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './printable-footer.scss';
 import { useDefaultFacility } from '../../billing.resource';
+import styles from './printable-footer.scss';
 
 const PrintableFooter = () => {
   const { data, isLoading } = useDefaultFacility();
