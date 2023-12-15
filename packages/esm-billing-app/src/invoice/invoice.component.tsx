@@ -38,10 +38,6 @@ const Invoice: React.FC<InvoiceProps> = () => {
         setIsPrinting(true);
         onBeforeGetContentResolve.current = resolve;
       }
-
-      setTimeout(() => {
-        resolve();
-      }, 100);
     });
   }, [bill, patient]);
 
