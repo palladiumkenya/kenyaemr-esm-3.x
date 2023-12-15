@@ -3,6 +3,7 @@ import { OpenmrsEncounter } from '../types';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { encounterRepresentation, MissedAppointmentDate_UUID } from '../../../utils/constants';
+import groupBy from 'lodash-es/groupBy';
 
 export const defaulterTracingEncounterUuid = '1495edf8-2df2-11e9-b210-d663bd873d93';
 
@@ -19,23 +20,13 @@ export function usePatientTracing(patientUuid: string, encounterType: string) {
   const results = responseData.flatMap((el) => el.obs).filter((obs) => obs.concept.uuid === MissedAppointmentDate_UUID);
 
   const uniqueSessionDates = results.map((el) => el.value);
-  const hashTableTable = new Map<string | number, Array<any>>();
-  responseData.forEach((encounter) => {
-    const groupDate = encounter.obs.find((obs) => obs.concept.uuid === MissedAppointmentDate_UUID)?.value;
-
-    if (hashTableTable.has(groupDate)) {
-      const existingEncounter = hashTableTable.get(groupDate);
-      if (uniqueSessionDates.includes(groupDate)) {
-        hashTableTable.set(groupDate, [encounter].concat(existingEncounter));
-      }
-    }
-    if (uniqueSessionDates.includes(groupDate)) {
-      hashTableTable.set(groupDate, [encounter]);
-    }
+  uniqueSessionDates.map(() => {
+    const data = responseData.find((encounter) =>
+      encounter.obs.find((ob) => ob.concept.uuid === MissedAppointmentDate_UUID),
+    );
+    console.log(data)
   });
 
-  // eslint-disable-next-line no-console
-  console.log(Array.from(hashTableTable)[0]);
 
   return {
     encounters: data?.data ? data?.data?.results : [],

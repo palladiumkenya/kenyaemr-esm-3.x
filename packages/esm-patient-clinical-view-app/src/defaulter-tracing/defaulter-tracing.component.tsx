@@ -30,7 +30,8 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
         key: 'missedAppointmentDate',
         header: t('missedAppointmentDate', 'Date Missed Appointment'),
         getValue: (encounter) => {
-          return formatDate(parseDate(getObsFromEncounter(encounter, MissedAppointmentDate_UUID)));
+          console.log((getObsFromEncounter(encounter, MissedAppointmentDate_UUID)));
+          return '';
         },
       },
       {
