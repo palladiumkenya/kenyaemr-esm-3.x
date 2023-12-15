@@ -12,7 +12,7 @@ interface PrintableInvoiceHeaderProps {
 const PrintableInvoiceHeader: React.FC<PrintableInvoiceHeaderProps> = ({ patientDetails }) => {
   const { t } = useTranslation();
   const { logo } = useConfig();
-  const { data, isLoading } = useDefaultFacility();
+  const { data } = useDefaultFacility();
 
   return (
     <div className={styles.container}>
@@ -42,15 +42,16 @@ const PrintableInvoiceHeader: React.FC<PrintableInvoiceHeaderProps> = ({ patient
 
       <div className={styles.printableBody}>
         <div className={styles.billDetails}>
-          <p className={styles.itemHeading}>{t('billTo', 'Bill to')} : </p>
+          <p className={styles.itemHeading}>{t('billedTo', 'Billed to')}</p>
           <p className={styles.itemLabel}>{patientDetails?.name}</p>
           <p className={styles.itemLabel}>{patientDetails?.county}</p>
           <p className={styles.itemLabel}>
-            {patientDetails?.subCounty}, {patientDetails?.city}
+            {patientDetails?.subCounty}
+            {patientDetails?.city ? `, ${patientDetails?.city}` : null}
           </p>
         </div>
 
-        <div>
+        <div className={styles.facilityDetails}>
           <p className={styles.facilityName}>{data?.display}</p>
           <p className={styles.itemLabel}>Kenya</p>
         </div>

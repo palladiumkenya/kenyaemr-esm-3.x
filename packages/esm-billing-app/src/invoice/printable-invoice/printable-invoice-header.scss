@@ -3,12 +3,15 @@
 @use '@carbon/type';
 
 .container {
-  margin: 0 1rem 5rem 1rem;
+  padding: 0 1rem 2rem;
+  border-bottom: 1px solid #ebedf2;
+  margin-bottom: 2rem;
 }
 
 .printableBody {
   display: flex;
   flex-direction: row;
+  justify-content: space-between;
 }
 
 .printableHeader {
@@ -27,6 +30,12 @@
   flex-direction: column;
 }
 
+.facilityDetails {
+  display: flex;
+  flex-flow: column wrap;
+  text-align: right;
+}
+
 .heading {
   font-size: 40px;
   text-transform: uppercase;
@@ -41,6 +50,7 @@
 
 .itemHeading {
   @include type.type-style('body-compact-02');
+  margin-bottom: 0.25rem;
   font-weight: bold;
   color: colors.$cool-gray-90;
 }

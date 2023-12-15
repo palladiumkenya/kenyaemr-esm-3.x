@@ -11,14 +11,12 @@
   display: flex;
   flex-direction: column;
   width: 80%;
-  border: 0.1pt solid colors.$cool-gray-30;
   padding: layout.$spacing-05;
   margin: layout.$spacing-05;
-  border-radius: 20px;
 }
 
 .detailsContainer {
-  margin: layout.$spacing-05;
+  margin: layout.$spacing-05 0;
   width: 20%;
 }
 
@@ -39,6 +37,7 @@
   @include type.type-style('body-compact-02');
   font-weight: bold;
   color: colors.$cool-gray-90;
+  margin-bottom: layout.$spacing-02;
 }
 
 .itemTotal {
