@@ -260,28 +260,28 @@ function FilterableTableHeader({
         </div>
         <div className={styles.backgroundDataFetchingIndicator}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <div>
-            <Tag type="red" title={billPaymentStatus}>
-              {billPaymentStatus === '' ? 'ALL' : billPaymentStatus}
-            </Tag>
-            <OverflowMenu flipped renderIcon={Filter}>
-              <OverflowMenuItem
-                className={styles.menuitem}
-                onClick={() => handleSetBillPaymentStatus('')}
-                itemText={t('all', 'ALL')}
-              />
-              <OverflowMenuItem
-                className={styles.menuitem}
-                onClick={() => handleSetBillPaymentStatus('PAID')}
-                itemText={t('paid', 'PAID')}
-              />
-              <OverflowMenuItem
-                className={styles.menuitem}
-                onClick={() => handleSetBillPaymentStatus('PENDING')}
-                itemText={t('pending', 'PENDING')}
-              />
-            </OverflowMenu>
-          </div>
+        </div>
+        <div>
+          <Tag type="red" title={billPaymentStatus}>
+            {billPaymentStatus === '' ? 'ALL' : billPaymentStatus}
+          </Tag>
+          <OverflowMenu className={styles.menu} flipped renderIcon={Filter}>
+            <OverflowMenuItem
+              className={styles.menuitem}
+              onClick={() => handleSetBillPaymentStatus('')}
+              itemText={t('all', 'ALL')}
+            />
+            <OverflowMenuItem
+              className={styles.menuitem}
+              onClick={() => handleSetBillPaymentStatus('PAID')}
+              itemText={t('paid', 'PAID')}
+            />
+            <OverflowMenuItem
+              className={styles.menuitem}
+              onClick={() => handleSetBillPaymentStatus('PENDING')}
+              itemText={t('pending', 'PENDING')}
+            />
+          </OverflowMenu>
         </div>
       </div>
       <Search
