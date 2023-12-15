@@ -21,3 +21,12 @@ export const defaulterTracingDashboardMeta = {
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
 };
+
+export const htsDashboardMeta = {
+  slot: 'patient-chart-hts-dashboard-slot',
+  columns: 1,
+  title: 'HTS Dashboard',
+  path: 'hts-dashboard',
+  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
+  config: {},
+};
