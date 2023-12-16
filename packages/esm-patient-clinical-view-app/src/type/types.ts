@@ -53,3 +53,8 @@ export interface Observation {
   value: any;
   obsDatetime?: string;
 }
+
+export interface ConceptToFormLabelMap {
+  display: string;
+  answers: null | Array<string>;
+}

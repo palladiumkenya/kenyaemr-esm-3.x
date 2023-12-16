@@ -4,29 +4,16 @@ import { SkeletonText } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { Observation } from '../../src/type/types';
 import styles from './encounter-observation-table.scss';
+import { mapConceptToFormLabel } from '../encounter-list/encounter-list-utils';
 
 interface EncounterObservationsProps {
   observations: Array<Observation>;
+  formConceptMap: Array<any>;
 }
 
-const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations }) => {
+const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations, formConceptMap }) => {
   const { t } = useTranslation();
   const { obsConceptUuidsToHide = [] } = useConfig();
-  const conceptMap = new Map([
-    ['1658AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Adherence rating'],
-    ['164848AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Patient received viral load result'],
-    [
-      '163310AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      'Was the Viral load result suppressed (less than 1000) or unsuppressed (greater than 1000) ',
-    ],
-    ['160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Way forward'],
-    ['160110AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Have any dosses been missed?'],
-    ['1898AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', "Patient's condition improved since last visit"],
-    ['95f73a05-7c52-4a8d-b3b1-f632a41d065d', 'Will the patient benefit from a home visit?'],
-    ['164891AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Date of first session'],
-    ['162846AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Pill count adherence % (from pill count)'],
-    ['1272AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'Has the patient been referred to other services?'],
-  ]);
 
   function getAnswerFromDisplay(display: string): string {
     if (display == undefined) {
@@ -38,11 +25,6 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     } else {
       return display.substring(colonIndex + 1).trim();
     }
-  }
-
-  function matchFormDisplay(conceptUuid: string): string {
-    let theDisplay = conceptMap.get(conceptUuid) ? conceptMap.get(conceptUuid) : '';
-    return theDisplay;
   }
 
   if (!observations) {
@@ -74,9 +56,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
           } else {
             return (
               <React.Fragment key={index}>
-                <span>
-                  {matchFormDisplay(obs.concept.uuid) ? matchFormDisplay(obs.concept.uuid) : obs.concept.display}
-                </span>
+                <span>{mapConceptToFormLabel(obs.concept.uuid, new Map(formConceptMap)) ?? obs.concept.display}</span>
                 <span>{getAnswerFromDisplay(obs.display)}</span>
               </React.Fragment>
             );

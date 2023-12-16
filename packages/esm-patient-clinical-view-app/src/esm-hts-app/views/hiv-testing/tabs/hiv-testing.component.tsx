@@ -112,6 +112,7 @@ const HivTestingEncounters: React.FC<HivTestingEncountersListProps> = ({ patient
       filter={(encounter) => {
         return encounter.form.uuid == htsInitialEncounterFormUUID || encounter.form.uuid == htsRetest;
       }}
+      formConceptMap={[]}
     />
   );
 };

@@ -63,6 +63,7 @@ export interface EncounterListProps {
     workspaceWindowSize?: 'minimized' | 'maximized';
   };
   filter?: (encounter: any) => boolean;
+  formConceptMap: Array<any>;
 }
 
 export const EncounterList: React.FC<EncounterListProps> = ({
@@ -74,6 +75,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   formList,
   filter,
   launchOptions,
+  formConceptMap,
 }) => {
   const { t } = useTranslation();
   const [paginatedRows, setPaginatedRows] = useState([]);
@@ -205,7 +207,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
             <div className={styles.widgetHeaderContainer}>
               {!hideFormLauncher && <div className={styles.toggleButtons}>{}</div>}
             </div>
-            <OTable tableHeaders={headers} tableRows={paginatedRows} />
+            <OTable tableHeaders={headers} tableRows={paginatedRows} formConceptMap={formConceptMap} />
             <Pagination
               page={currentPage}
               pageSize={pageSize}

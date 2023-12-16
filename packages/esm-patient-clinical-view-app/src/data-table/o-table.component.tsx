@@ -18,9 +18,10 @@ import EncounterObservations from '../encounter-observation/encounter-observatio
 interface TableProps {
   tableHeaders: any;
   tableRows: any;
+  formConceptMap: Array<any>;
 }
 
-export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows }) => {
+export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows, formConceptMap }) => {
   return (
     <TableContainer>
       <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
@@ -51,7 +52,10 @@ export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows }) => {
                       ))}
                     </TableExpandRow>
                     <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2}>
-                      <EncounterObservations observations={tableRows?.[index]?.obs ?? []} />
+                      <EncounterObservations
+                        observations={tableRows?.[index]?.obs ?? []}
+                        formConceptMap={formConceptMap}
+                      />
                     </TableExpandedRow>
                   </React.Fragment>
                 );

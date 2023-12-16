@@ -99,6 +99,7 @@ const LabourDeliveryList: React.FC<LabourDeliveryListProps> = ({ patientUuid }) 
       filter={(encounter) => {
         return encounter.form.uuid == LNDEncounterFormUUID;
       }}
+      formConceptMap={[]}
     />
   );
 };

@@ -12,6 +12,7 @@ import {
   eligibilityConcept,
   mlPrediction,
   testingRecommended,
+  conceptMap,
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../../../config-schema';
@@ -127,6 +128,8 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
     [t],
   );
 
+ 
+
   return (
     <EncounterList
       patientUuid={patientUuid}
@@ -142,6 +145,7 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
       filter={(encounter) => {
         return encounter.form.uuid == htsScreeningFormUUID;
       }}
+      formConceptMap={conceptMap}
     />
   );
 };
