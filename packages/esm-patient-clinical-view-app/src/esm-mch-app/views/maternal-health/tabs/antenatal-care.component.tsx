@@ -106,6 +106,7 @@ const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) =>
       filter={(encounter) => {
         return encounter.form.uuid == ANCEncounterFormUUID;
       }}
+      formConceptMap={[]}
     />
   );
 };

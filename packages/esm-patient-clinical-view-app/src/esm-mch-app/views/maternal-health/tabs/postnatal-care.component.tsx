@@ -112,6 +112,7 @@ const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) =>
       filter={(encounter) => {
         return encounter.form.uuid == MotherPNCEncounterFormUUID;
       }}
+      formConceptMap={[]}
     />
   );
 };
