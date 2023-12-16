@@ -65,7 +65,7 @@
   width: 30%;
   margin: spacing.$spacing-01 0;
 
-  &>p:first-child {
+  & > p:first-child {
     @include type.type-style('label-01');
     color: colors.$gray-70;
     margin-bottom: spacing.$spacing-02;
@@ -82,7 +82,7 @@
   align-items: center;
   justify-content: space-between;
 
-  &>h4 {
+  & > h4 {
     @include type.type-style('productive-heading-02');
     color: colors.$gray-80;
   }

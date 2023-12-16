@@ -1,7 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import "../../src/root.scss";
-
+@import '../../src/root.scss';
 
 .widgetContainer {
   background-color: $ui-background;
@@ -17,7 +16,7 @@
 }
 
 .widgetHeaderContainer > h4:after {
-  content: "";
+  content: '';
   display: block;
   width: 2rem;
   padding-top: 0.188rem;

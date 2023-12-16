@@ -2480,7 +2480,7 @@ __metadata:
     eslint-config-ts-react-important-stuff: "npm:^3.0.0"
     eslint-plugin-prettier: "npm:^3.3.1"
     fuzzy: "npm:^0.1.3"
-    husky: "npm:^8.0.1"
+    husky: "npm:^8.0.3"
     i18next: "npm:^19.7.0"
     i18next-parser: "npm:^5.4.0"
     identity-obj-proxy: "npm:^3.0.0"
@@ -2490,6 +2490,7 @@ __metadata:
     lerna: "npm:^4.0.0"
     lodash: "npm:^4.17.21"
     openmrs: "npm:next"
+    pinst: "npm:^3.0.0"
     prettier: "npm:^2.2.1"
     pretty-quick: "npm:^2.0.2"
     react: "npm:^18.2.0"
@@ -11371,12 +11372,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:^8.0.1":
-  version: 8.0.2
-  resolution: "husky@npm:8.0.2"
+"husky@npm:^8.0.3":
+  version: 8.0.3
+  resolution: "husky@npm:8.0.3"
   bin:
     husky: lib/bin.js
-  checksum: a988f05c804d8b3d26ad5db343d422f0344ccdadfd9347b03a53100f7e46f2375096cf222176ddd482072a1a8de688cb4f8f825c729a98f4003f7cd5a56759d9
+  checksum: b754cf70fdc97c3b60fec5b80056b9c11436464953b1691bf2b5dcf0081fb6685d2c5f47abb8b2b1c49f504aabea5321fdd6496f8b755d9f6e7525a493406abb
   languageName: node
   linkType: hard
 
@@ -15175,6 +15176,15 @@ __metadata:
   version: 2.0.4
   resolution: "pinkie@npm:2.0.4"
   checksum: 11d207257a044d1047c3755374d36d84dda883a44d030fe98216bf0ea97da05a5c9d64e82495387edeb9ee4f52c455bca97cdb97629932be65e6f54b29f5aec8
+  languageName: node
+  linkType: hard
+
+"pinst@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "pinst@npm:3.0.0"
+  bin:
+    pinst: bin.js
+  checksum: a75e4f7b5eeb9c76e7fd1b2d9854fcd38c304a3b1f9b563946a0f4357772c742222094e851f4c23d0bbdc4151af2d7875bb919c9ef8a9c4af77a02a73e8f72f0
   languageName: node
   linkType: hard
 

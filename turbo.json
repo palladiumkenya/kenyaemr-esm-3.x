@@ -22,6 +22,10 @@
     },
     "dev": {
       "cache": false
+    },
+    "coverage": {
+      "dependsOn": ["^coverage"],
+      "outputs": []
     }
   }
 }

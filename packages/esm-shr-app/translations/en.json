@@ -1,1 +1,20 @@
-{}
+{
+  "allergen": "Allergen",
+  "allergies": "Allergies",
+  "complaints": "Complaints",
+  "conditions": "Conditions",
+  "dateRecorded": "Date Recorded",
+  "diagnosis": "Diagnosis",
+  "errorSHRSummary": "Error loading SHR summary",
+  "labresults": "labResults",
+  "name": "Name",
+  "noSharedHealthRecordsFound": "No Shared Health Records Found",
+  "onsetDate": "Onset Date",
+  "reaction": "Reaction",
+  "severity": "Severity",
+  "sharedhealthrecords": "Shared Health Records",
+  "shrPatientSHRSummary": "Patient SHR Summary",
+  "status": "Status",
+  "value": "Value",
+  "vitals": "Vitals"
+}

@@ -1,5 +1,5 @@
 @use '@carbon/styles/scss/spacing';
-@import "~@openmrs/esm-styleguide/src/vars";
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .widgetContainer {
   background-color: $ui-background;
@@ -31,9 +31,8 @@
 
 .tabContainer li button {
   width: 100% !important;
-  }
+}
 
-
-  .hivStatusTag {
+.hivStatusTag {
   min-width: 80px;
-  }
+}
