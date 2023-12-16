@@ -13,9 +13,7 @@
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
     "release": "lerna version --no-git-tag-version",
     "start": "openmrs develop",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
-    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
-    "verify": "turbo run lint && turbo run typescript && yarn run test"
+    "verify": "turbo run lint && turbo run typescript && turbo run test"
   },
   "resolutions": {
     "sass": "^1.54.3"

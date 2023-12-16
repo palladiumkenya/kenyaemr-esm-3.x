@@ -1,1 +1,26 @@
-{}
+{
+  "actions": "Actions",
+  "add": "Add",
+  "ancVisitNumber": "ANC Visit Number",
+  "antenatalCare": "Antenatal Care",
+  "carePanel": "MCH Clinical View",
+  "deliveryDate": "Delivery Date",
+  "deliveryOutcome": "Delivery Outcome",
+  "editEncounter": "Edit",
+  "editForm": "Edit Form",
+  "facility": "Facility",
+  "followUpDate": "Next follow-up date",
+  "hivTestResults": "HIV Status",
+  "labourAndDelivery": "Labour and Delivery",
+  "motherGeneralCondition": "General condition",
+  "nextVisitDate": "Next visit date",
+  "noObservationsFound": "No observations found",
+  "partnerStatus": "HIV status of partner)",
+  "placeOfDelivery": "Place of Delivery",
+  "postnatalCare": "Postnatal Care",
+  "pphCondition": "PPH present",
+  "testingAtMaternity": "HIV test at maternity",
+  "uterusCondition": "PPH Condition of uterus",
+  "viewEncounter": "View",
+  "visitDate": "Visit Date"
+}
