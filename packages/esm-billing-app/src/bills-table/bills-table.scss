@@ -24,6 +24,26 @@
   }
 }
 
+.filterContainer {
+  flex: 1;
+
+  :global(.cds--dropdown__wrapper--inline) {
+    gap: 0;
+  }
+
+  :global(.cds--list-box__menu-icon) {
+    height: 1rem;
+  }
+
+  :global(.cds--list-box__menu) {
+    min-width: max-content;
+  }
+
+  :global(.cds--list-box) {
+    margin-left: layout.$spacing-03;
+  }
+}
+
 .menu {
   margin-left: layout.$spacing-03;
 }
@@ -39,7 +59,12 @@
 .backgroundDataFetchingIndicator {
   align-items: center;
   display: flex;
+  flex: 1;
   justify-content: space-between;
+
+  &:global(.cds--inline-loading) {
+    max-height: 1rem;
+  }
 }
 
 .tableContainer section {
@@ -105,6 +130,7 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
+  flex: 1;
 
   h4 {
     @include type.type-style('heading-compact-02');
