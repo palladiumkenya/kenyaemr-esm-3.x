@@ -1,4 +1,4 @@
-:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher: 
+:wave: *New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://o3-docs.openmrs.org). You may find the [Map of the Project](https://o3-docs.openmrs.org/docs/core-concepts) especially helpful.* :teacher: 
 
 ![Node.js CI](https://github.com/palladiumkenya/kenyaemr-esm-3.x/actions/workflows/ci.yml/badge.svg)
 
