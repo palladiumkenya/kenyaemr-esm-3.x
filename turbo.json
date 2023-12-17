@@ -2,19 +2,27 @@
   "$schema": "https://turborepo.org/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["^build"],
-      "outputs": ["dist/**"]  
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
     },
     "test": {
       "dependsOn": [],
       "outputs": []
     },
     "lint": {
-      "dependsOn": ["^lint"],
+      "dependsOn": [
+        "^lint"
+      ],
       "outputs": []
     },
     "typescript": {
-      "dependsOn": ["^typescript"],
+      "dependsOn": [
+        "^typescript"
+      ],
       "outputs": []
     },
     "extract-translations": {
@@ -24,7 +32,15 @@
       "cache": false
     },
     "coverage": {
-      "dependsOn": ["^coverage"],
+      "dependsOn": [
+        "^coverage"
+      ],
+      "outputs": []
+    },
+    "test:watch": {
+      "dependsOn": [
+        "^test:watch"
+      ],
       "outputs": []
     }
   }

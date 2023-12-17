@@ -6,7 +6,7 @@ const PrintableFooter = () => {
   const { data, isLoading } = useDefaultFacility();
 
   if (isLoading) {
-    return <div>'--'</div>;
+    return <div>--</div>;
   }
   return (
     <div className={styles.container}>

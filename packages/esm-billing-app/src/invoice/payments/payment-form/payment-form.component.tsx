@@ -43,7 +43,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
             name={`payment.${index}.method`}
             render={({ field }) => (
               <Dropdown
-                light
                 onChange={({ selectedItem }) => field.onChange(selectedItem.uuid)}
                 titleText={t('paymentMethod', 'Payment method')}
                 label={t('selectPaymentMethod', 'Select payment method')}
@@ -63,8 +62,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
                 invalid={!!errors?.payment?.[index]?.amount}
                 invalidText={errors?.payment?.[index]?.amount?.message}
                 labelText={t('amount', 'Amount')}
-                light
-                type="number"
+                placeholder={t('enterAmount', 'Enter amount')}
               />
             )}
           />
@@ -75,7 +73,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
               <TextInput
                 {...field}
                 labelText={t('referenceNumber', 'Ref number')}
-                light
                 placeholder={t('enterReferenceNumber', 'Enter ref. number')}
                 type="text"
               />

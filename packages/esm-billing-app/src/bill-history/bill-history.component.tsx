@@ -17,8 +17,8 @@ import {
   TableExpandRow,
   TableExpandedRow,
 } from '@carbon/react';
-import { ErrorState, isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, ErrorState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
 import styles from './bill-history.scss';
@@ -26,16 +26,14 @@ import styles from './bill-history.scss';
 interface BillHistoryProps {
   patientUuid: string;
 }
-
+const PAGE_SIZE = 10;
 const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
   const { bills, isLoading, isValidating, error } = useBills(patientUuid);
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
-  const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
-  const { paginated, goTo, results, currentPage } = usePagination(bills, pageSize);
+  const { paginated, goTo, results, currentPage } = usePagination(bills, PAGE_SIZE);
+  const { pageSizes } = usePaginationInfo(PAGE_SIZE, bills?.length, currentPage, results?.length);
 
   const headerData = [
     {
@@ -68,13 +66,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   if (isLoading) {
     return (
       <div className={styles.loaderContainer}>
-        <DataTableSkeleton
-          showHeader={false}
-          showToolbar={false}
-          zebra
-          columnCount={headerData?.length}
-          size={responsiveSize}
-        />
+        <DataTableSkeleton showHeader={false} showToolbar={false} zebra size={responsiveSize} />
       </div>
     );
   }
@@ -89,92 +81,89 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
     );
   }
 
-  if (bills?.length > 0) {
+  if (bills.length === 0) {
     return (
-      <div className={styles.billHistoryContainer}>
-        <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
-          {({
-            rows,
-            headers,
-            getExpandHeaderProps,
-            getTableProps,
-            getTableContainerProps,
-            getHeaderProps,
-            getRowProps,
-          }) => (
-            <TableContainer {...getTableContainerProps}>
-              <Table {...getTableProps()} aria-label="bill list">
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                    {headers.map((header, i) => (
-                      <TableHeader
-                        key={i}
-                        {...getHeaderProps({
-                          header,
-                        })}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, i) => (
-                    <React.Fragment key={row.id}>
-                      <TableExpandRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
-                        ))}
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
-                          <div className={styles.container} key={i}>
-                            <InvoiceTable billUuid={rowData?.[i].uuid} />
-                          </div>
-                        </TableExpandedRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                      )}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
-        {paginated && (
-          <Pagination
-            forwardText="Next page"
-            backwardText="Previous page"
-            page={currentPage}
-            pageSize={pageSize}
-            pageSizes={pageSizes}
-            totalItems={bills?.length}
-            className={styles.pagination}
-            size={responsiveSize}
-            onChange={({ pageSize: newPageSize, page: newPage }) => {
-              if (newPageSize !== pageSize) {
-                setPageSize(newPageSize);
-              }
-              if (newPage !== currentPage) {
-                goTo(newPage);
-              }
-            }}
-          />
-        )}
-      </div>
+      <Layer className={styles.emptyStateContainer}>
+        <Tile className={styles.tile}>
+          <div className={styles.illo}>
+            <EmptyDataIllustration />
+          </div>
+          <p className={styles.content}>There are no bills to display.</p>
+        </Tile>
+      </Layer>
     );
   }
 
   return (
-    <Layer className={styles.emptyStateContainer}>
-      <Tile className={styles.tile}>
-        <div className={styles.illo}>
-          <EmptyDataIllustration />
-        </div>
-        <p className={styles.content}>There are no bills to display.</p>
-      </Tile>
-    </Layer>
+    <div className={styles.billHistoryContainer}>
+      <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
+        {({
+          rows,
+          headers,
+          getExpandHeaderProps,
+          getTableProps,
+          getTableContainerProps,
+          getHeaderProps,
+          getRowProps,
+        }) => (
+          <TableContainer {...getTableContainerProps}>
+            <Table {...getTableProps()} aria-label="bill list">
+              <TableHead>
+                <TableRow>
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                  {headers.map((header, i) => (
+                    <TableHeader
+                      key={i}
+                      {...getHeaderProps({
+                        header,
+                      })}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row, i) => (
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableExpandRow>
+                    {row.isExpanded ? (
+                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
+                        <div className={styles.container} key={i}>
+                          <InvoiceTable billUuid={rowData?.[i].uuid} />
+                        </div>
+                      </TableExpandedRow>
+                    ) : (
+                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </DataTable>
+      {paginated && (
+        <Pagination
+          forwardText={t('nextPage', 'Next page')}
+          backwardText={t('previousPage', 'Previous page')}
+          page={currentPage}
+          pageSize={PAGE_SIZE}
+          pageSizes={pageSizes}
+          totalItems={bills.length}
+          className={styles.pagination}
+          size={responsiveSize}
+          onChange={({ page: newPage }) => {
+            if (newPage !== currentPage) {
+              goTo(newPage);
+            }
+          }}
+        />
+      )}
+    </div>
   );
 };
 

@@ -8,7 +8,7 @@ export interface LinkConfig {
   title: string;
 }
 
-function LinkExtension({ config }: { config: LinkConfig }) {
+export function LinkExtension({ config }: { config: LinkConfig }) {
   const { name, title } = config;
   const location = useLocation();
   const spaBasePath = window.getOpenmrsSpaBase() + 'home';
