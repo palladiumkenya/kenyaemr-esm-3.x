@@ -4,7 +4,7 @@ import styles from './metrics-cards.scss';
 import { useBills } from '../billing.resource';
 import { useBillMetrics } from './metrics.resource';
 import { useTranslation } from 'react-i18next';
-import { ErrorState } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { InlineLoading } from '@carbon/react';
 
 export default function MetricsCards() {

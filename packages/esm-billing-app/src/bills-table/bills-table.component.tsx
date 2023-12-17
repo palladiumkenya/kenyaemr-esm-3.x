@@ -145,7 +145,7 @@ const BillsTable = () => {
       <div className={styles.filterContainer}>
         <Dropdown
           className={styles.filterDropdown}
-          direction="left"
+          direction="bottom"
           id={`filter-${id}`}
           initialSelectedItem={filterItems[0]}
           items={filterItems}

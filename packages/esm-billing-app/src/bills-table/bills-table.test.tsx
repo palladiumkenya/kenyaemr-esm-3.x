@@ -1,12 +1,14 @@
 import React from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { useBills } from '../billing.resource';
 import BillsTable from './bills-table.component';
+import userEvent from '@testing-library/user-event';
 
 const mockbills = useBills as jest.Mock;
 
 const mockBillsData = [
-  { id: '1', patientName: 'John Doe', identifier: '12345678', visitType: 'Checkup', patientUuid: 'uuid1' },
+  { uuid: '1', patientName: 'John Doe', identifier: '12345678', visitType: 'Checkup', patientUuid: 'uuid1' },
+  { uuid: '2', patientName: 'Mary Smith', identifier: '98765432', visitType: 'Wake up', patientUuid: 'uuid2' },
 ];
 
 jest.mock('../billing.resource', () => ({
@@ -37,6 +39,12 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('BillsTable', () => {
+  let user;
+
+  beforeEach(() => {
+    user = userEvent.setup();
+  });
+
   it('renders data table with pending bills', () => {
     render(<BillsTable />);
 
@@ -50,37 +58,6 @@ describe('BillsTable', () => {
     const patientNameLink = screen.getByText('John Doe');
     expect(patientNameLink).toBeInTheDocument();
     expect(patientNameLink.tagName).toBe('A');
-  });
-
-  it.skip('filters active visits based on search input', () => {
-    mockbills.mockImplementationOnce(() => ({
-      activeVisits: [
-        {
-          id: '1',
-          patientName: 'John Doe',
-          visitTime: '12:59',
-          billingService: '',
-          department: 'uuid1',
-        },
-        {
-          id: '2',
-          patientName: 'Some One',
-          visitTime: '12:12',
-          billingService: '',
-          department: 'uuid2',
-        },
-      ],
-      isLoading: false,
-      isValidating: false,
-      error: null,
-    }));
-    render(<BillsTable />);
-
-    const searchInput = screen.getByPlaceholderText('Filter table');
-    fireEvent.change(searchInput, { target: { value: 'John' } });
-
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.queryByText('Some One')).toBeNull();
   });
 
   it('displays empty state when there are no bills', () => {
@@ -124,5 +101,54 @@ describe('BillsTable', () => {
 
     expect(screen.getByText(/sorry, there was a problem displaying this information/i)).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
+  });
+
+  test('should filter bills by search term and bill payment status', async () => {
+    render(<BillsTable />);
+
+    const searchInput = screen.getByRole('searchbox');
+    await user.type(searchInput, 'John Doe');
+
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.queryByText('Mary Smith')).not.toBeInTheDocument();
+
+    await user.clear(searchInput);
+    await user.type(searchInput, 'Mary Smith');
+
+    expect(screen.getByText('Mary Smith')).toBeInTheDocument();
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
+
+    // Should filter the table when bill payment status combobox is changed
+    const billCategorySelect = screen.getByRole('combobox');
+    expect(billCategorySelect).toBeInTheDocument();
+    await user.click(billCategorySelect, { name: 'All bills' });
+    expect(mockbills).toHaveBeenCalledWith('', '');
+
+    await user.click(screen.getByText('Pending bills'));
+    expect(screen.getByText('Pending bills')).toBeInTheDocument();
+    expect(mockbills).toHaveBeenCalledWith('', 'PENDING');
+  });
+
+  test('should show the loading spinner while retrieving data', () => {
+    mockbills.mockImplementationOnce(() => ({
+      bills: undefined,
+      isLoading: true,
+      isValidating: false,
+      error: null,
+    }));
+
+    render(<BillsTable />);
+
+    const dataTableSkeleton = screen.getByRole('table');
+    expect(dataTableSkeleton).toBeInTheDocument();
+    expect(dataTableSkeleton).toHaveClass('cds--skeleton cds--data-table cds--data-table--zebra');
+  });
+
+  test('should render patient name as a link', async () => {
+    render(<BillsTable />);
+
+    const patientNameLink = screen.getByRole('link', { name: 'John Doe' });
+    expect(patientNameLink).toBeInTheDocument();
+    expect(patientNameLink).toHaveAttribute('href', '/openmrs/spa/home/billing/patient/uuid1/1');
   });
 });

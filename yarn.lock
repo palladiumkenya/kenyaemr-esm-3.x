@@ -2538,7 +2538,7 @@ __metadata:
   resolution: "@kenyaemr/esm-3.x-apps@workspace:."
   dependencies:
     "@hookform/resolvers": "npm:^3.1.1"
-    "@openmrs/esm-framework": "npm:5.3.3-pre.1283"
+    "@openmrs/esm-framework": "npm:next"
     "@playwright/test": "npm:^1.30.0"
     "@swc/cli": "npm:^0.1.57"
     "@swc/core": "npm:^1.2.165"
@@ -2546,7 +2546,7 @@ __metadata:
     "@testing-library/dom": "npm:^8.16.0"
     "@testing-library/jest-dom": "npm:^5.16.4"
     "@testing-library/react": "npm:^13.3.0"
-    "@testing-library/user-event": "npm:^14.2.1"
+    "@testing-library/user-event": "npm:^14.5.1"
     "@types/jest": "npm:^28.1.4"
     "@types/lodash-es": "npm:^4.17.3"
     "@types/react": "npm:^18.2.39"
@@ -4064,7 +4064,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-framework@npm:5.3.3-pre.1283":
+"@openmrs/esm-framework@npm:next":
   version: 5.3.3-pre.1283
   resolution: "@openmrs/esm-framework@npm:5.3.3-pre.1283"
   dependencies:
@@ -5593,12 +5593,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/user-event@npm:^14.2.1":
-  version: 14.4.3
-  resolution: "@testing-library/user-event@npm:14.4.3"
+"@testing-library/user-event@npm:^14.5.1":
+  version: 14.5.1
+  resolution: "@testing-library/user-event@npm:14.5.1"
   peerDependencies:
     "@testing-library/dom": ">=7.21.4"
-  checksum: 0c7c1ee6bacd8faf15e00624ff6815f0cdf2529493c3a0d8ec6878bbedfc7bd4c7600b7a4b7a07302737e71400dc560ee17dc5706291505da09905c8ea3f3cd7
+  checksum: 696e1328c230b0a7063a41d82b5350c6be926696106809a4d79d446d190ff56bebb850fe564ff0952cb74ae81e59a6f10534a88ecbb3792083271a249e04e728
   languageName: node
   linkType: hard
 

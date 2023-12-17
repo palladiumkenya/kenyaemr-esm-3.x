@@ -17,8 +17,8 @@ import {
   TableExpandRow,
   TableExpandedRow,
 } from '@carbon/react';
-import { ErrorState, isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, ErrorState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
 import styles from './bill-history.scss';
@@ -26,16 +26,14 @@ import styles from './bill-history.scss';
 interface BillHistoryProps {
   patientUuid: string;
 }
-
+const PAGE_SIZE = 10;
 const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
   const { bills, isLoading, isValidating, error } = useBills(patientUuid);
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
-  const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
-  const { paginated, goTo, results, currentPage } = usePagination(bills, pageSize);
+  const { paginated, goTo, results, currentPage } = usePagination(bills, PAGE_SIZE);
+  const { pageSizes } = usePaginationInfo(PAGE_SIZE, bills?.length, currentPage, results?.length);
 
   const headerData = [
     {
@@ -144,18 +142,15 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
         </DataTable>
         {paginated && (
           <Pagination
-            forwardText="Next page"
-            backwardText="Previous page"
+            forwardText={t('nextPage', 'Next page')}
+            backwardText={t('previousPage', 'Previous page')}
             page={currentPage}
-            pageSize={pageSize}
+            pageSize={PAGE_SIZE}
             pageSizes={pageSizes}
             totalItems={bills?.length}
             className={styles.pagination}
             size={responsiveSize}
-            onChange={({ pageSize: newPageSize, page: newPage }) => {
-              if (newPageSize !== pageSize) {
-                setPageSize(newPageSize);
-              }
+            onChange={({ page: newPage }) => {
               if (newPage !== currentPage) {
                 goTo(newPage);
               }
