@@ -108,10 +108,10 @@ const Invoice: React.FC<InvoiceProps> = () => {
       </div>
 
       <InvoiceTable billUuid={bill?.uuid} />
-      {bill && <Payments bill={bill} />}
+      {<Payments bill={bill} />}
 
       <div className={styles.printContainer} ref={componentRef}>
-        <PrintableInvoice bill={bill} patient={patient} isLoading={isLoading} />
+        {isPrinting && <PrintableInvoice bill={bill} patient={patient} isLoading={isLoading} />}
       </div>
     </div>
   );

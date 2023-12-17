@@ -1,8 +1,9 @@
 import React from 'react';
-import { getByText, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import BillHistory from './bill-history.component';
 import { useBills } from '../billing.resource';
 import userEvent from '@testing-library/user-event';
+
 const testProps = {
   patientUuid: 'some-uuid',
 };
@@ -38,7 +39,7 @@ jest.mock('../billing.resource', () => ({
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: jest.fn(() => 'tablet'),
+  useLayoutType: jest.fn(() => 'small-desktop'),
   usePagination: jest.fn().mockImplementation((data) => ({
     currentPage: 1,
     goTo: () => {},
@@ -105,6 +106,11 @@ describe('BillHistory', () => {
     expect(screen.getByText(/11–12 of 12 items/)).toBeInTheDocument();
     await user.click(prevPageButton);
     expect(screen.getByText(/1–10 of 12 items/)).toBeInTheDocument();
+
+    // clicking the row should expand the row
+    const expandAllRowButton = screen.getByRole('button', { name: /Expand all rows/ });
+    expect(expandAllRowButton).toBeInTheDocument();
+    await user.click(expandAllRowButton);
   });
 
   test('should render empty state view when there are no bills', () => {

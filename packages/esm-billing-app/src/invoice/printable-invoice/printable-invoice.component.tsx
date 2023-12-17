@@ -90,7 +90,7 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
       <div className={styles.printableInvoiceContainer}>
         <div className={styles.detailsContainer}>
           {Object.entries(invoiceDetails).map(([key, val]) => (
-            <div className={styles.item}>
+            <div key={key} className={styles.item}>
               <p className={styles.itemHeading}>{key}</p>
               <span>{val}</span>
             </div>
@@ -131,7 +131,7 @@ const PrintableInvoice: React.FC<PrintableInvoiceProps> = ({ bill, patient, isLo
 
           <div className={styles.totalContainer}>
             {Object.entries(invoiceTotal).map(([key, val]) => (
-              <p className={styles.itemTotal}>
+              <p key={key} className={styles.itemTotal}>
                 <span className={styles.itemHeading}>{key}</span>: <span className={styles.itemLabel}>{val}</span>
               </p>
             ))}

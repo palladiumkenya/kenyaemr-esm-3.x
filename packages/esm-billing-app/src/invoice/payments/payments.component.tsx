@@ -32,7 +32,7 @@ export type PaymentFormValue = {
   payment: Array<Payment>;
 };
 
-const Payments: React.FC<PaymentProps> = ({ bill }) => {
+const Payments: React.FC<PaymentProps> = ({ bill = {} as MappedBill }) => {
   const { t } = useTranslation();
   const methods = useForm<PaymentFormValue>({
     mode: 'all',
@@ -57,7 +57,7 @@ const Payments: React.FC<PaymentProps> = ({ bill }) => {
     processBillPayment(paymentPayload, bill.uuid).then(
       (resp) => {
         showSnackbar({
-          title: t('Bill payment'),
+          title: t('billPayment', 'Bill payment'),
           subtitle: 'Bill payment processing has been successful',
           kind: 'success',
           timeoutInMs: 3000,

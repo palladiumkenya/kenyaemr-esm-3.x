@@ -81,7 +81,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
     return (
       <div className={styles.loaderContainer}>
         <DataTableSkeleton
-          columnCount={tableHeaders?.length}
+          columnCount={tableHeaders.length}
           showHeader={false}
           showToolbar={false}
           size={responsiveSize}
