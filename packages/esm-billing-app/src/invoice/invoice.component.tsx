@@ -12,6 +12,7 @@ import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import styles from './invoice.scss';
+import PrintReceipt from './printable-invoice/print-receipt.component';
 
 type InvoiceProps = {};
 
@@ -95,7 +96,7 @@ const Invoice: React.FC<InvoiceProps> = () => {
             <InvoiceDetails key={key} label={key} value={val} />
           ))}
         </section>
-        <div className={styles.buttonContainer}>
+        <div>
           <Button
             disabled={isPrinting}
             onClick={handlePrint}
@@ -104,6 +105,7 @@ const Invoice: React.FC<InvoiceProps> = () => {
             size="md">
             {t('printBill', 'Print bill')}
           </Button>
+          {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null}
         </div>
       </div>
 

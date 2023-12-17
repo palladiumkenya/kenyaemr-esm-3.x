@@ -31,10 +31,6 @@
   row-gap: 1.5rem;
 }
 
-.buttonContainer {
-  margin-left: 1rem;
-}
-
 .label {
   @include type.type-style('body-compact-02');
   color: colors.$gray-70;
