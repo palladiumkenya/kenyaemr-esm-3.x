@@ -1,25 +1,22 @@
-import React, { useMemo, useState, useCallback } from 'react';
+import React, { useCallback, useId, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   DataTable,
   DataTableSkeleton,
+  Dropdown,
   InlineLoading,
   Layer,
   Pagination,
   Search,
   Table,
+  TableBody,
+  TableCell,
   TableContainer,
   TableHead,
-  TableRow,
-  TableBody,
   TableHeader,
-  TableCell,
+  TableRow,
   Tile,
-  OverflowMenu,
-  OverflowMenuItem,
-  Tag,
 } from '@carbon/react';
-import { Filter } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import {
   useLayoutType,
@@ -31,14 +28,15 @@ import {
 } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
-import styles from './bills-table.scss';
 import { PENDING } from '../constants';
+import styles from './bills-table.scss';
 
 const BillsTable = () => {
   const { t } = useTranslation();
+  const id = useId();
   const config = useConfig();
   const layout = useLayoutType();
-  const [billPaymentStatus, setBillPaymentStatus] = useState(PENDING);
+  const [billPaymentStatus, setBillPaymentStatus] = useState('');
   const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
   const { bills, isLoading, isValidating, error } = useBills('', billPaymentStatus);
@@ -109,18 +107,17 @@ const BillsTable = () => {
     [goTo, setSearchString],
   );
 
+  const filterItems = [
+    { id: '', text: 'All bills' },
+    { id: 'PENDING', text: 'Pending bills' },
+    { id: 'PAID', text: 'Paid bills' },
+  ];
+
+  const handleFilterChange = ({ selectedItem }) => setBillPaymentStatus(selectedItem.id);
+
   if (isLoading) {
     return (
       <div className={styles.loaderContainer}>
-        <FilterableTableHeader
-          handleSearch={handleSearch}
-          isValidating={isValidating}
-          layout={layout}
-          responsiveSize={responsiveSize}
-          t={t}
-          billPaymentStatus={billPaymentStatus}
-          setBillPaymentStatus={setBillPaymentStatus}
-        />
         <DataTableSkeleton
           rowCount={pageSize}
           showHeader={false}
@@ -143,111 +140,114 @@ const BillsTable = () => {
     );
   }
 
-  if (bills?.length > 0) {
-    return (
-      <div className={styles.billListContainer}>
-        <FilterableTableHeader
-          handleSearch={handleSearch}
-          isValidating={isValidating}
-          layout={layout}
-          responsiveSize={responsiveSize}
-          billPaymentStatus={billPaymentStatus}
-          setBillPaymentStatus={setBillPaymentStatus}
-          t={t}
-        />
-        <DataTable
-          isSortable
-          rows={rowData}
-          headers={headerData}
+  return (
+    <>
+      <div className={styles.filterContainer}>
+        <Dropdown
+          className={styles.filterDropdown}
+          direction="left"
+          id={`filter-${id}`}
+          initialSelectedItem={filterItems[0]}
+          items={filterItems}
+          itemToString={(item) => (item ? item.text : '')}
+          label=""
+          onChange={handleFilterChange}
           size={responsiveSize}
-          useZebraStyles={rowData?.length > 1 ? true : false}>
-          {({ rows, headers, getRowProps, getTableProps }) => (
-            <TableContainer>
-              <Table {...getTableProps()} aria-label="bill list">
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader key={header.key}>{header.header}</TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      {...getRowProps({
-                        row,
-                      })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+          titleText={t('filterBy', 'Filter by') + ':'}
+          type="inline"
+        />
+      </div>
+
+      {bills?.length > 0 ? (
+        <div className={styles.billListContainer}>
+          <FilterableTableHeader
+            handleSearch={handleSearch}
+            isValidating={isValidating}
+            layout={layout}
+            responsiveSize={responsiveSize}
+            t={t}
+          />
+          <DataTable
+            isSortable
+            rows={rowData}
+            headers={headerData}
+            size={responsiveSize}
+            useZebraStyles={rowData?.length > 1 ? true : false}>
+            {({ rows, headers, getRowProps, getTableProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()} aria-label="bill list">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader key={header.key}>{header.header}</TableHeader>
                       ))}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow
+                        key={row.id}
+                        {...getRowProps({
+                          row,
+                        })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+          {searchResults?.length === 0 && (
+            <div className={styles.filterEmptyState}>
+              <Layer level={0}>
+                <Tile className={styles.filterEmptyStateTile}>
+                  <p className={styles.filterEmptyStateContent}>
+                    {t('noMatchingBillsToDisplay', 'No matching bills to display')}
+                  </p>
+                  <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+                </Tile>
+              </Layer>
+            </div>
           )}
-        </DataTable>
-        {searchResults?.length === 0 && (
-          <div className={styles.filterEmptyState}>
-            <Layer level={0}>
-              <Tile className={styles.filterEmptyStateTile}>
-                <p className={styles.filterEmptyStateContent}>
-                  {t('noMatchingBillsToDisplay', 'No matching bills to display')}
-                </p>
-                <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
-              </Tile>
-            </Layer>
-          </div>
-        )}
-        {paginated && (
-          <Pagination
-            forwardText="Next page"
-            backwardText="Previous page"
-            page={currentPage}
-            pageSize={pageSize}
-            pageSizes={pageSizes}
-            totalItems={searchResults?.length}
-            className={styles.pagination}
-            size={responsiveSize}
-            onChange={({ pageSize: newPageSize, page: newPage }) => {
-              if (newPageSize !== pageSize) {
-                setPageSize(newPageSize);
-              }
-              if (newPage !== currentPage) {
-                goTo(newPage);
-              }
-            }}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <Layer className={styles.emptyStateContainer}>
-      <Tile className={styles.tile}>
-        <div className={styles.illo}>
-          <EmptyDataIllustration />
+          {paginated && (
+            <Pagination
+              forwardText="Next page"
+              backwardText="Previous page"
+              page={currentPage}
+              pageSize={pageSize}
+              pageSizes={pageSizes}
+              totalItems={searchResults?.length}
+              className={styles.pagination}
+              size={responsiveSize}
+              onChange={({ pageSize: newPageSize, page: newPage }) => {
+                if (newPageSize !== pageSize) {
+                  setPageSize(newPageSize);
+                }
+                if (newPage !== currentPage) {
+                  goTo(newPage);
+                }
+              }}
+            />
+          )}
         </div>
-        <p className={styles.content}>There are no bills to display.</p>
-      </Tile>
-    </Layer>
+      ) : (
+        <Layer className={styles.emptyStateContainer}>
+          <Tile className={styles.tile}>
+            <div className={styles.illo}>
+              <EmptyDataIllustration />
+            </div>
+            <p className={styles.content}>There are no bills to display.</p>
+          </Tile>
+        </Layer>
+      )}
+    </>
   );
 };
 
-function FilterableTableHeader({
-  layout,
-  handleSearch,
-  isValidating,
-  responsiveSize,
-  t,
-  billPaymentStatus,
-  setBillPaymentStatus,
-}) {
-  const handleSetBillPaymentStatus = (status) => {
-    setBillPaymentStatus(status);
-  };
+function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveSize, t }) {
   return (
     <>
       <div className={styles.headerContainer}>
@@ -260,28 +260,6 @@ function FilterableTableHeader({
         </div>
         <div className={styles.backgroundDataFetchingIndicator}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-        </div>
-        <div>
-          <Tag type="red" title={billPaymentStatus}>
-            {billPaymentStatus === '' ? 'ALL' : billPaymentStatus}
-          </Tag>
-          <OverflowMenu className={styles.menu} flipped renderIcon={Filter}>
-            <OverflowMenuItem
-              className={styles.menuitem}
-              onClick={() => handleSetBillPaymentStatus('')}
-              itemText={t('all', 'ALL')}
-            />
-            <OverflowMenuItem
-              className={styles.menuitem}
-              onClick={() => handleSetBillPaymentStatus('PAID')}
-              itemText={t('paid', 'PAID')}
-            />
-            <OverflowMenuItem
-              className={styles.menuitem}
-              onClick={() => handleSetBillPaymentStatus('PENDING')}
-              itemText={t('pending', 'PENDING')}
-            />
-          </OverflowMenu>
         </div>
       </div>
       <Search
