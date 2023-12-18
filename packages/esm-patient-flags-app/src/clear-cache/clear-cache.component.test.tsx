@@ -1,8 +1,7 @@
 import React from 'react';
-import { render, fireEvent, screen } from '@testing-library/react';
-import { useTranslation } from 'react-i18next';
+import { render, screen } from '@testing-library/react';
 import ClearCacheButton from './clear-cache.component';
-
+import userEvent from '@testing-library/user-event';
 // Mocking window.location.reload
 Object.defineProperty(window, 'location', {
   value: {
@@ -18,11 +17,11 @@ describe('ClearCacheButton', () => {
   });
 
   it('clears local and session storage and reloads the page when clicked', async () => {
-    const { container } = render(<ClearCacheButton />);
+    const user = userEvent.setup();
+    render(<ClearCacheButton />);
     const button = await screen.findByRole('button', { name: /Reload & Clear Cache/i });
     expect(button).toBeInTheDocument();
-    fireEvent.click(button);
-
+    await user.click(button);
     expect(localStorage.clear).toHaveBeenCalled();
     expect(sessionStorage.clear).toHaveBeenCalled();
     expect(window.location.reload).toHaveBeenCalled();

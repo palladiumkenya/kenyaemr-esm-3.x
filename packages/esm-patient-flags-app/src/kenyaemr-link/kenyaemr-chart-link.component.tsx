@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@carbon/react';
 import { Home } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import usePatientId from '../hooks/usePatientId';
+import { usePatientId } from '../hooks/usePatientId';
 import { navigate } from '@openmrs/esm-framework';
 
 const KenyaEMRChartLink = () => {

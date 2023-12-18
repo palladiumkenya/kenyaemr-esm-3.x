@@ -1,6 +1,13 @@
-@use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '@carbon/layout';
 
 .flagContainer {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
+}
+
+.tag {
+  background-color: #ffff00; // not present in carbon colors
+  color: colors.$black;
+  padding: layout.$spacing-03;
+  cursor: pointer;
 }

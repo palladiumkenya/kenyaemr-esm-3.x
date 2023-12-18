@@ -19,7 +19,7 @@ const PatientFlags: React.FC<PatientFlagsProps> = ({ patientUuid }) => {
   return (
     <div className={styles.flagContainer}>
       {patientFlags.map((patientFlag) => (
-        <Tag key={patientFlag} type="magenta">
+        <Tag className={styles.tag} key={patientFlag} type="magenta">
           {patientFlag}
         </Tag>
       ))}
