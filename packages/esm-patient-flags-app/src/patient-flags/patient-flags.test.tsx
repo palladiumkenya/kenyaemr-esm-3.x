@@ -21,4 +21,10 @@ describe('<PatientFlags/>', () => {
     expect(screen.getByText(/^hiv$/i)).toBeInTheDocument();
     expect(screen.getByText(/^cancer$/i)).toBeInTheDocument();
   });
+
+  test("should display error message when there's an error", () => {
+    mockUsePatientFlags.mockReturnValue({ isLoading: false, patientFlags: [], error: 'some-error' });
+    render(<PatientFlags patientUuid="some-patient-uuid" />);
+    expect(screen.getByText(/Error loading patient flags/i)).toBeInTheDocument();
+  });
 });
