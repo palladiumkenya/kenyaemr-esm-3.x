@@ -22,7 +22,7 @@ const MaternalHealthList: React.FC<OverviewListProps> = ({ patientUuid }) => {
 
   return (
     <div className={styles.widgetCard}>
-      <CardHeader title={t('carePanel', 'MCH Clinical View')}>
+      <CardHeader title={t('mchClinicalView', 'MCH Clinical View')}>
         <div className={styles.contextSwitcherContainer}>
           <ContentSwitcher selectedIndex={switchItem?.index} onChange={setSwitcherItem}>
             <Switch name={'antenatal'} text="Antenatal Care" />

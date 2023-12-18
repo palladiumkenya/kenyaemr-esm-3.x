@@ -1,14 +1,12 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   Contacted_UUID,
   MissedAppointmentDate_UUID,
-  PatientTracingEncounterType_UUID,
   TracingNumber_UUID,
   TracingOutcome_UUID,
   TracingType_UUID,
-  PatientTracingFormName,
 } from '../../../utils/constants';
 import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -98,7 +96,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
       id: `${encounter.uuid}`,
       missedAppointmentDate:
         getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == '--' ||
-        getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == null
+          getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == null
           ? formatDate(parseDate(encounter.encounterDatetime))
           : formatDate(parseDate(getObsFromEncounter(encounter, MissedAppointmentDate_UUID))),
       visitDate: formatDate(new Date(encounter.encounterDatetime)),

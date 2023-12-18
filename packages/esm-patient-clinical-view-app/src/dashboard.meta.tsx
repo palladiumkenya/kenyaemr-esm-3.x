@@ -7,7 +7,7 @@ export const ClinicalDashboardGroup = {
 export const mchDashboardMeta = {
   slot: 'patient-chart-mch-dashboard-slot',
   columns: 1,
-  title: 'MCH Dashboard',
+  title: 'MCH',
   path: 'mch-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
@@ -16,7 +16,7 @@ export const mchDashboardMeta = {
 export const defaulterTracingDashboardMeta = {
   slot: 'patient-chart-defaulter-tracing-dashboard-slot',
   columns: 1,
-  title: 'Defaulter Tracing Dashboard',
+  title: 'Defaulter Tracing',
   path: 'defaulter-tracing-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
@@ -25,7 +25,7 @@ export const defaulterTracingDashboardMeta = {
 export const htsDashboardMeta = {
   slot: 'patient-chart-hts-dashboard-slot',
   columns: 1,
-  title: 'HTS Dashboard',
+  title: 'HTS',
   path: 'hts-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
