@@ -32,7 +32,7 @@ export const hivScreeningConceptMap = {
     },
   },
   '162558AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
-    display: 'Please indicated the type of disability :',
+    display: 'Please indicate the type of disability :',
     answers: {
       '120291AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Hearing impairment',
       '147215AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Visual impairment',
