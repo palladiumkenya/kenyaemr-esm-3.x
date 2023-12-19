@@ -18,7 +18,7 @@ import EncounterObservations from '../encounter-observation/encounter-observatio
 interface TableProps {
   tableHeaders: any;
   tableRows: any;
-  formConceptMap: Array<any>;
+  formConceptMap: object;
 }
 
 export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows, formConceptMap }) => {

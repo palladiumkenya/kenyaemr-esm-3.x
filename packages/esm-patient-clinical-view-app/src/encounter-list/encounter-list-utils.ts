@@ -66,33 +66,61 @@ export function getObsFromEncounter(encounter, obsConcept, isDate?: Boolean, isT
   return obs.value;
 }
 
-export function mapConceptToFormLabel2(conceptUuid: string, formConceptMap: Array<any>): string {
-  //conceptUuid: string, formConceptMap: Array<Array<[string,{display: string, answers: [string]}]>>
-  if (formConceptMap.length < 1) {
-    return String('');
-  }
-  return '';
-
-  // const conceptMap = new Map(formConceptMap);
-  // let theDisplay = conceptMap.get(conceptUuid) ? conceptMap.get(conceptUuid).get('display') : '';
-  // return String(theDisplay);
-}
-
 export function mapConceptToFormLabel(
   conceptUuid: string,
   formConceptMap: Map<string, { display: string; answers: [] }>,
+  isConceptQuestion: boolean,
 ): string {
-  //conceptUuid: string, formConceptMap: Array<Array<[string,{display: string, answers: [string]}]>>
+  const ourMap = formConceptMap;
   if (formConceptMap.size < 1) {
     return String('');
   }
-
   let theDisplay = formConceptMap.get(conceptUuid) ? formConceptMap.get(conceptUuid).display : '';
-  let answers = formConceptMap.get(conceptUuid)
-    ? formConceptMap.get(conceptUuid).answers['1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA']
-    : '';
-  console.log('All answers: ', formConceptMap.get(conceptUuid)?.answers || []);
-  console.log('answer: ', answers);
 
   return theDisplay;
+}
+
+export function mapObsValueToFormLabel(conceptUuid: string, answerConceptUuid: string, formConceptMap: object): string {
+  if (formConceptMap === undefined) {
+    return String('');
+  }
+
+  let theDisplay = formConceptMap[conceptUuid] ? formConceptMap[conceptUuid]?.answers[answerConceptUuid] : '';
+
+  return String(theDisplay);
+}
+
+export function mapConceptToFormLabel3(
+  conceptUuid: string,
+  formConceptMap: object,
+  isConceptQuestion: boolean,
+): string {
+  if (formConceptMap === undefined) {
+    return String('');
+  }
+
+  let theDisplay = formConceptMap[conceptUuid] ? formConceptMap[conceptUuid].display : '';
+
+  return theDisplay;
+}
+
+export function generateFormLabelsFromJSON() {
+  // const htsScreeningJson = {};
+  // const result = {};
+  // htsScreeningJson.pages.forEach((page) => {
+  //   //console.log('page: ', page.sections);
+  //   page.sections.forEach((section) => {
+  //     section.questions.forEach((question) => {
+  //       let answersMap = {};
+  //       let questionObject = {};
+  //       question.questionOptions.answers?.forEach((ans) => {
+  //         answersMap[ans.concept] = ans.label;
+  //       });
+  //       questionObject['display'] = question.label;
+  //       questionObject['answers'] = answersMap;
+  //       result[question.questionOptions.concept] = questionObject;
+  //     });
+  //   });
+  // });
+  // console.log('schema: ', JSON.stringify(result));
 }

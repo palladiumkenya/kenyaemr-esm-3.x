@@ -4,16 +4,12 @@ import { EncounterList, EncounterListColumn } from '../../../../encounter-list/e
 import { getObsFromEncounter } from '../../../../encounter-list/encounter-list-utils';
 import {
   populationTypeConcept,
-  keyPopulationTypeConcept,
-  priorityPopulationConcept,
   disabilityListConcept,
   departmentConcept,
-  relationWithIndexClientConcept,
   eligibilityConcept,
-  mlPrediction,
   testingRecommended,
-  conceptMap,
 } from '../../../constants';
+import { hivScreeningConceptMap } from '../hiv-screening-constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../../../config-schema';
 
@@ -36,7 +32,7 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
     () => [
       {
         key: 'visitDate',
-        header: t('visitDate', 'Visit Date'),
+        header: t('visitDate', 'Screening Date'),
         getValue: (encounter) => {
           return formatDate(parseDate(encounter.encounterDatetime));
         },
@@ -48,20 +44,6 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
           return getObsFromEncounter(encounter, populationTypeConcept);
         },
       },
-      // {
-      //   key: 'kpType',
-      //   header: t('kpType', 'KP type'),
-      //   getValue: (encounter) => {
-      //     return getObsFromEncounter(encounter, keyPopulationTypeConcept);
-      //   },
-      // },
-      // {
-      //   key: 'priorityPopulation',
-      //   header: t('priorityPopulation', 'Priority population)'),
-      //   getValue: (encounter) => {
-      //     return getObsFromEncounter(encounter, priorityPopulationConcept);
-      //   },
-      // },
       {
         key: 'disabilities',
         header: t('disabilities', 'Disabilities'),
@@ -76,13 +58,6 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
           return getObsFromEncounter(encounter, departmentConcept);
         },
       },
-      // {
-      //   key: 'relationWithIndex',
-      //   header: t('relationWithIndex', 'Relationship to index'),
-      //   getValue: (encounter) => {
-      //     return getObsFromEncounter(encounter, relationWithIndexClientConcept);
-      //   },
-      // },
       {
         key: 'clientEligibility',
         header: t('clientEligibility', 'Eligible'),
@@ -90,13 +65,6 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
           return getObsFromEncounter(encounter, eligibilityConcept);
         },
       },
-      // {
-      //   key: 'mlPrediction',
-      //   header: t('mlPrediction', 'ML prediction'),
-      //   getValue: (encounter) => {
-      //     return getObsFromEncounter(encounter, mlPrediction);
-      //   },
-      // },
       {
         key: 'testingRecommended',
         header: t('testingRecommended', 'Testing recommended'),
@@ -104,13 +72,6 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
           return getObsFromEncounter(encounter, testingRecommended);
         },
       },
-      // {
-      //   key: 'facility',
-      //   header: t('facility', 'Facility'),
-      //   getValue: (encounter) => {
-      //     return encounter.location.name;
-      //   },
-      // },
       {
         key: 'actions',
         header: t('actions', 'Actions'),
@@ -128,8 +89,6 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
     [t],
   );
 
- 
-
   return (
     <EncounterList
       patientUuid={patientUuid}
@@ -145,7 +104,7 @@ const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientU
       filter={(encounter) => {
         return encounter.form.uuid == htsScreeningFormUUID;
       }}
-      formConceptMap={conceptMap}
+      formConceptMap={hivScreeningConceptMap}
     />
   );
 };

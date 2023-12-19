@@ -11,6 +11,7 @@ import {
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../../../config-schema';
+import { hivTestingConceptMap } from '../hiv-testing-constants';
 
 interface HivTestingEncountersListProps {
   patientUuid: string;
@@ -112,7 +113,7 @@ const HivTestingEncounters: React.FC<HivTestingEncountersListProps> = ({ patient
       filter={(encounter) => {
         return encounter.form.uuid == htsInitialEncounterFormUUID || encounter.form.uuid == htsRetest;
       }}
-      formConceptMap={[]}
+      formConceptMap={hivTestingConceptMap}
     />
   );
 };
