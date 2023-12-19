@@ -13,6 +13,14 @@
       "order": 1,
       "online": true,
       "offline": false
+    },
+    {
+      "name": "mch-clinical-view",
+      "slot": "top-of-all-patient-dashboards-slot", 
+      "component": "mchClinicalView",
+      "order": 1,
+      "online": true,
+      "offline": false
     }
   ]
 }

@@ -11,7 +11,7 @@ const options = {
 };
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-// export const mchClinicalView = getSyncLifecycle(MaternalHealthList, options);
+export const mchClinicalView = getSyncLifecycle(MaternalHealthList, options);
 export const htsClinicalView = getSyncLifecycle(HivTestingEncountersList, options);
 
 export function startupApp() {
