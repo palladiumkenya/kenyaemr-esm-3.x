@@ -4,11 +4,7 @@ import { SkeletonText } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { Observation } from '../../src/type/types';
 import styles from './encounter-observation-table.scss';
-import {
-  mapConceptToFormLabel,
-  mapObsValueToFormLabel,
-  generateFormLabelsFromJSON,
-} from '../encounter-list/encounter-list-utils';
+import { mapConceptToFormLabel, mapObsValueToFormLabel } from '../encounter-list/encounter-list-utils';
 
 interface EncounterObservationsProps {
   observations: Array<Observation>;
@@ -18,7 +14,6 @@ interface EncounterObservationsProps {
 const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations, formConceptMap }) => {
   const { t } = useTranslation();
   const { obsConceptUuidsToHide = [] } = useConfig();
-
   function getAnswerFromDisplay(display: string): string {
     if (display == undefined) {
       return '';
@@ -52,9 +47,11 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
                 {obs.groupMembers.map((member) => (
                   <React.Fragment key={index}>
                     <span className={styles.childConcept}>
-                      {mapConceptToFormLabel(member.concept.uuid, formConceptMap) ?? member.concept.display}
+                      {mapConceptToFormLabel(member.concept.uuid, formConceptMap, member.concept.display)}
                     </span>
-                    <span>{getAnswerFromDisplay(member.display)}</span>
+                    <span>
+                      {mapObsValueToFormLabel(member.concept.uuid, member.value.uuid, formConceptMap, member.display)}
+                    </span>
                   </React.Fragment>
                 ))}
               </React.Fragment>
@@ -63,9 +60,9 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
             return (
               <React.Fragment key={index}>
                 <span className={styles.questionText}>
-                  {mapConceptToFormLabel(obs.concept.uuid, formConceptMap) ?? obs.concept.display}
+                  {mapConceptToFormLabel(obs.concept.uuid, formConceptMap, obs.concept.display)}
                 </span>
-                <span>{mapObsValueToFormLabel(obs.concept.uuid, obs.value.uuid, formConceptMap) ?? obs.display}</span>
+                <span>{mapObsValueToFormLabel(obs.concept.uuid, obs.value.uuid, formConceptMap, obs.value)}</span>
               </React.Fragment>
             );
           }
