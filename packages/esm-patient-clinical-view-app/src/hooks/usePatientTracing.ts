@@ -24,9 +24,8 @@ export function usePatientTracing(patientUuid: string, encounterType: string) {
     const data = responseData.find((encounter) =>
       encounter.obs.find((ob) => ob.concept.uuid === MissedAppointmentDate_UUID),
     );
-    console.log(data)
-  });
 
+  });
 
   return {
     encounters: data?.data ? data?.data?.results : [],
