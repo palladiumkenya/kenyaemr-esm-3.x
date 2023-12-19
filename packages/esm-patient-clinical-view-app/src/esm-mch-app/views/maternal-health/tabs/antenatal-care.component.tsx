@@ -2,18 +2,10 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EncounterList, EncounterListColumn } from '../../../../encounter-list/encounter-list.component';
 import { getObsFromEncounter } from '../../../../encounter-list/encounter-list-utils';
-import {
-  artInitiationConcept,
-  eDDConcept,
-  followUpDateConcept,
-  hivTestResultConcept,
-  ancVisitNumberConcept,
-  visitDateConcept,
-  vLResultsConcept,
-  partnerHivStatus,
-} from '../../../constants';
+import { followUpDateConcept, hivTestResultConcept, ancVisitNumberConcept, partnerHivStatus } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../../../config-schema';
+import { ancConceptMap } from '../antenatal-care-constants';
 
 interface AntenatalCareListProps {
   patientUuid: string;
@@ -106,7 +98,7 @@ const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) =>
       filter={(encounter) => {
         return encounter.form.uuid == ANCEncounterFormUUID;
       }}
-      formConceptMap={[]}
+      formConceptMap={ancConceptMap}
     />
   );
 };
