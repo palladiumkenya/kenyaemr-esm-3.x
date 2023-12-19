@@ -36,3 +36,23 @@
 .hivStatusTag {
   min-width: 80px;
 }
+
+.contextSwitcherContainer {
+  width: 20rem;
+  min-width: 60%;
+  margin-right: 1rem;
+}
+
+.desktopContentSwitcher {
+  width: 100%;
+}
+
+.tabletContentSwitcher {
+  width: 100%;
+}
+
+.widgetCard {
+  background-color: $ui-background;
+  border: 1px solid $ui-03;
+  position: relative;
+}
