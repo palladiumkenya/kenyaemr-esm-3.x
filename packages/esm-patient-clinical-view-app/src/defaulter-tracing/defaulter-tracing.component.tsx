@@ -2,7 +2,11 @@ import React, { useMemo } from 'react';
 import { usePatientTracing } from '../hooks/usePatientTracing';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime, getObsFromEncounter } from '../../../encounter-list/encounter-list-utils';
-import { EncounterList, EncounterListColumn } from '../../../encounter-list/encounter-list.component';
+import {
+  EncounterList,
+  EncounterListColumn,
+  EncounterListProps,
+} from '../../../encounter-list/encounter-list.component';
 import {
   useConfig,
   formatDate,
@@ -19,12 +23,15 @@ import {
   TracingNumber_UUID,
   TracingOutcome_UUID,
   TracingType_UUID,
+  PatientTracingFormName,
 } from '../../../utils/constants';
 import { defaulterTracing } from '../index';
 
 interface PatientTracingProps {
   patientUuid: string;
   encounterTypeUuid: string;
+  formEntrySub: any;
+  launchPatientWorkspace: Function;
 }
 
 const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounterTypeUuid }) => {
@@ -42,9 +49,10 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
         key: 'missedAppointmentDate',
         header: t('missedAppointmentDate', 'Date Missed Appointment'),
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, MissedAppointmentDate_UUID)
-            ? getObsFromEncounter(encounter, MissedAppointmentDate_UUID)
-            : formatDate(parseDate(encounter.encounterDatetime));
+          return getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == '--' ||
+            getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == null
+            ? formatDate(parseDate(encounter.encounterDatetime))
+            : formatDate(parseDate(getObsFromEncounter(encounter, MissedAppointmentDate_UUID)));
         },
       },
       {
@@ -82,6 +90,22 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
           return getObsFromEncounter(encounter, TracingOutcome_UUID);
         },
       },
+      {
+        key: 'actions',
+        header: t('actions', 'Actions'),
+        getValue: (encounter) => {
+          const baseActions = [
+            {
+              form: { name: PatientTracingFormName, package: 'hiv' },
+              encounterUuid: encounter.uuid,
+              intent: '*',
+              label: 'Edit Form',
+              mode: 'edit',
+            },
+          ];
+          return baseActions;
+        },
+      },
     ],
     [],
   );
@@ -90,12 +114,13 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
     <EncounterList
       patientUuid={patientUuid}
       encounterType={PatientTracingEncounterType_UUID}
+      formList={[{ name: PatientTracingFormName }]}
       columns={columns}
       description={headerTitle}
       headerTitle={headerTitle}
       launchOptions={{
         displayText: t('add', 'Add'),
-        moduleName: 'Patient Tracing',
+        moduleName: '/kenyaemr-esm-3.x-care-panel-app',
       }}
     />
   );

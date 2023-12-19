@@ -8,6 +8,7 @@ export const encounterRepresentation =
   'names:(uuid,conceptNameType,name))),form:(uuid,name))';
 
 //Patient Tracing
+export const PatientTracingFormName = 'Patient Tracing Form';
 export const MissedAppointmentDate_UUID = '164093AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const TracingType_UUID = 'a55f9516-ddb6-47ec-b10d-cb99d1d0bd41';
 export const TracingNumber_UUID = '1639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';

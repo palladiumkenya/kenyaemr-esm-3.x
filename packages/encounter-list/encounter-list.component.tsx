@@ -91,14 +91,6 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   const defaultActions = useMemo(
     () => [
       {
-        label: t('viewEncounter', 'View'),
-        form: {
-          name: forms[0]?.name,
-        },
-        mode: 'view',
-        intent: '*',
-      },
-      {
         label: t('editEncounter', 'Edit'),
         form: {
           name: forms[0]?.name,
@@ -119,16 +111,16 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     return [];
   }, [columns]);
   const handleOpenTracingForm = () => {
-    // launchPatientWorkspace('patient-form-entry-workspace', {
-    //   workspaceTitle: 'Defaulter Tracing',
-    //   formInfo: {
-    //     encounterUuid: '',
-    //     formUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93',
-    //     patientUuid,
-    //     visitTypeUuid: '',
-    //     visitUuid: '',
-    //   },
-    // });
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'Defaulter Tracing',
+      formInfo: {
+        encounterUuid: '',
+        formUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93',
+        patientUuid,
+        visitTypeUuid: '',
+        visitUuid: '',
+      },
+    });
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Defaulter Tracing',
       formInfo: { formUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93', encounterUuid: '' },
