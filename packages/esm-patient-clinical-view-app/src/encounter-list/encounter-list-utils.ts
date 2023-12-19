@@ -66,22 +66,36 @@ export function getObsFromEncounter(encounter, obsConcept, isDate?: Boolean, isT
   return obs.value;
 }
 
-export function mapObsValueToFormLabel(conceptUuid: string, answerConceptUuid: string, formConceptMap: object): string {
-  if (formConceptMap === undefined) {
-    return String('');
+export function mapObsValueToFormLabel(
+  conceptUuid: string,
+  answerConceptUuid: string,
+  formConceptMap: object,
+  defaultValue: string,
+): string {
+  if (formConceptMap === undefined || answerConceptUuid === undefined) {
+    const stringParts = defaultValue.split(':');
+    if (stringParts.length === 1) {
+      return defaultValue;
+    } else if (stringParts.length === 2) {
+      return stringParts[1];
+    } else {
+      // TODO: identify other cases to support here
+      // check for date
+      return formatDate(parseDate(defaultValue));
+    }
   }
 
-  let theDisplay = formConceptMap[conceptUuid] ? formConceptMap[conceptUuid]?.answers[answerConceptUuid] : '';
+  let theDisplay = formConceptMap[conceptUuid] ? formConceptMap[conceptUuid]?.answers[answerConceptUuid] : defaultValue;
 
   return String(theDisplay);
 }
 
-export function mapConceptToFormLabel(conceptUuid: string, formConceptMap: object): string {
+export function mapConceptToFormLabel(conceptUuid: string, formConceptMap: object, defaultValue: string): string {
   if (formConceptMap === undefined) {
-    return String('');
+    return defaultValue;
   }
 
-  let theDisplay = formConceptMap[conceptUuid] ? formConceptMap[conceptUuid].display : '';
+  let theDisplay = formConceptMap[conceptUuid] ? formConceptMap[conceptUuid].display : defaultValue;
 
   return theDisplay;
 }
@@ -91,7 +105,7 @@ export function mapConceptToFormLabel(conceptUuid: string, formConceptMap: objec
  * It should be moved to an appropriate place if not here
  */
 export function generateFormLabelsFromJSON() {
-  const htsScreeningJson = { pages: [] }; // may not be the correct representation
+  const htsScreeningJson = { pages: [] };
   const result = {};
   htsScreeningJson.pages.forEach((page) => {
     page.sections.forEach((section) => {
@@ -107,5 +121,5 @@ export function generateFormLabelsFromJSON() {
       });
     });
   });
-  // console.log('schema: ', JSON.stringify(result));
+  console.log('schema: ', JSON.stringify(result));
 }
