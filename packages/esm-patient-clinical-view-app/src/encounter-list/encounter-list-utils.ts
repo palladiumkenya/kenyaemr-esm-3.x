@@ -66,20 +66,6 @@ export function getObsFromEncounter(encounter, obsConcept, isDate?: Boolean, isT
   return obs.value;
 }
 
-export function mapConceptToFormLabel(
-  conceptUuid: string,
-  formConceptMap: Map<string, { display: string; answers: [] }>,
-  isConceptQuestion: boolean,
-): string {
-  const ourMap = formConceptMap;
-  if (formConceptMap.size < 1) {
-    return String('');
-  }
-  let theDisplay = formConceptMap.get(conceptUuid) ? formConceptMap.get(conceptUuid).display : '';
-
-  return theDisplay;
-}
-
 export function mapObsValueToFormLabel(conceptUuid: string, answerConceptUuid: string, formConceptMap: object): string {
   if (formConceptMap === undefined) {
     return String('');
@@ -90,11 +76,7 @@ export function mapObsValueToFormLabel(conceptUuid: string, answerConceptUuid: s
   return String(theDisplay);
 }
 
-export function mapConceptToFormLabel3(
-  conceptUuid: string,
-  formConceptMap: object,
-  isConceptQuestion: boolean,
-): string {
+export function mapConceptToFormLabel(conceptUuid: string, formConceptMap: object): string {
   if (formConceptMap === undefined) {
     return String('');
   }
@@ -104,23 +86,26 @@ export function mapConceptToFormLabel3(
   return theDisplay;
 }
 
+/**
+ * This is a util method stub for generating the mapping for labels in the form schema
+ * It should be moved to an appropriate place if not here
+ */
 export function generateFormLabelsFromJSON() {
-  // const htsScreeningJson = {};
-  // const result = {};
-  // htsScreeningJson.pages.forEach((page) => {
-  //   //console.log('page: ', page.sections);
-  //   page.sections.forEach((section) => {
-  //     section.questions.forEach((question) => {
-  //       let answersMap = {};
-  //       let questionObject = {};
-  //       question.questionOptions.answers?.forEach((ans) => {
-  //         answersMap[ans.concept] = ans.label;
-  //       });
-  //       questionObject['display'] = question.label;
-  //       questionObject['answers'] = answersMap;
-  //       result[question.questionOptions.concept] = questionObject;
-  //     });
-  //   });
-  // });
+  const htsScreeningJson = { pages: [] }; // may not be the correct representation
+  const result = {};
+  htsScreeningJson.pages.forEach((page) => {
+    page.sections.forEach((section) => {
+      section.questions.forEach((question) => {
+        let answersMap = {};
+        let questionObject = {};
+        question.questionOptions.answers?.forEach((ans) => {
+          answersMap[ans.concept] = ans.label;
+        });
+        questionObject['display'] = question.label;
+        questionObject['answers'] = answersMap;
+        result[question.questionOptions.concept] = questionObject;
+      });
+    });
+  });
   // console.log('schema: ', JSON.stringify(result));
 }

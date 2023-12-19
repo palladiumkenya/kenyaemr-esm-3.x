@@ -7,7 +7,6 @@ import styles from './encounter-observation-table.scss';
 import {
   mapConceptToFormLabel,
   mapObsValueToFormLabel,
-  mapConceptToFormLabel3,
   generateFormLabelsFromJSON,
 } from '../encounter-list/encounter-list-utils';
 
@@ -20,7 +19,6 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   const { t } = useTranslation();
   const { obsConceptUuidsToHide = [] } = useConfig();
 
-  generateFormLabelsFromJSON();
   function getAnswerFromDisplay(display: string): string {
     if (display == undefined) {
       return '';
@@ -49,12 +47,12 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
           if (obs.groupMembers) {
             return (
               <React.Fragment key={index}>
-                <span className={styles.parentConcept}>{obs.concept.display}</span>
+                <span className={styles.parentConcept}>{obs.concept.display ?? 'Group'}</span>
                 <span />
                 {obs.groupMembers.map((member) => (
                   <React.Fragment key={index}>
                     <span className={styles.childConcept}>
-                      {mapConceptToFormLabel3(member.concept.uuid, formConceptMap, true) ?? member.concept.display}
+                      {mapConceptToFormLabel(member.concept.uuid, formConceptMap) ?? member.concept.display}
                     </span>
                     <span>{getAnswerFromDisplay(member.display)}</span>
                   </React.Fragment>
@@ -65,7 +63,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
             return (
               <React.Fragment key={index}>
                 <span className={styles.questionText}>
-                  {mapConceptToFormLabel3(obs.concept.uuid, formConceptMap, true) ?? obs.concept.display}
+                  {mapConceptToFormLabel(obs.concept.uuid, formConceptMap) ?? obs.concept.display}
                 </span>
                 <span>{mapObsValueToFormLabel(obs.concept.uuid, obs.value.uuid, formConceptMap) ?? obs.display}</span>
               </React.Fragment>
