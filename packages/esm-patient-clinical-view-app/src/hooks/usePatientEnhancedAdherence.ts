@@ -1,13 +1,7 @@
 import useSWR from 'swr';
 import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
-import orderBy from 'lodash-es/orderBy';
-import groupBy from 'lodash/groupBy';
-import dayjs from 'dayjs';
-
-const SESSSION_DETAILS_CONCEPT = '1639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-const ADHERENCE_PLAN = '4342d15d-22e2-456e-bbfd-16b42b2ec8c6';
+const SESSSION_DETAILS_CONCEPT = '164891AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 const ADHERENCE_ENCOUNTER_TYPE_UUID = '54df6991-13de-4efc-a1a9-2d5ac1b72ff8';
-const RETURN_VISIT_DATE = '5096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 export type AdherenceProgram = {
   concept: OpenmrsResource;
@@ -22,44 +16,39 @@ export const usePatientEnhancedAdherence = (patientUuid: string) => {
     data: { results: Array<{ uuid: string; obs: Array<AdherenceProgram>; encounterDatetime: string }> };
   }>(url, openmrsFetch);
 
-  // Grouping enhanced adherence sessions
   const responseData = data?.data?.results ?? [];
+  const results = responseData.flatMap((el) => el.obs).filter((obs) => obs.concept.uuid === SESSSION_DETAILS_CONCEPT);
 
-  const results = responseData
-    .flatMap((el) => el.obs)
-    .filter((obs) => obs.concept.uuid === '164891AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+  const groupedEncounterResults: Record<string, Array<{ encounter: any }>> = {};
 
-  const uniqueSessionDates = results.map((el) => el.value);
-  const hashTableTable = new Map<string | number, Array<any>>();
   responseData.forEach((encounter) => {
-    const groupDate = encounter.obs.find((obs) => obs.concept.uuid === '164891AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')?.value;
-    console.log(groupDate, 'key');
-    if (hashTableTable.has(groupDate)) {
-      const existingEncounter = hashTableTable.get(groupDate);
-      if (uniqueSessionDates.includes(groupDate)) {
-        hashTableTable.set(groupDate, [encounter].concat(existingEncounter));
-      }
+    const seriesStartDateObs = encounter.obs.filter((obs) => obs.concept.uuid === SESSSION_DETAILS_CONCEPT);
+    let seriesStartDate = seriesStartDateObs[0]?.value ?? encounter.encounterDatetime;
+    const key = seriesStartDate?.split('T')[0].trim() ?? encounter.encounterDatetime;
+
+    if (!groupedEncounterResults[key]) {
+      groupedEncounterResults[key] = [];
     }
-    if (uniqueSessionDates.includes(groupDate)) {
-      hashTableTable.set(groupDate, [encounter]);
-    }
+    groupedEncounterResults[key].push({
+      encounter: encounter,
+    });
   });
 
-  console.log(Array.from(hashTableTable));
+  const groupedResults: Record<string, Array<{ obsDatetime: string; display: string }>> = {};
 
-  const patientAdherence =
-    data?.data?.results
-      ?.flatMap((adherence) => adherence.obs)
-      ?.filter((adherence) => adherence.concept.uuid === SESSSION_DETAILS_CONCEPT) ?? [];
+  results.forEach((obs) => {
+    const key = obs.value.split('T')[0];
+    if (!groupedResults[key]) {
+      groupedResults[key] = [];
+    }
+    groupedResults[key].push({
+      obsDatetime: obs.obsDatetime,
+      display: obs.concept.display,
+    });
+  });
 
-  const groupedData = groupBy(
-    data?.data?.results.flatMap((a) => a.obs) ?? [],
-    (adherence: any) => adherence?.concept?.uuid,
-  );
-  // eslint-disable-next-line no-console
-  // console.log('groupedData', groupedData);
   return {
-    patientAdherence: orderBy(patientAdherence, 'obsDatetime', 'desc'),
+    patientAdherence: groupedEncounterResults,
     error,
     isLoading,
     isValidating,
