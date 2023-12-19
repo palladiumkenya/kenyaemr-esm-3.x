@@ -6,7 +6,7 @@ type ResponseObject = {
 };
 
 export const useBillableServices = () => {
-  const url = ``;
-  const { data, isLoading, error, mutate } = useSWR<{ data: ResponseObject }>(url, openmrsFetch, {});
-  return { billableServices: data?.data.results ?? [], isLoading, error, mutate };
+  const url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display))`;
+  const { data, isLoading, isValidating, error, mutate } = useSWR<{ data: ResponseObject }>(url, openmrsFetch, {});
+  return { billableServices: data?.data.results ?? [], isLoading, isValidating, error, mutate };
 };

@@ -5,8 +5,8 @@ import BillableServices from './billable-services.component';
 describe('BillableService', () => {
   test('should render billable services', () => {
     renderBillableServices();
-    const title = screen.getByRole('heading', { name: /Billable services/i });
-    expect(title).toBeInTheDocument();
+    expect(screen.getByText(/Empty data illustration/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no services to display./i)).toBeInTheDocument();
   });
 });
 
