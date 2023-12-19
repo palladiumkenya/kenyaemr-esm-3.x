@@ -121,5 +121,4 @@ export function generateFormLabelsFromJSON() {
       });
     });
   });
-  console.log('schema: ', JSON.stringify(result));
 }
