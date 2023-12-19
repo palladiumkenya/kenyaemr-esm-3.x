@@ -2,7 +2,7 @@ import useSWRImmutable, { mutate } from 'swr';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { encounterRepresentation } from '../esm-mch-app/constants';
- // import { encounterRepresentation } from '../../../utils/constants';
+// import { encounterRepresentation } from '../../../utils/constants';
 
 export interface OpenmrsResource {
   uuid: string;

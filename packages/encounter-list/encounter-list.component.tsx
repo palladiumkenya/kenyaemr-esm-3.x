@@ -16,7 +16,7 @@ import {
 import { Add } from '@carbon/react/icons';
 import { useEncounterRows } from '../esm-patient-clinical-view-app/src/hooks/useEncounterRows';
 import { OpenmrsEncounter } from '../esm-patient-clinical-view-app/src/type/types';
-import { EmptyDataIllustration,launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 export interface O3FormSchema {
   name: string;
