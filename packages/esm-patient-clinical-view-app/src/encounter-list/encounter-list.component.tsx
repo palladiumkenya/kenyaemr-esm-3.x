@@ -63,7 +63,7 @@ export interface EncounterListProps {
     workspaceWindowSize?: 'minimized' | 'maximized';
   };
   filter?: (encounter: any) => boolean;
-  formConceptMap: Array<any>;
+  formConceptMap: object;
 }
 
 export const EncounterList: React.FC<EncounterListProps> = ({
