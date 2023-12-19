@@ -6,6 +6,8 @@ import { dashboardMeta } from './dashboard.meta';
 import rootComponent from './root.component';
 import BillHistory from './bill-history/bill-history.component';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
+import BillableServicesCardLink from './billable-services-admin-card-link.component';
+import { BillableServicesDashboard } from './billable-services/dashboard/dashboard.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -37,3 +39,5 @@ export const billingSummaryDashboardLink = getSyncLifecycle(
 export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
+export const billableServicesHome = getSyncLifecycle(BillableServicesDashboard, options);
+export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);

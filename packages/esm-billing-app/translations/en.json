@@ -3,6 +3,8 @@
   "amount": "Amount",
   "amountDue": "Amount due",
   "billableService": "Billable service",
+  "billableServices": "Billable Services",
+  "billableServicesManagement": "Billable Services Management",
   "billedTo": "Billed to",
   "billErrorService": "Bill service error",
   "billing": "Billing",
@@ -42,6 +44,7 @@
   "searchThisTable": "Search this table",
   "selectBillableService": "Select a billable service...",
   "selectPaymentMethod": "Select payment method",
+  "serviceMetrics": "Service Metrics",
   "totalAmount": "Total Amount",
   "totalTendered": "Total Tendered",
   "visitTime": "Visit time"

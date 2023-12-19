@@ -3,7 +3,12 @@
   "backendDependencies": {
     "kenyaemr": "^18.2.0"
   },
-  "pages": [],
+  "pages": [
+    {
+      "component": "billableServicesHome",
+      "route":"billable-services"
+    }
+  ],
   "extensions": [
     {
       "component": "billingDashboardLink",
@@ -45,6 +50,11 @@
       "name": "billing-checkin-form",
       "slot": "billing-checkin-slot",
       "component": "billingCheckInForm"
+    },
+    {
+      "slot": "system-admin-page-card-link-slot",
+      "component": "billableServicesCardLink",
+      "name": "billable-services-admin-card-link"
     }
   ]
 }
