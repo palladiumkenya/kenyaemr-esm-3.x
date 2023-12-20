@@ -52,7 +52,7 @@
     },
     {
       "name": "adherence-dashboard",
-      "component": "advancedAdherence",
+      "component": "enhancedAdherence",
       "slot": "patient-chart-adherence-dashboard-slot",
       "order": 10,
       "meta": {
@@ -61,13 +61,14 @@
     },
     {
       "name": "adherence-dashboard-link",
-      "component": "advancedAdherenceLink",
+      "component": "enhancedAdherenceLink",
       "slot": "patient-clinical-view-slot",
       "meta": {
         "columns": 1,
         "columnSpan": 1,
         "slot": "patient-chart-adherence-dashboard-slot",
-        "path": "Adherence"
+        "path": "Adherence",
+        "layoutMode": "anchored"
       }
     }
   ]
