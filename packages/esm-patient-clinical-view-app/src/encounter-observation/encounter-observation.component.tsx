@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { Observation } from '../../src/type/types';
 import styles from './encounter-observation-table.scss';
+import { Observation } from '../types';
 
 interface EncounterObservationsProps {
   observations: Array<Observation>;
