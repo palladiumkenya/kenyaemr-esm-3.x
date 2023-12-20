@@ -1,4 +1,5 @@
 {
+  "actions": "Actions",
   "addPaymentOptions": "Add payment option",
   "amount": "Amount",
   "amountDue": "Amount due",
@@ -15,6 +16,7 @@
   "billsList": "Bill list",
   "billTotal": "Bill total",
   "checkFilters": "Check the filters above",
+  "dateCreated": "Date Created",
   "discard": "Discard",
   "discount": "Discount",
   "enterAmount": "Enter amount",
@@ -35,6 +37,7 @@
   "nextPage": "Next page",
   "noMatchingBillsToDisplay": "No matching bills to display",
   "noMatchingItemsToDisplay": "No matching items to display",
+  "noMatchingServicesToDisplay": "No matching services to display",
   "paymentMethod": "Payment method",
   "payments": "Payments",
   "previousPage": "Previous page",
@@ -46,6 +49,11 @@
   "selectBillableService": "Select a billable service...",
   "selectPaymentMethod": "Select payment method",
   "serviceMetrics": "Service Metrics",
+  "serviceName": "Service Name",
+  "servicesList": "Services list",
+  "serviceType": "Service Type",
+  "shortName": "Short Name",
+  "status": "Service Status",
   "totalAmount": "Total Amount",
   "totalTendered": "Total Tendered",
   "visitTime": "Visit time"
