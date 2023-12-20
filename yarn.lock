@@ -2641,10 +2641,12 @@ __metadata:
   resolution: "@kenyaemr/esm-patient-clinical-view-app@workspace:packages/esm-patient-clinical-view-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
+    "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     webpack: "npm:^5.74.0"
   peerDependencies:
     "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 6.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x

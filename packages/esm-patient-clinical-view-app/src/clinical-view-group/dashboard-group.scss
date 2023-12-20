@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+
+.accordionContainer {
+  margin-top: layout.$spacing-05;
+}
+
+.accordionItem {
+  & > button {
+    margin-bottom: layout.$spacing-01;
+  }
+}

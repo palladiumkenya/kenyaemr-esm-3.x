@@ -23,6 +23,11 @@ export const configSchema = {
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
     },
   },
+  defaulterTracingEncounterUuid: {
+    _type: Type.String,
+    _description: 'Encounter UUID for defaulter tracing',
+    _default: '1495edf8-2df2-11e9-b210-d663bd873d93',
+  },
 };
 
 export interface ConfigObject {
@@ -35,4 +40,5 @@ export interface ConfigObject {
     htsInitialTest: string;
     htsRetest: string;
   };
+  defaulterTracingEncounterUuid: string;
 }
