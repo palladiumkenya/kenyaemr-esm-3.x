@@ -7,11 +7,29 @@
   "extensions": [
     {
       "name": "mch-clinical-view",
-      "slot": "top-of-all-patient-dashboards-slot", 
+      "slot": "patient-chart-mch-dashboard-slot",
       "component": "mchClinicalView",
       "order": 0,
       "online": true,
       "offline": false
+    },
+    {
+      "name": "patient-clinical-view-group-link",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "clinicalViewGroup"
+    },
+    {
+      "name": "mch-dashboard-link",
+      "component": "mchDashboardLink",
+      "slot": "patient-clinical-view-slot",
+      "order": 11,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-mch-dashboard-slot",
+        "path": "mch-dashboard",
+        "layoutMode": "anchored"
+      }
     }
   ]
 }
