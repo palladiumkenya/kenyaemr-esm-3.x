@@ -1,21 +1,6 @@
 import React, { useMemo } from 'react';
-import { usePatientTracing } from '../hooks/usePatientTracing';
 import { useTranslation } from 'react-i18next';
-import { formatDateTime, getObsFromEncounter } from '../../../encounter-list/encounter-list-utils';
-import {
-  EncounterList,
-  EncounterListColumn,
-  EncounterListProps,
-} from '../../../encounter-list/encounter-list.component';
-import {
-  useConfig,
-  formatDate,
-  parseDate,
-  isDesktop,
-  useLayoutType,
-  usePagination,
-  useVisit,
-} from '@openmrs/esm-framework';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import {
   Contacted_UUID,
   MissedAppointmentDate_UUID,
@@ -25,7 +10,10 @@ import {
   TracingType_UUID,
   PatientTracingFormName,
 } from '../../../utils/constants';
-import { defaulterTracing } from '../index';
+import { EncounterList, EncounterListColumn } from '../encounter-list/encounter-list.component';
+import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
+import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { Button } from '@carbon/react';
 
 interface PatientTracingProps {
   patientUuid: string;
@@ -36,13 +24,20 @@ interface PatientTracingProps {
 
 const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounterTypeUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
-  const layout = useLayoutType();
-  // const { currentVisit } = useVisit(patientUuid);
   const headerTitle = t('defaulterTracing', 'Defaulter Tracing');
 
-  const { encounters, isLoading, isValidating, error } = usePatientTracing(patientUuid, encounterTypeUuid);
-
+  const handleOpenDefaulterTracingForm = () => {
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'Defaulter Tracing',
+      formInfo: {
+        encounterUuid: '',
+        formUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93',
+        patientUuid,
+        visitTypeUuid: '',
+        visitUuid: '',
+      },
+    });
+  };
   const columns: EncounterListColumn[] = useMemo(
     () => [
       {
@@ -111,18 +106,25 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
   );
 
   return (
-    <EncounterList
-      patientUuid={patientUuid}
-      encounterType={PatientTracingEncounterType_UUID}
-      formList={[{ name: PatientTracingFormName }]}
-      columns={columns}
-      description={headerTitle}
-      headerTitle={headerTitle}
-      launchOptions={{
-        displayText: t('add', 'Add'),
-        moduleName: '/kenyaemr-esm-3.x-care-panel-app',
-      }}
-    />
+    <>
+      <CardHeader title={headerTitle}>
+        <Button onClick={handleOpenDefaulterTracingForm} style={{ marginLeft: '0.625rem' }} kind="ghost">
+          {t('add', 'Add')}
+        </Button>
+      </CardHeader>
+      <EncounterList
+        patientUuid={patientUuid}
+        encounterType={PatientTracingEncounterType_UUID}
+        formList={[{ name: PatientTracingFormName }]}
+        columns={columns}
+        description={headerTitle}
+        headerTitle={headerTitle}
+        launchOptions={{
+          displayText: t('add', 'Add'),
+          moduleName: '/kenyaemr-esm-3.x-care-panel-app',
+        }}
+      />
+    </>
   );
 };
 export default DefaulterTracing;
