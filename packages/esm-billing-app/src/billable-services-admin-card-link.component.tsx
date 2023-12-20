@@ -5,7 +5,7 @@ import { ArrowRight } from '@carbon/react/icons';
 
 const BillableServicesCardLink: React.FC = () => {
   const { t } = useTranslation();
-  const header = t('billableServices', 'Billable Services');
+  const header = t('manageBillableServices', 'Manage billable services');
   return (
     <Layer>
       <ClickableTile href={`${window.spaBase}/billable-services`} target="_blank" rel="noopener noreferrer">
