@@ -12,13 +12,11 @@ import {
   TableHeader,
   TableExpandHeader,
   TableExpandRow,
-  OverflowMenu,
-  OverflowMenuItem,
   TableExpandedRow,
-  InlineLoading,
   StructuredListSkeleton,
 } from '@carbon/react';
-import { CardHeader, ErrorState, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import AdherenceTable from './adherence-table.component';
 type EnhancedAdherenceProps = {
   patientUuid: string;
 };
@@ -60,9 +58,6 @@ const EnhancedAdherence: React.FC<EnhancedAdherenceProps> = ({ patientUuid }) =>
   }
   return (
     <>
-      <CardHeader title={headerTitle}>
-        {isValidating && <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />}
-      </CardHeader>{' '}
       <DataTable rows={tableRows} headers={headers}>
         {({
           rows,
@@ -73,11 +68,11 @@ const EnhancedAdherence: React.FC<EnhancedAdherenceProps> = ({ patientUuid }) =>
           getTableProps,
           getTableContainerProps,
         }) => (
-          <TableContainer title="DataTable" description="With expansion" {...getTableContainerProps()}>
-            <Table {...getTableProps()} aria-label="sample table">
+          <TableContainer title={headerTitle} {...getTableContainerProps()}>
+            <Table {...getTableProps()} aria-label={headerTitle}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader aria-label="expand row" />
+                  <TableExpandHeader aria-label={headerTitle} />
                   {headers.map((header, i) => (
                     <TableHeader
                       key={i}
@@ -102,7 +97,7 @@ const EnhancedAdherence: React.FC<EnhancedAdherenceProps> = ({ patientUuid }) =>
                     </TableExpandRow>
                     <TableExpandedRow
                       colSpan={headers.length + 1}
-                      className="demo-expanded-td"
+                      className={headerTitle}
                       {...getExpandedRowProps({
                         row,
                       })}>
@@ -115,40 +110,7 @@ const EnhancedAdherence: React.FC<EnhancedAdherenceProps> = ({ patientUuid }) =>
                           ))}
                         </TableRow>
                       </TableHead>
-                      {tableRows[index].encounter.map(({ encounter }, index) => {
-                        const { obs = [] } = encounter ?? {};
-                        const uniqueDates = new Set();
-                        return (
-                          <table key={index}>
-                            <TableBody>
-                              {obs?.map((o, obsIndex) => {
-                                if (
-                                  !uniqueDates.has(o?.obsDatetime) &&
-                                  o?.concept?.uuid === '1639AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-                                ) {
-                                  uniqueDates.add(o?.obsDatetime);
-                                  return (
-                                    <TableRow key={row.id}>
-                                      <td>{o?.obsDatetime.split('T')[0]}</td>
-                                      <td>{o?.value}</td>
-                                      <td>
-                                        <OverflowMenu ariaLabel="Actions" size="sm" flipped>
-                                          <OverflowMenuItem
-                                            hasDivider
-                                            itemText={t('edit', 'Edit')}
-                                            // onClick={}
-                                          />
-                                        </OverflowMenu>
-                                      </td>
-                                    </TableRow>
-                                  );
-                                }
-                                return null;
-                              })}
-                            </TableBody>
-                          </table>
-                        );
-                      })}
+                      <AdherenceTable encounterData={tableRows[index].encounter} />
                     </TableExpandedRow>
                   </React.Fragment>
                 ))}
@@ -160,5 +122,4 @@ const EnhancedAdherence: React.FC<EnhancedAdherenceProps> = ({ patientUuid }) =>
     </>
   );
 };
-
 export default EnhancedAdherence;
