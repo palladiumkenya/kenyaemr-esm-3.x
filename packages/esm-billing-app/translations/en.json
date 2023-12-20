@@ -39,6 +39,7 @@
   "loading": "Loading",
   "loadingBillingServices": "Loading billing services...",
   "loadingDescription": "Loading",
+  "manageBillableServices": "Manage billable services",
   "name": "Name",
   "nextPage": "Next page",
   "noMatchingBillsToDisplay": "No matching bills to display",
