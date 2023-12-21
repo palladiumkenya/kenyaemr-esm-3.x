@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   Contacted_UUID,
   MissedAppointmentDate_UUID,
@@ -10,11 +10,28 @@ import {
   TracingType_UUID,
   PatientTracingFormName,
 } from '../../../utils/constants';
-import { EncounterList, EncounterListColumn } from '../encounter-list/encounter-list.component';
 import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
-import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { Button } from '@carbon/react';
-
+import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
+import {
+  Button,
+  DataTable,
+  TableContainer,
+  Table,
+  TableExpandRow,
+  TableHead,
+  TableRow,
+  TableExpandHeader,
+  TableHeader,
+  TableBody,
+  TableCell,
+  TableExpandedRow,
+  OverflowMenu,
+  OverflowMenuItem,
+  DataTableSkeleton,
+} from '@carbon/react';
+import { defaulterTracingEncounterUuid, usePatientTracing } from '../hooks/usePatientTracing';
+import { ConfigObject } from '../config-schema';
+import { Add } from '@carbon/react/icons';
 interface PatientTracingProps {
   patientUuid: string;
   encounterTypeUuid: string;
@@ -24,105 +41,164 @@ interface PatientTracingProps {
 
 const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounterTypeUuid }) => {
   const { t } = useTranslation();
+  const {
+    formsList: { defaulterTracingFormUuid },
+  } = useConfig<ConfigObject>();
   const headerTitle = t('defaulterTracing', 'Defaulter Tracing');
-
-  const handleOpenDefaulterTracingForm = () => {
+  const { encounters, isLoading, error, mutate, isValidating } = usePatientTracing(
+    patientUuid,
+    defaulterTracingEncounterUuid,
+  );
+  const handleOpenOrEditDefaulterTracingForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Defaulter Tracing',
+      mutateForm: mutate,
       formInfo: {
-        encounterUuid: '',
-        formUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93',
+        encounterUuid: encounterUUID,
+        formUuid: defaulterTracingFormUuid,
         patientUuid,
         visitTypeUuid: '',
         visitUuid: '',
       },
     });
   };
-  const columns: EncounterListColumn[] = useMemo(
-    () => [
-      {
-        key: 'missedAppointmentDate',
-        header: t('missedAppointmentDate', 'Date Missed Appointment'),
-        getValue: (encounter) => {
-          return getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == '--' ||
-            getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == null
-            ? formatDate(parseDate(encounter.encounterDatetime))
-            : formatDate(parseDate(getObsFromEncounter(encounter, MissedAppointmentDate_UUID)));
-        },
-      },
-      {
-        key: 'visitDate',
-        header: t('visitDate', 'Tracing Date'),
-        getValue: (encounter) => {
-          return formatDate(parseDate(encounter.encounterDatetime));
-        },
-      },
-      {
-        key: 'tracingType',
-        header: t('tracingType', 'Tracing Type'),
-        getValue: (encounter) => {
-          return getObsFromEncounter(encounter, TracingType_UUID);
-        },
-      },
-      {
-        key: 'tracingNumber',
-        header: t('tracingNumber', 'Tracing No.'),
-        getValue: (encounter) => {
-          return getObsFromEncounter(encounter, TracingNumber_UUID);
-        },
-      },
-      {
-        key: 'contacted',
-        header: t('contacted', 'Contacted'),
-        getValue: (encounter) => {
-          return getObsFromEncounter(encounter, Contacted_UUID);
-        },
-      },
-      {
-        key: 'finalOutcome',
-        header: t('finalOutcome', 'Final Outcome'),
-        getValue: (encounter) => {
-          return getObsFromEncounter(encounter, TracingOutcome_UUID);
-        },
-      },
-      {
-        key: 'actions',
-        header: t('actions', 'Actions'),
-        getValue: (encounter) => {
-          const baseActions = [
-            {
-              form: { name: PatientTracingFormName, package: 'hiv' },
-              encounterUuid: encounter.uuid,
-              intent: '*',
-              label: 'Edit Form',
-              mode: 'edit',
-            },
-          ];
-          return baseActions;
-        },
-      },
-    ],
-    [],
-  );
+  const tableHeader = [
+    {
+      key: 'missedAppointmentDate',
+      header: t('missedAppointmentDate', 'Date Missed Appointment'),
+    },
+    {
+      key: 'visitDate',
+      header: t('visitDate', 'Tracing Date'),
+    },
+    {
+      key: 'tracingType',
+      header: t('tracingType', 'Tracing Type'),
+    },
+    {
+      key: 'tracingNumber',
+      header: t('tracingNumber', 'Tracing No.'),
+    },
+    {
+      key: 'contacted',
+      header: t('contacted', 'Contacted'),
+    },
+    {
+      key: 'finalOutcome',
+      header: t('finalOutcome', 'Final Outcome'),
+    },
+    {
+      key: 'actions',
+      header: t('actions', 'Actions'),
+    },
+  ];
 
+  const tableRows = encounters.map((encounter, index) => {
+    return {
+      id: `${encounter.uuid}`,
+      missedAppointmentDate:
+        getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == '--' ||
+        getObsFromEncounter(encounter, MissedAppointmentDate_UUID) == null
+          ? formatDate(parseDate(encounter.encounterDatetime))
+          : formatDate(parseDate(getObsFromEncounter(encounter, MissedAppointmentDate_UUID))),
+      visitDate: formatDate(new Date(encounter.encounterDatetime)),
+      tracingType: getObsFromEncounter(encounter, TracingType_UUID),
+      tracingNumber: getObsFromEncounter(encounter, TracingNumber_UUID),
+      contacted: getObsFromEncounter(encounter, Contacted_UUID),
+      finalOutcome: getObsFromEncounter(encounter, TracingOutcome_UUID),
+      actions: (
+        <OverflowMenu aria-label="overflow-menu" flipped="false">
+          <OverflowMenuItem
+            onClick={() => handleOpenOrEditDefaulterTracingForm(encounter.uuid)}
+            itemText={t('edit', 'Edit')}
+          />
+          <OverflowMenuItem itemText={t('delete', 'Delete')} isDelete />
+        </OverflowMenu>
+      ),
+    };
+  });
+
+  if (isLoading) {
+    return <DataTableSkeleton headers={tableHeader} aria-label="Defaulter Tracing" />;
+  }
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('defaulterTracing', 'Defaulter Tracing')} />;
+  }
+  if (encounters.length === 0) {
+    return (
+      <EmptyState
+        displayText={t('defaulterTracing', 'Defaulter Tracing')}
+        headerTitle={t('defaulterTracing', 'Defaulter Tracing')}
+        launchForm={handleOpenOrEditDefaulterTracingForm}
+      />
+    );
+  }
   return (
     <>
       <CardHeader title={headerTitle}>
-        <Button onClick={handleOpenDefaulterTracingForm} style={{ marginLeft: '0.625rem' }} kind="ghost">
+        <Button
+          size="md"
+          kind="ghost"
+          onClick={() => handleOpenOrEditDefaulterTracingForm()}
+          renderIcon={(props) => <Add size={24} {...props} />}
+          iconDescription="Add">
           {t('add', 'Add')}
         </Button>
       </CardHeader>
-      <EncounterList
-        patientUuid={patientUuid}
-        encounterType={PatientTracingEncounterType_UUID}
-        formList={[{ name: PatientTracingFormName }]}
-        columns={columns}
-        description={headerTitle}
-        headerTitle={headerTitle}
-        launchOptions={{
-          displayText: t('add', 'Add'),
-          moduleName: '/kenyaemr-esm-3.x-care-panel-app',
-        }}
+      <DataTable
+        rows={tableRows}
+        headers={tableHeader}
+        render={({
+          rows,
+          headers,
+          getHeaderProps,
+          getExpandHeaderProps,
+          getRowProps,
+          getExpandedRowProps,
+          getTableProps,
+          getTableContainerProps,
+        }) => (
+          <TableContainer {...getTableContainerProps()}>
+            <Table {...getTableProps()} aria-label="sample table">
+              <TableHead>
+                <TableRow>
+                  <TableExpandHeader enableToggle={true} {...getExpandHeaderProps()} />
+                  {headers.map((header, i) => (
+                    <TableHeader
+                      key={i}
+                      {...getHeaderProps({
+                        header,
+                      })}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow
+                      {...getRowProps({
+                        row,
+                      })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableExpandRow>
+                    <TableExpandedRow
+                      colSpan={headers.length + 1}
+                      className="demo-expanded-td"
+                      {...getExpandedRowProps({
+                        row,
+                      })}>
+                      <h6>To do...</h6>
+                    </TableExpandedRow>
+                  </React.Fragment>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       />
     </>
   );

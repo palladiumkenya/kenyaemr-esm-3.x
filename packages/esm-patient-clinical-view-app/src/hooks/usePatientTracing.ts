@@ -11,26 +11,16 @@ export function usePatientTracing(patientUuid: string, encounterType: string) {
   const config = useConfig() as ConfigObject;
   const url = `/ws/rest/v1/encounter?encounterType=${config.defaulterTracingEncounterUuid}&patient=${patientUuid}&v=${encounterRepresentation}`;
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: OpenmrsEncounter[] } }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: OpenmrsEncounter[] } }, Error>(
     url,
     openmrsFetch,
   );
-
-  const responseData = data?.data ? data?.data?.results : [];
-  const results = responseData.flatMap((el) => el.obs).filter((obs) => obs.concept.uuid === MissedAppointmentDate_UUID);
-
-  const uniqueSessionDates = results.map((el) => el.value);
-  uniqueSessionDates.map(() => {
-    const data = responseData.find((encounter) =>
-      encounter.obs.find((ob) => ob.concept.uuid === MissedAppointmentDate_UUID),
-    );
-  });
 
   return {
     encounters: data?.data ? data?.data?.results : [],
     isLoading,
     isValidating,
     error,
-    // onFormSave
+    mutate,
   };
 }
