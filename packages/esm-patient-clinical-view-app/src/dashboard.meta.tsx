@@ -21,3 +21,12 @@ export const defaulterTracingDashboardMeta = {
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
 };
+
+export const enhancedAdheranceDashboardMeta = {
+  slot: 'patient-chart-adherence-dashboard-slot',
+  columns: 1,
+  title: 'Adherence',
+  path: 'Adherence',
+  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
+  config: {},
+};
