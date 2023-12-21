@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Dropdown, InlineLoading, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import styles from './billing-checkin-form.scss';
+import VisitAttributesForm from './visit-attributes/visit-attributes-form.component';
 
 const DEFAULT_PRICE = 500.00001;
 const PENDING_PAYMENT_STATUS = 'PENDING';
@@ -17,21 +18,30 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const { t } = useTranslation();
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
+  const [attributes, setAttributes] = useState([]);
 
-  const handleCreateBill = useCallback((createBillPayload) => {
-    createPatientBill(createBillPayload).then(
-      () => {
-        showSnackbar({ title: 'Patient Bill', subtitle: 'Patient has been billed successfully', kind: 'success' });
-      },
-      (error) => {
-        showSnackbar({
-          title: 'Patient Bill Error',
-          subtitle: 'An error has occurred while creating patient bill',
-          kind: 'error',
-        });
-      },
-    );
-  }, []);
+  const shouldBillPatient =
+    attributes.find((item) => item.attributeType === 'caf2124f-00a9-4620-a250-efd8535afd6d')?.value ===
+    '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf';
+
+  const handleCreateBill = useCallback(
+    (createBillPayload) => {
+      shouldBillPatient &&
+        createPatientBill(createBillPayload).then(
+          () => {
+            showSnackbar({ title: 'Patient Bill', subtitle: 'Patient has been billed successfully', kind: 'success' });
+          },
+          (error) => {
+            showSnackbar({
+              title: 'Patient Bill Error',
+              subtitle: 'An error has occurred while creating patient bill',
+              kind: 'error',
+            });
+          },
+        );
+    },
+    [shouldBillPatient],
+  );
 
   const handleBillingService = ({ selectedItem }) => {
     const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
@@ -56,7 +66,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
       payments: [],
     };
 
-    setBillingInfo({ createBillPayload, handleCreateBill: () => handleCreateBill(createBillPayload) });
+    setBillingInfo({ createBillPayload, handleCreateBill: () => handleCreateBill(createBillPayload), attributes });
   };
 
   if (isLoadingLineItems || isLoadingCashPoints) {
@@ -82,16 +92,21 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
 
   return (
     <section className={styles.sectionContainer}>
-      <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
-      <div className={styles.sectionField}></div>
-      <Dropdown
-        label={t('selectBillableService', 'Select a billable service...')}
-        onChange={handleBillingService}
-        id="billable-items"
-        items={lineItems}
-        itemToString={(item) => (item ? item.commonName : '')}
-        titleText={t('billableService', 'Billable service')}
-      />
+      <VisitAttributesForm setAttributes={setAttributes} />
+      {shouldBillPatient && (
+        <>
+          <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
+          <div className={styles.sectionField}></div>
+          <Dropdown
+            label={t('selectBillableService', 'Select a billable service...')}
+            onChange={handleBillingService}
+            id="billable-items"
+            items={lineItems}
+            itemToString={(item) => (item ? item.commonName : '')}
+            titleText={t('billableService', 'Billable service')}
+          />
+        </>
+      )}
     </section>
   );
 };
