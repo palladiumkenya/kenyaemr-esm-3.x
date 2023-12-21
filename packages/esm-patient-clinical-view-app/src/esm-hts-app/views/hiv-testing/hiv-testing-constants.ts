@@ -32,6 +32,7 @@ export const hivTestingConceptMap = {
       '151342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Mentally Challenged',
       '164538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Physically Challenged',
       '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Others',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'None',
     },
   },
   '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
@@ -137,8 +138,8 @@ export const hivTestingConceptMap = {
   '1710AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
     display: 'Has consent been given? ',
     answers: {
-      true: 'Yes',
-      false: 'No',
+      '0': 'Yes',
+      '1': 'No',
     },
   },
   'b61c1482-1697-404c-ab96-fd698d5fd317': {

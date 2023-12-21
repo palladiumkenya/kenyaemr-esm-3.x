@@ -36,6 +36,10 @@ export interface Observation {
       uuid: string;
       display: string;
     };
+    name?: {
+      uuid: string;
+      name: string;
+    };
   };
   display: string;
   groupMembers: null | Array<{

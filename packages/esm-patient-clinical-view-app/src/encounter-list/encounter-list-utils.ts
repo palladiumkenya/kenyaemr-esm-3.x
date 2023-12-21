@@ -1,4 +1,5 @@
 import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { ancConceptMap } from '../esm-mch-app/views/maternal-health/antenatal-care-constants';
 
 export function getEncounterValues(encounter, param: string, isDate?: Boolean) {
   if (isDate) {
@@ -69,27 +70,61 @@ export function getObsFromEncounter(encounter, obsConcept, isDate?: Boolean, isT
 export function mapObsValueToFormLabel(
   conceptUuid: string,
   answerConceptUuid: string,
-  formConceptMap: object,
+  formConceptMap: { [key: string]: any },
   defaultValue: string,
 ): string {
-  if (formConceptMap === undefined || answerConceptUuid === undefined) {
-    const stringParts = defaultValue.split(':');
-    if (stringParts.length === 1) {
-      return defaultValue;
-    } else if (stringParts.length === 2) {
-      return stringParts[1];
-    } else {
-      // TODO: identify other cases to support here
-      // check for date
-      return formatDate(parseDate(defaultValue));
-    }
+  const typeOfVal = typeof defaultValue;
+  if (typeOfVal === 'number') {
+    // check early if value is number and return
+    return defaultValue;
   }
 
-  let theDisplay = formConceptMap[conceptUuid] ? formConceptMap[conceptUuid]?.answers[answerConceptUuid] : defaultValue;
+  const conceptMapOverride = formConceptMap !== undefined && Object.keys(formConceptMap).length > 0;
+  if (conceptMapOverride && answerConceptUuid !== undefined) {
+    // check for boolean concepts
+    if (answerConceptUuid === '1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+      answerConceptUuid = '0';
+    } else if (answerConceptUuid === '2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+      answerConceptUuid = '1';
+    }
+    let theDisplay = formConceptMap[conceptUuid]?.answers[answerConceptUuid];
 
-  return String(theDisplay);
+    if (typeof theDisplay !== undefined) {
+      return theDisplay;
+    } else {
+      return extractDefaultValueBasedOnType(defaultValue);
+    }
+  } else if (!conceptMapOverride || answerConceptUuid !== undefined) {
+    if (typeOfVal === 'object') {
+      return defaultValue['name']?.['name']; // extract the default name from the object
+    }
+  } else {
+    return extractDefaultValueBasedOnType(defaultValue);
+  }
 }
 
+function extractDefaultValueBasedOnType(defaultValue: any): string {
+  const typeOfVal = typeof defaultValue;
+
+  if (defaultValue !== undefined) {
+    if (typeOfVal === 'string') {
+      const stringParts = defaultValue.split(':');
+      if (stringParts.length === 0 || stringParts.length === 1) {
+        return defaultValue;
+      } else if (stringParts.length === 2) {
+        return stringParts[1];
+      } else {
+        // TODO: identify other cases to support here
+        // check for date
+        return formatDate(parseDate(defaultValue));
+      }
+    } else if (typeOfVal === 'object') {
+      return defaultValue['name']?.['name']; // extract the default name from the object
+    }
+  } else {
+    return defaultValue;
+  }
+}
 export function mapConceptToFormLabel(conceptUuid: string, formConceptMap: object, defaultValue: string): string {
   if (formConceptMap === undefined) {
     return defaultValue;
@@ -121,5 +156,4 @@ export function generateFormLabelsFromJSON() {
       });
     });
   });
-  console.log('schema: ', JSON.stringify(result));
 }

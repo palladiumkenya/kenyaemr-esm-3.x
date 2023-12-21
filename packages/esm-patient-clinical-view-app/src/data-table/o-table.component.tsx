@@ -19,9 +19,10 @@ interface TableProps {
   tableHeaders: any;
   tableRows: any;
   formConceptMap: object;
+  isExpandable?: boolean;
 }
 
-export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows, formConceptMap }) => {
+export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows, formConceptMap, isExpandable }) => {
   return (
     <TableContainer>
       <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">

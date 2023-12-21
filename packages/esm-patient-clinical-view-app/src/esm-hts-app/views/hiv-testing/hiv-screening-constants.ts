@@ -39,6 +39,7 @@ export const hivScreeningConceptMap = {
       '151342AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Mentally Challenged',
       '164538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Physically Challenged',
       '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Others',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'None',
     },
   },
   '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
@@ -125,7 +126,7 @@ export const hivScreeningConceptMap = {
     },
   },
   'cabad9c8-87e1-4163-b5fc-64cab0ca578b': {
-    display: 'Who performed the test?:',
+    display: 'Who performed the test?',
     answers: {
       '5619AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'HTS Provider',
       '2797e57b-d1ff-4928-b10e-b72e95b63faf': 'Self Tested',

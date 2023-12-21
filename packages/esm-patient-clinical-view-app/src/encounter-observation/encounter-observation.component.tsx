@@ -14,17 +14,6 @@ interface EncounterObservationsProps {
 const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations, formConceptMap }) => {
   const { t } = useTranslation();
   const { obsConceptUuidsToHide = [] } = useConfig();
-  function getAnswerFromDisplay(display: string): string {
-    if (display == undefined) {
-      return '';
-    }
-    const colonIndex = display.indexOf(':');
-    if (colonIndex === -1) {
-      return '';
-    } else {
-      return display.substring(colonIndex + 1).trim();
-    }
-  }
 
   if (!observations) {
     return <SkeletonText />;
@@ -60,7 +49,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
             return (
               <React.Fragment key={index}>
                 <span className={styles.questionText}>
-                  {mapConceptToFormLabel(obs.concept.uuid, formConceptMap, obs.concept.display)}
+                  {mapConceptToFormLabel(obs.concept.uuid, formConceptMap, obs.concept.name.name)}
                 </span>
                 <span>{mapObsValueToFormLabel(obs.concept.uuid, obs.value.uuid, formConceptMap, obs.value)}</span>
               </React.Fragment>
