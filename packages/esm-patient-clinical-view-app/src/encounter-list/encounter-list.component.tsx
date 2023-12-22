@@ -63,6 +63,8 @@ export interface EncounterListProps {
     workspaceWindowSize?: 'minimized' | 'maximized';
   };
   filter?: (encounter: any) => boolean;
+  formConceptMap: object;
+  isExpandable?: boolean;
 }
 
 export const EncounterList: React.FC<EncounterListProps> = ({
@@ -74,13 +76,15 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   formList,
   filter,
   launchOptions,
+  formConceptMap,
+  isExpandable,
 }) => {
   const { t } = useTranslation();
   const [paginatedRows, setPaginatedRows] = useState([]);
   const [forms, setForms] = useState<O3FormSchema[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const formNames = useMemo(() => formList.map((form) => form.name), []);
+  const formNames = useMemo(() => formList.map((form) => form.name), [formList]);
   const {
     encounters,
     isLoading: isLoadingEncounters,
@@ -205,7 +209,12 @@ export const EncounterList: React.FC<EncounterListProps> = ({
             <div className={styles.widgetHeaderContainer}>
               {!hideFormLauncher && <div className={styles.toggleButtons}>{}</div>}
             </div>
-            <OTable tableHeaders={headers} tableRows={paginatedRows} />
+            <OTable
+              tableHeaders={headers}
+              tableRows={paginatedRows}
+              formConceptMap={formConceptMap}
+              isExpandable={isExpandable}
+            />
             <Pagination
               page={currentPage}
               pageSize={pageSize}

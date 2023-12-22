@@ -2,68 +2,74 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EncounterList, EncounterListColumn } from '../../../../encounter-list/encounter-list.component';
 import { getObsFromEncounter } from '../../../../encounter-list/encounter-list-utils';
-import { followUpDateConcept, hivTestResultConcept, ancVisitNumberConcept, partnerHivStatus } from '../../../constants';
+import {
+  populationTypeConcept,
+  disabilityListConcept,
+  departmentConcept,
+  eligibilityConcept,
+  testingRecommended,
+} from '../../../constants';
+import { hivScreeningConceptMap } from '../hiv-screening-constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../../../config-schema';
-import { ancConceptMap } from '../antenatal-care-constants';
 
-interface AntenatalCareListProps {
+interface HivScreeningEncounterProps {
   patientUuid: string;
 }
 
-const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) => {
+const HivScreeningEncounters: React.FC<HivScreeningEncounterProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const headerTitle = t('antenatalCare', 'Antenatal Care');
+  const headerTitle = t('htsScreening', 'HTS Screening');
   const {
-    encounterTypes: { mchMotherConsultation },
-    formsList: { antenatal },
+    encounterTypes: { hivTestingServices },
+    formsList: { htsScreening },
   } = useConfig<ConfigObject>();
 
-  const ANCEncounterTypeUUID = mchMotherConsultation;
-  const ANCEncounterFormUUID = antenatal;
+  const htsEncounterTypeUUID = hivTestingServices;
+  const htsScreeningFormUUID = htsScreening;
 
   const columns: EncounterListColumn[] = useMemo(
     () => [
       {
         key: 'visitDate',
-        header: t('visitDate', 'Visit Date'),
+        header: t('visitDate', 'Screening Date'),
         getValue: (encounter) => {
           return formatDate(parseDate(encounter.encounterDatetime));
         },
       },
       {
-        key: 'ancVisitNumber',
-        header: t('ancVisitNumber', 'ANC Visit Number'),
+        key: 'populationType',
+        header: t('populationType', 'Population type'),
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, ancVisitNumberConcept);
+          return getObsFromEncounter(encounter, populationTypeConcept);
         },
       },
       {
-        key: 'hivTestResults',
-        header: t('hivTestResults', 'HIV Test Results'),
+        key: 'disabilities',
+        header: t('disabilities', 'Disabilities'),
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, hivTestResultConcept);
+          return getObsFromEncounter(encounter, disabilityListConcept);
         },
       },
       {
-        key: 'partnerStatus',
-        header: t('partnerStatus', 'HIV status of partner)'),
+        key: 'department',
+        header: t('department', 'Department'),
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, partnerHivStatus);
+          return getObsFromEncounter(encounter, departmentConcept);
         },
       },
       {
-        key: 'followUpDate',
-        header: t('followUpDate', 'Next follow-up date'),
+        key: 'clientEligibility',
+        header: t('clientEligibility', 'Eligible'),
         getValue: (encounter) => {
-          return getObsFromEncounter(encounter, followUpDateConcept, true);
+          return getObsFromEncounter(encounter, eligibilityConcept);
         },
       },
       {
-        key: 'facility',
-        header: t('facility', 'Facility'),
+        key: 'testingRecommended',
+        header: t('testingRecommended', 'Testing recommended'),
         getValue: (encounter) => {
-          return encounter.location.name;
+          return getObsFromEncounter(encounter, testingRecommended);
         },
       },
       {
@@ -86,21 +92,21 @@ const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) =>
   return (
     <EncounterList
       patientUuid={patientUuid}
-      encounterType={ANCEncounterTypeUUID}
-      formList={[{ name: 'Antenatal Form' }]}
+      encounterType={htsEncounterTypeUUID}
+      formList={[{ name: 'HTS screening Form' }]}
       columns={columns}
       description={headerTitle}
       headerTitle={headerTitle}
       launchOptions={{
         displayText: t('add', 'Add'),
-        moduleName: 'MCH Clinical View',
+        moduleName: 'HTS Clinical View',
       }}
       filter={(encounter) => {
-        return encounter.form.uuid == ANCEncounterFormUUID;
+        return encounter.form.uuid == htsScreeningFormUUID;
       }}
-      formConceptMap={ancConceptMap}
+      formConceptMap={hivScreeningConceptMap}
     />
   );
 };
 
-export default AntenatalCareList;
+export default HivScreeningEncounters;

@@ -5,6 +5,7 @@
   },
   "pages": [],
   "extensions": [
+
     {
       "name": "patient-clinical-view-group-link",
       "slot": "patient-chart-dashboard-slot",
@@ -31,10 +32,30 @@
       }
     },
     {
+      "name": "hts-clinical-view",
+      "slot": "patient-chart-hts-dashboard-slot",
+      "component": "htsClinicalView",
+      "order": 2,
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "hts-dashboard-link",
+      "component": "htsDashboardLink",
+      "slot": "patient-clinical-view-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-hts-dashboard-slot",
+        "path": "hts-dashboard",
+        "layoutMode": "anchored"
+      }
+    },
+    {
       "name": "defaulter-tracing-dashboard",
       "slot": "patient-chart-defaulter-tracing-dashboard-slot",
       "component": "defaulterTracing",
-      "order": 0,
+      "order": 3,
       "online": true,
       "offline": false
     },

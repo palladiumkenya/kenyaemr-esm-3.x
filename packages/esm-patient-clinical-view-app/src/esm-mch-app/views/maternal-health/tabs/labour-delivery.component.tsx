@@ -3,17 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { EncounterList, EncounterListColumn } from '../../../../encounter-list/encounter-list.component';
 import { getObsFromEncounter } from '../../../../encounter-list/encounter-list-utils';
 import {
-  ancHivResultConcept,
-  artInitiationConcept,
-  birthCountConcept,
   deliveryOutcomeConcept,
   hivTestAtMaternityResults,
   hivTestResultConcept,
   placeOfDeliveryConcept,
-  visitDateConcept,
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../../../config-schema';
+import { labourAndDeliveryConceptMap } from '../labour-and-delivery-care-constants';
 
 interface LabourDeliveryListProps {
   patientUuid: string;
@@ -99,6 +96,7 @@ const LabourDeliveryList: React.FC<LabourDeliveryListProps> = ({ patientUuid }) 
       filter={(encounter) => {
         return encounter.form.uuid == LNDEncounterFormUUID;
       }}
+      formConceptMap={labourAndDeliveryConceptMap}
     />
   );
 };

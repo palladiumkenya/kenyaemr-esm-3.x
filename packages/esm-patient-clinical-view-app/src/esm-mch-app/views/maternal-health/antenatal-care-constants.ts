@@ -1,0 +1,370 @@
+export const ancConceptMap = {
+  '1425AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'ANC Visit Number:',
+    answers: {},
+  },
+  '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Temperature (C) :',
+    answers: {},
+  },
+  '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Pulse Rate',
+    answers: {},
+  },
+  '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Systolic B.P',
+    answers: {},
+  },
+  '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Diastolic B.P',
+    answers: {},
+  },
+  '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Respiratory Rate',
+    answers: {},
+  },
+  '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Oxygen Saturation',
+    answers: {},
+  },
+  '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'MUAC',
+    answers: {},
+  },
+  '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Height:(cms)',
+    answers: {},
+  },
+  '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Weight: (kg)',
+    answers: {},
+  },
+  '163590AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Breast examination done:',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+    },
+  },
+  '5245AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Pallor:',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+      '1175AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Not applicable',
+    },
+  },
+  '1438AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Maturity in weeks:',
+    answers: {},
+  },
+  '1439AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Fundal Height (Weeks):',
+    answers: {},
+  },
+  '160090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Presentation:',
+    answers: {
+      '139814AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Frank Breech Presentation',
+      '160091AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'vertex presentation',
+    },
+  },
+  '162089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Lie:',
+    answers: {
+      '162088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Longitudinal lie',
+      '132623AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Oblique lie',
+      '124261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Transverse lie',
+    },
+  },
+  '1440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Foetal Heart Rate:',
+    answers: {},
+  },
+  '162107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Foetal Movement:',
+    answers: {
+      '113377AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Decreased fetal movements',
+      '162108AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Fetal movements present',
+      '162090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Increased fetal movements',
+      '1452AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No fetal movements',
+    },
+  },
+  '164410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'HIV Testing',
+    answers: {},
+  },
+  '159427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Final Results:',
+    answers: {
+      '703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Positive',
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '1138AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Inconclusive',
+    },
+  },
+  '164848AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Results given to client?',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'YES',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'NO',
+    },
+  },
+  '161557AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: "Has the client's partner been tested for HIV?",
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+    },
+  },
+  '1436AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Partner HIV Status:',
+    answers: {
+      '703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'HIV Positive',
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'HIV Negative',
+      '1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Unknown',
+    },
+  },
+  '56AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Microscopy',
+    answers: {},
+  },
+  '161441AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Leukocyte Esterase Test',
+    answers: {
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '1874AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Trace',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+)',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++)',
+      '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Three Plus(+++)',
+    },
+  },
+  '1875AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urinary Albumin (mg/dL)',
+    answers: {
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '1874AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Trace - 15',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+) - 30',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++) - 100',
+      '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Three Plus(+++) - 300',
+      '1365AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Four Plus(++++) - 1000',
+    },
+  },
+  '161442AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urinary Ketone (mg/dL)',
+    answers: {
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '1874AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Trace - 5',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+) - 15',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++) - 50',
+      '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Three Plus(+++) - 150',
+    },
+  },
+  '159734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Glucose Measurement (Qualitative)',
+    answers: {
+      '1115AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Normal',
+      '1874AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Trace',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+)',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++)',
+      '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Three Plus(+++)',
+      '1365AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Four Plus(++++)',
+    },
+  },
+  '161444AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Bile Salt Test (mg/dL)',
+    answers: {
+      '1115AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Normal',
+      '1874AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Trace - 1',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+) - 4',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++) - 8',
+      '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Three Plus(+++) - 12',
+    },
+  },
+  '161438AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine pH',
+    answers: {},
+  },
+  '161443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Bile Pigment Test',
+    answers: {
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+)',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++)',
+      '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Three Plus(+++)',
+    },
+  },
+  '161439AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Specific Gravity',
+    answers: {},
+  },
+  '162106AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Color',
+    answers: {
+      '162100AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Brown color',
+      '162099AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Colourless',
+      '162098AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Dark yellow colour',
+      '162097AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Light yellow colour',
+      '127778AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Red color',
+      '162105AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yellow-green colour',
+    },
+  },
+  '161440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Nitrite Test',
+    answers: {
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Positive',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+)',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++)',
+    },
+  },
+  '162101AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Turbidity',
+    answers: {
+      '162103AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Cloudy urine',
+      '162102AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Urine appears clear',
+      '162104AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Urine appears turbid',
+    },
+  },
+  '162096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Urine Dipstick for Blood',
+    answers: {
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '1874AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Trace',
+      '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'One Plus(+)',
+      '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Two Plus(++)',
+      '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Three Plus(+++)',
+    },
+  },
+  '299AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Syphilis serology:',
+    answers: {
+      '1229AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Negative',
+      '1228AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Positive',
+      '1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Requested',
+      '1402AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Not Tested',
+      '1304AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Poor Sample quality',
+    },
+  },
+  '159918AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Has the client been treated for syphilis?',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+    },
+  },
+  '32AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'BS for MPS:',
+    answers: {
+      '1138AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'INDETERMINATE',
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'NEGATIVE',
+      '703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'POSITIVE',
+    },
+  },
+  '21AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Haemoglobin:',
+    answers: {},
+  },
+  '161074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Has the client undergone antenatal exercises?',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+    },
+  },
+  '1659AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'TB Screening Results:',
+    answers: {
+      '1660AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'NO signs',
+      '142177AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'TB presumed',
+      '164128AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No signs and started on INH',
+      '1662AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'TB Rx',
+      '160737AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Not done (ND)',
+    },
+  },
+  '06398e78-0d3e-43d5-8017-f2fc3865e2e0': {
+    display: 'Has the client been screened for CaCx ?',
+    answers: {
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Normal',
+      '159393AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Presumed',
+      '703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Confirmed',
+      '1118AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Not Done',
+      '1175AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'N/A',
+    },
+  },
+  '163589AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'CaCx screening method?',
+    answers: {
+      '885AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Pap Smear',
+      '162816AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'VIA',
+      '9818bba5-ecd4-4cf9-a48f-5e5d9a48eec6': 'VILI',
+      '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Other',
+    },
+  },
+  '5356AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'WHO Staging:',
+    answers: {
+      '1204AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'WHO Stage1',
+      '1205AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'WHO Stage2',
+      '1206AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'WHO Stage3',
+      '1207AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'WHO Stage4',
+    },
+  },
+  '1271AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'HIV Viral load sample taken?',
+    answers: {
+      '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+    },
+  },
+  '1109AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: "Mother's prophylaxis given during this visit?",
+    answers: {
+      '105281AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Cotrimoxazole',
+      '74250AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Dapsone',
+      '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'None',
+    },
+  },
+  '1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'NVP for the baby dispensed?',
+    answers: {
+      '80586AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+      '1175AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'N/A',
+    },
+  },
+  '1912AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Has the client received ANC counselling:',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+    },
+  },
+  '161048AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Subject(s)',
+    answers: {},
+  },
+  '160481AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Referred from?',
+    answers: {
+      '1537AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Another Health Facility',
+      '163488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Community Unit',
+      '1175AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'N/A',
+    },
+  },
+  '163145AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Referred to?',
+    answers: {
+      '1537AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Another Health Facility',
+      '163488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Community Unit',
+      '1175AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'N/A',
+    },
+  },
+  '5096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Next appointment date:',
+    answers: {},
+  },
+  '159395AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Clinical Notes',
+    answers: {},
+  },
+};

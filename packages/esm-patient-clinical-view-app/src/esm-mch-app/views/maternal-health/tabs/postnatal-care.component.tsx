@@ -4,21 +4,13 @@ import { EncounterList, EncounterListColumn } from '../../../../encounter-list/e
 import { getObsFromEncounter } from '../../../../encounter-list/encounter-list-utils';
 import {
   hivTestResultConcept,
-  artUniqueNoConcept,
-  hivTestStatus,
-  MotherHivStatus,
   MotherNextVisitDate,
-  motherPostnatalEncounterType,
-  MotherViralLoadDate,
-  MotherViralLoadResult,
-  MothervisitDate,
-  ancVisitNumberConcept,
-  recenctViralLoad,
   motherGeneralConditionConcept,
   pphConditionConcept,
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../../../config-schema';
+import { pncConceptMap } from '../postnatal-care-constants';
 
 interface PostnatalCareListProps {
   patientUuid: string;
@@ -112,6 +104,7 @@ const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) =>
       filter={(encounter) => {
         return encounter.form.uuid == MotherPNCEncounterFormUUID;
       }}
+      formConceptMap={pncConceptMap}
     />
   );
 };

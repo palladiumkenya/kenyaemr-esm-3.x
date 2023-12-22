@@ -36,6 +36,10 @@ export interface Observation {
       uuid: string;
       display: string;
     };
+    name?: {
+      uuid: string;
+      name: string;
+    };
   };
   display: string;
   groupMembers: null | Array<{
@@ -52,4 +56,9 @@ export interface Observation {
   }>;
   value: any;
   obsDatetime?: string;
+}
+
+export interface ConceptToFormLabelMap {
+  display: string;
+  answers: null | Array<string>;
 }
