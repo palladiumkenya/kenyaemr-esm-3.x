@@ -40,7 +40,7 @@ export interface ConfigObject {
     htsScreening: string;
     htsInitialTest: string;
     htsRetest: string;
-    defaulterTracingFormUuid: string
+    defaulterTracingFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
 }
