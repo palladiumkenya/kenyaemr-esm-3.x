@@ -15,17 +15,15 @@ type NavBarOverLayerProps = {
 const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchResults, searchTerm, hideOverlay }) => {
   const { t } = useTranslation();
 
-
   const handleClearSearch = (event) => {
     event.stopPropagation();
     setSearchTerm('');
-  }
+  };
 
   return (
     <div className={styles.overlay}>
       <div className={styles.layout}>
         <Search
-          light
           autoFocus={true}
           className={styles.search}
           size="lg"
@@ -33,6 +31,7 @@ const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchRe
           labelText={t('search', 'Search for a module')}
           closeButtonLabelText="Clear search input"
           id="searchModulesInput"
+          value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
         />
 
@@ -65,4 +64,3 @@ const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchRe
 };
 
 export default NavBarOverlay;
-

@@ -3,7 +3,7 @@ import { HeaderGlobalAction } from '@carbon/react';
 import styles from './navbar-action-button.scss';
 import { useDebounce, useOnClickOutside } from '@openmrs/esm-framework';
 import NavBarOverlay from './navbar-overlay.component';
-import { Switcher, Close } from '@carbon/react/icons'
+import { Switcher, Close } from '@carbon/react/icons';
 import { moduleLinks } from './nav-utils';
 import { useTranslation } from 'react-i18next';
 
@@ -22,7 +22,6 @@ const NavbarActionButton: React.FC<NavbarActionButtonProps> = () => {
   const ref = useOnClickOutside<HTMLDivElement>(toggleOverlay, showOverlay);
 
   const debounceSearchTerm = useDebounce(searchTerm, DEBOUNCE_TIME);
-
   const searchResults =
     debounceSearchTerm === ''
       ? moduleLinks
@@ -45,11 +44,9 @@ const NavbarActionButton: React.FC<NavbarActionButtonProps> = () => {
         enterDelayMs={500}
         name="kenyaEMRModules"
         onClick={toggleOverlay}
-        className={showOverlay ? styles.active : styles.slotStyles}
-      >
+        className={showOverlay ? styles.active : styles.slotStyles}>
         {showOverlay ? <Close size={20} /> : <Switcher size={20} />}
       </HeaderGlobalAction>
-
     </div>
   );
 };
