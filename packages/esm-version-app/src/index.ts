@@ -13,7 +13,6 @@ const options = {
 export const importTranslations = require.context('../translations', false, /.json$/, 'lazy');
 
 export const about = getSyncLifecycle(rootComponent, options);
-export const aboutLink = getSyncLifecycle(aboutLinkComponent, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);

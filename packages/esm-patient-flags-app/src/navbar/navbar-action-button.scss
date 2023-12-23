@@ -1,0 +1,102 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.slotStyles {
+  background-color: transparent;
+}
+
+.active {
+  background-color: var(--brand-02);
+}
+
+.overlay {
+  position: fixed;
+  top: layout.$spacing-09;
+  right: 0;
+  min-width: 35vw;
+  max-width: 35vw;
+  background-color: colors.$white-hover;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  z-index: 999;
+}
+
+:global(.omrs-breakpoint-lt-small-desktop) .overlay {
+  min-width: 100vw;
+  max-width: 100vw;
+}
+
+:global(.omrs-breakpoint-gt-small-desktop) .overlay {
+  min-width: 50vw;
+  max-width: 50vw;
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+
+  & > div {
+    width: auto;
+  }
+}
+
+.search {
+  margin: layout.$spacing-05;
+  width: 100%;
+}
+
+.navLinks {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.5rem;
+  row-gap: 1rem;
+  padding: 0 1rem 1rem 1rem;
+}
+
+.navLinkItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 6rem;
+  min-width: 7.5rem;
+  height: 7rem;
+  justify-content: center;
+  background-color: colors.$cool-gray-10;
+  cursor: pointer;
+  row-gap: 1rem;
+
+  & > span {
+    @include type.type-style('body-01');
+  }
+
+  &:hover {
+    background-color: colors.$cool-gray-20;
+  }
+}
+
+.container {
+  margin: 2rem 1rem;
+}
+
+.emptyStateContainer {
+  @extend .container;
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid colors.$cool-gray-30;
+}
+
+.content {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.illo {
+  margin-top: layout.$spacing-05;
+}
