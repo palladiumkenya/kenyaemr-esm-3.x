@@ -11,12 +11,5 @@
       "offline": true
     }
   ],
-  "extensions": [
-    {
-      "name": "about--link",
-      "slot": "app-menu-slot",
-      "component": "aboutLink",
-      "order": 0
-    }
-  ]
+  "extensions": []
 }

@@ -1,38 +1,45 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Layer, Search, Tile } from '@carbon/react';
-import { navigate, useOnClickOutside } from '@openmrs/esm-framework';
-import styles from './navbar-button.scss';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import NavBarLink from './navbar-link.component';
+import styles from './navbar-action-button.scss';
 
 type NavBarOverLayerProps = {
   setSearchTerm: (searchTerm: string) => void;
   searchTerm: string;
   hideOverlay: (state: boolean) => void;
-  searchResults: Array<{ url: string; icon: React.ReactNode; label: string }>;
-  hide: boolean;
+  searchResults: Array<{ url?: string; icon: any; label: string }>;
 };
 
-const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchResults, searchTerm }) => {
+const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchResults, searchTerm, hideOverlay }) => {
   const { t } = useTranslation();
+
+
+  const handleClearSearch = (event) => {
+    event.stopPropagation();
+    setSearchTerm('');
+  }
+
   return (
     <div className={styles.overlay}>
       <div className={styles.layout}>
         <Search
           light
+          autoFocus={true}
           className={styles.search}
           size="lg"
-          placeholder="Find your items"
-          labelText="Search"
+          placeholder={t('search', 'Search for a module')}
+          labelText={t('search', 'Search for a module')}
           closeButtonLabelText="Clear search input"
-          id="search-1"
+          id="searchModulesInput"
           onChange={(event) => setSearchTerm(event.target.value)}
         />
 
         {searchResults.length > 0 && (
           <div className={styles.navLinks}>
             {searchResults.map((item, index) => (
-              <NavBarLinkItem key={index} {...item} />
+              <NavBarLink key={index} {...item} hideOverlay={hideOverlay} />
             ))}
           </div>
         )}
@@ -46,7 +53,7 @@ const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchRe
               <p className={styles.content}>
                 {t('emptyLinkSearchText', `There are no links to display that match ${searchTerm}`)}
               </p>
-              <Button kind="ghost" onClick={() => setSearchTerm('')}>
+              <Button kind="ghost" onClick={handleClearSearch}>
                 {t('clearSearch', 'Clear search')}
               </Button>
             </Tile>
@@ -59,17 +66,3 @@ const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchRe
 
 export default NavBarOverlay;
 
-type NavBarLinkItemProps = {
-  icon: React.ReactNode;
-  label: string;
-  url: string;
-};
-
-const NavBarLinkItem: React.FC<NavBarLinkItemProps> = ({ icon, label, url }) => {
-  return (
-    <div role="button" tabIndex={0} onClick={() => navigate({ to: url })} className={styles.navLinkItem}>
-      {icon}
-      <span>{label}</span>
-    </div>
-  );
-};

@@ -14,14 +14,6 @@
       "offline": false
     },
     {
-      "name": "kenyaemr-home-page",
-      "slot": "app-menu-slot",
-      "component": "kenyaemrHomePage",
-      "online": true,
-      "offline": false,
-      "order": 0
-    },
-    {
       "name": "kenyaemr-2.x-chart-link",
       "slot": "visit-header-right-slot",
       "component": "kenyaemr2ChartLink",
@@ -29,20 +21,12 @@
       "offline": true
     },
     {
-      "name": "clear-cache-button",
-      "slot": "app-menu-slot",
-      "component": "clearCacheButton",
-      "online": true,
-      "offline": false
-    },
-    {
       "name": "kenyaemr-module-links",
       "slot": "top-nav-actions-slot",
       "component": "navbarButtons",
+      "order": 5,
       "online": true,
-      "offline": false,
-      "order": 0
-
+      "offline": true
     }
   ]
 }
