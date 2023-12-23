@@ -1,7 +1,9 @@
 {
   "2xChart": "2.x Chart",
+  "clearSearch": "Clear search",
+  "emptyLinkSearchText": "",
   "errorPatientFlags": "Error loading patient flags",
-  "facilityDashboard": "Facility Dashboard",
   "kenyaEMRHome": "KenyaEMR Home",
-  "reloadAndClearCache": "Reload & Clear Cache"
+  "kenyaEMRModules": "KenyaEMR Modules",
+  "search": "Search for a module"
 }

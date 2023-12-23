@@ -13,7 +13,9 @@ type NavBarLinkItemProps = {
 const NavBarLink: React.FC<NavBarLinkItemProps> = ({ icon, label, url, hideOverlay, onClick }) => {
   const handleClick = (url) => {
     hideOverlay(false);
-    if (!url) return onClick && onClick();
+    if (!url) {
+      return onClick && onClick();
+    }
     navigate({ to: url });
   };
   return (
