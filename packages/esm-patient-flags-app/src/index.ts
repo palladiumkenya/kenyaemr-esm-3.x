@@ -3,6 +3,7 @@ import { configSchema } from './config-schema';
 import kenyaEmr2ChartLinkComponent from './kenyaemr-link/kenyaemr-chart-link.component';
 import patientFlagsComponent from './patient-flags/patient-flags.component';
 import kenyaemrHomePageComponent from './home-page/home-app.component';
+import { NavBarButton } from './navbar/navbar-button.component';
 
 const moduleName = '@kenyaemr/esm-patient-flags-app';
 
@@ -12,7 +13,7 @@ const options = {
 };
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
+export const navbarButtons = getSyncLifecycle(NavBarButton, options);
 export const kenyaemr2ChartLink = getSyncLifecycle(kenyaEmr2ChartLinkComponent, options);
 export const patientFlag = getSyncLifecycle(patientFlagsComponent, options);
 export const kenyaemrHomePage = getSyncLifecycle(kenyaemrHomePageComponent, options);

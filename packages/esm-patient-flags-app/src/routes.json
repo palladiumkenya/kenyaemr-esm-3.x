@@ -36,9 +36,9 @@
       "offline": false
     },
     {
-      "name": "kenyaemr-facility-dashboard",
-      "slot": "app-menu-slot",
-      "component": "kenyaemrFacilityDashboard",
+      "name": "kenyaemr-module-links",
+      "slot": "top-nav-actions-slot",
+      "component": "navbarButtons",
       "online": true,
       "offline": false,
       "order": 0
