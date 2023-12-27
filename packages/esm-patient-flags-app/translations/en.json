@@ -1,7 +1,7 @@
 {
   "2xChart": "2.x Chart",
   "clearSearch": "Clear search",
-  "emptyLinkSearchText": "",
+  "emptyLinkSearchText": "There are no links to display that match the search criteria",
   "errorPatientFlags": "Error loading patient flags",
   "kenyaEMRHome": "KenyaEMR Home",
   "kenyaEMRModules": "KenyaEMR Modules",

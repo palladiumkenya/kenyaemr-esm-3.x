@@ -50,7 +50,7 @@ const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchRe
                 <EmptyDataIllustration />
               </div>
               <p className={styles.content}>
-                {t('emptyLinkSearchText', `There are no links to display that match ${searchTerm}`)}
+                {t('emptyLinkSearchText', `There are no links to display that match the search criteria`)}
               </p>
               <Button kind="ghost" onClick={handleClearSearch}>
                 {t('clearSearch', 'Clear search')}
