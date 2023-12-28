@@ -25,7 +25,7 @@ interface TableProps {
 export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows, formConceptMap, isExpandable }) => {
   return (
     <TableContainer>
-      <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+      <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="md">
         {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
           <Table {...getTableProps()}>
             <TableHead>
@@ -44,23 +44,29 @@ export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows, formConc
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row, index) => {
-                return (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                    <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2}>
+              {rows.map((row, parentIndex) => (
+                <React.Fragment key={parentIndex}>
+                  <TableExpandRow {...getRowProps({ row })}>
+                    {row.cells.map((cell, childIndex) => (
+                      <TableCell key={childIndex}>{cell.value}</TableCell>
+                    ))}
+                  </TableExpandRow>
+                  {row.isExpanded ? (
+                    <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
                       <EncounterObservations
-                        observations={tableRows?.[index]?.obs ?? []}
+                        observations={tableRows?.[parentIndex]?.obs ?? []}
                         formConceptMap={formConceptMap}
                       />
                     </TableExpandedRow>
-                  </React.Fragment>
-                );
-              })}
+                  ) : (
+                    <TableExpandedRow
+                      className={styles.hiddenRow}
+                      colSpan={headers.length + 2}
+                      key={`${parentIndex}-hiddenRow`}
+                    />
+                  )}
+                </React.Fragment>
+              ))}
             </TableBody>
           </Table>
         )}
