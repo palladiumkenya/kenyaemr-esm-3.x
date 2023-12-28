@@ -57,7 +57,7 @@ describe('Navbar Action Button', () => {
 
     // should display empty state if no results are found
     await userEvent.type(searchBox, 'No results');
-    const emptyState = screen.getByText('There are no links to display that match No results');
+    const emptyState = screen.getByText('There are no links to display that match the search criteria');
     expect(emptyState).toBeInTheDocument();
 
     // clicking clear search should show all links
