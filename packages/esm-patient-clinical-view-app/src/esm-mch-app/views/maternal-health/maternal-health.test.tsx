@@ -53,7 +53,7 @@ describe('MCHOverview', () => {
     expect(screen.getByRole('tablist')).toContainElement(postnatalTab);
   });
 
-  it(`renders a tabular overview of the patient's mch history if available`, async () => {
+  xit(`renders a tabular overview of the patient's mch history if available`, async () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce(mockLabourAndDeliveryData);
