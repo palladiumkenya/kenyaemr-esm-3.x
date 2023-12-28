@@ -13,10 +13,9 @@ import {
   Layer,
   Tile,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
 import { useEncounterRows } from '../../src/hooks/useEncounterRows';
-import { OpenmrsEncounter } from '../type/types';
-import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { OpenmrsEncounter } from '../types';
 
 export interface O3FormSchema {
   name: string;
