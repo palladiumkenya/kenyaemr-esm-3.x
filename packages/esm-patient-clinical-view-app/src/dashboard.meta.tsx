@@ -1,5 +1,5 @@
 export const ClinicalDashboardGroup = {
-  title: 'Clinical View',
+  title: 'Clinical Views',
   slotName: 'patient-clinical-view-slot',
   isExpanded: true,
 };
@@ -27,6 +27,15 @@ export const htsDashboardMeta = {
   columns: 1,
   title: 'HTS',
   path: 'hts-dashboard',
+  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
+  config: {},
+};
+
+export const familyHistoryDashboardMeta = {
+  slot: 'patient-chart-family-history-slot',
+  columns: 1,
+  title: 'Family History',
+  path: 'family-history',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
 };

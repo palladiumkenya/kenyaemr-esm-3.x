@@ -29,6 +29,19 @@ export const configSchema = {
     _description: 'Encounter UUID for defaulter tracing',
     _default: '1495edf8-2df2-11e9-b210-d663bd873d93',
   },
+  concepts: {
+    probableCauseOfDeathConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description:
+        'Probable cause of death for a given patient determined from interviewing a family member or other non-medical personnel as part of a death registry questionnaire',
+      _default: '1599AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    problemListConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'List of given problems for a given patient',
+      _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -43,4 +56,5 @@ export interface ConfigObject {
     defaulterTracingFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
+  concepts: Record<string, string>;
 }
