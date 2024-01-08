@@ -2,9 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { Observation } from '../../src/type/types';
-import styles from './encounter-observation-table.scss';
+import styles from './encounter-observation-component.scss';
 import { mapConceptToFormLabel, mapObsValueToFormLabel } from '../encounter-list/encounter-list-utils';
+import { Observation } from '../types';
 
 interface EncounterObservationsProps {
   observations: Array<Observation>;
@@ -16,10 +16,10 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   const { obsConceptUuidsToHide = [] } = useConfig();
 
   if (!observations) {
-    return <SkeletonText />;
+    return <SkeletonText data-testid="skeleton-text" />;
   }
 
-  if (observations) {
+  if (observations?.length > 0) {
     const filteredObservations = !!obsConceptUuidsToHide.length
       ? observations?.filter((obs) => {
           return !obsConceptUuidsToHide.includes(obs?.concept?.uuid);
@@ -27,14 +27,14 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
       : observations;
     return (
       <div className={styles.observation}>
-        {filteredObservations?.map((obs, index) => {
+        {filteredObservations?.map((obs, parentIndex) => {
           if (obs.groupMembers) {
             return (
-              <React.Fragment key={index}>
+              <React.Fragment key={parentIndex}>
                 <span className={styles.parentConcept}>{obs.concept.display ?? 'Group'}</span>
                 <span />
-                {obs.groupMembers.map((member) => (
-                  <React.Fragment key={index}>
+                {obs.groupMembers.map((member, childIndex) => (
+                  <React.Fragment key={childIndex}>
                     <span className={styles.childConcept}>
                       {mapConceptToFormLabel(member.concept.uuid, formConceptMap, member.concept.display)}
                     </span>
@@ -47,7 +47,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
             );
           } else {
             return (
-              <React.Fragment key={index}>
+              <React.Fragment key={parentIndex}>
                 <span className={styles.questionText}>
                   {mapConceptToFormLabel(obs.concept.uuid, formConceptMap, obs.concept.name.name)}
                 </span>

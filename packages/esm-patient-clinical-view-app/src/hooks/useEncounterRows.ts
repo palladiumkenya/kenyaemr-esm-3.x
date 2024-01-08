@@ -2,24 +2,7 @@ import useSWRImmutable, { mutate } from 'swr';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { encounterRepresentation } from '../esm-mch-app/constants';
-// import { encounterRepresentation } from '../../../utils/constants';
-
-export interface OpenmrsResource {
-  uuid: string;
-  display?: string;
-  [anythingElse: string]: any;
-}
-
-export interface OpenmrsEncounter extends OpenmrsResource {
-  encounterDatetime: Date;
-  encounterType: string;
-  patient: string;
-  location: string;
-  encounterProviders?: Array<{ encounterRole: string; provider: string }>;
-  obs: Array<OpenmrsResource>;
-  form?: string;
-  visit?: string;
-}
+import { OpenmrsEncounter } from '../types';
 
 export function useEncounterRows(patientUuid: string, encounterType: string, encounterFilter: (encounter) => boolean) {
   const [encounters, setEncounters] = useState([]);
