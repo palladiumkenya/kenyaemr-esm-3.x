@@ -36,10 +36,10 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
                 {obs.groupMembers.map((member, childIndex) => (
                   <React.Fragment key={childIndex}>
                     <span className={styles.childConcept}>
-                      {mapConceptToFormLabel(member.concept.uuid, formConceptMap, member.concept.display)}
+                      {mapConceptToFormLabel(member?.concept?.uuid, formConceptMap, member.concept.display)}
                     </span>
                     <span>
-                      {mapObsValueToFormLabel(member.concept.uuid, member.value.uuid, formConceptMap, member.display)}
+                      {mapObsValueToFormLabel(member?.concept?.uuid, member.value.uuid, formConceptMap, member.display)}
                     </span>
                   </React.Fragment>
                 ))}
@@ -49,9 +49,9 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
             return (
               <React.Fragment key={parentIndex}>
                 <span className={styles.questionText}>
-                  {mapConceptToFormLabel(obs.concept.uuid, formConceptMap, obs.concept.name.name)}
+                  {mapConceptToFormLabel(obs?.concept?.uuid, formConceptMap, obs?.concept?.name.name)}
                 </span>
-                <span>{mapObsValueToFormLabel(obs.concept.uuid, obs.value.uuid, formConceptMap, obs.value)}</span>
+                <span>{mapObsValueToFormLabel(obs?.concept?.uuid, obs?.value?.uuid, formConceptMap, obs?.value)}</span>
               </React.Fragment>
             );
           }

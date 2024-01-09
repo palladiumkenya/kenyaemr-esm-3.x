@@ -1,4 +1,4 @@
-import { navigate } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './encounter-list.scss';
@@ -79,16 +79,12 @@ export const EncounterList: React.FC<EncounterListProps> = ({
   isExpandable,
 }) => {
   const { t } = useTranslation();
-  const [paginatedRows, setPaginatedRows] = useState([]);
   const [forms, setForms] = useState<O3FormSchema[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const layout = useLayoutType();
+  const pageSizes = [10, 20, 30, 40, 50];
   const formNames = useMemo(() => formList.map((form) => form.name), [formList]);
-  const {
-    encounters,
-    isLoading: isLoadingEncounters,
-    onFormSave,
-  } = useEncounterRows(patientUuid, encounterType, filter);
+  const { encounters, isLoading, onFormSave, error } = useEncounterRows(patientUuid, encounterType, filter);
   const { moduleName, workspaceWindowSize, displayText, hideFormLauncher } = launchOptions;
 
   const defaultActions = useMemo(
@@ -131,16 +127,11 @@ export const EncounterList: React.FC<EncounterListProps> = ({
     return [];
   }, [columns]);
 
-  const constructPaginatedTableRows = useCallback(
-    (encounters: OpenmrsEncounter[], currentPage: number, pageSize: number) => {
-      const startIndex = (currentPage - 1) * pageSize;
-      const paginatedEncounters = [];
-      for (let i = startIndex; i < startIndex + pageSize; i++) {
-        if (i < encounters.length) {
-          paginatedEncounters.push(encounters[i]);
-        }
-      }
-      const rows = paginatedEncounters.map((encounter) => {
+  const { goTo, results, currentPage } = usePagination(encounters, pageSize);
+
+  const constructTableRows = useCallback(
+    (results: OpenmrsEncounter[]) => {
+      const rows = results?.map((encounter) => {
         const tableRow: { id: string; actions: any; obs: any } = {
           id: encounter.uuid,
           actions: null,
@@ -177,6 +168,7 @@ export const EncounterList: React.FC<EncounterListProps> = ({
           <OverflowMenu flipped className={styles.flippedOverflowMenu}>
             {actions.map((actionItem, index) => (
               <OverflowMenuItem
+                key={index}
                 itemText={actionItem.label}
                 onClick={(e) => {
                   e.preventDefault();
@@ -187,55 +179,69 @@ export const EncounterList: React.FC<EncounterListProps> = ({
         );
         return tableRow;
       });
-      setPaginatedRows(rows);
+      return rows;
     },
-    [columns, defaultActions, forms, moduleName, workspaceWindowSize],
+    [columns, defaultActions, forms, moduleName, workspaceWindowSize, results],
   );
 
-  useEffect(() => {
-    if (encounters?.length) {
-      constructPaginatedTableRows(encounters, currentPage, pageSize);
-    }
-  }, [encounters, pageSize, constructPaginatedTableRows, currentPage]);
+  // Call the function to obtain the rows
+  const rows = constructTableRows(results);
+
+  if (isLoading) {
+    return <DataTableSkeleton rowCount={5} />;
+  }
+
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <Layer>
+          <ErrorState error={error} headerTitle={t('encountersList', 'Encounters list')} />
+        </Layer>
+      </div>
+    );
+  }
+
+  if (rows?.length === 0) {
+    return (
+      <div className={styles.widgetContainer}>
+        <Layer className={styles.emptyStateContainer}>
+          <Tile className={styles.tile}>
+            <div>
+              <EmptyDataIllustration />
+            </div>
+            <p className={styles.content}>There are no encounters to display</p>
+          </Tile>
+        </Layer>
+      </div>
+    );
+  }
 
   return (
     <>
-      {isLoadingEncounters ? (
-        <DataTableSkeleton rowCount={5} />
-      ) : encounters.length > 0 ? (
-        <>
-          <div className={styles.widgetContainer}>
-            <div className={styles.widgetHeaderContainer}>
-              {!hideFormLauncher && <div className={styles.toggleButtons}>{}</div>}
-            </div>
-            <OTable
-              tableHeaders={headers}
-              tableRows={paginatedRows}
-              formConceptMap={formConceptMap}
-              isExpandable={isExpandable}
-            />
-            <Pagination
-              page={currentPage}
-              pageSize={pageSize}
-              pageSizes={[10, 20, 30, 40, 50]}
-              totalItems={encounters.length}
-              onChange={({ page, pageSize }) => {
-                setCurrentPage(page);
-                setPageSize(pageSize);
-              }}
-            />
-          </div>
-        </>
-      ) : (
+      {rows?.length > 0 && (
         <div className={styles.widgetContainer}>
-          <Layer className={styles.emptyStateContainer}>
-            <Tile className={styles.tile}>
-              <div>
-                <EmptyDataIllustration />
-              </div>
-              <p className={styles.content}>There are no encounters to display</p>
-            </Tile>
-          </Layer>
+          <div className={styles.widgetHeaderContainer}>
+            {!hideFormLauncher && <div className={styles.toggleButtons}>{}</div>}
+          </div>
+          <OTable tableHeaders={headers} tableRows={rows} formConceptMap={formConceptMap} isExpandable={isExpandable} />
+          <Pagination
+            forwardText="Next page"
+            backwardText="Previous page"
+            page={currentPage}
+            pageSize={pageSize}
+            pageSizes={pageSizes}
+            totalItems={rows?.length}
+            className={styles.pagination}
+            size={isDesktop(layout) ? 'sm' : 'lg'}
+            onChange={({ pageSize: newPageSize, page: newPage }) => {
+              if (newPageSize !== pageSize) {
+                setPageSize(newPageSize);
+              }
+              if (newPage !== currentPage) {
+                goTo(newPage);
+              }
+            }}
+          />
         </div>
       )}
     </>
