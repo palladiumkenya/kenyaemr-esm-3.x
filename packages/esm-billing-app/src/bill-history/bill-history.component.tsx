@@ -16,9 +16,15 @@ import {
   TableExpandHeader,
   TableExpandRow,
   TableExpandedRow,
+  Button,
 } from '@carbon/react';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, ErrorState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyDataIllustration,
+  ErrorState,
+  usePaginationInfo,
+  launchPatientWorkspace,
+} from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
 import styles from './bill-history.scss';
@@ -89,6 +95,9 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
             <EmptyDataIllustration />
           </div>
           <p className={styles.content}>There are no bills to display.</p>
+          <Button onClick={() => launchPatientWorkspace('billing-form')} kind="ghost">
+            {t('launchBillForm', 'Launch bill form')}
+          </Button>
         </Tile>
       </Layer>
     );
