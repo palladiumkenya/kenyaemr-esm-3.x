@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
@@ -22,6 +23,13 @@
   :has(.filterEmptyState) {
     border-bottom: none;
   }
+}
+.left-justified-items {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  align-items: center;
 }
 
 .filterContainer {
@@ -178,4 +186,29 @@
 .filterEmptyStateHelper {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+.metricsContainer {
+  display: flex;
+  justify-content: space-between;
+  background-color: $ui-02;
+  height: spacing.$spacing-10;
+  align-items: center;
+  padding: 0 spacing.$spacing-05;
+}
+
+.metricsTitle {
+  @include type.type-style('heading-03');
+  color: $ui-05;
+}
+
+.actionsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $ui-02;
+}
+.actionBtn {
+  display: flex;
+  column-gap: 0.5rem;
 }
