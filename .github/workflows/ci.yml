@@ -111,7 +111,20 @@ jobs:
           mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
           mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
           ls dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+  Trigger_server_build:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
+      - name: Invoke workflow without inputs. Don't wait for result
+        uses: aurelien-baudet/workflow-dispatch@v2
+        with:
+          workflow: KenyaEMR CI
+          repo: palladiumkenya/openmrs-config-kenyaemr
+          token: ${{ secrets.PERSONAL_TOKENS }}
+          wait-for-completion: false 
   pre_release:
     runs-on: ubuntu-latest
 
