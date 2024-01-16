@@ -48,16 +48,17 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const handleBillingService = ({ selectedItem }) => {
     const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
     const itemUuid = selectedItem?.uuid ?? '';
+    const priceForPaymentMode = selectedItem.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod);
 
     // TODO: This line list should come from backend to avoid hard coding prices in the frontend
     const createBillPayload = {
       lineItems: [
         {
-          item: itemUuid,
+          billableService: itemUuid,
           quantity: 1,
-          price: DEFAULT_PRICE,
+          price: priceForPaymentMode ? priceForPaymentMode.price : '0.000',
           priceName: 'Default',
-          priceUuid: '',
+          priceUuid: priceForPaymentMode ? priceForPaymentMode.uuid : '',
           lineItemOrder: 0,
           paymentStatus: PENDING_PAYMENT_STATUS,
         },
@@ -88,15 +89,10 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     );
   }
 
-  // if (paymentMethod) {
-  //   lineItems.forEach((e) => {
-  //     e.servicePrices.forEach((p) => {
-  //       if (p.paymentMode && p.paymentMode.uuid == paymentMethod) {
-  //         lineList.push(e);
-  //       }
-  //     });
-  //   });
-  // }
+  const setServicePrice = (prices) => {
+    const matchingPrice = prices.find((p) => p.paymentMode?.uuid === paymentMethod);
+    return matchingPrice ? `(${matchingPrice.name}:${matchingPrice.price})` : '';
+  };
 
   if (cashError || lineError) {
     return (
@@ -121,9 +117,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
             onChange={handleBillingService}
             id="billable-items"
             items={lineList}
-            itemToString={(item) =>
-              item ? `${item.name} (${item.servicePrices[0].name}:${item.servicePrices[0].price})` : ''
-            }
+            itemToString={(item) => (item ? `${item.name} ${setServicePrice(item.servicePrices)}` : '')}
             titleText={t('billableService', 'Billable service')}
           />
         </>
