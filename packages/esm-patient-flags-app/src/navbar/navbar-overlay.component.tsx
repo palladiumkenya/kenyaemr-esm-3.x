@@ -4,12 +4,13 @@ import { Button, Layer, Search, Tile } from '@carbon/react';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import NavBarLink from './navbar-link.component';
 import styles from './navbar-action-button.scss';
+import { UserHasAccess } from '@openmrs/esm-framework';
 
 type NavBarOverLayerProps = {
   setSearchTerm: (searchTerm: string) => void;
   searchTerm: string;
   hideOverlay: (state: boolean) => void;
-  searchResults: Array<{ url?: string; icon: any; label: string }>;
+  searchResults: Array<{ url?: string; icon: any; label: string; requiresAdmin?: boolean }>;
 };
 
 const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchResults, searchTerm, hideOverlay }) => {
@@ -37,9 +38,15 @@ const NavBarOverlay: React.FC<NavBarOverLayerProps> = ({ setSearchTerm, searchRe
 
         {searchResults.length > 0 && (
           <div className={styles.navLinks}>
-            {searchResults.map((item, index) => (
-              <NavBarLink key={index} {...item} hideOverlay={hideOverlay} />
-            ))}
+            {searchResults.map((item, index) =>
+              item?.requiresAdmin ? (
+                <UserHasAccess privilege="coreapps.systemAdministration">
+                  <NavBarLink key={index} {...item} hideOverlay={hideOverlay} />
+                </UserHasAccess>
+              ) : (
+                <NavBarLink key={index} {...item} hideOverlay={hideOverlay} />
+              ),
+            )}
           </div>
         )}
 
