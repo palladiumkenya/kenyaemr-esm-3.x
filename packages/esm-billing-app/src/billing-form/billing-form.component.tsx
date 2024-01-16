@@ -48,8 +48,9 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
     const total = parseInt(price) * event.target.value;
     console.log(price, total);
 
-    (document.getElementById(event.target.id+"Total")  as HTMLInputElement).value = total.toString();
-    
+    // (document.getElementById(event.target.id+"Total")  as HTMLInputElement).value = total.toString();
+    (document.getElementById(event.target.id+"Total")  as HTMLInputElement).innerHTML = total.toString();
+
     
     // add totals
     // const totals =   Array.from(document.getElementsByClassName("totalValue"));
@@ -58,7 +59,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
     console.log(totals)
     let addUpTotals = 0;
     totals.forEach ((tot)=> {
-      var getTot = (tot as HTMLInputElement).value;
+      var getTot = (tot as HTMLInputElement).innerHTML;
       console.log(getTot);
       addUpTotals+=parseInt(getTot)
   })
@@ -106,7 +107,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
             <TableCell>{row.Item}</TableCell>
             <TableCell><NumberInput id={row.Item} min={0} max={100} value={row.Qnty} onChange={(e) => calculateTotal(e)}/></TableCell> 
             <TableCell><TextInput id={row.Item+"Price"} type="text" readonly value={row.Price} style={{padding:'0px',background: 'inherit'}}/></TableCell>      
-            <TableCell><TextInput id={row.Item+"Total"} type="text" readonly value={row.Total} style={{padding:'0px',background: 'inherit'}} className="totalValue"/></TableCell>    
+            <TableCell id={row.Item+"Total"}  className="totalValue">{row.Total}</TableCell>    
           </TableRow>
             )) : (
                 <p>Loading...</p>
