@@ -5,8 +5,8 @@ import BillableServices from './billable-services.component';
 describe('BillableService', () => {
   test('should render billable services', () => {
     renderBillableServices();
-    // expect(screen.getByText(/Empty data illustration/i)).toBeInTheDocument();
-    // expect(screen.getByText(/There are no services to display./i)).toBeInTheDocument();
+    expect(screen.getByText(/Empty data illustration/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no {displayText} to display for this patient/i)).toBeInTheDocument();
   });
 });
 
