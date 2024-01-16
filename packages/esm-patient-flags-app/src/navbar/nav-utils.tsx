@@ -10,6 +10,7 @@ import {
   User,
   VolumeFileStorage,
   Report,
+  InventoryManagement,
 } from '@carbon/react/icons';
 const openmrsSpaBase = window['getOpenmrsSpaBase']();
 
@@ -72,5 +73,10 @@ export const moduleLinks = [
     label: 'Dispensing App',
     url: `${openmrsSpaBase}dispensing`,
     icon: <Medication size={24} />,
+  },
+  {
+    label: 'Billable Services',
+    url: `${openmrsSpaBase}billable-services`,
+    icon: InventoryManagement,
   },
 ];
