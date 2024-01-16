@@ -2,17 +2,17 @@ import React, { useCallback } from 'react';
 import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TrashCan, Add } from '@carbon/react/icons';
-import { Button, Dropdown, NumberInputSkeleton, TextInput } from '@carbon/react';
+import { Button, Dropdown, NumberInputSkeleton, TextInput, NumberInput } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { PaymentFormValue } from '../payments.component';
 import { usePaymentModes } from '../payment.resource';
 import styles from './payment-form.scss';
 
-type PaymentFormProps = { disablePayment: boolean };
+type PaymentFormProps = { disablePayment: boolean; amountDue: number };
 
 const DEFAULT_PAYMENT = { method: '', amount: 0, referenceCode: '' };
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) => {
   const { t } = useTranslation();
   const {
     control,
@@ -57,11 +57,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment }) => {
             control={control}
             name={`payment.${index}.amount`}
             render={({ field }) => (
-              <TextInput
+              <NumberInput
                 {...field}
+                onChange={(e) => field.onChange(Number(e.target.value))}
                 invalid={!!errors?.payment?.[index]?.amount}
                 invalidText={errors?.payment?.[index]?.amount?.message}
-                labelText={t('amount', 'Amount')}
+                label={t('amount', 'Amount')}
                 placeholder={t('enterAmount', 'Enter amount')}
               />
             )}

@@ -15,17 +15,6 @@ import PaymentHistory from './payment-history/payment-history.component';
 import PaymentForm from './payment-form/payment-form.component';
 import styles from './payments.scss';
 
-const paymentSchema = z.object({
-  method: z.string().refine((value) => !!value, 'Payment method is required'),
-  amount: z.union([
-    z.number().refine((value) => !!value, 'Amount is required'),
-    z.string().refine((value) => !!value, 'Amount is required'),
-  ]),
-  referenceCode: z.union([z.number(), z.string()]).optional(),
-});
-
-const paymentFormSchema = z.object({ payment: z.array(paymentSchema) });
-
 type PaymentProps = { bill: MappedBill };
 export type Payment = { method: string; amount: string | number; referenceCode?: number | string };
 export type PaymentFormValue = {
@@ -34,6 +23,15 @@ export type PaymentFormValue = {
 
 const Payments: React.FC<PaymentProps> = ({ bill = {} as MappedBill }) => {
   const { t } = useTranslation();
+  const paymentSchema = z.object({
+    method: z.string().refine((value) => !!value, 'Payment method is required'),
+    amount: z
+      .number()
+      .lte(bill.totalAmount - bill.tenderedAmount, { message: 'Amount paid should not be greater than amount due' }),
+    referenceCode: z.union([z.number(), z.string()]).optional(),
+  });
+
+  const paymentFormSchema = z.object({ payment: z.array(paymentSchema) });
   const methods = useForm<PaymentFormValue>({
     mode: 'all',
     defaultValues: {},
@@ -79,7 +77,7 @@ const Payments: React.FC<PaymentProps> = ({ bill = {} as MappedBill }) => {
           </CardHeader>
           <div>
             {bill && <PaymentHistory bill={bill} />}
-            <PaymentForm disablePayment={amountDue <= 0} />
+            <PaymentForm disablePayment={amountDue <= 0} amountDue={amountDue} />
           </div>
         </div>
         <div className={styles.divider} />
