@@ -1,5 +1,5 @@
 import React, {useState,useEffect} from 'react';
-import { TextInput,NumberInput,RadioButtonGroup, RadioButton, Search, Table,TableHead,TableBody,TableHeader,TableRow,TableCell } from '@carbon/react';
+import { ButtonSet,Button, TextInput,NumberInput,RadioButtonGroup, RadioButton, Search, Table,TableHead,TableBody,TableHeader,TableRow,TableCell } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
@@ -17,15 +17,18 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
   const [isSearchEnabled, setIsSearchEnabled] = useState("");
   const [GrandTotal, setGrandTotal] = useState(0);
 
-  const rows = [
-    {'Item':'Panadol','Qnty':20, 'Price':10, 'Total':10},
-    {'Item':'Vaccine','Qnty':20, 'Price':10, 'Total':10},
-    {'Item':'Gloves','Qnty':20, 'Price':10, 'Total':10},
-    {'Item':'Syringe','Qnty':20, 'Price':10, 'Total':10}
+  
+
+  const defaultSearchItems = [
+    {'Item':'Paracetamol ','Qnty':20, 'Price':10, 'Total':10},
+    {'Item':'Pfizer Vaccine','Qnty':50, 'Price':10, 'Total':10},
+    {'Item':'GoodHealth Probiotics','Qnty':20, 'Price':10, 'Total':10},
+    {'Item':'Cipex Dewormer','Qnty':70, 'Price':10, 'Total':10}
 
   ];
+  
   const [searchOptions, setsearchOptions] = useState([]);
-
+  const [BillItems, setBillItems] = useState([]);
 
   const toggleSearch = (choiceSelected) => {
     // alert(JSON.stringify(event));
@@ -33,12 +36,14 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
     var isSelected = choiceSelected == 'Drug'
     // setIsSearchEnabled("disabled")
     if (choiceSelected == 'Drug'){
-      setIsSearchEnabled("disabled")
-
+      // setIsSearchEnabled("disabled")
+      (document.getElementById('searchField')  as HTMLInputElement).disabled = false;
       // console.log('in choice', isSearchEnabled);
 
     }else{
-      setIsSearchEnabled("")
+      // setIsSearchEnabled("")
+      (document.getElementById('searchField')  as HTMLInputElement).disabled = true;
+
     }
     console.log(choiceSelected, isSearchEnabled);
 
@@ -46,23 +51,20 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
 
 
   const calculateTotal = (event) => {
- 
     const price =   (document.getElementById(event.target.id+"Price")  as HTMLInputElement).value;
     const total = parseInt(price) * event.target.value;
-    console.log(price, total);
-
+    // console.log(price, total);
     // (document.getElementById(event.target.id+"Total")  as HTMLInputElement).value = total.toString();
     (document.getElementById(event.target.id+"Total")  as HTMLInputElement).innerHTML = total.toString();
-
     
     // add totals
     const totals = Array.from( document.querySelectorAll('[id$="Total"]'));
     // totals.foreach()
-    console.log(totals)
+    // console.log(totals)
     let addUpTotals = 0;
     totals.forEach ((tot)=> {
         var getTot = (tot as HTMLInputElement).innerHTML;
-        console.log(getTot);
+        // console.log(getTot);
         addUpTotals+=parseInt(getTot)
     })
     setGrandTotal(addUpTotals)
@@ -71,22 +73,27 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
 
 
   const filterItems= (searchVal) => {
-    console.log(searchVal)
-
-    // rows.filter(function (el) {
-    //   const filteredRes = el.Item.includes(searchVal); // Changed this so a home would match
-    //   console.log(filteredRes)
-    //   return filteredRes; // Changed this so a home would match
-    // });
+    
     if (searchVal!= ""){
-    const filteredRes =rows.filter(o =>
+    const filteredRes =defaultSearchItems.filter(o =>
       o.Item.toLowerCase().includes(searchVal.toLowerCase()));
-    console.log(filteredRes)
+    
     setsearchOptions(filteredRes)
     }else{
       setsearchOptions([])
 
     }
+  }
+
+  
+  const addItemToBill= (item) => {
+    
+    const filteredRes =defaultSearchItems.filter(o =>
+      o.Item.toLowerCase().includes(item.target.id.replace('Option','').toLowerCase()));
+    
+     BillItems.push({'Item':filteredRes[0].Item,'Qnty':1, 'Price':filteredRes[0].Price, 'Total':10})
+     setBillItems(BillItems)
+    
   }
 
   useEffect(() => {
@@ -108,13 +115,13 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
       </div>
       
       <div>
-        <Search size="lg" placeholder="Find your drugs here..." labelText="Search" 
-        closeButtonLabelText="Clear search input" id="search-1" onChange={() => {}} 
+        <Search id="searchField" size="lg" placeholder="Find your drugs here..." labelText="Search" disabled
+        closeButtonLabelText="Clear search input" onChange={() => {}} 
         className={styles.billingItem}  onKeyUp={(e) => {filterItems(e.target.value)}}/>
         <ul className={styles.searchContent}>
         {  searchOptions.map((row) => ( 
   
-            <li className={styles.searchItem}><p id={row.Item+"Option"}>{row.Item} Qnty.{row.Qnty} Ksh.{row.Price}</p>  </li>
+            <li className={styles.searchItem} onClick={(e) => addItemToBill(e)}><p id={row.Item+"Option"}>{row.Item} Qnty.{row.Qnty} Ksh.{row.Price}</p>  </li>
           ))
         }
         </ul>
@@ -132,11 +139,11 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
         </TableHead>
         <TableBody>   
 
-          { rows && Array.isArray(rows) ? rows.map((row) => ( 
+          { BillItems && Array.isArray(BillItems) ? BillItems.map((row) => ( 
           <TableRow>
             <TableCell>{row.Item}</TableCell>
-            <TableCell><NumberInput id={row.Item} min={0} max={100} value={row.Qnty} onChange={(e) => calculateTotal(e)}/></TableCell> 
-            <TableCell><TextInput id={row.Item+"Price"} type="text" readonly value={row.Price} style={{padding:'0px',background: 'inherit'}}/></TableCell>      
+            <TableCell><NumberInput id={row.Item} min={0} max={100} value={row.Qnty} onChange={(e) => {calculateTotal(e); row.Qnty=e.target.value}}/></TableCell> 
+            <TableCell><TextInput id={row.Item+"Price"} type="text" readonly value={row.Price} style={{padding:'0px',background: 'inherit'}} /></TableCell>      
             <TableCell id={row.Item+"Total"}  className="totalValue">{row.Total}</TableCell>    
           </TableRow>
             )) : (
@@ -146,11 +153,20 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
            <TableRow>
             <TableCell></TableCell>
             <TableCell></TableCell> 
-            <TableCell>Grand Total :</TableCell>      
+            <TableCell>Grand Total:</TableCell>      
             <TableCell><TextInput id="GrandTotalSum" type="text" readonly value={GrandTotal} style={{padding:'0px',background: 'inherit'}} /></TableCell>    
           </TableRow>
         </TableBody>
       </Table>
+
+      <ButtonSet className={styles.billingItem}>
+        <Button kind="secondary">
+          Discard
+        </Button>
+        <Button kind="primary">
+          Save
+        </Button>
+      </ButtonSet>
       {/* <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
             <Button className={styles.button} kind="secondary" >
               {t('cancel', 'Cancel')}
