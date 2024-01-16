@@ -12,7 +12,7 @@
 .searchContent {
   // display: none;
   position: absolute;
-  background-color: #f6f6f6;
+  background-color: #fff;
   min-width: 230px;
   overflow: auto;
   border: 1px solid #ddd;
@@ -24,5 +24,6 @@
   border-bottom: 0.1rem solid;
   border-bottom-color: silver;
   padding: 10px;
+  cursor: pointer;
 }
 
