@@ -14,7 +14,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   // const isTablet = useLayoutType() === 'tablet';
   // const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
-  const [isSearchEnabled, setIsSearchEnabled] = useState(false);
+  const [isSearchEnabled, setIsSearchEnabled] = useState("");
   const [GrandTotal, setGrandTotal] = useState(0);
 
   const rows = [
@@ -24,19 +24,22 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
     {'Item':'Syringe','Qnty':20, 'Price':10, 'Total':10}
 
   ];
+  const [searchOptions, setsearchOptions] = useState([]);
+
 
   const toggleSearch = (choiceSelected) => {
     // alert(JSON.stringify(event));
     console.log(choiceSelected, choiceSelected == 'Drug');
     var isSelected = choiceSelected == 'Drug'
-    setIsSearchEnabled(true)
-    // if (choiceSelected == 'Drug'){
-    //   setIsSearchEnabled(true)
-    //   console.log('in choice', isSearchEnabled);
+    // setIsSearchEnabled("disabled")
+    if (choiceSelected == 'Drug'){
+      setIsSearchEnabled("disabled")
 
-    // }else{
-    //   setIsSearchEnabled(false)
-    // }
+      // console.log('in choice', isSearchEnabled);
+
+    }else{
+      setIsSearchEnabled("")
+    }
     console.log(choiceSelected, isSearchEnabled);
 
   };
@@ -53,24 +56,42 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
 
     
     // add totals
-    // const totals =   Array.from(document.getElementsByClassName("totalValue"));
     const totals = Array.from( document.querySelectorAll('[id$="Total"]'));
     // totals.foreach()
     console.log(totals)
     let addUpTotals = 0;
     totals.forEach ((tot)=> {
-      var getTot = (tot as HTMLInputElement).innerHTML;
-      console.log(getTot);
-      addUpTotals+=parseInt(getTot)
-  })
-  setGrandTotal(addUpTotals)
-
+        var getTot = (tot as HTMLInputElement).innerHTML;
+        console.log(getTot);
+        addUpTotals+=parseInt(getTot)
+    })
+    setGrandTotal(addUpTotals)
 
   };
 
+
+  const filterItems= (searchVal) => {
+    console.log(searchVal)
+
+    // rows.filter(function (el) {
+    //   const filteredRes = el.Item.includes(searchVal); // Changed this so a home would match
+    //   console.log(filteredRes)
+    //   return filteredRes; // Changed this so a home would match
+    // });
+    if (searchVal!= ""){
+    const filteredRes =rows.filter(o =>
+      o.Item.toLowerCase().includes(searchVal.toLowerCase()));
+    console.log(filteredRes)
+    setsearchOptions(filteredRes)
+    }else{
+      setsearchOptions([])
+
+    }
+  }
+
   useEffect(() => {
     // action on update of movies
-}, []);
+  } , []);
 
 
   return (
@@ -86,10 +107,19 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
         
       </div>
       
+      <div>
+        <Search size="lg" placeholder="Find your drugs here..." labelText="Search" 
+        closeButtonLabelText="Clear search input" id="search-1" onChange={() => {}} 
+        className={styles.billingItem}  onKeyUp={(e) => {filterItems(e.target.value)}}/>
+        <ul className={styles.searchContent}>
+        {  searchOptions.map((row) => ( 
+  
+            <li className={styles.searchItem}><p id={row.Item+"Option"}>{row.Item} Qnty.{row.Qnty} Ksh.{row.Price}</p>  </li>
+          ))
+        }
+        </ul>
+      </div>
 
-      <Search size="lg" placeholder="Find your drugs here..." labelText="Search" 
-      closeButtonLabelText="Clear search input" id="search-1" onChange={() => {}} onKeyDown={() => {}} 
-      className={styles.billingItem} disabled={{isSearchEnabled}}/>
 
       <Table aria-label="sample table" className={styles.billingItem}>
         <TableHead>
