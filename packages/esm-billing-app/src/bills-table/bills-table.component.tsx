@@ -30,6 +30,7 @@ import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import { PENDING } from '../constants';
 import styles from './bills-table.scss';
+import { MappedBill } from '../types';
 
 const BillsTable = () => {
   const { t } = useTranslation();
@@ -57,8 +58,8 @@ const BillsTable = () => {
       key: 'patientName',
     },
     {
-      header: t('billingService', 'Billing service'),
-      key: 'billingService',
+      header: t('billedItems', 'Billed Items'),
+      key: 'billedItems',
     },
   ];
 
@@ -82,6 +83,17 @@ const BillsTable = () => {
 
   const { paginated, goTo, results, currentPage } = usePagination(searchResults, pageSize);
 
+  const setBilledItems = (bill: MappedBill) => {
+    let items = '';
+    if (bill.lineItems.length > 0) {
+      bill.lineItems.forEach((i) => {
+        items += items && i.item && !i.billableService ? ` & ${i.item}` : i.item ?? '';
+        items += items && i.billableService && !i.item ? ` & ${i.billableService}` : i.billableService ?? '';
+      });
+    }
+    return items;
+  };
+
   const rowData = results?.map((bill, index) => ({
     id: `${index}`,
     uuid: bill.uuid,
@@ -95,7 +107,7 @@ const BillsTable = () => {
     visitTime: bill.dateCreated,
     identifier: bill.identifier,
     department: '--',
-    billingService: bill.billingService,
+    billedItems: setBilledItems(bill),
     billingPrice: '--',
   }));
 
