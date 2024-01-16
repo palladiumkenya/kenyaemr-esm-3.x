@@ -1,14 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { RadioButtonGroup, RadioButton } from '@carbon/react';
 import styles from './visit-attributes-form.scss';
-import { ComboBox } from '@carbon/react';
-import { TextInput } from '@carbon/react';
+import { TextInput, InlineLoading, ComboBox, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { usePaymentMethods } from '../billing-form.resource';
 
-type VisitAttributesFormProps = { setAttributes: (state) => void };
+type VisitAttributesFormProps = {
+  setAttributes: (state) => void;
+  setPaymentMethod?: (value: any) => void;
+};
 
 type VisitAttributesFormValue = {
   paymentDetails: string;
@@ -26,7 +28,7 @@ const visitAttributesFormSchema = z.object({
   patientCategory: z.string(),
 });
 
-const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes }) => {
+const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes, setPaymentMethod }) => {
   const { t } = useTranslation();
   const { control, getValues, watch } = useForm<VisitAttributesFormValue>({
     mode: 'all',
@@ -40,13 +42,14 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     'policyNumber',
     'patientCategory',
   ]);
-  console.log(paymentDetails, paymentMethods, insuranceSchema, policyNumber, patientCategory);
+  const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentMethods();
   React.useEffect(() => {
     setAttributes(createVisitAttributesPayload());
   }, [paymentDetails, paymentMethods, insuranceSchema, policyNumber, patientCategory]);
 
   const createVisitAttributesPayload = () => {
     const { patientCategory, paymentMethods, policyNumber, paymentDetails } = getValues();
+    setPaymentMethod(paymentMethods);
     const formPayload = [
       { uuid: 'caf2124f-00a9-4620-a250-efd8535afd6d', value: paymentDetails },
       { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: paymentMethods },
@@ -61,6 +64,16 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       value: value.value,
     }));
   };
+
+  if (isLoadingPaymentModes) {
+    return (
+      <InlineLoading
+        status="active"
+        iconDescription={t('loadingDescription', 'Loading')}
+        description={t('loading', 'Loading data...')}
+      />
+    );
+  }
 
   return (
     <section>
@@ -89,19 +102,15 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
               className={styles.sectionField}
               onChange={({ selectedItem }) => field.onChange(selectedItem.uuid)}
               id="paymentMethods"
-              items={[
-                { text: 'MPESA', uuid: '0dcd014d-5843-4458-b407-d415d8709858' },
-                { text: 'CASH', uuid: '7fd55783-101d-457b-afc4-451fa8abb2cb' },
-                { text: 'INSURANCE', uuid: '29cc28bb-de26-4964-b109-41919f044a70' },
-              ]}
-              itemToString={(item) => (item ? item.text : '')}
+              items={paymentModes}
+              itemToString={(item) => (item ? item.name : '')}
               titleText={t('paymentMethods', 'Payment methods')}
             />
           )}
         />
       )}
 
-      {paymentMethods === '29cc28bb-de26-4964-b109-41919f044a70' &&
+      {paymentMethods === 'beac329b-f1dc-4a33-9e7c-d95821a137a6' &&
         paymentDetails === '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf' && (
           <>
             <Controller

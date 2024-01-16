@@ -19,6 +19,8 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const [attributes, setAttributes] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState<any>();
+  let lineList = [];
 
   const shouldBillPatient =
     attributes.find((item) => item.attributeType === 'caf2124f-00a9-4620-a250-efd8535afd6d')?.value ===
@@ -79,6 +81,23 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     );
   }
 
+  if (paymentMethod) {
+    lineList = [];
+    lineList = lineItems.filter((e) =>
+      e.servicePrices.some((p) => p.paymentMode && p.paymentMode.uuid === paymentMethod),
+    );
+  }
+
+  // if (paymentMethod) {
+  //   lineItems.forEach((e) => {
+  //     e.servicePrices.forEach((p) => {
+  //       if (p.paymentMode && p.paymentMode.uuid == paymentMethod) {
+  //         lineList.push(e);
+  //       }
+  //     });
+  //   });
+  // }
+
   if (cashError || lineError) {
     return (
       <InlineNotification
@@ -92,7 +111,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
 
   return (
     <section className={styles.sectionContainer}>
-      <VisitAttributesForm setAttributes={setAttributes} />
+      <VisitAttributesForm setAttributes={setAttributes} setPaymentMethod={setPaymentMethod} />
       {shouldBillPatient && (
         <>
           <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
@@ -101,8 +120,10 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
             label={t('selectBillableService', 'Select a billable service...')}
             onChange={handleBillingService}
             id="billable-items"
-            items={lineItems}
-            itemToString={(item) => (item ? item.commonName : '')}
+            items={lineList}
+            itemToString={(item) =>
+              item ? `${item.name} (${item.servicePrices[0].name}:${item.servicePrices[0].price})` : ''
+            }
             titleText={t('billableService', 'Billable service')}
           />
         </>

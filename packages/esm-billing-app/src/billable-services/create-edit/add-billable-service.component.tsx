@@ -73,7 +73,7 @@ const AddBillableService: React.FC = () => {
     });
     payload.name = billableServicePayload.serviceName;
     payload.shortName = billableServicePayload.shortName;
-    payload.serviceType = billableServicePayload.serviceType.id;
+    payload.serviceType = billableServicePayload.serviceType.uuid;
     payload.servicePrices = servicePrices;
     payload.serviceStatus = 'ENABLED';
 
