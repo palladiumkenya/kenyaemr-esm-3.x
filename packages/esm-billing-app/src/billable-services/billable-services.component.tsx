@@ -14,12 +14,14 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  Button,
 } from '@carbon/react';
-import { useLayoutType, isDesktop, useConfig, usePagination, ErrorState } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, isDesktop, useConfig, usePagination, ErrorState, navigate } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
 import { useTranslation } from 'react-i18next';
 import { useBillableServices } from './billable-service.resource';
+import { ArrowRight } from '@carbon/react/icons';
 
 const BillableServices = () => {
   const { t } = useTranslation();
@@ -27,9 +29,13 @@ const BillableServices = () => {
   const layout = useLayoutType();
   const config = useConfig();
   const [searchString, setSearchString] = useState('');
-  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+  const responsiveSize = isDesktop(layout) ? 'lg' : 'sm';
   const pageSizes = config?.billableServices?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.billableServices?.pageSize ?? 10);
+
+  //creating service state
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [overlayHeader, setOverlayTitle] = useState('');
 
   const headerData = [
     {
@@ -49,14 +55,18 @@ const BillableServices = () => {
       key: 'status',
     },
     {
-      header: t('dateCreated', 'Date Created'),
-      key: 'dateCreated',
+      header: t('prices', 'Prices'),
+      key: 'prices',
     },
     {
       header: t('actions', 'Actions'),
       key: 'actions',
     },
   ];
+
+  const launchBillableServiceForm = useCallback(() => {
+    navigate({ to: window.getOpenmrsSpaBase() + 'billable-services/add-service' });
+  }, []);
 
   const searchResults = useMemo(() => {
     if (billableServices !== undefined && billableServices.length > 0) {
@@ -74,16 +84,27 @@ const BillableServices = () => {
 
   const { paginated, goTo, results, currentPage } = usePagination(searchResults, pageSize);
 
-  const rowData = results?.map((service, index) => ({
-    id: `${index}`,
-    uuid: service.uuid,
-    serviceName: service.name,
-    shortName: service.shortName,
-    serviceType: service.serviceType.display,
-    status: service.serviceStatus,
-    dateCreated: '--',
-    actions: '--',
-  }));
+  let rowData = [];
+  if (results) {
+    results.forEach((service, index) => {
+      const s = {
+        id: `${index}`,
+        uuid: service.uuid,
+        serviceName: service.name,
+        shortName: service.shortName,
+        serviceType: service.serviceType.display,
+        status: service.serviceStatus,
+        prices: '--',
+        actions: '--',
+      };
+      let cost = '';
+      service.servicePrices.forEach((price) => {
+        cost += `${price.name} (${price.price}) `;
+      });
+      s.prices = cost;
+      rowData.push(s);
+    });
+  }
 
   const handleSearch = useCallback(
     (e) => {
@@ -103,6 +124,7 @@ const BillableServices = () => {
     <EmptyState
       displayText={t('billableService', 'Billable Service')}
       headerTitle={t('billableService', 'Billable Service')}
+      launchForm={launchBillableServiceForm}
     />;
   }
 
@@ -184,14 +206,11 @@ const BillableServices = () => {
           )}
         </div>
       ) : (
-        <Layer className={styles.emptyStateContainer}>
-          <Tile className={styles.tile}>
-            <div className={styles.illo}>
-              <EmptyDataIllustration />
-            </div>
-            <p className={styles.content}>There are no services to display.</p>
-          </Tile>
-        </Layer>
+        <EmptyState
+          launchForm={launchBillableServiceForm}
+          displayText={t('noServicesToDisplay', 'There are no services to display')}
+          headerTitle={t('billableService', 'Billable service')}
+        />
       )}
     </>
   );
@@ -212,12 +231,24 @@ function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveS
           <span>{isValidating ? <InlineLoading /> : null}</span>
         </div>
       </div>
-      <Search
-        labelText=""
-        placeholder={t('filterTable', 'Filter table')}
-        onChange={handleSearch}
-        size={responsiveSize}
-      />
+      <div className={styles.actionsContainer}>
+        <Search
+          labelText=""
+          placeholder={t('filterTable', 'Filter table')}
+          onChange={handleSearch}
+          size={responsiveSize}
+        />
+        <Button
+          size={responsiveSize}
+          kind="primary"
+          renderIcon={(props) => <ArrowRight size={16} {...props} />}
+          onClick={() => {
+            navigate({ to: window.getOpenmrsSpaBase() + 'billable-services/add-service' });
+          }}
+          iconDescription={t('addNewBillableService', 'Add new billable service')}>
+          {t('addNewService', 'Add new service')}
+        </Button>
+      </div>
     </>
   );
 }
