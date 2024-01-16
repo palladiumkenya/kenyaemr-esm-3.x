@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styles from './add-billable-service.scss';
-import { Form, ModalHeader, ModalBody, ModalFooter, Button, TextInput, ComboBox, Dropdown } from '@carbon/react';
+import { Form, Button, TextInput, ComboBox, Dropdown, Layer, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { createBillableSerice, usePaymentModes, useServiceTypes } from '../billable-service.resource';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Add, TrashCan } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
 
 const servicePriceSchema = z.object({
   paymentMode: z.string().refine((value) => !!value, 'Payment method is required'),
@@ -28,14 +28,10 @@ type PaymentModeFormValue = {
 const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: 0 };
 
 const AddBillableService: React.FC = () => {
-  const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
 
-  const { paymentModes } = usePaymentModes();
-  const { serviceTypes } = useServiceTypes();
-
-  const [paymentOptions, setPaymentOptions] = useState([]);
-  const [serviceOptions, setServiceOptions] = useState([]);
+  const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
+  const { serviceTypes, isLoading: isLoadingServicesTypes } = useServiceTypes();
   const [billableServicePayload, setBillableServicePayload] = useState<any>({});
 
   const {
@@ -47,7 +43,6 @@ const AddBillableService: React.FC = () => {
     defaultValues: {},
     resolver: zodResolver(paymentFormSchema),
   });
-
   const { fields, remove, append } = useFieldArray({ name: 'payment', control: control });
 
   const handleAppendPaymentMode = useCallback(() => append(DEFAULT_PAYMENT_OPTION), [append]);
@@ -58,34 +53,22 @@ const AddBillableService: React.FC = () => {
       to: window.getOpenmrsSpaBase() + 'billable-services',
     });
 
-  useEffect(() => {
-    let options = [];
-
-    if (paymentModes) {
-      paymentModes.forEach((e) => {
-        options.push({ uuid: e.uuid, name: e.name });
-      });
-    }
-    setPaymentOptions(options);
-  }, [paymentModes]);
-
-  useEffect(() => {
-    let options = [];
-
-    if (serviceTypes) {
-      serviceTypes.forEach((e) => {
-        options.push({ id: e.uuid, text: e.display });
-      });
-    }
-    setServiceOptions(options);
-  }, [serviceTypes]);
+  if (isLoadingPaymentModes && isLoadingServicesTypes) {
+    return (
+      <InlineLoading
+        status="active"
+        iconDescription={t('loadingDescription', 'Loading')}
+        description={t('loading', 'Loading data...')}
+      />
+    );
+  }
 
   const onSubmit = (data) => {
     const payload: any = {};
 
     let servicePrices = [];
     data.payment.forEach((element) => {
-      element.name = paymentOptions.filter((p) => p.uuid === element.paymentMode)[0].name;
+      element.name = paymentModes.filter((p) => p.uuid === element.paymentMode)[0].name;
       servicePrices.push(element);
     });
     payload.name = billableServicePayload.serviceName;
@@ -112,15 +95,12 @@ const AddBillableService: React.FC = () => {
 
   return (
     <Form className={styles.form}>
-      <ModalHeader>
-        <p>Add Billable Services</p>
-      </ModalHeader>
-      <ModalBody>
-        <section className={styles.section}>
+      <h4>{t('addBillableServices', 'Add Billable Services')}</h4>
+      <section className={styles.section}>
+        <Layer>
           <TextInput
             id="serviceName"
             type="text"
-            light={isTablet}
             labelText={t('serviceName', 'Service Name')}
             size="md"
             onChange={(e) =>
@@ -131,12 +111,13 @@ const AddBillableService: React.FC = () => {
             }
             placeholder="Enter service name"
           />
-        </section>
-        <section className={styles.section}>
+        </Layer>
+      </section>
+      <section className={styles.section}>
+        <Layer>
           <TextInput
             id="serviceShortName"
             type="text"
-            light={isTablet}
             labelText={t('serviceShortName', 'Short Name')}
             size="md"
             onChange={(e) =>
@@ -147,85 +128,89 @@ const AddBillableService: React.FC = () => {
             }
             placeholder="Enter service short name"
           />
-        </section>
+        </Layer>
+      </section>
 
-        <section className={styles.section}>
+      <section className={styles.section}>
+        <Layer>
           <ComboBox
             id="serviceType"
-            light={isTablet}
-            items={serviceOptions}
+            items={serviceTypes ?? []}
             titleText={t('serviceType', 'Service Type')}
-            itemToString={(item) => item?.text}
+            itemToString={(item) => item?.display}
             onChange={({ selectedItem }) => {
               setBillableServicePayload({
                 ...billableServicePayload,
-                display: selectedItem?.text,
+                display: selectedItem?.display,
                 serviceType: selectedItem,
               });
             }}
             placeholder="Select service type"
             required
           />
-        </section>
+        </Layer>
+      </section>
 
-        <section>
-          <div className={styles.container}>
-            {fields.map((field, index) => (
-              <div key={field.id} className={styles.paymentMethodContainer}>
-                <Controller
-                  control={control}
-                  name={`payment.${index}.paymentMode`}
-                  render={({ field }) => (
+      <section>
+        <div className={styles.container}>
+          {fields.map((field, index) => (
+            <div key={field.id} className={styles.paymentMethodContainer}>
+              <Controller
+                control={control}
+                name={`payment.${index}.paymentMode`}
+                render={({ field }) => (
+                  <Layer>
                     <Dropdown
                       onChange={({ selectedItem }) => field.onChange(selectedItem.uuid)}
                       titleText={t('paymentMode', 'Payment Mode')}
                       label={t('selectPaymentMethod', 'Select payment method')}
-                      items={paymentOptions}
+                      items={paymentModes ?? []}
                       itemToString={(item) => (item ? item.name : '')}
                       invalid={!!errors?.payment?.[index]?.paymentMode}
                       invalidText={errors?.payment?.[index]?.paymentMode?.message}
-                      light={isTablet}
                     />
-                  )}
-                />
-                <Controller
-                  control={control}
-                  name={`payment.${index}.price`}
-                  render={({ field }) => (
+                  </Layer>
+                )}
+              />
+              <Controller
+                control={control}
+                name={`payment.${index}.price`}
+                render={({ field }) => (
+                  <Layer>
                     <TextInput
                       {...field}
                       invalid={!!errors?.payment?.[index]?.price}
                       invalidText={errors?.payment?.[index]?.price?.message}
                       labelText={t('sellingPrice', 'Selling Price')}
                       placeholder={t('sellingAmount', 'Enter selling price')}
-                      light={isTablet}
                     />
-                  )}
-                />
-                <div className={styles.removeButtonContainer}>
-                  <TrashCan onClick={handleRemovePaymentMode} className={styles.removeButton} size={20} />
-                </div>
+                  </Layer>
+                )}
+              />
+              <div className={styles.removeButtonContainer}>
+                <TrashCan onClick={handleRemovePaymentMode} className={styles.removeButton} size={20} />
               </div>
-            ))}
-            <Button
-              size="md"
-              onClick={handleAppendPaymentMode}
-              className={styles.paymentButtons}
-              renderIcon={(props) => <Add size={24} {...props} />}
-              iconDescription="Add">
-              {t('addPaymentOptions', 'Add payment option')}
-            </Button>
-          </div>
-        </section>
-      </ModalBody>
-      <ModalFooter>
-        <Button kind="secondary" onClick={{}}>
+            </div>
+          ))}
+          <Button
+            size="md"
+            onClick={handleAppendPaymentMode}
+            className={styles.paymentButtons}
+            renderIcon={(props) => <Add size={24} {...props} />}
+            iconDescription="Add">
+            {t('addPaymentOptions', 'Add payment option')}
+          </Button>
+        </div>
+      </section>
+
+      <section>
+        <Button kind="secondary" onClick={handleNavigateToServiceDashboard}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button type="submit" onClick={handleSubmit(onSubmit)}>
           {t('save', 'Save')}
         </Button>
-      </ModalFooter>
+      </section>
     </Form>
   );
 };

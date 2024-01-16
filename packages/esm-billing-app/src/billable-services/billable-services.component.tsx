@@ -17,7 +17,7 @@ import {
   Button,
 } from '@carbon/react';
 import { useLayoutType, isDesktop, useConfig, usePagination, ErrorState, navigate } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
 import { useTranslation } from 'react-i18next';
 import { useBillableServices } from './billable-service.resource';
@@ -63,6 +63,10 @@ const BillableServices = () => {
       key: 'actions',
     },
   ];
+
+  const launchBillableServiceForm = useCallback(() => {
+    navigate({ to: window.getOpenmrsSpaBase() + 'billable-services/add-service' });
+  }, []);
 
   const searchResults = useMemo(() => {
     if (billableServices !== undefined && billableServices.length > 0) {
@@ -120,6 +124,7 @@ const BillableServices = () => {
     <EmptyState
       displayText={t('billableService', 'Billable Service')}
       headerTitle={t('billableService', 'Billable Service')}
+      launchForm={launchBillableServiceForm}
     />;
   }
 
@@ -201,14 +206,11 @@ const BillableServices = () => {
           )}
         </div>
       ) : (
-        <Layer className={styles.emptyStateContainer}>
-          <Tile className={styles.tile}>
-            <div className={styles.illo}>
-              <EmptyDataIllustration />
-            </div>
-            <p className={styles.content}>There are no services to display.</p>
-          </Tile>
-        </Layer>
+        <EmptyState
+          launchForm={launchBillableServiceForm}
+          displayText={t('noServicesToDisplay', 'There are no services to display')}
+          headerTitle={t('billableService', 'Billable service')}
+        />
       )}
     </>
   );
