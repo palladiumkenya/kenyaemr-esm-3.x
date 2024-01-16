@@ -77,6 +77,7 @@ export const moduleLinks = [
   {
     label: 'Billable Services',
     url: `${openmrsSpaBase}billable-services`,
-    icon: InventoryManagement,
+    icon: <InventoryManagement size={24} />,
+    requiresAdmin: true,
   },
 ];
