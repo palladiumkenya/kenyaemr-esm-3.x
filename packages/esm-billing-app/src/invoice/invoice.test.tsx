@@ -115,7 +115,7 @@ describe('Invoice', () => {
     await user.click(cashPaymentMode);
 
     // // enter payment amount
-    const paymentAmountInput = screen.getByRole('spinbutton', { name: /Enter amount/ });
+    const paymentAmountInput = screen.getByPlaceholderText('Enter amount');
     expect(paymentAmountInput).toBeInTheDocument();
     await user.type(paymentAmountInput, '100');
 
