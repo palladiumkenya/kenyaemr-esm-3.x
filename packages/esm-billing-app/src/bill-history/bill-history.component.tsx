@@ -28,6 +28,7 @@ import {
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
 import styles from './bill-history.scss';
+import { MappedBill } from '../types';
 
 interface BillHistoryProps {
   patientUuid: string;
@@ -51,8 +52,8 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
       key: 'identifier',
     },
     {
-      header: t('billingService', 'Billing service'),
-      key: 'billingService',
+      header: t('billedItems', 'Billed Items'),
+      key: 'billedItems',
     },
     {
       header: t('billTotal', 'Bill total'),
@@ -60,13 +61,24 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
     },
   ];
 
+  const setBilledItems = (bill: MappedBill) => {
+    let items = '';
+    if (bill.lineItems.length > 0) {
+      bill.lineItems.forEach((i) => {
+        items += items && i.item && !i.billableService ? ` & ${i.item}` : i.item ?? '';
+        items += items && i.billableService && !i.item ? ` & ${i.billableService}` : i.billableService ?? '';
+      });
+    }
+    return items;
+  };
+
   const rowData = results?.map((bill, index) => ({
     id: `${index}`,
     uuid: bill.uuid,
     billTotal: bill.totalAmount,
     visitTime: bill.dateCreated,
     identifier: bill.identifier,
-    billingService: bill.billingService,
+    billedItems: setBilledItems(bill),
   }));
 
   if (isLoading) {
