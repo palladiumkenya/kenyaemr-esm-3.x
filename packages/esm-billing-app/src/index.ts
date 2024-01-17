@@ -9,6 +9,7 @@ import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
 import BillableServiceHome from './billable-services/billable-services-home.component';
 import BillingForm from './billing-form/billing-form.component';
+import RequirePaymentModal from './modal/require-payment-modal.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -43,3 +44,4 @@ export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billableServicesHome = getSyncLifecycle(BillableServiceHome, options);
 export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
+export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);

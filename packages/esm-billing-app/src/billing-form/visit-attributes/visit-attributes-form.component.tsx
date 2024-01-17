@@ -1,10 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { RadioButtonGroup, RadioButton } from '@carbon/react';
+import { RadioButtonGroup, RadioButton, TextInput, ComboBox } from '@carbon/react';
 import styles from './visit-attributes-form.scss';
-import { ComboBox } from '@carbon/react';
-import { TextInput } from '@carbon/react';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
@@ -40,7 +38,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     'policyNumber',
     'patientCategory',
   ]);
-  console.log(paymentDetails, paymentMethods, insuranceSchema, policyNumber, patientCategory);
+
   React.useEffect(() => {
     setAttributes(createVisitAttributesPayload());
   }, [paymentDetails, paymentMethods, insuranceSchema, policyNumber, patientCategory]);
@@ -52,6 +50,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: paymentMethods },
       { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: policyNumber },
       { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: patientCategory },
+      { uuid: '919b51c9-8e2e-468f-8354-181bf3e55786', value: true },
     ];
     const visitAttributesPayload = formPayload.filter(
       (item) => item.value !== undefined && item.value !== null && item.value !== '',

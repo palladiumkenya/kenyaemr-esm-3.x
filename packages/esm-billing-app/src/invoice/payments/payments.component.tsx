@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@carbon/react';
-import { navigate, showSnackbar } from '@openmrs/esm-framework';
+import { navigate, showSnackbar, useVisit } from '@openmrs/esm-framework';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { type MappedBill } from '../../types';
 import { convertToCurrency } from '../../helpers';
@@ -14,6 +14,7 @@ import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.componen
 import PaymentHistory from './payment-history/payment-history.component';
 import PaymentForm from './payment-form/payment-form.component';
 import styles from './payments.scss';
+import { updateBillVisitAttribute } from './payment.resource';
 
 type PaymentProps = { bill: MappedBill };
 export type Payment = { method: string; amount: string | number; referenceCode?: number | string };
@@ -32,6 +33,7 @@ const Payments: React.FC<PaymentProps> = ({ bill = {} as MappedBill }) => {
   });
 
   const paymentFormSchema = z.object({ payment: z.array(paymentSchema) });
+  const { currentVisit } = useVisit(bill?.patientUuid);
   const methods = useForm<PaymentFormValue>({
     mode: 'all',
     defaultValues: {},
@@ -60,6 +62,7 @@ const Payments: React.FC<PaymentProps> = ({ bill = {} as MappedBill }) => {
           kind: 'success',
           timeoutInMs: 3000,
         });
+        updateBillVisitAttribute(currentVisit);
         handleNavigateToBillingDashboard();
       },
       (error) => {
