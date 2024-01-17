@@ -17,7 +17,6 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Information } from '@carbon/react/icons';
 import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { useBill } from '../billing.resource';
 import styles from './invoice-table.scss';
@@ -97,9 +96,9 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
         {({ rows, headers, getRowProps, getTableProps, getToolbarProps }) => (
           <TableContainer
             description={
-              <p className={styles.tableDescription}>
+              <span className={styles.tableDescription}>
                 <span>{t('itemsToBeBilled', 'Items to be billed')}</span>
-              </p>
+              </span>
             }
             title={t('lineItems', 'Line items')}>
             <div className={styles.toolbarWrapper}>
