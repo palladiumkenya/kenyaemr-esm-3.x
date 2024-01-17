@@ -23,9 +23,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
 
   const handleAppendPaymentMode = useCallback(() => append(DEFAULT_PAYMENT), [append]);
   const handleRemovePaymentMode = useCallback((index) => remove(index), [remove]);
+
   if (isLoading) {
     return <NumberInputSkeleton />;
   }
+
   if (error) {
     return (
       <div className={styles.errorPaymentContainer}>
@@ -43,6 +45,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             name={`payment.${index}.method`}
             render={({ field }) => (
               <Dropdown
+                id="paymentMethod"
                 onChange={({ selectedItem }) => field.onChange(selectedItem.uuid)}
                 titleText={t('paymentMethod', 'Payment method')}
                 label={t('selectPaymentMethod', 'Select payment method')}
@@ -58,6 +61,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             name={`payment.${index}.amount`}
             render={({ field }) => (
               <NumberInput
+                id="paymentAmount"
                 {...field}
                 onChange={(e) => field.onChange(Number(e.target.value))}
                 invalid={!!errors?.payment?.[index]?.amount}
@@ -72,8 +76,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             control={control}
             render={({ field }) => (
               <TextInput
+                id="paymentReferenceCode"
                 {...field}
-                labelText={t('referenceNumber', 'Ref number')}
+                labelText={t('referenceNumber', 'Reference number')}
                 placeholder={t('enterReferenceNumber', 'Enter ref. number')}
                 type="text"
               />

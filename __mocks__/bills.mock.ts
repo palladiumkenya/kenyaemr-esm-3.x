@@ -39,6 +39,7 @@ export const billsSummary = [
       {
         uuid: '6ff72ef2-4265-4fdb-8563-a3a2eefa484e',
         display: 'BillLineItem',
+        billableService: null,
         voided: false,
         voidReason: null,
         item: 'HIV self-test kit',
@@ -146,6 +147,7 @@ export const billsSummary = [
       {
         uuid: '6ff72ef2-4265-4fdb-8563-a3a2eefa484e',
         display: 'BillLineItem',
+        billableService: null,
         voided: false,
         voidReason: null,
         item: 'HIV self-test kit',
@@ -254,6 +256,7 @@ export const billsSummary = [
       {
         uuid: '6ff72ef2-4265-4fdb-8563-a3a2eefa484e',
         display: 'BillLineItem',
+        billableService: null,
         voided: false,
         voidReason: null,
         item: 'HIV self-test kit',
@@ -324,7 +327,7 @@ export const billsSummary = [
   },
 ];
 
-export const mockedBill = {
+export const mockBill = {
   id: 26,
   uuid: '6eb8d678-514d-46ad-9554-51e48d96d567',
   patientName: 'James Bond',
@@ -351,6 +354,7 @@ export const mockedBill = {
     {
       uuid: '053ab483-79de-43f9-a73b-5823ccd8518b',
       display: 'BillLineItem',
+      billableService: null,
       voided: false,
       voidReason: null,
       item: 'Hemoglobin',
