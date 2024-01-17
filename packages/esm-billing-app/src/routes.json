@@ -59,6 +59,10 @@
     {
       "name": "billing-form",
       "component": "billingForm"
+    },
+    {
+      "name": "require-billing-modal",
+      "component": "requirePaymentModal"
     }
   ]
 }

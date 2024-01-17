@@ -56,6 +56,7 @@ export interface LineItem {
   voided: boolean;
   voidReason: string | null;
   item: string;
+  billableService: string;
   quantity: number;
   price: number;
   priceName: string;

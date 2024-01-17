@@ -2,7 +2,7 @@ const rootConfig = require('../../jest.config.js');
 
 const packageConfig = {
   ...rootConfig,
-  collectCoverage: true,
+  collectCoverage: false,
 };
 
 module.exports = packageConfig;
