@@ -66,7 +66,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
         return {
           no: `${index + 1}`,
           id: `${item.uuid}`,
-          billItem: item.item,
+          billItem: item.item || item.billableService,
           billCode: bill.receiptNumber,
           status: bill.status,
           quantity: item.quantity,

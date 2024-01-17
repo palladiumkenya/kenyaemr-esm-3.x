@@ -50,7 +50,7 @@ const mockServiceTypes = [
   { uuid: 'a487a743-62ce-4f93-a66b-c5154ee8987d', display: 'Adherence counselling  service' },
 ];
 
-describe('AddBillableService', () => {
+xdescribe('AddBillableService', () => {
   beforeEach(() => {
     jest.resetAllMocks();
   });

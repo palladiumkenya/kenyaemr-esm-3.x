@@ -61,16 +61,8 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
     },
   ];
 
-  const setBilledItems = (bill: MappedBill) => {
-    let items = '';
-    if (bill.lineItems.length > 0) {
-      bill.lineItems.forEach((i) => {
-        items += items && i.item && !i.billableService ? ` & ${i.item}` : i.item ?? '';
-        items += items && i.billableService && !i.item ? ` & ${i.billableService}` : i.billableService ?? '';
-      });
-    }
-    return items;
-  };
+  const setBilledItems = (bill) =>
+    bill.lineItems.reduce((acc, item) => acc + (acc ? ' & ' : '') + (item.billableService || item.item || ''), '');
 
   const rowData = results?.map((bill, index) => ({
     id: `${index}`,
