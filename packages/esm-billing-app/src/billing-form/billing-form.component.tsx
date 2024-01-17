@@ -31,21 +31,18 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
   const [BillItems, setBillItems] = useState([]);
 
   const toggleSearch = (choiceSelected) => {
-    // alert(JSON.stringify(event));
-    console.log(choiceSelected, choiceSelected == 'Drug');
     var isSelected = choiceSelected == 'Drug'
     // setIsSearchEnabled("disabled")
-    if (choiceSelected == 'Drug'){
+    if (choiceSelected == 'Stock Item'){
       // setIsSearchEnabled("disabled")
       (document.getElementById('searchField')  as HTMLInputElement).disabled = false;
-      // console.log('in choice', isSearchEnabled);
-
+      
     }else{
       // setIsSearchEnabled("")
       (document.getElementById('searchField')  as HTMLInputElement).disabled = true;
 
     }
-    console.log(choiceSelected, isSearchEnabled);
+    
 
   };
 
@@ -53,18 +50,15 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
   const calculateTotal = (event) => {
     const price =   (document.getElementById(event.target.id+"Price")  as HTMLInputElement).value;
     const total = parseInt(price) * event.target.value;
-    // console.log(price, total);
     // (document.getElementById(event.target.id+"Total")  as HTMLInputElement).value = total.toString();
     (document.getElementById(event.target.id+"Total")  as HTMLInputElement).innerHTML = total.toString();
     
     // add totals
     const totals = Array.from( document.querySelectorAll('[id$="Total"]'));
-    // totals.foreach()
-    // console.log(totals)
+    
     let addUpTotals = 0;
     totals.forEach ((tot)=> {
         var getTot = (tot as HTMLInputElement).innerHTML;
-        // console.log(getTot);
         addUpTotals+=parseInt(getTot)
     })
     setGrandTotal(addUpTotals)
@@ -93,6 +87,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
     
      BillItems.push({'Item':filteredRes[0].Item,'Qnty':1, 'Price':filteredRes[0].Price, 'Total':10})
      setBillItems(BillItems)
+     setsearchOptions([])
     
   }
 
@@ -107,8 +102,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
         legendText={t('selectCategory', 'Select category')}
         name="radio-button-group"
         defaultSelected="radio-1" className={styles.billingItem} onChange={toggleSearch}>
-        <RadioButton labelText={t('drug', 'Drug')} value="Drug" id="radio-1" />
-        <RadioButton labelText={t('nonDrug', 'Non drug')} value="Non Drug" id="radio-2" />
+        <RadioButton labelText={t('stockItem', 'Stock Item')} value="Stock Item" id="radio-1" />
+        <RadioButton labelText={t('service', 'Service')} value="Service" id="radio-2" />
       </RadioButtonGroup>
       <div>
         
