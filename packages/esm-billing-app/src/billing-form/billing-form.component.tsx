@@ -16,7 +16,6 @@ import {
 } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
 
 type BillingFormProps = {
   patientUuid: string;
@@ -26,7 +25,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   // const isTablet = useLayoutType() === 'tablet';
   // const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
-  const [isSearchEnabled, setIsSearchEnabled] = useState('');
   const [GrandTotal, setGrandTotal] = useState(0);
 
   const defaultSearchItems = [
@@ -40,7 +38,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
   const [BillItems, setBillItems] = useState([]);
 
   const toggleSearch = (choiceSelected) => {
-    var isSelected = choiceSelected == 'Drug';
     // setIsSearchEnabled("disabled")
     if (choiceSelected == 'Stock Item') {
       // setIsSearchEnabled("disabled")
@@ -71,7 +68,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
   const CalculateTotalAfteraddBillItem = () => {
     // add totals
     let sum = 0;
-    const addUp = BillItems.map((o) => (sum += o.Price));
+    BillItems.map((o) => (sum += o.Price));
 
     setGrandTotal(sum);
   };
