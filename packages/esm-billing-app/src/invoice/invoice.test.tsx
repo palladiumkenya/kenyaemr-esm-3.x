@@ -5,16 +5,18 @@ import Invoice from './invoice.component';
 import { useBill, processBillPayment } from '../billing.resource';
 
 import { mockPayments, mockedBill } from '../../../../__mocks__/bills.mock';
-import { usePaymentModes } from './payments/payment.resource';
+import { usePaymentModes, updateBillVisitAttribute } from './payments/payment.resource';
 import { showSnackbar, usePatient } from '@openmrs/esm-framework';
 
 const mockBill = useBill as jest.MockedFunction<typeof useBill>;
 const mockUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
 const mockUsePatient = usePatient as jest.MockedFunction<typeof usePatient>;
+const mockUpdateBillVisitAttribute = updateBillVisitAttribute as jest.MockedFunction<typeof updateBillVisitAttribute>;
 
 jest.mock('./payments/payment.resource', () => ({
   usePaymentModes: jest.fn(),
+  updateBillVisitAttribute: jest.fn(),
 }));
 
 jest.mock('../billing.resource', () => ({

@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import BillingCheckInForm from './billing-checkin-form.component';
-import { useBillableItems, useCashPoint } from './billing-form.resource';
+import { useBillableItems, useCashPoint, createPatientBill } from './billing-form.resource';
 import userEvent from '@testing-library/user-event';
 
 const mockCashPoints = [
@@ -40,21 +40,21 @@ const mockBillableItems = [
   },
 ];
 
-const mockUseCashPoint = useCashPoint as jest.Mock;
-const mockUseBillableItems = useBillableItems as jest.Mock;
+const mockUseCashPoint = useCashPoint as jest.MockedFunction<typeof useCashPoint>;
+const mockUseBillableItems = useBillableItems as jest.MockedFunction<typeof useBillableItems>;
+const mockCreatePatientBill = createPatientBill as jest.MockedFunction<typeof createPatientBill>;
 
-jest.mock('./billing-form.resource', () => {
-  const actual = jest.requireActual('./billing-form.resource');
-  return { ...actual, useBillableItems: jest.fn(), useCashPoint: jest.fn() };
-});
+jest.mock('./billing-form.resource', () => ({
+  useBillableItems: jest.fn(),
+  useCashPoint: jest.fn(),
+  createPatientBill: jest.fn(),
+}));
 
 const testProps = { patientUuid: 'some-patient-uuid', setBillingInfo: jest.fn() };
 
 describe('BillingCheckInForm', () => {
-  test('Should render billing checkin form', () => {
-    mockUseBillableItems.mockReturnValueOnce({ lineItems: [], isLoading: false, error: null });
-    mockUseCashPoint.mockReturnValueOnce({ cashPoints: [], isLoading: false, error: null });
-    renderBillingCheckinForm();
+  beforeEach(() => {
+    jest.resetAllMocks();
   });
 
   test('should show the loading spinner while retrieving data', () => {
@@ -77,11 +77,17 @@ describe('BillingCheckInForm', () => {
 
   test('should render the form correctly and generate the required payload', async () => {
     const user = userEvent.setup();
-    mockUseBillableItems.mockReturnValueOnce({ lineItems: mockBillableItems, isLoading: false, error: null });
-    mockUseCashPoint.mockReturnValueOnce({ cashPoints: mockCashPoints, isLoading: false, error: null });
-    const { container } = renderBillingCheckinForm();
+    mockUseCashPoint.mockReturnValue({ cashPoints: [], isLoading: false, error: null });
+    mockUseBillableItems.mockReturnValue({ lineItems: mockBillableItems, isLoading: false, error: null });
+    renderBillingCheckinForm();
 
-    expect(screen.getByText('Billing')).toBeInTheDocument();
+    const paymentTypeSelect = screen.getByRole('group', { name: 'Payment Details' });
+    expect(paymentTypeSelect).toBeInTheDocument();
+
+    const paymentTypeRadio = screen.getByRole('radio', { name: 'Paying' });
+    expect(paymentTypeRadio).toBeInTheDocument();
+    await user.click(paymentTypeRadio);
+
     const billiableSelect = screen.getByRole('combobox', { name: 'Billable service' });
     expect(billiableSelect).toBeInTheDocument();
     await user.click(screen.getByRole('combobox', { name: 'Billable service' }));
@@ -91,23 +97,33 @@ describe('BillingCheckInForm', () => {
     expect(testProps.setBillingInfo).toHaveBeenCalled();
     expect(testProps.setBillingInfo).toHaveBeenCalledWith({
       createBillPayload: {
-        cashPoint: '54065383-b4d4-42d2-af4d-d250a1fd2590',
         lineItems: [
           {
             item: 'b47dddd6-4490-4bf7-b694-43bf19d04059',
-            lineItemOrder: 0,
-            paymentStatus: 'PENDING',
+            quantity: 1,
             price: 500.00001,
             priceName: 'Default',
             priceUuid: '',
-            quantity: 1,
+            lineItemOrder: 0,
+            paymentStatus: 'PENDING',
           },
         ],
+        cashPoint: '',
         patient: 'some-patient-uuid',
-        payments: [],
         status: 'PENDING',
+        payments: [],
       },
       handleCreateBill: expect.anything(),
+      attributes: [
+        {
+          attributeType: 'caf2124f-00a9-4620-a250-efd8535afd6d',
+          value: '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf',
+        },
+        {
+          attributeType: '919b51c9-8e2e-468f-8354-181bf3e55786',
+          value: true,
+        },
+      ],
     });
   });
 });
