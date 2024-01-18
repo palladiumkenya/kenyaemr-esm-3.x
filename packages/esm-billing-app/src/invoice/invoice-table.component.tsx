@@ -17,6 +17,8 @@ import {
   TableToolbarSearch,
   TableSelectRow,
   Tile,
+  type DataTableHeader,
+  type DataTableRow,
 } from '@carbon/react';
 import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { LineItem, MappedBill } from '../types';
@@ -34,7 +36,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
   const { lineItems } = bill;
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-
+  const [selectedLineItems, setSelectedLineItems] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
 
@@ -53,21 +55,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
       : lineItems;
   }, [debouncedSearchTerm, lineItems]);
 
-  const [selectedLineItems, setSelectedLineItems] = useState([]);
-
-  const handleRowSelection = (row, checked: boolean) => {
-    const matchingRow = filteredLineItems.find((item) => item.uuid === row.id);
-    let newSelectedLineItems;
-    if (checked) {
-      newSelectedLineItems = [...selectedLineItems, matchingRow];
-    } else {
-      newSelectedLineItems = selectedLineItems.filter((item) => item.uuid !== row.id);
-    }
-    setSelectedLineItems(newSelectedLineItems);
-    onSelectItem(newSelectedLineItems);
-  };
-
-  const tableHeaders = [
+  const tableHeaders: Array<typeof DataTableHeader> = [
     { header: 'No', key: 'no' },
     { header: 'Bill item', key: 'billItem' },
     { header: 'Bill code', key: 'billCode' },
@@ -77,7 +65,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
     { header: 'Total', key: 'total' },
   ];
 
-  const tableRows = useMemo(
+  const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
       filteredLineItems?.map((item, index) => {
         return {
@@ -107,6 +95,19 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
       </div>
     );
   }
+
+  const handleRowSelection = (row: typeof DataTableRow, checked: boolean) => {
+    const matchingRow = filteredLineItems.find((item) => item.uuid === row.id);
+    let newSelectedLineItems;
+
+    if (checked) {
+      newSelectedLineItems = [...selectedLineItems, matchingRow];
+    } else {
+      newSelectedLineItems = selectedLineItems.filter((item) => item.uuid !== row.id);
+    }
+    setSelectedLineItems(newSelectedLineItems);
+    onSelectItem(newSelectedLineItems);
+  };
 
   return (
     <div className={styles.invoiceContainer}>
