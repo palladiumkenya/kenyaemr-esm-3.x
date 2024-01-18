@@ -4,12 +4,13 @@ import styles from './invoice-breakdown.scss';
 type InvoiceBreakDownProps = {
   label: string;
   value: string;
+  hasBalance?: Boolean;
 };
 
-export const InvoiceBreakDown: React.FC<InvoiceBreakDownProps> = ({ label, value }) => {
+export const InvoiceBreakDown: React.FC<InvoiceBreakDownProps> = ({ label, value, hasBalance }) => {
   return (
     <div className={styles.invoiceBreakdown}>
-      <span className={styles.label}>{label}: </span>
+      <span className={hasBalance ? styles.extendedLabel : styles.label}>{label}: </span>
       <span className={styles.value}>{value}</span>
     </div>
   );

@@ -71,6 +71,8 @@ const Payments: React.FC<PaymentProps> = ({ bill = {} as MappedBill }) => {
     );
   };
 
+  const amountDueDisplay = (amount: number) => (amount < 0 ? 'Client balance' : 'Amount Due');
+
   return (
     <FormProvider {...methods}>
       <div className={styles.wrapper}>
@@ -91,7 +93,11 @@ const Payments: React.FC<PaymentProps> = ({ bill = {} as MappedBill }) => {
             value={convertToCurrency(bill.tenderedAmount + totalAmountTendered ?? 0)}
           />
           <InvoiceBreakDown label={t('discount', 'Discount')} value={'--'} />
-          <InvoiceBreakDown label={t('amountDue', 'Amount due')} value={convertToCurrency(amountDue ?? 0)} />
+          <InvoiceBreakDown
+            hasBalance={amountDue < 0 ?? false}
+            label={amountDueDisplay(amountDue)}
+            value={convertToCurrency(amountDue ?? 0)}
+          />
           <div className={styles.processPayments}>
             <Button onClick={handleNavigateToBillingDashboard} kind="secondary">
               {t('discard', 'Discard')}
