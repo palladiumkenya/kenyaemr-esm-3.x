@@ -1,3 +1,4 @@
+import useSWR from 'swr'
 import React, { useState, useEffect } from 'react';
 import {
   ButtonSet,
@@ -16,47 +17,60 @@ import {
 } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
+import { openmrsFetch} from '@openmrs/esm-framework';
+// import { fetchRes } from '../billing.resource';
+import { processBillItems } from '../billing.resource';
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
+
+
+
+
+
 
 type BillingFormProps = {
   patientUuid: string;
+  closeWorkspace: () => void;
 };
 
-const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
+const BillingForm: React.FC<BillingFormProps> = ({ patientUuid,closeWorkspace }) => {
   const { t } = useTranslation();
-  // const isTablet = useLayoutType() === 'tablet';
-  // const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
+  
   const [GrandTotal, setGrandTotal] = useState(0);
-
-  const defaultSearchItems = [
-    { Item: 'Paracetamol ', Qnty: 20, Price: 10, Total: 10 },
-    { Item: 'Pfizer Vaccine', Qnty: 50, Price: 10, Total: 10 },
-    { Item: 'GoodHealth Probiotics', Qnty: 20, Price: 10, Total: 10 },
-    { Item: 'Cipex Dewormer', Qnty: 70, Price: 10, Total: 10 },
-  ];
-
+  
   const [searchOptions, setsearchOptions] = useState([]);
+  const [defaultSearchItems, setdefaultSearchItems] = useState([]);
+
   const [BillItems, setBillItems] = useState([]);
+  const [FinalBill, setFinalBill] = useState({});
+
+  const [searchVal, setsearchVal] = useState("");
 
   const toggleSearch = (choiceSelected) => {
-    // setIsSearchEnabled("disabled")
     if (choiceSelected == 'Stock Item') {
-      // setIsSearchEnabled("disabled")
       (document.getElementById('searchField') as HTMLInputElement).disabled = false;
     } else {
-      // setIsSearchEnabled("")
       (document.getElementById('searchField') as HTMLInputElement).disabled = true;
     }
   };
 
-  const calculateTotal = (event) => {
+  const calculateTotal = (event, itemName) => {
+    const Qnty = event.target.value;
     const price = (document.getElementById(event.target.id + 'Price') as HTMLInputElement).value;
-    const total = parseInt(price) * event.target.value;
-    // (document.getElementById(event.target.id+"Total")  as HTMLInputElement).value = total.toString();
+    const total = parseInt(price) * Qnty;
     (document.getElementById(event.target.id + 'Total') as HTMLInputElement).innerHTML = total.toString();
 
-    // add totals
     const totals = Array.from(document.querySelectorAll('[id$="Total"]'));
 
+    const updateQnty = BillItems.filter((o) =>
+      o.Item.toLowerCase().includes(itemName.toLowerCase()),
+    );
+
+    updateQnty.map((o) =>
+      o.Qnty = Qnty
+    );
+
+    // setBillItems()
+    console.log("BillItems ",BillItems)
     let addUpTotals = 0;
     totals.forEach((tot) => {
       var getTot = (tot as HTMLInputElement).innerHTML;
@@ -73,30 +87,97 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
     setGrandTotal(sum);
   };
 
-  const filterItems = (searchVal) => {
-    if (searchVal != '') {
-      const filteredRes = defaultSearchItems.filter((o) => o.Item.toLowerCase().includes(searchVal.toLowerCase()));
-
-      setsearchOptions(filteredRes);
-    } else {
-      setsearchOptions([]);
-    }
-  };
-
-  const addItemToBill = (item) => {
-    const filteredRes = defaultSearchItems.filter((o) =>
-      o.Item.toLowerCase().includes(item.target.id.replace('Option', '').toLowerCase()),
-    );
-
-    BillItems.push({ Item: filteredRes[0].Item, Qnty: 1, Price: filteredRes[0].Price, Total: 10 });
+  const addItemToBill = (event, itemid, itemname) => {
+    // const filteredRes = defaultSearchItems.filter((o) =>
+    //   o.Item.toLowerCase().includes(item.target.id.replace('Option', '').toLowerCase()),
+    // );
+  
+    BillItems.push({ uuid: itemid, Item: itemname, Qnty: 1, Price: 10, Total: 10 });
     setBillItems(BillItems);
     setsearchOptions([]);
     CalculateTotalAfteraddBillItem();
   };
 
+
+//  filter items
+  const { data, error, isLoading, isValidating  } = useSWR(searchVal ?`/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}`:null,openmrsFetch, {});
+
+  const filterItems = (val) => {
+      setsearchVal(val)
+   
+    if (isLoading){
+      console.log("loading")
+    }else{
+       if(typeof data !== 'undefined'){
+        //set to null then repopulate
+        while(searchOptions.length > 0) {
+            searchOptions.pop();
+        }
+      
+        const res = data.data as { results: any[] }; 
+        
+        res.results.map((o) => {
+            if (o.commonName != ""  || o.commonName !=null){
+              searchOptions.push({uuid: o.uuid, Item: o.commonName, Qnty: 1, Price: 10, Total: 10 })
+              setsearchOptions(searchOptions)
+            }
+        }); 
+
+      }         
+                
+    }
+  }
+
+  const postBillItems = () => {
+    const bill ={
+      cashPoint: "54065383-b4d4-42d2-af4d-d250a1fd2590",
+      cashier: "f9badd80-ab76-11e2-9e96-0800200c9a66",
+      lineItems: [],
+      payments: [],
+      patient: patientUuid,
+      status: "PENDING"
+   }
+
+    // let newlineItems = []
+
+    BillItems.map((o) => {
+      bill.lineItems.push({
+          item: o.uuid,
+          quantity: 24,
+          price: 240.00,
+          priceName: "Default",
+          priceUuid: "7b9171ac-d3c1-49b4-beff-c9902aee5245",
+          lineItemOrder: 0,
+          paymentStatus: "PENDING"
+        })    
+        
+      }); 
+
+      console.log("get ill => ", bill)
+    // bill.lineItems = newlineItems;
+    // setFinalBill(bill);
+    // console.log("FinalBill => ", FinalBill)
+    const url = `/ws/rest/v1/cashier/bill`;
+    processBillItems(bill).then(
+      (resp) => {
+        showSnackbar({
+          title: t('billItems', 'Save Bill'),
+          subtitle: 'Bill processing has been successful',
+          kind: 'success',
+          timeoutInMs: 3000,
+        });
+      },
+      (error) => {
+        showSnackbar({ title: 'Bill processing error', kind: 'error', subtitle: error });
+      },
+    );
+
+  };
+
   useEffect(() => {
-    // action on update of movies
-  }, []);
+      // action on update of movies
+  }, [FinalBill]);
+
 
   return (
     <div className={styles.billingFormContainer}>
@@ -129,8 +210,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
           {searchOptions.map((row) => (
             <li className={styles.searchItem}>
               <Button
-                id={row.Item + 'Option'}
-                onClick={(e) => addItemToBill(e)}
+                id={row.uuid} 
+                onClick={(e) => addItemToBill(e, row.uuid, row.Item)}
                 style={{ background: 'inherit', color: 'black' }}>
                 {row.Item} Qnty.{row.Qnty} Ksh.{row.Price}
               </Button>
@@ -160,7 +241,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
                     max={100}
                     value={row.Qnty}
                     onChange={(e) => {
-                      calculateTotal(e);
+                      calculateTotal(e, row.Item);
                       row.Qnty = e.target.value;
                     }}
                   />
@@ -200,21 +281,10 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid }) => {
       </Table>
 
       <ButtonSet className={styles.billingItem}>
-        <Button kind="secondary">Discard</Button>
-        <Button kind="primary">Save</Button>
+        <Button kind="secondary" onClick={closeWorkspace}>Discard</Button>
+        <Button kind="primary" onClick={postBillItems}>Save</Button>
       </ButtonSet>
-      {/* <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" >
-              {t('cancel', 'Cancel')}
-            </Button>
-            <Button className={styles.button} disabled={isSubmittingForm} kind="primary" type="submit">
-              {isSubmittingForm ? (
-                <InlineLoading className={styles.spinner} description={t('saving', 'Saving') + '...'} />
-              ) : (
-                <span>{t('saveAndClose', 'Save & close')}</span>
-              )}
-            </Button>
-      </ButtonSet> */}
+      
     </div>
   );
 };
