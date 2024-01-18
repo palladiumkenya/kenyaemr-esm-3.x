@@ -7,6 +7,7 @@ import {
   mchDashboardMeta,
   defaulterTracingDashboardMeta,
   htsDashboardMeta,
+  inPatientDashboardMeta,
 } from './dashboard.meta';
 import DefaulterTracing from './defaulter-tracing/defaulter-tracing.component';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
@@ -27,6 +28,7 @@ export const clinicalViewGroup = getSyncLifecycle(createDashboardGroup(ClinicalD
 export const mchDashboardLink = getSyncLifecycle(createDashboardLink(mchDashboardMeta), options);
 export const defaulterTracingLink = getSyncLifecycle(createDashboardLink(defaulterTracingDashboardMeta), options);
 export const htsDashboardLink = getSyncLifecycle(createDashboardLink(htsDashboardMeta), options);
+export const inPatientLink = getSyncLifecycle(createDashboardLink(inPatientDashboardMeta), options);
 
 // Views
 export const mchClinicalView = getSyncLifecycle(MaternalHealthList, options);
