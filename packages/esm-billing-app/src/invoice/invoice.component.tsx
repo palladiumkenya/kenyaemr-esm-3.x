@@ -4,27 +4,35 @@ import { Printer } from '@carbon/react/icons';
 import { useParams } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 import { useTranslation } from 'react-i18next';
-import { convertToCurrency } from '../helpers';
 import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { convertToCurrency } from '../helpers';
+import { LineItem } from '../types';
 import { useBill } from '../billing.resource';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
+import PrintReceipt from './printable-invoice/print-receipt.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import styles from './invoice.scss';
-import PrintReceipt from './printable-invoice/print-receipt.component';
 
-type InvoiceProps = {};
+interface InvoiceDetailsProps {
+  label: string;
+  value: string | number;
+}
 
-const Invoice: React.FC<InvoiceProps> = () => {
-  const params = useParams();
+const Invoice: React.FC = () => {
   const { t } = useTranslation();
-  const { patient, patientUuid, isLoading } = usePatient(params?.patientUuid);
-  const { bill, isLoading: isLoadingBilling, error } = useBill(params?.billUuid);
+  const { billUuid, patientUuid } = useParams();
+  const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
+  const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
   const [isPrinting, setIsPrinting] = useState(false);
-  const componentRef = useRef(null);
+  const [selectedLineItems, setSelectedLineItems] = useState([]);
+  const componentRef = useRef<HTMLDivElement>(null);
+  const onBeforeGetContentResolve = useRef<(() => void) | null>(null);
 
-  const onBeforeGetContentResolve = useRef(null);
+  const handleSelectItem = (lineItems: Array<LineItem>) => {
+    setSelectedLineItems(lineItems);
+  };
 
   const handleAfterPrint = useCallback(() => {
     onBeforeGetContentResolve.current = null;
@@ -66,7 +74,7 @@ const Invoice: React.FC<InvoiceProps> = () => {
     'Invoice Status': bill?.status,
   };
 
-  if (isLoading && isLoadingBilling) {
+  if (isLoadingPatient && isLoadingBill) {
     return (
       <div className={styles.invoiceContainer}>
         <InlineLoading
@@ -109,20 +117,15 @@ const Invoice: React.FC<InvoiceProps> = () => {
         </div>
       </div>
 
-      <InvoiceTable billUuid={bill?.uuid} />
-      {<Payments bill={bill} />}
+      <InvoiceTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
+      <Payments bill={bill} selectedLineItems={selectedLineItems} />
 
       <div className={styles.printContainer} ref={componentRef}>
-        {isPrinting && <PrintableInvoice bill={bill} patient={patient} isLoading={isLoading} />}
+        {isPrinting && <PrintableInvoice bill={bill} patient={patient} isLoading={isLoadingPatient} />}
       </div>
     </div>
   );
 };
-
-interface InvoiceDetailsProps {
-  label: string;
-  value: string | number;
-}
 
 function InvoiceDetails({ label, value }: InvoiceDetailsProps) {
   return (

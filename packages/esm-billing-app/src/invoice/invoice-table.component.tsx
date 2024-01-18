@@ -15,22 +15,26 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
+  TableSelectRow,
   Tile,
 } from '@carbon/react';
 import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
-import { useBill } from '../billing.resource';
+import { LineItem, MappedBill } from '../types';
 import styles from './invoice-table.scss';
 
 type InvoiceTableProps = {
-  billUuid: string;
+  bill: MappedBill;
+  isSelectable?: boolean;
+  isLoadingBill?: boolean;
+  onSelectItem?: (selectedLineItems: LineItem[]) => void;
 };
 
-const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
+const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, isLoadingBill, onSelectItem }) => {
   const { t } = useTranslation();
+  const { lineItems } = bill;
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const { bill, isLoading } = useBill(billUuid);
-  const { lineItems } = bill;
+
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
 
@@ -42,12 +46,26 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
     return debouncedSearchTerm
       ? fuzzy
           .filter(debouncedSearchTerm, lineItems, {
-            extract: (lineItem) => `${lineItem.item}`,
+            extract: (lineItem: LineItem) => `${lineItem.item}`,
           })
           .sort((r1, r2) => r1.score - r2.score)
           .map((result) => result.original)
       : lineItems;
   }, [debouncedSearchTerm, lineItems]);
+
+  const [selectedLineItems, setSelectedLineItems] = useState([]);
+
+  const handleRowSelection = (row, checked: boolean) => {
+    const matchingRow = filteredLineItems.find((item) => item.uuid === row.id);
+    let newSelectedLineItems;
+    if (checked) {
+      newSelectedLineItems = [...selectedLineItems, matchingRow];
+    } else {
+      newSelectedLineItems = selectedLineItems.filter((item) => item.uuid !== row.id);
+    }
+    setSelectedLineItems(newSelectedLineItems);
+    onSelectItem(newSelectedLineItems);
+  };
 
   const tableHeaders = [
     { header: 'No', key: 'no' },
@@ -76,7 +94,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
     [bill.receiptNumber, bill.status, filteredLineItems],
   );
 
-  if (isLoading) {
+  if (isLoadingBill) {
     return (
       <div className={styles.loaderContainer}>
         <DataTableSkeleton
@@ -93,7 +111,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
   return (
     <div className={styles.invoiceContainer}>
       <DataTable headers={tableHeaders} isSortable rows={tableRows} size={responsiveSize} useZebraStyles>
-        {({ rows, headers, getRowProps, getTableProps, getToolbarProps }) => (
+        {({ rows, headers, getRowProps, getSelectionProps, getTableProps, getToolbarProps }) => (
           <TableContainer
             description={
               <span className={styles.tableDescription}>
@@ -117,6 +135,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
             <Table {...getTableProps()} aria-label="Invoice line items" className={styles.table}>
               <TableHead>
                 <TableRow>
+                  {rows.length > 1 && isSelectable ? <TableHeader /> : null}
                   {headers.map((header) => (
                     <TableHeader key={header.key}>{header.header}</TableHeader>
                   ))}
@@ -129,6 +148,13 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ billUuid }) => {
                     {...getRowProps({
                       row,
                     })}>
+                    {rows.length > 1 && isSelectable && (
+                      <TableSelectRow
+                        aria-label="Select row"
+                        {...getSelectionProps({ row })}
+                        onChange={(checked: boolean) => handleRowSelection(row, checked)}
+                      />
+                    )}
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}

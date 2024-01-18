@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTableSkeleton,
@@ -28,15 +28,15 @@ import {
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
 import styles from './bill-history.scss';
-import { MappedBill } from '../types';
 
 interface BillHistoryProps {
   patientUuid: string;
 }
+
 const PAGE_SIZE = 10;
 const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { bills, isLoading, isValidating, error } = useBills(patientUuid);
+  const { bills, isLoading, error } = useBills(patientUuid);
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const { paginated, goTo, results, currentPage } = usePagination(bills, PAGE_SIZE);
@@ -64,8 +64,8 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   const setBilledItems = (bill) =>
     bill.lineItems.reduce((acc, item) => acc + (acc ? ' & ' : '') + (item.billableService || item.item || ''), '');
 
-  const rowData = results?.map((bill, index) => ({
-    id: `${index}`,
+  const rowData = results?.map((bill) => ({
+    id: bill.uuid,
     uuid: bill.uuid,
     billTotal: bill.totalAmount,
     visitTime: bill.dateCreated,
@@ -120,7 +120,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
           getRowProps,
         }) => (
           <TableContainer {...getTableContainerProps}>
-            <Table {...getTableProps()} aria-label="bill list">
+            <Table className={styles.table} {...getTableProps()} aria-label="Bill list">
               <TableHead>
                 <TableRow>
                   <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
@@ -136,24 +136,28 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row, i) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                    {row.isExpanded ? (
-                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
-                        <div className={styles.container} key={i}>
-                          <InvoiceTable billUuid={rowData?.[i].uuid} />
-                        </div>
-                      </TableExpandedRow>
-                    ) : (
-                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                    )}
-                  </React.Fragment>
-                ))}
+                {rows.map((row, i) => {
+                  const currentBill = bills?.find((bill) => bill.uuid === row.id);
+
+                  return (
+                    <React.Fragment key={row.id}>
+                      <TableExpandRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </TableExpandRow>
+                      {row.isExpanded ? (
+                        <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
+                          <div className={styles.container} key={i}>
+                            <InvoiceTable bill={currentBill} isSelectable={false} />
+                          </div>
+                        </TableExpandedRow>
+                      ) : (
+                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>

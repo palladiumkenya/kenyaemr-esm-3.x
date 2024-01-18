@@ -28,21 +28,19 @@ import {
 } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
-import { PENDING } from '../constants';
 import styles from './bills-table.scss';
-import { MappedBill } from '../types';
 
 const BillsTable = () => {
   const { t } = useTranslation();
   const id = useId();
   const config = useConfig();
   const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const [billPaymentStatus, setBillPaymentStatus] = useState('');
   const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
   const { bills, isLoading, isValidating, error } = useBills('', billPaymentStatus);
   const [searchString, setSearchString] = useState('');
-  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
 
   const headerData = [
     {
@@ -86,13 +84,16 @@ const BillsTable = () => {
   const setBilledItems = (bill) =>
     bill?.lineItems?.reduce((acc, item) => acc + (acc ? ' & ' : '') + (item.billableService || item.item || ''), '');
 
+  const billingUrl = '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${uuid}';
+
   const rowData = results?.map((bill, index) => ({
     id: `${index}`,
     uuid: bill.uuid,
     patientName: (
       <ConfigurableLink
         style={{ textDecoration: 'none', maxWidth: '50%' }}
-        to={`${window.getOpenmrsSpaBase()}home/billing/patient/${bill.patientUuid}/${bill.uuid}`}>
+        to={billingUrl}
+        templateParams={{ patientUuid: bill.patientUuid, uuid: bill.uuid }}>
         {bill.patientName}
       </ConfigurableLink>
     ),
