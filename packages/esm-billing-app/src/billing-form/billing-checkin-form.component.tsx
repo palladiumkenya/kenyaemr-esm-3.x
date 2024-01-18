@@ -48,9 +48,11 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const handleBillingService = ({ selectedItem }) => {
     const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
     const itemUuid = selectedItem?.uuid ?? '';
-    const priceForPaymentMode = selectedItem.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod);
 
-    // TODO: This line list should come from backend to avoid hard coding prices in the frontend
+    // should default to first price if check returns empty. todo - update backend to return default price
+    const priceForPaymentMode =
+      selectedItem.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod) || selectedItem?.servicePrices[0];
+
     const createBillPayload = {
       lineItems: [
         {
