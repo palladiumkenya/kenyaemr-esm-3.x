@@ -1,18 +1,17 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Invoice from './invoice.component';
+import { useReactToPrint } from 'react-to-print';
+import { showSnackbar } from '@openmrs/esm-framework';
+import { mockPayments, mockBill } from '../../../../__mocks__/bills.mock';
 import { useBill, processBillPayment } from '../billing.resource';
+import { usePaymentModes } from './payments/payment.resource';
+import Invoice from './invoice.component';
 
-import { mockPayments, mockedBill } from '../../../../__mocks__/bills.mock';
-import { usePaymentModes, updateBillVisitAttribute } from './payments/payment.resource';
-import { showSnackbar, usePatient } from '@openmrs/esm-framework';
-
-const mockBill = useBill as jest.MockedFunction<typeof useBill>;
-const mockUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
-const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
-const mockUsePatient = usePatient as jest.MockedFunction<typeof usePatient>;
-const mockUpdateBillVisitAttribute = updateBillVisitAttribute as jest.MockedFunction<typeof updateBillVisitAttribute>;
+const mockedBill = jest.mocked(useBill);
+const mockedProcessBillPayment = jest.mocked(processBillPayment);
+const mockedUsePaymentModes = jest.mocked(usePaymentModes);
+const mockedUseReactToPrint = jest.mocked(useReactToPrint);
 
 jest.mock('./payments/payment.resource', () => ({
   usePaymentModes: jest.fn(),
@@ -25,31 +24,52 @@ jest.mock('../billing.resource', () => ({
   useDefaultFacility: jest.fn().mockReturnValue({ uuid: '54065383-b4d4-42d2-af4d-d250a1fd2590', display: 'MTRH' }),
 }));
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useParams: jest.fn().mockReturnValue({ patientUuid: 'patientUuid', billUuid: 'billUuid' }),
-}));
+jest.mock('react-router-dom', () => {
+  const originalModule = jest.requireActual('react-router-dom');
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  usePatient: jest.fn(),
-}));
+  return {
+    ...originalModule,
+    useParams: jest.fn().mockReturnValue({ patientUuid: 'patientUuid', billUuid: 'billUuid' }),
+  };
+});
+
+jest.mock('react-to-print', () => {
+  const originalModule = jest.requireActual('react-to-print');
+
+  return {
+    ...originalModule,
+    useReactToPrint: jest.fn(),
+  };
+});
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    usePatient: jest.fn().mockReturnValue({
+      patient: {
+        id: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
+        name: [{ given: ['John'], family: 'Doe' }],
+      },
+      patientUuid: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
+      isLoading: false,
+      error: null,
+    }),
+  };
+});
 
 describe('Invoice', () => {
   beforeEach(() => {
-    jest.restoreAllMocks();
-  });
-
-  test('should render Invoice component', async () => {
-    const user = userEvent.setup();
-    mockBill.mockReturnValue({
-      bill: mockedBill,
+    mockedBill.mockReturnValue({
+      bill: mockBill,
       isLoading: false,
       error: null,
       isValidating: false,
       mutate: jest.fn(),
     });
-    mockUsePaymentModes.mockReturnValue({
+
+    mockedUsePaymentModes.mockReturnValue({
       paymentModes: [
         { uuid: 'uuid', name: 'Cash', description: 'Cash Method', retired: false },
         { uuid: 'uuid1', name: 'MPESA', description: 'MPESA Method', retired: false },
@@ -58,79 +78,86 @@ describe('Invoice', () => {
       error: null,
       mutate: jest.fn(),
     });
-    mockUsePatient.mockReturnValue({
-      patient: {
-        id: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
-        name: [{ given: ['John'], family: 'Doe' }],
-      },
-      patientUuid: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
-      isLoading: false,
-      error: null,
-    });
+  });
+
+  afterEach(() => jest.clearAllMocks());
+
+  test('should be able to search through the invoice table and settle a bill', async () => {
+    const user = userEvent.setup();
+
     renderInvoice();
 
-    // Invoice details section
-    expect(screen.getByRole('heading', { name: 'Total Amount' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Amount Tendered' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Date And Time' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Invoice Status' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Invoice Number' })).toBeInTheDocument();
+    const expectedHeaders = [
+      /Total amount/i,
+      /Amount tendered/i,
+      /Date and time/i,
+      /Invoice status/i,
+      /Invoice number/i,
+    ];
 
-    const printButton = screen.getByRole('button', { name: 'Print bill' });
+    expectedHeaders.forEach((header) => {
+      expect(screen.getByRole('heading', { name: header })).toBeInTheDocument();
+    });
+
+    const printButton = screen.getByRole('button', { name: /Print bill/i });
     expect(printButton).toBeInTheDocument();
 
     // Should show the line items table with the correct headers
-    const tableHeader = screen.getByRole('heading', { name: 'Line items' });
-    expect(tableHeader).toBeInTheDocument();
-    expect(screen.getByText('Items to be billed')).toBeInTheDocument();
+    const expectedColumnHeaders = [/No/i, /Bill item/i, /Bill code/i, /Status/i, /Quantity/i, /Price/i, /Total/i];
 
-    const expectedColumnHeaders = [/No/, /Bill item/, /Bill code/, /Status/, /Quantity/, /Price/, /Total/];
-    expectedColumnHeaders.forEach((header) => {
-      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+    expectedColumnHeaders.forEach((columnHeader) => {
+      expect(screen.getByRole('columnheader', { name: columnHeader })).toBeInTheDocument();
     });
 
-    // // should be able to search the line items table
-    const searchInput = screen.getByPlaceholderText('Search this table');
+    expect(screen.getByRole('heading', { name: /Line items/i })).toBeInTheDocument();
+    expect(screen.getByText(/Items to be billed/i)).toBeInTheDocument();
+
+    // Should be able to search the line items table
+    const searchInput = screen.getByRole('searchbox');
     expect(searchInput).toBeInTheDocument();
     await user.type(searchInput, 'Hemoglobin');
     expect(screen.getByText('Hemoglobin')).toBeInTheDocument();
 
     await user.type(searchInput, 'Some random text');
     expect(screen.queryByText('Hemoglobin')).not.toBeInTheDocument();
-    expect(screen.getByText('No matching items to display')).toBeInTheDocument();
+    expect(screen.getByText(/No matching items to display/i)).toBeInTheDocument();
     await user.clear(searchInput);
 
-    // // should be able to handle payments
-    const paymentSection = await screen.findByRole('heading', { name: 'Payments' });
+    const row = mockBill.lineItems[0].item + ' ' + mockBill.receiptNumber + ' ' + mockBill.status.toUpperCase();
+
+    expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
+
+    // should be able to handle payments
+    const paymentSection = await screen.findByRole('heading', { name: /Payments/i });
     expect(paymentSection).toBeInTheDocument();
 
-    const addPaymentOptionButton = await screen.findByRole('button', { name: 'Add payment option' });
+    const addPaymentOptionButton = await screen.findByRole('button', { name: /Add payment option/i });
     expect(addPaymentOptionButton).toBeInTheDocument();
     await user.click(addPaymentOptionButton);
-    const paymentModeInput = screen.getByRole('combobox', { name: 'Payment method' });
+    const paymentModeInput = screen.getByRole('combobox', { name: /Payment method/i });
     expect(paymentModeInput).toBeInTheDocument();
     await user.click(paymentModeInput);
 
-    // // select cash payment mode
+    // select cash payment mode
     const cashPaymentMode = await screen.findByText('Cash');
     expect(cashPaymentMode).toBeInTheDocument();
     await user.click(cashPaymentMode);
 
-    // // enter payment amount
+    // enter payment amount
     const paymentAmountInput = screen.getByPlaceholderText('Enter amount');
     expect(paymentAmountInput).toBeInTheDocument();
     await user.type(paymentAmountInput, '100');
 
-    // // enter payment reference number
-    const paymentReferenceNumberInput = screen.getByRole('textbox', { name: /Enter ref. number/ });
+    // enter payment reference number
+    const paymentReferenceNumberInput = screen.getByRole('textbox', { name: /Reference number/ });
     expect(paymentReferenceNumberInput).toBeInTheDocument();
     await user.type(paymentReferenceNumberInput, '123456');
 
     expect(addPaymentOptionButton).toBeDisabled();
 
-    // // should process payment
-    mockProcessBillPayment.mockResolvedValueOnce(Promise.resolve({} as any));
-    const processPaymentButton = screen.getByRole('button', { name: 'Process Payment' });
+    // should process payment
+    mockedProcessBillPayment.mockResolvedValueOnce(Promise.resolve({} as any));
+    const processPaymentButton = screen.getByRole('button', { name: /Process Payment/i });
     expect(processPaymentButton).toBeInTheDocument();
     await user.click(processPaymentButton);
 
@@ -156,34 +183,25 @@ describe('Invoice', () => {
 
   test('should show print preview when print button is clicked', async () => {
     const user = userEvent.setup();
-    mockBill.mockReturnValue({
-      bill: mockedBill,
-      isLoading: false,
-      error: null,
-      isValidating: false,
-      mutate: jest.fn(),
-    });
-    mockUsePaymentModes.mockReturnValue({
-      paymentModes: [
-        { uuid: 'uuid', name: 'Cash', description: 'Cash Method', retired: false },
-        { uuid: 'uuid1', name: 'MPESA', description: 'MPESA Method', retired: false },
-      ],
-      isLoading: false,
-      error: null,
-      mutate: jest.fn(),
-    });
+
     renderInvoice();
 
-    const printButton = screen.getByRole('button', { name: 'Print bill' });
+    const printButton = screen.getByRole('button', { name: /Print bill/i });
     expect(printButton).toBeInTheDocument();
     await user.click(printButton);
+    expect(mockedUseReactToPrint).toHaveBeenCalledTimes(1);
+    expect(mockedUseReactToPrint).toHaveBeenCalledWith(
+      expect.objectContaining({
+        documentTitle: 'Invoice 0035-6 - John Doe',
+      }),
+    );
   });
 
   test('should show payment history if bill is paid and disable adding more payments', async () => {
     const user = userEvent.setup();
-    mockBill.mockReturnValue({
+    mockedBill.mockReturnValue({
       bill: {
-        ...mockedBill,
+        ...mockBill,
         status: 'PAID',
         payments: mockPayments,
         tenderedAmount: 100,
@@ -193,7 +211,8 @@ describe('Invoice', () => {
       isValidating: false,
       mutate: jest.fn(),
     });
-    mockUsePaymentModes.mockReturnValue({
+
+    mockedUsePaymentModes.mockReturnValue({
       paymentModes: [
         { uuid: 'uuid', name: 'Cash', description: 'Cash Method', retired: false },
         { uuid: 'uuid1', name: 'MPESA', description: 'MPESA Method', retired: false },
@@ -204,7 +223,7 @@ describe('Invoice', () => {
     });
 
     renderInvoice();
-    const paymentHistorySection = screen.getByRole('heading', { name: 'Payments' });
+    const paymentHistorySection = screen.getByRole('heading', { name: /Payments/i });
     expect(paymentHistorySection).toBeInTheDocument();
 
     const expectedColumnHeaders = [/Date of payment/, /Bill amount/, /Amount tendered/, /Payment method/];
@@ -212,7 +231,7 @@ describe('Invoice', () => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
 
-    const addPaymentOptionButton = await screen.findByRole('button', { name: 'Add payment option' });
+    const addPaymentOptionButton = await screen.findByRole('button', { name: /Add payment option/i });
     expect(addPaymentOptionButton).toBeInTheDocument();
     expect(addPaymentOptionButton).toBeDisabled();
   });
