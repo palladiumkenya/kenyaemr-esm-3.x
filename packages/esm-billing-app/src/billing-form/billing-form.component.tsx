@@ -1,4 +1,4 @@
-import useSWR from 'swr'
+import useSWR from 'swr';
 import React, { useState, useEffect } from 'react';
 import {
   ButtonSet,
@@ -17,39 +17,39 @@ import {
 } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
-import { openmrsFetch} from '@openmrs/esm-framework';
+import { navigate, showSnackbar, openmrsFetch } from '@openmrs/esm-framework';
 // import { fetchRes } from '../billing.resource';
-import { processBillItems } from '../billing.resource';
-import { navigate, showSnackbar } from '@openmrs/esm-framework';
-
-
-
-
-
+import { fetchSearchResults, processBillItems } from '../billing.resource';
 
 type BillingFormProps = {
   patientUuid: string;
   closeWorkspace: () => void;
 };
 
-const BillingForm: React.FC<BillingFormProps> = ({ patientUuid,closeWorkspace }) => {
+const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
-  
+
   const [GrandTotal, setGrandTotal] = useState(0);
-  
+
   const [searchOptions, setsearchOptions] = useState([]);
   const [defaultSearchItems, setdefaultSearchItems] = useState([]);
 
   const [BillItems, setBillItems] = useState([]);
   const [FinalBill, setFinalBill] = useState({});
 
-  const [searchVal, setsearchVal] = useState("");
+  const [searchVal, setsearchVal] = useState('');
+  const [category, setCategory] = useState('');
+
+
+
 
   const toggleSearch = (choiceSelected) => {
+    (document.getElementById('searchField') as HTMLInputElement).disabled = false;
+
     if (choiceSelected == 'Stock Item') {
-      (document.getElementById('searchField') as HTMLInputElement).disabled = false;
+      setCategory("Stock Item")
     } else {
-      (document.getElementById('searchField') as HTMLInputElement).disabled = true;
+      setCategory('Service')
     }
   };
 
@@ -61,16 +61,12 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid,closeWorkspace })
 
     const totals = Array.from(document.querySelectorAll('[id$="Total"]'));
 
-    const updateQnty = BillItems.filter((o) =>
-      o.Item.toLowerCase().includes(itemName.toLowerCase()),
-    );
+    const updateQnty = BillItems.filter((o) => o.Item.toLowerCase().includes(itemName.toLowerCase()));
 
-    updateQnty.map((o) =>
-      o.Qnty = Qnty
-    );
+    updateQnty.map((o) => (o.Qnty = Qnty));
 
     // setBillItems()
-    console.log("BillItems ",BillItems)
+    console.log('BillItems ', BillItems);
     let addUpTotals = 0;
     totals.forEach((tot) => {
       var getTot = (tot as HTMLInputElement).innerHTML;
@@ -87,73 +83,87 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid,closeWorkspace })
     setGrandTotal(sum);
   };
 
-  const addItemToBill = (event, itemid, itemname) => {
+  const addItemToBill = (event, itemid, itemname, itemcategory) => {
     // const filteredRes = defaultSearchItems.filter((o) =>
     //   o.Item.toLowerCase().includes(item.target.id.replace('Option', '').toLowerCase()),
     // );
-  
-    BillItems.push({ uuid: itemid, Item: itemname, Qnty: 1, Price: 10, Total: 10 });
+
+    BillItems.push({ uuid: itemid, Item: itemname, Qnty: 1, Price: 10, Total: 10, category: itemcategory });
     setBillItems(BillItems);
     setsearchOptions([]);
     CalculateTotalAfteraddBillItem();
+    console.log(BillItems)
   };
 
-
-//  filter items
-  const { data, error, isLoading, isValidating  } = useSWR(searchVal ?`/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}`:null,openmrsFetch, {});
+  //  filter items
+  const { data, error, isLoading, isValidating } = fetchSearchResults(searchVal, category);
 
   const filterItems = (val) => {
-      setsearchVal(val)
-   
-    if (isLoading){
-      console.log("loading")
-    }else{
-       if(typeof data !== 'undefined'){
-        //set to null then repopulate
-        while(searchOptions.length > 0) {
-            searchOptions.pop();
-        }
-      
-        const res = data.data as { results: any[] }; 
-        
-        res.results.map((o) => {
-            if (o.commonName != ""  || o.commonName !=null){
-              searchOptions.push({uuid: o.uuid, Item: o.commonName, Qnty: 1, Price: 10, Total: 10 })
-              setsearchOptions(searchOptions)
-            }
-        }); 
+    setsearchVal(val);
 
-      }         
-                
+    if (isLoading) {
+      console.log('loading');
+    } else {
+      if (typeof data !== 'undefined') {
+        //set to null then repopulate
+        while (searchOptions.length > 0) {
+          searchOptions.pop();
+        }
+
+        // const res = (data as any).data;
+        const res = data as { results: any[] };
+        console.log("res ===> ",res)
+        res.results.map((o) => {
+          if (o.commonName && (o.commonName != '' || o.commonName != null)) {
+            searchOptions.push({ uuid: o.uuid, Item: o.commonName, Qnty: 1, Price: 10, Total: 10, category:"StockItem" });
+            // setsearchOptions(searchOptions);
+          }else{
+            searchOptions.push({ uuid: o.uuid, Item: o.name, Qnty: 1, Price: 10, Total: 10, category:"Service" });
+          }
+          setsearchOptions(searchOptions);
+
+        });
+      }
     }
-  }
+  };
 
   const postBillItems = () => {
-    const bill ={
-      cashPoint: "54065383-b4d4-42d2-af4d-d250a1fd2590",
-      cashier: "f9badd80-ab76-11e2-9e96-0800200c9a66",
+    const bill = {
+      cashPoint: '54065383-b4d4-42d2-af4d-d250a1fd2590',
+      cashier: 'f9badd80-ab76-11e2-9e96-0800200c9a66',
       lineItems: [],
       payments: [],
       patient: patientUuid,
-      status: "PENDING"
-   }
+      status: 'PENDING',
+    };
 
     // let newlineItems = []
-
+    
     BillItems.map((o) => {
-      bill.lineItems.push({
+      if (o.category == 'StockItem') {
+        bill.lineItems.push({
           item: o.uuid,
-          quantity: 24,
-          price: 240.00,
-          priceName: "Default",
-          priceUuid: "7b9171ac-d3c1-49b4-beff-c9902aee5245",
+          quantity: parseInt(o.Qnty),
+          price: 240.0,
+          priceName: 'Default',
+          priceUuid: '7b9171ac-d3c1-49b4-beff-c9902aee5245',
           lineItemOrder: 0,
-          paymentStatus: "PENDING"
-        })    
-        
-      }); 
-
-      console.log("get ill => ", bill)
+          paymentStatus: 'PENDING',
+        });
+      }else{
+        bill.lineItems.push({
+          billableService: o.uuid,
+          quantity: parseInt(o.Qnty),
+          price: 240.0,
+          priceName: 'Default',
+          priceUuid: '7b9171ac-d3c1-49b4-beff-c9902aee5245',
+          lineItemOrder: 0,
+          paymentStatus: 'PENDING',
+        });
+      }
+    });
+    console.log(bill)
+    // console.log('get ill => ', bill);
     // bill.lineItems = newlineItems;
     // setFinalBill(bill);
     // console.log("FinalBill => ", FinalBill)
@@ -171,13 +181,9 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid,closeWorkspace })
         showSnackbar({ title: 'Bill processing error', kind: 'error', subtitle: error });
       },
     );
-
   };
 
-  useEffect(() => {
-      // action on update of movies
-  }, [FinalBill]);
-
+ 
 
   return (
     <div className={styles.billingFormContainer}>
@@ -210,8 +216,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid,closeWorkspace })
           {searchOptions.map((row) => (
             <li className={styles.searchItem}>
               <Button
-                id={row.uuid} 
-                onClick={(e) => addItemToBill(e, row.uuid, row.Item)}
+                id={row.uuid}
+                onClick={(e) => addItemToBill(e, row.uuid, row.Item, row.category)}
                 style={{ background: 'inherit', color: 'black' }}>
                 {row.Item} Qnty.{row.Qnty} Ksh.{row.Price}
               </Button>
@@ -281,10 +287,13 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid,closeWorkspace })
       </Table>
 
       <ButtonSet className={styles.billingItem}>
-        <Button kind="secondary" onClick={closeWorkspace}>Discard</Button>
-        <Button kind="primary" onClick={postBillItems}>Save</Button>
+        <Button kind="secondary" onClick={closeWorkspace}>
+          Discard
+        </Button>
+        <Button kind="primary" onClick={postBillItems}>
+          Save
+        </Button>
       </ButtonSet>
-      
     </div>
   );
 };

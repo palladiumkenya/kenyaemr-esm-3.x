@@ -14,7 +14,6 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
       errorRetryCount: 2,
     },
   );
-  
 
   const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     // create base object
@@ -102,12 +101,6 @@ export const useBill = (billUuid: string) => {
   };
 };
 
-// export const fetchRes = (searchVal) => {
-//   const { data, error, isLoading, isValidating  } = useSWR(searchVal ?"/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=stre":null,openmrsFetch, {});
-//   console.log(data)
-  
-//   return { data: data?.data, error, isLoading: isLoading, isValidating };
-// }
 
 export const processBillPayment = (payload, billUuid: string) => {
   const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
@@ -125,6 +118,25 @@ export function useDefaultFacility() {
   const url = '/ws/rest/v1/kenyaemr/default-facility';
   const { data, isLoading } = useSWR<{ data: FacilityDetail }>(authenticated ? url : null, openmrsFetch, {});
   return { data: data?.data, isLoading: isLoading };
+}
+
+export const fetchSearchResults = (searchVal, category) => {
+  if (category == 'Stock Item') {
+    const { data, error, isLoading, isValidating  } = useSWR(searchVal ?`/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}`:null,
+    openmrsFetch,
+     {});
+
+     return { data: data?.data, error, isLoading: isLoading, isValidating };
+
+  } else {
+    const { data, error, isLoading, isValidating  } = useSWR(searchVal ?`/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`:null
+    ,openmrsFetch,
+     {});
+     
+     return { data: data?.data, error, isLoading: isLoading, isValidating };
+
+  }  
+
 }
 
 export const usePatientPaymentInfo = (patientUuid: string) => {
