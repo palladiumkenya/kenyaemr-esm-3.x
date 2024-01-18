@@ -14,6 +14,7 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
       errorRetryCount: 2,
     },
   );
+  
 
   const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     // create base object
@@ -101,6 +102,13 @@ export const useBill = (billUuid: string) => {
   };
 };
 
+// export const fetchRes = (searchVal) => {
+//   const { data, error, isLoading, isValidating  } = useSWR(searchVal ?"/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=stre":null,openmrsFetch, {});
+//   console.log(data)
+  
+//   return { data: data?.data, error, isLoading: isLoading, isValidating };
+// }
+
 export const processBillPayment = (payload, billUuid: string) => {
   const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
   return openmrsFetch(url, {
@@ -130,4 +138,15 @@ export const usePatientPaymentInfo = (patientUuid: string) => {
     .filter(({ name }) => name === 'Insurance scheme' || name === 'Policy Number');
 
   return paymentInformation;
+};
+
+export const processBillItems = (payload) => {
+  const url = `/ws/rest/v1/cashier/bill`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: payload,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
