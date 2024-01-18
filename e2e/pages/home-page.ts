@@ -7,3 +7,10 @@ export class HomePage {
     await this.page.goto('home');
   }
 }
+
+export class BillingPage {
+  constructor(readonly page: Page) {}
+  async gotoBilling() {
+    await this.page.goto('/openmrs/spa/home/billing');
+  }
+}
