@@ -11,6 +11,7 @@ import {
   VolumeFileStorage,
   Report,
   InventoryManagement,
+  HospitalBed,
 } from '@carbon/react/icons';
 const openmrsSpaBase = window['getOpenmrsSpaBase']();
 
@@ -78,6 +79,12 @@ export const moduleLinks = [
     label: 'Billable Services',
     url: `${openmrsSpaBase}billable-services`,
     icon: <InventoryManagement size={24} />,
+    requiresAdmin: true,
+  },
+  {
+    label: 'Bed Management',
+    url: `${openmrsSpaBase}bed-management`,
+    icon: <HospitalBed size={24} />,
     requiresAdmin: true,
   },
 ];
