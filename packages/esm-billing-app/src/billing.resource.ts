@@ -101,7 +101,6 @@ export const useBill = (billUuid: string) => {
   };
 };
 
-
 export const processBillPayment = (payload, billUuid: string) => {
   const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
   return openmrsFetch(url, {
@@ -122,22 +121,25 @@ export function useDefaultFacility() {
 
 export const fetchSearchResults = (searchVal, category) => {
   if (category == 'Stock Item') {
-    const { data, error, isLoading, isValidating  } = useSWR(searchVal ?`/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}`:null,
-    openmrsFetch,
-     {});
+    const { data, error, isLoading, isValidating } = useSWR(
+      searchVal ? `/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}` : null,
+      openmrsFetch,
+      {},
+    );
 
-     return { data: data?.data, error, isLoading: isLoading, isValidating };
-
+    return { data: data?.data, error, isLoading: isLoading, isValidating };
   } else {
-    const { data, error, isLoading, isValidating  } = useSWR(searchVal ?`/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`:null
-    ,openmrsFetch,
-     {});
-     
-     return { data: data?.data, error, isLoading: isLoading, isValidating };
+    const { data, error, isLoading, isValidating } = useSWR(
+      searchVal
+        ? `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`
+        : null,
+      openmrsFetch,
+      {},
+    );
 
-  }  
-
-}
+    return { data: data?.data, error, isLoading: isLoading, isValidating };
+  }
+};
 
 export const usePatientPaymentInfo = (patientUuid: string) => {
   const { currentVisit } = useVisit(patientUuid);
