@@ -18,7 +18,6 @@ import {
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
 import { navigate, showSnackbar, openmrsFetch } from '@openmrs/esm-framework';
-// import { fetchRes } from '../billing.resource';
 import { fetchSearchResults, processBillItems } from '../billing.resource';
 
 type BillingFormProps = {
@@ -40,16 +39,13 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
   const [searchVal, setsearchVal] = useState('');
   const [category, setCategory] = useState('');
 
-
-
-
   const toggleSearch = (choiceSelected) => {
     (document.getElementById('searchField') as HTMLInputElement).disabled = false;
 
     if (choiceSelected == 'Stock Item') {
-      setCategory("Stock Item")
+      setCategory('Stock Item');
     } else {
-      setCategory('Service')
+      setCategory('Service');
     }
   };
 
@@ -61,12 +57,11 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
 
     const totals = Array.from(document.querySelectorAll('[id$="Total"]'));
 
-    const updateQnty = BillItems.filter((o) => o.Item.toLowerCase().includes(itemName.toLowerCase()));
+    const updateItem = BillItems.filter((o) => o.Item.toLowerCase().includes(itemName.toLowerCase()));
 
-    updateQnty.map((o) => (o.Qnty = Qnty));
-
-    // setBillItems()
-    console.log('BillItems ', BillItems);
+    updateItem.map((o) => (o.Qnty = Qnty));
+    updateItem.map((o) => (o.Total =total));
+    
     let addUpTotals = 0;
     totals.forEach((tot) => {
       var getTot = (tot as HTMLInputElement).innerHTML;
@@ -76,23 +71,18 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
   };
 
   const CalculateTotalAfteraddBillItem = () => {
-    // add totals
     let sum = 0;
     BillItems.map((o) => (sum += o.Price));
 
     setGrandTotal(sum);
   };
 
-  const addItemToBill = (event, itemid, itemname, itemcategory) => {
-    // const filteredRes = defaultSearchItems.filter((o) =>
-    //   o.Item.toLowerCase().includes(item.target.id.replace('Option', '').toLowerCase()),
-    // );
-
-    BillItems.push({ uuid: itemid, Item: itemname, Qnty: 1, Price: 10, Total: 10, category: itemcategory });
+  const addItemToBill = (event, itemid, itemname, itemcategory, itemPrice) => {
+    BillItems.push({ uuid: itemid, Item: itemname, Qnty: 1, Price: itemPrice, Total: itemPrice, category: itemcategory });
     setBillItems(BillItems);
     setsearchOptions([]);
     CalculateTotalAfteraddBillItem();
-    console.log(BillItems)
+    (document.getElementById('searchField') as HTMLInputElement).value = '';
   };
 
   //  filter items
@@ -110,18 +100,22 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
           searchOptions.pop();
         }
 
-        // const res = (data as any).data;
         const res = data as { results: any[] };
-        console.log("res ===> ",res)
+        
         res.results.map((o) => {
           if (o.commonName && (o.commonName != '' || o.commonName != null)) {
-            searchOptions.push({ uuid: o.uuid, Item: o.commonName, Qnty: 1, Price: 10, Total: 10, category:"StockItem" });
-            // setsearchOptions(searchOptions);
-          }else{
-            searchOptions.push({ uuid: o.uuid, Item: o.name, Qnty: 1, Price: 10, Total: 10, category:"Service" });
+            searchOptions.push({
+              uuid: o.uuid,
+              Item: o.commonName,
+              Qnty: 1,
+              Price: 10,
+              Total: 10,
+              category: 'StockItem',
+            });
+          } else {
+            searchOptions.push({ uuid: o.uuid, Item: o.name, Qnty: 1, Price: o.servicePrices[0].price, Total: 10, category: 'Service' });
           }
           setsearchOptions(searchOptions);
-
         });
       }
     }
@@ -137,8 +131,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
       status: 'PENDING',
     };
 
-    // let newlineItems = []
-    
     BillItems.map((o) => {
       if (o.category == 'StockItem') {
         bill.lineItems.push({
@@ -150,7 +142,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
           lineItemOrder: 0,
           paymentStatus: 'PENDING',
         });
-      }else{
+      } else {
         bill.lineItems.push({
           billableService: o.uuid,
           quantity: parseInt(o.Qnty),
@@ -162,11 +154,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
         });
       }
     });
-    console.log(bill)
-    // console.log('get ill => ', bill);
-    // bill.lineItems = newlineItems;
-    // setFinalBill(bill);
-    // console.log("FinalBill => ", FinalBill)
+
     const url = `/ws/rest/v1/cashier/bill`;
     processBillItems(bill).then(
       (resp) => {
@@ -182,8 +170,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
       },
     );
   };
-
- 
 
   return (
     <div className={styles.billingFormContainer}>
@@ -217,7 +203,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
             <li className={styles.searchItem}>
               <Button
                 id={row.uuid}
-                onClick={(e) => addItemToBill(e, row.uuid, row.Item, row.category)}
+                onClick={(e) => addItemToBill(e, row.uuid, row.Item, row.category, row.Price)}
                 style={{ background: 'inherit', color: 'black' }}>
                 {row.Item} Qnty.{row.Qnty} Ksh.{row.Price}
               </Button>
@@ -241,7 +227,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
               <TableRow>
                 <TableCell>{row.Item}</TableCell>
                 <TableCell>
-                  <NumberInput
+                  <input type="number" className="form-control"
                     id={row.Item}
                     min={0}
                     max={100}
@@ -272,7 +258,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
           <TableRow>
             <TableCell></TableCell>
             <TableCell></TableCell>
-            <TableCell>Grand Total:</TableCell>
+            <TableCell style={{fontWeight: "bold"}}>Grand Total:</TableCell>
             <TableCell>
               <TextInput
                 id="GrandTotalSum"
