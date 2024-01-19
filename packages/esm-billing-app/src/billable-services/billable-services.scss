@@ -212,3 +212,8 @@
   display: flex;
   column-gap: 0.5rem;
 }
+
+.mainSection {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+}

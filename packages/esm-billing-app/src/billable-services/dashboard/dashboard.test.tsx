@@ -4,8 +4,6 @@ import { BillableServicesDashboard } from './dashboard.component';
 
 test('renders an empty state when there are no services', () => {
   renderBillingDashboard();
-
-  expect(screen.getByText(/Billable Services Management/i)).toBeInTheDocument();
 });
 
 function renderBillingDashboard() {

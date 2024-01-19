@@ -28,7 +28,7 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
   const lineItems = bills.filter((bill) => bill.status !== 'PAID').flatMap((bill) => bill.lineItems);
   return (
     <div>
-      <ModalHeader closeModal={closeModal} title={t('billPaymentRequired', 'Bill payment required')} />
+      <ModalHeader closeModal={closeModal} title={t('patientBillingAlert', 'Patient Billing Alert')} />
       <ModalBody>
         <p className={styles.bodyShort02}>
           {t(

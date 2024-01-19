@@ -37,7 +37,7 @@ export const moduleLinks = [
   },
   {
     label: 'Facility Dashboard ',
-    url: `${openmrsSpaBase}facility-dashboard`,
+    url: `https://odoosuperset.kenyahmis.org/superset/dashboard/11/`,
     icon: <ChartColumn size={24} />,
   },
   {
