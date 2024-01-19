@@ -34,7 +34,7 @@ describe('PatientSummary', () => {
   beforeEach(() => {
     mockedUsePatientSummary.mockReturnValue({
       data: null,
-      isError: false,
+      error: false,
       isLoading: true,
     });
   });
@@ -48,9 +48,17 @@ describe('PatientSummary', () => {
   });
 
   it('renders an error message when data retrieval fails', () => {
+    const mockError = {
+      message: 'You are not logged in',
+      response: {
+        status: 401,
+        statusText: 'Unauthorized',
+      },
+    };
+
     mockedUsePatientSummary.mockReturnValue({
       data: null,
-      isError: true,
+      error: mockError,
       isLoading: false,
     });
 
@@ -62,7 +70,7 @@ describe('PatientSummary', () => {
   it('renders patient summary data when loaded', () => {
     mockedUsePatientSummary.mockReturnValue({
       data: mockPatient,
-      isError: false,
+      error: null,
       isLoading: false,
     });
 
@@ -92,7 +100,7 @@ describe('PatientSummary', () => {
 
     mockedUsePatientSummary.mockReturnValue({
       data: mockPatient,
-      isError: false,
+      error: null,
       isLoading: false,
     });
 

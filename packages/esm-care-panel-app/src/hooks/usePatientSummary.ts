@@ -1,6 +1,6 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import useSWR from 'swr';
 import { PatientSummary } from '../types/index';
+import useSWR from 'swr';
 
 export const usePatientSummary = (patientUuid: string) => {
   const programSummaryUrl = `/ws/rest/v1/kenyaemr/patientSummary?patientUuid=${patientUuid}`;
@@ -8,7 +8,7 @@ export const usePatientSummary = (patientUuid: string) => {
 
   return {
     data: data?.data ? data?.data : null,
-    isError: error,
-    isLoading: isLoading,
+    error,
+    isLoading,
   };
 };
