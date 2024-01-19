@@ -5,7 +5,6 @@
   "addNewService": "Add new service",
   "addPaymentOptions": "Add payment option",
   "amount": "Amount",
-  "amountDue": "Amount due",
   "amountPaid": "Amount paid : ",
   "amountToWaiveAriaLabel": "Enter amount to waive",
   "amountToWaiveHelper": "Specify the amount to be deducted from the bill",

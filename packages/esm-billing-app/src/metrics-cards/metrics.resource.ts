@@ -17,24 +17,29 @@ import { MappedBill } from '../types';
  */
 
 export const useBillMetrics = (bills: Array<MappedBill>) => {
-  const calculateTotals = (status?: string) => {
-    const filteredItems = status
-      ? bills.filter((bill) => bill.status === status).flatMap((bill) => bill.lineItems)
-      : bills.flatMap((bill) => bill.lineItems);
-    return calculateTotalAmount(filteredItems);
-  };
-
-  const paidBills = bills
-    .flatMap((bill) => bill.payments)
-    .flatMap((payment) => payment.amountTendered)
-    .reduce((prev, curr) => curr + prev, 0);
-
-  const cumulativeBills = calculateTotals();
-  const pendingBills = cumulativeBills - paidBills;
-
+  const { paidTotal, pendingTotal, cumulativeTotal } = calculateBillTotals(bills);
   return {
-    cumulativeBills: convertToCurrency(cumulativeBills),
-    pendingBills: convertToCurrency(pendingBills),
-    paidBills: convertToCurrency(paidBills),
+    cumulativeBills: convertToCurrency(cumulativeTotal),
+    pendingBills: convertToCurrency(pendingTotal),
+    paidBills: convertToCurrency(paidTotal),
   };
 };
+
+const calculateBillTotals = (bills: Array<MappedBill>) => {
+  let paidTotal = 0;
+  let pendingTotal = 0;
+  let cumulativeTotal = 0;
+
+  bills.forEach((bill) => {
+    if (bill.status === 'PAID') {
+      paidTotal += bill.totalAmount;
+    } else if (bill.status === 'PENDING') {
+      pendingTotal += bill.totalAmount;
+    }
+    cumulativeTotal += bill.totalAmount; // Add to cumulative total regardless of status
+  });
+
+  return { paidTotal, pendingTotal, cumulativeTotal };
+};
+
+export default calculateBillTotals;

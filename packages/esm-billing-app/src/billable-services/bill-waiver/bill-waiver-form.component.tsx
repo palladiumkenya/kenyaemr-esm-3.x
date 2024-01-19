@@ -1,5 +1,6 @@
 import React from 'react';
-import { Form, Stack, FormGroup, Layer, Button, NumberInput, Heading, Section } from '@carbon/react';
+import { Form, Stack, FormGroup, Layer, Button, NumberInput } from '@carbon/react';
+import { TaskAdd } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './bill-waiver-form.scss';
 import { LineItem, MappedBill } from '../../types';
@@ -21,7 +22,10 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
   const [waiverAmount, setWaiverAmount] = React.useState(0);
   const { lineItems: billableLineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const totalAmount = lineItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
-  const amountPaid = bill.payments?.reduce((acc, curr) => acc + curr.amount, 0);
+
+  if (lineItems?.length === 0) {
+    return null;
+  }
 
   const handleProcessPayment = (event) => {
     const waiverEndPointPayload = createBillWaiverPayload(
@@ -60,24 +64,23 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
 
   return (
     <Form className={styles.billWaiverForm} aria-label={t('waiverForm', 'Waiver form')}>
+      <hr />
       <Stack gap={7}>
         <FormGroup>
-          <Section level={6}>
-            <Heading>
-              {t('billWaiverTitle', 'Bill waiver for {{billName}} ', {
-                billName: lineItems.map((item) => item.item || item.billableService).join(', '),
+          <section className={styles.billWaiverDescription}>
+            <label className={styles.label}>{t('billItems', 'Bill Items')}</label>
+            <p className={styles.value}>
+              {t('billName', ' {{billName}} ', {
+                billName: lineItems.map((item) => item.item || item.billableService).join(', ') ?? '--',
               })}
-              <i>
-                {t('totalAmountToWaive', 'Total amount : ')} {convertToCurrency(totalAmount)}
-              </i>
-            </Heading>
-          </Section>
-          <Section level={6}>
-            <Heading>
-              {t('amountPaid', 'Amount paid : ')} {convertToCurrency(amountPaid)}
-            </Heading>
-          </Section>
-          <Layer>
+            </p>
+          </section>
+          <section className={styles.billWaiverDescription}>
+            <label className={styles.label}>{t('billTotal', 'Bill total')}</label>
+            <p className={styles.value}>{convertToCurrency(totalAmount)}</p>
+          </section>
+
+          <Layer className={styles.formControlLayer}>
             <NumberInput
               label={t('amountToWaiveLabel', 'Amount to Waive')}
               helperText={t('amountToWaiveHelper', 'Specify the amount to be deducted from the bill')}
@@ -93,7 +96,9 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
           </Layer>
         </FormGroup>
         <div className={styles.buttonContainer}>
-          <Button onClick={handleProcessPayment}>{t('processWaiver', 'Process waiver')}</Button>
+          <Button kind="tertiary" renderIcon={TaskAdd} onClick={handleProcessPayment}>
+            {t('postWaiver', 'Post waiver')}
+          </Button>
         </div>
       </Stack>
     </Form>
