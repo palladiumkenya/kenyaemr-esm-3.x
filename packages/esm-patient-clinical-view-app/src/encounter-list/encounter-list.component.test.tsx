@@ -1,6 +1,6 @@
 import React from 'react';
-import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
 import { EncounterList } from './encounter-list.component';
 import {
   formConceptMap,
@@ -45,9 +45,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('EncounterList', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+  afterEach(() => jest.clearAllMocks());
 
   test('should render loading datatable skeleton', async () => {
     // Mock SWRImmutable hook to return error state
@@ -72,9 +70,7 @@ describe('EncounterList', () => {
     }));
     const user = userEvent.setup();
 
-    await act(async () => {
-      render(<EncounterList {...testProps} />);
-    });
+    render(<EncounterList {...testProps} />);
 
     expect(screen.getByText('Test Date')).toBeInTheDocument();
     expect(screen.getByText('Test type')).toBeInTheDocument();
@@ -113,9 +109,9 @@ describe('EncounterList', () => {
       goTo: () => {},
       results: [],
     }));
-    await act(async () => {
-      render(<EncounterList {...testProps} />);
-    });
+
+    render(<EncounterList {...testProps} />);
+
     expect(screen.getByText(/There are no encounters to display/i)).toBeInTheDocument();
   });
 });

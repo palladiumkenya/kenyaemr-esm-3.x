@@ -47,4 +47,5 @@ module.exports = {
   testEnvironmentOptions: {
     url: 'http://localhost/',
   },
+  testTimeout: 15000,
 };

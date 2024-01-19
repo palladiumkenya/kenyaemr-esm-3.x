@@ -11,8 +11,6 @@ const testProps = {
   isExpandable: false,
 };
 
-jest.setTimeout(20000);
-
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
   useLayoutType: jest.fn(() => 'small-desktop'),
