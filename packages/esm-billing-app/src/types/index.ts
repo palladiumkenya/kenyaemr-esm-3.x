@@ -16,6 +16,7 @@ export interface MappedBill {
   payments: Array<Payment>;
   totalAmount?: number;
   tenderedAmount?: number;
+  display?: string;
 }
 
 interface LocationLink {

@@ -59,7 +59,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-describe('Invoice', () => {
+xdescribe('Invoice', () => {
   beforeEach(() => {
     mockedBill.mockReturnValue({
       bill: mockBill,

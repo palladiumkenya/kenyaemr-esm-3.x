@@ -31,8 +31,9 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
       cashPointLocation: bill?.cashPoint?.location?.display,
       dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
       lineItems: bill.lineItems,
-      billingService: bill.lineItems.map((bill) => bill.item).join(' & '),
+      billingService: bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  '),
       payments: bill.payments,
+      display: bill.display,
       totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
     };
 

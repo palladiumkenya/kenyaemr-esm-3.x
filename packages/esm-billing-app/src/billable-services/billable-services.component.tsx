@@ -92,7 +92,7 @@ const BillableServices = () => {
         uuid: service.uuid,
         serviceName: service.name,
         shortName: service.shortName,
-        serviceType: service.serviceType.display,
+        serviceType: service?.serviceType?.display,
         status: service.serviceStatus,
         prices: '--',
         actions: '--',
