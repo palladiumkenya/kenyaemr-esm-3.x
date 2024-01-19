@@ -1,12 +1,12 @@
 import React, { useRef, useState } from 'react';
-import styles from './patient-summary.scss';
 import { useTranslation } from 'react-i18next';
-import { formatDate, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { StructuredListSkeleton, Button } from '@carbon/react';
-import { usePatientSummary } from '../hooks/usePatientSummary';
 import { Printer } from '@carbon/react/icons';
+import { StructuredListSkeleton, Button } from '@carbon/react';
 import { useReactToPrint } from 'react-to-print';
+import { formatDate, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { usePatientSummary } from '../hooks/usePatientSummary';
 import PrintComponent from '../print-layout/print.component';
+import styles from './patient-summary.scss';
 
 interface PatientSummaryProps {
   patientUuid: string;
@@ -607,13 +607,13 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('viralLoadTrends', 'Viral load trends')}</p>
               {data?.allVlResults?.value?.length > 0
-                ? data?.allVlResults?.value?.map((vl) => {
+                ? data?.allVlResults?.value?.map((vl, index) => {
                     return (
-                      <>
+                      <div key={`vl-${index}`}>
                         <span className={styles.value}> {vl.vl} </span>
                         {vl?.vlDate === 'N/A' || vl?.vlDate === '' ? <span>None</span> : <span>{vl.vlDate}</span>}
                         <br />
-                      </>
+                      </div>
                     );
                   })
                 : '--'}
@@ -621,16 +621,16 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('cd4Trends', 'CD4 Trends')}</p>
               {data?.allCd4CountResults?.length > 0
-                ? data?.allCd4CountResults?.map((cd4) => {
+                ? data?.allCd4CountResults?.map((cd4, index) => {
                     return (
-                      <>
+                      <div key={`cd4Trend-${cd4}-${index}`}>
                         <span className={styles.value}> {cd4.cd4Count} </span>
                         <span className={styles.label}>
                           {' '}
                           {cd4.cd4CountDate ? formatDate(new Date(cd4.cd4CountDate)) : '--'}
                         </span>
                         <br />
-                      </>
+                      </div>
                     );
                   })
                 : '--'}

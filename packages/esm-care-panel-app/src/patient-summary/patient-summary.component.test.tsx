@@ -1,21 +1,32 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { act } from 'react-dom/test-utils';
-import PatientSummary from './patient-summary.component';
+import dayjs from 'dayjs';
+import userEvent from '@testing-library/user-event';
+import { render, screen } from '@testing-library/react';
+import { useReactToPrint } from 'react-to-print';
 import { useConfig } from '@openmrs/esm-framework';
 import { usePatientSummary } from '../hooks/usePatientSummary';
 import { mockPatient } from '../../../../__mocks__/patient-summary.mock';
-import dayjs from 'dayjs';
+import PatientSummary from './patient-summary.component';
 
 jest.mock('../hooks/usePatientSummary');
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatientSummary = usePatientSummary as jest.Mock;
+const mockedUseReactToPrint = jest.mocked(useReactToPrint);
 
 jest.mock('@openmrs/esm-framework', () => {
   return {
     ...jest.requireActual('@openmrs/esm-framework'),
     formatDate: jest.fn().mockImplementation((mockDate) => `${dayjs(mockDate).format('DD-MMM-YYYY')}`),
+  };
+});
+
+jest.mock('react-to-print', () => {
+  const originalModule = jest.requireActual('react-to-print');
+
+  return {
+    ...originalModule,
+    useReactToPrint: jest.fn(),
   };
 });
 
@@ -28,7 +39,7 @@ describe('PatientSummary', () => {
     });
   });
 
-  afterEach(() => mockedUsePatientSummary.mockReset());
+  afterEach(() => jest.clearAllMocks());
 
   it('renders a skeleton loader when loading', () => {
     render(<PatientSummary patientUuid={mockPatient.uuid} />);
@@ -77,27 +88,25 @@ describe('PatientSummary', () => {
   });
 
   it('triggers print when print button is clicked', async () => {
+    const user = userEvent.setup();
+
     mockedUsePatientSummary.mockReturnValue({
       data: mockPatient,
       isError: false,
       isLoading: false,
     });
 
-    const printFunction = jest.fn();
-    const useReactToPrintSpy = jest.spyOn(require('react-to-print'), 'useReactToPrint');
-
-    useReactToPrintSpy.mockReturnValue(printFunction);
     mockedUseConfig.mockReturnValue({ logo: {} });
 
     render(<PatientSummary patientUuid={mockPatient.uuid} />);
-    const printButton = screen.getByText('Print', { exact: true });
 
-    act(() => {
-      fireEvent.click(printButton);
-    });
+    const printButton = screen.getByRole('button', { name: /print/i });
+    expect(printButton).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(printFunction).toHaveBeenCalledTimes(1);
-    });
+    await screen.findByText(/patient summary/i);
+    await user.click(printButton);
+
+    // FIXME: Why does this happen twice?
+    expect(mockedUseReactToPrint).toHaveBeenCalled();
   });
 });

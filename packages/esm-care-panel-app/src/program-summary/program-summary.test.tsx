@@ -1,8 +1,8 @@
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
-import ProgramSummary, { ProgramSummaryProps } from './program-summary.component';
+import { render, screen } from '@testing-library/react';
 import { mockProgram } from '../../../../__mocks__/program-summary.mock';
 import { formatDate } from '@openmrs/esm-framework';
+import ProgramSummary, { ProgramSummaryProps } from './program-summary.component';
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...jest.requireActual('@openmrs/esm-framework'),
@@ -25,9 +25,7 @@ describe('ProgramSummary Component', () => {
   };
 
   it('displays HIV program details correctly', async () => {
-    await act(async () => {
-      render(<ProgramSummary {...mockProps} />);
-    });
+    render(<ProgramSummary {...mockProps} />);
 
     expect(screen.getByText('Current status')).toBeInTheDocument();
     expect(screen.getByText('Last viral load')).toBeInTheDocument();
@@ -51,9 +49,8 @@ describe('ProgramSummary Component', () => {
       ...mockProps,
       programName: 'TB',
     };
-    await act(async () => {
-      render(<ProgramSummary {...tbProps} />);
-    });
+
+    render(<ProgramSummary {...tbProps} />);
 
     expect(screen.getByText('Treatment number')).toBeInTheDocument();
     expect(screen.getByText(mockProgram.TB.tbTreatmentNumber)).toBeInTheDocument();
@@ -68,9 +65,8 @@ describe('ProgramSummary Component', () => {
       ...mockProps,
       programName: 'mchMother',
     };
-    await act(async () => {
-      render(<ProgramSummary {...mchMotherProps} />);
-    });
+
+    render(<ProgramSummary {...mchMotherProps} />);
 
     expect(screen.getByText('HIV status')).toBeInTheDocument();
     expect(screen.getByText(mockProgram.mchMother.hivStatus)).toBeInTheDocument();
@@ -85,9 +81,8 @@ describe('ProgramSummary Component', () => {
       ...mockProps,
       programName: 'mchChild',
     };
-    await act(async () => {
-      render(<ProgramSummary {...mchChildProps} />);
-    });
+
+    render(<ProgramSummary {...mchChildProps} />);
 
     expect(screen.getByText('HIV Status')).toBeInTheDocument();
     expect(screen.getByText(mockProgram.mchChild.hivStatus)).toBeInTheDocument();
