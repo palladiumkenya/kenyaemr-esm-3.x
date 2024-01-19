@@ -143,3 +143,9 @@
   @include type.type-style('body-compact-01');
   color: $text-02;
 }
+
+.table {
+  tr[data-child-row] td {
+    padding-left: 2rem !important;
+  }
+}
