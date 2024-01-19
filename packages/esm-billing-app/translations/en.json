@@ -13,8 +13,6 @@
   "billedTo": "Billed to",
   "billErrorService": "Bill service error",
   "billing": "Billing",
-  "billingService": "Billing service",
-  "billItems": "Save Bill",
   "billList": "Bill list",
   "billMetrics": "Bill metrics",
   "billPayment": "Bill payment",
@@ -25,6 +23,7 @@
   "checkFilters": "Check the filters above",
   "discard": "Discard",
   "discount": "Discount",
+  "drug": "Drug",
   "enterAmount": "Enter amount",
   "enterReferenceNumber": "Enter ref. number",
   "errorLoadingBillServices": "Error loading bill services",
@@ -56,8 +55,8 @@
   "paymentMethod": "Payment method",
   "paymentMethods": "Payment methods",
   "paymentMode": "Payment Mode",
-  "paymentMethod": "Payment method",
   "payments": "Payments",
+  "policyNumber": "Policy number",
   "previousPage": "Previous page",
   "prices": "Prices",
   "printBill": "Print bill",
@@ -79,8 +78,8 @@
   "serviceType": "Service Type",
   "shortName": "Short Name",
   "status": "Service Status",
-  "stockItem": "Stock Item",
   "totalAmount": "Total Amount",
   "totalTendered": "Total Tendered",
-  "visitTime": "Visit time"
+  "visitTime": "Visit time",
+  "stockItem": "Stock Item"
 }
