@@ -60,8 +60,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
     const updateItem = BillItems.filter((o) => o.Item.toLowerCase().includes(itemName.toLowerCase()));
 
     updateItem.map((o) => (o.Qnty = Qnty));
-    updateItem.map((o) => (o.Total =total));
-    
+    updateItem.map((o) => (o.Total = total));
+
     let addUpTotals = 0;
     totals.forEach((tot) => {
       var getTot = (tot as HTMLInputElement).innerHTML;
@@ -78,7 +78,14 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
   };
 
   const addItemToBill = (event, itemid, itemname, itemcategory, itemPrice) => {
-    BillItems.push({ uuid: itemid, Item: itemname, Qnty: 1, Price: itemPrice, Total: itemPrice, category: itemcategory });
+    BillItems.push({
+      uuid: itemid,
+      Item: itemname,
+      Qnty: 1,
+      Price: itemPrice,
+      Total: itemPrice,
+      category: itemcategory,
+    });
     setBillItems(BillItems);
     setsearchOptions([]);
     CalculateTotalAfteraddBillItem();
@@ -101,7 +108,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
         }
 
         const res = data as { results: any[] };
-        
+
         res.results.map((o) => {
           if (o.commonName && (o.commonName != '' || o.commonName != null)) {
             searchOptions.push({
@@ -113,7 +120,14 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
               category: 'StockItem',
             });
           } else {
-            searchOptions.push({ uuid: o.uuid, Item: o.name, Qnty: 1, Price: o.servicePrices[0].price, Total: 10, category: 'Service' });
+            searchOptions.push({
+              uuid: o.uuid,
+              Item: o.name,
+              Qnty: 1,
+              Price: o.servicePrices[0].price,
+              Total: 10,
+              category: 'Service',
+            });
           }
           setsearchOptions(searchOptions);
         });
@@ -227,7 +241,9 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
               <TableRow>
                 <TableCell>{row.Item}</TableCell>
                 <TableCell>
-                  <input type="number" className="form-control"
+                  <input
+                    type="number"
+                    className="form-control"
                     id={row.Item}
                     min={0}
                     max={100}
@@ -258,7 +274,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
           <TableRow>
             <TableCell></TableCell>
             <TableCell></TableCell>
-            <TableCell style={{fontWeight: "bold"}}>Grand Total:</TableCell>
+            <TableCell style={{ fontWeight: 'bold' }}>Grand Total:</TableCell>
             <TableCell>
               <TextInput
                 id="GrandTotalSum"
