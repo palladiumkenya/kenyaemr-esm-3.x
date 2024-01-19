@@ -10,6 +10,7 @@
   "billErrorService": "Bill service error",
   "billing": "Billing",
   "billingService": "Billing service",
+  "billItems": "Save Bill",
   "billList": "Bill list",
   "billMetrics": "Bill metrics",
   "billPayment": "Bill payment",
