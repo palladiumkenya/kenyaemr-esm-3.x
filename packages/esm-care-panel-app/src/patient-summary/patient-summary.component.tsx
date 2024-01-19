@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { Printer } from '@carbon/react/icons';
-import { StructuredListSkeleton, Button } from '@carbon/react';
-import { useReactToPrint } from 'react-to-print';
+import { Button, StructuredListSkeleton } from '@carbon/react';
 import { formatDate, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { usePatientSummary } from '../hooks/usePatientSummary';
+import { Printer } from '@carbon/react/icons';
+import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print-layout/print.component';
 import styles from './patient-summary.scss';
 
@@ -13,7 +14,7 @@ interface PatientSummaryProps {
 }
 
 const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
-  const { data, isError, isLoading } = usePatientSummary(patientUuid);
+  const { data, error, isLoading } = usePatientSummary(patientUuid);
   const currentUserSession = useSession();
   const componentRef = useRef(null);
   const [printMode, setPrintMode] = useState(false);
@@ -39,7 +40,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
     return <StructuredListSkeleton role="progressbar" />;
   }
 
-  if (isError) {
+  if (error) {
     return <span>{t('errorPatientSummary', 'Error loading patient summary')}</span>;
   }
 
@@ -622,16 +623,23 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               <p className={styles.label}>{t('cd4Trends', 'CD4 Trends')}</p>
               {data?.allCd4CountResults?.length > 0
                 ? data?.allCd4CountResults?.map((cd4, index) => {
-                    return (
-                      <div key={`cd4Trend-${cd4}-${index}`}>
-                        <span className={styles.value}> {cd4.cd4Count} </span>
-                        <span className={styles.label}>
-                          {' '}
-                          {cd4.cd4CountDate ? formatDate(new Date(cd4.cd4CountDate)) : '--'}
-                        </span>
-                        <br />
-                      </div>
-                    );
+                    let formattedDate: Date;
+
+                    if (dayjs(cd4.cd4CountDate, 'DD/MM/YYYY', true).isValid()) {
+                      const parts = cd4.cd4CountDate?.split('/');
+                      const day = parseInt(parts[0], 10);
+                      const month = parseInt(parts[1], 10) - 1; // Subtract 1 since months are zero-based
+                      const year = parseInt(parts[2], 10);
+                      formattedDate = new Date(year, month, day);
+
+                      return (
+                        <div key={`cd4Trend-${cd4}-${index}`}>
+                          <span className={styles.value}> {cd4.cd4Count} </span>
+                          <span className={styles.label}> {cd4.cd4CountDate ? formatDate(formattedDate) : '--'}</span>
+                          <br />
+                        </div>
+                      );
+                    }
                   })
                 : '--'}
             </div>
