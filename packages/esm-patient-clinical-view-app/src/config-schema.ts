@@ -22,12 +22,18 @@ export const configSchema = {
       htsRetest: 'b08471f6-0892-4bf7-ab2b-bf79797b8ea4',
       htsLinkage: '050a7f12-5c52-4cad-8834-863695af335d',
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
+      clinicalEncounter: 'e958f902-64df-4819-afd4-7fb061f59308',
     },
   },
   defaulterTracingEncounterUuid: {
     _type: Type.String,
     _description: 'Encounter UUID for defaulter tracing',
     _default: '1495edf8-2df2-11e9-b210-d663bd873d93',
+  },
+  clinicalEncounterUuid: {
+    _type: Type.String,
+    _description: 'Clinical Encounter UUID',
+    _default: '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   concepts: {
     probableCauseOfDeathConceptUuid: {
@@ -54,7 +60,9 @@ export interface ConfigObject {
     htsInitialTest: string;
     htsRetest: string;
     defaulterTracingFormUuid: string;
+    clinicalEncounterFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
+  clinicalEncounterUuid: string;
   concepts: Record<string, string>;
 }

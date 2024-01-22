@@ -7,6 +7,12 @@ export const encounterRepresentation =
   'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,name:(uuid,name)),value:(uuid,name:(uuid,name),' +
   'names:(uuid,conceptNameType,name))),form:(uuid,name))';
 
+export const clinicalEncounterRepresentation =
+  'custom:(uuid,encounterDatetime,encounterType,location:(uuid,name),diagnoses:(uuid,concept:(uuid,name:(uuid,name))),orders:(uuid,concept:(uuid,name:(uuid,name)))' +
+  'patient:(uuid,display),encounterProviders:(uuid,provider:(uuid,name)),' +
+  'obs:(uuid,obsDatetime,voided,groupMembers,concept:(uuid,name:(uuid,name)),value:(uuid,name:(uuid,name),' +
+  'names:(uuid,conceptNameType,name))),form:(uuid,name))';
+
 //Patient Tracing
 export const PatientTracingFormName = 'Patient Tracing Form';
 export const MissedAppointmentDate_UUID = '164093AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
@@ -16,3 +22,12 @@ export const Contacted_UUID = '160721AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const ReasonNotContacted_UUID = '166541AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const TracingOutcome_UUID = '160433AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const PatientTracingEncounterType_UUID = '1495edf8-2df2-11e9-b210-d663bd873d93';
+
+export const ClinicalEncounterFormName = 'Clinical Encounters';
+
+export const AdmissionDate_UUID = '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+// export const PrimaryDiagnosis_UUID = '';
+export const PriorityOfAdmission_UUID = '1655AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+// export const AdmittingDoctor_UUID= '';
+export const AdmissionWard_UUID = '5fc29316-0869-4b3b-ae2f-cc37c6014eb7';
+export const ClinicalEncounterType_UUID = '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';

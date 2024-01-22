@@ -84,6 +84,14 @@
       }
     },
     {
+      "name": "in-patient-dashboard",
+      "slot": "patient-chart-in-patient-dashboard-slot",
+      "component": "inpatientView",
+      "order": 3,
+      "online": true,
+      "offline": false
+    },
+    {
       "name": "family-history",
       "slot": "patient-chart-family-history-slot",
       "component": "familyHistory",
