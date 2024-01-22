@@ -1,13 +1,31 @@
-import React, { useCallback, useState } from 'react';
+/* eslint-disable curly */
+import React, { useCallback, useRef, useState } from 'react';
 import styles from './add-billable-service.scss';
-import { Form, Button, TextInput, ComboBox, Dropdown, Layer, InlineLoading } from '@carbon/react';
+import {
+  Form,
+  Button,
+  TextInput,
+  ComboBox,
+  Dropdown,
+  Layer,
+  InlineLoading,
+  Search,
+  Tile,
+  FormLabel,
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { createBillableSerice, usePaymentModes, useServiceTypes } from '../billable-service.resource';
+import {
+  createBillableSerice,
+  useConceptsSearch,
+  usePaymentModes,
+  useServiceTypes,
+} from '../billable-service.resource';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
-import { Add, TrashCan } from '@carbon/react/icons';
+import { Add, TrashCan, WarningFilled } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar } from '@openmrs/esm-framework';
+import { navigate, showSnackbar, useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { ServiceConcept } from '../../types';
 
 const servicePriceSchema = z.object({
   paymentMode: z.string().refine((value) => !!value, 'Payment method is required'),
@@ -38,7 +56,7 @@ const AddBillableService: React.FC = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<PaymentModeFormValue>({
+  } = useForm<any>({
     mode: 'all',
     defaultValues: {},
     resolver: zodResolver(paymentFormSchema),
@@ -47,6 +65,18 @@ const AddBillableService: React.FC = () => {
 
   const handleAppendPaymentMode = useCallback(() => append(DEFAULT_PAYMENT_OPTION), [append]);
   const handleRemovePaymentMode = useCallback((index) => remove(index), [remove]);
+
+  const isTablet = useLayoutType() === 'tablet';
+  const searchInputRef = useRef(null);
+  const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
+
+  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const debouncedSearchTerm = useDebounce(searchTerm);
+  const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
+  const handleConceptChange = useCallback((selectedConcept: any) => {
+    setSelectedConcept(selectedConcept);
+  }, []);
 
   const handleNavigateToServiceDashboard = () =>
     navigate({
@@ -76,6 +106,7 @@ const AddBillableService: React.FC = () => {
     payload.serviceType = billableServicePayload.serviceType.uuid;
     payload.servicePrices = servicePrices;
     payload.serviceStatus = 'ENABLED';
+    payload.concept = selectedConcept?.concept?.uuid;
 
     createBillableSerice(payload).then(
       (resp) => {
@@ -130,7 +161,73 @@ const AddBillableService: React.FC = () => {
           />
         </Layer>
       </section>
-
+      <section>
+        <FormLabel className={styles.conceptLabel}>Associated Concept</FormLabel>
+        <Controller
+          name="search"
+          control={control}
+          render={({ field: { onChange, value, onBlur } }) => (
+            <ResponsiveWrapper isTablet={isTablet}>
+              <Search
+                ref={searchInputRef}
+                size="md"
+                id="conceptsSearch"
+                labelText={t('enterConcept', 'Associated concept')}
+                placeholder={t('searchConcepts', 'Search associated concept')}
+                className={errors?.search && styles.serviceError}
+                onChange={(e) => {
+                  onChange(e);
+                  handleSearchTermChange(e);
+                }}
+                renderIcon={errors?.search && <WarningFilled />}
+                onBlur={onBlur}
+                onClear={() => {
+                  setSearchTerm('');
+                  setSelectedConcept(null);
+                }}
+                value={(() => {
+                  if (selectedConcept) {
+                    return selectedConcept.display;
+                  }
+                  if (debouncedSearchTerm) {
+                    return value;
+                  }
+                })()}
+              />
+            </ResponsiveWrapper>
+          )}
+        />
+        {(() => {
+          if (!debouncedSearchTerm || selectedConcept) return null;
+          if (isSearching)
+            return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
+          if (searchResults && searchResults.length) {
+            return (
+              <ul className={styles.conceptsList}>
+                {/*TODO: use uuid instead of index as the key*/}
+                {searchResults?.map((searchResult, index) => (
+                  <li
+                    role="menuitem"
+                    className={styles.service}
+                    key={index}
+                    onClick={() => handleConceptChange(searchResult)}>
+                    {searchResult.display}
+                  </li>
+                ))}
+              </ul>
+            );
+          }
+          return (
+            <Layer>
+              <Tile className={styles.emptyResults}>
+                <span>
+                  {t('noResultsFor', 'No results for')} <strong>"{debouncedSearchTerm}"</strong>
+                </span>
+              </Tile>
+            </Layer>
+          );
+        })()}
+      </section>
       <section className={styles.section}>
         <Layer>
           <ComboBox
@@ -214,5 +311,9 @@ const AddBillableService: React.FC = () => {
     </Form>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default AddBillableService;

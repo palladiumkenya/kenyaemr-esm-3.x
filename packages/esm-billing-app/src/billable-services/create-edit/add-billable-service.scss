@@ -75,3 +75,58 @@
 .removeButton {
   color: colors.$red-60;
 }
+
+.service {
+  padding: 1rem 0.75rem;
+}
+
+.conceptsList {
+  background-color: $ui-02;
+  max-height: 14rem;
+  overflow-y: auto;
+  border: 1px solid $ui-03;
+
+  li:hover {
+    background-color: $ui-03;
+  }
+}
+
+.emptyResults {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  min-height: 1rem;
+  border: 1px solid $ui-03;
+}
+
+.conceptLabel {
+  @include type.type-style('label-02');
+  margin: 1rem;
+}
+
+.errorContainer {
+  margin: 1rem;
+}
+
+.serviceError {
+  :global(.cds--search-input):focus {
+    outline: 2.5px solid $danger;
+  }
+
+  :global(.cds--search-magnifier) {
+    svg {
+      fill: $danger;
+    }
+  }
+}
+
+.errorMessage {
+  @include type.type-style('label-02');
+  color: $danger;
+  margin-top: 0.5rem;
+}
+
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: 1rem;
+  }
+}
