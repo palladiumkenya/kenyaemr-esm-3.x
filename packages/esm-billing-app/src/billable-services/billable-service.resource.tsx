@@ -1,5 +1,6 @@
 import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { ServiceConcept } from '../types';
 
 type ResponseObject = {
   results: Array<OpenmrsResource>;
@@ -33,3 +34,18 @@ export const createBillableSerice = (payload: any) => {
     },
   });
 };
+
+export function useConceptsSearch(conceptToLookup: string) {
+  const conditionsSearchUrl = `/ws/rest/v1/conceptsearch?q=${conceptToLookup}`;
+
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<ServiceConcept> } }, Error>(
+    conceptToLookup ? conditionsSearchUrl : null,
+    openmrsFetch,
+  );
+
+  return {
+    searchResults: data?.data?.results ?? [],
+    error: error,
+    isSearching: isLoading,
+  };
+}
