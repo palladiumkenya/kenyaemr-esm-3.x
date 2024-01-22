@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { formatDate, parseDate, openmrsFetch, useSession, OpenmrsResource } from '@openmrs/esm-framework';
+import { formatDate, parseDate, openmrsFetch, useSession, useVisit } from '@openmrs/esm-framework';
 import { FacilityDetail, MappedBill, PatientInvoice } from './types';
 import isEmpty from 'lodash-es/isEmpty';
 import sortBy from 'lodash-es/sortBy';
@@ -118,3 +118,16 @@ export function useDefaultFacility() {
   const { data, isLoading } = useSWR<{ data: FacilityDetail }>(authenticated ? url : null, openmrsFetch, {});
   return { data: data?.data, isLoading: isLoading };
 }
+
+export const usePatientPaymentInfo = (patientUuid: string) => {
+  const { currentVisit } = useVisit(patientUuid);
+  const attributes = currentVisit?.attributes ?? [];
+  const paymentInformation = attributes
+    .map((attribute) => ({
+      name: attribute.attributeType.name,
+      value: attribute.value,
+    }))
+    .filter(({ name }) => name === 'Insurance scheme' || name === 'Policy Number');
+
+  return paymentInformation;
+};

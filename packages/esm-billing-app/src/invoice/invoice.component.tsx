@@ -29,7 +29,6 @@ const Invoice: React.FC = () => {
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
   const onBeforeGetContentResolve = useRef<(() => void) | null>(null);
-
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     setSelectedLineItems(lineItems);
   };

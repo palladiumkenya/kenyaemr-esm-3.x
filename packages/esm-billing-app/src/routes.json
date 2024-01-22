@@ -63,6 +63,12 @@
     {
       "name": "require-billing-modal",
       "component": "requirePaymentModal"
+    },
+    {
+      "name": "patient-banner-billing-tags",
+      "component": "visitAttributeTags",
+      "slot": "patient-banner-tags-slot",
+      "order": 2
     }
   ]
 }
