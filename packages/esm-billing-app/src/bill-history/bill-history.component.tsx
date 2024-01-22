@@ -93,8 +93,10 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   if (bills.length === 0) {
     return (
-      <Layer className={styles.emptyStateContainer}>
+      <Layer className={styles.emptyStateContainer}>            
         <Tile className={styles.tile}>
+          {/* <p className={styles.billingHeading}>Billing History</p>  */}
+         
           <div className={styles.illo}>
             <EmptyDataIllustration />
           </div>
@@ -108,78 +110,81 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   }
 
   return (
-    <div className={styles.billHistoryContainer}>
-      <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
-        {({
-          rows,
-          headers,
-          getExpandHeaderProps,
-          getTableProps,
-          getTableContainerProps,
-          getHeaderProps,
-          getRowProps,
-        }) => (
-          <TableContainer {...getTableContainerProps}>
-            <Table className={styles.table} {...getTableProps()} aria-label="Bill list">
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                  {headers.map((header, i) => (
-                    <TableHeader
-                      key={i}
-                      {...getHeaderProps({
-                        header,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, i) => {
-                  const currentBill = bills?.find((bill) => bill.uuid === row.id);
+    <div>      
+      <p className={styles.billingHeading}>Billing History</p> 
+      <div className={styles.billHistoryContainer}>
+        <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
+          {({
+            rows,
+            headers,
+            getExpandHeaderProps,
+            getTableProps,
+            getTableContainerProps,
+            getHeaderProps,
+            getRowProps,
+          }) => (
+            <TableContainer {...getTableContainerProps}>
+              <Table className={styles.table} {...getTableProps()} aria-label="Bill list">
+                <TableHead>
+                  <TableRow>
+                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                    {headers.map((header, i) => (
+                      <TableHeader
+                        key={i}
+                        {...getHeaderProps({
+                          header,
+                        })}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, i) => {
+                    const currentBill = bills?.find((bill) => bill.uuid === row.id);
 
-                  return (
-                    <React.Fragment key={row.id}>
-                      <TableExpandRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
-                        ))}
-                      </TableExpandRow>
-                      {row.isExpanded ? (
-                        <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
-                          <div className={styles.container} key={i}>
-                            <InvoiceTable bill={currentBill} isSelectable={false} />
-                          </div>
-                        </TableExpandedRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                      )}
-                    </React.Fragment>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    return (
+                      <React.Fragment key={row.id}>
+                        <TableExpandRow {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          ))}
+                        </TableExpandRow>
+                        {row.isExpanded ? (
+                          <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
+                            <div className={styles.container} key={i}>
+                              <InvoiceTable bill={currentBill} isSelectable={false} />
+                            </div>
+                          </TableExpandedRow>
+                        ) : (
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                        )}
+                      </React.Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+        {paginated && (
+          <Pagination
+            forwardText={t('nextPage', 'Next page')}
+            backwardText={t('previousPage', 'Previous page')}
+            page={currentPage}
+            pageSize={PAGE_SIZE}
+            pageSizes={pageSizes}
+            totalItems={bills.length}
+            className={styles.pagination}
+            size={responsiveSize}
+            onChange={({ page: newPage }) => {
+              if (newPage !== currentPage) {
+                goTo(newPage);
+              }
+            }}
+          />
         )}
-      </DataTable>
-      {paginated && (
-        <Pagination
-          forwardText={t('nextPage', 'Next page')}
-          backwardText={t('previousPage', 'Previous page')}
-          page={currentPage}
-          pageSize={PAGE_SIZE}
-          pageSizes={pageSizes}
-          totalItems={bills.length}
-          className={styles.pagination}
-          size={responsiveSize}
-          onChange={({ page: newPage }) => {
-            if (newPage !== currentPage) {
-              goTo(newPage);
-            }
-          }}
-        />
-      )}
+      </div>
     </div>
   );
 };

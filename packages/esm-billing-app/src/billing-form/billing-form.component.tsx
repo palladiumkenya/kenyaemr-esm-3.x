@@ -120,14 +120,16 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
               category: 'StockItem',
             });
           } else {
-            searchOptions.push({
-              uuid: o.uuid,
-              Item: o.name,
-              Qnty: 1,
-              Price: o.servicePrices[0].price,
-              Total: 10,
-              category: 'Service',
-            });
+            if (o.name.toLowerCase().includes(searchVal.toLowerCase())){              
+                searchOptions.push({
+                  uuid: o.uuid,
+                  Item: o.name,
+                  Qnty: 1,
+                  Price: o.servicePrices[0].price,
+                  Total: o.servicePrices[0].price,
+                  category: 'Service',
+                });
+            }           
           }
           setsearchOptions(searchOptions);
         });
@@ -150,7 +152,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
         bill.lineItems.push({
           item: o.uuid,
           quantity: parseInt(o.Qnty),
-          price: 240.0,
+          price: o.Price,
           priceName: 'Default',
           priceUuid: '7b9171ac-d3c1-49b4-beff-c9902aee5245',
           lineItemOrder: 0,
@@ -160,7 +162,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
         bill.lineItems.push({
           billableService: o.uuid,
           quantity: parseInt(o.Qnty),
-          price: 240.0,
+          price: o.Price,
           priceName: 'Default',
           priceUuid: '7b9171ac-d3c1-49b4-beff-c9902aee5245',
           lineItemOrder: 0,
@@ -172,6 +174,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
     const url = `/ws/rest/v1/cashier/bill`;
     processBillItems(bill).then(
       (resp) => {
+        closeWorkspace();
         showSnackbar({
           title: t('billItems', 'Save Bill'),
           subtitle: 'Bill processing has been successful',
@@ -212,6 +215,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
             filterItems(e.target.value);
           }}
         />
+    
         <ul className={styles.searchContent}>
           {searchOptions.map((row) => (
             <li className={styles.searchItem}>
