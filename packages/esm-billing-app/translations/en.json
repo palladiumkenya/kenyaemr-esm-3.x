@@ -41,7 +41,7 @@
   "home": "Home",
   "identifier": "Identifier",
   "inlineLoading": "Loading bill items...",
-  "insuranceSchema": "Insurance schema",
+  "insuranceScheme": "Insurance scheme",
   "invalidWaiverAmount": "Invalid waiver amount",
   "invoice": "Invoice",
   "invoiceError": "Invoice error",

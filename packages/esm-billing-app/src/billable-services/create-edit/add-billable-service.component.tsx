@@ -161,7 +161,7 @@ const AddBillableService: React.FC = () => {
                 render={({ field }) => (
                   <Layer>
                     <Dropdown
-                      onChange={({ selectedItem }) => field.onChange(selectedItem.uuid)}
+                      onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
                       titleText={t('paymentMode', 'Payment Mode')}
                       label={t('selectPaymentMethod', 'Select payment method')}
                       items={paymentModes ?? []}

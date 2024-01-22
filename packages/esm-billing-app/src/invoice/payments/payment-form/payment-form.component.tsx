@@ -46,7 +46,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             render={({ field }) => (
               <Dropdown
                 id="paymentMethod"
-                onChange={({ selectedItem }) => field.onChange(selectedItem.uuid)}
+                onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
                 titleText={t('paymentMethod', 'Payment method')}
                 label={t('selectPaymentMethod', 'Select payment method')}
                 items={paymentModes}
