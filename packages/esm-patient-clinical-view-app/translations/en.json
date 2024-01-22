@@ -1,8 +1,14 @@
 {
   "actions": "Actions",
   "add": "Add",
+<<<<<<< HEAD
   "age": "Age",
   "alive": "Alive",
+=======
+  "admissionDate": "Date & Time of Admission",
+  "admissionWard": "Admission Ward",
+  "admittingDoctor": "Admitting Doctor",
+>>>>>>> ff517ec (Adding Clinical Encounter view (Draft-WIP))
   "ancVisitNumber": "ANC Visit Number",
   "antenatalCare": "Antenatal Care",
   "carePanel": "MCH Clinical View",
@@ -10,6 +16,7 @@
   "causeOfDeath": "Specific Cause of Death",
   "chronicDisease": "Chronic Disease",
   "clientEligibility": "Eligible",
+  "clinicalEncounter": "Clinical Encounter",
   "contacted": "Contacted",
   "dead": "Dead",
   "defaulterTracing": "Defaulter Tracing",
@@ -21,6 +28,7 @@
   "edit": "Edit",
   "editEncounter": "Edit",
   "editForm": "Edit Form",
+  "encounterDate": "Encounter Date",
   "encountersList": "Encounters list",
   "errorFamilyHistory": "",
   "facility": "Facility",
@@ -33,6 +41,7 @@
   "htsResult": "Final result",
   "htsScreening": "HTS Screening",
   "htsTestType": "Test type",
+  "inPatient": "In-Patient",
   "labourAndDelivery": "Labour and Delivery",
   "mchClinicalView": "MCH Clinical View",
   "loading": "Loading",
@@ -47,7 +56,12 @@
   "populationType": "Population type",
   "postnatalCare": "Postnatal Care",
   "pphCondition": "PPH present",
+<<<<<<< HEAD
   "relation": "Relation/Relative",
+=======
+  "primaryDiagnosis": "Primary Diagnosis",
+  "priorityOfAdmission": "Priority of Admission",
+>>>>>>> ff517ec (Adding Clinical Encounter view (Draft-WIP))
   "tbScreening": "TB screening outcome",
   "testApproach": "Approach",
   "testDate": "Test Date",

@@ -14,7 +14,6 @@ import {
 import DefaulterTracing from './defaulter-tracing/defaulter-tracing.component';
 // import ClinicalEncounter from './clinical-encounter/clinical-enc.component';
 import InPatientView from './in-patient/in-patient.component';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import FamilyHistory from './family-history/family-history.component';
 import './root.scss';
 
