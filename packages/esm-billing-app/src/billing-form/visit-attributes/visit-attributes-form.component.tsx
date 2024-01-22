@@ -42,6 +42,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     'policyNumber',
     'patientCategory',
   ]);
+
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentMethods();
   React.useEffect(() => {
     setAttributes(createVisitAttributesPayload());
@@ -53,8 +54,9 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     const formPayload = [
       { uuid: 'caf2124f-00a9-4620-a250-efd8535afd6d', value: paymentDetails },
       { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: paymentMethods },
-      { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: policyNumber },
-      { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: patientCategory },
+      { uuid: '0f4f3306-f01b-43c6-af5b-fdb60015cb02', value: policyNumber },
+      { uuid: '2d0fa959-6780-41f1-85b1-402045935068', value: insuranceSchema },
+      { uuid: '3b9dfac8-9e4d-11ee-8c90-0242ac120002', value: patientCategory },
       { uuid: '919b51c9-8e2e-468f-8354-181bf3e55786', value: true },
     ];
     const visitAttributesPayload = formPayload.filter(
