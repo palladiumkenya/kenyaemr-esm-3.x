@@ -2,6 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import ClinicalEncounter from '../clinical-encounter/clinical-enc.component';
+import SurgicalSummery from '../surgical summery/surgical-summery.component';
+import NeonatalSummery from '../neonatal summary/neonatal-summery.component';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { Add } from '@carbon/react/icons';
@@ -93,7 +95,7 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
               <div className={styles.desktopHeading}>
                 <h4>Surgical Summary</h4>
               </div>
-              {/*<ClinicalEncounter encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />*/}
+              <SurgicalSummery encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />
             </Tile>
           </Layer>
         </div>
@@ -105,7 +107,7 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
               <div className={styles.desktopHeading}>
                 <h4>Neonatal Summary</h4>
               </div>
-              {/*<ClinicalEncounter encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />*/}
+              <NeonatalSummery encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />
             </Tile>
           </Layer>
         </div>

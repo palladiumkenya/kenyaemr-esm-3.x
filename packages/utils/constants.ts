@@ -26,8 +26,18 @@ export const PatientTracingEncounterType_UUID = '1495edf8-2df2-11e9-b210-d663bd8
 export const ClinicalEncounterFormName = 'Clinical Encounters';
 
 export const AdmissionDate_UUID = '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
 // export const PrimaryDiagnosis_UUID = '';
 export const PriorityOfAdmission_UUID = '1655AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 // export const AdmittingDoctor_UUID= '';
 export const AdmissionWard_UUID = '5fc29316-0869-4b3b-ae2f-cc37c6014eb7';
 export const ClinicalEncounterType_UUID = '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MchEncounterType_UUID = 'c6d09e05-1f25-4164-8860-9f32c5a02df0';
+
+//delivery
+export const ModeOfDelivery_UUID = '5630AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const GestationalSize_UUID = '1789AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const BirthAbnormally_UUID = '164122AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const BloodLoss_UUID = '161928AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const GivenVitaminK_UUID = '984AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const DeliveryForm_UUID = '496c7cc3-0eea-4e84-a04c-2292949e2f7f';

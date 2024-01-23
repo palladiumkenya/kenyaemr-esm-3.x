@@ -82,3 +82,5 @@ dist
 /playwright/.cache/
 e2e/storageState.json
 .env
+
+package.json

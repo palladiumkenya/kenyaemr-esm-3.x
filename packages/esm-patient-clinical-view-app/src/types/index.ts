@@ -11,7 +11,9 @@ export interface OpenmrsEncounter extends OpenmrsResource {
     display?: string;
   }>;
   obs: Array<OpenmrsResource>;
-  form?: string;
+
+  form?: { name: string; uuid: string };
+
   visit?: string;
   diagnoses?: Array<{
     uuid: string;
