@@ -18,7 +18,7 @@ import {
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
 import { navigate, showSnackbar, openmrsFetch } from '@openmrs/esm-framework';
-import { fetchSearchResults, processBillItems } from '../billing.resource';
+import { useFetchSearchResults, processBillItems } from '../billing.resource';
 
 type BillingFormProps = {
   patientUuid: string;
@@ -93,7 +93,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
   };
 
   //  filter items
-  const { data, error, isLoading, isValidating } = fetchSearchResults(searchVal, category);
+  const { data, error, isLoading, isValidating } = useFetchSearchResults(searchVal, category);
 
   const filterItems = (val) => {
     setsearchVal(val);

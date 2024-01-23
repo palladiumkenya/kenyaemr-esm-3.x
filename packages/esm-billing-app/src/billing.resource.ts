@@ -119,27 +119,17 @@ export function useDefaultFacility() {
   return { data: data?.data, isLoading: isLoading };
 }
 
-export const fetchSearchResults = (searchVal, category) => {
+export function useFetchSearchResults(searchVal, category) {
+  let url = ``;
   if (category == 'Stock Item') {
-    const { data, error, isLoading, isValidating } = useSWR(
-      searchVal ? `/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}` : null,
-      openmrsFetch,
-      {},
-    );
-
-    return { data: data?.data, error, isLoading: isLoading, isValidating };
+    url = `/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}`;
   } else {
-    const { data, error, isLoading, isValidating } = useSWR(
-      searchVal
-        ? `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`
-        : null,
-      openmrsFetch,
-      {},
-    );
-
-    return { data: data?.data, error, isLoading: isLoading, isValidating };
+    url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
   }
-};
+  const { data, error, isLoading, isValidating } = useSWR(searchVal ? url : null, openmrsFetch, {});
+
+  return { data: data?.data, error, isLoading: isLoading, isValidating };
+}
 
 export const usePatientPaymentInfo = (patientUuid: string) => {
   const { currentVisit } = useVisit(patientUuid);
