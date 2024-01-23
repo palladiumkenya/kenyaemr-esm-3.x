@@ -70,7 +70,7 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid, enco
       header: t('actions', 'Actions'),
     },
   ];
-  const tableRows = encounters.map((encounter, index) => {
+  const tableRows = encounters?.map((encounter, index) => {
     return {
       id: `${encounter.uuid}`,
       encounterDate: formatDate(new Date(encounter.encounterDatetime)),
@@ -81,7 +81,7 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid, enco
           : formatDate(parseDate(getObsFromEncounter(encounter, AdmissionDate_UUID))),
       primaryDiagnosis: encounter.diagnoses.length > 0 ? encounter.diagnoses[0].diagnosis.coded.display : '--',
       priorityOfAdmission: getObsFromEncounter(encounter, PriorityOfAdmission_UUID),
-      admittingDoctor: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
+      admittingDoctor: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].provider.name : '',
       admissionWard: getObsFromEncounter(encounter, AdmissionWard_UUID),
       actions: (
         <OverflowMenu aria-label="overflow-menu" flipped="false">

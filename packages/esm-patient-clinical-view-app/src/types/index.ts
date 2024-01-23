@@ -1,5 +1,4 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
-
 export interface OpenmrsEncounter extends OpenmrsResource {
   encounterDatetime: string;
   encounterType: string;
@@ -20,7 +19,6 @@ export interface OpenmrsEncounter extends OpenmrsResource {
     diagnosis: { coded: { display: string } };
   }>;
 }
-
 export interface LocationData {
   display: string;
   uuid: string;

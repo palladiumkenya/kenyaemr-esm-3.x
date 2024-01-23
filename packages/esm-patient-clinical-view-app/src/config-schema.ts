@@ -33,7 +33,7 @@ export const configSchema = {
   clinicalEncounterUuid: {
     _type: Type.String,
     _description: 'Clinical Encounter UUID',
-    _default: '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _default: '465a92f2-baf8-42e9-9612-53064be868e8',
   },
   concepts: {
     probableCauseOfDeathConceptUuid: {
