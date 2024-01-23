@@ -5,10 +5,18 @@ export interface OpenmrsEncounter extends OpenmrsResource {
   encounterType: string;
   patient: string;
   location: string;
-  encounterProviders?: Array<{ encounterRole: string; provider: string }>;
+  encounterProviders?: Array<{
+    encounterRole: string;
+    provider: { uuid: string; person: { uuid: string; display: string } };
+    display?: string;
+  }>;
   obs: Array<OpenmrsResource>;
   form?: string;
   visit?: string;
+  diagnoses?: Array<{
+    uuid: string;
+    diagnosis: { coded: { display: string } };
+  }>;
 }
 
 export interface LocationData {

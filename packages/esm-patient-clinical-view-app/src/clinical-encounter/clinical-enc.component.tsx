@@ -24,6 +24,7 @@ import {
 import { clinicalEncounterUuid, useClinicalEncounter } from '../hooks/useClinicalEncounter';
 import { ConfigObject } from '../config-schema';
 import { Add } from '@carbon/react/icons';
+import { map } from 'zod';
 interface ClinicalEncounterProps {
   patientUuid: string;
   encounterTypeUuid: string;
@@ -84,19 +85,18 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid, enco
       header: t('actions', 'Actions'),
     },
   ];
-
   const tableRows = encounters.map((encounter, index) => {
     return {
       id: `${encounter.uuid}`,
+      encounterDate: formatDate(new Date(encounter.encounterDatetime)),
       admissionDate:
         getObsFromEncounter(encounter, AdmissionDate_UUID) == '--' ||
         getObsFromEncounter(encounter, AdmissionDate_UUID) == null
           ? formatDate(parseDate(encounter.encounterDatetime))
           : formatDate(parseDate(getObsFromEncounter(encounter, AdmissionDate_UUID))),
-      encounterDate: formatDate(new Date(encounter.encounterDatetime)),
-      //  primaryDiagnosis: getObsFromEncounter(encounter, PrimaryDiagnosis_UUID),
+      primaryDiagnosis: encounter.diagnoses.length > 0 ? encounter.diagnoses[0].diagnosis.coded.display : '--',
       priorityOfAdmission: getObsFromEncounter(encounter, PriorityOfAdmission_UUID),
-      admittingDoctor: encounter.encounterProviders,
+      admittingDoctor: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
       admissionWard: getObsFromEncounter(encounter, AdmissionWard_UUID),
       actions: (
         <OverflowMenu aria-label="overflow-menu" flipped="false">
@@ -109,7 +109,6 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid, enco
       ),
     };
   });
-
   if (isLoading) {
     return <DataTableSkeleton headers={tableHeader} aria-label="Cliical Encounter" />;
   }
@@ -125,7 +124,7 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid, enco
       />
     );
   }
-  return (
+  /*  return (
     <>
       <CardHeader title={headerTitle}>
         <Button
@@ -193,7 +192,24 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid, enco
         )}
       />
     </>
-  );
+  );*/
   //  return <div> Tast</div>;
+  return (
+    <table>
+      <tbody>
+        {tableRows.map((row) => (
+          <tr key={row.id}>
+            <td>{row.encounterDate}</td>
+            <td>{row.primaryDiagnosis}</td>
+            <td>{row.admissionDate}</td>
+            <td>{row.priorityOfAdmission}</td>
+            <td>{row.admittingDoctor}</td>
+            <td>{row.admissionWard}</td>
+            <td>{row.actions}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 };
 export default ClinicalEncounter;
