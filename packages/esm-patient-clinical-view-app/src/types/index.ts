@@ -1,4 +1,5 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
+
 export interface OpenmrsEncounter extends OpenmrsResource {
   encounterDatetime: string;
   encounterType: string;
@@ -9,15 +10,11 @@ export interface OpenmrsEncounter extends OpenmrsResource {
   form?: string;
   visit?: string;
 }
+
 export interface LocationData {
   display: string;
   uuid: string;
 }
-
-type Links = Array<{
-  rel: string;
-  uri: string;
-}>;
 
 export interface Concept {
   uuid: string;

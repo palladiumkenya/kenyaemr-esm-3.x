@@ -70,6 +70,26 @@
         "path": "defaulter-tracing-dashboard",
         "layoutMode": "anchored"
       }
+    },
+    {
+      "name": "family-history",
+      "slot": "patient-chart-family-history-slot",
+      "component": "familyHistory",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "family-history-link",
+      "component": "familyHistoryLink",
+      "slot": "patient-clinical-view-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-family-history-slot",
+        "path": "family-history",
+        "layoutMode": "anchored"
+      }
     }
   ]
 }
