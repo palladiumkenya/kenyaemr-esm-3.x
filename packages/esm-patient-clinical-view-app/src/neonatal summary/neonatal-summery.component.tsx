@@ -87,7 +87,7 @@ const NeonatalSummeryr: React.FC<NeonatalSummeryProps> = ({ patientUuid, encount
       header: t('actions', 'Actions'),
     },
   ];
-  const tableRows = encounters.map((encounter, index) => {
+  const tableRows = encounters?.map((encounter, index) => {
     return {
       id: `${encounter.uuid}`,
       encounterDate: formatDate(new Date(encounter.encounterDatetime)),

@@ -9,7 +9,8 @@ import { ConfigObject } from '../config-schema';
 import { Add } from '@carbon/react/icons';
 import { Tile, Layer, Button } from '@carbon/react';
 import styles from './in-patient.scss';
-
+import MaternalSummary from '../maternal-summary/maternal-summary.component';
+import InPatientSummary from '../in-patient-medical-summary/in-patient-medical-summary.component';
 interface InpatientProps {
   patientUuid: string;
   encounterTypeUuid: string;
@@ -24,7 +25,6 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
   const {
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
-
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
@@ -80,10 +80,17 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
         <div>
           <Layer>
             <Tile>
-              <div className={styles.desktopHeading}>
-                <h4>In Patient Medical Summary</h4>
-              </div>
-              {/*<ClinicalEncounter encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />*/}
+              <CardHeader title={'In Patient Medical Summary'}>
+                <Button
+                  size="md"
+                  kind="ghost"
+                  onClick={() => handleOpenOrEditClinicalEncounterForm()}
+                  renderIcon={(props) => <Add size={24} {...props} />}
+                  iconDescription="Add">
+                  {t('add', 'Add')}
+                </Button>
+              </CardHeader>
+              <InPatientSummary encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />
             </Tile>
           </Layer>
         </div>
@@ -108,6 +115,25 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
                 <h4>Neonatal Summary</h4>
               </div>
               <NeonatalSummery encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />
+            </Tile>
+          </Layer>
+        </div>
+      </div>
+      <div className={styles.cardContainer}>
+        <div>
+          <Layer>
+            <Tile>
+              <CardHeader title={'Maternal Summary'}>
+                <Button
+                  size="md"
+                  kind="ghost"
+                  onClick={() => handleOpenOrEditClinicalEncounterForm()}
+                  renderIcon={(props) => <Add size={24} {...props} />}
+                  iconDescription="Add">
+                  {t('add', 'Add')}
+                </Button>
+              </CardHeader>
+              <MaternalSummary encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />
             </Tile>
           </Layer>
         </div>
