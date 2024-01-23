@@ -4,27 +4,12 @@ import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from '../../../utils/constants';
 import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
-import {
-  Button,
-  DataTable,
-  TableContainer,
-  Table,
-  TableExpandRow,
-  TableHead,
-  TableRow,
-  TableExpandHeader,
-  TableHeader,
-  TableBody,
-  TableCell,
-  TableExpandedRow,
-  OverflowMenu,
-  OverflowMenuItem,
-  DataTableSkeleton,
-} from '@carbon/react';
+import { OverflowMenu, OverflowMenuItem, DataTableSkeleton } from '@carbon/react';
 import { clinicalEncounterUuid, useClinicalEncounter } from '../hooks/useClinicalEncounter';
 import { ConfigObject } from '../config-schema';
-import { Add } from '@carbon/react/icons';
-import { map } from 'zod';
+
+import styles from '../in-patient/in-patient.scss';
+
 interface ClinicalEncounterProps {
   patientUuid: string;
   encounterTypeUuid: string;
@@ -124,92 +109,44 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid, enco
       />
     );
   }
-  /*  return (
-    <>
-      <CardHeader title={headerTitle}>
-        <Button
-          size="md"
-          kind="ghost"
-          onClick={() => handleOpenOrEditClinicalEncounterForm()}
-          renderIcon={(props) => <Add size={24} {...props} />}
-          iconDescription="Add">
-          {t('add', 'Add')}
-        </Button>
-      </CardHeader>
-      <DataTable
-        rows={tableRows}
-        headers={tableHeader}
-        render={({
-          rows,
-          headers,
-          getHeaderProps,
-          getExpandHeaderProps,
-          getRowProps,
-          getExpandedRowProps,
-          getTableProps,
-          getTableContainerProps,
-        }) => (
-          <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()} aria-label="sample table">
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader enableToggle={true} {...getExpandHeaderProps()} />
-                  {headers.map((header, i) => (
-                    <TableHeader
-                      key={i}
-                      {...getHeaderProps({
-                        header,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow
-                      {...getRowProps({
-                        row,
-                      })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                    <TableExpandedRow
-                      colSpan={headers.length + 1}
-                      className="demo-expanded-td"
-                      {...getExpandedRowProps({
-                        row,
-                      })}>
-                      <h6>To do...</h6>
-                    </TableExpandedRow>
-                  </React.Fragment>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      />
-    </>
-  );*/
-  //  return <div> Tast</div>;
   return (
-    <table>
-      <tbody>
-        {tableRows.map((row) => (
-          <tr key={row.id}>
-            <td>{row.encounterDate}</td>
-            <td>{row.primaryDiagnosis}</td>
-            <td>{row.admissionDate}</td>
-            <td>{row.priorityOfAdmission}</td>
-            <td>{row.admittingDoctor}</td>
-            <td>{row.admissionWard}</td>
-            <td>{row.actions}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className={styles.cardContainer}>
+      <div className={styles.cardtext}>
+        <h6>Encounter Date</h6>
+        <br />
+        <p>{tableRows[0]?.encounterDate}</p>
+      </div>
+      <div className={styles.cardtext}>
+        <h6>Primary Diagnosis</h6>
+        <br />
+        <p>{tableRows[0]?.primaryDiagnosis}</p>
+      </div>
+      <div className={styles.cardtext}>
+        <h6>Admission Date</h6>
+        <br />
+        <p>{tableRows[0]?.admissionDate}</p>
+      </div>
+      <div className={styles.cardtext}>
+        <h6>Priority Of Admission</h6>
+        <br />
+        <p>{tableRows[0]?.priorityOfAdmission}</p>
+      </div>
+      <div className={styles.cardtext}>
+        <h6>Admitting Doctor</h6>
+        <br />
+        <p>{tableRows[0]?.admittingDoctor}</p>
+      </div>
+      <div className={styles.cardtext}>
+        <h6>Admission Ward</h6>
+        <br />
+        <p>{tableRows[0]?.admissionWard}</p>
+      </div>
+      <div className={styles.cardtext}>
+        <h6>Actions</h6>
+        <br />
+        {tableRows[0]?.actions}
+      </div>
+    </div>
   );
 };
 export default ClinicalEncounter;

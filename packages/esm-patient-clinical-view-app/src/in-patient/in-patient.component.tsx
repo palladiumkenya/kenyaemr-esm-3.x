@@ -2,12 +2,12 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import ClinicalEncounter from '../clinical-encounter/clinical-enc.component';
-import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { Add } from '@carbon/react/icons';
-import { Tile, Layer } from '@carbon/react';
+import { Tile, Layer, Button } from '@carbon/react';
 import styles from './in-patient.scss';
+
 interface InpatientProps {
   patientUuid: string;
   encounterTypeUuid: string;
@@ -19,6 +19,22 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
   const {
     formsList: { defaulterTracingFormUuid },
   } = useConfig<ConfigObject>();
+  const {
+    formsList: { clinicalEncounterFormUuid },
+  } = useConfig<ConfigObject>();
+
+  const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'Clinical Encounter',
+      formInfo: {
+        encounterUuid: encounterUUID,
+        formUuid: clinicalEncounterFormUuid,
+        patientUuid,
+        visitTypeUuid: '',
+        visitUuid: '',
+      },
+    });
+  };
   const headerTitle = t('inPatient', 'In-Patient');
   return (
     <>
@@ -33,9 +49,16 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
         <div className={styles.tilesContainer}>
           <Layer>
             <Tile>
-              <div className={styles.desktopHeading}>
-                <h4>Clinical Encounter View</h4>
-              </div>
+              <CardHeader title={'Clinical Encounter View'}>
+                <Button
+                  size="md"
+                  kind="ghost"
+                  onClick={() => handleOpenOrEditClinicalEncounterForm()}
+                  renderIcon={(props) => <Add size={24} {...props} />}
+                  iconDescription="Add">
+                  {t('add', 'Add')}
+                </Button>
+              </CardHeader>
               <ClinicalEncounter encounterTypeUuid={encounterTypeUuid} patientUuid={patientUuid} />
             </Tile>
           </Layer>
