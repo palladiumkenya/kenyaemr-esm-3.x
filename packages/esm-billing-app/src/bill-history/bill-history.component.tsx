@@ -103,7 +103,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
           </div>
           <p className={styles.content}>There are no bills to display.</p>
           <Button
-            onClick={() => launchPatientWorkspace('billing-form', { workspaceTitle: 'Defaulter Tracing' })}
+            onClick={() => launchPatientWorkspace('billing-form', { workspaceTitle: 'Billing Form' })}
             kind="ghost">
             {t('launchBillForm', 'Launch bill form')}
           </Button>
