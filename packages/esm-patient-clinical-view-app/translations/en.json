@@ -11,10 +11,16 @@
 >>>>>>> ff517ec (Adding Clinical Encounter view (Draft-WIP))
   "ancVisitNumber": "ANC Visit Number",
   "antenatalCare": "Antenatal Care",
+<<<<<<< HEAD
   "carePanel": "MCH Clinical View",
   "chronicleDisease": "Chronic Disease",
   "causeOfDeath": "Specific Cause of Death",
   "chronicDisease": "Chronic Disease",
+=======
+  "babyGivenVitaminD": "Baby Given Vitamin K",
+  "birthInjuriesTrauma": "Birth Injuries/Trauma",
+  "bloodLoss": "Blood Transfusion Done",
+>>>>>>> b7edcbd (lint error fix)
   "clientEligibility": "Eligible",
   "clinicalEncounter": "Clinical Encounter",
   "contacted": "Contacted",
@@ -35,6 +41,7 @@
   "familyHistory": "Family History",
   "finalOutcome": "Final Outcome",
   "followUpDate": "Next follow-up date",
+  "gestationalSize": "Gestational Size",
   "hivTestResults": "HIV Status",
   "htsClinicalView": "HTS Clinical View",
   "htsInitial": "Initial",
@@ -47,8 +54,15 @@
   "loading": "Loading",
   "loadingDescription": "Loading data...",
   "missedAppointmentDate": "Date Missed Appointment",
+  "modeofDelivery": "Mode of Delivery",
   "motherGeneralCondition": "General condition",
+<<<<<<< HEAD
   "name": "Name",
+=======
+  "neonatalAbnormalities": "Neonatal Abnormalities",
+  "neonatalProblems": "Neonatal Problems",
+  "neonatalSummery": "Neonatal Summery",
+>>>>>>> b7edcbd (lint error fix)
   "nextVisitDate": "Next visit date",
   "noObservationsFound": "No observations found",
   "partnerStatus": "HIV status of partner)",
