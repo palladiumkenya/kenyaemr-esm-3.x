@@ -150,11 +150,10 @@
   }
 }
 
-
 .billingHeading {
   position: relative;
   max-width: 400px;
-  text-align: "left";
+  text-align: 'left';
   margin-bottom: 40px;
 }
 
@@ -164,7 +163,7 @@
   width: 50px;
   height: 5px;
   background: green;
-  content: "";
+  content: '';
   display: block;
   left: 6%;
   transform: translatex(-50%);

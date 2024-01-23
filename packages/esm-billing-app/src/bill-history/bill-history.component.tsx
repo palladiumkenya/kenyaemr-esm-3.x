@@ -93,15 +93,18 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   if (bills.length === 0) {
     return (
-      <Layer className={styles.emptyStateContainer}>            
+      <Layer className={styles.emptyStateContainer}>
         <Tile className={styles.tile}>
-          {/* <p className={styles.billingHeading}>Billing History</p>  */}
-         
+          <p className={styles.billingHeading} style={{ textAlign: 'left' }}>
+            Billing History
+          </p>
           <div className={styles.illo}>
             <EmptyDataIllustration />
           </div>
           <p className={styles.content}>There are no bills to display.</p>
-          <Button onClick={() => launchPatientWorkspace('billing-form')} kind="ghost">
+          <Button
+            onClick={() => launchPatientWorkspace('billing-form', { workspaceTitle: 'Defaulter Tracing' })}
+            kind="ghost">
             {t('launchBillForm', 'Launch bill form')}
           </Button>
         </Tile>
@@ -110,8 +113,8 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   }
 
   return (
-    <div>      
-      <p className={styles.billingHeading}>Billing History</p> 
+    <div>
+      <p className={styles.billingHeading}>Billing History</p>
       <div className={styles.billHistoryContainer}>
         <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
           {({

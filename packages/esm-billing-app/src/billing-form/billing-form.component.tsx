@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ButtonSet,
   Button,
@@ -27,6 +27,7 @@ type BillingFormProps = {
 
 const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
+  const numberRef = useRef();
 
   const [GrandTotal, setGrandTotal] = useState(0);
 
@@ -34,7 +35,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
   const [defaultSearchItems, setdefaultSearchItems] = useState([]);
 
   const [BillItems, setBillItems] = useState([]);
-  const [FinalBill, setFinalBill] = useState({});
 
   const [searchVal, setsearchVal] = useState('');
   const [category, setCategory] = useState('');
@@ -51,16 +51,16 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
 
   const calculateTotal = (event, itemName) => {
     const Qnty = event.target.value;
-    const price = (document.getElementById(event.target.id + 'Price') as HTMLInputElement).value;
+    const price = (document.getElementById(event.target.id + 'Price') as HTMLInputElement).innerHTML;
     const total = parseInt(price) * Qnty;
     (document.getElementById(event.target.id + 'Total') as HTMLInputElement).innerHTML = total.toString();
-
-    const totals = Array.from(document.querySelectorAll('[id$="Total"]'));
 
     const updateItem = BillItems.filter((o) => o.Item.toLowerCase().includes(itemName.toLowerCase()));
 
     updateItem.map((o) => (o.Qnty = Qnty));
     updateItem.map((o) => (o.Total = total));
+
+    const totals = Array.from(document.querySelectorAll('[id$="Total"]'));
 
     let addUpTotals = 0;
     totals.forEach((tot) => {
@@ -99,7 +99,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
     setsearchVal(val);
 
     if (isLoading) {
-      console.log('loading');
     } else {
       if (typeof data !== 'undefined') {
         //set to null then repopulate
@@ -120,16 +119,16 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
               category: 'StockItem',
             });
           } else {
-            if (o.name.toLowerCase().includes(searchVal.toLowerCase())){              
-                searchOptions.push({
-                  uuid: o.uuid,
-                  Item: o.name,
-                  Qnty: 1,
-                  Price: o.servicePrices[0].price,
-                  Total: o.servicePrices[0].price,
-                  category: 'Service',
-                });
-            }           
+            if (o.name.toLowerCase().includes(searchVal.toLowerCase())) {
+              searchOptions.push({
+                uuid: o.uuid,
+                Item: o.name,
+                Qnty: 1,
+                Price: o.servicePrices[0].price,
+                Total: o.servicePrices[0].price,
+                category: 'Service',
+              });
+            }
           }
           setsearchOptions(searchOptions);
         });
@@ -215,7 +214,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
             filterItems(e.target.value);
           }}
         />
-    
+
         <ul className={styles.searchContent}>
           {searchOptions.map((row) => (
             <li className={styles.searchItem}>
@@ -229,6 +228,10 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
           ))}
         </ul>
       </div>
+
+      {/* <NumberInput id="carbon-number" min={0} max={100} value={50} ref={numberRef}
+      onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} 
+      className="testingNumberInput" label="NumberInput label" helperText="Optional helper text." invalidText="Number is not valid" /> */}
 
       <Table aria-label="sample table" className={styles.billingItem}>
         <TableHead>
@@ -257,16 +260,10 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
                       row.Qnty = e.target.value;
                     }}
                   />
+                  {/* <NumberInput id={row.Item} min={0} max={100} value={row.Qnty} ref={numberRef}
+                    onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} /> */}
                 </TableCell>
-                <TableCell>
-                  <TextInput
-                    id={row.Item + 'Price'}
-                    type="text"
-                    readonly
-                    value={row.Price}
-                    style={{ padding: '0px', background: 'inherit' }}
-                  />
-                </TableCell>
+                <TableCell id={row.Item + 'Price'}>{row.Price}</TableCell>
                 <TableCell id={row.Item + 'Total'} className="totalValue">
                   {row.Total}
                 </TableCell>
@@ -279,15 +276,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
             <TableCell></TableCell>
             <TableCell></TableCell>
             <TableCell style={{ fontWeight: 'bold' }}>Grand Total:</TableCell>
-            <TableCell>
-              <TextInput
-                id="GrandTotalSum"
-                type="text"
-                readonly
-                value={GrandTotal}
-                style={{ padding: '0px', background: 'inherit' }}
-              />
-            </TableCell>
+            <TableCell id="GrandTotalSum">{GrandTotal}</TableCell>
           </TableRow>
         </TableBody>
       </Table>
@@ -297,7 +286,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
           Discard
         </Button>
         <Button kind="primary" onClick={postBillItems}>
-          Save
+          Save & Close
         </Button>
       </ButtonSet>
     </div>
