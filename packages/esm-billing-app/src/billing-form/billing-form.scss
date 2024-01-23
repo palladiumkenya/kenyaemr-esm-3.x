@@ -3,3 +3,26 @@
 .billingFormContainer {
   padding: layout.$spacing-05;
 }
+
+.billingItem {
+  // padding: layout.$spacing-05;
+  margin-top: 30px;
+}
+
+.searchContent {
+  // display: none;
+  position: absolute;
+  background-color: #fff;
+  min-width: 230px;
+  overflow: auto;
+  border: 1px solid #ddd;
+  z-index: 1;
+  width: 92%;
+}
+
+.searchItem {
+  border-bottom: 0.1rem solid;
+  border-bottom-color: silver;
+  // padding: 10px;
+  cursor: pointer;
+}
