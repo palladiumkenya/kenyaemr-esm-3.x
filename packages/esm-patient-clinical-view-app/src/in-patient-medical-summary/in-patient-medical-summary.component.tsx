@@ -5,7 +5,7 @@ import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from
 import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, DataTableSkeleton } from '@carbon/react';
-import { clinicalEncounterUuid, useClinicalEncounter } from '../hooks/useClinicalEncounter';
+import { useClinicalEncounter } from '../hooks/useClinicalEncounter';
 import { ConfigObject } from '../config-schema';
 
 import styles from '../in-patient/in-patient.scss';
@@ -22,10 +22,11 @@ const InPatientSummary: React.FC<InPatientSummaryProps> = ({ patientUuid, encoun
   const {
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
+  const config = useConfig() as ConfigObject;
   const headerTitle = t('clinicalEncounter', 'Clinical Encounter Details');
   const { encounters, isLoading, error, mutate, isValidating } = useClinicalEncounter(
     patientUuid,
-    clinicalEncounterUuid,
+    config.clinicalEncounterUuid,
   );
   const handleOpenOrEditMaternalForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {

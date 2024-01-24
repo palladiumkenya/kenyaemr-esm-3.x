@@ -22,7 +22,7 @@ export const configSchema = {
       htsRetest: 'b08471f6-0892-4bf7-ab2b-bf79797b8ea4',
       htsLinkage: '050a7f12-5c52-4cad-8834-863695af335d',
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
-      clinicalEncounter: 'e958f902-64df-4819-afd4-7fb061f59308',
+      clinicalEncounterFormUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
     },
   },
   defaulterTracingEncounterUuid: {

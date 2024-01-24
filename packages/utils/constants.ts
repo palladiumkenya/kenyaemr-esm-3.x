@@ -23,7 +23,7 @@ export const ReasonNotContacted_UUID = '166541AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const TracingOutcome_UUID = '160433AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const PatientTracingEncounterType_UUID = '1495edf8-2df2-11e9-b210-d663bd873d93';
 
-export const ClinicalEncounterFormName = 'Clinical Encounters';
+export const ClinicalEncounterFormUuid = 'e958f902-64df-4819-afd4-7fb061f59308';
 
 export const AdmissionDate_UUID = '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
@@ -31,7 +31,6 @@ export const AdmissionDate_UUID = '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const PriorityOfAdmission_UUID = '1655AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 // export const AdmittingDoctor_UUID= '';
 export const AdmissionWard_UUID = '5fc29316-0869-4b3b-ae2f-cc37c6014eb7';
-export const ClinicalEncounterType_UUID = '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const MchEncounterType_UUID = 'c6d09e05-1f25-4164-8860-9f32c5a02df0';
 
 //delivery

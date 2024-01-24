@@ -1,11 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from '../../../utils/constants';
+import {
+  AdmissionDate_UUID,
+  PriorityOfAdmission_UUID,
+  AdmissionWard_UUID,
+  clinicalEncounterRepresentation,
+} from '../../../utils/constants';
 import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, DataTableSkeleton } from '@carbon/react';
-import { clinicalEncounterUuid, useClinicalEncounter } from '../hooks/useClinicalEncounter';
 import { ConfigObject } from '../config-schema';
 
 import styles from '../in-patient/in-patient.scss';
@@ -23,10 +27,13 @@ const ClinicalEncounter: React.FC<SurgicalSummeryProps> = ({ patientUuid, encoun
   const {
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
-
+  const config = useConfig() as ConfigObject;
   const headerTitle = t('clinicalEncounter', 'Clinical Encounter Details');
 
-  const { encounters, isLoading, error, mutate, isValidating } = useSurgicalSummery(patientUuid, clinicalEncounterUuid);
+  const { encounters, isLoading, error, mutate, isValidating } = useSurgicalSummery(
+    patientUuid,
+    config.clinicalEncounterUuid,
+  );
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',

@@ -15,7 +15,6 @@ import {
 import { getObsFromEncounter } from '../encounter-list/encounter-list-utils';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, DataTableSkeleton } from '@carbon/react';
-import { clinicalEncounterUuid, useClinicalEncounter } from '../hooks/useClinicalEncounter';
 import { ConfigObject } from '../config-schema';
 
 import styles from '../in-patient/in-patient.scss';
