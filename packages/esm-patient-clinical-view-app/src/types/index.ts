@@ -6,7 +6,7 @@ export interface OpenmrsEncounter extends OpenmrsResource {
   location: string;
   encounterProviders?: Array<{
     encounterRole: string;
-    provider: { uuid: string; person: { uuid: string; display: string } };
+    provider: { uuid: string; person: { uuid: string; display: string }; name: string };
     display?: string;
   }>;
   obs: Array<OpenmrsResource>;

@@ -1,26 +1,20 @@
 {
   "actions": "Actions",
   "add": "Add",
-<<<<<<< HEAD
   "age": "Age",
   "alive": "Alive",
-=======
   "admissionDate": "Date & Time of Admission",
   "admissionWard": "Admission Ward",
   "admittingDoctor": "Admitting Doctor",
->>>>>>> ff517ec (Adding Clinical Encounter view (Draft-WIP))
   "ancVisitNumber": "ANC Visit Number",
   "antenatalCare": "Antenatal Care",
-<<<<<<< HEAD
   "carePanel": "MCH Clinical View",
   "chronicleDisease": "Chronic Disease",
   "causeOfDeath": "Specific Cause of Death",
   "chronicDisease": "Chronic Disease",
-=======
   "babyGivenVitaminD": "Baby Given Vitamin K",
   "birthInjuriesTrauma": "Birth Injuries/Trauma",
   "bloodLoss": "Blood Transfusion Done",
->>>>>>> b7edcbd (lint error fix)
   "clientEligibility": "Eligible",
   "clinicalEncounter": "Clinical Encounter",
   "contacted": "Contacted",
@@ -58,13 +52,10 @@
   "missedAppointmentDate": "Date Missed Appointment",
   "modeofDelivery": "Mode of Delivery",
   "motherGeneralCondition": "General condition",
-<<<<<<< HEAD
   "name": "Name",
-=======
   "neonatalAbnormalities": "Neonatal Abnormalities",
   "neonatalProblems": "Neonatal Problems",
   "neonatalSummery": "Neonatal Summery",
->>>>>>> b7edcbd (lint error fix)
   "nextVisitDate": "Next visit date",
   "noObservationsFound": "No observations found",
   "partnerStatus": "HIV status of partner)",
@@ -72,12 +63,9 @@
   "populationType": "Population type",
   "postnatalCare": "Postnatal Care",
   "pphCondition": "PPH present",
-<<<<<<< HEAD
   "relation": "Relation/Relative",
-=======
   "primaryDiagnosis": "Primary Diagnosis",
   "priorityOfAdmission": "Priority of Admission",
->>>>>>> ff517ec (Adding Clinical Encounter view (Draft-WIP))
   "tbScreening": "TB screening outcome",
   "testApproach": "Approach",
   "testDate": "Test Date",
