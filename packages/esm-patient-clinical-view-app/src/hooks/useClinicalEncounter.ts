@@ -4,6 +4,7 @@ import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { clinicalEncounterRepresentation } from '../../../utils/constants';
 export const clinicalEncounterUuid = '1f230b7d-b79e-4e2d-9f19-0fa57cc6b215';
+export const clinicalEncounterFormUuid = 'e958f902-64df-4819-afd4-7fb061f59308';
 
 export function useClinicalEncounter(patientUuid: string, encounterType: string) {
   const config = useConfig() as ConfigObject;
@@ -13,9 +14,7 @@ export function useClinicalEncounter(patientUuid: string, encounterType: string)
     url,
     openmrsFetch,
   );
-  const clinicalEncounter = data?.data?.results?.filter(
-    (enc) => enc.form.uuid === 'e958f902-64df-4819-afd4-7fb061f59308',
-  );
+  const clinicalEncounter = data?.data?.results?.filter((enc) => enc.form.uuid === clinicalEncounterFormUuid);
 
   return {
     encounters: clinicalEncounter,
