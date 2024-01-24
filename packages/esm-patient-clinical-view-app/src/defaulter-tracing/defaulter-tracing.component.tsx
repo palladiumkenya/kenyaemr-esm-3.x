@@ -42,7 +42,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
   const {
     formsList: { defaulterTracingFormUuid },
   } = useConfig<ConfigObject>();
-  const headerTitle = t('defaulterTracing', 'Defaulter Tracing');
+  const headerTitle = t('defaulterTracing', 'Defaulter Tracing===');
   const { encounters, isLoading, error, mutate, isValidating } = usePatientTracing(
     patientUuid,
     defaulterTracingEncounterUuid,

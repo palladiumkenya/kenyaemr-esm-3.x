@@ -72,6 +72,26 @@
       }
     },
     {
+      "name": "in-patient-dashboard-link",
+      "component": "inPatientLink",
+      "slot": "patient-clinical-view-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-in-patient-dashboard-slot",
+        "path": "in-patient-dashboard",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "in-patient-dashboard",
+      "slot": "patient-chart-in-patient-dashboard-slot",
+      "component": "inpatientView",
+      "order": 3,
+      "online": true,
+      "offline": false
+    },
+    {
       "name": "family-history",
       "slot": "patient-chart-family-history-slot",
       "component": "familyHistory",
