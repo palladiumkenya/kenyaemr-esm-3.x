@@ -1,7 +1,7 @@
 import useSWRImmutable, { mutate } from 'swr';
 import { useCallback, useMemo } from 'react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { encounterRepresentation } from '../esm-mch-app/constants';
+import { encounterRepresentation } from '../hiv-care-and-treatment-services/maternal-and-child-health/constants';
 import { OpenmrsEncounter } from '../types';
 import isNull from 'lodash-es/isNull';
 
