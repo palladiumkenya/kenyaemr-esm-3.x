@@ -1,3 +1,4 @@
+import { configSchema } from '../config-schema';
 import { Payment, LineItem } from '../types';
 
 // amount already paid
@@ -34,7 +35,7 @@ export function calculateTotalAmount(lineItems: Array<LineItem>) {
 export const convertToCurrency = (amountToConvert: number) => {
   const formatter = new Intl.NumberFormat('en-KE', {
     style: 'currency',
-    currency: 'KES',
+    currency: configSchema.defaultCurrency._default,
     minimumFractionDigits: 2,
   });
 
