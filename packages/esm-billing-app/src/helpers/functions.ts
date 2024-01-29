@@ -33,9 +33,12 @@ export function calculateTotalAmount(lineItems: Array<LineItem>) {
 }
 
 export const convertToCurrency = (amountToConvert: number) => {
-  const formatter = new Intl.NumberFormat('en-KE', {
+  const locale = window.i18next?.language?.substring(0, 2) ?? '';
+  const currencySymbol = configSchema.defaultCurrency._default;
+
+  const formatter = new Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: configSchema.defaultCurrency._default,
+    currency: currencySymbol,
     minimumFractionDigits: 2,
   });
 
