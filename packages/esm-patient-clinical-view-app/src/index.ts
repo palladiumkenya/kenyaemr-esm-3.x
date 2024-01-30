@@ -27,7 +27,7 @@ import {
   htsDashboardMeta,
 } from './special-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
 import { specialClinicsNavGroup } from './special-clinics/special-clinic-dashboard.meta';
-import { familyHistoryDashboardMeta } from './family-partner-history/family-partnet-dashboard.meta';
+import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import OutPatientView from './clinical-encounter/out-patient-department/out-patient-department.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';

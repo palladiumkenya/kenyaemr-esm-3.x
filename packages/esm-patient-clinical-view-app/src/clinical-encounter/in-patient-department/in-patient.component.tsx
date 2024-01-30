@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ClinicalEncounter from '../clinical-enc.component';
-import SurgicalSummery from '../summary/surgical summery/surgical-summery.component';
+import SurgicalSummery from '../summary/surgical summary/surgical-summary.component';
 import NeonatalSummery from '../summary/neonatal summary/neonatal-summery.component';
 import { Dashboard, CloudMonitoring, Activity, UserMultiple, UserFollow } from '@carbon/react/icons';
 import { Tile, Layer, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
