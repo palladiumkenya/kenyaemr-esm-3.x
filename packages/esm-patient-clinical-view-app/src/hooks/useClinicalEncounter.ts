@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { OpenmrsEncounter } from '../types';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
-import { clinicalEncounterRepresentation, ClinicalEncounterFormUuid } from '../../../utils/constants';
+import { clinicalEncounterRepresentation, ClinicalEncounterFormUuid } from '../utils/constants';
 export function useClinicalEncounter(patientUuid: string, encounterType: string) {
   const config = useConfig() as ConfigObject;
   const url = `/ws/rest/v1/encounter?encounterType=${config.clinicalEncounterUuid}&patient=${patientUuid}&v=${clinicalEncounterRepresentation}`;

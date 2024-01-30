@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
-import { Accordion, AccordionItem } from '@carbon/react';
+import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+import { SideNavItems, SideNavMenu, SideNavDivider } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { registerNavGroup } from '@openmrs/esm-patient-common-lib';
 import styles from './dashboard-group.scss';
 
@@ -9,24 +10,26 @@ export interface DashboardGroupExtensionProps {
   slotName?: string;
   basePath: string;
   isExpanded?: boolean;
+  isChild?: boolean;
 }
 
-export const DashboardGroupExtension = ({ title, slotName, basePath, isExpanded }: DashboardGroupExtensionProps) => {
+export const DashboardGroupExtension: React.FC<DashboardGroupExtensionProps> = ({
+  title,
+  slotName,
+  basePath,
+  isExpanded,
+  isChild,
+}) => {
+  const isTablet = useLayoutType() === 'tablet';
   useEffect(() => {
     registerNavGroup(slotName);
   }, [slotName]);
 
   return (
-    <div className={styles.accordionContainer}>
-      <Accordion>
-        <AccordionItem
-          className={styles.accordionItem}
-          open={isExpanded ?? true}
-          title={title}
-          style={{ borderBottom: 'none' }}>
-          <ExtensionSlot style={{ width: '100%', minWidth: '15rem' }} name={slotName ?? title} state={{ basePath }} />
-        </AccordionItem>
-      </Accordion>
-    </div>
+    <SideNavItems className={styles.sideMenuItems} isSideNavExpanded={true}>
+      <SideNavMenu large={isTablet} defaultExpanded={isExpanded ?? true} title={title}>
+        <ExtensionSlot style={{ width: '100%', minWidth: '15rem' }} name={slotName ?? title} state={{ basePath }} />
+      </SideNavMenu>
+    </SideNavItems>
   );
 };

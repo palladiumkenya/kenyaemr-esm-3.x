@@ -1,0 +1,19 @@
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.cardContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+.value {
+  margin-top: layout.$spacing-03;
+  @include type.type-style('body-short-01');
+  color: colors.$gray-100;
+}

@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { OpenmrsEncounter } from '../types';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
-import { clinicalEncounterRepresentation } from '../../../utils/constants';
+import { clinicalEncounterRepresentation } from '../utils/constants';
 export const clinicalEncounterUuid = '1f230b7d-b79e-4e2d-9f19-0fa57cc6b215';
 
 export function useSurgicalSummery(patientUuid: string, encounterType: string) {

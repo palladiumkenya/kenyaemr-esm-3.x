@@ -2,12 +2,20 @@
 @use '@carbon/colors';
 @use '@carbon/type';
 
-.accordionContainer {
-  margin-top: layout.$spacing-05;
-}
+.sideMenuItems {
+  padding: 0;
 
-.accordionItem {
-  & > button {
-    margin-bottom: layout.$spacing-01;
+  :global(.cds--side-nav__link.active-left-nav-link) {
+    padding: 0 1.75rem;
   }
 }
+
+.childMenuItems {
+  padding-left: layout.$spacing-02;
+}
+
+// .childSubMenu {
+//   & button {
+//     font-weight: normal;
+//   }
+// }

@@ -1,30 +1,31 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from '../utils/constants';
-import { getObsFromEncounter } from '../ui/encounter-list/encounter-list-utils';
-import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
-import { useClinicalEncounter } from '../hooks/useClinicalEncounter';
-import { ConfigObject } from '../config-schema';
-import SummaryCard from './summary/summary-card.component';
-import capitalize from 'lodash-es/capitalize';
+import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from '../../../utils/constants';
+import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
+import { ConfigObject } from '../../../config-schema';
+import { useSurgicalSummery } from '../../../hooks/useSurgicalSummery';
+import SummaryCard from '../summary-card.component';
 
-import styles from './in-patient-department/in-patient.scss';
-interface ClinicalEncounterProps {
+import styles from '../../in-patient-department/in-patient.scss';
+
+interface SurgicalSummeryProps {
   patientUuid: string;
+  encounterTypeUuid: string;
+  formEntrySub?: any;
+  launchPatientWorkspace?: Function;
 }
 
-const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid }) => {
+const ClinicalEncounter: React.FC<SurgicalSummeryProps> = ({ patientUuid, encounterTypeUuid }) => {
   const { t } = useTranslation();
   const {
-    clinicalEncounterUuid,
     formsList: { clinicalEncounterFormUuid },
-  } = useConfig<ConfigObject>();
-  const { encounters, isLoading, error, mutate, isValidating } = useClinicalEncounter(
-    patientUuid,
     clinicalEncounterUuid,
-  );
+  } = useConfig<ConfigObject>();
+
+  const { encounters, isLoading, error, mutate } = useSurgicalSummery(patientUuid, clinicalEncounterUuid);
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
@@ -38,9 +39,8 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid }) =>
       },
     });
   };
-  const tableRows = encounters?.map((encounter, index) => {
+  const formattedEncounters = encounters.map((encounter, index) => {
     return {
-      id: `${encounter.uuid}`,
       encounterDate: formatDate(new Date(encounter.encounterDatetime)),
       admissionDate:
         getObsFromEncounter(encounter, AdmissionDate_UUID) == '--' ||
@@ -49,7 +49,7 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid }) =>
           : formatDate(parseDate(getObsFromEncounter(encounter, AdmissionDate_UUID))),
       primaryDiagnosis: encounter.diagnoses.length > 0 ? encounter.diagnoses[0].diagnosis.coded.display : '--',
       priorityOfAdmission: getObsFromEncounter(encounter, PriorityOfAdmission_UUID),
-      admittingDoctor: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].provider.name : '',
+      admittingDoctor: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
       admissionWard: getObsFromEncounter(encounter, AdmissionWard_UUID),
       actions: (
         <OverflowMenu aria-label="overflow-menu" flipped="false">
@@ -79,15 +79,17 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid }) =>
   }
   return (
     <div className={styles.cardContainer}>
-      <SummaryCard title={t('encounterDate', 'Encounter Date')} value={tableRows[0]?.encounterDate} />
-      <SummaryCard title={t('primaryDiagnosis', 'Primary Diagnosis')} value={tableRows[0]?.primaryDiagnosis} />
-      <SummaryCard title={t('admissionDate', 'Admission Date')} value={tableRows[0]?.admissionDate} />
+      <SummaryCard title={t('dateOfSurgery', 'Date of Surgery')} value={formattedEncounters[0]?.encounterDate} />
+      <SummaryCard title={t('typeOfSurgery', 'Type of Surgery')} value={formattedEncounters[0]?.primaryDiagnosis} />
       <SummaryCard
-        title={t('priorityOfAdmission', 'Priority Of Admission')}
-        value={tableRows[0]?.priorityOfAdmission}
+        title={t('postOperativeComplications', 'Post Operative Complications')}
+        value={formattedEncounters[0]?.admissionDate}
       />
-      <SummaryCard title={t('admittingDoctor', 'Admitting Doctor')} value={capitalize(tableRows[0]?.admittingDoctor)} />
-      <SummaryCard title={t('admissionWard', 'Admission Ward')} value={tableRows[0]?.admissionWard} />
+      <SummaryCard
+        title={t('postOperativeDiagnosis', 'Post Operative Diagnosis')}
+        value={formattedEncounters[0]?.priorityOfAdmission}
+      />
+      <SummaryCard title={t('operatingDoctor', 'Operating Doctor')} value={formattedEncounters[0]?.admittingDoctor} />
     </div>
   );
 };

@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { OpenmrsEncounter } from '../types';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
-import { DeliveryForm_UUID, MchEncounterType_UUID, encounterRepresentation } from '../../../utils/constants';
+import { DeliveryForm_UUID, MchEncounterType_UUID, encounterRepresentation } from '../utils/constants';
 
 export function useNeonatalSummery(patientUuid: string, encounterType: string) {
   const config = useConfig() as ConfigObject;

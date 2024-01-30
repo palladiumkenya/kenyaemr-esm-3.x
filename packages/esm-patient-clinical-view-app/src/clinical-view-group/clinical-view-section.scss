@@ -1,0 +1,15 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  height: layout.$layout-03;
+  display: flex;
+  align-items: center;
+  padding: layout.$layout-02 layout.$layout-01;
+  @include type.type-style('label-02');
+  color: colors.$gray-70;
+  column-gap: layout.$layout-01;
+  background-color: colors.$gray-10;
+  margin-top: layout.$layout-01;
+}
