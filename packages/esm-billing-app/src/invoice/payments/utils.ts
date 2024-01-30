@@ -10,13 +10,21 @@ export const createPaymentPayload = (
   const { cashier } = bill;
   const totalAmount = bill?.totalAmount;
   const paymentStatus = amountDue <= 0 ? 'PAID' : 'PENDING';
-
-  const billPayment = formValues.map((formValue) => ({
-    amount: parseFloat(totalAmount.toFixed(2)),
-    amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
+  const previousPayments = bill.payments.map((payment) => ({
+    amount: payment.amount,
+    amountTendered: payment.amountTendered,
     attributes: [],
-    instanceType: formValue.method,
+    instanceType: payment.instanceType.uuid,
   }));
+  const billPayment = formValues
+    .map((formValue) => ({
+      amount: parseFloat(totalAmount.toFixed(2)),
+      amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
+      attributes: [],
+      instanceType: formValue.method,
+    }))
+    .concat(previousPayments);
+
   const processedPayment = {
     cashPoint: bill.cashPointUuid,
     cashier: cashier.uuid,
