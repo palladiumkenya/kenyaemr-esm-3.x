@@ -1,22 +1,22 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EncounterList, EncounterListColumn } from '../../../../../ui/encounter-list/encounter-list.component';
-import { getObsFromEncounter } from '../../../../../ui/encounter-list/encounter-list-utils';
+import { EncounterList, EncounterListColumn } from '../ui/encounter-list/encounter-list.component';
+import { getObsFromEncounter } from '../ui/encounter-list/encounter-list-utils';
 import {
   deliveryOutcomeConcept,
   hivTestAtMaternityResults,
   hivTestResultConcept,
   placeOfDeliveryConcept,
-} from '../../../constants';
+} from './concepts/mch-concepts';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
-import { ConfigObject } from '../../../../../config-schema';
-import { labourAndDeliveryConceptMap } from '../labour-and-delivery-care-constants';
+import { ConfigObject } from '../config-schema';
+import { labourAndDeliveryConceptMap } from './concept-maps/labour-and-delivery-care-concepts-map';
 
-interface LabourDeliveryListProps {
+interface LabourDeliveryProps {
   patientUuid: string;
 }
 
-const LabourDeliveryList: React.FC<LabourDeliveryListProps> = ({ patientUuid }) => {
+const LabourDelivery: React.FC<LabourDeliveryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('labourAndDelivery', 'Labour and Delivery');
 
@@ -101,4 +101,4 @@ const LabourDeliveryList: React.FC<LabourDeliveryListProps> = ({ patientUuid }) 
   );
 };
 
-export default LabourDeliveryList;
+export default LabourDelivery;

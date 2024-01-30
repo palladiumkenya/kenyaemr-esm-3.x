@@ -1,17 +1,22 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EncounterList, EncounterListColumn } from '../../../../../ui/encounter-list/encounter-list.component';
-import { getObsFromEncounter } from '../../../../../ui/encounter-list/encounter-list-utils';
-import { followUpDateConcept, hivTestResultConcept, ancVisitNumberConcept, partnerHivStatus } from '../../../constants';
+import { EncounterList, EncounterListColumn } from '../ui/encounter-list/encounter-list.component';
+import { getObsFromEncounter } from '../ui/encounter-list/encounter-list-utils';
+import {
+  followUpDateConcept,
+  hivTestResultConcept,
+  ancVisitNumberConcept,
+  partnerHivStatus,
+} from './concepts/mch-concepts';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
-import { ConfigObject } from '../../../../../config-schema';
-import { ancConceptMap } from '../antenatal-care-constants';
+import { ConfigObject } from '../config-schema';
+import { ancConceptMap } from './concept-maps/antenatal-care-concepts-map';
 
-interface AntenatalCareListProps {
+interface AntenatalCareProps {
   patientUuid: string;
 }
 
-const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) => {
+const AntenatalCare: React.FC<AntenatalCareProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('antenatalCare', 'Antenatal Care');
   const {
@@ -103,4 +108,4 @@ const AntenatalCareList: React.FC<AntenatalCareListProps> = ({ patientUuid }) =>
   );
 };
 
-export default AntenatalCareList;
+export default AntenatalCare;

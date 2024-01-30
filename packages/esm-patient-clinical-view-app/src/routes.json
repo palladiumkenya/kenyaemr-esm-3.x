@@ -11,47 +11,86 @@
       "slot": "patient-chart-dashboard-slot"
     },
     {
-      "name": "hiv-care-and-treatment-dashboard-group-link",
+      "name": "family-history-link",
+      "component": "familyHistoryLink",
       "slot": "patient-chart-dashboard-slot",
-      "component": "hivCareAndTreatMentSideNavGroup"
+      "order": 14,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-family-history-slot",
+        "path": "family-history",
+        "layoutMode": "anchored"
+      }
     },
     {
-      "name": "outpatient-department-dashboard-group-link",
-      "slot": "patient-chart-dashboard-slot",
-      "component": "outPatientDepartmentSideNavGroup"
-    },
-    {
-      "name": "inpatient-department-dashboard-group-link",
-      "slot": "patient-chart-dashboard-slot",
-      "component": "inPatientDepartmentSideNavGroup"
-    },
-    {
-      "name": "mch-clinical-view",
-      "slot": "patient-chart-mch-dashboard-slot",
-      "component": "mchClinicalView",
+      "name": "family-history",
+      "slot": "patient-chart-family-history-slot",
+      "component": "familyHistory",
       "order": 0,
       "online": true,
       "offline": false
     },
     {
-      "name": "mch-dashboard-link",
-      "component": "mchDashboardLink",
-      "slot": "hiv-care-and-treatment-slot",
+      "name": "maternal-and-child-health-dashboard-group-link",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "maternalAndChildHealthSideNavGroup"
+    },
+    {
+      "name": "antenatal-care-dashboard-link",
+      "component": "antenatalCareLink",
+      "slot": "maternal-and-child-health-slot",
       "meta": {
         "columns": 1,
         "columnSpan": 1,
-        "slot": "patient-chart-mch-dashboard-slot",
-        "path": "mch-dashboard",
+        "slot": "patient-chart-antenatal-care-dashboard-slot",
+        "path": "antenatal-care-dashboard",
         "layoutMode": "anchored"
       }
     },
     {
-      "name": "hts-clinical-view",
-      "slot": "patient-chart-hts-dashboard-slot",
-      "component": "htsClinicalView",
-      "order": 2,
-      "online": true,
-      "offline": false
+      "name": "antenatal-care-dashboard",
+      "slot": "patient-chart-antenatal-care-dashboard-slot",
+      "component": "antenatalCare"
+    },
+    {
+      "name": "postnatal-care-dashboard-link",
+      "component": "postnatalCareLink",
+      "slot": "maternal-and-child-health-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-postnatal-care-dashboard-slot",
+        "path": "postnatal-care-dashboard",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "postnatal-care-dashboard",
+      "slot": "patient-chart-postnatal-care-dashboard-slot",
+      "component": "postnatalCare"
+    },
+    {
+      "name": "labour-and-delivery-dashboard-link",
+      "component": "labourAndDeliveryLink",
+      "slot": "maternal-and-child-health-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-labour-and-delivery-dashboard-slot",
+        "path": "labour-and-delivery-dashboard",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "labour-and-delivery-dashboard",
+      "slot": "patient-chart-labour-and-delivery-dashboard-slot",
+      "component": "labourAndDelivery"
+    },
+    {
+      "name": "hiv-care-and-treatment-dashboard-group-link",
+      "slot": "special-clinics-slot",
+      "component": "hivCareAndTreatMentSideNavGroup"
     },
     {
       "name": "hts-dashboard-link",
@@ -66,10 +105,10 @@
       }
     },
     {
-      "name": "defaulter-tracing-dashboard",
-      "slot": "patient-chart-defaulter-tracing-dashboard-slot",
-      "component": "defaulterTracing",
-      "order": 3,
+      "name": "hts-clinical-view",
+      "slot": "patient-chart-hts-dashboard-slot",
+      "component": "htsClinicalView",
+      "order": 2,
       "online": true,
       "offline": false
     },
@@ -86,44 +125,56 @@
       }
     },
     {
-      "name": "patient-chart-clinical-encounter-link",
-      "component": "clinicalEncounterLink",
-      "slot": "in-patient-department-slot",
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-clinical-encounter-slot",
-        "path": "clinical-encounter",
-        "layoutMode": "anchored"
-      }
-    },
-    {
-      "name": "patient-chart-clinical-encounter",
-      "slot": "patient-chart-clinical-encounter-slot",
-      "component": "clinicalEncounter",
+      "name": "defaulter-tracing-dashboard",
+      "slot": "patient-chart-defaulter-tracing-dashboard-slot",
+      "component": "defaulterTracing",
       "order": 3,
       "online": true,
       "offline": false
     },
     {
-      "name": "family-history",
-      "slot": "patient-chart-family-history-slot",
-      "component": "familyHistory",
-      "order": 0,
-      "online": true,
-      "offline": false
+      "name": "special-clinics-dashboard-group-link",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "specialClinicsSideNavGroup"
     },
     {
-      "name": "family-history-link",
-      "component": "familyHistoryLink",
-      "slot": "out-patient-department-slot",
+      "name": "clinical-encounter-dashboard-group-link",
+      "slot": "patient-chart-dashboard-slot",
+      "component": "clinicalEncountersSideNavGroup"
+    },
+    {
+      "name": "patient-chart-in-patient-clinical-encounter-link",
+      "component": "inPatientClinicalEncounterLink",
+      "slot": "clinical-encounter-slot",
       "meta": {
         "columns": 1,
         "columnSpan": 1,
-        "slot": "patient-chart-family-history-slot",
-        "path": "family-history",
-        "layoutMode": "anchored"
+        "slot": "patient-chart-in-patient-clinical-encounter-slot",
+        "layoutMode": "anchored",
+        "path": "in-patient-clinical-encounter"
       }
+    },
+    {
+      "name": "patient-chart-in-patient-clinical-encounter",
+      "slot": "patient-chart-in-patient-clinical-encounter-slot",
+      "component": "inPatientClinicalEncounter"
+    },
+    {
+      "name": "patient-chart-out-patient-clinical-encounter-link",
+      "component": "outPatientClinicalEncounterLink",
+      "slot": "clinical-encounter-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-out-patient-clinical-encounter-slot",
+        "layoutMode": "anchored",
+        "path": "out-patient-clinical-encounter"
+      }
+    },
+    {
+      "name": "patient-chart-out-patient-clinical-encounter",
+      "slot": "patient-chart-out-patient-clinical-encounter-slot",
+      "component": "outpatientClinicalEncounter"
     }
   ]
 }

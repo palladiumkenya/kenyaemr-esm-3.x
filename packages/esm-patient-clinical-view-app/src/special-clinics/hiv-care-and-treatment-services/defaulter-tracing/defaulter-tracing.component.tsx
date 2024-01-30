@@ -7,8 +7,8 @@ import {
   TracingNumber_UUID,
   TracingOutcome_UUID,
   TracingType_UUID,
-} from '../../utils/constants';
-import { getObsFromEncounter } from '../../ui/encounter-list/encounter-list-utils';
+} from '../../../utils/constants';
+import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
 import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import {
   Button,
@@ -27,8 +27,8 @@ import {
   OverflowMenuItem,
   DataTableSkeleton,
 } from '@carbon/react';
-import { defaulterTracingEncounterUuid, usePatientTracing } from '../../hooks/usePatientTracing';
-import { ConfigObject } from '../../config-schema';
+import { defaulterTracingEncounterUuid, usePatientTracing } from '../../../hooks/usePatientTracing';
+import { ConfigObject } from '../../../config-schema';
 import { Add } from '@carbon/react/icons';
 interface PatientTracingProps {
   patientUuid: string;

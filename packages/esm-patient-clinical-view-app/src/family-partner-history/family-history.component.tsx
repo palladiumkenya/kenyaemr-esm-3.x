@@ -16,11 +16,11 @@ import {
   Button,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { EmptyDataIllustration, ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
-import { isDesktop, navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { isDesktop, navigate, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
-import type { ConfigObject } from '../../config-schema';
+import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
 
 interface FamilyHistoryProps {
@@ -35,10 +35,11 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid, encounterTyp
   const config = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const { concepts } = config;
-  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
   const headerTitle = t('familyHistory', 'Family history');
+  const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
+  const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const headers = [
     {
@@ -46,7 +47,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid, encounterTyp
       key: 'name',
     },
     {
-      header: t('relation', 'Relation/Relative'),
+      header: t('relation', 'Relation'),
       key: 'relation',
     },
     {
@@ -58,7 +59,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid, encounterTyp
       key: 'alive',
     },
     {
-      header: t('causeOfDeath', 'Specific Cause of Death'),
+      header: t('causeOfDeath', 'Cause of Death'),
       key: 'causeOfDeath',
     },
     {
@@ -72,7 +73,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid, encounterTyp
   };
 
   const tableRows =
-    relationships?.map((relation) => {
+    results?.map((relation) => {
       const patientUuid = relation.patientUuid;
 
       return {
@@ -159,10 +160,10 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid, encounterTyp
       <Pagination
         page={currentPage}
         pageSize={pageSize}
-        pageSizes={[10, 20, 30, 40, 50]}
+        pageSizes={pageSizes}
         totalItems={relationships.length}
         onChange={({ page, pageSize }) => {
-          setCurrentPage(page);
+          goTo(page);
           setPageSize(pageSize);
         }}
       />

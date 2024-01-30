@@ -10,7 +10,7 @@ import { ConfigObject } from '../config-schema';
 import SummaryCard from './summary/summary-card.component';
 import capitalize from 'lodash-es/capitalize';
 
-import styles from '../in-patient-department/in-patient.scss';
+import styles from './in-patient-department/in-patient.scss';
 interface ClinicalEncounterProps {
   patientUuid: string;
 }

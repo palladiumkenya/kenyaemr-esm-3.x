@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EncounterList, EncounterListColumn } from '../../../../../ui/encounter-list/encounter-list.component';
-import { getObsFromEncounter } from '../../../../../ui/encounter-list/encounter-list-utils';
+import { EncounterList, EncounterListColumn } from '../../../../../../ui/encounter-list/encounter-list.component';
+import { getObsFromEncounter } from '../../../../../../ui/encounter-list/encounter-list-utils';
 import {
   testApproachConcept,
   testStrategyConcept,
@@ -10,7 +10,7 @@ import {
   tbScreeeningConcept,
 } from '../../../constants';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
-import { ConfigObject } from '../../../../../config-schema';
+import { ConfigObject } from '../../../../../../config-schema';
 import { hivTestingConceptMap } from '../hiv-testing-constants';
 
 interface HivTestingEncountersListProps {

@@ -1,22 +1,22 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EncounterList, EncounterListColumn } from '../../../../../ui/encounter-list/encounter-list.component';
-import { getObsFromEncounter } from '../../../../../ui/encounter-list/encounter-list-utils';
+import { EncounterList, EncounterListColumn } from '../ui/encounter-list/encounter-list.component';
+import { getObsFromEncounter } from '../ui/encounter-list/encounter-list-utils';
 import {
   hivTestResultConcept,
   MotherNextVisitDate,
   motherGeneralConditionConcept,
   pphConditionConcept,
-} from '../../../constants';
+} from './concepts/mch-concepts';
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
-import { ConfigObject } from '../../../../../config-schema';
-import { pncConceptMap } from '../postnatal-care-constants';
+import { ConfigObject } from '../config-schema';
+import { pncConceptMap } from './concept-maps/postnatal-care-concepts-map';
 
-interface PostnatalCareListProps {
+interface PostnatalCareProps {
   patientUuid: string;
 }
 
-const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) => {
+const PostnatalCare: React.FC<PostnatalCareProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('postnatalCare', 'Postnatal Care');
 
@@ -109,4 +109,4 @@ const PostnatalCareList: React.FC<PostnatalCareListProps> = ({ patientUuid }) =>
   );
 };
 
-export default PostnatalCareList;
+export default PostnatalCare;

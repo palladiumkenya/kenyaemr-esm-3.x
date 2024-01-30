@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import ClinicalEncounter from '../clinical-encounter/clinical-enc.component';
-import SurgicalSummery from '../clinical-encounter/summary/surgical summery/surgical-summery.component';
-import NeonatalSummery from '../clinical-encounter/summary/neonatal summary/neonatal-summery.component';
+import ClinicalEncounter from '../clinical-enc.component';
+import SurgicalSummery from '../summary/surgical summery/surgical-summery.component';
+import NeonatalSummery from '../summary/neonatal summary/neonatal-summery.component';
 import { Dashboard, CloudMonitoring, Activity, UserMultiple, UserFollow } from '@carbon/react/icons';
 import { Tile, Layer, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import styles from './in-patient.scss';
-import MaternalSummary from '../clinical-encounter/summary/maternal-summary/maternal-summary.component';
-import InPatientSummary from '../clinical-encounter/summary/in-patient-medical-summary/in-patient-medical-summary.component';
+import MaternalSummary from '../summary/maternal-summary/maternal-summary.component';
+import InPatientSummary from '../summary/in-patient-medical-summary/in-patient-medical-summary.component';
 interface InpatientProps {
   patientUuid: string;
   encounterTypeUuid: string;
@@ -22,7 +22,7 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
       <Layer>
         <Tile>
           <div className={styles.desktopHeading}>
-            <h4>{t('inPatient', 'In Patient Views')}</h4>
+            <h4>{t('inPatient', 'In Patient')}</h4>
           </div>
         </Tile>
       </Layer>

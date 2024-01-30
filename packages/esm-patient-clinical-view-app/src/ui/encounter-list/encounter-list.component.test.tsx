@@ -110,6 +110,6 @@ describe('EncounterList', () => {
 
     render(<EncounterList {...testProps} />);
 
-    expect(screen.getByText(/There are no {displayText} to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no {{displayText}} to display for this patient/i)).toBeInTheDocument();
   });
 });

@@ -1,5 +1,5 @@
 import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { ancConceptMap } from '../../hiv-care-and-treatment-services/maternal-and-child-health/views/maternal-health/antenatal-care-constants';
+import { ancConceptMap } from '../../maternal-and-child-health/concept-maps/antenatal-care-concepts-map';
 
 export function getEncounterValues(encounter, param: string, isDate?: Boolean) {
   if (isDate) {
