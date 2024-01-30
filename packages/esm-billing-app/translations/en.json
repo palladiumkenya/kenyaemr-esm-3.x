@@ -1,5 +1,6 @@
 {
   "actions": "Actions",
+  "addBill": "Add bill item(s)",
   "addBillableServices": "Add Billable Services",
   "addNewBillableService": "Add new billable service",
   "addNewService": "Add new service",
@@ -14,6 +15,7 @@
   "billedTo": "Billed to",
   "billErrorService": "Bill service error",
   "billing": "Billing",
+  "billingHistory": "Billing History",
   "billItem": "Bill item",
   "billItems": "Save Bill",
   "billList": "Bill list",
