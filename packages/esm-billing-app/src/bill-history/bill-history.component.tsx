@@ -18,12 +18,14 @@ import {
   TableExpandedRow,
   Button,
 } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
   EmptyDataIllustration,
   ErrorState,
   usePaginationInfo,
   launchPatientWorkspace,
+  CardHeader,
 } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
@@ -114,7 +116,14 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   return (
     <div>
-      <p className={styles.billingHeading}>Billing History</p>
+      <CardHeader title={t('billingHistory', 'Billing History')}>
+        <Button
+          renderIcon={Add}
+          onClick={() => launchPatientWorkspace('billing-form', { workspaceTitle: 'Billing Form' })}
+          kind="ghost">
+          {t('addBill', 'Add bill item(s)')}
+        </Button>
+      </CardHeader>
       <div className={styles.billHistoryContainer}>
         <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
           {({

@@ -1,10 +1,7 @@
-import useSWR from 'swr';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   ButtonSet,
   Button,
-  TextInput,
-  NumberInput,
   RadioButtonGroup,
   RadioButton,
   Search,
@@ -17,8 +14,9 @@ import {
 } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
-import { navigate, showSnackbar, openmrsFetch } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { useFetchSearchResults, processBillItems } from '../billing.resource';
+import { mutate } from 'swr';
 
 type BillingFormProps = {
   patientUuid: string;
@@ -174,6 +172,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }
     processBillItems(bill).then(
       (resp) => {
         closeWorkspace();
+        mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, { revalidate: true });
         showSnackbar({
           title: t('billItems', 'Save Bill'),
           subtitle: 'Bill processing has been successful',

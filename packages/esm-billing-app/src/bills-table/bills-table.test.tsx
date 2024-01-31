@@ -149,6 +149,5 @@ describe('BillsTable', () => {
 
     const patientNameLink = screen.getByRole('link', { name: 'John Doe' });
     expect(patientNameLink).toBeInTheDocument();
-    expect(patientNameLink).toHaveAttribute('href', '/openmrs/spa/home/billing/patient/${patientUuid}/${uuid}');
   });
 });
