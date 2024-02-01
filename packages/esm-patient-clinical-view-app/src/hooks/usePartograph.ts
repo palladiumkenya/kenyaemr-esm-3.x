@@ -1,10 +1,13 @@
 import useSWR from 'swr';
 import { OpenmrsEncounter } from '../types';
-import { OpenmrsResource, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
-import { encounterRepresentation, MissedAppointmentDate_UUID } from '../../../utils/constants';
-import groupBy from 'lodash-es/groupBy';
-import { partoGraphRepresentation } from '../esm-mch-app/constants';
+import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
+import {
+  MchEncounterType_UUID,
+  PartographEncounterFormUuid,
+  Progress_UUID,
+  encounterRepresentation,
+} from '../../../utils/constants';
+
 export type PartogramProgram = {
   concept: OpenmrsResource;
   obsDatetime: string;
@@ -14,8 +17,7 @@ export type PartogramProgram = {
   display: string;
 };
 export function usePartograph(patientUuid: string) {
-  const config = useConfig() as ConfigObject;
-  const url = `/ws/rest/v1/encounter?s=byEncounterForms&encounterType=c6d09e05-1f25-4164-8860-9f32c5a02df0&formUuid=d4c4dcfa-5c7b-4727-a7a6-f79a3b2c2735&patient=${patientUuid}&v=${encounterRepresentation}`;
+  const url = `/ws/rest/v1/encounter?s=byEncounterForms&encounterType=${MchEncounterType_UUID}&formUuid=${PartographEncounterFormUuid}&patient=${patientUuid}&v=${encounterRepresentation}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: OpenmrsEncounter[] } }, Error>(
     url,
@@ -24,9 +26,9 @@ export function usePartograph(patientUuid: string) {
   const results = data?.data ? data?.data?.results : [];
   const flattedObs = results
     .flatMap((encounter) => encounter.obs)
-    .filter((obs) => obs?.concept?.uuid === '160116AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+    .filter((obs) => obs?.concept?.uuid === Progress_UUID);
   return {
-    encounters: flattedObs,
+    encounters: flattedObs as Array<OpenmrsEncounter>,
     isLoading,
     isValidating,
     error,

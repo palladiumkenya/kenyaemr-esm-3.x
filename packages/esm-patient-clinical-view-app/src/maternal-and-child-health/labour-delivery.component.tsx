@@ -11,6 +11,7 @@ import {
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { labourAndDeliveryConceptMap } from './concept-maps/labour-and-delivery-care-concepts-map';
+import Partograph from '../partography/partograph.component';
 
 interface LabourDeliveryProps {
   patientUuid: string;
@@ -99,22 +100,7 @@ const LabourDelivery: React.FC<LabourDeliveryProps> = ({ patientUuid }) => {
         }}
         formConceptMap={labourAndDeliveryConceptMap}
       />
-      <EncounterList
-        patientUuid={patientUuid}
-        encounterType={LNDEncounterTypeUUID}
-        formList={[{ name: 'Labour & Delivery Form' }]}
-        columns={columns}
-        description={headerTitle}
-        headerTitle={headerTitle}
-        launchOptions={{
-          displayText: t('add', 'Add'),
-          moduleName: 'MCH Clinical View',
-        }}
-        filter={(encounter) => {
-          return encounter.form.uuid == LNDEncounterFormUUID;
-        }}
-        formConceptMap={labourAndDeliveryConceptMap}
-      />
+      <Partograph patientUuid={patientUuid} />
     </>
   );
 };
