@@ -28,7 +28,12 @@ export const createPaymentPayload = (
   const processedPayment = {
     cashPoint: bill.cashPointUuid,
     cashier: cashier.uuid,
-    lineItems: bill.lineItems.map((lineItem) => ({ ...lineItem, billableService: 'service', paymentStatus: 'PAID' })),
+    lineItems: bill.lineItems.map((lineItem) => ({
+      ...lineItem,
+      billableService: processBillItem(lineItem),
+      item: processBillItem(lineItem),
+      paymentStatus: 'PAID',
+    })),
     payments: [...billPayment],
     patient: patientUuid,
     status: paymentStatus,
@@ -36,3 +41,5 @@ export const createPaymentPayload = (
 
   return processedPayment;
 };
+
+const processBillItem = (item) => (item.item || item.billableService)?.split(':')[0];

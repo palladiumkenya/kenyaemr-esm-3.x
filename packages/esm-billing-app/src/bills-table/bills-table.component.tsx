@@ -82,7 +82,10 @@ const BillsTable = () => {
   const { paginated, goTo, results, currentPage } = usePagination(searchResults, pageSize);
 
   const setBilledItems = (bill) =>
-    bill?.lineItems?.reduce((acc, item) => acc + (acc ? ' & ' : '') + (item.billableService || item.item || ''), '');
+    bill?.lineItems?.reduce(
+      (acc, item) => acc + (acc ? ' & ' : '') + (item.billableService.split(':')[1] || item.item.split(':')[1] || ''),
+      '',
+    );
 
   const billingUrl = '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${uuid}';
 
