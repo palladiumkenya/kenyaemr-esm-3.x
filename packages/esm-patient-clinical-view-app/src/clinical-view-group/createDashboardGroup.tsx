@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { DashboardGroupExtension } from './dashboard-group.component';
 import { usePatient } from '@openmrs/esm-framework';
 import { useActivePatientEnrollment } from '@openmrs/esm-patient-common-lib';
@@ -10,26 +10,21 @@ type DashboardGroupProps = {
   isExpanded?: boolean;
   isChild?: boolean;
   showWhenExpression?: string;
+  basePath?: string;
 };
 
-export const createDashboardGroup = ({
-  title,
-  slotName,
-  isExpanded,
-  isChild,
-  showWhenExpression,
-}: DashboardGroupProps) => {
-  const DashboardGroup = ({ basePath }: { basePath: string }) => {
+const DashboardGroup = memo(
+  ({ title, slotName, isExpanded, isChild, basePath, showWhenExpression }: DashboardGroupProps) => {
     const { patient, isLoading: isLoadingPatient } = usePatient();
     const { activePatientEnrollment, isLoading: isLoadingActiveEnrollment } = useActivePatientEnrollment(patient?.id);
 
-    if (isLoadingPatient || isLoadingActiveEnrollment) {
-      return null;
-    }
+    const showGroup = useMemo(
+      () => evaluateExpression(showWhenExpression, patient, activePatientEnrollment),
+      [showWhenExpression, patient, activePatientEnrollment],
+    );
 
-    const showGroup = evaluateExpression(showWhenExpression, patient, activePatientEnrollment);
-    if (!showGroup) {
-      return null;
+    if (isLoadingPatient || isLoadingActiveEnrollment || !showGroup) {
+      return null; // Consider adding a loading indicator here instead of returning null
     }
 
     return (
@@ -42,6 +37,25 @@ export const createDashboardGroup = ({
         isExpanded={isExpanded}
       />
     );
-  };
-  return DashboardGroup;
+  },
+);
+
+export const createDashboardGroup = ({
+  title,
+  slotName,
+  isExpanded,
+  isChild,
+  showWhenExpression,
+}: DashboardGroupProps) => {
+  return ({ basePath, ...rest }) => (
+    <DashboardGroup
+      basePath={basePath}
+      title={title}
+      slotName={slotName}
+      isExpanded={isExpanded}
+      isChild={isChild}
+      showWhenExpression={showWhenExpression}
+      {...rest}
+    />
+  );
 };
