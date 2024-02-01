@@ -4,7 +4,6 @@ export const htsDashboardMeta = {
   title: 'HIV Testing Services',
   path: 'hts-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
-  config: {},
 };
 export const defaulterTracingDashboardMeta = {
   slot: 'patient-chart-defaulter-tracing-dashboard-slot',
@@ -12,7 +11,6 @@ export const defaulterTracingDashboardMeta = {
   title: 'Defaulter Tracing',
   path: 'defaulter-tracing-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
-  config: {},
 };
 
 export const hivCareAndTreatmentNavGroup = {
@@ -20,4 +18,5 @@ export const hivCareAndTreatmentNavGroup = {
   slotName: 'hiv-care-and-treatment-slot',
   isExpanded: true,
   isChild: true,
+  showWhenExpression: "enrollment.includes('HIV')",
 };
