@@ -10,7 +10,7 @@ import { PatientProgram } from '@openmrs/esm-patient-common-lib';
 export const evaluateExpression = (expression, patient, enrollments) => {
   const enrollment = enrollments?.flatMap((enrollment) => enrollment?.program['name']);
   const programUuids = enrollments?.flatMap((enrollment) => enrollment?.program['uuid']);
-  const { age, ageInDays, ageInMonths, ageInYears } = calculateAge(new Date(patient.birthDate));
+  const { age, ageInDays, ageInMonths, ageInYears } = calculateAge(new Date(patient?.birthDate));
   try {
     if (!expression || !patient) {
       return true;

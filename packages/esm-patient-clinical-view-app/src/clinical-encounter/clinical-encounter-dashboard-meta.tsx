@@ -1,7 +1,7 @@
 export const clinicalEncounterNavGroup = {
   title: 'Clinical Encounter',
   slotName: 'clinical-encounter-slot',
-  isExpanded: true,
+  isExpanded: false,
 };
 
 export const inPatientClinicalEncounterDashboardMeta = {

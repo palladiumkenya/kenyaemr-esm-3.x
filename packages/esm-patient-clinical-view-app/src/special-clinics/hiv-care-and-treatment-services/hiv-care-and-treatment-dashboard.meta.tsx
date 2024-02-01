@@ -16,7 +16,7 @@ export const defaulterTracingDashboardMeta = {
 export const hivCareAndTreatmentNavGroup = {
   title: 'HIV Care & Treatment',
   slotName: 'hiv-care-and-treatment-slot',
-  isExpanded: true,
+  isExpanded: false,
   isChild: true,
   showWhenExpression: "enrollment.includes('HIV')",
 };
