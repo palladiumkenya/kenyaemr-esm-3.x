@@ -29,4 +29,6 @@ export const maternalAndChildHealthNavGroup = {
   title: 'Maternal & Child Health',
   slotName: 'maternal-and-child-health-slot',
   isExpanded: true,
+  showWhenExpression:
+    'patient.gender === "female" && (enrollment.includes("MCH - Child Services") || enrollment.includes("MCH - Mother Services"))',
 };
