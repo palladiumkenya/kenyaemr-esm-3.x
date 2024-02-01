@@ -64,6 +64,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
     { header: 'Price', key: 'price' },
     { header: 'Total', key: 'total' },
   ];
+  const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
 
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
@@ -71,7 +72,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
         return {
           no: `${index + 1}`,
           id: `${item.uuid}`,
-          billItem: item.item || item.billableService,
+          billItem: processBillItem(item),
           billCode: bill.receiptNumber,
           status: bill.status,
           quantity: item.quantity,

@@ -21,7 +21,8 @@ export const createBillWaiverPayload = (
 
   const processedLineItems = lineItems.map((lineItem) => ({
     ...lineItem,
-    billableService: findBillableServiceUuid(billableLineItems, lineItem),
+    billableService: processBillItem(lineItem),
+    item: processBillItem(lineItem),
     paymentStatus: 'PAID',
   }));
 
@@ -36,6 +37,4 @@ export const createBillWaiverPayload = (
   return processedPayment;
 };
 
-const findBillableServiceUuid = (billableService: Array<OpenmrsResource>, lineItems: LineItem) => {
-  return billableService.find((service) => service.name === lineItems.billableService)?.uuid ?? null;
-};
+const processBillItem = (item) => (item.item || item.billableService)?.split(':')[0];
