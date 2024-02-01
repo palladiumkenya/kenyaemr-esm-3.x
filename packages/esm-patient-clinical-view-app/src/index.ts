@@ -19,7 +19,6 @@ import {
 import {
   inPatientClinicalEncounterDashboardMeta,
   clinicalEncounterNavGroup,
-  outPatientClinicalEncounterDashboardMeta,
 } from './clinical-encounter/clinical-encounter-dashboard-meta';
 import {
   hivCareAndTreatmentNavGroup,
@@ -55,12 +54,7 @@ export const inPatientClinicalEncounterLink = getSyncLifecycle(
   createDashboardLink(inPatientClinicalEncounterDashboardMeta),
   options,
 );
-export const outPatientClinicalEncounterLink = getSyncLifecycle(
-  createDashboardLink(outPatientClinicalEncounterDashboardMeta),
-  options,
-);
 export const inPatientClinicalEncounter = getSyncLifecycle(InPatientView, options);
-export const outpatientClinicalEncounter = getSyncLifecycle(OutPatientView, options);
 export const clinicalViewPatientDashboard = getSyncLifecycle(ClinicalViewSection, options);
 
 // Navigation group for HIV Care and Treatment in the patient chart sidebar
