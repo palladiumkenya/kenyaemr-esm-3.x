@@ -72,14 +72,12 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({ patie
   if (encounters.length === 0) {
     return (
       <EmptyState
-        displayText={t('socialHistory', 'Social History')}
+        displayText={t('clinicalEncounter', 'Clinical Encounter')}
         headerTitle={t('socialHistory', 'Social History')}
         launchForm={handleOpenOrEditClinicalEncounterForm}
       />
     );
   }
-  // eslint-disable-next-line no-console
-  console.log('----------tableRows', tableRows);
   return (
     <div className={styles.cardContainer}>
       {tableRows.map((row, index) => (

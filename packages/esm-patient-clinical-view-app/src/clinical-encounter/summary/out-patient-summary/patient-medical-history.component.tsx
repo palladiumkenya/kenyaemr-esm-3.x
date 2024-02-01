@@ -71,7 +71,7 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({ pat
   if (encounters.length === 0) {
     return (
       <EmptyState
-        displayText={t('medicalHistory', 'Medical History')}
+        displayText={t('clinicalEncounter', 'Clinical Encounter')}
         headerTitle={t('medicalHistory', 'Medical History')}
         launchForm={handleOpenOrEditClinicalEncounterForm}
       />
