@@ -12,7 +12,8 @@ export function useClinicalEncounter(patientUuid: string, encounterType: string)
     openmrsFetch,
   );
   const clinicalEncounter = data?.data?.results?.filter((enc) => enc.form.uuid === ClinicalEncounterFormUuid);
-
+  // eslint-disable-next-line no-console
+  console.log('=====clinicalEncounter==', clinicalEncounter);
   return {
     encounters: clinicalEncounter,
     isLoading,
