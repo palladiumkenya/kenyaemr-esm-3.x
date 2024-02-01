@@ -27,7 +27,11 @@ export const DashboardGroupExtension: React.FC<DashboardGroupExtensionProps> = (
 
   return (
     <SideNavItems className={styles.sideMenuItems} isSideNavExpanded={true}>
-      <SideNavMenu large={isTablet} defaultExpanded={isExpanded ?? true} title={title}>
+      <SideNavMenu
+        className={isChild && styles.sideNavMenu}
+        large={isTablet}
+        defaultExpanded={isExpanded ?? true}
+        title={title}>
         <ExtensionSlot style={{ width: '100%', minWidth: '15rem' }} name={slotName ?? title} state={{ basePath }} />
       </SideNavMenu>
     </SideNavItems>

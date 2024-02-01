@@ -24,7 +24,7 @@ const DashboardGroup = memo(
     );
 
     if (isLoadingPatient || isLoadingActiveEnrollment || !showGroup) {
-      return null; // Consider adding a loading indicator here instead of returning null
+      return null;
     }
 
     return (

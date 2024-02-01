@@ -14,8 +14,8 @@
   padding-left: layout.$spacing-02;
 }
 
-// .childSubMenu {
-//   & button {
-//     font-weight: normal;
-//   }
-// }
+.sideNavMenu {
+  :global(.cds--side-nav__submenu) {
+    padding-left: layout.$spacing-06;
+  }
+}
