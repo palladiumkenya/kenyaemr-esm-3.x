@@ -29,7 +29,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@openmrs/esm-framework": "next",
+    "@openmrs/esm-framework": "^5.3.2",
     "@playwright/test": "^1.30.0",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.165",
@@ -66,7 +66,7 @@
     "jest-environment-jsdom": "^28.1.2",
     "lerna": "^4.0.0",
     "lodash": "^4.17.21",
-    "openmrs": "next",
+    "openmrs": "^5.3.2",
     "pinst": "^3.0.0",
     "prettier": "^2.2.1",
     "pretty-quick": "^2.0.2",
