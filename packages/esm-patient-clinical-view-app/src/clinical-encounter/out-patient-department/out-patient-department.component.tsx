@@ -3,10 +3,17 @@ import { Layer, Tile, Tabs, TabList, Tab, TabPanels, TabPanel, Section, Heading 
 import { useTranslation } from 'react-i18next';
 import styles from './out-patient.scss';
 import { Friendship, ReminderMedical } from '@carbon/react/icons';
+import OutPatientMedicalHistory from '../summary/out-patient-summary/patient-medical-history.component';
+import OutPatientSocialHistory from '../summary/out-patient-summary/patient-social-history.component';
 
-type OutPatientProps = {};
+type OutPatientProps = {
+  patientUuid: string;
+  encounterTypeUuid: string;
+  formEntrySub: any;
+  launchPatientWorkspace: Function;
+};
 
-const OutPatientView: React.FC<OutPatientProps> = () => {
+const OutPatientView: React.FC<OutPatientProps> = ({ patientUuid, encounterTypeUuid }) => {
   const { t } = useTranslation();
   return (
     <>
@@ -24,16 +31,8 @@ const OutPatientView: React.FC<OutPatientProps> = () => {
             <Tab renderIcon={ReminderMedical}>{t('medicalHistory', 'Medical History')}</Tab>
           </TabList>
           <TabPanels>
-            <TabPanel>
-              <Section level={6}>
-                <Heading>{t('commingSoon', 'Comming soon, under development')}</Heading>
-              </Section>
-            </TabPanel>
-            <TabPanel>
-              <Section level={6}>
-                <Heading>{t('commingSoon', 'Comming soon, under development')}</Heading>
-              </Section>
-            </TabPanel>
+            <TabPanel>{<OutPatientSocialHistory patientUuid={patientUuid} />}</TabPanel>
+            <TabPanel>{<OutPatientMedicalHistory patientUuid={patientUuid} />}</TabPanel>
           </TabPanels>
         </Tabs>
       </Layer>

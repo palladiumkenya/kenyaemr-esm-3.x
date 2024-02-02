@@ -16,11 +16,7 @@ import {
   maternalAndChildHealthNavGroup,
   postnatalDashboardMeta,
 } from './maternal-and-child-health/mch-dashboard.meta';
-import {
-  inPatientClinicalEncounterDashboardMeta,
-  clinicalEncounterNavGroup,
-  outPatientClinicalEncounterDashboardMeta,
-} from './clinical-encounter/clinical-encounter-dashboard-meta';
+import { inPatientClinicalEncounterDashboardMeta } from './clinical-encounter/clinical-encounter-dashboard-meta';
 import {
   hivCareAndTreatmentNavGroup,
   defaulterTracingDashboardMeta,
@@ -44,23 +40,12 @@ export const importTranslation = require.context('../translations', false, /.jso
 // Special Clinics navigation group in the patient chart sidebar
 export const specialClinicsSideNavGroup = getSyncLifecycle(createDashboardGroup(specialClinicsNavGroup), options);
 
-// Navigation group for Clinical Encounters in the patient chart sidebar
-export const clinicalEncountersSideNavGroup = getSyncLifecycle(
-  createDashboardGroup(clinicalEncounterNavGroup),
-  options,
-);
-
 // Link and view for clinical encounters in the patient chart
 export const inPatientClinicalEncounterLink = getSyncLifecycle(
   createDashboardLink(inPatientClinicalEncounterDashboardMeta),
   options,
 );
-export const outPatientClinicalEncounterLink = getSyncLifecycle(
-  createDashboardLink(outPatientClinicalEncounterDashboardMeta),
-  options,
-);
 export const inPatientClinicalEncounter = getSyncLifecycle(InPatientView, options);
-export const outpatientClinicalEncounter = getSyncLifecycle(OutPatientView, options);
 export const clinicalViewPatientDashboard = getSyncLifecycle(ClinicalViewSection, options);
 
 // Navigation group for HIV Care and Treatment in the patient chart sidebar

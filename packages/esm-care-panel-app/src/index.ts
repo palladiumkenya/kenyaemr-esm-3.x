@@ -35,6 +35,7 @@ export const patientCareProgram = getSyncLifecycle(careProgramsComponent, {
 
 registerWorkspace({
   name: 'patient-regimen-workspace',
+
   title: 'Regimen Form',
   load: getSyncLifecycle(regimenFormComponent, options),
   canMaximize: true,

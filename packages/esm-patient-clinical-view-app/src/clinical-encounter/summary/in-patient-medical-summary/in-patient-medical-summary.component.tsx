@@ -69,7 +69,6 @@ const InPatientSummary: React.FC<InPatientSummaryProps> = ({ patientUuid }) => {
     <>
       <div className={styles.cardContainer}>
         <SummaryCard title="Diagnosis on Admission" value={tableRows[0]?.bloodGroup} />
-        <SummaryCard title={t('chronicIllness', 'Chronic Illness')} value={tableRows[0]?.foetalPresentation} />
         <SummaryCard title={t('therapiesPrescribed', 'Therapies Prescribed')} value={tableRows[0]?.maternalCondition} />
         <SummaryCard
           title={t('recommendedProcedure', 'Recommended Procedure')}
