@@ -4,9 +4,9 @@ import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import {
   MchEncounterType_UUID,
   PartographEncounterFormUuid,
-  Progress_UUID,
   encounterRepresentation,
-} from '../../../utils/constants';
+  Progress_UUID,
+} from '../utils/constants';
 
 export type PartogramProgram = {
   concept: OpenmrsResource;

@@ -11,7 +11,7 @@ import {
 import { useConfig, formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { labourAndDeliveryConceptMap } from './concept-maps/labour-and-delivery-care-concepts-map';
-import Partograph from '../partography/partograph.component';
+import Partograph from './partography/partograph.component';
 
 interface LabourDeliveryProps {
   patientUuid: string;

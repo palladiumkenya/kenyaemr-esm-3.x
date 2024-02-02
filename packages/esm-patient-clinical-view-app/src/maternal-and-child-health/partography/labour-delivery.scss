@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '../../src/root.scss';
+@import '../../root.scss';
 
 .widgetContainer {
   background-color: $ui-background;
@@ -14,6 +14,7 @@
 
 .tile {
   text-align: center;
+  margin: 1rem;
 }
 
 .emptyStateContainer {

@@ -18,7 +18,7 @@ import { Add } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import styles from './labour-delivery.scss';
-import { usePartograph } from '../hooks/usePartograph';
+import { usePartograph } from '../../hooks/usePartograph';
 import dayjs from 'dayjs';
 import {
   CervicalDilation,
@@ -26,7 +26,7 @@ import {
   FetalHeartRate,
   PartographEncounterFormUuid,
   SurgicalProcedure,
-} from '../../../utils/constants';
+} from '../../utils/constants';
 
 interface PartographyProps {
   patientUuid: string;
@@ -129,7 +129,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   }
 
   return (
-    <>
+    <Tile style={{ margin: '0.125rem' }}>
       <CardHeader title={headerTitle}>
         <Button onClick={handleAddHistory} kind="ghost" renderIcon={Add}>
           {t('add', 'Add')}
@@ -171,7 +171,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           );
         }}
       />
-    </>
+    </Tile>
   );
 };
 export default Partograph;
