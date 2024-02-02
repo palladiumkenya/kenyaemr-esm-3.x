@@ -7,6 +7,7 @@ import carePanelPatientSummaryComponent from './patient-summary/patient-summary.
 import careProgramsComponent from './care-programs/care-programs.component';
 import deleteRegimenConfirmationDialogComponent from './regimen-editor/delete-regimen-modal.component';
 import regimenFormComponent from './regimen-editor/regimen-form.component';
+import CarePanelDashboard from './care-panel-dashboard/care-panel-dashboard.component';
 
 const moduleName = '@kenyaemr/esm-care-panel-app';
 
@@ -22,7 +23,7 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const carePanelPatientSummary = getSyncLifecycle(carePanelPatientSummaryComponent, options);
+export const carePanelPatientSummary = getSyncLifecycle(CarePanelDashboard, options);
 
 export const deleteRegimenConfirmationDialog = getSyncLifecycle(deleteRegimenConfirmationDialogComponent, options);
 

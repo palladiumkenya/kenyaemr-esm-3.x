@@ -128,7 +128,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   }
 
   return (
-    <Tile>
+    <Tile className={styles.container}>
       <CardHeader title={t('carePrograms', 'Care Programs')}>
         {isValidating && (
           <InlineLoading
