@@ -50,9 +50,6 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
     return (
       <>
         <EmptyState displayText={t('carePanel', 'care panel')} headerTitle={t('carePanel', 'Care panel')} />
-        <div className={styles.careProgramContainer}>
-          <CarePrograms patientUuid={patientUuid} />
-        </div>
       </>
     );
   }
@@ -79,8 +76,6 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
             formEntrySub={formEntrySub}
             launchPatientWorkspace={launchPatientWorkspace}
           />
-
-          <CarePrograms patientUuid={patientUuid} />
         </div>
       </div>
     </>
