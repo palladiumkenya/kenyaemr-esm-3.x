@@ -3,7 +3,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { createDashboardGroup } from './clinical-view-group/createDashboardGroup';
 import DefaulterTracing from './special-clinics/hiv-care-and-treatment-services/defaulter-tracing/defaulter-tracing.component';
-import InPatientView from './clinical-encounter/in-patient-department/in-patient.component';
+import ClinicalEncounterDashboard from './clinical-encounter/dashboard/clinical-encounter-dashboard.component';
 import FamilyHistory from './family-partner-history/family-history.component';
 import HivTestingEncountersList from './special-clinics/hiv-care-and-treatment-services/hiv-testing-services/views/hiv-testing/hiv-testing-services.component';
 import ClinicalViewSection from './clinical-view-group/clinical-view-section.component';
@@ -24,7 +24,6 @@ import {
 } from './special-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
 import { specialClinicsNavGroup } from './special-clinics/special-clinic-dashboard.meta';
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
-import OutPatientView from './clinical-encounter/out-patient-department/out-patient-department.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -45,7 +44,7 @@ export const inPatientClinicalEncounterLink = getSyncLifecycle(
   createDashboardLink(inPatientClinicalEncounterDashboardMeta),
   options,
 );
-export const inPatientClinicalEncounter = getSyncLifecycle(InPatientView, options);
+export const inPatientClinicalEncounter = getSyncLifecycle(ClinicalEncounterDashboard, options);
 export const clinicalViewPatientDashboard = getSyncLifecycle(ClinicalViewSection, options);
 
 // Navigation group for HIV Care and Treatment in the patient chart sidebar

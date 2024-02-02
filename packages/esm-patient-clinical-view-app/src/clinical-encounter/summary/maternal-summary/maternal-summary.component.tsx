@@ -7,7 +7,7 @@ import { useClinicalEncounter } from '../../../hooks/useClinicalEncounter';
 import { ConfigObject } from '../../../config-schema';
 import SummaryCard from '../summary-card.component';
 
-import styles from '../../in-patient-department/in-patient.scss';
+import styles from '../../dashboard/in-patient.scss';
 
 interface MaternalSummaryProps {
   patientUuid: string;
