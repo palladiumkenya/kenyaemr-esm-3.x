@@ -26,8 +26,6 @@ export const PatientTracingEncounterType_UUID = '1495edf8-2df2-11e9-b210-d663bd8
 export const ClinicalEncounterFormUuid = 'e958f902-64df-4819-afd4-7fb061f59308';
 
 export const AdmissionDate_UUID = '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-
-// export const PrimaryDiagnosis_UUID = '';
 export const PriorityOfAdmission_UUID = '1655AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 // export const AdmittingDoctor_UUID= '';
 export const AdmissionWard_UUID = '5fc29316-0869-4b3b-ae2f-cc37c6014eb7';
@@ -37,10 +35,10 @@ export const Alcohol_Use_Duration_UUID = '1546AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const Smoking_UUID = '163201AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const Smoking_Duration_UUID = '159931AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const Other_Substance_Abuse_UUID = '163731AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const Surgical_History_UUID = '30fe6669-75f3-4a1d-89c3-753a060d559a';
-export const Accident_Trauma_UUID = '159520AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const Blood_Transfusion_UUID = '161927AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-export const Chronic_Disease_UUID = '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const SURGICAL_HISTORY_UUID = '30fe6669-75f3-4a1d-89c3-753a060d559a';
+export const ACCIDENT_TRAUMA_UUID = '159520AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const BLOOD_TRANSFUSION_UUID = '161927AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const CHRONIC_DISEASE_UUID = '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 //delivery
 export const ModeOfDelivery_UUID = '5630AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';

@@ -138,43 +138,25 @@
       "component": "specialClinicsSideNavGroup"
     },
     {
-      "name": "clinical-encounter-dashboard-group-link",
-      "slot": "patient-chart-dashboard-slot",
-      "component": "clinicalEncountersSideNavGroup"
-    },
-    {
-      "name": "patient-chart-in-patient-clinical-encounter-link",
+      "name": "clinical-encounter-link",
       "component": "inPatientClinicalEncounterLink",
-      "slot": "clinical-encounter-slot",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 40,
       "meta": {
         "columns": 1,
         "columnSpan": 1,
-        "slot": "patient-chart-in-patient-clinical-encounter-slot",
-        "layoutMode": "anchored",
-        "path": "in-patient-clinical-encounter"
+        "slot": "patient-chart-clinical-encounter-slot",
+        "path": "clinical-encounter",
+        "layoutMode": "anchored"
       }
     },
     {
-      "name": "patient-chart-in-patient-clinical-encounter",
-      "slot": "patient-chart-in-patient-clinical-encounter-slot",
-      "component": "inPatientClinicalEncounter"
-    },
-    {
-      "name": "patient-chart-out-patient-clinical-encounter-link",
-      "component": "outPatientClinicalEncounterLink",
-      "slot": "clinical-encounter-slot",
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-out-patient-clinical-encounter-slot",
-        "layoutMode": "anchored",
-        "path": "out-patient-clinical-encounter"
-      }
-    },
-    {
-      "name": "patient-chart-out-patient-clinical-encounter",
-      "slot": "patient-chart-out-patient-clinical-encounter-slot",
-      "component": "outpatientClinicalEncounter"
+      "name": "clinical-encounter",
+      "slot": "patient-chart-clinical-encounter-slot",
+      "component": "inPatientClinicalEncounter",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ]
 }

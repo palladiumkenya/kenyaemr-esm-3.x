@@ -1,12 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import {
-  Surgical_History_UUID,
-  Accident_Trauma_UUID,
-  Blood_Transfusion_UUID,
-  Chronic_Disease_UUID,
-} from '../../../utils/constants';
+import { SURGICAL_HISTORY_UUID, ACCIDENT_TRAUMA_UUID, BLOOD_TRANSFUSION_UUID } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
 import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
@@ -47,9 +42,9 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({ pat
     return {
       id: `${encounter.uuid}`,
       encounterDate: formatDate(new Date(encounter.encounterDatetime)),
-      surgicalHistory: getObsFromEncounter(encounter, Surgical_History_UUID),
-      bloodTransfusion: getObsFromEncounter(encounter, Blood_Transfusion_UUID),
-      accidentOrTrauma: getObsFromEncounter(encounter, Accident_Trauma_UUID),
+      surgicalHistory: getObsFromEncounter(encounter, SURGICAL_HISTORY_UUID),
+      bloodTransfusion: getObsFromEncounter(encounter, BLOOD_TRANSFUSION_UUID),
+      accidentOrTrauma: getObsFromEncounter(encounter, ACCIDENT_TRAUMA_UUID),
       finalDiagnosis: encounter.diagnoses.length > 0 ? encounter.diagnoses[0].diagnosis.coded.display : '--',
       actions: (
         <OverflowMenu aria-label="overflow-menu" flipped="false">
