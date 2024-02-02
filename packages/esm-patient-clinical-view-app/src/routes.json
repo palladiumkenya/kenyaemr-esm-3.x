@@ -33,7 +33,7 @@
     },
     {
       "name": "maternal-and-child-health-dashboard-group-link",
-      "slot": "patient-chart-dashboard-slot",
+      "slot": "clinical-view-section",
       "component": "maternalAndChildHealthSideNavGroup"
     },
     {
@@ -134,13 +134,13 @@
     },
     {
       "name": "special-clinics-dashboard-group-link",
-      "slot": "patient-chart-dashboard-slot",
+      "slot": "clinical-view-section",
       "component": "specialClinicsSideNavGroup"
     },
     {
       "name": "clinical-encounter-link",
       "component": "inPatientClinicalEncounterLink",
-      "slot": "patient-chart-dashboard-slot",
+      "slot": "clinical-view-section",
       "order": 40,
       "meta": {
         "columns": 1,
