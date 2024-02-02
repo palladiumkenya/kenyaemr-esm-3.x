@@ -14,8 +14,7 @@ import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
 import { useClinicalEncounter } from '../../../hooks/useClinicalEncounter';
 import { ConfigObject } from '../../../config-schema';
 import SummaryCard from '../summary-card.component';
-import capitalize from 'lodash-es/capitalize';
-import styles from './../../out-patient-department/out-patient.scss';
+import styles from './out-patient-summary.scss';
 interface OutPatientSocialHistoryProps {
   patientUuid: string;
 }

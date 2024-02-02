@@ -15,7 +15,7 @@ import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
 import { useNeonatalSummery } from '../../../hooks/useNeonatalSummery';
 import SummaryCard from '../summary-card.component';
 
-import styles from '../../in-patient-department/in-patient.scss';
+import styles from '../../dashboard/in-patient.scss';
 
 interface NeonatalSummeryProps {
   patientUuid: string;

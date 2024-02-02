@@ -18,22 +18,25 @@ import MaternalSummary from '../summary/maternal-summary/maternal-summary.compon
 import InPatientSummary from '../summary/in-patient-medical-summary/in-patient-medical-summary.component';
 import OutPatientSocialHistory from '../summary/out-patient-summary/patient-social-history.component';
 import OutPatientMedicalHistory from '../summary/out-patient-summary/patient-medical-history.component';
+import { useVisit } from '@openmrs/esm-framework';
 
-interface InpatientProps {
+interface ClinicalEncounterDashboard {
   patientUuid: string;
   encounterTypeUuid: string;
   formEntrySub: any;
   launchPatientWorkspace: Function;
 }
 
-const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUuid }) => {
+const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboard> = ({ patientUuid, encounterTypeUuid }) => {
   const { t } = useTranslation();
+  const { currentVisit } = useVisit(patientUuid);
+  const isInPatient = currentVisit?.visitType?.display?.toLocaleLowerCase() === 'inpatient';
   return (
     <>
       <Layer>
         <Tile>
           <div className={styles.desktopHeading}>
-            <h4>{t('inPatient', 'In Patient')}</h4>
+            <h4>{t('clinicalEncounter', 'Clinical encounter')}</h4>
           </div>
         </Tile>
       </Layer>
@@ -42,11 +45,11 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
           <TabList contained activation="manual" aria-label="List of tabs">
             <Tab renderIcon={Friendship}>{t('socialHistory', 'Social History')}</Tab>
             <Tab renderIcon={ReminderMedical}>{t('medicalHistory', 'Medical History')}</Tab>
-            <Tab renderIcon={CloudMonitoring}>{t('encounterDetails', 'Encounter details')}</Tab>
-            <Tab renderIcon={Activity}>{t('surgicalSummary', 'Surgical Summary')}</Tab>
-            <Tab renderIcon={UserMultiple}>{t('neonatalSummary', 'Neonatal Summary')}</Tab>
-            <Tab renderIcon={UserFollow}>{t('maternalSummary', 'Maternal Summary')}</Tab>
-            <Tab renderIcon={Dashboard}>{t('inPatientSummary', 'In Patient Summary')}</Tab>
+            {isInPatient && <Tab renderIcon={CloudMonitoring}>{t('encounterDetails', 'Encounter details')}</Tab>}
+            {isInPatient && <Tab renderIcon={Activity}>{t('surgicalSummary', 'Surgical Summary')}</Tab>}
+            {isInPatient && <Tab renderIcon={UserMultiple}>{t('neonatalSummary', 'Neonatal Summary')}</Tab>}
+            {isInPatient && <Tab renderIcon={UserFollow}>{t('maternalSummary', 'Maternal Summary')}</Tab>}
+            {isInPatient && <Tab renderIcon={Dashboard}>{t('inPatientSummary', 'In-Patient Summary')}</Tab>}
           </TabList>
           <TabPanels>
             <TabPanel>{<OutPatientSocialHistory patientUuid={patientUuid} />}</TabPanel>
@@ -70,4 +73,4 @@ const InPatientView: React.FC<InpatientProps> = ({ patientUuid, encounterTypeUui
     </>
   );
 };
-export default InPatientView;
+export default ClinicalEncounterDashboard;
