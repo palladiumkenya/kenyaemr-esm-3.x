@@ -25,6 +25,21 @@
         "title": "SHARED HEALTH RECORDS",
         "path": "SHR panel"
       }
+    },
+    {
+      "name": "community-referrals",
+      "slot": "community-referrals-slot",
+      "component": "shrRoot"
+    },
+    {
+      "name": "community-referrals-link",
+      "slot": "homepage-dashboard-slot",
+      "component": "communityReferralsDashboardLink",
+      "meta": {
+        "name": "community referrals",
+        "title": "community referrals",
+        "slot": "community-referrals-slot"
+      }
     }
   ]
 }
