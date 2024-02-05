@@ -3,6 +3,7 @@ import { OpenmrsEncounter } from '../types';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { clinicalEncounterRepresentation, ClinicalEncounterFormUuid } from '../utils/constants';
+import sortBy from 'lodash/sortBy';
 export function useClinicalEncounter(patientUuid: string, encounterType: string) {
   const config = useConfig() as ConfigObject;
   const url = `/ws/rest/v1/encounter?encounterType=${config.clinicalEncounterUuid}&patient=${patientUuid}&v=${clinicalEncounterRepresentation}`;
@@ -12,9 +13,9 @@ export function useClinicalEncounter(patientUuid: string, encounterType: string)
     openmrsFetch,
   );
   const clinicalEncounter = data?.data?.results?.filter((enc) => enc.form.uuid === ClinicalEncounterFormUuid);
-
+  const sortedClinicalEncounter = sortBy(clinicalEncounter, 'encounterDatetime').reverse();
   return {
-    encounters: clinicalEncounter,
+    encounters: sortedClinicalEncounter,
     isLoading,
     isValidating,
     error,
