@@ -24,9 +24,19 @@ export function usePartograph(patientUuid: string) {
     openmrsFetch,
   );
   const results = data?.data ? data?.data?.results : [];
-  const flattedObs = results
+  const sortedResults = results.sort((a, b) => {
+    const dateA = new Date(a.encounterDatetime).getTime();
+    const dateB = new Date(b.encounterDatetime).getTime();
+    return dateB - dateA;
+  });
+  const flattedObs = sortedResults
     .flatMap((encounter) => encounter.obs)
-    .filter((obs) => obs?.concept?.uuid === Progress_UUID);
+    .filter((obs) => obs?.concept?.uuid === Progress_UUID)
+    .sort((a, b) => {
+      const dateA = new Date(a.encounterDatetime).getTime();
+      const dateB = new Date(b.encounterDatetime).getTime();
+      return dateB - dateA;
+    });
   return {
     encounters: flattedObs as Array<OpenmrsEncounter>,
     isLoading,
