@@ -61,3 +61,15 @@ export const getGender = (gender: string, t) => {
       return gender;
   }
 };
+
+/**
+ * Extracts and returns the substring after the first colon (:) in the input string.
+ * The input string is expected to be in the format "uuid:string".
+ *
+ * @param {string} input - The input string from which the substring is to be extracted.
+ * @returns {string} The substring found after the first colon in the input string.
+ */
+export function extractString(input: string): string {
+  const parts = input.split(':');
+  return parts.length < 2 ? input : parts[1];
+}

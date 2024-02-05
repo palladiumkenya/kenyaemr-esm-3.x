@@ -63,7 +63,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     });
 
   const handleProcessPayment = () => {
-    const paymentPayload = createPaymentPayload(bill, bill.patientUuid, formValues, amountDue);
+    const paymentPayload = createPaymentPayload(bill, bill.patientUuid, formValues, amountDue, selectedLineItems);
     processBillPayment(paymentPayload, bill.uuid).then(
       () => {
         showSnackbar({

@@ -9,7 +9,7 @@ import {
   Checkbox,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { convertToCurrency } from '../../helpers';
+import { convertToCurrency, extractString } from '../../helpers';
 import { MappedBill, LineItem } from '../../types';
 import styles from './bill-waiver.scss';
 import BillWaiverForm from './bill-waiver-form.component';
@@ -48,7 +48,9 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill; setPatientUuid: (pat
         <StructuredListBody>
           {bills?.lineItems.map((lineItem) => (
             <StructuredListRow>
-              <StructuredListCell>{lineItem.item === '' ? lineItem.billableService : lineItem.item}</StructuredListCell>
+              <StructuredListCell>
+                {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
+              </StructuredListCell>
               <StructuredListCell>{lineItem.quantity}</StructuredListCell>
               <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
               <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>

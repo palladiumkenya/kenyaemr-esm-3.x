@@ -14,7 +14,7 @@ import {
 } from '@carbon/react';
 import styles from './require-payment.scss';
 import { useBills } from '../billing.resource';
-import { convertToCurrency } from '../helpers';
+import { convertToCurrency, extractString } from '../helpers';
 
 type RequirePaymentModalProps = {
   closeModal: () => void;
@@ -56,7 +56,7 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
             {lineItems.map((lineItem) => {
               return (
                 <StructuredListRow>
-                  <StructuredListCell>{lineItem.billableService || lineItem.item}</StructuredListCell>
+                  <StructuredListCell>{extractString(lineItem.billableService || lineItem.item)}</StructuredListCell>
                   <StructuredListCell>{lineItem.quantity}</StructuredListCell>
                   <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
                   <StructuredListCell>{convertToCurrency(lineItem.quantity * lineItem.price)}</StructuredListCell>
