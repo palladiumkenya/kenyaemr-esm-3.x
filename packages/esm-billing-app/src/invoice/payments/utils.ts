@@ -1,11 +1,20 @@
-import { MappedBill } from '../../types';
+import { LineItem, MappedBill } from '../../types';
 import { Payment } from './payments.component';
+
+const hasLineItem = (lineItems: Array<LineItem>, item: LineItem) => {
+  if (lineItems?.length === 0) {
+    return false;
+  }
+  const foundItem = lineItems.find((lineItem) => lineItem.uuid === item.uuid);
+  return Boolean(foundItem);
+};
 
 export const createPaymentPayload = (
   bill: MappedBill,
   patientUuid: string,
   formValues: Array<Payment>,
   amountDue: number,
+  selectedLineItems: Array<LineItem>,
 ) => {
   const { cashier } = bill;
   const totalAmount = bill?.totalAmount;
@@ -16,27 +25,33 @@ export const createPaymentPayload = (
     attributes: [],
     instanceType: payment.instanceType.uuid,
   }));
-  const billPayment = formValues
-    .map((formValue) => ({
-      amount: parseFloat(totalAmount.toFixed(2)),
-      amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
-      attributes: [],
-      instanceType: formValue.method,
-    }))
-    .concat(previousPayments);
+
+  const newPayments = formValues.map((formValue) => ({
+    amount: parseFloat(totalAmount.toFixed(2)),
+    amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
+    attributes: [],
+    instanceType: formValue.method,
+  }));
+
+  const updatedPayments = newPayments.concat(previousPayments);
+
+  const updatedLineItems = bill.lineItems.map((lineItem) => ({
+    ...lineItem,
+    billableService: processBillItem(lineItem),
+    item: processBillItem(lineItem),
+    paymentStatus: hasLineItem(selectedLineItems ?? [], lineItem) ? 'PAID' : 'PENDING',
+  }));
+
+  const allItemsBillPaymentStatus =
+    updatedLineItems.filter((item) => item.paymentStatus === 'PENDING').length === 0 ? 'PAID' : 'PENDING';
 
   const processedPayment = {
     cashPoint: bill.cashPointUuid,
     cashier: cashier.uuid,
-    lineItems: bill.lineItems.map((lineItem) => ({
-      ...lineItem,
-      billableService: processBillItem(lineItem),
-      item: processBillItem(lineItem),
-      paymentStatus: 'PAID',
-    })),
-    payments: [...billPayment],
+    lineItems: updatedLineItems,
+    payments: [...updatedPayments],
     patient: patientUuid,
-    status: paymentStatus,
+    status: selectedLineItems?.length > 0 ? allItemsBillPaymentStatus : paymentStatus,
   };
 
   return processedPayment;

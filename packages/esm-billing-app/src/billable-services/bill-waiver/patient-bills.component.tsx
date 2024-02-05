@@ -15,7 +15,7 @@ import {
   TableExpandedRow,
   Tile,
 } from '@carbon/react';
-import { convertToCurrency } from '../../helpers';
+import { convertToCurrency, extractString } from '../../helpers';
 import { useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import PatientBillsSelections from './bill-selection.component';
@@ -44,7 +44,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
   const tableRows = bills.map((bill) => ({
     id: `${bill.uuid}`,
     date: bill.dateCreated,
-    billableService: bill.billingService,
+    billableService: extractString(bill.billingService),
     totalAmount: convertToCurrency(bill.totalAmount),
   }));
 
