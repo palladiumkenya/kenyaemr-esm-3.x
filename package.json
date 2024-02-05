@@ -12,7 +12,7 @@
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
     "release": "lerna version --no-git-tag-version",
-    "start": "openmrs develop",
+    "start": "openmrs develop --sources packages/esm-patient-clinical-view-app --backend https://dev.kenyahmis.org --port 8090",
     "verify": "turbo run lint && turbo run typescript && turbo run test --color --concurrency=5"
   },
   "resolutions": {

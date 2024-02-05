@@ -15,14 +15,11 @@ import {
   DataTable,
   TableContainer,
   Table,
-  TableExpandRow,
   TableHead,
   TableRow,
-  TableExpandHeader,
   TableHeader,
   TableBody,
   TableCell,
-  TableExpandedRow,
   OverflowMenu,
   OverflowMenuItem,
   DataTableSkeleton,
@@ -147,21 +144,11 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
         size="sm"
         rows={tableRows}
         headers={tableHeader}
-        render={({
-          rows,
-          headers,
-          getHeaderProps,
-          getExpandHeaderProps,
-          getRowProps,
-          getExpandedRowProps,
-          getTableProps,
-          getTableContainerProps,
-        }) => (
+        render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
           <TableContainer size="sm" {...getTableContainerProps()}>
             <Table size="sm" {...getTableProps()} aria-label="sample table">
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader enableToggle={true} {...getExpandHeaderProps()} />
                   {headers.map((header, i) => (
                     <TableHeader
                       key={i}
@@ -175,24 +162,15 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow
-                      {...getRowProps({
-                        row,
-                      })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                    <TableExpandedRow
-                      colSpan={headers.length + 1}
-                      className="demo-expanded-td"
-                      {...getExpandedRowProps({
-                        row,
-                      })}>
-                      <h6>To do...</h6>
-                    </TableExpandedRow>
-                  </React.Fragment>
+                  <TableRow
+                    key={row.id}
+                    {...getRowProps({
+                      row,
+                    })}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    ))}
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>

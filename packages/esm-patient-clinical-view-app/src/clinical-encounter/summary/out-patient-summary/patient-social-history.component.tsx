@@ -9,12 +9,24 @@ import {
   Other_Substance_Abuse_UUID,
 } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
-import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
+import { EmptyState, launchPatientWorkspace, ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
+import {
+  OverflowMenu,
+  OverflowMenuItem,
+  InlineLoading,
+  Button,
+  DataTable,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+} from '@carbon/react';
 import { useClinicalEncounter } from '../../../hooks/useClinicalEncounter';
 import { ConfigObject } from '../../../config-schema';
-import SummaryCard from '../summary-card.component';
-import styles from './out-patient-summary.scss';
+import { Add } from '@carbon/react/icons';
 interface OutPatientSocialHistoryProps {
   patientUuid: string;
 }
@@ -25,6 +37,7 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({ patie
     clinicalEncounterUuid,
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
+  const headerTitle = t('socialHistory', 'Social History');
   const { encounters, isLoading, error, mutate, isValidating } = useClinicalEncounter(
     patientUuid,
     clinicalEncounterUuid,
@@ -42,6 +55,33 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({ patie
       },
     });
   };
+  const tableHeader = [
+    {
+      key: 'encounterDate',
+      header: t('encounterDate', 'Date'),
+    },
+    {
+      key: 'alcoholUse',
+      header: t('alcoholUse', 'Alcohol Use'),
+    },
+    {
+      key: 'alcoholUseDuration',
+      header: t('alcoholUseDuration', 'Alcohol Use Duration'),
+    },
+    {
+      key: 'smoking',
+      header: t('smoking', 'Smoking'),
+    },
+    {
+      key: 'smokingDuration',
+      header: t('smokingDuration', 'Smoking Duration'),
+    },
+    {
+      key: 'otherSubstanceAbuse',
+      header: t('otherSubstanceAbuse', 'Other Substance Abuse'),
+    },
+  ];
+
   const tableRows = encounters?.map((encounter, index) => {
     return {
       id: `${encounter.uuid}`,
@@ -78,18 +118,55 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({ patie
     );
   }
   return (
-    <div className={styles.cardContainer}>
-      {tableRows.map((row, index) => (
-        <React.Fragment key={index}>
-          <SummaryCard title={t('encounterDate', 'Date')} value={row?.encounterDate} />
-          <SummaryCard title={t('alcoholUse', 'Alcohol Use')} value={row?.alcoholUse} />
-          <SummaryCard title={t('alcoholUseDuration', 'Duration')} value={row?.alcoholUseDuration} />
-          <SummaryCard title={t('smoking', 'Tobacco Use')} value={row?.smoking} />
-          <SummaryCard title={t('smokingDuration', 'Duration')} value={row?.smokingDuration} />
-          <SummaryCard title={t('otherSubstanceAbuse', 'Other Substance Use')} value={row?.otherSubstanceAbuse} />
-        </React.Fragment>
-      ))}
-    </div>
+    <>
+      <CardHeader title={headerTitle}>
+        <Button
+          size="md"
+          kind="ghost"
+          onClick={() => handleOpenOrEditClinicalEncounterForm()}
+          renderIcon={(props) => <Add size={24} {...props} />}
+          iconDescription="Add">
+          {t('add', 'Add')}
+        </Button>
+      </CardHeader>
+      <DataTable
+        size="sm"
+        rows={tableRows}
+        headers={tableHeader}
+        render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+          <TableContainer size="sm" {...getTableContainerProps()}>
+            <Table size="sm" {...getTableProps()} aria-label="sample table">
+              <TableHead>
+                <TableRow>
+                  {headers.map((header, i) => (
+                    <TableHeader
+                      key={i}
+                      {...getHeaderProps({
+                        header,
+                      })}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    {...getRowProps({
+                      row,
+                    })}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      />
+    </>
   );
 };
 export default OutPatientSocialHistory;
