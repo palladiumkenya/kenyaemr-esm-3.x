@@ -6,6 +6,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { usePaymentMethods } from '../billing-form.resource';
+import { useConfig } from '@openmrs/esm-framework';
+import { BillingConfig } from '../../config-schema';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
@@ -30,6 +32,7 @@ const visitAttributesFormSchema = z.object({
 
 const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes, setPaymentMethod }) => {
   const { t } = useTranslation();
+  const config = useConfig<BillingConfig>();
   const { control, getValues, watch } = useForm<VisitAttributesFormValue>({
     mode: 'all',
     defaultValues: {},
@@ -52,12 +55,12 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     const { patientCategory, paymentMethods, policyNumber, paymentDetails } = getValues();
     setPaymentMethod(paymentMethods);
     const formPayload = [
-      { uuid: 'caf2124f-00a9-4620-a250-efd8535afd6d', value: paymentDetails },
-      { uuid: 'c39b684c-250f-4781-a157-d6ad7353bc90', value: paymentMethods },
-      { uuid: '0f4f3306-f01b-43c6-af5b-fdb60015cb02', value: policyNumber },
-      { uuid: '2d0fa959-6780-41f1-85b1-402045935068', value: insuranceSchema },
-      { uuid: '3b9dfac8-9e4d-11ee-8c90-0242ac120002', value: patientCategory },
-      { uuid: '919b51c9-8e2e-468f-8354-181bf3e55786', value: true },
+      { uuid: config.paymentDetails, value: paymentDetails },
+      { uuid: config.paymentMethods, value: paymentMethods },
+      { uuid: config.policyNumber, value: policyNumber },
+      { uuid: config.insuranceScheme, value: insuranceSchema },
+      { uuid: config.patientCategory, value: patientCategory },
+      { uuid: config.billPaymentStatus, value: true },
     ];
     const visitAttributesPayload = formPayload.filter(
       (item) => item.value !== undefined && item.value !== null && item.value !== '',
