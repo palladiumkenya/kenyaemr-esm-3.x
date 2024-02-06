@@ -34,6 +34,7 @@ export const createPaymentPayload = (
   }));
 
   const updatedPayments = newPayments.concat(previousPayments);
+  const totalAmountRendered = updatedPayments.reduce((acc, payment) => acc + payment.amountTendered, 0);
 
   const updatedLineItems = bill.lineItems.map((lineItem) => ({
     ...lineItem,
@@ -41,7 +42,7 @@ export const createPaymentPayload = (
     item: processBillItem(lineItem),
     paymentStatus:
       bill?.lineItems.length > 1
-        ? hasLineItem(selectedLineItems ?? [], lineItem)
+        ? hasLineItem(selectedLineItems ?? [], lineItem) && totalAmountRendered >= lineItem.price * lineItem.quantity
           ? 'PAID'
           : 'PENDING'
         : paymentStatus,
