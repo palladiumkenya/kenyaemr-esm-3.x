@@ -60,6 +60,11 @@ const Invoice: React.FC = () => {
   });
 
   useEffect(() => {
+    const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
+    setSelectedLineItems(paidLineItems);
+  }, [bill.lineItems]);
+
+  useEffect(() => {
     if (isPrinting && onBeforeGetContentResolve.current) {
       onBeforeGetContentResolve.current();
     }

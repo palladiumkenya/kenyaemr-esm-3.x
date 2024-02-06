@@ -34,12 +34,12 @@ type InvoiceTableProps = {
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, isLoadingBill, onSelectItem }) => {
   const { t } = useTranslation();
   const { lineItems } = bill;
+  const paidLineItems = lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const [selectedLineItems, setSelectedLineItems] = useState([]);
+  const [selectedLineItems, setSelectedLineItems] = useState(paidLineItems ?? []);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
-
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {
       return lineItems;
@@ -74,13 +74,13 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
           id: `${item.uuid}`,
           billItem: processBillItem(item),
           billCode: bill.receiptNumber,
-          status: bill.status,
+          status: item.paymentStatus,
           quantity: item.quantity,
           price: item.price,
           total: item.price * item.quantity,
         };
       }) ?? [],
-    [bill.receiptNumber, bill.status, filteredLineItems],
+    [bill.receiptNumber, filteredLineItems],
   );
 
   if (isLoadingBill) {
@@ -144,24 +144,27 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    {...getRowProps({
-                      row,
-                    })}>
-                    {rows.length > 1 && isSelectable && (
-                      <TableSelectRow
-                        aria-label="Select row"
-                        {...getSelectionProps({ row })}
-                        onChange={(checked: boolean) => handleRowSelection(row, checked)}
-                      />
-                    )}
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
+                {rows.map((row, index) => {
+                  return (
+                    <TableRow
+                      key={row.id}
+                      {...getRowProps({
+                        row,
+                      })}>
+                      {rows.length > 1 && isSelectable && (
+                        <TableSelectRow
+                          aria-label="Select row"
+                          {...getSelectionProps({ row })}
+                          onChange={(checked: boolean) => handleRowSelection(row, checked)}
+                          checked={Boolean(selectedLineItems?.find((item) => item?.uuid === row?.id))}
+                        />
+                      )}
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
