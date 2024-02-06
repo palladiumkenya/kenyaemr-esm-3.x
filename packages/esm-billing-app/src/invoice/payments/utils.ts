@@ -39,7 +39,12 @@ export const createPaymentPayload = (
     ...lineItem,
     billableService: processBillItem(lineItem),
     item: processBillItem(lineItem),
-    paymentStatus: hasLineItem(selectedLineItems ?? [], lineItem) ? 'PAID' : 'PENDING',
+    paymentStatus:
+      bill?.lineItems.length > 1
+        ? hasLineItem(selectedLineItems ?? [], lineItem)
+          ? 'PAID'
+          : 'PENDING'
+        : paymentStatus,
   }));
 
   const allItemsBillPaymentStatus =
