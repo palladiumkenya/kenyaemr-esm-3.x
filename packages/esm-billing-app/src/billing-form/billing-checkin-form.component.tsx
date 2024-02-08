@@ -2,11 +2,12 @@ import React, { useCallback, useState } from 'react';
 import { Dropdown, InlineLoading, InlineNotification } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import styles from './billing-checkin-form.scss';
 import VisitAttributesForm from './visit-attributes/visit-attributes-form.component';
+import { BillingConfig } from '../config-schema';
+import { uuidsMap } from '../constants';
 
-const DEFAULT_PRICE = 500.00001;
 const PENDING_PAYMENT_STATUS = 'PENDING';
 
 type BillingCheckInFormProps = {
@@ -16,6 +17,7 @@ type BillingCheckInFormProps = {
 
 const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, setBillingInfo }) => {
   const { t } = useTranslation();
+  const { paymentDetails } = useConfig<BillingConfig>();
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const [attributes, setAttributes] = useState([]);
@@ -23,8 +25,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   let lineList = [];
 
   const shouldBillPatient =
-    attributes.find((item) => item.attributeType === 'caf2124f-00a9-4620-a250-efd8535afd6d')?.value ===
-    '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf';
+    attributes.find((item) => item.attributeType === paymentDetails)?.value === uuidsMap.payingUuid;
 
   const handleCreateBill = useCallback(
     (createBillPayload) => {

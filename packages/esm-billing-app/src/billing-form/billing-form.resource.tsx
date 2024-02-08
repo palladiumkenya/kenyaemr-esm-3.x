@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import { LineItem } from '../types';
 import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
+import { waiverUuid } from '../constants';
 
 export const useBillableItems = () => {
   const url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
@@ -24,9 +24,17 @@ export const createPatientBill = (payload) => {
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
 
-export const usePaymentMethods = () => {
+export const usePaymentMethods = (filterWaiver?: boolean) => {
   const url = `/ws/rest/v1/cashier/paymentMode`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
+  const methods = filterWaiver
+    ? data?.data?.results?.filter((method) => method.uuid !== waiverUuid)
+    : data.data.results;
+  return { isLoading, error, paymentModes: methods ?? [] };
+};
 
-  return { isLoading, error, paymentModes: data?.data?.results ?? [] };
+export const useConceptAnswers = (conceptUuid: string) => {
+  const url = `/ws/rest/v1/concept/${conceptUuid}`;
+  const { data, isLoading, error } = useSWR<{ data: { answers: Array<OpenmrsResource> } }>(url, openmrsFetch);
+  return { conceptAnswers: data?.data?.answers, isLoading, error };
 };

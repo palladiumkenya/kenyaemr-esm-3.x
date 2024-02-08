@@ -1,7 +1,6 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
 import { LineItem, MappedBill } from '../../types';
-
-const WAIVER_UUID = 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4';
+import { waiverUuid } from '../../constants';
 
 export const createBillWaiverPayload = (
   bill: MappedBill,
@@ -16,7 +15,7 @@ export const createBillWaiverPayload = (
     amount: parseFloat(totalAmount.toFixed(2)),
     amountTendered: parseFloat(Number(amountWaived).toFixed(2)),
     attributes: [],
-    instanceType: WAIVER_UUID,
+    instanceType: waiverUuid,
   };
 
   const processedLineItems = lineItems.map((lineItem) => ({
