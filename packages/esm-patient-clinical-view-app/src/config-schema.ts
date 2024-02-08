@@ -66,3 +66,20 @@ export interface ConfigObject {
   clinicalEncounterUuid: string;
   concepts: Record<string, string>;
 }
+
+export interface PartograpyComponents {
+  id: string;
+  date: string;
+  fetalHeartRate: number;
+  cervicalDilation: number;
+  descentOfHead: string;
+}
+export interface ConfigPartographyObject {
+  concepts: {
+    obsDateUiid: string;
+    timeRecordedUuid: string;
+    fetalHeartRateUuid: string;
+    cervicalDilationUiid: string;
+    descentOfHead: string;
+  };
+}
