@@ -26,6 +26,7 @@ import {
   FetalHeartRate,
   PartographEncounterFormUuid,
   SurgicalProcedure,
+  descentOfHeadObj,
 } from '../../utils/constants';
 
 interface PartographyProps {
@@ -61,14 +62,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       key: 'descentOfHead',
     },
   ];
-  const descentOfHeadObj = {
-    '162135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '1/5',
-    '166065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '2/5',
-    '166066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '3/5',
-    '166067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '4/5',
-    '163734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '5/5',
-  };
-
   const tableRows =
     encounters.map((encounter) => {
       const groupMembers = encounter.groupMembers;
