@@ -37,6 +37,8 @@
     "url": "https://github.com/palladiumkenya/kenyaemr-esm-core/issues"
   },
   "dependencies": {
+    "@carbon/charts": "0.55.1",
+    "@carbon/charts-react": "0.55.1",
     "@carbon/react": "^1.42.1",
     "lodash-es": "^4.17.15"
   },
