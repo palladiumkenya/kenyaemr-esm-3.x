@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attributes-form.scss';
 import { TextInput, InlineLoading, ComboBox, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { usePaymentMethods } from '../billing-form.resource';
+import { useConceptAnswers, usePaymentMethods } from '../billing-form.resource';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
+import { uuidsMap } from '../../constants';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
@@ -33,6 +34,7 @@ const visitAttributesFormSchema = z.object({
 const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes, setPaymentMethod }) => {
   const { t } = useTranslation();
   const config = useConfig<BillingConfig>();
+  const { conceptAnswers = [], isLoading, error } = useConceptAnswers(uuidsMap.nonPayingPatientConceptUuid);
   const { control, getValues, watch } = useForm<VisitAttributesFormValue>({
     mode: 'all',
     defaultValues: {},
@@ -46,12 +48,9 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     'patientCategory',
   ]);
 
-  let { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentMethods();
-  React.useEffect(() => {
-    setAttributes(createVisitAttributesPayload());
-  }, [paymentDetails, paymentMethods, insuranceSchema, policyNumber, patientCategory]);
+  const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentMethods(true);
 
-  const createVisitAttributesPayload = () => {
+  const createVisitAttributesPayload = useCallback(() => {
     const { patientCategory, paymentMethods, policyNumber, paymentDetails } = getValues();
     setPaymentMethod(paymentMethods);
     const formPayload = [
@@ -60,7 +59,6 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       { uuid: config.policyNumber, value: policyNumber },
       { uuid: config.insuranceScheme, value: insuranceSchema },
       { uuid: config.patientCategory, value: patientCategory },
-      { uuid: config.billPaymentStatus, value: true },
     ];
     const visitAttributesPayload = formPayload.filter(
       (item) => item.value !== undefined && item.value !== null && item.value !== '',
@@ -69,7 +67,28 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       attributeType: value.uuid,
       value: value.value,
     }));
-  };
+  }, [
+    config.insuranceScheme,
+    config.patientCategory,
+    config.paymentDetails,
+    config.paymentMethods,
+    config.policyNumber,
+    getValues,
+    insuranceSchema,
+    setPaymentMethod,
+  ]);
+
+  React.useEffect(() => {
+    setAttributes(createVisitAttributesPayload());
+  }, [
+    paymentDetails,
+    paymentMethods,
+    insuranceSchema,
+    policyNumber,
+    patientCategory,
+    setAttributes,
+    createVisitAttributesPayload,
+  ]);
 
   if (isLoadingPaymentModes) {
     return (
@@ -80,7 +99,6 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       />
     );
   }
-  paymentModes = paymentModes?.filter((p) => p.uuid !== 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4');
 
   return (
     <section>
@@ -94,13 +112,13 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
             orientation="vertical"
             legendText={t('paymentDetails', 'Payment Details')}
             name="payment-details-group">
-            <RadioButton labelText="Paying" value="1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf" id="radio-1" />
-            <RadioButton labelText="Non paying" value="a28d7929-050a-4249-a61a-551e9b8cc102" id="radio-2" />
+            <RadioButton labelText="Paying" value={uuidsMap.payingUuid} id="paying" />
+            <RadioButton labelText="Non paying" value={uuidsMap.nonPayingUuid} id="nonPaying" />
           </RadioButtonGroup>
         )}
       />
 
-      {paymentDetails === '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf' && (
+      {paymentDetails === uuidsMap.payingUuid && (
         <Controller
           control={control}
           name="paymentMethods"
@@ -118,40 +136,39 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
         />
       )}
 
-      {paymentMethods === 'beac329b-f1dc-4a33-9e7c-d95821a137a6' &&
-        paymentDetails === '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf' && (
-          <>
-            <Controller
-              control={control}
-              name="insuranceScheme"
-              render={({ field }) => (
-                <TextInput
-                  className={styles.sectionField}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  id="insurance-scheme"
-                  type="text"
-                  labelText={t('insuranceScheme', 'Insurance scheme')}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="policyNumber"
-              render={({ field }) => (
-                <TextInput
-                  className={styles.sectionField}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  {...field}
-                  id="policy-number"
-                  type="text"
-                  labelText={t('policyNumber', 'Policy number')}
-                />
-              )}
-            />
-          </>
-        )}
+      {paymentMethods === uuidsMap.insuranceSchemeUuid && paymentDetails === uuidsMap.payingUuid && (
+        <>
+          <Controller
+            control={control}
+            name="insuranceScheme"
+            render={({ field }) => (
+              <TextInput
+                className={styles.sectionField}
+                onChange={(e) => field.onChange(e.target.value)}
+                id="insurance-scheme"
+                type="text"
+                labelText={t('insuranceScheme', 'Insurance scheme')}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="policyNumber"
+            render={({ field }) => (
+              <TextInput
+                className={styles.sectionField}
+                onChange={(e) => field.onChange(e.target.value)}
+                {...field}
+                id="policy-number"
+                type="text"
+                labelText={t('policyNumber', 'Policy number')}
+              />
+            )}
+          />
+        </>
+      )}
 
-      {paymentDetails === 'a28d7929-050a-4249-a61a-551e9b8cc102' && (
+      {paymentDetails === uuidsMap.nonPayingUuid && (
         <Controller
           control={control}
           name="patientCategory"
@@ -160,11 +177,8 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
               className={styles.sectionField}
               onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
               id="patientCategory"
-              items={[
-                { text: 'Child under 5', uuid: '2d61b762-6e32-4e2e-811f-ac72cbd3600a' },
-                { text: 'Student', uuid: '159465AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-              ]}
-              itemToString={(item) => (item ? item.text : '')}
+              items={conceptAnswers}
+              itemToString={(item) => (item ? item.display : '')}
               titleText={t('patientCategory', 'Patient category')}
             />
           )}

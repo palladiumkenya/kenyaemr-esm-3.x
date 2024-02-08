@@ -120,10 +120,6 @@ xdescribe('BillingCheckInForm', () => {
           attributeType: 'caf2124f-00a9-4620-a250-efd8535afd6d',
           value: '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf',
         },
-        {
-          attributeType: '919b51c9-8e2e-468f-8354-181bf3e55786',
-          value: true,
-        },
       ],
     });
   });
