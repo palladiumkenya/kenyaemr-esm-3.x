@@ -22,6 +22,7 @@
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
   "dependencies": {
+    "@carbon/charts-react": "^1.13.33",
     "@hookform/resolvers": "^3.1.1",
     "classnames": "^2.3.2",
     "fuzzy": "^0.1.3",

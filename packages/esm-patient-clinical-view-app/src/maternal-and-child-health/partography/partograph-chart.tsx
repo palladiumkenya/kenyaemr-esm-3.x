@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
-import { withUnit } from '@openmrs/esm-patient-common-lib';
 import styles from './partograph-chart.scss';
 import { LineChart } from '@carbon/charts-react';
 import { PartograpyComponents } from '../../config-schema';
-import '@carbon/charts-react/styles.css';
 
 enum ScaleTypes {
   TIME = 'time',
@@ -23,24 +21,29 @@ interface PartographyChartData {
 }
 const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents }) => {
   const { t } = useTranslation();
+  const convertedData = partograpyComponents.map((item) => {
+    const [numerator, denominator] = item.descentOfHead.split('/').map(Number);
+    const result = denominator !== 0 ? (numerator / denominator) * 10 : 10;
+    return { ...item, descentOfHead: result };
+  });
   const [selectedPartographSign, setSelectedPartographSign] = React.useState<PartographyChartData>({
-    title: `Fetal Heart Rate (${partograpyComponents[0]?.fetalHeartRate})`,
+    title: `Fetal Heart Rate (${convertedData[0]?.fetalHeartRate})`,
     value: 'fetalHeartRate',
   });
   const partographSigns = [
     {
       id: 'fetalHeartRate',
-      title: withUnit('Heart Rate', partograpyComponents[0]?.fetalHeartRate?.toString() ?? '-'),
+      title: `Heart Rate ${convertedData[0]?.fetalHeartRate?.toString() ?? '-'})`,
       value: 'fetalHeartRate',
     },
     {
       id: 'cervicalDilation',
-      title: withUnit('Cervical Dilation', partograpyComponents[0]?.cervicalDilation?.toString() ?? '-'),
+      title: `Cervical Dilation' ${convertedData[0]?.cervicalDilation?.toString() ?? '-'})`,
       value: 'cervicalDilation',
     },
     {
       id: 'descentOfHead',
-      title: withUnit('Descent of Head', partograpyComponents[0]?.descentOfHead ?? '-'),
+      title: `Descent of Head  ${convertedData[0]?.descentOfHead?.toString() ?? '-'})`,
       value: 'descentOfHead',
     },
   ];
