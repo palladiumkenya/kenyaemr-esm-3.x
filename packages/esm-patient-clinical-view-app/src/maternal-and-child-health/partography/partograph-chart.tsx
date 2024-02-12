@@ -1,11 +1,11 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
 import styles from './partograph-chart.scss';
 import { LineChart } from '@carbon/charts-react';
 import { PartograpyComponents } from '../../config-schema';
+import '@carbon/charts-react/styles.css';
 
 enum ScaleTypes {
   TIME = 'time',
@@ -30,12 +30,12 @@ const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents 
   const partographSigns = [
     {
       id: 'fetalHeartRate',
-      title: withUnit('Heart Rate', partograpyComponents[0]?.fetalHeartRate.toString() ?? '-'),
+      title: withUnit('Heart Rate', partograpyComponents[0]?.fetalHeartRate?.toString() ?? '-'),
       value: 'fetalHeartRate',
     },
     {
       id: 'cervicalDilation',
-      title: withUnit('Cervical Dilation', partograpyComponents[0]?.cervicalDilation.toString() ?? '-'),
+      title: withUnit('Cervical Dilation', partograpyComponents[0]?.cervicalDilation?.toString() ?? '-'),
       value: 'cervicalDilation',
     },
     {
@@ -44,21 +44,15 @@ const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents 
       value: 'descentOfHead',
     },
   ];
-  function parseTodayDate(dateString: string): Date | null {
-    const today = new Date();
-    const todayFormatted = today.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-
-    if (dateString.startsWith('Today')) {
-      return new Date(`${todayFormatted} ${dateString.slice(6)}`);
+  function parseTodayTime(dateString: string): string | null {
+    const dateTimeRegex = /(\d{2}:\d{2} [APMapm]{2})/;
+    const match = dateString.match(dateTimeRegex);
+    if (match) {
+      return match[0];
     } else {
-      return parseDate(dateString);
+      return null;
     }
   }
-
   const chartData = useMemo(() => {
     return partograpyComponents
       .filter((partography) => partography[selectedPartographSign.value])
@@ -70,7 +64,7 @@ const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents 
             return [
               {
                 group: 'Fetal Heart Rate',
-                key: formatDate(parseTodayDate(partoData.date.toString()), { year: false }),
+                key: parseTodayTime(partoData.date.toString()),
                 value: partoData.fetalHeartRate,
                 date: partoData.date,
               },
@@ -78,7 +72,7 @@ const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents 
           } else {
             return {
               group: selectedPartographSign.title,
-              key: formatDate(parseTodayDate(partoData.date.toString()), { year: false }),
+              key: parseTodayTime(partoData.date.toString()),
               value: partoData[selectedPartographSign.value],
               date: partoData.date,
             };
@@ -89,7 +83,7 @@ const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents 
   const chartOptions = {
     axes: {
       bottom: {
-        title: 'Date',
+        title: 'Time',
         mapsTo: 'key',
         scaleType: ScaleTypes.LABELS,
       },
