@@ -146,7 +146,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   return (
     <>
       {(() => {
-        if (encounters?.length) {
+        if (encounters && encounters?.length) {
           return (
             <div className={styles.widgetCard}>
               <CardHeader title={headerTitle}>
