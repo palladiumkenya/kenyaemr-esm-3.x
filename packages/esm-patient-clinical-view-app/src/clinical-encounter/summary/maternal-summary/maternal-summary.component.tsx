@@ -8,6 +8,20 @@ import { ConfigObject } from '../../../config-schema';
 import SummaryCard from '../summary-card.component';
 
 import styles from '../../dashboard/in-patient.scss';
+import {
+  ACCIDENT_TRAUMA_UUID,
+  AdmissionDate_UUID,
+  AdmissionWard_UUID,
+  Alcohol_Use_Duration_UUID,
+  Alcohol_Use_UUID,
+  BLOOD_TRANSFUSION_UUID,
+  CHRONIC_DISEASE_UUID,
+  Other_Substance_Abuse_UUID,
+  PriorityOfAdmission_UUID,
+  Smoking_Duration_UUID,
+  Smoking_UUID,
+  SURGICAL_HISTORY_UUID,
+} from '../../../utils/constants';
 
 interface MaternalSummaryProps {
   patientUuid: string;
@@ -19,9 +33,25 @@ const MaternalSummary: React.FC<MaternalSummaryProps> = ({ patientUuid }) => {
     clinicalEncounterUuid,
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
+  const config = useConfig() as ConfigObject;
   const { encounters, isLoading, error, mutate, isValidating } = useClinicalEncounter(
+    config.clinicalEncounterUuid,
+    config.formsList.clinicalEncounterFormUuid,
     patientUuid,
-    clinicalEncounterUuid,
+    [
+      Alcohol_Use_UUID,
+      Alcohol_Use_Duration_UUID,
+      Smoking_UUID,
+      Smoking_Duration_UUID,
+      Other_Substance_Abuse_UUID,
+      SURGICAL_HISTORY_UUID,
+      ACCIDENT_TRAUMA_UUID,
+      BLOOD_TRANSFUSION_UUID,
+      CHRONIC_DISEASE_UUID,
+      AdmissionDate_UUID,
+      PriorityOfAdmission_UUID,
+      AdmissionWard_UUID,
+    ],
   );
   const handleOpenOrEditMaternalForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {

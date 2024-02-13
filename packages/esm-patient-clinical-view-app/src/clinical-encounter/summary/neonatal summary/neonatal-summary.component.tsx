@@ -12,18 +12,18 @@ import {
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
 import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
-import { useNeonatalSummery } from '../../../hooks/useNeonatalSummery';
+import { useNeonatalSummary } from '../../../hooks/useNeonatalSummary';
 import SummaryCard from '../summary-card.component';
 
 import styles from '../../dashboard/in-patient.scss';
 
-interface NeonatalSummeryProps {
+interface NeonatalSummaryProps {
   patientUuid: string;
 }
 
-const NeonatalSummeryr: React.FC<NeonatalSummeryProps> = ({ patientUuid }) => {
+const NeonatalSummary: React.FC<NeonatalSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { encounters, isLoading, error, mutate } = useNeonatalSummery(patientUuid, MchEncounterType_UUID);
+  const { encounters, isLoading, error, mutate } = useNeonatalSummary(patientUuid, MchEncounterType_UUID);
 
   const handleOpenOrEditNeonatalSummaryForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
@@ -67,13 +67,13 @@ const NeonatalSummeryr: React.FC<NeonatalSummeryProps> = ({ patientUuid }) => {
     return <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;
   }
   if (error) {
-    return <ErrorState error={error} headerTitle={t('neonatalSummery', 'Neonatal Summary')} />;
+    return <ErrorState error={error} headerTitle={t('neonatalSummary', 'Neonatal Summary')} />;
   }
   if (encounters.length === 0) {
     return (
       <EmptyState
-        displayText={t('neonatalSummery', 'Neonatal Summery')}
-        headerTitle={t('neonatalSummery', 'Neonatal Summery')}
+        displayText={t('neonatalSummary', 'Neonatal Summary')}
+        headerTitle={t('neonatalSummary', 'Neonatal Summary')}
         launchForm={handleOpenOrEditNeonatalSummaryForm}
       />
     );
@@ -97,4 +97,4 @@ const NeonatalSummeryr: React.FC<NeonatalSummeryProps> = ({ patientUuid }) => {
     </div>
   );
 };
-export default NeonatalSummeryr;
+export default NeonatalSummary;

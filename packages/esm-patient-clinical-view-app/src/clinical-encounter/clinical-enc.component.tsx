@@ -5,26 +5,34 @@ import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from
 import { getObsFromEncounter } from '../ui/encounter-list/encounter-list-utils';
 import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
-import { useClinicalEncounter } from '../hooks/useClinicalEncounter';
 import { ConfigObject } from '../config-schema';
 import SummaryCard from './summary/summary-card.component';
 import capitalize from 'lodash-es/capitalize';
 
 import styles from './dashboard/in-patient.scss';
+import { OpenmrsEncounter } from '../types';
+import { KeyedMutator } from 'swr';
 interface ClinicalEncounterProps {
   patientUuid: string;
+  encounters: OpenmrsEncounter[];
+  isLoading: boolean;
+  error: Error;
+  isValidating: boolean;
+  mutate: KeyedMutator<any>;
 }
 
-const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({ patientUuid }) => {
+const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({
+  patientUuid,
+  encounters,
+  isLoading,
+  error,
+  mutate,
+  isValidating,
+}) => {
   const { t } = useTranslation();
   const {
-    clinicalEncounterUuid,
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
-  const { encounters, isLoading, error, mutate, isValidating } = useClinicalEncounter(
-    patientUuid,
-    clinicalEncounterUuid,
-  );
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
