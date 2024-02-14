@@ -17,11 +17,12 @@ import { useBills } from '../billing.resource';
 import { convertToCurrency, extractString } from '../helpers';
 
 type RequirePaymentModalProps = {
+  cancel: () => void;
   closeModal: () => void;
   patientUuid: string;
 };
 
-const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, patientUuid }) => {
+const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, patientUuid, cancel }) => {
   const { t } = useTranslation();
   const { bills, isLoading, error } = useBills(patientUuid);
 
@@ -31,10 +32,7 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
       <ModalHeader closeModal={closeModal} title={t('patientBillingAlert', 'Patient Billing Alert')} />
       <ModalBody>
         <p className={styles.bodyShort02}>
-          {t(
-            'billPaymentRequiredMessage',
-            'The current patient has pending bill. Advice patient to settle bill before receiving services',
-          )}
+          {t('billPaymentRequiredMessage', 'The current patient has pending bill. Advice patient to settle bill.')}
         </p>
         {isLoading && (
           <InlineLoading
@@ -65,13 +63,19 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
             })}
           </StructuredListBody>
         </StructuredListWrapper>
+        <p className={styles.providerMessage}>
+          {t(
+            'providerMessage',
+            'By clicking Proceed to care, you acknowledge that you have advised the patient to settle the bill.',
+          )}
+        </p>
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={closeModal}>
+        <Button kind="secondary" onClick={cancel}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="primary" onClick={closeModal}>
-          {t('ok', 'OK')}
+        <Button kind="danger" onClick={closeModal}>
+          {t('proceedToCare', 'Proceed to care')}
         </Button>
       </ModalFooter>
     </div>
