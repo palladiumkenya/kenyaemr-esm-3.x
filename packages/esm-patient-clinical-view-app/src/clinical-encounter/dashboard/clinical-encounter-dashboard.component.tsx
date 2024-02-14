@@ -52,8 +52,8 @@ const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({
   } = useConfig<ConfigObject>();
   const config = useConfig() as ConfigObject;
   const { encounters, isLoading, error, mutate, isValidating } = useClinicalEncounter(
-    config.clinicalEncounterUuid,
-    config.formsList.clinicalEncounterFormUuid,
+    clinicalEncounterUuid,
+    clinicalEncounterFormUuid,
     patientUuid,
     [
       AdmissionDate_UUID,
