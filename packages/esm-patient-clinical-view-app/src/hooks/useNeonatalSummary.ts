@@ -4,7 +4,7 @@ import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { DeliveryForm_UUID, MchEncounterType_UUID, encounterRepresentation } from '../utils/constants';
 
-export function useNeonatalSummery(patientUuid: string, encounterType: string) {
+export function useNeonatalSummary(patientUuid: string, encounterType: string) {
   const config = useConfig() as ConfigObject;
   const url = `/ws/rest/v1/encounter?encounterType=${MchEncounterType_UUID}&patient=${patientUuid}&v=${encounterRepresentation}`;
 

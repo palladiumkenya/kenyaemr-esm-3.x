@@ -6,26 +6,33 @@ import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-pat
 import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
 import { ConfigObject } from '../../../config-schema';
-import { useSurgicalSummery } from '../../../hooks/useSurgicalSummery';
 import SummaryCard from '../summary-card.component';
-
 import styles from '../../dashboard/in-patient.scss';
+import { OpenmrsEncounter } from '../../../types';
+import { KeyedMutator } from 'swr';
 
-interface SurgicalSummeryProps {
+interface SurgicalSummaryProps {
   patientUuid: string;
-  encounterTypeUuid: string;
   formEntrySub?: any;
   launchPatientWorkspace?: Function;
+  encounters: OpenmrsEncounter[];
+  isLoading: boolean;
+  error: Error;
+  isValidating: boolean;
+  mutate: KeyedMutator<any>;
 }
-
-const ClinicalEncounter: React.FC<SurgicalSummeryProps> = ({ patientUuid, encounterTypeUuid }) => {
+const ClinicalEncounter: React.FC<SurgicalSummaryProps> = ({
+  patientUuid,
+  encounters,
+  isLoading,
+  error,
+  mutate,
+  isValidating,
+}) => {
   const { t } = useTranslation();
   const {
     formsList: { clinicalEncounterFormUuid },
-    clinicalEncounterUuid,
   } = useConfig<ConfigObject>();
-
-  const { encounters, isLoading, error, mutate } = useSurgicalSummery(patientUuid, clinicalEncounterUuid);
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
