@@ -1,7 +1,7 @@
 import { Type } from '@openmrs/esm-framework';
 
 export interface BillingConfig {
-  paymentDetails: string;
+  isPatientExempted: string;
   paymentMethods: string;
   insuranceScheme: string;
   policyNumber: string;
@@ -10,9 +10,10 @@ export interface BillingConfig {
 }
 
 export const configSchema = {
-  paymentDetails: {
+  isPatientExempted: {
     _type: Type.String,
     _default: '3b9dfac8-9e4d-11ee-8c90-0242ac120002',
+    _description: 'Whether the patient should be exempted from paying for service i.e Prisoners',
   },
   paymentMethods: {
     _type: Type.String,

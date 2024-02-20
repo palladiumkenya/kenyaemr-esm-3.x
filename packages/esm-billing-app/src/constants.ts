@@ -1,7 +1,7 @@
 export const PENDING = 'PENDING';
 export const uuidsMap = {
-  payingUuid: '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf',
-  nonPayingUuid: 'a28d7929-050a-4249-a61a-551e9b8cc102',
+  isExceptedUuid: '1c30ee58-82d4-4ea4-a8c1-4bf2f9dfc8cf',
+  isNotExceptedUuid: 'a28d7929-050a-4249-a61a-551e9b8cc102',
   insuranceSchemeUuid: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
   nonPayingPatientConceptUuid: 'a28d7929-050a-4249-a61a-551e9b8cc102',
 };
