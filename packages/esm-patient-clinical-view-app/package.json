@@ -48,7 +48,7 @@
     "react-router-dom": "6.x"
   },
   "devDependencies": {
-    "@openmrs/esm-patient-common-lib": "next",
+    "@openmrs/esm-patient-common-lib": "^7.0.2-pre.3795",
     "webpack": "^5.74.0"
   }
 }

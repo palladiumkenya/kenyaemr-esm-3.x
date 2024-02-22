@@ -26,7 +26,11 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
   const { t } = useTranslation();
   const { bills, isLoading, error } = useBills(patientUuid);
 
-  const lineItems = bills.filter((bill) => bill.status !== 'PAID').flatMap((bill) => bill.lineItems);
+  const lineItems = bills
+    .filter((bill) => bill.status !== 'PAID')
+    .flatMap((bill) => bill.lineItems)
+    .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED');
+
   return (
     <div>
       <ModalHeader closeModal={closeModal} title={t('patientBillingAlert', 'Patient Billing Alert')} />

@@ -78,7 +78,7 @@ describe('CarePrograms', () => {
       .mockReturnValueOnce({ ...testProps, isLoading: false, carePrograms: [] });
 
     renderCarePrograms();
-    const emptyStateMessage = screen.getByText('There are no {displayText} to display for this patient');
+    const emptyStateMessage = screen.getByText('There are no {{displayText}} to display for this patient');
     const displayTitle = screen.getByRole('heading', { name: 'Care program' });
     expect(emptyStateMessage).toBeInTheDocument();
     expect(displayTitle).toBeInTheDocument();
