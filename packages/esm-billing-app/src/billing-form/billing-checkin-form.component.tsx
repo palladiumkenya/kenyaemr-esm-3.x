@@ -16,7 +16,9 @@ type BillingCheckInFormProps = {
 
 const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, setBillingInfo }) => {
   const { t } = useTranslation();
-  const { isPatientExempted } = useConfig<BillingConfig>();
+  const {
+    visitAttributeTypes: { isPatientExempted },
+  } = useConfig<BillingConfig>();
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const [attributes, setAttributes] = useState([]);
@@ -84,7 +86,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   if (paymentMethod) {
     lineList = [];
     lineList = lineItems.filter((e) =>
-      e.servicePrices.some((p) => p.paymentMode && p.paymentMode.uuid === paymentMethod),
+      e.servicePrices.some((p) => p.paymentMode && p.paymentMode.uuid === paymentMethod?.uuid),
     );
   }
 

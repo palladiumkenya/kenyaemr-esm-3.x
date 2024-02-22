@@ -4,11 +4,10 @@ import styles from './visit-attributes-form.scss';
 import { TextInput, InlineLoading, ComboBox, RadioButtonGroup, RadioButton, Layer } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { string, z } from 'zod';
 import { usePaymentMethods } from '../billing-form.resource';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
-import { IN_PRISON_CONCEPT, uuidsMap } from '../../constants';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
@@ -17,7 +16,7 @@ type VisitAttributesFormProps = {
 
 type VisitAttributesFormValue = {
   isPatientExempted: string;
-  paymentMethods: string;
+  paymentMethods: { uuid: string; name: string };
   insuranceScheme: string;
   policyNumber: string;
   exemptionCategory: string;
@@ -25,7 +24,7 @@ type VisitAttributesFormValue = {
 
 const visitAttributesFormSchema = z.object({
   isPatientExempted: z.string(),
-  paymentMethods: z.string(),
+  paymentMethods: z.object({ uuid: z.string(), name: z.string() }),
   insuranceSchema: z.string(),
   policyNumber: z.string(),
   exemptionCategory: z.string(),
@@ -33,7 +32,7 @@ const visitAttributesFormSchema = z.object({
 
 const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes, setPaymentMethod }) => {
   const { t } = useTranslation();
-  const config = useConfig<BillingConfig>();
+  const { visitAttributeTypes, patientExemptionCategories } = useConfig<BillingConfig>();
   const { control, getValues, watch, setValue } = useForm<VisitAttributesFormValue>({
     mode: 'all',
     defaultValues: {},
@@ -50,7 +49,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentMethods(true);
 
   const resetFormFieldsForNonExemptedPatients = useCallback(() => {
-    if ((isPatientExempted === uuidsMap.isNotExemptedUuid && paymentMethods !== null) || paymentMethods !== undefined) {
+    if ((isPatientExempted && paymentMethods !== null) || paymentMethods !== undefined) {
       setValue('insuranceScheme', '');
       setValue('policyNumber', '');
     }
@@ -61,11 +60,11 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     setPaymentMethod(paymentMethods);
     resetFormFieldsForNonExemptedPatients();
     const formPayload = [
-      { uuid: config.isPatientExempted, value: isPatientExempted },
-      { uuid: config.paymentMethods, value: paymentMethods },
-      { uuid: config.policyNumber, value: policyNumber },
-      { uuid: config.insuranceScheme, value: insuranceSchema },
-      { uuid: config.exemptionCategory, value: exemptionCategory },
+      { uuid: visitAttributeTypes.isPatientExempted, value: isPatientExempted },
+      { uuid: visitAttributeTypes.paymentMethods, value: paymentMethods?.uuid },
+      { uuid: visitAttributeTypes.policyNumber, value: policyNumber },
+      { uuid: visitAttributeTypes.insuranceScheme, value: insuranceSchema },
+      { uuid: visitAttributeTypes.exemptionCategory, value: exemptionCategory },
     ];
     const visitAttributesPayload = formPayload.filter(
       (item) => item.value !== undefined && item.value !== null && item.value !== '',
@@ -75,11 +74,11 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       value: value.value,
     }));
   }, [
-    config.insuranceScheme,
-    config.isPatientExempted,
-    config.exemptionCategory,
-    config.paymentMethods,
-    config.policyNumber,
+    visitAttributeTypes.insuranceScheme,
+    visitAttributeTypes.isPatientExempted,
+    visitAttributeTypes.exemptionCategory,
+    visitAttributeTypes.paymentMethods,
+    visitAttributeTypes.policyNumber,
     getValues,
     insuranceSchema,
     resetFormFieldsForNonExemptedPatients,
@@ -114,13 +113,13 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
                 orientation="horizontal"
                 legendText={t('isPatientExemptedLegend', 'Is patient exempted from payment?')}
                 name="patientExemption">
-                <RadioButton labelText="Yes" value={uuidsMap.isExemptedUuid} id="Yes" />
-                <RadioButton labelText="No" value={uuidsMap.isNotExemptedUuid} id="No" />
+                <RadioButton labelText="Yes" value={true} id="Yes" />
+                <RadioButton labelText="No" value={false} id="No" />
               </RadioButtonGroup>
             )}
           />
         </Layer>
-        {isPatientExempted === uuidsMap.isExemptedUuid && (
+        {isPatientExempted && (
           <Layer className={styles.sectionFieldLayer}>
             <Controller
               control={control}
@@ -130,8 +129,8 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
                   className={styles.sectionField}
                   onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
                   id="exemptionCategory"
-                  items={[{ ...IN_PRISON_CONCEPT }]}
-                  itemToString={(item) => (item ? item.display : '')}
+                  items={patientExemptionCategories}
+                  itemToString={(item) => (item ? item.label : '')}
                   titleText={t('exemptionCategory', 'Exemption category')}
                   placeholder={t('selectExemptionCategory', 'Select exemption category')}
                 />
@@ -146,7 +145,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
             render={({ field }) => (
               <ComboBox
                 className={styles.sectionField}
-                onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
+                onChange={({ selectedItem }) => field.onChange(selectedItem)}
                 id="paymentMethods"
                 items={paymentModes}
                 itemToString={(item) => (item ? item.name : '')}
@@ -157,7 +156,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
           />
         </Layer>
 
-        {paymentMethods === uuidsMap.insuranceSchemeUuid && isPatientExempted === uuidsMap.isExemptedUuid && (
+        {paymentMethods?.name?.toLocaleLowerCase().includes('insurance') && isPatientExempted && (
           <>
             <Layer className={styles.sectionFieldLayer}>
               <Controller
