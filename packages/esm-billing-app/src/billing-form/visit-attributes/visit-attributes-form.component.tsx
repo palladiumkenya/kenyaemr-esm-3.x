@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { usePaymentMethods } from '../billing-form.resource';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
-import { uuidsMap } from '../../constants';
+import { IN_PRISON_CONCEPT, uuidsMap } from '../../constants';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
@@ -20,7 +20,7 @@ type VisitAttributesFormValue = {
   paymentMethods: string;
   insuranceScheme: string;
   policyNumber: string;
-  patientCategory: string;
+  exemptionCategory: string;
 };
 
 const visitAttributesFormSchema = z.object({
@@ -28,7 +28,7 @@ const visitAttributesFormSchema = z.object({
   paymentMethods: z.string(),
   insuranceSchema: z.string(),
   policyNumber: z.string(),
-  patientCategory: z.string(),
+  exemptionCategory: z.string(),
 });
 
 const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes, setPaymentMethod }) => {
@@ -39,25 +39,25 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     defaultValues: {},
     resolver: zodResolver(visitAttributesFormSchema),
   });
-  const [isPatientExempted, paymentMethods, insuranceSchema, policyNumber, patientCategory] = watch([
+  const [isPatientExempted, paymentMethods, insuranceSchema, policyNumber, exemptionCategory] = watch([
     'isPatientExempted',
     'paymentMethods',
     'insuranceScheme',
     'policyNumber',
-    'patientCategory',
+    'exemptionCategory',
   ]);
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentMethods(true);
 
   const resetFormFieldsForNonExemptedPatients = useCallback(() => {
-    if ((isPatientExempted === uuidsMap.isNotExceptedUuid && paymentMethods !== null) || paymentMethods !== undefined) {
+    if ((isPatientExempted === uuidsMap.isNotExemptedUuid && paymentMethods !== null) || paymentMethods !== undefined) {
       setValue('insuranceScheme', '');
       setValue('policyNumber', '');
     }
   }, [isPatientExempted, paymentMethods, setValue]);
 
   const createVisitAttributesPayload = useCallback(() => {
-    const { patientCategory, paymentMethods, policyNumber, isPatientExempted } = getValues();
+    const { exemptionCategory, paymentMethods, policyNumber, isPatientExempted } = getValues();
     setPaymentMethod(paymentMethods);
     resetFormFieldsForNonExemptedPatients();
     const formPayload = [
@@ -65,7 +65,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       { uuid: config.paymentMethods, value: paymentMethods },
       { uuid: config.policyNumber, value: policyNumber },
       { uuid: config.insuranceScheme, value: insuranceSchema },
-      { uuid: config.patientCategory, value: patientCategory },
+      { uuid: config.exemptionCategory, value: exemptionCategory },
     ];
     const visitAttributesPayload = formPayload.filter(
       (item) => item.value !== undefined && item.value !== null && item.value !== '',
@@ -77,7 +77,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
   }, [
     config.insuranceScheme,
     config.isPatientExempted,
-    config.patientCategory,
+    config.exemptionCategory,
     config.paymentMethods,
     config.policyNumber,
     getValues,
@@ -88,7 +88,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
 
   React.useEffect(() => {
     setAttributes(createVisitAttributesPayload());
-  }, [paymentMethods, insuranceSchema, policyNumber, patientCategory, setAttributes, createVisitAttributesPayload]);
+  }, [paymentMethods, insuranceSchema, policyNumber, exemptionCategory, setAttributes, createVisitAttributesPayload]);
 
   if (isLoadingPaymentModes) {
     return (
@@ -112,27 +112,28 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
               <RadioButtonGroup
                 onChange={(selected) => field.onChange(selected)}
                 orientation="horizontal"
-                legendText={t('isPatientExemptedLegend', 'Is patient excepted from payment?')}
-                name="payment-details-group">
-                <RadioButton labelText="Yes" value={uuidsMap.isExceptedUuid} id="Yes" />
-                <RadioButton labelText="No" value={uuidsMap.isNotExceptedUuid} id="No" />
+                legendText={t('isPatientExemptedLegend', 'Is patient exempted from payment?')}
+                name="patientExemption">
+                <RadioButton labelText="Yes" value={uuidsMap.isExemptedUuid} id="Yes" />
+                <RadioButton labelText="No" value={uuidsMap.isNotExemptedUuid} id="No" />
               </RadioButtonGroup>
             )}
           />
         </Layer>
-        {isPatientExempted === uuidsMap.isExceptedUuid && (
+        {isPatientExempted === uuidsMap.isExemptedUuid && (
           <Layer className={styles.sectionFieldLayer}>
             <Controller
               control={control}
-              name="patientCategory"
+              name="exemptionCategory"
               render={({ field }) => (
                 <ComboBox
                   className={styles.sectionField}
                   onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
-                  id="patientCategory"
-                  items={[{ uuid: '162277AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'In Prision' }]}
+                  id="exemptionCategory"
+                  items={[{ ...IN_PRISON_CONCEPT }]}
                   itemToString={(item) => (item ? item.display : '')}
-                  titleText={t('patientCategory', 'Patient category')}
+                  titleText={t('exemptionCategory', 'Exemption category')}
+                  placeholder={t('selectExemptionCategory', 'Select exemption category')}
                 />
               )}
             />
@@ -156,7 +157,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
           />
         </Layer>
 
-        {paymentMethods === uuidsMap.insuranceSchemeUuid && isPatientExempted === uuidsMap.isExceptedUuid && (
+        {paymentMethods === uuidsMap.insuranceSchemeUuid && isPatientExempted === uuidsMap.isExemptedUuid && (
           <>
             <Layer className={styles.sectionFieldLayer}>
               <Controller

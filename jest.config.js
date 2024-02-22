@@ -18,8 +18,6 @@ module.exports = {
     '^uuid$': path.resolve(
       __dirname,
       'node_modules',
-      '@openmrs/esm-patient-common-lib',
-      'node_modules',
       'uuid',
       'dist',
       'index.js',

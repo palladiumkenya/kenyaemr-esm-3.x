@@ -7,9 +7,7 @@ import styles from './billing-checkin-form.scss';
 import VisitAttributesForm from './visit-attributes/visit-attributes-form.component';
 import { BillingConfig } from '../config-schema';
 import { hasPatientBeenExempted } from './helper';
-
-const PENDING_PAYMENT_STATUS = 'PENDING';
-const EXEMPTED_PAYMENT_STATUS = 'EXEMPTED';
+import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS } from '../constants';
 
 type BillingCheckInFormProps = {
   patientUuid: string;
@@ -34,7 +32,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
         const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
         showSnackbar({
           title: 'Patient Bill Error',
-          subtitle: `An error has occurred while creating patient bill ${errorMessage}`,
+          subtitle: `An error has occurred while creating patient bill, Contact system administrator quoting this error ${errorMessage}`,
           kind: 'error',
           isLowContrast: true,
         });
@@ -49,7 +47,9 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     // should default to first price if check returns empty. todo - update backend to return default price
     const priceForPaymentMode =
       selectedItem.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod) || selectedItem?.servicePrices[0];
-
+    const billStatus = hasPatientBeenExempted(attributes, isPatientExempted)
+      ? EXEMPTED_PAYMENT_STATUS
+      : PENDING_PAYMENT_STATUS;
     const createBillPayload = {
       lineItems: [
         {
@@ -59,14 +59,12 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
           priceName: 'Default',
           priceUuid: priceForPaymentMode ? priceForPaymentMode.uuid : '',
           lineItemOrder: 0,
-          paymentStatus: hasPatientBeenExempted(attributes, isPatientExempted)
-            ? EXEMPTED_PAYMENT_STATUS
-            : PENDING_PAYMENT_STATUS,
+          paymentStatus: billStatus,
         },
       ],
       cashPoint: cashPointUuid,
       patient: patientUuid,
-      status: PENDING_PAYMENT_STATUS,
+      status: billStatus,
       payments: [],
     };
 

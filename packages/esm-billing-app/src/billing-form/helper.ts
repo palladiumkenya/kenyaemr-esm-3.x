@@ -1,4 +1,4 @@
 import { uuidsMap } from '../constants';
 
 export const hasPatientBeenExempted = (attributes: Array<any>, isPatientExempted: string): boolean =>
-  attributes.find(({ attributeType }) => attributeType === isPatientExempted)?.value === uuidsMap.isExceptedUuid;
+  attributes.find(({ attributeType }) => attributeType === isPatientExempted)?.value === uuidsMap.isExemptedUuid;

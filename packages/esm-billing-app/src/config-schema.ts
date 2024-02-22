@@ -5,7 +5,7 @@ export interface BillingConfig {
   paymentMethods: string;
   insuranceScheme: string;
   policyNumber: string;
-  patientCategory: string;
+  exemptionCategory: string;
   billPaymentStatus: string;
 }
 
@@ -30,9 +30,9 @@ export const configSchema = {
     _description: 'The policy number visit attribute uuid',
     _default: '0f4f3306-f01b-43c6-af5b-fdb60015cb02',
   },
-  patientCategory: {
+  exemptionCategory: {
     _type: Type.String,
-    _description: 'The patient category visit attribute uuid',
+    _description: 'The exemption category visit attribute uuid',
     _default: 'df0362f9-782e-4d92-8bb2-3112e9e9eb3c',
   },
   billPaymentStatus: {

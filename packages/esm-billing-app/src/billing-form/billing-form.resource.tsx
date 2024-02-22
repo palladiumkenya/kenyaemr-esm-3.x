@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
-import { waiverUuid } from '../constants';
+import { WAIVER_UUID } from '../constants';
 
 export const useBillableItems = () => {
   const url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
@@ -28,7 +28,7 @@ export const usePaymentMethods = (filterWaiver?: boolean) => {
   const url = `/ws/rest/v1/cashier/paymentMode`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
   const methods = filterWaiver
-    ? data?.data?.results?.filter((method) => method.uuid !== waiverUuid)
+    ? data?.data?.results?.filter((method) => method.uuid !== WAIVER_UUID)
     : data.data.results;
   return { isLoading, error, paymentModes: methods ?? [] };
 };

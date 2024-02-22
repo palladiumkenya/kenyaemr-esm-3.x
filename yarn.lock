@@ -2635,7 +2635,7 @@ __metadata:
   resolution: "@kenyaemr/esm-care-panel-app@workspace:packages/esm-care-panel-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
+    "@openmrs/esm-patient-common-lib": "npm:^7.0.2-pre.3795"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
     webpack: "npm:^5.74.0"
@@ -2654,7 +2654,7 @@ __metadata:
   resolution: "@kenyaemr/esm-patient-clinical-view-app@workspace:packages/esm-patient-clinical-view-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
+    "@openmrs/esm-patient-common-lib": "npm:^7.0.2-pre.3795"
     lodash-es: "npm:^4.17.15"
     webpack: "npm:^5.74.0"
   peerDependencies:
@@ -2686,7 +2686,7 @@ __metadata:
   resolution: "@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
+    "@openmrs/esm-patient-common-lib": "npm:^7.0.2-pre.3795"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
     webpack: "npm:^5.74.0"
@@ -4019,6 +4019,21 @@ __metadata:
     "@openmrs/esm-styleguide": 5.x
     rxjs: 6.x
   checksum: 007320214dcefbe00dce88b9c99ad005c3675cee33ee4134fe3df91571269425f0d20d22a1bf8f61c266ed7640d7a31e1c5b0255614576cb80bd6c7eb87ad8b8
+  languageName: node
+  linkType: hard
+
+"@openmrs/esm-patient-common-lib@npm:^7.0.2-pre.3795":
+  version: 7.0.2-pre.3795
+  resolution: "@openmrs/esm-patient-common-lib@npm:7.0.2-pre.3795"
+  dependencies:
+    "@carbon/react": "npm:^1.12.0"
+    lodash-es: "npm:^4.17.21"
+    uuid: "npm:^8.3.2"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    react: 18.x
+    single-spa: 6.x
+  checksum: 3f7d1f3d998378ccf20d1dcd9c618a8a84f2f5b89634500d532af9a367030095d4635139668c93c672dd2251108fdd641aa83e87cab57a980fda24d5f66b109c
   languageName: node
   linkType: hard
 
