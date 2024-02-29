@@ -29,6 +29,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
       phoneNumber: data.phoneNumber,
       amount: data.billAmount,
       billUuid: bill.uuid,
+      billUrl: bill.uuid,
       referenceNumber: bill.receiptNumber,
       callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
     };
@@ -72,7 +73,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     type="text"
                     labelText={t('phoneNumber', 'Phone Number')}
                     size="md"
-                    placeholder="{t('phoneNumber,' 'Phone Number')}"
+                    placeholder="Phone Number"
                   />
                 </Layer>
               )}
