@@ -27,3 +27,14 @@ export const usePaymentModes = () => {
     error,
   };
 };
+
+export const initiateStkPush = (payload) => {
+  const url = `/ws/rest/v1/cashier/api/payment-request`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: payload,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};

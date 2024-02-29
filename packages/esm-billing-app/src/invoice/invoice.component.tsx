@@ -4,7 +4,7 @@ import { Printer } from '@carbon/react/icons';
 import { useParams } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePatient, showModal } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { convertToCurrency } from '../helpers';
 import { LineItem } from '../types';
@@ -58,6 +58,13 @@ const Invoice: React.FC = () => {
     onAfterPrint: handleAfterPrint,
     removeAfterPrint: true,
   });
+
+  const handleBillPayment = () => {
+    const dispose = showModal('initiate-payment-modal', {
+      closeModal: () => dispose(),
+      bill: bill,
+    });
+  };
 
   useEffect(() => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
@@ -118,6 +125,9 @@ const Invoice: React.FC = () => {
             {t('printBill', 'Print bill')}
           </Button>
           {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null}
+          <Button onClick={handleBillPayment} iconDescription="Initiate Payment" className={styles.button} size="md">
+            {t('initiatePayment', 'Initiate Payment')}
+          </Button>
         </div>
       </div>
 

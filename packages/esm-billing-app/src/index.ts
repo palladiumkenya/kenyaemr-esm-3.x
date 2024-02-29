@@ -11,6 +11,7 @@ import BillableServiceHome from './billable-services/billable-services-home.comp
 import BillingForm from './billing-form/billing-form.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
+import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -47,3 +48,4 @@ export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLin
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);
 export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
+export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, options);
