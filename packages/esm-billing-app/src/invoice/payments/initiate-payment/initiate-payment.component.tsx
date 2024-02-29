@@ -28,7 +28,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     const payload = {
       phoneNumber: data.phoneNumber,
       amount: data.billAmount,
-      billUrl: bill.uuid,
+      billUuid: bill.uuid,
       referenceNumber: bill.receiptNumber,
       callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
     };
@@ -59,7 +59,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
       <ModalHeader closeModal={closeModal} />
       <ModalBody>
         <Form className={styles.form}>
-          <h4>{t('paymentForm', 'Bill Payment')}</h4>
+          <h4>{t('paymentPayment', 'Bill Payment')}</h4>
           <section className={styles.section}>
             <Controller
               control={control}
@@ -72,7 +72,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     type="text"
                     labelText={t('phoneNumber', 'Phone Number')}
                     size="md"
-                    placeholder="Phone Number"
+                    placeholder="{t('phoneNumber,' 'Phone Number')}"
                   />
                 </Layer>
               )}

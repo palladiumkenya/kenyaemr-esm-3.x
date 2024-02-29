@@ -116,18 +116,19 @@ const Invoice: React.FC = () => {
           ))}
         </section>
         <div>
+          <Button onClick={handleBillPayment} iconDescription="Initiate Payment" size="md">
+            {t('initiatePayment', 'Initiate Payment')}
+          </Button>
           <Button
             disabled={isPrinting}
             onClick={handlePrint}
             renderIcon={(props) => <Printer size={24} {...props} />}
             iconDescription="Print bill"
+            className={styles.button}
             size="md">
             {t('printBill', 'Print bill')}
           </Button>
           {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null}
-          <Button onClick={handleBillPayment} iconDescription="Initiate Payment" className={styles.button} size="md">
-            {t('initiatePayment', 'Initiate Payment')}
-          </Button>
         </div>
       </div>
 
