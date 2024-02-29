@@ -129,9 +129,6 @@ const Invoice: React.FC = () => {
             {t('printBill', 'Print bill')}
           </Button>
           {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null}
-          <Button onClick={handleBillPayment} iconDescription="Initiate Payment" className={styles.button} size="md">
-            {t('initiatePayment', 'Initiate Payment')}
-          </Button>
         </div>
       </div>
 

@@ -73,7 +73,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     type="text"
                     labelText={t('phoneNumber', 'Phone Number')}
                     size="md"
-                    placeholder="Phone Number"
+                    placeholder="{t('phoneNumber,' 'Phone Number')}"
                   />
                 </Layer>
               )}
