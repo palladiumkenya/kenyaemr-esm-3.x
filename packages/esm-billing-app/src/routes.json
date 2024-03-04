@@ -47,8 +47,8 @@
       }
     },
     {
-      "name": "billing-checkin-form",
-      "slot": "billing-checkin-slot",
+      "name": "billing-check-in-form",
+      "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
     },
     {
