@@ -11,10 +11,10 @@ import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS } from '../constants';
 
 type BillingCheckInFormProps = {
   patientUuid: string;
-  setBillingInfo: (state) => void;
+  setExtraVisitInfo: (state) => void;
 };
 
-const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, setBillingInfo }) => {
+const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, setExtraVisitInfo }) => {
   const { t } = useTranslation();
   const {
     visitAttributeTypes: { isPatientExempted },
@@ -70,7 +70,10 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
       payments: [],
     };
 
-    setBillingInfo({ createBillPayload, handleCreateBill: () => handleCreateBill(createBillPayload), attributes });
+    setExtraVisitInfo({
+      handleCreateExtraVisitInfo: () => handleCreateBill(createBillPayload),
+      attributes,
+    });
   };
 
   if (isLoadingLineItems || isLoadingCashPoints) {
