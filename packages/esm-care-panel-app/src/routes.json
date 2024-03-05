@@ -30,6 +30,26 @@
     {
       "name": "delete-regimen-confirmation-dialog",
       "component": "deleteRegimenConfirmationDialog"
+    },
+    {
+      "name": "hiv-patient-visit-summary-dashboard-link",
+      "component": "hivPatientSummaryDashboardLink",
+      "slot": "hiv-care-and-treatment-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-hiv-patient-summary-slot",
+        "path": "HIV Patient Summary",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "hiv-patient-visit-summary",
+      "slot": "patient-chart-hiv-patient-summary-slot",
+      "component": "hivPatientSummary",
+      "order": 3,
+      "online": true,
+      "offline": false
     }
   ]
 }
