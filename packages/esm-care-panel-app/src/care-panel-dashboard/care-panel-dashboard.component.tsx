@@ -28,7 +28,6 @@ const CarePanelDashboard: React.FC<CarePanelDashboardProps> = ({
           <TabList contained activation="manual" aria-label="List of care panels">
             <Tab renderIcon={Dashboard}>{t('panelSummary', 'Panel summary')}</Tab>
             <Tab renderIcon={CloudMonitoring}>{t('enrollments', 'Program enrollment')}</Tab>
-            <Tab renderIcon={Printer}>{t('printSummary', 'Print summary')}</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -40,9 +39,6 @@ const CarePanelDashboard: React.FC<CarePanelDashboardProps> = ({
             </TabPanel>
             <TabPanel>
               <CarePrograms patientUuid={patientUuid} />
-            </TabPanel>
-            <TabPanel>
-              <PatientSummary patientUuid={patientUuid} />
             </TabPanel>
           </TabPanels>
         </Tabs>

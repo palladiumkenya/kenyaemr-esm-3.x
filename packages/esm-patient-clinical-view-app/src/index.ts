@@ -2,10 +2,10 @@ import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { createDashboardGroup } from './clinical-view-group/createDashboardGroup';
-import DefaulterTracing from './special-clinics/hiv-care-and-treatment-services/defaulter-tracing/defaulter-tracing.component';
+import DefaulterTracing from './specialized-clinics/hiv-care-and-treatment-services/defaulter-tracing/defaulter-tracing.component';
 import ClinicalEncounterDashboard from './clinical-encounter/dashboard/clinical-encounter-dashboard.component';
 import FamilyHistory from './family-partner-history/family-history.component';
-import HivTestingEncountersList from './special-clinics/hiv-care-and-treatment-services/hiv-testing-services/views/hiv-testing/hiv-testing-services.component';
+import HivTestingEncountersList from './specialized-clinics/hiv-care-and-treatment-services/hiv-testing-services/views/hiv-testing/hiv-testing-services.component';
 import ClinicalViewSection from './clinical-view-group/clinical-view-section.component';
 import AntenatalCare from './maternal-and-child-health/antenatal-care.component';
 import PostnatalCare from './maternal-and-child-health/postnatal-care.component';
@@ -21,8 +21,8 @@ import {
   hivCareAndTreatmentNavGroup,
   defaulterTracingDashboardMeta,
   htsDashboardMeta,
-} from './special-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
-import { specialClinicsNavGroup } from './special-clinics/special-clinic-dashboard.meta';
+} from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
+import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-dashboard.meta';
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
