@@ -1,16 +1,20 @@
 import useSWR from 'swr';
 import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
-
+import { useState } from 'react';
 export const useBillableItems = () => {
   const url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
+  const [searchTerm, setSearchTerm] = useState('');
+  const filteredItems =
+    data?.data?.results?.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase())) ?? [];
   return {
-    lineItems: data?.data?.results ?? [],
+    lineItems: filteredItems,
     isLoading,
     error,
+    searchTerm,
+    setSearchTerm,
   };
 };
-
 export const useCashPoint = () => {
   const url = `/ws/rest/v1/cashier/cashPoint`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);

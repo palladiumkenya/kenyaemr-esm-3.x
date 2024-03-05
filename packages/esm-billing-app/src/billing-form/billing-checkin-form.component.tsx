@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Dropdown, InlineLoading, InlineNotification, Layer } from '@carbon/react';
+import { InlineLoading, InlineNotification, Layer, Search } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -20,11 +20,21 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     visitAttributeTypes: { isPatientExempted },
   } = useConfig<BillingConfig>();
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
-  const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
+  const { lineItems, isLoading: isLoadingLineItems, error: lineError, searchTerm, setSearchTerm } = useBillableItems();
+  const [showItems, setShowItems] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const [attributes, setAttributes] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState<any>();
   let lineList = [];
-
+  const handleSearchInputChange = (event) => {
+    setSearchTerm(event.target.value);
+    if (!event.target.value) {
+      setShowItems(false);
+    } else {
+      setShowItems(true);
+    }
+  };
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
       () => {
@@ -42,7 +52,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     );
   }, []);
 
-  const handleBillingService = ({ selectedItem }) => {
+  const handleBillingService = (selectedItem) => {
     const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
     const itemUuid = selectedItem?.uuid ?? '';
 
@@ -76,6 +86,9 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     });
   };
 
+  const handleItemSelect = (selectedItem) => {
+    setSelectedItem(selectedItem);
+  };
   if (isLoadingLineItems || isLoadingCashPoints) {
     return (
       <InlineLoading
@@ -116,14 +129,30 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
         <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
         <div className={styles.sectionField}>
           <Layer>
-            <Dropdown
-              label={t('selectServices', 'Select a service...')}
-              onChange={handleBillingService}
+            <Search
+              size="lg"
+              placeholder={t('selectServicesHolder', 'Select a service...')}
+              labelText={t('selectServices', 'Select a service...')}
+              onChange={handleSearchInputChange}
               id="billable-items"
-              items={lineList}
-              itemToString={(item) => (item ? `${item.name} ${setServicePrice(item.servicePrices)}` : '')}
-              titleText={t('billableService', 'Billable service')}
+              value={searchTerm}
             />
+            {showItems && (
+              <div>
+                {lineItems
+                  .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                  .map((item) => (
+                    <div
+                      key={item.uuid}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleItemSelect(item)}
+                      style={{ backgroundColor: selectedItem === item ? 'GrayText' : 'transparent' }}>
+                      {item.name} {setServicePrice(item.servicePrices)}
+                    </div>
+                  ))}
+              </div>
+            )}
           </Layer>
         </div>
       </section>
