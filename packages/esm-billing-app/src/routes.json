@@ -69,6 +69,10 @@
       "component": "visitAttributeTags",
       "slot": "patient-banner-tags-slot",
       "order": 2
+    },
+    {
+      "name": "initiate-payment-modal",
+      "component": "initiatePaymentDialog"
     }
   ]
 }
