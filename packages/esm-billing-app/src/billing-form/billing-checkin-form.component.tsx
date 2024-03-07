@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { InlineLoading, InlineNotification, Layer, Search } from '@carbon/react';
+import React, { useCallback, useMemo, useState } from 'react';
+import { InlineLoading, InlineNotification, Layer, Search, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -19,11 +19,25 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const {
     visitAttributeTypes: { isPatientExempted },
   } = useConfig<BillingConfig>();
-  const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
-  const { lineItems, isLoading: isLoadingLineItems, error: lineError, searchTerm, setSearchTerm } = useBillableItems();
-  const [showItems, setShowItems] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
 
+  const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
+  const { lineItems, isLoading: isLoadingLineItems, error: lineError, setSearchTerm } = useBillableItems();
+  const [showItems, setShowItems] = useState(false);
+  const [searchString, setSearchString] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
+  const searchResults = useMemo(() => {
+    if (lineItems !== undefined && lineItems.length > 0) {
+      if (searchString && searchString.trim() !== '') {
+        const search = searchString.toLowerCase();
+        return lineItems?.filter((service) =>
+          Object.entries(service).some(([header, value]) => {
+            return header === 'uuid' ? false : `${value}`.toLowerCase().includes(search);
+          }),
+        );
+      }
+    }
+    return lineItems;
+  }, [searchString, lineItems]);
   const [attributes, setAttributes] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState<any>();
   let lineList = [];
@@ -35,6 +49,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
       setShowItems(true);
     }
   };
+
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
       () => {
@@ -86,9 +101,6 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     });
   };
 
-  const handleItemSelect = (selectedItem) => {
-    setSelectedItem(selectedItem);
-  };
   if (isLoadingLineItems || isLoadingCashPoints) {
     return (
       <InlineLoading
@@ -130,28 +142,40 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
         <div className={styles.sectionField}>
           <Layer>
             <Search
-              size="lg"
               placeholder={t('selectServicesHolder', 'Select a service...')}
               labelText={t('selectServices', 'Select a service...')}
               onChange={handleSearchInputChange}
               id="billable-items"
-              value={searchTerm}
             />
-            {showItems && (
-              <div>
-                {lineItems
-                  .filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                  .map((item) => (
+            {searchResults?.length === 0 ? (
+              <div className={styles.filterEmptyState}>
+                <Layer level={0}>
+                  <Tile className={styles.filterEmptyStateTile}>
+                    <p className={styles.filterEmptyStateContent}>
+                      {t('noMatchingServicesToDisplay', 'No matching services to display')}
+                    </p>
+                    <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
+                  </Tile>
+                </Layer>
+              </div>
+            ) : (
+              showItems && (
+                <div>
+                  {lineItems.map((item) => (
                     <div
                       key={item.uuid}
                       role="button"
                       tabIndex={0}
-                      onClick={() => handleItemSelect(item)}
+                      onClick={() => {
+                        handleBillingService(item);
+                        setSelectedItem(item);
+                      }}
                       style={{ backgroundColor: selectedItem === item ? 'GrayText' : 'transparent' }}>
                       {item.name} {setServicePrice(item.servicePrices)}
                     </div>
                   ))}
-              </div>
+                </div>
+              )
             )}
           </Layer>
         </div>

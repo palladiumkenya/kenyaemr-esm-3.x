@@ -97,6 +97,7 @@
   "selectPaymentMethod": "Select payment method",
   "selectPaymentMethodPlaceholder": "Select payment method",
   "selectServices": "Select a service...",
+  "selectServicesHolder": "Select a service...",
   "sellingAmount": "Enter selling price",
   "sellingPrice": "Selling Price",
   "service": "Service",
