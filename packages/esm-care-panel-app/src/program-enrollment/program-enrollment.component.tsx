@@ -20,7 +20,6 @@ import dayjs from 'dayjs';
 import { formatDate } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
-import { empty } from 'rxjs';
 
 export interface ProgramEnrollmentProps {
   patientUuid: string;
@@ -105,7 +104,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
         encounterUuid: '',
         formUuid: enrollment?.discontinuationFormUuid,
         additionalProps:
-          { enrollmenrDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
+          { enrollmentDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
           {},
       },
     });
@@ -123,7 +122,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
         encounterUuid: enrollment?.enrollmentEncounterUuid,
         formUuid: enrollment?.enrollmentFormUuid,
         additionalProps:
-          { enrollmenrDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
+          { enrollmentDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
           {},
       },
     });
