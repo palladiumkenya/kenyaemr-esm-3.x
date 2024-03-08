@@ -10,6 +10,7 @@ export interface BillingConfig {
     billPaymentStatus: string;
   };
   patientExemptionCategories: Array<{ value: string; label: string }>;
+  excludedPaymentMode: Array<{ uuid: string; label: string }>;
 }
 
 export const configSchema = {
@@ -59,5 +60,20 @@ export const configSchema = {
       },
     },
     _default: [{ value: 'IN_PRISON', label: 'In Prison' }],
+  },
+  excludedPaymentMode: {
+    _type: Type.Array,
+    _elements: {
+      uuid: {
+        _type: Type.UUID,
+        _description: 'The value of the payment mode to be excluded',
+      },
+      label: {
+        _type: Type.String,
+        _default: null,
+        _description: 'The label of the payment mode to be excluded',
+      },
+    },
+    _default: [],
   },
 };
