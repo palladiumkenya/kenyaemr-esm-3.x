@@ -156,7 +156,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
           />
         </Layer>
 
-        {paymentMethods?.name?.toLocaleLowerCase().includes('insurance') && isPatientExempted && (
+        {paymentMethods?.name?.toLocaleLowerCase().includes('insurance') && (
           <>
             <Layer className={styles.sectionFieldLayer}>
               <Controller
@@ -181,7 +181,6 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
                   <TextInput
                     className={styles.sectionField}
                     onChange={(e) => field.onChange(e.target.value)}
-                    {...field}
                     id="policy-number"
                     type="text"
                     labelText={t('policyNumber', 'Policy number')}

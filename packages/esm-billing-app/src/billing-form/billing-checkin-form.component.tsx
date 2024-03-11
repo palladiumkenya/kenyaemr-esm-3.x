@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { InlineLoading, InlineNotification, Layer, Search, Tile } from '@carbon/react';
+import { InlineLoading, InlineNotification, Layer, FilterableMultiSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -24,7 +24,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const { lineItems, isLoading: isLoadingLineItems, error: lineError, setSearchTerm } = useBillableItems();
   const [showItems, setShowItems] = useState(false);
   const [searchString, setSearchString] = useState('');
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState([]);
   const searchResults = useMemo(() => {
     if (lineItems !== undefined && lineItems.length > 0) {
       if (searchString && searchString.trim() !== '') {
@@ -141,42 +141,14 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
         <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
         <div className={styles.sectionField}>
           <Layer>
-            <Search
-              placeholder={t('selectServicesHolder', 'Select a service...')}
-              labelText={t('selectServices', 'Select a service...')}
-              onChange={handleSearchInputChange}
-              id="billable-items"
+            {/* TODO: Replace this Filterable multiselect with searching capability once endpoint is available */}
+            <FilterableMultiSelect
+              id="billing-service"
+              titleText={t('searchServices', 'Search services')}
+              items={lineItems ?? []}
+              itemToString={(item) => (item ? item?.name : '')}
+              onChange={({ selectedItems }) => setSelectedItem(selectedItems)}
             />
-            {searchResults?.length === 0 ? (
-              <div className={styles.filterEmptyState}>
-                <Layer level={0}>
-                  <Tile className={styles.filterEmptyStateTile}>
-                    <p className={styles.filterEmptyStateContent}>
-                      {t('noMatchingServicesToDisplay', 'No matching services to display')}
-                    </p>
-                    <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
-                  </Tile>
-                </Layer>
-              </div>
-            ) : (
-              showItems && (
-                <div>
-                  {lineItems.map((item) => (
-                    <div
-                      key={item.uuid}
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => {
-                        handleBillingService(item);
-                        setSelectedItem(item);
-                      }}
-                      style={{ backgroundColor: selectedItem === item ? 'GrayText' : 'transparent' }}>
-                      {item.name} {setServicePrice(item.servicePrices)}
-                    </div>
-                  ))}
-                </div>
-              )
-            )}
           </Layer>
         </div>
       </section>
