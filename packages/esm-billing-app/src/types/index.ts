@@ -166,3 +166,12 @@ export type ServiceConcept = {
   };
   display: string;
 };
+
+export type BillingService = {
+  name: string;
+  servicePrices: Array<{ name: string; paymentMode: { uuid: string; name: string }; price: number; uuid: string }>;
+  serviceStatus: string;
+  serviceType: { display: string };
+  shortName: string;
+  uuid: string;
+};
