@@ -11,6 +11,7 @@ export interface BillingConfig {
   };
   patientExemptionCategories: Array<{ value: string; label: string }>;
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
+  enforceBillPayment: boolean;
 }
 
 export const configSchema = {
@@ -75,5 +76,10 @@ export const configSchema = {
       },
     },
     _default: [],
+  },
+  enforceBillPayment: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether to enforce bill payment or not for patient to receive service',
   },
 };

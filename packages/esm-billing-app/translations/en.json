@@ -61,6 +61,7 @@
   "loadingDescription": "Loading",
   "manageBillableServices": "Manage billable services",
   "name": "Name",
+  "navigateBack": "Navigate back",
   "nextPage": "Next page",
   "noBilltoDisplay": "There are no bills to display for this patient",
   "noMatchingBillsToDisplay": "No matching bills to display",
