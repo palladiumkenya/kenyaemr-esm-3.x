@@ -15,6 +15,8 @@ import {
 import styles from './require-payment.scss';
 import { useBills } from '../billing.resource';
 import { convertToCurrency, extractString } from '../helpers';
+import { useConfig } from '@openmrs/esm-framework';
+import { BillingConfig } from '../config-schema';
 
 type RequirePaymentModalProps = {
   cancel: () => void;
@@ -24,7 +26,16 @@ type RequirePaymentModalProps = {
 
 const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, patientUuid, cancel }) => {
   const { t } = useTranslation();
-  const { bills, isLoading, error } = useBills(patientUuid);
+  const { bills, isLoading } = useBills(patientUuid);
+  const { enforceBillPayment } = useConfig<BillingConfig>();
+
+  const closeButtonText = enforceBillPayment
+    ? t('navigateBack', 'Navigate back')
+    : t('proceedToCare', 'Proceed to care');
+
+  const handleCloseModal = () => {
+    enforceBillPayment ? cancel() : closeModal();
+  };
 
   const lineItems = bills
     .filter((bill) => bill.status !== 'PAID')
@@ -78,8 +89,8 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
         <Button kind="secondary" onClick={cancel}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={closeModal}>
-          {t('proceedToCare', 'Proceed to care')}
+        <Button kind="danger" onClick={handleCloseModal}>
+          {closeButtonText}
         </Button>
       </ModalFooter>
     </div>

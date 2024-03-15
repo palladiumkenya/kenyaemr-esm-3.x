@@ -7,6 +7,12 @@
     {
       "component": "billableServicesHome",
       "route":"billable-services"
+    },
+    {
+      "component": "billingPrompt",
+      "routeRegex": "^patient\/.+\/chart",
+      "online": true,
+      "offline": false
     }
   ],
   "extensions": [

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { InlineLoading, InlineNotification, Layer, FilterableMultiSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
@@ -8,6 +8,7 @@ import VisitAttributesForm from './visit-attributes/visit-attributes-form.compon
 import { BillingConfig } from '../config-schema';
 import { hasPatientBeenExempted } from './helper';
 import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS } from '../constants';
+import { BillingService } from '../types';
 
 type BillingCheckInFormProps = {
   patientUuid: string;
@@ -19,36 +20,11 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const {
     visitAttributeTypes: { isPatientExempted },
   } = useConfig<BillingConfig>();
-
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
-  const { lineItems, isLoading: isLoadingLineItems, error: lineError, setSearchTerm } = useBillableItems();
-  const [showItems, setShowItems] = useState(false);
-  const [searchString, setSearchString] = useState('');
-  const [selectedItem, setSelectedItem] = useState([]);
-  const searchResults = useMemo(() => {
-    if (lineItems !== undefined && lineItems.length > 0) {
-      if (searchString && searchString.trim() !== '') {
-        const search = searchString.toLowerCase();
-        return lineItems?.filter((service) =>
-          Object.entries(service).some(([header, value]) => {
-            return header === 'uuid' ? false : `${value}`.toLowerCase().includes(search);
-          }),
-        );
-      }
-    }
-    return lineItems;
-  }, [searchString, lineItems]);
+  const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const [attributes, setAttributes] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState<any>();
   let lineList = [];
-  const handleSearchInputChange = (event) => {
-    setSearchTerm(event.target.value);
-    if (!event.target.value) {
-      setShowItems(false);
-    } else {
-      setShowItems(true);
-    }
-  };
 
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
@@ -67,28 +43,29 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     );
   }, []);
 
-  const handleBillingService = (selectedItem) => {
+  const handleBillingService = (selectedItems: Array<BillingService>) => {
     const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
-    const itemUuid = selectedItem?.uuid ?? '';
-
-    // should default to first price if check returns empty. todo - update backend to return default price
-    const priceForPaymentMode =
-      selectedItem.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod) || selectedItem?.servicePrices[0];
     const billStatus = hasPatientBeenExempted(attributes, isPatientExempted)
       ? EXEMPTED_PAYMENT_STATUS
       : PENDING_PAYMENT_STATUS;
-    const createBillPayload = {
-      lineItems: [
-        {
-          billableService: itemUuid,
-          quantity: 1,
-          price: priceForPaymentMode ? priceForPaymentMode.price : '0.000',
-          priceName: 'Default',
-          priceUuid: priceForPaymentMode ? priceForPaymentMode.uuid : '',
-          lineItemOrder: 0,
-          paymentStatus: billStatus,
-        },
-      ],
+
+    const lineItems = selectedItems.map((item, index) => {
+      // // should default to first price if check returns empty. todo - update backend to return default price
+      const priceForPaymentMode =
+        item.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod) || item?.servicePrices[0];
+      return {
+        billableService: item?.uuid ?? '',
+        quantity: 1,
+        price: priceForPaymentMode ? priceForPaymentMode.price : '0.000',
+        priceName: 'Default',
+        priceUuid: priceForPaymentMode ? priceForPaymentMode.uuid : '',
+        lineItemOrder: index,
+        paymentStatus: billStatus,
+      };
+    });
+
+    const billPayload = {
+      lineItems: lineItems,
       cashPoint: cashPointUuid,
       patient: patientUuid,
       status: billStatus,
@@ -96,7 +73,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     };
 
     setExtraVisitInfo({
-      handleCreateExtraVisitInfo: () => handleCreateBill(createBillPayload),
+      handleCreateExtraVisitInfo: () => handleCreateBill(billPayload),
       attributes,
     });
   };
@@ -118,11 +95,6 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     );
   }
 
-  const setServicePrice = (prices) => {
-    const matchingPrice = prices.find((p) => p.paymentMode?.uuid === paymentMethod);
-    return matchingPrice ? `(${matchingPrice.name}:${matchingPrice.price})` : '';
-  };
-
   if (cashError || lineError) {
     return (
       <InlineNotification
@@ -141,13 +113,12 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
         <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
         <div className={styles.sectionField}>
           <Layer>
-            {/* TODO: Replace this Filterable multiselect with searching capability once endpoint is available */}
             <FilterableMultiSelect
               id="billing-service"
               titleText={t('searchServices', 'Search services')}
               items={lineItems ?? []}
               itemToString={(item) => (item ? item?.name : '')}
-              onChange={({ selectedItems }) => setSelectedItem(selectedItems)}
+              onChange={({ selectedItems }) => handleBillingService(selectedItems)}
             />
           </Layer>
         </div>
