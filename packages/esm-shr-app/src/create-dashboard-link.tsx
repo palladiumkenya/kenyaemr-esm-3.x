@@ -3,13 +3,13 @@ import last from 'lodash-es/last';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 
-export interface LinkConfig {
+export interface DashboardLinkConfig {
   name: string;
   title: string;
 }
 
-export function SHRDashboardExtension({ config }: { config: LinkConfig }) {
-  const { name, title } = config;
+function SHRDashboardLinkExtension({ dashboardLinkConfig }: { dashboardLinkConfig: DashboardLinkConfig }) {
+  const { name, title } = dashboardLinkConfig;
   const location = useLocation();
   const spaBasePath = window.getOpenmrsSpaBase() + 'home';
 
@@ -33,9 +33,9 @@ export function SHRDashboardExtension({ config }: { config: LinkConfig }) {
   );
 }
 
-export const createHomeDashboardLink = (config: LinkConfig) => () =>
+export const createHomeDashboardLink = (dashboardLinkConfig: DashboardLinkConfig) => () =>
   (
     <BrowserRouter>
-      <SHRDashboardExtension config={config} />
+      <SHRDashboardLinkExtension dashboardLinkConfig={dashboardLinkConfig} />
     </BrowserRouter>
   );

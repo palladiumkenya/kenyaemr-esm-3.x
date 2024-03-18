@@ -3,8 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import CommunityReferrals from './community-referrals/community-referrals.component';
 
 const SHRRootComponent: React.FC = () => {
-  const baseName = `${window.spaBase}/home/community-referrals`;
-
+  const baseName = window.getOpenmrsSpaBase() + 'home/community-referrals';
   return (
     <BrowserRouter basename={baseName}>
       <Routes>

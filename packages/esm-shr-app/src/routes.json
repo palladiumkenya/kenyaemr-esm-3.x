@@ -3,7 +3,12 @@
   "backendDependencies": {
     "kenyaemr": "^18.6.2"
   },
-  "pages": [],
+  "pages": [
+    {
+      "component": "shrRoot",
+      "route": "community-referrals"
+    }
+  ],
   "extensions": [
     {
       "name": "shr-patient-summary",
@@ -36,8 +41,8 @@
       "slot": "homepage-dashboard-slot",
       "component": "communityReferralsDashboardLink",
       "meta": {
-        "name": "community referrals",
-        "title": "community referrals",
+        "name": "community-referrals",
+        "title": "community-referrals",
         "slot": "community-referrals-slot"
       }
     }
