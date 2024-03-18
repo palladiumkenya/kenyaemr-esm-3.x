@@ -4,7 +4,7 @@ import { dashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import { createHomeDashboardLink } from './create-dashboard-link';
-import SHRRootComponent from './shr-root.component';
+import ReferralReasonsDialogPopup from './community-referrals/referral-reasons/referral-reasons.component';
 
 const moduleName = '@kenyaemr/esm-shr-app';
 
@@ -34,3 +34,8 @@ export const communityReferralsDashboardLink = getSyncLifecycle(
 );
 
 export const shrRoot = getAsyncLifecycle(() => import('./shr-root.component'), options);
+
+export const referralReasonsDialogPopup = getSyncLifecycle(ReferralReasonsDialogPopup, {
+  featureName: 'View Referral Reasons',
+  moduleName,
+});

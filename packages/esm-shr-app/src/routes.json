@@ -45,6 +45,10 @@
         "title": "community-referrals",
         "slot": "community-referrals-slot"
       }
+    },
+    {
+      "name": "referral-reasons-dialog",
+      "component": "referralReasonsDialogPopup"
     }
   ]
 }
