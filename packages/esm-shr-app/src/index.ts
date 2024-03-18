@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
@@ -9,7 +9,7 @@ import SHRRootComponent from './shr-root.component';
 const moduleName = '@kenyaemr/esm-shr-app';
 
 const options = {
-  featureName: 'patient-shr',
+  featureName: '@kenyaemr/esm-shr-app',
   moduleName,
 };
 
@@ -33,4 +33,4 @@ export const communityReferralsDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const shrRoot = getSyncLifecycle(SHRRootComponent, options);
+export const shrRoot = getAsyncLifecycle(() => import('./shr-root.component'), options);
