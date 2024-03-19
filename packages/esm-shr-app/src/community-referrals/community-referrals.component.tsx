@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  DataTableSkeleton,
 } from '@carbon/react';
 import { useLayoutType, isDesktop, usePagination } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -124,94 +125,82 @@ const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
     [goTo, setSearchString],
   );
 
-  if (isLoading) {
-    <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;
-  }
-
-  return (
-    <>
-      {referrals?.length > 0 ? (
-        <div className={styles.serviceContainer}>
-          <FilterableTableHeader
-            handleSearch={handleSearch}
-            isValidating={isValidating}
-            layout={layout}
-            responsiveSize={responsiveSize}
-            t={t}
-          />
-          <DataTable
-            isSortable
-            rows={rowData}
-            headers={headerData}
-            size={responsiveSize}
-            useZebraStyles={rowData?.length > 1 ? true : false}>
-            {({ rows, headers, getRowProps, getTableProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()} aria-label="service list">
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader key={header.key}>{header.header}</TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        {...getRowProps({
-                          row,
-                        })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
-                        ))}
-                      </TableRow>
+  return isLoading ? (
+    <DataTableSkeleton />
+  ) : (
+    <div className={styles.serviceContainer}>
+      <FilterableTableHeader
+        handleSearch={handleSearch}
+        isValidating={isValidating}
+        layout={layout}
+        responsiveSize={responsiveSize}
+        t={t}
+      />
+      <DataTable
+        isSortable
+        rows={rowData}
+        headers={headerData}
+        size={responsiveSize}
+        useZebraStyles={rowData?.length > 1 ? true : false}>
+        {({ rows, headers, getRowProps, getTableProps }) => (
+          <TableContainer>
+            <Table {...getTableProps()} aria-label="Referred Patients">
+              <TableHead>
+                <TableRow>
+                  {headers.map((header) => (
+                    <TableHeader key={header.key}>{header.header}</TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    {...getRowProps({
+                      row,
+                    })}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DataTable>
-          {searchResults?.length === 0 && (
-            <div className={styles.filterEmptyState}>
-              <Layer level={0}>
-                <Tile className={styles.filterEmptyStateTile}>
-                  <p className={styles.filterEmptyStateContent}>
-                    {t('noMatchingServicesToDisplay', 'No matching services to display')}
-                  </p>
-                  <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
-                </Tile>
-              </Layer>
-            </div>
-          )}
-          {paginated && (
-            <Pagination
-              forwardText="Next page"
-              backwardText="Previous page"
-              page={currentPage}
-              pageSize={pageSize}
-              pageSizes={pageSizes}
-              totalItems={searchResults?.length}
-              className={styles.pagination}
-              size={responsiveSize}
-              onChange={({ pageSize: newPageSize, page: newPage }) => {
-                if (newPageSize !== pageSize) {
-                  setPageSize(newPageSize);
-                }
-                if (newPage !== currentPage) {
-                  goTo(newPage);
-                }
-              }}
-            />
-          )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </DataTable>
+      {searchResults?.length === 0 && (
+        <div className={styles.filterEmptyState}>
+          <Layer level={0}>
+            <Tile className={styles.filterEmptyStateTile}>
+              <p className={styles.filterEmptyStateContent}>
+                {t('noRecordsToDisplay', 'There are no new referrals to this facility')}
+              </p>
+            </Tile>
+          </Layer>
         </div>
-      ) : (
-        <EmptyState
-          displayText={t('noListToDisplay', 'There are no any referrals to display')}
-          headerTitle={t('referrals', 'Community Referrals')}
+      )}
+      {paginated && (
+        <Pagination
+          forwardText="Next page"
+          backwardText="Previous page"
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={pageSizes}
+          totalItems={searchResults?.length}
+          className={styles.pagination}
+          size={responsiveSize}
+          onChange={({ pageSize: newPageSize, page: newPage }) => {
+            if (newPageSize !== pageSize) {
+              setPageSize(newPageSize);
+            }
+            if (newPage !== currentPage) {
+              goTo(newPage);
+            }
+          }}
         />
       )}
-    </>
+    </div>
   );
 };
 
@@ -224,7 +213,7 @@ function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveS
             [styles.tabletHeading]: !isDesktop(layout),
             [styles.desktopHeading]: isDesktop(layout),
           })}>
-          <h4>{t('servicesList', 'Services list')}</h4>
+          <h4>{t('referredPatients', 'Referred Patients')}</h4>
         </div>
         <div className={styles.backgroundDataFetchingIndicator}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
