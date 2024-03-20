@@ -27,3 +27,13 @@ export const processCommunityReferral = (id: number) => {
     },
   });
 };
+
+export async function pullFacilityReferrals() {
+  const abortController = new AbortController();
+  return openmrsFetch(`/ws/rest/v1/kenyaemril/pullShrReferrals`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+  });
+}
