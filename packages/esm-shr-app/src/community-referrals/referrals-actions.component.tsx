@@ -15,7 +15,8 @@ const CommunityReferralActions: React.FC<ReferralReasonData> = (referralData) =>
   const refearralReasonsHandleClick = useCallback(() => {
     const dispose = showModal('referral-reasons-dialog', {
       closeModal: () => dispose(),
-      referralReasons: { referralData },
+      referralReasons: referralData.referralData,
+      handleProcessReferral,
     });
   }, [referralData]);
   const handleProcessReferral = useCallback(() => {

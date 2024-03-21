@@ -1,0 +1,22 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.reasonCode,
+.clinicalNote {
+  font-weight: bold;
+  color: #333;
+}
+
+.reasonCode span,
+.clinicalNote span {
+  font-weight: normal;
+}
