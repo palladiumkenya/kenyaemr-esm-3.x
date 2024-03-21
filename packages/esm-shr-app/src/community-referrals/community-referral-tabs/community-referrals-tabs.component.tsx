@@ -32,12 +32,14 @@ const CommunityReferralTabs = () => {
   return (
     <div className={styles.referralsList} data-testid="referralsList-list">
       <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange} className={styles.tabs}>
-        <TabList style={{ paddingLeft: '1rem' }} aria-label="Referrals tabs" contained>
-          <Tab className={styles.tab}>{t('active', 'Active')}</Tab>
-          <Tab className={styles.tab}>{t('completed', 'Completed')}</Tab>
-        </TabList>
+        <div style={{ display: 'flex' }}>
+          <TabList style={{ paddingLeft: '1rem' }} aria-label="Referrals tabs" contained>
+            <Tab className={styles.tab}>{t('active', 'Active')}</Tab>
+            <Tab className={styles.tab}>{t('completed', 'Completed')}</Tab>
+          </TabList>
+          <Button onClick={pullCommunityReferrals}>Pull Community Referrals</Button>
+        </div>
         <div>{isLoadingFacilityReferrals && <InlineLoading />}</div>
-        <Button onClick={pullCommunityReferrals}>Pull Community Referrals</Button>
         <TabPanels>
           <TabPanel className={styles.tabPanel}>
             <CommunityReferrals status="active" />
