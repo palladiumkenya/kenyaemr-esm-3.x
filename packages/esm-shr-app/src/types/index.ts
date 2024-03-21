@@ -176,3 +176,23 @@ type vl = {
   vl?: string;
   vlDate?: string;
 };
+export interface CommunityReferral {
+  id: number;
+  uuid: string;
+  nupi: string;
+  dateReferred: string;
+  referredFrom: string;
+  givenName: string;
+  middleName: string;
+  familyName: string;
+  birthdate: string;
+  gender: string;
+  referralReasons: ReferralReasonsProps;
+}
+
+export interface ReferralReasonsProps {
+  category: string;
+  clinicalNote: string;
+  reasonCode: string;
+  messageId: number;
+}
