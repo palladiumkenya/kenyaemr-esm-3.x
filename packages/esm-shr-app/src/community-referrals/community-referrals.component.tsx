@@ -15,8 +15,9 @@ import {
   TableRow,
   Tile,
   DataTableSkeleton,
+  Link,
 } from '@carbon/react';
-import { useLayoutType, isDesktop, usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, isDesktop, usePagination, navigate } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from '../community-referrals/community-referral-tabs/community-referrals-tabs.scss';
 import { useTranslation } from 'react-i18next';
@@ -70,10 +71,12 @@ const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
       header: t('referralService', 'Department'),
       key: 'referralService',
     },
-    {
-      header: t('actions', 'Actions'),
-      key: 'actions',
-    },
+    data.status === 'active'
+      ? {
+          header: t('actions', 'Actions'),
+          key: 'actions',
+        }
+      : '',
   ];
 
   const searchResults = useMemo(() => {
@@ -105,13 +108,23 @@ const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
         id: `${index}`,
         uuid: record.uuid,
         nupi: record.nupi,
-        name: setName(record),
+        name:
+          data.status === 'active' ? (
+            setName(record)
+          ) : (
+            <Link
+              onClick={() =>
+                navigate({ to: window.getOpenmrsSpaBase() + `patient/${record?.uuid}/chart/Patient Summary` })
+              }>
+              {setName(record)}
+            </Link>
+          ),
         gender: record.gender,
         birthdate: record.birthdate,
         dateReferred: record.dateReferred,
         referredFrom: record.referredFrom,
         referralService: record.referralReasons?.category,
-        actions: <CommunityReferralActions referralData={referralReasonsx} />,
+        actions: data.status === 'active' ? <CommunityReferralActions referralData={referralReasonsx} /> : null,
       };
       rowData.push(s);
     });
