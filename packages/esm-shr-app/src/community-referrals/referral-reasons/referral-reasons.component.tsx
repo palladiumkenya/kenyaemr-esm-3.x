@@ -9,12 +9,14 @@ import { showNotification } from '@openmrs/esm-framework';
 export interface ReferralReasonsDialogPopupProps {
   closeModal: () => void;
   referralReasons: ReferralReasonsProps;
+  status: string;
   handleProcessReferral: () => void;
 }
 
 const ReferralReasonsDialogPopup: React.FC<ReferralReasonsDialogPopupProps> = ({
   closeModal,
   referralReasons,
+  status,
   handleProcessReferral,
 }) => {
   const { t } = useTranslation();
@@ -51,9 +53,11 @@ const ReferralReasonsDialogPopup: React.FC<ReferralReasonsDialogPopupProps> = ({
           <Button kind="secondary" onClick={closeModal}>
             {t('cancel', 'Cancel')}
           </Button>
-          <Button kind="primary" onClick={handleServeClient}>
-            {t('serveClient', 'Serve client')}
-          </Button>
+          {status === 'completed' ? null : (
+            <Button kind="primary" onClick={handleServeClient}>
+              {t('serveClient', 'Serve client')}
+            </Button>
+          )}
         </ModalFooter>
       </Form>
     </div>
