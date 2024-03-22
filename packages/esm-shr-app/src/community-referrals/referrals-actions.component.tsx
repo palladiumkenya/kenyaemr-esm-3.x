@@ -8,19 +8,21 @@ import { processCommunityReferral } from './community-refferals.resource';
 
 interface ReferralReasonData {
   referralData: ReferralReasonsProps;
+  status: string;
 }
 
-const CommunityReferralActions: React.FC<ReferralReasonData> = (referralData) => {
+const CommunityReferralActions: React.FC<ReferralReasonData> = ({ status, referralData }) => {
   const { t } = useTranslation();
   const refearralReasonsHandleClick = useCallback(() => {
     const dispose = showModal('referral-reasons-dialog', {
       closeModal: () => dispose(),
-      referralReasons: referralData.referralData,
+      referralReasons: referralData,
+      status: status,
       handleProcessReferral,
     });
   }, [referralData]);
   const handleProcessReferral = useCallback(() => {
-    processCommunityReferral(referralData.referralData.messageId)
+    processCommunityReferral(referralData.messageId)
       .then((res) => {
         showSnackbar({
           title: t('processReferral', 'Process referral'),
@@ -49,9 +51,11 @@ const CommunityReferralActions: React.FC<ReferralReasonData> = (referralData) =>
       <Button kind="primary" size="md" style={{ 'margin-right': '10px' }} onClick={() => refearralReasonsHandleClick()}>
         View reasons
       </Button>
-      <Button kind="primary" size="md" onClick={() => handleProcessReferral()}>
-        Serve client
-      </Button>
+      {status === 'completed' ? null : (
+        <Button kind="primary" size="md" onClick={() => handleProcessReferral()}>
+          Serve client
+        </Button>
+      )}
     </>
   );
 };
