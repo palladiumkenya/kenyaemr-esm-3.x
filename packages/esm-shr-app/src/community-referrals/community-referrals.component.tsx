@@ -71,12 +71,10 @@ const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
       header: t('referralService', 'Department'),
       key: 'referralService',
     },
-    data.status === 'active'
-      ? {
-          header: t('actions', 'Actions'),
-          key: 'actions',
-        }
-      : '',
+    {
+      header: t('actions', 'Actions'),
+      key: 'actions',
+    },
   ];
 
   const searchResults = useMemo(() => {
