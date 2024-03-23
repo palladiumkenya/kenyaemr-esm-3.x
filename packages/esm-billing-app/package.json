@@ -38,12 +38,12 @@
   },
   "dependencies": {
     "@carbon/react": "^1.42.1",
+    "@openmrs/esm-patient-common-lib": "next",
     "lodash-es": "^4.17.15",
     "react-to-print": "^2.14.13"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "7.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",
     "react-router-dom": "6.x",
