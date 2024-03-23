@@ -21,15 +21,6 @@ const options = {
   moduleName,
 };
 
-// t('billing', 'Billing')
-export const billingDashboardLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'billing',
-    title: 'Billing',
-  }),
-  options,
-);
-
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 export function startupApp() {
@@ -38,6 +29,14 @@ export function startupApp() {
 
 export const billingSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),
+  options,
+);
+// t('billing', 'Billing')
+export const billingDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'billing',
+    title: 'Billing',
+  }),
   options,
 );
 
