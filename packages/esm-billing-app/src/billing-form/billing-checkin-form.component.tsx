@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { InlineLoading, InlineNotification, Layer, FilterableMultiSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
@@ -77,6 +77,13 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
       attributes,
     });
   };
+
+  useEffect(() => {
+    setExtraVisitInfo({
+      handleCreateExtraVisitInfo: () => {},
+      attributes,
+    });
+  }, []);
 
   if (isLoadingLineItems || isLoadingCashPoints) {
     return (
