@@ -29,7 +29,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@openmrs/esm-framework": "^5.3.2",
+    "@openmrs/esm-framework": "next",
     "@playwright/test": "^1.30.0",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.165",

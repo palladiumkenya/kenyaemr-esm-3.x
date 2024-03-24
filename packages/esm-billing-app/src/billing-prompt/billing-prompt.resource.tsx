@@ -18,7 +18,9 @@ export const useBillingPrompt = (patientUuid: string) => {
   const { currentVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
   const { bills, isLoading, error } = useBills(patientUuid);
 
-  const flattenBills = bills.flatMap((bill) => bill.lineItems);
+  const flattenBills = bills
+    .flatMap((bill) => bill.lineItems)
+    .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED');
   const flattenPayments = bills.flatMap((bill) => bill.payments);
 
   const totalBill = flattenBills.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
