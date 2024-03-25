@@ -21,7 +21,7 @@
     {
       "name": "shr-summary-dashboard-link",
       "component": "shrSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
+      "slot": "patient-chart-dashboard-slot-removed",
       "order": 21,
       "meta": {
         "columns": 1,
