@@ -56,7 +56,7 @@ const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
       key: 'gender',
     },
     {
-      header: t('birthdate', 'Birth Date'),
+      header: t('birthdate', 'Date of birth'),
       key: 'birthdate',
     },
     {
@@ -64,7 +64,7 @@ const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
       key: 'dateReferred',
     },
     {
-      header: t('referredFrom', 'Refereed From'),
+      header: t('referredFrom', 'Referred From'),
       key: 'referredFrom',
     },
     {
