@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, Tile, DataTableSkeleton } from '@carbon/react';
 import styles from './referral-chart-view.component.scss';
-import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { formatDate, isDesktop, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useCommunityReferral } from '../community-refferals.resource';
 
@@ -11,9 +11,13 @@ export interface ReferralReasonsDialogPopupProps {
 }
 
 const ReferralReasonsView: React.FC<ReferralReasonsDialogPopupProps> = ({ patientUuid }) => {
+  const { patient } = usePatient(patientUuid);
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { referral, isLoading, isValidating } = useCommunityReferral('MOH8DW535506J'); // TODO dynamically fetch nupi from patient chart
+  const patientNupiNumber = patient?.identifier.find((item) => {
+    return item.type.coding.some((coding) => coding.code === 'f85081e2-b4be-4e48-b3a4-7994b69bb101'); // nupi identifier
+  })?.value;
+  const { referral, isLoading, isValidating } = useCommunityReferral(patientNupiNumber);
 
   const headerTitle = t('referral', 'Referrals');
 
