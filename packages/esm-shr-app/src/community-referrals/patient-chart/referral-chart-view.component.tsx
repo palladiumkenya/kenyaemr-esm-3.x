@@ -65,6 +65,12 @@ const ReferralReasonsView: React.FC<ReferralReasonsDialogPopupProps> = ({ patien
               <span className={styles.value}> {referral?.referralReasons?.clinicalNote} </span>
             </p>
           </div>
+          <div className={styles.content}>
+            <p> {t('referredFrom', 'Referred From')}</p>
+            <p>
+              <span className={styles.value}> {referral?.referredFrom} </span>
+            </p>
+          </div>
         </div>
       </Tile>
     </Layer>
