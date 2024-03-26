@@ -188,6 +188,7 @@ export interface CommunityReferral {
   birthdate: string;
   gender: string;
   referralReasons: ReferralReasonsProps;
+  status?: string;
 }
 
 export interface ReferralReasonsProps {
@@ -195,4 +196,5 @@ export interface ReferralReasonsProps {
   clinicalNote: string;
   reasonCode: string;
   messageId: number;
+  referralDate?: string;
 }

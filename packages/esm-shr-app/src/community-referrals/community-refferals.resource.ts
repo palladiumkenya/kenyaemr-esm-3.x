@@ -37,3 +37,18 @@ export async function pullFacilityReferrals() {
     signal: abortController.signal,
   });
 }
+
+export const useCommunityReferral = (nupi: string) => {
+  const referralUrl = `/ws/rest/v1/kenyaemril/communityReferralByNupi?nupi=${nupi}`;
+  const { data, mutate, error, isLoading, isValidating } = useSWR<{ data: CommunityReferral }>(
+    referralUrl,
+    openmrsFetch,
+  );
+
+  return {
+    referral: data?.data ?? null,
+    isError: error,
+    isLoading: isLoading,
+    isValidating,
+  };
+};

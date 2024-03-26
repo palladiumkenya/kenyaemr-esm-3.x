@@ -49,6 +49,27 @@
     {
       "name": "referral-reasons-dialog",
       "component": "referralReasonsDialogPopup"
+    },
+    {
+      "name": "referral-view-link",
+      "component": "communityReferralLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 13,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-referral-slot",
+        "path": "community-referral",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "community-referral-view",
+      "slot": "patient-chart-referral-slot",
+      "component": "communityReferralWidget",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ]
 }
