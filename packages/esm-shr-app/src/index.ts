@@ -1,6 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { communityReferralDashboardMeta } from './dashboard.meta';
+import { referralDashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import { createHomeDashboardLink } from './create-dashboard-link';
@@ -41,6 +41,6 @@ export const referralReasonsDialogPopup = getSyncLifecycle(ReferralReasonsDialog
   moduleName,
 });
 
-// Dashboard links for community referrals and the corresponding view in the patient chart
-export const communityReferralWidget = getSyncLifecycle(ReferralChartView, options);
-export const communityReferralLink = getSyncLifecycle(createDashboardLink(communityReferralDashboardMeta), options);
+// Dashboard links for referrals and the corresponding view in the patient chart
+export const referralWidget = getSyncLifecycle(ReferralChartView, options);
+export const referralLink = getSyncLifecycle(createDashboardLink(referralDashboardMeta), options);

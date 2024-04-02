@@ -5,11 +5,11 @@
 //   path: 'SHR panel',
 // };
 
-export const communityReferralDashboardMeta = {
+export const referralDashboardMeta = {
   slot: 'patient-chart-referral-slot',
   columns: 1,
   title: 'Referrals',
-  path: 'community-referral',
+  path: 'referral',
   moduleName: '@kenyaemr/esm-shr-app',
   config: {},
 };

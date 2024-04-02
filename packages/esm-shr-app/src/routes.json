@@ -52,21 +52,21 @@
     },
     {
       "name": "referral-view-link",
-      "component": "communityReferralLink",
+      "component": "referralLink",
       "slot": "patient-chart-dashboard-slot",
       "order": 13,
       "meta": {
         "columns": 1,
         "columnSpan": 1,
         "slot": "patient-chart-referral-slot",
-        "path": "community-referral",
+        "path": "referral",
         "layoutMode": "anchored"
       }
     },
     {
-      "name": "community-referral-view",
+      "name": "referral-view",
       "slot": "patient-chart-referral-slot",
-      "component": "communityReferralWidget",
+      "component": "referralWidget",
       "order": 0,
       "online": true,
       "offline": false
