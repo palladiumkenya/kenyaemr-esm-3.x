@@ -26,7 +26,7 @@ const CommunityReferralActions: React.FC<ReferralReasonData> = ({ status, referr
       .then((res) => {
         showSnackbar({
           title: t('processReferral', 'Process referral'),
-          subtitle: t('processReferralSucess', 'Patient registered successfull'),
+          subtitle: t('processReferralSuccess', 'Patient registered successfully'),
           kind: 'success',
           timeoutInMs: 3500,
           isLowContrast: true,
