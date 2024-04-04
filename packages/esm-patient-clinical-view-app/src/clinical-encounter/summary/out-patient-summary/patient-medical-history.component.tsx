@@ -36,7 +36,6 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({
   encounters,
   isLoading,
   error,
-  mutate,
   isValidating,
 }) => {
   const { t } = useTranslation();
@@ -47,7 +46,13 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Medical History',
-      mutateForm: mutate,
+      mutateForm: mutate(
+        (key) => typeof key === 'string' && key.startsWith('/openmrs/ws/rest/v1/kenyaemr/flags'),
+        undefined,
+        {
+          revalidate: true,
+        },
+      ),
       formInfo: {
         encounterUuid: encounterUUID,
         formUuid: clinicalEncounterFormUuid,
