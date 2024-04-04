@@ -27,7 +27,7 @@ import {
 import { ConfigObject } from '../../../config-schema';
 import { Add } from '@carbon/react/icons';
 import { OpenmrsEncounter } from '../../../types';
-import { KeyedMutator } from 'swr';
+import { KeyedMutator, mutate } from 'swr';
 interface OutPatientSocialHistoryProps {
   patientUuid: string;
   encounters: OpenmrsEncounter[];
@@ -42,7 +42,6 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({
   encounters,
   isLoading,
   error,
-  mutate,
   isValidating,
 }) => {
   const { t } = useTranslation();
@@ -50,11 +49,18 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({
     clinicalEncounterUuid,
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
+
   const headerTitle = t('socialHistory', 'Social History');
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Social History',
-      mutateForm: mutate,
+      mutateForm: mutate(
+        (key) => typeof key === 'string' && key.startsWith('/openmrs/ws/rest/v1/kenyaemr/flags'),
+        undefined,
+        {
+          revalidate: true,
+        },
+      ),
       formInfo: {
         encounterUuid: encounterUUID,
         formUuid: clinicalEncounterFormUuid,
