@@ -24,6 +24,8 @@ import {
 } from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
 import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-dashboard.meta';
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
+import GenericNavLinks from './specialized-clinics/generic-nav-links/generic-nav-links.component';
+import GenericDashboard from './specialized-clinics/generic-nav-links/generic-dashboard.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -78,6 +80,9 @@ export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);
 export const postnatalCareLink = getSyncLifecycle(createDashboardLink(postnatalDashboardMeta), options);
 export const labourAndDeliveryLink = getSyncLifecycle(createDashboardLink(labourAndDeliveryDashboardMeta), options);
+
+export const genericNavLinks = getSyncLifecycle(GenericNavLinks, options);
+export const genericDashboard = getSyncLifecycle(GenericDashboard, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);

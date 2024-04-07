@@ -48,6 +48,36 @@ export const configSchema = {
       _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
+  specialClinics: {
+    _type: Type.Array,
+    _description: 'List of special clinics',
+    _default: [
+      {
+        id: 'renal-clinic',
+        title: 'Renal',
+        formUuid: '6d0be8bd-5320-45a0-9463-60c9ee2b1338',
+        encounterTypeUuid: '465a92f2-baf8-42e9-9612-53064be868e8',
+      },
+      {
+        id: 'physiotherapy-clinic',
+        title: 'Physiotherapy',
+        formUuid: 'fdada8da-75fe-44c6-93e1-782d41e5565b',
+        encounterTypeUuid: '465a92f2-baf8-42e9-9612-53064be868e8',
+      },
+      {
+        id: 'dental-clinic',
+        title: 'Dental',
+        formUuid: 'a3c01460-c346-4f3d-a627-5c7de9494ba0',
+        encounterTypeUuid: '465a92f2-baf8-42e9-9612-53064be868e8',
+      },
+      {
+        id: 'fertility-clinic',
+        title: 'Fertility',
+        formUuid: '32e43fc9-6de3-48e3-aafe-3b92f167753d',
+        encounterTypeUuid: '465a92f2-baf8-42e9-9612-53064be868e8',
+      },
+    ],
+  },
 };
 
 export interface ConfigObject {
@@ -65,4 +95,5 @@ export interface ConfigObject {
   defaulterTracingEncounterUuid: string;
   clinicalEncounterUuid: string;
   concepts: Record<string, string>;
+  specialClinics: Array<{ id: string; formUuid: string; encounterTypeUuid: string; title: string }>;
 }

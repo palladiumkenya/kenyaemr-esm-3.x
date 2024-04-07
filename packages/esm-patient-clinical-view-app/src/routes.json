@@ -93,6 +93,23 @@
       "component": "hivCareAndTreatMentSideNavGroup"
     },
     {
+      "name": "genericNavLinks",
+      "slot": "special-clinics-slot",
+      "component": "genericNavLinks",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-special-clinic-dashboard-slot",
+        "path": "special-clinics-dashboard",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "patient-chart-special-clinic-dashboard-slot",
+      "slot": "patient-chart-special-clinic-dashboard-slot",
+      "component": "genericDashboard"
+    },
+    {
       "name": "hts-dashboard-link",
       "component": "htsDashboardLink",
       "slot": "hiv-care-and-treatment-slot",
