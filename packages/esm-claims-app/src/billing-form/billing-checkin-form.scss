@@ -1,0 +1,14 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin: 0 0 layout.$spacing-03 0;
+  flex-basis: 30%;
+}
+
+.sectionField {
+  flex-basis: 70%;
+}
