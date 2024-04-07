@@ -3,7 +3,7 @@ import React from 'react';
 const BillingIllustration: React.FC = () => {
   return (
     <svg width="64" height="64" viewBox="10 10 60 60.02">
-      <title>Billing module illustration</title>
+      <title>Claims module illustration</title>
       <g fill="none" fillRule="evenodd">
         <path
           opacity="0.5"

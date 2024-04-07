@@ -116,7 +116,7 @@ describe('BillHistory', () => {
   test('should render empty state view when there are no bills', () => {
     mockbills.mockReturnValueOnce({ isLoading: false, isValidating: false, error: null, bills: [], mutate: jest.fn() });
     render(<BillHistory {...testProps} />);
-    const emptyState = screen.getByText(/There are no bills to display./);
+    const emptyState = screen.getByText(/There are no claims to display./);
     expect(emptyState).toBeInTheDocument();
   });
 });

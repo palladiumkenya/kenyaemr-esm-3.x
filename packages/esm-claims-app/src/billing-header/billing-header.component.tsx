@@ -19,7 +19,7 @@ const BillingHeader: React.FC<BillingHeaderProps> = ({ title }) => {
       <div className={styles['left-justified-items']}>
         <BillingIllustration />
         <div className={styles['page-labels']}>
-          <p>{t('billing', 'Billing')}</p>
+          <p>{t('claims', 'Claims')}</p>
           <p className={styles['page-name']}>{title}</p>
         </div>
       </div>

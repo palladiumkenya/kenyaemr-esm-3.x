@@ -90,7 +90,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
     return (
       <div className={styles.errorContainer}>
         <Layer>
-          <ErrorState error={error} headerTitle={t('billsList', 'Bill list')} />
+          <ErrorState error={error} headerTitle={t('claimsList', 'Claims list')} />
         </Layer>
       </div>
     );
@@ -101,12 +101,12 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
       <Layer className={styles.emptyStateContainer}>
         <Tile className={styles.tile}>
           <p className={styles.billingHeading} style={{ textAlign: 'left' }}>
-            Billing History
+            Claims History
           </p>
           <div className={styles.illo}>
             <EmptyDataIllustration />
           </div>
-          <p className={styles.content}>There are no bills to display.</p>
+          <p className={styles.content}>There are no claims to display.</p>
           <Button
             onClick={() => launchPatientWorkspace('billing-form', { workspaceTitle: 'Billing Form' })}
             kind="ghost">
@@ -139,7 +139,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
             getRowProps,
           }) => (
             <TableContainer {...getTableContainerProps}>
-              <Table className={styles.table} {...getTableProps()} aria-label="Bill list">
+              <Table className={styles.table} {...getTableProps()} aria-label="Claims list">
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />

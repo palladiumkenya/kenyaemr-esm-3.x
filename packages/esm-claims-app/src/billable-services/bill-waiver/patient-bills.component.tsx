@@ -57,7 +57,9 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
               <div className={styles.illo}>
                 <EmptyDataIllustration />
               </div>
-              <p className={styles.content}>{t('noBilltoDisplay', 'There are no bills to display for this patient')}</p>
+              <p className={styles.content}>
+                {t('noClaimsToDisplay', 'There are no claims to display for this patient')}
+              </p>
             </Tile>
           </Layer>
         </div>

@@ -117,7 +117,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     <>
       <VisitAttributesForm setAttributes={setAttributes} setPaymentMethod={setPaymentMethod} />
       <section className={styles.sectionContainer}>
-        <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
+        <div className={styles.sectionTitle}>{t('claims', 'Claims')}</div>
         <div className={styles.sectionField}>
           <Layer>
             <FilterableMultiSelect

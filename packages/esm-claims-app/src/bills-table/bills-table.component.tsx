@@ -143,7 +143,7 @@ const BillsTable = () => {
     return (
       <div className={styles.errorContainer}>
         <Layer>
-          <ErrorState error={error} headerTitle={t('billsList', 'Bill list')} />
+          <ErrorState error={error} headerTitle={t('claimsList', 'Claims list')} />
         </Layer>
       </div>
     );
@@ -248,7 +248,7 @@ const BillsTable = () => {
             <div className={styles.illo}>
               <EmptyDataIllustration />
             </div>
-            <p className={styles.content}>There are no bills to display.</p>
+            <p className={styles.content}>There are no claims to display.</p>
           </Tile>
         </Layer>
       )}
@@ -265,7 +265,7 @@ function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveS
             [styles.tabletHeading]: !isDesktop(layout),
             [styles.desktopHeading]: isDesktop(layout),
           })}>
-          <h4>{t('billList', 'Bill list')}</h4>
+          <h4>{t('claimsList', 'Claims list')}</h4>
         </div>
         <div className={styles.backgroundDataFetchingIndicator}>
           <span>{isValidating ? <InlineLoading /> : null}</span>

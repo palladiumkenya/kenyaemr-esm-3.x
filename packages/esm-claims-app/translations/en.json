@@ -63,7 +63,7 @@
   "name": "Name",
   "navigateBack": "Navigate back",
   "nextPage": "Next page",
-  "noBilltoDisplay": "There are no bills to display for this patient",
+  "noBilltoDisplay": "There are no claims to display for this patient",
   "noMatchingBillsToDisplay": "No matching bills to display",
   "noMatchingItemsToDisplay": "No matching items to display",
   "noMatchingServicesToDisplay": "No matching services to display",

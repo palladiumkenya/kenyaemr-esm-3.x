@@ -14,9 +14,10 @@ export default function MetricsCards() {
 
   const cards = useMemo(
     () => [
-      { title: 'Cumulative Bills', count: cumulativeBills },
-      { title: 'Pending Bills', count: pendingBills },
-      { title: 'Paid Bills', count: paidBills },
+      { title: 'All Claims', count: cumulativeBills },
+      { title: 'Pending Claims', count: pendingBills },
+      { title: 'Paid Claims', count: paidBills },
+      { title: 'Rejected Claims', count: paidBills },
     ],
     [cumulativeBills, pendingBills, paidBills],
   );
@@ -24,13 +25,13 @@ export default function MetricsCards() {
   if (isLoading) {
     return (
       <section className={styles.container}>
-        <InlineLoading status="active" iconDescription="Loading" description="Loading bill metrics..." />
+        <InlineLoading status="active" iconDescription="Loading" description="Loading claims metrics..." />
       </section>
     );
   }
 
   if (error) {
-    return <ErrorState headerTitle={t('billMetrics', 'Bill metrics')} error={error} />;
+    return <ErrorState headerTitle={t('claimsMetrics', 'Claims metrics')} error={error} />;
   }
   return (
     <section className={styles.container}>
