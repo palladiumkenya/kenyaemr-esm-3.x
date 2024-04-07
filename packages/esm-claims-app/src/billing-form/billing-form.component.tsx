@@ -15,7 +15,7 @@ import {
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { useFetchSearchResults, processBillItems } from '../billing.resource';
+import { useFetchSearchResults, processBillItems } from '../claims.resource';
 import { mutate } from 'swr';
 
 type BillingFormProps = {

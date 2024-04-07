@@ -67,10 +67,6 @@
       "component": "claimsForm"
     },
     {
-      "name": "require-claims-modal",
-      "component": "requirePaymentModal"
-    },
-    {
       "name": "patient-banner-claims-tags",
       "component": "visitAttributeTags",
       "slot": "patient-banner-tags-slot",

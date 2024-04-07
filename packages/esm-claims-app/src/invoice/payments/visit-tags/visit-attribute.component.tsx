@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tag } from '@carbon/react';
-import { usePatientPaymentInfo } from '../../../billing.resource';
+import { usePatientPaymentInfo } from '../../../claims.resource';
 
 type VisitAttributeTagsProps = { patientUuid: string };
 

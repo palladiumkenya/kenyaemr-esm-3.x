@@ -6,7 +6,7 @@ import styles from './bill-waiver-form.scss';
 import { LineItem, MappedBill } from '../../types';
 import { createBillWaiverPayload } from './utils';
 import { convertToCurrency } from '../../helpers';
-import { processBillPayment } from '../../billing.resource';
+import { processBillPayment } from '../../claims.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { useBillableItems, usePaymentMethods } from '../../billing-form/billing-form.resource';

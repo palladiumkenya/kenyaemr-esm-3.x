@@ -3,7 +3,7 @@ import { ExtensionSlot, UserHasAccess } from '@openmrs/esm-framework';
 import PatientBills from './patient-bills.component';
 import styles from './bill-waiver.scss';
 import BillWaiverForm from './bill-waiver-form.component';
-import { useBills } from '../../billing.resource';
+import { useBills } from '../../claims.resource';
 
 type BillWaiverProps = {};
 

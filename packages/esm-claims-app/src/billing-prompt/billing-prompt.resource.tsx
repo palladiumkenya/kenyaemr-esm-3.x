@@ -1,5 +1,5 @@
 import { Visit, useConfig, useVisit } from '@openmrs/esm-framework';
-import { useBills } from '../billing.resource';
+import { useBills } from '../claims.resource';
 import { BillingConfig } from '../config-schema';
 
 const INPATIENT_VISIT_TYPE = 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914';

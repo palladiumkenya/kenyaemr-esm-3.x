@@ -4,6 +4,17 @@ import { FacilityDetail, MappedBill, PatientInvoice } from './types';
 import isEmpty from 'lodash-es/isEmpty';
 import sortBy from 'lodash-es/sortBy';
 
+const fetcher = async (url) => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error('Failed to fetch data');
+  }
+  const data = await response.json();
+  // Filter the data where status is 'PENDING'
+  const filteredData = data.filter((item) => item.status === 'PENDING');
+  return filteredData;
+};
+
 export const useBills = (patientUuid: string = '', billStatus: string = '') => {
   const url = `/ws/rest/v1/cashier/bill?v=full`;
 
@@ -40,14 +51,17 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
     return mappedBill;
   };
 
+  // const filteredData = data.filter(item => item.status === 'PENDING');
   const sortBills = sortBy(data?.data?.results ?? [], ['dateCreated']).reverse();
   const filteredBills = billStatus === '' ? sortBills : sortBills?.filter((bill) => bill.status === billStatus);
   const mappedResults = filteredBills?.map((bill) => mapBillProperties(bill));
   const filteredResults = mappedResults?.filter((res) => res.patientUuid === patientUuid);
   const formattedBills = isEmpty(patientUuid) ? mappedResults : filteredResults || [];
+  const filteredData = formattedBills?.filter((item) => item.status === 'PENDING');
 
   return {
-    bills: formattedBills,
+    // bills: formattedBills,
+    bills: filteredData,
     error,
     isLoading,
     isValidating,

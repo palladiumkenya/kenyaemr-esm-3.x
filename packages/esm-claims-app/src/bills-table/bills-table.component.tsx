@@ -27,7 +27,7 @@ import {
   ConfigurableLink,
 } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
-import { useBills } from '../billing.resource';
+import { useBills } from '../claims.resource';
 import styles from './bills-table.scss';
 
 const BillsTable = () => {

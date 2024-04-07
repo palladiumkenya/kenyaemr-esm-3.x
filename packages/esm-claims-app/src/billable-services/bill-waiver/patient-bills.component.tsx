@@ -1,5 +1,5 @@
 import React from 'react';
-import { useBills } from '../../billing.resource';
+import { useBills } from '../../claims.resource';
 import {
   Layer,
   DataTable,

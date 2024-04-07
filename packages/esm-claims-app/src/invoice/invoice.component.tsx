@@ -8,7 +8,7 @@ import { ExtensionSlot, usePatient, showModal } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { convertToCurrency } from '../helpers';
 import { LineItem } from '../types';
-import { useBill } from '../billing.resource';
+import { useBill } from '../claims.resource';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
 import PrintReceipt from './printable-invoice/print-receipt.component';

@@ -3,7 +3,7 @@ import { PatientDetails } from '../../types';
 import styles from './printable-invoice-header.scss';
 import { useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useDefaultFacility } from '../../billing.resource';
+import { useDefaultFacility } from '../../claims.resource';
 
 interface PrintableInvoiceHeaderProps {
   patientDetails: PatientDetails;

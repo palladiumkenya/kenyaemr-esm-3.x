@@ -27,7 +27,7 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
-import { useBills } from '../billing.resource';
+import { useBills } from '../claims.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
 import styles from './bill-history.scss';
 

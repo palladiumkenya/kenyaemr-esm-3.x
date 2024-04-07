@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDefaultFacility } from '../../billing.resource';
+import { useDefaultFacility } from '../../claims.resource';
 import styles from './printable-footer.scss';
 
 const PrintableFooter = () => {

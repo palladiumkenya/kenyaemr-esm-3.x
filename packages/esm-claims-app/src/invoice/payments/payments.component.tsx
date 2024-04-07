@@ -9,7 +9,7 @@ import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { LineItem, type MappedBill } from '../../types';
 import { convertToCurrency } from '../../helpers';
 import { createPaymentPayload } from './utils';
-import { processBillPayment } from '../../billing.resource';
+import { processBillPayment } from '../../claims.resource';
 import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
 import PaymentHistory from './payment-history/payment-history.component';
 import PaymentForm from './payment-form/payment-form.component';
