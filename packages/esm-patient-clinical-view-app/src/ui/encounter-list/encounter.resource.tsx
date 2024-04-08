@@ -1,3 +1,5 @@
+import { OpenmrsResource, Visit } from '@openmrs/esm-framework';
+
 export function mapEncounters(encounters: Array<any>): MappedEncounter[] {
   return encounters?.map((enc) => ({
     id: enc?.uuid,
@@ -19,6 +21,9 @@ export interface Encounter {
   encounterDatetime: string;
   encounterProviders: Array<EncounterProvider>;
   obs: Array<Observation>;
+  visit: Visit;
+  encounterType: OpenmrsResource;
+  form: OpenmrsResource;
 }
 
 export interface EncounterProvider {
