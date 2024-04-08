@@ -103,7 +103,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     <section>
       <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
       <div className={styles.sectionField}>
-        <Layer className={styles.sectionFieldLayer}>
+        <div className={styles.sectionFieldLayer}>
           <Controller
             name="isPatientExempted"
             control={control}
@@ -118,9 +118,9 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
               </RadioButtonGroup>
             )}
           />
-        </Layer>
+        </div>
         {isPatientExempted && (
-          <Layer className={styles.sectionFieldLayer}>
+          <div className={styles.sectionFieldLayer}>
             <Controller
               control={control}
               name="exemptionCategory"
@@ -136,9 +136,9 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
                 />
               )}
             />
-          </Layer>
+          </div>
         )}
-        <Layer className={styles.sectionFieldLayer}>
+        <div className={styles.sectionFieldLayer}>
           <Controller
             control={control}
             name="paymentMethods"
@@ -154,11 +154,11 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
               />
             )}
           />
-        </Layer>
+        </div>
 
-        {paymentMethods?.name?.toLocaleLowerCase().includes('insurance') && (
+        {paymentMethods?.name?.toLocaleLowerCase() === 'insurance' && (
           <>
-            <Layer className={styles.sectionFieldLayer}>
+            <div className={styles.sectionFieldLayer}>
               <Controller
                 control={control}
                 name="insuranceScheme"
@@ -172,8 +172,8 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
                   />
                 )}
               />
-            </Layer>
-            <Layer className={styles.sectionFieldLayer}>
+            </div>
+            <div className={styles.sectionFieldLayer}>
               <Controller
                 control={control}
                 name="policyNumber"
@@ -187,7 +187,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
                   />
                 )}
               />
-            </Layer>
+            </div>
           </>
         )}
       </div>

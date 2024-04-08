@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { InlineLoading, InlineNotification, Layer, FilterableMultiSelect } from '@carbon/react';
+import { InlineLoading, InlineNotification, FilterableMultiSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
@@ -9,6 +9,7 @@ import { BillingConfig } from '../config-schema';
 import { hasPatientBeenExempted } from './helper';
 import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS } from '../constants';
 import { BillingService } from '../types';
+import SHANumberValidity from './social-health-authority/sha-number-validity.component';
 
 type BillingCheckInFormProps = {
   patientUuid: string;
@@ -116,18 +117,17 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   return (
     <>
       <VisitAttributesForm setAttributes={setAttributes} setPaymentMethod={setPaymentMethod} />
+      <SHANumberValidity paymentMethod={paymentMethod} />
       <section className={styles.sectionContainer}>
         <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
         <div className={styles.sectionField}>
-          <Layer>
-            <FilterableMultiSelect
-              id="billing-service"
-              titleText={t('searchServices', 'Search services')}
-              items={lineItems ?? []}
-              itemToString={(item) => (item ? item?.name : '')}
-              onChange={({ selectedItems }) => handleBillingService(selectedItems)}
-            />
-          </Layer>
+          <FilterableMultiSelect
+            id="billing-service"
+            titleText={t('searchServices', 'Search services')}
+            items={lineItems ?? []}
+            itemToString={(item) => (item ? item?.name : '')}
+            onChange={({ selectedItems }) => handleBillingService(selectedItems)}
+          />
         </div>
       </section>
     </>
