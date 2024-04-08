@@ -55,7 +55,19 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
 
   const clinicalFormTitle = capitalize(clinic.replace('-', ' '));
 
-  const handleWorkspaceForm = (encounterUuid: string = '') => {
+  const handleWorkspaceForm = () => {
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: clinicalFormTitle.replace('clinic', 'form'),
+      mutateForm: mutate,
+      formInfo: {
+        encounterUuid: '',
+        formUuid: clinicInfo?.formUuid,
+        additionalProps: {},
+      },
+    });
+  };
+
+  const handleWorkspaceEditForm = (encounterUuid: string = '') => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: clinicalFormTitle.replace('clinic', 'form'),
       mutateForm: mutate,
@@ -111,7 +123,7 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
         }) => (
           <TableContainer
             title={clinicalFormTitle}
-            description={t('patientRenalHistory', 'Patient renal history')}
+            description={`Encounters ${t('for', 'for')} ${clinicalFormTitle}`}
             {...getTableContainerProps()}>
             <Table {...getTableProps()} aria-label="sample table">
               <TableHead>
@@ -147,7 +159,10 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
                       })}>
                       <>
                         <EncounterObservations observations={encounters[index]['obs'] ?? []} />
-                        <Button onClick={() => handleWorkspaceForm(encounters[index].uuid)} kind="tertiary" size="sm">
+                        <Button
+                          onClick={() => handleWorkspaceEditForm(encounters[index].uuid)}
+                          kind="tertiary"
+                          size="sm">
                           {t('edit', 'Edit')}
                         </Button>
                       </>
