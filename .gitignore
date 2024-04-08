@@ -83,4 +83,3 @@ dist
 e2e/storageState.json
 .env
 
-package.json
