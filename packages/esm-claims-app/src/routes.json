@@ -7,74 +7,9 @@
     {
       "component": "claimsServicesHome",
       "route":"claims-services"
-    },
-    {
-      "component": "claimsPrompt",
-      "routeRegex": "^patient\/.+\/chart",
-      "online": true,
-      "offline": false
     }
   ],
   "extensions": [
-    {
-      "component": "claimsDashboardLink",
-      "name": "claims-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "claims",
-        "title": "claims",
-        "slot": "claims-dashboard-slot"
-      }
-    },
-    {
-      "component": "root",
-      "name": "claims-dashboard-root",
-      "slot": "claims-dashboard-slot"
-    },
-    {
-      "name": "claims-patient-summary",
-      "component": "claimsPatientSummary",
-      "slot": "patient-chart-claims-dashboard-slot",
-      "order": 10,
-      "meta": {
-        "columnSpan": 4
-      }
-    },
-    {
-      "name": "claims-summary-dashboard-link",
-      "component": "claimsSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
-      "order": 11,
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-claims-dashboard-slot",
-        "path": "Claims history"
-      }
-    },
-    {
-      "name": "claims-check-in-form",
-      "slot": "extra-visit-attribute-slot",
-      "component": "claimsCheckInForm"
-    },
-    {
-      "slot": "system-admin-page-card-link-slot",
-      "component": "claimsServicesCardLink",
-      "name": "claims-services-admin-card-link"
-    },
-    {
-      "name": "claims-form",
-      "component": "claimsForm"
-    },
-    {
-      "name": "patient-banner-claims-tags",
-      "component": "visitAttributeTags",
-      "slot": "patient-banner-tags-slot",
-      "order": 2
-    },
-    {
-      "name": "initiate-payment-modal",
-      "component": "initiatePaymentDialog"
-    }
+   
   ]
 }
