@@ -26,10 +26,10 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const claimsSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...dashboardMeta, moduleName }),
-  options,
-);
+// export const claimsSummaryDashboardLink = getSyncLifecycle(
+//   createDashboardLink({ ...dashboardMeta, moduleName }),
+//   options,
+// );
 
 export const claimsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({

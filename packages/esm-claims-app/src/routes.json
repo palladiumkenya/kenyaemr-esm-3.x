@@ -10,6 +10,20 @@
     }
   ],
   "extensions": [
-   
+    {
+      "component": "claimsDashboardLink",
+      "name": "claims-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "claims",
+        "title": "claims",
+        "slot": "claims-dashboard-slot"
+      }
+    },
+    {
+      "component": "root",
+      "name": "claims-dashboard-root",
+      "slot": "claims-dashboard-slot"
+    }
   ]
 }
