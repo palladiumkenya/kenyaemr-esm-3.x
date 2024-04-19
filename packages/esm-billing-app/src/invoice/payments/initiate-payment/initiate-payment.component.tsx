@@ -4,7 +4,7 @@ import { Button, Form, ModalBody, ModalHeader, TextInput, Layer } from '@carbon/
 import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
-import { initiateStkPush } from '../payment.resource';
+import { generateStkAccessToken, initiateStkPush } from '../payment.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 
 export interface InitiatePaymentDialogProps {
@@ -32,6 +32,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
       referenceNumber: bill.receiptNumber,
       callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
     };
+    generateStkAccessToken();
     initiateStkPush(payload).then(
       (resp) => {
         showSnackbar({
