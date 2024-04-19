@@ -54,26 +54,50 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     );
     closeModal();
   };
+
   return (
     <div>
       <ModalHeader closeModal={closeModal} />
       <ModalBody>
-        <Form className={styles.form}>
+        <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
           <h4>{t('paymentPayment', 'Bill Payment')}</h4>
           <section className={styles.section}>
             <Controller
               control={control}
               name="phoneNumber"
+              rules={{
+                required: true,
+                minLength: 10,
+                maxLength: 10,
+                pattern: /^[0-9]{10}$/,
+              }}
               render={({ field }) => (
                 <Layer>
                   <TextInput
                     {...field}
                     id="phoneNumber"
                     type="text"
-                    labelText={t('phoneNumber', 'Phone Number')}
+                    labelText={t('phoneNumber', 'Phone Number*')}
                     size="md"
-                    placeholder="{t('phoneNumber,' 'Phone Number')}"
+                    placeholder={t('phoneNumber', 'Phone Number')}
+                    invalid={errors.phoneNumber ? true : false}
                   />
+                  {errors.phoneNumber && errors.phoneNumber.type === 'required' && (
+                    <p className={styles.errorMsg}>{t('requiredField', 'This field is required')}</p>
+                  )}
+                  {errors.phoneNumber && errors.phoneNumber.type === 'minLength' && (
+                    <p className={styles.errorMsg}>
+                      {t('invalidPhoneNumber', 'Phone number must be exactly 10 digits long')}
+                    </p>
+                  )}
+                  {errors.phoneNumber && errors.phoneNumber.type === 'maxLength' && (
+                    <p className={styles.errorMsg}>
+                      {t('invalidPhoneNumber', 'Phone number must be exactly 10 digits long')}
+                    </p>
+                  )}
+                  {errors.phoneNumber && errors.phoneNumber.type === 'pattern' && (
+                    <p className={styles.errorMsg}>{t('invalidPhoneNumber', 'Phone number must numbers only')}</p>
+                  )}
                 </Layer>
               )}
             />
@@ -89,6 +113,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     size="md"
                     labelText={t('billAmount', 'Bill Amount')}
                     placeholder={t('billAmount', 'Bill Amount')}
+                    defaultValue={bill.totalAmount}
                   />
                 </Layer>
               )}
@@ -98,7 +123,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
             <Button kind="secondary" className={styles.buttonLayout} onClick={closeModal}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button type="submit" className={styles.button} onClick={handleSubmit(onSubmit)}>
+            <Button type="submit" className={styles.button}>
               {t('initiatePay', 'Initiate Payment')}
             </Button>
           </section>
