@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "extensions": [
+    {
+      "component": "morgueDashboardLink",
+      "name": "morgue-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "morgue",
+        "title": "morgue",
+        "slot": "morgue-dashboard-slot"
+      }
+    },
+    {
+      "component": "root",
+      "name": "morgue-dashboard-root",
+      "slot": "morgue-dashboard-slot"
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "morgue"
+    }
+  ]
+}
