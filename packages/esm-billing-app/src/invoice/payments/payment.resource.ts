@@ -55,14 +55,19 @@ export const generateStkAccessToken = async () => {
 };
 
 export const initiateStkPush = async (payload) => {
-  const access_token = await generateStkAccessToken();
-  console.log('[its-kios09]: Access token ready at STK push functionality', access_token);
-  const url = `/ws/rest/v1/cashier/api/payment-request`;
-  return openmrsFetch(url, {
-    method: 'POST',
-    body: payload,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+  try {
+    const access_token = await generateStkAccessToken();
+    console.log('[itskios-09]: Generated Access Token from initiateStkPush:', access_token);
+    const initiateUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
+    return openmrsFetch(initiateUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
