@@ -79,6 +79,16 @@
     {
       "name": "initiate-payment-modal",
       "component": "initiatePaymentDialog"
+    },
+    {
+      "name": "lab-order-billable-item",
+      "component": "labOrder",
+      "slot": "top-of-lab-order-form-slot"
+    },
+    {
+      "name": "drug-order-billable-item",
+      "component": "drugOrder",
+      "slot": "medication-info-slot"
     }
   ]
 }
