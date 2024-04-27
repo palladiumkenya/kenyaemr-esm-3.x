@@ -4,20 +4,24 @@ import { Button, Form, ModalBody, ModalHeader, TextInput, Layer } from '@carbon/
 import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { initiateStkPush } from '../payment.resource';
+import { showSnackbar,useConfig } from '@openmrs/esm-framework';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { formatPhoneNumber } from '../utils';
-import { Buffer } from 'buffer';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
-    .string()
-    .nonempty({ message: 'Phone number is required' })
-    .regex(/^\d{10}$/, { message: 'Phone number must be numeric and 10 digits' }),
-  billAmount: z.string().nonempty({ message: 'Amount is required' }),
+    .string({
+      required_error: 'Phone number is required',
+      invalid_type_error: 'Phone number must be 10 digits',
+    })
+    .max(10)
+    .trim()
+    .min(10),
+  billAmount: z.string({
+    required_error: 'Amount is required',
+  }),
 });
 
 export interface InitiatePaymentDialogProps {
@@ -41,52 +45,49 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     resolver: zodResolver(InitiatePaymentSchema),
   });
 
-  const onSubmit = async (data) => {
-    try {
-      const timeStamp = new Date()
-        .toISOString()
-        .replace(/[^0-9]/g, '')
-        .slice(0, -3);
-      const phoneNumber = formatPhoneNumber(data.phoneNumber);
-      const amountBilled = data.billAmount;
-      const password = shortCode + passKey + timeStamp;
-      const callBackUrl = mpesaCallbackUrl;
-      const Password = Buffer.from(password).toString('base64');
-      const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
+  const onSubmit = (data) => {
+    const validation = InitiatePaymentSchema.safeParse(data);
+    if (validation.success == false) {
+      const validationErrors = validation.error?.errors.map((error) => error.message);
 
+      validationErrors.forEach((error) => {
+        showSnackbar({
+          title: t('InitiatePaymentError', 'Initiate Payment Error'),
+          subtitle: error,
+          kind: 'error',
+          timeoutInMs: 3500,
+          isLowContrast: true,
+        });
+      });
+    } else {
       const payload = {
-        BusinessShortCode: shortCode,
-        Password: Password,
-        Timestamp: timeStamp,
-        TransactionType: 'CustomerPayBillOnline',
-        PartyA: phoneNumber,
-        PartyB: shortCode,
-        PhoneNumber: phoneNumber,
-        CallBackURL: callBackUrl,
-        AccountReference: accountReference,
-        TransactionDesc: 'KenyaEMRPay',
-        Amount: amountBilled,
+        phoneNumber: data.phoneNumber,
+        amount: data.billAmount,
+        billUuid: bill.uuid,
+        referenceNumber: bill.receiptNumber,
+        callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
       };
-
-      await initiateStkPush(payload, initiateUrl, authorizationUrl);
-      showSnackbar({
-        title: t('stkPush', 'STK Push'),
-        subtitle: t('stkPushSucess', 'STK Push send successfully'),
-        kind: 'success',
-        timeoutInMs: 3500,
-        isLowContrast: true,
-      });
+      initiateStkPush(payload).then(
+        (resp) => {
+          showSnackbar({
+            title: t('stkPush', 'STK Push'),
+            subtitle: t('stkPushSucess', 'STK Push send successfully'),
+            kind: 'success',
+            timeoutInMs: 3500,
+            isLowContrast: true,
+          });
+        },
+        (err) => {
+          showSnackbar({
+            title: t('stkPush', 'STK Push'),
+            subtitle: t('stkPushError', 'STK Push request failed', { error: err.message }),
+            kind: 'error',
+            timeoutInMs: 3500,
+            isLowContrast: true,
+          });
+        },
+      );
       closeModal();
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.errorMessage || err.message || t('stkPushError', 'STK Push request failed');
-      showSnackbar({
-        title: t('stkPush', 'STK Push'),
-        subtitle: errorMessage,
-        kind: 'error',
-        timeoutInMs: 3500,
-        isLowContrast: true,
-      });
     }
   };
 
@@ -106,9 +107,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     {...field}
                     size="md"
                     labelText={t('Phone Number', 'Phone Number')}
-                    invalid={!!errors.phoneNumber}
-                    invalidText={errors.phoneNumber?.message}
-                    placeholder={t('phoneNumber', 'Phone Number')}
+                    placeholder={t('Phone Number', 'Phone Number')}
                   />
                 </Layer>
               )}
