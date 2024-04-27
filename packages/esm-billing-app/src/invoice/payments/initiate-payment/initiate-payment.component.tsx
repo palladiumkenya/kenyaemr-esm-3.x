@@ -6,6 +6,21 @@ import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
 import { initiateStkPush } from '../payment.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
+import { z } from 'zod';
+
+const InitiatePaymentSchema = z.object({
+  phoneNumber: z
+    .string({
+      required_error: 'Phone number is required',
+      invalid_type_error: 'Phone number must be 10 digits',
+    })
+    .max(10)
+    .trim()
+    .min(10),
+  billAmount: z.string({
+    required_error: 'Amount is required',
+  }),
+});
 
 export interface InitiatePaymentDialogProps {
   closeModal: () => void;
@@ -25,34 +40,49 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   });
 
   const onSubmit = (data) => {
-    const payload = {
-      phoneNumber: data.phoneNumber,
-      amount: data.billAmount,
-      billUuid: bill.uuid,
-      referenceNumber: bill.receiptNumber,
-      callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
-    };
-    initiateStkPush(payload).then(
-      (resp) => {
+    const validation = InitiatePaymentSchema.safeParse(data);
+    if (validation.success == false) {
+      const validationErrors = validation.error?.errors.map((error) => error.message);
+
+      validationErrors.forEach((error) => {
         showSnackbar({
-          title: t('stkPush', 'STK Push'),
-          subtitle: t('stkPushSucess', 'STK Push send successfully'),
-          kind: 'success',
-          timeoutInMs: 3500,
-          isLowContrast: true,
-        });
-      },
-      (err) => {
-        showSnackbar({
-          title: t('stkPush', 'STK Push'),
-          subtitle: t('stkPushError', 'STK Push request failed', { error: err.message }),
+          title: t('InitiatePaymentError', 'Initiate Payment Error'),
+          subtitle: error,
           kind: 'error',
           timeoutInMs: 3500,
           isLowContrast: true,
         });
-      },
-    );
-    closeModal();
+      });
+    } else {
+      const payload = {
+        phoneNumber: data.phoneNumber,
+        amount: data.billAmount,
+        billUuid: bill.uuid,
+        referenceNumber: bill.receiptNumber,
+        callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
+      };
+      initiateStkPush(payload).then(
+        (resp) => {
+          showSnackbar({
+            title: t('stkPush', 'STK Push'),
+            subtitle: t('stkPushSucess', 'STK Push send successfully'),
+            kind: 'success',
+            timeoutInMs: 3500,
+            isLowContrast: true,
+          });
+        },
+        (err) => {
+          showSnackbar({
+            title: t('stkPush', 'STK Push'),
+            subtitle: t('stkPushError', 'STK Push request failed', { error: err.message }),
+            kind: 'error',
+            timeoutInMs: 3500,
+            isLowContrast: true,
+          });
+        },
+      );
+      closeModal();
+    }
   };
   return (
     <div>
@@ -68,11 +98,9 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                 <Layer>
                   <TextInput
                     {...field}
-                    id="phoneNumber"
-                    type="text"
-                    labelText={t('phoneNumber', 'Phone Number')}
                     size="md"
-                    placeholder={t('phoneNumber', 'Phone Number')}
+                    labelText={t('Phone Number', 'Phone Number')}
+                    placeholder={t('Phone Number', 'Phone Number')}
                   />
                 </Layer>
               )}
