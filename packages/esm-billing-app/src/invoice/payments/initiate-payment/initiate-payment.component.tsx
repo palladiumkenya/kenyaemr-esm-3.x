@@ -8,7 +8,6 @@ import { initiateStkPush } from '../payment.resource';
 import { showSnackbar,useConfig } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import { zodResolver } from '@hookform/resolvers/zod';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -40,9 +39,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   } = useForm<any>({
     mode: 'all',
     defaultValues: {
-      billAmount: String(bill.totalAmount),
+      billAmount: bill.totalAmount,
     },
-    resolver: zodResolver(InitiatePaymentSchema),
   });
 
   const onSubmit = (data) => {
@@ -124,8 +122,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     size="md"
                     labelText={t('billAmount', 'Bill Amount')}
                     placeholder={t('billAmount', 'Bill Amount')}
-                    invalid={!!errors.billAmount}
-                    invalidText={errors.billAmount?.message}
+                    defaultValue={bill.totalAmount}
                   />
                 </Layer>
               )}
