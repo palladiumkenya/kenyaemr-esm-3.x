@@ -2570,6 +2570,7 @@ __metadata:
     "@types/webpack-env": "npm:^1.16.0"
     "@typescript-eslint/eslint-plugin": "npm:^4.15.1"
     "@typescript-eslint/parser": "npm:^5.18.0"
+    axios: "npm:^1.6.8"
     babel-preset-minify: "npm:^0.5.1"
     classnames: "npm:^2.3.2"
     concurrently: "npm:^6.5.1"
@@ -2578,6 +2579,7 @@ __metadata:
     d3-selection: "npm:^3.0.0"
     dayjs: "npm:^1.8.36"
     dotenv: "npm:^16.0.3"
+    dotenv-webpack: "npm:^8.1.0"
     eslint: "npm:^7.20.0"
     eslint-config-prettier: "npm:^8.2.0"
     eslint-config-ts-react-important-stuff: "npm:^3.0.0"
@@ -7096,6 +7098,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.6.8":
+  version: 1.6.8
+  resolution: "axios@npm:1.6.8"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 3f9a79eaf1d159544fca9576261ff867cbbff64ed30017848e4210e49f3b01e97cf416390150e6fdf6633f336cd43dc1151f890bbd09c3c01ad60bb0891eee63
+  languageName: node
+  linkType: hard
+
 "axobject-query@npm:^2.2.0":
   version: 2.2.0
   resolution: "axobject-query@npm:2.2.0"
@@ -9810,10 +9823,37 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dotenv-defaults@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "dotenv-defaults@npm:2.0.2"
+  dependencies:
+    dotenv: "npm:^8.2.0"
+  checksum: e0cf2a499119ff0dbc6565aa7914bd0f0c42dc331790037cefe2215bf6620c2a4167a1ef2a29331e6d223f445329e1f7c7e3e7e8c647fd3b6ccb59e4c138b7ba
+  languageName: node
+  linkType: hard
+
+"dotenv-webpack@npm:^8.1.0":
+  version: 8.1.0
+  resolution: "dotenv-webpack@npm:8.1.0"
+  dependencies:
+    dotenv-defaults: "npm:^2.0.2"
+  peerDependencies:
+    webpack: ^4 || ^5
+  checksum: 74a46a48646cfbd18c1df9afec13bcff41feeff6662bcd734d4069774bd3ee8531f072c109579812841de7683be3edf06495b694c7e78a7653a270bd9106b0db
+  languageName: node
+  linkType: hard
+
 "dotenv@npm:^16.0.3":
   version: 16.1.3
   resolution: "dotenv@npm:16.1.3"
   checksum: 2b3e6c5d7cd2189d431f6e22f5e282296bc2ea732a927c9519b59624a7e2d0380945a637281f894e064ee224eec805ea20f6d2dccb94de05e66f0c8fb65ae7b8
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^8.2.0":
+  version: 8.6.0
+  resolution: "dotenv@npm:8.6.0"
+  checksum: 31d7b5c010cebb80046ba6853d703f9573369b00b15129536494f04b0af4ea0060ce8646e3af58b455af2f6f1237879dd261a5831656410ec92561ae1ea44508
   languageName: node
   linkType: hard
 
@@ -10762,6 +10802,16 @@ __metadata:
     debug:
       optional: true
   checksum: a57f93ce566d4602fe7b2f6cef8f8d3d053891b3d8f2feae7e97eec18aa0003d23aeec8e857801d93887eee27e1617276a16f6a3d5c9d78e45882346612462d5
+  languageName: node
+  linkType: hard
+
+"follow-redirects@npm:^1.15.6":
+  version: 1.15.6
+  resolution: "follow-redirects@npm:1.15.6"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: 70c7612c4cab18e546e36b991bbf8009a1a41cf85354afe04b113d1117569abf760269409cb3eb842d9f7b03d62826687086b081c566ea7b1e6613cf29030bf7
   languageName: node
   linkType: hard
 
@@ -16277,6 +16327,13 @@ __metadata:
     forwarded: "npm:0.2.0"
     ipaddr.js: "npm:1.9.1"
   checksum: f24a0c80af0e75d31e3451398670d73406ec642914da11a2965b80b1898ca6f66a0e3e091a11a4327079b2b268795f6fa06691923fef91887215c3d0e8ea3f68
+  languageName: node
+  linkType: hard
+
+"proxy-from-env@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "proxy-from-env@npm:1.1.0"
+  checksum: f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
   languageName: node
   linkType: hard
 
