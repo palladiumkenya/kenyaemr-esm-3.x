@@ -36,7 +36,9 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     formState: { errors },
   } = useForm<any>({
     mode: 'all',
-    defaultValues: {},
+    defaultValues: {
+      billAmount: bill.totalAmount,
+    },
   });
 
   const onSubmit = (data) => {
@@ -117,6 +119,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     size="md"
                     labelText={t('billAmount', 'Bill Amount')}
                     placeholder={t('billAmount', 'Bill Amount')}
+                    defaultValue={bill.totalAmount}
                   />
                 </Layer>
               )}
