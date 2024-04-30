@@ -54,5 +54,18 @@ export const generateStkAccessToken = async () => {
 };
 
 export const initiateStkPush = async (payload) => {
-  const access_token = await generateStkAccessToken();
+  try {
+    const access_token = await generateStkAccessToken();
+    const initiateUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
+    const response = await axios.post(initiateUrl, payload, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
