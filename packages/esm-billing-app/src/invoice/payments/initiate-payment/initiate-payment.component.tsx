@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, ModalBody, ModalHeader, TextInput, Layer } from '@carbon/react';
@@ -5,18 +6,21 @@ import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
 import { initiateStkPush } from '../payment.resource';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { z } from 'zod';
+import { formatPhoneNumber } from '../utils';
+import { Buffer } from 'buffer';
+import { useSystemSetting } from '../../../hooks/getMflCode';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
     .string({
       required_error: 'Phone number is required',
-      invalid_type_error: 'Phone number must be 10 digits',
+      invalid_type_error: 'Phone number must be numeric and 10 digits',
     })
-    .max(10)
-    .trim()
-    .min(10),
+    .refine((value) => /^\d{10}$/.test(value), {
+      message: 'Phone number must be 10 digits',
+    }),
   billAmount: z.string({
     required_error: 'Amount is required',
   }),
@@ -29,6 +33,8 @@ export interface InitiatePaymentDialogProps {
 
 const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
   const { t } = useTranslation();
+  const { mpesaCallbackUrl } = useConfig();
+  const { mflCodeValue } = useSystemSetting('facility.mflcode');
 
   const {
     control,
@@ -37,13 +43,13 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   } = useForm<any>({
     mode: 'all',
     defaultValues: {
-      billAmount: bill.totalAmount,
+      billAmount: String(bill.totalAmount),
     },
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const validation = InitiatePaymentSchema.safeParse(data);
-    if (validation.success == false) {
+    if (validation.success === false) {
       const validationErrors = validation.error?.errors.map((error) => error.message);
 
       validationErrors.forEach((error) => {
@@ -56,34 +62,61 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
         });
       });
     } else {
-      const payload = {
-        phoneNumber: data.phoneNumber,
-        amount: data.billAmount,
-        billUuid: bill.uuid,
-        referenceNumber: bill.receiptNumber,
-        callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
-      };
-      initiateStkPush(payload).then(
-        (resp) => {
-          showSnackbar({
-            title: t('stkPush', 'STK Push'),
-            subtitle: t('stkPushSucess', 'STK Push send successfully'),
-            kind: 'success',
-            timeoutInMs: 3500,
-            isLowContrast: true,
-          });
-        },
-        (err) => {
-          showSnackbar({
-            title: t('stkPush', 'STK Push'),
-            subtitle: t('stkPushError', 'STK Push request failed', { error: err.message }),
-            kind: 'error',
-            timeoutInMs: 3500,
-            isLowContrast: true,
-          });
-        },
-      );
-      closeModal();
+      try {
+        const shortCode = '174379';
+        const timeStamp = new Date()
+          .toISOString()
+          .replace(/[^0-9]/g, '')
+          .slice(0, -3);
+        const phoneNumber = formatPhoneNumber(data.phoneNumber);
+        const amountBilled = data.billAmount;
+        const passKey = 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919';
+        const password = shortCode + passKey + timeStamp;
+        const callBackUrl = mpesaCallbackUrl;
+        const Password = Buffer.from(password).toString('base64');
+        const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
+
+        const payload = {
+          BusinessShortCode: shortCode,
+          Password: Password,
+          Timestamp: timeStamp,
+          TransactionType: 'CustomerPayBillOnline',
+          PartyA: phoneNumber,
+          PartyB: shortCode,
+          PhoneNumber: phoneNumber,
+          CallBackURL: callBackUrl,
+          AccountReference: accountReference,
+          TransactionDesc: 'HelloTest',
+          Amount: amountBilled,
+        };
+
+        const resp = await initiateStkPush(payload);
+        const response_data = await resp.data;
+        console.log('[its-kios09]: STK PUSH response data: ', response_data);
+        const CheckoutRequestID = response_data.CheckoutRequestID;
+        console.log('CheckoutRequestID:', CheckoutRequestID);
+        console.log('MFL code:', mflCodeValue);
+
+        showSnackbar({
+          title: t('stkPush', 'STK Push'),
+          subtitle: t('stkPushSucess', 'STK Push send successfully'),
+          kind: 'success',
+          timeoutInMs: 3500,
+          isLowContrast: true,
+        });
+        closeModal();
+      } catch (err) {
+        console.error(err);
+        const errorMessage =
+          err.response?.data?.errorMessage || err.message || t('stkPushError', 'STK Push request failed');
+        showSnackbar({
+          title: t('stkPush', 'STK Push'),
+          subtitle: errorMessage,
+          kind: 'error',
+          timeoutInMs: 3500,
+          isLowContrast: true,
+        });
+      }
     }
   };
   return (
@@ -119,7 +152,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     size="md"
                     labelText={t('billAmount', 'Bill Amount')}
                     placeholder={t('billAmount', 'Bill Amount')}
-                    defaultValue={bill.totalAmount}
+                    defaultValue={String(bill.totalAmount)}
                   />
                 </Layer>
               )}
