@@ -12,6 +12,7 @@ export interface BillingConfig {
   patientExemptionCategories: Array<{ value: string; label: string }>;
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
   enforceBillPayment: boolean;
+  mpesaCallbackUrl: string;
 }
 
 export const configSchema = {
@@ -81,5 +82,10 @@ export const configSchema = {
     _type: Type.Boolean,
     _default: true,
     _description: 'Whether to enforce bill payment or not for patient to receive service',
+  },
+  mpesaCallbackUrl: {
+    _type: Type.String,
+    _default: 'https://76e3c9ac003fb3.lhr.life',
+    _description: 'MPESA callback Url to receive confirmation payload from MPESA Daraja API',
   },
 };

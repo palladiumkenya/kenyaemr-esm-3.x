@@ -2605,6 +2605,7 @@ __metadata:
     sass: "npm:^1.54.3"
     swc-loader: "npm:^0.2.3"
     swr: "npm:^2.2.4"
+    ts-dotenv: "npm:^0.9.1"
     turbo: "npm:^1.5.5"
     typescript: "npm:^4.0.3"
     webpack-cli: "npm:^4.10.0"
@@ -18652,6 +18653,13 @@ __metadata:
   version: 3.0.1
   resolution: "trim-newlines@npm:3.0.1"
   checksum: b530f3fadf78e570cf3c761fb74fef655beff6b0f84b29209bac6c9622db75ad1417f4a7b5d54c96605dcd72734ad44526fef9f396807b90839449eb543c6206
+  languageName: node
+  linkType: hard
+
+"ts-dotenv@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "ts-dotenv@npm:0.9.1"
+  checksum: d54a140b6d417605111ea17ff89ffbd459a0fec12d132e11372aff6e6ae1f5544fb4e1f4f8bff79be6f84e3a003aee7961d438a6c48f52a7923ea420b4f042e8
   languageName: node
   linkType: hard
 
