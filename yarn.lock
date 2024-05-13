@@ -2552,6 +2552,7 @@ __metadata:
   dependencies:
     "@hookform/resolvers": "npm:^3.1.1"
     "@openmrs/esm-framework": "npm:next"
+    "@openmrs/esm-patient-common-lib": "npm:next"
     "@playwright/test": "npm:^1.30.0"
     "@swc/cli": "npm:^0.1.57"
     "@swc/core": "npm:^1.2.165"
@@ -2616,12 +2617,12 @@ __metadata:
   resolution: "@kenyaemr/esm-billing-app@workspace:packages/esm-billing-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
     webpack: "npm:^5.74.0"
   peerDependencies:
     "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 7.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -2634,7 +2635,6 @@ __metadata:
   resolution: "@kenyaemr/esm-care-panel-app@workspace:packages/esm-care-panel-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
     webpack: "npm:^5.74.0"
@@ -2653,12 +2653,12 @@ __metadata:
   resolution: "@kenyaemr/esm-claims-app@workspace:packages/esm-claims-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
     webpack: "npm:^5.74.0"
   peerDependencies:
     "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-patient-common-lib": 7.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -2671,13 +2671,12 @@ __metadata:
   resolution: "@kenyaemr/esm-morgue-app@workspace:packages/esm-morgue-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
     webpack: "npm:^5.74.0"
   peerDependencies:
     "@openmrs/esm-framework": 5.x
-    "@openmrs/esm-patient-common-lib": "*"
+    "@openmrs/esm-patient-common-lib": 7.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -2690,7 +2689,6 @@ __metadata:
   resolution: "@kenyaemr/esm-patient-clinical-view-app@workspace:packages/esm-patient-clinical-view-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     webpack: "npm:^5.74.0"
   peerDependencies:
@@ -2722,12 +2720,11 @@ __metadata:
   resolution: "@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app"
   dependencies:
     "@carbon/react": "npm:^1.42.1"
-    "@openmrs/esm-patient-common-lib": "npm:next"
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^2.14.13"
     webpack: "npm:^5.74.0"
   peerDependencies:
-    "@openmrs/esm-framework": 5.x
+    "@openmrs/esm-framework": 7.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x

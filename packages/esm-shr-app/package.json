@@ -39,16 +39,16 @@
   "dependencies": {
     "@carbon/react": "^1.42.1",
     "lodash-es": "^4.17.15",
-    "react-to-print": "^2.14.13"
+    "react-to-print": "^2.14.13",
+    "@openmrs/esm-patient-common-lib": "^7.1.0"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "5.x",
+    "@openmrs/esm-framework": "7.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",
     "react-router-dom": "6.x"
   },
   "devDependencies": {
-    "@openmrs/esm-patient-common-lib": "next",
     "webpack": "^5.74.0"
   }
 }
