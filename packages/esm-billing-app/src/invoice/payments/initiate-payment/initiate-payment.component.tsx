@@ -57,8 +57,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
 
   let paymentStatement = '';
   const handleRefresh = () => {
-    checkPaymentRequestStatus('85c7961a-2b42-4c09-8b7d-a69f797a9520').then((paymentRequstStatus) => {
-      paymentStatement = `Payment for amount Ksh. ${paymentRequstStatus.data[0].amount} was successfully made. Payer phone number ${paymentRequstStatus.data[0].client_phone}. Mpesa reference number is ${paymentRequstStatus.data[0].transaction_reference_number}`;
+    checkPaymentRequestStatus(bill.uuid).then((paymentRequstStatus) => {
+      paymentStatement = `Payment for amount Ksh. ${paymentRequstStatus.data[0].amount} was successfully made. Payer's phone number ${paymentRequstStatus.data[0].client_phone}. Mpesa reference number is ${paymentRequstStatus.data[0].transaction_reference_number}`;
       showPaymentTransaction();
     });
   };
