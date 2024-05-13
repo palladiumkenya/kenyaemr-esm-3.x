@@ -1,0 +1,26 @@
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/styles/scss/spacing';
+
+.drugOrderContainer {
+  margin: spacing.$spacing-03 0;
+
+  & > div {
+    margin: spacing.$spacing-03 0;
+  }
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.itemInfo {
+  @include type.type-style('body-01');
+}
+
+.itemContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding-left: spacing.$spacing-03;
+}
