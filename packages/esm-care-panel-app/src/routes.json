@@ -51,5 +51,16 @@
       "online": true,
       "offline": false
     }
+  ],
+  "workspaces": [
+    {
+      "name": "patient-regimen-workspace",
+      "title": "Patient Regimen",
+      "component":"regimenFormWorkspace",
+      "type":"form",
+      "canMaximize": true,
+      "canHide": true,
+      "width": "wider"
+    }
   ]
 }
