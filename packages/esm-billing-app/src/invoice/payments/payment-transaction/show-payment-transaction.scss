@@ -1,0 +1,16 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.section {
+  margin: spacing.$spacing-03;
+}
+
+.center {
+  margin: auto;
+  width: 100%;
+  border: 3px solid green;
+  padding: 10px;
+}

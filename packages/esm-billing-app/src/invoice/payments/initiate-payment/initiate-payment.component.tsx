@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, ModalBody, ModalHeader, TextInput, Layer } from '@carbon/react';
 import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
-import { initiateStkPush } from '../payment.resource';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { checkPaymentRequestStatus, initiateStkPush, usePaymentRequestStatus } from '../payment.resource';
+import { showModal, showSnackbar } from '@openmrs/esm-framework';
 
 export interface InitiatePaymentDialogProps {
   closeModal: () => void;
@@ -31,7 +31,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
       billUuid: bill.uuid,
       billUrl: bill.uuid,
       referenceNumber: bill.receiptNumber,
-      callBackUrl: 'https://756e-105-163-1-73.ngrok-free.app/api/confirmation-url/',
+      callBackUrl: 'https://9cf8-196-106-176-56.ngrok-free.app/api/confirmation-url',
     };
     initiateStkPush(payload).then(
       (resp) => {
@@ -53,7 +53,21 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
         });
       },
     );
-    closeModal();
+  };
+
+  let paymentStatement = '';
+  const handleRefresh = () => {
+    checkPaymentRequestStatus('85c7961a-2b42-4c09-8b7d-a69f797a9520').then((paymentRequstStatus) => {
+      paymentStatement = `Payment for amount Ksh. ${paymentRequstStatus.data[0].amount} was successfully made. Payer phone number ${paymentRequstStatus.data[0].client_phone}. Mpesa reference number is ${paymentRequstStatus.data[0].transaction_reference_number}`;
+      showPaymentTransaction();
+    });
+  };
+
+  const showPaymentTransaction = () => {
+    const dispose = showModal('show-payment-transaction', {
+      closeModal: () => dispose(),
+      statement: paymentStatement,
+    });
   };
   return (
     <div>
@@ -73,7 +87,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                     type="text"
                     labelText={t('phoneNumber', 'Phone Number')}
                     size="md"
-                    placeholder="{t('phoneNumber,' 'Phone Number')}"
+                    placeholder={t('phoneNumber', 'Phone Number')}
                   />
                 </Layer>
               )}
@@ -96,11 +110,14 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
             />
           </section>
           <section>
+            <Button type="submit" className={styles.button} onClick={handleSubmit(onSubmit)}>
+              {t('sendStkPush', 'Send STK Push')}
+            </Button>
+            <Button className={styles.button} onClick={handleRefresh}>
+              {t('refreshPayment', 'Refresh Payment')}
+            </Button>
             <Button kind="secondary" className={styles.buttonLayout} onClick={closeModal}>
               {t('cancel', 'Cancel')}
-            </Button>
-            <Button type="submit" className={styles.button} onClick={handleSubmit(onSubmit)}>
-              {t('initiatePay', 'Initiate Payment')}
             </Button>
           </section>
         </Form>
