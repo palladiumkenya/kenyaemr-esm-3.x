@@ -26,11 +26,10 @@ import styles from './family-history.scss';
 interface FamilyHistoryProps {
   encounterTypeUuid: string;
   formEntrySub: any;
-  launchPatientWorkspace: Function;
   patientUuid: string;
 }
 
-const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid, encounterTypeUuid }) => {
+const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const layout = useLayoutType();

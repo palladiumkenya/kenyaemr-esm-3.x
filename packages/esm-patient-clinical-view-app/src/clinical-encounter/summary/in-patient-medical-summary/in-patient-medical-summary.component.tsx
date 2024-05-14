@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
-import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
 import { ConfigObject } from '../../../config-schema';
 import SummaryCard from '../summary-card.component';
@@ -19,21 +19,13 @@ interface InPatientSummaryProps {
   mutate: KeyedMutator<any>;
 }
 
-const InPatientSummary: React.FC<InPatientSummaryProps> = ({
-  patientUuid,
-  encounters,
-  isLoading,
-  error,
-  mutate,
-  isValidating,
-}) => {
+const InPatientSummary: React.FC<InPatientSummaryProps> = ({ patientUuid, encounters, isLoading, error, mutate }) => {
   const { t } = useTranslation();
   const {
-    clinicalEncounterUuid,
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
   const handleOpenOrEditMaternalForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
       mutateForm: mutate,
       formInfo: {

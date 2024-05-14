@@ -74,7 +74,6 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
             programName={switcherHeaders[switchItem?.index]}
             enrollments={patientEnrollments}
             formEntrySub={formEntrySub}
-            launchPatientWorkspace={launchPatientWorkspace}
           />
         </div>
       </div>
