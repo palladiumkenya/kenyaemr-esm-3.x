@@ -15,7 +15,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
-  createBillableSerice,
+  createBillableService,
   useConceptsSearch,
   usePaymentModes,
   useServiceTypes,
@@ -108,7 +108,7 @@ const AddBillableService: React.FC = () => {
     payload.serviceStatus = 'ENABLED';
     payload.concept = selectedConcept?.concept?.uuid;
 
-    createBillableSerice(payload).then(
+    createBillableService(payload).then(
       (resp) => {
         showSnackbar({
           title: t('billableService', 'Billable service'),
@@ -258,6 +258,7 @@ const AddBillableService: React.FC = () => {
                 render={({ field }) => (
                   <Layer>
                     <Dropdown
+                      id={`paymentMode-${index}`}
                       onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
                       titleText={t('paymentMode', 'Payment Mode')}
                       label={t('selectPaymentMethod', 'Select payment method')}
@@ -275,6 +276,7 @@ const AddBillableService: React.FC = () => {
                 render={({ field }) => (
                   <Layer>
                     <TextInput
+                      id={`price-${index}`}
                       {...field}
                       invalid={!!errors?.payment?.[index]?.price}
                       invalidText={errors?.payment?.[index]?.price?.message}
@@ -285,7 +287,13 @@ const AddBillableService: React.FC = () => {
                 )}
               />
               <div className={styles.removeButtonContainer}>
-                <TrashCan onClick={handleRemovePaymentMode} className={styles.removeButton} size={20} />
+                <TrashCan
+                  aria-label={`delete_${index}`}
+                  id={`delete_${index}`}
+                  onClick={() => handleRemovePaymentMode(index)}
+                  className={styles.removeButton}
+                  size={20}
+                />
               </div>
             </div>
           ))}
