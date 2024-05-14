@@ -39,10 +39,9 @@ interface ClinicalEncounterDashboardProps {
   patientUuid: string;
   encounterTypeUuid: string;
   formEntrySub: any;
-  launchPatientWorkspace: Function;
 }
 
-const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({ patientUuid, encounterTypeUuid }) => {
+const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const isInPatient = currentVisit?.visitType?.display?.toLocaleLowerCase() === 'inpatient';

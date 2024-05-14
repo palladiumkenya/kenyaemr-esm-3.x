@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   Contacted_UUID,
   MissedAppointmentDate_UUID,
@@ -9,7 +9,7 @@ import {
   TracingType_UUID,
 } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
-import { CardHeader, EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import {
   Button,
   DataTable,
@@ -31,10 +31,9 @@ interface PatientTracingProps {
   patientUuid: string;
   encounterTypeUuid: string;
   formEntrySub: any;
-  launchPatientWorkspace: Function;
 }
 
-const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounterTypeUuid }) => {
+const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const {
     formsList: { defaulterTracingFormUuid },
@@ -45,7 +44,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid, encounte
     defaulterTracingEncounterUuid,
   );
   const handleOpenOrEditDefaulterTracingForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Defaulter Tracing',
       mutateForm: mutate,
       formInfo: {

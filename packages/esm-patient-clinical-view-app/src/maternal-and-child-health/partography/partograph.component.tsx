@@ -15,8 +15,8 @@ import {
   Button,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { EmptyDataIllustration, ErrorState, CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
+import { formatDate, isDesktop, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import styles from './labour-delivery.scss';
 import { usePartograph } from '../../hooks/usePartograph';
 import dayjs from 'dayjs';
@@ -83,7 +83,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     }) ?? [];
 
   const handleAddHistory = () => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: headerTitle,
       mutateForm: () => {
         mutate();

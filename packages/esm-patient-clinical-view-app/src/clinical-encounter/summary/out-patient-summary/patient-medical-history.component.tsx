@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import { SURGICAL_HISTORY_UUID, ACCIDENT_TRAUMA_UUID, BLOOD_TRANSFUSION_UUID } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
-import { EmptyState, launchPatientWorkspace, ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
 import {
   OverflowMenu,
   OverflowMenuItem,
@@ -36,7 +36,6 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({
   encounters,
   isLoading,
   error,
-  isValidating,
 }) => {
   const { t } = useTranslation();
   const {
@@ -44,7 +43,7 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({
   } = useConfig<ConfigObject>();
   const headerTitle = t('medicalHistory', 'Medical History');
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Medical History',
       mutateForm: mutate(
         (key) => typeof key === 'string' && key.startsWith('/openmrs/ws/rest/v1/kenyaemr/flags'),
