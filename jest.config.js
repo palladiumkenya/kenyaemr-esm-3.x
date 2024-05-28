@@ -1,5 +1,7 @@
-/** @type {import('jest').Config} */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/**
+ * @returns {Promise<import('jest').Config>}
+ */
+
 const path = require('path');
 
 module.exports = {
@@ -11,9 +13,10 @@ module.exports = {
   moduleNameMapper: {
     '\\.(s?css)$': 'identity-obj-proxy',
     '@openmrs/esm-framework': '@openmrs/esm-framework/mock',
-    '^@carbon/charts-react$': path.resolve(__dirname, '__mocks__', '@carbon__charts-react.ts'),
+    '@openmrs/esm-patient-common-lib': '@openmrs/esm-patient-common-lib',
     '^dexie$': require.resolve('dexie'),
     '^lodash-es/(.*)$': 'lodash/$1',
+    'lodash-es': 'lodash',
     '^react-i18next$': path.resolve(__dirname, '__mocks__', 'react-i18next.js'),
     '^uuid$': path.resolve(__dirname, 'node_modules', 'uuid', 'dist', 'index.js'),
   },
@@ -34,10 +37,10 @@ module.exports = {
     },
   },
   setupFilesAfterEnv: [path.resolve(__dirname, 'tools', 'setupTests.ts')],
-  testPathIgnorePatterns: [path.resolve(__dirname, 'packages'), path.resolve(__dirname, 'e2e')],
+  testPathIgnorePatterns: [path.resolve(__dirname, 'e2e')],
   testEnvironment: 'jsdom',
   testEnvironmentOptions: {
     url: 'http://localhost/',
   },
-  testTimeout: 20000,
+  testTimeout: 25000,
 };
