@@ -85,7 +85,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             )}
           />
           <div className={styles.removeButtonContainer}>
-            <TrashCan onClick={handleRemovePaymentMode} className={styles.removeButton} size={20} />
+            <TrashCan onClick={() => handleRemovePaymentMode(index)} className={styles.removeButton} size={20} />
           </div>
         </div>
       ))}
