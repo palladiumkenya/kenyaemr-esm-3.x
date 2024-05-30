@@ -6,6 +6,7 @@
   margin: 2rem 0;
 }
 
+
 .billHistoryContainer {
   background-color: $ui-02;
   border: 1px solid $ui-03;
@@ -63,7 +64,7 @@
   margin: 1rem auto;
 }
 
-.expandedActiveVisitRow > td > div {
+.expandedActiveVisitRow>td>div {
   max-height: max-content !important;
 }
 
@@ -71,7 +72,7 @@
   padding: 0 2rem;
 }
 
-.expandedActiveVisitRow th[colspan] td[colspan] > div:first-child {
+.expandedActiveVisitRow th[colspan] td[colspan]>div:first-child {
   padding: 0 1rem;
 }
 

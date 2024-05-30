@@ -46,7 +46,7 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
 
   if (isLoading) {
     return (
-      <ComposedModal preventCloseOnClickOutside open={showModal.loadingModal}>
+      <ComposedModal passiveModal preventCloseOnClickOutside open={showModal.loadingModal}>
         <ModalBody>
           <Heading className={styles.modalTitle}>{t('billingStatus', 'Billing status')}</Heading>
           <InlineLoading
