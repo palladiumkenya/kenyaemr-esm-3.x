@@ -92,26 +92,28 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   if (bills.length === 0) {
     return (
-      <Layer className={styles.emptyStateContainer}>
-        <Tile className={styles.tile}>
-          <p className={styles.billingHeading} style={{ textAlign: 'left' }}>
-            Billing History
-          </p>
-          <div className={styles.illo}>
-            <EmptyDataIllustration />
-          </div>
-          <p className={styles.content}>There are no bills to display.</p>
-          <Button onClick={() => launchWorkspace('billing-form', { workspaceTitle: 'Billing Form' })} kind="ghost">
-            {t('launchBillForm', 'Launch bill form')}
-          </Button>
-        </Tile>
-      </Layer>
+      <>
+        <CardHeader title={t('patientBilling', 'Patient billing')}>
+          <></>
+        </CardHeader>
+        <Layer>
+          <Tile className={styles.tile}>
+            <div className={styles.illo}>
+              <EmptyDataIllustration />
+            </div>
+            <p className={styles.content}>There are no bills to display.</p>
+            <Button onClick={() => launchWorkspace('billing-form', { workspaceTitle: 'Billing Form' })} kind="ghost">
+              {t('launchBillForm', 'Launch bill form')}
+            </Button>
+          </Tile>
+        </Layer>
+      </>
     );
   }
 
   return (
     <div>
-      <CardHeader title={t('billingHistory', 'Billing History')}>
+      <CardHeader title={t('patientBilling', 'Patient billing')}>
         <Button
           renderIcon={Add}
           onClick={() => launchWorkspace('billing-form', { workspaceTitle: 'Billing Form' })}

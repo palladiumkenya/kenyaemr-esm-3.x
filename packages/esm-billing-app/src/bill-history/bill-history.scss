@@ -6,11 +6,6 @@
   margin: 2rem 0;
 }
 
-.emptyStateContainer,
-.loaderContainer {
-  @extend .container;
-}
-
 .billHistoryContainer {
   background-color: $ui-02;
   border: 1px solid $ui-03;
@@ -117,7 +112,7 @@
 
 .tile {
   text-align: center;
-  border: 1px solid $ui-03;
+  // border: 1px solid $ui-03;
 }
 
 .filterEmptyState {
