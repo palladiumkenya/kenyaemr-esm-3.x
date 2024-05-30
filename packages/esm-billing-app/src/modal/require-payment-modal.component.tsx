@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  ModalHeader,
   ModalBody,
   ModalFooter,
   Button,
@@ -11,22 +10,23 @@ import {
   StructuredListRow,
   StructuredListCell,
   StructuredListBody,
+  ComposedModal,
+  Heading,
 } from '@carbon/react';
 import styles from './require-payment.scss';
-import { useBills } from '../billing.resource';
 import { convertToCurrency, extractString } from '../helpers';
-import { useConfig } from '@openmrs/esm-framework';
+import { navigate, useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../config-schema';
+import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { useBillingPrompt } from '../billing-prompt/billing-prompt.resource';
 
-type RequirePaymentModalProps = {
-  cancel: () => void;
-  closeModal: () => void;
-  patientUuid: string;
-};
+type RequirePaymentModalProps = {};
 
-const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, patientUuid, cancel }) => {
+const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
   const { t } = useTranslation();
-  const { bills, isLoading } = useBills(patientUuid);
+  const patientUuid = getPatientUuidFromUrl();
+  const { shouldShowBillingPrompt, isLoading, bills } = useBillingPrompt(patientUuid);
+  const [showModal, setShowModal] = useState({ loadingModal: true, billingModal: true });
   const { enforceBillPayment } = useConfig<BillingConfig>();
 
   const closeButtonText = enforceBillPayment
@@ -34,7 +34,9 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
     : t('proceedToCare', 'Proceed to care');
 
   const handleCloseModal = () => {
-    enforceBillPayment ? cancel() : closeModal();
+    enforceBillPayment
+      ? navigate({ to: `\${openmrsSpaBase}/home` })
+      : setShowModal((prevState) => ({ ...prevState, billingModal: false }));
   };
 
   const lineItems = bills
@@ -42,20 +44,32 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
     .flatMap((bill) => bill.lineItems)
     .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED');
 
-  return (
-    <div>
-      <ModalHeader closeModal={closeModal} title={t('patientBillingAlert', 'Patient Billing Alert')} />
-      <ModalBody>
-        <p className={styles.bodyShort02}>
-          {t('billPaymentRequiredMessage', 'The current patient has pending bill. Advice patient to settle bill.')}
-        </p>
-        {isLoading && (
+  if (isLoading) {
+    return (
+      <ComposedModal preventCloseOnClickOutside open={showModal.loadingModal}>
+        <ModalBody>
+          <Heading className={styles.modalTitle}>{t('billingStatus', 'Billing status')}</Heading>
           <InlineLoading
             status="active"
             iconDescription="Loading"
-            description={t('inlineLoading', 'Loading bill items...')}
+            description={t('patientBilling', 'Verifying patient bills')}
           />
-        )}
+        </ModalBody>
+      </ComposedModal>
+    );
+  }
+
+  if (!shouldShowBillingPrompt) {
+    return null;
+  }
+
+  return (
+    <ComposedModal preventCloseOnClickOutside open={showModal.billingModal}>
+      <ModalBody>
+        <Heading className={styles.modalTitle}>{t('patientBillingAlert', 'Patient Billing Alert')}</Heading>
+        <p className={styles.bodyShort02}>
+          {t('billPaymentRequiredMessage', 'The current patient has pending bill. Advice patient to settle bill.')}
+        </p>
         <StructuredListWrapper isCondensed>
           <StructuredListHead>
             <StructuredListRow head>
@@ -78,22 +92,24 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = ({ closeModal, p
             })}
           </StructuredListBody>
         </StructuredListWrapper>
-        <p className={styles.providerMessage}>
-          {t(
-            'providerMessage',
-            'By clicking Proceed to care, you acknowledge that you have advised the patient to settle the bill.',
-          )}
-        </p>
+        {!enforceBillPayment && (
+          <p className={styles.providerMessage}>
+            {t(
+              'providerMessage',
+              'By clicking Proceed to care, you acknowledge that you have advised the patient to settle the bill.',
+            )}
+          </p>
+        )}
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={cancel}>
+        <Button kind="secondary" onClick={() => navigate({ to: `\${openmrsSpaBase}/home` })}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" onClick={handleCloseModal}>
           {closeButtonText}
         </Button>
       </ModalFooter>
-    </div>
+    </ComposedModal>
   );
 };
 

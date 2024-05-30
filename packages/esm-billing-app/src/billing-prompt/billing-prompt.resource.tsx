@@ -30,15 +30,16 @@ export const useBillingPrompt = (patientUuid: string) => {
   // Should show billing prompt if the following conditions are met:
   // 1. The current visit is not an inpatient visit
   // 2. The patient has a bill balance
-  // 3. The payment method is not insurance
+  // 3. The payment method is not insurances
 
   return {
     shouldShowBillingPrompt:
       !isCurrentVisitInPatient(currentVisit) &&
       patientBillBalance > 0 &&
       !isPaymentMethodInsurance(currentVisit, paymentMethods),
-    isLoading: isLoading && isLoadingVisit,
+    isLoading: isLoading || isLoadingVisit,
     error,
     currentVisit,
+    bills,
   };
 };
