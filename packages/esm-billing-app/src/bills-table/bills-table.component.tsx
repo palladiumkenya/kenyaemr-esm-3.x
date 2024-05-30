@@ -30,13 +30,23 @@ import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import styles from './bills-table.scss';
 
-const BillsTable = () => {
+const filterItems = [
+  { id: '', text: 'All bills' },
+  { id: 'PENDING', text: 'Pending bills' },
+  { id: 'PAID', text: 'Paid bills' },
+];
+
+type BillTableProps = {
+  defaultBillPaymentStatus?: string;
+};
+
+const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' }) => {
   const { t } = useTranslation();
   const id = useId();
   const config = useConfig();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const [billPaymentStatus, setBillPaymentStatus] = useState('');
+  const [billPaymentStatus, setBillPaymentStatus] = useState(defaultBillPaymentStatus);
   const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
   const { bills, isLoading, isValidating, error } = useBills('', billPaymentStatus);
@@ -115,12 +125,6 @@ const BillsTable = () => {
     [goTo, setSearchString],
   );
 
-  const filterItems = [
-    { id: '', text: 'All bills' },
-    { id: 'PENDING', text: 'Pending bills' },
-    { id: 'PAID', text: 'Paid bills' },
-  ];
-
   const handleFilterChange = ({ selectedItem }) => setBillPaymentStatus(selectedItem.id);
 
   if (isLoading) {
@@ -155,7 +159,7 @@ const BillsTable = () => {
           className={styles.filterDropdown}
           direction="bottom"
           id={`filter-${id}`}
-          initialSelectedItem={filterItems[0]}
+          initialSelectedItem={filterItems.find((item) => item.id === billPaymentStatus)}
           items={filterItems}
           itemToString={(item) => (item ? item.text : '')}
           label=""
