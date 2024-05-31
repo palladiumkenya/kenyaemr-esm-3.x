@@ -19,6 +19,7 @@ import dayjs from 'dayjs';
 import { formatDate, launchWorkspace } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 export interface ProgramEnrollmentProps {
   patientUuid: string;
@@ -91,7 +92,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
   );
 
   const handleDiscontinue = (enrollment) => {
-    launchWorkspace('patient-form-entry-workspace', {
+    launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: enrollment?.discontinuationFormName,
       mutateForm: () => {
         mutate((key) => true, undefined, {
@@ -109,7 +110,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
   };
 
   const handleEditEnrollment = (enrollment) => {
-    launchWorkspace('patient-form-entry-workspace', {
+    launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: enrollment?.enrollmentFormName,
       mutateForm: () => {
         mutate((key) => true, undefined, {

@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import CarePrograms from './care-programs.component';
 import * as careProgramsHook from '../hooks/useCarePrograms';
-import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { useVisit, launchWorkspace } from '@openmrs/esm-framework';
 import { PatientCarePrograms } from '../hooks/useCarePrograms';
 import userEvent from '@testing-library/user-event';
@@ -102,7 +102,7 @@ describe('CarePrograms', () => {
     const enrollButton = screen.getByRole('button', { name: /Enroll/ });
     const discontinueButton = screen.getByRole('button', { name: /Discontinue/ });
     await user.click(enrollButton);
-    expect(launchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
         additionalProps: { enrollmenrDetails: undefined },
         encounterUuid: '',
@@ -113,7 +113,7 @@ describe('CarePrograms', () => {
     });
 
     await user.click(discontinueButton);
-    expect(launchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
         additionalProps: {
           enrollmenrDetails: {

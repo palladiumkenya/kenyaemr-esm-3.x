@@ -13,10 +13,16 @@ import {
   Tile,
 } from '@carbon/react';
 import { Close, DocumentAdd } from '@carbon/react/icons';
-import { CardHeader, EmptyState, launchStartVisitPrompt, ErrorState } from '@openmrs/esm-patient-common-lib';
+import {
+  CardHeader,
+  EmptyState,
+  launchStartVisitPrompt,
+  ErrorState,
+  launchPatientWorkspace,
+} from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
-import { formatDate, launchWorkspace, useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { formatDate, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
 import { mutate } from 'swr';
 
@@ -36,12 +42,13 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
     (careProgram: PatientCarePrograms) => {
       const isEnrolled = careProgram.enrollmentStatus === 'active';
       const formUuid = isEnrolled ? careProgram.discontinuationFormUuid : careProgram.enrollmentFormUuid;
+
       const workspaceTitle = isEnrolled
         ? `${careProgram.display} Discontinuation form`
         : `${careProgram.display} Enrollment form`;
 
       currentVisit
-        ? launchWorkspace('patient-form-entry-workspace', {
+        ? launchPatientWorkspace('patient-form-entry-workspace', {
             workspaceTitle: workspaceTitle,
             mutateForm: () => {
               mutate((key) => true, undefined, {
