@@ -5,10 +5,10 @@ import isEmpty from 'lodash-es/isEmpty';
 import sortBy from 'lodash-es/sortBy';
 
 export const useBills = (patientUuid: string = '', billStatus: string = '') => {
-  const url = `/ws/rest/v1/cashier/bill?v=full`;
+  const url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
-    url,
+    patientUuid ? `${url}&patientUuid=${patientUuid}` : url,
     openmrsFetch,
     {
       errorRetryCount: 2,

@@ -13,7 +13,7 @@ export function BillingDashboard() {
       <BillingHeader title={t('home', 'Home')} />
       <MetricsCards />
       <main className={styles.billsTableContainer}>
-        <BillsTable />
+        <BillsTable defaultBillPaymentStatus="PENDING" />
       </main>
     </main>
   );

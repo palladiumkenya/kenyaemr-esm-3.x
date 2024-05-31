@@ -44,9 +44,13 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
     .flatMap((bill) => bill.lineItems)
     .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED');
 
-  if (isLoading) {
-    return (
-      <ComposedModal preventCloseOnClickOutside open={showModal.loadingModal}>
+  if (!shouldShowBillingPrompt) {
+    return null;
+  }
+
+  return (
+    <ComposedModal preventCloseOnClickOutside open={showModal.billingModal}>
+      {isLoading ? (
         <ModalBody>
           <Heading className={styles.modalTitle}>{t('billingStatus', 'Billing status')}</Heading>
           <InlineLoading
@@ -55,52 +59,44 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
             description={t('patientBilling', 'Verifying patient bills')}
           />
         </ModalBody>
-      </ComposedModal>
-    );
-  }
-
-  if (!shouldShowBillingPrompt) {
-    return null;
-  }
-
-  return (
-    <ComposedModal preventCloseOnClickOutside open={showModal.billingModal}>
-      <ModalBody>
-        <Heading className={styles.modalTitle}>{t('patientBillingAlert', 'Patient Billing Alert')}</Heading>
-        <p className={styles.bodyShort02}>
-          {t('billPaymentRequiredMessage', 'The current patient has pending bill. Advice patient to settle bill.')}
-        </p>
-        <StructuredListWrapper isCondensed>
-          <StructuredListHead>
-            <StructuredListRow head>
-              <StructuredListCell head>{t('item', 'Item')}</StructuredListCell>
-              <StructuredListCell head>{t('quantity', 'Quantity')}</StructuredListCell>
-              <StructuredListCell head>{t('unitPrice', 'Unit price')}</StructuredListCell>
-              <StructuredListCell head>{t('total', 'Total')}</StructuredListCell>
-            </StructuredListRow>
-          </StructuredListHead>
-          <StructuredListBody>
-            {lineItems.map((lineItem) => {
-              return (
-                <StructuredListRow>
-                  <StructuredListCell>{extractString(lineItem.billableService || lineItem.item)}</StructuredListCell>
-                  <StructuredListCell>{lineItem.quantity}</StructuredListCell>
-                  <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
-                  <StructuredListCell>{convertToCurrency(lineItem.quantity * lineItem.price)}</StructuredListCell>
-                </StructuredListRow>
-              );
-            })}
-          </StructuredListBody>
-        </StructuredListWrapper>
-        {!enforceBillPayment && (
-          <p className={styles.providerMessage}>
-            {t(
-              'providerMessage',
-              'By clicking Proceed to care, you acknowledge that you have advised the patient to settle the bill.',
-            )}
+      ) : (
+        <ModalBody>
+          <Heading className={styles.modalTitle}>{t('patientBillingAlert', 'Patient Billing Alert')}</Heading>
+          <p className={styles.bodyShort02}>
+            {t('billPaymentRequiredMessage', 'The current patient has pending bill. Advice patient to settle bill.')}
           </p>
-        )}
-      </ModalBody>
+          <StructuredListWrapper isCondensed>
+            <StructuredListHead>
+              <StructuredListRow head>
+                <StructuredListCell head>{t('item', 'Item')}</StructuredListCell>
+                <StructuredListCell head>{t('quantity', 'Quantity')}</StructuredListCell>
+                <StructuredListCell head>{t('unitPrice', 'Unit price')}</StructuredListCell>
+                <StructuredListCell head>{t('total', 'Total')}</StructuredListCell>
+              </StructuredListRow>
+            </StructuredListHead>
+            <StructuredListBody>
+              {lineItems.map((lineItem) => {
+                return (
+                  <StructuredListRow>
+                    <StructuredListCell>{extractString(lineItem.billableService || lineItem.item)}</StructuredListCell>
+                    <StructuredListCell>{lineItem.quantity}</StructuredListCell>
+                    <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
+                    <StructuredListCell>{convertToCurrency(lineItem.quantity * lineItem.price)}</StructuredListCell>
+                  </StructuredListRow>
+                );
+              })}
+            </StructuredListBody>
+          </StructuredListWrapper>
+          {!enforceBillPayment && (
+            <p className={styles.providerMessage}>
+              {t(
+                'providerMessage',
+                'By clicking Proceed to care, you acknowledge that you have advised the patient to settle the bill.',
+              )}
+            </p>
+          )}
+        </ModalBody>
+      )}
       <ModalFooter>
         <Button kind="secondary" onClick={() => navigate({ to: `\${openmrsSpaBase}/home` })}>
           {t('cancel', 'Cancel')}
