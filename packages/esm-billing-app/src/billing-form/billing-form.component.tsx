@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   ButtonSet,
   Button,
@@ -14,8 +14,9 @@ import {
 } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar } from '@openmrs/esm-framework';
 import { useFetchSearchResults, processBillItems } from '../billing.resource';
+import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 
 type BillingFormProps = {
@@ -23,9 +24,9 @@ type BillingFormProps = {
   closeWorkspace: () => void;
 };
 
-const BillingForm: React.FC<BillingFormProps> = ({ patientUuid, closeWorkspace }) => {
+const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
-  const numberRef = useRef();
+  const patientUuid = getPatientUuidFromUrl();
 
   const [GrandTotal, setGrandTotal] = useState(0);
 
