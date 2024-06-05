@@ -38,8 +38,8 @@ export const usePaymentModes = () => {
 
 export const generateStkAccessToken = async () => {
   try {
-    const consumerKey = 'WK6ABTLXbJtcySnmvHBV7WTH285O0k9NoTs5fzWXGt6PGiUM';
-    const consumerSecret = 'C82O7IoDR8onqibYGRQpV2xIaGRWY7Ozr7NbnOAbTuj8SCaJGMbTNhh0qBrBQ1VO';
+    const consumerKey = '';
+    const consumerSecret = '';
     const authorizationUrl = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
     const headers = {
