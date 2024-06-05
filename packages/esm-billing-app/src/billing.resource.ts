@@ -3,9 +3,12 @@ import { formatDate, parseDate, openmrsFetch, useSession, useVisit } from '@open
 import { FacilityDetail, MappedBill, PatientInvoice } from './types';
 import isEmpty from 'lodash-es/isEmpty';
 import sortBy from 'lodash-es/sortBy';
+import dayjs from 'dayjs';
 
 export const useBills = (patientUuid: string = '', billStatus: string = '') => {
-  const url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))`;
+  // TODO: Should be provided from the UI
+  const defaultCreatedOnOrAfterDateTime = dayjs().startOf('day').toISOString();
+  const url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${defaultCreatedOnOrAfterDateTime}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     patientUuid ? `${url}&patientUuid=${patientUuid}` : url,
