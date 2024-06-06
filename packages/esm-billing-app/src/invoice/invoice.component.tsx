@@ -14,6 +14,7 @@ import Payments from './payments/payments.component';
 import PrintReceipt from './printable-invoice/print-receipt.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import styles from './invoice.scss';
+import MakeClaims from './claims/make-claims.component';
 
 interface InvoiceDetailsProps {
   label: string;
@@ -128,7 +129,8 @@ const Invoice: React.FC = () => {
             size="md">
             {t('printBill', 'Print bill')}
           </Button>
-          {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null}
+          {/* {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null} */}
+          <MakeClaims />
         </div>
       </div>
 
