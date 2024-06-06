@@ -89,6 +89,10 @@
       "name": "drug-order-billable-item",
       "component": "drugOrder",
       "slot": "medication-info-slot"
+    },
+    {
+      "name": "show-payment-transaction",
+      "component": "showPaymentTransaction"
     }
   ]
 }

@@ -43,3 +43,22 @@ export const initiateStkPush = (payload) => {
     },
   });
 };
+
+export const usePaymentRequestStatus = (billUuid) => {
+  const url = `/ws/rest/v1/cashier/api/payment-transaction-status?billUuid=${billUuid}`;
+  const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch, swrOption);
+
+  return {
+    paymentRequstStatus: data?.data ?? [],
+    isLoading,
+    mutate,
+    error,
+  };
+};
+
+export const checkPaymentRequestStatus = (billUuid) => {
+  const url = `/ws/rest/v1/cashier/api/payment-transaction-status?billUuid=${billUuid}`;
+  return openmrsFetch(url, {
+    method: 'GET',
+  });
+};

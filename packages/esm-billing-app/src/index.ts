@@ -14,6 +14,7 @@ import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.co
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import DrugOrder from './billable-services/billiable-item/drug-order.component';
 import LabOrder from './billable-services/billiable-item/lab-order.component';
+import ShowPaymentTransaction from './invoice/payments/payment-transaction/show-payment-transaction.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -52,3 +53,4 @@ export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
 export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, options);
 export const labOrder = getSyncLifecycle(LabOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
+export const showPaymentTransaction = getSyncLifecycle(ShowPaymentTransaction, options);
