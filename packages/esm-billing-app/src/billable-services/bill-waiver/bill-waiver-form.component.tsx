@@ -9,7 +9,8 @@ import { convertToCurrency } from '../../helpers';
 import { processBillPayment } from '../../billing.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
-import { useBillableItems, usePaymentMethods } from '../../billing-form/billing-form.resource';
+import { useBillableItems } from '../../billing-form/billing-form.resource';
+import { usePaymentModes } from '../../invoice/payments/payment.resource';
 
 type BillWaiverFormProps = {
   bill: MappedBill;
@@ -22,7 +23,7 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
   const [waiverAmount, setWaiverAmount] = React.useState(0);
   const { lineItems: billableLineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const totalAmount = lineItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
-  const { paymentModes } = usePaymentMethods();
+  const { paymentModes } = usePaymentModes();
   if (lineItems?.length === 0) {
     return null;
   }

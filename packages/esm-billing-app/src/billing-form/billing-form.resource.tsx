@@ -27,13 +27,6 @@ export const createPatientBill = (payload) => {
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
 
-export const usePaymentMethods = (filterWaiver?: boolean) => {
-  const url = `/ws/rest/v1/cashier/paymentMode`;
-  const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
-  const methods = data?.data?.results ?? [];
-  return { isLoading, error, paymentModes: methods ?? [] };
-};
-
 export const useConceptAnswers = (conceptUuid: string) => {
   const url = `/ws/rest/v1/concept/${conceptUuid}`;
   const { data, isLoading, error } = useSWR<{ data: { answers: Array<OpenmrsResource> } }>(url, openmrsFetch);
