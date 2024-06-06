@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash/capitalize';
 import { ErrorState, formatDate, launchWorkspace, useConfig } from '@openmrs/esm-framework';
@@ -55,7 +55,7 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
   const clinicalFormTitle = capitalize(clinic.replace('-', ' '));
 
   const handleWorkspaceForm = () => {
-    launchWorkspace('patient-form-entry-workspace', {
+    launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: clinicalFormTitle.replace('clinic', 'form'),
       mutateForm: mutate,
       formInfo: {
