@@ -34,6 +34,7 @@ const filterItems = [
   { id: '', text: 'All bills' },
   { id: 'PENDING', text: 'Pending bills' },
   { id: 'PAID', text: 'Paid bills' },
+  { id: 'POSTED', text: 'Posted bills' },
 ];
 
 type BillTableProps = {
