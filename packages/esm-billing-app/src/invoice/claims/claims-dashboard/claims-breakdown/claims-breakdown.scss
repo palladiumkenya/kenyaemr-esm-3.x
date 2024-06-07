@@ -1,0 +1,35 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.claimsBreakdownContainer {
+  display: flex;
+  justify-content: flex-end;
+  padding: layout.$spacing-09 !important;
+}
+
+.claimsBreakdown {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: flex-end;
+  margin-right: auto;
+}
+
+.label {
+  @include type.type-style('heading-03');
+  color: colors.$gray-100;
+  text-align: end;
+}
+
+.value {
+  @extend .label;
+  font-weight: bold;
+  margin-left: layout.$spacing-03;
+  text-align: start;
+}
+
+.extendedLabel {
+  @extend .label;
+  font-weight: bold;
+  color: crimson;
+}
