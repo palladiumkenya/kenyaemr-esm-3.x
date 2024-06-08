@@ -90,13 +90,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
           Amount: amountBilled,
         };
 
-        const resp = await initiateStkPush(payload);
-        const response_data = await resp.data;
-        console.log('[its-kios09]: STK PUSH response data: ', response_data);
-        const CheckoutRequestID = response_data.CheckoutRequestID;
-        console.log('CheckoutRequestID:', CheckoutRequestID);
-        console.log('MFL code:', mflCodeValue);
-
+        await initiateStkPush(payload);
         showSnackbar({
           title: t('stkPush', 'STK Push'),
           subtitle: t('stkPushSucess', 'STK Push send successfully'),
