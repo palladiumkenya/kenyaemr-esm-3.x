@@ -38,17 +38,16 @@ export const usePaymentModes = () => {
 
 export const generateStkAccessToken = async () => {
   try {
-    const consumerKey = '';
-    const consumerSecret = '';
+    const consumerKey = 'WK6ABTLXbJtcySnmvHBV7WTH285O0k9NoTs5fzWXGt6PGiUM';
+    const consumerSecret = 'C82O7IoDR8onqibYGRQpV2xIaGRWY7Ozr7NbnOAbTuj8SCaJGMbTNhh0qBrBQ1VO';
     const authorizationUrl = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Basic ${auth}`,
     };
-    const response = await axios(authorizationUrl, { method: 'GET', headers });
-    const { access_token } = await response.data;
-    console.log(access_token);
+    const response = await fetch(authorizationUrl, { method: 'GET', headers: headers });
+    const { access_token } = await response.json();
     return access_token;
   } catch (error) {
     console.error(error);
@@ -62,8 +61,13 @@ export const initiateStkPush = async (payload) => {
       Authorization: `Bearer ${access_token}`,
     };
     const initiateUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-    return await axios.post(initiateUrl, payload, { headers: headers });
-  } catch (error) {
-    console.error(error);
+    const response = await fetch(initiateUrl, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(payload),
+    });
+    return await response.json();
+  } catch (err) {
+    console.error(err);
   }
 };
