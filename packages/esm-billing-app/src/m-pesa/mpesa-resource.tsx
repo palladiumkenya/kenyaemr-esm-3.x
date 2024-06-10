@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { BillingConfig } from '../../config-schema';
 import { Buffer } from 'buffer';
+import { BillingConfig } from '../config-schema';
 
 type PaymentMethod = {
   uuid: string;

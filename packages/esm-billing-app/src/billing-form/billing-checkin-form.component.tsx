@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { InlineLoading, InlineNotification, FilterableMultiSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { useCashPoint, useBillableItems, createPatientBill } from './billing-form.resource';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import styles from './billing-checkin-form.scss';
 import VisitAttributesForm from './visit-attributes/visit-attributes-form.component';
@@ -10,6 +9,7 @@ import { hasPatientBeenExempted } from './helper';
 import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS } from '../constants';
 import { BillingService } from '../types';
 import SHANumberValidity from './social-health-authority/sha-number-validity.component';
+import { createPatientBill, useBillableItems, useCashPoint } from '../billing.resource';
 
 type BillingCheckInFormProps = {
   patientUuid: string;

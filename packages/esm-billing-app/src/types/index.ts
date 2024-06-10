@@ -250,3 +250,10 @@ interface CommonMedicationProps {
 export interface CommonMedicationValueCoded extends CommonMedicationProps {
   valueCoded: string;
 }
+
+export type PaymentMethod = {
+  uuid: string;
+  description: string;
+  name: string;
+  retired: boolean;
+};

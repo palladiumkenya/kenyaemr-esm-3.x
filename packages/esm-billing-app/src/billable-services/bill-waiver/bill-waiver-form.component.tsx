@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Stack, FormGroup, Layer, Button, NumberInput } from '@carbon/react';
 import { TaskAdd } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -6,11 +6,9 @@ import styles from './bill-waiver-form.scss';
 import { LineItem, MappedBill } from '../../types';
 import { createBillWaiverPayload } from './utils';
 import { convertToCurrency, extractString } from '../../helpers';
-import { processBillPayment } from '../../billing.resource';
+import { processBillPayment, usePaymentModes } from '../../billing.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
-import { useBillableItems } from '../../billing-form/billing-form.resource';
-import { usePaymentModes } from '../../invoice/payments/payment.resource';
 
 type BillWaiverFormProps = {
   bill: MappedBill;
@@ -20,8 +18,8 @@ type BillWaiverFormProps = {
 
 const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPatientUuid }) => {
   const { t } = useTranslation();
-  const [waiverAmount, setWaiverAmount] = React.useState(0);
-  const { lineItems: billableLineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
+  const [waiverAmount, setWaiverAmount] = useState(0);
+
   const totalAmount = lineItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   const { paymentModes } = usePaymentModes(false);
 
@@ -29,15 +27,8 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
     return null;
   }
 
-  const handleProcessPayment = (event) => {
-    const waiverEndPointPayload = createBillWaiverPayload(
-      bill,
-      waiverAmount,
-      totalAmount,
-      lineItems,
-      billableLineItems,
-      paymentModes,
-    );
+  const handleProcessPayment = () => {
+    const waiverEndPointPayload = createBillWaiverPayload(bill, waiverAmount, totalAmount, lineItems, paymentModes);
 
     processBillPayment(waiverEndPointPayload, bill.uuid).then(
       (resp) => {
@@ -71,7 +62,7 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
     <Form className={styles.billWaiverForm} aria-label={t('waiverForm', 'Waiver form')}>
       <hr />
       <Stack gap={7}>
-        <FormGroup>
+        <FormGroup legendText={t('waiverForm', 'Waiver form')}>
           <section className={styles.billWaiverDescription}>
             <label className={styles.label}>{t('billItems', 'Bill Items')}</label>
             <p className={styles.value}>
@@ -87,6 +78,7 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
 
           <Layer className={styles.formControlLayer}>
             <NumberInput
+              id="waiverAmount"
               label={t('amountToWaiveLabel', 'Amount to Waive')}
               helperText={t('amountToWaiveHelper', 'Specify the amount to be deducted from the bill')}
               aria-label={t('amountToWaiveAriaLabel', 'Enter amount to waive')}
@@ -94,7 +86,7 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
               disableWheel
               min={0}
               max={totalAmount}
-              invalidText={t('invalidWaiverAmount', 'Invalid waiver amount')}
+              invalidText={t('invalidWaiverAmountMessage', 'Amount to waive cannot be greater than total amount')}
               value={waiverAmount}
               onChange={(event) => setWaiverAmount(event.target.value)}
             />

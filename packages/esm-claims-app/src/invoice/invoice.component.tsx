@@ -30,7 +30,7 @@ const Invoice: React.FC = () => {
   const componentRef = useRef<HTMLDivElement>(null);
   const onBeforeGetContentResolve = useRef<(() => void) | null>(null);
   const handleSelectItem = (lineItems: Array<LineItem>) => {
-    setSelectedLineItems(lineItems);
+    setSelectedLineItems((prevState) => [...prevState, ...lineItems]);
   };
 
   const handleAfterPrint = useCallback(() => {
