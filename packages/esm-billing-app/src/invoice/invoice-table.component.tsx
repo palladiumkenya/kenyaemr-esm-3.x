@@ -155,8 +155,12 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
                         <TableSelectRow
                           aria-label="Select row"
                           {...getSelectionProps({ row })}
+                          disabled={tableRows[index].status === 'PAID'}
                           onChange={(checked: boolean) => handleRowSelection(row, checked)}
-                          checked={Boolean(selectedLineItems?.find((item) => item?.uuid === row?.id))}
+                          checked={
+                            tableRows[index].status === 'PAID' ||
+                            Boolean(selectedLineItems?.find((item) => item?.uuid === row?.id))
+                          }
                         />
                       )}
                       {row.cells.map((cell) => (

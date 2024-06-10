@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './bill-waiver-form.scss';
 import { LineItem, MappedBill } from '../../types';
 import { createBillWaiverPayload } from './utils';
-import { convertToCurrency } from '../../helpers';
+import { convertToCurrency, extractString } from '../../helpers';
 import { processBillPayment } from '../../billing.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
@@ -23,7 +23,8 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
   const [waiverAmount, setWaiverAmount] = React.useState(0);
   const { lineItems: billableLineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const totalAmount = lineItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
-  const { paymentModes } = usePaymentModes();
+  const { paymentModes } = usePaymentModes(false);
+
   if (lineItems?.length === 0) {
     return null;
   }
@@ -52,10 +53,12 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
           revalidate: true,
         });
       },
-      (err) => {
+      (error) => {
         showSnackbar({
           title: t('billWaiver', 'Bill waiver'),
-          subtitle: t('billWaiverError', 'Bill waiver failed {{error}}', { error: err.message }),
+          subtitle: t('billWaiverError', 'Bill waiver failed {{error}}', {
+            error: error?.responseBody?.error?.message ?? error.message,
+          }),
           kind: 'error',
           timeoutInMs: 3500,
           isLowContrast: true,
@@ -73,7 +76,7 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
             <label className={styles.label}>{t('billItems', 'Bill Items')}</label>
             <p className={styles.value}>
               {t('billName', ' {{billName}} ', {
-                billName: lineItems.map((item) => item.item || item.billableService).join(', ') ?? '--',
+                billName: lineItems.map((item) => extractString(item.item || item.billableService)).join(', ') ?? '--',
               })}
             </p>
           </section>
