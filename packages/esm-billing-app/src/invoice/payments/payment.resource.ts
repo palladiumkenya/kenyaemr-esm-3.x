@@ -34,11 +34,10 @@ export const usePaymentModes = () => {
   };
 };
 
-export const generateStkAccessToken = async () => {
+export const generateStkAccessToken = async (authorizationUrl: string) => {
   try {
     const consumerKey = '';
     const consumerSecret = '';
-    const authorizationUrl = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
     const headers = {
       'Content-Type': 'application/json',
@@ -48,17 +47,17 @@ export const generateStkAccessToken = async () => {
     const { access_token } = await response.json();
     return access_token;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
-export const initiateStkPush = async (payload) => {
+
+export const initiateStkPush = async (payload, initiateUrl: string, authorizationUrl: string) => {
   try {
-    const access_token = await generateStkAccessToken();
+    const access_token = await generateStkAccessToken(authorizationUrl);
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${access_token}`,
     };
-    const initiateUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
     const response = await fetch(initiateUrl, {
       method: 'POST',
       headers: headers,
@@ -66,6 +65,6 @@ export const initiateStkPush = async (payload) => {
     });
     return await response.json();
   } catch (err) {
-    console.error(err);
+    throw err;
   }
 };
