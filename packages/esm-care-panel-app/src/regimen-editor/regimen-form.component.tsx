@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -17,9 +17,9 @@ import {
   toOmrsIsoString,
   toDateObjectStrict,
   showNotification,
-  showToast,
   useConfig,
   showModal,
+  showSnackbar,
 } from '@openmrs/esm-framework';
 import styles from './standard-regimen.scss';
 import StandardRegimen from './standard-regimen.component';
@@ -69,19 +69,34 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
   const [obsArrayForPrevEncounter, setObsArrayForPrevEncounter] = useState([]);
 
   useEffect(() => {
+    const regimenLineObs = {
+      concept: Regimen.RegimenLineConcept,
+      value: standardRegimenLine,
+    };
+    const standardRegimenObs = {
+      concept: Regimen.standardRegimenConcept,
+      value: standardRegimen,
+    };
+    const regimenReasonObs = {
+      concept: Regimen.reasonCodedConcept,
+      value: regimenReason,
+    };
+    const dateStoppedRegObs = {
+      concept: Regimen.dateDrugStoppedCon,
+      value: toDateObjectStrict(
+        toOmrsIsoString(new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date())),
+      ),
+    };
+    const categoryObs = {
+      concept: category === 'ARV' ? Regimen.arvCategoryConcept : Regimen.tbCategoryConcept,
+      value: regimenEvent,
+    };
+
     if (standardRegimenLine && regimenEvent !== Regimen.stopRegimenConcept) {
-      const regimenLineObs = {
-        concept: Regimen.RegimenLineConcept,
-        value: standardRegimenLine,
-      };
       addOrUpdateObsObject(regimenLineObs, obsArray, setObsArray);
     }
 
     if (standardRegimen && regimenEvent !== Regimen.stopRegimenConcept) {
-      const standardRegimenObs = {
-        concept: Regimen.standardRegimenConcept,
-        value: standardRegimen,
-      };
       addOrUpdateObsObject(standardRegimenObs, obsArray, setObsArray);
     }
 
@@ -89,37 +104,14 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
       regimenReason &&
       (regimenEvent === Regimen.stopRegimenConcept || regimenEvent === Regimen.changeRegimenConcept)
     ) {
-      const regimenReasonObs = {
-        concept: Regimen.reasonCodedConcept,
-        value: regimenReason,
-      };
       addOrUpdateObsObject(regimenReasonObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
     }
+
     if (visitDate && (regimenEvent === Regimen.stopRegimenConcept || regimenEvent === Regimen.changeRegimenConcept)) {
-      const dateStoppedRegObs = {
-        concept: Regimen.dateDrugStoppedCon,
-        value: toDateObjectStrict(
-          toOmrsIsoString(new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date())),
-        ),
-      };
       addOrUpdateObsObject(dateStoppedRegObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
     }
-    if (regimenEvent && category === 'ARV') {
-      const categoryObs = {
-        concept: Regimen.arvCategoryConcept,
-        value: regimenEvent,
-      };
-      if (regimenEvent === Regimen.stopRegimenConcept) {
-        addOrUpdateObsObject(categoryObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
-      } else {
-        addOrUpdateObsObject(categoryObs, obsArray, setObsArray);
-      }
-    }
-    if (regimenEvent && category === 'TB') {
-      const categoryObs = {
-        concept: Regimen.tbCategoryConcept,
-        value: regimenEvent,
-      };
+
+    if (regimenEvent && category) {
       if (regimenEvent === Regimen.stopRegimenConcept) {
         addOrUpdateObsObject(categoryObs, obsArrayForPrevEncounter, setObsArrayForPrevEncounter);
       } else {
@@ -144,12 +136,10 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
       regimenEvent !== Regimen.stopRegimenConcept
     ) {
       setObsArray((prevObsArray) => {
-        // Create a map to track distinct values based on the 'value' key
         const distinctValuesMap = new Map();
         prevObsArray.forEach((item) => {
           distinctValuesMap.set(item.value, item);
         });
-        // Add or update items from nonStandardRegimens to the map based on the 'value' key
         nonStandardRegimens.forEach((item) => {
           distinctValuesMap.set(item.value, item);
         });
@@ -162,7 +152,6 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
-
       setIsSubmitting(true);
 
       const encounterToSave: Encounter = {
@@ -181,21 +170,26 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
         form: Regimen.regimenForm,
         obs: obsArray,
       };
+
       const encounterToUpdate: UpdateObs = {
         obs: obsArrayForPrevEncounter,
       };
+
       if (regimenEncounter.uuid) {
         updateEncounter(encounterToUpdate, regimenEncounter.uuid);
         closeWorkspace();
       }
+
       if (obsArray.length > 0) {
         saveEncounter(encounterToSave).then(
           (response) => {
             if (response.status === 201) {
-              showToast({
-                kind: 'success',
+              showSnackbar({
                 title: t('regimenUpdated', 'Regimen updated'),
-                description: t('regimenUpdatedSuccessfully', `Regimen updated successfully.`),
+                subtitle: t('regimenUpdatedSuccessfully', 'Regimen updated successfully'),
+                kind: 'success',
+                timeoutInMs: 3500,
+                isLowContrast: true,
               });
               setIsSubmitting(false);
               mutate(`/ws/rest/v1/kenyaemr/currentProgramDetails?patientUuid=${patientUuid}`);
@@ -213,8 +207,11 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
               critical: true,
               description: error?.message,
             });
+            setIsSubmitting(false);
           },
         );
+      } else {
+        setIsSubmitting(false);
       }
     },
     [
@@ -224,29 +221,46 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
       visitDate,
       obsArray,
       obsArrayForPrevEncounter,
-      sessionUser?.currentProvider?.uuid,
+      sessionUser,
+      config,
       regimenEncounter.uuid,
-      sessionUser?.sessionLocation?.uuid,
-      config.regimenObs.encounterProviderRoleUuid,
       closeWorkspace,
     ],
   );
 
-  const handleOnChange = () => {
-    // setIgnoreChanges((prevState) => !prevState);
-  };
   const launchDeleteRegimenDialog = () => {
     const dispose = showModal('delete-regimen-confirmation-dialog', {
       closeCancelModal: () => dispose(),
       regimenEncounterUuid: regimenEncounter.uuid,
-      patientUuid: patientUuid,
-      category: category,
+      patientUuid,
+      category,
       closeWorkspace,
     });
   };
 
+  const regimenDatePicker = useMemo(
+    () => (
+      <DatePicker
+        dateFormat="d/m/Y"
+        datePickerType="single"
+        id="regimenDate"
+        style={{ paddingBottom: '1rem' }}
+        maxDate={new Date().toISOString()}
+        onChange={([date]) => setVisitDate(date)}
+        value={visitDate}>
+        <DatePickerInput
+          id="regimenDateInput"
+          labelText={t('date', 'Date')}
+          placeholder="dd/mm/yyyy"
+          style={{ width: '100%' }}
+        />
+      </DatePicker>
+    ),
+    [visitDate, t],
+  );
+
   return (
-    <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
+    <Form className={styles.form} onSubmit={handleSubmit}>
       <div>
         <Stack gap={8} className={styles.container}>
           <h4 className={styles.regimenTitle}>Current Regimen: {onRegimen}</h4>
@@ -255,23 +269,19 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
             <RadioButtonGroup
               className={styles.radioButtonWrapper}
               name="regimenEvent"
-              onChange={(uuid) => {
-                setRegimenEvent(uuid);
-              }}>
+              onChange={(uuid) => setRegimenEvent(uuid)}>
               <RadioButton
                 key={'start-regimen'}
                 labelText={t('startRegimen', 'Start')}
                 value={Regimen.startOrRestartConcept}
                 disabled={lastRegimenEncounter.uuid}
               />
-
               <RadioButton
                 key={'restart-regimen'}
                 labelText={t('restartRegimen', 'Restart')}
                 value={Regimen.startOrRestartConcept}
                 disabled={!lastRegimenEncounter.endDate && lastRegimenEncounter.event !== 'STOP ALL'}
               />
-
               <RadioButton
                 key={'change-regimen'}
                 labelText={t('changeRegimen', 'Change')}
@@ -294,32 +304,13 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
             </RadioButtonGroup>
             {regimenEvent ? (
               <>
-                {regimenEvent !== 'undo' ? (
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
-                    id="regimenDate"
-                    style={{ paddingBottom: '1rem' }}
-                    maxDate={new Date().toISOString()}
-                    onChange={([date]) => setVisitDate(date)}
-                    value={visitDate}>
-                    <DatePickerInput
-                      id="regimenDateInput"
-                      labelText={t('date', 'Date')}
-                      placeholder="dd/mm/yyyy"
-                      style={{ width: '100%' }}
-                    />
-                  </DatePicker>
-                ) : null}
-
+                {regimenEvent !== 'undo' && regimenDatePicker}
                 {regimenEvent && regimenEvent !== Regimen.stopRegimenConcept && regimenEvent !== 'undo' ? (
                   <>
                     <RadioButtonGroup
                       className={styles.radioButtonWrapper}
                       name="regimenType"
-                      onChange={(uuid) => {
-                        setSelectedRegimenType(uuid);
-                      }}>
+                      onChange={(uuid) => setSelectedRegimenType(uuid)}>
                       <RadioButton key={'standardUuid'} labelText={'Use standard regimen'} value={'standardUuid'} />
                       <RadioButton
                         key={'nonStandardUuid'}
@@ -345,11 +336,10 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                     )}
                   </>
                 ) : null}
-
-                {regimenEvent === Regimen.stopRegimenConcept ||
-                (regimenEvent === Regimen.changeRegimenConcept && selectedRegimenType) ? (
+                {(regimenEvent === Regimen.stopRegimenConcept ||
+                  (regimenEvent === Regimen.changeRegimenConcept && selectedRegimenType)) && (
                   <RegimenReason category={category} setRegimenReason={setRegimenReason} />
-                ) : null}
+                )}
               </>
             ) : null}
           </section>

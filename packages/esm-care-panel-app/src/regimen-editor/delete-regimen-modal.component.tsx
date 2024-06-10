@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { showNotification, showSnackbar } from '@openmrs/esm-framework';
 import { deleteEncounter } from './regimen.resource';
 import { mutate } from 'swr';
 
@@ -32,11 +32,12 @@ const DeleteRegimenModal: React.FC<DeleteRegimenModalProps> = ({
         .then((response) => {
           if (response.status === 204) {
             closeCancelModal();
-            showToast({
-              critical: true,
-              kind: 'success',
-              description: t('regimenDeletedSuccessfully', 'Regimen successfully'),
+            showSnackbar({
               title: t('regimenDeleted', 'Regimen deleted'),
+              subtitle: t('regimenDeletedSuccessfully', 'Regimen deleted successfully'),
+              kind: 'success',
+              timeoutInMs: 3500,
+              isLowContrast: true,
             });
             mutate(`/ws/rest/v1/kenyaemr/regimenHistory?patientUuid=${patientUuid}&category=${category}`);
             mutate(`/ws/rest/v1/kenyaemr/currentProgramDetails?patientUuid=${patientUuid}`);

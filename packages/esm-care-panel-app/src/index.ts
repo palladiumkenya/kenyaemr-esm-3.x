@@ -1,7 +1,7 @@
 import { defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { dashboardMeta, hivPatientSummaryDashboardMeta } from './dashboard.meta';
-import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import carePanelComponent from './care-panel/care-panel.component';
 import careProgramsComponent from './care-programs/care-programs.component';
 import deleteRegimenConfirmationDialogComponent from './regimen-editor/delete-regimen-modal.component';
@@ -34,17 +34,6 @@ export const patientCareProgram = getSyncLifecycle(careProgramsComponent, {
   featureName: 'care-programs',
 });
 
-registerWorkspace({
-  name: 'patient-regimen-workspace',
-
-  title: 'Regimen Form',
-  load: getSyncLifecycle(regimenFormComponent, options),
-  canMaximize: true,
-  canHide: true,
-  width: 'wider',
-  type: 'clinical-form',
-});
-
 // t('carePanel', 'Care panel')
 export const carePanelSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),
@@ -55,3 +44,4 @@ export const hivPatientSummaryDashboardLink = getSyncLifecycle(
   options,
 );
 export const hivPatientSummary = getSyncLifecycle(PatientSummary, options);
+export const regimenFormWorkspace = getSyncLifecycle(regimenFormComponent, options);

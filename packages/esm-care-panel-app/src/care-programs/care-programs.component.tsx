@@ -16,9 +16,9 @@ import { Close, DocumentAdd } from '@carbon/react/icons';
 import {
   CardHeader,
   EmptyState,
-  launchPatientWorkspace,
   launchStartVisitPrompt,
   ErrorState,
+  launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
@@ -42,6 +42,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
     (careProgram: PatientCarePrograms) => {
       const isEnrolled = careProgram.enrollmentStatus === 'active';
       const formUuid = isEnrolled ? careProgram.discontinuationFormUuid : careProgram.enrollmentFormUuid;
+
       const workspaceTitle = isEnrolled
         ? `${careProgram.display} Discontinuation form`
         : `${careProgram.display} Enrollment form`;

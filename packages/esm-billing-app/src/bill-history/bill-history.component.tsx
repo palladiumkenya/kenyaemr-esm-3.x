@@ -19,14 +19,8 @@ import {
   Button,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import {
-  EmptyDataIllustration,
-  ErrorState,
-  usePaginationInfo,
-  launchPatientWorkspace,
-  CardHeader,
-} from '@openmrs/esm-patient-common-lib';
+import { isDesktop, useLayoutType, usePagination, launchWorkspace } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, ErrorState, usePaginationInfo, CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
 import styles from './bill-history.scss';
@@ -98,31 +92,31 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   if (bills.length === 0) {
     return (
-      <Layer className={styles.emptyStateContainer}>
-        <Tile className={styles.tile}>
-          <p className={styles.billingHeading} style={{ textAlign: 'left' }}>
-            Billing History
-          </p>
-          <div className={styles.illo}>
-            <EmptyDataIllustration />
-          </div>
-          <p className={styles.content}>There are no bills to display.</p>
-          <Button
-            onClick={() => launchPatientWorkspace('billing-form', { workspaceTitle: 'Billing Form' })}
-            kind="ghost">
-            {t('launchBillForm', 'Launch bill form')}
-          </Button>
-        </Tile>
-      </Layer>
+      <>
+        <CardHeader title={t('patientBilling', 'Patient billing')}>
+          <></>
+        </CardHeader>
+        <Layer>
+          <Tile className={styles.tile}>
+            <div className={styles.illo}>
+              <EmptyDataIllustration />
+            </div>
+            <p className={styles.content}>There are no bills to display.</p>
+            <Button onClick={() => launchWorkspace('billing-form', { workspaceTitle: 'Billing Form' })} kind="ghost">
+              {t('launchBillForm', 'Launch bill form')}
+            </Button>
+          </Tile>
+        </Layer>
+      </>
     );
   }
 
   return (
     <div>
-      <CardHeader title={t('billingHistory', 'Billing History')}>
+      <CardHeader title={t('patientBilling', 'Patient billing')}>
         <Button
           renderIcon={Add}
-          onClick={() => launchPatientWorkspace('billing-form', { workspaceTitle: 'Billing Form' })}
+          onClick={() => launchWorkspace('billing-form', { workspaceTitle: 'Billing Form' })}
           kind="ghost">
           {t('addBill', 'Add bill item(s)')}
         </Button>

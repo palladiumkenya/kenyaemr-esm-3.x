@@ -1,9 +1,7 @@
-/* eslint-disable no-console */
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
 import { Buffer } from 'buffer';
-import axios from 'axios';
 
 type PaymentMethod = {
   uuid: string;

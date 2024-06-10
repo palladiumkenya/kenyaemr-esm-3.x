@@ -11,3 +11,8 @@
   color: colors.$red-50;
   margin-top: 1.5rem;
 }
+
+.modalTitle {
+  @include type.type-style('productive-heading-03');
+  padding: 0.5rem 0;
+}

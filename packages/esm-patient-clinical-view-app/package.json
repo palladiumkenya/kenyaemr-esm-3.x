@@ -42,13 +42,11 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "5.x",
-    "@openmrs/esm-patient-common-lib": "7.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",
     "react-router-dom": "6.x"
   },
   "devDependencies": {
-    "@openmrs/esm-patient-common-lib": "next",
     "webpack": "^5.74.0"
   }
 }

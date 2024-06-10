@@ -14,19 +14,18 @@ import {
   TableContainer,
 } from '@carbon/react';
 import styles from './program-enrollment.scss';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import isEmpty from 'lodash/isEmpty';
 import dayjs from 'dayjs';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 export interface ProgramEnrollmentProps {
   patientUuid: string;
   programName: string;
   enrollments: Array<any>;
   formEntrySub: any;
-  launchPatientWorkspace: Function;
 }
 const shareObjProperty = { dateEnrolled: 'Enrolled on', dateCompleted: 'Date Completed' };
 const programDetailsMap = {

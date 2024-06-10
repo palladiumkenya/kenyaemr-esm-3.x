@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Form, ModalBody, ModalHeader, TextInput, Layer } from '@carbon/react';
@@ -29,7 +30,6 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const { t } = useTranslation();
   const { mpesaCallbackUrl } = useConfig();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
-
   const {
     control,
     handleSubmit,

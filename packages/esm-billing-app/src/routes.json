@@ -9,7 +9,7 @@
       "route":"billable-services"
     },
     {
-      "component": "billingPrompt",
+      "component": "requirePaymentModal",
       "routeRegex": "^patient\/.+\/chart",
       "online": true,
       "offline": false
@@ -49,7 +49,7 @@
         "columns": 1,
         "columnSpan": 1,
         "slot": "patient-chart-billing-dashboard-slot",
-        "path": "Billing history"
+        "path": "Billing"
       }
     },
     {
@@ -79,6 +79,16 @@
     {
       "name": "initiate-payment-modal",
       "component": "initiatePaymentDialog"
+    },
+    {
+      "name": "lab-order-billable-item",
+      "component": "labOrder",
+      "slot": "top-of-lab-order-form-slot"
+    },
+    {
+      "name": "drug-order-billable-item",
+      "component": "drugOrder",
+      "slot": "medication-info-slot"
     }
   ]
 }

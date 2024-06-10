@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CardHeader, EmptyState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash/capitalize';
-import { ErrorState, formatDate, useConfig } from '@openmrs/esm-framework';
+import { ErrorState, formatDate, launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../config-schema';
 import { genericTableHeader, useEncounters } from './useEncounters';
 import {
@@ -19,7 +19,6 @@ import {
   TableExpandedRow,
   DataTableSkeleton,
   Button,
-  OverflowMenuItem,
 } from '@carbon/react';
 import EncounterObservations from './encounter-observations/encounter-observations.component';
 
@@ -68,7 +67,7 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
   };
 
   const handleWorkspaceEditForm = (encounterUuid: string = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: clinicalFormTitle.replace('clinic', 'form'),
       mutateForm: mutate,
       formInfo: {
