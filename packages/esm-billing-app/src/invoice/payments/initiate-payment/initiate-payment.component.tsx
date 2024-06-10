@@ -44,14 +44,12 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
 
   const onSubmit = async (data) => {
     try {
-      const shortCode = '';
       const timeStamp = new Date()
         .toISOString()
         .replace(/[^0-9]/g, '')
         .slice(0, -3);
       const phoneNumber = formatPhoneNumber(data.phoneNumber);
       const amountBilled = data.billAmount;
-      const passKey = '';
       const password = shortCode + passKey + timeStamp;
       const callBackUrl = mpesaCallbackUrl;
       const Password = Buffer.from(password).toString('base64');
@@ -71,7 +69,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
         Amount: amountBilled,
       };
 
-      await initiateStkPush(payload);
+      await initiateStkPush(payload, initiateUrl, authorizationUrl);
       showSnackbar({
         title: t('stkPush', 'STK Push'),
         subtitle: t('stkPushSucess', 'STK Push send successfully'),
@@ -81,7 +79,6 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
       });
       closeModal();
     } catch (err) {
-      console.error(err);
       const errorMessage =
         err.response?.data?.errorMessage || err.message || t('stkPushError', 'STK Push request failed');
       showSnackbar({

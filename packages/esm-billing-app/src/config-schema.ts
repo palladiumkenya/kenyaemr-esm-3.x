@@ -112,7 +112,4 @@ export const configSchema = {
     _default: '',
     _description: 'MPESA Initiator url which Initiates online payment on behalf of a customer.',
   },
-    _default: 'https://76e3c9ac003fb3.lhr.life',
-    _description: 'MPESA callback Url to receive confirmation payload from MPESA Daraja API',
-  
 };
