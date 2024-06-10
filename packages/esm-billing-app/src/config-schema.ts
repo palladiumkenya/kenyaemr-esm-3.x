@@ -13,6 +13,10 @@ export interface BillingConfig {
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
   enforceBillPayment: boolean;
   mpesaCallbackUrl: string;
+  shortCode: string;
+  passKey: string;
+  authorizationUrl: string;
+  initiateUrl: string;
 }
 
 export const configSchema = {
@@ -85,7 +89,27 @@ export const configSchema = {
   },
   mpesaCallbackUrl: {
     _type: Type.String,
-    _default: 'https://76e3c9ac003fb3.lhr.life',
+    _default: '',
     _description: 'MPESA callback Url to receive confirmation payload from MPESA Daraja API',
+  },
+  shortCode: {
+    _type: Type.String,
+    _default: '',
+    _description: 'shortcode used to identify an organization and receive the transaction',
+  },
+  passKey: {
+    _type: Type.String,
+    _default: '',
+    _description: 'Passkey used for generating password for generation of access token to auth APIs',
+  },
+  authorizationUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'MPESA Authenciation url gives you a time bound access token to call allowed APIs.',
+  },
+  initiateUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'MPESA Initiator url which Initiates online payment on behalf of a customer.',
   },
 };

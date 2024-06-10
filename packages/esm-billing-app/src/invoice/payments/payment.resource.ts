@@ -1,9 +1,7 @@
-/* eslint-disable no-console */
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
 import { Buffer } from 'buffer';
-import axios from 'axios';
 
 type PaymentMethod = {
   uuid: string;
@@ -36,34 +34,37 @@ export const usePaymentModes = () => {
   };
 };
 
-export const generateStkAccessToken = async () => {
+export const generateStkAccessToken = async (authorizationUrl: string) => {
   try {
     const consumerKey = '';
     const consumerSecret = '';
-    const authorizationUrl = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
     const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Basic ${auth}`,
     };
-    const response = await axios(authorizationUrl, { method: 'GET', headers });
-    const { access_token } = await response.data;
-    console.log(access_token);
+    const response = await fetch(authorizationUrl, { method: 'GET', headers: headers });
+    const { access_token } = await response.json();
     return access_token;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 };
-export const initiateStkPush = async (payload) => {
+
+export const initiateStkPush = async (payload, initiateUrl: string, authorizationUrl: string) => {
   try {
-    const access_token = await generateStkAccessToken();
+    const access_token = await generateStkAccessToken(authorizationUrl);
     const headers = {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${access_token}`,
     };
-    const initiateUrl = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-    return await axios.post(initiateUrl, payload, { headers: headers });
-  } catch (error) {
-    console.error(error);
+    const response = await fetch(initiateUrl, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(payload),
+    });
+    return await response.json();
+  } catch (err) {
+    throw err;
   }
 };
