@@ -57,8 +57,6 @@
   "identifier": "Identifier",
   "initiatePay": "Initiate Payment",
   "initiatePayment": "Initiate Payment",
-  "inStock": "{{quantityUoM}}(s) In stock ",
-  "InitiatePaymentError": "Initiate Payment Error",
   "inlineLoading": "Loading bill items...",
   "insuranceScheme": "Insurance scheme",
   "invalidSHANumber": "SHA number is invalid, advice patient to update payment or contact SHA",
