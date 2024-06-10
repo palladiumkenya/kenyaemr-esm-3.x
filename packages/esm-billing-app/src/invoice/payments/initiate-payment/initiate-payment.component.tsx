@@ -5,7 +5,7 @@ import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
 import { initiateStkPush } from '../payment.resource';
-import { showSnackbar,useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formatPhoneNumber } from '../utils';
