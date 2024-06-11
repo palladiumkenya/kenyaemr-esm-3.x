@@ -1,0 +1,80 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '../../root.scss';
+
+@media screen {
+  .printPage {
+    background-color: white;
+    display: none;
+  }
+}
+
+@media print {
+  @page {
+    size: auto;
+    margin: 5px;
+  }
+
+  .section {
+    margin: 5px;
+  }
+
+  table {
+    font-family: Arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  td,
+  th {
+    border: 1px solid #000;
+    text-align: left;
+    font-size: 8px;
+    padding: 8px;
+    width: 80px;
+  }
+
+  th {
+    background-color: #f2f2f2;
+  }
+
+  .headingText {
+    font-size: '10px';
+    font-weight: 'bold';
+    margin: '5px';
+  }
+
+  .header {
+    display: 'flex';
+    justify-content: 'space-around';
+    flex-direction: 'row';
+    align-items: 'center';
+    margin: ' 10px';
+  }
+
+  .facilityContainer {
+    display: 'flex';
+    flex-direction: 'row';
+    justify-content: 'space-between';
+  }
+
+  .patientContainer {
+    display: 'flex';
+    flex-direction: 'column';
+  }
+
+  .headerSection {
+    display: 'flex';
+    flex-direction: 'column';
+    justify-content: 'center';
+    align-items: 'center';
+  }
+
+  .footerSection {
+    margin: '10px';
+    display: 'flex';
+    width: '500px';
+    flex-direction: 'row';
+  }
+}

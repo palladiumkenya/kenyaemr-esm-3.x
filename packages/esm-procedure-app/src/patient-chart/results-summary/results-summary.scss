@@ -1,0 +1,158 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '../../root.scss';
+
+.section {
+  margin: 5px;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: 5rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+}
+
+.separator {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  width: 80%;
+  margin: 1.5rem auto;
+  overflow: hidden;
+  text-align: center;
+
+  &::before,
+  &::after {
+    background-color: $text-03;
+    content: '';
+    display: inline-block;
+    height: 1px;
+    position: relative;
+    vertical-align: middle;
+    width: 50%;
+  }
+
+  &::before {
+    right: 0.5rem;
+    margin-left: -50%;
+  }
+
+  &::after {
+    left: 0.5rem;
+    margin-right: -50%;
+  }
+}
+
+td {
+  white-space: nowrap;
+}
+
+.criticallyLow,
+.criticallyHigh,
+.low,
+.high {
+  td:nth-child(2) {
+    @include type.type-style('heading-compact-01');
+  }
+}
+
+.criticallyLow,
+.criticallyHigh {
+  border: 2px solid colors.$red-60 !important;
+}
+
+.low,
+.high {
+  border: 1.5px solid colors.$black-100 !important;
+}
+
+.criticallyLow {
+  td:nth-child(2)::after {
+    content: ' ↓↓';
+  }
+}
+
+.criticallyHigh {
+  td:nth-child(2)::after {
+    content: ' ↑↑';
+  }
+}
+
+.low {
+  td:nth-child(2)::after {
+    content: ' ↓';
+  }
+}
+
+.high {
+  td:nth-child(2)::after {
+    content: ' ↑';
+  }
+}
+
+.off-scale-low {
+  td:nth-child(2)::after {
+    content: ' ↓↓↓';
+  }
+}
+
+.off-scale-high {
+  td:nth-child(2)::after {
+    content: ' ↑↑↑';
+  }
+}
+
+.offScaleHigh,
+.offScaleLow,
+.criticallyHigh,
+.criticallyLow,
+.high,
+.low {
+  @include type.type-style('heading-compact-01');
+}
+
+.criticallyLow::after {
+  content: ' ↓↓';
+}
+
+.criticallyHigh::after {
+  content: ' ↑↑';
+}
+
+.low::after {
+  content: ' ↓';
+}
+
+.high::after {
+  content: ' ↑';
+}
+
+.cds--data-table--zebra tbody tr[data-parent-row]:nth-child(4n + 1) td {
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  border-top: 1px solid #e0e0e0;
+  padding: 0 16px;
+}

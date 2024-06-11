@@ -3,17 +3,17 @@ import styles from './result-form.scss';
 import { Button, InlineLoading, ModalBody, ModalFooter, TextArea, FormLabel } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { closeOverlay } from '../components/overlay/hook';
-import { ExtensionSlot, showSnackbar, usePatient } from '@openmrs/esm-framework';
-import { Result } from '../radiology-tabs/work-list/work-list.resource';
+import { ExtensionSlot, showNotification, showToast, usePatient } from '@openmrs/esm-framework';
+import { useGetOrderConceptByUuid, saveProcedureReport } from './result-form.resource';
+import { Result } from '../work-list/work-list.resource';
 import { useForm } from 'react-hook-form';
-import { saveProcedureReport, useGetOrderConceptByUuid } from './result-form.resource';
 
 interface ResultFormProps {
   patientUuid: string;
   order: Result;
 }
 
-const ProcedureReportForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
+const PostProcedureForm: React.FC<ResultFormProps> = ({ order, patientUuid }) => {
   const [report, setProcedureReport] = useState('');
   const { t } = useTranslation();
   const {
@@ -37,37 +37,40 @@ const ProcedureReportForm: React.FC<ResultFormProps> = ({ order, patientUuid }) 
   }, [patient, patientUuid]);
 
   if (isLoadingConcepts) {
-    return <div>Loading test details</div>;
+    return <div>Loading procedure details</div>;
   }
 
   const onSubmit = (data, e) => {
     e.preventDefault();
+    // assign result to test order
 
     const reportPayload = {
       patient: patientUuid,
       procedureOrder: order.uuid,
       concept: order.concept.uuid,
-      status: 'COMPLETED',
+      status: 'IN_PROGRESS',
       procedureReport: report,
-      encounters: [],
+      participants: [],
+      procedureResults: [],
+      complications: [],
     };
 
     saveProcedureReport(reportPayload).then(
       () => {
-        showSnackbar({
-          isLowContrast: true,
-          title: t('saveReport', 'Report updated successful'),
+        showToast({
+          critical: true,
+          title: t('saveReport', 'Report updated sucessful'),
           kind: 'success',
-          subtitle: t('generateSuccessfully', 'You have successfully save the report'),
+          description: t('generateSuccessfully', 'Report saved successfully'),
         });
         closeOverlay();
       },
       (err) => {
-        showSnackbar({
+        showNotification({
           title: t(`errorSavingReport', 'Error occurred while saving the report`),
           kind: 'error',
-          isLowContrast: true,
-          subtitle: err?.message,
+          critical: true,
+          description: err?.message,
         });
       },
     );
@@ -114,4 +117,4 @@ const ProcedureReportForm: React.FC<ResultFormProps> = ({ order, patientUuid }) 
   );
 };
 
-export default ProcedureReportForm;
+export default PostProcedureForm;

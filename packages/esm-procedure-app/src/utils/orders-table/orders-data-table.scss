@@ -1,0 +1,50 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '../../root.scss';
+
+.tableContainer {
+  background-color: $ui-01;
+  margin: 0 spacing.$spacing-05;
+  padding: 0;
+
+  a {
+    text-decoration: none;
+  }
+
+  th {
+    color: $text-02;
+  }
+
+  :global(.cds--data-table) {
+    background-color: $ui-03;
+  }
+
+  .toolbarContent {
+    height: spacing.$spacing-07;
+    margin-bottom: spacing.$spacing-02;
+  }
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: 5rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}

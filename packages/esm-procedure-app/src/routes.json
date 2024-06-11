@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "extensions": [
+    {
+      "component": "procedureDashboardLink",
+      "name": "procedure-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "procedure",
+        "title": "procedure",
+        "slot": "procedure-dashboard-slot"
+      }
+    },
+    {
+      "component": "root",
+      "name": "procedure-dashboard-root",
+      "slot": "procedure-dashboard-slot"
+    },
+    {
+        "name": "procedures-ordered-tile-component",
+        "slot": "procedure-tiles-slot",
+        "component": "OrderedTileComponent",
+        "meta": {
+            "name": "proceduresOrderedTileSlot",
+            "title": "Active Orders"
+        }
+    },
+    {
+      "name": "procedures-worklist-tile-component",
+      "slot": "procedure-tiles-slot",
+      "component": "worklistTileComponent",
+      "meta": {
+          "name": "worklisTileSlot",
+          "title": "Worklist"
+      }
+  },
+  {
+    "name": "procedures-referred-tile-component",
+    "slot": "procedure-tiles-slot",
+    "component": "referredOutTileComponent",
+    "meta": {
+      "name": "referredTileSlot",
+      "title": "Referred Out"
+    }
+  },
+  {
+    "name": "procedures-not-done-tile-component",
+    "slot": "procedure-tiles-slot",
+    "component": "notDoneTileComponent",
+    "meta": {
+      "name": "notDoneTileSlot",
+      "title": "Not Done"
+    }
+  },
+  {
+    "name": "procedures-completed-tile-component",
+    "slot": "procedure-tiles-slot",
+    "component": "completedTileComponent",
+    "meta": {
+        "name": "completedTileSlot",
+        "title": "Completed"
+    }
+},
+    {
+      "name": "procedures-worklist-tab-component",
+      "slot": "procedures-panels-slot",
+      "component": "worklistProceduresTabComponent",
+      "meta": {
+          "name": "proceduresPanelSlot",
+          "title": "Worklist"
+      }
+  },
+    {
+      "name": "procedures-referred-tab-component",
+      "slot": "procedures-panels-slot",
+      "component": "referredProceduresTabComponent",
+      "meta": {
+          "name": "proceduresPanelSlot",
+          "title": "Referred Out"
+      }
+  },
+  {
+    "name": "procedures-not-done-tab-component",
+    "slot": "procedures-panels-slot",
+    "component": "notDoneProceduresTabComponent",
+    "meta": {
+        "name": "proceduresPanelSlot",
+        "title": "Not Done"
+    }
+},
+  {
+    "name": "procedures-completed-tab-component",
+    "slot": "procedures-panels-slot",
+    "component": "completedProceduresTabComponent",
+    "meta": {
+        "name": "proceduresPanelSlot",
+        "title": "Completed"
+    }
+},
+    {
+      "name":"procedure-instructions-modal",
+      "component": "procedureInstructionsModalComponent"
+    },
+    {
+      "name":"procedure-reject-reason-modal",
+      "component": "procedureRejectModalComponent"
+    },
+    {
+      "name":"add-procedure-to-worklist-dialog",
+      "component": "addProcedureToWorklistDialogComponent"
+    },
+    {
+      "name": "reject-procedure-order-dialog",
+      "component": "rejectProcedureOrderDialogComponent"
+    },
+    {
+      "name": "procedures-order-panel",
+      "component": "proceduresOrderPanel",
+      "slot": "order-basket-slot",
+      "order": 4
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "add-procedures-order",
+      "type": "order",
+      "title": "Add procedure order",
+      "component": "addProceduresOrderWorkspace"
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "procedure"
+    }
+  ]
+}
