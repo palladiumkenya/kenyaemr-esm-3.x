@@ -1,6 +1,6 @@
 import React from 'react';
-import { ImageMedical } from '@carbon/react/icons';
 import styles from './radiology-header.scss';
+import { ImageMedical } from '@carbon/react/icons';
 
 const RadiologyIllustration: React.FC = () => {
   return (

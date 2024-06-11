@@ -3,16 +3,16 @@
 @import '@openmrs/esm-styleguide/src/vars';
 
 .desktopTile {
-  border-left: 4px solid #6929c4;
+  border-left: 4px solid #18cd69;
   background-color: $ui-02;
-  border-top: 1px solid #e8daff;
+  border-top: 1px solid #8ecdaa;
   border-right: none;
   padding: 0;
 }
 
 .tabletTile {
   @extend .desktopTile;
-  border-top: 1px solid #612ebd;
+  border-top: 1px solid #0ec862;
 }
 
 .collapsedTile {

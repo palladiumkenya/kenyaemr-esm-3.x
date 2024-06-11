@@ -2,4 +2,4 @@
 
 # ESM Radiology App
 
-This is a frontend module that provides imaging functionality.
+This is a frontend module that provides imaging functionality to KenyaEMR.
