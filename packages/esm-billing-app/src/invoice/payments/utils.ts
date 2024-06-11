@@ -1,5 +1,4 @@
-import { LineItem, MappedBill } from '../../types';
-import { Payment } from './payments.component';
+import { FormPayment, LineItem, MappedBill } from '../../types';
 
 const hasLineItem = (lineItems: Array<LineItem>, item: LineItem) => {
   if (lineItems?.length === 0) {
@@ -12,7 +11,7 @@ const hasLineItem = (lineItems: Array<LineItem>, item: LineItem) => {
 export const createPaymentPayload = (
   bill: MappedBill,
   patientUuid: string,
-  formValues: Array<Payment>,
+  formValues: Array<FormPayment>,
   amountDue: number,
   selectedLineItems: Array<LineItem>,
 ) => {

@@ -3,10 +3,10 @@ import { FormProvider, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useVisit } from '@openmrs/esm-framework';
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
 import { Button } from '@carbon/react';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { LineItem, type MappedBill } from '../../types';
+import { LineItem, PaymentFormValue, type MappedBill } from '../../types';
 import { convertToCurrency } from '../../helpers';
 import { createPaymentPayload } from './utils';
 import { processBillPayment } from '../../billing.resource';
@@ -14,16 +14,11 @@ import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.componen
 import PaymentHistory from './payment-history/payment-history.component';
 import PaymentForm from './payment-form/payment-form.component';
 import styles from './payments.scss';
+import { computeTotalPrice, extractErrorMessagesFromResponse } from '../../utils';
 
 type PaymentProps = {
   bill: MappedBill;
   selectedLineItems: Array<LineItem>;
-};
-
-export type Payment = { method: string; amount: string | number; referenceCode?: number | string };
-
-export type PaymentFormValue = {
-  payment: Array<Payment>;
 };
 
 const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
@@ -36,12 +31,10 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     referenceCode: z.union([z.number(), z.string()]).optional(),
   });
 
-  const paymentFormSchema = z.object({ payment: z.array(paymentSchema) });
-  const { currentVisit } = useVisit(bill?.patientUuid);
   const methods = useForm<PaymentFormValue>({
     mode: 'all',
     defaultValues: {},
-    resolver: zodResolver(paymentFormSchema),
+    resolver: zodResolver(z.object({ payment: z.array(paymentSchema) })),
   });
 
   const formValues = useWatch({
@@ -50,9 +43,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   });
 
   const hasMoreThanOneLineItem = bill?.lineItems?.length > 1;
-
   const computedTotal = hasMoreThanOneLineItem ? computeTotalPrice(selectedLineItems) : bill.totalAmount ?? 0;
-
   const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount) ?? 0, 0) ?? 0;
   const amountDue = Number(computedTotal) - (Number(bill.tenderedAmount) + Number(totalAmountTendered));
 
@@ -64,7 +55,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const handleProcessPayment = () => {
     const paymentPayload = createPaymentPayload(bill, bill.patientUuid, formValues, amountDue, selectedLineItems);
     processBillPayment(paymentPayload, bill.uuid).then(
-      () => {
+      (resp) => {
         showSnackbar({
           title: t('billPayment', 'Bill payment'),
           subtitle: 'Bill payment processing has been successful',
@@ -74,7 +65,15 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
         handleNavigateToBillingDashboard();
       },
       (error) => {
-        showSnackbar({ title: 'Bill payment error', kind: 'error', subtitle: error });
+        showSnackbar({
+          title: t('failedBillPayment', 'Bill payment failed'),
+          subtitle: `An unexpected error occurred while processing your bill payment. Please contact the system administrator and provide them with the following error details: ${extractErrorMessagesFromResponse(
+            error.responseBody,
+          )}`,
+          kind: 'error',
+          timeoutInMs: 3000,
+          isLowContrast: true,
+        });
       },
     );
   };
@@ -118,21 +117,6 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
       </div>
     </FormProvider>
   );
-};
-
-const computeTotalPrice = (items) => {
-  if (items && !items.length) {
-    return 0;
-  }
-
-  let totalPrice = 0;
-
-  items?.forEach((item) => {
-    const { price, quantity } = item;
-    totalPrice += price * quantity;
-  });
-
-  return totalPrice;
 };
 
 export default Payments;
