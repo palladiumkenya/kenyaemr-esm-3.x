@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "extensions": [
+    {
+      "component": "radiologyDashboardLink",
+      "name": "radiology-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "radiology",
+        "title": "radiology",
+        "slot": "radiology-dashboard-slot"
+      }
+    },
+    {
+      "component": "root",
+      "name": "radiology-dashboard-root",
+      "slot": "radiology-dashboard-slot"
+    },
+    {
+      "name": "radiology-tests-ordered-tile-component",
+      "slot": "radiology-tiles-slot",
+      "component": "testOrderedTileComponent",
+      "meta": {
+        "name": "testsOrderedTileSlot",
+        "title": "Ordered tests"
+      }
+    },
+    {
+      "name": "radiology-worklist-tile-component",
+      "slot": "radiology-tiles-slot",
+      "component": "worklistTileComponent",
+      "meta": {
+        "name": "worklisTileSlot",
+        "title": "Worklist"
+      }
+    },
+    {
+      "name": "radiology-referred-tile-component",
+      "slot": "radiology-tiles-slot",
+      "component": "referredTileComponent",
+      "meta": {
+        "name": "referredTileSlot",
+        "title": "Referred tests"
+      }
+    },
+    {
+      "name": "radiology-review-tile-component",
+      "slot": "radiology-tiles-slot",
+      "component": "reviewTileComponent",
+      "meta": {
+        "name": "reviewTileSlot",
+        "title": "Review"
+      }
+    },
+    {
+      "name": "radiology-approved-tile-component",
+      "slot": "radiology-tiles-slot",
+      "component": "approveTileComponent",
+      "meta": {
+        "name": "approveTileSlot",
+        "title": "Approved"
+      }
+    },
+    {
+      "name": "radiology-notdone-tile-component",
+      "slot": "radiology-tiles-slot",
+      "component": "notDoneTileComponent",
+      "meta": {
+        "name": "notDoneTileSlot",
+        "title": "Not Done"
+      }
+    },
+    {
+      "name": "add-radiology-to-worklist-dialog",
+      "component": "addRadiologyToWorklistDialogComponent"
+    },
+    {
+      "name": "radiology-order-panel",
+      "component": "radiologyOrderPanel",
+      "slot": "order-basket-slot",
+      "order": 3
+    },
+    {
+      "name": "add-radiology-to-worklist-dialog",
+      "component": "addRadiologyToWorklistDialogComponent"
+    },
+    {
+      "name": "reject-radiology-order-dialog",
+      "component": "rejectOrderDialog"
+    },
+    {
+      "name": "radiology-instructions-modal",
+      "component": "radiologyInstructionsModalComponent"
+    },
+    {
+      "name": "review-radilogy-report-dialog",
+      "component": "reviewRadiologyReportDialog"
+    },
+    {
+      "name":"radiology-reject-reason-modal",
+      "component": "radiologyRejectReasonModalComponent"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "add-radiology-order",
+      "type": "order",
+      "component": "addRadiologyOrderWorkspace",
+      "title": "Add Radiology Order"
+     
+      
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "radiology"
+    }
+  ]
+}

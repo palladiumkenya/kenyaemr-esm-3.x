@@ -1,0 +1,20 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+
+.textAreaInput {
+}
+
+.infoSection {
+  margin-bottom: 2rem;
+}
+
+.modalBody {
+}
+
+:global(.cds--tooltip-trigger__wrapper) {
+  // visibility: hidden;
+}
+
+:global(.cds--modal-close-button) {
+  // visibility: hidden;
+}
