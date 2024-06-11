@@ -15,11 +15,17 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
   const {
     control,
     formState: { errors },
+    setFocus,
   } = useFormContext<PaymentFormValue>();
   const { paymentModes, isLoading, error } = usePaymentModes();
   const { fields, remove, append } = useFieldArray({ name: 'payment', control: control });
 
-  const handleAppendPaymentMode = useCallback(() => append({ method: '', amount: 0, referenceCode: '' }), [append]);
+  const handleAppendPaymentMode = useCallback(() => {
+    {
+      append({ method: '', amount: 0, referenceCode: '' });
+      setFocus(`payment.${fields.length}.method`);
+    }
+  }, [append]);
   const handleRemovePaymentMode = useCallback((index) => remove(index), [remove]);
 
   if (isLoading) {
@@ -43,8 +49,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             name={`payment.${index}.method`}
             render={({ field }) => (
               <Dropdown
+                {...field}
                 id="paymentMethod"
-                onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
+                onChange={({ selectedItem }) => {
+                  setFocus(`payment.${index}.amount`);
+                  field.onChange(selectedItem?.uuid);
+                }}
                 titleText={t('paymentMethod', 'Payment method')}
                 label={t('selectPaymentMethod', 'Select payment method')}
                 items={paymentModes}
@@ -59,8 +69,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             name={`payment.${index}.amount`}
             render={({ field }) => (
               <NumberInput
-                id="paymentAmount"
                 {...field}
+                id="paymentAmount"
                 onChange={(e) => field.onChange(Number(e.target.value))}
                 invalid={!!errors?.payment?.[index]?.amount}
                 invalidText={errors?.payment?.[index]?.amount?.message}
@@ -74,8 +84,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
             control={control}
             render={({ field }) => (
               <TextInput
-                id="paymentReferenceCode"
                 {...field}
+                id="paymentReferenceCode"
                 labelText={t('referenceNumber', 'Reference number')}
                 placeholder={t('enterReferenceNumber', 'Enter ref. number')}
                 type="text"
