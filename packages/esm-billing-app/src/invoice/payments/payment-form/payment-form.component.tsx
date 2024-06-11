@@ -5,8 +5,8 @@ import { TrashCan, Add } from '@carbon/react/icons';
 import { Button, Dropdown, NumberInputSkeleton, TextInput, NumberInput } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { PaymentFormValue } from '../payments.component';
-import { usePaymentModes } from '../payment.resource';
 import styles from './payment-form.scss';
+import { usePaymentModes } from '../../../billing.resource';
 
 type PaymentFormProps = { disablePayment: boolean; amountDue: number };
 

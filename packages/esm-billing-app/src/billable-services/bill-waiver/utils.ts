@@ -6,7 +6,6 @@ export const createBillWaiverPayload = (
   amountWaived: number,
   totalAmount: number,
   lineItems: Array<LineItem>,
-  billableLineItems: Array<OpenmrsResource>,
   paymentModes: Array<OpenmrsResource>,
 ) => {
   const { cashier } = bill;

@@ -1,7 +1,7 @@
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { BillingConfig } from '../../config-schema';
 import { Buffer } from 'buffer';
+import { BillingConfig } from '../config-schema';
 
 type PaymentMethod = {
   uuid: string;
@@ -14,7 +14,7 @@ const swrOption = {
   errorRetryCount: 2,
 };
 
-export const usePaymentModes = () => {
+export const usePaymentModes = (excludeWaiver: boolean = true) => {
   const { excludedPaymentMode } = useConfig<BillingConfig>();
   const url = `/ws/rest/v1/cashier/paymentMode`;
   const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<PaymentMethod> } }>(
@@ -27,7 +27,7 @@ export const usePaymentModes = () => {
       ? data?.data?.results.filter((mode) => !excludedPaymentMode.some((excluded) => excluded.uuid === mode.uuid)) ?? []
       : data?.data?.results ?? [];
   return {
-    paymentModes: allowedPaymentModes,
+    paymentModes: excludeWaiver ? allowedPaymentModes : data?.data?.results,
     isLoading,
     mutate,
     error,

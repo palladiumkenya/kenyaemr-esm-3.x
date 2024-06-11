@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
-import { usePaymentModes } from '../../invoice/payments/payment.resource';
+import { usePaymentModes } from '../../billing.resource';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;

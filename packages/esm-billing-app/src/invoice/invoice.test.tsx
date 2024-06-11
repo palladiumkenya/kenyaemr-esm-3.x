@@ -4,19 +4,14 @@ import userEvent from '@testing-library/user-event';
 import { useReactToPrint } from 'react-to-print';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mockPayments, mockBill } from '../../../../__mocks__/bills.mock';
-import { useBill, processBillPayment } from '../billing.resource';
-import { usePaymentModes } from './payments/payment.resource';
+import { useBill, processBillPayment, usePaymentModes } from '../billing.resource';
+
 import Invoice from './invoice.component';
 
 const mockedBill = jest.mocked(useBill);
 const mockedProcessBillPayment = jest.mocked(processBillPayment);
 const mockedUsePaymentModes = jest.mocked(usePaymentModes);
 const mockedUseReactToPrint = jest.mocked(useReactToPrint);
-
-jest.mock('./payments/payment.resource', () => ({
-  usePaymentModes: jest.fn(),
-  updateBillVisitAttribute: jest.fn(),
-}));
 
 jest.mock('../billing.resource', () => ({
   useBill: jest.fn(),
