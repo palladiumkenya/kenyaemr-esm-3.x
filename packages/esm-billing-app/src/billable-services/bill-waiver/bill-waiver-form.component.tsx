@@ -4,7 +4,7 @@ import { TaskAdd } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './bill-waiver-form.scss';
 import { LineItem, MappedBill } from '../../types';
-import { createBillWaiverPayload } from './utils';
+import { createBillWaiverPayload, extractErrorMessagesFromResponse } from '../../utils';
 import { convertToCurrency, extractString } from '../../helpers';
 import { processBillPayment, usePaymentModes } from '../../billing.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
@@ -48,7 +48,7 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
         showSnackbar({
           title: t('billWaiver', 'Bill waiver'),
           subtitle: t('billWaiverError', 'Bill waiver failed {{error}}', {
-            error: error?.responseBody?.error?.message ?? error.message,
+            error: extractErrorMessagesFromResponse(error?.responseBody),
           }),
           kind: 'error',
           timeoutInMs: 3500,

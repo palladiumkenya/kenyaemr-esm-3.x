@@ -4,13 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { TrashCan, Add } from '@carbon/react/icons';
 import { Button, Dropdown, NumberInputSkeleton, TextInput, NumberInput } from '@carbon/react';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { PaymentFormValue } from '../payments.component';
 import styles from './payment-form.scss';
 import { usePaymentModes } from '../../../billing.resource';
+import { PaymentFormValue } from '../../../types';
 
 type PaymentFormProps = { disablePayment: boolean; amountDue: number };
-
-const DEFAULT_PAYMENT = { method: '', amount: 0, referenceCode: '' };
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) => {
   const { t } = useTranslation();
@@ -21,7 +19,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
   const { paymentModes, isLoading, error } = usePaymentModes();
   const { fields, remove, append } = useFieldArray({ name: 'payment', control: control });
 
-  const handleAppendPaymentMode = useCallback(() => append(DEFAULT_PAYMENT), [append]);
+  const handleAppendPaymentMode = useCallback(() => append({ method: '', amount: 0, referenceCode: '' }), [append]);
   const handleRemovePaymentMode = useCallback((index) => remove(index), [remove]);
 
   if (isLoading) {

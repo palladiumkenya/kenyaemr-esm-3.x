@@ -1,4 +1,3 @@
-/* eslint-disable curly */
 import React, { useCallback, useRef, useState } from 'react';
 import styles from './add-billable-service.scss';
 import {
@@ -24,8 +23,9 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Add, TrashCan, WarningFilled } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useDebounce, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { navigate, showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { ServiceConcept } from '../../types';
+import { extractErrorMessagesFromResponse } from '../../utils';
 
 const servicePriceSchema = z.object({
   paymentMode: z.string().refine((value) => !!value, 'Payment method is required'),
@@ -35,14 +35,6 @@ const servicePriceSchema = z.object({
   ]),
 });
 const paymentFormSchema = z.object({ payment: z.array(servicePriceSchema) });
-
-type PaymentMode = {
-  paymentMode: string;
-  price: string | number;
-};
-type PaymentModeFormValue = {
-  payment: Array<PaymentMode>;
-};
 const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: 0 };
 
 const AddBillableService: React.FC = () => {
@@ -114,12 +106,18 @@ const AddBillableService: React.FC = () => {
           title: t('billableService', 'Billable service'),
           subtitle: 'Billable service created successfully',
           kind: 'success',
+          isLowContrast: true,
           timeoutInMs: 3000,
         });
         handleNavigateToServiceDashboard();
       },
       (error) => {
-        showSnackbar({ title: 'Bill payment error', kind: 'error', subtitle: error });
+        showSnackbar({
+          title: 'Error adding billable service',
+          kind: 'error',
+          subtitle: extractErrorMessagesFromResponse(error.responseBody),
+          isLowContrast: true,
+        });
       },
     );
   };
@@ -198,9 +196,12 @@ const AddBillableService: React.FC = () => {
           )}
         />
         {(() => {
-          if (!debouncedSearchTerm || selectedConcept) return null;
-          if (isSearching)
+          if (!debouncedSearchTerm || selectedConcept) {
+            return null;
+          }
+          if (isSearching) {
             return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
+          }
           if (searchResults && searchResults.length) {
             return (
               <ul className={styles.conceptsList}>

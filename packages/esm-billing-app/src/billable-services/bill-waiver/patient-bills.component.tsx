@@ -1,5 +1,4 @@
 import React from 'react';
-import { useBills } from '../../billing.resource';
 import {
   Layer,
   DataTable,
@@ -57,7 +56,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
               <div className={styles.illo}>
                 <EmptyDataIllustration />
               </div>
-              <p className={styles.content}>{t('noBilltoDisplay', 'There are no bills to display for this patient')}</p>
+              <p className={styles.content}>{t('noBillDisplay', 'There are no bills to display for this patient')}</p>
             </Tile>
           </Layer>
         </div>
