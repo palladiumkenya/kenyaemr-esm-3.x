@@ -6,10 +6,11 @@ import { Report } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
 import { spaBasePath } from '../constants';
 
-const MakeClaims: React.FC = () => {
+const MakeClaims: React.FC<{ patientUuid: string; billUuid: string }> = ({ patientUuid, billUuid }) => {
   const { t } = useTranslation();
+
   const navigateToCreateClaimScreen = () => {
-    navigate({ to: `${spaBasePath}/billing/claims` });
+    navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
   };
 
   return (

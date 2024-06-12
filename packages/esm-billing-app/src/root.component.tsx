@@ -12,7 +12,7 @@ const RootComponent: React.FC = () => {
       <Routes>
         <Route path="/" element={<BillingDashboard />} />
         <Route path="/patient/:patientUuid/:billUuid" element={<Invoice />} />
-        <Route path="/claims" element={<ClaimScreen />} />
+        <Route path="/patient/:patientUuid/:billUuid/claims" element={<ClaimScreen />} />
       </Routes>
     </BrowserRouter>
   );
