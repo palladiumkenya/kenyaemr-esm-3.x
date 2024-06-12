@@ -14,7 +14,7 @@ import Payments from './payments/payments.component';
 import PrintReceipt from './printable-invoice/print-receipt.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import styles from './invoice.scss';
-import MakeClaims from './claims/make-claims.component';
+import MakeClaims from '../claims/make-claims.component';
 
 interface InvoiceDetailsProps {
   label: string;

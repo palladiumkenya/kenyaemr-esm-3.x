@@ -22,7 +22,7 @@ import {
 } from '@carbon/react';
 import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import styles from './claims-table.scss';
-import { LineItem, MappedBill } from '../../../../types';
+import { LineItem, MappedBill } from '../../../types';
 import ClaimsForm from '../claims-form/claims-form.component';
 
 type ClaimsTableProps = {

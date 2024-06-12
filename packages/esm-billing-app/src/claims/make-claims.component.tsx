@@ -4,7 +4,7 @@ import styles from './make-claims.scss';
 import { Button } from '@carbon/react';
 import { Report } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
-import { spaBasePath } from '../../constants';
+import { spaBasePath } from '../constants';
 
 const MakeClaims: React.FC = () => {
   const { t } = useTranslation();
