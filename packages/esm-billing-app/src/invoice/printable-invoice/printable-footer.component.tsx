@@ -1,16 +1,31 @@
 import React from 'react';
-import { useDefaultFacility } from '../../billing.resource';
 import styles from './printable-footer.scss';
+import { useTranslation } from 'react-i18next';
+import dayjs from 'dayjs';
+import { useSession } from '@openmrs/esm-framework';
 
-const PrintableFooter = () => {
-  const { data, isLoading } = useDefaultFacility();
+type PrintableFooterProps = {
+  facilityInfo: Record<string, any>;
+};
 
-  if (isLoading) {
-    return <div>--</div>;
-  }
+const PrintableFooter: React.FC<PrintableFooterProps> = ({ facilityInfo }) => {
+  const { t } = useTranslation();
+  const session = useSession();
+
   return (
     <div className={styles.container}>
-      <p className={styles.itemFooter}>{data?.display}</p>
+      <p className={styles.itemFooter}>{facilityInfo?.display}</p>
+      <p className={styles.footDescription}>
+        {t(
+          'generatedMessage',
+          'The invoice has been electronically generated and is a valid document. It was created by {{userName}} on {{date}} at {{time}}',
+          {
+            userName: `${session?.user?.display}`,
+            date: dayjs().format('DD-MM-YYYY'),
+            time: dayjs().format('hh:mm A'),
+          },
+        )}
+      </p>
     </div>
   );
 };
