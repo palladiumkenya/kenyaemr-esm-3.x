@@ -1,10 +1,8 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import PrintableInvoiceHeader from './printable-invoice-header.component';
-import { useDefaultFacility } from '../../billing.resource';
 import { useConfig } from '@openmrs/esm-framework';
 
-const mockUseDefaultFacility = useDefaultFacility as jest.MockedFunction<typeof useDefaultFacility>;
 const mockUseConfig = useConfig as jest.MockedFunction<typeof useConfig>;
 
 jest.mock('../../billing.resource', () => ({
@@ -28,8 +26,8 @@ const testProps = {
 describe('PrintableInvoiceHeader', () => {
   test('should render PrintableInvoiceHeader component', () => {
     mockUseConfig.mockReturnValue({ logo: { src: 'logo.png', alt: 'logo' } });
-    mockUseDefaultFacility.mockReturnValue({ data: { display: 'MTRH', uuid: 'mtrh-uuid' }, isLoading: false });
-    render(<PrintableInvoiceHeader {...testProps} />);
+
+    render(<PrintableInvoiceHeader facilityInfo={{ display: 'MTRH', uuid: 'mtrh-uuid' }} {...testProps} />);
     const header = screen.getByText('Invoice');
     expect(header).toBeInTheDocument();
 
@@ -42,16 +40,16 @@ describe('PrintableInvoiceHeader', () => {
 
   test('should display the logo when logo is provided', () => {
     mockUseConfig.mockReturnValue({ logo: { src: 'logo.png', alt: 'logo' } });
-    mockUseDefaultFacility.mockReturnValue({ data: { display: 'MTRH', uuid: 'mtrh-uuid' }, isLoading: false });
-    render(<PrintableInvoiceHeader {...testProps} />);
+
+    render(<PrintableInvoiceHeader facilityInfo={{ display: 'MTRH', uuid: 'mtrh-uuid' }} {...testProps} />);
     const logo = screen.getByAltText('logo');
     expect(logo).toBeInTheDocument();
   });
 
   test('should display the default logo when logo is not provided', () => {
     mockUseConfig.mockReturnValue({ logo: {} });
-    mockUseDefaultFacility.mockReturnValue({ data: { display: 'MTRH', uuid: 'mtrh-uuid' }, isLoading: false });
-    render(<PrintableInvoiceHeader {...testProps} />);
+
+    render(<PrintableInvoiceHeader facilityInfo={{ display: 'MTRH', uuid: 'mtrh-uuid' }} {...testProps} />);
     const logo = screen.getByRole('img');
     expect(logo).toBeInTheDocument();
   });

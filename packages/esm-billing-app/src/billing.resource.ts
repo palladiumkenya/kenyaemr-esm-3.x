@@ -97,7 +97,7 @@ export const useBill = (billUuid: string) => {
       cashPointUuid: bill?.cashPoint?.uuid,
       cashPointName: bill?.cashPoint?.name,
       cashPointLocation: bill?.cashPoint?.location?.display,
-      dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
+      dateCreated: bill?.dateCreated ?? '--',
       lineItems: bill.lineItems,
       billingService: bill.lineItems.map((bill) => bill.item).join(' '),
       payments: bill.payments,
