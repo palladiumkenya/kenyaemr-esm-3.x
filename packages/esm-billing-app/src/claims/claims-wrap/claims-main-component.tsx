@@ -9,11 +9,11 @@ import { ClaimsBreakDown } from '../claims-dashboard/claims-breakdown/claims-bre
 import { convertToCurrency } from '../../helpers';
 import { useTranslation } from 'react-i18next';
 
-interface ClaimsMainHeaderProps {
+interface ClaimsMainProps {
   bill: MappedBill;
 }
 
-const ClaimMainComponent: React.FC<ClaimsMainHeaderProps> = ({ bill }) => {
+const ClaimMainComponent: React.FC<ClaimsMainProps> = ({ bill }) => {
   const { t } = useTranslation();
 
   const [selectedLineItems, setSelectedLineItems] = useState([]);

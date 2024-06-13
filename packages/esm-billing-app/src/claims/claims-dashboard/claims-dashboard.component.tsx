@@ -35,11 +35,7 @@ const ClaimScreen: React.FC = () => {
     );
   }
 
-  return (
-    <>
-      <ClaimsHeader patient={patient} bill={bill} />
-    </>
-  );
+  return <ClaimsHeader patient={patient} bill={bill} />;
 };
 
 export default ClaimScreen;
