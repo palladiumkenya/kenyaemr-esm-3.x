@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
+  TextArea,
   Form,
   Layer,
   Stack,
@@ -21,18 +22,30 @@ const ClaimsForm: React.FC = () => {
     <Form className={styles.form}>
       <Stack gap={4} className={styles.grid}>
         <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
-        <Column>
-          <Layer className={styles.input}>
-            <TextInput
-              id="claimExplanation"
-              invalidText="Required"
-              placeholder="Claim Explanation"
-              labelText={t('claimExplanation', 'Claim Explanation')}
-            />
-          </Layer>
-        </Column>
-        <Row className={styles.facilityVisitRow}>
-          <Column className={styles.facilityColumn}>
+        <Row className={styles.formClaimRow}>
+          <Column className={styles.formClaimColumn}>
+            <Layer className={styles.input}>
+              <TextInput
+                id="visitType"
+                invalidText="Required"
+                placeholder="Visit Type"
+                labelText={t('visitType', ' Visit Type')}
+              />
+            </Layer>
+          </Column>
+          <Column className={styles.formClaimColumn}>
+            <Layer className={styles.input}>
+              <TextInput
+                id="facility"
+                invalidText="Required"
+                placeholder="Facility"
+                labelText={t('facility', 'Facility')}
+              />
+            </Layer>
+          </Column>
+        </Row>
+        <Row className={styles.formClaimRow}>
+          <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
               <DatePicker datePickerType="single">
                 <DatePickerInput
@@ -45,7 +58,7 @@ const ClaimsForm: React.FC = () => {
               </DatePicker>
             </Layer>
           </Column>
-          <Column className={styles.facilityColumn}>
+          <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
               <DatePicker datePickerType="single">
                 <DatePickerInput
@@ -59,30 +72,18 @@ const ClaimsForm: React.FC = () => {
             </Layer>
           </Column>
         </Row>
-        <Row className={styles.facilityVisitRow}>
-          <Column className={styles.facilityColumn}>
-            <Layer className={styles.input}>
-              <TextInput
-                id="visitType"
-                invalidText="Required"
-                placeholder="Visit Type"
-                labelText={t('visitType', ' Visit Type')}
-              />
-            </Layer>
-          </Column>
-          <Column className={styles.facilityColumn}>
-            <Layer className={styles.input}>
-              <TextInput
-                id="facility"
-                invalidText="Required"
-                placeholder="Facility"
-                labelText={t('facility', 'Facility')}
-              />
-            </Layer>
-          </Column>
-        </Row>
-        <Row className={styles.facilityVisitRow}>
-          <Column className={styles.facilityColumn}>
+        <Column>
+          <Layer className={styles.input}>
+            <TextInput
+              id="diagnosis"
+              invalidText="Required"
+              placeholder="Diagnosis"
+              labelText={t('diagnosis', 'Diagnosis')}
+            />
+          </Layer>
+        </Column>
+        <Row className={styles.formClaimRow}>
+          <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
               <TextInput
                 id="claimcode"
@@ -92,7 +93,7 @@ const ClaimsForm: React.FC = () => {
               />
             </Layer>
           </Column>
-          <Column className={styles.facilityColumn}>
+          <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
               <TextInput
                 id="guarantee"
@@ -105,11 +106,12 @@ const ClaimsForm: React.FC = () => {
         </Row>
         <Column>
           <Layer className={styles.input}>
-            <TextInput
-              id="diagnosis"
+            <TextArea
+              labelText={t('claimExplanation', 'Claim Explanation')}
               invalidText="Required"
-              placeholder="Diagnosis"
-              labelText={t('diagnosis', 'Diagnosis')}
+              rows={4}
+              placeholder="Claim Explanation"
+              id="claimExplanation"
             />
           </Layer>
         </Column>

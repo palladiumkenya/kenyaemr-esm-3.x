@@ -19,10 +19,5 @@
 .claimTitle {
   @include type.type-style('heading-02');
   display: flex;
-  flex: 3;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: space-between;
   margin: layout.$spacing-05;
-  row-gap: 1.5rem;
 }

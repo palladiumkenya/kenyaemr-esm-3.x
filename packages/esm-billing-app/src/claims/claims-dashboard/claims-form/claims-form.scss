@@ -154,13 +154,12 @@
   }
 }
 
-/* New Styles for Facility and Visit Type */
-.facilityVisitRow {
+.formClaimRow {
   display: flex;
   flex-wrap: nowrap;
-  gap: spacing.$spacing-05; /* Adjust gap between columns */
+  gap: spacing.$spacing-05;
 }
 
-.facilityColumn {
-  flex: 1 1 0%; /* Makes columns take up equal space */
+.formClaimColumn {
+  flex: 1 1 0%;
 }
