@@ -61,7 +61,8 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
     { header: 'Serial No.', key: 'serialno' },
     { header: 'Bill Item', key: 'inventoryname' },
     { header: 'Status', key: 'status' },
-    { header: 'Total', key: 'total' },
+    { header: 'Total amount', key: 'total' },
+    { header: 'Bill creation date', key: 'dateofbillcreation' },
   ];
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
 
@@ -75,6 +76,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           serialno: bill.receiptNumber,
           status: item.paymentStatus,
           total: item.price * item.quantity,
+          dateofbillcreation: bill.dateCreated,
         };
       }) ?? [],
     [bill.receiptNumber, filteredLineItems],
