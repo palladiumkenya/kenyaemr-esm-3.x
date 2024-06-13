@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -14,9 +14,26 @@ import {
   DatePickerInput,
 } from '@carbon/react';
 import styles from './claims-form.scss';
+import { MappedBill } from '../../../types';
+import { useSession } from '@openmrs/esm-framework';
+import { useSystemSetting } from '../../../hooks/getMflCode';
 
-const ClaimsForm: React.FC = () => {
+type ClaimsFormProps = {
+  bill: MappedBill;
+};
+
+const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
   const { t } = useTranslation();
+  const session = useSession();
+  const location = session?.sessionLocation?.display;
+  const { mflCodeValue } = useSystemSetting('facility.mflcode');
+  const [facilityDisplay, setFacilityDisplay] = useState('facility');
+
+  useEffect(() => {
+    if (location) {
+      setFacilityDisplay(`${location}${mflCodeValue ? ` - (${mflCodeValue})` : ''}`);
+    }
+  }, [location, mflCodeValue]);
 
   return (
     <Form className={styles.form}>
@@ -25,12 +42,7 @@ const ClaimsForm: React.FC = () => {
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
-              <TextInput
-                id="visitType"
-                invalidText="Required"
-                placeholder="Visit Type"
-                labelText={t('visitType', ' Visit Type')}
-              />
+              <TextInput id="visitType" invalidText="Required" labelText={t('visitType', ' Visit Type')} value="" />
             </Layer>
           </Column>
           <Column className={styles.formClaimColumn}>
@@ -38,8 +50,8 @@ const ClaimsForm: React.FC = () => {
               <TextInput
                 id="facility"
                 invalidText="Required"
-                placeholder="Facility"
                 labelText={t('facility', 'Facility')}
+                value={facilityDisplay}
               />
             </Layer>
           </Column>
@@ -47,15 +59,13 @@ const ClaimsForm: React.FC = () => {
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
-              <DatePicker datePickerType="single">
-                <DatePickerInput
-                  placeholder="mm/dd/yyyy"
-                  labelText={t('treatmentstart', 'Treatment Start')}
-                  id="date-picker-single-claims-1"
-                  size="xl"
-                  className={styles.datePickerInput}
-                />
-              </DatePicker>
+              <TextInput
+                id="treatmentstart"
+                invalidText="Required"
+                labelText={t('treatmentstart', 'Treatment Start')}
+                value={bill.dateCreated ? bill.dateCreated : '--/--/----'}
+                readOnly
+              />
             </Layer>
           </Column>
           <Column className={styles.formClaimColumn}>
