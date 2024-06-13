@@ -19,8 +19,8 @@ const ClaimsForm: React.FC = () => {
 
   return (
     <Form className={styles.form}>
-      <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}>
+        <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
         <Column>
           <Layer className={styles.input}>
             <TextInput
@@ -113,15 +113,15 @@ const ClaimsForm: React.FC = () => {
             />
           </Layer>
         </Column>
+        <ButtonSet className={styles.buttonSet}>
+          <Button className={styles.button} kind="danger">
+            {t('discardClaim', 'Discard Claim')}
+          </Button>
+          <Button className={styles.button} kind="primary" type="submit">
+            {t('processClaim', 'Process Claim')}
+          </Button>
+        </ButtonSet>
       </Stack>
-      <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="danger">
-          {t('discardClaim', 'Discard Claim')}
-        </Button>
-        <Button className={styles.button} kind="primary" type="submit">
-          {t('processClaim', 'Process Claim')}
-        </Button>
-      </ButtonSet>
     </Form>
   );
 };

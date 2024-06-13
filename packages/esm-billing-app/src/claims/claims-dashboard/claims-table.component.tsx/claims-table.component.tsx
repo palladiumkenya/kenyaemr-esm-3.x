@@ -23,7 +23,6 @@ import {
 import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import styles from './claims-table.scss';
 import { LineItem, MappedBill } from '../../../types';
-import ClaimsForm from '../claims-form/claims-form.component';
 
 type ClaimsTableProps = {
   bill: MappedBill;
@@ -79,7 +78,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           dateofbillcreation: bill.dateCreated,
         };
       }) ?? [],
-    [bill.receiptNumber, filteredLineItems],
+    [bill.dateCreated, bill.receiptNumber, filteredLineItems],
   );
 
   if (isLoadingBill) {
@@ -182,7 +181,6 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           </Layer>
         </div>
       )}
-      <ClaimsForm />
     </div>
   );
 };

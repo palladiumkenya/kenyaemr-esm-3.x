@@ -89,7 +89,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
           {notification && (
             <InlineNotification
               kind="error"
-              title={t('Error')}
+              title={t('mpesaError', 'Mpesa Error')}
               subtitle={notification}
               onCloseButtonClick={() => setNotification(null)}
             />

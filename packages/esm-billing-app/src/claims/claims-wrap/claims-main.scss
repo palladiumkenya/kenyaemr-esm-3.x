@@ -1,0 +1,19 @@
+// main-component.scss
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .mainContainer {
+    flex-direction: row;
+    gap: 2rem;
+  }
+}
+
+.claimContainer,
+.form {
+  flex: 1;
+}
