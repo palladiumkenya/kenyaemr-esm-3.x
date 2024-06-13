@@ -5,21 +5,23 @@ import ClaimsHeader from './claims-header/claims-header.component';
 import { usePatient, ErrorState } from '@openmrs/esm-framework';
 import styles from './claims-header/claims-header.scss';
 import { InlineLoading } from '@carbon/react';
+import { useBill } from '../../billing.resource';
 
 const ClaimScreen: React.FC = () => {
   const { billUuid, patientUuid } = useParams();
   const { t } = useTranslation();
 
-  const { patient, isLoading: isLoadingPatient, error } = usePatient(patientUuid);
+  const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
+  const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
 
-  if (isLoadingPatient) {
+  if (isLoadingPatient && isLoadingBill) {
     return (
       <div className={styles.invoiceContainer}>
         <InlineLoading
           className={styles.loader}
           status="active"
-          iconDescription={t('loading', 'Loading')}
-          description={t('loadingPatientHeader', 'Loading patient header...')}
+          iconDescription="Loading"
+          description="Loading patient header..."
         />
       </div>
     );
@@ -35,7 +37,7 @@ const ClaimScreen: React.FC = () => {
 
   return (
     <>
-      <ClaimsHeader patient={patient} billUuid={billUuid} />
+      <ClaimsHeader patient={patient} bill={bill} />
     </>
   );
 };

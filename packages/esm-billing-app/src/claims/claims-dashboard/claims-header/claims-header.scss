@@ -26,26 +26,3 @@
   margin: layout.$spacing-05;
   row-gap: 1.5rem;
 }
-.details {
-  display: flex;
-  flex: 3;
-  flex-flow: row wrap;
-  align-items: center;
-  justify-content: space-between;
-  margin: layout.$spacing-05;
-  row-gap: 1.5rem;
-}
-
-@media screen {
-  .printContainer {
-    background-color: colors.$white;
-    display: none;
-  }
-}
-
-@media print {
-  html,
-  body {
-    background-color: colors.$white !important;
-  }
-}

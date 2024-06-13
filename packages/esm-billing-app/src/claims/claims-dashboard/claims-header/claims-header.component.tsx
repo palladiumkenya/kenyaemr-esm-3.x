@@ -1,21 +1,28 @@
 // Filename: claims-header.component.tsx
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ErrorState, ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './claims-header.scss';
+import { MappedBill } from '../../../types';
+import ClaimsTable from '../claims-table.component.tsx/claims-table.component';
 
 interface ClaimsHeaderProps {
   patient: fhir.Patient;
-  billUuid: string;
+  bill: MappedBill;
 }
 
-const ClaimsHeader: React.FC<ClaimsHeaderProps> = ({ patient, billUuid }) => {
+const ClaimsHeader: React.FC<ClaimsHeaderProps> = ({ patient, bill }) => {
   const { t } = useTranslation();
-
+  console.log('patient', patient);
+  console.log('billUuid', bill);
   return (
-    <div className={styles.invoiceContainer}>
+    <div className={styles.claimContainer}>
       {patient && <ExtensionSlot name="patient-header-slot" state={{ patientUuid: patient.id, patient }} />}
+      <div className={styles.detailsContainer}>
+        <span className={styles.claimTitle}> {t('createClaim', 'Create Claim')}</span>
+      </div>
+      <ClaimsTable bill={bill} />
     </div>
   );
 };

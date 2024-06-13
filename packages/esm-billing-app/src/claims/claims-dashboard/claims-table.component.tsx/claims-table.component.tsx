@@ -59,7 +59,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const tableHeaders: Array<typeof DataTableHeader> = [
     { header: 'No', key: 'no' },
     { header: 'Serial No.', key: 'serialno' },
-    { header: 'Inventory Name', key: 'inventoryname' },
+    { header: 'Bill Item', key: 'inventoryname' },
     { header: 'Status', key: 'status' },
     { header: 'Total', key: 'total' },
   ];
