@@ -89,6 +89,12 @@
       "name": "drug-order-billable-item",
       "component": "drugOrder",
       "slot": "medication-info-slot"
+    },
+    {
+      "name": "test-order-action",
+      "component": "testOrderAction",
+      "slot": "tests-ordered-actions-slot",
+      "order": 0
     }
   ]
 }
