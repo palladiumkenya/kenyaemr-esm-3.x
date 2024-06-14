@@ -1,30 +1,32 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Layer, Tile, DataTableSkeleton } from '@carbon/react';
+import { Layer, Tile, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import styles from './referral-chart-view.component.scss';
-import { formatDate, isDesktop, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { ErrorState, formatDate, isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader, EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useCommunityReferral } from '../community-refferals.resource';
+import { ReferralConfigObject } from '../../config-schema';
 
 export interface ReferralReasonsDialogPopupProps {
-  patientUuid: string;
+  patient: fhir.Patient;
 }
 
-const ReferralReasonsView: React.FC<ReferralReasonsDialogPopupProps> = ({ patientUuid }) => {
-  const { patient } = usePatient(patientUuid);
+const ReferralReasonsView: React.FC<ReferralReasonsDialogPopupProps> = ({ patient }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const patientNupiNumber = patient?.identifier.find((item) => {
-    return item.type.coding.some((coding) => coding.code === 'f85081e2-b4be-4e48-b3a4-7994b69bb101'); // nupi identifier
-  })?.value;
-  const { referral, isLoading, isValidating } = useCommunityReferral(patientNupiNumber);
+  const { nationalPatientUniqueIdentifier } = useConfig<ReferralConfigObject>();
+  const getPatientNupiNumber = (patient: fhir.Patient, nationalPatientUniqueIdentifier: string): string | undefined => {
+    return patient?.identifier.find((item) => {
+      return item.type.coding.some((coding) => coding.code === nationalPatientUniqueIdentifier);
+    })?.value;
+  };
 
+  const nationalPatientUniqueNumber = getPatientNupiNumber(patient, nationalPatientUniqueIdentifier);
+
+  const { referral, isLoading, isValidating, isError } = useCommunityReferral(nationalPatientUniqueNumber);
   const headerTitle = t('referral', 'Referrals');
 
-  if (isLoading) {
-    return <DataTableSkeleton rowCount={5} />;
-  }
-  if (referral == null) {
+  if (!nationalPatientUniqueNumber) {
     return (
       <Layer>
         <Tile className={styles.tile}>
@@ -32,53 +34,54 @@ const ReferralReasonsView: React.FC<ReferralReasonsDialogPopupProps> = ({ patien
             <h4>{headerTitle}</h4>
           </div>
           <EmptyDataIllustration />
-          <p className={styles.content}>There is no referral data to display for this patient.</p>
+          <p className={styles.content}>
+            {t(
+              'missingNupiIdentiferMessage',
+              'The patient is missing  national patient unique identifier (NUPI). Please register the patient with the client registry to retrieve their referrals.',
+            )}
+          </p>
         </Tile>
       </Layer>
     );
   }
-  return (
-    <Layer>
-      <Tile>
-        <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-          <h4>{headerTitle}</h4>
-        </div>
-        <div className={styles.container}>
-          <div className={styles.content}>
-            <p>{t('referralDate', 'Referral Date')} </p>
-            <p>
-              <span className={styles.value}>{formatDate(new Date(referral?.referralReasons?.referralDate))}</span>
-            </p>
-          </div>
-          <div className={styles.content}>
-            <p> {t('status', 'Status')}</p>
-            <p>
-              <span className={styles.value}> {referral?.status} </span>
-            </p>
-          </div>
 
-          <div className={styles.content}>
-            <p> {t('ReasonCode', 'Reason Code')}</p>
-            <p>
-              <span className={styles.value}> {referral?.referralReasons?.reasonCode} </span>
-            </p>
-          </div>
-          <div className={styles.content}>
-            <p> {t('clinicalNote', 'Clinical Note')}</p>
-            <p>
-              <span className={styles.value}> {referral?.referralReasons?.clinicalNote} </span>
-            </p>
-          </div>
-          <div className={styles.content}>
-            <p> {t('referredFrom', 'Referred From')}</p>
-            <p>
-              <span className={styles.value}> {referral?.referredFrom} </span>
-            </p>
-          </div>
-        </div>
-      </Tile>
-    </Layer>
+  if (isLoading) {
+    return <DataTableSkeleton rowCount={5} />;
+  }
+
+  if (referral === null) {
+    return <EmptyState displayText={t('emptyReferralsMessage', ' referral data')} headerTitle={headerTitle} />;
+  }
+
+  if (isError) {
+    return <ErrorState error={isError} headerTitle={headerTitle} />;
+  }
+  return (
+    <>
+      <CardHeader title={headerTitle}>
+        {isValidating && <InlineLoading description={t('loading', 'Loading...')} />}
+      </CardHeader>
+      <div className={styles.container}>
+        <ReferralCard
+          label={t('referralDate', 'Referral Date')}
+          value={formatDate(new Date(referral?.referralReasons?.referralDate))}
+        />
+        <ReferralCard label={t('status', 'Status')} value={referral?.status} />
+        <ReferralCard label={t('reasonCode', 'Reason Code')} value={referral?.referralReasons?.reasonCode} />
+        <ReferralCard label={t('clinicalNote', 'Clinical Note')} value={referral?.referralReasons?.clinicalNote} />
+        <ReferralCard label={t('referredFrom', 'Referred From')} value={referral?.referredFrom} />
+      </div>
+    </>
   );
 };
 
 export default ReferralReasonsView;
+
+const ReferralCard: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+  return (
+    <div className={styles.cardContainer}>
+      <span className={styles.label}>{label}</span>
+      <span className={styles.value}>{value}</span>
+    </div>
+  );
+};
