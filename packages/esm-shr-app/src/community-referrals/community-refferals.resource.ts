@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { CommunityReferral } from '../types';
 
@@ -39,10 +39,11 @@ export async function pullFacilityReferrals() {
 }
 
 export const useCommunityReferral = (nupi: string) => {
-  const referralUrl = `/ws/rest/v1/kenyaemril/communityReferralByNupi?nupi=${nupi}`;
-  const { data, mutate, error, isLoading, isValidating } = useSWR<{ data: CommunityReferral }>(
-    referralUrl,
+  const referralUrl = `${restBaseUrl}/kenyaemril/communityReferralByNupi?nupi=${nupi}`;
+  const { data, error, isLoading, isValidating } = useSWR<{ data: CommunityReferral }>(
+    nupi ? referralUrl : null,
     openmrsFetch,
+    { errorRetryCount: 3, errorRetryInterval: 5000 },
   );
 
   return {
