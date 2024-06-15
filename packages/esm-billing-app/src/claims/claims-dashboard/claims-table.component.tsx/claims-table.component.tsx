@@ -20,7 +20,7 @@ import {
   type DataTableHeader,
   type DataTableRow,
 } from '@carbon/react';
-import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
+import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import styles from './claims-table.scss';
 import { LineItem, MappedBill } from '../../../types';
 
@@ -75,7 +75,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           serialno: bill.receiptNumber,
           status: item.paymentStatus,
           total: item.price * item.quantity,
-          dateofbillcreation: bill.dateCreated,
+          dateofbillcreation: formatDate(new Date(bill.dateCreated), { mode: 'standard' }),
         };
       }) ?? [],
     [bill.dateCreated, bill.receiptNumber, filteredLineItems],

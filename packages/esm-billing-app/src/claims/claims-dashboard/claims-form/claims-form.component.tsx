@@ -15,8 +15,9 @@ import {
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill } from '../../../types';
-import { useSession } from '@openmrs/esm-framework';
+import { formatDate, useSession } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
+import { string } from 'zod';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -63,8 +64,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 id="treatmentstart"
                 invalidText="Required"
                 labelText={t('treatmentstart', 'Treatment Start')}
-                value={bill.dateCreated ? bill.dateCreated : '--/--/----'}
-                readOnly
+                value={bill.dateCreated ? formatDate(new Date(bill.dateCreated), { mode: 'standard' }) : '--/--/----'}
               />
             </Layer>
           </Column>
