@@ -32,6 +32,27 @@
       "offline": false
     },
     {
+      "name": "contact-list-link",
+      "component": "contactListLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 14,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-relationships-slot",
+        "path": "contact-list",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "contact-list",
+      "slot": "patient-chart-relationships-slot",
+      "component": "contactList",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+    {
       "name": "maternal-and-child-health-dashboard-group-link",
       "slot": "clinical-view-section",
       "component": "maternalAndChildHealthSideNavGroup"

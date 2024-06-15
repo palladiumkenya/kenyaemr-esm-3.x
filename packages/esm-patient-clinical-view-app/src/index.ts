@@ -26,6 +26,8 @@ import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-das
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import GenericNavLinks from './specialized-clinics/generic-nav-links/generic-nav-links.component';
 import GenericDashboard from './specialized-clinics/generic-nav-links/generic-dashboard.component';
+import { contactListDashboardMeta } from './dashboard.meta';
+import ContactList from './contact-list/contact-list.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -64,6 +66,10 @@ export const defaulterTracing = getSyncLifecycle(DefaulterTracing, options);
 // Dashboard links for Family History and the corresponding view in the patient chart
 export const familyHistory = getSyncLifecycle(FamilyHistory, options);
 export const familyHistoryLink = getSyncLifecycle(createDashboardLink(familyHistoryDashboardMeta), options);
+
+// RElationships links for Family History and the corresponding view in the patient chart
+export const contactList = getSyncLifecycle(ContactList, options);
+export const contactListLink = getSyncLifecycle(createDashboardLink(contactListDashboardMeta), options);
 
 // Navigation group for Maternal and Child Health in the patient chart sidebar
 export const maternalAndChildHealthSideNavGroup = getSyncLifecycle(
