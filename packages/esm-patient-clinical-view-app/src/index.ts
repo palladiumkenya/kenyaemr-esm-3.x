@@ -66,7 +66,6 @@ export const defaulterTracing = getSyncLifecycle(DefaulterTracing, options);
 // Dashboard links for Family History and the corresponding view in the patient chart
 export const familyHistory = getSyncLifecycle(FamilyHistory, options);
 export const familyHistoryLink = getSyncLifecycle(createDashboardLink(familyHistoryDashboardMeta), options);
-
 // RElationships links for Family History and the corresponding view in the patient chart
 export const contactList = getSyncLifecycle(ContactList, options);
 export const contactListLink = getSyncLifecycle(createDashboardLink(contactListDashboardMeta), options);
