@@ -8,16 +8,16 @@ import {
   Stack,
   TextInput,
   Row,
-  DatePicker,
+  MultiSelect,
   ButtonSet,
   Button,
   DatePickerInput,
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill } from '../../../types';
-import { formatDate, useSession } from '@openmrs/esm-framework';
+import { formatDate, useSession, useVisit } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import { string } from 'zod';
+import { useParams } from 'react-router-dom';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -29,7 +29,24 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
   const location = session?.sessionLocation?.display;
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [facilityDisplay, setFacilityDisplay] = useState('facility');
+  const { patientUuid } = useParams();
+  const { currentVisit } = useVisit(patientUuid);
+  const encounterProviders =
+    currentVisit?.encounters.flatMap((encounter) =>
+      encounter.encounterProviders.map((provider) => ({
+        id: provider.uuid,
+        text: provider.display,
+      })),
+    ) || [];
 
+  // const diagnoses =
+  //   currentVisit?.encounters.flatMap(
+  //     (encounter) =>
+  //       encounter.?.map((diagnosis) => ({
+  //         id: diagnosis.uuid,
+  //         text: diagnosis.display,
+  //       })) || [],
+  //   ) || [];
   useEffect(() => {
     if (location) {
       setFacilityDisplay(`${location}${mflCodeValue ? ` - (${mflCodeValue})` : ''}`);
@@ -43,7 +60,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
-              <TextInput id="visitType" invalidText="Required" labelText={t('visitType', ' Visit Type')} value="" />
+              <TextInput
+                id="visitType"
+                invalidText="Required"
+                labelText={t('visitType', 'Visit Type')}
+                value={currentVisit?.visitType?.display || '__'}
+              />
             </Layer>
           </Column>
           <Column className={styles.formClaimColumn}>
@@ -64,52 +86,60 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 id="treatmentstart"
                 invalidText="Required"
                 labelText={t('treatmentstart', 'Treatment Start')}
-                value={bill.dateCreated ? formatDate(new Date(bill.dateCreated), { mode: 'standard' }) : '--/--/----'}
+                value={
+                  currentVisit?.startDatetime
+                    ? formatDate(new Date(currentVisit?.startDatetime), { mode: 'standard' })
+                    : '--/--/----'
+                }
               />
             </Layer>
           </Column>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
-              <DatePicker datePickerType="single">
-                <DatePickerInput
-                  placeholder="mm/dd/yyyy"
-                  labelText={t('treatmentend', 'Treatment End')}
-                  id="date-picker-single-claims-2"
-                  size="xl"
-                  className={styles.datePickerInput}
-                />
-              </DatePicker>
+              <TextInput
+                id="treatmentend"
+                invalidText="Required"
+                labelText={t('treatmentend', 'Treatment End')}
+                value={
+                  currentVisit?.stopDatetime
+                    ? formatDate(new Date(currentVisit?.stopDatetime), { mode: 'standard' })
+                    : '--/--/----'
+                }
+              />
             </Layer>
           </Column>
         </Row>
         <Column>
           <Layer className={styles.input}>
-            <TextInput
-              id="diagnosis"
-              invalidText="Required"
-              placeholder="Diagnosis"
-              labelText={t('diagnosis', 'Diagnosis')}
+            <MultiSelect
+              label="Diagnoses"
+              id="diagnoses"
+              titleText="Diagnoses"
+              items=""
+              itemToString={(item) => (item ? item.text : '')}
+              selectionFeedback="top-after-reopen"
             />
           </Layer>
         </Column>
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
-              <TextInput
-                id="claimcode"
-                invalidText="Required"
-                placeholder="Claim Code"
-                labelText={t('claimcode', ' Claim Code')}
+              <MultiSelect
+                id="provider_name"
+                titleText="Provider Name"
+                items={encounterProviders}
+                itemToString={(item) => (item ? item.text : '')}
+                selectionFeedback="top-after-reopen"
               />
             </Layer>
           </Column>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
               <TextInput
-                id="guarantee"
+                id="claimcode"
                 invalidText="Required"
-                placeholder="Guarantee ID"
-                labelText={t('guarantee', 'Guarantee ID')}
+                placeholder="Claim Code"
+                labelText={t('claimcode', 'Claim Code')}
               />
             </Layer>
           </Column>
