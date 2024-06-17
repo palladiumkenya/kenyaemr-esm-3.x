@@ -112,9 +112,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
         <Column>
           <Layer className={styles.input}>
             <MultiSelect
-              label="Diagnoses"
               id="diagnoses"
-              titleText="Diagnoses"
+              titleText={t('diagnoses', 'Diagnoses')}
               items=""
               itemToString={(item) => (item ? item.text : '')}
               selectionFeedback="top-after-reopen"
@@ -126,7 +125,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
             <Layer className={styles.input}>
               <MultiSelect
                 id="provider_name"
-                titleText="Provider Name"
+                titleText={t('provider_name', 'Provider Name')}
                 items={encounterProviders}
                 itemToString={(item) => (item ? item.text : '')}
                 selectionFeedback="top-after-reopen"
