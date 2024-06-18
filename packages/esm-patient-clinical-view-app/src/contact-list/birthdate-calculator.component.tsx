@@ -13,13 +13,26 @@ import {
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const BirthDateCalculator = ({ onClose, props: { date } }) => {
+const BirthDateCalculator = ({ onClose, props: { date, onBirthDateChange } }) => {
   const { t } = useTranslation();
-  const [fromDate, setFromDate] = useState<Date>(date ?? new Date());
   const [formState, setFormState] = useState({
     fromDate: date ?? new Date(),
-    age: '',
+    age: 0,
   });
+
+  const handleSubmit = () => {
+    const { fromDate, age } = formState;
+
+    // Create a new date object to avoid mutating state directly
+    const dob = new Date(fromDate);
+
+    // Subtract the age from the current year
+    dob.setFullYear(dob.getFullYear() - age);
+
+    // Update the state and close the modal
+    onBirthDateChange(dob);
+    onClose();
+  };
 
   return (
     <React.Fragment>
@@ -42,15 +55,17 @@ const BirthDateCalculator = ({ onClose, props: { date } }) => {
             <DatePicker
               datePickerType="single"
               value={formState.fromDate}
-              onChange={(e) => setFormState({ ...formState, fromDate: e.target.value })}>
-              <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('fromDate', 'From Date')} size="xl" />
+              onChange={([date]) => setFormState({ ...formState, fromDate: date })}>
+              <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('onDate', 'On Date')} size="xl" />
             </DatePicker>
           </Layer>
         </Column>
       </ModalBody>
       <ModalFooter>
         <ButtonSet>
-          <Button kind="primary">Submit</Button>
+          <Button kind="primary" onClick={handleSubmit}>
+            Submit
+          </Button>
           <Button kind="secondary" onClick={onClose}>
             Cancel
           </Button>

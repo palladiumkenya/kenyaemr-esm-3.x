@@ -58,22 +58,18 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
     resolver: zodResolver(ContactListFormSchema),
   });
 
-  const observableDob = form.watch('dateOfBirth');
-
   const { t } = useTranslation();
   const onSubmit = (values: ContactListFormType) => {};
   const handleCalculateBirthDate = () => {
     const dispose = showModal('birth-date-calculator', {
       onClose: () => dispose(),
-      props: { date: observableDob },
-      //props to pass in to the modal component
+      props: { date: new Date(), onBirthDateChange: (date) => form.setValue('dateOfBirth', date) },
     });
   };
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
-      {`${observableDob}`}
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Layer>
@@ -128,13 +124,12 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 control={form.control}
                 name="dateOfBirth"
                 render={({ field }) => (
-                  <DatePicker datePickerType="single">
+                  <DatePicker datePickerType="single" {...field}>
                     <DatePickerInput
                       placeholder="mm/dd/yyyy"
                       labelText={t('dateOfBirth', 'Date of birth')}
                       size="xl"
                       className={styles.datePickerInput}
-                      {...field}
                     />
                   </DatePicker>
                 )}

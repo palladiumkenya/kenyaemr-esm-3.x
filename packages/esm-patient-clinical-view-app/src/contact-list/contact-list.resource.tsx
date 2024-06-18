@@ -128,8 +128,3 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
   }
   return relationshipsData;
 }
-
-export const dateFromAge = (age: number): Date => {
-  const today = new Date();
-  return new Date(today.getTime() - age * 24 * 60 * 60 * 1000);
-};
