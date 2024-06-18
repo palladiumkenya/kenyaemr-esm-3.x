@@ -64,6 +64,14 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       header: t('contact', 'Contact'),
       key: 'contact',
     },
+    {
+      header: t('status', 'Status'),
+      key: 'status',
+    },
+    {
+      header: t('baselineStatus', 'Base line status'),
+      key: 'baselineStatus',
+    },
   ];
 
   const handleAddContact = () => {
@@ -85,6 +93,8 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         sex: relation.gender,
         alive: relation?.dead ? t('dead', 'Dead') : t('alive', 'Alive'),
         contact: relation.contact,
+        status: '--',
+        baselineStatus: '--',
       };
     }) ?? [];
 

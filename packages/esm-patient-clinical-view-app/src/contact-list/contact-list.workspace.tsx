@@ -14,7 +14,7 @@ import { Calculator } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showModal } from '@openmrs/esm-framework';
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import styles from './contact-list-form.scss';
@@ -77,51 +77,68 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Layer>
-            <DatePicker datePickerType="single">
-              <DatePickerInput
-                placeholder="mm/dd/yyyy"
-                labelText={t('listingDate', 'Listing Date')}
-                size="xl"
-                {...form.register('listingDate')}
-              />
-            </DatePicker>
-          </Layer>
-        </Column>
-        <Column>
-          <Layer className={styles.input}>
-            <TextInput
-              {...form.register('firstName')}
-              placeholder="first name"
-              labelText={t('firstName', 'First name')}
+            <Controller
+              control={form.control}
+              name="listingDate"
+              render={({ field }) => (
+                <DatePicker dateFormat="d/m/Y" id="listingDate" datePickerType="single" {...field}>
+                  <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('listingDate', 'Listing Date')} size="xl" />
+                </DatePicker>
+              )}
             />
           </Layer>
         </Column>
         <Column>
           <Layer className={styles.input}>
-            <TextInput
-              {...form.register('middleName')}
-              placeholder="middle name"
-              labelText={t('middleName', 'Middle name')}
+            <Controller
+              control={form.control}
+              name="firstName"
+              render={({ field }) => (
+                <TextInput {...field} placeholder="first name" labelText={t('firstName', 'First name')} />
+              )}
             />
           </Layer>
         </Column>
         <Column>
           <Layer className={styles.input}>
-            <TextInput {...form.register('lastName')} placeholder="lst name" labelText={t('lastName', 'Last name')} />
+            <Controller
+              control={form.control}
+              name="middleName"
+              render={({ field }) => (
+                <TextInput {...field} placeholder="middle name" labelText={t('middleName', 'Middle name')} />
+              )}
+            />
+          </Layer>
+        </Column>
+        <Column>
+          <Layer className={styles.input}>
+            <Controller
+              control={form.control}
+              name="lastName"
+              render={({ field }) => (
+                <TextInput {...field} placeholder="last name" labelText={t('lastName', 'Last name')} />
+              )}
+            />
           </Layer>
         </Column>
         <Row>
           <Column className={styles.facilityColumn}>
             <Layer className={styles.input}>
-              <DatePicker datePickerType="single">
-                <DatePickerInput
-                  placeholder="mm/dd/yyyy"
-                  labelText={t('dateOfBirth', 'Date of birth')}
-                  size="xl"
-                  className={styles.datePickerInput}
-                  {...form.register('dateOfBirth')}
-                />
-              </DatePicker>
+              <Controller
+                control={form.control}
+                name="dateOfBirth"
+                render={({ field }) => (
+                  <DatePicker datePickerType="single">
+                    <DatePickerInput
+                      placeholder="mm/dd/yyyy"
+                      labelText={t('dateOfBirth', 'Date of birth')}
+                      size="xl"
+                      className={styles.datePickerInput}
+                      {...field}
+                    />
+                  </DatePicker>
+                )}
+              />
             </Layer>
           </Column>
           <Button kind="ghost" renderIcon={Calculator} onClick={handleCalculateBirthDate}>
@@ -131,15 +148,21 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
 
         <Column>
           <Layer className={styles.input}>
-            <TextInput {...form.register('address')} placeholder="address" labelText={t('address', 'Address')} />
+            <Controller
+              control={form.control}
+              name="address"
+              render={({ field }) => <TextInput {...field} placeholder="address" labelText={t('address', 'Address')} />}
+            />
           </Layer>
         </Column>
         <Column>
           <Layer className={styles.input}>
-            <TextInput
-              {...form.register('phoneNumber')}
-              placeholder="phone number"
-              labelText={t('phoneNumber', 'Phone number')}
+            <Controller
+              control={form.control}
+              name="phoneNumber"
+              render={({ field }) => (
+                <TextInput {...field} placeholder="phone number" labelText={t('phoneNumber', 'Phone number')} />
+              )}
             />
           </Layer>
         </Column>
