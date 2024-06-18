@@ -8,16 +8,16 @@ import {
   Stack,
   TextInput,
   Row,
-  MultiSelect,
   ButtonSet,
   Button,
-  DatePickerInput,
+  FilterableMultiSelect,
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill } from '../../../types';
-import { formatDate, useSession, useVisit } from '@openmrs/esm-framework';
+import { formatDate } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
+import { useCurrentVisitForm } from './claims-form.resource';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -25,33 +25,26 @@ type ClaimsFormProps = {
 
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
   const { t } = useTranslation();
-  const session = useSession();
-  const location = session?.sessionLocation?.display;
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
-  const [facilityDisplay, setFacilityDisplay] = useState('facility');
   const { patientUuid } = useParams();
-  const { currentVisit } = useVisit(patientUuid);
+  const { visits: recentVisit } = useCurrentVisitForm(patientUuid);
+
   const encounterProviders =
-    currentVisit?.encounters.flatMap((encounter) =>
+    recentVisit?.encounters.flatMap((encounter) =>
       encounter.encounterProviders.map((provider) => ({
         id: provider.uuid,
         text: provider.display,
       })),
     ) || [];
 
-  // const diagnoses =
-  //   currentVisit?.encounters.flatMap(
-  //     (encounter) =>
-  //       encounter.?.map((diagnosis) => ({
-  //         id: diagnosis.uuid,
-  //         text: diagnosis.display,
-  //       })) || [],
-  //   ) || [];
-  useEffect(() => {
-    if (location) {
-      setFacilityDisplay(`${location}${mflCodeValue ? ` - (${mflCodeValue})` : ''}`);
-    }
-  }, [location, mflCodeValue]);
+  const diagnoses =
+    recentVisit?.encounters.flatMap(
+      (encounter) =>
+        encounter.diagnoses.map((diagnosis) => ({
+          id: diagnosis.uuid,
+          text: diagnosis.display,
+        })) || [],
+    ) || [];
 
   return (
     <Form className={styles.form}>
@@ -64,7 +57,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 id="visitType"
                 invalidText="Required"
                 labelText={t('visitType', 'Visit Type')}
-                value={currentVisit?.visitType?.display || '__'}
+                value={recentVisit?.visitType.display || 'Wait for visit type'}
               />
             </Layer>
           </Column>
@@ -74,7 +67,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 id="facility"
                 invalidText="Required"
                 labelText={t('facility', 'Facility')}
-                value={facilityDisplay}
+                value={`${recentVisit?.location.display || ''} - ${mflCodeValue || 'Wait for facility name'}`}
               />
             </Layer>
           </Column>
@@ -87,8 +80,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 invalidText="Required"
                 labelText={t('treatmentstart', 'Treatment Start')}
                 value={
-                  currentVisit?.startDatetime
-                    ? formatDate(new Date(currentVisit?.startDatetime), { mode: 'standard' })
+                  recentVisit?.startDatetime
+                    ? formatDate(new Date(recentVisit?.startDatetime), { mode: 'standard' })
                     : '--/--/----'
                 }
               />
@@ -101,8 +94,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 invalidText="Required"
                 labelText={t('treatmentend', 'Treatment End')}
                 value={
-                  currentVisit?.stopDatetime
-                    ? formatDate(new Date(currentVisit?.stopDatetime), { mode: 'standard' })
+                  recentVisit?.stopDatetime
+                    ? formatDate(new Date(recentVisit?.stopDatetime), { mode: 'standard' })
                     : '--/--/----'
                 }
               />
@@ -111,10 +104,10 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
         </Row>
         <Column>
           <Layer className={styles.input}>
-            <MultiSelect
+            <FilterableMultiSelect
               id="diagnoses"
               titleText={t('diagnoses', 'Diagnoses')}
-              items=""
+              items={diagnoses}
               itemToString={(item) => (item ? item.text : '')}
               selectionFeedback="top-after-reopen"
             />
@@ -123,10 +116,11 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
-              <MultiSelect
+              <FilterableMultiSelect
                 id="provider_name"
                 titleText={t('provider_name', 'Provider Name')}
                 items={encounterProviders}
+                selectedItems
                 itemToString={(item) => (item ? item.text : '')}
                 selectionFeedback="top-after-reopen"
               />
