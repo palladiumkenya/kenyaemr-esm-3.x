@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
-import { useContacts } from './contact-list.resource';
-import { useTranslation } from 'react-i18next';
-import { ErrorState, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
+  Button,
   DataTable,
   DataTableSkeleton,
   Layer,
   Pagination,
+  Row,
   Table,
   TableBody,
   TableCell,
@@ -16,10 +13,14 @@ import {
   TableHeader,
   TableRow,
   Tile,
-  Button,
 } from '@carbon/react';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { ErrorState, isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useContacts } from './contact-list.resource';
 import styles from './contact-list.scss';
-import { Add } from '@carbon/react/icons';
 
 interface ContactListProps {
   patientUuid: string;
@@ -66,7 +67,9 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   ];
 
   const handleAddContact = () => {
-    // navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
+    launchWorkspace('contact-list-form', {
+      workspaceTitle: 'Contact Form',
+    });
   };
 
   const tableRows =
@@ -100,7 +103,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
             <h4>{headerTitle}</h4>
           </div>
           <EmptyDataIllustration />
-          <p className={styles.content}>There is no family history data to display for this patient.</p>
+          <p className={styles.content}>There is contact data to list for this patient.</p>
           <Button onClick={handleAddContact} renderIcon={Add} kind="ghost">
             {t('recordContact', 'Record Contact')}
           </Button>
@@ -111,7 +114,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={headerTitle}>
-        {isLoading && <DataTableSkeleton rowCount={5} />}{' '}
         <Button onClick={handleAddContact} renderIcon={Add} kind="ghost">
           {t('add', 'Add')}
         </Button>
@@ -135,6 +137,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
+                  <TableHeader>Actions</TableHeader>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -143,6 +146,12 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}
+                    <TableCell>
+                      <Row className={styles.inlineActions}>
+                        <Button kind="tertiary" renderIcon={Edit} iconDescription="Edit Record" hasIconOnly />
+                        <Button kind="tertiary" renderIcon={TrashCan} iconDescription="Delete Record" hasIconOnly />
+                      </Row>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

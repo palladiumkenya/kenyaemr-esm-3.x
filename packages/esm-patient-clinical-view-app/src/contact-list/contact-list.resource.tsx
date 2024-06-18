@@ -65,7 +65,7 @@ function extractTelephone(display: string) {
 export const useContacts = (patientUuid: string) => {
   const customeRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display)),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display)),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
-  const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
+  const url = `/ws/rest/v1/relationship?v=${customeRepresentation}`;
   const { data, error, isLoading, mutate, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
     url,
     openmrsFetch,
@@ -128,3 +128,8 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
   }
   return relationshipsData;
 }
+
+export const dateFromAge = (age: number): Date => {
+  const today = new Date();
+  return new Date(today.getTime() - age * 24 * 60 * 60 * 1000);
+};

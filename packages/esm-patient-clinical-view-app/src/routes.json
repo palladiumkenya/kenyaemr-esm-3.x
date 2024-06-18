@@ -53,6 +53,10 @@
       "offline": false
     },
     {
+      "name": "contact-list-form",
+      "component": "contactListForm"
+    },
+    {
       "name": "maternal-and-child-health-dashboard-group-link",
       "slot": "clinical-view-section",
       "component": "maternalAndChildHealthSideNavGroup"
@@ -196,5 +200,11 @@
       "online": true,
       "offline": false
     }
-  ]
+  ],
+  "modals": [
+	{
+	  "name": "birth-date-calculator",
+	  "component": "birthDateCalculator"
+	}
+]
 }
