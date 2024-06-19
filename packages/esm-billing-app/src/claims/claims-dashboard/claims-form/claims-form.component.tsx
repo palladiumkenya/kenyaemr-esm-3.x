@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -11,13 +11,14 @@ import {
   ButtonSet,
   Button,
   FilterableMultiSelect,
+  MultiSelect,
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill } from '../../../types';
 import { formatDate } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
-import { useCurrentVisitForm } from './claims-form.resource';
+import { useVisit } from './claims-form.resource';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -27,7 +28,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
   const { t } = useTranslation();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const { patientUuid } = useParams();
-  const { visits: recentVisit } = useCurrentVisitForm(patientUuid);
+  const { visits: recentVisit } = useVisit(patientUuid);
 
   const encounterProviders =
     recentVisit?.encounters.flatMap((encounter) =>
@@ -37,14 +38,33 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       })),
     ) || [];
 
-  const diagnoses =
-    recentVisit?.encounters.flatMap(
-      (encounter) =>
-        encounter.diagnoses.map((diagnosis) => ({
-          id: diagnosis.uuid,
-          text: diagnosis.display,
-        })) || [],
-    ) || [];
+  const diagnoses = useMemo(
+    () =>
+      recentVisit?.encounters.flatMap(
+        (encounter) =>
+          encounter.diagnoses.map((diagnosis) => ({
+            id: diagnosis.uuid,
+            text: diagnosis.display,
+            certainty: diagnosis.certainty,
+          })) || [],
+      ) || [],
+    [recentVisit],
+  );
+
+  const confirmedDiagnoses = useMemo(
+    () => diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED'),
+    [diagnoses],
+  );
+
+  const [selectedDiagnoses, setSelectedDiagnoses] = useState([]);
+
+  useEffect(() => {
+    setSelectedDiagnoses(confirmedDiagnoses);
+  }, [confirmedDiagnoses]);
+
+  const handleDiagnosesChange = ({ selectedItems }) => {
+    setSelectedDiagnoses(selectedItems);
+  };
 
   return (
     <Form className={styles.form}>
@@ -104,12 +124,14 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
         </Row>
         <Column>
           <Layer className={styles.input}>
-            <FilterableMultiSelect
+            <MultiSelect
               id="diagnoses"
               titleText={t('diagnoses', 'Diagnoses')}
               items={diagnoses}
               itemToString={(item) => (item ? item.text : '')}
               selectionFeedback="top-after-reopen"
+              selectedItems={selectedDiagnoses}
+              onChange={handleDiagnosesChange}
             />
           </Layer>
         </Column>
@@ -120,7 +142,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 id="provider_name"
                 titleText={t('provider_name', 'Provider Name')}
                 items={encounterProviders}
-                selectedItems
                 itemToString={(item) => (item ? item.text : '')}
                 selectionFeedback="top-after-reopen"
               />
