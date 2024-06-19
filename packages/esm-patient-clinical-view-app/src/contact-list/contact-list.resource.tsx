@@ -41,7 +41,16 @@ interface Person {
   attributes: {
     uuid: string;
     display: string;
+    attributeType: {
+      uuid: string;
+      display: string;
+    };
   }[];
+}
+
+interface RelationShipType {
+  uuid: string;
+  displayAIsToB: string;
 }
 
 function extractName(display: string) {
@@ -64,8 +73,8 @@ function extractTelephone(display: string) {
 
 export const useContacts = (patientUuid: string) => {
   const customeRepresentation =
-    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display)),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display)),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
-  const url = `/ws/rest/v1/relationship?v=${customeRepresentation}`;
+    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
+  const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
   const { data, error, isLoading, mutate, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
     url,
     openmrsFetch,
@@ -83,12 +92,24 @@ export const useContacts = (patientUuid: string) => {
   };
 };
 
+export const useRelationshipTypes = () => {
+  const customeRepresentation = 'custom:(uuid,displayAIsToB)';
+  const url = `/ws/rest/v1/relationshiptype?v=${customeRepresentation}`;
+
+  const { data, error, isLoading } = useSWR<{ data: { results: RelationShipType[] } }>(url, openmrsFetch);
+  return {
+    error,
+    isLoading,
+    relationshipTypes: data?.data?.results ?? [],
+  };
+};
+
 function extractContactData(patientIdentifier: string, relationships: Array<Relationship>): Array<Contact> {
   const relationshipsData: Contact[] = [];
-  const telUuid = 'f7ed0636-3911-493c-9565-6829f6841aa7';
+  const telUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
   for (const r of relationships) {
     if (patientIdentifier === r.personA.uuid) {
-      const tel: string | undefined = r.personB.attributes.find((attr) => attr.uuid === telUuid)?.display;
+      const tel: string | undefined = r.personB.attributes.find((attr) => attr.attributeType.uuid === telUuid)?.display;
       relationshipsData.push({
         uuid: r.uuid,
         name: extractName(r.personB.display),
@@ -106,7 +127,7 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
           : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
       });
     } else {
-      const tel: string | undefined = r.personA.attributes.find((attr) => attr.uuid === telUuid)?.display;
+      const tel: string | undefined = r.personA.attributes.find((attr) => attr.attributeType.uuid === telUuid)?.display;
 
       relationshipsData.push({
         uuid: r.uuid,
@@ -128,3 +149,22 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
   }
   return relationshipsData;
 }
+
+export const hivStatus = [
+  { value: 'Positive', label: 'Positive' },
+  { value: 'Negative', label: 'Negative' },
+  { value: 'Unknown', label: 'Unknown' },
+];
+
+export const contactLivingWithPatient = [
+  { value: 'Yes', label: 'Yes' },
+  { value: 'No', label: 'No' },
+  { value: 'Declined', label: 'Declined to answer' },
+];
+
+export const pnsAproach = [
+  { value: 'Passive', label: 'Passive referral' },
+  { value: 'Contract', label: 'Contract referral' },
+  { value: 'Provider', label: 'Provider referral' },
+  { value: 'Dual', label: 'Dual referral' },
+];
