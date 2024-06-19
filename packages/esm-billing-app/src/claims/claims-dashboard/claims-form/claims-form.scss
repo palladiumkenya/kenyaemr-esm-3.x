@@ -84,22 +84,6 @@
   margin-top: spacing.$spacing-05;
 }
 
-.inputRow {
-  margin-top: spacing.$spacing-05;
-  width: 50%;
-}
-
-.datePickersRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: spacing.$spacing-05;
-  align-items: center;
-}
-
-.datePickerInput {
-  width: 100%;
-}
-
 .button {
   height: spacing.$spacing-08;
   display: flex;
