@@ -97,6 +97,10 @@
   }
 }
 
+.sectionHeader {
+  @include type.type-style('heading-02');
+}
+
 :global(.omrs-breakpoint-lt-desktop) {
   .form {
     height: var(--tablet-workspace-window-height);

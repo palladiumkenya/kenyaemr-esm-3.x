@@ -6,8 +6,8 @@ import {
   DatePickerInput,
   Dropdown,
   Form,
-  Layer,
-  Row,
+  RadioButton,
+  RadioButtonGroup,
   Stack,
   TextInput,
 } from '@carbon/react';
@@ -19,7 +19,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import styles from './contact-list-form.scss';
-import { contactLivingWithPatient, hivStatus, pnsAproach, useRelationshipTypes } from './contact-list.resource';
+import {
+  contactLivingWithPatient,
+  hivStatus,
+  maritalStatus,
+  pnsAproach,
+  useRelationshipTypes,
+} from './contact-list.resource';
 
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
@@ -30,7 +36,7 @@ const ContactListFormSchema = z.object({
   firstName: z.string().min(1, 'Required'),
   middleName: z.string().min(1, 'Required'),
   lastName: z.string().min(1, 'Required'),
-  gender: z.enum(['M', 'F', 'U']),
+  gender: z.enum(['M', 'F']),
   dateOfBirth: z.date({ coerce: true }),
   maritalStatus: z.string(),
   address: z.string(),
@@ -60,7 +66,6 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       lastName: '',
       maritalStatus: '',
       listingDate: new Date(),
-      gender: 'U',
       dateOfBirth: new Date(),
       patient: '',
       relationshipToPatient: 'a8058424-5ddf-4ce2-a5ee-6e08d01b5960',
@@ -84,189 +89,204 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       <pre>{`${JSON.stringify(form.formState.errors, null, 2)}`}</pre>
       <Stack gap={4} className={styles.grid}>
         <Column>
-          <Layer>
-            <Controller
-              control={form.control}
-              name="listingDate"
-              render={({ field }) => (
-                <DatePicker dateFormat="d/m/Y" id="listingDate" datePickerType="single" {...field}>
-                  <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('listingDate', 'Listing Date')} size="xl" />
-                </DatePicker>
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="listingDate"
+            render={({ field }) => (
+              <DatePicker dateFormat="d/m/Y" id="listingDate" datePickerType="single" {...field}>
+                <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('listingDate', 'Listing Date')} size="xl" />
+              </DatePicker>
+            )}
+          />
+        </Column>
+        <span className={styles.sectionHeader}>Demographics</span>
+        <Column>
+          <Controller
+            control={form.control}
+            name="firstName"
+            render={({ field }) => (
+              <TextInput {...field} placeholder="First name" labelText={t('firstName', 'First name')} />
+            )}
+          />
         </Column>
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="firstName"
-              render={({ field }) => (
-                <TextInput {...field} placeholder="first name" labelText={t('firstName', 'First name')} />
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="middleName"
+            render={({ field }) => (
+              <TextInput {...field} placeholder="Middle name" labelText={t('middleName', 'Middle name')} />
+            )}
+          />
         </Column>
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="middleName"
-              render={({ field }) => (
-                <TextInput {...field} placeholder="middle name" labelText={t('middleName', 'Middle name')} />
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="lastName"
+            render={({ field }) => (
+              <TextInput {...field} placeholder="Last name" labelText={t('lastName', 'Last name')} />
+            )}
+          />
         </Column>
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="lastName"
-              render={({ field }) => (
-                <TextInput {...field} placeholder="last name" labelText={t('lastName', 'Last name')} />
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="gender"
+            render={({ field }) => (
+              <RadioButtonGroup
+                legendText={t('sex', 'Sex')}
+                {...field}
+                // defaultSelected=""
+                className={styles.billingItem}>
+                <RadioButton labelText={t('male', 'Male')} value="M" id="M" />
+                <RadioButton labelText={t('female', 'Female')} value="F" id="F" />
+              </RadioButtonGroup>
+            )}
+          />
         </Column>
-        <Row>
-          <Column className={styles.facilityColumn}>
-            <Layer className={styles.input}>
-              <Controller
-                control={form.control}
-                name="dateOfBirth"
-                render={({ field }) => (
-                  <DatePicker datePickerType="single" {...field}>
-                    <DatePickerInput
-                      placeholder="mm/dd/yyyy"
-                      labelText={t('dateOfBirth', 'Date of birth')}
-                      size="xl"
-                      className={styles.datePickerInput}
-                    />
-                  </DatePicker>
-                )}
-              />
-            </Layer>
-          </Column>
 
+        <Column className={styles.facilityColumn}>
+          <Controller
+            control={form.control}
+            name="dateOfBirth"
+            render={({ field }) => (
+              <DatePicker datePickerType="single" {...field}>
+                <DatePickerInput
+                  placeholder="mm/dd/yyyy"
+                  labelText={t('dateOfBirth', 'Date of birth')}
+                  size="xl"
+                  className={styles.datePickerInput}
+                />
+              </DatePicker>
+            )}
+          />
           <Button kind="ghost" renderIcon={Calculator} onClick={handleCalculateBirthDate}>
             From Age
           </Button>
-        </Row>
+        </Column>
 
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="address"
-              render={({ field }) => <TextInput {...field} placeholder="address" labelText={t('address', 'Address')} />}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="maritalStatus"
+            render={({ field }) => (
+              <Dropdown
+                id="maritalStatus"
+                titleText={t('maritalStatus', 'Marital status')}
+                {...field}
+                initialSelectedItem={field.value}
+                label="Choose option"
+                items={maritalStatus.map((r) => r.value)}
+                itemToString={(item) => maritalStatus.find((r) => r.value === item)?.label ?? ''}
+              />
+            )}
+          />
+        </Column>
+        <span className={styles.sectionHeader}>Contact</span>
+
+        <Column>
+          <Controller
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <TextInput {...field} placeholder="Physical Address/Landmark" labelText={t('address', 'Address')} />
+            )}
+          />
         </Column>
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <TextInput {...field} placeholder="phone number" labelText={t('phoneNumber', 'Phone number')} />
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <TextInput {...field} placeholder="Phone number" labelText={t('phoneNumber', 'Phone number')} />
+            )}
+          />
+        </Column>
+        <span className={styles.sectionHeader}>Relationship</span>
+        <Column>
+          <Controller
+            control={form.control}
+            name="relationshipToPatient"
+            render={({ field }) => (
+              <Dropdown
+                id="relationshipToPatient"
+                titleText={t('relationToPatient', 'Relation to patient')}
+                {...field}
+                initialSelectedItem={field.value}
+                label="Select Realtionship"
+                items={relationshipTypes.map((r) => r.uuid)}
+                itemToString={(item) => relationshipTypes.find((r) => r.uuid === item)?.displayAIsToB ?? ''}
+              />
+            )}
+          />
         </Column>
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="relationshipToPatient"
-              render={({ field }) => (
-                <Dropdown
-                  id="relationshipToPatient"
-                  titleText={t('relationToPatient', 'Relation to patient')}
-                  {...field}
-                  initialSelectedItem={field.value}
-                  label="Select Realtionship"
-                  items={relationshipTypes.map((r) => r.uuid)}
-                  itemToString={(item) => relationshipTypes.find((r) => r.uuid === item)?.displayAIsToB ?? ''}
-                />
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="livingWithClient"
+            render={({ field }) => (
+              <Dropdown
+                id="livingWithClient"
+                titleText={t('livingWithClient', 'Living with client')}
+                {...field}
+                initialSelectedItem={field.value}
+                label="Select"
+                items={contactLivingWithPatient.map((r) => r.value)}
+                itemToString={(item) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
+              />
+            )}
+          />
         </Column>
+        <span className={styles.sectionHeader}>Baseline Information</span>
+
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="livingWithClient"
-              render={({ field }) => (
-                <Dropdown
-                  id="livingWithClient"
-                  titleText={t('livingWithClient', 'Living with client')}
-                  {...field}
-                  initialSelectedItem={field.value}
-                  label="Select"
-                  items={contactLivingWithPatient.map((r) => r.value)}
-                  itemToString={(item) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            />
-          </Layer>
-        </Column>
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="baselineStatus"
-              render={({ field }) => (
-                <Dropdown
-                  id="baselineStatus"
-                  titleText={t('baselineStatus', 'Baseline HIV Status')}
-                  {...field}
-                  initialSelectedItem={field.value}
-                  label="Select HIV Status"
-                  items={hivStatus.map((r) => r.value)}
-                  itemToString={(item) => hivStatus.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="baselineStatus"
+            render={({ field }) => (
+              <Dropdown
+                id="baselineStatus"
+                titleText={t('baselineStatus', 'HIV Status')}
+                {...field}
+                initialSelectedItem={field.value}
+                label="Select HIV Status"
+                items={hivStatus.map((r) => r.value)}
+                itemToString={(item) => hivStatus.find((r) => r.value === item)?.label ?? ''}
+              />
+            )}
+          />
         </Column>
         <Column className={styles.facilityColumn}>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="booking"
-              render={({ field }) => (
-                <DatePicker datePickerType="single" {...field}>
-                  <DatePickerInput
-                    placeholder="mm/dd/yyyy"
-                    labelText={t('baselineBooking', 'Baseline booking date')}
-                    size="xl"
-                    className={styles.datePickerInput}
-                  />
-                </DatePicker>
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="booking"
+            render={({ field }) => (
+              <DatePicker datePickerType="single" {...field}>
+                <DatePickerInput
+                  placeholder="mm/dd/yyyy"
+                  labelText={t('bookingDate', 'Booking date')}
+                  size="xl"
+                  className={styles.datePickerInput}
+                />
+              </DatePicker>
+            )}
+          />
         </Column>
         <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={form.control}
-              name="preferedPNSAproach"
-              render={({ field }) => (
-                <Dropdown
-                  id="preferedPNSAproach"
-                  titleText={t('preferedPNSAproach', 'Prefered PNS Aproach')}
-                  {...field}
-                  initialSelectedItem={field.value}
-                  label="Select Aproach"
-                  items={pnsAproach.map((r) => r.value)}
-                  itemToString={(item) => pnsAproach.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            />
-          </Layer>
+          <Controller
+            control={form.control}
+            name="preferedPNSAproach"
+            render={({ field }) => (
+              <Dropdown
+                id="preferedPNSAproach"
+                titleText={t('preferedPNSAproach', 'Prefered PNS Aproach')}
+                {...field}
+                initialSelectedItem={field.value}
+                label="Select Aproach"
+                items={pnsAproach.map((r) => r.value)}
+                itemToString={(item) => pnsAproach.find((r) => r.value === item)?.label ?? ''}
+              />
+            )}
+          />
         </Column>
       </Stack>
 

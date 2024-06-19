@@ -168,3 +168,11 @@ export const pnsAproach = [
   { value: 'Provider', label: 'Provider referral' },
   { value: 'Dual', label: 'Dual referral' },
 ];
+
+export const maritalStatus = [
+  { value: 'Single', label: 'Single' },
+  { value: 'Married Polygamous', label: 'Married Polygamous' },
+  { value: 'Divorced', label: 'Divorced' },
+  { value: 'Married Monogamous', label: 'Married Monogamous' },
+  { value: 'Widowed', label: 'Wodowed' },
+];
