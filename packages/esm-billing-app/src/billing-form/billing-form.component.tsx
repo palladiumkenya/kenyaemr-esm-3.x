@@ -123,8 +123,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                 uuid: o.uuid,
                 Item: o.name,
                 Qnty: 1,
-                Price: o.servicePrices[0].price,
-                Total: o.servicePrices[0].price,
+                Price: o.servicePrices[0]?.price,
+                Total: o.servicePrices[0]?.price,
                 category: 'Service',
               });
             }
