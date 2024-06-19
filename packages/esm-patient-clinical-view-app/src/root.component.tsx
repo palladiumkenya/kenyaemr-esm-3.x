@@ -7,9 +7,7 @@ const Root: React.FC = () => {
 
   return (
     <BrowserRouter basename={baseName}>
-      <Routes>
-        <Route path="/" element={<ContactProfile />} />
-      </Routes>
+      <Routes>{/* <Route path="/" element={<ContactProfile />} /> */}</Routes>
     </BrowserRouter>
   );
 };
