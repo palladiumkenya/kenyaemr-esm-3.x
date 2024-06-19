@@ -3,12 +3,16 @@ import { render, screen } from '@testing-library/react';
 import BillHistory from './bill-history.component';
 import { useBills } from '../billing.resource';
 import userEvent from '@testing-library/user-event';
+import { useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 
 const testProps = {
   patientUuid: 'some-uuid',
 };
 
 const mockbills = useBills as jest.MockedFunction<typeof useBills>;
+const mockUseLaunchWorkspaceRequiringVisit = useLaunchWorkspaceRequiringVisit as jest.MockedFunction<
+  typeof useLaunchWorkspaceRequiringVisit
+>;
 
 const mockBillsData = [
   { uuid: '1', patientName: 'John Doe', identifier: '12345678', billingService: 'Checkup', totalAmount: 500 },
@@ -48,6 +52,11 @@ jest.mock('@openmrs/esm-framework', () => ({
   })),
 }));
 
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...jest.requireActual('@openmrs/esm-patient-common-lib'),
+  useLaunchWorkspaceRequiringVisit: jest.fn(),
+}));
+
 describe('BillHistory', () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -74,7 +83,7 @@ describe('BillHistory', () => {
     expect(errorState).toBeInTheDocument();
   });
 
-  xtest('should render bills table', async () => {
+  test('should render bills table', async () => {
     const user = userEvent.setup();
     mockbills.mockReturnValueOnce({
       isLoading: false,
@@ -86,9 +95,9 @@ describe('BillHistory', () => {
     render(<BillHistory {...testProps} />);
     expect(screen.getByText('Visit time')).toBeInTheDocument();
     expect(screen.getByText('Identifier')).toBeInTheDocument();
-    const expectedColumnHeaders = [/Visit time/, /Identifier/, /Billing service/, /Bill total/];
+    const expectedColumnHeaders = [/Visit time/, /Identifier/, /Billed Items/, /Bill total/];
     expectedColumnHeaders.forEach((header) => {
-      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: header })).toBeInTheDocument();
     });
 
     const tableRowGroup = screen.getAllByRole('rowgroup');
@@ -113,10 +122,15 @@ describe('BillHistory', () => {
     await user.click(expandAllRowButton);
   });
 
-  test('should render empty state view when there are no bills', () => {
+  test('should render empty state view when there are no bills', async () => {
     mockbills.mockReturnValueOnce({ isLoading: false, isValidating: false, error: null, bills: [], mutate: jest.fn() });
     render(<BillHistory {...testProps} />);
     const emptyState = screen.getByText(/There are no bills to display./);
     expect(emptyState).toBeInTheDocument();
+
+    // should have a button to launch billing form
+    const launchBillingFormButton = screen.getByRole('button', { name: /Launch bill form/ });
+    expect(launchBillingFormButton).toBeInTheDocument();
+    expect(mockUseLaunchWorkspaceRequiringVisit).toHaveBeenCalledWith('billing-form');
   });
 });
