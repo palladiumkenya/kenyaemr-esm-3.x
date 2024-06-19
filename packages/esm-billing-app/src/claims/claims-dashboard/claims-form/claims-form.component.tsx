@@ -15,7 +15,7 @@ import {
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill } from '../../../types';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, navigate } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
 import { useVisit } from './claims-form.resource';
@@ -27,8 +27,12 @@ type ClaimsFormProps = {
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
   const { t } = useTranslation();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
-  const { patientUuid } = useParams();
+  const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit } = useVisit(patientUuid);
+  const handleNavigateToBillingOptions = () =>
+    navigate({
+      to: window.getOpenmrsSpaBase() + `home/billing/patient/${patientUuid}/${billUuid}`,
+    });
 
   const encounterProviders =
     recentVisit?.encounters.flatMap((encounter) =>
@@ -170,7 +174,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
           </Layer>
         </Column>
         <ButtonSet className={styles.buttonSet}>
-          <Button className={styles.button} kind="danger">
+          <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
             {t('discardClaim', 'Discard Claim')}
           </Button>
           <Button className={styles.button} kind="primary" type="submit">
