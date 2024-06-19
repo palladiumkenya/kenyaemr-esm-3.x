@@ -90,6 +90,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
     () => diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED'),
     [diagnoses],
   );
+  const patientName = bill.patientName;
 
   const {
     control,
@@ -118,7 +119,31 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
     },
   });
 
-  const onSubmit = (data) => {};
+  const onSubmit = (data) => {
+    const lineItemUuids = bill.lineItems.map((item) => item.uuid);
+    const payload = {
+      providedItems: {
+        [billUuid]: {
+          items: lineItemUuids,
+          explanation: data.claimExplanation,
+          justification: data.claimJustification,
+        },
+      },
+      claimExplanation: data.claimExplanation,
+      claimJustification: data.claimJustification,
+      startDate: data.treatmentStart,
+      endDate: data.treatmentEnd,
+      location: mflCodeValue,
+      diagnoses: data.diagnoses.map((diagnosis) => diagnosis.id),
+      paidInFacility: true,
+      patient: patientName,
+      visitType: data.visitType,
+      guaranteeId: data.guaranteeId,
+      provider: data.providerName.map((provider) => provider.text),
+      claimCode: data.claimCode,
+      billNumber: bill.receiptNumber,
+    };
+  };
 
   useEffect(() => {
     setValue('diagnoses', confirmedDiagnoses);
