@@ -108,13 +108,17 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
         const res = data as { results: any[] };
 
         res.results.map((o) => {
-          if (o.commonName && (o.commonName != '' || o.commonName != null)) {
+          if (
+            o.commonName &&
+            (o.commonName != '' || o.commonName != null) &&
+            (o.purchasePrice != '' || o.purchasePrice != null)
+          ) {
             searchOptions.push({
               uuid: o.uuid,
               Item: o.commonName,
               Qnty: 1,
-              Price: 10,
-              Total: 10,
+              Price: o?.purchasePrice,
+              Total: o?.purchasePrice,
               category: 'StockItem',
             });
           } else {
