@@ -15,7 +15,7 @@ import {
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill } from '../../../types';
-import { formatDate, navigate } from '@openmrs/esm-framework';
+import { formatDate, navigate, showSnackbar } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
 import { useVisit } from './claims-form.resource';
@@ -143,6 +143,13 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       claimCode: data.claimCode,
       billNumber: bill.receiptNumber,
     };
+    showSnackbar({
+      title: t('processClaim', 'Process Claim'),
+      subtitle: t('sendClaim', 'Claim send successfully'),
+      kind: 'success',
+      timeoutInMs: 3500,
+      isLowContrast: true,
+    });
   };
 
   useEffect(() => {

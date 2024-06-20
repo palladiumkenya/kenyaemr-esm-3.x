@@ -1,7 +1,7 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import ClaimsHeader from './claims-header/claims-header.component';
+import ClaimsHeader from './header/claims-header.component';
 import { usePatient, ErrorState } from '@openmrs/esm-framework';
 import styles from './claims-header/claims-header.scss';
 import { InlineLoading } from '@carbon/react';

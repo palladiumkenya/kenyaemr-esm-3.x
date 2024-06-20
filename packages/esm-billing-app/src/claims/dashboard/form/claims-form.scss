@@ -28,7 +28,7 @@
   justify-content: space-between;
   background-color: white;
 
-  @media (min-width: 768px) {
+  :global(.omrs-breakpoint-lt-desktop) {
     width: 50%;
     padding: spacing.$spacing-06 spacing.$spacing-05;
   }
@@ -65,12 +65,12 @@
     gap: spacing.$spacing-05;
     margin-bottom: spacing.$spacing-03;
 
-    @media (max-width: 767px) {
+    :global(.omrs-breakpoint-lt-desktop) {
       justify-content: center;
     }
   }
 
-  @media (min-width: 1768px) {
+  :global(.omrs-breakpoint-lt-desktop) {
     width: 768px;
   }
 }

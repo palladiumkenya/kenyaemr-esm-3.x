@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styles from './claims-main.scss';
 import { LineItem, MappedBill } from '../../types';
-import ClaimsTable from '../claims-dashboard/claims-table.component.tsx/claims-table.component';
-import ClaimsForm from '../claims-dashboard/claims-form/claims-form.component';
+import ClaimsTable from '../dashboard/table/claims-table.component';
+import ClaimsForm from '../dashboard/form/claims-form.component';
 import { useBill } from '../../billing.resource';
 import { computeTotalPrice } from '../../utils';
-import { ClaimsBreakDown } from '../claims-dashboard/claims-breakdown/claims-breakdown.component';
+import { ClaimsBreakDown } from '../dashboard/breakdown/claims-breakdown.component';
 import { convertToCurrency } from '../../helpers';
 import { useTranslation } from 'react-i18next';
 
