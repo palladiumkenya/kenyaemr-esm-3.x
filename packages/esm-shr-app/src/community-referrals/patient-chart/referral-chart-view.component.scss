@@ -27,6 +27,7 @@
   color: colors.$gray-70;
   margin-top: layout.$layout-05;
   margin-bottom: layout.$spacing-03;
+  align-self: center;
 }
 
 .desktopHeading,
@@ -48,28 +49,27 @@
     }
   }
 }
-.value {
-  @include type.type-style('body-short-02');
-  color: colors.$gray-100;
-}
-.content {
-  width: 50%;
-  margin: spacing.$spacing-03 0;
 
-  & > p:first-child {
-    @include type.type-style('label-01');
-    color: colors.$gray-70;
-    margin-bottom: spacing.$spacing-02;
-  }
-
-  & span {
-    @include type.type-style('body-short-02');
-    color: colors.$gray-100;
-  }
-}
 .container {
-  display: flex;
-  flex-direction: row;
-  padding-left: 1rem;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 1rem;
+  background-color: colors.$white-0;
+  padding: layout.$spacing-05;
+
+  .cardContainer {
+    display: flex;
+    flex-direction: column;
+    row-gap: layout.$spacing-01;
+
+    .label {
+      @include type.type-style('body-compact-01');
+      color: colors.$gray-100;
+    }
+
+    .value {
+      @include type.type-style('label-01');
+      color: colors.$gray-80;
+    }
+  }
 }

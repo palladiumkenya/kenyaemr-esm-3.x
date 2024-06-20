@@ -1,0 +1,23 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.claimContainer {
+  background-color: colors.$gray-10;
+  height: calc(100vh - 3rem);
+}
+
+.errorContainer {
+  margin: layout.$spacing-05;
+}
+
+.loader {
+  display: flex;
+  min-height: layout.$spacing-09;
+  justify-content: center;
+}
+.claimTitle {
+  @include type.type-style('heading-02');
+  display: flex;
+  margin: layout.$spacing-05;
+}

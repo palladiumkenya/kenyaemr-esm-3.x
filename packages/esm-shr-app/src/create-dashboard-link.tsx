@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import last from 'lodash-es/last';
 import { BrowserRouter, useLocation } from 'react-router-dom';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 
@@ -10,24 +9,15 @@ export interface DashboardLinkConfig {
 
 function SHRDashboardLinkExtension({ dashboardLinkConfig }: { dashboardLinkConfig: DashboardLinkConfig }) {
   const { name, title } = dashboardLinkConfig;
-  const location = useLocation();
   const spaBasePath = window.getOpenmrsSpaBase() + 'home';
+  const pathName = useLocation().pathname;
 
-  let urlSegment = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
-
-  const isUUID = (value) => {
-    const regex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
-    return regex.test(value);
-  };
-
-  if (isUUID(urlSegment)) {
-    urlSegment = 'community-referrals';
-  }
+  const isLinkActive = useMemo(() => pathName === `${spaBasePath}/${name}`, [pathName, spaBasePath, name]);
 
   return (
     <ConfigurableLink
       to={spaBasePath + '/' + name}
-      className={`cds--side-nav__link ${name === urlSegment && 'active-left-nav-link'}`}>
+      className={`cds--side-nav__link ${isLinkActive && 'active-left-nav-link'}`}>
       {title}
     </ConfigurableLink>
   );
