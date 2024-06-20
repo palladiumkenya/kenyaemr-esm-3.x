@@ -40,7 +40,7 @@
   justify-content: flex-start;
 }
 
-:global(.omrs-breakpoint-lt-desktop){
+:global(.omrs-breakpoint-lt-desktop) {
   .claimContainer {
     width: 50%;
   }

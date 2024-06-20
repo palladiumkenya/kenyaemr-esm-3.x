@@ -10,7 +10,7 @@
   flex-direction: column;
 }
 
-:global(.omrs-breakpoint-lt-desktop){
+:global(.omrs-breakpoint-lt-desktop) {
   .mainContainer {
     flex-direction: column;
   }

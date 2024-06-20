@@ -123,6 +123,7 @@
   "selectPaymentMethodPlaceholder": "Select payment method",
   "sellingAmount": "Enter selling price",
   "sellingPrice": "Selling Price",
+  "sendClaim": "Claim send successfully",
   "service": "Service",
   "serviceMetrics": "Service Metrics",
   "serviceName": "Service Name",
