@@ -78,7 +78,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       recentVisit?.encounters.flatMap(
         (encounter) =>
           encounter.diagnoses.map((diagnosis) => ({
-            id: diagnosis.uuid,
+            id: diagnosis.diagnosis.coded.uuid,
             text: diagnosis.display,
             certainty: diagnosis.certainty,
           })) || [],
@@ -142,6 +142,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       provider: data.providerName.map((provider) => provider.text),
       claimCode: data.claimCode,
       billNumber: bill.receiptNumber,
+      use: 'claim',
+      insurer: 'SHA',
     };
     showSnackbar({
       title: t('processClaim', 'Process Claim'),

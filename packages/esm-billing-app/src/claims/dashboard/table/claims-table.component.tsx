@@ -17,6 +17,7 @@ import {
   TableToolbarSearch,
   TableSelectRow,
   Tile,
+  Pagination,
   type DataTableHeader,
   type DataTableRow,
 } from '@carbon/react';
@@ -40,6 +41,9 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const [selectedLineItems, setSelectedLineItems] = useState(paidLineItems ?? []);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {
       return lineItems;
@@ -55,6 +59,12 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
       : lineItems;
   }, [debouncedSearchTerm, lineItems]);
 
+  const paginatedLineItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredLineItems.slice(startIndex, endIndex);
+  }, [filteredLineItems, currentPage, pageSize]);
+
   const tableHeaders: Array<typeof DataTableHeader> = [
     { header: 'No', key: 'no' },
     { header: 'Serial No.', key: 'serialno' },
@@ -63,11 +73,12 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
     { header: 'Total amount', key: 'total' },
     { header: 'Bill creation date', key: 'dateofbillcreation' },
   ];
+
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
 
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
-      filteredLineItems?.map((item, index) => {
+      paginatedLineItems?.map((item, index) => {
         return {
           no: `${index + 1}`,
           id: `${item.uuid}`,
@@ -78,7 +89,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           dateofbillcreation: formatDate(new Date(bill.dateCreated), { mode: 'standard' }),
         };
       }) ?? [],
-    [bill.dateCreated, bill.receiptNumber, filteredLineItems],
+    [bill.dateCreated, bill.receiptNumber, paginatedLineItems],
   );
 
   if (isLoadingBill) {
@@ -181,6 +192,20 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           </Layer>
         </div>
       )}
+      <Pagination
+        forwardText="Next page"
+        backwardText="Previous page"
+        page={currentPage}
+        pageSize={pageSize}
+        pageSizes={[5, 10, 20, 50]}
+        totalItems={filteredLineItems.length}
+        className={styles.pagination}
+        size={responsiveSize}
+        onChange={({ pageSize: newPageSize, page: newPage }) => {
+          setPageSize(newPageSize);
+          setCurrentPage(newPage);
+        }}
+      />
     </div>
   );
 };

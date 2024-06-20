@@ -42,7 +42,7 @@
 
 :global(.omrs-breakpoint-lt-desktop) {
   .claimContainer {
-    width: 50%;
+    width: 100%;
   }
 }
 
@@ -102,4 +102,7 @@
 
 .tableContainer {
   width: 100%;
+}
+.pagination {
+  background: white;
 }

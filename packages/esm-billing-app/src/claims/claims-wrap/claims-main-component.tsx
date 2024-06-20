@@ -35,7 +35,7 @@ const ClaimMainComponent: React.FC<ClaimsMainProps> = ({ bill }) => {
         <ClaimsTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
         <ClaimsForm bill={bill} />
       </div>
-      <ClaimsBreakDown label={t('totalClaimAmount', 'Total Claims Amount')} value={convertToCurrency(computedTotal)} />
+      {/* <ClaimsBreakDown label={t('totalClaimAmount', 'Total Claims Amount')} value={convertToCurrency(computedTotal)} /> */}
     </div>
   );
 };

@@ -1,13 +1,12 @@
 .mainContainer {
   display: flex;
-  flex-direction: column;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 .content {
   display: flex;
-  flex-direction: column;
+  width: 100%;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
@@ -16,7 +15,7 @@
   }
 
   .content {
-    flex-direction: row;
+    flex-direction: column;
   }
 }
 
