@@ -14,10 +14,10 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = ({ bill }) => {
       key: 'dateCreated',
       header: 'Date of payment',
     },
-    {
-      key: 'amount',
-      header: 'Bill amount',
-    },
+    // {
+    //   key: 'amount',
+    //   header: 'Bill amount',
+    // },
     {
       key: 'amountTendered',
       header: 'Amount tendered',

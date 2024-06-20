@@ -62,7 +62,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
           kind: 'success',
           timeoutInMs: 3000,
         });
-        handleNavigateToBillingDashboard();
+        // handleNavigateToBillingDashboard();
       },
       (error) => {
         showSnackbar({
