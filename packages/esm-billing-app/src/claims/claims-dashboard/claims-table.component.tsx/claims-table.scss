@@ -32,10 +32,18 @@
 }
 
 .claimContainer {
+  width: 100%;
   margin: layout.$spacing-09 layout.$spacing-05 0;
   border: 1px solid $ui-03;
   display: flex;
+  flex-direction: column;
   justify-content: flex-start;
+}
+
+@media (min-width: 768px) {
+  .claimContainer {
+    width: 50%;
+  }
 }
 
 .searchbox {
@@ -91,13 +99,7 @@
     height: layout.$spacing-07;
   }
 }
+
 .tableContainer {
   width: 100%;
-}
-
-@media (min-width: 1200px) {
-  .tableContainer {
-    width: 50%;
-    margin-right: auto;
-  }
 }
