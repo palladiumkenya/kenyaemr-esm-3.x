@@ -1,3 +1,4 @@
+import { OpenmrsResource } from '@openmrs/esm-framework';
 import { type Drug, type OrderBasketItem } from '@openmrs/esm-patient-common-lib';
 export interface MappedBill {
   uuid: string;
@@ -261,4 +262,14 @@ export type FormPayment = { method: string; amount: string | number; referenceCo
 
 export type PaymentFormValue = {
   payment: Array<FormPayment>;
+};
+
+export type QueueEntry = {
+  queueEntry: {
+    uuid: string;
+    priority: OpenmrsResource;
+    status: OpenmrsResource;
+    queue: OpenmrsResource;
+    queueComingFrom: OpenmrsResource;
+  };
 };

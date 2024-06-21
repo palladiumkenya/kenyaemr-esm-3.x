@@ -1,10 +1,10 @@
 import React from 'react';
 import { Drug } from '@openmrs/esm-patient-common-lib';
-import { DosingUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from '../../types';
-import { useBillableItem, useSockItemInventory } from './useBilliableItem';
+import { DosingUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from '../../../types';
+import { useBillableItem, useSockItemInventory } from '../useBillableItem';
 import { useTranslation } from 'react-i18next';
 import styles from './drug-order.scss';
-import { convertToCurrency } from '../../helpers';
+import { convertToCurrency } from '../../../helpers';
 
 type DrugOrderProps = {
   order: {
