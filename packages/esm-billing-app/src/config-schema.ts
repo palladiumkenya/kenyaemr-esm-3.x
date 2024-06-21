@@ -18,6 +18,7 @@ export interface BillingConfig {
   passKey: string;
   authorizationUrl: string;
   initiateUrl: string;
+  billingStatusQueryUrl: string;
 }
 
 export const configSchema = {
@@ -117,5 +118,10 @@ export const configSchema = {
     _type: Type.String,
     _default: '',
     _description: 'MPESA Initiator url which Initiates online payment on behalf of a customer.',
+  },
+  billingStatusQueryUrl: {
+    _type: Type.String,
+    _default: '${restBaseUrl}/cashier/billLineItem?orderUuid=${orderUuid}&v=full',
+    _description: 'URL to query billing status',
   },
 };

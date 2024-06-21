@@ -36,10 +36,11 @@ export const usePatientQueue = (patientUuid: string) => {
 };
 
 export const usePatientBill = (orderUuid: string) => {
-  const url = `ws/rest/v1/cashier/billLineItem?orderUuid=${orderUuid}&v=full`;
+  const { billingStatusQueryUrl } = useConfig<BillingConfig>();
+  const billUrl = createUrl(restBaseUrl, orderUuid, billingStatusQueryUrl);
   const { data, isLoading, error } = useSWR<{
     data: { results: Array<LineItem> };
-  }>(url, openmrsFetch);
+  }>(billUrl, openmrsFetch);
 
   const hasPendingPayment = data?.data?.results?.some(
     (lineItem) => lineItem.paymentStatus === 'PENDING' || lineItem.paymentStatus === 'POSTED',
@@ -47,3 +48,7 @@ export const usePatientBill = (orderUuid: string) => {
 
   return { hasPendingPayment, isLoading, error };
 };
+
+function createUrl(restBaseUrl: string, orderUuid: string, templateUrl: string): string {
+  return templateUrl.replace('${restBaseUrl}', restBaseUrl).replace('${orderUuid}', orderUuid);
+}

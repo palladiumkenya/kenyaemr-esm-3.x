@@ -117,7 +117,10 @@ jest.mock('./test-order-action.resource', () => ({
 }));
 
 test('should return isLoading as true when isLoadingQueue is true', () => {
-  mockedUseConfig.mockReturnValue({ inPatientVisitTypeUuid: '3371a4d4-f66f-4454-a86d-92c7b3da990c' });
+  mockedUseConfig.mockReturnValue({
+    inPatientVisitTypeUuid: '3371a4d4-f66f-4454-a86d-92c7b3da990c',
+    billingStatusQueryUrl: `/ws/rest/v1/cashier/billLineItem?orderUuid={{orderUuid}}&v=full`,
+  });
   mockedUseVisit.mockReturnValue({
     currentVisit: mockCurrentVisit,
     isLoading: false,
@@ -137,7 +140,10 @@ test('should return isLoading as true when isLoadingQueue is true', () => {
 });
 
 test('should return `hasPendingPayment` as false when current visit type is inpatient', () => {
-  mockedUseConfig.mockReturnValue({ inPatientVisitTypeUuid: '3371a4d4-f66f-4454-a86d-92c7b3da990c' });
+  mockedUseConfig.mockReturnValue({
+    inPatientVisitTypeUuid: '3371a4d4-f66f-4454-a86d-92c7b3da990c',
+    billingStatusQueryUrl: `/ws/rest/v1/cashier/billLineItem?orderUuid={{orderUuid}}&v=full`,
+  });
   mockedUseVisit.mockReturnValue({
     currentVisit: { mockCurrentVisit, visitType: { uuid: '3371a4d4-f66f-4454-a86d-92c7b3da990c' } },
     isLoading: false,
@@ -159,6 +165,7 @@ test('should return `hasPendingPayment` as false when current visit type is inpa
 test('should return `hasPendingPayment` as false when patient is an emergency case', () => {
   mockedUseConfig.mockReturnValue({
     concepts: { emergencyPriorityConceptUuid: '80cd8f8c-5d82-4cdc-b96e-a6addeb94b7f' },
+    billingStatusQueryUrl: `/ws/rest/v1/cashier/billLineItem?orderUuid={{orderUuid}}&v=full`,
   });
   mockedUseVisit.mockReturnValue({
     currentVisit: { mockCurrentVisit, visitType: { uuid: '3371a4d4-f66f-4454-a86d-92c7b3da990c' } },
@@ -181,6 +188,7 @@ test('should return `hasPendingPayment` as false when patient is an emergency ca
 test('should return `hasPendingPayment` as false when patient has completed payments', () => {
   mockedUseConfig.mockReturnValue({
     concepts: { emergencyPriorityConceptUuid: '180cd8f8c-5d82-4cdc-b96e-a6addeb94b7f' },
+    billingStatusQueryUrl: `/ws/rest/v1/cashier/billLineItem?orderUuid={{orderUuid}}&v=full`,
   });
   mockedUseVisit.mockReturnValue({
     currentVisit: { mockCurrentVisit, visitType: { uuid: '13371a4d4-f66f-4454-a86d-92c7b3da990c' } },
@@ -207,6 +215,7 @@ test('should return `hasPendingPayment` as false when patient has completed paym
 test('should return `hasPendingPayment` as true when patient has done partial payments', () => {
   mockedUseConfig.mockReturnValue({
     concepts: { emergencyPriorityConceptUuid: '180cd8f8c-5d82-4cdc-b96e-a6addeb94b7f' },
+    billingStatusQueryUrl: `/ws/rest/v1/cashier/billLineItem?orderUuid={{orderUuid}}&v=full`,
   });
   mockedUseVisit.mockReturnValue({
     currentVisit: { mockCurrentVisit, visitType: { uuid: '13371a4d4-f66f-4454-a86d-92c7b3da990c' } },
@@ -233,6 +242,7 @@ test('should return `hasPendingPayment` as true when patient has done partial pa
 test('should return `hasPendingPayment` as true when patient has unsettled payments', () => {
   mockedUseConfig.mockReturnValue({
     concepts: { emergencyPriorityConceptUuid: '180cd8f8c-5d82-4cdc-b96e-a6addeb94b7f' },
+    billingStatusQueryUrl: `/ws/rest/v1/cashier/billLineItem?orderUuid={{orderUuid}}&v=full`,
   });
   mockedUseVisit.mockReturnValue({
     currentVisit: { mockCurrentVisit, visitType: { uuid: '13371a4d4-f66f-4454-a86d-92c7b3da990c' } },
