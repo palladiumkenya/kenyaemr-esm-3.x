@@ -45,7 +45,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const hasMoreThanOneLineItem = bill?.lineItems?.length > 1;
   const computedTotal = hasMoreThanOneLineItem ? computeTotalPrice(selectedLineItems) : bill.totalAmount ?? 0;
   const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount) ?? 0, 0) ?? 0;
-  const amountDue = Number(computedTotal) - (Number(bill.tenderedAmount) + Number(totalAmountTendered));
+  const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + Number(totalAmountTendered));
 
   const handleNavigateToBillingDashboard = () =>
     navigate({
@@ -93,7 +93,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
         </div>
         <div className={styles.divider} />
         <div className={styles.paymentTotals}>
-          <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={convertToCurrency(computedTotal)} />
+          <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill.totalAmount)} />
           <InvoiceBreakDown
             label={t('totalTendered', 'Total Tendered')}
             value={convertToCurrency(bill.tenderedAmount + totalAmountTendered ?? 0)}
