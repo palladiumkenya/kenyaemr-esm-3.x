@@ -1,6 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Form, ModalBody, ModalHeader, TextInput, Layer, InlineNotification } from '@carbon/react';
+import {
+  Button,
+  Form,
+  ModalBody,
+  ModalHeader,
+  TextInput,
+  Layer,
+  InlineNotification,
+  InlineLoading,
+  Loading,
+} from '@carbon/react';
 import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
@@ -10,7 +20,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { formatPhoneNumber } from '../utils';
 import { Buffer } from 'buffer';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
+import {
+  MPESA_PAYMENT_API,
+  RequestStatus,
+  getRequestStatus,
+  initiateStkPush,
+  readableStatusMap,
+} from '../../../m-pesa/mpesa-resource';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -27,9 +43,39 @@ export interface InitiatePaymentDialogProps {
 
 const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
   const { t } = useTranslation();
-  const { mpesaCallbackUrl, passKey, shortCode, authorizationUrl, initiateUrl } = useConfig();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
-  const [notification, setNotification] = useState<string | null>(null);
+  const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
+  const [requestData, setRequestData] = useState<{ requestId: string; requestStatus: RequestStatus | null }>({
+    requestId: null,
+    requestStatus: 'INITIATED',
+  });
+  const [isLoading, setIsLoading] = useState(false);
+
+  // eslint-disable-next-line no-console
+  console.log('request-data', requestData);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (requestData.requestId && !['COMPLETE', 'FAILED', 'NOT-FOUND'].includes(requestData.requestStatus)) {
+      const fetchStatus = async () => {
+        const status = await getRequestStatus(requestData.requestId);
+        if (status === 'COMPLETE' || status === 'FAILED' || status === 'NOT-FOUND') {
+          clearInterval(interval);
+        }
+        if (status === 'COMPLETE' || status === 'INITIATED') {
+          setNotification({ type: 'success', message: readableStatusMap.get(status) });
+        }
+        if (status === 'FAILED' || status === 'NOT-FOUND') {
+          setNotification({ type: 'error', message: readableStatusMap.get(status) });
+        }
+      };
+
+      interval = setInterval(fetchStatus, 2000);
+
+      return () => clearInterval(interval);
+    }
+  }, [requestData.requestId, requestData.requestStatus]);
 
   const {
     control,
@@ -43,41 +89,21 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     resolver: zodResolver(InitiatePaymentSchema),
   });
 
-  const onSubmit = async (data) => {
-    const timeStamp = new Date()
-      .toISOString()
-      .replace(/[^0-9]/g, '')
-      .slice(0, -3);
+  const onSubmit = async (data: { phoneNumber: any; billAmount: any }) => {
     const phoneNumber = formatPhoneNumber(data.phoneNumber);
     const amountBilled = data.billAmount;
-    const password = shortCode + passKey + timeStamp;
-    const callBackUrl = mpesaCallbackUrl;
-    const Password = Buffer.from(password).toString('base64');
     const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
 
     const payload = {
-      BusinessShortCode: shortCode,
-      Password: Password,
-      Timestamp: timeStamp,
-      TransactionType: 'CustomerPayBillOnline',
-      PartyA: phoneNumber,
-      PartyB: shortCode,
-      PhoneNumber: phoneNumber,
-      CallBackURL: callBackUrl,
       AccountReference: accountReference,
-      TransactionDesc: 'KenyaEMRPay',
+      PhoneNumber: phoneNumber,
       Amount: amountBilled,
     };
 
-    await initiateStkPush(payload, initiateUrl, authorizationUrl, setNotification);
-    showSnackbar({
-      title: t('stkPush', 'STK Push'),
-      subtitle: t('stkPushSucess', 'STK Push send successfully'),
-      kind: 'success',
-      timeoutInMs: 3500,
-      isLowContrast: true,
-    });
-    closeModal();
+    setIsLoading(true);
+    const requestId = await initiateStkPush(payload, setNotification);
+    setIsLoading(false);
+    setRequestData({ requestId, requestStatus: 'INITIATED' });
   };
 
   return (
@@ -88,9 +114,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
           <h4>{t('paymentPayment', 'Bill Payment')}</h4>
           {notification && (
             <InlineNotification
-              kind="error"
-              title={t('mpesaError', 'Mpesa Error')}
-              subtitle={notification}
+              kind={notification.type}
+              title={notification.message}
               onCloseButtonClick={() => setNotification(null)}
             />
           )}

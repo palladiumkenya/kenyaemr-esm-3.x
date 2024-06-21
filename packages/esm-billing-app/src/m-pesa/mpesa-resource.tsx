@@ -1,39 +1,56 @@
-import { Buffer } from 'buffer';
+export type RequestStatus = 'INITIATED' | 'COMPLETE' | 'FAILED' | 'NOT-FOUND';
 
-export const generateStkAccessToken = async (authorizationUrl: string, setNotification) => {
+export const readableStatusMap = new Map<RequestStatus, string>();
+readableStatusMap.set('COMPLETE', 'Complete');
+readableStatusMap.set('FAILED', 'Failed');
+readableStatusMap.set('INITIATED', 'Waiting for user...');
+readableStatusMap.set('NOT-FOUND', 'Request not found');
+
+// export const MPESA_PAYMENT_API = 'https://payments-kenyaemr.vercel.app';
+export const MPESA_PAYMENT_API = 'http://localhost:3000';
+
+export const initiateStkPush = async (
+  payload,
+  setNotification: (notification: { type: 'error' | 'success'; message: string }) => void,
+): Promise<string> => {
   try {
-    const consumerKey = '';
-    const consumerSecret = '';
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${auth}`,
-    };
-    const response = await fetch(authorizationUrl, { method: 'GET', headers: headers });
-    const { access_token } = await response.json();
-    return access_token;
-  } catch (error) {
-    setNotification('Unable to reach the MPESA server, please try again later.');
-    throw error;
+    const url = `${MPESA_PAYMENT_API}/api/mpesa/stk-push`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phoneNumber: payload.PhoneNumber,
+        amount: payload.Amount,
+        accountReference: payload.AccountReference,
+      }),
+    });
+
+    const response: { requestId: string } = await res.json();
+
+    setNotification({ message: 'STK Push sent successfully', type: 'success' });
+    return response.requestId;
+  } catch (err) {
+    console.error(err);
+    setNotification({ message: 'Unable to initiate Lipa Na Mpesa, please try again later.', type: 'error' });
+    throw err;
   }
 };
 
-export const initiateStkPush = async (payload, initiateUrl: string, authorizationUrl: string, setNotification) => {
-  try {
-    const access_token = await generateStkAccessToken(authorizationUrl, setNotification);
-    const headers = {
+export const getRequestStatus = async (requestId: string): Promise<RequestStatus> => {
+  const requestResponse = await fetch(`${MPESA_PAYMENT_API}/api/mpesa/check-payment-state`, {
+    method: 'POST',
+    headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${access_token}`,
-    };
-    const response = await fetch(initiateUrl, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(payload),
-    });
+    },
+    body: JSON.stringify({
+      requestId,
+    }),
+  });
 
-    return await response.json();
-  } catch (err) {
-    setNotification('Unable to initiate Lipa Na Mpesa, please try again later.');
-    throw err;
-  }
+  const requestStatus: { status: RequestStatus } = await requestResponse.json();
+
+  return requestStatus.status;
 };
