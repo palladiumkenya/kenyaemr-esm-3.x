@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -14,24 +14,25 @@ import {
   MultiSelect,
 } from '@carbon/react';
 import styles from './claims-form.scss';
-import { MappedBill } from '../../../types';
+import { MappedBill, LineItem } from '../../../types';
 import { formatDate, navigate, showSnackbar } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
-import { useVisit } from './claims-form.resource';
+import { processClaims, useVisit } from './claims-form.resource';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 type ClaimsFormProps = {
   bill: MappedBill;
+  selectedLineItems: LineItem[];
 };
 
 const ClaimsFormSchema = z.object({
   claimCode: z.string().nonempty({ message: 'Claim code is required' }),
-  guaranteeId: z.string().nonempty({ message: 'Claim code is required' }),
+  guaranteeId: z.string().nonempty({ message: 'Guarantee Id is required' }),
   claimExplanation: z.string().nonempty({ message: 'Claim explanation is required' }),
-  claimJustification: z.string().nonempty({ message: 'Claim explanation is required' }),
+  claimJustification: z.string().nonempty({ message: 'Claim justification is required' }),
   providerName: z
     .array(
       z.object({
@@ -54,11 +55,14 @@ const ClaimsFormSchema = z.object({
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
 });
 
-const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
+const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit } = useVisit(patientUuid);
+  const visitUuid = recentVisit?.visitType.uuid;
+  // console.log(bill);
+  // console.log(recentVisit);
 
   const handleNavigateToBillingOptions = () =>
     navigate({
@@ -90,8 +94,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
     () => diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED'),
     [diagnoses],
   );
-  const patientName = bill.patientName;
-
   const {
     control,
     handleSubmit,
@@ -105,7 +107,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       guaranteeId: '',
       claimExplanation: '',
       claimJustification: '',
-
       providerName: [],
       diagnoses: [],
       visitType: recentVisit?.visitType.display || '',
@@ -119,12 +120,20 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
     },
   });
 
-  const onSubmit = (data) => {
-    const lineItemUuids = bill.lineItems.map((item) => item.uuid);
+  const onSubmit = async (data) => {
+    const lineItems = selectedLineItems.map((item) => ({
+      uuid: item.uuid,
+      price: item.price * item.quantity,
+      quantity: item.quantity,
+    }));
     const payload = {
       providedItems: {
         [billUuid]: {
-          items: lineItemUuids,
+          items: lineItems.map((item) => ({
+            uuid: item.uuid,
+            price: item.price,
+            quantity: item.quantity,
+          })),
           explanation: data.claimExplanation,
           justification: data.claimJustification,
         },
@@ -136,22 +145,35 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       location: mflCodeValue,
       diagnoses: data.diagnoses.map((diagnosis) => diagnosis.id),
       paidInFacility: true,
-      patient: patientName,
-      visitType: data.visitType,
+      patient: patientUuid,
+      visitType: visitUuid,
       guaranteeId: data.guaranteeId,
-      provider: data.providerName.map((provider) => provider.text),
+      provider: data.providerName.id,
       claimCode: data.claimCode,
-      billNumber: bill.receiptNumber,
+      billNumber: 'add141f8-742a-4e24-9d27-9047fb43f467',
       use: 'claim',
       insurer: 'SHA',
     };
-    showSnackbar({
-      title: t('processClaim', 'Process Claim'),
-      subtitle: t('sendClaim', 'Claim send successfully'),
-      kind: 'success',
-      timeoutInMs: 3500,
-      isLowContrast: true,
-    });
+    console.log(payload);
+    try {
+      // await processClaims(payload);
+      showSnackbar({
+        title: t('processClaim', 'Process Claim'),
+        subtitle: t('sendClaim', 'Claim sent successfully'),
+        kind: 'success',
+        timeoutInMs: 3500,
+        isLowContrast: true,
+      });
+    } catch (err) {
+      console.error(err);
+      showSnackbar({
+        title: t('processClaimError', 'Process Claim Error'),
+        subtitle: t('sendClaimError', 'Failed to send claim'),
+        kind: 'error',
+        timeoutInMs: 3500,
+        isLowContrast: true,
+      });
+    }
   };
 
   useEffect(() => {

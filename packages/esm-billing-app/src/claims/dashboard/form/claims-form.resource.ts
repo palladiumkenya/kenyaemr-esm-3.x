@@ -18,3 +18,24 @@ export function useVisit(patientUuid: string) {
     mutateVisits: mutate,
   };
 }
+
+export const processClaims = async (payload) => {
+  try {
+    const url = `/ws/rest/v1/insuranceclaims/claims`;
+    const response = await openmrsFetch(url, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error('Error processing claims:', err);
+    throw err;
+  }
+};

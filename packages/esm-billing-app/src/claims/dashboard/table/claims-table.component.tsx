@@ -35,29 +35,28 @@ type ClaimsTableProps = {
 const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, isLoadingBill, onSelectItem }) => {
   const { t } = useTranslation();
   const { lineItems } = bill;
-  const paidLineItems = lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const [selectedLineItems, setSelectedLineItems] = useState(paidLineItems ?? []);
+  const [selectedLineItems, setSelectedLineItems] = useState<LineItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  const paidLineItems = useMemo(() => lineItems.filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
+
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {
-      return lineItems;
+      return paidLineItems;
     }
 
-    return debouncedSearchTerm
-      ? fuzzy
-          .filter(debouncedSearchTerm, lineItems, {
-            extract: (lineItem: LineItem) => `${lineItem.item}`,
-          })
-          .sort((r1, r2) => r1.score - r2.score)
-          .map((result) => result.original)
-      : lineItems;
-  }, [debouncedSearchTerm, lineItems]);
+    return fuzzy
+      .filter(debouncedSearchTerm, paidLineItems, {
+        extract: (lineItem: LineItem) => `${lineItem.item}`,
+      })
+      .sort((r1, r2) => r1.score - r2.score)
+      .map((result) => result.original);
+  }, [debouncedSearchTerm, paidLineItems]);
 
   const paginatedLineItems = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;

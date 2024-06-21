@@ -16,16 +16,13 @@ interface ClaimsMainProps {
 const ClaimMainComponent: React.FC<ClaimsMainProps> = ({ bill }) => {
   const { t } = useTranslation();
 
-  const [selectedLineItems, setSelectedLineItems] = useState([]);
+  const [selectedLineItems, setSelectedLineItems] = useState<LineItem[]>([]);
   const { isLoading: isLoadingBill, error } = useBill(bill.uuid);
+
   const handleSelectItem = (lineItems: Array<LineItem>) => {
-    const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
-    setSelectedLineItems([...lineItems, ...paidLineItems]);
+    setSelectedLineItems(lineItems);
   };
-  useEffect(() => {
-    const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
-    setSelectedLineItems(paidLineItems);
-  }, [bill.lineItems]);
+
   const hasMoreThanOneLineItem = bill?.lineItems?.length > 1;
   const computedTotal = hasMoreThanOneLineItem ? computeTotalPrice(selectedLineItems) : bill.totalAmount ?? 0;
 
@@ -33,7 +30,7 @@ const ClaimMainComponent: React.FC<ClaimsMainProps> = ({ bill }) => {
     <div className={styles.mainContainer}>
       <div className={styles.content}>
         <ClaimsTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
-        <ClaimsForm bill={bill} />
+        <ClaimsForm bill={bill} selectedLineItems={selectedLineItems} /> {/* Pass selectedLineItems here */}
       </div>
       {/* <ClaimsBreakDown label={t('totalClaimAmount', 'Total Claims Amount')} value={convertToCurrency(computedTotal)} /> */}
     </div>
