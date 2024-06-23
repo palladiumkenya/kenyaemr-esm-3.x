@@ -1,32 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Form,
-  ModalBody,
-  ModalHeader,
-  TextInput,
-  Layer,
-  InlineNotification,
-  InlineLoading,
-  Loading,
-} from '@carbon/react';
+import { Button, Form, ModalBody, ModalHeader, TextInput, Layer, InlineNotification, Loading } from '@carbon/react';
 import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formatPhoneNumber } from '../utils';
-import { Buffer } from 'buffer';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import {
-  MPESA_PAYMENT_API,
-  RequestStatus,
-  getRequestStatus,
-  initiateStkPush,
-  readableStatusMap,
-} from '../../../m-pesa/mpesa-resource';
+import { RequestStatus, getRequestStatus, initiateStkPush, readableStatusMap } from '../../../m-pesa/mpesa-resource';
+import { getErrorMessage } from '../../../helpers';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -47,27 +30,29 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [requestData, setRequestData] = useState<{ requestId: string; requestStatus: RequestStatus | null }>({
     requestId: null,
-    requestStatus: 'INITIATED',
+    requestStatus: null,
   });
   const [isLoading, setIsLoading] = useState(false);
-
-  // eslint-disable-next-line no-console
-  console.log('request-data', requestData);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
     if (requestData.requestId && !['COMPLETE', 'FAILED', 'NOT-FOUND'].includes(requestData.requestStatus)) {
       const fetchStatus = async () => {
-        const status = await getRequestStatus(requestData.requestId);
-        if (status === 'COMPLETE' || status === 'FAILED' || status === 'NOT-FOUND') {
+        try {
+          const status = await getRequestStatus(requestData.requestId);
+          if (status === 'COMPLETE' || status === 'FAILED' || status === 'NOT-FOUND') {
+            clearInterval(interval);
+          }
+          if (status === 'COMPLETE' || status === 'INITIATED') {
+            setNotification({ type: 'success', message: readableStatusMap.get(status) });
+          }
+          if (status === 'FAILED' || status === 'NOT-FOUND') {
+            setNotification({ type: 'error', message: readableStatusMap.get(status) });
+          }
+        } catch (error) {
           clearInterval(interval);
-        }
-        if (status === 'COMPLETE' || status === 'INITIATED') {
-          setNotification({ type: 'success', message: readableStatusMap.get(status) });
-        }
-        if (status === 'FAILED' || status === 'NOT-FOUND') {
-          setNotification({ type: 'error', message: readableStatusMap.get(status) });
+          setNotification({ type: 'error', message: getErrorMessage(error) });
         }
       };
 
@@ -160,6 +145,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
               {t('cancel', 'Cancel')}
             </Button>
             <Button type="submit" className={styles.button} onClick={handleSubmit(onSubmit)} disabled={!isValid}>
+              {isLoading && <Loading className="button-spinner" withOverlay={false} small />}
               {t('initiatePay', 'Initiate Payment')}
             </Button>
           </section>

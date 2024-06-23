@@ -6,15 +6,15 @@ readableStatusMap.set('FAILED', 'Failed');
 readableStatusMap.set('INITIATED', 'Waiting for user...');
 readableStatusMap.set('NOT-FOUND', 'Request not found');
 
-// export const MPESA_PAYMENT_API = 'https://payments-kenyaemr.vercel.app';
-export const MPESA_PAYMENT_API = 'http://localhost:3000';
+export const MPESA_PAYMENT_API_BASE_URL = 'https://billing.kenyahmis.org';
+// export const MPESA_PAYMENT_API_BASE_URL = 'http://localhost:3000';
 
 export const initiateStkPush = async (
   payload,
   setNotification: (notification: { type: 'error' | 'success'; message: string }) => void,
 ): Promise<string> => {
   try {
-    const url = `${MPESA_PAYMENT_API}/api/mpesa/stk-push`;
+    const url = `${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/stk-push`;
 
     const res = await fetch(url, {
       method: 'POST',
@@ -40,7 +40,7 @@ export const initiateStkPush = async (
 };
 
 export const getRequestStatus = async (requestId: string): Promise<RequestStatus> => {
-  const requestResponse = await fetch(`${MPESA_PAYMENT_API}/api/mpesa/check-payment-state`, {
+  const requestResponse = await fetch(`${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/check-payment-state`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
