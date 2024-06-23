@@ -3,8 +3,8 @@ import {
   DataTable,
   DataTableSkeleton,
   Layer,
+  Link,
   Pagination,
-  Row,
   Table,
   TableBody,
   TableCell,
@@ -14,13 +14,15 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit, TrashCan } from '@carbon/react/icons';
-import { ErrorState, isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { Add } from '@carbon/react/icons';
+import { ErrorState, isDesktop, launchWorkspace, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ContactActions from './contact-actions.component';
 import { useContacts } from './contact-list.resource';
 import styles from './contact-list.scss';
+import HIVStatus from './hiv-status.component';
 
 interface ContactListProps {
   patientUuid: string;
@@ -65,12 +67,12 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       key: 'contact',
     },
     {
-      header: t('status', 'Status'),
-      key: 'status',
+      header: t('hivStatus', 'HIV Status'),
+      key: 'hivStatus',
     },
     {
-      header: t('baselineStatus', 'Base line status'),
-      key: 'baselineStatus',
+      header: t('actions', 'Actions'),
+      key: 'actions',
     },
   ];
 
@@ -87,14 +89,21 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       return {
         id: `${relation.uuid}`,
         startDate: relation.startDate,
-        name: relation.name,
+        name: (
+          <Link
+            onClick={() =>
+              navigate({ to: window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary` })
+            }>
+            {relation.name}
+          </Link>
+        ),
         relation: relation?.relationshipType,
         age: relation?.relativeAge ?? '--',
         sex: relation.gender,
         alive: relation?.dead ? t('dead', 'Dead') : t('alive', 'Alive'),
         contact: relation.contact,
-        status: '--',
-        baselineStatus: '--',
+        hivStatus: <HIVStatus relativeUuid={relation.relativeUuid} />,
+        actions: <ContactActions relativeUuid={relation.relativeUuid} />,
       };
     }) ?? [];
 
@@ -147,7 +156,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
-                  <TableHeader>Actions</TableHeader>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -156,12 +164,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}
-                    <TableCell>
-                      <Row className={styles.inlineActions}>
-                        <Button kind="tertiary" renderIcon={Edit} iconDescription="Edit Record" hasIconOnly />
-                        <Button kind="tertiary" renderIcon={TrashCan} iconDescription="Delete Record" hasIconOnly />
-                      </Row>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

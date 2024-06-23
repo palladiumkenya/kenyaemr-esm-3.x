@@ -53,6 +53,26 @@ interface RelationShipType {
   displayAIsToB: string;
 }
 
+interface Enrollment {
+  uuid: string;
+  program: {
+    name: string;
+    uuid: string;
+  };
+}
+
+interface HTSEncounter {
+  uuid: string;
+  display: string;
+  encounterDatetime: string;
+  obs: {
+    uuid: string;
+    display: string;
+    obsDatetime: string;
+    value: string;
+  }[];
+}
+
 function extractName(display: string) {
   const pattern = /-\s*(.*)$/;
   const match = display.match(pattern);
@@ -101,6 +121,30 @@ export const useRelationshipTypes = () => {
     error,
     isLoading,
     relationshipTypes: data?.data?.results ?? [],
+  };
+};
+
+export const useRelativeHivEnrollment = (relativeUuid: string) => {
+  const customeRepresentation = 'custom:(uuid,program:(name,uuid))';
+  const url = `/ws/rest/v1/programenrollment?v=${customeRepresentation}&patient=${relativeUuid}`;
+  const hivProgram = 'dfdc6d40-2f2f-463d-ba90-cc97350441a8';
+  const { data, error, isLoading } = useSWR<{ data: { results: Enrollment[] } }>(url, openmrsFetch);
+  return {
+    error,
+    isLoading,
+    enrollment: (data?.data?.results ?? []).find((en) => en.program.uuid === hivProgram) ?? null,
+  };
+};
+
+export const useRelativeHTSEncounter = (relativeUuid: string) => {
+  const customeRepresentation = 'custom:(uuid,program:(name,uuid))';
+  const htsEncounter = '9c0a7a57-62ff-4f75-babe-5835b0e921b7';
+  const url = `/ws/rest/v1/encounter?v=${customeRepresentation}&patient=${relativeUuid}&encounterType=${htsEncounter}`;
+  const { data, error, isLoading } = useSWR<{ data: { results: HTSEncounter[] } }>(url, openmrsFetch);
+  return {
+    error,
+    isLoading,
+    encounters: data?.data?.results ?? [],
   };
 };
 
@@ -176,3 +220,23 @@ export const maritalStatus = [
   { value: 'Married Monogamous', label: 'Married Monogamous' },
   { value: 'Widowed', label: 'Wodowed' },
 ];
+
+export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
+  encounters: HTSEncounter[],
+  enrollment: Enrollment | null,
+) => {
+  if (enrollment) {
+    return 'Positive';
+  }
+  if (!enrollment && !encounters.length) {
+    return 'Unknown';
+  }
+  if (
+    !enrollment &&
+    encounters.length &&
+    encounters.findIndex((en) => en.obs.some((ob) => ob.value === 'Positive')) !== -1
+  ) {
+    return 'Positive';
+  }
+  return 'Negative';
+};
