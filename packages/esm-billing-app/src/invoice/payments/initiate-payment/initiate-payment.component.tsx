@@ -8,8 +8,13 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formatPhoneNumber } from '../utils';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import { RequestStatus, getRequestStatus, initiateStkPush, readableStatusMap } from '../../../m-pesa/mpesa-resource';
-import { getErrorMessage } from '../../../helpers';
+import {
+  RequestStatus,
+  getErrorMessage,
+  getRequestStatus,
+  initiateStkPush,
+  readableStatusMap,
+} from '../../../m-pesa/mpesa-resource';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -52,7 +57,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
           }
         } catch (error) {
           clearInterval(interval);
-          setNotification({ type: 'error', message: getErrorMessage(error) });
+          setNotification({ type: 'error', message: getErrorMessage(error, t) });
         }
       };
 
@@ -60,7 +65,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
 
       return () => clearInterval(interval);
     }
-  }, [requestData.requestId, requestData.requestStatus]);
+  }, [requestData.requestId, requestData.requestStatus, t]);
 
   const {
     control,

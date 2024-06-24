@@ -49,7 +49,21 @@ export const getRequestStatus = async (requestId: string): Promise<RequestStatus
     }),
   });
 
+  if (!requestResponse.ok) {
+    const error = new Error(`HTTP error! status: ${requestResponse.status}`);
+    error.message = requestResponse.statusText;
+    throw error;
+  }
+
   const requestStatus: { status: RequestStatus } = await requestResponse.json();
 
   return requestStatus.status;
+};
+
+export const getErrorMessage = (err: { message: string }, t) => {
+  if (err.message) {
+    return err.message;
+  }
+
+  return t('unKnownErrorMsg', 'An unknown error occurred');
 };

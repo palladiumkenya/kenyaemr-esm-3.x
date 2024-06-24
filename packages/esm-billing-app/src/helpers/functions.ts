@@ -81,15 +81,3 @@ function removeUUID(str) {
   // Replace the UUID with an empty string
   return str.replace(uuidPattern, '');
 }
-
-export const getErrorMessage = (err: any) => {
-  if (err.response?.data.message) {
-    return err.response.data.message;
-  }
-
-  if (err.message) {
-    return err.message;
-  }
-
-  return t('unKnownErrorMsg','An unknown error occurred')
-};
