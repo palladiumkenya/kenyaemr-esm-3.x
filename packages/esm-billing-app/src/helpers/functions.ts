@@ -91,5 +91,5 @@ export const getErrorMessage = (err: any) => {
     return err.message;
   }
 
-  return 'an unknown error occurred';
+  return t('unKnownErrorMsg','An unknown error occurred')
 };
