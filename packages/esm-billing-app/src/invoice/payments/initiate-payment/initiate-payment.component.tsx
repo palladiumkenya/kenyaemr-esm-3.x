@@ -145,7 +145,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
               {t('cancel', 'Cancel')}
             </Button>
             <Button type="submit" className={styles.button} onClick={handleSubmit(onSubmit)} disabled={!isValid}>
-              {isLoading && <Loading className="button-spinner" withOverlay={false} small />}
+              {isLoading && <Loading className={styles.button_spinner} withOverlay={false} small />}
               {t('initiatePay', 'Initiate Payment')}
             </Button>
           </section>
