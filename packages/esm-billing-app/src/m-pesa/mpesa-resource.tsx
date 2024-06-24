@@ -7,7 +7,6 @@ readableStatusMap.set('INITIATED', 'Waiting for user...');
 readableStatusMap.set('NOT-FOUND', 'Request not found');
 
 export const MPESA_PAYMENT_API_BASE_URL = 'https://billing.kenyahmis.org';
-// export const MPESA_PAYMENT_API_BASE_URL = 'http://localhost:3000';
 
 export const initiateStkPush = async (
   payload,
