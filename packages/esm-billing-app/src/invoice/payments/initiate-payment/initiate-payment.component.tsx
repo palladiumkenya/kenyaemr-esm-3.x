@@ -15,6 +15,7 @@ import {
   initiateStkPush,
   readableStatusMap,
 } from '../../../m-pesa/mpesa-resource';
+import { useRequestStatus } from '../../../hooks/useRequestStatus';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -33,39 +34,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const { t } = useTranslation();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
-  const [requestData, setRequestData] = useState<{ requestId: string; requestStatus: RequestStatus | null }>({
-    requestId: null,
-    requestStatus: null,
-  });
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (requestData.requestId && !['COMPLETE', 'FAILED', 'NOT-FOUND'].includes(requestData.requestStatus)) {
-      const fetchStatus = async () => {
-        try {
-          const status = await getRequestStatus(requestData.requestId);
-          if (status === 'COMPLETE' || status === 'FAILED' || status === 'NOT-FOUND') {
-            clearInterval(interval);
-          }
-          if (status === 'COMPLETE' || status === 'INITIATED') {
-            setNotification({ type: 'success', message: readableStatusMap.get(status) });
-          }
-          if (status === 'FAILED' || status === 'NOT-FOUND') {
-            setNotification({ type: 'error', message: readableStatusMap.get(status) });
-          }
-        } catch (error) {
-          clearInterval(interval);
-          setNotification({ type: 'error', message: getErrorMessage(error, t) });
-        }
-      };
-
-      interval = setInterval(fetchStatus, 2000);
-
-      return () => clearInterval(interval);
-    }
-  }, [requestData.requestId, requestData.requestStatus, t]);
+  const [, setRequestData] = useRequestStatus(setNotification);
 
   const {
     control,
