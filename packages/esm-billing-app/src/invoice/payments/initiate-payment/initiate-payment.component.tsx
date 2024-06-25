@@ -35,7 +35,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [, setRequestData] = useRequestStatus(setNotification);
+  const pollingTrigger = useRequestStatus(setNotification);
 
   const {
     control,
@@ -63,7 +63,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     setIsLoading(true);
     const requestId = await initiateStkPush(payload, setNotification);
     setIsLoading(false);
-    setRequestData({ requestId, requestStatus: 'INITIATED' });
+    pollingTrigger({ requestId, requestStatus: 'INITIATED' });
   };
 
   return (

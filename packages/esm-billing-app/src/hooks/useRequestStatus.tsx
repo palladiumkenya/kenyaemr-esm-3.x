@@ -4,9 +4,14 @@ import { useTranslation } from 'react-i18next';
 
 type RequestData = { requestId: string; requestStatus: RequestStatus | null };
 
+/**
+ * useRequestStatus
+ * @param setNotification a function to call with the appropriate notification type
+ * @returns a function to trigger the polling.
+ */
 export const useRequestStatus = (
   setNotification: React.Dispatch<SetStateAction<{ type: 'error' | 'success'; message: string } | null>>,
-): [RequestData | null, React.Dispatch<React.SetStateAction<RequestData | null>>] => {
+): React.Dispatch<React.SetStateAction<RequestData | null>> => {
   const { t } = useTranslation();
 
   const [requestData, setRequestData] = useState<{ requestId: string; requestStatus: RequestStatus | null }>({
@@ -42,5 +47,5 @@ export const useRequestStatus = (
     }
   }, [requestData.requestId, requestData.requestStatus, setNotification, t]);
 
-  return [requestData, setRequestData];
+  return setRequestData;
 };

@@ -34,7 +34,6 @@ export const initiateStkPush = async (
   } catch (err) {
     console.error(err);
     setNotification({ message: 'Unable to initiate Lipa Na Mpesa, please try again later.', type: 'error' });
-    throw err;
   }
 };
 
