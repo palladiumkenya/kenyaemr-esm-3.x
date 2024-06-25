@@ -1,6 +1,8 @@
-import { formatDatetime, openmrsFetch, parseDate } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
+import { formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
+import { z } from 'zod';
+import { ConfigObject } from '../config-schema';
 
 export interface Relationship {
   display: string;
@@ -27,8 +29,10 @@ interface Contact {
   relationshipType: string;
   patientUuid: string;
   gender: string;
-  contact: string;
-  startDate: string;
+  contact: string | null;
+  startDate: string | null;
+  baselineHIVStatus: string | null;
+  personContactCreated: string | null;
 }
 
 interface Person {
@@ -72,6 +76,21 @@ interface HTSEncounter {
     value: string;
   }[];
 }
+export const ContactListFormSchema = z.object({
+  listingDate: z.date({ coerce: true }),
+  givenName: z.string().min(1, 'Required'),
+  middleName: z.string().min(1, 'Required'),
+  familyName: z.string().min(1, 'Required'),
+  gender: z.enum(['M', 'F']),
+  dateOfBirth: z.date({ coerce: true }),
+  maritalStatus: z.string(),
+  address: z.string(),
+  phoneNumber: z.string(),
+  relationshipToPatient: z.string().uuid(),
+  livingWithClient: z.string().optional(),
+  baselineStatus: z.string().optional(),
+  preferedPNSAproach: z.string(),
+});
 
 function extractName(display: string) {
   const pattern = /-\s*(.*)$/;
@@ -91,6 +110,13 @@ function extractTelephone(display: string) {
   return display.trim();
 }
 
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+function replaceAll(str: string, find: string, replace: string) {
+  return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
+}
 export const useContacts = (patientUuid: string) => {
   const customeRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
@@ -103,12 +129,16 @@ export const useContacts = (patientUuid: string) => {
     return data?.data?.results?.length ? extractContactData(patientUuid, data?.data?.results) : [];
   }, [data?.data?.results, patientUuid]);
 
+  const onFormSave = useCallback(() => {
+    mutate;
+  }, [url]);
+
   return {
     contacts: relationships,
     error,
     isLoading,
     isValidating,
-    mutate,
+    onFormSave,
   };
 };
 
@@ -138,8 +168,11 @@ export const useRelativeHivEnrollment = (relativeUuid: string) => {
 
 export const useRelativeHTSEncounter = (relativeUuid: string) => {
   const customeRepresentation = 'custom:(uuid,program:(name,uuid))';
-  const htsEncounter = '9c0a7a57-62ff-4f75-babe-5835b0e921b7';
-  const url = `/ws/rest/v1/encounter?v=${customeRepresentation}&patient=${relativeUuid}&encounterType=${htsEncounter}`;
+  const {
+    encounterTypes: { hivTestingServices },
+    formsList: { htsInitialTest },
+  } = useConfig<ConfigObject>();
+  const url = `/ws/rest/v1/encounter?v=${customeRepresentation}&patient=${relativeUuid}&encounterType=${hivTestingServices}`;
   const { data, error, isLoading } = useSWR<{ data: { results: HTSEncounter[] } }>(url, openmrsFetch);
   return {
     error,
@@ -151,9 +184,17 @@ export const useRelativeHTSEncounter = (relativeUuid: string) => {
 function extractContactData(patientIdentifier: string, relationships: Array<Relationship>): Array<Contact> {
   const relationshipsData: Contact[] = [];
   const telUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
+  const baseHIVStatusUuid = '3ca03c84-632d-4e53-95ad-91f1bd9d96d6';
+  const contactCreatedUuid = '7c94bd35-fba7-4ef7-96f5-29c89a318fcf';
   for (const r of relationships) {
     if (patientIdentifier === r.personA.uuid) {
       const tel: string | undefined = r.personB.attributes.find((attr) => attr.attributeType.uuid === telUuid)?.display;
+      const baselineHIVStatus: string | undefined = r.personB.attributes.find(
+        (attr) => attr.attributeType.uuid === baseHIVStatusUuid,
+      )?.display;
+      const contactCreated = r.personB.attributes.find(
+        (attr) => attr.attributeType.uuid === contactCreatedUuid,
+      )?.display;
       relationshipsData.push({
         uuid: r.uuid,
         name: extractName(r.personB.display),
@@ -165,13 +206,21 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
         relationshipType: r.relationshipType.bIsToA,
         patientUuid: r.personB.uuid,
         gender: r.personB.gender,
-        contact: tel ? extractTelephone(tel) : '--',
+        contact: tel ? extractTelephone(tel) : null,
+        baselineHIVStatus: baselineHIVStatus ?? null,
+        personContactCreated: contactCreated ?? null,
         startDate: !r.startDate
-          ? '--'
+          ? null
           : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
       });
     } else {
       const tel: string | undefined = r.personA.attributes.find((attr) => attr.attributeType.uuid === telUuid)?.display;
+      const baselineHIVStatus: string | undefined = r.personA.attributes.find(
+        (attr) => attr.attributeType.uuid === baseHIVStatusUuid,
+      )?.display;
+      const contactCreated = r.personA.attributes.find(
+        (attr) => attr.attributeType.uuid === contactCreatedUuid,
+      )?.display;
 
       relationshipsData.push({
         uuid: r.uuid,
@@ -184,9 +233,11 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
         relationshipType: r.relationshipType.aIsToB,
         patientUuid: r.personA.uuid,
         gender: r.personB.gender,
-        contact: tel ? extractTelephone(tel) : '--',
+        contact: tel ? extractTelephone(tel) : null,
+        baselineHIVStatus: baselineHIVStatus ?? null,
+        personContactCreated: contactCreated ?? null,
         startDate: !r.startDate
-          ? '--'
+          ? null
           : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
       });
     }
@@ -194,31 +245,17 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
   return relationshipsData;
 }
 
-export const hivStatus = [
-  { value: 'Positive', label: 'Positive' },
-  { value: 'Negative', label: 'Negative' },
-  { value: 'Unknown', label: 'Unknown' },
-];
-
 export const contactLivingWithPatient = [
-  { value: 'Yes', label: 'Yes' },
-  { value: 'No', label: 'No' },
-  { value: 'Declined', label: 'Declined to answer' },
+  { value: '1065', label: 'Yes' },
+  { value: '1066', label: 'No' },
+  { value: '162570', label: 'Declined to answer' },
 ];
 
 export const pnsAproach = [
-  { value: 'Passive', label: 'Passive referral' },
-  { value: 'Contract', label: 'Contract referral' },
-  { value: 'Provider', label: 'Provider referral' },
-  { value: 'Dual', label: 'Dual referral' },
-];
-
-export const maritalStatus = [
-  { value: 'Single', label: 'Single' },
-  { value: 'Married Polygamous', label: 'Married Polygamous' },
-  { value: 'Divorced', label: 'Divorced' },
-  { value: 'Married Monogamous', label: 'Married Monogamous' },
-  { value: 'Widowed', label: 'Wodowed' },
+  { value: '160551', label: 'Passive referral' },
+  { value: '161642', label: 'Contract referral' },
+  { value: '163096', label: 'Provider referral' },
+  { value: '162284', label: 'Dual referral' },
 ];
 
 export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
@@ -239,4 +276,95 @@ export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
     return 'Positive';
   }
   return 'Negative';
+};
+
+const fetcher = async <T = any,>(url: string, payload: T) => {
+  const response = await openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (response.ok) {
+    return await response.json();
+  }
+  throw new Error(`Fetch failed with status ${response.status}`);
+};
+
+export const saveContact = async (
+  {
+    givenName,
+    middleName,
+    familyName,
+    gender,
+    address,
+    baselineStatus,
+    dateOfBirth,
+    listingDate,
+    livingWithClient,
+    maritalStatus,
+    phoneNumber,
+    preferedPNSAproach,
+    relationshipToPatient,
+  }: z.infer<typeof ContactListFormSchema>,
+  patientUuid: string,
+) => {
+  // Create person
+  const baselineHIVStatus = '3ca03c84-632d-4e53-95ad-91f1bd9d96d6';
+  const telephoneAttributeUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
+  const addedAsContactUuid = '7c94bd35-fba7-4ef7-96f5-29c89a318fcf';
+  const maritalStatusUuid = '1056AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+  const personPayload = {
+    names: [{ givenName, middleName, familyName }],
+    gender,
+    birthdate: dateOfBirth,
+    addresses: [{ preferred: true, address1: address }],
+    attributes: [
+      {
+        attributeType: baselineHIVStatus,
+        value: replaceAll(baselineStatus, 'A', ''),
+      },
+      {
+        attributeType: telephoneAttributeUuid,
+        value: phoneNumber,
+      },
+      {
+        attributeType: addedAsContactUuid,
+        value: '1065',
+      },
+    ],
+  };
+
+  const person: Person = await fetcher(`/ws/rest/v1/person`, personPayload);
+  // Create relationship and obs in parallell
+  const relationshipPayload = {
+    personA: person.uuid,
+    relationshipType: relationshipToPatient,
+    personB: patientUuid,
+    startDate: listingDate.toISOString(),
+  };
+
+  const now = new Date().toISOString();
+  const obsPayload = {
+    person: person.uuid,
+    obsDatetime: now,
+    concept: maritalStatusUuid,
+    value: replaceAll(maritalStatus, 'A', ''),
+  };
+
+  const asyncTask = await Promise.allSettled([
+    fetcher(`/ws/rest/v1/relationship`, relationshipPayload),
+    fetcher(`/ws/rest/v1/obs`, obsPayload),
+  ]);
+
+  const status = asyncTask.map((val, index) => val.status);
+  if (status.every((stat) => stat === 'fulfilled')) {
+    // TODO Success action
+    alert('Success');
+  } else {
+    // TODO handleError
+    alert(`Error: ${status}`);
+  }
 };

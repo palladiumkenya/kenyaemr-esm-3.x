@@ -1,5 +1,5 @@
 import { Button, ButtonSkeleton, Row } from '@carbon/react';
-import { Edit, Microscope, TrashCan } from '@carbon/react/icons';
+import { Microscope, TrashCan } from '@carbon/react/icons';
 import React from 'react';
 import {
   getHivStatusBasedOnEnrollmentAndHTSEncounters,
@@ -9,9 +9,10 @@ import {
 
 interface ContactActionsProps {
   relativeUuid: string;
+  baseLineHIVStatus: string | null;
 }
 
-const ContactActions: React.FC<ContactActionsProps> = ({ relativeUuid }) => {
+const ContactActions: React.FC<ContactActionsProps> = ({ relativeUuid, baseLineHIVStatus }) => {
   const { enrollment, isLoading, error } = useRelativeHivEnrollment(relativeUuid);
   const { encounters, isLoading: encounterLoading } = useRelativeHTSEncounter(relativeUuid);
 
@@ -24,12 +25,13 @@ const ContactActions: React.FC<ContactActionsProps> = ({ relativeUuid }) => {
     );
   }
 
+  const hivStatus = getHivStatusBasedOnEnrollmentAndHTSEncounters(encounters, enrollment);
+
   return (
     <Row>
-      {['Unknown', 'Negative'].includes(getHivStatusBasedOnEnrollmentAndHTSEncounters(encounters, enrollment)) && (
-        <Button kind="tertiary" renderIcon={Microscope} iconDescription="Test" hasIconOnly />
-      )}
-      <Button kind="tertiary" renderIcon={Edit} iconDescription="Edit Record" hasIconOnly />
+      {[hivStatus, baseLineHIVStatus].every((status) =>
+        ['Unknown', 'Negative', 'NEGATIVE', 'UNKNOWN', null].includes(status),
+      ) && <Button kind="tertiary" renderIcon={Microscope} iconDescription="Test" hasIconOnly />}
       <Button kind="tertiary" renderIcon={TrashCan} iconDescription="Delete Record" hasIconOnly />
     </Row>
   );

@@ -1,0 +1,27 @@
+export const contactListConceptMap = {
+  '1436AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Partner HIV Status:',
+    answers: {
+      '703AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'HIV Positive',
+      '664AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'HIV Negative',
+      '1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Unknown',
+    },
+  },
+  '1056AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+    display: 'Civil status',
+    answers: {
+      '1057AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Single',
+      '1058AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Divorced',
+      '1059AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Widowed',
+      '159715AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Married Polygamous',
+      '5555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Married Monogamous',
+    },
+  },
+  'a6b3803f-e594-4318-8624-3eaed46322a7': {
+    display: 'Add Patient Contact',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+    },
+  },
+};

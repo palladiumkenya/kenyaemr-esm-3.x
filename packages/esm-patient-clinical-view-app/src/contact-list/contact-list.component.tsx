@@ -67,8 +67,16 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       key: 'contact',
     },
     {
+      header: t('contactCreated', 'Contact created'),
+      key: 'contactCreated',
+    },
+    {
       header: t('hivStatus', 'HIV Status'),
       key: 'hivStatus',
+    },
+    {
+      header: t('baselineHivStatus', 'Baseline HIV Status'),
+      key: 'baseLineivStatus',
     },
     {
       header: t('actions', 'Actions'),
@@ -88,7 +96,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
 
       return {
         id: `${relation.uuid}`,
-        startDate: relation.startDate,
+        startDate: relation.startDate ?? '--',
         name: (
           <Link
             onClick={() =>
@@ -97,13 +105,15 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
             {relation.name}
           </Link>
         ),
+        contactCreated: relation.personContactCreated ?? 'No',
         relation: relation?.relationshipType,
         age: relation?.relativeAge ?? '--',
         sex: relation.gender,
         alive: relation?.dead ? t('dead', 'Dead') : t('alive', 'Alive'),
-        contact: relation.contact,
+        contact: relation.contact ?? '--',
         hivStatus: <HIVStatus relativeUuid={relation.relativeUuid} />,
-        actions: <ContactActions relativeUuid={relation.relativeUuid} />,
+        baseLineivStatus: relation.baselineHIVStatus ?? '--',
+        actions: <ContactActions relativeUuid={relation.relativeUuid} baseLineHIVStatus={relation.baselineHIVStatus} />,
       };
     }) ?? [];
 

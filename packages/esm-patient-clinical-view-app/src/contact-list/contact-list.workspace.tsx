@@ -14,40 +14,24 @@ import {
 import { Calculator } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showModal } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
 import {
+  ContactListFormSchema,
   contactLivingWithPatient,
-  hivStatus,
-  maritalStatus,
   pnsAproach,
+  saveContact,
   useRelationshipTypes,
 } from './contact-list.resource';
 
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
+  props: any;
 }
-
-const ContactListFormSchema = z.object({
-  listingDate: z.date({ coerce: true }),
-  firstName: z.string().min(1, 'Required'),
-  middleName: z.string().min(1, 'Required'),
-  lastName: z.string().min(1, 'Required'),
-  gender: z.enum(['M', 'F']),
-  dateOfBirth: z.date({ coerce: true }),
-  maritalStatus: z.string(),
-  address: z.string(),
-  phoneNumber: z.string(),
-  relationshipToPatient: z.string().uuid(),
-  patient: z.string().uuid(),
-  livingWithClient: z.enum(['Y', 'N', 'U']).optional(),
-  baselineStatus: z.string().optional(),
-  booking: z.date({ coerce: true }).optional(),
-  preferedPNSAproach: z.string(),
-});
 
 type ContactListFormType = z.infer<typeof ContactListFormSchema>;
 
@@ -57,25 +41,45 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   promptBeforeClosing,
   handlePostResponse,
   patientUuid,
+  props,
 }) => {
   const form = useForm<ContactListFormType>({
     defaultValues: {
       address: '',
-      firstName: '',
+      givenName: '',
       middleName: '',
-      lastName: '',
+      familyName: '',
       maritalStatus: '',
       listingDate: new Date(),
       dateOfBirth: new Date(),
-      patient: '',
-      relationshipToPatient: 'a8058424-5ddf-4ce2-a5ee-6e08d01b5960',
+      relationshipToPatient: '',
     },
     resolver: zodResolver(ContactListFormSchema),
   });
   const { isLoading, error, relationshipTypes } = useRelationshipTypes();
-  const observableRel = form.watch('relationshipToPatient');
   const { t } = useTranslation();
-  const onSubmit = (values: ContactListFormType) => {};
+  const onSubmit = async (values: ContactListFormType) => {
+    await saveContact(values, patientUuid);
+  };
+
+  const maritalStatus = useMemo(
+    () =>
+      Object.entries(contactListConceptMap['1056AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].answers).map(([uuid, display]) => ({
+        label: display,
+        value: uuid,
+      })),
+    [],
+  );
+
+  const hivStatus = useMemo(
+    () =>
+      Object.entries(contactListConceptMap['1436AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].answers).map(([uuid, display]) => ({
+        label: display,
+        value: uuid,
+      })),
+    [],
+  );
+
   const handleCalculateBirthDate = () => {
     const dispose = showModal('birth-date-calculator', {
       onClose: () => dispose(),
@@ -86,7 +90,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
-      <pre>{`${JSON.stringify(form.formState.errors, null, 2)}`}</pre>
+      <pre>{`${JSON.stringify(form.formState.errors, null, 2)}-props-${props}`}</pre>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Controller
@@ -103,7 +107,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
         <Column>
           <Controller
             control={form.control}
-            name="firstName"
+            name="givenName"
             render={({ field }) => (
               <TextInput {...field} placeholder="First name" labelText={t('firstName', 'First name')} />
             )}
@@ -121,7 +125,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
         <Column>
           <Controller
             control={form.control}
-            name="lastName"
+            name="familyName"
             render={({ field }) => (
               <TextInput {...field} placeholder="Last name" labelText={t('lastName', 'Last name')} />
             )}
@@ -172,7 +176,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
               <Dropdown
                 id="maritalStatus"
                 titleText={t('maritalStatus', 'Marital status')}
-                {...field}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
                 initialSelectedItem={field.value}
                 label="Choose option"
                 items={maritalStatus.map((r) => r.value)}
@@ -210,7 +216,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
               <Dropdown
                 id="relationshipToPatient"
                 titleText={t('relationToPatient', 'Relation to patient')}
-                {...field}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
                 initialSelectedItem={field.value}
                 label="Select Realtionship"
                 items={relationshipTypes.map((r) => r.uuid)}
@@ -227,7 +235,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
               <Dropdown
                 id="livingWithClient"
                 titleText={t('livingWithClient', 'Living with client')}
-                {...field}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
                 initialSelectedItem={field.value}
                 label="Select"
                 items={contactLivingWithPatient.map((r) => r.value)}
@@ -246,28 +256,14 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
               <Dropdown
                 id="baselineStatus"
                 titleText={t('baselineStatus', 'HIV Status')}
-                {...field}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
                 initialSelectedItem={field.value}
                 label="Select HIV Status"
                 items={hivStatus.map((r) => r.value)}
                 itemToString={(item) => hivStatus.find((r) => r.value === item)?.label ?? ''}
               />
-            )}
-          />
-        </Column>
-        <Column className={styles.facilityColumn}>
-          <Controller
-            control={form.control}
-            name="booking"
-            render={({ field }) => (
-              <DatePicker datePickerType="single" {...field}>
-                <DatePickerInput
-                  placeholder="mm/dd/yyyy"
-                  labelText={t('bookingDate', 'Booking date')}
-                  size="xl"
-                  className={styles.datePickerInput}
-                />
-              </DatePicker>
             )}
           />
         </Column>
@@ -279,7 +275,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
               <Dropdown
                 id="preferedPNSAproach"
                 titleText={t('preferedPNSAproach', 'Prefered PNS Aproach')}
-                {...field}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
                 initialSelectedItem={field.value}
                 label="Select Aproach"
                 items={pnsAproach.map((r) => r.value)}
