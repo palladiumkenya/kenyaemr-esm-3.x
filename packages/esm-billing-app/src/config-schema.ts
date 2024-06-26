@@ -17,9 +17,15 @@ export interface BillingConfig {
   passKey: string;
   authorizationUrl: string;
   initiateUrl: string;
+  mpesaAPIBaseUrl: string;
 }
 
 export const configSchema = {
+  mpesaAPIBaseUrl: {
+    _type: Type.String,
+    _description: 'The base url that will be used to make any backend calls related to mpesa.',
+    _default: 'https://billing.kenyahmis.org',
+  },
   visitAttributeTypes: {
     isPatientExempted: {
       _type: Type.String,

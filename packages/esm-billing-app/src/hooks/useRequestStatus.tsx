@@ -1,6 +1,8 @@
 import { useState, useEffect, SetStateAction } from 'react';
 import { RequestStatus, getRequestStatus, readableStatusMap, getErrorMessage } from '../m-pesa/mpesa-resource';
 import { useTranslation } from 'react-i18next';
+import { useConfig } from '@openmrs/esm-framework';
+import { BillingConfig } from '../config-schema';
 
 type RequestData = { requestId: string; requestStatus: RequestStatus | null };
 
@@ -13,6 +15,7 @@ export const useRequestStatus = (
   setNotification: React.Dispatch<SetStateAction<{ type: 'error' | 'success'; message: string } | null>>,
 ): React.Dispatch<React.SetStateAction<RequestData | null>> => {
   const { t } = useTranslation();
+  const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
 
   const [requestData, setRequestData] = useState<{ requestId: string; requestStatus: RequestStatus | null }>({
     requestId: null,
@@ -25,7 +28,7 @@ export const useRequestStatus = (
     if (requestData.requestId && !['COMPLETE', 'FAILED', 'NOT-FOUND'].includes(requestData.requestStatus)) {
       const fetchStatus = async () => {
         try {
-          const status = await getRequestStatus(requestData.requestId);
+          const status = await getRequestStatus(requestData.requestId, mpesaAPIBaseUrl);
           if (status === 'COMPLETE' || status === 'FAILED' || status === 'NOT-FOUND') {
             clearInterval(interval);
           }
@@ -45,7 +48,7 @@ export const useRequestStatus = (
 
       return () => clearInterval(interval);
     }
-  }, [requestData.requestId, requestData.requestStatus, setNotification, t]);
+  }, [mpesaAPIBaseUrl, requestData.requestId, requestData.requestStatus, setNotification, t]);
 
   return setRequestData;
 };

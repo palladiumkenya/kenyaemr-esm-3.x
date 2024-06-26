@@ -6,11 +6,10 @@ readableStatusMap.set('FAILED', 'Failed');
 readableStatusMap.set('INITIATED', 'Waiting for user...');
 readableStatusMap.set('NOT-FOUND', 'Request not found');
 
-export const MPESA_PAYMENT_API_BASE_URL = 'https://billing.kenyahmis.org';
-
 export const initiateStkPush = async (
   payload,
   setNotification: (notification: { type: 'error' | 'success'; message: string }) => void,
+  MPESA_PAYMENT_API_BASE_URL: string,
 ): Promise<string> => {
   try {
     const url = `${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/stk-push`;
@@ -27,17 +26,28 @@ export const initiateStkPush = async (
       }),
     });
 
+    if (!res.ok && res.status === 403) {
+      const error = new Error('Health facility M-PESA data not configured.');
+      throw error;
+    }
+
     const response: { requestId: string } = await res.json();
 
     setNotification({ message: 'STK Push sent successfully', type: 'success' });
     return response.requestId;
   } catch (err) {
-    console.error(err);
-    setNotification({ message: 'Unable to initiate Lipa Na Mpesa, please try again later.', type: 'error' });
+    const error = err as Error;
+    setNotification({
+      message: error.message ?? 'Unable to initiate Lipa Na Mpesa, please try again later.',
+      type: 'error',
+    });
   }
 };
 
-export const getRequestStatus = async (requestId: string): Promise<RequestStatus> => {
+export const getRequestStatus = async (
+  requestId: string,
+  MPESA_PAYMENT_API_BASE_URL: string,
+): Promise<RequestStatus> => {
   const requestResponse = await fetch(`${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/check-payment-state`, {
     method: 'POST',
     headers: {
@@ -50,7 +60,10 @@ export const getRequestStatus = async (requestId: string): Promise<RequestStatus
 
   if (!requestResponse.ok) {
     const error = new Error(`HTTP error! status: ${requestResponse.status}`);
-    error.message = requestResponse.statusText;
+
+    if (requestResponse.statusText) {
+      error.message = requestResponse.statusText;
+    }
     throw error;
   }
 

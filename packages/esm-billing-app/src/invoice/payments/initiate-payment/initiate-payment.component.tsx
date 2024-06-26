@@ -16,6 +16,8 @@ import {
   readableStatusMap,
 } from '../../../m-pesa/mpesa-resource';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
+import { useConfig } from '@openmrs/esm-framework';
+import { BillingConfig } from '../../../config-schema';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -32,6 +34,7 @@ export interface InitiatePaymentDialogProps {
 
 const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
   const { t } = useTranslation();
+  const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +64,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     };
 
     setIsLoading(true);
-    const requestId = await initiateStkPush(payload, setNotification);
+    const requestId = await initiateStkPush(payload, setNotification, mpesaAPIBaseUrl);
     setIsLoading(false);
     pollingTrigger({ requestId, requestStatus: 'INITIATED' });
   };
