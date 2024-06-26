@@ -179,7 +179,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         navigate({
           to: window.getOpenmrsSpaBase() + `home/billing/`,
         });
-      }, 5000);
+      }, 2000);
     } catch (err) {
       console.error(err);
       const timeoutId = setTimeout(clearNotification, 3000);
