@@ -127,13 +127,14 @@ export const useContacts = (patientUuid: string) => {
   const customeRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
   const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
-  const { data, error, isLoading, mutate, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
+  const config = useConfig<ConfigObject>();
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
     url,
     openmrsFetch,
   );
   const relationships = useMemo(() => {
-    return data?.data?.results?.length ? extractContactData(patientUuid, data?.data?.results) : [];
-  }, [data?.data?.results, patientUuid]);
+    return data?.data?.results?.length ? extractContactData(patientUuid, data?.data?.results, config) : [];
+  }, [data?.data?.results, patientUuid, config]);
   return {
     contacts: relationships,
     error,
@@ -157,12 +158,12 @@ export const useRelationshipTypes = () => {
 export const useRelativeHivEnrollment = (relativeUuid: string) => {
   const customeRepresentation = 'custom:(uuid,program:(name,uuid))';
   const url = `/ws/rest/v1/programenrollment?v=${customeRepresentation}&patient=${relativeUuid}`;
-  const hivProgram = 'dfdc6d40-2f2f-463d-ba90-cc97350441a8';
+  const config = useConfig<ConfigObject>();
   const { data, error, isLoading } = useSWR<{ data: { results: Enrollment[] } }>(url, openmrsFetch);
   return {
     error,
     isLoading,
-    enrollment: (data?.data?.results ?? []).find((en) => en.program.uuid === hivProgram) ?? null,
+    enrollment: (data?.data?.results ?? []).find((en) => en.program.uuid === config.hivProgramUuid) ?? null,
   };
 };
 
@@ -170,7 +171,6 @@ export const useRelativeHTSEncounter = (relativeUuid: string) => {
   const customeRepresentation = 'custom:(uuid,program:(name,uuid))';
   const {
     encounterTypes: { hivTestingServices },
-    formsList: { htsInitialTest },
   } = useConfig<ConfigObject>();
   const url = `/ws/rest/v1/encounter?v=${customeRepresentation}&patient=${relativeUuid}&encounterType=${hivTestingServices}`;
   const { data, error, isLoading } = useSWR<{ data: { results: HTSEncounter[] } }>(url, openmrsFetch);
@@ -181,30 +181,43 @@ export const useRelativeHTSEncounter = (relativeUuid: string) => {
   };
 };
 
-function extractContactData(patientIdentifier: string, relationships: Array<Relationship>): Array<Contact> {
+function extractAttributeData(person: Person, config: ConfigObject) {
+  return person.attributes.reduce<{
+    contact: string | null;
+    baselineHIVStatus: string | null;
+    personContactCreated: string | null;
+    pnsAproach: string | null;
+    livingWithClient: string | null;
+  }>(
+    (prev, attr) => {
+      if (attr.attributeType.uuid === config.contactPersonAttributesUuid.telephone) {
+        return { ...prev, contact: attr.display ? extractTelephone(attr.display) : null };
+      } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus) {
+        return { ...prev, baselineHIVStatus: attr.display ?? null };
+      } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.contactCreated) {
+        return { ...prev, personContactCreated: attr.display ?? null };
+      } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.livingWithContact) {
+        return { ...prev, livingWithClient: attr.display ?? null };
+      } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach) {
+        return { ...prev, pnsAproach: attr.display ?? null };
+      }
+      return prev;
+    },
+    { contact: null, baselineHIVStatus: null, personContactCreated: null, pnsAproach: null, livingWithClient: null },
+  );
+}
+
+function extractContactData(
+  patientIdentifier: string,
+  relationships: Array<Relationship>,
+  config: ConfigObject,
+): Array<Contact> {
   const relationshipsData: Contact[] = [];
-  const telUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
-  const baseHIVStatusUuid = '3ca03c84-632d-4e53-95ad-91f1bd9d96d6';
-  const contactCreatedUuid = '7c94bd35-fba7-4ef7-96f5-29c89a318fcf';
-  const pnsAproachAttributeUuid = '59d1b886-90c8-4f7f-9212-08b20a9ee8cf';
-  const livingWithContactAttributeUuid = '35a08d84-9f80-4991-92b4-c4ae5903536e';
 
   for (const r of relationships) {
     if (patientIdentifier === r.personA.uuid) {
-      const tel: string | undefined = r.personB.attributes.find((attr) => attr.attributeType.uuid === telUuid)?.display;
-      const baselineHIVStatus: string | undefined = r.personB.attributes.find(
-        (attr) => attr.attributeType.uuid === baseHIVStatusUuid,
-      )?.display;
-      const contactCreated = r.personB.attributes.find(
-        (attr) => attr.attributeType.uuid === contactCreatedUuid,
-      )?.display;
-      const preferedPns = r.personB.attributes.find(
-        (attr) => attr.attributeType.uuid === pnsAproachAttributeUuid,
-      )?.display;
-      const livingWithClient = r.personB.attributes.find(
-        (attr) => attr.attributeType.uuid === livingWithContactAttributeUuid,
-      )?.display;
       relationshipsData.push({
+        ...extractAttributeData(r.personB, config),
         uuid: r.uuid,
         name: extractName(r.personB.display),
         display: r.personB.display,
@@ -215,31 +228,13 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
         relationshipType: r.relationshipType.bIsToA,
         patientUuid: r.personB.uuid,
         gender: r.personB.gender,
-        contact: tel ? extractTelephone(tel) : null,
-        baselineHIVStatus: baselineHIVStatus ?? null,
-        personContactCreated: contactCreated ?? null,
-        livingWithClient: livingWithClient ?? null,
-        pnsAproach: preferedPns ?? null,
         startDate: !r.startDate
           ? null
           : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
       });
     } else {
-      const tel: string | undefined = r.personA.attributes.find((attr) => attr.attributeType.uuid === telUuid)?.display;
-      const baselineHIVStatus: string | undefined = r.personA.attributes.find(
-        (attr) => attr.attributeType.uuid === baseHIVStatusUuid,
-      )?.display;
-      const contactCreated = r.personA.attributes.find(
-        (attr) => attr.attributeType.uuid === contactCreatedUuid,
-      )?.display;
-      const preferedPns = r.personA.attributes.find(
-        (attr) => attr.attributeType.uuid === pnsAproachAttributeUuid,
-      )?.display;
-      const livingWithClient = r.personA.attributes.find(
-        (attr) => attr.attributeType.uuid === livingWithContactAttributeUuid,
-      )?.display;
-
       relationshipsData.push({
+        ...extractAttributeData(r.personA, config),
         uuid: r.uuid,
         name: extractName(r.personA.display),
         display: r.personA.display,
@@ -250,11 +245,6 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
         relationshipType: r.relationshipType.aIsToB,
         patientUuid: r.personA.uuid,
         gender: r.personB.gender,
-        contact: tel ? extractTelephone(tel) : null,
-        baselineHIVStatus: baselineHIVStatus ?? null,
-        personContactCreated: contactCreated ?? null,
-        livingWithClient: livingWithClient ?? null,
-        pnsAproach: preferedPns ?? null,
         startDate: !r.startDate
           ? null
           : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
@@ -317,6 +307,7 @@ export const saveContact = async (
   }: z.infer<typeof ContactListFormSchema>,
   patientUuid: string,
   encounter: Record<string, any>,
+  config: ConfigObject,
 ) => {
   const results: {
     step: 'person' | 'relationship' | 'obs' | 'patient';
@@ -324,15 +315,6 @@ export const saveContact = async (
     message: string;
   }[] = [];
   // Create person
-  const baselineHIVStatus = '3ca03c84-632d-4e53-95ad-91f1bd9d96d6';
-  const telephoneAttributeUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
-  const addedAsContactUuid = '7c94bd35-fba7-4ef7-96f5-29c89a318fcf';
-  const maritalStatusUuid = '1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-  const openmrsIdTypeUuid = 'dfacd928-0370-4315-99d7-6ec1c9f7ae76';
-  const registrationEncounterTypeUuid = 'de1f9d67-b73e-4e1b-90d0-036166fc6995';
-  const pnsAproachAttributeUuid = '59d1b886-90c8-4f7f-9212-08b20a9ee8cf';
-  const livingWithContactAttributeUuid = '35a08d84-9f80-4991-92b4-c4ae5903536e';
-
   const personPayload = {
     names: [{ givenName, middleName, familyName }],
     gender,
@@ -341,37 +323,37 @@ export const saveContact = async (
     dead: false,
     attributes: [
       {
-        attributeType: baselineHIVStatus,
+        attributeType: config.contactPersonAttributesUuid.baselineHIVStatus,
         value: replaceAll(baselineStatus, 'A', ''),
       },
       {
-        attributeType: telephoneAttributeUuid,
+        attributeType: config.contactPersonAttributesUuid.telephone,
         value: phoneNumber,
       },
       {
-        attributeType: addedAsContactUuid,
+        attributeType: config.contactPersonAttributesUuid.contactCreated,
         value: '1065',
       },
       {
-        attributeType: pnsAproachAttributeUuid,
+        attributeType: config.contactPersonAttributesUuid.preferedPnsAproach,
         value: replaceAll(preferedPNSAproach, 'A', ''),
       },
       {
-        attributeType: livingWithContactAttributeUuid,
+        attributeType: config.contactPersonAttributesUuid.livingWithContact,
         value: replaceAll(livingWithClient, 'A', ''),
       },
     ],
   };
   try {
     // Generate Openmrs Id for the patient
-    const identifier = await generateOpenmrsIdentifier();
+    const identifier = await generateOpenmrsIdentifier(config.openmrsIdentifierSourceUuid);
     // Create patient
     const patient: Patient = await fetcher(`/ws/rest/v1/patient`, {
       person: personPayload,
       identifiers: [
         {
           identifier: identifier.data.identifier,
-          identifierType: openmrsIdTypeUuid,
+          identifierType: config.openmrsIDUuid,
           location: encounter.location,
         },
       ],
@@ -395,9 +377,9 @@ export const saveContact = async (
     // Create encounter with marital status obs
     const demographicsPayload = {
       ...encounter,
-      encounterType: registrationEncounterTypeUuid,
+      encounterType: config.registrationEncounterUuid,
       patient: patient.uuid,
-      obs: [{ concept: maritalStatusUuid, value: maritalStatus }],
+      obs: [{ concept: config.maritalStatusUuid, value: maritalStatus }],
     };
 
     const asyncTask = await Promise.allSettled([
@@ -428,11 +410,9 @@ export const saveContact = async (
   return results;
 };
 
-export function generateOpenmrsIdentifier() {
-  const openmrsIdentifierSourceUuid = 'fb034aac-2353-4940-abe2-7bc94e7c1e71';
+export function generateOpenmrsIdentifier(source: string) {
   const abortController = new AbortController();
-
-  return openmrsFetch(`${restBaseUrl}/idgen/identifiersource/${openmrsIdentifierSourceUuid}/identifier`, {
+  return openmrsFetch(`${restBaseUrl}/idgen/identifiersource/${source}/identifier`, {
     headers: {
       'Content-Type': 'application/json',
     },

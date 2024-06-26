@@ -19,6 +19,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
+import { ConfigObject } from '../config-schema';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
 import { ContactListFormSchema, saveContact, useRelationshipTypes } from './contact-list.resource';
@@ -56,6 +57,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   const session = useSession();
 
   const patientRegistrationConfig = useConfig({ externalModuleName: '@kenyaemr/esm-patient-registration-app' });
+  const config = useConfig<ConfigObject>();
 
   const onSubmit = async (values: ContactListFormType) => {
     const encounter = {
@@ -68,7 +70,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       ],
       form: patientRegistrationConfig.registrationObs.registrationFormUuid,
     };
-    const results = await saveContact(values, patientUuid, encounter);
+    const results = await saveContact(values, patientUuid, encounter, config);
     closeWorkspace();
     mutate((key) => {
       return typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship');
