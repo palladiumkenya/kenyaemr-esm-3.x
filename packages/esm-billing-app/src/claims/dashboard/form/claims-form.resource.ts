@@ -32,7 +32,7 @@ export function useVisit(patientUuid: string) {
 export const useProviders = () => {
   const customRepresentation = 'custom:(uuid,display)';
   const url = `/ws/rest/v1/provider?v=${customRepresentation}`;
-  const { data, error } = useSWRImmutable<FetchResponse<ProvidersResponse>>(url, openmrsFetch);
+  const { data, error } = useSWRImmutable<{ data: ProvidersResponse }>(url, openmrsFetch);
 
   return { data, error };
 };
