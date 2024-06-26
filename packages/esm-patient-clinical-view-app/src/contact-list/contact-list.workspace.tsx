@@ -13,7 +13,7 @@ import {
 } from '@carbon/react';
 import { Calculator } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, showModal, showNotification, useSession } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, showModal, showNotification, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -59,12 +59,22 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   });
   const { isLoading, error, relationshipTypes } = useRelationshipTypes();
   const { t } = useTranslation();
-  const {
-    sessionLocation: { uuid: currLocationUUid },
-  } = useSession();
+  const session = useSession();
+
+  const patientRegistrationConfig = useConfig({ externalModuleName: '@kenyaemr/esm-patient-registration-app' });
 
   const onSubmit = async (values: ContactListFormType) => {
-    const results = await saveContact(values, patientUuid, currLocationUUid);
+    const encounter = {
+      location: session.sessionLocation.uuid,
+      encounterProviders: [
+        {
+          provider: session.currentProvider.uuid,
+          encounterRole: patientRegistrationConfig.registrationObs.encounterProviderRoleUuid,
+        },
+      ],
+      form: patientRegistrationConfig.registrationObs.registrationFormUuid,
+    };
+    const results = await saveContact(values, patientUuid, encounter);
     closeWorkspace();
     mutate((key) => {
       return typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship');

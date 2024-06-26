@@ -1,5 +1,5 @@
 import { formatDatetime, openmrsFetch, parseDate, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
@@ -308,7 +308,7 @@ export const saveContact = async (
     relationshipToPatient,
   }: z.infer<typeof ContactListFormSchema>,
   patientUuid: string,
-  locationUuid: string,
+  encounter: Record<string, any>,
 ) => {
   const results: {
     step: 'person' | 'relationship' | 'obs' | 'patient';
@@ -319,8 +319,9 @@ export const saveContact = async (
   const baselineHIVStatus = '3ca03c84-632d-4e53-95ad-91f1bd9d96d6';
   const telephoneAttributeUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
   const addedAsContactUuid = '7c94bd35-fba7-4ef7-96f5-29c89a318fcf';
-  const maritalStatusUuid = '1056AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+  const maritalStatusUuid = '1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
   const openmrsIdTypeUuid = 'dfacd928-0370-4315-99d7-6ec1c9f7ae76';
+  const registrationEncounterTypeUuid = 'de1f9d67-b73e-4e1b-90d0-036166fc6995';
   const personPayload = {
     names: [{ givenName, middleName, familyName }],
     gender,
@@ -352,7 +353,7 @@ export const saveContact = async (
         {
           identifier: identifier.data.identifier,
           identifierType: openmrsIdTypeUuid,
-          location: locationUuid,
+          location: encounter.location,
         },
       ],
     });
@@ -372,16 +373,17 @@ export const saveContact = async (
     };
 
     const now = new Date().toISOString();
-    const obsPayload = {
-      person: patient.person.uuid,
-      obsDatetime: now,
-      concept: maritalStatusUuid,
-      value: replaceAll(maritalStatus, 'A', ''),
+    // Create encounter with marital status obs
+    const demographicsPayload = {
+      ...encounter,
+      encounterType: registrationEncounterTypeUuid,
+      patient: patient.uuid,
+      obs: [{ concept: maritalStatusUuid, value: maritalStatus }],
     };
 
     const asyncTask = await Promise.allSettled([
       fetcher(`/ws/rest/v1/relationship`, relationshipPayload),
-      fetcher(`/ws/rest/v1/obs`, obsPayload),
+      fetcher(`/ws/rest/v1/encounter`, demographicsPayload),
     ]);
 
     asyncTask.forEach(({ status }, index) => {
@@ -395,10 +397,6 @@ export const saveContact = async (
           status === 'fulfilled' ? 'Contact demographics saved succesfully!' : 'Error saving contact demographics';
         step = 'obs';
       }
-      // else {
-      //   message = status === 'fulfilled' ? 'Patient created successfully' : 'Error creating Patient';
-      //   step = 'patient';
-      // }
       results.push({
         status,
         message,
