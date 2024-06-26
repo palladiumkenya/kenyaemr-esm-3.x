@@ -1,6 +1,6 @@
 import React from 'react';
-import { convertToCurrency } from '../../helpers';
-import { useBillableItem } from './useBilliableItem';
+import { convertToCurrency } from '../../../helpers';
+import { useBillableItem } from '../useBillableItem';
 
 type LabOrderProps = {
   order: {

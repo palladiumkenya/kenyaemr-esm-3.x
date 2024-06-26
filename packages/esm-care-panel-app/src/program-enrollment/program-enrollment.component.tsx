@@ -16,7 +16,7 @@ import {
 import styles from './program-enrollment.scss';
 import isEmpty from 'lodash/isEmpty';
 import dayjs from 'dayjs';
-import { formatDate, launchWorkspace } from '@openmrs/esm-framework';
+import { formatDate } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
