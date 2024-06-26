@@ -24,4 +24,21 @@ export const contactListConceptMap = {
       '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
     },
   },
+  '7b827b42-9733-4d4f-8015-b40a07ac3052': {
+    display: 'Prefered PNS Aproach',
+    answers: {
+      '160551AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Passive referral',
+      '161642AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Contract referral',
+      '163096AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Provider referral',
+      '162284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Dual referral',
+    },
+  },
+  '36906d55-ade7-4d1a-b3b7-18fd59bffb0f': {
+    display: 'Living with client',
+    answers: {
+      '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Yes',
+      '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'No',
+      '162570AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'Declined to answer',
+    },
+  },
 };

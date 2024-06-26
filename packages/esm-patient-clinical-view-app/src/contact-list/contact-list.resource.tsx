@@ -33,6 +33,8 @@ interface Contact {
   startDate: string | null;
   baselineHIVStatus: string | null;
   personContactCreated: string | null;
+  livingWithClient: string | null;
+  pnsAproach: string | null;
 }
 
 interface Person {
@@ -184,6 +186,9 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
   const telUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
   const baseHIVStatusUuid = '3ca03c84-632d-4e53-95ad-91f1bd9d96d6';
   const contactCreatedUuid = '7c94bd35-fba7-4ef7-96f5-29c89a318fcf';
+  const pnsAproachAttributeUuid = '59d1b886-90c8-4f7f-9212-08b20a9ee8cf';
+  const livingWithContactAttributeUuid = '35a08d84-9f80-4991-92b4-c4ae5903536e';
+
   for (const r of relationships) {
     if (patientIdentifier === r.personA.uuid) {
       const tel: string | undefined = r.personB.attributes.find((attr) => attr.attributeType.uuid === telUuid)?.display;
@@ -192,6 +197,12 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
       )?.display;
       const contactCreated = r.personB.attributes.find(
         (attr) => attr.attributeType.uuid === contactCreatedUuid,
+      )?.display;
+      const preferedPns = r.personB.attributes.find(
+        (attr) => attr.attributeType.uuid === pnsAproachAttributeUuid,
+      )?.display;
+      const livingWithClient = r.personB.attributes.find(
+        (attr) => attr.attributeType.uuid === livingWithContactAttributeUuid,
       )?.display;
       relationshipsData.push({
         uuid: r.uuid,
@@ -207,6 +218,8 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
         contact: tel ? extractTelephone(tel) : null,
         baselineHIVStatus: baselineHIVStatus ?? null,
         personContactCreated: contactCreated ?? null,
+        livingWithClient: livingWithClient ?? null,
+        pnsAproach: preferedPns ?? null,
         startDate: !r.startDate
           ? null
           : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
@@ -218,6 +231,12 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
       )?.display;
       const contactCreated = r.personA.attributes.find(
         (attr) => attr.attributeType.uuid === contactCreatedUuid,
+      )?.display;
+      const preferedPns = r.personA.attributes.find(
+        (attr) => attr.attributeType.uuid === pnsAproachAttributeUuid,
+      )?.display;
+      const livingWithClient = r.personA.attributes.find(
+        (attr) => attr.attributeType.uuid === livingWithContactAttributeUuid,
       )?.display;
 
       relationshipsData.push({
@@ -234,6 +253,8 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
         contact: tel ? extractTelephone(tel) : null,
         baselineHIVStatus: baselineHIVStatus ?? null,
         personContactCreated: contactCreated ?? null,
+        livingWithClient: livingWithClient ?? null,
+        pnsAproach: preferedPns ?? null,
         startDate: !r.startDate
           ? null
           : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
@@ -242,19 +263,6 @@ function extractContactData(patientIdentifier: string, relationships: Array<Rela
   }
   return relationshipsData;
 }
-
-export const contactLivingWithPatient = [
-  { value: '1065', label: 'Yes' },
-  { value: '1066', label: 'No' },
-  { value: '162570', label: 'Declined to answer' },
-];
-
-export const pnsAproach = [
-  { value: '160551', label: 'Passive referral' },
-  { value: '161642', label: 'Contract referral' },
-  { value: '163096', label: 'Provider referral' },
-  { value: '162284', label: 'Dual referral' },
-];
 
 export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
   encounters: HTSEncounter[],
@@ -322,6 +330,9 @@ export const saveContact = async (
   const maritalStatusUuid = '1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
   const openmrsIdTypeUuid = 'dfacd928-0370-4315-99d7-6ec1c9f7ae76';
   const registrationEncounterTypeUuid = 'de1f9d67-b73e-4e1b-90d0-036166fc6995';
+  const pnsAproachAttributeUuid = '59d1b886-90c8-4f7f-9212-08b20a9ee8cf';
+  const livingWithContactAttributeUuid = '35a08d84-9f80-4991-92b4-c4ae5903536e';
+
   const personPayload = {
     names: [{ givenName, middleName, familyName }],
     gender,
@@ -340,6 +351,14 @@ export const saveContact = async (
       {
         attributeType: addedAsContactUuid,
         value: '1065',
+      },
+      {
+        attributeType: pnsAproachAttributeUuid,
+        value: replaceAll(preferedPNSAproach, 'A', ''),
+      },
+      {
+        attributeType: livingWithContactAttributeUuid,
+        value: replaceAll(livingWithClient, 'A', ''),
       },
     ],
   };

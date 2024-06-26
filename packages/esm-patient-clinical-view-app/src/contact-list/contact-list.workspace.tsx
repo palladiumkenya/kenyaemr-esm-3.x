@@ -21,13 +21,7 @@ import { mutate } from 'swr';
 import { z } from 'zod';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
-import {
-  ContactListFormSchema,
-  contactLivingWithPatient,
-  pnsAproach,
-  saveContact,
-  useRelationshipTypes,
-} from './contact-list.resource';
+import { ContactListFormSchema, saveContact, useRelationshipTypes } from './contact-list.resource';
 
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
@@ -100,6 +94,24 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   const hivStatus = useMemo(
     () =>
       Object.entries(contactListConceptMap['1436AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].answers).map(([uuid, display]) => ({
+        label: display,
+        value: uuid,
+      })),
+    [],
+  );
+
+  const pnsAproach = useMemo(
+    () =>
+      Object.entries(contactListConceptMap['7b827b42-9733-4d4f-8015-b40a07ac3052'].answers).map(([uuid, display]) => ({
+        label: display,
+        value: uuid,
+      })),
+    [],
+  );
+
+  const contactLivingWithPatient = useMemo(
+    () =>
+      Object.entries(contactListConceptMap['36906d55-ade7-4d1a-b3b7-18fd59bffb0f'].answers).map(([uuid, display]) => ({
         label: display,
         value: uuid,
       })),

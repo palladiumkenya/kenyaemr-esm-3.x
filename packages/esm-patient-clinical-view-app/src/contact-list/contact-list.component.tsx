@@ -79,6 +79,14 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       key: 'baseLineivStatus',
     },
     {
+      header: t('livingWithClient', 'Living with client'),
+      key: 'livingWithClient',
+    },
+    {
+      header: t('pnsAproach', 'PNS Aproach'),
+      key: 'pnsAproach',
+    },
+    {
       header: t('actions', 'Actions'),
       key: 'actions',
     },
@@ -113,6 +121,8 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         contact: relation.contact ?? '--',
         hivStatus: <HIVStatus relativeUuid={relation.relativeUuid} />,
         baseLineivStatus: relation.baselineHIVStatus ?? '--',
+        livingWithClient: relation.livingWithClient ?? '--',
+        pnsAproach: relation.pnsAproach ?? '--',
         actions: <ContactActions relativeUuid={relation.relativeUuid} baseLineHIVStatus={relation.baselineHIVStatus} />,
       };
     }) ?? [];
