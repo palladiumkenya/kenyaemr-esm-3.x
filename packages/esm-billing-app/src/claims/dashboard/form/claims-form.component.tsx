@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -12,16 +12,19 @@ import {
   Button,
   FilterableMultiSelect,
   MultiSelect,
+  InlineLoading,
+  InlineNotification,
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill, LineItem } from '../../../types';
-import { formatDate, navigate, showSnackbar } from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
-import { processClaims, useVisit } from './claims-form.resource';
+import { processClaims, useProviders, useVisit } from './claims-form.resource';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { extractNameString, formatDate } from '../../../helpers/functions';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -61,44 +64,46 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit } = useVisit(patientUuid);
   const visitUuid = recentVisit?.visitType.uuid;
-  // console.log(bill);
-  // console.log(recentVisit);
+
+  const { data } = useProviders();
+  const [providers, setProviders] = useState([]);
+  const [notification, setNotification] = useState({ kind: '', title: '', subtitle: '', timeoutId: null });
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (data && data.data.results) {
+      setProviders(data.data.results.map((provider) => ({ id: provider.uuid, text: provider.display })));
+    }
+  }, [data]);
 
   const handleNavigateToBillingOptions = () =>
     navigate({
       to: window.getOpenmrsSpaBase() + `home/billing/patient/${patientUuid}/${billUuid}`,
     });
 
-  const encounterProviders =
-    recentVisit?.encounters.flatMap((encounter) =>
-      encounter.encounterProviders.map((provider) => ({
-        id: provider.uuid,
-        text: provider.display,
-      })),
-    ) || [];
-
-  const diagnoses = useMemo(
-    () =>
-      recentVisit?.encounters.flatMap(
+  const diagnoses = useMemo(() => {
+    return (
+      recentVisit?.encounters?.flatMap(
         (encounter) =>
           encounter.diagnoses.map((diagnosis) => ({
             id: diagnosis.diagnosis.coded.uuid,
             text: diagnosis.display,
             certainty: diagnosis.certainty,
           })) || [],
-      ) || [],
-    [recentVisit],
-  );
+      ) || []
+    );
+  }, [recentVisit]);
 
-  const confirmedDiagnoses = useMemo(
-    () => diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED'),
-    [diagnoses],
-  );
+  const confirmedDiagnoses = useMemo(() => {
+    return diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED');
+  }, [diagnoses]);
+
   const {
     control,
     handleSubmit,
     formState: { errors, isValid },
     setValue,
+    reset,
   } = useForm({
     mode: 'all',
     resolver: zodResolver(ClaimsFormSchema),
@@ -109,35 +114,40 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       claimJustification: '',
       providerName: [],
       diagnoses: [],
-      visitType: recentVisit?.visitType.display || '',
-      facility: `${recentVisit?.location.display || ''} - ${mflCodeValue || ''}`,
-      treatmentStart: recentVisit?.startDatetime
-        ? formatDate(new Date(recentVisit.startDatetime), { mode: 'standard' })
-        : '',
-      treatmentEnd: recentVisit?.stopDatetime
-        ? formatDate(new Date(recentVisit.stopDatetime), { mode: 'standard' })
-        : '',
+      visitType: recentVisit?.visitType?.display || '',
+      facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
+      treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
+      treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
     },
   });
 
+  const clearNotification = () => {
+    if (notification.timeoutId) {
+      clearTimeout(notification.timeoutId);
+    }
+    setNotification({ kind: '', title: '', subtitle: '', timeoutId: null });
+  };
+
   const onSubmit = async (data) => {
-    const lineItems = selectedLineItems.map((item) => ({
-      uuid: item.uuid,
-      price: item.price * item.quantity,
-      quantity: item.quantity,
-    }));
-    const payload = {
-      providedItems: {
-        [billUuid]: {
-          items: lineItems.map((item) => ({
-            uuid: item.uuid,
+    setLoading(true);
+    const providedItems = selectedLineItems.reduce((acc, item) => {
+      acc[item.uuid] = {
+        items: [
+          {
+            uuid: '70116AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
             price: item.price,
             quantity: item.quantity,
-          })),
-          explanation: data.claimExplanation,
-          justification: data.claimJustification,
-        },
-      },
+            item: item.uuid,
+          },
+        ],
+        explanation: data.claimExplanation,
+        justification: data.claimJustification,
+      };
+      return acc;
+    }, {});
+
+    const payload = {
+      providedItems,
       claimExplanation: data.claimExplanation,
       claimJustification: data.claimJustification,
       startDate: data.treatmentStart,
@@ -148,52 +158,70 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       patient: patientUuid,
       visitType: visitUuid,
       guaranteeId: data.guaranteeId,
-      provider: data.providerName.id,
+      providers: data.providerName.map((provider) => provider.id),
       claimCode: data.claimCode,
-      billNumber: 'add141f8-742a-4e24-9d27-9047fb43f467',
       use: 'claim',
       insurer: 'SHA',
+      billNumber: billUuid,
     };
-    console.log(payload);
+
     try {
-      // await processClaims(payload);
-      showSnackbar({
+      await processClaims(payload);
+      const timeoutId = setTimeout(clearNotification, 5000);
+      setNotification({
+        kind: 'success',
         title: t('processClaim', 'Process Claim'),
         subtitle: t('sendClaim', 'Claim sent successfully'),
-        kind: 'success',
-        timeoutInMs: 3500,
-        isLowContrast: true,
+        timeoutId,
       });
+      reset();
+      setTimeout(() => {
+        navigate({
+          to: window.getOpenmrsSpaBase() + `home/billing/`,
+        });
+      }, 5000);
     } catch (err) {
       console.error(err);
-      showSnackbar({
-        title: t('processClaimError', 'Process Claim Error'),
-        subtitle: t('sendClaimError', 'Failed to send claim'),
+      const timeoutId = setTimeout(clearNotification, 3000);
+      setNotification({
         kind: 'error',
-        timeoutInMs: 3500,
-        isLowContrast: true,
+        title: t('claimError', 'Claim Error'),
+        subtitle: t('sendClaimError', 'Request Failed, Please try later........'),
+        timeoutId,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     setValue('diagnoses', confirmedDiagnoses);
-    setValue('visitType', recentVisit?.visitType.display || '');
-    setValue('facility', `${recentVisit?.location.display || ''} - ${mflCodeValue || ''}`);
-    setValue(
-      'treatmentStart',
-      recentVisit?.startDatetime ? formatDate(new Date(recentVisit.startDatetime), { mode: 'standard' }) : '',
-    );
-    setValue(
-      'treatmentEnd',
-      recentVisit?.stopDatetime ? formatDate(new Date(recentVisit.stopDatetime), { mode: 'standard' }) : '',
-    );
+    setValue('visitType', recentVisit?.visitType?.display || '');
+    setValue('facility', `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`);
+    setValue('treatmentStart', recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '');
+    setValue('treatmentEnd', recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '');
   }, [confirmedDiagnoses, recentVisit, mflCodeValue, setValue]);
+  useEffect(() => {
+    return () => {
+      if (notification.timeoutId) {
+        clearTimeout(notification.timeoutId);
+      }
+    };
+  }, [notification.timeoutId]);
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
         <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
+        {notification.kind && (
+          <InlineNotification
+            kind={notification.kind}
+            title={notification.title}
+            subtitle={notification.subtitle}
+            lowContrast
+            hideCloseButton
+          />
+        )}
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
@@ -203,8 +231,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    id="visitType"
-                    labelText={t('visitType', 'Visit Type')}
+                    id="visittype"
+                    labelText={t('visittype', 'Visit Type')}
                     readOnly
                     value={field.value}
                   />
@@ -296,8 +324,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                   {...field}
                   id="provider_name"
                   titleText={t('provider_name', 'Provider Name')}
-                  items={encounterProviders}
-                  itemToString={(item) => (item ? item.text : '')}
+                  items={providers}
+                  itemToString={(item) => (item ? extractNameString(item.text) : '')}
                   selectionFeedback="top-after-reopen"
                   selectedItems={field.value}
                   onChange={({ selectedItems }) => field.onChange(selectedItems)}
@@ -386,8 +414,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
             {t('discardClaim', 'Discard Claim')}
           </Button>
-          <Button className={styles.button} kind="primary" type="submit" disabled={!isValid}>
-            {t('processClaim', 'Process Claim')}
+          <Button className={styles.button} kind="primary" type="submit" disabled={!isValid || loading}>
+            {loading ? (
+              <InlineLoading description={t('processing', 'Processing...')} />
+            ) : (
+              t('processClaim', 'Process Claim')
+            )}
           </Button>
         </ButtonSet>
       </Stack>

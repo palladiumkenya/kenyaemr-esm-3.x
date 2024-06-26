@@ -1,5 +1,15 @@
 import useSWR from 'swr';
-import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+
+interface Provider {
+  uuid: string;
+  display: string;
+}
+
+interface ProvidersResponse {
+  results: Provider[];
+}
 
 export function useVisit(patientUuid: string) {
   const customRepresentation =
@@ -19,23 +29,21 @@ export function useVisit(patientUuid: string) {
   };
 }
 
-export const processClaims = async (payload) => {
-  try {
-    const url = `/ws/rest/v1/insuranceclaims/claims`;
-    const response = await openmrsFetch(url, {
-      method: 'POST',
-      body: JSON.stringify(payload),
-    });
+export const useProviders = () => {
+  const customRepresentation = 'custom:(uuid,display)';
+  const url = `/ws/rest/v1/provider?v=${customRepresentation}`;
+  const { data, error } = useSWRImmutable<FetchResponse<ProvidersResponse>>(url, openmrsFetch);
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Error ${response.status}: ${errorText}`);
-    }
+  return { data, error };
+};
 
-    const data = await response.json();
-    return data;
-  } catch (err) {
-    console.error('Error processing claims:', err);
-    throw err;
-  }
+export const processClaims = (payload) => {
+  const url = `/ws/rest/v1/insuranceclaims/claims`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };

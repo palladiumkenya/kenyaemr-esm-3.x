@@ -63,7 +63,7 @@
     display: flex;
     justify-content: flex-end;
     gap: spacing.$spacing-05;
-    margin-bottom: spacing.$spacing-03;
+    margin-bottom: spacing.$spacing-07;
 
     :global(.omrs-breakpoint-lt-desktop) {
       justify-content: center;
@@ -98,7 +98,7 @@
   display: flex;
   justify-content: flex-end;
   gap: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-07;
 }
 
 .claimFormTitle {
