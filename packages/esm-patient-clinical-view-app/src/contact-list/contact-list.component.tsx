@@ -33,7 +33,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('contactList', 'Contact list');
   const layout = useLayoutType();
-  const { contacts, error, isLoading } = useContacts(patientUuid);
+  const { contacts, error, isLoading, onFormSave } = useContacts(patientUuid);
   const { results, totalPages, currentPage, goTo } = usePagination(contacts, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 

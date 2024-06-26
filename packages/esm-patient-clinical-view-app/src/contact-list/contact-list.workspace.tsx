@@ -13,10 +13,11 @@ import {
 } from '@carbon/react';
 import { Calculator } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, showModal } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, showModal, showNotification, useSession } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import { z } from 'zod';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
@@ -58,8 +59,23 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   });
   const { isLoading, error, relationshipTypes } = useRelationshipTypes();
   const { t } = useTranslation();
+  const {
+    sessionLocation: { uuid: currLocationUUid },
+  } = useSession();
+
   const onSubmit = async (values: ContactListFormType) => {
-    await saveContact(values, patientUuid);
+    const results = await saveContact(values, patientUuid, currLocationUUid);
+    closeWorkspace();
+    mutate((key) => {
+      return typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship');
+    });
+    results.forEach((res) => {
+      showNotification({
+        title: res.message,
+        kind: res.status === 'fulfilled' ? 'success' : 'error',
+        description: res.message,
+      });
+    });
   };
 
   const maritalStatus = useMemo(
@@ -90,7 +106,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
-      <pre>{`${JSON.stringify(form.formState.errors, null, 2)}-props-${props}`}</pre>
+      <pre>{`${JSON.stringify(form.formState.errors, null, 2)}`}</pre>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Controller

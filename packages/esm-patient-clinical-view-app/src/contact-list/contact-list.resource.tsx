@@ -1,4 +1,4 @@
-import { formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, openmrsFetch, parseDate, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import { z } from 'zod';
@@ -49,6 +49,14 @@ interface Person {
       uuid: string;
       display: string;
     };
+  }[];
+}
+
+interface Patient {
+  uuid: string;
+  person: Person;
+  identifiers: {
+    uuid: string;
   }[];
 }
 
@@ -110,10 +118,6 @@ function extractTelephone(display: string) {
   return display.trim();
 }
 
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
-}
-
 function replaceAll(str: string, find: string, replace: string) {
   return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
 }
@@ -129,16 +133,11 @@ export const useContacts = (patientUuid: string) => {
     return data?.data?.results?.length ? extractContactData(patientUuid, data?.data?.results) : [];
   }, [data?.data?.results, patientUuid]);
 
-  const onFormSave = useCallback(() => {
-    mutate;
-  }, [url]);
-
   return {
     contacts: relationships,
     error,
     isLoading,
     isValidating,
-    onFormSave,
   };
 };
 
@@ -310,17 +309,25 @@ export const saveContact = async (
     relationshipToPatient,
   }: z.infer<typeof ContactListFormSchema>,
   patientUuid: string,
+  locationUuid: string,
 ) => {
+  const results: {
+    step: 'person' | 'relationship' | 'obs' | 'patient';
+    status: 'fulfilled' | 'rejected';
+    message: string;
+  }[] = [];
   // Create person
   const baselineHIVStatus = '3ca03c84-632d-4e53-95ad-91f1bd9d96d6';
   const telephoneAttributeUuid = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
   const addedAsContactUuid = '7c94bd35-fba7-4ef7-96f5-29c89a318fcf';
   const maritalStatusUuid = '1056AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+  const openmrsIdTypeUuid = 'dfacd928-0370-4315-99d7-6ec1c9f7ae76';
   const personPayload = {
     names: [{ givenName, middleName, familyName }],
     gender,
     birthdate: dateOfBirth,
     addresses: [{ preferred: true, address1: address }],
+    dead: false,
     attributes: [
       {
         attributeType: baselineHIVStatus,
@@ -336,35 +343,85 @@ export const saveContact = async (
       },
     ],
   };
+  try {
+    // Generate Openmrs Id for the patient
+    const identifier = await generateOpenmrsIdentifier();
+    // Create patient
+    const patient: Patient = await fetcher(`/ws/rest/v1/patient`, {
+      person: personPayload,
+      identifiers: [
+        {
+          identifier: identifier.data.identifier,
+          identifierType: openmrsIdTypeUuid,
+          location: locationUuid,
+        },
+      ],
+    });
 
-  const person: Person = await fetcher(`/ws/rest/v1/person`, personPayload);
-  // Create relationship and obs in parallell
-  const relationshipPayload = {
-    personA: person.uuid,
-    relationshipType: relationshipToPatient,
-    personB: patientUuid,
-    startDate: listingDate.toISOString(),
-  };
+    // Person creation success
+    results.push({
+      step: 'person',
+      message: 'Patient created successfully',
+      status: 'fulfilled',
+    });
+    // Create patient, relationship and obs in parallell
+    const relationshipPayload = {
+      personA: patient.person.uuid,
+      relationshipType: relationshipToPatient,
+      personB: patientUuid,
+      startDate: listingDate.toISOString(),
+    };
 
-  const now = new Date().toISOString();
-  const obsPayload = {
-    person: person.uuid,
-    obsDatetime: now,
-    concept: maritalStatusUuid,
-    value: replaceAll(maritalStatus, 'A', ''),
-  };
+    const now = new Date().toISOString();
+    const obsPayload = {
+      person: patient.person.uuid,
+      obsDatetime: now,
+      concept: maritalStatusUuid,
+      value: replaceAll(maritalStatus, 'A', ''),
+    };
 
-  const asyncTask = await Promise.allSettled([
-    fetcher(`/ws/rest/v1/relationship`, relationshipPayload),
-    fetcher(`/ws/rest/v1/obs`, obsPayload),
-  ]);
+    const asyncTask = await Promise.allSettled([
+      fetcher(`/ws/rest/v1/relationship`, relationshipPayload),
+      fetcher(`/ws/rest/v1/obs`, obsPayload),
+    ]);
 
-  const status = asyncTask.map((val, index) => val.status);
-  if (status.every((stat) => stat === 'fulfilled')) {
-    // TODO Success action
-    alert('Success');
-  } else {
-    // TODO handleError
-    alert(`Error: ${status}`);
+    asyncTask.forEach(({ status }, index) => {
+      let message: string;
+      let step: any;
+      if (index === 0) {
+        message = status === 'fulfilled' ? 'Relationship created successfully' : 'Error creating Relationship';
+        step = 'relationship';
+      } else if (index === 1) {
+        message =
+          status === 'fulfilled' ? 'Contact demographics saved succesfully!' : 'Error saving contact demographics';
+        step = 'obs';
+      }
+      // else {
+      //   message = status === 'fulfilled' ? 'Patient created successfully' : 'Error creating Patient';
+      //   step = 'patient';
+      // }
+      results.push({
+        status,
+        message,
+        step,
+      });
+    });
+  } catch (error) {
+    results.push({ message: 'Error creating patient', step: 'person', status: 'rejected' });
   }
+  return results;
 };
+
+export function generateOpenmrsIdentifier() {
+  const openmrsIdentifierSourceUuid = 'fb034aac-2353-4940-abe2-7bc94e7c1e71';
+  const abortController = new AbortController();
+
+  return openmrsFetch(`${restBaseUrl}/idgen/identifiersource/${openmrsIdentifierSourceUuid}/identifier`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: {},
+    signal: abortController.signal,
+  });
+}
