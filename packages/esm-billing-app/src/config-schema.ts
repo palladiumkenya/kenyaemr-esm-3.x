@@ -9,6 +9,7 @@ export interface BillingConfig {
     exemptionCategory: string;
     billPaymentStatus: string;
   };
+  inPatientVisitTypeUuid: string;
   patientExemptionCategories: Array<{ value: string; label: string }>;
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
   enforceBillPayment: boolean;
@@ -17,10 +18,16 @@ export interface BillingConfig {
   passKey: string;
   authorizationUrl: string;
   initiateUrl: string;
+  billingStatusQueryUrl: string;
   mpesaAPIBaseUrl: string;
 }
 
 export const configSchema = {
+  inPatientVisitTypeUuid: {
+    _type: Type.String,
+    _description: 'The visit type uuid for in-patient',
+    _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914',
+  },
   mpesaAPIBaseUrl: {
     _type: Type.String,
     _description: 'The base url that will be used to make any backend calls related to mpesa.',
@@ -117,5 +124,10 @@ export const configSchema = {
     _type: Type.String,
     _default: '',
     _description: 'MPESA Initiator url which Initiates online payment on behalf of a customer.',
+  },
+  billingStatusQueryUrl: {
+    _type: Type.String,
+    _default: '${restBaseUrl}/cashier/billLineItem?orderUuid=${orderUuid}&v=full',
+    _description: 'URL to query billing status',
   },
 };
