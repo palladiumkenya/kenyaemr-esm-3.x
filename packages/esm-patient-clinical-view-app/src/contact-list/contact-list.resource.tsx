@@ -132,7 +132,6 @@ export const useContacts = (patientUuid: string) => {
   const relationships = useMemo(() => {
     return data?.data?.results?.length ? extractContactData(patientUuid, data?.data?.results) : [];
   }, [data?.data?.results, patientUuid]);
-
   return {
     contacts: relationships,
     error,
