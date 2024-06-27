@@ -13,7 +13,7 @@ type RequestData = { requestId: string; requestStatus: RequestStatus | null };
  */
 export const useRequestStatus = (
   setNotification: React.Dispatch<SetStateAction<{ type: 'error' | 'success'; message: string } | null>>,
-): React.Dispatch<React.SetStateAction<RequestData | null>> => {
+): [RequestData, React.Dispatch<React.SetStateAction<RequestData | null>>] => {
   const { t } = useTranslation();
   const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
 
@@ -50,5 +50,5 @@ export const useRequestStatus = (
     }
   }, [mpesaAPIBaseUrl, requestData.requestId, requestData.requestStatus, setNotification, t]);
 
-  return setRequestData;
+  return [requestData, setRequestData];
 };

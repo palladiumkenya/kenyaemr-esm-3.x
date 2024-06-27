@@ -38,7 +38,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const pollingTrigger = useRequestStatus(setNotification);
+  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification);
 
   const {
     control,
@@ -122,9 +122,19 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
             <Button kind="secondary" className={styles.buttonLayout} onClick={closeModal}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button type="submit" className={styles.button} onClick={handleSubmit(onSubmit)} disabled={!isValid}>
-              {isLoading && <Loading className={styles.button_spinner} withOverlay={false} small />}
-              {t('initiatePay', 'Initiate Payment')}
+            <Button
+              type="submit"
+              className={styles.button}
+              onClick={handleSubmit(onSubmit)}
+              disabled={!isValid || isLoading || requestStatus === 'INITIATED'}>
+              {isLoading ? (
+                <>
+                  <Loading className={styles.button_spinner} withOverlay={false} small />{' '}
+                  {t('processingPayment', 'Processing Payment')}
+                </>
+              ) : (
+                t('initiatePay', 'Initiate Payment')
+              )}
             </Button>
           </section>
         </Form>
