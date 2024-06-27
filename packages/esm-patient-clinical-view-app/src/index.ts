@@ -76,6 +76,9 @@ export const antenatalCare = getSyncLifecycle(AntenatalCare, options);
 export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 
+// Case Management
+// export const caseManagement = getSyncLifecycle(CaseManagement, options);
+
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);
 export const postnatalCareLink = getSyncLifecycle(createDashboardLink(postnatalDashboardMeta), options);

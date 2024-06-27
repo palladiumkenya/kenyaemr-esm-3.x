@@ -134,10 +134,9 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       acc[item.uuid] = {
         items: [
           {
-            uuid: '70116AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            uuid: item.itemOrServiceConceptUuid,
             price: item.price,
             quantity: item.quantity,
-            item: item.uuid,
           },
         ],
         explanation: data.claimExplanation,
@@ -164,7 +163,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       insurer: 'SHA',
       billNumber: billUuid,
     };
-
     try {
       await processClaims(payload);
       const timeoutId = setTimeout(clearNotification, 5000);
