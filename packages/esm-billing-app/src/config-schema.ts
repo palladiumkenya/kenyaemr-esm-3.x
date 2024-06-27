@@ -19,6 +19,7 @@ export interface BillingConfig {
   authorizationUrl: string;
   initiateUrl: string;
   billingStatusQueryUrl: string;
+  mpesaAPIBaseUrl: string;
 }
 
 export const configSchema = {
@@ -26,6 +27,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'The visit type uuid for in-patient',
     _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914',
+  },
+  mpesaAPIBaseUrl: {
+    _type: Type.String,
+    _description: 'The base url that will be used to make any backend calls related to mpesa.',
+    _default: 'https://billing.kenyahmis.org',
   },
   visitAttributeTypes: {
     isPatientExempted: {

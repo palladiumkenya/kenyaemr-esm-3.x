@@ -273,3 +273,5 @@ export type QueueEntry = {
     queueComingFrom: OpenmrsResource;
   };
 };
+
+export type RequestStatus = 'INITIATED' | 'COMPLETE' | 'FAILED' | 'NOT-FOUND';
