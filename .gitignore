@@ -83,3 +83,5 @@ dist
 e2e/storageState.json
 .env
 
+#vscode
+.vscode/settings.json

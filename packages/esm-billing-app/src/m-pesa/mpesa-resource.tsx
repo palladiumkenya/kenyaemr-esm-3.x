@@ -1,39 +1,81 @@
-import { Buffer } from 'buffer';
+import { RequestStatus } from '../types';
 
-export const generateStkAccessToken = async (authorizationUrl: string, setNotification) => {
+export const readableStatusMap = new Map<RequestStatus, string>();
+readableStatusMap.set('COMPLETE', 'Complete');
+readableStatusMap.set('FAILED', 'Failed');
+readableStatusMap.set('INITIATED', 'Waiting for user...');
+readableStatusMap.set('NOT-FOUND', 'Request not found');
+
+export const initiateStkPush = async (
+  payload,
+  setNotification: (notification: { type: 'error' | 'success'; message: string }) => void,
+  MPESA_PAYMENT_API_BASE_URL: string,
+): Promise<string> => {
   try {
-    const consumerKey = '';
-    const consumerSecret = '';
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Basic ${auth}`,
-    };
-    const response = await fetch(authorizationUrl, { method: 'GET', headers: headers });
-    const { access_token } = await response.json();
-    return access_token;
-  } catch (error) {
-    setNotification('Unable to reach the MPESA server, please try again later.');
-    throw error;
+    const url = `${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/stk-push`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phoneNumber: payload.PhoneNumber,
+        amount: payload.Amount,
+        accountReference: payload.AccountReference,
+      }),
+    });
+
+    if (!res.ok && res.status === 403) {
+      const error = new Error('Health facility M-PESA data not configured.');
+      throw error;
+    }
+
+    const response: { requestId: string } = await res.json();
+
+    setNotification({ message: 'STK Push sent successfully', type: 'success' });
+    return response.requestId;
+  } catch (err) {
+    const error = err as Error;
+    setNotification({
+      message: error.message ?? 'Unable to initiate Lipa Na Mpesa, please try again later.',
+      type: 'error',
+    });
   }
 };
 
-export const initiateStkPush = async (payload, initiateUrl: string, authorizationUrl: string, setNotification) => {
-  try {
-    const access_token = await generateStkAccessToken(authorizationUrl, setNotification);
-    const headers = {
+export const getRequestStatus = async (
+  requestId: string,
+  MPESA_PAYMENT_API_BASE_URL: string,
+): Promise<RequestStatus> => {
+  const requestResponse = await fetch(`${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/check-payment-state`, {
+    method: 'POST',
+    headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${access_token}`,
-    };
-    const response = await fetch(initiateUrl, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(payload),
-    });
+    },
+    body: JSON.stringify({
+      requestId,
+    }),
+  });
 
-    return await response.json();
-  } catch (err) {
-    setNotification('Unable to initiate Lipa Na Mpesa, please try again later.');
-    throw err;
+  if (!requestResponse.ok) {
+    const error = new Error(`HTTP error! status: ${requestResponse.status}`);
+
+    if (requestResponse.statusText) {
+      error.message = requestResponse.statusText;
+    }
+    throw error;
   }
+
+  const requestStatus: { status: RequestStatus } = await requestResponse.json();
+
+  return requestStatus.status;
+};
+
+export const getErrorMessage = (err: { message: string }, t) => {
+  if (err.message) {
+    return err.message;
+  }
+
+  return t('unKnownErrorMsg', 'An unknown error occurred');
 };
