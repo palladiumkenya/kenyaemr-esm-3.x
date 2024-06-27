@@ -82,8 +82,10 @@ interface HTSEncounter {
   obs: {
     uuid: string;
     display: string;
-    obsDatetime: string;
-    value: string;
+    value: {
+      uuid: string;
+      display: string;
+    };
   }[];
 }
 export const ContactListFormSchema = z.object({
@@ -92,14 +94,14 @@ export const ContactListFormSchema = z.object({
   middleName: z.string().min(1, 'Required'),
   familyName: z.string().min(1, 'Required'),
   gender: z.enum(['M', 'F']),
-  dateOfBirth: z.date({ coerce: true }),
-  maritalStatus: z.string(),
-  address: z.string(),
-  phoneNumber: z.string(),
+  dateOfBirth: z.date({ coerce: true }).max(new Date()),
+  maritalStatus: z.string().optional(),
+  address: z.string().optional(),
+  phoneNumber: z.string().optional(),
   relationshipToPatient: z.string().uuid(),
   livingWithClient: z.string().optional(),
   baselineStatus: z.string().optional(),
-  preferedPNSAproach: z.string(),
+  preferedPNSAproach: z.string().optional(),
 });
 
 function extractName(display: string) {
@@ -168,7 +170,7 @@ export const useRelativeHivEnrollment = (relativeUuid: string) => {
 };
 
 export const useRelativeHTSEncounter = (relativeUuid: string) => {
-  const customeRepresentation = 'custom:(uuid,program:(name,uuid))';
+  const customeRepresentation = 'custom:(uuid,display,encounterDatetime,obs:(uuid,display,value:(uuid,display)))';
   const {
     encounterTypes: { hivTestingServices },
   } = useConfig<ConfigObject>();
@@ -267,7 +269,9 @@ export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
   if (
     !enrollment &&
     encounters.length &&
-    encounters.findIndex((en) => en.obs.some((ob) => ob.value === 'Positive')) !== -1
+    encounters.findIndex((en) =>
+      en.obs.some((ob) => ['positive', 'hiv positive'].includes(ob.value.display.toLocaleLowerCase())),
+    ) !== -1
   ) {
     return 'Positive';
   }
@@ -319,29 +323,45 @@ export const saveContact = async (
     names: [{ givenName, middleName, familyName }],
     gender,
     birthdate: dateOfBirth,
-    addresses: [{ preferred: true, address1: address }],
+    addresses: address ? [{ preferred: true, address1: address }] : undefined,
     dead: false,
     attributes: [
-      {
-        attributeType: config.contactPersonAttributesUuid.baselineHIVStatus,
-        value: replaceAll(baselineStatus, 'A', ''),
-      },
-      {
-        attributeType: config.contactPersonAttributesUuid.telephone,
-        value: phoneNumber,
-      },
+      ...(baselineStatus
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.baselineHIVStatus,
+              value: replaceAll(baselineStatus, 'A', ''),
+            },
+          ]
+        : []),
+      ...(phoneNumber
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.telephone,
+              value: phoneNumber,
+            },
+          ]
+        : []),
       {
         attributeType: config.contactPersonAttributesUuid.contactCreated,
         value: '1065',
       },
-      {
-        attributeType: config.contactPersonAttributesUuid.preferedPnsAproach,
-        value: replaceAll(preferedPNSAproach, 'A', ''),
-      },
-      {
-        attributeType: config.contactPersonAttributesUuid.livingWithContact,
-        value: replaceAll(livingWithClient, 'A', ''),
-      },
+      ...(preferedPNSAproach
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.preferedPnsAproach,
+              value: replaceAll(preferedPNSAproach, 'A', ''),
+            },
+          ]
+        : []),
+      ...(livingWithClient
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.livingWithContact,
+              value: replaceAll(livingWithClient, 'A', ''),
+            },
+          ]
+        : []),
     ],
   };
   try {
@@ -375,16 +395,19 @@ export const saveContact = async (
 
     const now = new Date().toISOString();
     // Create encounter with marital status obs
-    const demographicsPayload = {
-      ...encounter,
-      encounterType: config.registrationEncounterUuid,
-      patient: patient.uuid,
-      obs: [{ concept: config.maritalStatusUuid, value: maritalStatus }],
-    };
+    let demographicsPayload;
+    if (maritalStatus) {
+      demographicsPayload = {
+        ...encounter,
+        encounterType: config.registrationEncounterUuid,
+        patient: patient.uuid,
+        obs: [{ concept: config.maritalStatusUuid, value: maritalStatus }],
+      };
+    }
 
     const asyncTask = await Promise.allSettled([
       fetcher(`/ws/rest/v1/relationship`, relationshipPayload),
-      fetcher(`/ws/rest/v1/encounter`, demographicsPayload),
+      ...(maritalStatus ? [fetcher(`/ws/rest/v1/encounter`, demographicsPayload)] : []),
     ]);
 
     asyncTask.forEach(({ status }, index) => {

@@ -77,7 +77,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
     });
     results.forEach((res) => {
       showNotification({
-        title: res.message,
+        title: res.status === 'fulfilled' ? 'Success' : 'Failure',
         kind: res.status === 'fulfilled' ? 'success' : 'error',
         description: res.message,
       });
@@ -130,15 +130,26 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
-      <pre>{`${JSON.stringify(form.formState.errors, null, 2)}`}</pre>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Controller
             control={form.control}
             name="listingDate"
             render={({ field }) => (
-              <DatePicker dateFormat="d/m/Y" id="listingDate" datePickerType="single" {...field}>
-                <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('listingDate', 'Listing Date')} size="xl" />
+              <DatePicker
+                dateFormat="d/m/Y"
+                id="listingDate"
+                datePickerType="single"
+                {...field}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}>
+                <DatePickerInput
+                  invalid={form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}
+                  placeholder="mm/dd/yyyy"
+                  labelText={t('listingDate', 'Listing Date')}
+                  size="xl"
+                />
               </DatePicker>
             )}
           />
@@ -149,7 +160,13 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             control={form.control}
             name="givenName"
             render={({ field }) => (
-              <TextInput {...field} placeholder="First name" labelText={t('firstName', 'First name')} />
+              <TextInput
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                {...field}
+                placeholder="First name"
+                labelText={t('firstName', 'First name')}
+              />
             )}
           />
         </Column>
@@ -158,7 +175,13 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             control={form.control}
             name="middleName"
             render={({ field }) => (
-              <TextInput {...field} placeholder="Middle name" labelText={t('middleName', 'Middle name')} />
+              <TextInput
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                {...field}
+                placeholder="Middle name"
+                labelText={t('middleName', 'Middle name')}
+              />
             )}
           />
         </Column>
@@ -167,7 +190,13 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             control={form.control}
             name="familyName"
             render={({ field }) => (
-              <TextInput {...field} placeholder="Last name" labelText={t('lastName', 'Last name')} />
+              <TextInput
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                {...field}
+                placeholder="Last name"
+                labelText={t('lastName', 'Last name')}
+              />
             )}
           />
         </Column>
@@ -180,6 +209,8 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 legendText={t('sex', 'Sex')}
                 {...field}
                 // defaultSelected=""
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
                 className={styles.billingItem}>
                 <RadioButton labelText={t('male', 'Male')} value="M" id="M" />
                 <RadioButton labelText={t('female', 'Female')} value="F" id="F" />
@@ -195,6 +226,8 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             render={({ field }) => (
               <DatePicker datePickerType="single" {...field}>
                 <DatePickerInput
+                  invalid={form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}
                   placeholder="mm/dd/yyyy"
                   labelText={t('dateOfBirth', 'Date of birth')}
                   size="xl"
@@ -214,6 +247,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             name="maritalStatus"
             render={({ field }) => (
               <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
                 id="maritalStatus"
                 titleText={t('maritalStatus', 'Marital status')}
                 onChange={(e) => {
@@ -234,7 +270,13 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             control={form.control}
             name="address"
             render={({ field }) => (
-              <TextInput {...field} placeholder="Physical Address/Landmark" labelText={t('address', 'Address')} />
+              <TextInput
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                {...field}
+                placeholder="Physical Address/Landmark"
+                labelText={t('address', 'Address')}
+              />
             )}
           />
         </Column>
@@ -243,7 +285,13 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             control={form.control}
             name="phoneNumber"
             render={({ field }) => (
-              <TextInput {...field} placeholder="Phone number" labelText={t('phoneNumber', 'Phone number')} />
+              <TextInput
+                {...field}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                placeholder="Phone number"
+                labelText={t('phoneNumber', 'Phone number')}
+              />
             )}
           />
         </Column>
@@ -254,6 +302,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             name="relationshipToPatient"
             render={({ field }) => (
               <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
                 id="relationshipToPatient"
                 titleText={t('relationToPatient', 'Relation to patient')}
                 onChange={(e) => {
@@ -273,6 +324,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             name="livingWithClient"
             render={({ field }) => (
               <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
                 id="livingWithClient"
                 titleText={t('livingWithClient', 'Living with client')}
                 onChange={(e) => {
@@ -294,6 +348,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             name="baselineStatus"
             render={({ field }) => (
               <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
                 id="baselineStatus"
                 titleText={t('baselineStatus', 'HIV Status')}
                 onChange={(e) => {
@@ -313,6 +370,9 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             name="preferedPNSAproach"
             render={({ field }) => (
               <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
                 id="preferedPNSAproach"
                 titleText={t('preferedPNSAproach', 'Prefered PNS Aproach')}
                 onChange={(e) => {

@@ -1,14 +1,14 @@
 import { Button, ButtonSkeleton, Row } from '@carbon/react';
-import { Microscope, TrashCan } from '@carbon/react/icons';
+import { Microscope } from '@carbon/react/icons';
+import { useConfig } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
+import { ConfigObject } from '../config-schema';
 import {
   getHivStatusBasedOnEnrollmentAndHTSEncounters,
   useRelativeHTSEncounter,
   useRelativeHivEnrollment,
 } from './contact-list.resource';
-import { launchPatientChartWithWorkspaceOpen, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
 
 interface ContactActionsProps {
   relativeUuid: string;
@@ -46,14 +46,14 @@ const ContactActions: React.FC<ContactActionsProps> = ({ relativeUuid, baseLineH
         ['Unknown', 'Negative', 'NEGATIVE', 'UNKNOWN', null].includes(status),
       ) && (
         <Button
-          kind="tertiary"
+          kind="ghost"
           renderIcon={Microscope}
           iconDescription="Test"
-          hasIconOnly
-          onClick={handleLauchHTSInitialForm}
-        />
+          // hasIconOnly
+          onClick={handleLauchHTSInitialForm}>
+          Test
+        </Button>
       )}
-      <Button kind="tertiary" renderIcon={TrashCan} iconDescription="Delete Record" hasIconOnly />
     </Row>
   );
 };
