@@ -1,8 +1,9 @@
 import { useState, useEffect, SetStateAction } from 'react';
-import { RequestStatus, getRequestStatus, readableStatusMap, getErrorMessage } from '../m-pesa/mpesa-resource';
+import { getRequestStatus, readableStatusMap, getErrorMessage } from '../m-pesa/mpesa-resource';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../config-schema';
+import { RequestStatus } from '../types';
 
 type RequestData = { requestId: string; requestStatus: RequestStatus | null };
 

@@ -8,13 +8,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formatPhoneNumber } from '../utils';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import {
-  RequestStatus,
-  getErrorMessage,
-  getRequestStatus,
-  initiateStkPush,
-  readableStatusMap,
-} from '../../../m-pesa/mpesa-resource';
+import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../../config-schema';

@@ -1,4 +1,4 @@
-export type RequestStatus = 'INITIATED' | 'COMPLETE' | 'FAILED' | 'NOT-FOUND';
+import { RequestStatus } from '../types';
 
 export const readableStatusMap = new Map<RequestStatus, string>();
 readableStatusMap.set('COMPLETE', 'Complete');
