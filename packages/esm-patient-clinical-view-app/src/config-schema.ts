@@ -78,6 +78,42 @@ export const configSchema = {
       },
     ],
   },
+  registrationEncounterUuid: {
+    _type: Type.String,
+    _description: 'Registration encounter UUID',
+    _default: 'de1f9d67-b73e-4e1b-90d0-036166fc6995',
+  },
+  openmrsIDUuid: {
+    _type: Type.String,
+    _description: 'OpenMRS Identifier  UUID',
+    _default: 'dfacd928-0370-4315-99d7-6ec1c9f7ae76',
+  },
+  maritalStatusUuid: {
+    _type: Type.String,
+    _description: 'Marital status concept UUID',
+    _default: '1054AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  openmrsIdentifierSourceUuid: {
+    _type: Type.String,
+    _description: 'OpenMRS Identifier Source UUID (Identifier Generator for OpenMRS ID)',
+    _default: 'fb034aac-2353-4940-abe2-7bc94e7c1e71',
+  },
+  hivProgramUuid: {
+    _type: Type.String,
+    _description: 'HIV Program UUID',
+    _default: 'dfdc6d40-2f2f-463d-ba90-cc97350441a8',
+  },
+  contactPersonAttributesUuid: {
+    _type: Type.Object,
+    _description: 'Contact created patient attributes UUID',
+    _default: {
+      telephone: 'b2c38640-2603-4629-aebd-3b54f33f1e3a',
+      baselineHIVStatus: '3ca03c84-632d-4e53-95ad-91f1bd9d96d6',
+      contactCreated: '7c94bd35-fba7-4ef7-96f5-29c89a318fcf',
+      preferedPnsAproach: '59d1b886-90c8-4f7f-9212-08b20a9ee8cf',
+      livingWithContact: '35a08d84-9f80-4991-92b4-c4ae5903536e',
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -94,6 +130,18 @@ export interface ConfigObject {
   };
   defaulterTracingEncounterUuid: string;
   clinicalEncounterUuid: string;
+  registrationEncounterUuid: string;
+  openmrsIDUuid: string;
+  openmrsIdentifierSourceUuid: string;
+  maritalStatusUuid: string;
+  hivProgramUuid: string;
   concepts: Record<string, string>;
   specialClinics: Array<{ id: string; formUuid: string; encounterTypeUuid: string; title: string }>;
+  contactPersonAttributesUuid: {
+    telephone: string;
+    baselineHIVStatus: string;
+    contactCreated: string;
+    preferedPnsAproach: string;
+    livingWithContact: string;
+  };
 }
