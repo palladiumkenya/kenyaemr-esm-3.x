@@ -1,15 +1,5 @@
 import { useState, useEffect } from 'react';
-
-interface RegimenItem {
-  name: string;
-  conceptRef: string;
-}
-
-interface RegimenLineGroup {
-  regimenline: string;
-  regimenLineValue: string;
-  regimen: RegimenItem[];
-}
+import { RegimenItem, RegimenLineGroup } from '../types';
 
 function useFilteredRegimen(regimenData: RegimenLineGroup[] | undefined, patientAge: number): RegimenLineGroup[] {
   const [filteredRegimen, setFilteredRegimen] = useState<RegimenLineGroup[]>([]);
