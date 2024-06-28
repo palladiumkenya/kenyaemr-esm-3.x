@@ -15,7 +15,14 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ErrorState, isDesktop, launchWorkspace, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  ErrorState,
+  isDesktop,
+  launchWorkspace,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -106,12 +113,9 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         id: `${relation.uuid}`,
         startDate: relation.startDate ?? '--',
         name: (
-          <Link
-            onClick={() =>
-              navigate({ to: window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary` })
-            }>
+          <ConfigurableLink to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
             {relation.name}
-          </Link>
+          </ConfigurableLink>
         ),
         contactCreated: relation.personContactCreated ?? 'No',
         relation: relation?.relationshipType,
@@ -142,7 +146,9 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
             <h4>{headerTitle}</h4>
           </div>
           <EmptyDataIllustration />
-          <p className={styles.content}>There is contact data to list for this patient.</p>
+          <p className={styles.content}>
+            {t('noContactToDisplay', 'There is no contact data to display for this patient.')}
+          </p>
           <Button onClick={handleAddContact} renderIcon={Add} kind="ghost">
             {t('recordContact', 'Record Contact')}
           </Button>
