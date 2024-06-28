@@ -1,0 +1,11 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  height: calc(100vh - 3rem);
+}
+
+.billsTableContainer {
+  margin: 2rem 1rem;
+}
