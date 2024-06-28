@@ -7,7 +7,7 @@ import { useNonStandardRegimen } from '../hooks/useNonStandardRegimen';
 import { Regimen } from '../types';
 import useFilteredRegimen from '../hooks/useFilteredRegimen';
 import { usePatient } from '@openmrs/esm-framework';
-import useCalculateAge from '../hooks/useCalculateAge';
+import calculateAge from '../hooks/useCalculateAge';
 
 interface NonStandardRegimenProps {
   category: string;
@@ -30,7 +30,7 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
   const [selectedRegimens, setSelectedRegimens] = useState(Array(5).fill(''));
   const [nonStandardRegimenObjects, setStandardRegimenObjects] = useState([]);
   const { patient } = usePatient();
-  const patientAge = useCalculateAge(patient?.birthDate);
+  const patientAge = calculateAge(patient?.birthDate);
   const filteredRegimenByAge = useFilteredRegimen(matchingCategory?.category, patientAge);
 
   const handleRegimenLineChange = (e) => {

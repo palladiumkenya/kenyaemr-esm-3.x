@@ -5,7 +5,7 @@ import { useStandardRegimen } from '../hooks/useStandardRegimen';
 import styles from './standard-regimen.scss';
 import useFilteredRegimen from '../hooks/useFilteredRegimen';
 import { usePatient } from '@openmrs/esm-framework';
-import useCalculateAge from '../hooks/useCalculateAge';
+import calculateAge from '../hooks/useCalculateAge';
 
 interface StandardRegimenProps {
   category: string;
@@ -28,7 +28,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
   const [selectedRegimens, setSelectedRegimens] = useState([]);
   const matchingCategory = standardRegimen.find((item) => item.categoryCode === category);
   const { patient } = usePatient();
-  const patientAge = useCalculateAge(patient?.birthDate);
+  const patientAge = calculateAge(patient?.birthDate);
   const filteredRegimenByAge = useFilteredRegimen(matchingCategory?.category, patientAge);
 
   useEffect(() => {
