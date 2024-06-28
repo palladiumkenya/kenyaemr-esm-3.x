@@ -44,7 +44,7 @@ function replaceAll(str: string, find: string, replace: string) {
 }
 export const useContacts = (patientUuid: string) => {
   const customeRepresentation =
-    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
+    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
   const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
   const config = useConfig<ConfigObject>();
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
@@ -112,13 +112,13 @@ function extractAttributeData(person: Person, config: ConfigObject) {
       if (attr.attributeType.uuid === config.contactPersonAttributesUuid.telephone) {
         return { ...prev, contact: attr.display ? extractTelephone(attr.display) : null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus) {
-        return { ...prev, baselineHIVStatus: attr.display ?? null };
+        return { ...prev, baselineHIVStatus: getConceptName(attr.value) ?? null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.contactCreated) {
-        return { ...prev, personContactCreated: attr.display ?? null };
+        return { ...prev, personContactCreated: getConceptName(attr.value) ?? null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.livingWithContact) {
-        return { ...prev, livingWithClient: attr.display ?? null };
+        return { ...prev, livingWithClient: getConceptName(attr.value) ?? null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach) {
-        return { ...prev, pnsAproach: attr.display ?? null };
+        return { ...prev, pnsAproach: getConceptName(attr.value) ?? null };
       }
       return prev;
     },
@@ -172,6 +172,22 @@ function extractContactData(
   }
   return relationshipsData;
 }
+const getConceptName = (key) => {
+  return conceptIdNameMap.get(key);
+};
+
+const conceptIdNameMap = new Map([
+  ['162284', 'Dual referral'],
+  ['163096', 'Provider referral'],
+  ['161642', 'Contract referral'],
+  ['160551', 'Passive referral'],
+  ['703', 'Positive'],
+  ['664', 'Negative'],
+  ['1067', 'Unknown'],
+  ['1066', 'No'],
+  ['1065', 'Yes'],
+  ['162570', 'Declined to answer'],
+]);
 
 export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
   encounters: HTSEncounter[],
