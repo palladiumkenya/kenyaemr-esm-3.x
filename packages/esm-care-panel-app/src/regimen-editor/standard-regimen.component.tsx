@@ -29,7 +29,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
   const matchingCategory = standardRegimen.find((item) => item.categoryCode === category);
   const { patient } = usePatient();
   const patientAge = calculateAge(patient?.birthDate);
-  const filteredRegimenByAge = useFilteredRegimen(matchingCategory?.category, patientAge);
+  const filteredRegimenLineByAge = useFilteredRegimen(matchingCategory?.category, patientAge);
 
   useEffect(() => {
     const matchingRegimenLine = matchingCategory?.category.find(
@@ -67,7 +67,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
             {!selectedRegimenLine || selectedRegimenLine == '--' ? (
               <SelectItem text={t('selectRegimenLine', 'Select Regimen Line')} value="" />
             ) : null}
-            {filteredRegimenByAge.map((line) => (
+            {filteredRegimenLineByAge.map((line) => (
               <SelectItem key={line.regimenline} text={line.regimenline} value={line.regimenLineValue}>
                 {line.regimenline}
               </SelectItem>
