@@ -105,6 +105,7 @@ export interface Person {
   attributes: {
     uuid: string;
     display: string;
+    value: string;
     attributeType: {
       uuid: string;
       display: string;
