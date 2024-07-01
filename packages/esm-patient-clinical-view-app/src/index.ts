@@ -26,6 +26,9 @@ import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-das
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import GenericNavLinks from './specialized-clinics/generic-nav-links/generic-nav-links.component';
 import GenericDashboard from './specialized-clinics/generic-nav-links/generic-dashboard.component';
+import { createLeftPanelLink } from './left-panel-link.component';
+import { caseManagementDashboardMeta } from './dashboard.meta';
+import WrapComponent from './case-management/wrap/wrap.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -77,7 +80,8 @@ export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 
 // Case Management
-// export const caseManagement = getSyncLifecycle(CaseManagement, options);
+export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
+export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);

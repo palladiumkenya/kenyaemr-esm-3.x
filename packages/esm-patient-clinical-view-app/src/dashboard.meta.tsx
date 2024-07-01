@@ -56,3 +56,12 @@ export const labourDeliveryDashboardMeta = {
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
 };
+export const caseManagementDashboardMeta = {
+  name: 'case-management',
+  slot: 'case-management-dashboard-slot',
+  title: 'Case management',
+  path: 'case-management',
+  columns: 1,
+  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
+  config: {},
+};
