@@ -103,7 +103,9 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         id: `${relation.uuid}`,
         startDate: relation.startDate ?? '--',
         name: (
-          <ConfigurableLink to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
+          <ConfigurableLink
+            style={{ textDecoration: 'none' }}
+            to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
             {relation.name}
           </ConfigurableLink>
         ),
