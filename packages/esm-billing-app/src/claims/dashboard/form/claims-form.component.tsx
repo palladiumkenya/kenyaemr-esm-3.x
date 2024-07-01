@@ -13,11 +13,10 @@ import {
   FilterableMultiSelect,
   MultiSelect,
   InlineLoading,
-  InlineNotification,
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill, LineItem } from '../../../types';
-import { navigate } from '@openmrs/esm-framework';
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
 import { processClaims, useProviders, useVisit } from './claims-form.resource';
@@ -67,7 +66,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
 
   const { data } = useProviders();
   const [providers, setProviders] = useState([]);
-  const [notification, setNotification] = useState({ kind: '', title: '', subtitle: '', timeoutId: null });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -121,13 +119,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     },
   });
 
-  const clearNotification = () => {
-    if (notification.timeoutId) {
-      clearTimeout(notification.timeoutId);
-    }
-    setNotification({ kind: '', title: '', subtitle: '', timeoutId: null });
-  };
-
   const onSubmit = async (data) => {
     setLoading(true);
     const providedItems = selectedLineItems.reduce((acc, item) => {
@@ -165,12 +156,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     };
     try {
       await processClaims(payload);
-      const timeoutId = setTimeout(clearNotification, 5000);
-      setNotification({
+      showSnackbar({
         kind: 'success',
         title: t('processClaim', 'Process Claim'),
         subtitle: t('sendClaim', 'Claim sent successfully'),
-        timeoutId,
+        timeoutInMs: 3000,
+        isLowContrast: true,
       });
       reset();
       setTimeout(() => {
@@ -180,12 +171,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       }, 2000);
     } catch (err) {
       console.error(err);
-      const timeoutId = setTimeout(clearNotification, 3000);
-      setNotification({
+      showSnackbar({
         kind: 'error',
         title: t('claimError', 'Claim Error'),
         subtitle: t('sendClaimError', 'Request Failed, Please try later........'),
-        timeoutId,
+        timeoutInMs: 2500,
+        isLowContrast: true,
       });
     } finally {
       setLoading(false);
@@ -199,27 +190,10 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     setValue('treatmentStart', recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '');
     setValue('treatmentEnd', recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '');
   }, [confirmedDiagnoses, recentVisit, mflCodeValue, setValue]);
-  useEffect(() => {
-    return () => {
-      if (notification.timeoutId) {
-        clearTimeout(notification.timeoutId);
-      }
-    };
-  }, [notification.timeoutId]);
-
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
         <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
-        {notification.kind && (
-          <InlineNotification
-            kind={notification.kind}
-            title={notification.title}
-            subtitle={notification.subtitle}
-            lowContrast
-            hideCloseButton
-          />
-        )}
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
