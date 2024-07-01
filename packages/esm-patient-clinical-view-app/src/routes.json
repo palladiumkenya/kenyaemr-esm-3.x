@@ -199,6 +199,25 @@
       "order": 0,
       "online": true,
       "offline": false
+    },
+     {
+      "component": "caseManagementDashboardLink",
+      "name": "case-management-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "case-management",
+        "title": "Case Management",
+        "slot": "case-management-dashboard-slot",
+        "path": "/case-management"
+      }
+    },
+    {
+      "name": "wrap-component-view",
+      "slot": "case-management-dashboard-slot",
+      "component": "wrapComponent",
+      "order": 2,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [

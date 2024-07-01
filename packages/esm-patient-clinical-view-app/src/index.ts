@@ -8,7 +8,7 @@ import { configSchema } from './config-schema';
 import BirthDateCalculator from './contact-list/birthdate-calculator.component';
 import ContactList from './contact-list/contact-list.component';
 import ContactListForm from './contact-list/contact-list.workspace';
-import { contactListDashboardMeta } from './dashboard.meta';
+import { caseManagementDashboardMeta, contactListDashboardMeta } from './dashboard.meta';
 import FamilyHistory from './family-partner-history/family-history.component';
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import AntenatalCare from './maternal-and-child-health/antenatal-care.component';
@@ -30,6 +30,8 @@ import {
 } from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
 import HivTestingEncountersList from './specialized-clinics/hiv-care-and-treatment-services/hiv-testing-services/views/hiv-testing/hiv-testing-services.component';
 import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-dashboard.meta';
+import { createLeftPanelLink } from './left-panel-link.component';
+import WrapComponent from './case-management/wrap/wrap.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -85,6 +87,10 @@ export const maternalAndChildHealthSideNavGroup = getSyncLifecycle(
 export const antenatalCare = getSyncLifecycle(AntenatalCare, options);
 export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
+
+// Case Management
+export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
+export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);
