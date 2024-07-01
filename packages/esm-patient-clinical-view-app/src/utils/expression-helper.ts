@@ -55,3 +55,7 @@ function calculateAge(dob: Date) {
 
   return { ageInYears: years, ageInMonths: totalMonths, ageInDays: totalDays, age: years };
 }
+
+export function replaceAll(str: string, find: string, replace: string) {
+  return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
+}
