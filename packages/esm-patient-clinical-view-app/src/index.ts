@@ -8,7 +8,7 @@ import { configSchema } from './config-schema';
 import BirthDateCalculator from './contact-list/birthdate-calculator.component';
 import ContactList from './contact-list/contact-list.component';
 import ContactListForm from './contact-list/contact-list.workspace';
-import { contactListDashboardMeta } from './dashboard.meta';
+import { contactListDashboardMeta, caseManagementDashboardMeta } from './dashboard.meta';
 import FamilyHistory from './family-partner-history/family-history.component';
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import AntenatalCare from './maternal-and-child-health/antenatal-care.component';
@@ -31,7 +31,6 @@ import {
 import HivTestingEncountersList from './specialized-clinics/hiv-care-and-treatment-services/hiv-testing-services/views/hiv-testing/hiv-testing-services.component';
 import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-dashboard.meta';
 import { createLeftPanelLink } from './left-panel-link.component';
-import { caseManagementDashboardMeta } from './dashboard.meta';
 import WrapComponent from './case-management/wrap/wrap.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
