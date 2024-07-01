@@ -32,6 +32,7 @@ import HivTestingEncountersList from './specialized-clinics/hiv-care-and-treatme
 import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-dashboard.meta';
 import { createLeftPanelLink } from './left-panel-link.component';
 import WrapComponent from './case-management/wrap/wrap.component';
+import CaseManagementForm from './case-management/workspace/case-management.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -91,6 +92,7 @@ export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 // Case Management
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
+export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
 
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);

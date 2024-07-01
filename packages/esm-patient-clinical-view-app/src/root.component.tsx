@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import WrapComponent from './case-management/wrap/wrap.component';
 
 const Root: React.FC = () => {
