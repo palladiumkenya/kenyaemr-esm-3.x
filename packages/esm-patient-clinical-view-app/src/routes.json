@@ -218,6 +218,10 @@
       "order": 2,
       "online": true,
       "offline": false
+    },
+        {
+      "name": "case-management-form",
+      "component": "caseManagementForm"
     }
   ],
   "modals": [
