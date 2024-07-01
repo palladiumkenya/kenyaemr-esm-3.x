@@ -1,0 +1,26 @@
+.mainContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .mainContainer {
+    flex-direction: column;
+  }
+
+  .content {
+    flex-direction: row;
+  }
+}
+
+.claimContainer,
+.form {
+  flex: 1;
+}

@@ -20,10 +20,9 @@ import {
   type DataTableHeader,
   type DataTableRow,
 } from '@carbon/react';
-import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
+import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import styles from './claims-table.scss';
-import { LineItem, MappedBill } from '../../../../types';
-import ClaimsForm from '../claims-form/claims-form.component';
+import { LineItem, MappedBill } from '../../../types';
 
 type ClaimsTableProps = {
   bill: MappedBill;
@@ -59,9 +58,10 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const tableHeaders: Array<typeof DataTableHeader> = [
     { header: 'No', key: 'no' },
     { header: 'Serial No.', key: 'serialno' },
-    { header: 'Inventory Name', key: 'inventoryname' },
+    { header: 'Bill Item', key: 'inventoryname' },
     { header: 'Status', key: 'status' },
-    { header: 'Total', key: 'total' },
+    { header: 'Total amount', key: 'total' },
+    { header: 'Bill creation date', key: 'dateofbillcreation' },
   ];
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
 
@@ -75,9 +75,10 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           serialno: bill.receiptNumber,
           status: item.paymentStatus,
           total: item.price * item.quantity,
+          dateofbillcreation: formatDate(new Date(bill.dateCreated), { mode: 'standard' }),
         };
       }) ?? [],
-    [bill.receiptNumber, filteredLineItems],
+    [bill.dateCreated, bill.receiptNumber, filteredLineItems],
   );
 
   if (isLoadingBill) {
@@ -180,7 +181,6 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           </Layer>
         </div>
       )}
-      <ClaimsForm />
     </div>
   );
 };

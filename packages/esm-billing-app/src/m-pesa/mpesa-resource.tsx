@@ -1,70 +1,81 @@
-import useSWR from 'swr';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { Buffer } from 'buffer';
-import { BillingConfig } from '../config-schema';
+import { RequestStatus } from '../types';
 
-type PaymentMethod = {
-  uuid: string;
-  description: string;
-  name: string;
-  retired: boolean;
-};
+export const readableStatusMap = new Map<RequestStatus, string>();
+readableStatusMap.set('COMPLETE', 'Complete');
+readableStatusMap.set('FAILED', 'Failed');
+readableStatusMap.set('INITIATED', 'Waiting for user...');
+readableStatusMap.set('NOT-FOUND', 'Request not found');
 
-const swrOption = {
-  errorRetryCount: 2,
-};
-
-export const usePaymentModes = (excludeWaiver: boolean = true) => {
-  const { excludedPaymentMode } = useConfig<BillingConfig>();
-  const url = `/ws/rest/v1/cashier/paymentMode`;
-  const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<PaymentMethod> } }>(
-    url,
-    openmrsFetch,
-    swrOption,
-  );
-  const allowedPaymentModes =
-    excludedPaymentMode?.length > 0
-      ? data?.data?.results.filter((mode) => !excludedPaymentMode.some((excluded) => excluded.uuid === mode.uuid)) ?? []
-      : data?.data?.results ?? [];
-  return {
-    paymentModes: excludeWaiver ? allowedPaymentModes : data?.data?.results,
-    isLoading,
-    mutate,
-    error,
-  };
-};
-
-export const generateStkAccessToken = async (authorizationUrl: string) => {
+export const initiateStkPush = async (
+  payload,
+  setNotification: (notification: { type: 'error' | 'success'; message: string }) => void,
+  MPESA_PAYMENT_API_BASE_URL: string,
+): Promise<string> => {
   try {
-    const consumerKey = '';
-    const consumerSecret = '';
-    const auth = Buffer.from(`${consumerKey}:${consumerSecret}`).toString('base64');
-    const headers = {
+    const url = `${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/stk-push`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        phoneNumber: payload.PhoneNumber,
+        amount: payload.Amount,
+        accountReference: payload.AccountReference,
+      }),
+    });
+
+    if (!res.ok && res.status === 403) {
+      const error = new Error('Health facility M-PESA data not configured.');
+      throw error;
+    }
+
+    const response: { requestId: string } = await res.json();
+
+    setNotification({ message: 'STK Push sent successfully', type: 'success' });
+    return response.requestId;
+  } catch (err) {
+    const error = err as Error;
+    setNotification({
+      message: error.message ?? 'Unable to initiate Lipa Na Mpesa, please try again later.',
+      type: 'error',
+    });
+  }
+};
+
+export const getRequestStatus = async (
+  requestId: string,
+  MPESA_PAYMENT_API_BASE_URL: string,
+): Promise<RequestStatus> => {
+  const requestResponse = await fetch(`${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/check-payment-state`, {
+    method: 'POST',
+    headers: {
       'Content-Type': 'application/json',
-      Authorization: `Basic ${auth}`,
-    };
-    const response = await fetch(authorizationUrl, { method: 'GET', headers: headers });
-    const { access_token } = await response.json();
-    return access_token;
-  } catch (error) {
+    },
+    body: JSON.stringify({
+      requestId,
+    }),
+  });
+
+  if (!requestResponse.ok) {
+    const error = new Error(`HTTP error! status: ${requestResponse.status}`);
+
+    if (requestResponse.statusText) {
+      error.message = requestResponse.statusText;
+    }
     throw error;
   }
+
+  const requestStatus: { status: RequestStatus } = await requestResponse.json();
+
+  return requestStatus.status;
 };
 
-export const initiateStkPush = async (payload, initiateUrl: string, authorizationUrl: string) => {
-  try {
-    const access_token = await generateStkAccessToken(authorizationUrl);
-    const headers = {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${access_token}`,
-    };
-    const response = await fetch(initiateUrl, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(payload),
-    });
-    return await response.json();
-  } catch (err) {
-    throw err;
+export const getErrorMessage = (err: { message: string }, t) => {
+  if (err.message) {
+    return err.message;
   }
+
+  return t('unKnownErrorMsg', 'An unknown error occurred');
 };

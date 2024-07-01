@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Form, ModalBody, ModalHeader, TextInput, Layer } from '@carbon/react';
+import { Button, Form, ModalBody, ModalHeader, TextInput, Layer, InlineNotification, Loading } from '@carbon/react';
 import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formatPhoneNumber } from '../utils';
-import { Buffer } from 'buffer';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
+import { useRequestStatus } from '../../../hooks/useRequestStatus';
+import { useConfig } from '@openmrs/esm-framework';
+import { BillingConfig } from '../../../config-schema';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -27,8 +28,12 @@ export interface InitiatePaymentDialogProps {
 
 const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
   const { t } = useTranslation();
-  const { mpesaCallbackUrl, passKey, shortCode, authorizationUrl, initiateUrl } = useConfig();
+  const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
+  const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification);
+
   const {
     control,
     handleSubmit,
@@ -41,53 +46,21 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     resolver: zodResolver(InitiatePaymentSchema),
   });
 
-  const onSubmit = async (data) => {
-    try {
-      const timeStamp = new Date()
-        .toISOString()
-        .replace(/[^0-9]/g, '')
-        .slice(0, -3);
-      const phoneNumber = formatPhoneNumber(data.phoneNumber);
-      const amountBilled = data.billAmount;
-      const password = shortCode + passKey + timeStamp;
-      const callBackUrl = mpesaCallbackUrl;
-      const Password = Buffer.from(password).toString('base64');
-      const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
+  const onSubmit = async (data: { phoneNumber: any; billAmount: any }) => {
+    const phoneNumber = formatPhoneNumber(data.phoneNumber);
+    const amountBilled = data.billAmount;
+    const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
 
-      const payload = {
-        BusinessShortCode: shortCode,
-        Password: Password,
-        Timestamp: timeStamp,
-        TransactionType: 'CustomerPayBillOnline',
-        PartyA: phoneNumber,
-        PartyB: shortCode,
-        PhoneNumber: phoneNumber,
-        CallBackURL: callBackUrl,
-        AccountReference: accountReference,
-        TransactionDesc: 'KenyaEMRPay',
-        Amount: amountBilled,
-      };
+    const payload = {
+      AccountReference: accountReference,
+      PhoneNumber: phoneNumber,
+      Amount: amountBilled,
+    };
 
-      await initiateStkPush(payload, initiateUrl, authorizationUrl);
-      showSnackbar({
-        title: t('stkPush', 'STK Push'),
-        subtitle: t('stkPushSucess', 'STK Push send successfully'),
-        kind: 'success',
-        timeoutInMs: 3500,
-        isLowContrast: true,
-      });
-      closeModal();
-    } catch (err) {
-      const errorMessage =
-        err.response?.data?.errorMessage || err.message || t('stkPushError', 'STK Push request failed');
-      showSnackbar({
-        title: t('stkPush', 'STK Push'),
-        subtitle: errorMessage,
-        kind: 'error',
-        timeoutInMs: 3500,
-        isLowContrast: true,
-      });
-    }
+    setIsLoading(true);
+    const requestId = await initiateStkPush(payload, setNotification, mpesaAPIBaseUrl);
+    setIsLoading(false);
+    pollingTrigger({ requestId, requestStatus: 'INITIATED' });
   };
 
   return (
@@ -96,6 +69,13 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
       <ModalBody>
         <Form className={styles.form}>
           <h4>{t('paymentPayment', 'Bill Payment')}</h4>
+          {notification && (
+            <InlineNotification
+              kind={notification.type}
+              title={notification.message}
+              onCloseButtonClick={() => setNotification(null)}
+            />
+          )}
           <section className={styles.section}>
             <Controller
               control={control}
@@ -136,8 +116,19 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
             <Button kind="secondary" className={styles.buttonLayout} onClick={closeModal}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button type="submit" className={styles.button} onClick={handleSubmit(onSubmit)} disabled={!isValid}>
-              {t('initiatePay', 'Initiate Payment')}
+            <Button
+              type="submit"
+              className={styles.button}
+              onClick={handleSubmit(onSubmit)}
+              disabled={!isValid || isLoading || requestStatus === 'INITIATED'}>
+              {isLoading ? (
+                <>
+                  <Loading className={styles.button_spinner} withOverlay={false} small />{' '}
+                  {t('processingPayment', 'Processing Payment')}
+                </>
+              ) : (
+                t('initiatePay', 'Initiate Payment')
+              )}
             </Button>
           </section>
         </Form>

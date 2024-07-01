@@ -14,7 +14,7 @@ import Payments from './payments/payments.component';
 import PrintReceipt from './printable-invoice/print-receipt.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import styles from './invoice.scss';
-import MakeClaims from './claims/make-claims.component';
+import MakeClaims from '../claims/make-claims.component';
 
 interface InvoiceDetailsProps {
   label: string;
@@ -30,6 +30,7 @@ const Invoice: React.FC = () => {
   const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
+
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems([...lineItems, ...paidLineItems]);
@@ -100,9 +101,11 @@ const Invoice: React.FC = () => {
           ))}
         </section>
         <div>
-          <Button onClick={handleBillPayment} iconDescription="Initiate Payment" size="md">
-            {t('initiatePayment', 'Initiate Payment')}
-          </Button>
+          {bill?.status !== 'PAID' && (
+            <Button onClick={handleBillPayment} iconDescription="Initiate Payment" size="md">
+              {t('initiatePayment', 'Initiate Payment')}
+            </Button>
+          )}
           <Button
             disabled={isPrinting}
             onClick={handlePrint}
@@ -113,7 +116,7 @@ const Invoice: React.FC = () => {
             {isPrinting ? t('printing', 'Printing...') : t('printBill', 'Print bill')}
           </Button>
           {/* {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null} */}
-          <MakeClaims />
+          <MakeClaims patientUuid={patientUuid} billUuid={billUuid} />
         </div>
       </div>
 
