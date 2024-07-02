@@ -1,0 +1,14 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.risk-score-card {
+  width: 100%;
+  border: 2px solid $grey-2;
+}
+
+.risk-score-card__item {
+  flex-grow: 1;
+  padding: spacing.$spacing-08;
+}
