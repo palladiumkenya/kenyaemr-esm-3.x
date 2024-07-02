@@ -37,13 +37,12 @@ export const useBillableItem = (billableItemId: string) => {
 
 export const useSockItemInventory = (stockItemId: string) => {
   const url = `/ws/rest/v1/stockmanagement/stockiteminventory?v=default&limit=10&totalCount=true&drugUuid=${stockItemId}`;
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<{ quantityUoM: string; quantity: number }> } }>(
-    url,
-    openmrsFetch,
-  );
-  const stockItemsInfo = first(data?.data?.results ?? []);
+  const { data, error, isLoading } = useSWR<{
+    data: { results: Array<{ quantityUoM: string; quantity: number; partyName: string }> };
+  }>(url, openmrsFetch);
+
   return {
-    stockItem: stockItemsInfo,
+    stockItem: (data?.data?.results as Array<any>) ?? [],
     isLoading: isLoading,
     error,
   };
