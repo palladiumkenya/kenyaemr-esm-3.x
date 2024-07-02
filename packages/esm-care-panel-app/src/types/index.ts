@@ -219,3 +219,14 @@ export interface UpdateObs {
     value: string | number;
   }>;
 }
+
+export interface RegimenItem {
+  name: string;
+  conceptRef: string;
+}
+
+export interface RegimenLineGroup {
+  regimenline: string;
+  regimenLineValue: string;
+  regimen: RegimenItem[];
+}
