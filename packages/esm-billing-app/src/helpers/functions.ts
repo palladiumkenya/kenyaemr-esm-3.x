@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { Payment, LineItem } from '../types';
 
 // amount already paid
@@ -80,4 +81,17 @@ function removeUUID(str) {
 
   // Replace the UUID with an empty string
   return str.replace(uuidPattern, '');
+}
+
+// cleans the provider display name
+export function extractNameString(formattedString) {
+  if (!formattedString) {
+    return '';
+  }
+  const parts = formattedString.split(' - ');
+  return parts.length > 1 ? parts[1] : '';
+}
+
+export function formatDate(date) {
+  return dayjs(date).format('YYYY-MM-DD');
 }

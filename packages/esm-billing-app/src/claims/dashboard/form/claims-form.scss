@@ -28,7 +28,7 @@
   justify-content: space-between;
   background-color: white;
 
-  @media (min-width: 768px) {
+  :global(.omrs-breakpoint-lt-desktop) {
     width: 50%;
     padding: spacing.$spacing-06 spacing.$spacing-05;
   }
@@ -63,14 +63,14 @@
     display: flex;
     justify-content: flex-end;
     gap: spacing.$spacing-05;
-    margin-bottom: spacing.$spacing-03;
+    margin-bottom: spacing.$spacing-07;
 
-    @media (max-width: 767px) {
+    :global(.omrs-breakpoint-lt-desktop) {
       justify-content: center;
     }
   }
 
-  @media (min-width: 1768px) {
+  :global(.omrs-breakpoint-lt-desktop) {
     width: 768px;
   }
 }
@@ -98,7 +98,7 @@
   display: flex;
   justify-content: flex-end;
   gap: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-07;
 }
 
 .claimFormTitle {
@@ -126,10 +126,6 @@
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
-  .form {
-    height: var(--tablet-workspace-window-height);
-  }
-
   .buttonSet {
     padding: spacing.$spacing-06 spacing.$spacing-05;
     background-color: $ui-02;

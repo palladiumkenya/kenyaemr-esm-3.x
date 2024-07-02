@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './claims-header.scss';
 import ClaimMainComponent from '../../claims-wrap/claims-main-component';
@@ -11,14 +10,12 @@ interface ClaimsHeaderProps {
 }
 
 const ClaimsHeader: React.FC<ClaimsHeaderProps> = ({ patient, bill }) => {
-  const { t } = useTranslation();
   return (
     <div className={styles.claimContainer}>
       {patient && <ExtensionSlot name="patient-header-slot" state={{ patientUuid: patient.id, patient }} />}
       <div className={styles.detailsContainer}>
-        <span className={styles.claimTitle}> {t('createClaim', 'Create Claim')}</span>
+        <ClaimMainComponent bill={bill} />
       </div>
-      <ClaimMainComponent bill={bill} />
     </div>
   );
 };

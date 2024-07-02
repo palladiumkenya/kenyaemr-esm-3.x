@@ -1,22 +1,21 @@
 .mainContainer {
   display: flex;
-  flex-direction: column;
   margin: 0 auto;
   padding: 0 1rem;
 }
 
 .content {
   display: flex;
-  flex-direction: column;
+  width: 100%;
 }
 
-@media (min-width: 768px) {
+:global(.omrs-breakpoint-lt-desktop) {
   .mainContainer {
     flex-direction: column;
   }
 
   .content {
-    flex-direction: row;
+    flex-direction: column;
   }
 }
 
