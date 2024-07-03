@@ -9,6 +9,7 @@ import {
   TextInput,
   FilterableMultiSelect,
   ButtonSet,
+  ComboBox,
   Button,
   MultiSelect,
   DatePicker,
@@ -46,7 +47,7 @@ const CaseManagementForm: React.FC = () => {
         <span className={styles.sectionHeader}>Demographics</span>
 
         <Column>
-          <FilterableMultiSelect
+          <ComboBox
             id="case_manager_name"
             titleText={t('manager', 'Case Manager')}
             label="Multiselect Label"
