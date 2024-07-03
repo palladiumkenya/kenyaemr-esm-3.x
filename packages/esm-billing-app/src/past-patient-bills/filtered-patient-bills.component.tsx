@@ -14,10 +14,10 @@ import {
 } from '@carbon/react';
 import { convertToCurrency, extractString } from '../helpers';
 import { useTranslation } from 'react-i18next';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { MappedBill } from '../types';
 import styles from '../bills-table/bills-table.scss';
 import { ConfigurableLink } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 type PatientBillsProps = {
   patientUuid: string;
@@ -29,7 +29,7 @@ const PastPatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, set
   const { t } = useTranslation();
 
   if (!patientUuid) {
-    return;
+    <h3>Missing patient information</h3>;
   }
 
   const tableHeaders = [
@@ -55,24 +55,11 @@ const PastPatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, set
   }));
 
   if (bills.length === 0 && patientUuid !== '') {
-    return (
-      <>
-        <div style={{ marginTop: '0.625rem' }}>
-          <Layer className={styles.emptyStateContainer}>
-            <Tile className={styles.tile}>
-              <div className={styles.illo}>
-                <EmptyDataIllustration />
-              </div>
-              <p className={styles.content}>{t('noBillDisplay', 'There are no bills to display for this patient')}</p>
-            </Tile>
-          </Layer>
-        </div>
-      </>
-    );
+    <EmptyState displayText={'Pending Patient Bills Found'} headerTitle={'No Pending Patient Bills Found'} />;
   }
 
   return (
-    <div style={{ marginTop: '1rem' }}>
+    <div className={styles.container}>
       <DataTable
         rows={tableRows}
         headers={tableHeaders}
