@@ -12,7 +12,7 @@ interface CaseManagerResponse {
 
 interface RelationshipType {
   uuid: string;
-  displayAIsToB: string;
+  display: string;
 }
 
 interface RelationshipTypeResponse {
@@ -28,9 +28,9 @@ export const useCaseManagers = () => {
 };
 
 export const useRelationshipType = () => {
-  const customRepresentation = 'custom:(uuid,display)';
+  const customRepresentation = 'custom:(uuid,display)&q=Case manager';
   const url = `/ws/rest/v1/relationshiptype?v=${customRepresentation}`;
-  const { data, error } = useSWRImmutable<{ data: CaseManagerResponse }>(url, openmrsFetch);
+  const { data, error } = useSWRImmutable<{ data: RelationshipTypeResponse }>(url, openmrsFetch);
 
   return { data, error };
 };
