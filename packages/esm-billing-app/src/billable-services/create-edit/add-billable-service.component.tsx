@@ -33,6 +33,7 @@ const servicePriceSchema = z.object({
   paymentMode: z.string({ required_error: 'Payment method is required' }),
   price: z
     .string()
+    .refine((value) => !isNaN(Number(value)), 'Value must be a number')
     .refine((value) => parseInt(value) > 0, 'Price should be a number more than zero')
     .refine((value) => !!value, 'Price is required'),
 });
