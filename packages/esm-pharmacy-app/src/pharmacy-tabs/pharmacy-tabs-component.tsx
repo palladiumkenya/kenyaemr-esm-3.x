@@ -11,8 +11,8 @@ export const PharmacyTabs: React.FC = () => {
     <main>
       <Tabs className={styles.tabs}>
         <TabList className={styles.tablist} aria-label="List tabs" contained>
-          <Tab className={styles.tab}>{t('patients', 'Patients')}</Tab>
-          <Tab className={styles.tab}>{t('users', 'Users')}</Tab>
+          <Tab className={styles.tab}>{t('patients', 'Assigned Patients')}</Tab>
+          <Tab className={styles.tab}>{t('users', 'Asigned Users')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>

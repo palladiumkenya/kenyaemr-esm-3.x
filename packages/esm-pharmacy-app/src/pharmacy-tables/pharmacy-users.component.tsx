@@ -237,7 +237,7 @@ export const PharmacyUsers: React.FC = () => {
                   // TODO: add background color to the toolbar
                 }}>
                 <TableToolbarContent style={{ margin: 0, position: 'relative' }}>
-                  <TableToolbarSearch
+                  {/* <TableToolbarSearch
                     style={{
                       backgroundColor: '#f4f4f4',
                       position: 'absolute',
@@ -255,7 +255,7 @@ export const PharmacyUsers: React.FC = () => {
                       size="md"
                       style={{ background: 'transparent' }}
                     />
-                  </DatePicker>
+                  </DatePicker> */}
                 </TableToolbarContent>
               </TableToolbar>
               <Table {...getTableProps()} aria-label="sample table">
