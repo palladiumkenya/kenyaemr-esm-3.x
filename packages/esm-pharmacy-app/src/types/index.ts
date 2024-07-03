@@ -1,4 +1,4 @@
-import { Location } from '@openmrs/esm-framework';
+import { Location, Patient } from '@openmrs/esm-framework';
 
 export interface Pharmacy extends Location {
   //Inherits Uuid,display,name
@@ -6,4 +6,20 @@ export interface Pharmacy extends Location {
   cityVillage?: string;
   stateProvince?: string;
   countyDistrict?: string;
+}
+
+export interface PharmacyPatient {
+  uuid: string;
+  name: string;
+  age?: number;
+  gender?: string;
+  telephoneContact?: string;
+}
+
+export interface PharmacyUser {
+  uuid: string;
+  name: string;
+  age?: number;
+  gender?: string;
+  telephoneContact?: string;
 }
