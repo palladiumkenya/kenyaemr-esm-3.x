@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
+import { Controller, FieldArrayWithId, UseFieldArrayRemove, useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TrashCan, Add } from '@carbon/react/icons';
 import { Button, Dropdown, NumberInputSkeleton, TextInput, NumberInput } from '@carbon/react';
@@ -8,9 +8,15 @@ import styles from './payment-form.scss';
 import { usePaymentModes } from '../../../billing.resource';
 import { PaymentFormValue } from '../../../types';
 
-type PaymentFormProps = { disablePayment: boolean; amountDue: number };
+type PaymentFormProps = {
+  disablePayment: boolean;
+  amountDue: number;
+  append: (obj: { method: string; amount: number; referenceCode: string }) => void;
+  fields: FieldArrayWithId<PaymentFormValue, 'payment', 'id'>[];
+  remove: UseFieldArrayRemove;
+};
 
-const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, append, remove, fields }) => {
   const { t } = useTranslation();
   const {
     control,
@@ -18,7 +24,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
     setFocus,
   } = useFormContext<PaymentFormValue>();
   const { paymentModes, isLoading, error } = usePaymentModes();
-  const { fields, remove, append } = useFieldArray({ name: 'payment', control: control });
 
   const handleAppendPaymentMode = useCallback(() => {
     {
@@ -26,6 +31,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue }) 
       setFocus(`payment.${fields.length}.method`);
     }
   }, [append]);
+
   const handleRemovePaymentMode = useCallback((index) => remove(index), [remove]);
 
   if (isLoading) {
