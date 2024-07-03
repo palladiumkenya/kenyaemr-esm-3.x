@@ -19,31 +19,17 @@
     color: $ui-05;
   }
 }
-
-.form {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 50%;
+.datePickerInput {
+  width: 23rem;
 }
 
 .grid {
   margin: 0 spacing.$spacing-05;
   padding: 0rem;
 }
-
-.datePickersRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: spacing.$spacing-05;
-  align-items: center;
-  justify-content: space-between;
+.textbox {
+  margin-bottom: spacing.$spacing-10;
 }
-
-.datePickerInput {
-  width: 100%;
-}
-
 .button {
   height: spacing.$spacing-10;
   display: flex;
@@ -56,11 +42,7 @@
   padding: 0rem;
   margin-top: spacing.$spacing-10;
   display: flex;
-  justify-content: center;
-  margin-bottom: spacing.$spacing-02;
-}
-.textbox {
-  margin-bottom: spacing.$spacing-10;
+  justify-content: end;
 }
 
 .caseFormTitle {

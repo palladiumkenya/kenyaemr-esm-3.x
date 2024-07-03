@@ -59,3 +59,10 @@ function calculateAge(dob: Date) {
 export function replaceAll(str: string, find: string, replace: string) {
   return str.replace(new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replace);
 }
+export function extractNameString(formattedString) {
+  if (!formattedString) {
+    return '';
+  }
+  const parts = formattedString.split(' - ');
+  return parts.length > 1 ? parts[1] : '';
+}
