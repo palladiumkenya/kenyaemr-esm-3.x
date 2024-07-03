@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import styles from './case-management.scss';
 import { useSession } from '@openmrs/esm-framework';
-import { useCaseManagers } from './case-management.resource';
+import { useCaseManagers, useRelationshipType } from './case-management.resource';
 import { extractNameString } from '../../utils/expression-helper';
 
 const CaseManagementForm: React.FC = () => {
@@ -26,6 +26,7 @@ const CaseManagementForm: React.FC = () => {
   const { user } = useSession();
   const caseManagerDefault = user?.person?.display;
   const { data, error } = useCaseManagers();
+  const { data: relationshipTypesData } = useRelationshipType();
 
   const caseManagers =
     data?.data.results.map((manager) => ({
@@ -33,7 +34,14 @@ const CaseManagementForm: React.FC = () => {
       text: manager.display,
     })) || [];
 
-  const [selectedCaseManager, setSelectedCaseManager] = useState(null);
+  const caseManagerRlshipType =
+    relationshipTypesData?.data.results.map((relationship) => ({
+      id: relationship.uuid,
+      text: relationship.display,
+    })) || [];
+  console.log(caseManagerRlshipType);
+
+  const [selectedCaseManager, setSelectedCaseManager] = useState('');
 
   const onSubmit = async (data) => {
     // console.log('Selected Case Manager:', selectedCaseManager);
@@ -50,7 +58,6 @@ const CaseManagementForm: React.FC = () => {
           <ComboBox
             id="case_manager_name"
             titleText={t('manager', 'Case Manager')}
-            label="Multiselect Label"
             items={caseManagers}
             itemToString={(item) => extractNameString(item ? item.text : '')}
             onChange={({ selectedItems }) => setSelectedCaseManager(selectedItems)}
@@ -69,10 +76,12 @@ const CaseManagementForm: React.FC = () => {
           />
         </Column>
         <Column>
-          <TextInput
+          <ComboBox
             id="relationship_name"
-            placeholder="Relationship With Case"
-            labelText={t('relationship', 'Relationship')}
+            titleText={t('relationship', 'Relationship')}
+            items={caseManagerRlshipType}
+            itemToString={(item) => (item ? item.text : '')}
+            onChange={({ selectedItems }) => setSelectedCaseManager(selectedItems)}
           />
         </Column>
         <Column>
