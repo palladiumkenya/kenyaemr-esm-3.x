@@ -3,9 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Select, SelectItem } from '@carbon/react';
 import { useStandardRegimen } from '../hooks/useStandardRegimen';
 import styles from './standard-regimen.scss';
-import useFilteredRegimen from '../hooks/useFilteredRegimen';
 import { usePatient } from '@openmrs/esm-framework';
-import calculateAge from '../hooks/useCalculateAge';
+import { filterRegimenData, calculateAge } from './utils';
 
 interface StandardRegimenProps {
   category: string;
@@ -29,7 +28,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
   const matchingCategory = standardRegimen.find((item) => item.categoryCode === category);
   const { patient } = usePatient();
   const patientAge = calculateAge(patient?.birthDate);
-  const filteredRegimenLineByAge = useFilteredRegimen(matchingCategory?.category, patientAge);
+  const filteredRegimenLineByAge = filterRegimenData(matchingCategory?.category, patientAge);
 
   useEffect(() => {
     const matchingRegimenLine = matchingCategory?.category.find(
