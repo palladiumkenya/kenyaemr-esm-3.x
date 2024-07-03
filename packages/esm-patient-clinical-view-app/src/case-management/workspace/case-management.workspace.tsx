@@ -14,21 +14,20 @@ import {
   MultiSelect,
   DatePicker,
   DatePickerInput,
-  Search,
 } from '@carbon/react';
 import styles from './case-management.scss';
-import { ExtensionSlot, usePatient, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, useSession } from '@openmrs/esm-framework';
 import { useCaseManagers, useRelationshipType } from './case-management.resource';
-import { extractNameString } from '../../utils/expression-helper';
+import { extractNameString, uppercaseText } from '../../utils/expression-helper';
 import PatientInfo from './patient-info.component';
+import { caseManagementConceptMap } from './case-management-concept-map';
 
 const CaseManagementForm: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useSession();
   const [patientUuid, setPatientUuid] = useState('');
-  const [patientSelected, setPatientSelected] = useState(false); // Track if patient is selected
+  const [patientSelected, setPatientSelected] = useState(false);
 
-  const caseManagerDefault = user?.person?.display;
   const { data, error } = useCaseManagers();
   const { data: relationshipTypesData } = useRelationshipType();
 
@@ -45,6 +44,14 @@ const CaseManagementForm: React.FC = () => {
     })) || [];
 
   const [selectedCaseManager, setSelectedCaseManager] = useState('');
+  const [selectedReasons, setSelectedReasons] = useState([]);
+
+  const conceptReasons = useMemo(() => {
+    return Object.keys(caseManagementConceptMap.answers).map((key) => ({
+      id: key,
+      text: caseManagementConceptMap.answers[key],
+    }));
+  }, []);
 
   const onSubmit = async (data) => {
     // Handle form submission
@@ -52,7 +59,7 @@ const CaseManagementForm: React.FC = () => {
 
   const selectPatient = (patientUuid) => {
     setPatientUuid(patientUuid);
-    setPatientSelected(true); // Set patientSelected to true when patient is selected
+    setPatientSelected(true);
   };
 
   return (
@@ -65,8 +72,9 @@ const CaseManagementForm: React.FC = () => {
           <ComboBox
             id="case_manager_name"
             titleText={t('manager', 'Case Manager')}
+            placeholder="Select Case Manager"
             items={caseManagers}
-            itemToString={(item) => extractNameString(item ? item.text : '')}
+            itemToString={(item) => uppercaseText(extractNameString(item ? item.text : ''))}
             onChange={({ selectedItems }) => setSelectedCaseManager(selectedItems)}
           />
         </Column>
@@ -89,8 +97,9 @@ const CaseManagementForm: React.FC = () => {
           <ComboBox
             id="relationship_name"
             titleText={t('relationship', 'Relationship')}
+            placeholder="Select Relationship"
             items={caseManagerRlshipType}
-            itemToString={(item) => (item ? item.text : '')}
+            itemToString={(item) => (item ? uppercaseText(item.text) : '')}
             onChange={({ selectedItems }) => setSelectedCaseManager(selectedItems)}
           />
         </Column>
@@ -117,11 +126,13 @@ const CaseManagementForm: React.FC = () => {
           </DatePicker>
         </Column>
         <Column>
-          <MultiSelect
+          <ComboBox
             id="reasons"
+            placeholder="Select Reason for Assignment"
             titleText={t('reasons', 'Reason for Assignment')}
-            items={caseManagers}
-            itemToString={(item) => (item ? item.text : '')}
+            items={conceptReasons}
+            itemToString={(item) => (item ? uppercaseText(item.text) : '')}
+            onChange={({ selectedItems }) => setSelectedReasons(selectedItems)}
           />
         </Column>
         <Column className={styles.textbox}>

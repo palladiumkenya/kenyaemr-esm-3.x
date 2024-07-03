@@ -73,3 +73,6 @@ export const formatPatientName = (patient) => {
 
   return `${givenNames} ${familyName}`.trim();
 };
+export const uppercaseText = (text) => {
+  return text.toUpperCase();
+};
