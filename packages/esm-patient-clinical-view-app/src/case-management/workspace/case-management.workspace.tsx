@@ -7,7 +7,7 @@ import {
   Layer,
   Stack,
   TextInput,
-  Row,
+  FilterableMultiSelect,
   ButtonSet,
   Button,
   MultiSelect,
@@ -17,18 +17,45 @@ import {
 } from '@carbon/react';
 import styles from './case-management.scss';
 import { useSession } from '@openmrs/esm-framework';
+import { useCaseManagers } from './case-management.resource';
+import { extractNameString } from '../../utils/expression-helper';
 
 const CaseManagementForm: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useSession();
-  const currentProvider = user?.person?.display;
-  console.log(currentProvider);
-  const onSubmit = async (data) => {};
+  const caseManagerDefault = user?.person?.display;
+  const { data, error } = useCaseManagers();
+
+  const caseManagers =
+    data?.data.results.map((manager) => ({
+      id: manager.uuid,
+      text: manager.display,
+    })) || [];
+
+  const [selectedCaseManager, setSelectedCaseManager] = useState(null);
+
+  const onSubmit = async (data) => {
+    // console.log('Selected Case Manager:', selectedCaseManager);
+    // Handle form submission
+  };
+
   return (
-    <Form>
+    <Form className={styles.form} onSubmit={onSubmit}>
       <span className={styles.caseFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}>
-        <span className={styles.sectionHeader}>Case Information</span>
+        <span className={styles.sectionHeader}>Demographics</span>
+
+        <Column>
+          <FilterableMultiSelect
+            id="case_manager_name"
+            titleText={t('manager', 'Case Manager')}
+            label="Multiselect Label"
+            items={caseManagers}
+            itemToString={(item) => extractNameString(item ? item.text : '')}
+            onChange={({ selectedItems }) => setSelectedCaseManager(selectedItems)}
+          />
+        </Column>
+        <span className={styles.sectionHeader}>Relationship Info</span>
         <Column>
           <Search
             size="lg"
@@ -40,30 +67,42 @@ const CaseManagementForm: React.FC = () => {
             onKeyDown={() => {}}
           />
         </Column>
-        <span className={styles.sectionHeader}>Case Manager Information</span>
-
         <Column>
           <TextInput
-            id="case_manager_name"
-            placeholder="Case Manager Name"
-            labelText={t('manager', 'Case Manager Name')}
+            id="relationship_name"
+            placeholder="Relationship With Case"
+            labelText={t('relationship', 'Relationship')}
           />
         </Column>
-        <span className={styles.sectionHeader}> More Information</span>
-        <Row className={styles.datePickersRow}>
-          <Column>
-            <DatePicker datePickerType="single">
-              <DatePickerInput placeholder="mm/dd/yyyy" labelText="Start Date" id="case-start-date-picker" size="md" />
-            </DatePicker>
-          </Column>
-          <Column>
-            <DatePicker datePickerType="single">
-              <DatePickerInput placeholder="mm/dd/yyyy" labelText="End Date" id="case-end-date-picker" size="md" />
-            </DatePicker>
-          </Column>
-        </Row>
         <Column>
-          <MultiSelect id="reasons" titleText={t('reasons', 'Reason for Assignment')} />
+          <DatePicker datePickerType="single">
+            <DatePickerInput
+              placeholder="mm/dd/yyyy"
+              labelText="Start Date"
+              id="case-start-date-picker"
+              size="md"
+              className={styles.datePickerInput}
+            />
+          </DatePicker>
+        </Column>
+        <Column>
+          <DatePicker datePickerType="single">
+            <DatePickerInput
+              placeholder="mm/dd/yyyy"
+              labelText="End Date"
+              id="case-end-date-picker"
+              size="md"
+              className={styles.component}
+            />
+          </DatePicker>
+        </Column>
+        <Column>
+          <MultiSelect
+            id="reasons"
+            titleText={t('reasons', 'Reason for Assignment')}
+            items={caseManagers}
+            itemToString={(item) => (item ? item.text : '')}
+          />{' '}
         </Column>
         <Column className={styles.textbox}>
           <TextArea labelText="Any additional notes" rows={4} id="case-manager-notes" />
@@ -75,7 +114,7 @@ const CaseManagementForm: React.FC = () => {
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">
-          {t('submit', 'Submit')}
+          {t('save', 'Save and discard')}
         </Button>
       </ButtonSet>
     </Form>

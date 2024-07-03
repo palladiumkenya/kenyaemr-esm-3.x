@@ -55,3 +55,10 @@ function calculateAge(dob: Date) {
 
   return { ageInYears: years, ageInMonths: totalMonths, ageInDays: totalDays, age: years };
 }
+export function extractNameString(formattedString) {
+  if (!formattedString) {
+    return '';
+  }
+  const parts = formattedString.split(' - ');
+  return parts.length > 1 ? parts[1] : '';
+}

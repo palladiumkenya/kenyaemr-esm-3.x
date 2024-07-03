@@ -10,7 +10,7 @@ const MetricsHeader = () => {
   const metricsTitle = t('caseManager', 'Case Manager summaries');
   const handleAddCase = () => {
     launchWorkspace('case-management-form', {
-      workspaceTitle: 'Enrollment Form',
+      workspaceTitle: 'Case Management Form',
     });
   };
   return (
@@ -20,9 +20,9 @@ const MetricsHeader = () => {
         <Button
           kind="tertiary"
           renderIcon={(props) => <WatsonHealthStressBreathEditor size={16} {...props} />}
-          iconDescription={t('enroll', 'Enroll a case')}
+          iconDescription={t('addCase', 'add a case')}
           onClick={handleAddCase}>
-          {t('enroll', 'Enroll a case')}
+          {t('addCase', 'add a case')}
         </Button>
       </div>
     </div>
