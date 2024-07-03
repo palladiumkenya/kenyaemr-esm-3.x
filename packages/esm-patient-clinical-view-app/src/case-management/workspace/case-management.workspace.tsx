@@ -17,13 +17,17 @@ import {
   Search,
 } from '@carbon/react';
 import styles from './case-management.scss';
-import { useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePatient, useSession } from '@openmrs/esm-framework';
 import { useCaseManagers, useRelationshipType } from './case-management.resource';
 import { extractNameString } from '../../utils/expression-helper';
+import PatientInfo from './patient-info.component';
 
 const CaseManagementForm: React.FC = () => {
   const { t } = useTranslation();
   const { user } = useSession();
+  const [patientUuid, setPatientUuid] = useState('');
+  const [patientSelected, setPatientSelected] = useState(false); // Track if patient is selected
+
   const caseManagerDefault = user?.person?.display;
   const { data, error } = useCaseManagers();
   const { data: relationshipTypesData } = useRelationshipType();
@@ -39,13 +43,16 @@ const CaseManagementForm: React.FC = () => {
       id: relationship.uuid,
       text: relationship.display,
     })) || [];
-  console.log(caseManagerRlshipType);
 
   const [selectedCaseManager, setSelectedCaseManager] = useState('');
 
   const onSubmit = async (data) => {
-    // console.log('Selected Case Manager:', selectedCaseManager);
     // Handle form submission
+  };
+
+  const selectPatient = (patientUuid) => {
+    setPatientUuid(patientUuid);
+    setPatientSelected(true); // Set patientSelected to true when patient is selected
   };
 
   return (
@@ -64,17 +71,20 @@ const CaseManagementForm: React.FC = () => {
           />
         </Column>
         <span className={styles.sectionHeader}>Relationship Info</span>
-        <Column>
-          <Search
-            size="lg"
-            placeholder="Search for a case by name or identifier number"
-            labelText="Search"
-            closeButtonLabelText="Clear"
-            id="case-search"
-            onChange={() => {}}
-            onKeyDown={() => {}}
-          />
-        </Column>
+        {patientSelected && <PatientInfo patientUuid={patientUuid} />}
+        {!patientSelected && (
+          <Column>
+            <ExtensionSlot
+              name="patient-search-bar-slot"
+              state={{
+                selectPatientAction: selectPatient,
+                buttonProps: {
+                  kind: 'primary',
+                },
+              }}
+            />
+          </Column>
+        )}
         <Column>
           <ComboBox
             id="relationship_name"
@@ -112,7 +122,7 @@ const CaseManagementForm: React.FC = () => {
             titleText={t('reasons', 'Reason for Assignment')}
             items={caseManagers}
             itemToString={(item) => (item ? item.text : '')}
-          />{' '}
+          />
         </Column>
         <Column className={styles.textbox}>
           <TextArea labelText="Any additional notes" rows={4} id="case-manager-notes" />
