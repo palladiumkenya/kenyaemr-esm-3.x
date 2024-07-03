@@ -3,8 +3,14 @@ import styles from './patient-bills-dashboard.scss';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import PastPatientBills from '../filtered-patient-bills.component';
 import { useBills } from '../../billing.resource';
+import { Dropdown } from '@carbon/react';
 
-const PastPatientBillsScreen: React.FC = () => {
+const filterItems = [
+  { id: 'PENDING', text: 'Pending bills' },
+  { id: 'POSTED', text: 'Posted bills' },
+];
+
+const PatientBillsScreen: React.FC = () => {
   const [patientUuid, setPatientUuid] = React.useState<string>('');
   const { bills } = useBills(patientUuid);
   const filterBills = bills.filter((bill) => bill.status !== 'PAID' && patientUuid === bill.patientUuid) ?? [];
@@ -25,4 +31,4 @@ const PastPatientBillsScreen: React.FC = () => {
   );
 };
 
-export default PastPatientBillsScreen;
+export default PatientBillsScreen;

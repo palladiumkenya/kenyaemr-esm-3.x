@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, Tabs, TabPanel, TabPanels } from '@carbon/react';
 import styles from './billing-tab.scss';
-import PastPatientBillsScreen from '../past-patient-bills/patient-bills-dashboard/patient-bills-dashboard';
+import PatientBillsScreen from '../past-patient-bills/patient-bills-dashboard/patient-bills-dashboard';
 import BillsTable from '../bills-table/bills-table.component';
 
 const BillingTabs = () => {
@@ -19,7 +19,7 @@ const BillingTabs = () => {
         <div style={{ display: 'flex' }}>
           <TabList style={{ paddingLeft: '1rem' }} aria-label="Billing tabs" contained>
             <Tab className={styles.tab}>{"Today's bills"}</Tab>
-            <Tab className={styles.tab}>{'All Bills'}</Tab>
+            <Tab className={styles.tab}>{t('patientBills', 'Patient Bill')}</Tab>
           </TabList>
         </div>
         <TabPanels>
@@ -27,7 +27,7 @@ const BillingTabs = () => {
             <BillsTable />
           </TabPanel>
           <TabPanel className={styles.tabPanel}>
-            <PastPatientBillsScreen />
+            <PatientBillsScreen />
           </TabPanel>
         </TabPanels>
       </Tabs>
