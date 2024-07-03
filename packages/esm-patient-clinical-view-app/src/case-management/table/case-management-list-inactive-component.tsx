@@ -12,26 +12,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tile,
+  Search,
   Button,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { isDesktop, launchWorkspace, navigate, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './case-management-list.scss';
 
-interface CaseManagementProps {
-  encounterTypeUuid: string;
-  formEntrySub: any;
-  patientUuid: string;
-}
-
-const CaseManagementList: React.FC<CaseManagementProps> = ({ patientUuid }) => {
+const CaseManagementListInActive: React.FC = () => {
   const { t } = useTranslation();
   const config = useConfig();
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
-  const headerTitle = t('CaseManagement', 'Case Management');
+  const responsiveSize = isDesktop(layout) ? 'lg' : 'sm';
+
+  const headerTitle = t('inactiveCases', 'InActive Cases');
 
   const headers = [
     {
@@ -55,29 +50,21 @@ const CaseManagementList: React.FC<CaseManagementProps> = ({ patientUuid }) => {
       key: 'dateofend',
     },
     {
+      header: t('notes', 'Notes'),
+      key: 'notes',
+    },
+    {
       header: t('action', 'Action'),
       key: 'action',
     },
   ];
 
   const tableRows = [];
-  const handleAddContact = () => {
-    launchWorkspace('contact-list-form', {
-      workspaceTitle: 'Contact Form',
-    });
-  };
-
-  const handleAddHistory = () => {
-    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
-  };
 
   return (
     <div className={styles.widgetContainer}>
-      <CardHeader title={headerTitle}>
-        <Button onClick={handleAddContact} renderIcon={Add} kind="ghost">
-          {t('add', 'Add')}
-        </Button>
-      </CardHeader>
+      <CardHeader title={headerTitle} children={''}></CardHeader>
+      <Search labelText="" placeholder={t('filterTable', 'Filter table')} size={responsiveSize} />
       <DataTable
         useZebraStyles
         size="sm"
@@ -117,12 +104,10 @@ const CaseManagementList: React.FC<CaseManagementProps> = ({ patientUuid }) => {
         pageSize={pageSize}
         pageSizes={[5, 10, 15]}
         totalItems={tableRows.length}
-        onChange={({ page, pageSize }) => {
-          // Handle pagination change
-        }}
+        onChange={({ page, pageSize }) => {}}
       />
     </div>
   );
 };
 
-export default CaseManagementList;
+export default CaseManagementListInActive;
