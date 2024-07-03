@@ -27,10 +27,10 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
+import useRelationshipTypes from '../hooks/useRelationshipTypes';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
-import { ContactListFormSchema, saveContact, useRelationshipTypes } from './contact-list.resource';
-
+import { ContactListFormSchema, saveContact } from './contact-list.resource';
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   props: any;
