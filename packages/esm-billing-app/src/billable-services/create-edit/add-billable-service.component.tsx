@@ -267,6 +267,7 @@ const AddBillableService: React.FC = () => {
             name="serviceTypeName"
             render={({ field }) => (
               <ComboBox
+                id="serviceType"
                 items={serviceTypes ?? []}
                 titleText={t('serviceType', 'Service Type')}
                 itemToString={(item: { display: string }) => (item ? item.display : '')}
