@@ -22,6 +22,19 @@
 .datePickerInput {
   width: 23rem;
 }
+.form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 20px;
+}
+
+.buttonSet {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: spacing.$spacing-04;
+}
 
 .grid {
   margin: 0 spacing.$spacing-05;
@@ -36,13 +49,6 @@
   align-content: flex-start;
   align-items: baseline;
   min-width: 47.5%;
-}
-
-.buttonSet {
-  padding: 0rem;
-  margin-top: spacing.$spacing-10;
-  display: flex;
-  justify-content: end;
 }
 
 .caseFormTitle {
@@ -84,5 +90,9 @@
     background-color: $ui-02;
     justify-content: flex-end;
     gap: spacing.$spacing-05;
+    padding: 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: end;
   }
 }

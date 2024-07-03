@@ -20,9 +20,9 @@ const MetricsHeader = () => {
         <Button
           kind="tertiary"
           renderIcon={(props) => <WatsonHealthStressBreathEditor size={16} {...props} />}
-          iconDescription={t('addCase', 'add a case')}
+          iconDescription={t('addCase', 'Add a case')}
           onClick={handleAddCase}>
-          {t('addCase', 'add a case')}
+          {t('addCase', 'Add a case')}
         </Button>
       </div>
     </div>
