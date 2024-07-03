@@ -1,5 +1,5 @@
-import { Tile } from '@carbon/react';
-import { ExtensionSlot, PatientPhoto, usePatient } from '@openmrs/esm-framework';
+import { Tile, InlineLoading } from '@carbon/react';
+import { PatientPhoto, usePatient } from '@openmrs/esm-framework';
 import React from 'react';
 import styles from './patient-info.scss';
 import { formatPatientName } from '../../utils/expression-helper';
@@ -9,7 +9,7 @@ const PatientInfo: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const formattedName = formatPatientName(patient);
 
   if (isLoading) {
-    return <span>Loading...</span>;
+    return <InlineLoading status="active" iconDescription="Loading" description="Loading patient data ..." />;
   }
 
   if (error) {
