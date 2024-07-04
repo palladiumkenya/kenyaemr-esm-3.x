@@ -42,7 +42,6 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
-  handlePostResponse,
   patientUuid,
   props,
 }) => {
