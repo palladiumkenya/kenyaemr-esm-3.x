@@ -14,3 +14,19 @@ export async function fetchPerson(query: string, abortController: AbortControlle
   });
   return patientsRes.data.results;
 }
+
+export const saveMapping = async (data: z.infer<typeof pharmacyAssignmentFormSchema>) => {
+  const url = `${restBaseUrl}/datafilter/entitybasismap`;
+  const response = await openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (response.ok) {
+    return await response.text();
+  }
+  throw new Error(`Error mapping patient`);
+};

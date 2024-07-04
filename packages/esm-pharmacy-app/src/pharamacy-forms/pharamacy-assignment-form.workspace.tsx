@@ -1,13 +1,14 @@
 import { Button, ButtonSet, Column, Form, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, showToast } from '@openmrs/esm-framework';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { Autosuggest } from '../autosuggest/autosuggest.component';
-import { fetchPerson, pharmacyAssignmentFormSchema } from '../pharmacy.resources';
+import { fetchPerson, pharmacyAssignmentFormSchema, saveMapping } from '../pharmacy.resources';
 import styles from './pharmacy-assignment-form.scss';
+import { mutate } from 'swr';
 
 type FormType = z.infer<typeof pharmacyAssignmentFormSchema>;
 
@@ -33,21 +34,22 @@ const PharmacyAssignmentForm: React.FC<PharmacyAssignmentFormProps> = ({
   });
   const { t } = useTranslation();
   const onSubmit = async (values: FormType) => {
-    alert(JSON.stringify(values, null, 2));
+    try {
+      const message = await saveMapping(values);
+      showToast({ kind: 'success', description: message, title: 'Success' });
+      closeWorkspace();
+      mutate((key) => {
+        return typeof key === 'string' && key.startsWith('/ws/rest/v1/datafilter/search');
+      });
+    } catch (error) {
+      showToast({ kind: 'error', description: error.message, title: 'Failure' });
+    }
   };
 
   const searchPerson = async (query: string) => {
     const abortController = new AbortController();
     return await fetchPerson(query, abortController);
   };
-
-  // const handleSuggestionSelected = useCallback(
-  //   (field: string, selectedSuggestion: string) => {
-  //     setIsInvalid(!selectedSuggestion);
-  //     setFieldValue(field, selectedSuggestion);
-  //   },
-  //   [setFieldValue],
-  // );
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>

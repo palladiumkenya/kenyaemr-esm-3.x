@@ -8,15 +8,15 @@ const extractPharamacyData = (mapping: PhamarcyUserMapping) => {
     uuid: mapping.basis.uuid,
     name: mapping.basis.name,
     dateMaped: formatDatetime(new Date(mapping.dateCreated), { mode: 'standard', noToday: true }),
+    cityVillage: mapping.basis.cityVillage,
+    countyDistrict: mapping.basis.countyDistrict,
+    mflCode: mapping.basis['Master Facility Code'],
   } as Pharmacy;
 };
 
 // TODO Custome representation optimization
 const usePharmacies = (userUuid: string) => {
-  const config = useConfig<Config>();
-  const customeRepresentation = 'full';
   const url = `${restBaseUrl}/datafilter/search`;
-  // const url = `${restBaseUrl}/location?tag=${config.admissionLocationTagUuid}&v=${customeRepresentation}`;
 
   const fetchUserPharmacies = async (url: string) => {
     const abortController = new AbortController();
