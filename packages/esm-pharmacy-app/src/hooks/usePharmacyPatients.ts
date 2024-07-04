@@ -3,7 +3,7 @@ import useSWR from 'swr';
 import { PharamacyPatientMapping, PharmacyPatient } from '../types';
 
 const usePharmacyPatients = (pharmacyUuid: string) => {
-  const url = `${restBaseUrl}/datafilter/search`;
+  const url = `${restBaseUrl}/datafilter/search?type=org.openmrs.Patient`;
 
   const fetchPharmacyPatients = async (url: string) => {
     const abortController = new AbortController();

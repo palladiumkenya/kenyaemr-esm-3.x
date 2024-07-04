@@ -55,14 +55,12 @@ export const PharmacyUsers: React.FC = () => {
       };
     }) ?? [];
 
-  const handdleTagPharmacy = () => {
-    const handdleAssignToPharmacy = () => {
-      launchWorkspace('pharmacy-assignment-form', {
-        workspaceTitle: 'Pharmacy Assignment Form',
-        pharmacyUuid,
-        type: 'org.openmrs.User',
-      });
-    };
+  const handdleAssignToPharmacy = () => {
+    launchWorkspace('pharmacy-assignment-form', {
+      workspaceTitle: 'Pharmacy Assignment Form',
+      pharmacyUuid,
+      type: 'org.openmrs.User',
+    });
   };
 
   if (isLoading) {
@@ -81,7 +79,7 @@ export const PharmacyUsers: React.FC = () => {
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>{t('noPharmacyUsers', 'No Pharmacy users to list.')}</p>
-          <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
+          <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
             {t('assignUser', 'Assign User')}
           </Button>
         </Tile>
@@ -91,7 +89,7 @@ export const PharmacyUsers: React.FC = () => {
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={headerTitle}>
-        <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
+        <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
           {t('assignUser', 'Assign User')}
         </Button>
       </CardHeader>

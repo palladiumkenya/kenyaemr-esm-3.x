@@ -14,6 +14,13 @@ export async function fetchPerson(query: string, abortController: AbortControlle
   });
   return patientsRes.data.results;
 }
+export async function fetchUser(query: string, abortController: AbortController) {
+  const customPresentation = 'custom:(uuid,display,person:(display))';
+  const patientsRes = await openmrsFetch(`${restBaseUrl}/user?q=${query}&v=${customPresentation}`, {
+    signal: abortController.signal,
+  });
+  return patientsRes.data.results;
+}
 
 export const saveMapping = async (data: z.infer<typeof pharmacyAssignmentFormSchema>) => {
   const url = `${restBaseUrl}/datafilter/entitybasismap`;

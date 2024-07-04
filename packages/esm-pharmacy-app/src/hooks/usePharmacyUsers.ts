@@ -4,7 +4,7 @@ import { PhamarcyUserMapping, PharmacyUser } from '../types';
 
 const usePharmacyUsers = (pharmacyUuid: string) => {
   const customPresentation = 'full';
-  const url = `${restBaseUrl}/datafilter/search`;
+  const url = `${restBaseUrl}/datafilter/search?type=org.openmrs.User`;
   const fetchPharmacyUsers = async (url: string) => {
     const abortController = new AbortController();
 

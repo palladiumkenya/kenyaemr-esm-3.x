@@ -1,14 +1,14 @@
-import { Button, ButtonSet, Column, Form, Stack } from '@carbon/react';
+import { Button, ButtonSet, Column, Form, RadioButton, RadioButtonGroup, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showToast } from '@openmrs/esm-framework';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import { z } from 'zod';
 import { Autosuggest } from '../autosuggest/autosuggest.component';
-import { fetchPerson, pharmacyAssignmentFormSchema, saveMapping } from '../pharmacy.resources';
+import { fetchPerson, fetchUser, pharmacyAssignmentFormSchema, saveMapping } from '../pharmacy.resources';
 import styles from './pharmacy-assignment-form.scss';
-import { mutate } from 'swr';
 
 type FormType = z.infer<typeof pharmacyAssignmentFormSchema>;
 
@@ -39,22 +39,46 @@ const PharmacyAssignmentForm: React.FC<PharmacyAssignmentFormProps> = ({
       showToast({ kind: 'success', description: message, title: 'Success' });
       closeWorkspace();
       mutate((key) => {
-        return typeof key === 'string' && key.startsWith('/ws/rest/v1/datafilter/search');
+        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/datafilter/search?type=${values.entityType}`);
       });
     } catch (error) {
       showToast({ kind: 'error', description: error.message, title: 'Failure' });
     }
   };
 
-  const searchPerson = async (query: string) => {
+  const searchPatient = async (query: string) => {
     const abortController = new AbortController();
     return await fetchPerson(query, abortController);
   };
 
+  const searchUser = async (query: string) => {
+    const abortController = new AbortController();
+    return await fetchUser(query, abortController);
+  };
+
+  const observableEntityType = form.watch('entityType');
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}></Stack>
+      <Column>
+        <Controller
+          control={form.control}
+          name="entityType"
+          render={({ field }) => (
+            <RadioButtonGroup
+              legendText={t('entityType', 'Entity Type')}
+              {...field}
+              defaultSelected={field.value}
+              invalid={form.formState.errors[field.name]?.message}
+              invalidText={form.formState.errors[field.name]?.message}
+              className={styles.billingItem}>
+              <RadioButton labelText={t('user', 'User')} value="org.openmrs.User" id="org.openmrs.User" />
+              <RadioButton labelText={t('user', 'Patient')} value="org.openmrs.Patient" id="org.openmrs.Patient" />
+            </RadioButtonGroup>
+          )}
+        />
+      </Column>
       <Column>
         <Controller
           control={form.control}
@@ -66,9 +90,12 @@ const PharmacyAssignmentForm: React.FC<PharmacyAssignmentFormProps> = ({
               placeholder={t('fullNamePlaceHolder', 'Firstname Familyname')}
               invalid={Boolean(form.formState.errors[field.name]?.message)}
               invalidText={form.formState.errors[field.name]?.message}
-              getDisplayValue={(item) => item.display}
+              getDisplayValue={(item) =>
+                observableEntityType == 'org.openmrs.Patient' ? item.display : item.person.display
+              }
               getFieldValue={(item) => item.uuid}
-              getSearchResults={searchPerson}
+              getSearchResults={observableEntityType == 'org.openmrs.Patient' ? searchPatient : searchUser}
+              onClear={() => field.onChange('')}
               onSuggestionSelected={(field_, value) => {
                 if (value) {
                   field.onChange(value);
