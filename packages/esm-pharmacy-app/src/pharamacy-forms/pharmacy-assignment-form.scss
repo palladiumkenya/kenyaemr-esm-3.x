@@ -30,11 +30,7 @@
 .grid {
   margin: 0 spacing.$spacing-05;
   padding: 0rem;
-}
-
-.input {
-  margin-left: spacing.$spacing-05;
-  margin-right: spacing.$spacing-05;
+  row-gap: 1rem;
 }
 
 .inputRow {
@@ -61,14 +57,6 @@
   min-width: 20%;
 }
 
-.buttonSet {
-  padding: 0rem;
-  margin-top: spacing.$spacing-05;
-  display: flex;
-  justify-content: flex-end;
-  gap: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-05;
-}
 .inlineActions {
   display: flex;
   gap: spacing.$spacing-05; /* Adjust the spacing as needed */
@@ -106,12 +94,18 @@
   .form {
     height: var(--tablet-workspace-window-height);
   }
+}
 
-  .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
-    justify-content: flex-end;
-    gap: spacing.$spacing-05;
+.buttonSet {
+  width: 100%;
+  padding-top: spacing.$spacing-05;
+  background-color: $ui-02;
+  justify-content: space-between;
+  bottom: 0;
+  position: absolute;
+  & > button {
+    max-width: 50% !important;
+    width: 50%;
   }
 }
 
@@ -124,4 +118,8 @@
 
 .facilityColumn {
   flex: 1 1 0%; /* Makes columns take up equal space */
+}
+
+.radioButtonGroup {
+  margin-top: spacing.$spacing-04;
 }

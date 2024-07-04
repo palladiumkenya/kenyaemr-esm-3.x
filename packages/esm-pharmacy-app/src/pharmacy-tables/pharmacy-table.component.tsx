@@ -72,7 +72,9 @@ const PharmaciesTable = () => {
       return {
         id: `${pharmacy.uuid}`,
         name: (
-          <ConfigurableLink to={window.getOpenmrsSpaBase() + `home/pharmacy/${pharmacy.uuid}`}>
+          <ConfigurableLink
+            to={window.getOpenmrsSpaBase() + `home/pharmacy/${pharmacy.uuid}`}
+            style={{ textDecoration: 'none' }}>
             {pharmacy.name}
           </ConfigurableLink>
         ),
@@ -111,7 +113,7 @@ const PharmaciesTable = () => {
   }
   return (
     <div className={styles.widgetContainer}>
-      <CardHeader title={headerTitle}>
+      <CardHeader title={`Community Pharmacies (${pharmacies.length})`}>
         <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
           {t('tagPharmacy', 'Tag pharmacy')}
         </Button>

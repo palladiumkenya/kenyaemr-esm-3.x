@@ -19,7 +19,7 @@ import {
   isDesktop,
   launchWorkspace,
   showModal,
-  showToast,
+  showSnackbar,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -101,13 +101,13 @@ export const PharmacyUsers: React.FC = () => {
         entityType: 'org.openmrs.User',
         basisType: 'org.openmrs.Location',
       });
-      showToast({ kind: 'success', description: results, title: 'Success' });
+      showSnackbar({ kind: 'success', subtitle: results, title: 'Success' });
 
       mutate((key) => {
         return typeof key === 'string' && key.startsWith(`/ws/rest/v1/datafilter/search?type=org.openmrs.User`);
       });
     } catch (error) {
-      showToast({ kind: 'error', description: error.message, title: 'Failure' });
+      showSnackbar({ kind: 'error', subtitle: error.message, title: 'Failure' });
     }
   };
 

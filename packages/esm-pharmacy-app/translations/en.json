@@ -1,4 +1,5 @@
 {
+  "actions": "Actions",
   "age": "Age",
   "assignPatient": "Assign Patient",
   "assignUser": "Assign User",
@@ -24,5 +25,6 @@
   "tagged": "Tagged phamacies",
   "tagPharmacy": "Tag pharmacy",
   "users": "Assigned Users",
-  "viewReport": "View Report"
+  "viewReport": "View Report",
+  "warning": "Warning!"
 }
