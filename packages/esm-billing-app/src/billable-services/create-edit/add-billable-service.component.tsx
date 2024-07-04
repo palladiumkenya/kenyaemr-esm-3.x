@@ -28,7 +28,6 @@ import { navigate, showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm
 import { ServiceConcept } from '../../types';
 import { extractErrorMessagesFromResponse } from '../../utils';
 
-// Define the servicePriceSchema with a custom message for an empty array
 const servicePriceSchema = z.object({
   paymentMode: z.string({ required_error: 'Payment method is required' }),
   price: z
@@ -45,7 +44,7 @@ const paymentFormSchema = z.object({
   }),
   shortName: z.string({ required_error: 'A valid short name is required.' }),
   serviceTypeName: z.string({ required_error: 'A service type is required' }),
-  conceptSearch: z.string({ required_error: 'Concept search is required.' }),
+  concept: z.string({ required_error: 'Concept search is required.' }),
 });
 
 type FormData = z.infer<typeof paymentFormSchema>;
@@ -97,6 +96,7 @@ const AddBillableService: React.FC = () => {
       return {
         name: paymentModes.filter((p) => p.uuid === element.paymentMode)[0].name,
         price: element.price,
+        paymentMode: element.paymentMode,
       };
     });
 
@@ -106,11 +106,6 @@ const AddBillableService: React.FC = () => {
     payload.servicePrices = servicePrices;
     payload.serviceStatus = 'ENABLED';
     payload.concept = selectedConcept?.concept?.uuid;
-
-    // eslint-disable-next-line no-console
-    console.log('data', data);
-    // eslint-disable-next-line no-console
-    console.log('payload', payload);
 
     createBillableService(payload).then(
       (resp) => {
@@ -191,7 +186,7 @@ const AddBillableService: React.FC = () => {
         <div className={styles.serviceName}>
           <FormLabel className={styles.conceptLabel}>Associated Concept</FormLabel>
           <Controller
-            name="conceptSearch"
+            name="concept"
             control={control}
             render={({ field: { onChange, value, onBlur } }) => (
               <ResponsiveWrapper isTablet={isTablet}>
@@ -201,12 +196,12 @@ const AddBillableService: React.FC = () => {
                   id="conceptsSearch"
                   labelText={t('enterConcept', 'Associated concept')}
                   placeholder={t('searchConcepts', 'Search associated concept')}
-                  className={errors?.conceptSearch && styles.serviceError}
+                  className={errors?.concept && styles.serviceError}
                   onChange={(e) => {
                     onChange(e);
                     handleSearchTermChange(e);
                   }}
-                  renderIcon={errors?.conceptSearch && <WarningFilled />}
+                  renderIcon={errors?.concept && <WarningFilled />}
                   onBlur={onBlur}
                   onClear={() => {
                     setSearchTerm('');
@@ -344,7 +339,8 @@ const AddBillableService: React.FC = () => {
         <Button kind="secondary" onClick={handleNavigateToServiceDashboard}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={!isValid || !selectedConcept}>
+        {/* <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={!isValid}> */}
+        <Button type="submit" onClick={handleSubmit(onSubmit)}>
           {t('save', 'Save')}
         </Button>
       </section>

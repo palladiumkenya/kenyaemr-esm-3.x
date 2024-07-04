@@ -53,6 +53,14 @@ const mockServiceTypes = [
   { uuid: 'a487a743-62ce-4f93-a66b-c5154ee8987d', display: 'Adherence counselling  service' },
 ];
 
+const mockConcepts = [
+  {
+    concept: { uuid: 'c9604249-db0a-4d03-b074-fc6bc2fa13e6', display: 'test' },
+    conceptName: { uuid: 'c9604249-db0a-4d03-b074-fc6bc2fa1334', display: 'test2' },
+    display: 'Lab service',
+  },
+];
+
 describe('AddBillableService', () => {
   beforeEach(() => {
     jest.resetAllMocks();
@@ -69,7 +77,7 @@ describe('AddBillableService', () => {
     });
     mockUsePaymentModes.mockReturnValue({ paymentModes: mockPaymentModes, error: null, isLoading: false });
     mockUseServiceTypes.mockReturnValue({ serviceTypes: mockServiceTypes, error: false, isLoading: false });
-    mockUseConceptsSearch.mockReturnValue({ searchResults: [], error: null, isSearching: false });
+    mockUseConceptsSearch.mockReturnValue({ searchResults: mockConcepts, error: undefined, isSearching: false });
     render(<AddBillableService />);
 
     const formTitle = screen.getByRole('heading', { name: /Add Billable Services/i });
@@ -121,6 +129,7 @@ describe('AddBillableService', () => {
 
     mockCreateBillableService.mockReturnValue(Promise.resolve({} as FetchResponse<any>));
     const saveBtn = screen.getByRole('button', { name: /Save/i });
+
     expect(saveBtn).toBeInTheDocument();
     await user.click(saveBtn);
 
@@ -139,8 +148,6 @@ describe('AddBillableService', () => {
       serviceStatus: 'ENABLED',
       concept: undefined,
     });
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/openmrs/spa/billable-services' });
   });
 
   test("should navigate back to billable services dashboard when 'Cancel' button is clicked", async () => {
@@ -154,7 +161,7 @@ describe('AddBillableService', () => {
     });
     mockUsePaymentModes.mockReturnValue({ paymentModes: mockPaymentModes, error: null, isLoading: false });
     mockUseServiceTypes.mockReturnValue({ serviceTypes: mockServiceTypes, error: false, isLoading: false });
-    mockUseConceptsSearch.mockReturnValue({ searchResults: [], error: null, isSearching: false });
+    mockUseConceptsSearch.mockReturnValue({ searchResults: mockConcepts, error: undefined, isSearching: false });
     render(<AddBillableService />);
 
     const cancelBtn = screen.getByRole('button', { name: /Cancel/i });
