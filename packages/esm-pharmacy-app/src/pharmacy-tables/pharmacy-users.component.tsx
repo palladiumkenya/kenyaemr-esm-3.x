@@ -41,16 +41,8 @@ export const PharmacyUsers: React.FC = () => {
       key: 'name',
     },
     {
-      header: t('age', 'Age'),
-      key: 'age',
-    },
-    {
-      header: t('sex', 'Sex'),
-      key: 'sex',
-    },
-    {
-      header: t('contact', 'Contact'),
-      key: 'contact',
+      header: t('dateMapped', 'Date Mapped'),
+      key: 'dateMapped',
     },
   ];
 
@@ -59,9 +51,7 @@ export const PharmacyUsers: React.FC = () => {
       return {
         id: `${user.uuid}`,
         name: user.name,
-        age: user.age ?? '--',
-        sex: user.gender ?? '--',
-        contact: user.telephoneContact ?? '--',
+        dateMapped: user.dateMapped,
       };
     }) ?? [];
 

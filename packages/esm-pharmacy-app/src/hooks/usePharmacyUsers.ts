@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { FetchResponse, formatDatetime, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { PhamarcyUserMapping, PharmacyUser } from '../types';
 
@@ -36,7 +36,7 @@ const extractData = (mapping: PhamarcyUserMapping) => {
   return {
     name: mapping.entity.name,
     uuid: mapping.entity.uuid,
-    telephoneContact: '0787687656',
+    dateMapped: formatDatetime(new Date(mapping.dateCreated), { mode: 'standard', noToday: true }),
   } as PharmacyUser;
 };
 

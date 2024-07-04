@@ -56,6 +56,10 @@ export const PharmacyPatients: React.FC = () => {
       header: t('contact', 'Contact'),
       key: 'contact',
     },
+    {
+      header: t('dateMapped', 'Date Mapped'),
+      key: 'dateMapped',
+    },
   ];
 
   const tableRows =
@@ -67,6 +71,7 @@ export const PharmacyPatients: React.FC = () => {
         age: patient.age ?? '--',
         sex: patient.gender ?? '--',
         contact: patient.telephoneContact ?? '--',
+        dateMapped: patient.dateMapped,
       };
     }) ?? [];
 

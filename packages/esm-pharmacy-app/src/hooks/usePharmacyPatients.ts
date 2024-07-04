@@ -1,9 +1,8 @@
-import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { FetchResponse, formatDatetime, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { PharamacyPatientMapping, PharmacyPatient } from '../types';
 
 const usePharmacyPatients = (pharmacyUuid: string) => {
-  const customPresentation = 'full';
   const url = `${restBaseUrl}/datafilter/search`;
 
   const fetchPharmacyPatients = async (url: string) => {
@@ -40,8 +39,9 @@ const extractData = (mapping: PharamacyPatientMapping) => {
     uuid: mapping.entity.uuid,
     age: mapping.entity.age,
     gender: mapping.entity.gender,
-    telephoneContact: '0787687656',
+    telephoneContact: mapping.entity['Telephone contact'],
     openmrsId: mapping.entity.OpenMRSID,
+    dateMapped: formatDatetime(new Date(mapping.dateCreated), { mode: 'standard', noToday: true }),
   } as PharmacyPatient;
 };
 

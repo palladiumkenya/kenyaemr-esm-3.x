@@ -7,11 +7,22 @@ export interface Pharmacy extends Location {
   stateProvince?: string;
   countyDistrict?: string;
   dateMaped: string;
+  mflCode: string;
 }
 
 interface Basis {
   uuid: string;
   name: string;
+  country?: string;
+  address3?: string;
+  countyDistrict?: string;
+  address2?: string;
+  address1?: string;
+  address6?: string;
+  address5?: string;
+  cityVillage?: string;
+  address4?: string;
+  'Master Facility Code'?: string;
 }
 
 export interface PhamarcyUserMapping {
@@ -34,6 +45,7 @@ export interface PharamacyPatientMapping {
     name: string;
     uuid: string;
     age?: number;
+    'Telephone contact'?: string;
   };
   basis: Basis;
 }
@@ -45,12 +57,11 @@ export interface PharmacyPatient {
   age?: number;
   gender?: string;
   telephoneContact?: string;
+  dateMapped: string;
 }
 
 export interface PharmacyUser {
   uuid: string;
   name: string;
-  age?: number;
-  gender?: string;
-  telephoneContact?: string;
+  dateMapped: string;
 }
