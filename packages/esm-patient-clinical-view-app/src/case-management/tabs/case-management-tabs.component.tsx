@@ -5,7 +5,10 @@ import styles from './case-management-tabs.scss';
 import CaseManagementListActive from '../table/case-management-list-active-component';
 import CaseManagementListInActive from '../table/case-management-list-inactive-component';
 
-const CaseManagementTabs = () => {
+const CaseManagementTabs: React.FC<{
+  setActiveCasesCount: (count: number) => void;
+  setInactiveCasesCount: (count: number) => void;
+}> = ({ setActiveCasesCount, setInactiveCasesCount }) => {
   const { t } = useTranslation();
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
 
@@ -24,10 +27,10 @@ const CaseManagementTabs = () => {
         </div>
         <TabPanels>
           <TabPanel className={styles.tabPanel}>
-            <CaseManagementListActive />
+            <CaseManagementListActive setActiveCasesCount={setActiveCasesCount} />
           </TabPanel>
           <TabPanel className={styles.tabPanel}>
-            <CaseManagementListInActive />
+            <CaseManagementListInActive setInactiveCasesCount={setInactiveCasesCount} />
           </TabPanel>
         </TabPanels>
       </Tabs>

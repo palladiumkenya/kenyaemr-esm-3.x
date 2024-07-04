@@ -5,8 +5,8 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import styles from './case-management.scss';
-import { ExtensionSlot, useSession } from '@openmrs/esm-framework';
-import { useCaseManagers, useRelationshipType } from './case-management.resource';
+import { ExtensionSlot, navigate, showSnackbar, useSession } from '@openmrs/esm-framework';
+import { saveRelationship, useActivecases, useCaseManagers, useRelationshipType } from './case-management.resource';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
 import PatientInfo from './patient-info.component';
 import { caseManagementConceptMap } from './case-management-concept-map';
@@ -15,12 +15,16 @@ const schema = z.object({
   caseManager: z.string().nonempty({ message: 'Case Manager is required' }),
   relationship: z.string().nonempty({ message: 'Relationship is required' }),
   startDate: z.date({ required_error: 'Start Date is required' }),
-  reasons: z.string().nonempty({ message: 'At least one reason is required' }),
+  // reasons: z.string().nonempty({ message: 'At least one reason is required' }),
   endDate: z.date().optional(),
   notes: z.string().optional(),
 });
 
-const CaseManagementForm: React.FC = () => {
+type CaseManagementProp = {
+  closeWorkspace: () => void;
+};
+
+const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const { user } = useSession();
   const [patientUuid, setPatientUuid] = useState('');
@@ -28,10 +32,12 @@ const CaseManagementForm: React.FC = () => {
 
   const { data, error } = useCaseManagers();
   const { data: relationshipTypesData } = useRelationshipType();
+  const caseManagerUuid = user?.person.uuid;
+  const { mutate: fetchCases } = useActivecases(caseManagerUuid);
 
   const caseManagers =
     data?.data.results.map((manager) => ({
-      id: manager.uuid,
+      id: manager.person.uuid,
       text: manager.display,
     })) || [];
 
@@ -58,7 +64,36 @@ const CaseManagementForm: React.FC = () => {
   });
 
   const onSubmit = async (data) => {
-    // Handle form submission
+    const payload = {
+      personA: data.caseManager,
+      relationshipType: data.relationship,
+      personB: patientUuid,
+      startDate: data.startDate.toISOString(),
+      endDate: data.endDate ? data.endDate.toISOString() : null,
+    };
+    try {
+      await saveRelationship(payload);
+      await fetchCases();
+      showSnackbar({
+        kind: 'success',
+        title: t('saveRlship', 'Save Relationship'),
+        subtitle: t('savedRlship', 'Relationship saved successfully'),
+        timeoutInMs: 3000,
+        isLowContrast: true,
+      });
+
+      // Navigate or handle closing the form after submission
+      closeWorkspace();
+    } catch (err) {
+      console.error(err);
+      showSnackbar({
+        kind: 'error',
+        title: t('RlshipError', 'Relationship Error'),
+        subtitle: t('RlshipError', 'Request Failed.......'),
+        timeoutInMs: 2500,
+        isLowContrast: true,
+      });
+    }
   };
 
   const selectPatient = (patientUuid) => {
@@ -76,18 +111,24 @@ const CaseManagementForm: React.FC = () => {
           <Controller
             name="caseManager"
             control={control}
-            render={({ field, fieldState }) => (
-              <ComboBox
-                id="case_manager_name"
-                titleText={t('manager', 'Case Manager')}
-                placeholder="Select Case Manager"
-                items={caseManagers}
-                itemToString={(item) => uppercaseText(extractNameString(item ? item.text : ''))}
-                onChange={(e) => field.onChange(e.selectedItem?.id)}
-                invalid={!!fieldState.error}
-                invalidText={fieldState.error?.message}
-              />
-            )}
+            defaultValue={caseManagerUuid}
+            render={({ field, fieldState }) => {
+              return (
+                <ComboBox
+                  id="case_manager_name"
+                  titleText={t('manager', 'Case Manager')}
+                  placeholder="Select Case Manager"
+                  items={caseManagers}
+                  itemToString={(item) => uppercaseText(extractNameString(item ? item.text : ''))}
+                  onChange={(e) => {
+                    field.onChange(e.selectedItem?.id);
+                  }}
+                  selectedItem={caseManagers.find((manager) => manager.id === field.value)}
+                  invalid={!!fieldState.error}
+                  invalidText={fieldState.error?.message}
+                />
+              );
+            }}
           />
         </Column>
 
@@ -164,7 +205,7 @@ const CaseManagementForm: React.FC = () => {
           />
         </Column>
 
-        <Column>
+        {/* <Column>
           <Controller
             name="reasons"
             control={control}
@@ -181,7 +222,7 @@ const CaseManagementForm: React.FC = () => {
               />
             )}
           />
-        </Column>
+        </Column> */}
 
         <Column className={styles.textbox}>
           <Controller
@@ -195,7 +236,7 @@ const CaseManagementForm: React.FC = () => {
       </Stack>
 
       <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="secondary">
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit" disabled={!isValid || !patientSelected}>

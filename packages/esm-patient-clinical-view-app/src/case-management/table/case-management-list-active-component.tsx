@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  DataTableSkeleton,
   Pagination,
   Table,
   TableBody,
@@ -12,61 +11,109 @@ import {
   TableHeader,
   TableRow,
   Search,
+  Layer,
+  Tile,
+  Button,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { ConfigurableLink, isDesktop, useLayoutType, useSession } from '@openmrs/esm-framework';
 import styles from './case-management-list.scss';
+import { useActivecases } from '../workspace/case-management.resource';
+import { extractNameString, uppercaseText } from '../../utils/expression-helper';
 
-const CaseManagementListActive: React.FC = () => {
+const CaseManagementListActive: React.FC<{ setActiveCasesCount: (count: number) => void }> = ({
+  setActiveCasesCount,
+}) => {
   const { t } = useTranslation();
-  const config = useConfig();
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
   const responsiveSize = isDesktop(layout) ? 'lg' : 'sm';
+  const { user } = useSession();
+  const caseManagerPersonUuid = user?.person.uuid;
+
+  const { data: activeCasesData, error: activeCasesError } = useActivecases(caseManagerPersonUuid);
 
   const headerTitle = t('activeCases', 'Active Cases');
+  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const headers = [
-    {
-      header: t('date', 'Date'),
-      key: 'date',
-    },
-    {
-      header: t('names', 'Names'),
-      key: 'names',
-    },
-    {
-      header: t('reason', 'Reason for asigned'),
-      key: 'age',
-    },
-    {
-      header: t('dateofstart', 'Start Date'),
-      key: 'dateofstart',
-    },
-    {
-      header: t('dateofend', 'End Date'),
-      key: 'dateofend',
-    },
-    {
-      header: t('notes', 'Notes'),
-      key: 'notes',
-    },
-    {
-      header: t('action', 'Action'),
-      key: 'action',
-    },
+    { key: 'sno', header: t('s/No', 'S/No') },
+    { key: 'names', header: t('names', 'Names') },
+    // { key: 'reason', header: t('reason', 'Reason for assigned') },
+    { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
+    { key: 'dateofend', header: t('dateofend', 'End Date') },
+    // { key: 'notes', header: t('notes', 'Notes') },
+    { key: 'action', header: t('action', 'Action') },
   ];
 
-  const tableRows = [];
+  const filteredCases = activeCasesData?.data.results.filter(
+    (caseData) =>
+      caseData.endDate === null &&
+      (extractNameString(caseData.personB.display).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
+  );
+  const tableRows = filteredCases
+    ?.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+    .map((caseData, index) => ({
+      id: caseData.uuid,
+      sno: (currentPage - 1) * pageSize + index + 1,
+
+      names: (
+        <ConfigurableLink
+          style={{ textDecoration: 'none', maxWidth: '50%' }}
+          to={patientChartUrl}
+          templateParams={{ patientUuid: caseData.personB.uuid }}>
+          {uppercaseText(extractNameString(caseData.personB.display))}
+        </ConfigurableLink>
+      ),
+
+      // reason: t('assignedTo', 'Assigned to ') + caseData.personB.display,
+      dateofstart: new Date(caseData.startDate).toLocaleDateString(),
+      dateofend: caseData.endDate ? new Date(caseData.endDate).toLocaleDateString() : '-',
+      notes: '-',
+      action: (
+        <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
+          {/* <OverflowMenuItem itemText="Transfer Case" />
+          <OverflowMenuItem hasDivider isDelete itemText="End Relationship" /> */}
+        </OverflowMenu>
+      ),
+    }));
+
+  useEffect(() => {
+    setActiveCasesCount(filteredCases?.length || 0);
+  }, [filteredCases, setActiveCasesCount]);
+
+  if (filteredCases?.length === 0) {
+    return (
+      <Layer>
+        <Tile className={styles.tile}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{headerTitle}</h4>
+          </div>
+          <EmptyDataIllustration />
+          <p className={styles.content}>{t('noActiveCasesToDisplay', 'There is no active cases data to display.')}</p>
+        </Tile>
+      </Layer>
+    );
+  }
 
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={headerTitle} children={''}></CardHeader>
-      <Search labelText="" placeholder={t('filterTable', 'Filter table')} size={responsiveSize} />
+      <Search
+        labelText=""
+        placeholder={t('filterTable', 'Filter table')}
+        size={responsiveSize}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
       <DataTable
         useZebraStyles
         size="sm"
-        rows={tableRows}
+        rows={tableRows || []}
         headers={headers}
         render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()}>
@@ -74,11 +121,7 @@ const CaseManagementListActive: React.FC = () => {
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}>
+                    <TableHeader key={header.key} {...getHeaderProps({ header })}>
                       {header.header}
                     </TableHeader>
                   ))}
@@ -98,11 +141,14 @@ const CaseManagementListActive: React.FC = () => {
         )}
       />
       <Pagination
-        page={1}
+        page={currentPage}
         pageSize={pageSize}
         pageSizes={[5, 10, 15]}
-        totalItems={tableRows.length}
-        onChange={({ page, pageSize }) => {}}
+        totalItems={filteredCases?.length || 0}
+        onChange={({ page, pageSize }) => {
+          setCurrentPage(page);
+          setPageSize(pageSize);
+        }}
       />
     </div>
   );
