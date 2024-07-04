@@ -14,7 +14,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ErrorState, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -65,7 +65,13 @@ export const PharmacyPatients: React.FC = () => {
       };
     }) ?? [];
 
-  const handdleTagPharmacy = () => {};
+  const handdleAssignToPharmacy = () => {
+    launchWorkspace('pharmacy-assignment-form', {
+      workspaceTitle: 'Pharmacy Assignment Form',
+      pharmacyUuid,
+      type: 'org.openmrs.Patient',
+    });
+  };
 
   if (isLoading) {
     return <DataTableSkeleton rowCount={5} />;
@@ -83,7 +89,7 @@ export const PharmacyPatients: React.FC = () => {
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>{t('noPharmacyPatients', 'No Pharmacy Patients to list.')}</p>
-          <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
+          <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
             {t('assignPatient', 'Assign Patient')}
           </Button>
         </Tile>
@@ -93,7 +99,7 @@ export const PharmacyPatients: React.FC = () => {
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={headerTitle}>
-        <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
+        <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
           {t('assignPatient', 'Assign Patient')}
         </Button>
       </CardHeader>

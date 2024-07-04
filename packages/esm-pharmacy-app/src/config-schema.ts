@@ -38,7 +38,7 @@ export const configSchema = {
   admissionLocationTagUuid: {
     _type: Type.String,
     _description: 'Location Tag for Phamacy where patient/person is assigned',
-    _default: 'd23d22c3-a820-4203-a79b-6b3683586d0b',
+    _default: '0815e0b2-1182-4157-9340-bee371ea41e4',
   },
 };
 

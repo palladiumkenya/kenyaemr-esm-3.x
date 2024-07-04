@@ -24,7 +24,10 @@ export function startupApp() {
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
-
+export const pharmacyAssignmentForm = getAsyncLifecycle(
+  () => import('./pharamacy-forms/pharamacy-assignment-form.workspace'),
+  options,
+);
 export const pharmacyDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'pharmacy',
