@@ -339,8 +339,7 @@ const AddBillableService: React.FC = () => {
         <Button kind="secondary" onClick={handleNavigateToServiceDashboard}>
           {t('cancel', 'Cancel')}
         </Button>
-        {/* <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={!isValid}> */}
-        <Button type="submit" onClick={handleSubmit(onSubmit)}>
+        <Button type="submit" onClick={handleSubmit(onSubmit)} disabled={!isValid || !selectedConcept}>
           {t('save', 'Save')}
         </Button>
       </section>
