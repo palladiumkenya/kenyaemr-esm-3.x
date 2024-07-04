@@ -23,7 +23,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
 };
 
 export const usePatientQueue = (patientUuid: string) => {
-  const config = useConfig({ externalModuleName: '@openmrs/esm-service-queues-app' });
+  const config = useConfig({ externalModuleName: '@kenyaemr/esm-service-queues-app' });
   const url = `${restBaseUrl}/visit-queue-entry?patient=${patientUuid}`;
   const { data, isLoading, error } = useSWR<{
     data: { results: Array<QueueEntry> };

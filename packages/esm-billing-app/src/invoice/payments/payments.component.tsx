@@ -1,5 +1,5 @@
-import React from 'react';
-import { FormProvider, useForm, useWatch } from 'react-hook-form';
+import React, { useState } from 'react';
+import { FormProvider, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,6 +15,7 @@ import PaymentHistory from './payment-history/payment-history.component';
 import PaymentForm from './payment-form/payment-form.component';
 import styles from './payments.scss';
 import { computeTotalPrice, extractErrorMessagesFromResponse } from '../../utils';
+import { mutate } from 'swr';
 
 type PaymentProps = {
   bill: MappedBill;
@@ -36,11 +37,13 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     defaultValues: {},
     resolver: zodResolver(z.object({ payment: z.array(paymentSchema) })),
   });
+  const formArrayMethods = useFieldArray({ name: 'payment', control: methods.control });
 
   const formValues = useWatch({
     name: 'payment',
     control: methods.control,
   });
+  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
 
   const hasMoreThanOneLineItem = bill?.lineItems?.length > 1;
   const computedTotal = hasMoreThanOneLineItem ? computeTotalPrice(selectedLineItems) : bill.totalAmount ?? 0;
@@ -53,7 +56,9 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     });
 
   const handleProcessPayment = () => {
+    const { remove } = formArrayMethods;
     const paymentPayload = createPaymentPayload(bill, bill.patientUuid, formValues, amountDue, selectedLineItems);
+    remove();
     processBillPayment(paymentPayload, bill.uuid).then(
       (resp) => {
         showSnackbar({
@@ -62,6 +67,9 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
           kind: 'success',
           timeoutInMs: 3000,
         });
+        const url = `/ws/rest/v1/cashier/bill/${bill.uuid}`;
+        mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, { revalidate: true });
+        setPaymentSuccessful(true);
       },
       (error) => {
         showSnackbar({
@@ -88,7 +96,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
           </CardHeader>
           <div>
             {bill && <PaymentHistory bill={bill} />}
-            <PaymentForm disablePayment={amountDue <= 0} amountDue={amountDue} />
+            <PaymentForm {...formArrayMethods} disablePayment={amountDue <= 0} amountDue={amountDue} />
           </div>
         </div>
         <div className={styles.divider} />

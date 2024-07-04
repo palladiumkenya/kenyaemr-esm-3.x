@@ -96,7 +96,7 @@ export const configSchema = {
   openmrsIdentifierSourceUuid: {
     _type: Type.String,
     _description: 'OpenMRS Identifier Source UUID (Identifier Generator for OpenMRS ID)',
-    _default: '1952cc86-4f48-4737-a0ef-5e8a5bb63e41',
+    _default: 'fb034aac-2353-4940-abe2-7bc94e7c1e71',
   },
   hivProgramUuid: {
     _type: Type.String,
@@ -143,5 +143,22 @@ export interface ConfigObject {
     contactCreated: string;
     preferedPnsAproach: string;
     livingWithContact: string;
+  };
+}
+
+export interface PartograpyComponents {
+  id: string;
+  date: string;
+  fetalHeartRate: number;
+  cervicalDilation: number;
+  descentOfHead: string;
+}
+export interface ConfigPartographyObject {
+  concepts: {
+    obsDateUiid: string;
+    timeRecordedUuid: string;
+    fetalHeartRateUuid: string;
+    cervicalDilationUiid: string;
+    descentOfHead: string;
   };
 }

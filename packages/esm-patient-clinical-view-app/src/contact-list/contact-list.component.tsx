@@ -3,7 +3,6 @@ import {
   DataTable,
   DataTableSkeleton,
   Layer,
-  Link,
   Pagination,
   Table,
   TableBody,
@@ -26,8 +25,7 @@ import {
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ContactActions from './contact-actions.component';
-import { useContacts } from './contact-list.resource';
+import useContacts from '../hooks/useContacts';
 import styles from './contact-list.scss';
 import HIVStatus from './hiv-status.component';
 
@@ -66,10 +64,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       key: 'sex',
     },
     {
-      header: t('alive', 'Alive'),
-      key: 'alive',
-    },
-    {
       header: t('contact', 'Contact'),
       key: 'contact',
     },
@@ -93,10 +87,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       header: t('pnsAproach', 'PNS Aproach'),
       key: 'pnsAproach',
     },
-    {
-      header: t('actions', 'Actions'),
-      key: 'actions',
-    },
   ];
 
   const handleAddContact = () => {
@@ -113,7 +103,9 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         id: `${relation.uuid}`,
         startDate: relation.startDate ?? '--',
         name: (
-          <ConfigurableLink to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
+          <ConfigurableLink
+            style={{ textDecoration: 'none' }}
+            to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
             {relation.name}
           </ConfigurableLink>
         ),
@@ -127,7 +119,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         baseLineivStatus: relation.baselineHIVStatus ?? '--',
         livingWithClient: relation.livingWithClient ?? '--',
         pnsAproach: relation.pnsAproach ?? '--',
-        actions: <ContactActions relativeUuid={relation.relativeUuid} baseLineHIVStatus={relation.baselineHIVStatus} />,
       };
     }) ?? [];
 
