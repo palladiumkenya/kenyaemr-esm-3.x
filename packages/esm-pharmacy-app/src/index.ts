@@ -28,6 +28,10 @@ export const pharmacyAssignmentForm = getAsyncLifecycle(
   () => import('./pharamacy-forms/pharamacy-assignment-form.workspace'),
   options,
 );
+export const pharmacyDeleteConfirmDialog = getAsyncLifecycle(
+  () => import('./pharamacy-forms/delete-confirm-dialog.component'),
+  options,
+);
 export const pharmacyDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'pharmacy',

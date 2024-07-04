@@ -5,7 +5,7 @@ export const pharmacyAssignmentFormSchema = z.object({
   entityIdentifier: z.string().min(1, 'Required'),
   entityType: z.enum(['org.openmrs.User', 'org.openmrs.Patient']),
   basisIdentifier: z.string().min(1, 'Required'),
-  basisType: z.string().optional().default('org.openmrs.Location'),
+  basisType: z.enum(['org.openmrs.Location']).optional().default('org.openmrs.Location'),
 });
 
 export async function fetchPerson(query: string, abortController: AbortController) {
@@ -36,4 +36,20 @@ export const saveMapping = async (data: z.infer<typeof pharmacyAssignmentFormSch
     return await response.text();
   }
   throw new Error(`Error mapping patient`);
+};
+
+export const revokePharamacyAssignment = async (data: z.infer<typeof pharmacyAssignmentFormSchema>) => {
+  const url = `${restBaseUrl}/datafilter/revoke`;
+  const response = await openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(data),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (response.ok) {
+    return await response.text();
+  }
+  throw new Error(`Error revoking mapping`);
 };

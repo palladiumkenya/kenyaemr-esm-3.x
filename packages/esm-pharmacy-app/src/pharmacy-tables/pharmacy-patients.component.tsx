@@ -13,13 +13,23 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { ErrorState, isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { Add, TrashCan } from '@carbon/react/icons';
+import {
+  ErrorState,
+  isDesktop,
+  launchWorkspace,
+  showModal,
+  showToast,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { mutate } from 'swr';
 import { usePharmacyPatients } from '../hooks';
+import { revokePharamacyAssignment } from '../pharmacy.resources';
 import styles from './pharmacy-tables.scss';
 
 export const PharmacyPatients: React.FC = () => {
@@ -60,6 +70,10 @@ export const PharmacyPatients: React.FC = () => {
       header: t('dateMapped', 'Date Mapped'),
       key: 'dateMapped',
     },
+    {
+      header: t('actions', 'Actions'),
+      key: 'actions',
+    },
   ];
 
   const tableRows =
@@ -72,6 +86,22 @@ export const PharmacyPatients: React.FC = () => {
         sex: patient.gender ?? '--',
         contact: patient.telephoneContact ?? '--',
         dateMapped: patient.dateMapped,
+        actions: (
+          <Button
+            kind="tertiary"
+            renderIcon={TrashCan}
+            onClick={() => {
+              const dispose = showModal('pharmacy-delete-confirm-dialog', {
+                onDelete: () => {
+                  handleRevoke(patient.uuid);
+                  dispose();
+                },
+                onClose: () => dispose(),
+              });
+            }}>
+            Revoke
+          </Button>
+        ),
       };
     }) ?? [];
 
@@ -81,6 +111,24 @@ export const PharmacyPatients: React.FC = () => {
       pharmacyUuid,
       type: 'org.openmrs.Patient',
     });
+  };
+
+  const handleRevoke = async (patientUuid: string) => {
+    try {
+      const results = await revokePharamacyAssignment({
+        entityIdentifier: patientUuid,
+        basisIdentifier: pharmacyUuid,
+        entityType: 'org.openmrs.Patient',
+        basisType: 'org.openmrs.Location',
+      });
+      showToast({ kind: 'success', description: results, title: 'Success' });
+
+      mutate((key) => {
+        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/datafilter/search?type=org.openmrs.Patient`);
+      });
+    } catch (error) {
+      showToast({ kind: 'error', description: error.message, title: 'Failure' });
+    }
   };
 
   if (isLoading) {
