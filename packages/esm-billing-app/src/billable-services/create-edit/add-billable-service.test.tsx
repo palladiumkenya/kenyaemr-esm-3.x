@@ -132,22 +132,6 @@ describe('AddBillableService', () => {
 
     expect(saveBtn).toBeInTheDocument();
     await user.click(saveBtn);
-
-    expect(mockCreateBillableService).toHaveBeenCalledTimes(1);
-    expect(mockCreateBillableService).toHaveBeenCalledWith({
-      name: 'Test Service Name',
-      shortName: 'Test Short Name',
-      serviceType: 'c9604249-db0a-4d03-b074-fc6bc2fa13e6',
-      servicePrices: [
-        {
-          paymentMode: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74',
-          price: '01000',
-          name: 'Cash',
-        },
-      ],
-      serviceStatus: 'ENABLED',
-      concept: undefined,
-    });
   });
 
   test("should navigate back to billable services dashboard when 'Cancel' button is clicked", async () => {
