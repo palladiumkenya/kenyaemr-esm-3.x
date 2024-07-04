@@ -25,21 +25,29 @@ const DrugOrder: React.FC<DrugOrderProps> = ({ order }) => {
   const { t } = useTranslation();
   const { stockItem, isLoading: isLoadingInventory } = useSockItemInventory(order?.drug?.uuid);
   const { billableItem, isLoading } = useBillableItem(order?.drug.concept.uuid);
-
   if (isLoading || isLoadingInventory) {
     return null;
   }
 
   return (
     <div className={styles.drugOrderContainer}>
-      {stockItem && (
-        <div className={styles.itemContainer}>
-          <span className={styles.bold}>
-            {t('inStock', '{{quantityUoM}}(s) In stock ', { quantityUoM: stockItem?.quantityUoM })}
-          </span>
-          <span>{Math.round(stockItem?.quantity)}</span>
-        </div>
+      {stockItem && stockItem.length > 0 ? (
+        <>
+          <div className={styles.bold}>{'In Stock'}</div>
+          {stockItem.map((item, index) => (
+            <div key={index} className={styles.itemContainer}>
+              <span>{item.partyName}</span>
+              <span>
+                {' '}
+                {Math.round(item.quantity)} {item.quantityUoM}(s){' '}
+              </span>
+            </div>
+          ))}
+        </>
+      ) : (
+        <div className={styles.red}>{'Drug Is Not Available  / Out of Stock'}</div>
       )}
+
       <div>
         {billableItem &&
           billableItem?.servicePrices.map((item) => (
