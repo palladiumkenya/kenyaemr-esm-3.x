@@ -23,6 +23,10 @@
     {
       "name": "pharmacy-assignment-form",
       "component": "pharmacyAssignmentForm"
+    },
+    {
+      "name": "pharmacy-delete-confirm-dialog",
+      "component": "pharmacyDeleteConfirmDialog"
     }
   ],
   "pages": [

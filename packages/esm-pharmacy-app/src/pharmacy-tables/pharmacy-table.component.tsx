@@ -35,7 +35,6 @@ const PharmaciesTable = () => {
     user: { uuid: sessionUserUuid },
   } = useSession();
   const { error, pharmacies, isLoading } = usePharmacies(sessionUserUuid);
-  // console.log(pharmacies);
 
   const headerTitle = t('communityPharmacies', 'Community pharmacies');
 
