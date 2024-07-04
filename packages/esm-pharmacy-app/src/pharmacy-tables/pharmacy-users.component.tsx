@@ -14,7 +14,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ErrorState, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -65,7 +65,15 @@ export const PharmacyUsers: React.FC = () => {
       };
     }) ?? [];
 
-  const handdleTagPharmacy = () => {};
+  const handdleTagPharmacy = () => {
+    const handdleAssignToPharmacy = () => {
+      launchWorkspace('pharmacy-assignment-form', {
+        workspaceTitle: 'Pharmacy Assignment Form',
+        pharmacyUuid,
+        type: 'org.openmrs.User',
+      });
+    };
+  };
 
   if (isLoading) {
     return <DataTableSkeleton rowCount={5} />;
