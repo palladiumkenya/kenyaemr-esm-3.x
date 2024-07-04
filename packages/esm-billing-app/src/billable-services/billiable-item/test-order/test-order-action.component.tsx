@@ -7,6 +7,10 @@ import { showModal } from '@openmrs/esm-framework';
 
 type TestOrderProps = { order: Order };
 
+enum FulfillerStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+}
+
 const TestOrderAction: React.FC<TestOrderProps> = ({ order }) => {
   const { t } = useTranslation();
   const { isLoading, hasPendingPayment } = useTestOrderBillStatus(order.uuid, order.patient.uuid);
@@ -22,6 +26,11 @@ const TestOrderAction: React.FC<TestOrderProps> = ({ order }) => {
   // 1. The current visit is in-patient
   // 2. The test order has been paid in full
   // 3. The patient is an emergency patient
+
+  // If the order is in progress, do not show the action
+  if (order.fulfillerStatus === FulfillerStatus.IN_PROGRESS) {
+    return null;
+  }
 
   if (isLoading) {
     return <OverflowMenuItem itemText={t('loading', 'Loading...')} />;
