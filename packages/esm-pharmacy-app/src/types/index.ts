@@ -6,10 +6,41 @@ export interface Pharmacy extends Location {
   cityVillage?: string;
   stateProvince?: string;
   countyDistrict?: string;
+  dateMaped: string;
+}
+
+interface Basis {
+  uuid: string;
+  name: string;
+}
+
+export interface PhamarcyUserMapping {
+  uuid: string;
+  dateCreated: number;
+  entity: {
+    name: string;
+    uuid: string;
+  };
+  basis: Basis;
+}
+
+export interface PharamacyPatientMapping {
+  uuid: string;
+  dateCreated: number;
+  entity: {
+    OpenMRSID?: string;
+    identifier?: string;
+    gender?: string;
+    name: string;
+    uuid: string;
+    age?: number;
+  };
+  basis: Basis;
 }
 
 export interface PharmacyPatient {
   uuid: string;
+  openmrsId?: string;
   name: string;
   age?: number;
   gender?: string;

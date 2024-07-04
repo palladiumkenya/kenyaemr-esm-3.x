@@ -14,17 +14,29 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { ConfigurableLink, ErrorState, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  ErrorState,
+  isDesktop,
+  useLayoutType,
+  usePagination,
+  useSession,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePharmacies as useRegistrationTaggedPharmacies } from '../hooks';
+import { usePharmacies } from '../hooks';
 import styles from './pharmacy-tables.scss';
 
 const PharmaciesTable = () => {
   const { t } = useTranslation();
   const [currentPageSize, setCurrentPageSize] = useState<number>(10);
-  const { error, pharmacies, isLoading } = useRegistrationTaggedPharmacies();
+  const {
+    user: { uuid: sessionUserUuid },
+  } = useSession();
+  const { error, pharmacies, isLoading } = usePharmacies(sessionUserUuid);
+  // console.log(pharmacies);
+
   const headerTitle = t('communityPharmacies', 'Community pharmacies');
 
   const [pageSize, setPageSize] = useState(10);
@@ -39,8 +51,8 @@ const PharmaciesTable = () => {
       key: 'name',
     },
     {
-      header: t('description', 'Description'),
-      key: 'description',
+      header: t('dateMapped', 'Date Mapped'),
+      key: 'dateMapped',
     },
     {
       header: t('cityVillage', 'City village'),
@@ -69,6 +81,7 @@ const PharmaciesTable = () => {
         cityVillage: pharmacy.cityVillage ?? '--',
         stateProvince: pharmacy.stateProvince ?? '--',
         countyDistrict: pharmacy.countyDistrict ?? '--',
+        dateMapped: pharmacy.dateMaped,
       };
     }) ?? [];
 

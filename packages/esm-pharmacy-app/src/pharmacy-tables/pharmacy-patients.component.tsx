@@ -37,6 +37,10 @@ export const PharmacyPatients: React.FC = () => {
 
   const headers = [
     {
+      header: t('openmrsId', 'OpenMRS ID'),
+      key: 'openmrsId',
+    },
+    {
       header: t('name', 'Name'),
       key: 'name',
     },
@@ -58,6 +62,7 @@ export const PharmacyPatients: React.FC = () => {
     results?.map((patient) => {
       return {
         id: `${patient.uuid}`,
+        openmrsId: patient.openmrsId,
         name: patient.name,
         age: patient.age ?? '--',
         sex: patient.gender ?? '--',
