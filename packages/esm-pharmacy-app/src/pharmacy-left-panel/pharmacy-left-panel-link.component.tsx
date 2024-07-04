@@ -23,7 +23,6 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   if (isUUID(urlSegment)) {
     urlSegment = 'pharmacy';
   }
-
   return (
     <ConfigurableLink
       to={spaBasePath + '/' + name}

@@ -11,11 +11,11 @@ const DeleteConfirmDialog = ({ onClose, onDelete }) => {
       <ModalBody>Are you sure yoiu want to revoke access?</ModalBody>
       <ModalFooter>
         <ButtonSet>
-          <Button kind="primary" onClick={onDelete}>
-            Revoke
-          </Button>
           <Button kind="secondary" onClick={onClose}>
             Cancel
+          </Button>
+          <Button kind="primary" onClick={onDelete}>
+            Revoke
           </Button>
         </ButtonSet>
       </ModalFooter>

@@ -7,7 +7,7 @@ const PharmacyComponent: React.FC = () => {
   return (
     <div className={`omrs-main-content`}>
       <PhamacyHeader title={'Pharmacy'} />
-      <PharmacyMetrics />
+      {/* <PharmacyMetrics /> */}
       <PharmaciesTable />
     </div>
   );
