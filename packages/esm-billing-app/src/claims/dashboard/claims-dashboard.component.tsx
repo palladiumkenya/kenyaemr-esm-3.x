@@ -5,7 +5,7 @@ import { usePatient, ErrorState } from '@openmrs/esm-framework';
 import styles from './header/claims-header.scss';
 import { InlineLoading } from '@carbon/react';
 import { useBill } from '../../billing.resource';
-import ClaimsHeader from './claims-header/claims-header.component';
+import ClaimsHeader from './header/claims-header.component';
 
 const ClaimScreen: React.FC = () => {
   const { billUuid, patientUuid } = useParams();
