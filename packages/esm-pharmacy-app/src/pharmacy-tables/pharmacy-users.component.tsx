@@ -16,6 +16,7 @@ import {
 import { Add, TrashCan } from '@carbon/react/icons';
 import {
   ErrorState,
+  UserHasAccess,
   isDesktop,
   launchWorkspace,
   showModal,
@@ -67,20 +68,22 @@ export const PharmacyUsers: React.FC = () => {
         name: user.name,
         dateMapped: user.dateMapped,
         actions: (
-          <Button
-            kind="tertiary"
-            renderIcon={TrashCan}
-            onClick={() => {
-              const dispose = showModal('pharmacy-delete-confirm-dialog', {
-                onDelete: () => {
-                  handleRevoke(user.uuid);
-                  dispose();
-                },
-                onClose: () => dispose(),
-              });
-            }}>
-            Revoke
-          </Button>
+          <UserHasAccess privilege={'coreapps.systemAdministration'} fallback="--">
+            <Button
+              kind="tertiary"
+              renderIcon={TrashCan}
+              onClick={() => {
+                const dispose = showModal('pharmacy-delete-confirm-dialog', {
+                  onDelete: () => {
+                    handleRevoke(user.uuid);
+                    dispose();
+                  },
+                  onClose: () => dispose(),
+                });
+              }}>
+              Revoke
+            </Button>
+          </UserHasAccess>
         ),
       };
     }) ?? [];
@@ -127,9 +130,11 @@ export const PharmacyUsers: React.FC = () => {
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>{t('noPharmacyUsers', 'No Pharmacy users to list.')}</p>
-          <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
-            {t('assignUser', 'Assign User')}
-          </Button>
+          <UserHasAccess privilege={'coreapps.systemAdministration'}>
+            <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
+              {t('assignUser', 'Assign User')}
+            </Button>
+          </UserHasAccess>
         </Tile>
       </Layer>
     );
@@ -137,9 +142,11 @@ export const PharmacyUsers: React.FC = () => {
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={headerTitle}>
-        <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
-          {t('assignUser', 'Assign User')}
-        </Button>
+        <UserHasAccess privilege={`coreapps.systemAdministration`}>
+          <Button onClick={handdleAssignToPharmacy} renderIcon={Add} kind="ghost">
+            {t('assignUser', 'Assign User')}
+          </Button>
+        </UserHasAccess>
       </CardHeader>
       <DataTable
         useZebraStyles

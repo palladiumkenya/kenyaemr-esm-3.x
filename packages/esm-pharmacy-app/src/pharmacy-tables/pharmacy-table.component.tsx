@@ -104,9 +104,9 @@ const PharmaciesTable = () => {
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>{t('noCommunityPharmacyToList', 'No Community Pharmacies to list.')}</p>
-          <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
+          {/* <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
             {t('tagPharmacy', 'Tag pharmacy')}
-          </Button>
+          </Button> */}
         </Tile>
       </Layer>
     );
@@ -114,9 +114,10 @@ const PharmaciesTable = () => {
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={`Community Pharmacies (${pharmacies.length})`}>
-        <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
+        {''}
+        {/* <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
           {t('tagPharmacy', 'Tag pharmacy')}
-        </Button>
+        </Button> */}
       </CardHeader>
       <DataTable
         useZebraStyles
