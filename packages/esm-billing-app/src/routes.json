@@ -95,6 +95,10 @@
       "component": "testOrderAction",
       "slot": "tests-ordered-actions-slot",
       "order": 0
+    },
+    {
+      "name":"update-billable-services-dialog",
+      "component": "updateBillableServicesDialog"
     }
   ]
 }

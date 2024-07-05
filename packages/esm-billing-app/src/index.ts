@@ -15,6 +15,7 @@ import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import UpdateBillableServicesDialog from './billable-services/create-edit/update-billable-service.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -54,3 +55,4 @@ export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, opt
 export const labOrder = getSyncLifecycle(LabOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
+export const updateBillableServicesDialog = getSyncLifecycle(UpdateBillableServicesDialog, options);

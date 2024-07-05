@@ -16,12 +16,20 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { useLayoutType, isDesktop, useConfig, usePagination, ErrorState, navigate } from '@openmrs/esm-framework';
+import {
+  useLayoutType,
+  isDesktop,
+  useConfig,
+  usePagination,
+  ErrorState,
+  navigate,
+  showModal,
+} from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
 import { useTranslation } from 'react-i18next';
 import { useBillableServices } from './billable-service.resource';
-import { ArrowRight } from '@carbon/react/icons';
+import { ArrowRight, Edit } from '@carbon/react/icons';
 
 const BillableServices = () => {
   const { t } = useTranslation();
@@ -37,6 +45,12 @@ const BillableServices = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayHeader, setOverlayTitle] = useState('');
 
+  const handleEditClick = (service) => {
+    const dispose = showModal('update-billable-services-dialog', {
+      closeModal: () => dispose(),
+      service,
+    });
+  };
   const headerData = [
     {
       header: t('serviceName', 'Service Name'),
@@ -95,7 +109,7 @@ const BillableServices = () => {
         serviceType: service?.serviceType?.display,
         status: service.serviceStatus,
         prices: '--',
-        actions: '--',
+        actions: <Edit onClick={() => handleEditClick(service)} style={{ cursor: 'pointer' }} />,
       };
       let cost = '';
       service.servicePrices.forEach((price) => {
