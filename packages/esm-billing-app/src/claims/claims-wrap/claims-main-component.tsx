@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './claims-main.scss';
 import { LineItem, MappedBill } from '../../types';
-import ClaimsTable from '../dashboard/claims-table.component.tsx/claims-table.component';
+import ClaimsTable from '../dashboard/table/claims-table.component';
 import ClaimsForm from '../dashboard/claims-form/claims-form.component';
 import { useBill } from '../../billing.resource';
 import { computeTotalPrice } from '../../utils';
