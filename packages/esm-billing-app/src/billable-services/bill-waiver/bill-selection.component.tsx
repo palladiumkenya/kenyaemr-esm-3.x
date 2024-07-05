@@ -7,6 +7,8 @@ import {
   StructuredListWrapper,
   Layer,
   Checkbox,
+  OverflowMenu,
+  OverflowMenuItem
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
@@ -55,12 +57,12 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill; setPatientUuid: (pat
               <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
               <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
               <StructuredListCell>
-                <Checkbox
-                  hideLabel
-                  onChange={(event, { checked, id }) => handleOnCheckBoxChange(event, { checked, id })}
-                  labelText={checkBoxLabel(lineItem)}
-                  id={lineItem.uuid}
-                />
+              <OverflowMenu aria-label="overflow-menu" align="bottom">
+                <OverflowMenuItem itemText="Waive BIll" />
+                <OverflowMenuItem itemText="Cancel Bill" />
+                <OverflowMenuItem itemText="Edit Bill" />
+                <OverflowMenuItem itemText="Delete Bill" />
+              </OverflowMenu>
               </StructuredListCell>
             </StructuredListRow>
           ))}

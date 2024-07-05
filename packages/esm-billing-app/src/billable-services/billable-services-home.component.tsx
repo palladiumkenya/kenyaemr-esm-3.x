@@ -27,8 +27,8 @@ const BillableServiceHome: React.FC = () => {
                 {t('billableServices', 'Billable Services')}
               </SideNavLink>
               <UserHasAccess privilege="coreapps.systemAdministration">
-                <SideNavLink onClick={() => handleNavigation('waive-bill')} renderIcon={Money}>
-                  {t('billWaiver', 'Bill waiver')}
+                <SideNavLink onClick={() => handleNavigation('patient-bill-manager')} renderIcon={Money}>
+                  {t('billManager', 'Bill Manager')}
                 </SideNavLink>
               </UserHasAccess>
             </SideNavItems>
@@ -39,7 +39,7 @@ const BillableServiceHome: React.FC = () => {
           <Routes>
             <Route path="/" element={<BillableServicesDashboard />} />
             <Route path="/add-service" element={<AddBillableService />} />
-            <Route path="/waive-bill" element={<BillWaiver />} />
+            <Route path="/patient-bill-manager" element={<BillWaiver />} />
           </Routes>
         </section>
       </main>

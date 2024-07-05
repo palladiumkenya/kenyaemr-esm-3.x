@@ -17,13 +17,12 @@ const BillWaiver: React.FC<BillWaiverProps> = () => {
         <ExtensionSlot
           name="patient-search-bar-slot"
           state={{
-            selectPatientAction: (patientUuid) => setPatientUuid(patientUuid),
+            selectPatientAction: (patientUuid:string ) => setPatientUuid(patientUuid),
             buttonProps: {
               kind: 'primary',
             },
           }}
         />
-
         <PatientBills patientUuid={patientUuid} bills={filterBills} setPatientUuid={setPatientUuid} />
       </div>
     </UserHasAccess>
