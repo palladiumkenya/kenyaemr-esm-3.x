@@ -14,7 +14,6 @@
   "noPharmacyPatients": "No Pharmacy Patients to list.",
   "noPharmacyUsers": "No Pharmacy users to list.",
   "openmrsId": "OpenMRS ID",
-  "patient": "Assigned patients",
   "pharmacies": "Phamacies",
   "pharmacy": "Commity pharmacy",
   "pharmacyPatients": "Pharmacy Patients",
@@ -22,9 +21,7 @@
   "pharmacyUsers": "Pharmacy Users",
   "sex": "Sex",
   "stateProvince": "State province",
-  "tagged": "Tagged phamacies",
   "tagPharmacy": "Tag pharmacy",
-  "users": "Assigned Users",
   "viewReport": "View Report",
   "warning": "Warning!"
 }
