@@ -13,7 +13,6 @@ import {
   Search,
   Layer,
   Tile,
-  Button,
   OverflowMenu,
   OverflowMenuItem,
 } from '@carbon/react';
@@ -23,9 +22,7 @@ import styles from './case-management-list.scss';
 import { useActivecases } from '../workspace/case-management.resource';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
 
-const CaseManagementListActive: React.FC<{ setActiveCasesCount: (count: number) => void }> = ({
-  setActiveCasesCount,
-}) => {
+const CaseManagementListActive: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
@@ -34,10 +31,11 @@ const CaseManagementListActive: React.FC<{ setActiveCasesCount: (count: number) 
   const responsiveSize = isDesktop(layout) ? 'lg' : 'sm';
   const { user } = useSession();
   const caseManagerPersonUuid = user?.person.uuid;
+  const [activeCasesCount, setActiveCasesCountState] = useState(0);
 
   const { data: activeCasesData, error: activeCasesError } = useActivecases(caseManagerPersonUuid);
 
-  const headerTitle = t('activeCases', 'Active Cases');
+  const headerTitle = `${t('activeCases', 'Active Cases')} - ${activeCasesCount}`;
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const headers = [
@@ -61,7 +59,6 @@ const CaseManagementListActive: React.FC<{ setActiveCasesCount: (count: number) 
     .map((caseData, index) => ({
       id: caseData.uuid,
       sno: (currentPage - 1) * pageSize + index + 1,
-
       names: (
         <ConfigurableLink
           style={{ textDecoration: 'none', maxWidth: '50%' }}
@@ -70,7 +67,6 @@ const CaseManagementListActive: React.FC<{ setActiveCasesCount: (count: number) 
           {uppercaseText(extractNameString(caseData.personB.display))}
         </ConfigurableLink>
       ),
-
       // reason: t('assignedTo', 'Assigned to ') + caseData.personB.display,
       dateofstart: new Date(caseData.startDate).toLocaleDateString(),
       dateofend: caseData.endDate ? new Date(caseData.endDate).toLocaleDateString() : '-',
@@ -83,9 +79,11 @@ const CaseManagementListActive: React.FC<{ setActiveCasesCount: (count: number) 
       ),
     }));
 
+  // Update the count of active cases whenever `filteredCases` changes
   useEffect(() => {
-    setActiveCasesCount(filteredCases?.length || 0);
-  }, [filteredCases, setActiveCasesCount]);
+    const count = filteredCases?.length || 0;
+    setActiveCasesCountState(count);
+  }, [filteredCases]);
 
   if (filteredCases?.length === 0) {
     return (

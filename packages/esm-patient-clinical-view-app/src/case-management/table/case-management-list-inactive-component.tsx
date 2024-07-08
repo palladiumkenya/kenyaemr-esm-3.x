@@ -11,7 +11,6 @@ import {
   TableHeader,
   TableRow,
   Search,
-  Button,
   Layer,
   Tile,
   OverflowMenu,
@@ -21,11 +20,9 @@ import { CardHeader, EmptyDataIllustration } from '@openmrs/esm-patient-common-l
 import { ConfigurableLink, isDesktop, useLayoutType, useSession } from '@openmrs/esm-framework';
 import styles from './case-management-list.scss';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
-import { useActivecases, saveRelationship } from '../workspace/case-management.resource';
+import { useActivecases } from '../workspace/case-management.resource';
 
-const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: number) => void }> = ({
-  setInactiveCasesCount,
-}) => {
+const CaseManagementListInActive: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
@@ -34,10 +31,12 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
   const responsiveSize = isDesktop(layout) ? 'lg' : 'sm';
   const { user } = useSession();
   const caseManagerPersonUuid = user?.person.uuid;
+  const [inactiveCasesCount, setInactiveCasesCountState] = useState(0);
 
   const { data: inactiveCasesData } = useActivecases(caseManagerPersonUuid);
 
-  const headerTitle = t('inactiveCases', 'Inactive Cases');
+  const headerTitle = `${t('inactiveCases', 'Inactive Cases')} - ${inactiveCasesCount}`;
+  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const headers = [
     { key: 'sno', header: t('s/No', 'S/No') },
@@ -55,7 +54,6 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
       (extractNameString(caseData.personB.display).toLowerCase().includes(searchTerm.toLowerCase()) ||
         caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
   );
-  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const tableRows = filteredCases
     ?.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -81,9 +79,11 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
       ),
     }));
 
+  // Update the count of inactive cases whenever `filteredCases` changes
   useEffect(() => {
-    setInactiveCasesCount(filteredCases?.length || 0);
-  }, [filteredCases, setInactiveCasesCount]);
+    const count = filteredCases?.length || 0;
+    setInactiveCasesCountState(count);
+  }, [filteredCases]);
 
   if (filteredCases?.length === 0) {
     return (
