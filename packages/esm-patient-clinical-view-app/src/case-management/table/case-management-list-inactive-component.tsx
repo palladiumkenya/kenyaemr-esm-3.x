@@ -14,7 +14,6 @@ import {
   Layer,
   Tile,
   OverflowMenu,
-  OverflowMenuItem,
 } from '@carbon/react';
 import { CardHeader, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableLink, isDesktop, useLayoutType, useSession } from '@openmrs/esm-framework';
@@ -22,7 +21,11 @@ import styles from './case-management-list.scss';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
 import { useActivecases } from '../workspace/case-management.resource';
 
-const CaseManagementListInActive: React.FC = () => {
+interface CaseManagementListInActiveProps {
+  setInactiveCasesCount: (count: number) => void;
+}
+
+const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({ setInactiveCasesCount }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
@@ -31,20 +34,16 @@ const CaseManagementListInActive: React.FC = () => {
   const responsiveSize = isDesktop(layout) ? 'lg' : 'sm';
   const { user } = useSession();
   const caseManagerPersonUuid = user?.person.uuid;
-  const [inactiveCasesCount, setInactiveCasesCountState] = useState(0);
 
   const { data: inactiveCasesData } = useActivecases(caseManagerPersonUuid);
 
-  const headerTitle = `${t('inactiveCases', 'Inactive Cases')} - ${inactiveCasesCount}`;
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const headers = [
     { key: 'sno', header: t('s/No', 'S/No') },
     { key: 'names', header: t('names', 'Names') },
-    // { key: 'reason', header: t('reason', 'Reason for assigned') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
-    // { key: 'notes', header: t('notes', 'Notes') },
     { key: 'action', header: t('action', 'Action') },
   ];
 
@@ -68,10 +67,8 @@ const CaseManagementListInActive: React.FC = () => {
           {uppercaseText(extractNameString(caseData.personB.display))}
         </ConfigurableLink>
       ),
-      // reason: t('assignedTo', 'Assigned to ') + caseData.personB.display,
       dateofstart: new Date(caseData.startDate).toLocaleDateString(),
       dateofend: new Date(caseData.endDate).toLocaleDateString(),
-      // notes: '-',
       action: (
         <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
           {/* <OverflowMenuItem itemText="Transfer Case" /> */}
@@ -79,11 +76,12 @@ const CaseManagementListInActive: React.FC = () => {
       ),
     }));
 
-  // Update the count of inactive cases whenever `filteredCases` changes
   useEffect(() => {
     const count = filteredCases?.length || 0;
-    setInactiveCasesCountState(count);
-  }, [filteredCases]);
+    setInactiveCasesCount(count);
+  }, [filteredCases, setInactiveCasesCount]);
+
+  const headerTitle = `${t('inactiveCases', 'Inactive Cases')}`;
 
   if (filteredCases?.length === 0) {
     return (
