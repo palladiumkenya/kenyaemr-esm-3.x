@@ -65,14 +65,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const visitUuid = recentVisit?.visitType.uuid;
 
   const { data } = useProviders();
-  const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (data && data.data.results) {
-      setProviders(data.data.results.map((provider) => ({ id: provider.uuid, text: provider.display })));
-    }
-  }, [data]);
+  const providers = data?.data.results.map((provider) => ({ id: provider.uuid, text: provider.display })) || [];
 
   const handleNavigateToBillingOptions = () =>
     navigate({
