@@ -17,6 +17,7 @@ import {
   TableToolbarSearch,
   TableSelectRow,
   Tile,
+  Pagination,
   type DataTableHeader,
   type DataTableRow,
 } from '@carbon/react';
@@ -34,26 +35,34 @@ type ClaimsTableProps = {
 const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, isLoadingBill, onSelectItem }) => {
   const { t } = useTranslation();
   const { lineItems } = bill;
-  const paidLineItems = lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
-  const [selectedLineItems, setSelectedLineItems] = useState(paidLineItems ?? []);
+  const [selectedLineItems, setSelectedLineItems] = useState<LineItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const paidLineItems = useMemo(() => lineItems.filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
+
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {
-      return lineItems;
+      return paidLineItems;
     }
 
-    return debouncedSearchTerm
-      ? fuzzy
-          .filter(debouncedSearchTerm, lineItems, {
-            extract: (lineItem: LineItem) => `${lineItem.item}`,
-          })
-          .sort((r1, r2) => r1.score - r2.score)
-          .map((result) => result.original)
-      : lineItems;
-  }, [debouncedSearchTerm, lineItems]);
+    return fuzzy
+      .filter(debouncedSearchTerm, paidLineItems, {
+        extract: (lineItem: LineItem) => `${lineItem.item}`,
+      })
+      .sort((r1, r2) => r1.score - r2.score)
+      .map((result) => result.original);
+  }, [debouncedSearchTerm, paidLineItems]);
+
+  const paginatedLineItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredLineItems.slice(startIndex, endIndex);
+  }, [filteredLineItems, currentPage, pageSize]);
 
   const tableHeaders: Array<typeof DataTableHeader> = [
     { header: 'No', key: 'no' },
@@ -63,11 +72,12 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
     { header: 'Total amount', key: 'total' },
     { header: 'Bill creation date', key: 'dateofbillcreation' },
   ];
+
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
 
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
-      filteredLineItems?.map((item, index) => {
+      paginatedLineItems?.map((item, index) => {
         return {
           no: `${index + 1}`,
           id: `${item.uuid}`,
@@ -78,7 +88,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           dateofbillcreation: formatDate(new Date(bill.dateCreated), { mode: 'standard' }),
         };
       }) ?? [],
-    [bill.dateCreated, bill.receiptNumber, filteredLineItems],
+    [bill.dateCreated, bill.receiptNumber, paginatedLineItems],
   );
 
   if (isLoadingBill) {
@@ -181,6 +191,20 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           </Layer>
         </div>
       )}
+      <Pagination
+        forwardText="Next page"
+        backwardText="Previous page"
+        page={currentPage}
+        pageSize={pageSize}
+        pageSizes={[5, 10, 20, 50]}
+        totalItems={filteredLineItems.length}
+        className={styles.pagination}
+        size={responsiveSize}
+        onChange={({ pageSize: newPageSize, page: newPage }) => {
+          setPageSize(newPageSize);
+          setCurrentPage(newPage);
+        }}
+      />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Column,
@@ -12,26 +12,29 @@ import {
   Button,
   FilterableMultiSelect,
   MultiSelect,
+  InlineLoading,
 } from '@carbon/react';
 import styles from './claims-form.scss';
-import { MappedBill } from '../../../types';
-import { formatDate, navigate } from '@openmrs/esm-framework';
+import { MappedBill, LineItem } from '../../../types';
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
-import { useVisit } from './claims-form.resource';
+import { processClaims, useProviders, useVisit } from './claims-form.resource';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { extractNameString, formatDate } from '../../../helpers/functions';
 
 type ClaimsFormProps = {
   bill: MappedBill;
+  selectedLineItems: LineItem[];
 };
 
 const ClaimsFormSchema = z.object({
   claimCode: z.string().nonempty({ message: 'Claim code is required' }),
-  guaranteeId: z.string().nonempty({ message: 'Claim code is required' }),
+  guaranteeId: z.string().nonempty({ message: 'Guarantee Id is required' }),
   claimExplanation: z.string().nonempty({ message: 'Claim explanation is required' }),
-  claimJustification: z.string().nonempty({ message: 'Claim explanation is required' }),
+  claimJustification: z.string().nonempty({ message: 'Claim justification is required' }),
   providerName: z
     .array(
       z.object({
@@ -54,49 +57,45 @@ const ClaimsFormSchema = z.object({
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
 });
 
-const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
+const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit } = useVisit(patientUuid);
+  const visitUuid = recentVisit?.visitType.uuid;
+
+  const { data } = useProviders();
+  const [loading, setLoading] = useState(false);
+  const providers = data?.data.results.map((provider) => ({ id: provider.uuid, text: provider.display })) || [];
 
   const handleNavigateToBillingOptions = () =>
     navigate({
       to: window.getOpenmrsSpaBase() + `home/billing/patient/${patientUuid}/${billUuid}`,
     });
 
-  const encounterProviders =
-    recentVisit?.encounters.flatMap((encounter) =>
-      encounter.encounterProviders.map((provider) => ({
-        id: provider.uuid,
-        text: provider.display,
-      })),
-    ) || [];
-
-  const diagnoses = useMemo(
-    () =>
-      recentVisit?.encounters.flatMap(
+  const diagnoses = useMemo(() => {
+    return (
+      recentVisit?.encounters?.flatMap(
         (encounter) =>
           encounter.diagnoses.map((diagnosis) => ({
-            id: diagnosis.uuid,
+            id: diagnosis.diagnosis.coded.uuid,
             text: diagnosis.display,
             certainty: diagnosis.certainty,
           })) || [],
-      ) || [],
-    [recentVisit],
-  );
+      ) || []
+    );
+  }, [recentVisit]);
 
-  const confirmedDiagnoses = useMemo(
-    () => diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED'),
-    [diagnoses],
-  );
-  const patientName = bill.patientName;
+  const confirmedDiagnoses = useMemo(() => {
+    return diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED');
+  }, [diagnoses]);
 
   const {
     control,
     handleSubmit,
     formState: { errors, isValid },
     setValue,
+    reset,
   } = useForm({
     mode: 'all',
     resolver: zodResolver(ClaimsFormSchema),
@@ -105,30 +104,34 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       guaranteeId: '',
       claimExplanation: '',
       claimJustification: '',
-
       providerName: [],
       diagnoses: [],
-      visitType: recentVisit?.visitType.display || '',
-      facility: `${recentVisit?.location.display || ''} - ${mflCodeValue || ''}`,
-      treatmentStart: recentVisit?.startDatetime
-        ? formatDate(new Date(recentVisit.startDatetime), { mode: 'standard' })
-        : '',
-      treatmentEnd: recentVisit?.stopDatetime
-        ? formatDate(new Date(recentVisit.stopDatetime), { mode: 'standard' })
-        : '',
+      visitType: recentVisit?.visitType?.display || '',
+      facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
+      treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
+      treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
     },
   });
 
-  const onSubmit = (data) => {
-    const lineItemUuids = bill.lineItems.map((item) => item.uuid);
+  const onSubmit = async (data) => {
+    setLoading(true);
+    const providedItems = selectedLineItems.reduce((acc, item) => {
+      acc[item.uuid] = {
+        items: [
+          {
+            uuid: item.itemOrServiceConceptUuid,
+            price: item.price,
+            quantity: item.quantity,
+          },
+        ],
+        explanation: data.claimExplanation,
+        justification: data.claimJustification,
+      };
+      return acc;
+    }, {});
+
     const payload = {
-      providedItems: {
-        [billUuid]: {
-          items: lineItemUuids,
-          explanation: data.claimExplanation,
-          justification: data.claimJustification,
-        },
-      },
+      providedItems,
       claimExplanation: data.claimExplanation,
       claimJustification: data.claimJustification,
       startDate: data.treatmentStart,
@@ -136,29 +139,51 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
       location: mflCodeValue,
       diagnoses: data.diagnoses.map((diagnosis) => diagnosis.id),
       paidInFacility: true,
-      patient: patientName,
-      visitType: data.visitType,
+      patient: patientUuid,
+      visitType: visitUuid,
       guaranteeId: data.guaranteeId,
-      provider: data.providerName.map((provider) => provider.text),
+      providers: data.providerName.map((provider) => provider.id),
       claimCode: data.claimCode,
-      billNumber: bill.receiptNumber,
+      use: 'claim',
+      insurer: 'SHA',
+      billNumber: billUuid,
     };
+    try {
+      await processClaims(payload);
+      showSnackbar({
+        kind: 'success',
+        title: t('processClaim', 'Process Claim'),
+        subtitle: t('sendClaim', 'Claim sent successfully'),
+        timeoutInMs: 3000,
+        isLowContrast: true,
+      });
+      reset();
+      setTimeout(() => {
+        navigate({
+          to: window.getOpenmrsSpaBase() + `home/billing/`,
+        });
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      showSnackbar({
+        kind: 'error',
+        title: t('claimError', 'Claim Error'),
+        subtitle: t('sendClaimError', 'Request Failed, Please try later........'),
+        timeoutInMs: 2500,
+        isLowContrast: true,
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     setValue('diagnoses', confirmedDiagnoses);
-    setValue('visitType', recentVisit?.visitType.display || '');
-    setValue('facility', `${recentVisit?.location.display || ''} - ${mflCodeValue || ''}`);
-    setValue(
-      'treatmentStart',
-      recentVisit?.startDatetime ? formatDate(new Date(recentVisit.startDatetime), { mode: 'standard' }) : '',
-    );
-    setValue(
-      'treatmentEnd',
-      recentVisit?.stopDatetime ? formatDate(new Date(recentVisit.stopDatetime), { mode: 'standard' }) : '',
-    );
+    setValue('visitType', recentVisit?.visitType?.display || '');
+    setValue('facility', `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`);
+    setValue('treatmentStart', recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '');
+    setValue('treatmentEnd', recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '');
   }, [confirmedDiagnoses, recentVisit, mflCodeValue, setValue]);
-
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
@@ -172,8 +197,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    id="visitType"
-                    labelText={t('visitType', 'Visit Type')}
+                    id="visittype"
+                    labelText={t('visittype', 'Visit Type')}
                     readOnly
                     value={field.value}
                   />
@@ -265,8 +290,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
                   {...field}
                   id="provider_name"
                   titleText={t('provider_name', 'Provider Name')}
-                  items={encounterProviders}
-                  itemToString={(item) => (item ? item.text : '')}
+                  items={providers}
+                  itemToString={(item) => (item ? extractNameString(item.text) : '')}
                   selectionFeedback="top-after-reopen"
                   selectedItems={field.value}
                   onChange={({ selectedItems }) => field.onChange(selectedItems)}
@@ -355,8 +380,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill }) => {
           <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
             {t('discardClaim', 'Discard Claim')}
           </Button>
-          <Button className={styles.button} kind="primary" type="submit" disabled={!isValid}>
-            {t('processClaim', 'Process Claim')}
+          <Button className={styles.button} kind="primary" type="submit" disabled={!isValid || loading}>
+            {loading ? (
+              <InlineLoading description={t('processing', 'Processing...')} />
+            ) : (
+              t('processClaim', 'Process Claim')
+            )}
           </Button>
         </ButtonSet>
       </Stack>
