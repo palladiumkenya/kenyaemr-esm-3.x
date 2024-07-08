@@ -52,7 +52,6 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       familyName: '',
       maritalStatus: '',
       listingDate: new Date(),
-      dateOfBirth: new Date(),
       relationshipToPatient: '',
     },
     resolver: zodResolver(ContactListFormSchema),
