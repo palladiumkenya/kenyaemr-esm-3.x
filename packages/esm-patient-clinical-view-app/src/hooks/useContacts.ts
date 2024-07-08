@@ -122,7 +122,15 @@ const useContacts = (patientUuid: string) => {
     openmrsFetch,
   );
   const relationships = useMemo(() => {
-    return data?.data?.results?.length ? extractContactData(patientUuid, data?.data?.results, config) : [];
+    return data?.data?.results?.length
+      ? extractContactData(
+          patientUuid,
+          data?.data?.results.filter((rel) =>
+            config.familyRelationshipsTypeList.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
+          ),
+          config,
+        )
+      : [];
   }, [data?.data?.results, patientUuid, config]);
   return {
     contacts: relationships,
