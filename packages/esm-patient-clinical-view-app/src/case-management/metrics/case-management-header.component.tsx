@@ -16,14 +16,13 @@ const MetricsHeader = () => {
   };
   return (
     <div className={styles.metricsContainer}>
-      <span className={styles.metricsTitle}> </span>
       <div className={styles.actionBtn}>
         <Button
           kind="tertiary"
           renderIcon={(props) => <WatsonHealthStressBreathEditor size={16} {...props} />}
-          iconDescription={t('addCases', 'Add a case')}
+          iconDescription={t('addCase', 'Add case')}
           onClick={handleAddCase}>
-          {t('addCases', 'Add a case')}
+          {t('addCase', 'Add case')}
         </Button>
       </div>
     </div>
