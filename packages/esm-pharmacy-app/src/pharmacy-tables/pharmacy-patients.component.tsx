@@ -46,6 +46,16 @@ export const PharmacyPatients: React.FC = () => {
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
   const layout = useLayoutType();
 
+  const launchDeleteModal = (patientUuid: string) => {
+    const dispose = showModal('pharmacy-delete-confirm-dialog', {
+      onDelete: () => {
+        handleRevoke(patientUuid);
+        dispose();
+      },
+      onClose: () => dispose(),
+    });
+  };
+
   const headers = [
     {
       header: t('openmrsId', 'OpenMRS ID'),
@@ -93,13 +103,7 @@ export const PharmacyPatients: React.FC = () => {
               kind="tertiary"
               renderIcon={TrashCan}
               onClick={() => {
-                const dispose = showModal('pharmacy-delete-confirm-dialog', {
-                  onDelete: () => {
-                    handleRevoke(patient.uuid);
-                    dispose();
-                  },
-                  onClose: () => dispose(),
-                });
+                launchDeleteModal(patient.uuid);
               }}>
               Revoke
             </Button>

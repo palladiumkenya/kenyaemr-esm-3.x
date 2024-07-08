@@ -1,9 +1,8 @@
-import { FetchResponse, formatDatetime, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { FetchResponse, formatDatetime, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { Config } from '../config-schema';
 import { PhamarcyUserMapping, Pharmacy } from '../types';
 
-const extractPharamacyData = (mapping: PhamarcyUserMapping) => {
+const extractPharmacyData = (mapping: PhamarcyUserMapping) => {
   return {
     uuid: mapping.basis.uuid,
     name: mapping.basis.name,
@@ -14,8 +13,7 @@ const extractPharamacyData = (mapping: PhamarcyUserMapping) => {
   } as Pharmacy;
 };
 
-// TODO Custome representation optimization
-const usePharmacies = (userUuid: string) => {
+const useUserMappedPharmacies = (userUuid: string) => {
   const url = `${restBaseUrl}/datafilter/search`;
 
   const fetchUserPharmacies = async (url: string) => {
@@ -42,8 +40,8 @@ const usePharmacies = (userUuid: string) => {
   return {
     isLoading,
     error,
-    pharmacies: (data?.data ?? []).map(extractPharamacyData),
+    pharmacies: (data?.data ?? []).map(extractPharmacyData),
   };
 };
 
-export default usePharmacies;
+export default useUserMappedPharmacies;

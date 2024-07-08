@@ -5,6 +5,7 @@ import { formatDate, useSession } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { usePharmacy } from '../hooks';
 import { useParams } from 'react-router-dom';
+import { SkeletonText } from '@carbon/react';
 
 const PharmacyDetailHeader = () => {
   const { t } = useTranslation();
@@ -14,12 +15,11 @@ const PharmacyDetailHeader = () => {
   const { error, isLoading, pharmacy } = usePharmacy(pharmacyUuid);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <SkeletonText style={{ height: '40px' }} />;
   }
   return (
     <div className={styles.header}>
       <div className={styles['left-justified-items']}>
-        {/* <PharmacyIllustration /> */}
         <div className={styles['page-labels']}>
           <p>{t('pharmacy', 'Community pharmacy')}</p>
           <p className={styles['page-name']}>{pharmacy.name}</p>

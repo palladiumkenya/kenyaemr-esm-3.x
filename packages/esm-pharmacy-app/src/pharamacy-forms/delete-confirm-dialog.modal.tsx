@@ -8,7 +8,7 @@ const DeleteConfirmDialog = ({ onClose, onDelete }) => {
   return (
     <React.Fragment>
       <ModalHeader closeModal={onClose}>{t('warning', 'Warning!')}</ModalHeader>
-      <ModalBody>Are you sure yoiu want to revoke access?</ModalBody>
+      <ModalBody>Are you sure you want to revoke access?</ModalBody>
       <ModalFooter>
         <ButtonSet>
           <Button kind="secondary" onClick={onClose}>

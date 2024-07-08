@@ -24,7 +24,7 @@ const usePharmacyPatients = (pharmacyUuid: string) => {
     return response;
   };
 
-  const { data, isLoading, error } = useSWR<FetchResponse<PharamacyPatientMapping[]>>(url, fetchPharmacyPatients);
+  const { data, isLoading, error } = useSWR<FetchResponse<Array<PharamacyPatientMapping>>>(url, fetchPharmacyPatients);
 
   return {
     isLoading,

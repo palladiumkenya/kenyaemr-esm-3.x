@@ -29,7 +29,7 @@ export const pharmacyAssignmentForm = getAsyncLifecycle(
   options,
 );
 export const pharmacyDeleteConfirmDialog = getAsyncLifecycle(
-  () => import('./pharamacy-forms/delete-confirm-dialog.component'),
+  () => import('./pharamacy-forms/delete-confirm-dialog.modal'),
   options,
 );
 export const pharmacyDashboardLink = getSyncLifecycle(

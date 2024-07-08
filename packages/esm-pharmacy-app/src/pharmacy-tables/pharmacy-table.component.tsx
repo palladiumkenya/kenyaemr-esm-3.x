@@ -25,7 +25,7 @@ import {
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePharmacies } from '../hooks';
+import { useUserMappedPharmacies } from '../hooks';
 import styles from './pharmacy-tables.scss';
 
 const PharmaciesTable = () => {
@@ -34,7 +34,7 @@ const PharmaciesTable = () => {
   const {
     user: { uuid: sessionUserUuid },
   } = useSession();
-  const { error, pharmacies, isLoading } = usePharmacies(sessionUserUuid);
+  const { error, pharmacies, isLoading } = useUserMappedPharmacies(sessionUserUuid);
 
   const headerTitle = t('communityPharmacies', 'Community pharmacies');
 
@@ -104,9 +104,6 @@ const PharmaciesTable = () => {
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>{t('noCommunityPharmacyToList', 'No Community Pharmacies to list.')}</p>
-          {/* <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
-            {t('tagPharmacy', 'Tag pharmacy')}
-          </Button> */}
         </Tile>
       </Layer>
     );
@@ -114,10 +111,7 @@ const PharmaciesTable = () => {
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={`Community Pharmacies (${pharmacies.length})`}>
-        {''}
-        {/* <Button onClick={handdleTagPharmacy} renderIcon={Add} kind="ghost">
-          {t('tagPharmacy', 'Tag pharmacy')}
-        </Button> */}
+        <div />
       </CardHeader>
       <DataTable
         useZebraStyles

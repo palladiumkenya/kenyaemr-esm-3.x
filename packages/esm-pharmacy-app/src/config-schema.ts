@@ -35,15 +35,9 @@ export const configSchema = {
     },
     _validators: [validator((v) => v.length > 0, 'At least one person must be greeted.')],
   },
-  admissionLocationTagUuid: {
-    _type: Type.String,
-    _description: 'Location Tag for Phamacy where patient/person is assigned',
-    _default: '0815e0b2-1182-4157-9340-bee371ea41e4',
-  },
 };
 
 export type Config = {
   casualGreeting: boolean;
   whoToGreet: Array<string>;
-  admissionLocationTagUuid: string;
 };
