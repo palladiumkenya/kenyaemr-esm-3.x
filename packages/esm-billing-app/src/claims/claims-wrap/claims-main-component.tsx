@@ -1,42 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import styles from './claims-main.scss';
 import { LineItem, MappedBill } from '../../types';
-import ClaimsTable from '../claims-dashboard/claims-table.component.tsx/claims-table.component';
-import ClaimsForm from '../claims-dashboard/claims-form/claims-form.component';
+import ClaimsTable from '../dashboard/table/claims-table.component';
 import { useBill } from '../../billing.resource';
-import { computeTotalPrice } from '../../utils';
-import { ClaimsBreakDown } from '../claims-dashboard/claims-breakdown/claims-breakdown.component';
-import { convertToCurrency } from '../../helpers';
 import { useTranslation } from 'react-i18next';
+import ClaimsForm from '../dashboard/form/claims-form.component';
+import MainMetrics from '../metrics/metrics.component';
 
 interface ClaimsMainProps {
   bill: MappedBill;
 }
 
 const ClaimMainComponent: React.FC<ClaimsMainProps> = ({ bill }) => {
-  const { t } = useTranslation();
-
-  const [selectedLineItems, setSelectedLineItems] = useState([]);
+  const [selectedLineItems, setSelectedLineItems] = useState<LineItem[]>([]);
   const { isLoading: isLoadingBill, error } = useBill(bill.uuid);
+
   const handleSelectItem = (lineItems: Array<LineItem>) => {
-    const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
-    setSelectedLineItems([...lineItems, ...paidLineItems]);
+    setSelectedLineItems(lineItems);
   };
-  useEffect(() => {
-    const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
-    setSelectedLineItems(paidLineItems);
-  }, [bill.lineItems]);
-  const hasMoreThanOneLineItem = bill?.lineItems?.length > 1;
-  const computedTotal = hasMoreThanOneLineItem ? computeTotalPrice(selectedLineItems) : bill.totalAmount ?? 0;
 
   return (
-    <div className={styles.mainContainer}>
-      <div className={styles.content}>
-        <ClaimsTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
-        <ClaimsForm bill={bill} />
+    <>
+      <MainMetrics selectedLineItems={selectedLineItems} bill={bill} />
+      <div className={styles.mainContainer}>
+        <div className={styles.content}>
+          <ClaimsTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
+          <ClaimsForm bill={bill} selectedLineItems={selectedLineItems} />
+        </div>
       </div>
-      <ClaimsBreakDown label={t('totalClaimAmount', 'Total Claims Amount')} value={convertToCurrency(computedTotal)} />
-    </div>
+    </>
   );
 };
 

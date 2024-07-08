@@ -67,6 +67,7 @@ export interface LineItem {
   lineItemOrder: number;
   resourceVersion: string;
   paymentStatus: string;
+  itemOrServiceConceptUuid: string;
 }
 
 interface PatientLink {
