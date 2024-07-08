@@ -15,9 +15,9 @@ import { useTranslation } from 'react-i18next';
 
 const BirthDateCalculator = ({ onClose, props: { date, onBirthDateChange } }) => {
   const { t } = useTranslation();
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<{ fromDate: Date; age: number | undefined }>({
     fromDate: date ?? new Date(),
-    age: 0,
+    age: undefined,
   });
 
   const handleSubmit = () => {
@@ -63,7 +63,7 @@ const BirthDateCalculator = ({ onClose, props: { date, onBirthDateChange } }) =>
       </ModalBody>
       <ModalFooter>
         <ButtonSet>
-          <Button kind="primary" onClick={handleSubmit}>
+          <Button kind="primary" onClick={handleSubmit} disabled={!formState.age || !formState.fromDate}>
             Submit
           </Button>
           <Button kind="secondary" onClick={onClose}>
