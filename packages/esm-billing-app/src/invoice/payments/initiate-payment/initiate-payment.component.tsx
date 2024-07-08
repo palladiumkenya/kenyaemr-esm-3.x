@@ -1,6 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Form, ModalBody, ModalHeader, TextInput, Layer, InlineNotification, Loading } from '@carbon/react';
+import {
+  Button,
+  Form,
+  ModalBody,
+  ModalHeader,
+  TextInput,
+  Layer,
+  InlineNotification,
+  InlineLoading,
+  Loading,
+} from '@carbon/react';
 import styles from './initiate-payment.scss';
 import { Controller, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
@@ -10,8 +20,9 @@ import { formatPhoneNumber } from '../utils';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
-import { useConfig } from '@openmrs/esm-framework';
+import { useConfig, usePatient } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../../config-schema';
+import { usePatientAttributes } from '../../../hooks/usePatientAttributes';
 
 const InitiatePaymentSchema = z.object({
   phoneNumber: z
@@ -28,6 +39,7 @@ export interface InitiatePaymentDialogProps {
 
 const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
   const { t } = useTranslation();
+  const { phoneNumber, isLoading: isLoadingPhoneNumber } = usePatientAttributes(bill.patientUuid);
   const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
@@ -38,13 +50,16 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     control,
     handleSubmit,
     formState: { errors, isValid },
+    setValue,
   } = useForm<any>({
     mode: 'all',
-    defaultValues: {
-      billAmount: String(bill.totalAmount),
-    },
+    defaultValues: { billAmount: String(bill.totalAmount), phoneNumber: phoneNumber },
     resolver: zodResolver(InitiatePaymentSchema),
   });
+
+  useEffect(() => {
+    setValue('phoneNumber', phoneNumber);
+  }, [phoneNumber, setValue]);
 
   const onSubmit = async (data: { phoneNumber: any; billAmount: any }) => {
     const phoneNumber = formatPhoneNumber(data.phoneNumber);
@@ -62,6 +77,10 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     setIsLoading(false);
     pollingTrigger({ requestId, requestStatus: 'INITIATED' });
   };
+
+  if (isLoadingPhoneNumber || isLoading) {
+    return <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;
+  }
 
   return (
     <div>

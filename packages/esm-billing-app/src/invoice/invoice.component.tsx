@@ -1,20 +1,19 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Button, InlineLoading } from '@carbon/react';
-import { Printer } from '@carbon/react/icons';
+import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
 import { useParams } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, usePatient, showModal, formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePatient, showModal, formatDatetime, parseDate, navigate } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { convertToCurrency } from '../helpers';
 import { LineItem } from '../types';
 import { useBill, useDefaultFacility } from '../billing.resource';
 import InvoiceTable from './invoice-table.component';
 import Payments from './payments/payments.component';
-import PrintReceipt from './printable-invoice/print-receipt.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import styles from './invoice.scss';
-import MakeClaims from '../claims/make-claims.component';
+import { spaBasePath } from '../constants';
 
 interface InvoiceDetailsProps {
   label: string;
@@ -100,24 +99,45 @@ const Invoice: React.FC = () => {
             <InvoiceDetails key={key} label={key} value={val} />
           ))}
         </section>
-        <div>
-          {bill?.status !== 'PAID' && (
-            <Button onClick={handleBillPayment} iconDescription="Initiate Payment" size="md">
-              {t('initiatePayment', 'Initiate Payment')}
-            </Button>
-          )}
-          <Button
-            disabled={isPrinting}
-            onClick={handlePrint}
-            renderIcon={(props) => <Printer size={24} {...props} />}
-            iconDescription="Print bill"
-            className={styles.button}
-            size="md">
-            {isPrinting ? t('printing', 'Printing...') : t('printBill', 'Print bill')}
-          </Button>
-          {/* {bill.status === 'PAID' ? <PrintReceipt billId={bill?.id} /> : null} */}
-          <MakeClaims patientUuid={patientUuid} billUuid={billUuid} />
-        </div>
+      </div>
+      <div className={styles.actionArea}>
+        <Button
+          kind="secondary"
+          size="sm"
+          disabled={bill?.status !== 'PAID'}
+          onClick={() => navigate({ to: `\${openmrsBase}/ws/rest/v1/cashier/receipt?billId=${bill.id}` })}
+          renderIcon={Printer}
+          iconDescription="Add">
+          {t('printRecept', 'Print receipt')}
+        </Button>
+        <Button
+          onClick={handlePrint}
+          kind="tertiary"
+          size="sm"
+          disabled={isPrinting}
+          renderIcon={Printer}
+          iconDescription="Add"
+          tooltipPosition="right">
+          {isPrinting ? t('printingInvoice', 'Printing invoice...') : t('printInvoice', 'Print invoice')}
+        </Button>
+        <Button
+          onClick={handleBillPayment}
+          disabled={bill?.status === 'PAID'}
+          size="sm"
+          renderIcon={Wallet}
+          iconDescription="Add"
+          tooltipPosition="left">
+          {t('mpesaPayment', 'MPESA Payment')}
+        </Button>
+        <Button
+          onClick={() => navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` })}
+          kind="danger"
+          size="sm"
+          renderIcon={BaggageClaim}
+          iconDescription="Add"
+          tooltipPosition="bottom">
+          {t('claim', 'Process claims')}
+        </Button>
       </div>
 
       <InvoiceTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
