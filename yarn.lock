@@ -2773,6 +2773,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kenyaemr/esm-pharmacy-app@workspace:packages/esm-pharmacy-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-pharmacy-app@workspace:packages/esm-pharmacy-app"
+  dependencies:
+    "@carbon/react": "npm:^1.42.1"
+    lodash-es: "npm:^4.17.15"
+    react-to-print: "npm:^2.14.13"
+    webpack: "npm:^5.74.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app":
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app"
