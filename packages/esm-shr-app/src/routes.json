@@ -50,6 +50,10 @@
       "name": "referral-reasons-dialog",
       "component": "referralReasonsDialogPopup"
     },
+     {
+      "name": "facility-referral-form",
+      "component": "facilityRefferalForm"
+    },
     {
       "name": "referral-view-link",
       "component": "referralLink",

@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, Tabs, TabPanel, TabPanels, InlineLoading } from '@carbon/react';
 import styles from './referrals-tabs.scss';
-import CommunityReferrals from '../referrals.component';
+import ReferralTable from '../referrals.component';
 
 interface ReferralTabsProps {
   isLoadingFacilityReferrals: boolean;
@@ -27,10 +27,13 @@ const ReferralTabs: React.FC<ReferralTabsProps> = ({ isLoadingFacilityReferrals 
         <div>{isLoadingFacilityReferrals && <InlineLoading description="Pulling referrals..." />}</div>
         <TabPanels>
           <TabPanel className={styles.tabPanel}>
-            <CommunityReferrals status="active" />
+            <ReferralTable status="active" />
           </TabPanel>
           <TabPanel className={styles.tabPanel}>
-            <CommunityReferrals status="completed" />
+            <ReferralTable status="active" />
+          </TabPanel>
+          <TabPanel className={styles.tabPanel}>
+            <ReferralTable status="completed" />
           </TabPanel>
         </TabPanels>
       </Tabs>

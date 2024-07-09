@@ -25,11 +25,11 @@ import { useCommunityReferrals } from './refferals.resource';
 import CommunityReferralActions from './referrals-actions.component';
 import { ReferralReasonsProps } from '../types';
 
-type CommunityReferralProps = {
+type ReferralProps = {
   status: string;
 };
 
-const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
+const ReferralTable: React.FC<ReferralProps> = (data) => {
   const { t } = useTranslation();
   const { referrals, isLoading, isValidating } = useCommunityReferrals(data.status);
   const layout = useLayoutType();
@@ -241,4 +241,4 @@ function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveS
     </>
   );
 }
-export default CommunityReferrals;
+export default ReferralTable;
