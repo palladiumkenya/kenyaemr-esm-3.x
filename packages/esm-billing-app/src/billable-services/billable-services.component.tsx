@@ -23,7 +23,7 @@ import {
   usePagination,
   ErrorState,
   navigate,
-  showModal,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
@@ -46,11 +46,11 @@ const BillableServices = () => {
   const [overlayHeader, setOverlayTitle] = useState('');
 
   const handleEditClick = (service) => {
-    const dispose = showModal('update-billable-services-dialog', {
-      closeModal: () => dispose(),
+    launchWorkspace('update-billable-services-workspace', {
       service,
     });
   };
+
   const headerData = [
     {
       header: t('serviceName', 'Service Name'),

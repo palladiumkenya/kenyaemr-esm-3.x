@@ -55,4 +55,4 @@ export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, opt
 export const labOrder = getSyncLifecycle(LabOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
-export const updateBillableServicesDialog = getSyncLifecycle(UpdateBillableServicesDialog, options);
+export const updateBillableServicesWorkspace = getSyncLifecycle(UpdateBillableServicesDialog, options);
