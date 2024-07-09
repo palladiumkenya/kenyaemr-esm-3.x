@@ -63,16 +63,4 @@ export const procedureOrder = getSyncLifecycle(ProcedureOrder, options);
 export const imagingOrder = getSyncLifecycle(ImagingOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
-
-// bill manager modals
-export const cancelBillModal = getSyncLifecycle(CancelBillModal, options);
-export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
-
-// bill manager extensions
-export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
-export const editBillForm = getSyncLifecycle(EditBillForm, options);
-
-export function startupApp() {
-  defineConfigSchema(moduleName, configSchema);
-}
-export const updateBillableServicesDialog = getSyncLifecycle(UpdateBillableServicesDialog, options);
+export const updateBillableServicesWorkspace = getSyncLifecycle(UpdateBillableServicesDialog, options);

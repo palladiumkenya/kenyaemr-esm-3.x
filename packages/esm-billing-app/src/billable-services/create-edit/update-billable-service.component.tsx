@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   Form,
-  ModalHeader,
-  Modal,
   TextInput,
   Layer,
   ComboBox,
@@ -13,8 +11,6 @@ import {
   Search,
   Tile,
   FormLabel,
-  ModalBody,
-  ModalFooter,
 } from '@carbon/react';
 import { Controller, useForm, useFieldArray } from 'react-hook-form';
 import { showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm-framework';
@@ -39,13 +35,13 @@ const servicePriceSchema = z.object({
 const paymentFormSchema = z.object({ payment: z.array(servicePriceSchema) });
 
 export interface UpdateBillableServicesDialogProps {
-  closeModal: () => void;
+  closeWorkspace: () => void;
   service: any;
 }
 
 const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: 0 };
 
-const UpdateBillableServicesDialog: React.FC<UpdateBillableServicesDialogProps> = ({ closeModal, service }) => {
+const UpdateBillableServicesDialog: React.FC<UpdateBillableServicesDialogProps> = ({ closeWorkspace, service }) => {
   const { t } = useTranslation();
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
@@ -123,7 +119,7 @@ const UpdateBillableServicesDialog: React.FC<UpdateBillableServicesDialogProps> 
           kind: 'success',
           timeoutInMs: 3000,
         });
-        closeModal();
+        closeWorkspace();
       },
       (error) => {
         showSnackbar({ title: 'Update error', kind: 'error', subtitle: error.message });
@@ -142,198 +138,195 @@ const UpdateBillableServicesDialog: React.FC<UpdateBillableServicesDialogProps> 
   }
 
   return (
-    <div>
-      <ModalHeader closeModal={closeModal} hasScrollingContent />
-      <ModalBody>
-        <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-          <h4>{t('updateBillableService', 'Update Billable Service')}</h4>
-          <section className={`${styles.section} ${styles.scrollableContent}`}>
-            <section className={styles.section}>
-              <Layer>
-                <Controller
-                  control={control}
-                  name="serviceName"
-                  defaultValue={service.name || ''}
-                  render={({ field }) => (
-                    <TextInput
-                      id="serviceName"
-                      labelText={t('serviceName', 'Service Name')}
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e.target.value);
-                      }}
-                      value={field.value}
-                      invalid={!!errors.serviceName}
-                      invalidText={errors.serviceName?.message}
-                    />
-                  )}
-                />
-              </Layer>
-              <Layer>
-                <Controller
-                  control={control}
-                  name="shortName"
-                  defaultValue={service.shortName || ''}
-                  render={({ field }) => (
-                    <TextInput
-                      id="shortName"
-                      labelText={t('shortName', 'Short Name')}
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e.target.value);
-                      }}
-                      value={field.value}
-                      invalid={!!errors.shortName}
-                      invalidText={errors.shortName?.message}
-                    />
-                  )}
-                />
-              </Layer>
-              <Layer>
-                <Controller
-                  control={control}
-                  name="serviceType"
-                  render={({ field }) => (
-                    <ComboBox
-                      id="serviceType"
-                      items={serviceTypes ?? []}
-                      titleText={t('serviceType', 'Service Type')}
-                      itemToString={(item) => item?.display || ''}
-                      onChange={({ selectedItem }) => field.onChange(selectedItem)}
-                      placeholder="Select service type"
-                      initialSelectedItem={serviceTypes.find((type) => type.display === service.serviceType.display)}
-                    />
-                  )}
-                />
-              </Layer>
-              <FormLabel className={styles.conceptLabel}>Associated Concept</FormLabel>
+    <>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <h4>{t('updateBillableService', 'Update Billable Service')}</h4>
+        <section className={`${styles.section} ${styles.scrollableContent}`}>
+          <section className={styles.section}>
+            <Layer>
               <Controller
-                name="search"
                 control={control}
-                render={({ field: { onChange, value, onBlur } }) => (
-                  <ResponsiveWrapper isTablet={isTablet}>
-                    <Search
-                      ref={searchInputRef}
-                      size="md"
-                      id="conceptsSearch"
-                      labelText={t('enterConcept', 'Associated concept')}
-                      placeholder={t('searchConcepts', 'Search associated concept')}
-                      className={errors?.search && styles.serviceError}
-                      onChange={(e) => {
-                        onChange(e);
-                        handleSearchTermChange(e);
-                      }}
-                      renderIcon={errors?.search && <WarningFilled />}
-                      onBlur={onBlur}
-                      onClear={() => {
-                        setSearchTerm('');
-                        setSelectedConcept(null);
-                      }}
-                      value={selectedConcept ? selectedConcept.display : value}
-                    />
-                  </ResponsiveWrapper>
+                name="serviceName"
+                defaultValue={service.name || ''}
+                render={({ field }) => (
+                  <TextInput
+                    id="serviceName"
+                    labelText={t('serviceName', 'Service Name')}
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                    }}
+                    value={field.value}
+                    invalid={!!errors.serviceName}
+                    invalidText={errors.serviceName?.message}
+                  />
                 )}
               />
-              {(() => {
-                if (!debouncedSearchTerm || selectedConcept) {
-                  return null;
-                }
-                if (isSearching) {
-                  return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
-                }
-                if (searchResults && searchResults.length) {
-                  return (
-                    <ul className={styles.conceptsList}>
-                      {searchResults?.map((searchResult, index) => (
-                        <li
-                          role="menuitem"
-                          className={styles.service}
-                          key={index}
-                          onClick={() => handleConceptChange(searchResult)}>
-                          {searchResult.display}
-                        </li>
-                      ))}
-                    </ul>
-                  );
-                }
+            </Layer>
+            <Layer>
+              <Controller
+                control={control}
+                name="shortName"
+                defaultValue={service.shortName || ''}
+                render={({ field }) => (
+                  <TextInput
+                    id="shortName"
+                    labelText={t('shortName', 'Short Name')}
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                    }}
+                    value={field.value}
+                    invalid={!!errors.shortName}
+                    invalidText={errors.shortName?.message}
+                  />
+                )}
+              />
+            </Layer>
+            <Layer>
+              <Controller
+                control={control}
+                name="serviceType"
+                render={({ field }) => (
+                  <ComboBox
+                    id="serviceType"
+                    items={serviceTypes ?? []}
+                    titleText={t('serviceType', 'Service Type')}
+                    itemToString={(item) => item?.display || ''}
+                    onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                    placeholder="Select service type"
+                    initialSelectedItem={serviceTypes.find((type) => type.display === service.serviceType.display)}
+                  />
+                )}
+              />
+            </Layer>
+            <FormLabel className={styles.conceptLabel}>Associated Concept</FormLabel>
+            <Controller
+              name="search"
+              control={control}
+              render={({ field: { onChange, value, onBlur } }) => (
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <Search
+                    ref={searchInputRef}
+                    size="md"
+                    id="conceptsSearch"
+                    labelText={t('enterConcept', 'Associated concept')}
+                    placeholder={t('searchConcepts', 'Search associated concept')}
+                    className={errors?.search && styles.serviceError}
+                    onChange={(e) => {
+                      onChange(e);
+                      handleSearchTermChange(e);
+                    }}
+                    renderIcon={errors?.search && <WarningFilled />}
+                    onBlur={onBlur}
+                    onClear={() => {
+                      setSearchTerm('');
+                      setSelectedConcept(null);
+                    }}
+                    value={selectedConcept ? selectedConcept.display : value}
+                  />
+                </ResponsiveWrapper>
+              )}
+            />
+            {(() => {
+              if (!debouncedSearchTerm || selectedConcept) {
+                return null;
+              }
+              if (isSearching) {
+                return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
+              }
+              if (searchResults && searchResults.length) {
                 return (
-                  <Layer>
-                    <Tile className={styles.emptyResults}>
-                      <span>
-                        {t('noResultsFor', 'No results for')} <strong>"{debouncedSearchTerm}"</strong>
-                      </span>
-                    </Tile>
-                  </Layer>
+                  <ul className={styles.conceptsList}>
+                    {searchResults?.map((searchResult, index) => (
+                      <li
+                        role="menuitem"
+                        className={styles.service}
+                        key={index}
+                        onClick={() => handleConceptChange(searchResult)}>
+                        {searchResult.display}
+                      </li>
+                    ))}
+                  </ul>
                 );
-              })()}
-              {fields.map((field, index) => (
-                <div key={field.id} className={styles.paymentMethodContainer}>
-                  <Controller
-                    control={control}
-                    name={`payment.${index}.paymentMode`}
-                    render={({ field }) => (
-                      <Layer>
-                        <Dropdown
-                          id={`paymentMode-${index}`}
-                          onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
-                          titleText={t('paymentMode', 'Payment Mode')}
-                          label={t('selectPaymentMethod', 'Select payment method')}
-                          items={paymentModes ?? []}
-                          itemToString={(item) => (item ? item.name : '')}
-                          invalid={!!errors?.payment?.[index]?.paymentMode}
-                          invalidText={errors?.payment?.[index]?.paymentMode?.message}
-                          initialSelectedItem={paymentModes.find((mode) => mode.uuid === field.value)}
-                        />
-                      </Layer>
-                    )}
+              }
+              return (
+                <Layer>
+                  <Tile className={styles.emptyResults}>
+                    <span>
+                      {t('noResultsFor', 'No results for')} <strong>"{debouncedSearchTerm}"</strong>
+                    </span>
+                  </Tile>
+                </Layer>
+              );
+            })()}
+            {fields.map((field, index) => (
+              <div key={field.id} className={styles.paymentMethodContainer}>
+                <Controller
+                  control={control}
+                  name={`payment.${index}.paymentMode`}
+                  render={({ field }) => (
+                    <Layer>
+                      <Dropdown
+                        id={`paymentMode-${index}`}
+                        onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
+                        titleText={t('paymentMode', 'Payment Mode')}
+                        label={t('selectPaymentMethod', 'Select payment method')}
+                        items={paymentModes ?? []}
+                        itemToString={(item) => (item ? item.name : '')}
+                        invalid={!!errors?.payment?.[index]?.paymentMode}
+                        invalidText={errors?.payment?.[index]?.paymentMode?.message}
+                        initialSelectedItem={paymentModes.find((mode) => mode.uuid === field.value)}
+                      />
+                    </Layer>
+                  )}
+                />
+                <Controller
+                  control={control}
+                  name={`payment.${index}.price`}
+                  render={({ field }) => (
+                    <Layer>
+                      <TextInput
+                        id={`price-${index}`}
+                        {...field}
+                        invalid={!!errors?.payment?.[index]?.price}
+                        invalidText={errors?.payment?.[index]?.price?.message}
+                        labelText={t('sellingPrice', 'Selling Price')}
+                        placeholder={t('sellingAmount', 'Enter selling price')}
+                      />
+                    </Layer>
+                  )}
+                />
+                <div className={styles.removeButtonContainer}>
+                  <TrashCan
+                    aria-label={`delete_${index}`}
+                    id={`delete_${index}`}
+                    onClick={() => handleRemovePaymentMode(index)}
+                    className={styles.removeButton}
+                    size={20}
                   />
-                  <Controller
-                    control={control}
-                    name={`payment.${index}.price`}
-                    render={({ field }) => (
-                      <Layer>
-                        <TextInput
-                          id={`price-${index}`}
-                          {...field}
-                          invalid={!!errors?.payment?.[index]?.price}
-                          invalidText={errors?.payment?.[index]?.price?.message}
-                          labelText={t('sellingPrice', 'Selling Price')}
-                          placeholder={t('sellingAmount', 'Enter selling price')}
-                        />
-                      </Layer>
-                    )}
-                  />
-                  <div className={styles.removeButtonContainer}>
-                    <TrashCan
-                      aria-label={`delete_${index}`}
-                      id={`delete_${index}`}
-                      onClick={() => handleRemovePaymentMode(index)}
-                      className={styles.removeButton}
-                      size={20}
-                    />
-                  </div>
                 </div>
-              ))}
-              <Button
-                size="md"
-                onClick={handleAppendPaymentMode}
-                className={styles.paymentButtons}
-                renderIcon={(props) => <Add size={24} {...props} />}
-                iconDescription="Add">
-                {t('addPaymentOptions', 'Add payment option')}
-              </Button>
+              </div>
+            ))}
+            <Button
+              size="md"
+              onClick={handleAppendPaymentMode}
+              className={styles.paymentButtons}
+              renderIcon={(props) => <Add size={24} {...props} />}
+              iconDescription="Add">
+              {t('addPaymentOptions', 'Add payment option')}
+            </Button>
 
-              <Button kind="secondary" className={styles.buttonLayout} onClick={closeModal}>
-                {t('cancel', 'Cancel')}
-              </Button>
-              <Button type="submit" className={styles.button} onClick={onSubmit}>
-                {t('update', 'Update')}
-              </Button>
-            </section>
+            <Button kind="secondary" className={styles.buttonLayout} onClick={closeWorkspace}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button type="submit" className={styles.button} onClick={onSubmit}>
+              {t('update', 'Update')}
+            </Button>
           </section>
-        </Form>
-      </ModalBody>
-    </div>
+        </section>
+      </Form>
+    </>
   );
 };
 
