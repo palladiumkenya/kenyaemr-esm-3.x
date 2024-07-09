@@ -96,3 +96,16 @@
     background-color: colors.$white !important;
   }
 }
+
+.actionArea {
+  margin: 0.625rem;
+  padding-top: 0.625rem;
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 0.325rem;
+  border-top: 1px solid colors.$gray-20;
+
+  & > button {
+    max-height: 2rem;
+  }
+}

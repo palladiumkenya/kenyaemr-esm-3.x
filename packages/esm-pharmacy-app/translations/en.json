@@ -8,20 +8,14 @@
   "contact": "Contact",
   "countyDistrict": "County District",
   "dateMapped": "Date Mapped",
-  "enroll": "Enroll new body",
   "name": "NAME",
   "noCommunityPharmacyToList": "No Community Pharmacies to list.",
   "noPharmacyPatients": "No Pharmacy Patients to list.",
   "noPharmacyUsers": "No Pharmacy users to list.",
   "openmrsId": "OpenMRS ID",
-  "pharmacies": "Phamacies",
   "pharmacy": "Commity pharmacy",
   "pharmacyPatients": "Pharmacy Patients",
-  "pharmacySummary": "Pharmacy Summary",
   "pharmacyUsers": "Pharmacy Users",
   "sex": "Sex",
-  "stateProvince": "State province",
-  "tagPharmacy": "Tag pharmacy",
-  "viewReport": "View Report",
-  "warning": "Warning!"
+  "stateProvince": "State province"
 }
