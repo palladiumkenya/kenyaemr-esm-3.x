@@ -9,12 +9,7 @@ const usePatientIITScore = (patientUuid: string) => {
   return {
     isLoading,
     error,
-    riskScore: data?.data ?? {
-      riskScore: 'High',
-      evaluationDate: '2023-07-01',
-      description: 'Risk of heart disease based on various factors.',
-      riskFactors: 'High cholesterol, Smoking, Lack of exercise, Poor diet',
-    },
+    riskScore: data?.data,
   };
 };
 
