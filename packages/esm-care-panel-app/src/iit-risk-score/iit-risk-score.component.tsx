@@ -3,7 +3,7 @@ import { ErrorState } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePatientIITScore from '../hooks/usePatientIITScore';
-import styles from './iits-risk-score.scss';
+import styles from './iit-risk-score.scss';
 
 interface CarePanellIITRiskScoreProps {
   patientUuid: string;
@@ -13,7 +13,7 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
   const { riskScore, error, isLoading } = usePatientIITScore(patientUuid);
   const { t } = useTranslation();
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <div className={styles['risk-score-card']}>
         <Row style={{ display: 'flex' }}>
@@ -38,6 +38,7 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
         </Row>
       </div>
     );
+  }
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('iitRiscScore', 'IIT Risk Score')} />;
