@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DocumentView, Filter } from '@carbon/react/icons';
+import { AirlineManageGates, UpdateNow } from '@carbon/react/icons';
 import { Button } from '@carbon/react';
 import styles from './referrals-header.scss';
 
@@ -17,7 +17,7 @@ const MetricsHeader: React.FC<MetricsHeaderProps> = ({ pullReferrals, isLoadingF
       <div className={styles.actionBtn}>
         <Button
           kind="primary"
-          renderIcon={(props) => <Filter size={16} {...props} />}
+          renderIcon={(props) => <UpdateNow size={20} {...props} />}
           iconDescription={t('pullReferrals', 'Pull Referrals')}
           onClick={pullReferrals}
           disabled={isLoadingFacilityReferrals}>
@@ -25,9 +25,9 @@ const MetricsHeader: React.FC<MetricsHeaderProps> = ({ pullReferrals, isLoadingF
         </Button>
         <Button
           kind="tertiary"
-          renderIcon={(props) => <DocumentView size={16} {...props} />}
-          iconDescription={t('view', 'View Departmental summaries')}>
-          {t('view', 'View Departmental summaries')}
+          renderIcon={(props) => <AirlineManageGates size={20} {...props} />}
+          iconDescription={t('referralPatient', 'Refer Patient')}>
+          {t('referralPatient', 'Refer Patient')}
         </Button>
       </div>
     </div>
