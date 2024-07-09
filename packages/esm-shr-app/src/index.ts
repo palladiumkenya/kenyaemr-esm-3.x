@@ -4,8 +4,8 @@ import { referralDashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import { createHomeDashboardLink } from './create-dashboard-link';
-import ReferralReasonsDialogPopup from './community-referrals/referral-reasons/referral-reasons.component';
-import ReferralChartView from './community-referrals/patient-chart/referral-chart-view.component';
+import ReferralReasonsDialogPopup from './referrals/referral-reasons/referral-reasons.component';
+import ReferralChartView from './referrals/patient-chart/referral-chart-view.component';
 
 const moduleName = '@kenyaemr/esm-shr-app';
 

@@ -4,7 +4,7 @@ import { Layer, Tile, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import styles from './referral-chart-view.component.scss';
 import { ErrorState, formatDate, isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { useCommunityReferral } from '../community-refferals.resource';
+import { useCommunityReferral } from '../refferals.resource';
 import { ReferralConfigObject } from '../../config-schema';
 
 export interface ReferralReasonsDialogPopupProps {

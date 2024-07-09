@@ -19,9 +19,9 @@ import {
 } from '@carbon/react';
 import { useLayoutType, isDesktop, usePagination, navigate } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import styles from '../community-referrals/community-referral-tabs/community-referrals-tabs.scss';
+import styles from '../referrals/referral-tabs/referrals-tabs.scss';
 import { useTranslation } from 'react-i18next';
-import { useCommunityReferrals } from './community-refferals.resource';
+import { useCommunityReferrals } from './refferals.resource';
 import CommunityReferralActions from './referrals-actions.component';
 import { ReferralReasonsProps } from '../types';
 

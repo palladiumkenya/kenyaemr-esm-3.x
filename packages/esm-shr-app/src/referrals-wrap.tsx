@@ -1,12 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ReferralsHeader } from './header/referrals-header.component';
-import CommunityReferralTabs from './community-referrals/community-referral-tabs/community-referrals-tabs.component';
+import ReferralTabs from './referrals/referral-tabs/referrals-tabs.component';
+import MetricsHeader from './header/referrals-button-header.component';
+import { mutate } from 'swr';
+import { pullFacilityReferrals } from './referrals/refferals.resource';
 
 const ReferralWrap: React.FC = () => {
+  const [isLoadingFacilityReferrals, setIsLoadingFacilityReferrals] = useState(false);
+
+  const pullReferrals = () => {
+    setIsLoadingFacilityReferrals(true);
+    pullFacilityReferrals()
+      .then((r) => {
+        mutate(
+          (key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/kenyaemril/communityReferrals?status=active'),
+        );
+        setIsLoadingFacilityReferrals(false);
+      })
+      .catch((err) => {
+        setIsLoadingFacilityReferrals(false);
+      });
+  };
+
   return (
     <div className={`omrs-main-content`}>
       <ReferralsHeader />
-      <CommunityReferralTabs />
+      <MetricsHeader pullReferrals={pullReferrals} isLoadingFacilityReferrals={isLoadingFacilityReferrals} />
+      <ReferralTabs isLoadingFacilityReferrals={isLoadingFacilityReferrals} />
     </div>
   );
 };

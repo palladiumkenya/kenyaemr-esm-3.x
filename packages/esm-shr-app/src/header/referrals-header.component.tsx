@@ -15,7 +15,8 @@ export const ReferralsHeader: React.FC = () => {
       <div className={styles['left-justified-items']}>
         <ReferralsIllustration />
         <div className={styles['page-labels']}>
-          <p className={styles['page-name']}>{t('facilityReferrals', 'Facility Referrals')}</p>
+          <p>{t('facilityWide', 'Facility Wide')}</p>
+          <p className={styles['page-name']}>{t('referrals', 'Referrals')}</p>
         </div>
       </div>
       <div className={styles['right-justified-items']}>
