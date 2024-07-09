@@ -26,10 +26,10 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const communityReferralsDashboardLink = getSyncLifecycle(
+export const ReferralsDashboardLink = getSyncLifecycle(
   createHomeDashboardLink({
-    name: 'community-referrals',
-    title: 'Community referrals',
+    name: 'referrals',
+    title: 'Referrals',
   }),
   options,
 );

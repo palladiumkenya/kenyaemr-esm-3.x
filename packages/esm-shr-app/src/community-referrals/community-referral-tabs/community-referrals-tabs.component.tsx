@@ -34,7 +34,8 @@ const CommunityReferralTabs = () => {
       <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange} className={styles.tabs}>
         <div style={{ display: 'flex' }}>
           <TabList style={{ paddingLeft: '1rem' }} aria-label="Referrals tabs" contained>
-            <Tab className={styles.tab}>{t('active', 'Active')}</Tab>
+            <Tab className={styles.tab}>{t('from', 'From Community')}</Tab>
+            <Tab className={styles.tab}>{t('from', 'From Facility')}</Tab>
             <Tab className={styles.tab}>{t('completed', 'Completed')}</Tab>
           </TabList>
           <Button onClick={pullCommunityReferrals}>Pull Community Referrals</Button>

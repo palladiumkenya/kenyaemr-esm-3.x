@@ -1,8 +1,8 @@
 import React from 'react';
 import { ConnectReference } from '@carbon/react/icons';
-import styles from './community-referrals-header.scss';
+import styles from './referrals-header.scss';
 
-const CommunityReferralsIllustration: React.FC = () => {
+const ReferralsIllustration: React.FC = () => {
   return (
     <div className={styles.svgContainer}>
       <ConnectReference className={styles.iconOverrides} />
@@ -10,4 +10,4 @@ const CommunityReferralsIllustration: React.FC = () => {
   );
 };
 
-export default CommunityReferralsIllustration;
+export default ReferralsIllustration;
