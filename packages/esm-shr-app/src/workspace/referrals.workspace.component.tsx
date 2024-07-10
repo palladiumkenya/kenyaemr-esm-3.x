@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Column, Form, Stack, Search, ButtonSet, ComboBox, Button, Tile, TextInput, TextArea } from '@carbon/react';
+import { Column, Form, Stack, Search, ButtonSet, ComboBox, Button, Tile, TextArea } from '@carbon/react';
 import { ExtensionSlot, showSnackbar, useSession } from '@openmrs/esm-framework';
 import PatientInfo from './referral-patient-info.component';
 import styles from './referral.workspace.scss';
-import { useReason, Concept } from './referral-workspace.resource';
+import { useReason, useFacility, Concept, Facility } from './referral-workspace.resource';
 
 type FacilityReferralProp = {
   closeWorkspace: () => void;
@@ -15,10 +15,13 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
   const { user } = useSession();
   const [patientUuid, setPatientUuid] = useState('');
   const [patientSelected, setPatientSelected] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [reasonSearchTerm, setReasonSearchTerm] = useState('');
+  const [facilitySearchTerm, setFacilitySearchTerm] = useState('');
   const [selectedReasons, setSelectedReasons] = useState<Concept[]>([]);
+  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
   const [referralType, setReferralType] = useState('');
-  const { data: reasons, error } = useReason(searchTerm);
+  const { data: reasons, error: reasonsError } = useReason(reasonSearchTerm);
+  const { data: facilities, error: facilitiesError } = useFacility(facilitySearchTerm);
 
   const onSubmit = async (data) => {
     try {
@@ -47,8 +50,12 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
     setPatientSelected(true);
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
+  const handleReasonSearchChange = (e) => {
+    setReasonSearchTerm(e.target.value);
+  };
+
+  const handleFacilitySearchChange = (e) => {
+    setFacilitySearchTerm(e.target.value);
   };
 
   const handleReasonSelect = (reason) => {
@@ -57,8 +64,17 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
     }
   };
 
+  const handleFacilitySelect = (facility) => {
+    setSelectedFacility(facility);
+    setFacilitySearchTerm('');
+  };
+
   const handleRemoveReason = (uuid) => {
     setSelectedReasons(selectedReasons.filter((reason) => reason.uuid !== uuid));
+  };
+
+  const handleRemoveFacility = () => {
+    setSelectedFacility(null);
   };
 
   const handleReferralTypeChange = (e) => {
@@ -74,7 +90,7 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
           <ComboBox
             id="select-referral-type"
             placeholder="Select referral type"
-            items={['Facility to Facility', 'Facility to Community']}
+            items={['Facility to Facility']}
             onChange={handleReferralTypeChange}
           />
         </Column>
@@ -83,32 +99,39 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
           <>
             <span className={styles.sectionHeader}>Search for facility to refer to</span>
             <Column>
-              <Search
-                size="lg"
-                placeholder="Facility to refer patient to"
-                labelText="Search"
-                closeButtonLabelText="Clear"
-                id="search-1"
-                onChange={() => {}}
-                onKeyDown={() => {}}
-              />
+              {!selectedFacility && (
+                <Search
+                  size="lg"
+                  placeholder="Facility to refer patient to"
+                  labelText="Search"
+                  closeButtonLabelText="Clear"
+                  id="facility-search"
+                  value={facilitySearchTerm}
+                  onChange={handleFacilitySearchChange}
+                />
+              )}
+              {facilitySearchTerm && facilities && (
+                <div className={styles.facilityList}>
+                  {facilities.map((facility) => (
+                    <Tile
+                      key={facility.uuid}
+                      className={styles.facilityTile}
+                      onClick={() => handleFacilitySelect(facility)}
+                      role="button"
+                      tabIndex={0}>
+                      {facility.name} - {facility.attributes[0]?.value}
+                    </Tile>
+                  ))}
+                </div>
+              )}
+              {selectedFacility && (
+                <Tile key={selectedFacility.uuid} className={styles.facilityTile} onClick={handleRemoveFacility}>
+                  {selectedFacility.name} - {selectedFacility.attributes[0].value}
+                </Tile>
+              )}
             </Column>
           </>
         )}
-
-        {referralType === 'Facility to Community' && (
-          <>
-            <span className={styles.sectionHeader}>Community unit name</span>
-            <Column>
-              <TextInput id="community-unit-name" type="text" placeholder="Community name" />
-            </Column>
-            <span className={styles.sectionHeader}>Community code</span>
-            <Column>
-              <TextInput id="community-unit-code" type="text" placeholder="Community code" />
-            </Column>
-          </>
-        )}
-
         <span className={styles.sectionHeader}>Search for patient</span>
         {patientSelected && <PatientInfo patientUuid={patientUuid} />}
         {!patientSelected && (
@@ -132,10 +155,10 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
             labelText="Search"
             closeButtonLabelText="Clear reason"
             id="reason-for-referral"
-            value={searchTerm}
-            onChange={handleSearchChange}
+            value={reasonSearchTerm}
+            onChange={handleReasonSearchChange}
           />
-          {searchTerm && reasons && (
+          {reasonSearchTerm && reasons && (
             <div className={styles.reasonList}>
               {reasons.map((reason) => (
                 <Tile
