@@ -230,3 +230,18 @@ export interface RegimenLineGroup {
   regimenLineValue: string;
   regimen: RegimenItem[];
 }
+
+export interface IITRiskScore {
+  riskScore: string;
+  evaluationDate: string;
+  description: string;
+  riskFactors: string;
+}
+
+export interface Enrollment {
+  uuid: string;
+  program: {
+    name: string;
+    uuid: string;
+  };
+}
