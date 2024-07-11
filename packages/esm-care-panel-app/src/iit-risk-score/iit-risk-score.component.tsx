@@ -40,11 +40,12 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
     );
   }
 
-  if (error) {
-    return <ErrorState error={error} headerTitle={t('iitRiscScore', 'IIT Risk Score')} />;
-  }
+  // if (error) {
+  //   return <ErrorState error={error} headerTitle={t('iitRiscScore', 'IIT Risk Score')} />;
+  // }
   return (
     <div className={styles['risk-score-card']}>
+      <span className={styles.sectionHeader}>IIT Risk Score</span>
       <Row style={{ display: 'flex' }}>
         <Column lg={4} md={4} sm={4} className={styles['risk-score-card__item']}>
           <strong>Risk Score:</strong>

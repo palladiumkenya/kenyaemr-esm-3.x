@@ -1,20 +1,18 @@
-@use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
-@use '@carbon/colors';
+@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.risk-score-card {
-  width: 100%;
-  border: 0.15rem solid $grey-2;
-  margin-bottom: spacing.$spacing-08;
-}
-
-.risk-score-card__item {
-  flex-grow: 1;
-  padding: spacing.$spacing-08;
+.machine-learning {
+  padding: 8px;
+  gap: spacing.$spacing-08;
 }
 
 .sectionHeader {
+  @include type.type-style('heading-02');
+}
+
+.title {
   @include type.type-style('heading-02');
   display: flex;
   align-items: center;

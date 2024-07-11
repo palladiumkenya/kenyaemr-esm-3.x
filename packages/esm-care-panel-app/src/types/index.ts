@@ -237,3 +237,11 @@ export interface IITRiskScore {
   description: string;
   riskFactors: string;
 }
+
+export interface Enrollment {
+  uuid: string;
+  program: {
+    name: string;
+    uuid: string;
+  };
+}
