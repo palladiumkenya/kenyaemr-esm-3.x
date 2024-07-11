@@ -92,7 +92,7 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>
-            {t('noContactToDisplay', 'There is no contact data to display for this patient.')}
+            {t('noInActiveCasesToDisplay', 'There is no inactive cases data to display.')}
           </p>
         </Tile>
       </Layer>
