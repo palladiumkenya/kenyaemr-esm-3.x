@@ -10,7 +10,7 @@ const usePatientIITScore = (patientUuid: string) => {
 
   const riskScore = useMemo(() => data?.data ?? patientRiskScore.at(-1), [patientUuid]);
   return {
-    isLoading,
+    isLoading: false,
     error,
     riskScore,
   };
