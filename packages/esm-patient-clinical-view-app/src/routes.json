@@ -11,19 +11,6 @@
       "slot": "patient-chart-dashboard-slot"
     },
     {
-      "name": "family-history-link",
-      "component": "familyHistoryLink",
-      "slot": "patient-chart-dashboard-slot",
-      "order": 14,
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-family-history-slot",
-        "path": "family-history",
-        "layoutMode": "anchored"
-      }
-    },
-    {
       "name": "family-history",
       "slot": "patient-chart-family-history-slot",
       "component": "familyHistory",
@@ -32,22 +19,22 @@
       "offline": false
     },
     {
-      "name": "contact-list-link",
-      "component": "contactListLink",
+      "name": "relationships-link",
+      "component": "relationshipsLink",
       "slot": "patient-chart-dashboard-slot",
       "order": 14,
       "meta": {
         "columns": 1,
         "columnSpan": 1,
         "slot": "patient-chart-relationships-slot",
-        "path": "contact-list",
+        "path": "relationships",
         "layoutMode": "anchored"
       }
     },
     {
-      "name": "contact-list",
+      "name": "relationships",
       "slot": "patient-chart-relationships-slot",
-      "component": "contactList",
+      "component": "relationships",
       "order": 0,
       "online": true,
       "offline": false

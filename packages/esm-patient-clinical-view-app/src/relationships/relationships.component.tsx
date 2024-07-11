@@ -1,7 +1,16 @@
 import React from 'react';
+import { RelationshipsTab } from './tabs/relationships-tabs-component';
 
-const Relationships = () => {
-  return <div>Relationships</div>;
+interface RelationshipsProps {
+  patientUuid: string;
+}
+
+const Relationships: React.FC<RelationshipsProps> = ({ patientUuid }) => {
+  return (
+    <>
+      <RelationshipsTab patientUuid={patientUuid} />
+    </>
+  );
 };
 
 export default Relationships;
