@@ -196,7 +196,7 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit" disabled={!patientSelected}>
-          {t('save', 'Save')}
+          {t('refer', 'Refer Patient')}
         </Button>
       </ButtonSet>
     </Form>
