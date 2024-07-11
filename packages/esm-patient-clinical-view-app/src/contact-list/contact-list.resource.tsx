@@ -36,7 +36,9 @@ export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
     encounters.findIndex((en) =>
       en.obs.some(
         (ob) =>
-          ob?.value && ob.value?.display && ['positive', 'hiv positive'].includes(ob.value?.display?.toLocaleLowerCase()),
+          ob?.value &&
+          ob.value?.display &&
+          ['positive', 'hiv positive'].includes(ob.value?.display?.toLocaleLowerCase()),
       ),
     ) !== -1
   ) {
