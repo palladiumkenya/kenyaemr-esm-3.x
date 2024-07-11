@@ -1,0 +1,39 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.risk-score-card {
+  width: 100%;
+  border: 0.15rem solid $grey-2;
+  margin-bottom: spacing.$spacing-08;
+}
+
+.risk-score-card__item {
+  flex: 1;
+  padding: spacing.$spacing-05;
+}
+
+.sectionHeader {
+  @include type.type-style('heading-02');
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: spacing.$spacing-05;
+  row-gap: 1.5rem;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 2rem;
+    border-bottom: 0.375rem solid var(--brand-03);
+    position: absolute;
+    bottom: -0.75rem;
+    left: 0;
+  }
+
+  & > span {
+    @include type.type-style('body-01');
+  }
+}
