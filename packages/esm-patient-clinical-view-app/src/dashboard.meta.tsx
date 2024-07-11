@@ -57,6 +57,14 @@ export const contactListDashboardMeta = {
   config: {},
 };
 
+export const relationshipsDashboardMeta = {
+  slot: 'patient-chart-relationships-slot',
+  columns: 1,
+  title: 'Relationships',
+  path: 'relationships',
+  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
+  config: {},
+};
 export const labourDeliveryDashboardMeta = {
   slot: 'patient-chart-labour-delivery-slot',
   columns: 1,
