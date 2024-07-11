@@ -70,26 +70,3 @@ svg.iconOverrides {
   height: 72px;
   fill: var(--brand-03);
 }
-.metricsContainer {
-  display: flex;
-  justify-content: space-between;
-  background-color: $ui-02;
-  height: layout.$spacing-10;
-  align-items: center;
-  padding: 0 layout.$spacing-05;
-  float: right;
-}
-
-.metricsTitle {
-  @include type.type-style('heading-03');
-  color: $ui-05;
-}
-
-.actionBtn {
-  display: flex;
-  column-gap: 0.5rem;
-}
-
-.comboBtn {
-  cursor: default;
-}
