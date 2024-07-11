@@ -11,21 +11,21 @@ import {
   TableHeader,
   TableRow,
   Search,
-  Button,
   Layer,
   Tile,
   OverflowMenu,
-  OverflowMenuItem,
 } from '@carbon/react';
 import { CardHeader, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableLink, isDesktop, useLayoutType, useSession } from '@openmrs/esm-framework';
 import styles from './case-management-list.scss';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
-import { useActivecases, saveRelationship } from '../workspace/case-management.resource';
+import { useActivecases } from '../workspace/case-management.resource';
 
-const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: number) => void }> = ({
-  setInactiveCasesCount,
-}) => {
+interface CaseManagementListInActiveProps {
+  setInactiveCasesCount: (count: number) => void;
+}
+
+const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({ setInactiveCasesCount }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
@@ -37,15 +37,13 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
 
   const { data: inactiveCasesData } = useActivecases(caseManagerPersonUuid);
 
-  const headerTitle = t('inactiveCases', 'Inactive Cases');
+  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const headers = [
     { key: 'sno', header: t('s/No', 'S/No') },
     { key: 'names', header: t('names', 'Names') },
-    // { key: 'reason', header: t('reason', 'Reason for assigned') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
-    // { key: 'notes', header: t('notes', 'Notes') },
     { key: 'action', header: t('action', 'Action') },
   ];
 
@@ -55,7 +53,6 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
       (extractNameString(caseData.personB.display).toLowerCase().includes(searchTerm.toLowerCase()) ||
         caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
   );
-  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const tableRows = filteredCases
     ?.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -70,10 +67,8 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
           {uppercaseText(extractNameString(caseData.personB.display))}
         </ConfigurableLink>
       ),
-      // reason: t('assignedTo', 'Assigned to ') + caseData.personB.display,
       dateofstart: new Date(caseData.startDate).toLocaleDateString(),
       dateofend: new Date(caseData.endDate).toLocaleDateString(),
-      // notes: '-',
       action: (
         <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
           {/* <OverflowMenuItem itemText="Transfer Case" /> */}
@@ -82,8 +77,11 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
     }));
 
   useEffect(() => {
-    setInactiveCasesCount(filteredCases?.length || 0);
+    const count = filteredCases?.length || 0;
+    setInactiveCasesCount(count);
   }, [filteredCases, setInactiveCasesCount]);
+
+  const headerTitle = `${t('inactiveCases', 'Inactive Cases')}`;
 
   if (filteredCases?.length === 0) {
     return (
@@ -94,7 +92,7 @@ const CaseManagementListInActive: React.FC<{ setInactiveCasesCount: (count: numb
           </div>
           <EmptyDataIllustration />
           <p className={styles.content}>
-            {t('noContactToDisplay', 'There is no contact data to display for this patient.')}
+            {t('noInActiveCasesToDisplay', 'There is no inactive cases data to display.')}
           </p>
         </Tile>
       </Layer>
