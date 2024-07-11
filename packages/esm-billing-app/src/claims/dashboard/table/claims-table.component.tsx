@@ -43,7 +43,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const paidLineItems = useMemo(() => lineItems.filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
+  const paidLineItems = useMemo(() => lineItems?.filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
 
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {

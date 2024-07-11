@@ -1,0 +1,12 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.rowContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  margin-left: layout.$spacing-07;
+  padding-top: spacing.$spacing-07;
+}
