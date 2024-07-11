@@ -1,5 +1,5 @@
 import { Column, Row, SkeletonText } from '@carbon/react';
-import { ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, formatDate, parseDate } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePatientIITScore from '../hooks/usePatientIITScore';
@@ -49,11 +49,11 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
       <Row style={{ display: 'flex' }}>
         <Column lg={4} md={4} sm={4} className={styles['risk-score-card__item']}>
           <strong>Risk Score:</strong>
-          <p>{riskScore?.riskScore}</p>
+          <p>{`${riskScore?.riskScore ?? 0}%`}</p>
         </Column>
         <Column lg={4} md={4} sm={4} className={styles['risk-score-card__item']}>
           <strong>Evaluation Date:</strong>
-          <p>{riskScore?.evaluationDate}</p>
+          <p>{formatDate(parseDate(riskScore?.evaluationDate))}</p>
         </Column>
       </Row>
       <Row style={{ display: 'flex' }}>
