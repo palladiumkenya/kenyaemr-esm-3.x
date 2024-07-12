@@ -41,7 +41,7 @@ const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
     return (
       <InlineNotification
         kind="info"
-        title={t('noprices', 'No procedural price found ')}
+        title={t('noprice', 'No price found ')}
         subtitle={t('noInfo', 'Please contact the cashier')}
         lowContrast
       />
