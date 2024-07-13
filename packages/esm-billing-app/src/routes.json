@@ -96,5 +96,31 @@
       "slot": "tests-ordered-actions-slot",
       "order": 0
     }
+  ],
+  "workspaces": [
+    {
+      "name": "cancel-bill-form",
+      "component": "cancelBillForm",
+      "title": "Cancel Bill Form",
+      "type": "other-form"
+    },
+    {
+      "name": "waive-bill-form",
+      "component": "waiveBillForm",
+      "title": "Waive Bill Form",
+      "type": "other-form"
+    },
+    {
+      "name": "edit-bill-form",
+      "component": "editBillForm",
+      "title": "Edit Bill Form",
+      "type": "other-form"
+    },
+    {
+      "name": "delete-bill-form",
+      "component": "deleteBillForm",
+      "title": "Delete Bill Form",
+      "type": "other-form"
+    }
   ]
 }

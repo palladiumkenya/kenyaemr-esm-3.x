@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import BillWaiverForm from './bill-waiver-form.component';
-import { processBillPayment, usePaymentModes } from '../../billing.resource';
+import { processBillPayment, usePaymentModes } from '../../../billing.resource';
 import userEvent from '@testing-library/user-event';
 
 const mockedUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;

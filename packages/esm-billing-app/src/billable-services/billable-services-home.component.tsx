@@ -8,8 +8,10 @@ import styles from './billable-services.scss';
 import BillingHeader from '../billing-header/billing-header.component';
 import { Wallet, Money } from '@carbon/react/icons';
 import { UserHasAccess, navigate } from '@openmrs/esm-framework';
-import BillWaiver from './bill-waiver/bill-waiver.component';
+import BillManager from './bill-manager/bill-manager.component';
+
 const basePath = `${window.spaBase}/billable-services`;
+
 const BillableServiceHome: React.FC = () => {
   const { t } = useTranslation();
 
@@ -39,7 +41,7 @@ const BillableServiceHome: React.FC = () => {
           <Routes>
             <Route path="/" element={<BillableServicesDashboard />} />
             <Route path="/add-service" element={<AddBillableService />} />
-            <Route path="/patient-bill-manager" element={<BillWaiver />} />
+            <Route path="/patient-bill-manager" element={<BillManager />} />
           </Routes>
         </section>
       </main>

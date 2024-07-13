@@ -8,33 +8,23 @@ import {
   Layer,
   Checkbox,
   OverflowMenu,
-  OverflowMenuItem
+  OverflowMenuItem,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
 import { MappedBill, LineItem } from '../../types';
-import styles from './bill-waiver.scss';
-import BillWaiverForm from './bill-waiver-form.component';
+import styles from './bill-manager.scss';
+import { launchWorkspace } from '@openmrs/esm-framework';
 
-const PatientBillsSelections: React.FC<{ bills: MappedBill; setPatientUuid: (patientUuid) => void }> = ({
-  bills,
-  setPatientUuid,
-}) => {
+const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
   const { t } = useTranslation();
-  const [selectedBills, setSelectedBills] = React.useState<Array<LineItem>>([]);
 
-  const checkBoxLabel = (lineItem) => {
-    return `${lineItem.item === '' ? lineItem.billableService : lineItem.item} ${convertToCurrency(lineItem.price)}`;
+  const handleOpenWorkspace = (workspace: { title: string; name: string }) => {
+    launchWorkspace(workspace.name, {
+      workspaceTitle: workspace.title,
+    });
   };
 
-  const handleOnCheckBoxChange = (event, { checked, id }) => {
-    const selectedLineItem = bills.lineItems.find((lineItem) => lineItem.uuid === id);
-    if (checked) {
-      setSelectedBills([...selectedBills, selectedLineItem]);
-    } else {
-      setSelectedBills(selectedBills.filter((lineItem) => lineItem.uuid !== id));
-    }
-  };
   return (
     <Layer>
       <StructuredListWrapper className={styles.billListContainer} isCondensed selection={true}>
@@ -57,18 +47,29 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill; setPatientUuid: (pat
               <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
               <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
               <StructuredListCell>
-              <OverflowMenu aria-label="overflow-menu" align="bottom">
-                <OverflowMenuItem itemText="Waive BIll" />
-                <OverflowMenuItem itemText="Cancel Bill" />
-                <OverflowMenuItem itemText="Edit Bill" />
-                <OverflowMenuItem itemText="Delete Bill" />
-              </OverflowMenu>
+                <OverflowMenu aria-label="overflow-menu" align="bottom">
+                  <OverflowMenuItem
+                    itemText="Waive BIll"
+                    onClick={() => handleOpenWorkspace({ name: 'waive-bill-form', title: 'Waive Bill Form' })}
+                  />
+                  <OverflowMenuItem
+                    itemText="Cancel Bill"
+                    onClick={() => handleOpenWorkspace({ name: 'cancel-bill-form', title: 'Cancel Bill Form' })}
+                  />
+                  <OverflowMenuItem
+                    itemText="Edit Bill"
+                    onClick={() => handleOpenWorkspace({ name: 'edit-bill-form', title: 'Edit Bill Form' })}
+                  />
+                  <OverflowMenuItem
+                    itemText="Delete Bill"
+                    onClick={() => handleOpenWorkspace({ name: 'delete-bill-form', title: 'Delete Bill Form' })}
+                  />
+                </OverflowMenu>
               </StructuredListCell>
             </StructuredListRow>
           ))}
         </StructuredListBody>
       </StructuredListWrapper>
-      <BillWaiverForm bill={bills} lineItems={selectedBills} setPatientUuid={setPatientUuid} />
     </Layer>
   );
 };

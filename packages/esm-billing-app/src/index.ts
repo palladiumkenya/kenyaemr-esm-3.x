@@ -15,6 +15,10 @@ import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import { CancelBillForm } from './billable-services/bill-manager/workspaces/cancel-bill-form.workspace';
+import { DeleteBillForm } from './billable-services/bill-manager/workspaces/delete-bill-form.workspace';
+import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
+import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -25,15 +29,11 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-export function startupApp() {
-  defineConfigSchema(moduleName, configSchema);
-}
-
 export const billingSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),
   options,
 );
-// t('billing', 'Billing')
+
 export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billing',
@@ -46,6 +46,7 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billableServicesHome = getSyncLifecycle(BillableServiceHome, options);
+
 export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);
@@ -54,3 +55,11 @@ export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, opt
 export const labOrder = getSyncLifecycle(LabOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
+export const cancelBillForm = getSyncLifecycle(CancelBillForm, options);
+export const deleteBillForm = getSyncLifecycle(DeleteBillForm, options);
+export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
+export const editBillForm = getSyncLifecycle(EditBillForm, options);
+
+export function startupApp() {
+  defineConfigSchema(moduleName, configSchema);
+}

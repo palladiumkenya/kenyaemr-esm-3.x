@@ -24,10 +24,9 @@ import styles from '../../bills-table/bills-table.scss';
 type PatientBillsProps = {
   patientUuid: string;
   bills: Array<MappedBill>;
-  setPatientUuid: (patientUuid: string) => void;
 };
 
-const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPatientUuid }) => {
+const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills }) => {
   const { t } = useTranslation();
 
   if (!patientUuid) {
@@ -118,7 +117,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
                         row,
                       })}>
                       <div>
-                        <PatientBillsSelections bills={bills[index]} setPatientUuid={setPatientUuid} />
+                        <PatientBillsSelections bills={bills[index]} />
                       </div>
                     </TableExpandedRow>
                   </React.Fragment>

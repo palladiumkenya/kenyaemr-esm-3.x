@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Form, Stack, FormGroup, Layer, Button, NumberInput } from '@carbon/react';
 import { TaskAdd } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import styles from './bill-waiver-form.scss';
-import { LineItem, MappedBill } from '../../types';
-import { createBillWaiverPayload, extractErrorMessagesFromResponse } from '../../utils';
-import { convertToCurrency, extractString } from '../../helpers';
-import { processBillPayment, usePaymentModes } from '../../billing.resource';
+import styles from './waive-bill-form.scss';
+import { LineItem, MappedBill } from '../../../types';
+import { createBillWaiverPayload, extractErrorMessagesFromResponse } from '../../../utils';
+import { convertToCurrency, extractString } from '../../../helpers';
+import { processBillPayment, usePaymentModes } from '../../../billing.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 
@@ -16,9 +16,9 @@ type BillWaiverFormProps = {
   setPatientUuid: (patientUuid) => void;
 };
 
-const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPatientUuid }) => {
+export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPatientUuid }) => {
   const { t } = useTranslation();
-  const [waiverAmount, setWaiverAmount] = useState(0);
+  const [waiverAmount, setWaiverAmount] = useState<string>('0');
 
   const totalAmount = lineItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   const { paymentModes } = usePaymentModes(false);
@@ -28,7 +28,13 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
   }
 
   const handleProcessPayment = () => {
-    const waiverEndPointPayload = createBillWaiverPayload(bill, waiverAmount, totalAmount, lineItems, paymentModes);
+    const waiverEndPointPayload = createBillWaiverPayload(
+      bill,
+      parseInt(waiverAmount),
+      totalAmount,
+      lineItems,
+      paymentModes,
+    );
 
     processBillPayment(waiverEndPointPayload, bill.uuid).then(
       (resp) => {
@@ -88,7 +94,7 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
               max={totalAmount}
               invalidText={t('invalidWaiverAmountMessage', 'Amount to waive cannot be greater than total amount')}
               value={waiverAmount}
-              onChange={(event) => setWaiverAmount(event.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setWaiverAmount(event.target.value)}
             />
           </Layer>
         </FormGroup>
@@ -101,5 +107,3 @@ const BillWaiverForm: React.FC<BillWaiverFormProps> = ({ bill, lineItems, setPat
     </Form>
   );
 };
-
-export default BillWaiverForm;
