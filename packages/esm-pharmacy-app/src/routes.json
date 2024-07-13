@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "extensions": [
+    {
+      "component": "pharmacyDashboardLink",
+      "name": "pharmacy-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "pharmacy",
+        "title": "pharmacy",
+        "slot": "pharmacy-dashboard-slot"
+      }
+    },
+    {
+      "component": "root",
+      "name": "pharmacy-dashboard-root",
+      "slot": "pharmacy-dashboard-slot"
+    },
+    {
+      "name": "pharmacy-assignment-form",
+      "component": "pharmacyAssignmentForm"
+    },
+    {
+      "name": "pharmacy-delete-confirm-dialog",
+      "component": "pharmacyDeleteConfirmDialog"
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "pharmacy"
+    }
+  ]
+}

@@ -16,7 +16,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   DefaultWorkspaceProps,
   showModal,
-  showNotification,
+  showSnackbar,
   useConfig,
   usePatient,
   useSession,
@@ -27,7 +27,6 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
-import useRelationshipTypes from '../hooks/useRelationshipTypes';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
 import { ContactListFormSchema, saveContact } from './contact-list.resource';
@@ -42,7 +41,6 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
-  handlePostResponse,
   patientUuid,
   props,
 }) => {
@@ -54,12 +52,10 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       familyName: '',
       maritalStatus: '',
       listingDate: new Date(),
-      dateOfBirth: new Date(),
       relationshipToPatient: '',
     },
     resolver: zodResolver(ContactListFormSchema),
   });
-  const { isLoading, error, relationshipTypes } = useRelationshipTypes();
   const { t } = useTranslation();
   const session = useSession();
   const { patient } = usePatient();
@@ -84,10 +80,10 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       return typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship');
     });
     results.forEach((res) => {
-      showNotification({
+      showSnackbar({
         title: res.status === 'fulfilled' ? 'Success' : 'Failure',
         kind: res.status === 'fulfilled' ? 'success' : 'error',
-        description: res.message,
+        subtitle: res.message,
       });
     });
   };
@@ -320,8 +316,10 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 }}
                 initialSelectedItem={field.value}
                 label="Select Realtionship"
-                items={relationshipTypes.map((r) => r.uuid)}
-                itemToString={(item) => relationshipTypes.find((r) => r.uuid === item)?.displayAIsToB ?? ''}
+                items={config.familyRelationshipsTypeList.map((r) => r.uuid)}
+                itemToString={(item) =>
+                  config.familyRelationshipsTypeList.find((r) => r.uuid === item)?.displayAIsToB ?? ''
+                }
               />
             )}
           />
@@ -400,7 +398,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit">
+        <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>
           {t('submit', 'Submit')}
         </Button>
       </ButtonSet>

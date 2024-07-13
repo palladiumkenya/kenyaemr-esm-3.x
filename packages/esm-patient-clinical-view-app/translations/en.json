@@ -1,7 +1,10 @@
 {
+  " ": "Case Manager",
   "accidentOrTrauma": "Accident/Trauma",
   "actions": "Actions",
+  "activeCases": "Active cases",
   "add": "Add",
+  "addCase": "Add case",
   "admissionDate": "Date & Time of Admission",
   "admissionWard": "Admission Ward",
   "admittingDoctor": "Admitting Doctor",
@@ -43,6 +46,7 @@
   "disabilities": "Disabilities",
   "dischargeDate": "Discharge Date",
   "dischargingDoctor": "Discharging Doctor",
+  "discontinuationCases": "Discontinuation cases",
   "edit": "Edit",
   "editEncounter": "Edit",
   "editForm": "Edit Form",

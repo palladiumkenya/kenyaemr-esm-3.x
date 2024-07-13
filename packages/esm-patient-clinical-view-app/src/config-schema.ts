@@ -114,6 +114,48 @@ export const configSchema = {
       livingWithContact: '35a08d84-9f80-4991-92b4-c4ae5903536e',
     },
   },
+  familyRelationshipsTypeList: {
+    _type: Type.Array,
+    _description: 'List of Family relationship types (Used to list contacts)',
+    _default: [
+      {
+        uuid: '8d91a01c-c2cc-11de-8d13-0010c6dffd0f',
+        displayAIsToB: 'Sibling',
+      },
+      {
+        uuid: '8d91a210-c2cc-11de-8d13-0010c6dffd0f',
+        displayAIsToB: 'Parent',
+      },
+      {
+        uuid: '8d91a3dc-c2cc-11de-8d13-0010c6dffd0f',
+        displayAIsToB: 'Aunt/Uncle',
+      },
+      {
+        uuid: '5f115f62-68b7-11e3-94ee-6bef9086de92',
+        displayAIsToB: 'Guardian',
+      },
+      {
+        uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
+        displayAIsToB: 'Spouse',
+      },
+      {
+        uuid: '007b765f-6725-4ae9-afee-9966302bace4',
+        displayAIsToB: 'Partner',
+      },
+      {
+        uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
+        displayAIsToB: 'Co-wife',
+      },
+      {
+        uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
+        displayAIsToB: 'Injectable-drug-user',
+      },
+      {
+        uuid: '76edc1fe-c5ce-4608-b326-c8ecd1020a73',
+        displayAIsToB: 'SNS',
+      },
+    ],
+  },
 };
 
 export interface ConfigObject {
@@ -144,6 +186,7 @@ export interface ConfigObject {
     preferedPnsAproach: string;
     livingWithContact: string;
   };
+  familyRelationshipsTypeList: Array<{ uuid: string; displayAIsToB: string }>;
 }
 
 export interface PartograpyComponents {
