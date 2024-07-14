@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StructuredListHead,
   StructuredListRow,
@@ -14,7 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
 import { MappedBill, LineItem } from '../../types';
 import styles from './bill-manager.scss';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal } from '@openmrs/esm-framework';
+import { CancelBillModal } from './modals/cancel-bill.modal';
 
 const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
   const { t } = useTranslation();
@@ -25,9 +26,23 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
     });
   };
 
+  const handleOpenCancelBillModal = () => {
+    const dispose = showModal('cancel-bill-modal', {
+      onClose: () => dispose(),
+      //props to pass in to the modal component
+    });
+  };
+
+  const handleOpenDeleteBillModal = () => {
+    const dispose = showModal('delete-bill-modal', {
+      onClose: () => dispose(),
+      //props to pass in to the modal component
+    });
+  };
+
   return (
     <Layer>
-      <StructuredListWrapper className={styles.billListContainer} isCondensed selection={true}>
+      <StructuredListWrapper className={styles.billListContainer} selection={true}>
         <StructuredListHead>
           <StructuredListRow head>
             <StructuredListCell head>{t('billItem', 'Bill item')}</StructuredListCell>
@@ -53,17 +68,11 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
                     onClick={() => handleOpenWorkspace({ name: 'waive-bill-form', title: 'Waive Bill Form' })}
                   />
                   <OverflowMenuItem
-                    itemText="Cancel Bill"
-                    onClick={() => handleOpenWorkspace({ name: 'cancel-bill-form', title: 'Cancel Bill Form' })}
-                  />
-                  <OverflowMenuItem
                     itemText="Edit Bill"
                     onClick={() => handleOpenWorkspace({ name: 'edit-bill-form', title: 'Edit Bill Form' })}
                   />
-                  <OverflowMenuItem
-                    itemText="Delete Bill"
-                    onClick={() => handleOpenWorkspace({ name: 'delete-bill-form', title: 'Delete Bill Form' })}
-                  />
+                  <OverflowMenuItem itemText="Cancel Bill" onClick={handleOpenCancelBillModal} />
+                  <OverflowMenuItem itemText="Delete Bill" onClick={handleOpenDeleteBillModal} />
                 </OverflowMenu>
               </StructuredListCell>
             </StructuredListRow>

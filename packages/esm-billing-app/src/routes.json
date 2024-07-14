@@ -81,6 +81,14 @@
       "component": "initiatePaymentDialog"
     },
     {
+      "name": "cancel-bill-modal",
+      "component": "cancelBillModal"   
+    },
+    {
+      "name": "delete-bill-modal",
+      "component": "deleteBillModal"
+    },
+    {
       "name": "lab-order-billable-item",
       "component": "labOrder",
       "slot": "top-of-lab-order-form-slot"
@@ -99,12 +107,6 @@
   ],
   "workspaces": [
     {
-      "name": "cancel-bill-form",
-      "component": "cancelBillForm",
-      "title": "Cancel Bill Form",
-      "type": "other-form"
-    },
-    {
       "name": "waive-bill-form",
       "component": "waiveBillForm",
       "title": "Waive Bill Form",
@@ -114,12 +116,6 @@
       "name": "edit-bill-form",
       "component": "editBillForm",
       "title": "Edit Bill Form",
-      "type": "other-form"
-    },
-    {
-      "name": "delete-bill-form",
-      "component": "deleteBillForm",
-      "title": "Delete Bill Form",
       "type": "other-form"
     }
   ]

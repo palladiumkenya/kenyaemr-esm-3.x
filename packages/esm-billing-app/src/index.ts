@@ -15,10 +15,10 @@ import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
-import { CancelBillForm } from './billable-services/bill-manager/workspaces/cancel-bill-form.workspace';
-import { DeleteBillForm } from './billable-services/bill-manager/workspaces/delete-bill-form.workspace';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
+import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
+import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -52,11 +52,16 @@ export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);
 export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
 export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, options);
+
 export const labOrder = getSyncLifecycle(LabOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
-export const cancelBillForm = getSyncLifecycle(CancelBillForm, options);
-export const deleteBillForm = getSyncLifecycle(DeleteBillForm, options);
+
+// bill manager modals
+export const cancelBillModal = getSyncLifecycle(CancelBillModal, options);
+export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
+
+// bill manager extensions
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 
