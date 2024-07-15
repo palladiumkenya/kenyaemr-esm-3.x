@@ -28,12 +28,7 @@ const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
 
   if (isLoading) {
     return (
-      <InlineNotification
-        kind="info"
-        title={t('loadingPrices', 'Loading prices')}
-        subtitle={t('pleaseWait', 'Please wait...')}
-        lowContrast
-      />
+      <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
     );
   }
 
