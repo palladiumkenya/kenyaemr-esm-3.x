@@ -24,9 +24,9 @@ export const BillableServicesSideNav = () => {
           </SideNavLink>
           <UserHasAccess privilege="coreapps.systemAdministration">
             <SideNavLink
-              onClick={() => handleNavigation('patient-bill-manager')}
+              onClick={() => handleNavigation('bill-manager')}
               renderIcon={Money}
-              isActive={pathname.includes('patient-bill-manager')}>
+              isActive={pathname.includes('bill-manager')}>
               {t('billManager', 'Bill Manager')}
             </SideNavLink>
           </UserHasAccess>

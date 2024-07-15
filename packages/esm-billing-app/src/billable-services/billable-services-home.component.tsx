@@ -20,7 +20,7 @@ const BillableServiceHome: React.FC = () => {
           <Routes>
             <Route path="/" element={<BillableServicesDashboard />} />
             <Route path="/add-service" element={<AddBillableService />} />
-            <Route path="/patient-bill-manager" element={<BillManager />} />
+            <Route path="/bill-manager" element={<BillManager />} />
           </Routes>
         </section>
       </main>

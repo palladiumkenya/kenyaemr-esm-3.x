@@ -12,37 +12,35 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
-import { MappedBill, LineItem } from '../../types';
+import { LineItem, MappedBill } from '../../types';
 import styles from './bill-manager.scss';
 import { launchWorkspace, showModal } from '@openmrs/esm-framework';
-import { CancelBillModal } from './modals/cancel-bill.modal';
 
-const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
+const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
   const { t } = useTranslation();
 
-  const handleOpenWorkspace = (workspace: { title: string; name: string }) => {
-    launchWorkspace(workspace.name, {
-      workspaceTitle: workspace.title,
+  const handleOpenEditLineItemWorkspace = (lineItem: LineItem) => {
+    launchWorkspace('edit-bill-form', {
+      workspaceTitle: 'Edit Bill Form',
+      lineItem,
     });
   };
 
-  const handleOpenCancelBillModal = () => {
+  const handleOpenCancelLineItemModal = () => {
     const dispose = showModal('cancel-bill-modal', {
       onClose: () => dispose(),
-      //props to pass in to the modal component
     });
   };
 
-  const handleOpenDeleteBillModal = () => {
+  const handleOpenDeleteLineItemModal = () => {
     const dispose = showModal('delete-bill-modal', {
       onClose: () => dispose(),
-      //props to pass in to the modal component
     });
   };
 
   return (
     <Layer>
-      <StructuredListWrapper className={styles.billListContainer} selection={true}>
+      <StructuredListWrapper className={styles.billListContainer} selection={true} isCondensed>
         <StructuredListHead>
           <StructuredListRow head>
             <StructuredListCell head>{t('billItem', 'Bill item')}</StructuredListCell>
@@ -53,7 +51,7 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
           </StructuredListRow>
         </StructuredListHead>
         <StructuredListBody>
-          {bills?.lineItems.map((lineItem) => (
+          {bill?.lineItems.map((lineItem) => (
             <StructuredListRow>
               <StructuredListCell>
                 {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
@@ -63,16 +61,9 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
               <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
               <StructuredListCell>
                 <OverflowMenu aria-label="overflow-menu" align="bottom">
-                  <OverflowMenuItem
-                    itemText="Waive BIll"
-                    onClick={() => handleOpenWorkspace({ name: 'waive-bill-form', title: 'Waive Bill Form' })}
-                  />
-                  <OverflowMenuItem
-                    itemText="Edit Bill"
-                    onClick={() => handleOpenWorkspace({ name: 'edit-bill-form', title: 'Edit Bill Form' })}
-                  />
-                  <OverflowMenuItem itemText="Cancel Bill" onClick={handleOpenCancelBillModal} />
-                  <OverflowMenuItem itemText="Delete Bill" onClick={handleOpenDeleteBillModal} />
+                  <OverflowMenuItem itemText="Edit Item" onClick={() => handleOpenEditLineItemWorkspace(lineItem)} />
+                  <OverflowMenuItem itemText="Cancel Item" onClick={handleOpenCancelLineItemModal} />
+                  <OverflowMenuItem itemText="Delete Item" onClick={handleOpenDeleteLineItemModal} />
                 </OverflowMenu>
               </StructuredListCell>
             </StructuredListRow>
@@ -83,4 +74,4 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill }> = ({ bills }) => {
   );
 };
 
-export default PatientBillsSelections;
+export default BillLineItems;
