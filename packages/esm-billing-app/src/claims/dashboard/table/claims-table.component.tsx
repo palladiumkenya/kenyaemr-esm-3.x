@@ -61,7 +61,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const paginatedLineItems = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
-    return filteredLineItems.slice(startIndex, endIndex);
+    return filteredLineItems?.slice(startIndex, endIndex);
   }, [filteredLineItems, currentPage, pageSize]);
 
   const tableHeaders: Array<typeof DataTableHeader> = [
@@ -106,7 +106,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   }
 
   const handleRowSelection = (row: typeof DataTableRow, checked: boolean) => {
-    const matchingRow = filteredLineItems.find((item) => item.uuid === row.id);
+    const matchingRow = filteredLineItems?.find((item) => item.uuid === row.id);
     let newSelectedLineItems;
 
     if (checked) {
@@ -197,7 +197,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
         page={currentPage}
         pageSize={pageSize}
         pageSizes={[5, 10, 20, 50]}
-        totalItems={filteredLineItems.length}
+        totalItems={filteredLineItems?.length}
         className={styles.pagination}
         size={responsiveSize}
         onChange={({ pageSize: newPageSize, page: newPage }) => {
