@@ -25,7 +25,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const [attributes, setAttributes] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState<any>();
-  let lineList = [];
+  const [isPatientExemptedValue, setIsPatientExemptedValue] = useState<string | null>(null); // Add this state
 
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
@@ -109,22 +109,25 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
 
   return (
     <>
-      <VisitAttributesForm setAttributes={setAttributes} setPaymentMethod={setPaymentMethod} />
+      <VisitAttributesForm
+        setAttributes={setAttributes}
+        setPaymentMethod={setPaymentMethod}
+        setIsPatientExempted={setIsPatientExemptedValue}
+      />
       <SHANumberValidity paymentMethod={paymentMethod} />
-      {paymentMethod && (
-        <section className={styles.sectionContainer}>
-          <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
-          <div className={styles.sectionField}>
-            <FilterableMultiSelect
-              id="billing-service"
-              titleText={t('searchServices', 'Search services')}
-              items={lineItems ?? []}
-              itemToString={(item) => (item ? item?.name : '')}
-              onChange={({ selectedItems }) => handleBillingService(selectedItems)}
-            />
-          </div>
-        </section>
-      )}
+      <section className={styles.sectionContainer}>
+        <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
+        <div className={styles.sectionField}>
+          <FilterableMultiSelect
+            id="billing-service"
+            titleText={t('searchServices', 'Search services')}
+            items={lineItems ?? []}
+            itemToString={(item) => (item ? item?.name : '')}
+            onChange={({ selectedItems }) => handleBillingService(selectedItems)}
+            disabled={isPatientExemptedValue === ''}
+          />
+        </div>
+      </section>
     </>
   );
 };

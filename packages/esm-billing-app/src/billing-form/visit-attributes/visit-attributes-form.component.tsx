@@ -12,6 +12,7 @@ import styles from './visit-attributes-form.scss';
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
   setPaymentMethod?: (value: any) => void;
+  setIsPatientExempted: (value: string) => void;
 };
 
 type VisitAttributesFormValue = {
@@ -30,7 +31,11 @@ const visitAttributesFormSchema = z.object({
   exemptionCategory: z.string().optional(),
 });
 
-const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes, setPaymentMethod }) => {
+const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
+  setAttributes,
+  setPaymentMethod,
+  setIsPatientExempted,
+}) => {
   const { t } = useTranslation();
   const { visitAttributeTypes, patientExemptionCategories } = useConfig<BillingConfig>();
   const { control, getValues, watch, setValue } = useForm<VisitAttributesFormValue>({
@@ -59,7 +64,8 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     if (isPatientExempted === 'true') {
       resetFormFieldsForNonExemptedPatients();
     }
-  }, [isPatientExempted, resetFormFieldsForNonExemptedPatients]);
+    setIsPatientExempted(isPatientExempted);
+  }, [isPatientExempted, resetFormFieldsForNonExemptedPatients, setIsPatientExempted]);
 
   const createVisitAttributesPayload = useCallback(() => {
     const values = getValues();
