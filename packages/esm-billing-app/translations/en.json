@@ -90,7 +90,7 @@
   "noMatchingBillsToDisplay": "No matching bills to display",
   "noMatchingItemsToDisplay": "No matching items to display",
   "noMatchingServicesToDisplay": "No matching services to display",
-  "noprices": "No procedural price found ",
+  "noprice": "No price found ",
   "noResultsFor": "No results for",
   "noServicesToDisplay": "There are no services to display",
   "patientBilling": "Patient Billing",
