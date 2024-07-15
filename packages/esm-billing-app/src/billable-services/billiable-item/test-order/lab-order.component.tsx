@@ -47,7 +47,7 @@ const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
     <Tile id="" className={styles.prices}>
       <div className={styles.listContainer}>
         <StructuredListWrapper isCondensed>
-          A
+          
           <StructuredListHead>
             <StructuredListRow head>
               <StructuredListCell head className={styles.cell}>
