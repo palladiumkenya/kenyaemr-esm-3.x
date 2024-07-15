@@ -15,15 +15,15 @@ export const RelationshipsTab: React.FC<RelationshipsTabProps> = ({ patientUuid 
     <main>
       <Tabs className={styles.tabs}>
         <TabList className={styles.tablist} aria-label="List tabs" contained>
-          <Tab className={styles.tab}>{t('contactList', 'Contact List')}</Tab>
-          <Tab className={styles.tab}>{t('familyHistory', 'Family History')}</Tab>
+          <Tab className={styles.tab}>{t('family', 'Family')}</Tab>
+          <Tab className={styles.tab}>{t('pnsContacts', 'PNS Contacts')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
-            <ContactList patientUuid={patientUuid} />
+            <FamilyHistory patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
-            <FamilyHistory patientUuid={patientUuid} encounterTypeUuid="" formEntrySub="" />
+            <ContactList patientUuid={patientUuid} />
           </TabPanel>
         </TabPanels>
       </Tabs>
