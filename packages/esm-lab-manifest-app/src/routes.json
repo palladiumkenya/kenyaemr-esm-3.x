@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "extensions": [
+    {
+      "component": "labManifestDashboardLink",
+      "name": "lab-manifest-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "lab-manifest",
+        "title": "lab-manifest",
+        "slot": "lab-manifest-dashboard-slot"
+      }
+    },
+    {
+      "component": "root",
+      "name": "lab-manifest-dashboard-root",
+      "slot": "lab-manifest-dashboard-slot"
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "lab-manifest"
+    }
+  ]
+}
