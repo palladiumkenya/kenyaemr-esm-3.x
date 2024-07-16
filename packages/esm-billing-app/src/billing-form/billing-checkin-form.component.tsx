@@ -25,7 +25,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const [attributes, setAttributes] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState<any>();
-  const [isPatientExemptedValue, setIsPatientExemptedValue] = useState<string | null>(null); // Add this state
+  const [isPatientExemptedValue, setIsPatientExemptedValue] = useState<string | null>(null);
 
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
@@ -119,6 +119,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
         <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
         <div className={styles.sectionField}>
           <FilterableMultiSelect
+            key={isPatientExemptedValue}
             id="billing-service"
             titleText={t('searchServices', 'Search services')}
             items={lineItems ?? []}
