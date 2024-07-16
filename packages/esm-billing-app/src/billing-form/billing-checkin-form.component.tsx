@@ -51,7 +51,6 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
       : PENDING_PAYMENT_STATUS;
 
     const lineItems = selectedItems.map((item, index) => {
-      // should default to first price if check returns empty. todo - update backend to return default price
       const priceForPaymentMode =
         item.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod) || item?.servicePrices[0];
       return {
