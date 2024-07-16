@@ -1,4 +1,20 @@
 {
-    "labManifest": "Lab manifest Management",
-    "viewReport":"View Report"
+  "addNewManifest": "Add new Manifest",
+  "completed": "Completed",
+  "completeManifest": "Complete Manifest",
+  "draft": "Draft",
+  "draftManifest": "Draft Manifest",
+  "incompleted": "Incompleted",
+  "incompletedManifest": "Incomplete Manifest",
+  "labManifest": "Lab manifest Management",
+  "labManifestSummary": "Lab Manifest Summary",
+  "onHold": "On Hold",
+  "onHoldManifest": "On Hold Manifest",
+  "readyToSend": "Ready To send",
+  "rendyToSendManifest": "Ready To send Manifest",
+  "sending": "Sending",
+  "sendingManifest": "Sending Manifest",
+  "submitted": "Submitted",
+  "submittedManifest": "Submitted Manifest",
+  "viewReport": "View Report"
 }

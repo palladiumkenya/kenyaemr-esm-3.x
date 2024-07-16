@@ -1,7 +1,8 @@
 import React from 'react';
+import styles from './lab-manifest-table.scss';
 
-const LabManifests = () => {
+const LabManifestsTable = () => {
   return <div>LabManifests</div>;
 };
 
-export default LabManifests;
+export default LabManifestsTable;
