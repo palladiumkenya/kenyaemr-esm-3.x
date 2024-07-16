@@ -3,15 +3,15 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.tabs {
+.relationship-tabs {
   grid-column: span 2;
 }
 
-.tablist {
+.relationship-tablist {
   padding: 0 spacing.$spacing-05;
 }
 
-.tab {
+.relationship-tab {
   min-width: 8.875rem;
 
   &:active {
