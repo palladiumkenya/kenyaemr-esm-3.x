@@ -114,20 +114,22 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
         setIsPatientExempted={setIsPatientExemptedValue}
       />
       <SHANumberValidity paymentMethod={paymentMethod} />
-      <section className={styles.sectionContainer}>
-        <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
-        <div className={styles.sectionField}>
-          <FilterableMultiSelect
-            key={isPatientExemptedValue}
-            id="billing-service"
-            titleText={t('searchServices', 'Search services')}
-            items={lineItems ?? []}
-            itemToString={(item) => (item ? item?.name : '')}
-            onChange={({ selectedItems }) => handleBillingService(selectedItems)}
-            disabled={isPatientExemptedValue === ''}
-          />
-        </div>
-      </section>
+      {paymentMethod && (
+        <section className={styles.sectionContainer}>
+          <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
+          <div className={styles.sectionField}>
+            <FilterableMultiSelect
+              key={isPatientExemptedValue}
+              id="billing-service"
+              titleText={t('searchServices', 'Search services')}
+              items={lineItems ?? []}
+              itemToString={(item) => (item ? item?.name : '')}
+              onChange={({ selectedItems }) => handleBillingService(selectedItems)}
+              disabled={isPatientExemptedValue === ''}
+            />
+          </div>
+        </section>
+      )}
     </>
   );
 };
