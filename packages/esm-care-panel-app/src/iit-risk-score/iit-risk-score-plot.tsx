@@ -27,11 +27,24 @@ const CarePanelRiskScorePlot: React.FC<CarePanelRiskScorePlotProps> = ({ patient
         title: 'Risk Score (%)',
         percentage: true,
         scaleType: ScaleTypes.LINEAR,
+        includeZero: true,
       },
     },
     curve: 'curveMonotoneX',
     height: '400px',
+    tooltip: {
+      // Tooltip configuration for displaying descriptions
+      enabled: true,
+
+      valueFormatter(value, label) {
+        if (label === 'Risk Score (%)') {
+          return `${value} (${patientRiskScore.find((r) => `${r.riskScore}` === `${value}`)?.description ?? ''})`;
+        }
+        return `${value}`;
+      },
+    },
   };
+
   return (
     <div className={styles['risk-score-card']}>
       <span className={styles.sectionHeader}>IIT Risk Score Trend</span>
