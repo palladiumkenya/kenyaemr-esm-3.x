@@ -35,7 +35,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
             },
           }}
         />
-        {!patientUuid && (
+        {!patientUuid ? (
           <div style={{ marginTop: '0.625rem' }}>
             <Layer className={billTableStyles.emptyStateContainer}>
               <Tile className={billTableStyles.tile}>
@@ -48,8 +48,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
               </Tile>
             </Layer>
           </div>
-        )}
-        {isLoading && (
+        ) : isLoading ? (
           <DataTableSkeleton
             headers={headers}
             aria-label="patient bills table"
@@ -60,8 +59,9 @@ const BillManager: React.FC<BillManagerProps> = () => {
             columnCount={3}
             className={styles.dataTableSkeleton}
           />
+        ) : (
+          bills && <PatientBills bills={filteredBills} />
         )}
-        {bills.length > 0 && patientUuid && <PatientBills bills={filteredBills} />}
       </div>
       <WorkspaceContainer overlay contextKey="bill-manager" />
     </UserHasAccess>

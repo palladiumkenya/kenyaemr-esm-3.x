@@ -83,6 +83,7 @@
   "noMatchingServicesToDisplay": "No matching services to display",
   "noResultsFor": "No results for",
   "noServicesToDisplay": "There are no services to display",
+  "notSearchedState": "Please search for a patient in the input above",
   "patientBilling": "Patient Billing",
   "patientBillingAlert": "Patient Billing Alert",
   "patientBills": "Patient bill",
