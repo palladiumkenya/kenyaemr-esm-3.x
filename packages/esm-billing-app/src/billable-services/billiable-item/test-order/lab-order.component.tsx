@@ -10,6 +10,7 @@ import {
   StructuredListRow,
   StructuredListCell,
   StructuredListBody,
+  InlineLoading,
   Tile,
 } from '@carbon/react';
 
@@ -27,9 +28,7 @@ const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
 
   if (isLoading) {
-    return (
-      <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
-    );
+    return <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;
   }
 
   if (error || !billableItem) {
@@ -47,7 +46,6 @@ const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
     <Tile id="" className={styles.prices}>
       <div className={styles.listContainer}>
         <StructuredListWrapper isCondensed>
-          
           <StructuredListHead>
             <StructuredListRow head>
               <StructuredListCell head className={styles.cell}>
