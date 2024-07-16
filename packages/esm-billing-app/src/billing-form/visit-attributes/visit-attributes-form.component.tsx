@@ -156,7 +156,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
                   id="paymentMethods"
                   items={paymentModes}
                   itemToString={(item) => (item ? item.name : '')}
-                  titleText={t('paymentMethodsTitle', 'Payment methods')}
+                  titleText={t('paymentMethodsTitle', 'Payment method')}
                   placeholder={t('selectPaymentMethodPlaceholder', 'Select payment method')}
                 />
               )}
