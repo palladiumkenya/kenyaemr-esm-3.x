@@ -13,10 +13,10 @@ export const RelationshipsTab: React.FC<RelationshipsTabProps> = ({ patientUuid 
   const { t } = useTranslation();
   return (
     <main>
-      <Tabs className={styles['relationship-tabs']}>
-        <TabList className={styles['relationship-tablist']} aria-label="List tabs" contained>
-          <Tab className={styles['relationship-tab']}>{t('family', 'Family')}</Tab>
-          <Tab className={styles['relationship-tab']}>{t('pnsContacts', 'PNS Contacts')}</Tab>
+      <Tabs className={styles.relationshipTabs}>
+        <TabList className={styles.relationshipTablist} aria-label="List tabs" contained>
+          <Tab className={styles.relationshipTab}>{t('family', 'Family')}</Tab>
+          <Tab className={styles.relationshipTab}>{t('pnsContacts', 'PNS Contacts')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
