@@ -86,6 +86,11 @@
       "slot": "top-of-lab-order-form-slot"
     },
     {
+      "name": "price-info-order",
+      "component": "priceInfoOrder",
+      "slot": "price-info-order-slot"
+    },
+    {
       "name": "drug-order-billable-item",
       "component": "drugOrder",
       "slot": "medication-info-slot"
