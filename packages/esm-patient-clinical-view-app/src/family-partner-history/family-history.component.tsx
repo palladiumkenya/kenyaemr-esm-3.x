@@ -17,15 +17,15 @@ import {
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import { isDesktop, navigate, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ConfigurableLink, isDesktop, navigate, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
 
 interface FamilyHistoryProps {
-  encounterTypeUuid: string;
-  formEntrySub: any;
+  encounterTypeUuid?: string;
+  formEntrySub?: any;
   patientUuid: string;
 }
 
@@ -77,7 +77,13 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
 
       return {
         id: `${relation.uuid}`,
-        name: relation.name,
+        name: (
+          <ConfigurableLink
+            style={{ textDecoration: 'none' }}
+            to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
+            {relation.name}
+          </ConfigurableLink>
+        ),
         relation: relation?.relationshipType,
         age: relation?.relativeAge ?? '--',
         alive: relation?.dead ? t('dead', 'Dead') : t('alive', 'Alive'),

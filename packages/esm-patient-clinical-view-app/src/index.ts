@@ -8,7 +8,7 @@ import { configSchema } from './config-schema';
 import BirthDateCalculator from './contact-list/birthdate-calculator.component';
 import ContactList from './contact-list/contact-list.component';
 import ContactListForm from './contact-list/contact-list.workspace';
-import { caseManagementDashboardMeta, contactListDashboardMeta } from './dashboard.meta';
+import { caseManagementDashboardMeta, contactListDashboardMeta, relationshipsDashboardMeta } from './dashboard.meta';
 import FamilyHistory from './family-partner-history/family-history.component';
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import AntenatalCare from './maternal-and-child-health/antenatal-care.component';
@@ -33,6 +33,7 @@ import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-das
 import { createLeftPanelLink } from './left-panel-link.component';
 import WrapComponent from './case-management/wrap/wrap.component';
 import CaseManagementForm from './case-management/workspace/case-management.workspace';
+import Relationships from './relationships/relationships.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -73,6 +74,9 @@ export const familyHistory = getSyncLifecycle(FamilyHistory, options);
 export const familyHistoryLink = getSyncLifecycle(createDashboardLink(familyHistoryDashboardMeta), options);
 
 // RElationships links for Family History and the corresponding view in the patient chart
+export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
+export const relationships = getSyncLifecycle(Relationships, options);
+
 export const contactList = getSyncLifecycle(ContactList, options);
 export const contactListLink = getSyncLifecycle(createDashboardLink(contactListDashboardMeta), options);
 export const contactListForm = getSyncLifecycle(ContactListForm, options);
