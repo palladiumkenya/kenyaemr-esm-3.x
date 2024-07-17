@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
 import PriceInfoOrder from './price-info-order.componet';
 
-type LabOrderProps = {
+type ImagingOrderProps = {
   order: {
     testType?: {
       label: string;
@@ -13,7 +13,7 @@ type LabOrderProps = {
   };
 };
 
-const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
+const ImagingOrder: React.FC<ImagingOrderProps> = ({ order }) => {
   const { t } = useTranslation();
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
 
@@ -30,4 +30,4 @@ const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
   return <PriceInfoOrder billableItem={billableItem} error={error} />;
 };
 
-export default LabOrder;
+export default ImagingOrder;
