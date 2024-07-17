@@ -1,41 +1,19 @@
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { usePatient, ErrorState } from '@openmrs/esm-framework';
-import styles from './header/claims-header.scss';
-import { InlineLoading } from '@carbon/react';
-import { useBill } from '../../billing.resource';
-import ClaimsHeader from './header/claims-header.component';
+import ClaimsDashboardHeader from './header/claims-dashboard-header.component';
+import ClaimsDashboardTable from './table/claims-dashboard-table.component';
+import styles from './claims-dashboard.scss';
 
-const ClaimScreen: React.FC = () => {
-  const { billUuid, patientUuid } = useParams();
+function ClaimsDashboard() {
   const { t } = useTranslation();
 
-  const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
-  const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
-
-  if (isLoadingPatient && isLoadingBill) {
-    return (
-      <div className={styles.invoiceContainer}>
-        <InlineLoading
-          className={styles.loader}
-          status="active"
-          iconDescription="Loading"
-          description="Loading patient header..."
-        />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorContainer}>
-        <ErrorState headerTitle={t('createClaimError', 'Create Claim error')} error={error} />
-      </div>
-    );
-  }
-
-  return <ClaimsHeader patient={patient} bill={bill} />;
-};
-
-export default ClaimScreen;
+  return (
+    <main>
+      <ClaimsDashboardHeader title={t('home', 'Home')} />
+      <main className={styles.claimsTableContainer}>
+        <ClaimsDashboardTable defaultBillPaymentStatus="PENDING" />
+      </main>
+    </main>
+  );
+}
+export default ClaimsDashboard;

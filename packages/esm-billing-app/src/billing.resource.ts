@@ -222,3 +222,57 @@ export const useConceptAnswers = (conceptUuid: string) => {
   const { data, isLoading, error } = useSWR<{ data: { answers: Array<OpenmrsResource> } }>(url, openmrsFetch);
   return { conceptAnswers: data?.data?.answers, isLoading, error };
 };
+export const usePatientBillsByPeriod = (
+  patientUuid: string,
+  startDate: string,
+  endDate: string,
+  billStatus?: string,
+) => {
+  const url =
+    startDate && endDate
+      ? `/ws/rest/v1/cashier/bill?v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startDate}&createdOnOrBefore=${endDate}&patientUuid=${patientUuid}`
+      : null;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
+    patientUuid && startDate && endDate ? url : null,
+    openmrsFetch,
+    {
+      errorRetryCount: 2,
+    },
+  );
+
+  const mapBillProperties = (bill: PatientInvoice): MappedBill => {
+    const mappedBill: MappedBill = {
+      id: bill?.id,
+      uuid: bill?.uuid,
+      patientName: bill?.patient?.display.split('-')?.[1],
+      identifier: bill?.patient?.display.split('-')?.[0],
+      patientUuid: bill?.patient?.uuid,
+      status: bill.lineItems.some((item) => item.paymentStatus === 'PENDING') ? 'PENDING' : 'PAID',
+      receiptNumber: bill?.receiptNumber,
+      cashier: bill?.cashier,
+      cashPointUuid: bill?.cashPoint?.uuid,
+      cashPointName: bill?.cashPoint?.name,
+      cashPointLocation: bill?.cashPoint?.location?.display,
+      dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
+      lineItems: bill.lineItems,
+      billingService: bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  '),
+      payments: bill.payments,
+      display: bill.display,
+      totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
+    };
+
+    return mappedBill;
+  };
+
+  const sortBills = sortBy(data?.data?.results ?? [], ['dateCreated']).reverse();
+  const formattedBills = sortBills?.map((bill) => mapBillProperties(bill));
+
+  return {
+    bills: formattedBills,
+    error,
+    isLoading,
+    isValidating,
+    mutate,
+  };
+};

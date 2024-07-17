@@ -27,9 +27,24 @@
       }
     },
     {
+      "component": "claimsDashboardLink",
+      "name": "claims-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "bill-claims",
+        "title": "claims",
+        "slot": "claims-dashboard-slot"
+      }
+    },
+    {
       "component": "root",
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
+    },
+    {
+      "component": "claims",
+      "name": "claims-dashboard-root",
+      "slot": "claims-dashboard-slot"
     },
     {
       "name": "billing-patient-summary",
