@@ -1,10 +1,10 @@
 import React from 'react';
 import { useBillableItem } from '../useBillableItem';
 import { useTranslation } from 'react-i18next';
-import { InlineNotification, InlineLoading, Tile } from '@carbon/react';
+import { InlineLoading } from '@carbon/react';
 import PriceInfoOrder from './price-info-order.componet';
 
-type LabOrderProps = {
+type ImagingOrderProps = {
   order: {
     testType?: {
       label: string;
@@ -13,26 +13,21 @@ type LabOrderProps = {
   };
 };
 
-const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
+const ImagingOrder: React.FC<ImagingOrderProps> = ({ order }) => {
   const { t } = useTranslation();
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
 
   if (isLoading) {
-    return <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;
-  }
-
-  if (error || !billableItem) {
     return (
-      <InlineNotification
-        kind="info"
-        title={t('noprice', 'No price found ')}
-        subtitle={t('noInfo', 'Please contact the cashier')}
-        lowContrast
+      <InlineLoading
+        status="active"
+        iconDescription={t('loading', 'Loading')}
+        description={t('loadingData', 'Loading data...')}
       />
     );
   }
 
-  return <PriceInfoOrder billableItem={billableItem} />;
+  return <PriceInfoOrder billableItem={billableItem} error={error} />;
 };
 
-export default LabOrder;
+export default ImagingOrder;

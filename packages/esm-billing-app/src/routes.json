@@ -86,9 +86,18 @@
       "slot": "top-of-lab-order-form-slot"
     },
     {
+      "name": "procedure-order-billable-item",
+      "component": "procedureOrder",
+      "slot": "top-of-procedure-order-form-slot"
+    },
+    {
+      "name": "imaging-order-billable-item",
+      "component": "imagingOrder",
+      "slot": "top-of-imaging-order-form-slot"
+    },
+    {
       "name": "price-info-order",
-      "component": "priceInfoOrder",
-      "slot": "price-info-order-slot"
+      "component": "priceInfoOrder"
     },
     {
       "name": "drug-order-billable-item",
