@@ -1,0 +1,20 @@
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.prices {
+  justify-content: center;
+  align-items: center;
+  margin: layout.$spacing-03;
+}
+
+.listContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cell {
+  padding: spacing.$spacing-05;
+}

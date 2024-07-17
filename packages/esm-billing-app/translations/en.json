@@ -70,6 +70,7 @@
   "lineItems": "Line items",
   "loading": "Loading",
   "loadingBillingServices": "Loading billing services...",
+  "loadingData": "Loading data...",
   "loadingDescription": "Loading",
   "makeclaims": "Make Claims",
   "manageBillableServices": "Manage billable services",
@@ -77,6 +78,7 @@
   "name": "Name",
   "navigateBack": "Navigate back",
   "nextPage": "Next page",
+  "no": "No",
   "noBillDisplay": "There are no bills to display for this patient",
   "noMatchingBillsToDisplay": "No matching bills to display",
   "noMatchingItemsToDisplay": "No matching items to display",
@@ -147,5 +149,7 @@
   "validatingSHANumber": "Validating SHA Number",
   "validSHANumber": "SHA number is valid, proceed with care",
   "visitTime": "Visit time",
-  "visittype": "Visit Type"
+  "visittype": "Visit Type",
+  "waiverForm": "Waiver form",
+  "yes": "Yes"
 }
