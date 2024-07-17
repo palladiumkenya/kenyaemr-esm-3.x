@@ -1,6 +1,5 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './visit-attributes-form.scss';
 import { TextInput, InlineLoading, ComboBox, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,15 +7,17 @@ import { z } from 'zod';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
 import { usePaymentModes } from '../../billing.resource';
+import styles from './visit-attributes-form.scss';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
   setPaymentMethod?: (value: any) => void;
+  setIsPatientExempted: (value: string) => void;
 };
 
 type VisitAttributesFormValue = {
   isPatientExempted: string;
-  paymentMethods: { uuid: string; name: string };
+  paymentMethods: { uuid: string; name: string } | null;
   insuranceScheme: string;
   policyNumber: string;
   exemptionCategory: string;
@@ -24,70 +25,70 @@ type VisitAttributesFormValue = {
 
 const visitAttributesFormSchema = z.object({
   isPatientExempted: z.string(),
-  paymentMethods: z.object({ uuid: z.string(), name: z.string() }),
-  insuranceSchema: z.string(),
-  policyNumber: z.string(),
-  exemptionCategory: z.string(),
+  paymentMethods: z.object({ uuid: z.string(), name: z.string() }).nullable(),
+  insuranceScheme: z.string().optional(),
+  policyNumber: z.string().optional(),
+  exemptionCategory: z.string().optional(),
 });
 
-const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes, setPaymentMethod }) => {
+const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
+  setAttributes,
+  setPaymentMethod,
+  setIsPatientExempted,
+}) => {
   const { t } = useTranslation();
   const { visitAttributeTypes, patientExemptionCategories } = useConfig<BillingConfig>();
   const { control, getValues, watch, setValue } = useForm<VisitAttributesFormValue>({
     mode: 'all',
-    defaultValues: {},
+    defaultValues: {
+      isPatientExempted: '',
+      paymentMethods: null,
+      insuranceScheme: '',
+      policyNumber: '',
+      exemptionCategory: '',
+    },
     resolver: zodResolver(visitAttributesFormSchema),
   });
-  const [isPatientExempted, paymentMethods, insuranceSchema, policyNumber, exemptionCategory] = watch([
-    'isPatientExempted',
-    'paymentMethods',
-    'insuranceScheme',
-    'policyNumber',
-    'exemptionCategory',
-  ]);
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
+  const [isPatientExempted, paymentMethods] = watch(['isPatientExempted', 'paymentMethods']);
 
   const resetFormFieldsForNonExemptedPatients = useCallback(() => {
-    if ((isPatientExempted && paymentMethods !== null) || paymentMethods !== undefined) {
-      setValue('insuranceScheme', '');
-      setValue('policyNumber', '');
+    setValue('insuranceScheme', '');
+    setValue('policyNumber', '');
+    setValue('exemptionCategory', '');
+    setValue('paymentMethods', null);
+  }, [setValue]);
+
+  useEffect(() => {
+    if (isPatientExempted === 'true') {
+      resetFormFieldsForNonExemptedPatients();
     }
-  }, [isPatientExempted, paymentMethods, setValue]);
+    setIsPatientExempted(isPatientExempted);
+  }, [isPatientExempted, resetFormFieldsForNonExemptedPatients, setIsPatientExempted]);
 
   const createVisitAttributesPayload = useCallback(() => {
-    const { exemptionCategory, paymentMethods, policyNumber, isPatientExempted } = getValues();
-    setPaymentMethod(paymentMethods);
-    resetFormFieldsForNonExemptedPatients();
+    const values = getValues();
+    setPaymentMethod?.(values.paymentMethods);
     const formPayload = [
-      { uuid: visitAttributeTypes.isPatientExempted, value: isPatientExempted },
-      { uuid: visitAttributeTypes.paymentMethods, value: paymentMethods?.uuid },
-      { uuid: visitAttributeTypes.policyNumber, value: policyNumber },
-      { uuid: visitAttributeTypes.insuranceScheme, value: insuranceSchema },
-      { uuid: visitAttributeTypes.exemptionCategory, value: exemptionCategory },
+      { uuid: visitAttributeTypes.isPatientExempted, value: values.isPatientExempted },
+      { uuid: visitAttributeTypes.paymentMethods, value: values.paymentMethods?.uuid },
+      { uuid: visitAttributeTypes.policyNumber, value: values.policyNumber },
+      { uuid: visitAttributeTypes.insuranceScheme, value: values.insuranceScheme },
+      { uuid: visitAttributeTypes.exemptionCategory, value: values.exemptionCategory },
     ];
     const visitAttributesPayload = formPayload.filter(
       (item) => item.value !== undefined && item.value !== null && item.value !== '',
     );
-    return Object.entries(visitAttributesPayload).map(([key, value]) => ({
-      attributeType: value.uuid,
-      value: value.value,
+    return visitAttributesPayload.map(({ uuid, value }) => ({
+      attributeType: uuid,
+      value,
     }));
-  }, [
-    visitAttributeTypes.insuranceScheme,
-    visitAttributeTypes.isPatientExempted,
-    visitAttributeTypes.exemptionCategory,
-    visitAttributeTypes.paymentMethods,
-    visitAttributeTypes.policyNumber,
-    getValues,
-    insuranceSchema,
-    resetFormFieldsForNonExemptedPatients,
-    setPaymentMethod,
-  ]);
+  }, [getValues, visitAttributeTypes, setPaymentMethod]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setAttributes(createVisitAttributesPayload());
-  }, [paymentMethods, insuranceSchema, policyNumber, exemptionCategory, setAttributes, createVisitAttributesPayload]);
+  }, [isPatientExempted, paymentMethods, getValues, createVisitAttributesPayload, setAttributes]);
 
   if (isLoadingPaymentModes) {
     return (
@@ -109,17 +110,21 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
             control={control}
             render={({ field }) => (
               <RadioButtonGroup
-                onChange={(selected) => field.onChange(selected)}
+                onChange={(selected) => {
+                  field.onChange(selected);
+                  setValue('isPatientExempted', selected);
+                }}
                 orientation="horizontal"
                 legendText={t('isPatientExemptedLegend', 'Is patient exempted from payment?')}
                 name="patientExemption">
-                <RadioButton labelText="Yes" value={true} id="Yes" />
-                <RadioButton labelText="No" value={false} id="No" />
+                <RadioButton labelText={t('yes', 'Yes')} value="true" id="Yes" />
+                <RadioButton labelText={t('no', 'No')} value="false" id="No" />
               </RadioButtonGroup>
             )}
           />
         </div>
-        {isPatientExempted && (
+
+        {isPatientExempted === 'true' && (
           <div className={styles.sectionFieldLayer}>
             <Controller
               control={control}
@@ -138,25 +143,28 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
             />
           </div>
         )}
-        <div className={styles.sectionFieldLayer}>
-          <Controller
-            control={control}
-            name="paymentMethods"
-            render={({ field }) => (
-              <ComboBox
-                className={styles.sectionField}
-                onChange={({ selectedItem }) => field.onChange(selectedItem)}
-                id="paymentMethods"
-                items={paymentModes}
-                itemToString={(item) => (item ? item.name : '')}
-                titleText={t('paymentMethodsTitle', 'Payment methods')}
-                placeholder={t('selectPaymentMethodPlaceholder', 'Select payment method')}
-              />
-            )}
-          />
-        </div>
 
-        {paymentMethods?.name?.toLocaleLowerCase() === 'insurance' && (
+        {isPatientExempted === 'false' && (
+          <div className={styles.sectionFieldLayer}>
+            <Controller
+              control={control}
+              name="paymentMethods"
+              render={({ field }) => (
+                <ComboBox
+                  className={styles.sectionField}
+                  onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                  id="paymentMethods"
+                  items={paymentModes}
+                  itemToString={(item) => (item ? item.name : '')}
+                  titleText={t('paymentMethodsTitle', 'Payment method')}
+                  placeholder={t('selectPaymentMethod', 'Select payment method')}
+                />
+              )}
+            />
+          </div>
+        )}
+
+        {paymentMethods?.name?.toLowerCase() === 'insurance' && isPatientExempted === 'false' && (
           <>
             <div className={styles.sectionFieldLayer}>
               <Controller

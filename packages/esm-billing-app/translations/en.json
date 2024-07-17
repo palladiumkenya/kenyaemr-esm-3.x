@@ -84,6 +84,7 @@
   "name": "Name",
   "navigateBack": "Navigate back",
   "nextPage": "Next page",
+  "no": "No",
   "noBillDisplay": "There are no bills to display for this patient",
   "noMatchingBillsToDisplay": "No matching bills to display",
   "noMatchingItemsToDisplay": "No matching items to display",
@@ -155,5 +156,6 @@
   "validSHANumber": "SHA number is valid, proceed with care",
   "visitTime": "Visit time",
   "visittype": "Visit Type",
-  "waiverForm": "Waiver form"
+  "waiverForm": "Waiver form",
+  "yes": "Yes"
 }
