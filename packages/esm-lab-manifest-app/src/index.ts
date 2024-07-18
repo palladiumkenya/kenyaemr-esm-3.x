@@ -25,6 +25,7 @@ export function startupApp() {
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
+export const labManifestForm = getAsyncLifecycle(() => import('./forms/lab-manifest-form.workspace'), options);
 
 export const labManifestDashboardLink = getSyncLifecycle(
   createLeftPanelLink({

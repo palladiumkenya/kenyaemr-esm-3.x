@@ -16,6 +16,10 @@
       }
     },
     {
+      "name": "lab-manifest-form",
+      "component": "labManifestForm"
+    },
+    {
       "component": "root",
       "name": "lab-manifest-dashboard-root",
       "slot": "lab-manifest-dashboard-slot"

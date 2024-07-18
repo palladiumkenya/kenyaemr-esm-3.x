@@ -72,12 +72,6 @@ const LabManifestsTable = () => {
     },
   ];
 
-  const handleAddContact = () => {
-    // launchWorkspace('contact-list-form', {
-    //   workspaceTitle: 'Contact Form',
-    // });
-  };
-
   const tableRows =
     results?.map((manifest) => {
       const patientUuid = manifest.uuid;
