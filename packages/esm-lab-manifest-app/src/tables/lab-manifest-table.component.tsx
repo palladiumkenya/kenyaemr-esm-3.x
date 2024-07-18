@@ -2,6 +2,8 @@ import {
   Button,
   DataTable,
   DataTableSkeleton,
+  Dropdown,
+  Layer,
   Pagination,
   Table,
   TableBody,
@@ -10,21 +12,24 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tile,
 } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { ErrorState, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { ErrorState, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
+import { LabManifestFilters } from '../lab-manifest.resources';
 import styles from './lab-manifest-table.scss';
 
 const LabManifestsTable = () => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
+  const [currFilter, setCurrFilter] = useState('draft');
   const headerTitle = t('lab Manifest', 'Lab Manifest');
   const layout = useLayoutType();
-  const { manifests, error, isLoading } = useLabManifest('');
+  const { manifests, error, isLoading } = useLabManifest(currFilter);
   const { results, totalPages, currentPage, goTo } = usePagination(manifests, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
@@ -86,7 +91,7 @@ const LabManifestsTable = () => {
         type: manifest.type,
         status: manifest.status,
         dispatch: manifest.dispatch,
-        actions: <Button renderIcon={View} hasIconOnly kind="tertiary" />,
+        actions: <Button renderIcon={View} hasIconOnly kind="tertiary" iconDescription={t('view', 'View')} />,
       };
     }) ?? [];
 
@@ -98,20 +103,47 @@ const LabManifestsTable = () => {
   }
 
   if (manifests.length === 0) {
-    return <EmptyState displayText={t('labManifest', 'Lab Manifest')} headerTitle="Lab manifest title" />;
+    return (
+      <Layer>
+        <Tile className={styles.tile}>
+          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
+            <h4>{headerTitle}</h4>
+            <div style={{ padding: '10px' }}>
+              <Dropdown
+                style={{ minWidth: '300px' }}
+                id="manifestStatus"
+                onChange={({ selectedItem }) => {
+                  setCurrFilter(selectedItem);
+                }}
+                initialSelectedItem={currFilter}
+                label={t('selectManifestStatus', 'Select manifest status')}
+                items={LabManifestFilters.map((mn) => mn.value)}
+                itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
+              />
+            </div>
+          </div>
+          <EmptyDataIllustration />
+          <p className={styles.content}>{t('notLabManifetToDisplay', 'There is no lab manifets data to display.')}</p>
+        </Tile>
+      </Layer>
+    );
   }
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={headerTitle}>
-        {/* <Dropdown
-          id="manifestStatus"
-          onChange={({ selectedItem }) => {}}
-          titleText={t('paymentMethod', 'Payment method')}
-          label={t('selectPaymentMethod', 'Select payment method')}
-          items={LabManifestFilters.map((mn) => mn.value)}
-          itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
-        /> */}
-        {''}
+        <div style={{ padding: '10px' }}>
+          <Dropdown
+            style={{ minWidth: '300px' }}
+            id="manifestStatus"
+            onChange={({ selectedItem }) => {
+              setCurrFilter(selectedItem);
+            }}
+            initialSelectedItem={currFilter}
+            label={t('selectManifestStatus', 'Select manifest status')}
+            items={LabManifestFilters.map((mn) => mn.value)}
+            itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
+          />
+        </div>
       </CardHeader>
       <DataTable
         useZebraStyles

@@ -4,7 +4,7 @@ import { labManifest } from '../lab-manifest.mock';
 const useLabManifest = (status: string) => {
   return {
     isLoading: false,
-    manifests: labManifest,
+    manifests: labManifest.filter((manifest) => manifest.status === status),
     error: undefined,
   };
 };

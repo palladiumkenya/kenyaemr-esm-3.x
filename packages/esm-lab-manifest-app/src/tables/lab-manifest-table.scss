@@ -32,6 +32,9 @@
 .tabletHeading {
   text-align: left;
   text-transform: capitalize;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 
   h4 {
     @include type.type-style('heading-compact-02');
