@@ -3,13 +3,13 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.risk-score-card {
+.riskScoreCard {
   width: 100%;
   border: 0.15rem solid $grey-2;
   margin-bottom: spacing.$spacing-08;
 }
 
-.risk-score-card__item {
+.riskScoreCardItem {
   flex: 1;
   padding: spacing.$spacing-05;
 }
