@@ -15,15 +15,15 @@ export const LabManifestHeader: React.FC<LabManifestHeaderProps> = ({ title }) =
 
   return (
     <div className={styles.header}>
-      <div className={styles['left-justified-items']}>
+      <div className={styles['leftJustifiedItems']}>
         <LabManifestIllustration />
-        <div className={styles['page-labels']}>
+        <div className={styles['pageLabels']}>
           <p>{t('labManifest', 'Lab manifest Management')}</p>
-          <p className={styles['page-name']}>{title}</p>
+          <p className={styles['pageName']}>{title}</p>
         </div>
       </div>
-      <div className={styles['right-justified-items']}>
-        <div className={styles['date-and-location']}>
+      <div className={styles['rightJustifieditems']}>
+        <div className={styles['dateAndLocation']}>
           <Location size={16} />
           <span className={styles.value}>{userLocation}</span>
           <span className={styles.middot}>&middot;</span>

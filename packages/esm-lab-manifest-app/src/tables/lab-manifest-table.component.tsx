@@ -19,7 +19,7 @@ import { ErrorState, isDesktop, navigate, useLayoutType, usePagination } from '@
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLabManifest } from '../hooks';
+import { useLabManifests } from '../hooks';
 import { LabManifestFilters } from '../lab-manifest.resources';
 import styles from './lab-manifest-table.scss';
 
@@ -29,7 +29,7 @@ const LabManifestsTable = () => {
   const [currFilter, setCurrFilter] = useState('draft');
   const headerTitle = t('lab Manifest', 'Lab Manifest');
   const layout = useLayoutType();
-  const { manifests, error, isLoading } = useLabManifest(currFilter);
+  const { manifests, error, isLoading } = useLabManifests(currFilter);
   const { results, totalPages, currentPage, goTo } = usePagination(manifests, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
