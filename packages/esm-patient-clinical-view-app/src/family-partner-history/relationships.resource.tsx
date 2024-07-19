@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { type FetchResponse, openmrsFetch, FHIRResource } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+import { RelationshipTypeResponse } from '../case-management/workspace/case-management.resource';
 
 interface RelationshipsResponse {
   results: Array<Relationship>;
@@ -73,6 +75,14 @@ function mapObservations(obsData) {
     });
   }
 }
+
+export const useAllRelationshipTypes = () => {
+  const customRepresentation = 'custom:(uuid,display)';
+  const url = `/ws/rest/v1/relationshiptype?v=${customRepresentation}`;
+  const { data, error } = useSWRImmutable<{ data: RelationshipTypeResponse }>(url, openmrsFetch);
+
+  return { data, error };
+};
 
 export function useRelationships(patientUuid: string) {
   const customRepresentation =

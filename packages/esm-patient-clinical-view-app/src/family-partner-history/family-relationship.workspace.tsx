@@ -7,10 +7,10 @@ import { z } from 'zod';
 import styles from './family-relationship.scss';
 import { ExtensionSlot, showSnackbar } from '@openmrs/esm-framework';
 import { uppercaseText } from '../utils/expression-helper';
-import { saveRelationship, useAllRelationshipTypes } from '../case-management/workspace/case-management.resource';
+import { saveRelationship } from '../case-management/workspace/case-management.resource';
 import PatientInfo from '../case-management/workspace/patient-info.component';
 import { mutate } from 'swr';
-import { useRelationships } from './relationships.resource';
+import { useAllRelationshipTypes, useRelationships } from './relationships.resource';
 
 const schema = z.object({
   relationship: z.string({ required_error: 'Relationship is required' }),
@@ -25,17 +25,31 @@ type FamilyRelationshipFormProps = {
   personAUUID: string;
 };
 
+export const familyRelationshipTypes = [
+  'Sibling/Sibling',
+  'Parent/Child',
+  'Aunt/Uncle/Niece/Nephew',
+  'Guardian/Dependant',
+  'Spouse/Spouse',
+  'Partner/Partner',
+  'Co-wife/Co-wife',
+  'SNS/SNS',
+  'Injectable-drug-user/Injectable-druguser',
+];
+
 const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWorkspace, personAUUID }) => {
   const { t } = useTranslation();
   const [patientUuid, setPatientUuid] = useState<string | undefined>(undefined);
-  const { data: relationshipTypesData } = useAllRelationshipTypes();
   const { relationshipsUrl } = useRelationships(personAUUID);
+  const { data: relationshipTypesData } = useAllRelationshipTypes();
 
-  const caseManagerRlshipType =
-    relationshipTypesData?.data.results.map((relationship) => ({
-      id: relationship.uuid,
-      text: relationship.display,
-    })) || [];
+  const relationshipTypes =
+    relationshipTypesData?.data.results
+      .map((relationship) => ({
+        id: relationship.uuid,
+        text: relationship.display,
+      }))
+      .filter((r) => familyRelationshipTypes.includes(r.text)) || [];
 
   const {
     control,
@@ -108,7 +122,7 @@ const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWo
                 id="relationship_name"
                 titleText={t('relationship', 'Relationship')}
                 placeholder="Select Relationship"
-                items={caseManagerRlshipType}
+                items={relationshipTypes}
                 itemToString={(item) => (item ? uppercaseText(item.text) : '')}
                 onChange={(e) => field.onChange(e.selectedItem?.id)}
                 invalid={!!fieldState.error}
