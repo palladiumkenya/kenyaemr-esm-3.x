@@ -60,6 +60,14 @@ export const useRelationshipType = () => {
   return { data, error };
 };
 
+export const useAllRelationshipTypes = () => {
+  const customRepresentation = 'custom:(uuid,display)';
+  const url = `/ws/rest/v1/relationshiptype?v=${customRepresentation}`;
+  const { data, error } = useSWRImmutable<{ data: RelationshipTypeResponse }>(url, openmrsFetch);
+
+  return { data, error };
+};
+
 export const saveRelationship = (payload) => {
   const url = `/ws/rest/v1/relationship`;
   return openmrsFetch(url, {

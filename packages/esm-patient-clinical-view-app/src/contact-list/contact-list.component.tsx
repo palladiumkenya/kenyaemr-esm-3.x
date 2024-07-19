@@ -141,7 +141,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
             {t('noContactToDisplay', 'There is no contact data to display for this patient.')}
           </p>
           <Button onClick={handleAddContact} renderIcon={Add} kind="ghost">
-            {t('recordContact', 'Record Contact')}
+            {t('addPNSContact', 'Add PNS Contact')}
           </Button>
         </Tile>
       </Layer>

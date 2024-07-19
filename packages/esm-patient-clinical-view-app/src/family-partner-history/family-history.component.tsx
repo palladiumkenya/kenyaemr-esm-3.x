@@ -17,7 +17,14 @@ import {
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import { ConfigurableLink, isDesktop, navigate, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  isDesktop,
+  launchWorkspace,
+  useConfig,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { useRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
@@ -36,7 +43,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const { concepts } = config;
   const [pageSize, setPageSize] = useState(10);
   const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
-  const headerTitle = t('familyHistory', 'Family history');
+  const headerTitle = t('familyContacts', 'Family contacts');
   const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
@@ -68,7 +75,10 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   ];
 
   const handleAddHistory = () => {
-    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
+    launchWorkspace('family-relationship-form', {
+      workspaceTitle: 'Family Relationship Form',
+      personAUUID: patientUuid,
+    });
   };
 
   const tableRows =
@@ -95,8 +105,19 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
       };
     }) ?? [];
 
-  if (isLoading) {
-    return <DataTableSkeleton rowCount={5} />;
+  if (isLoading || isValidating) {
+    return (
+      <DataTableSkeleton
+        headers={headers}
+        aria-label="patient bills table"
+        showToolbar={false}
+        showHeader={false}
+        rowCount={3}
+        zebra
+        columnCount={3}
+        className={styles.dataTableSkeleton}
+      />
+    );
   }
 
   if (error) {
@@ -113,7 +134,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
           <EmptyDataIllustration />
           <p className={styles.content}>There is no family history data to display for this patient.</p>
           <Button onClick={handleAddHistory} renderIcon={Add} kind="ghost">
-            {t('recordHistory', 'Record History')}
+            {t('addRelationship', 'Add relationship')}
           </Button>
         </Tile>
       </Layer>

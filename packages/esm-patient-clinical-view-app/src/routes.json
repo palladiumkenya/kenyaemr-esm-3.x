@@ -206,9 +206,13 @@
       "online": true,
       "offline": false
     },
-        {
+    {
       "name": "case-management-form",
       "component": "caseManagementForm"
+    },
+    {
+      "name": "family-relationship-form",
+      "component": "familyRelationshipForm"
     }
   ],
   "modals": [

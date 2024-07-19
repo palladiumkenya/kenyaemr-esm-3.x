@@ -83,8 +83,11 @@ export function useRelationships(patientUuid: string) {
     : null;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<RelationshipsResponse>, Error>(
-    patientUuid ? relationshipsUrl : null,
+    relationshipsUrl,
     openmrsFetch,
+    {
+      revalidateOnFocus: false,
+    },
   );
 
   const relationships = useMemo(() => {
@@ -96,6 +99,7 @@ export function useRelationships(patientUuid: string) {
     error,
     isLoading,
     isValidating,
+    relationshipsUrl,
   };
 }
 
