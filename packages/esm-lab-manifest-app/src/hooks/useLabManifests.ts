@@ -1,7 +1,7 @@
 import React from 'react';
 import { labManifest } from '../lab-manifest.mock';
 
-const useLabManifest = (status: string) => {
+const useLabManifests = (status: string) => {
   return {
     isLoading: false,
     manifests: labManifest.filter((manifest) => manifest.status === status),
@@ -9,4 +9,4 @@ const useLabManifest = (status: string) => {
   };
 };
 
-export default useLabManifest;
+export default useLabManifests;

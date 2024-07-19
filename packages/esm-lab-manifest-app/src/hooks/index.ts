@@ -1,1 +1,1 @@
-export { default as useLabManifest } from './useLabManifest';
+export { default as useLabManifests } from './useLabManifests';

@@ -15,7 +15,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { ErrorState, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, isDesktop, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -72,10 +72,12 @@ const LabManifestsTable = () => {
     },
   ];
 
+  const handleViewManifestSamples = (manifestUuid: string) => {
+    navigate({ to: window.getOpenmrsSpaBase() + `home/lab-manifest/${manifestUuid}` });
+  };
+
   const tableRows =
     results?.map((manifest) => {
-      const patientUuid = manifest.uuid;
-
       return {
         id: `${manifest.uuid}`,
         startDate: manifest.startDate ?? '--',
@@ -85,7 +87,15 @@ const LabManifestsTable = () => {
         type: manifest.type,
         status: manifest.status,
         dispatch: manifest.dispatch,
-        actions: <Button renderIcon={View} hasIconOnly kind="tertiary" iconDescription={t('view', 'View')} />,
+        actions: (
+          <Button
+            renderIcon={View}
+            hasIconOnly
+            kind="tertiary"
+            iconDescription={t('view', 'View')}
+            onClick={() => handleViewManifestSamples(manifest.uuid)}
+          />
+        ),
       };
     }) ?? [];
 
