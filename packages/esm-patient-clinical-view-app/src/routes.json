@@ -209,6 +209,24 @@
         {
       "name": "case-management-form",
       "component": "caseManagementForm"
+    },
+     {
+      "name": "case-encounter-link",
+      "component": "caseMangementChart",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 14,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "case-encounter-slot",
+        "path": "case-management-encounter",
+        "layoutMode": "anchored"
+      }
+    },
+     {
+      "name": "case-encounter-table-dashboard",
+        "slot": "case-encounter-slot",
+      "component": "caseEncounterOverview"
     }
   ],
   "modals": [
