@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import {
@@ -9,6 +9,7 @@ import {
   Layer,
   OverflowMenu,
   OverflowMenuItem,
+  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -37,11 +38,18 @@ import {
   useSession,
   userHasAccess,
 } from '@openmrs/esm-framework';
-import { EmptyState, PatientChartPagination, launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyState,
+  PatientChartPagination,
+  launchFormEntryOrHtmlForms,
+  launchPatientWorkspace,
+} from '@openmrs/esm-patient-common-lib';
 import styles from './case-encounter-table.scss';
 import { HtmlFormEntryForm } from '../../config-schema';
 import { deleteEncounter, MappedEncounter } from './case-encounter.resource';
 import EncounterObservations from './encounter-observations.component';
+import { useFormState } from 'react-hook-form';
+import { mutate } from 'swr';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -70,7 +78,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     getConfig('@openmrs/esm-patient-forms-app').then((config) => {
       setHtmlFormEntryFormsConfig(config.htmlFormEntryForms as HtmlFormEntryForm[]);
     });
-  });
+  }, []);
 
   const encounterTypes = useMemo(() => {
     return visits ? [...new Set(visits.map((encounter) => encounter.encounterType))].sort() : [];
@@ -92,44 +100,28 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
 
   const { results: paginatedVisits, goTo, currentPage } = usePagination(filteredRows ?? [], visitCount);
 
-  const tableHeaders = [
-    {
-      header: t('dateAndTime', 'Date & time'),
-      key: 'datetime',
-    },
-  ];
-
-  if (showAllEncounters) {
-    tableHeaders.push({
-      header: t('visitType', 'Visit type'),
-      key: 'visitType',
-    });
-  }
-
-  tableHeaders.push(
-    {
-      header: t('encounterType', 'Encounter type'),
-      key: 'encounterType',
-    },
-    {
-      header: t('form', 'Form name'),
-      key: 'formName',
-    },
-    {
-      header: t('provider', 'Provider'),
-      key: 'provider',
-    },
+  const tableHeaders = useMemo(
+    () => [
+      { header: t('dateAndTime', 'Date & time'), key: 'datetime' },
+      ...(showAllEncounters ? [{ header: t('visitType', 'Visit type'), key: 'visitType' }] : []),
+      { header: t('encounterType', 'Encounter type'), key: 'encounterType' },
+      { header: t('form', 'Form name'), key: 'formName' },
+      { header: t('provider', 'Provider'), key: 'provider' },
+    ],
+    [showAllEncounters, t],
   );
 
-  const tableRows = useMemo(() => {
-    return paginatedVisits?.map((encounter) => ({
-      ...encounter,
-      formName: encounter.form?.display ?? '--',
-      datetime: formatDatetime(parseDate(encounter.datetime)),
-    }));
-  }, [paginatedVisits]);
+  const tableRows = useMemo(
+    () =>
+      paginatedVisits?.map((encounter) => ({
+        ...encounter,
+        formName: encounter.form?.display ?? '--',
+        datetime: formatDatetime(parseDate(encounter.datetime)),
+      })),
+    [paginatedVisits],
+  );
 
-  const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem);
+  const handleEncounterTypeChange = useCallback(({ selectedItem }) => setFilter(selectedItem), []);
 
   const handleDeleteEncounter = React.useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
@@ -162,27 +154,45 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     },
     [t, mutateVisits],
   );
+  const handleFilter = useCallback(
+    ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> =>
+      rowIds.filter((rowId) =>
+        headers.some(({ key }) => {
+          const cellId = getCellId(rowId, key);
+          const filterableValue = cellsById[cellId].value;
+          const filterTerm = inputValue.toLowerCase();
 
-  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
-    return rowIds.filter((rowId) =>
-      headers.some(({ key }) => {
-        const cellId = getCellId(rowId, key);
-        const filterableValue = cellsById[cellId].value;
-        const filterTerm = inputValue.toLowerCase();
+          return ('' + filterableValue).toLowerCase().includes(filterTerm);
+        }),
+      ),
+    [],
+  );
 
-        return ('' + filterableValue).toLowerCase().includes(filterTerm);
-      }),
-    );
-  };
-
-  // All encounters tab in visits
   if (!visits?.length) {
     return (
       <EmptyState headerTitle={t('encounters', 'Encounters')} displayText={t('encounters__lower', 'encounters')} />
     );
   }
   const headerTitle = t('encountersCase', 'Case Management Encounters');
+  const forms = [
+    { id: 'high-iit-intervention', label: 'High IIT Intervention' },
+    { id: 'ccc-defaulter-tracing', label: 'CCC Defaulter Tracing' },
+    { id: 'cardex-nursing-plan', label: 'Cardex Nursing Plan' },
+  ];
 
+  const handleOpenOrEditDefaulterTracingForm = (encounterUUID = '') => {
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'Defaulter Tracing',
+      mutateForm: mutate,
+      formInfo: {
+        encounterUuid: encounterUUID,
+        formUuid: '',
+        patientUuid,
+        visitTypeUuid: '',
+        visitUuid: '',
+      },
+    });
+  };
   return (
     <DataTable
       filterRows={handleFilter}
@@ -228,6 +238,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                   onChange={onInputChange}
                   placeholder={t('searchThisList', 'Search this list')}
                 />
+                <div className={styles.filterContainer}>
+                  <Dropdown
+                    id="dropdown"
+                    items={forms}
+                    itemToString={(item) => (item ? item.label : '')}
+                    initialSelectedItem={useFormState[0]}
+                    label="Select forms"
+                    type="inline"
+                    size={desktopLayout ? 'sm' : 'lg'}
+                  />
+                </div>
               </TableToolbarContent>
             </TableToolbar>
             <Table {...getTableProps()}>
