@@ -9,3 +9,11 @@ export interface LabManifest {
   status: string;
   dispatch: string;
 }
+
+export interface LabManifestSample {
+  uuid: string;
+}
+
+export interface ActiveRequests {
+  uuid: String;
+}

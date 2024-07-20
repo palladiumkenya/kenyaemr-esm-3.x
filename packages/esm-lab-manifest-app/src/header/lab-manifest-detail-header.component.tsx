@@ -1,11 +1,10 @@
-import React from 'react';
-import { useLabManifest } from '../hooks';
-import styles from './lab-manifest-header.scss';
-import MetricsCard from '../metrics/lab-manifest-card.component';
-import { useTranslation } from 'react-i18next';
-import { Layers } from '@carbon/react/icons';
-import LabManifestIllustration from './lab-manifest-illustration.component';
 import { Button } from '@carbon/react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLabManifest } from '../hooks';
+import MetricsCard from '../metrics/lab-manifest-card.component';
+import styles from './lab-manifest-header.scss';
+import LabManifestIllustration from './lab-manifest-illustration.component';
 
 interface LabManifestDetailHeaderProps {
   manifestUuid: string;

@@ -1,4 +1,4 @@
-import { LabManifest } from './types';
+import { ActiveRequests, LabManifest, LabManifestSample } from './types';
 
 export const labManifest: LabManifest[] = [
   {
@@ -72,3 +72,7 @@ export const labManifest: LabManifest[] = [
     status: 'submitted',
   },
 ];
+
+export const labManifestSamples: LabManifestSample[] = [];
+
+export const activeRequests: ActiveRequests[] = [];
