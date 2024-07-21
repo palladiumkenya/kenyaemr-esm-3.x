@@ -14,15 +14,15 @@ import { useAllRelationshipTypes, useRelationships } from './relationships.resou
 
 const schema = z.object({
   relationship: z.string({ required_error: 'Relationship is required' }),
-  startDate: z.date({ required_error: 'Start Date is required' }),
+  startDate: z.date({ required_error: 'Start date is required' }),
   endDate: z.date().optional(),
   notes: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
 
-type FamilyRelationshipFormProps = {
+type RelationshipFormProps = {
   closeWorkspace: () => void;
-  personAUUID: string;
+  rootPersonUuid: string;
 };
 
 export const familyRelationshipTypes = [
@@ -62,7 +62,7 @@ const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWo
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     const payload = {
-      personA: personAUUID,
+      personA: rootPersonUuid,
       personB: relatedPersonUuid,
       relationshipType: data.relationship,
       startDate: data.startDate.toISOString(),
@@ -73,7 +73,7 @@ const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWo
       mutate(relationshipsUrl);
       showSnackbar({
         kind: 'success',
-        title: t('saveRlship', 'Save Relationship'),
+        title: t('saveRelationship', 'Save Relationship'),
         subtitle: t('savedRlship', 'Relationship saved successfully'),
         timeoutInMs: 3000,
         isLowContrast: true,
@@ -83,7 +83,7 @@ const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWo
     } catch (err) {
       showSnackbar({
         kind: 'error',
-        title: t('RlshipError', 'Relationship Error'),
+        title: t('relationshpError', 'Relationship Error'),
         subtitle: t('RlshipError', 'Request Failed.......'),
         timeoutInMs: 2500,
         isLowContrast: true,
@@ -91,8 +91,8 @@ const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWo
     }
   };
 
-  const selectPatient = (patientUuid: string) => {
-    setPatientUuid(patientUuid);
+  const selectPatient = (relatedPersonUuid: string) => {
+    setPatientUuid(relatedPersonUuid);
   };
 
   return (
@@ -183,7 +183,7 @@ const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWo
             name="notes"
             control={control}
             render={({ field }) => (
-              <TextArea labelText="Any additional notes" rows={4} id="case-manager-notes" {...field} />
+              <TextArea labelText={t('addiotionalNotes','Any additional notes')} rows={4} id="relationship-notes" {...field} />
             )}
           />
         </Column>
