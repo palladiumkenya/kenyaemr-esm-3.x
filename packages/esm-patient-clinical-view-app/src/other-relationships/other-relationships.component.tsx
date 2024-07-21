@@ -25,23 +25,23 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { useRelationships } from './relationships.resource';
-import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
-import styles from './family-history.scss';
+import styles from './other-relationships.scss';
+import { useRelationships } from '../family-partner-history/relationships.resource';
+import ConceptObservations from '../family-partner-history/concept-obs.component';
 
-interface FamilyHistoryProps {
+interface OtherRelationshipsProps {
   patientUuid: string;
 }
 
-const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
+export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const layout = useLayoutType();
   const { concepts } = config;
   const [pageSize, setPageSize] = useState(10);
   const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
-  const headerTitle = t('familyContacts', 'Family contacts');
+  const headerTitle = t('otherRelationships', 'Other Relationships');
   const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
@@ -73,8 +73,8 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   ];
 
   const handleAddHistory = () => {
-    launchWorkspace('family-relationship-form', {
-      workspaceTitle: 'Family Relationship Form',
+    launchWorkspace('other-relationship-form', {
+      workspaceTitle: 'Other Relationship Form',
       rootPersonUuid: patientUuid,
     });
   };
@@ -130,7 +130,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
             <h4>{headerTitle}</h4>
           </div>
           <EmptyDataIllustration />
-          <p className={styles.content}>There is no family history data to display for this patient.</p>
+          <p className={styles.content}>There is no other relationships data to display for this patient.</p>
           <Button onClick={handleAddHistory} renderIcon={Add} kind="ghost">
             {t('addRelationship', 'Add relationship')}
           </Button>
@@ -194,4 +194,3 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     </div>
   );
 };
-export default FamilyHistory;

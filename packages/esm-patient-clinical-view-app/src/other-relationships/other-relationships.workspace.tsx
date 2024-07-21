@@ -1,16 +1,17 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Column, TextArea, Form, Stack, ButtonSet, ComboBox, Button, DatePicker, DatePickerInput } from '@carbon/react';
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import styles from './family-relationship.scss';
+import styles from './other-relationships.scss';
 import { ExtensionSlot, showSnackbar } from '@openmrs/esm-framework';
 import { uppercaseText } from '../utils/expression-helper';
 import { saveRelationship } from '../case-management/workspace/case-management.resource';
 import PatientInfo from '../case-management/workspace/patient-info.component';
 import { mutate } from 'swr';
-import { useAllRelationshipTypes, useRelationships } from './relationships.resource';
+import { useAllRelationshipTypes, useRelationships } from '../family-partner-history/relationships.resource';
+import { familyRelationshipTypes } from '../family-partner-history/family-relationship.workspace';
 
 const schema = z.object({
   relationship: z.string({ required_error: 'Relationship is required' }),
@@ -20,24 +21,12 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-type RelationshipFormProps = {
+type OtherRelationshipsFormProps = {
   closeWorkspace: () => void;
   rootPersonUuid: string;
 };
 
-export const familyRelationshipTypes = [
-  'Sibling/Sibling',
-  'Parent/Child',
-  'Aunt/Uncle/Niece/Nephew',
-  'Guardian/Dependant',
-  'Spouse/Spouse',
-  'Partner/Partner',
-  'Co-wife/Co-wife',
-  'SNS/SNS',
-  'Injectable-drug-user/Injectable-druguser',
-];
-
-const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
+export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
   const { t } = useTranslation();
   const [relatedPersonUuid, setRelatedPersonUuid] = useState<string | undefined>(undefined);
   const { relationshipsUrl } = useRelationships(rootPersonUuid);
@@ -49,7 +38,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
         id: relationship.uuid,
         text: relationship.display,
       }))
-      .filter((r) => familyRelationshipTypes.includes(r.text)) || [];
+      .filter((r) => !familyRelationshipTypes.includes(r.text)) || [];
 
   const {
     control,
@@ -205,5 +194,3 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
     </Form>
   );
 };
-
-export default FamilyRelationshipForm;
