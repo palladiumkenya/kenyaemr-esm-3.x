@@ -63,7 +63,7 @@ const FamilyRelationshipForm: React.FC<FamilyRelationshipFormProps> = ({ closeWo
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     const payload = {
       personA: personAUUID,
-      personB: patientUuid,
+      personB: relatedPersonUuid,
       relationshipType: data.relationship,
       startDate: data.startDate.toISOString(),
       endDate: data.endDate ? data.endDate.toISOString() : null,
