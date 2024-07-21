@@ -29,6 +29,7 @@ import { useRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
+import { familyRelationshipTypes } from './family-relationship.workspace';
 
 interface FamilyHistoryProps {
   patientUuid: string;
@@ -41,8 +42,11 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const { concepts } = config;
   const [pageSize, setPageSize] = useState(10);
   const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
+
+  const familyRelationships = relationships.filter((r) => familyRelationshipTypes.includes(r.relationshipTypeDisplay));
+
   const headerTitle = t('familyContacts', 'Family contacts');
-  const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
+  const { results, totalPages, currentPage, goTo } = usePagination(familyRelationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const headers = [
@@ -122,7 +126,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (relationships.length === 0) {
+  if (familyRelationships.length === 0) {
     return (
       <Layer>
         <Tile className={styles.tile}>

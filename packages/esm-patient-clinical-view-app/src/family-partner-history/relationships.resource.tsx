@@ -17,6 +17,7 @@ interface ExtractedRelationship {
   causeOfDeath: string;
   relativeUuid: string;
   relationshipType: string;
+  relationshipTypeDisplay: string;
   patientUuid: string;
 }
 
@@ -129,6 +130,7 @@ function extractRelationshipData(
         causeOfDeath: r.personB.causeOfDeath,
         relativeUuid: r.personB.uuid,
         relationshipType: r.relationshipType.bIsToA,
+        relationshipTypeDisplay: r.relationshipType.display,
         patientUuid: r.personB.uuid,
       });
     } else {

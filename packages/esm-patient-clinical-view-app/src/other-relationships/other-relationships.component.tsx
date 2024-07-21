@@ -29,6 +29,7 @@ import type { ConfigObject } from '../config-schema';
 import styles from './other-relationships.scss';
 import { useRelationships } from '../family-partner-history/relationships.resource';
 import ConceptObservations from '../family-partner-history/concept-obs.component';
+import { familyRelationshipTypes } from '../family-partner-history/family-relationship.workspace';
 
 interface OtherRelationshipsProps {
   patientUuid: string;
@@ -41,8 +42,13 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
   const { concepts } = config;
   const [pageSize, setPageSize] = useState(10);
   const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
+
+  const nonFamilyRelationships = relationships.filter(
+    (r) => !familyRelationshipTypes.includes(r.relationshipTypeDisplay),
+  );
+
   const headerTitle = t('otherRelationships', 'Other Relationships');
-  const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
+  const { results, totalPages, currentPage, goTo } = usePagination(nonFamilyRelationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const headers = [
@@ -122,7 +128,7 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (relationships.length === 0) {
+  if (nonFamilyRelationships.length === 0) {
     return (
       <Layer>
         <Tile className={styles.tile}>
