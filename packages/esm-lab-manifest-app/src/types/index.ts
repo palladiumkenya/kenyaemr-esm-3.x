@@ -17,3 +17,15 @@ export interface LabManifestSample {
 export interface ActiveRequests {
   uuid: String;
 }
+
+export interface Constiuency {
+  name: string;
+  code: string;
+}
+
+export interface County {
+  name: string;
+  number: string;
+  capital: string;
+  constituencies: Constiuency[];
+}

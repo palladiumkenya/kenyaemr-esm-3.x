@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { LabManifestHeader } from '../header/lab-manifest-header.component';
 import LabManifestMetrics from '../metrics/lab-manifest-metrics.component';
-import { LabManifestTabs } from '../tabs/lab-manifest-tabs-component';
 import LabManifestsTable from '../tables/lab-manifest-table.component';
 
 const LabManifestComponent: React.FC = () => {
+  const { t } = useTranslation();
   return (
     <div className={`omrs-main-content`}>
-      <LabManifestHeader title={'Lab Manifest'} />
+      <LabManifestHeader title={t('labManifest', 'Lab Manifest')} />
       <LabManifestMetrics />
-      {/* <LabManifestTabs /> */}
       <LabManifestsTable />
     </div>
   );

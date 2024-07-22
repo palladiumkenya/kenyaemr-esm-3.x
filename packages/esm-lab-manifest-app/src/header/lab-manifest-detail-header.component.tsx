@@ -1,10 +1,10 @@
-import { Button } from '@carbon/react';
+import { Button, ButtonSet } from '@carbon/react';
+import { ArrowLeft, Edit } from '@carbon/react/icons';
+import { launchWorkspace, navigate } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
-import MetricsCard from '../metrics/lab-manifest-card.component';
 import styles from './lab-manifest-header.scss';
-import LabManifestIllustration from './lab-manifest-illustration.component';
 
 interface LabManifestDetailHeaderProps {
   manifestUuid: string;
@@ -13,10 +13,20 @@ interface LabManifestDetailHeaderProps {
 const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manifestUuid }) => {
   const { isLoading, manifest } = useLabManifest(manifestUuid);
   const { t } = useTranslation();
+
+  const handleGoBack = () => {
+    navigate({ to: window.getOpenmrsSpaBase() + `home/lab-manifest` });
+  };
+
+  const handleEditManifest = () => {
+    launchWorkspace('lab-manifest-form', {
+      workspaceTitle: 'Lab Manifest Form',
+      manifest,
+    });
+  };
   return (
     <div>
       <div className={styles.manifestDetailHeader}>
-        <LabManifestIllustration />
         <div className={styles.manifestDetailContent}>
           <div>
             <strong>Date:</strong>
@@ -33,22 +43,15 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
             {manifest.labPersonContact}
           </div>
         </div>
-        <div>
-          <Button>{t('editManifest', 'Edit Manifest')}</Button>
-        </div>
       </div>
-      <div className={styles.cardContainer} data-testid="clinic-metrics">
-        <MetricsCard
-          label={t('samples', 'Samples')}
-          value={'0'}
-          headerLabel={t('manifestSamples', 'Manifest samples')}
-        />
-        <MetricsCard
-          label={t('request', 'Requests')}
-          value={'0'}
-          headerLabel={t('activeRequests', 'Active Requests')}
-        />
-      </div>
+      <ButtonSet className={styles.btnSet}>
+        <Button kind="tertiary" renderIcon={ArrowLeft} onClick={handleGoBack}>
+          {t('back', 'Back')}
+        </Button>
+        <Button kind="tertiary" renderIcon={Edit} onClick={handleEditManifest}>
+          {t('editManifest', 'Edit Manifest')}
+        </Button>
+      </ButtonSet>
     </div>
   );
 };

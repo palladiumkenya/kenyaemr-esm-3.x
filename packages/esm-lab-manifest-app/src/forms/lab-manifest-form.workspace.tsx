@@ -15,11 +15,12 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { labManifestFormSchema, manifestTypes } from '../lab-manifest.resources';
+import { LabManifestFilters, labManifestFormSchema, manifestTypes } from '../lab-manifest.resources';
 import styles from './lab-manifest-form.scss';
+import { County, LabManifest } from '../types';
 interface LabManifestFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
-  props: any;
+  manifest?: LabManifest;
 }
 
 type ContactListFormType = z.infer<typeof labManifestFormSchema>;
@@ -28,15 +29,23 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
   promptBeforeClosing,
-  props,
+  manifest,
 }) => {
+  const counties = require('../counties.json') as County[];
   const form = useForm<ContactListFormType>({
-    defaultValues: {},
+    defaultValues: {
+      courierName: manifest?.courrier,
+      labPersonContact: manifest?.labPersonContact,
+      startDate: new Date(),
+      endDate: new Date(),
+      manifestStatus: manifest?.status,
+      dispatchDate: new Date(),
+    },
     resolver: zodResolver(labManifestFormSchema),
   });
   const { t } = useTranslation();
   const session = useSession();
-
+  const observableSelectedCounty = form.watch('county');
   const onSubmit = async (values: ContactListFormType) => {};
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -98,8 +107,8 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
                 ref={field.ref}
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
-                id="maritalStatus"
-                titleText={t('maritalStatus', 'Marital status')}
+                id="manifestType"
+                titleText={t('manifestType', 'Manifest Type')}
                 onChange={(e) => {
                   field.onChange(e.selectedItem);
                 }}
@@ -180,11 +189,13 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
                 titleText={t('county', 'County')}
                 onChange={(e) => {
                   field.onChange(e.selectedItem);
+                  form.setValue('subCounty', undefined);
+                  // form.resetField("subCounty")
                 }}
                 initialSelectedItem={field.value}
-                label="Choose option"
-                items={[].map((r) => r.value)}
-                itemToString={(item) => [].find((r) => r.value === item)?.label ?? ''}
+                label="Select county"
+                items={counties.map((r) => r.name)}
+                itemToString={(item) => item ?? ''}
               />
             )}
           />
@@ -200,13 +211,19 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
                 invalidText={form.formState.errors[field.name]?.message}
                 id="subCounty"
                 titleText={t('subCounty', 'Sub county')}
+                initialSelectedItem={field.value}
                 onChange={(e) => {
                   field.onChange(e.selectedItem);
                 }}
-                initialSelectedItem={field.value}
-                label="Choose option"
-                items={[].map((r) => r.value)}
-                itemToString={(item) => [].find((r) => r.value === item)?.label ?? ''}
+                label="Select subcounty"
+                items={(counties.find((c) => c.name == observableSelectedCounty)?.constituencies ?? []).map(
+                  (r) => r.name,
+                )}
+                itemToString={(item) =>
+                  (counties.find((c) => c.name == observableSelectedCounty)?.constituencies ?? []).find(
+                    (c) => c.name === item,
+                  )?.name ?? 'Select subcounty'
+                }
               />
             )}
           />
@@ -303,8 +320,8 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
                 }}
                 initialSelectedItem={field.value}
                 label="Select status"
-                items={[].map((r) => r.uuid)}
-                itemToString={(item) => [].find((r) => r.uuid === item)?.displayAIsToB ?? ''}
+                items={LabManifestFilters.map((r) => r.value)}
+                itemToString={(item) => LabManifestFilters.find((r) => r.value === item)?.label ?? ''}
               />
             )}
           />

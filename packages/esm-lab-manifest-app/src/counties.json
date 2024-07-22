@@ -1,0 +1,1494 @@
+[
+    {
+        "name": "Mombasa",
+        "number": "1",
+        "capital": "Mombasa City",
+        "constituencies": [
+            {
+                "name":"Changamwe",
+                "code": "1"
+            },
+            {
+                "name": "Jomvu",
+                "code": "2"
+            },
+            {
+                "name": "Kisauni",
+                "code": "3"
+            },
+            {
+                "name": "Nyali",
+                "code": "4"
+            },
+            {
+                "name": "Likoni",
+                "code": "5"
+            },
+            {
+                "name": "Mvita",
+                "code": "6"
+            }
+        ]
+    },
+    {
+        "name": "Kwale",
+        "number": "2",
+        "capital": "Kwale",
+        "constituencies": [
+            {
+                "name":"Msambweni",
+                "code": "7"
+            },
+            {
+                "name": "Lunga Lunga",
+                "code": "8"
+            },
+            {
+                "name": "Matuga",
+                "code": "9"
+            },
+            {
+                "name": "Kinango",
+                "code": "10"
+            }
+        ]
+    },
+    {
+        "name": "Kilifi",
+        "number": "3",
+        "capital": "Kilifi",
+        "constituencies": [
+            {
+                "name":"Kilifi North",
+                "code": "11"
+            },
+            {
+                "name": "Kilifi South",
+                "code": "12"
+            },
+            {
+                "name": "Kaloleni",
+                "code": "13"
+            },
+            {
+                "name": "Rabai",
+                "code": "14"
+            },
+            {
+                "name": "Ganze",
+                "code": "15"
+            },
+            {
+                "name": "Malindi",
+                "code": "16"
+            },
+            {
+                "name": "Magarini",
+                "code": "17"
+            }
+        ]
+    },
+    {
+        "name": "Tana River",
+        "number": "4",
+        "capital": "Hola",
+        "constituencies": [
+            {
+                "name":"Garsen",
+                "code": "18"
+            },
+            {
+                "name": "Galole",
+                "code": "19"
+            },
+            {
+                "name": "Bura",
+                "code": "20"
+            }
+        ]
+    },
+    {
+        "name": "Lamu",
+        "number": "5",
+        "capital": "Lamu",
+        "constituencies": [
+            {
+                "name":"Lamu East",
+                "code": "21"
+            },
+            {
+                "name": "Lamu West",
+                "code": "22"
+            }
+        ]
+    },
+    {
+        "name": "Taita Taveta",
+        "number": "6",
+        "capital": "Mwatate",
+        "constituencies": [
+            {
+                "name":"Taveta",
+                "code": "23"
+            },
+            {
+                "name": "Wundanyi",
+                "code": "24"
+            },
+            {
+                "name": "Mwatate",
+                "code": "25"
+            },
+            {
+                "name": "Voi",
+                "code": "26"
+            }
+        ]
+    },
+    {
+        "name": "Garissa",
+        "number": "7",
+        "capital": "Garissa",
+        "constituencies": [
+            {
+                "name":"Garissa Township",
+                "code": "27"
+            },
+            {
+                "name": "Balambala",
+                "code": "28"
+            },
+            {
+                "name": "Lagdera",
+                "code": "29"
+            },
+            {
+                "name": "Dadaab",
+                "code": "30"
+            },
+            {
+                "name": "Fafi",
+                "code": "31"
+            },
+            {
+                "name": "Ijara",
+                "code": "32"
+            }
+        ]
+    },
+    {
+        "name": "Wajir",
+        "number": "8",
+        "capital": "Wajir",
+        "constituencies": [
+            {
+                "name":"Wajir North",
+                "code": "33"
+            },
+            {
+                "name": "Wajir East",
+                "code": "34"
+            },
+            {
+                "name": "Tarbaj",
+                "code": "35"
+            },
+            {
+                "name": "Wajir West",
+                "code": "36"
+            },
+            {
+                "name": "Eldas",
+                "code": "37"
+            },
+            {
+                "name": "Wajir South",
+                "code": "38"
+            }
+        ]
+    },
+    {
+        "name": "Mandera",
+        "number": "9",
+        "capital": "Mandera",
+        "constituencies": [
+            {
+                "name":"Mandera West",
+                "code": "39"
+            },
+            {
+                "name": "Banissa",
+                "code": "40"
+            },
+            {
+                "name": "Mandera North",
+                "code": "41"
+            },
+            {
+                "name": "Mandera South",
+                "code": "42"
+            },
+            {
+                "name": "Mandera East",
+                "code": "43"
+            },
+            {
+                "name": "Lafey",
+                "code": "44"
+            }
+        ]
+    },
+    {
+        "name": "Marsabit",
+        "number": "10",
+        "capital": "Marsabit",
+        "constituencies": [
+            {
+                "name":"Moyale",
+                "code": "45"
+            },
+            {
+                "name": "North Horr",
+                "code": "46"
+            },
+            {
+                "name": "Saku",
+                "code": "47"
+            },
+            {
+                "name": "Laisamis",
+                "code": "48"
+            }
+        ]
+    },
+    {
+        "name": "Isiolo",
+        "number": "11",
+        "capital": "Isiolo",
+        "constituencies": [
+            {
+                "name":"Isiolo North",
+                "code": "49"
+            },
+            {
+                "name": "Isiolo South",
+                "code": "50"
+            }
+        ]
+    },
+    {
+        "name": "Meru",
+        "number": "12",
+        "capital": "Meru",
+        "constituencies": [
+            {
+                "name":"Igembe South",
+                "code": "51"
+            },
+            {
+                "name": "Igembe Central",
+                "code": "52"
+            },
+            {
+                "name": "Igembe North",
+                "code": "53"
+            },
+            {
+                "name": "Tigania West",
+                "code": "54"
+            },
+            {
+                "name": "Tigania East",
+                "code": "55"
+            },
+            {
+                "name": "North Imenti",
+                "code": "56"
+            },
+            {
+                "name": "Buuri",
+                "code": "57"
+            },
+            {
+                "name": "Central Imenti",
+                "code": "58"
+            },
+            {
+                "name": "South Imenti",
+                "code": "59"
+            }
+        ]
+    },
+    {
+        "name": "Tharaka-Nithi",
+        "number": "13",
+        "capital": "Chuka",
+        "constituencies": [
+            {
+                "name":"Maara",
+                "code": "60"
+            },
+            {
+                "name": "Chuka",
+                "code": "61"
+            },
+            {
+                "name": "Tharaka",
+                "code": "62"
+            }
+        ]
+    },
+    {
+        "name": "Embu",
+        "number": "14",
+        "capital": "Embu",
+        "constituencies": [
+            {
+                "name":"Manyatta",
+                "code": "63"
+            },
+            {
+                "name": "Runyenjes",
+                "code": "64"
+            },
+            {
+                "name": "Mbeere South",
+                "code": "65"
+            },
+            {
+                "name": "Mbeere North",
+                "code": "66"
+            }
+        ]
+    },
+    {
+        "name": "Kitui",
+        "number": "15",
+        "capital": "Kitui",
+        "constituencies": [
+            {
+                "name":"Mwingi North",
+                "code": "67"
+            },
+            {
+                "name": "Mwingi West",
+                "code": "68"
+            },
+            {
+                "name": "Mwingi Central",
+                "code": "69"
+            },
+            {
+                "name": "Kitui West",
+                "code": "70"
+            },
+            {
+                "name": "Kitui Rural",
+                "code": "71"
+            },
+            {
+                "name": "Kitui Central",
+                "code": "72"
+            },
+            {
+                "name": "Kitui East",
+                "code": "73"
+            },
+            {
+                "name": "Kitui South",
+                "code": "74"
+            }
+        ]
+    },
+    {
+        "name": "Machakos",
+        "number": "16",
+        "capital": "Machakos",
+        "constituencies": [
+            {
+                "name":"Masinga",
+                "code": "75"
+            },
+            {
+                "name": "Yatta",
+                "code": "76"
+            },
+            {
+                "name": "Kangundo",
+                "code": "77"
+            },
+            {
+                "name": "Matungulu",
+                "code": "78"
+            },
+            {
+                "name": "Kathiani",
+                "code": "79"
+            },
+            {
+                "name": "Mavoko",
+                "code": "80"
+            },
+            {
+                "name": "Machakos Town",
+                "code": "81"
+            },
+            {
+                "name": "Mwala",
+                "code": "82"
+            }
+        ]
+    },
+    {
+        "name": "Makueni",
+        "number": "17",
+        "capital": "Wote",
+        "constituencies": [
+            {
+                "name":"Mbooni",
+                "code": "83"
+            },
+            {
+                "name": "Kilome",
+                "code": "84"
+            },
+            {
+                "name": "Kaiti",
+                "code": "85"
+            },
+            {
+                "name": "Makueni",
+                "code": "86"
+            },
+            {
+                "name": "Kibwezi West",
+                "code": "87"
+            },
+            {
+                "name": "Kibwezi East",
+                "code": "88"
+            }
+        ]
+    },
+    {
+        "name": "Nyandarua",
+        "number": "18",
+        "capital": "Ol kalou",
+        "constituencies": [
+            {
+                "name":"Kinangop",
+                "code": "89"
+            },
+            {
+                "name": "Kipipiri",
+                "code": "90"
+            },
+            {
+                "name": "Ol kalou",
+                "code": "91"
+            },
+            {
+                "name": "Ol Jorok",
+                "code": "92"
+            },
+            {
+                "name": "Ndaragwa",
+                "code": "93"
+            }
+        ]
+    },
+    {
+        "name": "Nyeri",
+        "number": "19",
+        "capital": "Nyeri",
+        "constituencies": [
+            {
+                "name":"Tetu",
+                "code": "94"
+            },
+            {
+                "name": "Kieni",
+                "code": "95"
+            },
+            {
+                "name": "Mathira",
+                "code": "96"
+            },
+            {
+                "name": "Othaya",
+                "code": "97"
+            },
+            {
+                "name": "Mukurweini",
+                "code": "98"
+            },
+            {
+                "name": "Nyeri Town",
+                "code": "99"
+            }
+        ]
+    },
+    {
+        "name": "Kirinyaga",
+        "number": "20",
+        "capital": "Kutus",
+        "constituencies": [
+            {
+                "name":"Mwea",
+                "code": "100"
+            },
+            {
+                "name": "Gichugu",
+                "code": "101"
+            },
+            {
+                "name": "Ndia",
+                "code": "102"
+            },
+            {
+                "name": "Kirinyaga Central",
+                "code": "103"
+            }
+        ]
+    },
+    {
+        "name": "Murang'a",
+        "number": "21",
+        "capital": "Murang'a",
+        "constituencies": [
+            {
+                "name":"Kangema",
+                "code": "104"
+            },
+            {
+                "name": "Mathioya",
+                "code": "105"
+            },
+            {
+                "name": "Kiharu",
+                "code": "106"
+            },
+            {
+                "name": "Kigumo",
+                "code": "107"
+            },
+            {
+                "name": "Maragwa",
+                "code": "108"
+            },
+            {
+                "name": "Kandara",
+                "code": "109"
+            },
+            {
+                "name": "Gatanga",
+                "code": "110"
+            }
+        ]
+    },
+    {
+        "name": "Kiambu",
+        "number": "22",
+        "capital": "Kiambu",
+        "constituencies": [
+            {
+                "name":"Gatundu South",
+                "code": "111"
+            },
+            {
+                "name": "Gatundu North",
+                "code": "112"
+            },
+            {
+                "name": "Juja",
+                "code": "113"
+            },
+            {
+                "name": "Thika Town",
+                "code": "114"
+            },
+            {
+                "name": "Ruiru",
+                "code": "115"
+            },
+            {
+                "name": "Githunguri",
+                "code": "116"
+            },
+            {
+                "name": "Kiambu",
+                "code": "117"
+            },
+            {
+                "name": "Kiambaa",
+                "code": "118"
+            },
+            {
+                "name": "Kabete",
+                "code": "119"
+            },
+            {
+                "name": "Kikuyu",
+                "code": "120"
+            },
+            {
+                "name": "Limuru",
+                "code": "121"
+            },
+            {
+                "name": "Lari",
+                "code": "122"
+            }
+        ]
+    },
+    {
+        "name": "Turkana",
+        "number": "23",
+        "capital": "Lodwar",
+        "constituencies": [
+            {
+                "name":"Turkana North",
+                "code": "123"
+            },
+            {
+                "name": "Turkana West",
+                "code": "124"
+            },
+            {
+                "name": "Turkana Central",
+                "code": "125"
+            },
+            {
+                "name": "Loima",
+                "code": "126"
+            },
+            {
+                "name": "Turkana South",
+                "code": "127"
+            },
+            {
+                "name": "Turkana East",
+                "code": "128"
+            }
+        ]
+    },
+    {
+        "name": "West Pokot",
+        "number": "24",
+        "capital": "Kapenguria",
+        "constituencies": [
+            {
+                "name":"Kapenguria",
+                "code": "129"
+            },
+            {
+                "name": "Sigor",
+                "code": "130"
+            },
+            {
+                "name": "Kacheliba",
+                "code": "131"
+            },
+            {
+                "name": "Pokot South",
+                "code": "132"
+            }
+        ]
+    },
+
+    {
+        "name": "Samburu",
+        "number": "25",
+        "capital": "Maralal",
+        "constituencies": [
+            {
+                "name":"Samburu West",
+                "code": "133"
+            },
+            {
+                "name": "Samburu North",
+                "code": "134"
+            },
+            {
+                "name": "Samburu East",
+                "code": "135"
+            }
+        ]
+    },
+    {
+        "name": "Trans-Nzoia",
+        "number": "26",
+        "capital": "Kitale",
+        "constituencies": [
+            {
+                "name":"Kwanza",
+                "code": "136"
+            },
+            {
+                "name": "Endebess",
+                "code": "137"
+            },
+            {
+                "name": "Saboti",
+                "code": "138"
+            },
+            {
+                "name": "Kiminini",
+                "code": "139"
+            },
+            {
+                "name": "Cherangany",
+                "code": "140"
+            }
+        ]
+    },
+    {
+        "name": "Uasin Gishu",
+        "number": "27",
+        "capital": "Eldoret",
+        "constituencies": [
+            {
+                "name":"Soy",
+                "code": "141"
+            },
+            {
+                "name": "Turbo",
+                "code": "142"
+            },
+            {
+                "name": "Moiben",
+                "code": "143"
+            },
+            {
+                "name": "Ainabkoi",
+                "code": "144"
+            },
+            {
+                "name": "Kapseret",
+                "code": "145"
+            },
+            {
+                "name": "Kesses",
+                "code": "146"
+            }
+        ]
+    },
+    {
+        "name": "Elgeyo-Marakwet",
+        "number": "28",
+        "capital": "Iten",
+        "constituencies": [
+            {
+                "name":"Marakwet East",
+                "code": "147"
+            },
+            {
+                "name": "Marakwet West",
+                "code": "148"
+            },
+            {
+                "name": "Keiyo North",
+                "code": "149"
+            },
+            {
+                "name": "Keiyo South",
+                "code": "150"
+            }
+        ]
+    },
+    {
+        "name": "Nandi",
+        "number": "29",
+        "capital": "Kapsabet",
+        "constituencies": [
+            {
+                "name":"Tinderet",
+                "code": "151"
+            },
+            {
+                "name": "Aldai",
+                "code": "152"
+            },
+            {
+                "name": "Nandi Hiils",
+                "code": "153"
+            },
+            {
+                "name": "Chesumei",
+                "code": "154"
+            },
+            {
+                "name": "Emgwen",
+                "code": "155"
+            },
+            {
+                "name": "Mosop",
+                "code": "156"
+            }
+        ]
+    },
+    {
+        "name": "Baringo",
+        "number": "30",
+        "capital": "Kabarnet",
+        "constituencies": [
+            {
+                "name":"Tiaty",
+                "code": "157"
+            },
+            {
+                "name": "Baringo North",
+                "code": "158"
+            },
+            {
+                "name": "Baringo Central",
+                "code": "159"
+            },
+            {
+                "name": "Baringo South",
+                "code": "160"
+            },
+            {
+                "name": "Mogotio",
+                "code": "161"
+            },
+            {
+                "name": "Eldama Ravine",
+                "code": "162"
+            }
+        ]
+    },
+    {
+        "name": "Laikipia",
+        "number": "31",
+        "capital": "Rumuruti",
+        "constituencies": [
+            {
+                "name":"Laikipia West",
+                "code": "163"
+            },
+            {
+                "name": "Laikipia East",
+                "code": "164"
+            },
+            {
+                "name": "Laikipia North",
+                "code": "165"
+            }
+        ]
+    },
+    {
+        "name": "Nakuru",
+        "number": "32",
+        "capital": "Nakuru",
+        "constituencies": [
+            {
+                "name":"Molo",
+                "code": "166"
+            },
+            {
+                "name": "Njoro",
+                "code": "167"
+            },
+            {
+                "name": "Naivasha",
+                "code": "168"
+            },
+            {
+                "name": "Gilgil",
+                "code": "169"
+            },
+            {
+                "name": "Kuresoi South",
+                "code": "170"
+            },
+            {
+                "name": "Kuresoi North",
+                "code": "171"
+            },
+            {
+                "name": "Subukia",
+                "code": "172"
+            },
+            {
+                "name": "Rongai",
+                "code": "173"
+            },
+            {
+                "name": "Bahati",
+                "code": "174"
+            },
+            {
+                "name": "Nakuru Town West",
+                "code": "175"
+            },
+            {
+
+                "name": "Nakuru Town East",
+                "code": "176"
+            }
+        ]
+    },
+    {
+        "name": "Narok",
+        "number": "33",
+        "capital": "Narok",
+        "constituencies": [
+            {
+                "name":"Kilgoris",
+                "code": "177"
+            },
+            {
+                "name": "Emurua Dikirr",
+                "code": "178"
+            },
+            {
+                "name": "Narok North",
+                "code": "179"
+            },
+            {
+                "name": "Narok East",
+                "code": "180"
+            },
+            {
+                "name": "Narok South",
+                "code": "181"
+            },
+            {
+                "name": "Narok West",
+                "code": "182"
+            }
+        ]
+    },
+    {
+        "name": "Kajiado",
+        "number": "34",
+        "capital": "Kajiado",
+        "constituencies": [
+            {
+                "name":"Kajiado North",
+                "code": "183"
+            },
+            {
+                "name": "Kajiado Central",
+                "code": "184"
+            },
+            {
+                "name": "Kajiado East",
+                "code": "185"
+            },
+            {
+                "name": "Kajiado West",
+                "code": "186"
+            },
+            {
+                "name": "Kajiado South",
+                "code": "187"
+            }
+        ]
+    },
+    {
+        "name": "Kericho",
+        "number": "35",
+        "capital": "Kericho",
+        "constituencies": [
+            {
+                "name":"Kipkelion East",
+                "code": "188"
+            },
+            {
+                "name": "Kipkelion West",
+                "code": "189"
+            },
+            {
+                "name": "Ainamoi",
+                "code": "190"
+            },
+            {
+                "name": "Bureti",
+                "code": "191"
+            },
+            {
+                "name": "Belgut",
+                "code": "192"
+            },
+            {
+                "name": "Sigowet-Soin",
+                "code": "193"
+            }
+        ]
+    },
+    {
+        "name": "Bomet",
+        "number": "36",
+        "capital": "Bomet",
+        "constituencies": [
+            {
+                "name":"Sotik",
+                "code": "194"
+            },
+            {
+                "name": "Chepalungu",
+                "code": "195"
+            },
+            {
+                "name": "Bomet East",
+                "code": "196"
+            },
+            {
+                "name": "Bomet Central",
+                "code": "197"
+            },
+            {
+                "name": "Konoin",
+                "code": "198"
+            }
+        ]
+    },
+    {
+        "name": "Kakamega",
+        "number": "37",
+        "capital": "Kakamega",
+        "constituencies": [
+            {
+                "name":"Lugari",
+                "code": "199"
+            },
+            {
+                "name": "Likuyani",
+                "code": "200"
+            },
+            {
+                "name": "Malava",
+                "code": "201"
+            },
+            {
+                "name": "Lurambi",
+                "code": "202"
+            },
+            {
+                "name": "Navakholo",
+                "code": "203"
+            },
+            {
+                "name": "Mumias West",
+                "code": "204"
+            },
+            {
+                "name": "Mumias East",
+                "code": "205"
+            },
+            {
+                "name": "Matungu",
+                "code": "206"
+            },
+            {
+                "name": "Butere",
+                "code": "207"
+            },
+            {
+                "name": "Khwisero",
+                "code": "208"
+            },
+            {
+                "name": "Shinyalu",
+                "code": "209"
+            },
+            {
+                "name": "Ikolomani",
+                "code": "210"
+            }
+        ]
+    },
+    {
+        "name": "Vihiga",
+        "number": "38",
+        "capital": "Mbale",
+        "constituencies": [
+            {
+                "name":"Vihiga",
+                "code": "211"
+            },
+            {
+                "name": "Sabatia",
+                "code": "212"
+            },
+            {
+                "name": "Hamisi",
+                "code": "213"
+            },
+            {
+                "name": "Luanda",
+                "code": "214"
+            },
+            {
+                "name": "Emuhaya",
+                "code": "215"
+            }
+        ]
+    },
+    {
+        "name": "Bungoma",
+        "number": "39",
+        "capital": "Bungoma",
+        "constituencies": [
+            {
+                "name":"Mount Elgon",
+                "code": "216"
+            },
+            {
+                "name": "Sirisia",
+                "code": "217"
+            },
+            {
+                "name": "Kabuchai",
+                "code": "218"
+            },
+            {
+                "name": "Bumula",
+                "code": "219"
+            },
+            {
+                "name": "Kanduyi",
+                "code": "220"
+            },
+            {
+                "name": "Webuye East",
+                "code": "221"
+            },
+            {
+                "name": "Webuye West",
+                "code": "222"
+            },
+            {
+                "name": "Kimilili",
+                "code": "223"
+            },
+            {
+                "name": "Tongaren",
+                "code": "224"
+            }
+        ]
+    },
+    {
+        "name": "Busia",
+        "number": "40",
+        "capital": "Busia",
+        "constituencies": [
+            {
+                "name":"Teso North",
+                "code": "225"
+            },
+            {
+                "name": "Teso South",
+                "code": "226"
+            },
+            {
+                "name": "Nambale",
+                "code": "227"
+            },
+            {
+                "name": "Matayos",
+                "code": "228"
+            },
+            {
+                "name": "Butula",
+                "code": "229"
+            },
+            {
+                "name": "Funyula",
+                "code": "230"
+            },
+            {
+                "name": "Budalangi",
+                "code": "231"
+            }
+        ]
+    },
+    {
+        "name": "Siaya",
+        "number": "41",
+        "capital": "Siaya",
+        "constituencies": [
+            {
+                "name":"Ugenya",
+                "code": "232"
+            },
+            {
+                "name": "Ugunja",
+                "code": "233"
+            },
+            {
+                "name": "Alego Usonga",
+                "code": "234"
+            },
+            {
+                "name": "Gem",
+                "code": "235"
+            },
+            {
+                "name": "Bondo",
+                "code": "236"
+            },
+            {
+                "name": "Rarieda",
+                "code": "237"
+            }
+        ]
+    },
+    {
+        "name": "Kisumu",
+        "number": "42",
+        "capital": "Kisumu",
+        "constituencies": [
+            {
+                "name":"Kisumu East",
+                "code": "238"
+            },
+            {
+                "name": "Kisumu West",
+                "code": "239"
+            },
+            {
+                "name": "Kisumu Central",
+                "code": "240"
+            },
+            {
+                "name": "Seme",
+                "code": "241"
+            },
+            {
+                "name": "Nyando",
+                "code": "242"
+            },
+            {
+                "name": "Muhoroni",
+                "code": "243"
+            },
+            {
+                "name": "Nyakach",
+                "code": "244"
+            }
+        ]
+    },
+    {
+        "name": "Homa Bay",
+        "number": "43",
+        "capital": "Homa Bay",
+        "constituencies": [
+            {
+                "name":"Kasipul",
+                "code": "245"
+            },
+            {
+                "name": "Kabondo Kasipul",
+                "code": "246"
+            },
+            {
+                "name": "Karachuonyo",
+                "code": "247"
+            },
+            {
+                "name": "Rangwe",
+                "code": "248"
+            },
+            {
+                "name": "Homa Bay Town",
+                "code": "249"
+            },
+            {
+                "name": "Ndhiwa",
+                "code": "250"
+            },
+            {
+                "name": "Mbita",
+                "code": "251"
+            },
+            {
+                "name": "Suba",
+                "code": "252"
+            }
+        ]
+    },
+    {
+        "name": "Migori",
+        "number": "44",
+        "capital": "Migori",
+        "constituencies": [
+            {
+                "name":"Rongo",
+                "code": "253"
+            },
+            {
+                "name": "Awendo",
+                "code": "254"
+            },
+            {
+                "name": "Suna East",
+                "code": "255"
+            },
+            {
+                "name": "Suna West",
+                "code": "256"
+            },
+            {
+                "name": "Uriri",
+                "code": "257"
+            },
+            {
+                "name": "Nyatike",
+                "code": "258"
+            },
+            {
+                "name": "Kuria West",
+                "code": "259"
+            },
+            {
+                "name": "Kuria East",
+                "code": "260"
+            }
+        ]
+    },
+    {
+        "name": "Kisii",
+        "number": "45",
+        "capital": "Kisii",
+        "constituencies": [
+            {
+                "name":"Bonchari",
+                "code": "261"
+            },
+            {
+                "name": "South Mugirango",
+                "code": "262"
+            },
+            {
+                "name": "Bomachoge Borabu",
+                "code": "263"
+            },
+            {
+                "name": "Bobasi",
+                "code": "264"
+            },
+            {
+                "name": "Bomachoge Chache",
+                "code": "265"
+            },
+            {
+                "name": "Nyaribari Masaba",
+                "code": "266"
+            },
+            {
+                "name": "Nyaibari Chache",
+                "code": "267"
+            },
+            {
+                "name": "Kitutu Chache North",
+                "code": "268"
+            },
+            {
+                "name": "Kitutu Chache South",
+                "code": "269"
+            }
+        ]
+    },
+    {
+        "name": "Nyamira",
+        "number": "46",
+        "capital": "Nyamira",
+        "constituencies": [
+            {
+                "name":"Kitutu Masaba",
+                "code": "270"
+            },
+            {
+                "name": "West Mugirango",
+                "code": "271"
+            },
+            {
+                "name": "North Mugirango",
+                "code": "272"
+            },
+            {
+                "name": "Borabu",
+                "code": "273"
+            }
+        ]
+    },
+    {
+        "name": "Nairobi",
+        "number": "47",
+        "capital": "Nairobi City",
+        "constituencies": [
+            {
+                "name":"Westlands",
+                "code": "274"
+            },
+            {
+                "name": "Dagoretti North",
+                "code": "275"
+            },
+            {
+                "name": "Dagoretti South",
+                "code": "276"
+            },
+            {
+                "name": "Lang'ata",
+                "code": "277"
+            },
+            {
+                "name": "Kibra",
+                "code": "278"
+            },
+            {
+                "name": "Roysambu",
+                "code": "279"
+            },
+            {
+                "name": "Kasarani",
+                "code": "280"
+            },
+            {
+                "name": "Ruaraka",
+                "code": "281"
+            },
+            {
+                "name": "Embakasi South",
+                "code": "282"
+            },
+            {
+                "name": "Embakasi North",
+                "code": "283"
+            },
+            {
+                "name": "Embakasi Central",
+                "code": "284"
+            },
+            {
+                "name": "Embakasi East",
+                "code": "285"
+            },
+            {
+                "name": " Embakasi West",
+                "code": "286"
+            },
+            {
+                "name": "Makadara",
+                "code": "287"
+            },
+            {
+                "name": " Kamukunji",
+                "code": "288"
+            },
+            {
+                "name": "Starehe",
+                "code": "289"
+            },
+            {
+                "name": "Mathare",
+                "code": "290"
+            }
+        ]
+    }
+
+]
