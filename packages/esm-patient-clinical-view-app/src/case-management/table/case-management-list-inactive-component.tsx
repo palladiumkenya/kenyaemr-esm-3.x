@@ -40,11 +40,10 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
 
   const headers = [
-    { key: 'sno', header: t('s/No', 'S/No') },
+    { key: 'sno' },
     { key: 'names', header: t('names', 'Names') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
-    { key: 'action', header: t('action', 'Action') },
   ];
 
   const filteredCases = inactiveCasesData?.data.results.filter(
@@ -69,11 +68,6 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
       ),
       dateofstart: new Date(caseData.startDate).toLocaleDateString(),
       dateofend: new Date(caseData.endDate).toLocaleDateString(),
-      action: (
-        <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
-          {/* <OverflowMenuItem itemText="Transfer Case" /> */}
-        </OverflowMenu>
-      ),
     }));
 
   useEffect(() => {

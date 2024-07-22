@@ -44,7 +44,6 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
     { key: 'names', header: t('names', 'Names') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
-    { key: 'action', header: t('action', 'Action') },
   ];
 
   const filteredCases = activeCasesData?.data.results.filter(
