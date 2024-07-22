@@ -5,13 +5,13 @@ import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import styles from './other-relationships.scss';
-import { ExtensionSlot, showSnackbar } from '@openmrs/esm-framework';
+import { ExtensionSlot, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { uppercaseText } from '../utils/expression-helper';
 import { saveRelationship } from '../case-management/workspace/case-management.resource';
 import PatientInfo from '../case-management/workspace/patient-info.component';
 import { mutate } from 'swr';
 import { useAllRelationshipTypes, useRelationships } from '../family-partner-history/relationships.resource';
-import { familyRelationshipTypes } from '../family-partner-history/family-relationship.workspace';
+import { ConfigObject } from '../config-schema';
 
 const schema = z.object({
   relationship: z.string({ required_error: 'Relationship is required' }),
@@ -31,6 +31,8 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
   const [relatedPersonUuid, setRelatedPersonUuid] = useState<string | undefined>(undefined);
   const { relationshipsUrl } = useRelationships(rootPersonUuid);
   const { data: relationshipTypesData } = useAllRelationshipTypes();
+  const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
+  const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
 
   const relationshipTypes =
     relationshipTypesData?.data.results
@@ -38,7 +40,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
         id: relationship.uuid,
         text: relationship.display,
       }))
-      .filter((r) => !familyRelationshipTypes.includes(r.text)) || [];
+      .filter((r) => !familyRelationshipTypeUUIDs.has(r.id)) || [];
 
   const {
     control,
@@ -57,6 +59,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
       startDate: data.startDate.toISOString(),
       endDate: data.endDate ? data.endDate.toISOString() : null,
     };
+
     try {
       await saveRelationship(payload);
       mutate(relationshipsUrl);

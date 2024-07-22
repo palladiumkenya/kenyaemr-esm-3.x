@@ -18,6 +18,7 @@ interface ExtractedRelationship {
   relativeUuid: string;
   relationshipType: string;
   relationshipTypeDisplay: string;
+  relationshipTypeUUID: string;
   patientUuid: string;
 }
 
@@ -131,6 +132,7 @@ function extractRelationshipData(
         relativeUuid: r.personB.uuid,
         relationshipType: r.relationshipType.bIsToA,
         relationshipTypeDisplay: r.relationshipType.display,
+        relationshipTypeUUID: r.relationshipType.uuid,
         patientUuid: r.personB.uuid,
       });
     } else {

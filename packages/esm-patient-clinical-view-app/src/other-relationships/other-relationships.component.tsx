@@ -29,7 +29,6 @@ import type { ConfigObject } from '../config-schema';
 import styles from './other-relationships.scss';
 import { useRelationships } from '../family-partner-history/relationships.resource';
 import ConceptObservations from '../family-partner-history/concept-obs.component';
-import { familyRelationshipTypes } from '../family-partner-history/family-relationship.workspace';
 
 interface OtherRelationshipsProps {
   patientUuid: string;
@@ -39,13 +38,12 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const layout = useLayoutType();
-  const { concepts } = config;
+  const { concepts, familyRelationshipsTypeList } = config;
   const [pageSize, setPageSize] = useState(10);
-  const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
 
-  const nonFamilyRelationships = relationships.filter(
-    (r) => !familyRelationshipTypes.includes(r.relationshipTypeDisplay),
-  );
+  const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
+  const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
+  const nonFamilyRelationships = relationships.filter((r) => !familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
 
   const headerTitle = t('otherRelationships', 'Other Relationships');
   const { results, totalPages, currentPage, goTo } = usePagination(nonFamilyRelationships, pageSize);
