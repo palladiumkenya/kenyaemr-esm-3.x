@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import styles from './add-billable-service.scss';
+import styles from './update-billable-services.scss';
 import {
   Form,
   Button,
@@ -65,16 +65,6 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
     setValue,
   } = useForm<FormData>({
     mode: 'all',
-    defaultValues: {
-      serviceName: initialData?.name || '',
-      shortName: initialData?.shortName || '',
-      serviceTypeName: initialData?.serviceType?.display || '',
-      concept: initialData?.concept?.display || '',
-      payment: initialData?.servicePrices?.map((price) => ({
-        paymentMode: price.paymentMode,
-        price: price.price.toString(),
-      })) || [DEFAULT_PAYMENT_OPTION],
-    },
     resolver: zodResolver(paymentFormSchema),
   });
 
@@ -169,9 +159,8 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
   }
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <h4>{t('updateBillableService', 'Update Billable Service')}</h4>
-      <section className={`${styles.section} ${styles.scrollableContent}`}>
+    <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+      <section className={`${styles.section}`}>
         <section className={styles.section}>
           <Layer>
             <Controller
@@ -337,7 +326,8 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
                   </Layer>
                 )}
               />
-              <div className={styles.removeButtonContainer}>
+              <div>
+                <br />
                 <TrashCan
                   aria-label={`delete_${index}`}
                   id={`delete_${index}`}
@@ -348,6 +338,7 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
               </div>
             </div>
           ))}
+          <br />
           <Button
             size="md"
             onClick={handleAppendPaymentMode}
@@ -356,6 +347,7 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
             iconDescription="Add">
             {t('addPaymentOptions', 'Add payment option')}
           </Button>
+          <br />
           <br />
           <Button kind="secondary" className={styles.buttonLayout} onClick={closeWorkspace}>
             {t('cancel', 'Cancel')}
