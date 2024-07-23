@@ -223,6 +223,14 @@
 
         "layoutMode": "anchored"
       }
+    },
+     {
+      "name": "case-encounter-header",
+      "slot": "patient-chart-case-encounter-slot",
+      "component": "caseEncounterHeader",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [

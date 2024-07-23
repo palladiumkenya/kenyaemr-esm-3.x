@@ -39,6 +39,7 @@ import { createLeftPanelLink } from './left-panel-link.component';
 import WrapComponent from './case-management/wrap/wrap.component';
 import CaseManagementForm from './case-management/workspace/case-management.workspace';
 import Relationships from './relationships/relationships.component';
+import CaseEncounterHeader from './case-management/encounters/case-encounter-header.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -103,7 +104,7 @@ export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
 export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
-
+export const caseEncounterHeader = getSyncLifecycle(CaseEncounterHeader, options);
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);
 export const postnatalCareLink = getSyncLifecycle(createDashboardLink(postnatalDashboardMeta), options);
