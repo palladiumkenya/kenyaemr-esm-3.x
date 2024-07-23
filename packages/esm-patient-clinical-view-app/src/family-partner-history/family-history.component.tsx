@@ -110,7 +110,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     return (
       <DataTableSkeleton
         headers={headers}
-        aria-label="patient bills table"
+        aria-label="patient family table"
         showToolbar={false}
         showHeader={false}
         rowCount={3}
