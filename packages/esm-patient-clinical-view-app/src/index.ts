@@ -8,7 +8,12 @@ import { configSchema } from './config-schema';
 import BirthDateCalculator from './contact-list/birthdate-calculator.component';
 import ContactList from './contact-list/contact-list.component';
 import ContactListForm from './contact-list/contact-list.workspace';
-import { caseManagementDashboardMeta, contactListDashboardMeta, relationshipsDashboardMeta } from './dashboard.meta';
+import {
+  caseEncounterDashboardMeta,
+  caseManagementDashboardMeta,
+  contactListDashboardMeta,
+  relationshipsDashboardMeta,
+} from './dashboard.meta';
 import FamilyHistory from './family-partner-history/family-history.component';
 import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import AntenatalCare from './maternal-and-child-health/antenatal-care.component';
@@ -97,6 +102,7 @@ export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
+export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
 
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);
