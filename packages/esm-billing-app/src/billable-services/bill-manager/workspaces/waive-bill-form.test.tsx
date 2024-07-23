@@ -1,20 +1,19 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import BillWaiverForm from './bill-waiver-form.component';
 import { processBillPayment, usePaymentModes } from '../../../billing.resource';
+import { WaiveBillForm } from './waive-bill-form.workspace';
 import userEvent from '@testing-library/user-event';
+import { MappedBill } from '../../../types';
 
 const mockedUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
 
-jest.mock('../../billing.resource', () => ({
+jest.mock('../../../billing.resource', () => ({
   processBillPayment: jest.fn(),
   usePaymentModes: jest.fn(),
 }));
 
-const mockSetPatientUuid = jest.fn();
-
-const mockedBill = {
+const mockedBill: MappedBill = {
   id: 1909,
   uuid: '45143fae-b83d-4768-ada5-621e8dc1229d',
   patientName: ' Test Patient',
@@ -51,8 +50,8 @@ const mockedBill = {
       priceUuid: '',
       lineItemOrder: 0,
       paymentStatus: 'PENDING',
-      order: null,
       resourceVersion: '1.8',
+      itemOrServiceConceptUuid: '',
     },
   ],
   billingService: '3f5d0684-a280-477e-a67b-2a956a1f6dca:Registration Revist',
@@ -60,25 +59,6 @@ const mockedBill = {
   display: '1937-2',
   totalAmount: 50,
 };
-
-const mockedLineItems = [
-  {
-    uuid: 'e53c5589-e588-4bb9-bb72-6d4d16189679',
-    display: 'BillLineItem',
-    voided: false,
-    voidReason: null,
-    item: '',
-    billableService: '3f5d0684-a280-477e-a67b-2a956a1f6dca:Registration Revist',
-    quantity: 1,
-    price: 50,
-    priceName: 'Default',
-    priceUuid: '',
-    lineItemOrder: 0,
-    paymentStatus: 'PENDING',
-    order: null,
-    resourceVersion: '1.8',
-  },
-];
 
 const mockedPaymentMode = [
   {
@@ -98,11 +78,11 @@ describe('BillWaiverForm', () => {
       error: null,
       mutate: jest.fn(),
     });
-    render(<BillWaiverForm bill={mockedBill} lineItems={mockedLineItems} setPatientUuid={mockSetPatientUuid} />);
+    render(<WaiveBillForm bill={mockedBill} />);
     expect(screen.getByText('Bill Items')).toBeInTheDocument();
 
     // get waiver amount input
-    const waiverAmountInput = screen.getByRole('spinbutton', { name: 'Enter amount to waive' });
+    const waiverAmountInput = screen.getByTestId('waiverAmountInput');
     await user.type(waiverAmountInput, '50');
 
     // should display error if amount keyed in is greater than total amount
@@ -126,39 +106,39 @@ describe('BillWaiverForm', () => {
     await user.click(screen.getByRole('button', { name: 'Post waiver' }));
 
     expect(mockProcessBillPayment).toBeCalledTimes(1);
-    expect(mockProcessBillPayment).toBeCalledWith(
-      {
-        cashPoint: mockedBill.cashPointUuid,
-        cashier: mockedBill.cashier.uuid,
-        lineItems: [
-          {
-            uuid: 'e53c5589-e588-4bb9-bb72-6d4d16189679',
-            display: 'BillLineItem',
-            voided: false,
-            voidReason: null,
-            item: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
-            billableService: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
-            quantity: 1,
-            price: 50,
-            priceName: 'Default',
-            priceUuid: '',
-            lineItemOrder: 0,
-            paymentStatus: 'PAID',
-            order: null,
-            resourceVersion: '1.8',
-          },
-        ],
-        payments: [
-          {
-            amount: 50,
-            amountTendered: 50,
-            attributes: [],
-            instanceType: mockedPaymentMode[0].uuid,
-          },
-        ],
-        patient: mockedBill.patientUuid,
-      },
-      '45143fae-b83d-4768-ada5-621e8dc1229d',
-    );
+
+    const expectedBill = {
+      cashPoint: mockedBill.cashPointUuid,
+      cashier: mockedBill.cashier.uuid,
+      lineItems: [
+        {
+          uuid: 'e53c5589-e588-4bb9-bb72-6d4d16189679',
+          display: 'BillLineItem',
+          voided: false,
+          voidReason: null,
+          item: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
+          billableService: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
+          quantity: 1,
+          price: 50,
+          priceName: 'Default',
+          priceUuid: '',
+          lineItemOrder: 0,
+          paymentStatus: 'PAID',
+          resourceVersion: '1.8',
+          itemOrServiceConceptUuid: '',
+        },
+      ],
+      payments: [
+        {
+          amount: 50,
+          amountTendered: 50,
+          attributes: [],
+          instanceType: mockedPaymentMode[0].uuid,
+        },
+      ],
+      patient: mockedBill.patientUuid,
+    };
+
+    expect(mockProcessBillPayment).toBeCalledWith(expectedBill, '45143fae-b83d-4768-ada5-621e8dc1229d');
   });
 });

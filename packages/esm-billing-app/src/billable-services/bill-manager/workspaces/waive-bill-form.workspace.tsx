@@ -87,7 +87,6 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill }) => {
 
   return (
     <Form className={styles.form} aria-label={t('waiverForm', 'Waiver form')} onSubmit={handleSubmit(onSubmit)}>
-      <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={7}>
         <FormGroup>
           <section className={styles.billWaiverDescription}>
@@ -119,13 +118,14 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill }) => {
                   {...field}
                   invalidText={errors.waiveAmount?.message || 'Invalid'}
                   invalid={!!errors.waiveAmount}
+                  data-testid="waiverAmountInput"
                 />
               </Layer>
             )}
           />
         </FormGroup>
         <div className={styles.buttonContainer}>
-          <Button kind="tertiary" renderIcon={TaskAdd} disabled={!isValid}>
+          <Button kind="tertiary" renderIcon={TaskAdd} disabled={!isValid} role="button" type="submit">
             {t('postWaiver', 'Post waiver')}
           </Button>
         </div>

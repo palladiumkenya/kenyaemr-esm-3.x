@@ -17,9 +17,9 @@ export const CancelBillModal: React.FC<{
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={onClose}>
-          Cancel
+          {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger">Continue</Button>
+        <Button kind="danger">{t('continue', 'Continue')}</Button>
       </ModalFooter>
     </React.Fragment>
   );
