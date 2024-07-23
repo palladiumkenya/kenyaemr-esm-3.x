@@ -34,12 +34,12 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
           </div>
           <div>
             <strong>Status:</strong>
-            {manifest.status} | <strong>Type</strong> : {manifest.type} | <strong>Courrier:</strong>
-            {manifest.courrier}
+            {manifest.manifestStatus} | <strong>Type</strong> : {manifest.manifestType} | <strong>Courrier:</strong>
+            {manifest.courierName}
           </div>
           <div>
             <strong>Dispatch Date:</strong>
-            {manifest.dispatch} | <strong>Lab person Contact:</strong>
+            {manifest.dispatchDate} | <strong>Lab person Contact:</strong>
             {manifest.labPersonContact}
           </div>
         </div>

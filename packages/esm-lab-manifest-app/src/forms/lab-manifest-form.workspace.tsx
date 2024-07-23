@@ -10,14 +10,15 @@ import {
   TextInput,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, useLayoutType } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, parseDate, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { LabManifestFilters, labManifestFormSchema, manifestTypes } from '../lab-manifest.resources';
+import { LabManifestFilters, labManifestFormSchema, manifestTypes, saveLabManifest } from '../lab-manifest.resources';
 import styles from './lab-manifest-form.scss';
 import { County, LabManifest } from '../types';
+import { mutate } from 'swr';
 interface LabManifestFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   manifest?: LabManifest;
@@ -34,12 +35,10 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
   const counties = require('../counties.json') as County[];
   const form = useForm<ContactListFormType>({
     defaultValues: {
-      courierName: manifest?.courrier,
-      labPersonContact: manifest?.labPersonContact,
-      startDate: new Date(),
-      endDate: new Date(),
-      manifestStatus: manifest?.status,
-      dispatchDate: new Date(),
+      ...manifest,
+      dispatchDate: manifest?.dispatchDate ? parseDate(manifest.dispatchDate) : undefined,
+      startDate: manifest?.startDate ? parseDate(manifest.startDate) : undefined,
+      endDate: manifest?.endDate ? parseDate(manifest.endDate) : undefined,
     },
     resolver: zodResolver(labManifestFormSchema),
   });
@@ -47,7 +46,18 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
   const observableSelectedCounty = form.watch('county');
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
-  const onSubmit = async (values: ContactListFormType) => {};
+  const onSubmit = async (values: ContactListFormType) => {
+    try {
+      await saveLabManifest(values, manifest?.uuid);
+      mutate((key) => {
+        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/lab-manifest?status=${values.manifestStatus}`);
+      });
+      closeWorkspace();
+      showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
+    } catch (error) {
+      showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating lab manifest' });
+    }
+  };
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>

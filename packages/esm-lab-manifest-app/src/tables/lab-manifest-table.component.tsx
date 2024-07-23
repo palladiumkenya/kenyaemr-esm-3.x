@@ -15,7 +15,15 @@ import {
   Tile,
 } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { ErrorState, isDesktop, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import {
+  ErrorState,
+  formatDate,
+  isDesktop,
+  navigate,
+  parseDate,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -80,13 +88,13 @@ const LabManifestsTable = () => {
     results?.map((manifest) => {
       return {
         id: `${manifest.uuid}`,
-        startDate: manifest.startDate ?? '--',
-        endDate: manifest.endDate,
-        courrier: manifest.courrier,
+        startDate: manifest.startDate ? formatDate(parseDate(manifest.startDate)) : '--',
+        endDate: manifest.endDate ? formatDate(parseDate(manifest.endDate)) : '--',
+        courrier: manifest.courierName,
         labPersonContact: manifest.labPersonContact,
-        type: manifest.type,
-        status: manifest.status,
-        dispatch: manifest.dispatch,
+        type: manifest.manifestType,
+        status: manifest.manifestStatus,
+        dispatch: manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--',
         actions: (
           <Button
             renderIcon={View}

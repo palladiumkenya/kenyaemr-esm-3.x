@@ -18,7 +18,7 @@ function LabManifestMetrics() {
       <div className={styles.cardContainer} data-testid="clinic-metrics">
         {LabManifestFilters.map((f, index) => (
           <span key={index}>
-            <strong>{f.label}</strong>: {labManifest.filter((l) => l.status === f.value).length}
+            <strong>{f.label}</strong>: {labManifest.filter((l) => l.manifestStatus === f.value).length}
           </span>
         ))}
       </div>
