@@ -23,7 +23,6 @@ import PriceInfoOrder from './billable-services/billiable-item/test-order/price-
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
 
-
 const moduleName = '@kenyaemr/esm-billing-app';
 
 const options = {

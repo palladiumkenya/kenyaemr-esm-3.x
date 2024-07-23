@@ -87,7 +87,7 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill }) => {
 
   return (
     <Form className={styles.form} aria-label={t('waiverForm', 'Waiver form')} onSubmit={handleSubmit(onSubmit)}>
-      <span className={styles.caseFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
+      <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={7}>
         <FormGroup>
           <section className={styles.billWaiverDescription}>

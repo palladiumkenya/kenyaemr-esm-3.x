@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { convertToCurrency, extractString } from '../../helpers';
 import { useTranslation } from 'react-i18next';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedBill } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
@@ -53,15 +53,11 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
 
   if (bills.length === 0) {
     return (
-      <div style={{ marginTop: '0.625rem' }}>
-        <Layer className={styles.emptyStateContainer}>
-          <Tile className={styles.tile}>
-            <div className={styles.illo}>
-              <EmptyDataIllustration />
-            </div>
-            <p className={styles.content}>{t('noBillDisplay', 'There are no bills to display for this patient')}</p>
-          </Tile>
-        </Layer>
+      <div style={{ marginTop: '1rem' }}>
+        <EmptyState
+          displayText={t('noBillDisplay', 'There are no bills to display for this patient')}
+          headerTitle="No bills"
+        />
       </div>
     );
   }

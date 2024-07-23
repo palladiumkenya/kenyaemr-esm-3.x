@@ -21,7 +21,7 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
 
   const handleOpenEditLineItemWorkspace = (lineItem: LineItem) => {
     launchWorkspace('edit-bill-form', {
-      workspaceTitle: t('editBillForm' , 'Edit Bill Form'),
+      workspaceTitle: t('editBillForm', 'Edit Bill Form'),
       lineItem,
     });
   };

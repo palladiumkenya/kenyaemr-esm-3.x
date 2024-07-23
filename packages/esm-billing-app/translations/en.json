@@ -41,6 +41,7 @@
   "discard": "Discard",
   "discardClaim": "Discard Claim",
   "discount": "Discount",
+  "editBillForm": "Edit Bill Form",
   "enterAmount": "Enter amount",
   "enterConcept": "Associated concept",
   "enterReferenceNumber": "Enter ref. number",
@@ -122,7 +123,6 @@
   "selectExemptionCategory": "Select exemption category",
   "selectitemstobeclaimed": "Select items that are to be included in the claims",
   "selectPaymentMethod": "Select payment method",
-  "selectPaymentMethodPlaceholder": "Select payment method",
   "sellingAmount": "Enter selling price",
   "sellingPrice": "Selling Price",
   "sendClaim": "Claim sent successfully",
@@ -150,6 +150,5 @@
   "validSHANumber": "SHA number is valid, proceed with care",
   "visitTime": "Visit time",
   "visittype": "Visit Type",
-  "waiverForm": "Waiver form",
   "yes": "Yes"
 }

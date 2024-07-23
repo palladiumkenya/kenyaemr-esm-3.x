@@ -33,7 +33,7 @@
   @include type.type-style('body-01');
 }
 
-.caseFormTitle {
+.formTitle {
   @include type.type-style('heading-02');
   display: flex;
   align-items: center;
@@ -57,6 +57,6 @@
   }
 }
 
-.editFormInput{
+.editFormInput {
   margin-bottom: spacing.$spacing-05;
 }
