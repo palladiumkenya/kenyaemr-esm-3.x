@@ -27,5 +27,5 @@ export interface County {
   name: string;
   number: string;
   capital: string;
-  constituencies: Constiuency[];
+  constituencies: Array<Constiuency>;
 }

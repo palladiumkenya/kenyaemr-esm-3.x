@@ -10,7 +10,7 @@ import {
   TextInput,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, useSession } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -44,8 +44,9 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
     resolver: zodResolver(labManifestFormSchema),
   });
   const { t } = useTranslation();
-  const session = useSession();
   const observableSelectedCounty = form.watch('county');
+  const layout = useLayoutType();
+  const controlSize = layout === 'tablet' ? 'xl' : 'sm';
   const onSubmit = async (values: ContactListFormType) => {};
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -68,7 +69,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
                   invalidText={form.formState.errors[field.name]?.message}
                   placeholder="mm/dd/yyyy"
                   labelText={t('startDate', 'Start Date')}
-                  size="xl"
+                  size={controlSize}
                 />
               </DatePicker>
             )}
@@ -190,7 +191,6 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({
                 onChange={(e) => {
                   field.onChange(e.selectedItem);
                   form.setValue('subCounty', undefined);
-                  // form.resetField("subCounty")
                 }}
                 initialSelectedItem={field.value}
                 label="Select county"

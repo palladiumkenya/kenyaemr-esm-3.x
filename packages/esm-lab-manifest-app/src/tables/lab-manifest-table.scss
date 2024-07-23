@@ -1,12 +1,13 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .widgetContainer {
   background-color: colors.$white-0;
-  border: 1px solid colors.$gray-20;
-  margin-bottom: 1rem;
+  border: spacing.$spacing-01 solid colors.$gray-20;
+  margin-bottom: spacing.$spacing-02;
 }
 
 .widgetContainer :global(.cds--data-table) thead th button span {
@@ -15,10 +16,6 @@
 
 .tile {
   text-align: center;
-}
-
-.emptyStateContainer {
-  margin: 2rem 0;
 }
 
 .content {
