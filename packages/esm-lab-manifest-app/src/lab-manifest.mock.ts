@@ -1,6 +1,6 @@
-import { ActiveRequests, LabManifest, LabManifestSample } from './types';
+import { ActiveRequests, MappedLabManifest, LabManifestSample } from './types';
 
-export const labManifest: LabManifest[] = [
+export const labManifest: MappedLabManifest[] = [
   {
     uuid: '3d5c12c3-737f-495b-b987-26a7cf5d0fed',
     startDate: '2023-01-12T00:00:00.000Z',

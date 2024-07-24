@@ -1,6 +1,7 @@
-import { generateOfflineUuid, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { generateOfflineUuid } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { labManifest } from './lab-manifest.mock';
+import { LabManifest, MappedLabManifest } from './types';
 
 export const LabManifestFilters = [
   {
@@ -99,3 +100,23 @@ export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema
     };
   }
 };
+
+export const extractLabManifest = (manifest: LabManifest) =>
+  ({
+    uuid: manifest.uuid,
+    dispatchDate: manifest.dispatchDate,
+    endDate: manifest.dispatchDate,
+    startDate: manifest.startDate,
+    clinicianContact: manifest.clinicianPhoneContact,
+    clinicianName: manifest.clinicianName,
+    county: manifest.county,
+    courierName: manifest.courier,
+    facilityEmail: manifest.facilityEmail,
+    facilityPhoneContact: manifest.facilityPhoneContact,
+    labPersonContact: manifest.labPocPhoneNumber,
+    manifestId: manifest.identifier,
+    manifestStatus: manifest.status,
+    // manifestType: manifest.manifestType,
+    personHandedTo: manifest.courierOfficer,
+    subCounty: manifest.subCounty,
+  } as MappedLabManifest);

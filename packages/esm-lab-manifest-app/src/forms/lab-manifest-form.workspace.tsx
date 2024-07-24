@@ -17,11 +17,11 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { LabManifestFilters, labManifestFormSchema, manifestTypes, saveLabManifest } from '../lab-manifest.resources';
 import styles from './lab-manifest-form.scss';
-import { County, LabManifest } from '../types';
+import { County, MappedLabManifest } from '../types';
 import { mutate } from 'swr';
 interface LabManifestFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
-  manifest?: LabManifest;
+  manifest?: MappedLabManifest;
 }
 
 type ContactListFormType = z.infer<typeof labManifestFormSchema>;

@@ -1,6 +1,6 @@
 import { Button, ButtonSet, SkeletonText } from '@carbon/react';
 import { ArrowLeft, Edit } from '@carbon/react/icons';
-import { launchWorkspace, navigate } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, navigate, parseDate } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
@@ -43,7 +43,7 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
         <div className={styles.manifestDetailContent}>
           <div>
             <strong>Date:</strong>
-            {manifest.startDate} <strong>To</strong> {manifest.endDate}
+            {formatDate(parseDate(manifest.startDate))} <strong>To</strong> {formatDate(parseDate(manifest.endDate))}
           </div>
           <div>
             <strong>Status:</strong>
@@ -52,7 +52,7 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
           </div>
           <div>
             <strong>Dispatch Date:</strong>
-            {manifest.dispatchDate} | <strong>Lab person Contact:</strong>
+            {formatDate(parseDate(manifest.dispatchDate))} | <strong>Lab person Contact:</strong>
             {manifest.labPersonContact}
           </div>
         </div>

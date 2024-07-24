@@ -90,11 +90,12 @@ const LabManifestsTable = () => {
         id: `${manifest.uuid}`,
         startDate: manifest.startDate ? formatDate(parseDate(manifest.startDate)) : '--',
         endDate: manifest.endDate ? formatDate(parseDate(manifest.endDate)) : '--',
-        courrier: manifest.courierName,
-        labPersonContact: manifest.labPersonContact,
-        type: manifest.manifestType,
-        status: manifest.manifestStatus,
+        courrier: manifest.courierName ? manifest.courierName : '--',
+        labPersonContact: manifest.labPersonContact ?? '--',
+        type: manifest.manifestType ?? '--',
+        status: manifest.manifestStatus ?? '--',
         dispatch: manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--',
+        manifestId: manifest.manifestId ?? '--',
         actions: (
           <Button
             renderIcon={View}

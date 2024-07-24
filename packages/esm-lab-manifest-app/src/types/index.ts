@@ -1,4 +1,4 @@
-export interface LabManifest {
+export interface MappedLabManifest {
   uuid: string;
   startDate: string;
   endDate: string;
@@ -15,6 +15,25 @@ export interface LabManifest {
   facilityEmail?: string;
   facilityPhoneContact?: string;
   personHandedTo?: string;
+}
+
+export interface LabManifest {
+  uuid: string;
+  identifier?: string;
+  startDate: string;
+  endDate: string;
+  dispatchDate: string;
+  courier?: string;
+  courierOfficer?: string;
+  status?: string;
+  county?: string;
+  subCounty?: string;
+  facilityEmail?: string;
+  facilityPhoneContact?: string;
+  clinicianPhoneContact?: string;
+  clinicianName?: string;
+  labPocPhoneNumber?: string;
+  manifestType?: number;
 }
 
 export interface LabManifestSample {
