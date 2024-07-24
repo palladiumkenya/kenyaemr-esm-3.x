@@ -24,9 +24,7 @@ import {
   ErrorState,
   navigate,
   WorkspaceContainer,
-  showModal,
   launchWorkspace,
-  WorkspaceContainer,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
@@ -48,9 +46,9 @@ const BillableServices = () => {
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayHeader, setOverlayTitle] = useState('');
 
-  const handleEditClick = (initialData) => {
+  const handleEditClick = (service) => {
     launchWorkspace('update-billable-services-workspace', {
-      initialData,
+      service,
     });
   };
 

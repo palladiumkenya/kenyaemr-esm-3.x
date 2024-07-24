@@ -49,9 +49,9 @@ const paymentFormSchema = z.object({
 type FormData = z.infer<typeof paymentFormSchema>;
 const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '1' };
 
-const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initialData: any }> = ({
+const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; service: any }> = ({
   closeWorkspace,
-  initialData,
+  service,
 }) => {
   const { t } = useTranslation();
 
@@ -77,7 +77,7 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
   const searchInputRef = useRef(null);
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
-  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(initialData?.concept);
+  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(service?.concept);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
@@ -110,7 +110,7 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
     payload.servicePrices = servicePrices;
     payload.serviceStatus = 'ENABLED';
     payload.concept = selectedConcept?.concept?.uuid;
-    payload.uuid = initialData.uuid;
+    payload.uuid = service.uuid;
 
     createBillableService(payload).then(
       (resp) => {
@@ -135,20 +135,20 @@ const UpdateBillableServicesDialog: React.FC<{ closeWorkspace: () => void; initi
   };
 
   useEffect(() => {
-    if (initialData) {
-      setValue('serviceName', initialData.name);
-      setValue('shortName', initialData.shortName);
-      setValue('serviceTypeName', initialData.serviceType.display);
-      setValue('concept', initialData.concept?.display || '');
+    if (service) {
+      setValue('serviceName', service.name);
+      setValue('shortName', service.shortName);
+      setValue('serviceTypeName', service.serviceType.display);
+      setValue('concept', service.concept?.display || '');
       setValue(
         'payment',
-        initialData.servicePrices.map((price) => ({
+        service.servicePrices.map((price) => ({
           paymentMode: paymentModes.find((mode) => mode.uuid === price.paymentMode),
           price: price.price.toString(),
         })),
       );
     }
-  }, [initialData, setValue, paymentModes]);
+  }, [service, setValue, paymentModes]);
 
   if (isLoadingServicesTypes || isLoadingPaymentModes) {
     return (
