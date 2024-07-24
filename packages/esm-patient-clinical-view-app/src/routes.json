@@ -225,9 +225,9 @@
       }
     },
      {
-      "name": "case-encounter-header",
+      "name": "case-encounter-table",
       "slot": "patient-chart-case-encounter-slot",
-      "component": "caseEncounterHeader",
+      "component": "caseEncounterTable",
       "order": 0,
       "online": true,
       "offline": false
