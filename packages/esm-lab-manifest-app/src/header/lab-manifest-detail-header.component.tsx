@@ -1,4 +1,4 @@
-import { Button, ButtonSet } from '@carbon/react';
+import { Button, ButtonSet, SkeletonText } from '@carbon/react';
 import { ArrowLeft, Edit } from '@carbon/react/icons';
 import { launchWorkspace, navigate } from '@openmrs/esm-framework';
 import React from 'react';
@@ -24,6 +24,19 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
       manifest,
     });
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.manifestDetailHeader}>
+        <div className={styles.manifestDetailContent}>
+          {Array.from({ length: 3 }).map((_) => (
+            <SkeletonText style={{ maxWidth: '400px' }} />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className={styles.manifestDetailHeader}>
