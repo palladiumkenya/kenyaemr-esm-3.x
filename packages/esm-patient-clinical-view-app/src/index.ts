@@ -9,6 +9,7 @@ import BirthDateCalculator from './contact-list/birthdate-calculator.component';
 import ContactList from './contact-list/contact-list.component';
 import ContactListForm from './contact-list/contact-list.workspace';
 import {
+  caseEncounterDashboardMeta,
   caseManagementDashboardMeta,
   contactListDashboardMeta,
   familyHistoryDashboardMeta,
@@ -39,6 +40,7 @@ import { createLeftPanelLink } from './left-panel-link.component';
 import WrapComponent from './case-management/wrap/wrap.component';
 import CaseManagementForm from './case-management/workspace/case-management.workspace';
 import Relationships from './relationships/relationships.component';
+import CaseEncounterOverviewComponent from './case-management/encounters/case-encounter-overview.component';
 import FamilyRelationshipForm from './family-partner-history/family-relationship.workspace';
 import { OtherRelationships } from './other-relationships/other-relationships.component';
 import { OtherRelationshipsForm } from './other-relationships/other-relationships.workspace';
@@ -112,6 +114,9 @@ export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
+export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
+// export const caseEncounterHeader = getSyncLifecycle(CaseEncounterHeader, options);
+export const caseEncounterTable = getSyncLifecycle(CaseEncounterOverviewComponent, options);
 
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);

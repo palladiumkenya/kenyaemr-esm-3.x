@@ -213,6 +213,28 @@
       "order": 2,
       "online": true,
       "offline": false
+    },
+    {
+      "name": "case-encounter-link",
+      "component": "caseEncounterDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 14,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-case-encounter-slot",
+        "path": "case-encounter",
+
+        "layoutMode": "anchored"
+      }
+    },
+     {
+      "name": "case-encounter-table",
+      "slot": "patient-chart-case-encounter-slot",
+      "component": "caseEncounterTable",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [

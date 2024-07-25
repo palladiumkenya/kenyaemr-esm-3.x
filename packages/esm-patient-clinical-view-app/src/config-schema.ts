@@ -9,6 +9,24 @@ export const configSchema = {
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
     },
   },
+  caseManagementForms: {
+    _type: Type.Array,
+    _description: 'List of form and encounter UUIDs',
+    _default: [
+      {
+        id: 'high-iit-intervention',
+        title: 'High IIT Intervention Form',
+        formUuid: 'd86a77bd-769a-47ec-942a-716afbd907cc',
+        encounterTypeUuid: 'a0034eee-1940-4e35-847f-97537a35d05e',
+      },
+      {
+        id: 'home-visit-checklist',
+        title: 'Home Visit Checklist Form',
+        formUuid: 'dbe7db2d-abed-47b6-904f-1308b997d7bf',
+        encounterTypeUuid: '4224f8bf-11b2-4e47-a958-1dbdfd7fa41d',
+      },
+    ],
+  },
   formsList: {
     _type: Type.Object,
     _description: 'List of form UUIDs',
@@ -159,6 +177,7 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
   encounterTypes: { mchMotherConsultation: string; hivTestingServices: string };
   formsList: {
     labourAndDelivery: string;
