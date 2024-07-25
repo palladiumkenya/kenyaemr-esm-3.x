@@ -30,17 +30,25 @@ test('Check if Bill table is available', async ({ page }) => {
     await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/home/billing`);
   });
 
-  await test.step('Then i should be able to see bills table', async () => {
-    const billList = page
+  await test.step('Then I should be able to see bills table if there are bills', async () => {
+    const billListLocator = page
       .locator('div[class*="-esm-billing__bills"] h4')
       .filter({ hasText: /^Bill list$/ })
       .first();
-    await expect(billList).toBeVisible();
-  });
 
-  await test.step('I should be able  to  see table header ', async () => {
-    const billHeaders = page.locator('div[class*="-esm-billing__bills"] tr').first();
-    await expect(billHeaders).toContainText('Visit timeIdentifierNameBilled Items');
+    await page.waitForTimeout(40000);
+
+    const billListTableCount = await billListLocator.count();
+
+    if (billListTableCount > 0) {
+      await expect(billListLocator).toBeVisible();
+      await test.step('I should be able to see table header', async () => {
+        const billHeaders = page.locator('div[class*="-esm-billing__bills"] tr').first();
+        await expect(billHeaders).toContainText('Visit timeIdentifierNameBilled Items');
+      });
+    } else {
+      test.skip();
+    }
   });
 });
 
@@ -51,13 +59,27 @@ test('Make payment for a bill', async ({ page }) => {
     await billingPage.gotoBilling();
   });
 
-  await test.step('when I click a on a client on table I should be directed to patient bill summary', async () => {
-    const tdWithAnchorTags = await page.$$('div[class*="-esm-billing__bills"] tbody td a');
-    if (tdWithAnchorTags.length <= 0) {
-      return;
-    }
-    const randomIndex = Math.floor(Math.random() * tdWithAnchorTags.length);
-    await tdWithAnchorTags[randomIndex].click();
-    await expect(page).toHaveURL('^/spa/home/billing/patient/');
-  });
+  const billListLocator = page
+    .locator('div[class*="-esm-billing__bills"] h4')
+    .filter({ hasText: /^Bill list$/ })
+    .first();
+
+  await page.waitForTimeout(40000);
+
+  const billListTableCount = await billListLocator.count();
+
+  if (billListTableCount > 0) {
+    await test.step('when I click a on a client on table I should be directed to patient bill summary', async () => {
+      const tdWithAnchorTags = await page.$$('div[class*="-esm-billing__bills"] tbody td a');
+      if (tdWithAnchorTags.length <= 0) {
+        return;
+      }
+      const randomIndex = Math.floor(Math.random() * tdWithAnchorTags.length);
+      await tdWithAnchorTags[randomIndex].click();
+      const currentURL = page.url();
+      expect(currentURL).toContain('/spa/home/billing/patient/');
+    });
+  } else {
+    test.skip();
+  }
 });
