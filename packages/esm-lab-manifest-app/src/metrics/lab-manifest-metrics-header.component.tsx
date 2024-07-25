@@ -1,18 +1,13 @@
-/* eslint-disable no-console */
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import styles from './lab-manifest-header.scss';
-import { Button, TextInput, Modal, Select, ComboBox, SelectItem, DatePickerInput, DatePicker } from '@carbon/react';
 import { launchWorkspace } from '@openmrs/esm-framework';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import styles from './lab-manifest-header.scss';
 
 const MetricsHeader = () => {
   const { t } = useTranslation();
   const metricsTitle = t('labManifestSummary', 'Lab Manifest Summary');
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const filterItems = (menu) => {
-    return menu?.item?.toLowerCase().includes(menu?.inputValue?.toLowerCase());
-  };
 
   const handleAddLabManifest = () => {
     launchWorkspace('lab-manifest-form', {

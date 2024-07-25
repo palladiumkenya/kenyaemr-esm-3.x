@@ -6,7 +6,7 @@ import { LabManifest, MappedLabManifest } from './types';
 export const LabManifestFilters = [
   {
     label: 'Draft',
-    value: 'draft',
+    value: 'Draft',
   },
   {
     label: 'Ready To send',
@@ -22,23 +22,23 @@ export const LabManifestFilters = [
   },
   {
     label: 'Submitted',
-    value: 'submitted',
+    value: 'Submitted',
   },
   {
     label: 'Incomplete with Errors',
-    value: 'incompleteWithErrors',
+    value: 'Incomplete errors',
   },
   {
     label: 'Incomplete With Results',
-    value: 'incompleteWithResults',
+    value: 'Incomplete results',
   },
   {
     label: 'Complete with Errors',
-    value: 'completeWithErrors',
+    value: 'Complete errors',
   },
   {
     label: 'Complete with Results',
-    value: 'completeWithResults',
+    value: 'Complete results',
   },
 ];
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;

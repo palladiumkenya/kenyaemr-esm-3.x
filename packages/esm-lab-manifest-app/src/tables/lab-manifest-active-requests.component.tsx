@@ -18,6 +18,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './lab-manifest-table.scss';
 import useActiveRequests from '../hooks/useActiveRequests';
+import { ActiveRequests } from '../types';
 
 interface LabManifestActiveRequestsProps {
   manifestUuid: string;
@@ -76,23 +77,23 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
   };
 
   const tableRows =
-    (results as any[])?.map((sample) => {
+    (results as any[])?.map((activeRequest) => {
       return {
-        id: `${sample.uuid}`,
-        startDate: sample.startDate ?? '--',
-        endDate: sample.endDate,
-        courrier: sample.courrier,
-        labPersonContact: sample.labPersonContact,
-        type: sample.type,
-        status: sample.status,
-        dispatch: sample.dispatch,
+        id: `${activeRequest.uuid}`,
+        startDate: activeRequest.startDate ?? '--',
+        endDate: activeRequest.endDate,
+        courrier: activeRequest.courrier,
+        labPersonContact: activeRequest.labPersonContact,
+        type: activeRequest.type,
+        status: activeRequest.status,
+        dispatch: activeRequest.dispatch,
         actions: (
           <Button
             renderIcon={View}
             hasIconOnly
             kind="tertiary"
             iconDescription={t('view', 'View')}
-            onClick={() => handleViewManifestSamples(sample.uuid)}
+            onClick={() => handleViewManifestSamples(activeRequest.uuid)}
           />
         ),
       };

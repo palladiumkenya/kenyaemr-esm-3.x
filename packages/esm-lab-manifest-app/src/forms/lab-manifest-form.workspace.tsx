@@ -11,7 +11,7 @@ import {
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, parseDate, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -26,12 +26,7 @@ interface LabManifestFormProps extends DefaultWorkspaceProps {
 
 type ContactListFormType = z.infer<typeof labManifestFormSchema>;
 
-const LabManifestForm: React.FC<LabManifestFormProps> = ({
-  closeWorkspace,
-  closeWorkspaceWithSavedChanges,
-  promptBeforeClosing,
-  manifest,
-}) => {
+const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manifest }) => {
   const counties = require('../counties.json') as County[];
   const form = useForm<ContactListFormType>({
     defaultValues: {

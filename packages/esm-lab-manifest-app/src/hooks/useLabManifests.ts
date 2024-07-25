@@ -9,7 +9,7 @@ const useLabManifests = (status: string) => {
 
   return {
     isLoading,
-    manifests: (data?.data?.results ?? []).map(extractLabManifest),
+    manifests: (data?.data?.results ?? []).map(extractLabManifest).filter((m) => m.manifestStatus == status),
     error,
   };
 };

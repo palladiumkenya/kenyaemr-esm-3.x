@@ -34,10 +34,14 @@ export interface LabManifest {
   clinicianName?: string;
   labPocPhoneNumber?: string;
   manifestType?: number;
+  labManifestOrders: Array<LabManifest>;
 }
 
 export interface LabManifestSample {
   uuid: string;
+  id: number;
+  sampleType: string;
+  status: string;
 }
 
 export interface ActiveRequests {

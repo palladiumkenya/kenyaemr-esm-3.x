@@ -34,7 +34,7 @@ import styles from './lab-manifest-table.scss';
 const LabManifestsTable = () => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
-  const [currFilter, setCurrFilter] = useState('draft');
+  const [currFilter, setCurrFilter] = useState('Draft');
   const headerTitle = t('lab Manifest', 'Lab Manifest');
   const layout = useLayoutType();
   const { manifests, error, isLoading } = useLabManifests(currFilter);
