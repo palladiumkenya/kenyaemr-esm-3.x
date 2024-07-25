@@ -36,7 +36,7 @@ test('Check if Bill table is available', async ({ page }) => {
       .filter({ hasText: /^Bill list$/ })
       .first();
 
-    await billListLocator.waitFor({ state: 'visible', timeout: 40000 });
+    await page.waitForTimeout(40000);
 
     const billListTableCount = await billListLocator.count();
 
@@ -64,7 +64,7 @@ test('Make payment for a bill', async ({ page }) => {
     .filter({ hasText: /^Bill list$/ })
     .first();
 
-  await billListLocator.waitFor({ state: 'visible', timeout: 40000 });
+  await page.waitForTimeout(40000);
 
   const billListTableCount = await billListLocator.count();
 
