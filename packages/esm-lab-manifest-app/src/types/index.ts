@@ -15,6 +15,7 @@ export interface MappedLabManifest {
   facilityEmail?: string;
   facilityPhoneContact?: string;
   personHandedTo?: string;
+  samples: Array<LabManifestSample>;
 }
 
 export interface LabManifest {
@@ -34,7 +35,7 @@ export interface LabManifest {
   clinicianName?: string;
   labPocPhoneNumber?: string;
   manifestType?: number;
-  labManifestOrders: Array<LabManifest>;
+  labManifestOrders: Array<LabManifestSample>;
 }
 
 export interface LabManifestSample {

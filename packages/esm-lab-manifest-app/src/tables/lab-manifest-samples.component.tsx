@@ -11,21 +11,22 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { View } from '@carbon/react/icons';
+import { TrashCan, View } from '@carbon/react/icons';
 import { ErrorState, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLabManifestSamples } from '../hooks';
 import styles from './lab-manifest-table.scss';
+import { useLabManifest } from '../hooks';
+import { LabManifestSample } from '../types';
 
 interface LabManifestSamplesProps {
   manifestUuid: string;
 }
 
 const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid }) => {
-  const { error, isLoading, samples } = useLabManifestSamples(manifestUuid);
-
+  const { error, isLoading, manifest } = useLabManifest(manifestUuid);
+  const samples = manifest?.samples ?? [];
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('labManifestSamples', 'Lab Manifest Samples');
@@ -35,7 +36,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
   const headers = [
     {
       header: t('patientName', 'Patient name'),
-      key: 'startDate',
+      key: 'patientName',
     },
     {
       header: t('cccKDODNumber', 'CCC/KDOD Number'),
@@ -48,14 +49,6 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     {
       header: t('sampleType', 'Sample type'),
       key: 'sampleType',
-    },
-    {
-      header: t('manifestId', 'Manifest Id'),
-      key: 'manifestId',
-    },
-    {
-      header: t('labPersonContact', 'Lab person Contact'),
-      key: 'labPersonContact',
     },
     {
       header: t('status', 'Status'),
@@ -71,28 +64,23 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     },
   ];
 
-  const handleViewManifestSamples = (manifestUuid: string) => {
-    navigate({ to: window.getOpenmrsSpaBase() + `home/lab-manifest/${manifestUuid}` });
+  const handleDeleteManifestSample = (manifestUuid: string) => {
+    // TODO Implement delete logic when endpoint is a
   };
 
   const tableRows =
-    (results as any[])?.map((sample) => {
+    (results as LabManifestSample[])?.map((sample) => {
       return {
         id: `${sample.uuid}`,
-        startDate: sample.startDate ?? '--',
-        endDate: sample.endDate,
-        courrier: sample.courrier,
-        labPersonContact: sample.labPersonContact,
-        type: sample.type,
+        sampleType: sample.sampleType ?? '--',
         status: sample.status,
-        dispatch: sample.dispatch,
         actions: (
           <Button
-            renderIcon={View}
+            renderIcon={TrashCan}
             hasIconOnly
             kind="tertiary"
-            iconDescription={t('view', 'View')}
-            onClick={() => handleViewManifestSamples(sample.uuid)}
+            iconDescription={t('removeFromManifest', 'Remove from Manifest')}
+            onClick={() => handleDeleteManifestSample(sample.uuid)}
           />
         ),
       };

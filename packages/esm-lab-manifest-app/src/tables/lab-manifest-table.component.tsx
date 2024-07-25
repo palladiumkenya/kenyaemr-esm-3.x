@@ -75,6 +75,10 @@ const LabManifestsTable = () => {
       key: 'dispatch',
     },
     {
+      header: t('samples', 'Samples'),
+      key: 'samples',
+    },
+    {
       header: t('actions', 'Actions'),
       key: 'actions',
     },
@@ -96,6 +100,7 @@ const LabManifestsTable = () => {
         status: manifest.manifestStatus ?? '--',
         dispatch: manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--',
         manifestId: manifest.manifestId ?? '--',
+        samples: `${manifest.samples.length}`,
         actions: (
           <Button
             renderIcon={View}

@@ -10,6 +10,7 @@ export const labManifest: MappedLabManifest[] = [
     labPersonContact: '0727112355',
     dispatchDate: '2023-01-12T00:00:00.000Z',
     manifestStatus: 'draft',
+    samples: [],
   },
   {
     uuid: '3d5c12c3-737f-495b-b987-26a7cf5d0fef',
@@ -20,6 +21,7 @@ export const labManifest: MappedLabManifest[] = [
     labPersonContact: '0727112355',
     dispatchDate: '2024-03-12T00:00:00.000Z',
     manifestStatus: 'draft',
+    samples: [],
   },
   {
     uuid: '3d5c12c3-737f-495b-b987-26a7cf5d0fe1',
@@ -30,6 +32,7 @@ export const labManifest: MappedLabManifest[] = [
     labPersonContact: '0727112355',
     dispatchDate: '2024-07-12T00:00:00.000Z',
     manifestStatus: 'readyToSend',
+    samples: [],
   },
   {
     uuid: '3d5c12c3-737f-495b-b987-26a7cf5d0fe2',
@@ -40,6 +43,7 @@ export const labManifest: MappedLabManifest[] = [
     labPersonContact: '0727112355',
     dispatchDate: '2024-01-12T00:00:00.000Z',
     manifestStatus: 'readyToSend',
+    samples: [],
   },
   {
     uuid: '3d5c12c3-737f-495b-b987-26a7cf5d0fe3',
@@ -50,6 +54,7 @@ export const labManifest: MappedLabManifest[] = [
     labPersonContact: '0727112355',
     dispatchDate: '2024-05-12T00:00:00.000Z',
     manifestStatus: 'sending',
+    samples: [],
   },
   {
     uuid: '3d5c12c3-737f-495b-b987-26a7cf5d0fe4',
@@ -60,6 +65,7 @@ export const labManifest: MappedLabManifest[] = [
     labPersonContact: '0727112355',
     dispatchDate: '2024-02-12T00:00:00.000Z',
     manifestStatus: 'submitted',
+    samples: [],
   },
   {
     uuid: '3d5c12c3-737f-495b-b987-26a7cf5d0fe5',
@@ -70,6 +76,7 @@ export const labManifest: MappedLabManifest[] = [
     labPersonContact: '0727112355',
     dispatchDate: '2024-01-12T00:00:00.000Z',
     manifestStatus: 'submitted',
+    samples: [],
   },
 ];
 

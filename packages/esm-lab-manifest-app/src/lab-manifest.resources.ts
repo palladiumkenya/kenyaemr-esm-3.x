@@ -88,6 +88,7 @@ export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema
       endDate: endDate.toISOString(),
       startDate: startDate.toISOString(),
       uuid: generateOfflineUuid(),
+      samples: [],
     });
   } else {
     const index = labManifest.findIndex((mn) => mn.uuid === maifestId);
@@ -97,6 +98,7 @@ export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema
       endDate: endDate.toISOString(),
       startDate: startDate.toISOString(),
       uuid: generateOfflineUuid(),
+      samples: [],
     };
   }
 };
@@ -119,4 +121,5 @@ export const extractLabManifest = (manifest: LabManifest) =>
     // manifestType: manifest.manifestType,
     personHandedTo: manifest.courierOfficer,
     subCounty: manifest.subCounty,
+    samples: manifest.labManifestOrders ?? [],
   } as MappedLabManifest);
