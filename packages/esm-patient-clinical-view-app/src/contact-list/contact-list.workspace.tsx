@@ -317,9 +317,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 initialSelectedItem={field.value}
                 label="Select Realtionship"
                 items={config.familyRelationshipsTypeList.map((r) => r.uuid)}
-                itemToString={(item) =>
-                  config.familyRelationshipsTypeList.find((r) => r.uuid === item)?.displayAIsToB ?? ''
-                }
+                itemToString={(item) => config.familyRelationshipsTypeList.find((r) => r.uuid === item)?.display ?? ''}
               />
             )}
           />

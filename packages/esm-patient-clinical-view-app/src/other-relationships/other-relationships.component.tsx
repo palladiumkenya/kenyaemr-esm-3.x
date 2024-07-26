@@ -25,27 +25,28 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { useRelationships } from './relationships.resource';
-import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
-import styles from './family-history.scss';
+import styles from './other-relationships.scss';
+import { useRelationships } from '../family-partner-history/relationships.resource';
+import ConceptObservations from '../family-partner-history/concept-obs.component';
 
-interface FamilyHistoryProps {
+interface OtherRelationshipsProps {
   patientUuid: string;
 }
 
-const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
+export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
-  const { concepts, familyRelationshipsTypeList } = config;
   const layout = useLayoutType();
+  const { concepts, familyRelationshipsTypeList } = config;
   const [pageSize, setPageSize] = useState(10);
+
   const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
   const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
-  const familyRelationships = relationships.filter((r) => familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
+  const nonFamilyRelationships = relationships.filter((r) => !familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
 
-  const headerTitle = t('familyContacts', 'Family contacts');
-  const { results, totalPages, currentPage, goTo } = usePagination(familyRelationships, pageSize);
+  const headerTitle = t('otherRelationships', 'Other Relationships');
+  const { results, totalPages, currentPage, goTo } = usePagination(nonFamilyRelationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const headers = [
@@ -76,8 +77,8 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   ];
 
   const handleAddHistory = () => {
-    launchWorkspace('family-relationship-form', {
-      workspaceTitle: 'Family Relationship Form',
+    launchWorkspace('other-relationship-form', {
+      workspaceTitle: 'Other Relationship Form',
       rootPersonUuid: patientUuid,
     });
   };
@@ -110,7 +111,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     return (
       <DataTableSkeleton
         headers={headers}
-        aria-label="patient family table"
+        aria-label="patient bills table"
         showToolbar={false}
         showHeader={false}
         rowCount={3}
@@ -125,7 +126,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (familyRelationships.length === 0) {
+  if (nonFamilyRelationships.length === 0) {
     return (
       <Layer>
         <Tile className={styles.tile}>
@@ -133,7 +134,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
             <h4>{headerTitle}</h4>
           </div>
           <EmptyDataIllustration />
-          <p className={styles.content}>There is no family history data to display for this patient.</p>
+          <p className={styles.content}>There is no other relationships data to display for this patient.</p>
           <Button onClick={handleAddHistory} renderIcon={Add} kind="ghost">
             {t('addRelationship', 'Add relationship')}
           </Button>
@@ -197,4 +198,3 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     </div>
   );
 };
-export default FamilyHistory;
