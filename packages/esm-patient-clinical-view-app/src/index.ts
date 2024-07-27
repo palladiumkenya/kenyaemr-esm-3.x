@@ -8,9 +8,15 @@ import { configSchema } from './config-schema';
 import BirthDateCalculator from './contact-list/birthdate-calculator.component';
 import ContactList from './contact-list/contact-list.component';
 import ContactListForm from './contact-list/contact-list.workspace';
-import { caseManagementDashboardMeta, contactListDashboardMeta } from './dashboard.meta';
+import {
+  caseEncounterDashboardMeta,
+  caseManagementDashboardMeta,
+  contactListDashboardMeta,
+  familyHistoryDashboardMeta,
+  otherRelationshipsDashboardMeta,
+  relationshipsDashboardMeta,
+} from './dashboard.meta';
 import FamilyHistory from './family-partner-history/family-history.component';
-import { familyHistoryDashboardMeta } from './family-partner-history/family-partner-dashboard.meta';
 import AntenatalCare from './maternal-and-child-health/antenatal-care.component';
 import LabourDelivery from './maternal-and-child-health/labour-delivery.component';
 import {
@@ -33,6 +39,11 @@ import { specialClinicsNavGroup } from './specialized-clinics/special-clinic-das
 import { createLeftPanelLink } from './left-panel-link.component';
 import WrapComponent from './case-management/wrap/wrap.component';
 import CaseManagementForm from './case-management/workspace/case-management.workspace';
+import Relationships from './relationships/relationships.component';
+import CaseEncounterOverviewComponent from './case-management/encounters/case-encounter-overview.component';
+import FamilyRelationshipForm from './family-partner-history/family-relationship.workspace';
+import { OtherRelationships } from './other-relationships/other-relationships.component';
+import { OtherRelationshipsForm } from './other-relationships/other-relationships.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -71,8 +82,18 @@ export const defaulterTracing = getSyncLifecycle(DefaulterTracing, options);
 // Dashboard links for Family History and the corresponding view in the patient chart
 export const familyHistory = getSyncLifecycle(FamilyHistory, options);
 export const familyHistoryLink = getSyncLifecycle(createDashboardLink(familyHistoryDashboardMeta), options);
+export const familyRelationshipForm = getSyncLifecycle(FamilyRelationshipForm, options);
 
-// RElationships links for Family History and the corresponding view in the patient chart
+// Dashboard links for Other relationships and the corresponding view in the patient chart
+export const otherRelationships = getSyncLifecycle(OtherRelationships, options);
+export const otherRelationshipsLink = getSyncLifecycle(createDashboardLink(otherRelationshipsDashboardMeta), options);
+export const otherRelationshipsForm = getSyncLifecycle(OtherRelationshipsForm, options);
+
+// Relationships links for Family History and the corresponding view in the patient chart
+export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
+export const relationships = getSyncLifecycle(Relationships, options);
+
+// Contacts
 export const contactList = getSyncLifecycle(ContactList, options);
 export const contactListLink = getSyncLifecycle(createDashboardLink(contactListDashboardMeta), options);
 export const contactListForm = getSyncLifecycle(ContactListForm, options);
@@ -93,6 +114,9 @@ export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
+export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
+// export const caseEncounterHeader = getSyncLifecycle(CaseEncounterHeader, options);
+export const caseEncounterTable = getSyncLifecycle(CaseEncounterOverviewComponent, options);
 
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);

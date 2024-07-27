@@ -1,5 +1,6 @@
 import { APIRequestContext, Page, test as base } from '@playwright/test';
 import { api } from '../fixtures';
+import { addURLChangeListener } from './location-selector';
 
 // This file sets up our custom test harness using the custom fixtures.
 // See https://playwright.dev/docs/test-fixtures#creating-a-fixture for details.
@@ -17,4 +18,8 @@ export interface CustomWorkerFixtures {
 
 export const test = base.extend<CustomTestFixtures, CustomWorkerFixtures>({
   api: [api, { scope: 'worker' }],
+  page: async ({ page }, use) => {
+    addURLChangeListener(page);
+    await use(page);
+  },
 });

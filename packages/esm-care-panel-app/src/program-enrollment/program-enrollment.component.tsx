@@ -33,8 +33,6 @@ const programDetailsMap = {
     dateEnrolled: 'Enrolled on',
     whoStage: 'WHO Stage',
     entryPoint: 'Entry Point',
-    regimenShortDisplay: 'Regimen',
-    changeReasons: 'Reason for regimen change',
     reason: 'Reason for discontinuation',
   },
   TB: {

@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { type FetchResponse, openmrsFetch, FHIRResource } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, FHIRResource, restBaseUrl } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+import { RelationshipTypeResponse } from '../case-management/workspace/case-management.resource';
 
 interface RelationshipsResponse {
   results: Array<Relationship>;
@@ -15,6 +17,8 @@ interface ExtractedRelationship {
   causeOfDeath: string;
   relativeUuid: string;
   relationshipType: string;
+  relationshipTypeDisplay: string;
+  relationshipTypeUUID: string;
   patientUuid: string;
 }
 
@@ -74,6 +78,14 @@ function mapObservations(obsData) {
   }
 }
 
+export const useAllRelationshipTypes = () => {
+  const customRepresentation = 'custom:(uuid,display)';
+  const url = `${restBaseUrl}/relationshiptype?v=${customRepresentation}`;
+  const { data, error } = useSWRImmutable<{ data: RelationshipTypeResponse }>(url, openmrsFetch);
+
+  return { data, error };
+};
+
 export function useRelationships(patientUuid: string) {
   const customRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath),personB:(uuid,age,display,dead,causeOfDeath),relationshipType:(uuid,display,description,aIsToB,bIsToA))';
@@ -83,8 +95,11 @@ export function useRelationships(patientUuid: string) {
     : null;
 
   const { data, error, isLoading, isValidating } = useSWR<FetchResponse<RelationshipsResponse>, Error>(
-    patientUuid ? relationshipsUrl : null,
+    relationshipsUrl,
     openmrsFetch,
+    {
+      revalidateOnFocus: false,
+    },
   );
 
   const relationships = useMemo(() => {
@@ -96,6 +111,7 @@ export function useRelationships(patientUuid: string) {
     error,
     isLoading,
     isValidating,
+    relationshipsUrl,
   };
 }
 
@@ -115,6 +131,8 @@ function extractRelationshipData(
         causeOfDeath: r.personB.causeOfDeath,
         relativeUuid: r.personB.uuid,
         relationshipType: r.relationshipType.bIsToA,
+        relationshipTypeDisplay: r.relationshipType.display,
+        relationshipTypeUUID: r.relationshipType.uuid,
         patientUuid: r.personB.uuid,
       });
     } else {
