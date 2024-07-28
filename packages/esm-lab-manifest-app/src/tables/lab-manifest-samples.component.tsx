@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { TrashCan, View } from '@carbon/react/icons';
-import { ErrorState, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, formatDate, navigate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,11 +35,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
 
   const headers = [
     {
-      header: t('patientName', 'Patient name'),
-      key: 'patientName',
-    },
-    {
-      header: t('cccKDODNumber', 'CCC/KDOD Number'),
+      header: t('patient', 'Patient'),
       key: 'cccKDODNumber',
     },
     {
@@ -55,8 +51,16 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
       key: 'status',
     },
     {
-      header: t('dispatch', 'Dispatch'),
-      key: 'dispatch',
+      header: t('dateRequested', 'Date Requested'),
+      key: 'dateRequested',
+    },
+    {
+      header: t('resultDate', 'Result Date'),
+      key: 'resultDate',
+    },
+    {
+      header: t('result', 'Result'),
+      key: 'result',
     },
     {
       header: t('actions', 'Actions'),
@@ -65,7 +69,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
   ];
 
   const handleDeleteManifestSample = (manifestUuid: string) => {
-    // TODO Implement delete logic when endpoint is a
+    // TODO Implement delete logic when endpoint is a ready
   };
 
   const tableRows =
@@ -74,6 +78,11 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         id: `${sample.uuid}`,
         sampleType: sample.sampleType ?? '--',
         status: sample.status,
+        batchNumber: sample.batchNumber ?? '--',
+        cccKDODNumber: sample?.order?.patient?.identifiers[0]?.identifier ?? '--',
+        dateRequested: sample.dateSent ? formatDate(parseDate(sample.dateSent)) : '--',
+        resultDate: sample.resultDate ? formatDate(parseDate(sample.resultDate)) : '--',
+        result: sample.result ?? '--',
         actions: (
           <Button
             renderIcon={TrashCan}

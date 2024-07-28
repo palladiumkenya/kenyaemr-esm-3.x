@@ -4,12 +4,12 @@ import { extractLabManifest } from '../lab-manifest.resources';
 import { LabManifest } from '../types';
 
 const useLabManifests = (status: string) => {
-  const url = `${restBaseUrl}/labmanifest?v=full`;
+  const url = `${restBaseUrl}/labmanifest?v=full&status=${status}`;
   const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<LabManifest> }>>(url, openmrsFetch);
 
   return {
     isLoading,
-    manifests: (data?.data?.results ?? []).map(extractLabManifest).filter((m) => m.manifestStatus == status),
+    manifests: (data?.data?.results ?? []).map(extractLabManifest),
     error,
   };
 };

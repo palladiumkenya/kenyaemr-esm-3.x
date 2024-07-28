@@ -18,6 +18,8 @@
   "manifestSamples": "Manifest samples",
   "notLabManifetToDisplay": "There is no lab manifets data to display.",
   "patientName": "Patient name",
+  "removeFromManifest": "Remove from Manifest",
+  "samples": "Samples",
   "sampleType": "Sample type",
   "selectManifestStatus": "Select manifest status",
   "startDate": "Start date",

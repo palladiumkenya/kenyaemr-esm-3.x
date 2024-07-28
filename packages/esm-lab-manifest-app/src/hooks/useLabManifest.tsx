@@ -4,7 +4,7 @@ import { extractLabManifest } from '../lab-manifest.resources';
 import { LabManifest } from '../types';
 
 const useLabManifest = (manifestUuid: string) => {
-  const url = `${restBaseUrl}/labmanifest/${manifestUuid}?v=full`;
+  const url = `${restBaseUrl}/labmanifest/${manifestUuid}`;
   const { isLoading, error, data } = useSWR<FetchResponse<LabManifest>>(url, openmrsFetch);
 
   return {

@@ -38,11 +38,24 @@ export interface LabManifest {
   labManifestOrders: Array<LabManifestSample>;
 }
 
+export interface Order {
+  patient: {
+    id: number;
+    uuid: string;
+    identifiers: Array<{ identifier: string; uuid: string }>;
+  };
+}
+
 export interface LabManifestSample {
   uuid: string;
   id: number;
   sampleType: string;
   status: string;
+  result: string;
+  batchNumber: string;
+  dateSent: string;
+  resultDate: string;
+  order: Order;
 }
 
 export interface ActiveRequests {

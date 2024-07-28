@@ -43,7 +43,8 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
         <div className={styles.manifestDetailContent}>
           <div>
             <strong>Date:</strong>
-            {formatDate(parseDate(manifest.startDate))} <strong>To</strong> {formatDate(parseDate(manifest.endDate))}
+            {manifest.startDate ? formatDate(parseDate(manifest.startDate)) : '--'} <strong>To</strong>{' '}
+            {manifest.endDate ? formatDate(parseDate(manifest.endDate)) : '--'}
           </div>
           <div>
             <strong>Status:</strong>
@@ -52,7 +53,8 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
           </div>
           <div>
             <strong>Dispatch Date:</strong>
-            {formatDate(parseDate(manifest.dispatchDate))} | <strong>Lab person Contact:</strong>
+            {manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--'} |{' '}
+            <strong>Lab person Contact:</strong>
             {manifest.labPersonContact}
           </div>
         </div>
