@@ -1,0 +1,9 @@
+@use '@carbon/type';
+
+.modalHeaderLabel {
+  @include type.type-style('label-02');
+}
+
+.modalHeaderHeading {
+  @include type.type-style('heading-compact-02');
+}

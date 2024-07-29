@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   StructuredListHead,
   StructuredListRow,
@@ -7,35 +7,40 @@ import {
   StructuredListWrapper,
   Layer,
   Checkbox,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
-import { MappedBill, LineItem } from '../../types';
-import styles from './bill-waiver.scss';
-import BillWaiverForm from './bill-waiver-form.component';
+import { LineItem, MappedBill } from '../../types';
+import styles from './bill-manager.scss';
+import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 
-const PatientBillsSelections: React.FC<{ bills: MappedBill; setPatientUuid: (patientUuid) => void }> = ({
-  bills,
-  setPatientUuid,
-}) => {
+const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
   const { t } = useTranslation();
-  const [selectedBills, setSelectedBills] = React.useState<Array<LineItem>>([]);
 
-  const checkBoxLabel = (lineItem) => {
-    return `${lineItem.item === '' ? lineItem.billableService : lineItem.item} ${convertToCurrency(lineItem.price)}`;
+  const handleOpenEditLineItemWorkspace = (lineItem: LineItem) => {
+    launchWorkspace('edit-bill-form', {
+      workspaceTitle: t('editBillForm', 'Edit Bill Form'),
+      lineItem,
+    });
   };
 
-  const handleOnCheckBoxChange = (event, { checked, id }) => {
-    const selectedLineItem = bills.lineItems.find((lineItem) => lineItem.uuid === id);
-    if (checked) {
-      setSelectedBills([...selectedBills, selectedLineItem]);
-    } else {
-      setSelectedBills(selectedBills.filter((lineItem) => lineItem.uuid !== id));
-    }
+  const handleOpenCancelLineItemModal = () => {
+    const dispose = showModal('cancel-bill-modal', {
+      onClose: () => dispose(),
+    });
   };
+
+  const handleOpenDeleteLineItemModal = () => {
+    const dispose = showModal('delete-bill-modal', {
+      onClose: () => dispose(),
+    });
+  };
+
   return (
     <Layer>
-      <StructuredListWrapper className={styles.billListContainer} isCondensed selection={true}>
+      <StructuredListWrapper className={styles.billListContainer} selection={true} isCondensed>
         <StructuredListHead>
           <StructuredListRow head>
             <StructuredListCell head>{t('billItem', 'Bill item')}</StructuredListCell>
@@ -46,7 +51,7 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill; setPatientUuid: (pat
           </StructuredListRow>
         </StructuredListHead>
         <StructuredListBody>
-          {bills?.lineItems.map((lineItem) => (
+          {bill?.lineItems.map((lineItem) => (
             <StructuredListRow>
               <StructuredListCell>
                 {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
@@ -55,20 +60,18 @@ const PatientBillsSelections: React.FC<{ bills: MappedBill; setPatientUuid: (pat
               <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
               <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
               <StructuredListCell>
-                <Checkbox
-                  hideLabel
-                  onChange={(event, { checked, id }) => handleOnCheckBoxChange(event, { checked, id })}
-                  labelText={checkBoxLabel(lineItem)}
-                  id={lineItem.uuid}
-                />
+                <OverflowMenu aria-label="overflow-menu" align="bottom">
+                  <OverflowMenuItem itemText="Edit Item" onClick={() => handleOpenEditLineItemWorkspace(lineItem)} />
+                  <OverflowMenuItem itemText="Cancel Item" onClick={handleOpenCancelLineItemModal} />
+                  <OverflowMenuItem itemText="Delete Item" onClick={handleOpenDeleteLineItemModal} />
+                </OverflowMenu>
               </StructuredListCell>
             </StructuredListRow>
           ))}
         </StructuredListBody>
       </StructuredListWrapper>
-      <BillWaiverForm bill={bills} lineItems={selectedBills} setPatientUuid={setPatientUuid} />
     </Layer>
   );
 };
 
-export default PatientBillsSelections;
+export default BillLineItems;

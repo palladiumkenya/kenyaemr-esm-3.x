@@ -19,10 +19,7 @@ interface RelationshipType {
   display: string;
 }
 
-interface RelationshipTypeResponse {
-  results: RelationshipType[];
-}
-interface RelationshipTypeResponse {
+export interface RelationshipTypeResponse {
   results: RelationshipType[];
 }
 

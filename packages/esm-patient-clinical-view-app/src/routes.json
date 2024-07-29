@@ -19,6 +19,14 @@
       "offline": false
     },
     {
+      "name": "other-relationships",
+      "slot": "patient-chart-family-history-slot",
+      "component": "otherRelationships",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+    {
       "name": "relationships-link",
       "component": "relationshipsLink",
       "slot": "patient-chart-dashboard-slot",
@@ -206,9 +214,27 @@
       "online": true,
       "offline": false
     },
-        {
-      "name": "case-management-form",
-      "component": "caseManagementForm"
+    {
+      "name": "case-encounter-link",
+      "component": "caseEncounterDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 14,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-case-encounter-slot",
+        "path": "case-encounter",
+
+        "layoutMode": "anchored"
+      }
+    },
+     {
+      "name": "case-encounter-table",
+      "slot": "patient-chart-case-encounter-slot",
+      "component": "caseEncounterTable",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [
@@ -216,5 +242,25 @@
 	  "name": "birth-date-calculator",
 	  "component": "birthDateCalculator"
 	}
+],
+"workspaces": [
+  {
+    "name": "case-management-form",
+    "component": "caseManagementForm",
+    "title": "Case Management Form",
+    "type": "form"
+  },
+  {
+    "name": "family-relationship-form",
+    "component": "familyRelationshipForm",
+    "title": "Family Relationship Form",
+    "type": "form"
+  },
+  {
+    "name": "other-relationship-form",
+    "component": "otherRelationshipsForm",
+    "title": "Other Relationships Form",
+    "type": "form"
+  }
 ]
 }

@@ -179,3 +179,11 @@
   @include type.type-style('body-compact-01');
   color: $text-02;
 }
+
+.expendableRow {
+  padding-left: 1rem;
+}
+
+.scalpel {
+  cursor: pointer;
+}

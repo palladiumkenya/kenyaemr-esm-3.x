@@ -16,7 +16,15 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { useLayoutType, isDesktop, useConfig, usePagination, ErrorState, navigate } from '@openmrs/esm-framework';
+import {
+  useLayoutType,
+  isDesktop,
+  useConfig,
+  usePagination,
+  ErrorState,
+  navigate,
+  WorkspaceContainer,
+} from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
 import { useTranslation } from 'react-i18next';

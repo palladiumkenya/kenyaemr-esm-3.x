@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Layer,
   DataTable,
@@ -13,26 +13,23 @@ import {
   TableCell,
   TableExpandedRow,
   Tile,
+  Button,
 } from '@carbon/react';
 import { convertToCurrency, extractString } from '../../helpers';
 import { useTranslation } from 'react-i18next';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
-import PatientBillsSelections from './bill-selection.component';
+import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedBill } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
+import BillLineItems from './bill-line-items.component';
+import { Scalpel } from '@carbon/react/icons';
+import { launchWorkspace } from '@openmrs/esm-framework';
 
 type PatientBillsProps = {
-  patientUuid: string;
   bills: Array<MappedBill>;
-  setPatientUuid: (patientUuid: string) => void;
 };
 
-const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPatientUuid }) => {
+const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   const { t } = useTranslation();
-
-  if (!patientUuid) {
-    return;
-  }
 
   const tableHeaders = [
     { header: 'Date', key: 'date' },
@@ -47,20 +44,21 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
     totalAmount: convertToCurrency(bill.totalAmount),
   }));
 
-  if (bills.length === 0 && patientUuid !== '') {
+  const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {
+    launchWorkspace('waive-bill-form', {
+      workspaceTitle: 'Waive Bill Form',
+      bill,
+    });
+  };
+
+  if (bills.length === 0) {
     return (
-      <>
-        <div style={{ marginTop: '0.625rem' }}>
-          <Layer className={styles.emptyStateContainer}>
-            <Tile className={styles.tile}>
-              <div className={styles.illo}>
-                <EmptyDataIllustration />
-              </div>
-              <p className={styles.content}>{t('noBillDisplay', 'There are no bills to display for this patient')}</p>
-            </Tile>
-          </Layer>
-        </div>
-      </>
+      <div style={{ marginTop: '1rem' }}>
+        <EmptyState
+          displayText={t('noBillDisplay', 'There are no bills to display for this patient')}
+          headerTitle="No bills"
+        />
+      </div>
     );
   }
 
@@ -69,6 +67,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
       <DataTable
         rows={tableRows}
         headers={tableHeaders}
+        compact
         size="sm"
         useZebraStyles
         render={({
@@ -88,7 +87,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
             <Table {...getTableProps()} aria-label="sample table">
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader enableToggle={true} {...getExpandHeaderProps()} />
+                  <TableExpandHeader {...getExpandHeaderProps()} />
                   {headers.map((header, i) => (
                     <TableHeader
                       key={i}
@@ -98,6 +97,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
                       {header.header}
                     </TableHeader>
                   ))}
+                  <TableHeader>Action</TableHeader>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -110,16 +110,20 @@ const PatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPati
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
+                      <TableCell>
+                        <Scalpel
+                          onClick={() => handleOpenWaiveBillWorkspace(bills[index])}
+                          className={styles.scalpel}
+                        />
+                      </TableCell>
                     </TableExpandRow>
                     <TableExpandedRow
-                      colSpan={headers.length + 1}
-                      className="demo-expanded-td"
+                      colSpan={headers.length + 2}
+                      className={styles.expendableRow}
                       {...getExpandedRowProps({
                         row,
                       })}>
-                      <div>
-                        <PatientBillsSelections bills={bills[index]} setPatientUuid={setPatientUuid} />
-                      </div>
+                      <BillLineItems bill={bills[index]} />
                     </TableExpandedRow>
                   </React.Fragment>
                 ))}
