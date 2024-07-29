@@ -62,7 +62,7 @@ const MetricsHeader = () => {
           renderIcon={(props) => <ArrowRight size={16} {...props} />}
           iconDescription={t('enroll', 'Add new Provider')}
           onClick={() => setIsModalOpen(true)}>
-          {t('enroll', 'ENROLL NEW PROVIDER')}
+          {t('enroll', 'Enroll new provider')}
         </Button>
       </div>
       <Modal
