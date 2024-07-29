@@ -10,6 +10,9 @@ export const ContactListFormSchema = z.object({
   middleName: z.string().min(1, 'Required'),
   familyName: z.string().min(1, 'Required'),
   gender: z.enum(['M', 'F']),
+  physicalAssault: z.enum(['1065', '1066']).optional(),
+  threatened: z.enum(['1065', '1066']).optional(),
+  sexualAssault: z.enum(['1065', '1066']).optional(),
   dateOfBirth: z.date({ coerce: true }).max(new Date(), 'Must not be a future date'),
   maritalStatus: z.string().optional(),
   address: z.string().optional(),
@@ -18,7 +21,13 @@ export const ContactListFormSchema = z.object({
   livingWithClient: z.string().optional(),
   baselineStatus: z.string().optional(),
   preferedPNSAproach: z.string().optional(),
+  ipvOutCome: z.enum(['True', 'False']).optional(),
 });
+
+export const contactIPVOutcomeOptions = [
+  { label: 'True', value: 'True' },
+  { label: 'False', value: 'False' },
+];
 
 export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
   encounters: HTSEncounter[],
@@ -77,6 +86,7 @@ export const saveContact = async (
     phoneNumber,
     preferedPNSAproach,
     relationshipToPatient,
+    ipvOutCome,
   }: z.infer<typeof ContactListFormSchema>,
   patientUuid: string,
   encounter: Record<string, any>,
@@ -135,6 +145,14 @@ export const saveContact = async (
             },
           ]
         : []),
+      ...(ipvOutCome
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.contactIPVOutcome,
+              value: ipvOutCome,
+            },
+          ]
+        : []),
     ],
   };
   try {
@@ -159,9 +177,9 @@ export const saveContact = async (
     });
     // Create relationship payload
     const relationshipPayload = {
-      personA: patient.person.uuid,
+      personA: patientUuid,
       relationshipType: relationshipToPatient,
-      personB: patientUuid,
+      personB: patient.person.uuid,
       startDate: listingDate.toISOString(),
     };
     // Create optional encounter with marital/civil status obs

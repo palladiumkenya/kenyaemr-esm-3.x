@@ -21,7 +21,7 @@ import {
   usePatient,
   useSession,
 } from '@openmrs/esm-framework';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
@@ -29,7 +29,7 @@ import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
-import { ContactListFormSchema, saveContact } from './contact-list.resource';
+import { contactIPVOutcomeOptions, ContactListFormSchema, saveContact } from './contact-list.resource';
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   props: any;
@@ -130,6 +130,22 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
       props: { date: new Date(), onBirthDateChange: (date) => form.setValue('dateOfBirth', date) },
     });
   };
+
+  const observableRelationship = form.watch('relationshipToPatient');
+  const observablePhysicalAssault = form.watch('physicalAssault');
+  const observableThreatened = form.watch('threatened');
+  const observableSexualAssault = form.watch('sexualAssault');
+
+  useEffect(() => {
+    if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes('1065')) {
+      form.setValue('ipvOutCome', 'True');
+    } else if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].every((v) => v === '1066')) {
+      form.setValue('ipvOutCome', 'False');
+    }
+  }, [observablePhysicalAssault, observableThreatened, observableSexualAssault]);
+
+  const showIPVRelatedFields =
+    config.contactSexualRelationships.findIndex((r) => r.uuid === observableRelationship) !== -1;
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -344,6 +360,99 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             )}
           />
         </Column>
+        {showIPVRelatedFields && (
+          <>
+            <span className={styles.sectionHeader}>IPV Questions</span>
+            <Column>
+              <Controller
+                control={form.control}
+                name="physicalAssault"
+                render={({ field }) => (
+                  <RadioButtonGroup
+                    id="physicalAssault"
+                    legendText={t(
+                      'physicalAssault',
+                      '1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?',
+                    )}
+                    {...field}
+                    // defaultSelected=""
+                    invalid={form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}
+                    className={styles.billingItem}>
+                    <RadioButton labelText={t('yes', 'Yes')} value="1065" id="physicalAssault_1065" />
+                    <RadioButton labelText={t('no', 'No')} value="1066" id="physicalAssault_1066" />
+                  </RadioButtonGroup>
+                )}
+              />
+            </Column>
+            <Column>
+              <Controller
+                control={form.control}
+                name="threatened"
+                render={({ field }) => (
+                  <RadioButtonGroup
+                    id="threatened"
+                    legendText={t('threatened', '2. Has he/she ever threatened to hurt you?')}
+                    {...field}
+                    // defaultSelected=""
+                    invalid={form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}
+                    className={styles.billingItem}>
+                    <RadioButton labelText={t('yes', 'Yes')} value="1065" id="threatened_1065" />
+                    <RadioButton labelText={t('no', 'No')} value="1066" id="threatened_1066" />
+                  </RadioButtonGroup>
+                )}
+              />
+            </Column>
+            <Column>
+              <Controller
+                control={form.control}
+                name="sexualAssault"
+                render={({ field }) => (
+                  <RadioButtonGroup
+                    id="sexualAssault"
+                    legendText={t(
+                      'sexualAssault',
+                      '3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?',
+                    )}
+                    {...field}
+                    // defaultSelected=""
+                    invalid={form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}
+                    className={styles.billingItem}>
+                    <RadioButton labelText={t('yes', 'Yes')} value="1065" id="sexualAssault_1065" />
+                    <RadioButton labelText={t('no', 'No')} value="1066" id="sexualAssault_1066" />
+                  </RadioButtonGroup>
+                )}
+              />
+            </Column>
+            <span className={styles.sectionHeader}>IPV Outcome</span>
+            <Column>
+              <Controller
+                control={form.control}
+                name="ipvOutCome"
+                render={({ field }) => (
+                  <Dropdown
+                    ref={field.ref}
+                    invalid={form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}
+                    id="ipvOutCome"
+                    titleText={t('ipvOutCome', 'IPV Outcome')}
+                    onChange={(e) => {
+                      field.onChange(e.selectedItem);
+                    }}
+                    initialSelectedItem={field.value}
+                    label="Choose option"
+                    items={contactIPVOutcomeOptions.map((r) => r.value)}
+                    itemToString={(item) => {
+                      return contactIPVOutcomeOptions.find((r) => r.value === item)?.label ?? '';
+                    }}
+                  />
+                )}
+              />
+            </Column>
+          </>
+        )}
         <span className={styles.sectionHeader}>Baseline Information</span>
 
         <Column>
@@ -385,7 +494,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 initialSelectedItem={field.value}
                 label="Select Aproach"
                 items={pnsAproach.map((r) => r.value)}
-                itemToString={(item) => pnsAproach.find((r) => r.value === item)?.label ?? ''}
+                itemToString={(item) => pnsAproach.find((r) => r.value === field.value)?.label ?? ''}
               />
             )}
           />

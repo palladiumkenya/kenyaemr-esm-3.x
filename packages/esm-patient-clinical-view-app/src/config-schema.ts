@@ -130,6 +130,7 @@ export const configSchema = {
       contactCreated: '7c94bd35-fba7-4ef7-96f5-29c89a318fcf',
       preferedPnsAproach: '59d1b886-90c8-4f7f-9212-08b20a9ee8cf',
       livingWithContact: '35a08d84-9f80-4991-92b4-c4ae5903536e',
+      contactIPVOutcome: '49c543c2-a72a-4b0a-8cca-39c375c0726f',
     },
   },
   familyRelationshipsTypeList: {
@@ -174,6 +175,20 @@ export const configSchema = {
       },
     ],
   },
+  contactSexualRelationships: {
+    _type: Type.Array,
+    _description: 'List of Sexual relationship',
+    _default: [
+      {
+        uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
+        display: 'Spouse/Spouse',
+      },
+      {
+        uuid: '007b765f-6725-4ae9-afee-9966302bace4',
+        display: 'Partner/Partner',
+      },
+    ],
+  },
 };
 
 export interface ConfigObject {
@@ -204,8 +219,10 @@ export interface ConfigObject {
     contactCreated: string;
     preferedPnsAproach: string;
     livingWithContact: string;
+    contactIPVOutcome: string;
   };
   familyRelationshipsTypeList: Array<{ uuid: string; display: string }>;
+  contactSexualRelationships: Array<{ uuid: string; display: string }>;
 }
 
 export interface PartograpyComponents {
