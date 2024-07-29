@@ -41,6 +41,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
   const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
+
   const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
   const familyRelationships = relationships.filter((r) => familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
 

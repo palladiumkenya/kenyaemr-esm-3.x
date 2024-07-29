@@ -214,6 +214,8 @@ function extractRelationshipData(
         relativeUuid: r.personA.uuid,
         dead: r.personA.dead,
         relationshipType: r.relationshipType.aIsToB,
+        relationshipTypeDisplay: r.relationshipType.display,
+        relationshipTypeUUID: r.relationshipType.uuid,
         patientUuid: r.personA.uuid,
       });
     }
