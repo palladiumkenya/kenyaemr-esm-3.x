@@ -147,7 +147,7 @@ export const Discharged: React.FC = () => {
   }, [paginatedResults]);
 
   const tableColumns = [
-    { id: 0, header: t('id', 'IDENTIFIER'), key: 'id' },
+    {  header: t('id', 'IDENTIFIER'), key: 'id' },
     { id: 2, header: t('name', 'NAME'), key: 'name' },
     { id: 1, header: t('compartment', 'COMPARTMENT'), key: 'compartment' },
     {
