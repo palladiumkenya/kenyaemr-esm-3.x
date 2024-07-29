@@ -37,10 +37,9 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
 
   const { data: inactiveCasesData } = useActivecases(caseManagerPersonUuid);
 
-  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/case-encounter';
+  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/case-management-encounters';
 
   const headers = [
-    { key: 'sno', header: t('s/No', 'S/No') },
     { key: 'names', header: t('names', 'Names') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
@@ -57,7 +56,6 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
     ?.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     .map((caseData, index) => ({
       id: caseData.uuid,
-      sno: (currentPage - 1) * pageSize + index + 1,
       names: (
         <ConfigurableLink
           style={{ textDecoration: 'none', maxWidth: '50%' }}
