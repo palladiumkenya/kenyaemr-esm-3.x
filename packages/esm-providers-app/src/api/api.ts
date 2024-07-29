@@ -3,8 +3,7 @@ import { Buffer } from 'buffer';
 import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 
 const providerUrl = `${restBaseUrl}/provider?v=full`
-export const custom =
-  '/ws/rest/v1/provider?&v=custom:(uuid,identifier,display,person:(uuid,display),attributes:(uuid,display),retired)';
+export const custom = custom:(uuid,identifier,display,person:(uuid,display),attributes:(uuid,display),retired)';
 
 const fetcher = async (url) => {
   try {
