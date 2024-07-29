@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from '@carbon/react/icons';
