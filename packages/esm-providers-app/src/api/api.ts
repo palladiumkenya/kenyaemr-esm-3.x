@@ -2,7 +2,7 @@ import useSWR from 'swr';
 import { Buffer } from 'buffer';
 import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 
-export const BASE_URL = '/ws/rest/v1/provider?v=full';
+const providerUrl = `${restBaseUrl}/provider?v=full`
 export const custom =
   '/ws/rest/v1/provider?&v=custom:(uuid,identifier,display,person:(uuid,display),attributes:(uuid,display),retired)';
 
