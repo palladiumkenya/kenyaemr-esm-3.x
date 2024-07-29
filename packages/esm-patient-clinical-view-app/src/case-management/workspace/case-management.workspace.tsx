@@ -15,7 +15,6 @@ const schema = z.object({
   caseManager: z.string().nonempty({ message: 'Case Manager is required' }),
   relationship: z.string().nonempty({ message: 'Relationship is required' }),
   startDate: z.date({ required_error: 'Start Date is required' }),
-  // reasons: z.string().nonempty({ message: 'At least one reason is required' }),
   endDate: z.date().optional(),
   notes: z.string().optional(),
 });
@@ -30,8 +29,15 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
   const [patientUuid, setPatientUuid] = useState('');
   const [patientSelected, setPatientSelected] = useState(false);
 
-  const { data, error } = useCaseManagers();
+  const { data } = useCaseManagers();
   const { data: relationshipTypesData } = useRelationshipType();
+
+  const caseManagerRlshipType =
+    relationshipTypesData?.map((relationship) => ({
+      id: relationship.uuid,
+      text: relationship.display,
+    })) || [];
+
   const caseManagerUuid = user?.person.uuid;
   const { mutate: fetchCases } = useActivecases(caseManagerUuid);
 
@@ -39,12 +45,6 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
     data?.data.results.map((manager) => ({
       id: manager.person.uuid,
       text: manager.display,
-    })) || [];
-
-  const caseManagerRlshipType =
-    relationshipTypesData?.data.results.map((relationship) => ({
-      id: relationship.uuid,
-      text: relationship.display,
     })) || [];
 
   const conceptReasons = useMemo(() => {

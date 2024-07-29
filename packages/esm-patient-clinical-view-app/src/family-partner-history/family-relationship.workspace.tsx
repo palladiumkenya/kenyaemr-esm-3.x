@@ -10,7 +10,7 @@ import { uppercaseText } from '../utils/expression-helper';
 import { saveRelationship } from '../case-management/workspace/case-management.resource';
 import PatientInfo from '../case-management/workspace/patient-info.component';
 import { mutate } from 'swr';
-import { useAllRelationshipTypes, useRelationships } from './relationships.resource';
+import { useAllRelationshipTypes, useFamilyRelationshipTypes, useRelationships } from './relationships.resource';
 import { ConfigObject } from '../config-schema';
 
 const schema = z.object({
@@ -30,9 +30,9 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
   const { t } = useTranslation();
   const [relatedPersonUuid, setRelatedPersonUuid] = useState<string | undefined>(undefined);
   const { relationshipsUrl } = useRelationships(rootPersonUuid);
-  const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
+  const { data: familyRelationshipsTypes } = useFamilyRelationshipTypes();
 
-  const relationshipTypes = familyRelationshipsTypeList.map((relationship) => ({
+  const relationshipTypes = familyRelationshipsTypes.map((relationship) => ({
     id: relationship.uuid,
     text: relationship.display,
   }));
@@ -107,7 +107,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
               <ComboBox
                 id="relationship_name"
                 titleText={t('relationship', 'Relationship')}
-                placeholder="Select Relationship"
+                placeholder="Relationship to patient"
                 items={relationshipTypes}
                 itemToString={(item) => (item ? uppercaseText(item.text) : '')}
                 onChange={(e) => field.onChange(e.selectedItem?.id)}

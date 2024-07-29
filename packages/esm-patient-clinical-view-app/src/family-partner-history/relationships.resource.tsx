@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { type FetchResponse, openmrsFetch, FHIRResource, restBaseUrl } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, FHIRResource, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { RelationshipTypeResponse } from '../case-management/workspace/case-management.resource';
+import { ConfigObject } from '../config-schema';
 
 interface RelationshipsResponse {
   results: Array<Relationship>;
@@ -48,6 +49,12 @@ type FHIRResourceResponse = {
   entry: Array<FHIRResource>;
 };
 
+interface RelationshipType {
+  uuid: string;
+  display: string;
+  direction: string;
+}
+
 export const useCodedConceptObservations = (patientUuid: string, conceptUuid: string) => {
   const url = `/ws/fhir2/R4/Observation?subject:Patient=${patientUuid}&code=${conceptUuid}&_summary=data&_sort=-date&_count=100`;
 
@@ -79,11 +86,73 @@ function mapObservations(obsData) {
 }
 
 export const useAllRelationshipTypes = () => {
-  const customRepresentation = 'custom:(uuid,display)';
-  const url = `${restBaseUrl}/relationshiptype?v=${customRepresentation}`;
+  const url = `${restBaseUrl}/relationshiptype?v=default`;
   const { data, error } = useSWRImmutable<{ data: RelationshipTypeResponse }>(url, openmrsFetch);
 
   return { data, error };
+};
+
+export const useFamilyRelationshipTypes = () => {
+  const url = `${restBaseUrl}/relationshiptype?v=default`;
+  const { data, error } = useSWRImmutable<{ data?: RelationshipTypeResponse }>(url, openmrsFetch);
+  const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
+  const familyRelationshipTypesUUIDs = new Set(familyRelationshipsTypeList.map((r) => r.uuid));
+
+  const tmp: RelationshipType[] = [];
+
+  data?.data.results
+    .filter((type) => familyRelationshipTypesUUIDs.has(type.uuid))
+    .forEach((type) => {
+      const aIsToB = {
+        display: type.displayAIsToB ? type.displayAIsToB : type.displayBIsToA,
+        uuid: type.uuid,
+        direction: 'aIsToB',
+      };
+      const bIsToA = {
+        display: type.displayBIsToA ? type.displayBIsToA : type.displayAIsToB,
+        uuid: type.uuid,
+        direction: 'bIsToA',
+      };
+      aIsToB.display === bIsToA.display
+        ? tmp.push(aIsToB)
+        : bIsToA.display === 'Patient'
+        ? tmp.push(aIsToB, { display: `Patient (${aIsToB.display})`, uuid: type.uuid, direction: 'bIsToA' })
+        : tmp.push(aIsToB, bIsToA);
+    });
+
+  return { data: tmp, error };
+};
+
+// Hook for getting all other relationship types other than "family types";
+export const useOtherRelationshipTypes = () => {
+  const url = `${restBaseUrl}/relationshiptype?v=default`;
+  const { data, error } = useSWRImmutable<{ data?: RelationshipTypeResponse }>(url, openmrsFetch);
+  const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
+  const familyRelationshipTypesUUIDs = new Set(familyRelationshipsTypeList.map((r) => r.uuid));
+
+  const tmp: RelationshipType[] = [];
+
+  data?.data.results
+    .filter((type) => !familyRelationshipTypesUUIDs.has(type.uuid))
+    .forEach((type) => {
+      const aIsToB = {
+        display: type.displayAIsToB ? type.displayAIsToB : type.displayBIsToA,
+        uuid: type.uuid,
+        direction: 'aIsToB',
+      };
+      const bIsToA = {
+        display: type.displayBIsToA ? type.displayBIsToA : type.displayAIsToB,
+        uuid: type.uuid,
+        direction: 'bIsToA',
+      };
+      aIsToB.display === bIsToA.display
+        ? tmp.push(aIsToB)
+        : bIsToA.display === 'Patient'
+        ? tmp.push(aIsToB, { display: `Patient (${aIsToB.display})`, uuid: type.uuid, direction: 'bIsToA' })
+        : tmp.push(aIsToB, bIsToA);
+    });
+
+  return { data: tmp, error };
 };
 
 export function useRelationships(patientUuid: string) {
