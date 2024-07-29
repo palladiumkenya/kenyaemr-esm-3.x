@@ -17,7 +17,7 @@ export function startupApp() {
   registerBreadcrumbs([
     {
       title: 'providers',
-      path: morgueBasepath,
+      path: providerBasepath,
       parent: `${window.spaBase}/home`,
     },
   ]);
