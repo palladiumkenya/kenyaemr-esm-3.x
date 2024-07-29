@@ -77,16 +77,9 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
   };
 
   const tableRows =
-    (results as any[])?.map((activeRequest) => {
+    (results as ActiveRequests[])?.map((activeRequest) => {
       return {
         id: `${activeRequest.uuid}`,
-        startDate: activeRequest.startDate ?? '--',
-        endDate: activeRequest.endDate,
-        courrier: activeRequest.courrier,
-        labPersonContact: activeRequest.labPersonContact,
-        type: activeRequest.type,
-        status: activeRequest.status,
-        dispatch: activeRequest.dispatch,
         actions: (
           <Button
             renderIcon={View}

@@ -1,6 +1,5 @@
-import { generateOfflineUuid } from '@openmrs/esm-framework';
+import { generateOfflineUuid, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { z } from 'zod';
-import { labManifest } from './lab-manifest.mock';
 import { LabManifest, MappedLabManifest } from './types';
 
 export const LabManifestFilters = [
@@ -10,15 +9,15 @@ export const LabManifestFilters = [
   },
   {
     label: 'Ready To send',
-    value: 'readyToSend',
+    value: 'Ready to send',
   },
   {
     label: 'On Hold',
-    value: 'onHold',
+    value: 'On Hold',
   },
   {
     label: 'Sending',
-    value: 'sending',
+    value: 'Sending',
   },
   {
     label: 'Submitted',
@@ -67,40 +66,24 @@ export const manifestTypes = [
   },
 ];
 
-export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema>, maifestId: string | undefined) => {
-  await new Promise((res, _) => {
-    setTimeout(res, 300);
-  });
+export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema>, manifestId: string | undefined) => {
+  let url;
   const abortController = new AbortController();
-  const { dispatchDate, endDate, startDate } = data;
-  // return openmrsFetch(`${restBaseUrl}/labManifests`, {
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   method: 'POST',
-  //   body: JSON.stringify(data),
-  //   signal: abortController.signal,
-  // });
-  if (!maifestId) {
-    labManifest.push({
-      ...data,
-      dispatchDate: dispatchDate.toISOString(),
-      endDate: endDate.toISOString(),
-      startDate: startDate.toISOString(),
-      uuid: generateOfflineUuid(),
-      samples: [],
-    });
+
+  if (!manifestId) {
+    url = `${restBaseUrl}/labmanifest`;
   } else {
-    const index = labManifest.findIndex((mn) => mn.uuid === maifestId);
-    labManifest[index] = {
-      ...data,
-      dispatchDate: dispatchDate.toISOString(),
-      endDate: endDate.toISOString(),
-      startDate: startDate.toISOString(),
-      uuid: generateOfflineUuid(),
-      samples: [],
-    };
+    url = `${restBaseUrl}/labmanifest/${manifestId}`;
   }
+
+  return openmrsFetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(data),
+    signal: abortController.signal,
+  });
 };
 
 export const extractLabManifest = (manifest: LabManifest) =>

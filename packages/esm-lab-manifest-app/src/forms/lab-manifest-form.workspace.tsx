@@ -44,9 +44,18 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const onSubmit = async (values: ContactListFormType) => {
     try {
       await saveLabManifest(values, manifest?.uuid);
-      mutate((key) => {
-        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/lab-manifest?status=${values.manifestStatus}`);
-      });
+      if (manifest?.uuid) {
+        mutate((key) => {
+          return (
+            typeof key === 'string' &&
+            key.startsWith(`/ws/rest/v1/labmanifest/${manifest!.uuid}?status=${values.manifestStatus}`)
+          );
+        });
+      } else {
+        mutate((key) => {
+          return typeof key === 'string' && key.startsWith(`/ws/rest/v1/labmanifest?status=${values.manifestStatus}`);
+        });
+      }
       closeWorkspace();
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {

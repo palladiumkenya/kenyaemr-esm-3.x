@@ -59,7 +59,7 @@ export interface LabManifestSample {
 }
 
 export interface ActiveRequests {
-  uuid: String;
+  uuid: string;
 }
 
 export interface Constiuency {
