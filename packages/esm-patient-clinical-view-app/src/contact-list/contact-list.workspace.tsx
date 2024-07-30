@@ -135,6 +135,8 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   const observablePhysicalAssault = form.watch('physicalAssault');
   const observableThreatened = form.watch('threatened');
   const observableSexualAssault = form.watch('sexualAssault');
+  const showIPVRelatedFields =
+    config.contactSexualRelationships.findIndex((r) => r.uuid === observableRelationship) !== -1;
 
   useEffect(() => {
     if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes('1065')) {
@@ -142,10 +144,10 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
     } else if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].every((v) => v === '1066')) {
       form.setValue('ipvOutCome', 'False');
     }
-  }, [observablePhysicalAssault, observableThreatened, observableSexualAssault]);
-
-  const showIPVRelatedFields =
-    config.contactSexualRelationships.findIndex((r) => r.uuid === observableRelationship) !== -1;
+    if (!showIPVRelatedFields) {
+      form.setValue('ipvOutCome', undefined);
+    }
+  }, [observablePhysicalAssault, observableThreatened, observableSexualAssault, observableRelationship]);
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -441,7 +443,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                     onChange={(e) => {
                       field.onChange(e.selectedItem);
                     }}
-                    initialSelectedItem={field.value}
+                    selectedItem={field.value}
                     label="Choose option"
                     items={contactIPVOutcomeOptions.map((r) => r.value)}
                     itemToString={(item) => {
@@ -494,7 +496,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 initialSelectedItem={field.value}
                 label="Select Aproach"
                 items={pnsAproach.map((r) => r.value)}
-                itemToString={(item) => pnsAproach.find((r) => r.value === field.value)?.label ?? ''}
+                itemToString={(item) => pnsAproach.find((r) => r.value === item)?.label ?? ''}
               />
             )}
           />
