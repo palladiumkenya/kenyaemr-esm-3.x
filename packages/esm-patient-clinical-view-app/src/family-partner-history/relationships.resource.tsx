@@ -130,7 +130,7 @@ export const useOtherRelationshipTypes = () => {
   const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
   const familyRelationshipTypesUUIDs = new Set(familyRelationshipsTypeList.map((r) => r.uuid));
 
-  const tmp: RelationshipType[] = [];
+  const relationShipType: Array<RelationshipType> = [];
 
   data?.data.results
     .filter((type) => !familyRelationshipTypesUUIDs.has(type.uuid))

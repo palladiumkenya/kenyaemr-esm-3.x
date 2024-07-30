@@ -56,11 +56,7 @@ export const useRelationshipType = () => {
   const url = `/ws/rest/v1/relationshiptype?v=${customRepresentation}`;
   const { data, error } = useSWRImmutable<{ data: RelationshipTypeResponse }>(url, openmrsFetch);
 
-  const tmp: {
-    uuid: string;
-    display: string;
-    direction: string;
-  }[] = [];
+ const relations: Array<{ uuid: string; display: string; direction: string }> = [];
 
   data?.data.results.forEach((type) => {
     const aIsToB = {
