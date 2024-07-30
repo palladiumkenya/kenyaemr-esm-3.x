@@ -45,7 +45,7 @@ const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
 export const labManifestFormSchema = z.object({
   startDate: z.date({ coerce: true }),
   endDate: z.date({ coerce: true }),
-  manifestType: z.string(),
+  manifestType: z.number({ coerce: true }),
   dispatchDate: z.date({ coerce: true }),
   courierName: z.string().optional(),
   personHandedTo: z.string().optional(),
@@ -58,13 +58,6 @@ export const labManifestFormSchema = z.object({
   labPersonContact: z.string().regex(PHONE_NUMBER_REGEX, { message: 'Invalid phone number' }),
   manifestStatus: z.string(),
 });
-
-export const manifestTypes = [
-  {
-    value: 'VL',
-    label: 'Viral load',
-  },
-];
 
 export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema>, manifestId: string | undefined) => {
   let url;
@@ -81,7 +74,22 @@ export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema
       'Content-Type': 'application/json',
     },
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      startDate: data.startDate,
+      endDate: data.endDate,
+      dispatchDate: data.dispatchDate,
+      courier: data.courierName,
+      courierOfficer: data.personHandedTo,
+      status: data.manifestStatus,
+      county: data.county,
+      subCounty: data.subCounty,
+      facilityEmail: data.facilityEmail,
+      facilityPhoneContact: data.facilityPhoneContact,
+      clinicianPhoneContact: data.clinicianContact,
+      clinicianName: data.clinicianName,
+      labPocPhoneNumber: data.labPersonContact,
+      manifestType: data.manifestType,
+    }),
     signal: abortController.signal,
   });
 };
