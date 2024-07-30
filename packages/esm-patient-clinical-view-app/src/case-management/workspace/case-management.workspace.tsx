@@ -6,7 +6,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import styles from './case-management.scss';
 import { ExtensionSlot, navigate, showSnackbar, useSession } from '@openmrs/esm-framework';
-import { saveRelationship, useActivecases, useCaseManagers, useRelationshipType } from './case-management.resource';
+import {
+  saveRelationship,
+  useActivecases,
+  useCaseManagerRelationshipType,
+  useCaseManagers,
+} from './case-management.resource';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
 import PatientInfo from './patient-info.component';
 import { caseManagementConceptMap } from './case-management-concept-map';
@@ -28,9 +33,9 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
   const { user } = useSession();
   const [patientUuid, setPatientUuid] = useState('');
   const [patientSelected, setPatientSelected] = useState(false);
-
   const { data } = useCaseManagers();
-  const { data: relationshipTypesData } = useRelationshipType();
+
+  const { data: relationshipTypesData } = useCaseManagerRelationshipType();
 
   const caseManagerRlshipType =
     relationshipTypesData?.map((relationship) => ({
