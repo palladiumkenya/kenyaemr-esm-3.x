@@ -1,6 +1,6 @@
 import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createLeftPanelLink } from './morgue-left-panel/morgue-left-panel-link.component';
+import { createLeftPanelLink } from './left-panel/morgue-left-panel-link.component';
 const moduleName = '@kenyaemr/esm-morgue-app';
 
 const options = {

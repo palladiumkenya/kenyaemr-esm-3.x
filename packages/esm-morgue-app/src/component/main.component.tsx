@@ -1,6 +1,6 @@
 import React from 'react';
-import { MorgueHeader } from '../morgue-header/morgue-header.component';
-import MorgueMetrics from '../morgue-metrics/morgue-metrics.component';
+import { MorgueHeader } from '../header/morgue-header.component';
+import MorgueMetrics from '../metrics/morgue-metrics.component';
 import { ContentSwitchTabs } from '../content-switcher/content-switcher.component';
 
 const MainComponent: React.FC = () => {

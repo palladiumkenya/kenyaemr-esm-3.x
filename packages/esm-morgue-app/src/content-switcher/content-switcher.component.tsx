@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { ContentSwitcher, Switch } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Admissionqueue } from '../morgue-tables/morgue-admission.component';
 import styles from './content-switcher.scss';
+import { WaitingQueue } from '../tables/waiting-queue.component';
 
 export const ContentSwitchTabs: React.FC = () => {
   const { t } = useTranslation();
 
   const switchTabs = [
-    { name: t('awaitBay', 'Awaiting Queue'), component: <Admissionqueue /> },
-    { name: t('admitted', 'Admitted Bodies'), component: '' },
-    { name: t('discharge', 'Discharge Bodies'), component: '' },
+    { name: t('waitQueue', 'Waiting queue'), component: <WaitingQueue /> },
+    { name: t('admtted', 'Admitted'), component: '' },
+    { name: t('discharged', 'Discharged'), component: '' },
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
