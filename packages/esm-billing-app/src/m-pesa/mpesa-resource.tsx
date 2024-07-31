@@ -32,13 +32,12 @@ export const initiateStkPush = async (
     }
 
     const response: { requestId: string } = await res.json();
-
     setNotification({ message: 'STK Push sent successfully', type: 'success' });
+
     return response.requestId;
   } catch (err) {
-    const error = err as Error;
     setNotification({
-      message: error.message ?? 'Unable to initiate Lipa Na Mpesa, please try again later.',
+      message: 'Unable to initiate Lipa Na Mpesa, please try again later.',
       type: 'error',
     });
   }
