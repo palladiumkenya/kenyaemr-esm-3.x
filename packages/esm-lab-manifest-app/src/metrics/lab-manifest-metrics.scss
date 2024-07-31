@@ -1,0 +1,17 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.cardContainer {
+  background-color: $color-gray-30;
+  display: flex;
+  justify-content: space-between;
+  padding: spacing.$spacing-05;
+  flex-flow: row wrap;
+  margin-top: spacing.$spacing-05;
+  gap: spacing.$spacing-05;
+}
+
+.metricContainer {
+  max-width: spacing.$spacing-13;
+}

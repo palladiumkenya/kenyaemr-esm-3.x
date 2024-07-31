@@ -12,6 +12,7 @@ import {
   Report,
   InventoryManagement,
   HospitalBed,
+  ChemistryReference,
 } from '@carbon/react/icons';
 const openmrsSpaBase = window['getOpenmrsSpaBase']();
 
@@ -74,6 +75,11 @@ export const moduleLinks = [
     label: 'Dispensing App',
     url: `${openmrsSpaBase}dispensing`,
     icon: <Medication size={24} />,
+  },
+  {
+    label: 'Lab Manifest App',
+    url: `${openmrsSpaBase}home/lab-manifest`,
+    icon: <ChemistryReference size={24} />,
   },
   {
     label: 'Billable Services',
