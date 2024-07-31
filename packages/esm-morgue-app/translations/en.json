@@ -1,15 +1,10 @@
 {
-  "action": "ACTION",
   "admitted": "Admitted Bodies",
-  "awaitBay": "Awaiting Queue",
-  "cause": "CAUSE OF DEATH",
-  "created": "CREATED BY",
-  "date": "DATE AND TIME OF DEATH",
-  "date-created": "DATE CREATED",
+  "admtted": "Admitted",
   "discharge": "Discharge Bodies",
-  "id": "IDENTIFIER",
+  "discharged": "Discharged",
   "morgue": "Morgue Management",
-  "name": "NAME",
   "queue": "Admission Queue",
-  "viewReport": "View Report"
+  "viewReport": "View Report",
+  "waitQueue": "Waiting queue"
 }
