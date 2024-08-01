@@ -26,19 +26,27 @@ export const initiateStkPush = async (
       }),
     });
 
-    if (!res.ok && res.status === 403) {
-      const error = new Error('Health facility M-PESA data not configured.');
-      throw error;
+    if (res.ok) {
+      const response: { requestId: string } = await res.json();
+      setNotification({ message: 'STK Push sent successfully', type: 'success' });
+      return response.requestId;
     }
 
-    const response: { requestId: string } = await res.json();
+    if (!res.ok && res.status === 403) {
+      setNotification({
+        message: 'Health facility M-PESA data not configured.',
+        type: 'error',
+      });
 
-    setNotification({ message: 'STK Push sent successfully', type: 'success' });
-    return response.requestId;
+      return;
+    }
+
+    if (!res.ok) {
+      throw new Error('Unable to initiate Lipa Na Mpesa, please try again later.');
+    }
   } catch (err) {
-    const error = err as Error;
     setNotification({
-      message: error.message ?? 'Unable to initiate Lipa Na Mpesa, please try again later.',
+      message: 'Unable to initiate Lipa Na Mpesa, please try again later.',
       type: 'error',
     });
   }

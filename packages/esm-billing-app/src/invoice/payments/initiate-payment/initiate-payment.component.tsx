@@ -10,9 +10,10 @@ import {
   InlineNotification,
   InlineLoading,
   Loading,
+  NumberInputSkeleton,
 } from '@carbon/react';
 import styles from './initiate-payment.scss';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { MappedBill } from '../../../types';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,17 +21,19 @@ import { formatPhoneNumber } from '../utils';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
-import { useConfig, usePatient } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../../config-schema';
 import { usePatientAttributes } from '../../../hooks/usePatientAttributes';
 
-const InitiatePaymentSchema = z.object({
+const initiatePaymentSchema = z.object({
   phoneNumber: z
     .string()
     .nonempty({ message: 'Phone number is required' })
     .regex(/^\d{10}$/, { message: 'Phone number must be numeric and 10 digits' }),
   billAmount: z.string().nonempty({ message: 'Amount is required' }),
 });
+
+type FormData = z.infer<typeof initiatePaymentSchema>;
 
 export interface InitiatePaymentDialogProps {
   closeModal: () => void;
@@ -51,17 +54,23 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     handleSubmit,
     formState: { errors, isValid },
     setValue,
-  } = useForm<any>({
+    watch,
+    reset,
+  } = useForm<FormData>({
     mode: 'all',
     defaultValues: { billAmount: String(bill.totalAmount), phoneNumber: phoneNumber },
-    resolver: zodResolver(InitiatePaymentSchema),
+    resolver: zodResolver(initiatePaymentSchema),
   });
 
-  useEffect(() => {
-    setValue('phoneNumber', phoneNumber);
-  }, [phoneNumber, setValue]);
+  const watchedPhoneNumber = watch('phoneNumber');
 
-  const onSubmit = async (data: { phoneNumber: any; billAmount: any }) => {
+  useEffect(() => {
+    if (!watchedPhoneNumber && phoneNumber) {
+      reset({ phoneNumber: watchedPhoneNumber });
+    }
+  }, [watchedPhoneNumber, setValue, phoneNumber, reset]);
+
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     const phoneNumber = formatPhoneNumber(data.phoneNumber);
     const amountBilled = data.billAmount;
     const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
@@ -78,10 +87,6 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     pollingTrigger({ requestId, requestStatus: 'INITIATED' });
   };
 
-  if (isLoadingPhoneNumber || isLoading) {
-    return <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;
-  }
-
   return (
     <div>
       <ModalHeader closeModal={closeModal} />
@@ -95,24 +100,28 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
               onCloseButtonClick={() => setNotification(null)}
             />
           )}
-          <section className={styles.section}>
-            <Controller
-              control={control}
-              name="phoneNumber"
-              render={({ field }) => (
-                <Layer>
-                  <TextInput
-                    {...field}
-                    size="md"
-                    labelText={t('Phone Number', 'Phone Number')}
-                    placeholder={t('Phone Number', 'Phone Number')}
-                    invalid={!!errors.phoneNumber}
-                    invalidText={errors.phoneNumber?.message}
-                  />
-                </Layer>
-              )}
-            />
-          </section>
+          {isLoadingPhoneNumber ? (
+            <NumberInputSkeleton className={styles.section} />
+          ) : (
+            <section className={styles.section}>
+              <Controller
+                control={control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <Layer>
+                    <TextInput
+                      {...field}
+                      size="md"
+                      labelText={t('Phone Number', 'Phone Number')}
+                      placeholder={t('Phone Number', 'Phone Number')}
+                      invalid={!!errors.phoneNumber}
+                      invalidText={errors.phoneNumber?.message}
+                    />
+                  </Layer>
+                )}
+              />
+            </section>
+          )}
           <section className={styles.section}>
             <Controller
               control={control}
