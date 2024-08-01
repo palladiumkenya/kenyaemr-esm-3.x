@@ -21,6 +21,7 @@ import { mutate } from 'swr';
 import { z } from 'zod';
 import { addOrderToManifest, labManifestOrderToManifestFormSchema, sampleTypes } from '../lab-manifest.resources';
 import styles from './lab-manifest-form.scss';
+import { useLabManifest } from '../hooks';
 
 interface LabManifestOrdersToManifestFormProps {
   onClose: () => void;
@@ -50,6 +51,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
     resolver: zodResolver(labManifestOrderToManifestFormSchema),
   });
 
+  const { error, isLoading, manifest } = useLabManifest(selectedOrders[0]?.labManifest?.uuid);
   const onSubmit = async (values: OrderToManifestFormType) => {
     try {
       const results = await Promise.allSettled(
@@ -57,16 +59,20 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
       );
       results.forEach((res) => {
         if (res.status === 'fulfilled') {
-          showSnackbar({ title: 'Success', kind: 'success', subtitle: JSON.stringify(res.value) });
+          showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Order added succesfully' });
         } else {
-          showSnackbar({ title: 'Success', kind: 'error', subtitle: JSON.stringify(res.reason) });
+          showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding order to the manifest' });
         }
       });
+      const mutateLinks = [
+        `/ws/rest/v1/labmanifest?v=full&status=${manifest.manifestStatus}`,
+        `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifest?.uuid}`,
+        `/ws/rest/v1/labmanifest/${manifest?.uuid}`,
+      ];
       mutate((key) => {
-        return typeof key === 'string' && key.startsWith(`/ws/rest/v1/labmanifest?status`);
+        return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
       });
       onClose();
-      showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding orders to the manifest' });
     }

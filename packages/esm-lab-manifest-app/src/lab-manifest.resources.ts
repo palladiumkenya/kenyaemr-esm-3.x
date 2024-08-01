@@ -1,4 +1,4 @@
-import { generateOfflineUuid, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { LabManifest, MappedLabManifest } from './types';
 
@@ -114,6 +114,15 @@ export const addOrderToManifest = async (data: z.infer<typeof labManifestOrderTo
     },
     method: 'POST',
     body: JSON.stringify({ ...data, status: 'Pending' }),
+    signal: abortController.signal,
+  });
+};
+
+export const removeSampleFromTheManifest = async (orderUuid: string) => {
+  let url = `${restBaseUrl}/labmanifestorder/${orderUuid}`;
+  const abortController = new AbortController();
+  return openmrsFetch(url, {
+    method: 'DELETE',
     signal: abortController.signal,
   });
 };

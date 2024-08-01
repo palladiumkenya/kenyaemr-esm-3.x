@@ -63,13 +63,15 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
       payload: string;
     }>,
   ) => {
-    const dispose = showModal('lab-manifest-order-modal-form', {
-      onClose: () => dispose(),
-      props: {
-        title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
-        selectedOrders: selected,
-      },
-    });
+    if (selected.length > 0) {
+      const dispose = showModal('lab-manifest-order-modal-form', {
+        onClose: () => dispose(),
+        props: {
+          title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
+          selectedOrders: selected,
+        },
+      });
+    }
   };
 
   const tableRows =
