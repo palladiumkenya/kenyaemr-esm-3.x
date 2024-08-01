@@ -96,7 +96,7 @@ export const caseEncounterDashboardMeta = {
   slot: 'patient-chart-relationships-slot',
   columns: 1,
   title: 'Case management',
-  path: 'case-encounter',
+  path: 'case-management-encounters',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
 };
