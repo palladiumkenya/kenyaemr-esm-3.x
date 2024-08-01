@@ -42,6 +42,11 @@ export const LabManifestFilters = [
 ];
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
 
+export const sampleTypes = [
+  { label: 'Frozen plasma', value: 'Frozen plasma' },
+  { label: 'Whole Blood', value: 'Whole Blood' },
+];
+
 export const labManifestFormSchema = z.object({
   startDate: z.date({ coerce: true }),
   endDate: z.date({ coerce: true }),
@@ -57,6 +62,12 @@ export const labManifestFormSchema = z.object({
   clinicianContact: z.string().regex(PHONE_NUMBER_REGEX, { message: 'Invalid phone number' }),
   labPersonContact: z.string().regex(PHONE_NUMBER_REGEX, { message: 'Invalid phone number' }),
   manifestStatus: z.string(),
+});
+
+export const labManifestOrderToManifestFormSchema = z.object({
+  sampleType: z.string(),
+  sampleCollectionDate: z.date({ coerce: true }),
+  sampleSeparationDate: z.date({ coerce: true }),
 });
 
 export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema>, manifestId: string | undefined) => {
@@ -94,11 +105,24 @@ export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema
   });
 };
 
+export const addOrderToManifest = async (data: z.infer<typeof labManifestOrderToManifestFormSchema>) => {
+  let url = `${restBaseUrl}/labmanifestorder`;
+  const abortController = new AbortController();
+  return openmrsFetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify({ ...data, status: 'Pending' }),
+    signal: abortController.signal,
+  });
+};
+
 export const extractLabManifest = (manifest: LabManifest) =>
   ({
     uuid: manifest.uuid,
     dispatchDate: manifest.dispatchDate,
-    endDate: manifest.dispatchDate,
+    endDate: manifest.endDate,
     startDate: manifest.startDate,
     clinicianContact: manifest.clinicianPhoneContact,
     clinicianName: manifest.clinicianName,
@@ -109,7 +133,7 @@ export const extractLabManifest = (manifest: LabManifest) =>
     labPersonContact: manifest.labPocPhoneNumber,
     manifestId: manifest.identifier,
     manifestStatus: manifest.status,
-    // manifestType: manifest.manifestType,
+    manifestType: String(manifest.manifestType),
     personHandedTo: manifest.courierOfficer,
     subCounty: manifest.subCounty,
     samples: manifest.labManifestOrders ?? [],

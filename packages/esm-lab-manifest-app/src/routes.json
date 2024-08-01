@@ -19,6 +19,10 @@
       "component": "labManifestForm"
     },
     {
+      "name": "lab-manifest-order-modal-form",
+      "component": "labManifestOrderToManifestForm"
+    },
+    {
       "component": "root",
       "name": "lab-manifest-dashboard-root",
       "slot": "lab-manifest-dashboard-slot"

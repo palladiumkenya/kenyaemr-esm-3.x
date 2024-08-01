@@ -10,7 +10,7 @@ export const configSchema = {
         type: 'EID Type',
       },
       {
-        id: 1,
+        id: 2,
         type: 'VL Type',
       },
       {

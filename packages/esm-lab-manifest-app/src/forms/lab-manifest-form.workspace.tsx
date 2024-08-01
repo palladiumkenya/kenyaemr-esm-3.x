@@ -30,6 +30,7 @@ type ContactListFormType = z.infer<typeof labManifestFormSchema>;
 const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manifest }) => {
   const { labmanifestTypes } = useConfig<LabManifestConfig>();
   const counties = require('../counties.json') as County[];
+
   const form = useForm<ContactListFormType>({
     defaultValues: {
       ...manifest,
@@ -47,18 +48,15 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const onSubmit = async (values: ContactListFormType) => {
     try {
       await saveLabManifest(values, manifest?.uuid);
-      if (manifest?.uuid) {
-        mutate((key) => {
-          return (
-            typeof key === 'string' &&
-            key.startsWith(`/ws/rest/v1/labmanifest/${manifest!.uuid}?status=${values.manifestStatus}`)
-          );
-        });
-      } else {
-        mutate((key) => {
-          return typeof key === 'string' && key.startsWith(`/ws/rest/v1/labmanifest?status=${values.manifestStatus}`);
-        });
-      }
+      const mutateLinks = [
+        `/ws/rest/v1/labmanifest?v=full&status=${values.manifestStatus}`,
+        `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifest?.uuid}`,
+        `/ws/rest/v1/labmanifest/${manifest?.uuid}`,
+      ];
+      mutate((key) => {
+        return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
+      });
+
       closeWorkspace();
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {
@@ -67,7 +65,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   };
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
+      <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Controller
