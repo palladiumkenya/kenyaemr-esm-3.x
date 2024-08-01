@@ -1,10 +1,11 @@
 {
   "admitted": "Admitted Bodies",
-  "admtted": "Admitted",
-  "discharge": "Discharge Bodies",
+  "admittedOnes": "Admitted",
+  "amountCollected": "Amount(s)",
+  "awaiting": "Awaiting",
   "discharged": "Discharged",
+  "discharges": "Discharges",
+  "enrollingBtn": "Add New Deceased",
   "morgue": "Morgue Management",
-  "queue": "Admission Queue",
-  "viewReport": "View Report",
   "waitQueue": "Waiting queue"
 }
