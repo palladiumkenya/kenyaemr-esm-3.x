@@ -25,7 +25,7 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { useRelationships } from './relationships.resource';
+import { usePatientRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
@@ -40,7 +40,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const { concepts, familyRelationshipsTypeList } = config;
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
-  const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
+  const { relationships, error, isLoading, isValidating } = usePatientRelationships(patientUuid);
 
   const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
   const familyRelationships = relationships.filter((r) => familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));

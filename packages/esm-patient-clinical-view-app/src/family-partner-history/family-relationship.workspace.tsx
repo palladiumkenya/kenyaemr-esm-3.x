@@ -10,7 +10,7 @@ import { uppercaseText } from '../utils/expression-helper';
 import { saveRelationship } from '../case-management/workspace/case-management.resource';
 import PatientInfo from '../case-management/workspace/patient-info.component';
 import { mutate } from 'swr';
-import { useMappedRelationshipTypes, useRelationships } from './relationships.resource';
+import { useMappedRelationshipTypes, usePatientRelationships } from './relationships.resource';
 import { ConfigObject } from '../config-schema';
 
 const schema = z.object({
@@ -29,7 +29,7 @@ type RelationshipFormProps = {
 const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
   const { t } = useTranslation();
   const [relatedPersonUuid, setRelatedPersonUuid] = useState<string | undefined>(undefined);
-  const { relationshipsUrl } = useRelationships(rootPersonUuid);
+  const { relationshipsUrl } = usePatientRelationships(rootPersonUuid);
   const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
   const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
   const familyRelationshipTypesUUIDs = new Set(familyRelationshipsTypeList.map((r) => r.uuid));

@@ -123,7 +123,7 @@ export const useMappedRelationshipTypes = () => {
   return { data: relations, error };
 };
 
-export function useRelationships(patientUuid: string) {
+export function usePatientRelationships(patientUuid: string) {
   const customRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath),personB:(uuid,age,display,dead,causeOfDeath),relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 

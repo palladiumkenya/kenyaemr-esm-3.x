@@ -1,20 +1,15 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Column, TextArea, Form, Stack, ButtonSet, ComboBox, Button, DatePicker, DatePickerInput } from '@carbon/react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import styles from './case-management.scss';
-import { ExtensionSlot, navigate, showSnackbar, useSession } from '@openmrs/esm-framework';
-import {
-  saveRelationship,
-  useActivecases,
-  useCaseManagerRelationshipType,
-  useCaseManagers,
-} from './case-management.resource';
+import { ExtensionSlot, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { saveRelationship, useActivecases, useCaseManagers } from './case-management.resource';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
 import PatientInfo from './patient-info.component';
-import { caseManagementConceptMap } from './case-management-concept-map';
+import { useMappedRelationshipTypes } from '../../family-partner-history/relationships.resource';
 
 const schema = z.object({
   caseManager: z.string().nonempty({ message: 'Case Manager is required' }),
@@ -23,6 +18,8 @@ const schema = z.object({
   endDate: z.date().optional(),
   notes: z.string().optional(),
 });
+
+type FormData = z.infer<typeof schema>;
 
 type CaseManagementProp = {
   closeWorkspace: () => void;
@@ -34,14 +31,15 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
   const [patientUuid, setPatientUuid] = useState('');
   const [patientSelected, setPatientSelected] = useState(false);
   const { data } = useCaseManagers();
+  const { data: relationshipTypes } = useMappedRelationshipTypes();
 
-  const { data: relationshipTypesData } = useCaseManagerRelationshipType();
-
-  const caseManagerRlshipType =
-    relationshipTypesData?.map((relationship) => ({
-      id: relationship.uuid,
-      text: relationship.display,
-    })) || [];
+  const caseManagerRelationshipTypeMapped =
+    relationshipTypes
+      .filter((relationshipType) => relationshipType.display === 'Case manager')
+      ?.map((relationship) => ({
+        id: relationship.uuid,
+        text: relationship.display,
+      })) || [];
 
   const caseManagerUuid = user?.person.uuid;
   const { mutate: fetchCases } = useActivecases(caseManagerUuid);
@@ -52,23 +50,16 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
       text: manager.display,
     })) || [];
 
-  const conceptReasons = useMemo(() => {
-    return Object.keys(caseManagementConceptMap.answers).map((key) => ({
-      id: key,
-      text: caseManagementConceptMap.answers[key],
-    }));
-  }, []);
-
   const {
     control,
     handleSubmit,
     formState: { isValid },
-  } = useForm({
+  } = useForm<FormData>({
     mode: 'onChange',
     resolver: zodResolver(schema),
   });
 
-  const onSubmit = async (data) => {
+  const onSubmit: SubmitHandler<FormData> = async (data) => {
     const payload = {
       personA: data.caseManager,
       relationshipType: data.relationship,
@@ -76,6 +67,7 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
       startDate: data.startDate.toISOString(),
       endDate: data.endDate ? data.endDate.toISOString() : null,
     };
+
     try {
       await saveRelationship(payload);
       await fetchCases();
@@ -87,10 +79,8 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
         isLowContrast: true,
       });
 
-      // Navigate or handle closing the form after submission
       closeWorkspace();
     } catch (err) {
-      console.error(err);
       showSnackbar({
         kind: 'error',
         title: t('RlshipError', 'Relationship Error'),
@@ -162,7 +152,7 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
                 id="relationship_name"
                 titleText={t('relationship', 'Relationship')}
                 placeholder="Select Relationship"
-                items={caseManagerRlshipType}
+                items={caseManagerRelationshipTypeMapped}
                 itemToString={(item) => (item ? uppercaseText(item.text) : '')}
                 onChange={(e) => field.onChange(e.selectedItem?.id)}
                 invalid={!!fieldState.error}
@@ -209,25 +199,6 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
             )}
           />
         </Column>
-
-        {/* <Column>
-          <Controller
-            name="reasons"
-            control={control}
-            render={({ field, fieldState }) => (
-              <ComboBox
-                id="reasons"
-                placeholder="Select Reason for Assignment"
-                titleText={t('reasons', 'Reason for Assignment')}
-                items={conceptReasons}
-                itemToString={(item) => (item ? uppercaseText(item.text) : '')}
-                onChange={(e) => field.onChange(e.selectedItem?.id)}
-                invalid={!!fieldState.error}
-                invalidText={fieldState.error?.message}
-              />
-            )}
-          />
-        </Column> */}
 
         <Column className={styles.textbox}>
           <Controller
