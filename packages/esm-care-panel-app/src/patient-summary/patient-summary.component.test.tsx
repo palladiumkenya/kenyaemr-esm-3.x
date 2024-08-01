@@ -86,7 +86,7 @@ describe('PatientSummary', () => {
     expect(screen.getByText(mockPatient.weight)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.height)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.bmi)).toBeInTheDocument();
-    expect(screen.getByText(mockPatient.bloodPressure)).toBeInTheDocument();
+    expect(screen.getByText(`${mockPatient.bloodPressure}/${mockPatient.bpDiastolic}`)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.oxygenSaturation)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.pulseRate)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.familyProtection)).toBeInTheDocument();
