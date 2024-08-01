@@ -4,6 +4,22 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .contentSwitcherWrapper {
-  width: 70%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin: spacing.$spacing-05;
+}
+.contentSwitcher {
+  width: 50rem;
+}
+
+.rightButton {
+  --cds-layout-size-height-context: var(--cds-layout-size-height-sm, 2rem);
+  --cds-layout-size-height: var(--cds-layout-size-height-context);
+  margin-left: auto;
+  display: flex; // Make button a flex container
+  align-items: center; // Vertically center the text
+  justify-content: center; // Horizontally center the text
+  text-align: center; // Ensure text is centered
+  padding: 0 spacing.$spacing-04;
 }

@@ -15,22 +15,15 @@ import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './generic-table.scss';
 
-type Header<T> = {
-  key: keyof T;
-  header: string;
-  isSortable?: boolean;
-};
+interface GenericTableProps {
+  rows: any[];
+  headers: { header: string; key: string }[];
+}
 
-type GenericTableProps<T> = {
-  data: T[];
-  headers: Header<T>[];
-  pageSize?: number;
-  renderRow: (item: T) => React.ReactNode;
-};
-
-const GenericTable: React.FC<GenericTableProps<any>> = ({ data, headers, pageSize = 10, renderRow }) => {
+const GenericTable: React.FC<GenericTableProps> = ({ rows, headers }) => {
   const { t } = useTranslation();
-  const { results: paginatedData, currentPage, goTo } = usePagination(data, pageSize);
+  const pageSize = 10; // Set your desired page size
+  const { results: paginatedData, currentPage, goTo } = usePagination(rows, pageSize);
   const isTablet = useLayoutType() === 'tablet';
 
   return (
@@ -43,7 +36,7 @@ const GenericTable: React.FC<GenericTableProps<any>> = ({ data, headers, pageSiz
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      key={header.key as string}
+                      key={header.key}
                       className={classNames(styles.productiveHeading01, styles.text02)}
                       {...getHeaderProps({
                         header,
@@ -56,7 +49,11 @@ const GenericTable: React.FC<GenericTableProps<any>> = ({ data, headers, pageSiz
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id}>{renderRow(row)}</TableRow>
+                  <TableRow key={row.id}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    ))}
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
@@ -65,7 +62,7 @@ const GenericTable: React.FC<GenericTableProps<any>> = ({ data, headers, pageSiz
       </DataTable>
       <PatientChartPagination
         currentItems={paginatedData.length}
-        totalItems={data.length}
+        totalItems={rows.length}
         onPageNumberChange={goTo}
         pageNumber={currentPage}
         pageSize={pageSize}

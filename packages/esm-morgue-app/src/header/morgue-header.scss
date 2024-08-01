@@ -1,7 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-
 .header {
   @include type.type-style('body-compact-02');
   color: $text-02;
@@ -11,7 +10,11 @@
   border-left: 0px;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 2rem;
+  margin-right: 0;
+  overflow-x: hidden;
+  padding: 0 1rem;
 }
 
 .left-justified-items {
@@ -19,12 +22,6 @@
   flex-direction: row;
   align-items: center;
   margin-left: 0.75rem;
-}
-
-.right-justified-items {
-  @include type.type-style('body-compact-02');
-  color: $text-02;
-  padding-top: 1rem;
 }
 
 .page-name {
@@ -39,25 +36,6 @@
   }
 }
 
-.date-and-location {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  margin-right: 1rem;
-}
-
-.value {
-  margin-left: 0.25rem;
-}
-
-.middot {
-  margin: 0 0.5rem;
-}
-
-.view {
-  @include type.type-style('label-01');
-}
-
 svg.iconOverrides {
   width: 72 !important;
   height: 72 !important;
@@ -68,4 +46,96 @@ svg.iconOverrides {
   width: 72px;
   height: 72px;
   fill: var(--brand-03);
+}
+
+.metrics {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 12px 16px 0 0;
+  margin-right: 3.75rem;
+  width: auto;
+  height: auto;
+}
+
+.wrapMetrics {
+  width: auto;
+  height: auto;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 0;
+  min-width: 100px;
+}
+
+.metricLabel {
+  flex-grow: 0;
+  font-family: IBMPlexSans;
+  font-size: 12px;
+  line-height: 1.33;
+  letter-spacing: 0.32px;
+  color: $text-02;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metricValue {
+  flex-grow: 0;
+  font-family: IBMPlexSans;
+  font-size: 1.75rem;
+  line-height: 1.4;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metricLocationDate {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 15px;
+  width: auto;
+  max-width: 120px;
+}
+
+.location,
+.date {
+  display: flex;
+  align-items: center;
+  font-size: 15px;
+  line-height: 1.33;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.location {
+  margin-bottom: 4px;
+}
+
+@media (max-width: 768px) {
+  .metrics {
+    gap: 12px;
+    margin-right: 1rem;
+  }
+
+  .wrapMetrics {
+    min-width: 80px;
+  }
+
+  .metricLabel,
+  .metricValue {
+    font-size: 0.875rem;
+  }
 }
