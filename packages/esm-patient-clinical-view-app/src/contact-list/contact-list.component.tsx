@@ -87,6 +87,10 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       header: t('pnsAproach', 'PNS Aproach'),
       key: 'pnsAproach',
     },
+    {
+      header: t('ipvOutcome', 'IPV Outcome'),
+      key: 'ipvOutcome',
+    },
   ];
 
   const handleAddContact = () => {
@@ -119,6 +123,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         baseLineivStatus: relation.baselineHIVStatus ?? '--',
         livingWithClient: relation.livingWithClient ?? '--',
         pnsAproach: relation.pnsAproach ?? '--',
+        ipvOutcome: relation.ipvOutcome ?? '--',
       };
     }) ?? [];
 

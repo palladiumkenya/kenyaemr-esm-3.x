@@ -13,7 +13,7 @@ function extractName(display: string) {
   return display.trim();
 }
 
-function extractTelephone(display: string) {
+function extractValue(display: string) {
   const pattern = /=\s*(.*)$/;
   const match = display.match(pattern);
   if (match && match.length > 1) {
@@ -46,10 +46,11 @@ function extractAttributeData(person: Person, config: ConfigObject) {
     personContactCreated: string | null;
     pnsAproach: string | null;
     livingWithClient: string | null;
+    ipvOutcome: string | null;
   }>(
     (prev, attr) => {
       if (attr.attributeType.uuid === config.contactPersonAttributesUuid.telephone) {
-        return { ...prev, contact: attr.display ? extractTelephone(attr.display) : null };
+        return { ...prev, contact: attr.display ? extractValue(attr.display) : null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus) {
         return { ...prev, baselineHIVStatus: getConceptName(attr.value) ?? null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.contactCreated) {
@@ -58,10 +59,19 @@ function extractAttributeData(person: Person, config: ConfigObject) {
         return { ...prev, livingWithClient: getConceptName(attr.value) ?? null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach) {
         return { ...prev, pnsAproach: getConceptName(attr.value) ?? null };
+      } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.contactIPVOutcome) {
+        return { ...prev, ipvOutcome: attr.display ? extractValue(attr.display) : null };
       }
       return prev;
     },
-    { contact: null, baselineHIVStatus: null, personContactCreated: null, pnsAproach: null, livingWithClient: null },
+    {
+      contact: null,
+      baselineHIVStatus: null,
+      personContactCreated: null,
+      pnsAproach: null,
+      livingWithClient: null,
+      ipvOutcome: null,
+    },
   );
 }
 

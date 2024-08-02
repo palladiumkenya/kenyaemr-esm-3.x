@@ -93,6 +93,7 @@ export interface Contact {
   personContactCreated: string | null;
   livingWithClient: string | null;
   pnsAproach: string | null;
+  ipvOutcome: string | null;
 }
 
 export interface Person {
