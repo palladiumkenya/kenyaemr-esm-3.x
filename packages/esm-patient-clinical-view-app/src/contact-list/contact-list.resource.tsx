@@ -4,12 +4,18 @@ import { ConfigObject } from '../config-schema';
 import { Enrollment, HTSEncounter, Patient } from '../types';
 import { replaceAll } from '../utils/expression-helper';
 
+export const BOOLEAN_YES = '1065';
+export const BOOLEAN_NO = '1066';
+
 export const ContactListFormSchema = z.object({
   listingDate: z.date({ coerce: true }),
   givenName: z.string().min(1, 'Required'),
   middleName: z.string().min(1, 'Required'),
   familyName: z.string().min(1, 'Required'),
   gender: z.enum(['M', 'F']),
+  physicalAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+  threatened: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+  sexualAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
   dateOfBirth: z.date({ coerce: true }).max(new Date(), 'Must not be a future date'),
   maritalStatus: z.string().optional(),
   address: z.string().optional(),
@@ -18,7 +24,13 @@ export const ContactListFormSchema = z.object({
   livingWithClient: z.string().optional(),
   baselineStatus: z.string().optional(),
   preferedPNSAproach: z.string().optional(),
+  ipvOutCome: z.enum(['True', 'False']).optional(),
 });
+
+export const contactIPVOutcomeOptions = [
+  { label: 'True', value: 'True' },
+  { label: 'False', value: 'False' },
+];
 
 export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
   encounters: HTSEncounter[],
@@ -77,6 +89,7 @@ export const saveContact = async (
     phoneNumber,
     preferedPNSAproach,
     relationshipToPatient,
+    ipvOutCome,
   }: z.infer<typeof ContactListFormSchema>,
   patientUuid: string,
   encounter: Record<string, any>,
@@ -115,7 +128,7 @@ export const saveContact = async (
         : []),
       {
         attributeType: config.contactPersonAttributesUuid.contactCreated,
-        value: '1065',
+        value: BOOLEAN_YES,
       },
       // Add Optional Prefered PNS Aproach attribute
       ...(preferedPNSAproach
@@ -132,6 +145,14 @@ export const saveContact = async (
             {
               attributeType: config.contactPersonAttributesUuid.livingWithContact,
               value: replaceAll(livingWithClient, 'A', ''),
+            },
+          ]
+        : []),
+      ...(ipvOutCome
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.contactIPVOutcome,
+              value: ipvOutCome,
             },
           ]
         : []),
@@ -159,9 +180,9 @@ export const saveContact = async (
     });
     // Create relationship payload
     const relationshipPayload = {
-      personA: patient.person.uuid,
+      personA: patientUuid,
       relationshipType: relationshipToPatient,
-      personB: patientUuid,
+      personB: patient.person.uuid,
       startDate: listingDate.toISOString(),
     };
     // Create optional encounter with marital/civil status obs
