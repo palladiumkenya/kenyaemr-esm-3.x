@@ -19,17 +19,17 @@ import {
 } from '@carbon/react';
 import { useLayoutType, isDesktop, usePagination, navigate } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import styles from '../community-referrals/community-referral-tabs/community-referrals-tabs.scss';
+import styles from '../referrals/referral-tabs/referrals-tabs.scss';
 import { useTranslation } from 'react-i18next';
-import { useCommunityReferrals } from './community-refferals.resource';
+import { useCommunityReferrals } from './refferals.resource';
 import CommunityReferralActions from './referrals-actions.component';
 import { ReferralReasonsProps } from '../types';
 
-type CommunityReferralProps = {
+type ReferralProps = {
   status: string;
 };
 
-const CommunityReferrals: React.FC<CommunityReferralProps> = (data) => {
+const ReferralTable: React.FC<ReferralProps> = (data) => {
   const { t } = useTranslation();
   const { referrals, isLoading, isValidating } = useCommunityReferrals(data.status);
   const layout = useLayoutType();
@@ -241,4 +241,4 @@ function FilterableTableHeader({ layout, handleSearch, isValidating, responsiveS
     </>
   );
 }
-export default CommunityReferrals;
+export default ReferralTable;

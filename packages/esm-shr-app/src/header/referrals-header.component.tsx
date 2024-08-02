@@ -2,10 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
 import { useSession, formatDate } from '@openmrs/esm-framework';
-import CommunityReferralsIllustration from './community-referrals-illustration.component';
-import styles from './community-referrals-header.scss';
+import styles from './referrals-header.scss';
+import ReferralsIllustration from './referrals-illustration.component';
 
-export const CommunityReferralsHeader: React.FC = () => {
+export const ReferralsHeader: React.FC = () => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
@@ -13,9 +13,10 @@ export const CommunityReferralsHeader: React.FC = () => {
   return (
     <div className={styles.header}>
       <div className={styles['left-justified-items']}>
-        <CommunityReferralsIllustration />
+        <ReferralsIllustration />
         <div className={styles['page-labels']}>
-          <p className={styles['page-name']}>{t('communityReferrals', 'Community Referrals')}</p>
+          <p>{t('facilityWide', 'Facility Wide')}</p>
+          <p className={styles['page-name']}>{t('referrals', 'Referrals')}</p>
         </div>
       </div>
       <div className={styles['right-justified-items']}>

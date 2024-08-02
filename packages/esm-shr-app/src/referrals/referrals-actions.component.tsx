@@ -4,7 +4,7 @@ import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { navigate, showModal, showSnackbar } from '@openmrs/esm-framework';
 import { ReferralReasonsProps } from '../types';
-import { processCommunityReferral } from './community-refferals.resource';
+import { processCommunityReferral } from './refferals.resource';
 
 interface ReferralReasonData {
   referralData: ReferralReasonsProps;

@@ -6,7 +6,7 @@
   "pages": [
     {
       "component": "shrRoot",
-      "route": "community-referrals"
+      "route": "referrals"
     }
   ],
   "extensions": [
@@ -32,23 +32,27 @@
       }
     },
     {
-      "name": "community-referrals",
-      "slot": "community-referrals-slot",
+      "name": "referrals",
+      "slot": "referrals-slot",
       "component": "shrRoot"
     },
     {
-      "name": "community-referrals-link",
+      "name": "referrals-link",
       "slot": "homepage-dashboard-slot",
-      "component": "communityReferralsDashboardLink",
+      "component": "ReferralsDashboardLink",
       "meta": {
-        "name": "community-referrals",
-        "title": "community-referrals",
-        "slot": "community-referrals-slot"
+        "name": "referrals",
+        "title": "referrals",
+        "slot": "referrals-slot"
       }
     },
     {
       "name": "referral-reasons-dialog",
       "component": "referralReasonsDialogPopup"
+    },
+     {
+      "name": "facility-referral-form",
+      "component": "facilityRefferalForm"
     },
     {
       "name": "referral-view-link",
