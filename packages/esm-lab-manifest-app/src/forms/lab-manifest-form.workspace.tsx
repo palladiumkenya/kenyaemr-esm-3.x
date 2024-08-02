@@ -10,15 +10,16 @@ import {
   TextInput,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, parseDate, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, parseDate, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { LabManifestFilters, labManifestFormSchema, manifestTypes, saveLabManifest } from '../lab-manifest.resources';
+import { LabManifestFilters, labManifestFormSchema, saveLabManifest } from '../lab-manifest.resources';
 import styles from './lab-manifest-form.scss';
 import { County, MappedLabManifest } from '../types';
 import { mutate } from 'swr';
+import { LabManifestConfig } from '../config-schema';
 interface LabManifestFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   manifest?: MappedLabManifest;
@@ -27,10 +28,13 @@ interface LabManifestFormProps extends DefaultWorkspaceProps {
 type ContactListFormType = z.infer<typeof labManifestFormSchema>;
 
 const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manifest }) => {
+  const { labmanifestTypes } = useConfig<LabManifestConfig>();
   const counties = require('../counties.json') as County[];
+
   const form = useForm<ContactListFormType>({
     defaultValues: {
       ...manifest,
+      manifestType: manifest?.manifestType ? Number(manifest.manifestType) : undefined,
       dispatchDate: manifest?.dispatchDate ? parseDate(manifest.dispatchDate) : undefined,
       startDate: manifest?.startDate ? parseDate(manifest.startDate) : undefined,
       endDate: manifest?.endDate ? parseDate(manifest.endDate) : undefined,
@@ -44,18 +48,15 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const onSubmit = async (values: ContactListFormType) => {
     try {
       await saveLabManifest(values, manifest?.uuid);
-      if (manifest?.uuid) {
-        mutate((key) => {
-          return (
-            typeof key === 'string' &&
-            key.startsWith(`/ws/rest/v1/labmanifest/${manifest!.uuid}?status=${values.manifestStatus}`)
-          );
-        });
-      } else {
-        mutate((key) => {
-          return typeof key === 'string' && key.startsWith(`/ws/rest/v1/labmanifest?status=${values.manifestStatus}`);
-        });
-      }
+      const mutateLinks = [
+        `/ws/rest/v1/labmanifest?v=full&status=${values.manifestStatus}`,
+        `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifest?.uuid}`,
+        `/ws/rest/v1/labmanifest/${manifest?.uuid}`,
+      ];
+      mutate((key) => {
+        return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
+      });
+
       closeWorkspace();
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {
@@ -64,7 +65,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   };
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      <span className={styles.contactFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
+      <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Controller
@@ -129,8 +130,8 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
                 }}
                 initialSelectedItem={field.value}
                 label="Choose option"
-                items={manifestTypes.map((r) => r.value)}
-                itemToString={(item) => manifestTypes.find((r) => r.value === item)?.label ?? ''}
+                items={labmanifestTypes.map((r) => r.id)}
+                itemToString={(item) => labmanifestTypes.find((r) => r.id === item)?.type ?? ''}
               />
             )}
           />

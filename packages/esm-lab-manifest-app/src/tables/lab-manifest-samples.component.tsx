@@ -12,13 +12,24 @@ import {
   TableRow,
 } from '@carbon/react';
 import { TrashCan, View } from '@carbon/react/icons';
-import { ErrorState, formatDate, navigate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import {
+  ErrorState,
+  formatDate,
+  navigate,
+  parseDate,
+  showModal,
+  showSnackbar,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './lab-manifest-table.scss';
 import { useLabManifest } from '../hooks';
 import { LabManifestSample } from '../types';
+import { removeSampleFromTheManifest } from '../lab-manifest.resources';
+import { mutate } from 'swr';
 
 interface LabManifestSamplesProps {
   manifestUuid: string;
@@ -68,8 +79,28 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     },
   ];
 
-  const handleDeleteManifestSample = (manifestUuid: string) => {
-    // TODO Implement delete logic when endpoint is a ready
+  const handleDeleteManifestSample = (sampleUUid: string) => {
+    const dispose = showModal('sample-delete-confirm-dialog', {
+      onClose: () => dispose(),
+      onDelete: async () => {
+        try {
+          await removeSampleFromTheManifest(sampleUUid);
+          const mutateLinks = [
+            `/ws/rest/v1/labmanifest?v=full&status=${manifest.manifestStatus}`,
+            `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifest.uuid}`,
+            `/ws/rest/v1/labmanifest/${manifest?.uuid}`,
+          ];
+          mutate((key) => {
+            return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
+          });
+
+          dispose();
+          showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Sample removed from manifest successfully!' });
+        } catch (e) {
+          showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error removing sample from the manifest' });
+        }
+      },
+    });
   };
 
   const tableRows =
