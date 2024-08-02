@@ -19,6 +19,14 @@
       "component": "labManifestForm"
     },
     {
+      "name": "lab-manifest-order-modal-form",
+      "component": "labManifestOrderToManifestForm"
+    },
+    {
+      "name": "sample-delete-confirm-dialog",
+      "component": "sampleDeleteConfirmDialog"
+    },
+    {
       "component": "root",
       "name": "lab-manifest-dashboard-root",
       "slot": "lab-manifest-dashboard-slot"

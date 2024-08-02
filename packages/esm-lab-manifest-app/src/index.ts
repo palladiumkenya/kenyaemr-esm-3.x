@@ -26,7 +26,14 @@ export function startupApp() {
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 export const labManifestForm = getAsyncLifecycle(() => import('./forms/lab-manifest-form.workspace'), options);
-
+export const labManifestOrderToManifestForm = getAsyncLifecycle(
+  () => import('./forms/lab-manifest-orders-to-manifest.modal'),
+  options,
+);
+export const sampleDeleteConfirmDialog = getAsyncLifecycle(
+  () => import('./forms/sample-delete-confirm-dialog.modal'),
+  options,
+);
 export const labManifestDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'lab-manifest',

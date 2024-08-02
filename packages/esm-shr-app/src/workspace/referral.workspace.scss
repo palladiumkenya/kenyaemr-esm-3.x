@@ -15,70 +15,37 @@
   display: flex;
   justify-content: space-between;
   .warning {
-    @include type.type-style('heading-01');
+    @include type.type-style('heading-compact-01');
     color: $ui-05;
   }
 }
-
 .form {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  width: 50%;
+  height: 100%;
+  padding-bottom: 20px;
+}
+
+.buttonSet {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: spacing.$spacing-04;
 }
 
 .grid {
   margin: 0 spacing.$spacing-05;
   padding: 0rem;
 }
-
-.input {
-  margin-top: spacing.$spacing-05;
+.textbox {
+  margin-bottom: spacing.$spacing-10;
 }
-
-.inputRow {
-  margin-top: spacing.$spacing-05;
-  width: 50%; // Adjust width as per your design requirements
-}
-
-.datePickersRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: spacing.$spacing-05; // Adjust gap between columns
-  align-items: center;
-  width: 100%;
-}
-
-.datePickerInput {
-  flex-grow: 1;
-}
-
 .button {
   height: spacing.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
-  min-width: 20%;
-}
-
-.buttonSet {
-  padding: 0rem;
-  margin-top: spacing.$spacing-05;
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: spacing.$spacing-05;
-}
-
-.datesContainer {
-  padding: 0rem;
-  justify-content: space-between;
-  width: 100%;
-  display: flex;
-}
-.inlineActions {
-  display: flex;
-  gap: spacing.$spacing-05; /* Adjust the spacing as needed */
+  min-width: 47.5%;
 }
 
 .formTitle {
@@ -107,6 +74,7 @@
 
 .sectionHeader {
   @include type.type-style('heading-02');
+  margin-top: spacing.$spacing-05;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {
@@ -119,5 +87,41 @@
     background-color: $ui-02;
     justify-content: flex-end;
     gap: spacing.$spacing-05;
+    padding: 0;
+    margin-top: auto;
+    display: flex;
+    justify-content: end;
   }
+}
+
+.reasonList {
+  display: flex;
+  flex-direction: column;
+  gap: spacing.$spacing-05;
+  max-height: 15rem;
+  overflow-y: auto;
+  border-radius: spacing.$spacing-05;
+  padding: 0.5rem;
+}
+
+.reasonItem {
+  padding: 8px;
+  cursor: pointer;
+}
+
+.reasonTile {
+  padding: spacing.$spacing-05;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.selectedReasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: spacing.$spacing-05;
+}
+.reasonTextbox {
+  margin-bottom: spacing.$spacing-05;
 }

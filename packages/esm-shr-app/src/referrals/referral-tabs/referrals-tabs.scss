@@ -24,6 +24,7 @@
     border-bottom: none;
   }
 }
+
 .left-justified-items {
   display: flex;
   flex-direction: row;
@@ -188,32 +189,20 @@
   color: $text-02;
 }
 
-.metricsContainer {
-  display: flex;
-  justify-content: space-between;
-  background-color: $ui-02;
-  height: spacing.$spacing-10;
-  align-items: center;
-  padding: 0 spacing.$spacing-05;
-}
-
-.metricsTitle {
-  @include type.type-style('heading-03');
-  color: $ui-05;
-}
-
-.actionsContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: $ui-02;
-}
 .actionBtn {
   display: flex;
-  column-gap: 0.5rem;
+  gap: 0.5rem;
+  margin-right: layout.$spacing-05;
 }
 
 .mainSection {
   display: grid;
   grid-template-columns: 16rem 1fr;
+}
+
+.tabsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 1rem;
 }

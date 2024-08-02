@@ -1,4 +1,4 @@
-import { generateOfflineUuid, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { LabManifest, MappedLabManifest } from './types';
 
@@ -42,10 +42,15 @@ export const LabManifestFilters = [
 ];
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
 
+export const sampleTypes = [
+  { label: 'Frozen plasma', value: 'Frozen plasma' },
+  { label: 'Whole Blood', value: 'Whole Blood' },
+];
+
 export const labManifestFormSchema = z.object({
   startDate: z.date({ coerce: true }),
   endDate: z.date({ coerce: true }),
-  manifestType: z.string(),
+  manifestType: z.number({ coerce: true }),
   dispatchDate: z.date({ coerce: true }),
   courierName: z.string().optional(),
   personHandedTo: z.string().optional(),
@@ -59,12 +64,11 @@ export const labManifestFormSchema = z.object({
   manifestStatus: z.string(),
 });
 
-export const manifestTypes = [
-  {
-    value: 'VL',
-    label: 'Viral load',
-  },
-];
+export const labManifestOrderToManifestFormSchema = z.object({
+  sampleType: z.string(),
+  sampleCollectionDate: z.date({ coerce: true }),
+  sampleSeparationDate: z.date({ coerce: true }),
+});
 
 export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema>, manifestId: string | undefined) => {
   let url;
@@ -81,7 +85,44 @@ export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema
       'Content-Type': 'application/json',
     },
     method: 'POST',
-    body: JSON.stringify(data),
+    body: JSON.stringify({
+      startDate: data.startDate,
+      endDate: data.endDate,
+      dispatchDate: data.dispatchDate,
+      courier: data.courierName,
+      courierOfficer: data.personHandedTo,
+      status: data.manifestStatus,
+      county: data.county,
+      subCounty: data.subCounty,
+      facilityEmail: data.facilityEmail,
+      facilityPhoneContact: data.facilityPhoneContact,
+      clinicianPhoneContact: data.clinicianContact,
+      clinicianName: data.clinicianName,
+      labPocPhoneNumber: data.labPersonContact,
+      manifestType: data.manifestType,
+    }),
+    signal: abortController.signal,
+  });
+};
+
+export const addOrderToManifest = async (data: z.infer<typeof labManifestOrderToManifestFormSchema>) => {
+  let url = `${restBaseUrl}/labmanifestorder`;
+  const abortController = new AbortController();
+  return openmrsFetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify({ ...data, status: 'Pending' }),
+    signal: abortController.signal,
+  });
+};
+
+export const removeSampleFromTheManifest = async (orderUuid: string) => {
+  let url = `${restBaseUrl}/labmanifestorder/${orderUuid}`;
+  const abortController = new AbortController();
+  return openmrsFetch(url, {
+    method: 'DELETE',
     signal: abortController.signal,
   });
 };
@@ -90,7 +131,7 @@ export const extractLabManifest = (manifest: LabManifest) =>
   ({
     uuid: manifest.uuid,
     dispatchDate: manifest.dispatchDate,
-    endDate: manifest.dispatchDate,
+    endDate: manifest.endDate,
     startDate: manifest.startDate,
     clinicianContact: manifest.clinicianPhoneContact,
     clinicianName: manifest.clinicianName,
@@ -101,7 +142,7 @@ export const extractLabManifest = (manifest: LabManifest) =>
     labPersonContact: manifest.labPocPhoneNumber,
     manifestId: manifest.identifier,
     manifestStatus: manifest.status,
-    // manifestType: manifest.manifestType,
+    manifestType: String(manifest.manifestType),
     personHandedTo: manifest.courierOfficer,
     subCounty: manifest.subCounty,
     samples: manifest.labManifestOrders ?? [],

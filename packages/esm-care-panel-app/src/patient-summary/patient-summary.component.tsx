@@ -261,7 +261,9 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('bloodPressure', 'Blood pressure')}</p>
               <p>
-                <span className={styles.value}>{data?.bloodPressure ? data?.bloodPressure : '--'}</span>
+                <span className={styles.value}>
+                  {data?.bloodPressure && data?.bpDiastolic ? `${data?.bloodPressure}/${data?.bpDiastolic}` : '--'}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
