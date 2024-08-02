@@ -29,7 +29,13 @@ import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
-import { contactIPVOutcomeOptions, ContactListFormSchema, saveContact } from './contact-list.resource';
+import {
+  BOOLEAN_NO,
+  BOOLEAN_YES,
+  contactIPVOutcomeOptions,
+  ContactListFormSchema,
+  saveContact,
+} from './contact-list.resource';
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   props: any;
@@ -139,9 +145,11 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
     config.contactSexualRelationships.findIndex((r) => r.uuid === observableRelationship) !== -1;
 
   useEffect(() => {
-    if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes('1065')) {
+    if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes(BOOLEAN_YES)) {
       form.setValue('ipvOutCome', 'True');
-    } else if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].every((v) => v === '1066')) {
+    } else if (
+      [observablePhysicalAssault, observableThreatened, observableSexualAssault].every((v) => v === BOOLEAN_NO)
+    ) {
       form.setValue('ipvOutCome', 'False');
     }
     if (!showIPVRelatedFields) {
@@ -230,7 +238,6 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
               <RadioButtonGroup
                 legendText={t('sex', 'Sex')}
                 {...field}
-                // defaultSelected=""
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 className={styles.billingItem}>
@@ -377,12 +384,11 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                       '1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?',
                     )}
                     {...field}
-                    // defaultSelected=""
                     invalid={form.formState.errors[field.name]?.message}
                     invalidText={form.formState.errors[field.name]?.message}
                     className={styles.billingItem}>
-                    <RadioButton labelText={t('yes', 'Yes')} value="1065" id="physicalAssault_1065" />
-                    <RadioButton labelText={t('no', 'No')} value="1066" id="physicalAssault_1066" />
+                    <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="physicalAssault_yes" />
+                    <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="physicalAssault_no" />
                   </RadioButtonGroup>
                 )}
               />
@@ -396,12 +402,11 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                     id="threatened"
                     legendText={t('threatened', '2. Has he/she ever threatened to hurt you?')}
                     {...field}
-                    // defaultSelected=""
                     invalid={form.formState.errors[field.name]?.message}
                     invalidText={form.formState.errors[field.name]?.message}
                     className={styles.billingItem}>
-                    <RadioButton labelText={t('yes', 'Yes')} value="1065" id="threatened_1065" />
-                    <RadioButton labelText={t('no', 'No')} value="1066" id="threatened_1066" />
+                    <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="threatened_yes" />
+                    <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="threatened_no" />
                   </RadioButtonGroup>
                 )}
               />
@@ -418,12 +423,11 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                       '3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?',
                     )}
                     {...field}
-                    // defaultSelected=""
                     invalid={form.formState.errors[field.name]?.message}
                     invalidText={form.formState.errors[field.name]?.message}
                     className={styles.billingItem}>
-                    <RadioButton labelText={t('yes', 'Yes')} value="1065" id="sexualAssault_1065" />
-                    <RadioButton labelText={t('no', 'No')} value="1066" id="sexualAssault_1066" />
+                    <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="sexualAssault_yes" />
+                    <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="sexualAssault_no" />
                   </RadioButtonGroup>
                 )}
               />

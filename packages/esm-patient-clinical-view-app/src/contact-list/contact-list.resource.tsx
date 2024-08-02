@@ -4,15 +4,18 @@ import { ConfigObject } from '../config-schema';
 import { Enrollment, HTSEncounter, Patient } from '../types';
 import { replaceAll } from '../utils/expression-helper';
 
+export const BOOLEAN_YES = '1065';
+export const BOOLEAN_NO = '1066';
+
 export const ContactListFormSchema = z.object({
   listingDate: z.date({ coerce: true }),
   givenName: z.string().min(1, 'Required'),
   middleName: z.string().min(1, 'Required'),
   familyName: z.string().min(1, 'Required'),
   gender: z.enum(['M', 'F']),
-  physicalAssault: z.enum(['1065', '1066']).optional(),
-  threatened: z.enum(['1065', '1066']).optional(),
-  sexualAssault: z.enum(['1065', '1066']).optional(),
+  physicalAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+  threatened: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+  sexualAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
   dateOfBirth: z.date({ coerce: true }).max(new Date(), 'Must not be a future date'),
   maritalStatus: z.string().optional(),
   address: z.string().optional(),
@@ -125,7 +128,7 @@ export const saveContact = async (
         : []),
       {
         attributeType: config.contactPersonAttributesUuid.contactCreated,
-        value: '1065',
+        value: BOOLEAN_YES,
       },
       // Add Optional Prefered PNS Aproach attribute
       ...(preferedPNSAproach
