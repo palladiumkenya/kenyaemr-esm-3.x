@@ -2,6 +2,8 @@
   "actions": "Actions",
   "activeRequests": "Active Requests",
   "addNewManifest": "Add new Manifest",
+  "addSelectedSamples": "Add Selected Samples",
+  "addToManifest": "Add To manifest",
   "back": "Back",
   "batchNumber": "Batch Number",
   "cccKDODNumber": "CCC/KDOD Number",

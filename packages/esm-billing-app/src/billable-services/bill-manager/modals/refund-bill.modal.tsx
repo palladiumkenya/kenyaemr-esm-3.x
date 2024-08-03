@@ -13,14 +13,24 @@ export const RefundBillModal: React.FC<{
   lineItem: LineItem;
 }> = ({ onClose, bill, lineItem }) => {
   const { t } = useTranslation();
-
   const [isLoading, setIsLoading] = useState(false);
 
   const refundBillItems = () => {
+    const lineItemToBeRefunded = {
+      item: lineItem.uuid,
+      quantity: lineItem.quantity,
+      price: -lineItem.price,
+      priceName: lineItem.priceName,
+      priceUuid: lineItem.priceUuid,
+      lineItemOrder: lineItem.lineItemOrder,
+      paymentStatus: lineItem.paymentStatus,
+      billableService: lineItem.billableService.split(':').at(0),
+    };
+
     const billWithRefund = {
       cashPoint: bill.cashPointUuid,
       cashier: bill.cashier.uuid,
-      lineItems: [{ ...lineItem, price: -lineItem.price }],
+      lineItems: [lineItemToBeRefunded],
       payments: bill.payments,
       patient: bill.patientUuid,
       status: bill.status,
