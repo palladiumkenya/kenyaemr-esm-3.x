@@ -85,6 +85,10 @@
       "component": "cancelBillModal"   
     },
     {
+      "name": "refund-bill-modal",
+      "component": "refundBillModal"   
+    },
+    {
       "name": "delete-bill-modal",
       "component": "deleteBillModal"
     },

@@ -6,7 +6,6 @@ import {
   StructuredListBody,
   StructuredListWrapper,
   Layer,
-  Checkbox,
   OverflowMenu,
   OverflowMenuItem,
 } from '@carbon/react';
@@ -22,6 +21,14 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
   const handleOpenEditLineItemWorkspace = (lineItem: LineItem) => {
     launchWorkspace('edit-bill-form', {
       workspaceTitle: t('editBillForm', 'Edit Bill Form'),
+      lineItem,
+    });
+  };
+
+  const handleOpenRefundLineItemModal = (lineItem: LineItem) => {
+    const dispose = showModal('refund-bill-modal', {
+      onClose: () => dispose(),
+      bill,
       lineItem,
     });
   };
@@ -60,9 +67,10 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
               <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
               <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
               <StructuredListCell>
-                <OverflowMenu aria-label="overflow-menu" align="bottom">
+                <OverflowMenu aria-label="overflow-menu">
                   <OverflowMenuItem itemText="Edit Item" onClick={() => handleOpenEditLineItemWorkspace(lineItem)} />
                   <OverflowMenuItem itemText="Cancel Item" onClick={handleOpenCancelLineItemModal} />
+                  <OverflowMenuItem itemText="Refund Item" onClick={() => handleOpenRefundLineItemModal(lineItem)} />
                   <OverflowMenuItem itemText="Delete Item" onClick={handleOpenDeleteLineItemModal} />
                 </OverflowMenu>
               </StructuredListCell>
