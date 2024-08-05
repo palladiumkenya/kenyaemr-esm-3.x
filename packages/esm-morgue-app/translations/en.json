@@ -6,7 +6,9 @@
   "discharged": "Discharged",
   "discharges": "Discharges",
   "enrollingBtn": "Add New Deceased",
+  "error": "An error occurred:",
   "fromHosp": "From Hospital",
+  "loading": "Loading...",
   "morgue": "Morgue Management",
   "readyForAdmit": "Ready for Admission",
   "waitQueue": "Waiting queue"
