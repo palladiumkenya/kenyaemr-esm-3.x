@@ -33,8 +33,7 @@ export const RefundBillModal: React.FC<{
       lineItems: [lineItemToBeRefunded],
       payments: bill.payments,
       patient: bill.patientUuid,
-      // status: bill.status,
-      status: 'REFUNDED',
+      status: bill.status,
     };
 
     setIsLoading(true);

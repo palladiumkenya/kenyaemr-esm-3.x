@@ -34,14 +34,22 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   const tableHeaders = [
     { header: 'Date', key: 'date' },
     { header: 'Billable Service', key: 'billableService' },
+    { header: 'Status', key: 'status' },
+    { header: 'Credit Amount', key: 'creditAmount' },
     { header: 'Total Amount', key: 'totalAmount' },
   ];
+
+  console.log('bills', bills);
 
   const tableRows = bills.map((bill) => ({
     id: `${bill.uuid}`,
     date: bill.dateCreated,
     billableService: extractString(bill.billingService),
     totalAmount: convertToCurrency(bill.totalAmount),
+    status: bill.status,
+    creditAmount: convertToCurrency(
+      bill.lineItems.filter((li) => Math.sign(li.price) === -1).reduce((acc, curr) => acc + Math.abs(curr.price), 0),
+    ),
   }));
 
   const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {
