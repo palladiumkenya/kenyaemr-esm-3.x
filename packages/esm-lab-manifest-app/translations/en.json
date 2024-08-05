@@ -9,6 +9,7 @@
   "cccKDODNumber": "CCC/KDOD Number",
   "courrier": "Courrier",
   "dateRequested": "Date Requested",
+  "deleteSelectedSamples": "Remove Selected Samples",
   "dispatch": "Dispatch",
   "edit": "Edit",
   "editManifest": "Edit Manifest",

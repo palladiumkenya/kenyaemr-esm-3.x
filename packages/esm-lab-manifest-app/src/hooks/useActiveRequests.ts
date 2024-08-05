@@ -1,11 +1,10 @@
 import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { activeRequests } from '../lab-manifest.mock';
-import { ActiveRequests } from '../types';
+import { ActiveRequest } from '../types';
 
 const useActiveRequests = (labManifestUuid: string) => {
   const url = `${restBaseUrl}/kemrorder/validorders?manifestUuid=${labManifestUuid}`;
-  const { isLoading, error, data } = useSWR<FetchResponse<ActiveRequests>>(url, openmrsFetch);
+  const { isLoading, error, data } = useSWR<FetchResponse<ActiveRequest>>(url, openmrsFetch);
 
   return {
     isLoading,
