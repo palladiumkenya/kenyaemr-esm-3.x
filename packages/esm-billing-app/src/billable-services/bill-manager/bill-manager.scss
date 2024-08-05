@@ -14,11 +14,13 @@
 }
 
 .refundedItem {
-  // background-color: #f87171;
-  // background-color: #fca5a5;
   background-color: #fee2e2;
 }
 
 .refundedItem:hover {
   background-color: #fecaca !important;
+}
+
+.refundedItem:active {
+  background-color: #fca5a5 !important;
 }

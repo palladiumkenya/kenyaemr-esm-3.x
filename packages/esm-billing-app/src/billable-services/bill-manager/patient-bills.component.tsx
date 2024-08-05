@@ -40,7 +40,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   ];
 
   if (hasRefundedItems) {
-    tableHeaders.splice(2, 0, { header: 'Creditted Amount', key: 'creditAmount' });
+    tableHeaders.splice(2, 0, { header: 'Refunded Amount', key: 'creditAmount' });
   }
 
   const tableRows = bills.map((bill) => ({
@@ -48,9 +48,13 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
     date: bill.dateCreated,
     totalAmount: convertToCurrency(bill.totalAmount),
     status: bill.status,
-    creditAmount: convertToCurrency(
-      bill.lineItems.filter((li) => Math.sign(li.price) === -1).reduce((acc, curr) => acc + Math.abs(curr.price), 0),
-    ),
+    creditAmount: hasRefundedItems
+      ? convertToCurrency(
+          bill.lineItems
+            .filter((li) => Math.sign(li.price) === -1)
+            .reduce((acc, curr) => acc + Math.abs(curr.price), 0),
+        )
+      : convertToCurrency(0),
   }));
 
   const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {
