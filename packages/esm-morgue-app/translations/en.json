@@ -6,6 +6,8 @@
   "discharged": "Discharged",
   "discharges": "Discharges",
   "enrollingBtn": "Add New Deceased",
+  "fromHosp": "From Hospital",
   "morgue": "Morgue Management",
+  "readyForAdmit": "Ready for Admission",
   "waitQueue": "Waiting queue"
 }

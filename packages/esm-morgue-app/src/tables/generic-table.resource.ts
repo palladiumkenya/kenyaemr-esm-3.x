@@ -1,6 +1,6 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
-interface DeceasedInfo {
+export interface DeceasedInfo {
   uuid: string;
   display: string;
   identifiers: Array<{

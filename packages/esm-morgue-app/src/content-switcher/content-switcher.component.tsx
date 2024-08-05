@@ -3,13 +3,14 @@ import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './content-switcher.scss';
 import { WaitingQueue } from '../tables/waiting-queue.component';
+import { AdmittedQueue } from '../tables/admitted-queue.component';
 
 export const ContentSwitchTabs: React.FC = () => {
   const { t } = useTranslation();
 
   const switchTabs = [
     { name: t('waitQueue', 'Waiting queue'), component: <WaitingQueue /> },
-    { name: t('admitted', 'Admitted'), component: '' },
+    { name: t('admitted', 'Admitted'), component: <AdmittedQueue /> },
     { name: t('discharged', 'Discharged'), component: '' },
   ];
 
