@@ -8,7 +8,7 @@ const LabManifestComponent: React.FC = () => {
   const { t } = useTranslation();
   return (
     <div className={`omrs-main-content`}>
-      <LabManifestHeader title={t('labManifest', 'Lab Manifest')} />
+      <LabManifestHeader title={t('labManifestDashboard', 'Lab Manifest Dashboard')} />
       <LabManifestMetrics />
       <LabManifestsTable />
     </div>

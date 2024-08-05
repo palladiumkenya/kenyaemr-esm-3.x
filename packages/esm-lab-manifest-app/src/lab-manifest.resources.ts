@@ -1,6 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { z } from 'zod';
 import { LabManifest, MappedLabManifest } from './types';
+import { mutate } from 'swr';
 
 export const LabManifestFilters = [
   {
@@ -115,6 +116,17 @@ export const addOrderToManifest = async (data: z.infer<typeof labManifestOrderTo
     method: 'POST',
     body: JSON.stringify({ ...data, status: 'Pending' }),
     signal: abortController.signal,
+  });
+};
+
+export const mutateManifestLinks = (manifestUuid?: string, manifestStatus?: string) => {
+  const mutateLinks = [
+    `/ws/rest/v1/labmanifest?v=full&status=${manifestStatus}`,
+    `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifestUuid}`,
+    `/ws/rest/v1/labmanifest/${manifestUuid}`,
+  ];
+  mutate((key) => {
+    return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
   });
 };
 

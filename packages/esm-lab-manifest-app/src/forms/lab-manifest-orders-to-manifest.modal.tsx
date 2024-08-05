@@ -19,14 +19,21 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
-import { addOrderToManifest, labManifestOrderToManifestFormSchema, sampleTypes } from '../lab-manifest.resources';
-import styles from './lab-manifest-form.scss';
 import { useLabManifest } from '../hooks';
+import {
+  addOrderToManifest,
+  labManifestOrderToManifestFormSchema,
+  mutateManifestLinks,
+  sampleTypes,
+} from '../lab-manifest.resources';
+import { ActiveRequestOrder } from '../types';
+import ActiveOrdersSelectionPreview from './active-order-selection-preview';
+import styles from './lab-manifest-form.scss';
 
 interface LabManifestOrdersToManifestFormProps {
   onClose: () => void;
   props: {
-    title?: string;
+    orders?: Array<ActiveRequestOrder>;
     selectedOrders: Array<{
       labManifest: {
         uuid: string;
@@ -43,7 +50,7 @@ type OrderToManifestFormType = z.infer<typeof labManifestOrderToManifestFormSche
 
 const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormProps> = ({
   onClose,
-  props: { title, selectedOrders },
+  props: { selectedOrders, orders },
 }) => {
   const { t } = useTranslation();
   const form = useForm<OrderToManifestFormType>({
@@ -64,14 +71,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
           showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding order to the manifest' });
         }
       });
-      const mutateLinks = [
-        `/ws/rest/v1/labmanifest?v=full&status=${manifest.manifestStatus}`,
-        `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifest?.uuid}`,
-        `/ws/rest/v1/labmanifest/${manifest?.uuid}`,
-      ];
-      mutate((key) => {
-        return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
-      });
+      mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
       onClose();
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding orders to the manifest' });
@@ -82,7 +82,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
     <React.Fragment>
       <Form onSubmit={form.handleSubmit(onSubmit)}>
         <ModalHeader closeModal={onClose} className={styles.heading}>
-          {title ?? t('updateSampleDetails', 'Update Sample Details')}
+          {t('updateSampleDetails', 'Update Sample Details')}
         </ModalHeader>
         <ModalBody>
           <Stack gap={4} className={styles.grid}>
@@ -154,15 +154,18 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
                 />
               </Column>
             </Row>
+            <div className={styles.previewContainer}>
+              <ActiveOrdersSelectionPreview orders={orders} />
+            </div>
           </Stack>
         </ModalBody>
         <ModalFooter>
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">
-              Submit
-            </Button>
             <Button className={styles.button} kind="secondary" onClick={onClose}>
               Cancel
+            </Button>
+            <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">
+              Add Samples
             </Button>
           </ButtonSet>
         </ModalFooter>
