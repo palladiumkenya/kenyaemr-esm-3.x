@@ -57,3 +57,28 @@
   padding-left: spacing.$spacing-05;
   padding-right: spacing.$spacing-05;
 }
+
+.sectionHeader {
+  @include type.type-style('heading-02');
+}
+
+.modalQuiz {
+  margin-bottom: spacing.$spacing-05;
+}
+
+.button {
+  height: spacing.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 20%;
+}
+
+.buttonSet {
+  padding: 0rem;
+  margin-top: spacing.$spacing-05;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: spacing.$spacing-05;
+}
