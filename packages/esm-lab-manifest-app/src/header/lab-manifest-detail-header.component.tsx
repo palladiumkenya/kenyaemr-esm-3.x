@@ -1,10 +1,11 @@
 import { Button, ButtonSet, Layer, Row, SkeletonText, Tile } from '@carbon/react';
 import { ArrowLeft, Edit, Printer } from '@carbon/react/icons';
-import { formatDate, launchWorkspace, navigate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, navigate, parseDate, showSnackbar } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
 import styles from './lab-manifest-header.scss';
+import { printableManifestStatus, printManifest } from '../lab-manifest.resources';
 
 interface LabManifestDetailHeaderProps {
   manifestUuid: string;
@@ -23,6 +24,14 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
       workspaceTitle: 'Lab Manifest Form',
       manifest,
     });
+  };
+
+  const handlePrintManifest = async () => {
+    try {
+      await printManifest(manifest.uuid);
+    } catch (error) {
+      showSnackbar({ title: 'Failure', subtitle: 'Error printing manifest', kind: 'error' });
+    }
   };
 
   if (isLoading) {
@@ -63,7 +72,7 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
           <span className={styles.samplesCountValue}>{manifest.samples.length}</span>
         </Row>
       </Tile>
-      <ButtonSet className={styles.btnSet}>
+      <Row className={styles.btnSet}>
         <Button kind="tertiary" renderIcon={ArrowLeft} onClick={handleGoBack}>
           {t('back', 'Back')}
         </Button>
@@ -71,11 +80,13 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
           <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest}>
             {t('editManifest', 'Edit Manifest')}
           </Button>
-          <Button kind="secondary" renderIcon={Printer} onClick={handleEditManifest}>
-            {t('printManifest', 'Print Manifest')}
-          </Button>
+          {printableManifestStatus.includes(manifest.manifestStatus) && (
+            <Button kind="secondary" renderIcon={Printer} onClick={handlePrintManifest}>
+              {t('printManifest', 'Print Manifest')}
+            </Button>
+          )}
         </Row>
-      </ButtonSet>
+      </Row>
     </Layer>
   );
 };
