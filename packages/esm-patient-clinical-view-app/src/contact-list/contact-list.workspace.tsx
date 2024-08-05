@@ -184,6 +184,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             )}
           />
         </Column>
+
         <span className={styles.sectionHeader}>Demographics</span>
         <Column>
           <Controller

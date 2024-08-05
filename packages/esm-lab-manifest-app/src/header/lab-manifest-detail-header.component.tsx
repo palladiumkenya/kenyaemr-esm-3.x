@@ -1,5 +1,5 @@
 import { Button, ButtonSet, Layer, Row, SkeletonText, Tile } from '@carbon/react';
-import { ArrowLeft, Edit } from '@carbon/react/icons';
+import { ArrowLeft, Edit, Printer } from '@carbon/react/icons';
 import { formatDate, launchWorkspace, navigate, parseDate } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -67,9 +67,14 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
         <Button kind="tertiary" renderIcon={ArrowLeft} onClick={handleGoBack}>
           {t('back', 'Back')}
         </Button>
-        <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest}>
-          {t('editManifest', 'Edit Manifest')}
-        </Button>
+        <Row className={styles.btnSetRight}>
+          <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest}>
+            {t('editManifest', 'Edit Manifest')}
+          </Button>
+          <Button kind="secondary" renderIcon={Printer} onClick={handleEditManifest}>
+            {t('printManifest', 'Print Manifest')}
+          </Button>
+        </Row>
       </ButtonSet>
     </Layer>
   );

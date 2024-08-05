@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { LabManifest, MappedLabManifest } from './types';
 import { mutate } from 'swr';
 
+export const printableManifestStatus = ['Submitted', 'Complete results'];
+
 export const LabManifestFilters = [
   {
     label: 'Draft',
@@ -159,3 +161,25 @@ export const extractLabManifest = (manifest: LabManifest) =>
     subCounty: manifest.subCounty,
     samples: manifest.labManifestOrders ?? [],
   } as MappedLabManifest);
+
+const printFile = async (url: string) => {
+  const res = await fetch(url, {
+    headers: {
+      'Content-Type': 'application/pdf',
+    },
+  });
+  const fileData = await res.arrayBuffer();
+  const blob = new Blob([fileData], { type: 'application/pdf' });
+  const _url = URL.createObjectURL(blob);
+  window.open(_url, '_blank');
+};
+
+export const printManifest = async (manifestUid: string) => {
+  const url = `/openmrs${restBaseUrl}/kemrorder/printmanifest?manifestUuid=${manifestUid}`;
+  return await printFile(url);
+};
+
+export const printSpecimentLabel = async (manifestOrderUuid: string) => {
+  const url = `/openmrs${restBaseUrl}/kemrorder/printspecimenlabel?manifestOrderUuid=${manifestOrderUuid}`;
+  return await printFile(url);
+};
