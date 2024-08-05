@@ -163,9 +163,6 @@ export const usePatientPaymentInfo = (patientUuid: string) => {
 };
 
 export const processBillItems = (payload) => {
-  // eslint-disable-next-line no-console
-  console.log('payload', payload);
-
   const url = `/ws/rest/v1/cashier/bill`;
   return openmrsFetch(url, {
     method: 'POST',

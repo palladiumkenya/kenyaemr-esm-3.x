@@ -23,7 +23,7 @@ export const RefundBillModal: React.FC<{
       priceName: lineItem.priceName,
       priceUuid: lineItem.priceUuid,
       lineItemOrder: lineItem.lineItemOrder,
-      paymentStatus: lineItem.paymentStatus,
+      paymentStatus: 'PAID', //TODO thi status should be sommething like "CREDITED"
       billableService: lineItem.billableService.split(':').at(0),
     };
 
@@ -33,7 +33,8 @@ export const RefundBillModal: React.FC<{
       lineItems: [lineItemToBeRefunded],
       payments: bill.payments,
       patient: bill.patientUuid,
-      status: bill.status,
+      // status: bill.status,
+      status: 'REFUNDED',
     };
 
     setIsLoading(true);

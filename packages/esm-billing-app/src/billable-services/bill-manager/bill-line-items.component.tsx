@@ -18,6 +18,37 @@ import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
   const { t } = useTranslation();
 
+  return (
+    <Layer>
+      <StructuredListWrapper className={styles.billListContainer} selection={true} isCondensed>
+        <StructuredListHead>
+          <StructuredListRow head>
+            <StructuredListCell head>{t('billItem', 'Bill item')}</StructuredListCell>
+            <StructuredListCell head>{t('quantity', 'Quantity')}</StructuredListCell>
+            <StructuredListCell head>{t('unitPrice', 'Unit Price')}</StructuredListCell>
+            <StructuredListCell head>{t('total', 'Total')}</StructuredListCell>
+            <StructuredListCell head>{t('actions', 'Actions')}</StructuredListCell>
+          </StructuredListRow>
+        </StructuredListHead>
+        <StructuredListBody>
+          {bill?.lineItems.map((lineItem) => (
+            <LineItemRow bill={bill} lineItem={lineItem} key={lineItem.uuid} />
+          ))}
+        </StructuredListBody>
+      </StructuredListWrapper>
+    </Layer>
+  );
+};
+
+const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill }) => {
+  const refundedLineItemBillableServiceUUIDs = bill.lineItems
+    .filter((li) => Math.sign(li.price) === -1)
+    .map((li) => li.billableService.split(':').at(0));
+
+  const isRefundedItem = refundedLineItemBillableServiceUUIDs.includes(lineItem.billableService.split(':').at(0));
+
+  const { t } = useTranslation();
+
   const handleOpenEditLineItemWorkspace = (lineItem: LineItem) => {
     launchWorkspace('edit-bill-form', {
       workspaceTitle: t('editBillForm', 'Edit Bill Form'),
@@ -46,39 +77,24 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
   };
 
   return (
-    <Layer>
-      <StructuredListWrapper className={styles.billListContainer} selection={true} isCondensed>
-        <StructuredListHead>
-          <StructuredListRow head>
-            <StructuredListCell head>{t('billItem', 'Bill item')}</StructuredListCell>
-            <StructuredListCell head>{t('quantity', 'Quantity')}</StructuredListCell>
-            <StructuredListCell head>{t('unitPrice', 'Unit Price')}</StructuredListCell>
-            <StructuredListCell head>{t('total', 'Total')}</StructuredListCell>
-            <StructuredListCell head>{t('actions', 'Actions')}</StructuredListCell>
-          </StructuredListRow>
-        </StructuredListHead>
-        <StructuredListBody>
-          {bill?.lineItems.map((lineItem) => (
-            <StructuredListRow>
-              <StructuredListCell>
-                {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
-              </StructuredListCell>
-              <StructuredListCell>{lineItem.quantity}</StructuredListCell>
-              <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
-              <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
-              <StructuredListCell>
-                <OverflowMenu aria-label="overflow-menu">
-                  <OverflowMenuItem itemText="Edit Item" onClick={() => handleOpenEditLineItemWorkspace(lineItem)} />
-                  <OverflowMenuItem itemText="Cancel Item" onClick={handleOpenCancelLineItemModal} />
-                  <OverflowMenuItem itemText="Refund Item" onClick={() => handleOpenRefundLineItemModal(lineItem)} />
-                  <OverflowMenuItem itemText="Delete Item" onClick={handleOpenDeleteLineItemModal} />
-                </OverflowMenu>
-              </StructuredListCell>
-            </StructuredListRow>
-          ))}
-        </StructuredListBody>
-      </StructuredListWrapper>
-    </Layer>
+    <StructuredListRow>
+      <StructuredListCell>
+        {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
+      </StructuredListCell>
+      <StructuredListCell>{lineItem.quantity}</StructuredListCell>
+      <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
+      <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
+      <StructuredListCell>
+        <OverflowMenu aria-label="overflow-menu">
+          <OverflowMenuItem itemText="Edit Item" onClick={() => handleOpenEditLineItemWorkspace(lineItem)} />
+          <OverflowMenuItem itemText="Cancel Item" onClick={handleOpenCancelLineItemModal} />
+          {!isRefundedItem && (
+            <OverflowMenuItem itemText="Refund Item" onClick={() => handleOpenRefundLineItemModal(lineItem)} />
+          )}
+          <OverflowMenuItem itemText="Delete Item" onClick={handleOpenDeleteLineItemModal} />
+        </OverflowMenu>
+      </StructuredListCell>
+    </StructuredListRow>
   );
 };
 
