@@ -29,13 +29,13 @@ interface LabManifestFormProps extends DefaultWorkspaceProps {
   manifest?: MappedLabManifest;
 }
 
-type ContactListFormType = z.infer<typeof labManifestFormSchema>;
+type LabManifestFormType = z.infer<typeof labManifestFormSchema>;
 
 const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manifest }) => {
   const { labmanifestTypes } = useConfig<LabManifestConfig>();
   const counties = require('../counties.json') as County[];
 
-  const form = useForm<ContactListFormType>({
+  const form = useForm<LabManifestFormType>({
     defaultValues: {
       ...manifest,
       manifestType: manifest?.manifestType ? Number(manifest.manifestType) : undefined,
@@ -49,10 +49,10 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const observableSelectedCounty = form.watch('county');
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
-  const onSubmit = async (values: ContactListFormType) => {
+  const onSubmit = async (values: LabManifestFormType) => {
     try {
       await saveLabManifest(values, manifest?.uuid);
-      mutateManifestLinks(values?.manifestStatus, manifest?.uuid);
+      mutateManifestLinks(manifest?.uuid, values?.manifestStatus);
       closeWorkspace();
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {
@@ -69,10 +69,11 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="startDate"
             render={({ field }) => (
               <DatePicker
+                value={field.value}
+                onChange={field.onChange}
                 dateFormat="d/m/Y"
                 id="startDate"
                 datePickerType="single"
-                {...field}
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
@@ -92,10 +93,11 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="endDate"
             render={({ field }) => (
               <DatePicker
+                value={field.value}
+                onChange={field.onChange}
                 dateFormat="d/m/Y"
                 id="endDate"
                 datePickerType="single"
-                {...field}
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
@@ -133,7 +135,6 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
           />
         </Column>
         <span className={styles.sectionHeader}>Dispatch status</span>
-
         <Column>
           <Controller
             control={form.control}
@@ -343,7 +344,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>
+        <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">
           {t('submit', 'Submit')}
         </Button>
       </ButtonSet>

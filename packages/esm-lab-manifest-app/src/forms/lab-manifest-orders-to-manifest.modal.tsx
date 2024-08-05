@@ -71,7 +71,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
           showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding order to the manifest' });
         }
       });
-      mutateManifestLinks(manifest?.manifestStatus, manifest?.uuid);
+      mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
       onClose();
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding orders to the manifest' });
