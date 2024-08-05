@@ -20,7 +20,12 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
 import { useLabManifest } from '../hooks';
-import { addOrderToManifest, labManifestOrderToManifestFormSchema, sampleTypes } from '../lab-manifest.resources';
+import {
+  addOrderToManifest,
+  labManifestOrderToManifestFormSchema,
+  mutateManifestLinks,
+  sampleTypes,
+} from '../lab-manifest.resources';
 import { ActiveRequestOrder } from '../types';
 import ActiveOrdersSelectionPreview from './active-order-selection-preview';
 import styles from './lab-manifest-form.scss';
@@ -66,14 +71,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
           showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding order to the manifest' });
         }
       });
-      const mutateLinks = [
-        `/ws/rest/v1/labmanifest?v=full&status=${manifest.manifestStatus}`,
-        `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifest?.uuid}`,
-        `/ws/rest/v1/labmanifest/${manifest?.uuid}`,
-      ];
-      mutate((key) => {
-        return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
-      });
+      mutateManifestLinks(manifest?.manifestStatus, manifest?.uuid);
       onClose();
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding orders to the manifest' });

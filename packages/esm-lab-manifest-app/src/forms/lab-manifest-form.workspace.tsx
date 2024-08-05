@@ -11,15 +11,19 @@ import {
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, parseDate, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { LabManifestFilters, labManifestFormSchema, saveLabManifest } from '../lab-manifest.resources';
-import styles from './lab-manifest-form.scss';
-import { County, MappedLabManifest } from '../types';
-import { mutate } from 'swr';
 import { LabManifestConfig } from '../config-schema';
+import {
+  LabManifestFilters,
+  labManifestFormSchema,
+  mutateManifestLinks,
+  saveLabManifest,
+} from '../lab-manifest.resources';
+import { County, MappedLabManifest } from '../types';
+import styles from './lab-manifest-form.scss';
 interface LabManifestFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   manifest?: MappedLabManifest;
@@ -48,15 +52,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const onSubmit = async (values: ContactListFormType) => {
     try {
       await saveLabManifest(values, manifest?.uuid);
-      const mutateLinks = [
-        `/ws/rest/v1/labmanifest?v=full&status=${values.manifestStatus}`,
-        `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifest?.uuid}`,
-        `/ws/rest/v1/labmanifest/${manifest?.uuid}`,
-      ];
-      mutate((key) => {
-        return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
-      });
-
+      mutateManifestLinks(values?.manifestStatus, manifest?.uuid);
       closeWorkspace();
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {

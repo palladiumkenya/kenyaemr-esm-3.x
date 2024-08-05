@@ -122,7 +122,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
           <Button
             renderIcon={TrashCan}
             hasIconOnly
-            kind="tertiary"
+            kind="ghost"
             iconDescription={t('removeFromManifest', 'Remove from Manifest')}
             onClick={() => handleDeleteManifestSample(sample.uuid)}
           />

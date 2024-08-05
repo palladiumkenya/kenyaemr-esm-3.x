@@ -86,6 +86,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
           <Button
             kind="tertiary"
             iconDescription={t('addToManifest', 'Add To manifest')}
+            renderIcon={Add}
             onClick={() =>
               handleAddSelectedToManifest([
                 {
