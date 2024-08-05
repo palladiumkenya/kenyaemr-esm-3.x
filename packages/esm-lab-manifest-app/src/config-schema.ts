@@ -7,15 +7,15 @@ export const configSchema = {
     _default: [
       {
         id: 1,
-        type: 'EID Type',
+        type: 'EID',
       },
       {
         id: 2,
-        type: 'VL Type',
+        type: 'VL',
       },
       {
         id: 3,
-        type: 'FLU Type',
+        type: 'FLU',
       },
     ],
   },

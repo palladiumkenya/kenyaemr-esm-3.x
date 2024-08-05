@@ -47,3 +47,13 @@
     }
   }
 }
+
+.btnSet {
+  flex-flow: row wrap;
+  gap: spacing.$spacing-03;
+}
+
+.btn {
+  padding-left: spacing.$spacing-05;
+  padding-right: spacing.$spacing-05;
+}

@@ -3,10 +3,8 @@ import { ArrowRight } from '@carbon/react/icons';
 import { launchWorkspace } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { LabManifestFilters } from '../lab-manifest.resources';
-import LabManifestMetricValue from './lab-manifest-metric-value.component';
-import styles from './lab-manifest-metrics.scss';
 import MetricCard from './lab-manifest-metric-card.component';
+import styles from './lab-manifest-metrics.scss';
 
 export interface Service {
   uuid: string;
