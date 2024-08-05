@@ -23,7 +23,7 @@ export const RefundBillModal: React.FC<{
       priceName: lineItem.priceName,
       priceUuid: lineItem.priceUuid,
       lineItemOrder: lineItem.lineItemOrder,
-      paymentStatus: 'PAID', //TODO thi status should be sommething like "CREDITED"
+      paymentStatus: 'CREDITED ',
       billableService: lineItem.billableService.split(':').at(0),
     };
 

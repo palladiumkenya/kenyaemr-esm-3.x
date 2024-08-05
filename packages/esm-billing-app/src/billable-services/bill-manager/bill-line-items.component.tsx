@@ -77,7 +77,7 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
   };
 
   return (
-    <StructuredListRow>
+    <StructuredListRow className={isRefundedItem && styles.refundedItem}>
       <StructuredListCell>
         {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
       </StructuredListCell>

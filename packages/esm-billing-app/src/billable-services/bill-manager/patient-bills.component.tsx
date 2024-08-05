@@ -17,7 +17,7 @@ import {
 } from '@carbon/react';
 import { convertToCurrency, extractString } from '../../helpers';
 import { useTranslation } from 'react-i18next';
-import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedBill } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
@@ -31,20 +31,21 @@ type PatientBillsProps = {
 const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   const { t } = useTranslation();
 
+  const hasRefundedItems = bills.some((bill) => bill.lineItems.some((li) => Math.sign(li.price) === -1));
+
   const tableHeaders = [
     { header: 'Date', key: 'date' },
-    { header: 'Billable Service', key: 'billableService' },
     { header: 'Status', key: 'status' },
-    { header: 'Credit Amount', key: 'creditAmount' },
     { header: 'Total Amount', key: 'totalAmount' },
   ];
 
-  console.log('bills', bills);
+  if (hasRefundedItems) {
+    tableHeaders.splice(2, 0, { header: 'Creditted Amount', key: 'creditAmount' });
+  }
 
   const tableRows = bills.map((bill) => ({
     id: `${bill.uuid}`,
     date: bill.dateCreated,
-    billableService: extractString(bill.billingService),
     totalAmount: convertToCurrency(bill.totalAmount),
     status: bill.status,
     creditAmount: convertToCurrency(
