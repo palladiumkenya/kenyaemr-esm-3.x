@@ -69,6 +69,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
         props: {
           title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
           selectedOrders: selected,
+          orders: request.Orders.filter((order) => selected.some((o) => o.order.uuid === order.orderUuid)),
         },
       });
     }
@@ -85,6 +86,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
           <Button
             kind="tertiary"
             iconDescription={t('addToManifest', 'Add To manifest')}
+            renderIcon={Add}
             onClick={() =>
               handleAddSelectedToManifest([
                 {

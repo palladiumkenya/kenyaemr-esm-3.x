@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonSet,
   DataTable,
   DataTableSkeleton,
   Dropdown,
@@ -14,21 +15,25 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { View } from '@carbon/react/icons';
+import { Edit, View } from '@carbon/react/icons';
 import {
   ErrorState,
   formatDate,
   isDesktop,
+  launchWorkspace,
   navigate,
   parseDate,
+  useConfig,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LabManifestConfig } from '../config-schema';
 import { useLabManifests } from '../hooks';
 import { LabManifestFilters } from '../lab-manifest.resources';
+import { MappedLabManifest } from '../types';
 import styles from './lab-manifest-table.scss';
 
 const LabManifestsTable = () => {
@@ -40,7 +45,7 @@ const LabManifestsTable = () => {
   const { manifests, error, isLoading } = useLabManifests(currFilter);
   const { results, totalPages, currentPage, goTo } = usePagination(manifests, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
-
+  const { labmanifestTypes } = useConfig<LabManifestConfig>();
   const headers = [
     {
       header: t('startDate', 'Start date'),
@@ -88,6 +93,13 @@ const LabManifestsTable = () => {
     navigate({ to: window.getOpenmrsSpaBase() + `home/lab-manifest/${manifestUuid}` });
   };
 
+  const handleEditManifest = (manifest: MappedLabManifest) => {
+    launchWorkspace('lab-manifest-form', {
+      workspaceTitle: 'Lab Manifest Form',
+      manifest,
+    });
+  };
+
   const tableRows =
     results?.map((manifest) => {
       return {
@@ -96,19 +108,30 @@ const LabManifestsTable = () => {
         endDate: manifest.endDate ? formatDate(parseDate(manifest.endDate)) : '--',
         courrier: manifest.courierName ? manifest.courierName : '--',
         labPersonContact: manifest.labPersonContact ?? '--',
-        type: manifest.manifestType ?? '--',
+        type: labmanifestTypes.find((type) => `${type.id}` === manifest?.manifestType)?.type ?? '--',
         status: manifest.manifestStatus ?? '--',
         dispatch: manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--',
         manifestId: manifest.manifestId ?? '--',
         samples: `${manifest.samples.length}`,
         actions: (
-          <Button
-            renderIcon={View}
-            hasIconOnly
-            kind="tertiary"
-            iconDescription={t('view', 'View')}
-            onClick={() => handleViewManifestSamples(manifest.uuid)}
-          />
+          <ButtonSet className={styles.btnSet}>
+            <Button
+              className={styles.btn}
+              renderIcon={View}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('view', 'View')}
+              onClick={() => handleViewManifestSamples(manifest.uuid)}
+            />
+            <Button
+              className={styles.btn}
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('edit', 'Edit')}
+              onClick={() => handleEditManifest(manifest)}
+            />
+          </ButtonSet>
         ),
       };
     }) ?? [];

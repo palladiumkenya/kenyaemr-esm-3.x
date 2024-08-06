@@ -122,6 +122,15 @@
       "slot": "tests-ordered-actions-slot",
       "order": 0
     }
+    
+  ],
+  "workspaces": [
+    {
+      "name": "update-billable-services-workspace",
+      "title": "Update Billable Services",
+      "component": "updateBillableServicesWorkspace",
+      "type": "workspace"
+    }
   ],
   "workspaces": [
     {

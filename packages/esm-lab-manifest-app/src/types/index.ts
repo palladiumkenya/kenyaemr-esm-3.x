@@ -58,20 +58,22 @@ export interface LabManifestSample {
   order: Order;
 }
 
-export interface ActiveRequests {
-  Orders: Array<{
-    orderId: number;
-    orderUuid: string;
-    patientId: number;
-    patientUuid: string;
-    patientName: string;
-    cccKdod: string;
-    dateRequested: string;
-    payload: string;
-    hasProblem;
-  }>;
+export interface ActiveRequest {
+  Orders: Array<ActiveRequestOrder>;
   cccNumberType: number;
   heiNumberType: number;
+}
+
+export interface ActiveRequestOrder {
+  orderId: number;
+  orderUuid: string;
+  patientId: number;
+  patientUuid: string;
+  patientName: string;
+  cccKdod: string;
+  dateRequested: string;
+  payload: string;
+  hasProblem;
 }
 
 export interface Constiuency {
