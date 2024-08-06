@@ -5,6 +5,8 @@ import { mutate } from 'swr';
 
 export const printableManifestStatus = ['Submitted', 'Complete results'];
 
+export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
+
 export const LabManifestFilters = [
   {
     label: 'Draft',

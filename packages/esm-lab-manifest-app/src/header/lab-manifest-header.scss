@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .header {
@@ -119,12 +120,12 @@ svg.iconOverrides {
 }
 
 .detailHeaderContent {
-  background-color: $color-gray-30;
+  background-color: colors.$gray-10;
   width: fit-content;
 }
 
 .detailHeaderContentLoading {
-  background-color: $color-gray-30;
+  background-color: colors.$gray-10;
   max-width: 70%;
 }
 
