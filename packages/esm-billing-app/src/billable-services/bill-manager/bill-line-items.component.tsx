@@ -41,11 +41,16 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
 };
 
 const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill }) => {
+  const refundedLineItemUUIDs = bill.lineItems.filter((li) => Math.sign(li.price) === -1).map((li) => li.uuid);
+  const isRefundedLineItem = refundedLineItemUUIDs.includes(lineItem.uuid);
+
   const refundedLineItemBillableServiceUUIDs = bill.lineItems
     .filter((li) => Math.sign(li.price) === -1)
     .map((li) => li.billableService.split(':').at(0));
 
-  const isRefundedItem = refundedLineItemBillableServiceUUIDs.includes(lineItem.billableService.split(':').at(0));
+  const isRefundedBillableService = refundedLineItemBillableServiceUUIDs.includes(
+    lineItem.billableService.split(':').at(0),
+  );
 
   const { t } = useTranslation();
 
@@ -77,7 +82,7 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
   };
 
   return (
-    <StructuredListRow className={isRefundedItem && styles.refundedItem}>
+    <StructuredListRow className={isRefundedLineItem && styles.refundedItem}>
       <StructuredListCell>
         {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
       </StructuredListCell>
@@ -88,7 +93,7 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
         <OverflowMenu aria-label="overflow-menu">
           <OverflowMenuItem itemText="Edit Item" onClick={() => handleOpenEditLineItemWorkspace(lineItem)} />
           <OverflowMenuItem itemText="Cancel Item" onClick={handleOpenCancelLineItemModal} />
-          {!isRefundedItem && (
+          {!isRefundedBillableService && (
             <OverflowMenuItem itemText="Refund Item" onClick={() => handleOpenRefundLineItemModal(lineItem)} />
           )}
           <OverflowMenuItem itemText="Delete Item" onClick={handleOpenDeleteLineItemModal} />
