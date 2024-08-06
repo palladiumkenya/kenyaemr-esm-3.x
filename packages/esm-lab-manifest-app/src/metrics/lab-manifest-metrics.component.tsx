@@ -39,17 +39,17 @@ function LabManifestMetrics() {
           ]}
         />
         <MetricCard
-          title="Manifest With Errors"
+          title="Complete Manifest"
           status={[
+            { status: 'Complete results', color: 'green' },
             { status: 'Complete errors', color: 'red' },
-            { status: 'Incomplete errors', color: 'orange' },
           ]}
         />
         <MetricCard
-          title="Manifest With Results"
+          title="Incomplete Manifest"
           status={[
-            { status: 'Complete results', color: 'green' },
             { status: 'Incomplete results', color: 'orange' },
+            { status: 'Incomplete errors', color: 'red' },
           ]}
         />
       </Layer>

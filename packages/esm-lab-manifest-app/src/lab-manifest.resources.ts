@@ -4,7 +4,7 @@ import { LabManifest, MappedLabManifest } from './types';
 import { mutate } from 'swr';
 
 export const printableManifestStatus = ['Submitted', 'Complete results'];
-
+export const editableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
 
 export const LabManifestFilters = [
@@ -42,7 +42,7 @@ export const LabManifestFilters = [
   },
   {
     label: 'Complete with Results',
-    value: 'Complete results',
+    value: 'Complete results', //ok
   },
 ];
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;

@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { LabManifestConfig } from '../config-schema';
 import {
+  editableManifestStatus,
   LabManifestFilters,
   labManifestFormSchema,
   mutateManifestLinks,
@@ -333,8 +334,12 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
                 }}
                 initialSelectedItem={field.value}
                 label="Select status"
-                items={LabManifestFilters.map((r) => r.value)}
-                itemToString={(item) => LabManifestFilters.find((r) => r.value === item)?.label ?? ''}
+                items={LabManifestFilters.filter((lm) => editableManifestStatus.includes(lm.value)).map((r) => r.value)}
+                itemToString={(item) =>
+                  LabManifestFilters.filter((lm) => editableManifestStatus.includes(lm.value)).find(
+                    (r) => r.value === item,
+                  )?.label ?? ''
+                }
               />
             )}
           />

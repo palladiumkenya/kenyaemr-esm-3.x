@@ -33,7 +33,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LabManifestConfig } from '../config-schema';
 import { useLabManifests } from '../hooks';
-import { LabManifestFilters, printableManifestStatus, printManifest } from '../lab-manifest.resources';
+import {
+  editableManifestStatus,
+  LabManifestFilters,
+  printableManifestStatus,
+  printManifest,
+} from '../lab-manifest.resources';
 import { MappedLabManifest } from '../types';
 import styles from './lab-manifest-table.scss';
 
@@ -132,14 +137,16 @@ const LabManifestsTable = () => {
               iconDescription={t('view', 'View')}
               onClick={() => handleViewManifestSamples(manifest.uuid)}
             />
-            <Button
-              className={styles.btn}
-              renderIcon={Edit}
-              hasIconOnly
-              kind="ghost"
-              iconDescription={t('edit', 'Edit')}
-              onClick={() => handleEditManifest(manifest)}
-            />
+            {editableManifestStatus.includes(manifest.manifestStatus) && (
+              <Button
+                className={styles.btn}
+                renderIcon={Edit}
+                hasIconOnly
+                kind="ghost"
+                iconDescription={t('edit', 'Edit')}
+                onClick={() => handleEditManifest(manifest)}
+              />
+            )}
             {printableManifestStatus.includes(manifest.manifestStatus) && (
               <Button
                 className={styles.btn}
