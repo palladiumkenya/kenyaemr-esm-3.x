@@ -18,7 +18,7 @@ const LabManifestMetricValue: React.FC<LabManifestMetricValueProps> = ({ status,
   }
   return (
     <span>
-      <span style={{ color }}>{status}</span> <br />
+      <span className={styles[color]}>{status}</span> <br />
       <br />
       {manifests?.length ?? '--'}
     </span>

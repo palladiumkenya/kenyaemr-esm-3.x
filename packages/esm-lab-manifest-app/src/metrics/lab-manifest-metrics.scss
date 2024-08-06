@@ -60,3 +60,15 @@
   @include type.type-style('heading-05');
   font-weight: var(--cds-heading-05-font-weight, 100);
 }
+
+.metricDanger {
+  color: $danger;
+}
+
+.metricWarning {
+  color: colors.$orange-40;
+}
+
+.metricSuccess {
+  color: colors.$green-40;
+}

@@ -123,11 +123,17 @@ export const addOrderToManifest = async (data: z.infer<typeof labManifestOrderTo
   });
 };
 
-export const mutateManifestLinks = (manifestUuid?: string, manifestStatus?: string) => {
+export const mutateManifestLinks = (
+  manifestUuid?: string,
+  manifestStatus?: string,
+  statusCurrent: string = undefined,
+) => {
   const mutateLinks = [
     `/ws/rest/v1/labmanifest?v=full&status=${manifestStatus}`,
+    `/ws/rest/v1/labmanifest?v=full&status=${statusCurrent}`,
     `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifestUuid}`,
     `/ws/rest/v1/labmanifest/${manifestUuid}`,
+    `/ws/rest/v1/kemrorder/manifestmetrics`,
   ];
   mutate((key) => {
     return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));

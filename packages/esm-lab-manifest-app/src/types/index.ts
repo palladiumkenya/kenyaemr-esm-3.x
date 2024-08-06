@@ -119,3 +119,17 @@ export interface ManifestMetrics {
   summaryGraph: Array<ManifestMetricYearSummary>;
   userHasSettingsEditRole: boolean;
 }
+
+export interface MappedManifestMetrics {
+  Draft: number;
+  'On Hold': number;
+  'Ready to send': number;
+  Sending: number;
+  Submitted: number;
+  'Incomplete errors': number;
+  'Incomplete results': number;
+  'Complete errors': number;
+  'Complete results': number;
+  summaryGraph: Array<ManifestMetricYearSummary>;
+  userHasSettingsEditRole: boolean;
+}

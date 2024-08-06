@@ -53,7 +53,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const onSubmit = async (values: LabManifestFormType) => {
     try {
       await saveLabManifest(values, manifest?.uuid);
-      mutateManifestLinks(manifest?.uuid, values?.manifestStatus);
+      mutateManifestLinks(manifest?.uuid, values?.manifestStatus, manifest?.manifestStatus);
       closeWorkspace();
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {

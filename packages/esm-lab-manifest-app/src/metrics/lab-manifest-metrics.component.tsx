@@ -26,30 +26,30 @@ function LabManifestMetrics() {
         <MetricCard
           title="TotalManifest"
           status={[
-            { status: 'Draft', color: 'red' },
-            { status: 'On Hold', color: 'orange' },
-            { status: 'Ready to send', color: 'green' },
+            { status: 'Draft', color: 'metricDanger' },
+            { status: 'On Hold', color: 'metricWarning' },
+            { status: 'Ready to send', color: 'metricSuccess' },
           ]}
         />
         <MetricCard
           title="Ready to send"
           status={[
-            { status: 'Sending', color: 'red' },
-            { status: 'Submitted', color: 'orange' },
+            { status: 'Sending', color: 'metricDanger' },
+            { status: 'Submitted', color: 'metricWarning' },
           ]}
         />
         <MetricCard
           title="Complete Manifest"
           status={[
-            { status: 'Complete results', color: 'green' },
-            { status: 'Complete errors', color: 'red' },
+            { status: 'Complete results', color: 'metricSuccess' },
+            { status: 'Complete errors', color: 'metricDanger' },
           ]}
         />
         <MetricCard
           title="Incomplete Manifest"
           status={[
-            { status: 'Incomplete results', color: 'orange' },
-            { status: 'Incomplete errors', color: 'red' },
+            { status: 'Incomplete results', color: 'metricWarning' },
+            { status: 'Incomplete errors', color: 'metricDanger' },
           ]}
         />
       </Layer>
