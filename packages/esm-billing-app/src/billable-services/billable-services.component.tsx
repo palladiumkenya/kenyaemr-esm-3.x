@@ -24,13 +24,12 @@ import {
   ErrorState,
   navigate,
   WorkspaceContainer,
-  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
 import { useTranslation } from 'react-i18next';
 import { useBillableServices } from './billable-service.resource';
-import { ArrowRight, Edit } from '@carbon/react/icons';
+import { ArrowRight } from '@carbon/react/icons';
 
 const BillableServices = () => {
   const { t } = useTranslation();
@@ -45,12 +44,6 @@ const BillableServices = () => {
   //creating service state
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayHeader, setOverlayTitle] = useState('');
-
-  const handleEditClick = (service) => {
-    launchWorkspace('update-billable-services-workspace', {
-      service,
-    });
-  };
 
   const headerData = [
     {
@@ -110,7 +103,7 @@ const BillableServices = () => {
         serviceType: service?.serviceType?.display,
         status: service.serviceStatus,
         prices: '--',
-        actions: <Edit onClick={() => handleEditClick(service)} style={{ cursor: 'pointer' }} />,
+        actions: '--',
       };
       let cost = '';
       service.servicePrices.forEach((price) => {
@@ -145,7 +138,6 @@ const BillableServices = () => {
 
   return (
     <>
-      <WorkspaceContainer overlay contextKey="billable-services" />
       {billableServices?.length > 0 ? (
         <div className={styles.serviceContainer}>
           <FilterableTableHeader
