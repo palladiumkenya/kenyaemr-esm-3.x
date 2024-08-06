@@ -74,6 +74,8 @@ export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 
+export const updateBillableServicesWorkspace = getSyncLifecycle(UpdateBillableServicesDialog, options);
+
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
