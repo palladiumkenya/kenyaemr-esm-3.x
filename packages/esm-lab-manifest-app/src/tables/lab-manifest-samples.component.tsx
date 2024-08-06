@@ -14,7 +14,7 @@ import {
   TableSelectAll,
   TableSelectRow,
 } from '@carbon/react';
-import { Printer, TrashCan } from '@carbon/react/icons';
+import { ArrowRight, Printer, TrashCan } from '@carbon/react/icons';
 import { ErrorState, formatDate, parseDate, showModal, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
@@ -189,7 +189,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
                   const data = selectedRows.map(({ id }) => samples.find((s) => s.uuid === id));
                   handleDeleteSelectedSamples(data);
                 }}
-                renderIcon={TrashCan}
+                renderIcon={ArrowRight}
                 kind="ghost">
                 {t('deleteSelectedSamples', 'Remove Selected Samples')}
               </Button>
