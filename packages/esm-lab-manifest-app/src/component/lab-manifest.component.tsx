@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LabManifestHeader } from '../header/lab-manifest-header.component';
 import LabManifestMetrics from '../metrics/lab-manifest-metrics.component';
 import LabManifestsTable from '../tables/lab-manifest-table.component';
+import LabManifestSummaryChart from './lab-manifest-summary-chart.component';
 
 const LabManifestComponent: React.FC = () => {
   const { t } = useTranslation();
@@ -10,6 +11,7 @@ const LabManifestComponent: React.FC = () => {
     <div className={`omrs-main-content`}>
       <LabManifestHeader title={t('labManifestDashboard', 'Lab Manifest Dashboard')} />
       <LabManifestMetrics />
+      {/* <LabManifestSummaryChart /> */}
       <LabManifestsTable />
     </div>
   );

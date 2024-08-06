@@ -133,3 +133,8 @@ export interface MappedManifestMetrics {
   summaryGraph: Array<ManifestMetricYearSummary>;
   userHasSettingsEditRole: boolean;
 }
+export interface TransformedData {
+  group: string;
+  month: string;
+  value: number;
+}

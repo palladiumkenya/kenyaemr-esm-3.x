@@ -35,8 +35,9 @@ const extractStatusMetrics = (metric: ManifestMetrics) => {
 
 const useLabManifestMetrics = () => {
   const url = `${restBaseUrl}/kemrorder/manifestmetrics`;
-  const { isLoading, data, error } = useSWR<FetchResponse<ManifestMetrics>>(url, openmrsFetch);
+  const { isLoading, data, error, isValidating } = useSWR<FetchResponse<ManifestMetrics>>(url, openmrsFetch);
   const _data = data?.data ? extractStatusMetrics(data!.data!) : null;
+
   return {
     isLoading,
     error,

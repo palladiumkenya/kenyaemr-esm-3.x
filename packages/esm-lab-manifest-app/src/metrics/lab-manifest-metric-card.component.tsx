@@ -20,8 +20,8 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, status = [] }) => {
       <Row className={styles.metricCardRow}>
         <Column>
           <p className={styles.metricCardAgregateValue}>
-            {statusAggregates?.(status.map((s) => s.status))}
-            {/* {manifests.length} */}
+            {/* {statusAggregates?.(status.map((s) => s.status))} */}
+            {manifests.length}
           </p>
         </Column>
         <Column>

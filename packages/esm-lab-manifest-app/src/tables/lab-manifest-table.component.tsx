@@ -180,9 +180,9 @@ const LabManifestsTable = () => {
                 style={{ minWidth: '300px' }}
                 id="manifestStatus"
                 onChange={({ selectedItem }) => {
-                  setCurrFilter(selectedItem);
+                  setCurrFilter(LabManifestFilters.find((lb) => lb.value === selectedItem).params);
                 }}
-                initialSelectedItem={currFilter}
+                initialSelectedItem={LabManifestFilters.find((lb) => lb.params === currFilter).value}
                 label={t('selectManifestStatus', 'Select manifest status')}
                 items={LabManifestFilters.map((mn) => mn.value)}
                 itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
@@ -203,9 +203,9 @@ const LabManifestsTable = () => {
             style={{ minWidth: '300px' }}
             id="manifestStatus"
             onChange={({ selectedItem }) => {
-              setCurrFilter(selectedItem);
+              setCurrFilter(LabManifestFilters.find((lb) => lb.value === selectedItem).params);
             }}
-            initialSelectedItem={currFilter}
+            initialSelectedItem={LabManifestFilters.find((lb) => lb.params === currFilter).value}
             label={t('selectManifestStatus', 'Select manifest status')}
             items={LabManifestFilters.map((mn) => mn.value)}
             itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}

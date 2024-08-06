@@ -2,6 +2,7 @@ import { SkeletonText } from '@carbon/react';
 import React from 'react';
 import { useLabManifests } from '../hooks';
 import styles from './lab-manifest-metrics.scss';
+import { LabManifestFilters } from '../lab-manifest.resources';
 
 interface LabManifestMetricValueProps {
   status: string;
@@ -9,7 +10,7 @@ interface LabManifestMetricValueProps {
 }
 
 const LabManifestMetricValue: React.FC<LabManifestMetricValueProps> = ({ status, color }) => {
-  const { error, isLoading, manifests } = useLabManifests(status);
+  const { error, isLoading, manifests } = useLabManifests(LabManifestFilters.find((lb) => lb.value === status)?.params);
   if (isLoading) {
     return <SkeletonText className={styles.labManifestStatusMetricValue} />;
   }
