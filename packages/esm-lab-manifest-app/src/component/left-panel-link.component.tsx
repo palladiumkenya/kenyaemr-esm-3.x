@@ -21,7 +21,7 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   };
 
   if (isUUID(urlSegment)) {
-    urlSegment = 'lab-manifest';
+    urlSegment = location.pathname.split('/').at(-2);
   }
 
   return (
