@@ -7,3 +7,13 @@
 .modalHeaderHeading {
   @include type.type-style('heading-compact-02');
 }
+
+.button_spinner {
+  padding: 0;
+  margin-right: 12px;
+}
+
+.loading_wrapper {
+  display: flex;
+  align-items: center;
+}

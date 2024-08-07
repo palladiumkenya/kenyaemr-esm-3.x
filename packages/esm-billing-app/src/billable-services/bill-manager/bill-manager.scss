@@ -12,3 +12,15 @@
 .dataTableSkeleton {
   margin-top: 0.625rem;
 }
+
+.refundedItem {
+  background-color: #fee2e2;
+}
+
+.refundedItem:hover {
+  background-color: #fecaca !important;
+}
+
+.refundedItem:active {
+  background-color: #fca5a5 !important;
+}
