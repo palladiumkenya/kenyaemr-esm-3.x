@@ -104,9 +104,11 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   if (bills.length === 0) {
     return (
       <>
-        <CardHeader title={t('patientBilling', 'Patient billing')}>
-          <></>
-        </CardHeader>
+        <div className={styles.widgetCard}>
+          <CardHeader title={t('patientBilling', 'Patient billing')}>
+            <></>
+          </CardHeader>
+        </div>
         <Layer>
           <Tile className={styles.tile}>
             <div className={styles.illo}>

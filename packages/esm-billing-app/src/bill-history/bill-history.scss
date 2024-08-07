@@ -5,7 +5,10 @@
 .container {
   margin: 2rem 0;
 }
-
+.widgetCard {
+  height: 50% !important;
+  background-color: $ui-02;
+}
 .billHistoryContainer {
   background-color: $ui-02;
   border: 1px solid $ui-03;
