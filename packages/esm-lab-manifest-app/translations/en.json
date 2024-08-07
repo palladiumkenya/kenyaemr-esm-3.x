@@ -24,6 +24,8 @@
   "notLabManifetToDisplay": "There is no lab manifets data to display.",
   "patient": "Patient",
   "patientName": "Patient name",
+  "printManifest": "Print Manifest",
+  "printSpecimenLabel": "Print Specimen Label",
   "removeFromManifest": "Remove from Manifest",
   "result": "Result",
   "resultDate": "Result Date",

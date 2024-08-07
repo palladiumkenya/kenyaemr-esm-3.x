@@ -13,7 +13,7 @@ import {
   TableSelectAll,
   TableSelectRow,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { Add, ArrowRight } from '@carbon/react/icons';
 import { ErrorState, showModal, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
@@ -84,9 +84,10 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
         dateRequested: activeRequest.dateRequested,
         actions: (
           <Button
-            kind="tertiary"
+            kind="ghost"
             iconDescription={t('addToManifest', 'Add To manifest')}
             renderIcon={Add}
+            hasIconOnly
             onClick={() =>
               handleAddSelectedToManifest([
                 {
@@ -154,7 +155,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
 
                   handleAddSelectedToManifest(data);
                 }}
-                renderIcon={Add}
+                renderIcon={ArrowRight}
                 kind="ghost">
                 {t('addSelectedSamples', 'Add Selected Samples')}
               </Button>

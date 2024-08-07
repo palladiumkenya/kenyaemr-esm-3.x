@@ -1,4 +1,4 @@
-import { formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ConfigObject } from '../config-schema';
@@ -96,9 +96,7 @@ function extractContactData(
         relationshipType: r.relationshipType.bIsToA,
         patientUuid: r.personB.uuid,
         gender: r.personB.gender,
-        startDate: !r.startDate
-          ? null
-          : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
+        startDate: !r.startDate ? null : formatDate(parseDate(r.startDate)),
       });
     } else {
       relationshipsData.push({
@@ -113,9 +111,7 @@ function extractContactData(
         relationshipType: r.relationshipType.aIsToB,
         patientUuid: r.personA.uuid,
         gender: r.personB.gender,
-        startDate: !r.startDate
-          ? null
-          : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
+        startDate: !r.startDate ? null : formatDate(parseDate(r.startDate)),
       });
     }
   }

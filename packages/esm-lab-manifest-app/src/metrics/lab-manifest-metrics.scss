@@ -25,6 +25,10 @@
   flex-direction: row;
   justify-content: flex-end;
   width: 100%;
+
+  & > button {
+    border-color: colors.$blue-60;
+  }
 }
 
 .metricCardContainer {
