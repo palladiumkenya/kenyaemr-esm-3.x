@@ -36,6 +36,7 @@ import {
   ContactListFormSchema,
   saveContact,
 } from './contact-list.resource';
+import { useMappedRelationshipTypes } from '../family-partner-history/relationships.resource';
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   props: any;
@@ -68,6 +69,13 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
 
   const patientRegistrationConfig = useConfig({ externalModuleName: '@kenyaemr/esm-patient-registration-app' });
   const config = useConfig<ConfigObject>();
+  const { data } = useMappedRelationshipTypes();
+  const pnsRelationshipTypes = data
+    ? config.pnsRelationships.map((rel) => ({
+        ...rel,
+        display: data!.find((r) => r.uuid === rel.uuid)?.display,
+      }))
+    : [];
 
   const onSubmit = async (values: ContactListFormType) => {
     const encounter = {
@@ -185,7 +193,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
           />
         </Column>
 
-        <span className={styles.sectionHeader}>Demographics</span>
+        <span className={styles.sectionHeader}>{t('demographics', 'Demographics')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -267,7 +275,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             )}
           />
           <Button kind="ghost" renderIcon={Calculator} onClick={handleCalculateBirthDate}>
-            From Age
+            {t('fromAge', 'From Age')}
           </Button>
         </Column>
 
@@ -293,8 +301,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Contact</span>
-
+        <span className={styles.sectionHeader}>{t('contact', 'Contact')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -325,7 +332,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Relationship</span>
+        <span className={styles.sectionHeader}>{t('relationship', 'Relationship')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -342,8 +349,8 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 }}
                 initialSelectedItem={field.value}
                 label="Select Realtionship"
-                items={config.pnsRelationships.map((r) => r.uuid)}
-                itemToString={(item) => config.pnsRelationships.find((r) => r.uuid === item)?.display ?? ''}
+                items={pnsRelationshipTypes.map((r) => r.uuid)}
+                itemToString={(item) => pnsRelationshipTypes.find((r) => r.uuid === item)?.display ?? ''}
               />
             )}
           />
@@ -372,7 +379,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
         </Column>
         {showIPVRelatedFields && (
           <>
-            <span className={styles.sectionHeader}>IPV Questions</span>
+            <span className={styles.sectionHeader}>{t('ipvQuestions', 'IPV Questions')}</span>
             <Column>
               <Controller
                 control={form.control}
@@ -433,7 +440,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 )}
               />
             </Column>
-            <span className={styles.sectionHeader}>IPV Outcome</span>
+            <span className={styles.sectionHeader}>{t('ipvOutcome', 'IPV Outcome')}</span>
             <Column>
               <Controller
                 control={form.control}
@@ -460,7 +467,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
             </Column>
           </>
         )}
-        <span className={styles.sectionHeader}>Baseline Information</span>
+        <span className={styles.sectionHeader}>{t('naselineInformation', 'Baseline Information')}</span>
 
         <Column>
           <Controller
