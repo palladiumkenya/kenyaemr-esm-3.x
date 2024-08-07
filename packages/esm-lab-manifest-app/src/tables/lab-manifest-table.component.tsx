@@ -15,7 +15,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Edit, View } from '@carbon/react/icons';
+import { Edit, Printer, View } from '@carbon/react/icons';
 import {
   ErrorState,
   formatDate,
@@ -23,6 +23,7 @@ import {
   launchWorkspace,
   navigate,
   parseDate,
+  showSnackbar,
   useConfig,
   useLayoutType,
   usePagination,
@@ -32,7 +33,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LabManifestConfig } from '../config-schema';
 import { useLabManifests } from '../hooks';
-import { LabManifestFilters } from '../lab-manifest.resources';
+import { LabManifestFilters, printableManifestStatus, printManifest } from '../lab-manifest.resources';
 import { MappedLabManifest } from '../types';
 import styles from './lab-manifest-table.scss';
 
@@ -100,6 +101,14 @@ const LabManifestsTable = () => {
     });
   };
 
+  const handlePrintManifest = async (manifest: MappedLabManifest) => {
+    try {
+      await printManifest(manifest.uuid);
+    } catch (error) {
+      showSnackbar({ title: 'Failure', subtitle: 'Error printing manifest', kind: 'error' });
+    }
+  };
+
   const tableRows =
     results?.map((manifest) => {
       return {
@@ -131,6 +140,16 @@ const LabManifestsTable = () => {
               iconDescription={t('edit', 'Edit')}
               onClick={() => handleEditManifest(manifest)}
             />
+            {printableManifestStatus.includes(manifest.manifestStatus) && (
+              <Button
+                className={styles.btn}
+                renderIcon={Printer}
+                hasIconOnly
+                kind="ghost"
+                iconDescription={t('printManifest', 'Print Manifest')}
+                onClick={() => handlePrintManifest(manifest)}
+              />
+            )}
           </ButtonSet>
         ),
       };

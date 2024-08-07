@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonSet,
   DataTable,
   DataTableSkeleton,
   Pagination,
@@ -13,13 +14,13 @@ import {
   TableSelectAll,
   TableSelectRow,
 } from '@carbon/react';
-import { TrashCan } from '@carbon/react/icons';
+import { ArrowRight, Printer, TrashCan } from '@carbon/react/icons';
 import { ErrorState, formatDate, parseDate, showModal, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
-import { mutateManifestLinks, removeSampleFromTheManifest } from '../lab-manifest.resources';
+import { mutateManifestLinks, printSpecimentLabel, removeSampleFromTheManifest } from '../lab-manifest.resources';
 import { LabManifestSample } from '../types';
 import styles from './lab-manifest-table.scss';
 
@@ -107,6 +108,14 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     }
   };
 
+  async function handlePrintSpecimenLabel(sample: LabManifestSample) {
+    try {
+      await printSpecimentLabel(sample.uuid);
+    } catch (error) {
+      showSnackbar({ title: 'Failure', subtitle: 'Error specimen label', kind: 'error' });
+    }
+  }
+
   const tableRows =
     (results as LabManifestSample[])?.map((sample) => {
       return {
@@ -119,13 +128,24 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         resultDate: sample.resultDate ? formatDate(parseDate(sample.resultDate)) : '--',
         result: sample.result ?? '--',
         actions: (
-          <Button
-            renderIcon={TrashCan}
-            hasIconOnly
-            kind="ghost"
-            iconDescription={t('removeFromManifest', 'Remove from Manifest')}
-            onClick={() => handleDeleteManifestSample(sample.uuid)}
-          />
+          <ButtonSet className={styles.btnSet}>
+            <Button
+              renderIcon={TrashCan}
+              className={styles.btn}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('removeFromManifest', 'Remove from Manifest')}
+              onClick={() => handleDeleteManifestSample(sample.uuid)}
+            />
+            <Button
+              className={styles.btn}
+              renderIcon={Printer}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('printSpecimenLabel', 'Print Specimen Label')}
+              onClick={() => handlePrintSpecimenLabel(sample)}
+            />
+          </ButtonSet>
         ),
       };
     }) ?? [];
@@ -169,7 +189,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
                   const data = selectedRows.map(({ id }) => samples.find((s) => s.uuid === id));
                   handleDeleteSelectedSamples(data);
                 }}
-                renderIcon={TrashCan}
+                renderIcon={ArrowRight}
                 kind="ghost">
                 {t('deleteSelectedSamples', 'Remove Selected Samples')}
               </Button>

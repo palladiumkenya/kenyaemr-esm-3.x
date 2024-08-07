@@ -1,5 +1,5 @@
 import { Button, Layer } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
+import { Add, ArrowRight } from '@carbon/react/icons';
 import { launchWorkspace } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -55,8 +55,8 @@ function LabManifestMetrics() {
       </Layer>
       <Layer className={styles.btnLayer}>
         <Button
-          kind="tertiary"
-          renderIcon={(props) => <ArrowRight size={16} {...props} />}
+          kind="ghost"
+          renderIcon={Add}
           iconDescription={t('addNewManifest', 'Add new Manifest')}
           onClick={handleAddLabManifest}>
           {t('addNewManifest', 'Add new Manifest')}
