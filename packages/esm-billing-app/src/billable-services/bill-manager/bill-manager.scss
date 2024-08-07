@@ -16,12 +16,12 @@
 
 .refundedItem {
   background-color: colors.$red-20;
-}
 
-.refundedItem:hover {
-  background-color: colors.$red-30 !important;
-}
+  &:hover {
+    background-color: colors.$red-30 !important;
+  }
 
-.refundedItem:active {
-  background-color: colors.$red-40 !important;
+  &:active {
+    background-color: colors.$red-40 !important;
+  }
 }
