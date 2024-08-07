@@ -42,7 +42,7 @@ export const convertToCurrency = (amountToConvert: number) => {
   let formattedAmount = formatter.format(Math.abs(amountToConvert));
 
   if (amountToConvert < 0) {
-    formattedAmount = `(${formattedAmount})`;
+    formattedAmount = `- ${formattedAmount}`;
   }
 
   return formattedAmount;
