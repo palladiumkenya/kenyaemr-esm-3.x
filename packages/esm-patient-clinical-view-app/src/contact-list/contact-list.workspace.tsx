@@ -142,7 +142,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   const observableThreatened = form.watch('threatened');
   const observableSexualAssault = form.watch('sexualAssault');
   const showIPVRelatedFields =
-    config.contactSexualRelationships.findIndex((r) => r.uuid === observableRelationship) !== -1;
+    config.pnsRelationships.findIndex((r) => r.uuid === observableRelationship && r.sexual) !== -1;
 
   useEffect(() => {
     if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes(BOOLEAN_YES)) {
@@ -341,8 +341,8 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
                 }}
                 initialSelectedItem={field.value}
                 label="Select Realtionship"
-                items={config.familyRelationshipsTypeList.map((r) => r.uuid)}
-                itemToString={(item) => config.familyRelationshipsTypeList.find((r) => r.uuid === item)?.display ?? ''}
+                items={config.pnsRelationships.map((r) => r.uuid)}
+                itemToString={(item) => config.pnsRelationships.find((r) => r.uuid === item)?.display ?? ''}
               />
             )}
           />

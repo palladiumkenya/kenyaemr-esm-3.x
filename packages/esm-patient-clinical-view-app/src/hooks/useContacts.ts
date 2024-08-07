@@ -136,7 +136,7 @@ const useContacts = (patientUuid: string) => {
       ? extractContactData(
           patientUuid,
           data?.data?.results.filter((rel) =>
-            config.familyRelationshipsTypeList.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
+            config.pnsRelationships.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
           ),
           config,
         )

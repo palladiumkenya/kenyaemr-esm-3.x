@@ -176,17 +176,29 @@ export const configSchema = {
       },
     ],
   },
-  contactSexualRelationships: {
+  pnsRelationships: {
     _type: Type.Array,
-    _description: 'List of Sexual relationship',
+    _description: 'List of Patner relationship (PNS - Patner Notification Service)',
     _default: [
       {
         uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
         display: 'Spouse/Spouse',
+        sexual: true,
       },
       {
         uuid: '007b765f-6725-4ae9-afee-9966302bace4',
         display: 'Partner/Partner',
+        sexual: true,
+      },
+      {
+        uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
+        display: 'Co-wife/Co-wife',
+        sexual: false,
+      },
+      {
+        uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
+        display: 'Injectable-drug-user/Injectable-druguser',
+        sexual: false,
       },
     ],
   },
@@ -223,7 +235,7 @@ export interface ConfigObject {
     contactIPVOutcome: string;
   };
   familyRelationshipsTypeList: Array<{ uuid: string; display: string }>;
-  contactSexualRelationships: Array<{ uuid: string; display: string }>;
+  pnsRelationships: Array<{ uuid: string; display: string; sexual: boolean }>;
 }
 
 export interface PartograpyComponents {
