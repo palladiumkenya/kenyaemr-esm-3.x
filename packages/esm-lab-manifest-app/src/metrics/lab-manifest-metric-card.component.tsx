@@ -1,9 +1,8 @@
-import { Column, Layer, Row } from '@carbon/react';
+import { Column, Layer, Row, SkeletonPlaceholder } from '@carbon/react';
 import React from 'react';
-import useLabManifestAggregates from '../hooks/useLabManifestAggregates';
+import { useLabManifestMetrics } from '../hooks';
 import LabManifestMetricValue from './lab-manifest-metric-value.component';
 import styles from './lab-manifest-metrics.scss';
-import { useLabManifestMetrics } from '../hooks';
 
 interface MetricCardProps {
   title: string;
@@ -12,17 +11,21 @@ interface MetricCardProps {
 
 const MetricCard: React.FC<MetricCardProps> = ({ title, status = [] }) => {
   const { isLoading, error, metrics, statusAggregates } = useLabManifestMetrics();
-  const { manifests } = useLabManifestAggregates(status.map((s) => s.status));
+
+  if (isLoading) {
+    return <SkeletonPlaceholder style={{ flex: 1 }} />;
+  }
+
+  if (error) {
+    return null;
+  }
 
   return (
     <Layer className={styles.metricCardContainer}>
       <p>{title}</p>
       <Row className={styles.metricCardRow}>
         <Column>
-          <p className={styles.metricCardAgregateValue}>
-            {/* {statusAggregates?.(status.map((s) => s.status))} */}
-            {manifests.length}
-          </p>
+          <p className={styles.metricCardAgregateValue}>{statusAggregates?.(status.map((s) => s.status))}</p>
         </Column>
         <Column>
           <Row className={styles.metricCardStatusRow}>
