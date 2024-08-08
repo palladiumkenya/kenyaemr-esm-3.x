@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './lab-manifest-table.scss';
 import { Search } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
 
 interface FilterTableHeaderProps {
   searchText?: string;
@@ -8,10 +9,11 @@ interface FilterTableHeaderProps {
 }
 
 const FilterTableHeader: React.FC<FilterTableHeaderProps> = ({ onSearch, searchText = '' }) => {
+  const { t } = useTranslation();
   return (
     <div>
       <Search
-        placeholder="Search this table"
+        placeholder={t('searchThisTable', 'Search this table')}
         onClear={() => {
           onSearch('');
         }}

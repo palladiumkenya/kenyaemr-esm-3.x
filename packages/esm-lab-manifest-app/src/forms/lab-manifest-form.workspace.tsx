@@ -63,7 +63,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
-        <span className={styles.sectionHeader}>Manifest Date range</span>
+        <span className={styles.sectionHeader}>{t('manifestDateRange', 'Manifest Date range')}</span>
 
         <Column>
           <Controller
@@ -113,7 +113,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Manifest type</span>
+        <span className={styles.sectionHeader}>{t('manifestType', 'Manifest type')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -136,7 +136,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Dispatch Details</span>
+        <span className={styles.sectionHeader}>{t('dispatchDetails', 'Dispatch Details')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -190,7 +190,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Address</span>
+        <span className={styles.sectionHeader}>{t('address', 'Address')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -317,7 +317,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Manifest status</span>
+        <span className={styles.sectionHeader}>{t('manifestStatus', 'Manifest status')}</span>
         <Column>
           <Controller
             control={form.control}
