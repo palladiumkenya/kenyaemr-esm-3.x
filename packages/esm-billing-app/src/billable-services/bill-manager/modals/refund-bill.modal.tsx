@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { processBillItems } from '../../../billing.resource';
 import { mutate } from 'swr';
-import { LineItem, MappedBill } from '../../../types';
+import { LineItem, MappedBill, PaymentStatus } from '../../../types';
 
 export const RefundBillModal: React.FC<{
   onClose: () => void;
@@ -23,7 +23,7 @@ export const RefundBillModal: React.FC<{
       priceName: lineItem.priceName,
       priceUuid: lineItem.priceUuid,
       lineItemOrder: lineItem.lineItemOrder,
-      paymentStatus: 'CREDITED',
+      paymentStatus: PaymentStatus.CREDITED,
       billableService: lineItem.billableService.split(':').at(0),
     };
 
@@ -44,7 +44,7 @@ export const RefundBillModal: React.FC<{
           revalidate: true,
         });
         showSnackbar({
-          title: t('billItems', 'Refund Items'),
+          title: t('refundItems', 'Refund Items'),
           subtitle: 'Item has been successfully refunded.',
           kind: 'success',
           timeoutInMs: 3000,

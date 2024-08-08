@@ -276,3 +276,13 @@ export type QueueEntry = {
 };
 
 export type RequestStatus = 'INITIATED' | 'COMPLETE' | 'FAILED' | 'NOT-FOUND';
+
+export enum PaymentStatus {
+  POSTED = 'POSTED',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  CREDITED = 'CREDITED',
+  CANCELLED = 'CANCELLED',
+  ADJUSTED = 'ADJUSTED',
+  EXEMPTED = 'EXEMPTED',
+}

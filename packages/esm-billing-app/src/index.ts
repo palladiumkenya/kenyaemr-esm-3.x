@@ -22,6 +22,7 @@ import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
+import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -70,6 +71,7 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 // bill manager extensions
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
+export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
