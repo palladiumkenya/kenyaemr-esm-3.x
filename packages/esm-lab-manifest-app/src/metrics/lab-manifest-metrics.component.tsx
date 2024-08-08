@@ -1,6 +1,4 @@
-import { Button, Layer } from '@carbon/react';
-import { Add, ArrowRight } from '@carbon/react/icons';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { Layer } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import MetricCard from './lab-manifest-metric-card.component';
@@ -13,12 +11,6 @@ export interface Service {
 
 function LabManifestMetrics() {
   const { t } = useTranslation();
-
-  const handleAddLabManifest = () => {
-    launchWorkspace('lab-manifest-form', {
-      workspaceTitle: 'Lab Manifest Form',
-    });
-  };
 
   return (
     <Layer className={styles.metricContainer}>
@@ -52,15 +44,6 @@ function LabManifestMetrics() {
             { status: 'Incomplete errors', color: 'metricDanger' },
           ]}
         />
-      </Layer>
-      <Layer className={styles.btnLayer}>
-        <Button
-          kind="ghost"
-          renderIcon={Add}
-          iconDescription={t('addNewManifest', 'Add new Manifest')}
-          onClick={handleAddLabManifest}>
-          {t('addNewManifest', 'Add new Manifest')}
-        </Button>
       </Layer>
     </Layer>
   );

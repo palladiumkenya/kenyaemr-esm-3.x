@@ -5,14 +5,34 @@
   },
   "extensions": [
     {
-      "component": "labManifestDashboardLink",
+      "component": "labManifestSideNavGroup",
       "name": "lab-manifest-dashboard-link",
+      "slot": "homepage-dashboard-slot"
+    },
+    {
+      "component": "manifestOverviewDashboardLink",
+      "name": "manifest-overview-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "lab-manifest-overview",
+        "title": "Overview",
+        "slot": "lab-manifest-overview-slot"
+      }
+    },
+    {
+      "component": "manifestsDashboardLink",
+      "name": "manifests-dashboard-link",
       "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "lab-manifest",
-        "title": "lab-manifest",
+        "title": "Manifests",
         "slot": "lab-manifest-dashboard-slot"
       }
+    },
+    {
+      "name": "lab-manifest-overview",
+      "component": "labManifestOverview",
+      "slot": "lab-manifest-overview-slot"
     },
     {
       "name": "lab-manifest-form",
