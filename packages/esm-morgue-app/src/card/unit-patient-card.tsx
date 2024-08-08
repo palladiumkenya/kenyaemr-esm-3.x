@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './ward-patient-card.scss';
+import styles from './unit-patient-card.scss';
 import { getPatientName, launchWorkspace } from '@openmrs/esm-framework';
 import UnitPatientName from './row-elements/unit-patient-name';
 import UnitPatientAge from './row-elements/unit-patient-age';
@@ -8,10 +8,12 @@ import UnitPatientObs from './row-elements/unit-patient-obs';
 import UnitPatientUnitNumber from './row-elements/unit-patient-unit-number';
 import UnitPatientIdentifier from './row-elements/unit-patient-identifier';
 import unitPatientAddress from './row-elements/unit-patient-header-address';
+import { DeceasedInfo } from '../tables/generic-table.resource';
 
-// Define the props type using the DeceasedInfo type
-
-const WardPatientCard: React.FC<> = ({ patient }) => {
+interface WardPatientCardProps {
+  patient: DeceasedInfo;
+}
+const WardPatientCard: React.FC<WardPatientCardProps> = ({ patient }) => {
   const patientCardRows = [
     UnitPatientName,
     UnitPatientAge,
