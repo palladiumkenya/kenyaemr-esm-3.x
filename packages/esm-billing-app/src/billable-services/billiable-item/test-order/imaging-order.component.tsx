@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useBillableItem } from '../useBillableItem';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
@@ -11,11 +11,18 @@ type ImagingOrderProps = {
       conceptUuid: string;
     };
   };
+  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const ImagingOrder: React.FC<ImagingOrderProps> = ({ order }) => {
+const ImagingOrder: React.FC<ImagingOrderProps> = ({ order, setHasPrice }) => {
   const { t } = useTranslation();
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
+
+  useEffect(() => {
+    if (billableItem) {
+      setHasPrice(billableItem.servicePrices.length > 0);
+    }
+  }, [billableItem, setHasPrice]);
 
   if (isLoading) {
     return (
@@ -27,7 +34,7 @@ const ImagingOrder: React.FC<ImagingOrderProps> = ({ order }) => {
     );
   }
 
-  return <PriceInfoOrder billableItem={billableItem} error={error} />;
+  return <PriceInfoOrder billableItem={billableItem} error={error} setHasPrice={setHasPrice} />;
 };
 
 export default ImagingOrder;

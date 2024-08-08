@@ -15,19 +15,19 @@ import {
 type PriceInfoOrderProps = {
   billableItem: any;
   error?: boolean;
+  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error }) => {
+const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error, setHasPrice }) => {
   const { t } = useTranslation();
 
-  if (error || !billableItem) {
+  const hasPrice = billableItem && billableItem.servicePrices && billableItem.servicePrices.length > 0;
+
+  setHasPrice(hasPrice);
+
+  if (error || !billableItem || !hasPrice) {
     return (
-      <InlineNotification
-        kind="info"
-        title={t('noprice', 'No price found')}
-        subtitle={t('noInfo', 'Please contact the cashier')}
-        lowContrast
-      />
+      <InlineNotification kind="warning" title={t('noprice', 'No price configured for this service')} lowContrast />
     );
   }
 
