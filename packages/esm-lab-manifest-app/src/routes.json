@@ -7,32 +7,32 @@
     {
       "component": "labManifestSideNavGroup",
       "name": "lab-manifest-dashboard-link",
-      "slot": "homepage-dashboard-slot"
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "lab-manifest",
+        "title": "Lab manifest Overview",
+        "slot": "lab-manifest-slot"     
+      }
+    },
+    {
+      "component": "root",
+      "name": "lab-manifest-dashboard-root",
+      "slot": "lab-manifest-slot"
+    },
+    {
+      "component": "labManifestOverview",
+      "name": "lab-manifest-overview",
+      "slot": "lab-manifest-overview-slot"
     },
     {
       "component": "manifestOverviewDashboardLink",
-      "name": "manifest-overview-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "lab-manifest-overview",
-        "title": "Overview",
-        "slot": "lab-manifest-overview-slot"
-      }
+      "name": "manifest-overview-link",
+      "slot": "lab-manifest-dashbaord-link-slot"
     },
     {
       "component": "manifestsDashboardLink",
       "name": "manifests-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "lab-manifest",
-        "title": "Manifests",
-        "slot": "lab-manifest-dashboard-slot"
-      }
-    },
-    {
-      "name": "lab-manifest-overview",
-      "component": "labManifestOverview",
-      "slot": "lab-manifest-overview-slot"
+      "slot": "lab-manifest-dashbaord-link-slot"
     },
     {
       "name": "lab-manifest-form",
@@ -45,17 +45,16 @@
     {
       "name": "sample-delete-confirm-dialog",
       "component": "sampleDeleteConfirmDialog"
-    },
-    {
-      "component": "root",
-      "name": "lab-manifest-dashboard-root",
-      "slot": "lab-manifest-dashboard-slot"
     }
   ],
   "pages": [
     {
       "component": "root",
       "route": "lab-manifest"
+    },
+    {
+      "component": "labManifestOverview",
+      "route": "lab-manifest-overview"
     }
   ]
 }

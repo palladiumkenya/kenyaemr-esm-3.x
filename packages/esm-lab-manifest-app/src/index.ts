@@ -51,14 +51,14 @@ export const labManifestSideNavGroup = getSyncLifecycle(
 );
 export const manifestOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'lab-manifest-overview', // path
+    name: 'lab-manifest/overview',
     title: 'Overview',
   }),
   options,
 );
 export const manifestsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'lab-manifest', //path
+    name: 'lab-manifest',
     title: 'Manifests',
   }),
   options,

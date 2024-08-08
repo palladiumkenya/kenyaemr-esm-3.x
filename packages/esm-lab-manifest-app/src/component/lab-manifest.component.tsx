@@ -19,7 +19,6 @@ const LabManifestComponent: React.FC = () => {
   return (
     <div className={`omrs-main-content`}>
       <LabManifestHeader title={t('labManifestDashboard', 'Lab Manifest Dashboard')} />
-      <LabManifestMetrics />
       <Layer className={styles.btnLayer}>
         <Button
           kind="ghost"
