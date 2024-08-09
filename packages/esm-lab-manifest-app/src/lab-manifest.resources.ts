@@ -143,7 +143,6 @@ export const mutateManifestLinks = (
     `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifestUuid}`,
     `/ws/rest/v1/labmanifest/${manifestUuid}`,
     `/ws/rest/v1/kemrorder/manifestmetrics`,
-    `/ws/rest/v1/labmanifest-aggregate`,
   ];
   mutate((key) => {
     return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
