@@ -26,6 +26,7 @@ import {
   usePaginationInfo,
   CardHeader,
   useLaunchWorkspaceRequiringVisit,
+  EmptyState,
 } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import InvoiceTable from '../invoice/invoice-table.component';
@@ -103,22 +104,13 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   if (bills.length === 0) {
     return (
-      <>
-        <CardHeader title={t('patientBilling', 'Patient billing')}>
-          <></>
-        </CardHeader>
-        <Layer>
-          <Tile className={styles.tile}>
-            <div className={styles.illo}>
-              <EmptyDataIllustration />
-            </div>
-            <p className={styles.content}>There are no bills to display.</p>
-            <Button onClick={handleLaunchBillForm} kind="ghost">
-              {t('launchBillForm', 'Launch bill form')}
-            </Button>
-          </Tile>
-        </Layer>
-      </>
+      <Layer>
+        <EmptyState
+          displayText={''}
+          headerTitle={t('patientBilling', 'Patient billing')}
+          launchForm={handleLaunchBillForm}
+        />
+      </Layer>
     );
   }
 
