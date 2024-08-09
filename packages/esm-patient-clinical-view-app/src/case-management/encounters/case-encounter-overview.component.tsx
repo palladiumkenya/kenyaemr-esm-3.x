@@ -64,7 +64,7 @@ const CaseEncounterHeader = ({ patientUuid, mutate, onFilterChange }: CaseEncoun
     <>
       <div className={styles.widgetCard}>
         <CardHeader title={title}>
-          <div className={styles.controlsContainer}>
+          <div className={styles.elementContainer}>
             <Dropdown
               id="serviceFilter"
               initialSelectedItem={{ text: t('all', 'All'), filterUuid: '' }}
@@ -74,11 +74,10 @@ const CaseEncounterHeader = ({ patientUuid, mutate, onFilterChange }: CaseEncoun
               items={[{ text: t('all', 'All'), filterUuid: '' }, ...items]}
               itemToString={(item) => (item ? item.text : '')}
               onChange={handleEncounterTypeChange}
-              size="sm"
+              size="lg"
             />
             <ComboBox
               onChange={handleComboBoxChange}
-              size="sm"
               id="select-form"
               items={items}
               itemToString={(item) => (item ? item.text : '')}

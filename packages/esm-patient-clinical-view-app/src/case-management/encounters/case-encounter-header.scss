@@ -4,17 +4,18 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .widgetCard {
-  height: 50% !important;
+  height: layout.$spacing-10;
   background-color: $ui-02;
 }
 
-.controlsContainer {
+.elementContainer {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 1rem;
-  margin-right: 1rem;
+  gap: layout.$spacing-05;
+  margin-right: layout.$spacing-05;
 }
+
 .actionBtn {
   display: flex;
   column-gap: 0.5rem;
