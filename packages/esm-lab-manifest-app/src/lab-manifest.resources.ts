@@ -1,48 +1,57 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { z } from 'zod';
-import { LabManifest, MappedLabManifest } from './types';
 import { mutate } from 'swr';
+import { z } from 'zod';
+import { LabManifest, ManifestMetricYearSummary, MappedLabManifest, TransformedData } from './types';
 
 export const printableManifestStatus = ['Submitted', 'Complete results'];
-
+export const editableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
 
 export const LabManifestFilters = [
   {
     label: 'Draft',
     value: 'Draft',
+    params: 'Draft',
   },
   {
     label: 'Ready To send',
     value: 'Ready to send',
+    params: 'Ready to send',
   },
   {
     label: 'On Hold',
     value: 'On Hold',
+    params: 'On Hold',
   },
   {
     label: 'Sending',
     value: 'Sending',
+    params: 'Sending',
   },
   {
     label: 'Submitted',
     value: 'Submitted',
+    params: 'Submitted',
   },
   {
     label: 'Incomplete with Errors',
     value: 'Incomplete errors',
+    params: 'Incomplete results&withErrors=true',
   },
   {
     label: 'Incomplete With Results',
     value: 'Incomplete results',
+    params: 'Incomplete results&withErrors=false',
   },
   {
     label: 'Complete with Errors',
     value: 'Complete errors',
+    params: 'Complete results&withErrors=true',
   },
   {
     label: 'Complete with Results',
     value: 'Complete results',
+    params: 'Complete results&withErrors=false',
   },
 ];
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
@@ -123,11 +132,17 @@ export const addOrderToManifest = async (data: z.infer<typeof labManifestOrderTo
   });
 };
 
-export const mutateManifestLinks = (manifestUuid?: string, manifestStatus?: string) => {
+export const mutateManifestLinks = (
+  manifestUuid?: string,
+  manifestStatus?: string,
+  statusCurrent: string = undefined,
+) => {
   const mutateLinks = [
     `/ws/rest/v1/labmanifest?v=full&status=${manifestStatus}`,
+    `/ws/rest/v1/labmanifest?v=full&status=${statusCurrent}`,
     `/ws/rest/v1/kemrorder/validorders?manifestUuid=${manifestUuid}`,
     `/ws/rest/v1/labmanifest/${manifestUuid}`,
+    `/ws/rest/v1/kemrorder/manifestmetrics`,
   ];
   mutate((key) => {
     return typeof key === 'string' && mutateLinks.some((link) => key.startsWith(link));
@@ -185,3 +200,15 @@ export const printSpecimentLabel = async (manifestOrderUuid: string) => {
   const url = `/openmrs${restBaseUrl}/kemrorder/printspecimenlabel?manifestOrderUuid=${manifestOrderUuid}`;
   return await printFile(url);
 };
+
+export function transformManifestSummaryChartData(data: ManifestMetricYearSummary[]): TransformedData[] {
+  const monthNames = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+
+  return data.flatMap((item) =>
+    monthNames.map((month) => ({
+      group: `${item.year}`,
+      month,
+      value: item[month as keyof ManifestMetricYearSummary],
+    })),
+  );
+}

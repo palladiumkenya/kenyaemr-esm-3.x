@@ -14,7 +14,7 @@ import {
   TableSelectRow,
 } from '@carbon/react';
 import { Add, ArrowRight } from '@carbon/react/icons';
-import { ErrorState, showModal, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, showModal, showNotification, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -64,14 +64,23 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
     }>,
   ) => {
     if (selected.length > 0) {
-      const dispose = showModal('lab-manifest-order-modal-form', {
-        onClose: () => dispose(),
-        props: {
-          title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
-          selectedOrders: selected,
-          orders: request.Orders.filter((order) => selected.some((o) => o.order.uuid === order.orderUuid)),
-        },
-      });
+      const orders = request.Orders.filter((order) => selected.some((o) => o.order.uuid === order.orderUuid));
+      if (orders.every((order) => order.cccKdod)) {
+        const dispose = showModal('lab-manifest-order-modal-form', {
+          onClose: () => dispose(),
+          props: {
+            title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
+            selectedOrders: selected,
+            orders,
+          },
+        });
+      } else {
+        showNotification({
+          title: 'Failed to add samples to manifest',
+          kind: 'error',
+          description: 'All patients must have CCC/KDOD Number',
+        });
+      }
     }
   };
 
@@ -79,8 +88,8 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
     results?.map((activeRequest) => {
       return {
         id: `${activeRequest.orderUuid}`,
-        patientName: activeRequest.patientName,
-        cccKdod: activeRequest.cccKdod,
+        patientName: activeRequest.patientName ?? '--',
+        cccKdod: activeRequest.cccKdod ?? '--',
         dateRequested: activeRequest.dateRequested,
         actions: (
           <Button

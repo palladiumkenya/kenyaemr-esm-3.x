@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { LabManifestConfig } from '../config-schema';
 import {
+  editableManifestStatus,
   LabManifestFilters,
   labManifestFormSchema,
   mutateManifestLinks,
@@ -52,7 +53,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const onSubmit = async (values: LabManifestFormType) => {
     try {
       await saveLabManifest(values, manifest?.uuid);
-      mutateManifestLinks(manifest?.uuid, values?.manifestStatus);
+      mutateManifestLinks(manifest?.uuid, values?.manifestStatus, manifest?.manifestStatus);
       closeWorkspace();
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
     } catch (error) {
@@ -62,7 +63,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
-        <span className={styles.sectionHeader}>Manifest Date range</span>
+        <span className={styles.sectionHeader}>{t('manifestDateRange', 'Manifest Date range')}</span>
 
         <Column>
           <Controller
@@ -112,7 +113,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Manifest type</span>
+        <span className={styles.sectionHeader}>{t('manifestType', 'Manifest type')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -135,7 +136,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Dispatch Details</span>
+        <span className={styles.sectionHeader}>{t('dispatchDetails', 'Dispatch Details')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -189,7 +190,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Address</span>
+        <span className={styles.sectionHeader}>{t('address', 'Address')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -316,7 +317,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             )}
           />
         </Column>
-        <span className={styles.sectionHeader}>Manifest status</span>
+        <span className={styles.sectionHeader}>{t('manifestStatus', 'Manifest status')}</span>
         <Column>
           <Controller
             control={form.control}
@@ -333,8 +334,12 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
                 }}
                 initialSelectedItem={field.value}
                 label="Select status"
-                items={LabManifestFilters.map((r) => r.value)}
-                itemToString={(item) => LabManifestFilters.find((r) => r.value === item)?.label ?? ''}
+                items={LabManifestFilters.filter((lm) => editableManifestStatus.includes(lm.value)).map((r) => r.value)}
+                itemToString={(item) =>
+                  LabManifestFilters.filter((lm) => editableManifestStatus.includes(lm.value)).find(
+                    (r) => r.value === item,
+                  )?.label ?? ''
+                }
               />
             )}
           />

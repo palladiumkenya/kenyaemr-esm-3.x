@@ -5,14 +5,34 @@
   },
   "extensions": [
     {
-      "component": "labManifestDashboardLink",
+      "component": "labManifestSideNavGroup",
       "name": "lab-manifest-dashboard-link",
       "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "lab-manifest",
-        "title": "lab-manifest",
-        "slot": "lab-manifest-dashboard-slot"
+        "title": "Lab manifest Overview",
+        "slot": "lab-manifest-slot"     
       }
+    },
+    {
+      "component": "root",
+      "name": "lab-manifest-dashboard-root",
+      "slot": "lab-manifest-slot"
+    },
+    {
+      "component": "labManifestOverview",
+      "name": "lab-manifest-overview",
+      "slot": "lab-manifest-overview-slot"
+    },
+    {
+      "component": "manifestOverviewDashboardLink",
+      "name": "manifest-overview-link",
+      "slot": "lab-manifest-dashbaord-link-slot"
+    },
+    {
+      "component": "manifestsDashboardLink",
+      "name": "manifests-dashboard-link",
+      "slot": "lab-manifest-dashbaord-link-slot"
     },
     {
       "name": "lab-manifest-form",
@@ -25,17 +45,16 @@
     {
       "name": "sample-delete-confirm-dialog",
       "component": "sampleDeleteConfirmDialog"
-    },
-    {
-      "component": "root",
-      "name": "lab-manifest-dashboard-root",
-      "slot": "lab-manifest-dashboard-slot"
     }
   ],
   "pages": [
     {
       "component": "root",
       "route": "lab-manifest"
+    },
+    {
+      "component": "labManifestOverview",
+      "route": "lab-manifest-overview"
     }
   ]
 }
