@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useConfig, formatDate, showModal, showSnackbar, isDesktop, useLayoutType } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import {
+  CardHeader,
+  EmptyDataIllustration,
+  launchPatientWorkspace,
+  PatientChartPagination,
+} from '@openmrs/esm-patient-common-lib';
 import { ComboBox, Dropdown, DataTableSkeleton, Layer, Tile } from '@carbon/react';
 import { KeyedMutator } from 'swr';
 import styles from './case-encounter-header.scss';
@@ -56,30 +61,33 @@ const CaseEncounterHeader = ({ patientUuid, mutate, onFilterChange }: CaseEncoun
   };
 
   return (
-    <div className={styles.headerContainer}>
-      <span className={styles.headerTitle}>{title}</span>
-      <div className={styles.actionBtn}>
-        <Dropdown
-          id="serviceFilter"
-          initialSelectedItem={{ text: t('all', 'All'), filterUuid: '' }}
-          label=""
-          titleText={t('filterByForm', 'Filter by form') + ':'}
-          type="inline"
-          items={[{ text: t('all', 'All'), filterUuid: '' }, ...items]}
-          itemToString={(item) => (item ? item.text : '')}
-          onChange={handleEncounterTypeChange}
-          size="lg"
-        />
-        <ComboBox
-          onChange={handleComboBoxChange}
-          id="select-form"
-          items={items}
-          itemToString={(item) => (item ? item.text : '')}
-          placeholder="Select forms"
-          className={styles.comboBox}
-        />
+    <>
+      <div className={styles.widgetCard}>
+        <CardHeader title={title}>
+          <div className={styles.elementContainer}>
+            <Dropdown
+              id="serviceFilter"
+              initialSelectedItem={{ text: t('all', 'All'), filterUuid: '' }}
+              label=""
+              titleText={t('filterByForm', 'Filter by form') + ':'}
+              type="inline"
+              items={[{ text: t('all', 'All'), filterUuid: '' }, ...items]}
+              itemToString={(item) => (item ? item.text : '')}
+              onChange={handleEncounterTypeChange}
+              size="lg"
+            />
+            <ComboBox
+              onChange={handleComboBoxChange}
+              id="select-form"
+              items={items}
+              itemToString={(item) => (item ? item.text : '')}
+              placeholder="Select forms"
+              className={styles.comboBox}
+            />
+          </div>
+        </CardHeader>
       </div>
-    </div>
+    </>
   );
 };
 
