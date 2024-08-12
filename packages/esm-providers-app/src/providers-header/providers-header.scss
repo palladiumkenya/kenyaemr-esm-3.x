@@ -1,13 +1,14 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/colors';
+@use '@carbon/styles/scss/spacing';
 
 .header {
   @include type.type-style('body-compact-02');
-  color: $text-02;
+  color: colors.$gray-70;
   height: spacing.$spacing-12;
-  background-color: $ui-02;
-  border: 1px solid $ui-03;
+  background-color: colors.$white-0;
+  border: 1px solid colors.$gray-20;
   border-left: 0px;
   display: flex;
   justify-content: space-between;
@@ -23,7 +24,7 @@
 
 .right-justified-items {
   @include type.type-style('body-compact-02');
-  color: $text-02;
+  color: colors.$gray-70;
   padding-top: 1rem;
 }
 

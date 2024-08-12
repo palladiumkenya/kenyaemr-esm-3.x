@@ -1,18 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowRight } from '@carbon/react/icons';
-import { ClickableTile } from '@carbon/react';
 import styles from './providers-header.scss';
-import { Button, TextInput, Modal, Search, DatePickerInput, DatePicker } from '@carbon/react';
+import { Button, TextInput, Modal, Search, DatePickerInput, DatePicker, ClickableTile } from '@carbon/react';
 import { searchUsers } from '../api/api';
-
-const debounce = (func, delay) => {
-  let timeoutId;
-  return (...args) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => func(...args), delay);
-  };
-};
 
 const MetricsHeader = () => {
   const { t } = useTranslation();
@@ -66,11 +57,11 @@ const MetricsHeader = () => {
         </Button>
       </div>
       <Modal
-        primaryButtonText="ADD NEW PROVIDER"
-        secondaryButtonText="CANCEL"
+        primaryButtonText={t('addNewProvider', 'Add New Provider')}
+        secondaryButtonText={t('cancel', 'Cancel')}
         open={isModalOpen}
         onRequestClose={() => setIsModalOpen(false)}
-        modalHeading="NEW PROVIDER"
+        modalHeading={t('enrollNewProvider', 'Enroll New Provider')}
         hasScrollingContent>
         <div style={{ paddingBottom: '8px' }}>
           <Search

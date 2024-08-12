@@ -1,9 +1,7 @@
 import React from 'react';
 import { TabPanels, TabPanel, TabList, Tabs, Tab } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Admissionqueue } from '../providers-tables/providers-admission.component';
-import { Discharged } from '../providers-tables/providers-discharged.component';
-import { AdmittedQueue } from '../providers-tables/providers-admitted.component';
+import { AdmissionQueue } from '../providers-tables/providers-admission.component';
 
 import styles from './providers-tabs.scss';
 
@@ -20,16 +18,16 @@ export const ProvidersTabs: React.FC = () => {
         </TabList>
         <TabPanels>
           <TabPanel>
-            <Admissionqueue />
+            <AdmissionQueue />
           </TabPanel>
           <TabPanel>
-            <Admissionqueue />
+            <AdmissionQueue />
           </TabPanel>
           <TabPanel>
-            <Admissionqueue />
+            <AdmissionQueue />
           </TabPanel>
           <TabPanel>
-            <Admissionqueue />
+            <AdmissionQueue />
           </TabPanel>
         </TabPanels>
       </Tabs>

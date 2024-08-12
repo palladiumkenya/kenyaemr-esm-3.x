@@ -1,12 +1,11 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ProvidersComponent from './providers-component/providers.component';
+import { providerBasePath } from './constants';
 
 const Root: React.FC = () => {
-  const baseName = window.getOpenmrsSpaBase() + 'home/providers';
-
   return (
-    <BrowserRouter basename={baseName}>
+    <BrowserRouter basename={providerBasePath}>
       <Routes>
         <Route path="/" element={<ProvidersComponent />} />
       </Routes>

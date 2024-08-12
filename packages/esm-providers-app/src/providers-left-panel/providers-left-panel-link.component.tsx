@@ -33,8 +33,9 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   );
 }
 
-export const createLeftPanelLink = (config: LinkConfig) => () => (
-  <BrowserRouter>
-    <LinkExtension config={config} />
-  </BrowserRouter>
-);
+export const createLeftPanelLink = (config: LinkConfig) => () =>
+  (
+    <BrowserRouter>
+      <LinkExtension config={config} />
+    </BrowserRouter>
+  );

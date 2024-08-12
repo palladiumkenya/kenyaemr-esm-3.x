@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { usePagination } from '@openmrs/esm-framework';
 
-export const activeproviders: React.FC = () => {
+export const ActiveProviders: React.FC = () => {
   const { t } = useTranslation();
   const [currentPageSize, setCurrentPageSize] = useState<number>(10);
 
@@ -131,11 +131,11 @@ export const activeproviders: React.FC = () => {
   }, [paginatedResults]);
 
   const tableColumns = [
-    { id: 0, header: t('id', 'IDENTIFIER'), key: 'id' },
-    { id: 1, header: t('name', 'NAME'), key: 'name' },
-    { id: 2, header: t('name', 'LICENSE NUMBER'), key: 'license' },
-    { id: 3, header: t('date', 'LICENSE EXPIRY DATE'), key: 'date' },
-    { id: 4, header: t('action', 'ACTION'), key: 'action' },
+    { header: t('id', 'Identifier'), key: 'id' },
+    { header: t('name', 'Name'), key: 'name' },
+    { header: t('name', 'License Number'), key: 'license' },
+    { header: t('date', 'License expiry date'), key: 'date' },
+    { header: t('action', 'Action'), key: 'action' },
   ];
 
   return isLoading ? (

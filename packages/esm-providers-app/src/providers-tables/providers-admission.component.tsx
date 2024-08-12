@@ -17,13 +17,14 @@ import {
   OverflowMenuItem,
 } from '@carbon/react';
 import { usePagination } from '@openmrs/esm-framework';
-import { getAllProviders } from '../api/api';
-import { use } from 'i18next';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { UseAllProviders } from '../api/api';
+import { defaultPageSize } from '../constants';
 
-export const Admissionqueue: React.FC = () => {
+export const AdmissionQueue: React.FC = () => {
   const { t } = useTranslation();
-  const [currentPageSize, setCurrentPageSize] = useState<number>(5);
-  const { response, isLoading, error, isValidating } = getAllProviders();
+  const [currentPageSize, setCurrentPageSize] = useState<number>(defaultPageSize);
+  const { response, isLoading, error, isValidating } = UseAllProviders();
 
   useEffect(() => {}, [response, isLoading, error, isValidating]);
 
@@ -42,9 +43,7 @@ export const Admissionqueue: React.FC = () => {
   });
 
   const { goTo, results: paginatedResults, currentPage } = usePagination(filteredResult, currentPageSize);
-
-  // const pageSizes = [5, 10, 15, 20, 25];
-  const pageSizes = [10, 20, 30, 40, 50];
+  const { pageSizes } = usePaginationInfo(currentPageSize, response.length, currentPage, paginatedResults.length);
 
   const rows = useMemo(() => {
     return paginatedResults.map((entry: any) => ({
@@ -60,11 +59,11 @@ export const Admissionqueue: React.FC = () => {
   }, [paginatedResults]);
 
   const tableColumns = [
-    { id: 0, header: t('id', 'IDENTIFIER'), key: 'id' },
-    { id: 1, header: t('name', 'NAME'), key: 'name' },
-    { id: 2, header: t('licenseNumber', 'LICENSE NUMBER'), key: 'licenseNumber' },
-    { id: 3, header: t('licenseExpiryDate', 'LICENSE EXPIRY DATE'), key: 'licenseExpiryDate' },
-    { id: 4, header: t('action', 'ACTION'), key: 'action' },
+    { header: t('identifier', 'Identifier'), key: 'id' },
+    { header: t('name', 'Name'), key: 'name' },
+    { header: t('licenseNumber', 'License Number'), key: 'licenseNumber' },
+    { header: t('licenseExpiryDate', 'License expiry date'), key: 'licenseExpiryDate' },
+    { header: t('action', 'Action'), key: 'action' },
   ];
 
   return isLoading ? (
@@ -85,7 +84,7 @@ export const Admissionqueue: React.FC = () => {
                 }}>
                 <TableToolbarSearch />
               </TableToolbar>
-              <Table {...getTableProps()} aria-label="sample table">
+              <Table {...getTableProps()} aria-label={t('providerAdmission', 'Provider Admission')}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header, i) => (
@@ -110,8 +109,8 @@ export const Admissionqueue: React.FC = () => {
                 </TableBody>
               </Table>
               <Pagination
-                forwardText="Next page"
-                backwardText="Previous page"
+                forwardText={t('nextPage', 'Next page')}
+                backwardText={t('previousPage', 'Previous page')}
                 page={currentPage}
                 pageSize={currentPageSize}
                 pageSizes={pageSizes}

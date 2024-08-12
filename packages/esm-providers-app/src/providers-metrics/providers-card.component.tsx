@@ -28,12 +28,6 @@ const MetricsCard: React.FC<MetricsCardProps> = ({ label, value, headerLabel, ch
             <label className={styles.headerLabel}>{headerLabel}</label>
             {children}
           </div>
-          <div className={styles.link}>
-            <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/home`}>
-              {t('viewReport', 'View Report')}
-            </ConfigurableLink>
-            <ArrowRight size={16} />
-          </div>
         </div>
         <div>
           <label className={styles.totalsLabel}>{label}</label>

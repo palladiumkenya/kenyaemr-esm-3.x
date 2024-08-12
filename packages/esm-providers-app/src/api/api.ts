@@ -1,9 +1,8 @@
 import useSWR from 'swr';
-import { Buffer } from 'buffer';
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
-const providerUrl = `${restBaseUrl}/provider?v=full`
-export const custom = custom:(uuid,identifier,display,person:(uuid,display),attributes:(uuid,display),retired)';
+const providerUrl = `${restBaseUrl}/provider`;
+export const custom = `?v=custom:(uuid,identifier,display,person:(uuid,display),attributes:(uuid,display),retired)`;
 
 const fetcher = async (url) => {
   try {
@@ -18,8 +17,8 @@ const fetcher = async (url) => {
   }
 };
 
-export const getAllProviders = () => {
-  const { data, isLoading, error, isValidating } = useSWR(`${custom}`, fetcher);
+export const UseAllProviders = () => {
+  const { data, isLoading, error, isValidating } = useSWR(`${providerUrl}${custom}`, fetcher);
 
   const response = data ? (data as any)?.results : [];
 
