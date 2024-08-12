@@ -2,7 +2,7 @@ import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { createLeftPanelLink } from './left-panel-link.component';
 import { configSchema } from './config-schema';
-import { dashboardMeta } from './dashboard.meta';
+import { dashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
 import rootComponent from './root.component';
 import BillHistory from './bill-history/bill-history.component';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
@@ -18,6 +18,8 @@ import TestOrderAction from './billable-services/billiable-item/test-order/test-
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
+import SHRSummaryPanell from './shr-summary/shr-summary.component';
+import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -34,6 +36,11 @@ export function startupApp() {
 
 export const billingSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),
+  options,
+);
+
+export const shrSummaryDashboardLink = getSyncLifecycle(
+  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
   options,
 );
 // t('billing', 'Billing')
@@ -60,3 +67,5 @@ export const procedureOrder = getSyncLifecycle(ProcedureOrder, options);
 export const imagingOrder = getSyncLifecycle(ImagingOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
+export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanell, options);
+export const shrAuthorizationForm = getSyncLifecycle(SHRAuthorizationForm, options);
