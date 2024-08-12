@@ -75,7 +75,22 @@ export function extractString(input: string): string {
   return removeUUID(parts.length < 2 ? input : parts[1]);
 }
 
-function removeUUID(str) {
+export function extractBillableServiceReadableString(input: string): string {
+  const parts = input
+    .split(' ')
+    .map((s) => s.split(':')[1])
+    .filter((s) => Boolean(s));
+
+  const firstTwoBillableServices = parts.slice(0, 2);
+
+  if (parts.length <= 2) {
+    return firstTwoBillableServices.join(', ');
+  }
+
+  return `${firstTwoBillableServices.join(', ')} & ${parts.length - 2} other services`;
+}
+
+function removeUUID(str: string) {
   // Regular expression to match a UUID
   const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
 

@@ -7,6 +7,7 @@ import { useBills } from '../../billing.resource';
 import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
+import { NoPatientSelectedState } from './no-patient-selected-state.component';
 
 type BillManagerProps = {};
 
@@ -36,18 +37,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
           }}
         />
         {!patientUuid ? (
-          <div style={{ marginTop: '0.625rem' }}>
-            <Layer className={billTableStyles.emptyStateContainer}>
-              <Tile className={billTableStyles.tile}>
-                <div className={billTableStyles.illo}>
-                  <EmptyDataIllustration />
-                </div>
-                <p className={billTableStyles.content}>
-                  {t('notSearchedState', 'Please search for a patient in the input above')}
-                </p>
-              </Tile>
-            </Layer>
-          </div>
+          <NoPatientSelectedState />
         ) : isLoading ? (
           <DataTableSkeleton
             headers={headers}
