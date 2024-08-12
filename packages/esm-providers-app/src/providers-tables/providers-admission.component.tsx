@@ -20,15 +20,16 @@ import { usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { UseAllProviders } from '../api/api';
 import { defaultPageSize } from '../constants';
+import capitalize from 'lodash-es/capitalize';
 
 export const AdmissionQueue: React.FC = () => {
   const { t } = useTranslation();
   const [currentPageSize, setCurrentPageSize] = useState<number>(defaultPageSize);
-  const { response, isLoading, error, isValidating } = UseAllProviders();
+  const { providers, isLoading, error, isValidating } = UseAllProviders();
 
-  useEffect(() => {}, [response, isLoading, error, isValidating]);
+  useEffect(() => {}, [providers, isLoading, error, isValidating]);
 
-  const filteredResult = response.map((provider) => {
+  const filteredResult = providers.map((provider) => {
     // Extract custom attributes
     const licenseNumberAttr = provider.attributes.find((attr) => attr.display.startsWith('Licence Number'));
     const licenseExpiryDateAttr = provider.attributes.find((attr) => attr.display.startsWith('Licence Expiry Date'));
@@ -43,11 +44,12 @@ export const AdmissionQueue: React.FC = () => {
   });
 
   const { goTo, results: paginatedResults, currentPage } = usePagination(filteredResult, currentPageSize);
-  const { pageSizes } = usePaginationInfo(currentPageSize, response.length, currentPage, paginatedResults.length);
+  const { pageSizes } = usePaginationInfo(currentPageSize, providers.length, currentPage, paginatedResults.length);
 
   const rows = useMemo(() => {
-    return paginatedResults.map((entry: any) => ({
+    return paginatedResults.map((entry) => ({
       ...entry,
+      name: capitalize(entry.name),
       action: (
         <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
           <OverflowMenuItem itemText="Sync with HWR" />
@@ -59,7 +61,7 @@ export const AdmissionQueue: React.FC = () => {
   }, [paginatedResults]);
 
   const tableColumns = [
-    { header: t('identifier', 'Identifier'), key: 'id' },
+    { header: t('identifier', 'Identifier'), key: 'identifier' },
     { header: t('name', 'Name'), key: 'name' },
     { header: t('licenseNumber', 'License Number'), key: 'licenseNumber' },
     { header: t('licenseExpiryDate', 'License expiry date'), key: 'licenseExpiryDate' },
@@ -114,7 +116,7 @@ export const AdmissionQueue: React.FC = () => {
                 page={currentPage}
                 pageSize={currentPageSize}
                 pageSizes={pageSizes}
-                totalItems={response.length}
+                totalItems={providers.length}
                 onChange={({ pageSize, page }) => {
                   if (pageSize !== currentPageSize) {
                     setCurrentPageSize(pageSize);

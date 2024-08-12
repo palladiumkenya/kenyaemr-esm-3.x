@@ -1,29 +1,18 @@
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { Provider } from '../types';
 
 const providerUrl = `${restBaseUrl}/provider`;
 export const custom = `?v=custom:(uuid,identifier,display,person:(uuid,display),attributes:(uuid,display),retired)`;
 
-const fetcher = async (url) => {
-  try {
-    const response = await openmrsFetch(url, {});
-    if (!response.ok) {
-      throw new Error(`Failed to fetch data: ${response.statusText}`);
-    }
-
-    return response.json();
-  } catch (error) {
-    throw new Error(`An error occurred while fetching data: ${error.message}`);
-  }
-};
-
 export const UseAllProviders = () => {
-  const { data, isLoading, error, isValidating } = useSWR(`${providerUrl}${custom}`, fetcher);
-
-  const response = data ? (data as any)?.results : [];
+  const { data, isLoading, error, isValidating } = useSWR<{ data: { results: Array<Provider> } }>(
+    `${providerUrl}${custom}`,
+    openmrsFetch,
+  );
 
   return {
-    response,
+    providers: data?.data.results ?? [],
     isLoading,
     error,
     isValidating,
@@ -31,7 +20,7 @@ export const UseAllProviders = () => {
 };
 
 export const searchUsers = async (name: string, ac = new AbortController()) => {
-  const results = await openmrsFetch(`ws/rest/v1/user?q=${name}&v=custom:(uuid,display,person)`, {
+  const results = await openmrsFetch(`${restBaseUrl}/user?q=${name}&v=custom:(uuid,display,person)`, {
     signal: ac.signal,
   });
   return results.data.results;

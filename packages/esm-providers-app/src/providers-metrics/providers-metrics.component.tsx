@@ -12,7 +12,7 @@ export interface Service {
 
 function ProviderMetrics() {
   const { t } = useTranslation();
-  const { response } = UseAllProviders();
+  const { providers } = UseAllProviders();
 
   return (
     <>
@@ -20,7 +20,7 @@ function ProviderMetrics() {
       <div className={styles.cardContainer} data-testid="clinic-metrics">
         <MetricsCard
           label={t('totalProviders', 'Total Providers')}
-          value={response ? response.length : 0}
+          value={providers ? providers.length : 0}
           headerLabel={t('all', 'All Providers')}
         />
         <MetricsCard
