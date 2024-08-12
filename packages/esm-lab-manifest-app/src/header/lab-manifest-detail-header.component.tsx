@@ -5,7 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
 import styles from './lab-manifest-header.scss';
-import { printableManifestStatus, printManifest } from '../lab-manifest.resources';
+import { editableManifestStatus, printableManifestStatus, printManifest } from '../lab-manifest.resources';
 
 interface LabManifestDetailHeaderProps {
   manifestUuid: string;
@@ -77,9 +77,11 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
           {t('back', 'Back')}
         </Button>
         <Row className={styles.btnSetRight}>
-          <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest}>
-            {t('editManifest', 'Edit Manifest')}
-          </Button>
+          {editableManifestStatus.includes(manifest.manifestStatus) && (
+            <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest}>
+              {t('editManifest', 'Edit Manifest')}
+            </Button>
+          )}
           {printableManifestStatus.includes(manifest.manifestStatus) && (
             <Button kind="secondary" renderIcon={Printer} onClick={handlePrintManifest}>
               {t('printManifest', 'Print Manifest')}

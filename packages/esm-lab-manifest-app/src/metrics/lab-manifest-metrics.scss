@@ -22,6 +22,7 @@
   display: flex;
   margin-top: spacing.$spacing-05;
   margin-bottom: spacing.$spacing-05;
+  padding-right: spacing.$spacing-05;
   flex-direction: row;
   justify-content: flex-end;
   width: 100%;
@@ -59,4 +60,16 @@
 .metricCardAgregateValue {
   @include type.type-style('heading-05');
   font-weight: var(--cds-heading-05-font-weight, 100);
+}
+
+.metricDanger {
+  color: $danger;
+}
+
+.metricWarning {
+  color: colors.$orange-40;
+}
+
+.metricSuccess {
+  color: colors.$green-40;
 }
