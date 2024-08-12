@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { InlineLoading, InlineNotification, FilterableMultiSelect } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig, useFeatureFlag } from '@openmrs/esm-framework';
 import styles from './billing-checkin-form.scss';
 import VisitAttributesForm from './visit-attributes/visit-attributes-form.component';
 import { BillingConfig } from '../config-schema';
@@ -10,6 +10,9 @@ import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS } from '../constants';
 import { BillingService } from '../types';
 import SHANumberValidity from './social-health-authority/sha-number-validity.component';
 import { createPatientBill, useBillableItems, useCashPoint } from '../billing.resource';
+import { visitAttributesFormSchema, VisitAttributesFormValue } from './check-in-form.utils';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 type BillingCheckInFormProps = {
   patientUuid: string;
@@ -18,6 +21,7 @@ type BillingCheckInFormProps = {
 
 const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, setExtraVisitInfo }) => {
   const { t } = useTranslation();
+  const hieFeatureFlags = useFeatureFlag('healthInformationExchange');
   const {
     visitAttributeTypes: { isPatientExempted },
   } = useConfig<BillingConfig>();
@@ -26,6 +30,17 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const [attributes, setAttributes] = useState([]);
   const [paymentMethod, setPaymentMethod] = useState<any>();
   const [isPatientExemptedValue, setIsPatientExemptedValue] = useState<string | null>(null);
+  const formMethods = useForm<VisitAttributesFormValue>({
+    mode: 'all',
+    defaultValues: {
+      isPatientExempted: '',
+      paymentMethods: null,
+      insuranceScheme: '',
+      policyNumber: '',
+      exemptionCategory: '',
+    },
+    resolver: zodResolver(visitAttributesFormSchema),
+  });
 
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
@@ -107,13 +122,13 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   }
 
   return (
-    <>
+    <FormProvider {...formMethods}>
       <VisitAttributesForm
         setAttributes={setAttributes}
         setPaymentMethod={setPaymentMethod}
         setIsPatientExempted={setIsPatientExemptedValue}
       />
-      <SHANumberValidity paymentMethod={paymentMethod} />
+      {hieFeatureFlags && <SHANumberValidity paymentMethod={attributes} patientUuid={patientUuid} />}
       {paymentMethod && (
         <section className={styles.sectionContainer}>
           <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
@@ -130,7 +145,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
           </div>
         </section>
       )}
-    </>
+    </FormProvider>
   );
 };
 
