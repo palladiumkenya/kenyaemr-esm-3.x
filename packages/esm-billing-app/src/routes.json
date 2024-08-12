@@ -32,9 +32,10 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "name": "benefits-package",
-        "title": "Benefits package",
         "slot": "patient-chart-benefits-dashboard-slot",
-        "path": "Benefits Package"
+        "path": "Benefits Package",
+        "columns": 1,
+        "columnSpan": 1
       }
     },
     {
