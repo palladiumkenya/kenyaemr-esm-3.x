@@ -2,7 +2,7 @@ import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { createLeftPanelLink } from './left-panel-link.component';
 import { configSchema } from './config-schema';
-import { dashboardMeta } from './dashboard.meta';
+import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import rootComponent from './root.component';
 import BillHistory from './bill-history/bill-history.component';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
@@ -23,6 +23,7 @@ import PriceInfoOrder from './billable-services/billiable-item/test-order/price-
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
+import BenefitsPackage from './benefits-package/benefits-package.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -42,6 +43,14 @@ export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billing',
     title: 'Billing',
+  }),
+  options,
+);
+
+export const benefitsPackageDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...benefitsPackageDashboardMeta,
+    moduleName,
   }),
   options,
 );
@@ -72,6 +81,9 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
+
+// Benefits
+export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
