@@ -1,11 +1,18 @@
-import React from 'react';
-import styles from './shr-tables.scss';
-import { DataTableSkeleton } from '@carbon/react';
+import { useLayoutType } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-const PatientSHRSummartTable = () => {
+interface PatientSHRSummartTableProps {}
+
+const PatientSHRSummartTable: React.FC<PatientSHRSummartTableProps> = () => {
+  const { t } = useTranslation();
+  const [pageSize, setPageSize] = useState(10);
+  const layout = useLayoutType();
+
   return (
     <div>
-      <DataTableSkeleton />
+      <EmptyState displayText={t('Conditopns', 'Conditions')} headerTitle={t('shrRecords', 'SHR Records')} />
     </div>
   );
 };
