@@ -19,12 +19,29 @@
     {
       "component": "billingDashboardLink",
       "name": "billing-dashboard-link",
-      "slot": "homepage-dashboard-slot",
+      "slot": "patient-chart-dashboard-slot",
       "meta": {
         "name": "billing",
         "title": "billing",
         "slot": "billing-dashboard-slot"
       }
+    },
+    {
+      "component": "benefitsPackageDashboardLink",
+      "name": "benefits-package-dashboard-link",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "benefits-package",
+        "slot": "patient-chart-benefits-dashboard-slot",
+        "path": "Benefits Package",
+        "columns": 1,
+        "columnSpan": 1
+      }
+    },
+    {
+      "component": "benefitsPackage",
+      "name": "benefits-package",
+      "slot": "patient-chart-benefits-dashboard-slot"
     },
     {
       "component": "root",
@@ -49,7 +66,9 @@
         "columns": 1,
         "columnSpan": 1,
         "slot": "patient-chart-billing-dashboard-slot",
-        "path": "Billing"
+        "path": "Billing",
+        "layoutMode": "anchored"
+
       }
     },
     {
