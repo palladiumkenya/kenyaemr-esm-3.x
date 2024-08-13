@@ -13,7 +13,7 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   const location = useLocation();
   const spaBasePath = window.getOpenmrsSpaBase() + 'home';
 
-  let urlSegment = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))!), [location.pathname]);
+  let urlSegment = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
   const isUUID = (value) => {
     const regex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
@@ -21,7 +21,7 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   };
 
   if (isUUID(urlSegment)) {
-    urlSegment = 'lab-manifest';
+    urlSegment = 'providers';
   }
 
   return (
