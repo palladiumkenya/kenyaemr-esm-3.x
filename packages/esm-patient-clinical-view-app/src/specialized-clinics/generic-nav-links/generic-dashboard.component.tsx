@@ -2,25 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { CardHeader, EmptyState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash/capitalize';
-import { ErrorState, formatDate, launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace, showModal, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../../config-schema';
 import { genericTableHeader, useEncounters } from './useEncounters';
-import {
-  DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableExpandHeader,
-  TableHeader,
-  TableBody,
-  TableExpandRow,
-  TableCell,
-  TableExpandedRow,
-  DataTableSkeleton,
-  Button,
-} from '@carbon/react';
-import EncounterObservations from './encounter-observations/encounter-observations.component';
+import { DataTableSkeleton, Button } from '@carbon/react';
+import GenericTable from './generic-table.component';
+import { deleteEncounter } from '../../case-management/encounters/case-encounter-table.resource';
 
 type GenericDashboardProps = { patientUuid: string };
 
@@ -65,9 +52,8 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
       },
     });
   };
-
   const handleWorkspaceEditForm = (encounterUuid: string = '') => {
-    launchWorkspace('patient-form-entry-workspace', {
+    launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: clinicalFormTitle.replace('clinic', 'form'),
       mutateForm: mutate,
       formInfo: {
@@ -78,16 +64,37 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
     });
   };
 
-  const rows =
-    encounters?.map((encounter) => ({
-      id: `${encounter.uuid}`,
-      encounterDatetime: formatDate(new Date(encounter.encounterDatetime)),
-      visitType: encounter.visit?.visitType?.display ?? '--',
-      provider:
-        encounter.encounterProviders?.length > 0
-          ? capitalize(encounter.encounterProviders[0].provider['display'])
-          : '--',
-    })) ?? [];
+  const handleDeleteEncounter = React.useCallback(
+    (encounterUuid: string, encounterTypeName?: string) => {
+      const close = showModal('delete-encounter-modal', {
+        close: () => close(),
+        encounterTypeName: encounterTypeName || '',
+        onConfirmation: () => {
+          const abortController = new AbortController();
+          deleteEncounter(encounterUuid, abortController)
+            .then(() => {
+              mutate?.();
+              showSnackbar({
+                isLowContrast: true,
+                title: t('encounterDeleted', 'Encounter deleted'),
+                subtitle: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
+                kind: 'success',
+              });
+            })
+            .catch(() => {
+              showSnackbar({
+                isLowContrast: false,
+                title: t('error', 'Error'),
+                subtitle: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
+                kind: 'error',
+              });
+            });
+          close();
+        },
+      });
+    },
+    [t, mutate],
+  );
 
   if (isLoading) {
     return <DataTableSkeleton headers={genericTableHeader} aria-label="sample table" />;
@@ -105,74 +112,17 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
 
   return (
     <div>
-      <CardHeader title={capitalize(clinic.replace('-', ' '))}>
+      <CardHeader title={clinicalFormTitle}>
         <Button onClick={handleWorkspaceForm} kind="ghost">
           {t('add', 'Add')}
         </Button>
       </CardHeader>
-      <DataTable size="sm" useZebraStyles rows={rows} headers={genericTableHeader}>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getExpandedRowProps,
-          getTableProps,
-          getTableContainerProps,
-        }) => (
-          <TableContainer
-            title={clinicalFormTitle}
-            description={`Encounters ${t('for', 'for')} ${clinicalFormTitle}`}
-            {...getTableContainerProps()}>
-            <Table {...getTableProps()} aria-label="sample table">
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader aria-label="expand row" />
-                  {headers.map((header, i) => (
-                    <TableHeader
-                      key={i}
-                      {...getHeaderProps({
-                        header,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, index) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow
-                      {...getRowProps({
-                        row,
-                      })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                    <TableExpandedRow
-                      colSpan={headers.length + 1}
-                      className="demo-expanded-td"
-                      {...getExpandedRowProps({
-                        row,
-                      })}>
-                      <>
-                        <EncounterObservations observations={encounters[index]['obs'] ?? []} />
-                        <Button
-                          onClick={() => handleWorkspaceEditForm(encounters[index].uuid)}
-                          kind="tertiary"
-                          size="sm">
-                          {t('edit', 'Edit')}
-                        </Button>
-                      </>
-                    </TableExpandedRow>
-                  </React.Fragment>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+      <GenericTable
+        encounters={encounters}
+        onEdit={handleWorkspaceEditForm}
+        onDelete={handleDeleteEncounter}
+        headers={genericTableHeader}
+      />
     </div>
   );
 };

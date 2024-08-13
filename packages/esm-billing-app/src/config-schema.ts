@@ -13,11 +13,6 @@ export interface BillingConfig {
   patientExemptionCategories: Array<{ value: string; label: string }>;
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
   enforceBillPayment: boolean;
-  mpesaCallbackUrl: string;
-  shortCode: string;
-  passKey: string;
-  authorizationUrl: string;
-  initiateUrl: string;
   billingStatusQueryUrl: string;
   mpesaAPIBaseUrl: string;
 }
@@ -99,31 +94,6 @@ export const configSchema = {
     _type: Type.Boolean,
     _default: true,
     _description: 'Whether to enforce bill payment or not for patient to receive service',
-  },
-  mpesaCallbackUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'MPESA callback Url to receive confirmation payload from MPESA Daraja API',
-  },
-  shortCode: {
-    _type: Type.String,
-    _default: '',
-    _description: 'shortcode used to identify an organization and receive the transaction',
-  },
-  passKey: {
-    _type: Type.String,
-    _default: '',
-    _description: 'Passkey used for generating password for generation of access token to auth APIs',
-  },
-  authorizationUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'MPESA Authenciation url gives you a time bound access token to call allowed APIs.',
-  },
-  initiateUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'MPESA Initiator url which Initiates online payment on behalf of a customer.',
   },
   billingStatusQueryUrl: {
     _type: Type.String,

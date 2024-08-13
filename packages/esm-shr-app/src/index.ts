@@ -4,8 +4,9 @@ import { referralDashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import { createHomeDashboardLink } from './create-dashboard-link';
-import ReferralReasonsDialogPopup from './community-referrals/referral-reasons/referral-reasons.component';
-import ReferralChartView from './community-referrals/patient-chart/referral-chart-view.component';
+import ReferralReasonsDialogPopup from './referrals/referral-reasons/referral-reasons.component';
+import ReferralChartView from './referrals/patient-chart/referral-chart-view.component';
+import FacilityRefferalForm from './workspace/referrals.workspace.component';
 
 const moduleName = '@kenyaemr/esm-shr-app';
 
@@ -26,10 +27,10 @@ export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const communityReferralsDashboardLink = getSyncLifecycle(
+export const ReferralsDashboardLink = getSyncLifecycle(
   createHomeDashboardLink({
-    name: 'community-referrals',
-    title: 'Community referrals',
+    name: 'referrals',
+    title: 'Referrals',
   }),
   options,
 );
@@ -44,3 +45,4 @@ export const referralReasonsDialogPopup = getSyncLifecycle(ReferralReasonsDialog
 // Dashboard links for referrals and the corresponding view in the patient chart
 export const referralWidget = getSyncLifecycle(ReferralChartView, options);
 export const referralLink = getSyncLifecycle(createDashboardLink(referralDashboardMeta), options);
+export const facilityRefferalForm = getSyncLifecycle(FacilityRefferalForm, options);

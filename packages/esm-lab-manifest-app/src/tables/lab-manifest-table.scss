@@ -1,0 +1,84 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.widgetContainer {
+  background-color: colors.$white-0;
+  border: spacing.$spacing-01 solid colors.$gray-20;
+  margin-bottom: spacing.$spacing-02;
+}
+
+.widgetContainer :global(.cds--data-table) thead th button span {
+  height: unset !important;
+}
+
+.tile {
+  text-align: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-70;
+  margin-top: layout.$layout-05;
+  margin-bottom: layout.$spacing-03;
+}
+
+.desktopHeading,
+.tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: colors.$gray-70;
+
+    &:after {
+      content: '';
+      display: block;
+      width: spacing.$spacing-01;
+      padding-top: spacing.$spacing-03;
+      border-bottom: spacing.$spacing-01 solid;
+      @include brand-03(border-bottom-color);
+    }
+  }
+}
+
+.btnSet {
+  flex-flow: row wrap;
+  gap: spacing.$spacing-03;
+}
+
+.btn {
+  padding-left: spacing.$spacing-05;
+  padding-right: spacing.$spacing-05;
+}
+
+.sectionHeader {
+  @include type.type-style('heading-02');
+}
+
+.modalQuiz {
+  margin-bottom: spacing.$spacing-05;
+}
+
+.button {
+  height: spacing.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 20%;
+}
+
+.buttonSet {
+  padding: 0rem;
+  margin-top: spacing.$spacing-05;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: spacing.$spacing-05;
+}

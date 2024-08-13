@@ -15,11 +15,16 @@ import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
+import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
+import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
+import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
 import SHRSummaryPanell from './shr-summary/shr-summary.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
+import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -29,10 +34,6 @@ const options = {
 };
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
-
-export function startupApp() {
-  defineConfigSchema(moduleName, configSchema);
-}
 
 export const billingSummaryDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...dashboardMeta, moduleName }),
@@ -56,11 +57,13 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billableServicesHome = getSyncLifecycle(BillableServiceHome, options);
+
 export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);
 export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
 export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, options);
+
 export const labOrder = getSyncLifecycle(LabOrder, options);
 export const priceInfoOrder = getSyncLifecycle(PriceInfoOrder, options);
 export const procedureOrder = getSyncLifecycle(ProcedureOrder, options);
@@ -69,3 +72,16 @@ export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
 export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanell, options);
 export const shrAuthorizationForm = getSyncLifecycle(SHRAuthorizationForm, options);
+
+// bill manager modals
+export const cancelBillModal = getSyncLifecycle(CancelBillModal, options);
+export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
+
+// bill manager extensions
+export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
+export const editBillForm = getSyncLifecycle(EditBillForm, options);
+export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
+
+export function startupApp() {
+  defineConfigSchema(moduleName, configSchema);
+}

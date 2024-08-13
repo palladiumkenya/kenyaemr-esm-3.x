@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
   encounterTypes: {
@@ -8,6 +9,24 @@ export const configSchema = {
       mchMotherConsultation: 'c6d09e05-1f25-4164-8860-9f32c5a02df0',
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
     },
+  },
+  caseManagementForms: {
+    _type: Type.Array,
+    _description: 'List of form and encounter UUIDs',
+    _default: [
+      {
+        id: 'high-iit-intervention',
+        title: 'High IIT Intervention Form',
+        formUuid: 'd86a77bd-769a-47ec-942a-716afbd907cc',
+        encounterTypeUuid: 'a0034eee-1940-4e35-847f-97537a35d05e',
+      },
+      {
+        id: 'home-visit-checklist',
+        title: 'Home Visit Checklist Form',
+        formUuid: 'dbe7db2d-abed-47b6-904f-1308b997d7bf',
+        encounterTypeUuid: '4224f8bf-11b2-4e47-a958-1dbdfd7fa41d',
+      },
+    ],
   },
   formsList: {
     _type: Type.Object,
@@ -112,6 +131,7 @@ export const configSchema = {
       contactCreated: '7c94bd35-fba7-4ef7-96f5-29c89a318fcf',
       preferedPnsAproach: '59d1b886-90c8-4f7f-9212-08b20a9ee8cf',
       livingWithContact: '35a08d84-9f80-4991-92b4-c4ae5903536e',
+      contactIPVOutcome: '49c543c2-a72a-4b0a-8cca-39c375c0726f',
     },
   },
   familyRelationshipsTypeList: {
@@ -120,45 +140,72 @@ export const configSchema = {
     _default: [
       {
         uuid: '8d91a01c-c2cc-11de-8d13-0010c6dffd0f',
-        displayAIsToB: 'Sibling',
+        display: 'Sibling/Sibling',
       },
       {
         uuid: '8d91a210-c2cc-11de-8d13-0010c6dffd0f',
-        displayAIsToB: 'Parent',
+        display: 'Parent/Child',
       },
       {
         uuid: '8d91a3dc-c2cc-11de-8d13-0010c6dffd0f',
-        displayAIsToB: 'Aunt/Uncle',
+        display: 'Aunt/Uncle/Niece/Nephew',
       },
       {
         uuid: '5f115f62-68b7-11e3-94ee-6bef9086de92',
-        displayAIsToB: 'Guardian',
+        display: 'Guardian/Dependant',
       },
       {
         uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
-        displayAIsToB: 'Spouse',
+        display: 'Spouse/Spouse',
       },
       {
         uuid: '007b765f-6725-4ae9-afee-9966302bace4',
-        displayAIsToB: 'Partner',
+        display: 'Partner/Partner',
       },
       {
         uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
-        displayAIsToB: 'Co-wife',
+        display: 'Co-wife/Co-wife',
       },
       {
         uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
-        displayAIsToB: 'Injectable-drug-user',
+        display: 'Injectable-drug-user/Injectable-druguser',
       },
       {
         uuid: '76edc1fe-c5ce-4608-b326-c8ecd1020a73',
-        displayAIsToB: 'SNS',
+        display: 'SNS/SNS',
+      },
+    ],
+  },
+  pnsRelationships: {
+    _type: Type.Array,
+    _description: 'List of Patner relationship (PNS - Patner Notification Service)',
+    _default: [
+      {
+        uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
+        display: 'Spouse/Spouse',
+        sexual: true,
+      },
+      {
+        uuid: '007b765f-6725-4ae9-afee-9966302bace4',
+        display: 'Partner/Partner',
+        sexual: true,
+      },
+      {
+        uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
+        display: 'Co-wife/Co-wife',
+        sexual: false,
+      },
+      {
+        uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
+        display: 'Injectable-drug-user/Injectable-druguser',
+        sexual: false,
       },
     ],
   },
 };
 
 export interface ConfigObject {
+  caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
   encounterTypes: { mchMotherConsultation: string; hivTestingServices: string };
   formsList: {
     labourAndDelivery: string;
@@ -185,8 +232,10 @@ export interface ConfigObject {
     contactCreated: string;
     preferedPnsAproach: string;
     livingWithContact: string;
+    contactIPVOutcome: string;
   };
-  familyRelationshipsTypeList: Array<{ uuid: string; displayAIsToB: string }>;
+  familyRelationshipsTypeList: Array<{ uuid: string; display: string }>;
+  pnsRelationships: Array<{ uuid: string; display: string; sexual: boolean }>;
 }
 
 export interface PartograpyComponents {
