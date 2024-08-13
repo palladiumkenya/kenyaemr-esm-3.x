@@ -1,30 +1,31 @@
 import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import { createLeftPanelLink } from './left-panel-link.component';
-import { configSchema } from './config-schema';
-import { dashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
-import rootComponent from './root.component';
+import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
-import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
-import BillableServiceHome from './billable-services/billable-services-home.component';
-import BillingForm from './billing-form/billing-form.component';
-import RequirePaymentModal from './modal/require-payment-modal.component';
-import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
-import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
-import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
-import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
-import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
-import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
-import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
+import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
+import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
+import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
+import BillableServiceHome from './billable-services/billable-services-home.component';
+import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
+import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
+import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
-import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
-import SHRSummaryPanell from './shr-summary/shr-summary.component';
+import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import BillingCheckInForm from './billing-form/billing-checkin-form.component';
+import BillingForm from './billing-form/billing-form.component';
+import { configSchema } from './config-schema';
+import { benefitsPackageDashboardMeta, dashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
+import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
+import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
+import { createLeftPanelLink } from './left-panel-link.component';
+import RequirePaymentModal from './modal/require-payment-modal.component';
+import rootComponent from './root.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
-import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
+import SHRSummaryPanell from './shr-summary/shr-summary.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -49,6 +50,14 @@ export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billing',
     title: 'Billing',
+  }),
+  options,
+);
+
+export const benefitsPackageDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...benefitsPackageDashboardMeta,
+    moduleName,
   }),
   options,
 );
@@ -81,6 +90,9 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
+
+// Benefits
+export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
