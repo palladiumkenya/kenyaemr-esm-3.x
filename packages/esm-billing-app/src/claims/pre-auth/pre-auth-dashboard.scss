@@ -1,0 +1,17 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.preAuthContainer {
+  margin: layout.$spacing-05;
+  border: 1px solid $ui-03;
+}
+.loader {
+  display: flex;
+  min-height: layout.$spacing-09;
+  justify-content: center;
+}
+.errorContainer {
+  margin: layout.$spacing-05;
+}

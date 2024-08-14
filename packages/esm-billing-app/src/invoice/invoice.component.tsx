@@ -138,7 +138,13 @@ const Invoice: React.FC = () => {
           tooltipPosition="bottom">
           {t('claim', 'Process claims')}
         </Button>
-        <Button kind="primary" size="sm" renderIcon={ConvertToCloud} iconDescription="Add" tooltipPosition="bottom">
+        <Button
+          onClick={() => navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/pre-auth-request` })}
+          kind="primary"
+          size="sm"
+          renderIcon={ConvertToCloud}
+          iconDescription="Add"
+          tooltipPosition="bottom">
           {t('preauth', 'Create Pre-Auth Request')}
         </Button>
       </div>
