@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, InlineLoading } from '@carbon/react';
-import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
+import { BaggageClaim, Printer, Wallet, ConvertToCloud } from '@carbon/react/icons';
 import { useParams } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 import { useTranslation } from 'react-i18next';
@@ -137,6 +137,9 @@ const Invoice: React.FC = () => {
           iconDescription="Add"
           tooltipPosition="bottom">
           {t('claim', 'Process claims')}
+        </Button>
+        <Button kind="primary" size="sm" renderIcon={ConvertToCloud} iconDescription="Add" tooltipPosition="bottom">
+          {t('preauth', 'Create Pre-Auth Request')}
         </Button>
       </div>
 
