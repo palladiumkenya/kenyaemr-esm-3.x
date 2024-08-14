@@ -3,9 +3,8 @@
 @use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.preAuthContainer {
-  margin: layout.$spacing-05;
-  border: 1px solid $ui-03;
+.backButton {
+  margin: layout.$spacing-04;
 }
 .loader {
   display: flex;
@@ -14,4 +13,30 @@
 }
 .errorContainer {
   margin: layout.$spacing-05;
+}
+
+.preAuthMainContainer {
+  display: flex;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.content {
+  display: flex;
+  width: 100%;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .preAuthMainContainer {
+    flex-direction: column;
+  }
+
+  .content {
+    flex-direction: column;
+  }
+}
+
+.preAuthMainContainer,
+.form {
+  flex: 1;
 }
