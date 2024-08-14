@@ -100,6 +100,7 @@
   "pickLabRequest": "Pick Lab Request",
   "policyNumber": "Policy number",
   "preauth": "Create Pre-Auth Request",
+  "preAuthRequestError": "Pre-authorization request error page",
   "previousPage": "Previous page",
   "prices": "Prices",
   "printingInvoice": "Printing invoice...",
