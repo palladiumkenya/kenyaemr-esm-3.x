@@ -58,6 +58,7 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
     launchWorkspace('edit-bill-form', {
       workspaceTitle: t('editBillForm', 'Edit Bill Form'),
       lineItem,
+      bill,
     });
   };
 
