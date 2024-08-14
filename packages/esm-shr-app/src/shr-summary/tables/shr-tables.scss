@@ -3,11 +3,6 @@
 @use '@carbon/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-@use '@carbon/colors';
-@use '@carbon/layout';
-@use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
-
 .widgetContainer {
   background-color: colors.$white-0;
   border: 1px solid colors.$gray-20;
@@ -31,6 +26,10 @@
   color: colors.$gray-70;
   margin-top: layout.$layout-05;
   margin-bottom: layout.$spacing-03;
+}
+
+.btnOutline {
+  border-color: colors.$blue-60;
 }
 
 .desktopHeading,

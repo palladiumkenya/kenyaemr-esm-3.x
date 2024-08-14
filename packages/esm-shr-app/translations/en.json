@@ -8,6 +8,7 @@
   "complaints": "Complaints",
   "completed": "Completed",
   "conditions": "Conditions",
+  "Conditopns": "Conditions",
   "dateRecorded": "Date Recorded",
   "dateReferred": "Date Referred",
   "diagnosis": "Diagnosis",
@@ -52,6 +53,7 @@
   "severity": "Severity",
   "sharedhealthrecords": "Shared Health Records",
   "shrPatientSHRSummary": "Patient SHR Summary",
+  "shrRecords": "SHR Records",
   "status": "Status",
   "value": "Value",
   "vitals": "Vitals"
