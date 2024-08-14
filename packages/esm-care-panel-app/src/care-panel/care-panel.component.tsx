@@ -10,7 +10,6 @@ import RegimenHistory from '../regimen/regimen-history.component';
 import first from 'lodash/first';
 import sortBy from 'lodash/sortBy';
 import { ErrorState } from '@openmrs/esm-framework';
-import CarePrograms from '../care-programs/care-programs.component';
 
 interface CarePanelProps {
   patientUuid: string;
@@ -26,12 +25,12 @@ type SwitcherItem = {
 
 const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launchPatientWorkspace }) => {
   const { t } = useTranslation();
-  const { isLoading, error, enrollments } = useEnrollmentHistory(patientUuid);
+  const { isLoading, error, enrollments, isValidating } = useEnrollmentHistory(patientUuid);
   const switcherHeaders = sortBy(Object.keys(enrollments || {}));
   const [switchItem, setSwitcherItem] = useState<SwitcherItem>({ index: 0 });
   const patientEnrollments = useMemo(
     () => (isLoading ? [] : enrollments[switchItem?.name || first(switcherHeaders)]),
-    [enrollments, isLoading, switchItem?.name, switcherHeaders],
+    [enrollments, isLoading, switchItem?.name, switcherHeaders, isValidating],
   );
 
   if (isLoading) {
