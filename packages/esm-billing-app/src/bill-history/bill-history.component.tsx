@@ -93,24 +93,16 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   }
 
   if (error) {
-    return (
-      <div className={styles.errorContainer}>
-        <Layer>
-          <ErrorState error={error} headerTitle={t('billsList', 'Bill list')} />
-        </Layer>
-      </div>
-    );
+    return <ErrorState error={error} headerTitle={t('billsList', 'Bill list')} />;
   }
 
   if (bills.length === 0) {
     return (
-      <Layer>
-        <EmptyState
-          displayText={''}
-          headerTitle={t('patientBilling', 'Patient billing')}
-          launchForm={handleLaunchBillForm}
-        />
-      </Layer>
+      <EmptyState
+        displayText={'Patient Billing'}
+        headerTitle={t('patientBilling', 'Patient billing')}
+        launchForm={handleLaunchBillForm}
+      />
     );
   }
 
