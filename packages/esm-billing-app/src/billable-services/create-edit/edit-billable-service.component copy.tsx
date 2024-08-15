@@ -50,12 +50,18 @@ const paymentFormSchema = z.object({
 export type FormData = z.infer<typeof paymentFormSchema>;
 const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '1', uuid: null };
 type AddBillableServiceProps = {
-  initialValues?: FormData;
-  serviceId?: string;
-  serviceConcept?: any;
+  initialValues: FormData;
+  serviceId: string;
+  serviceConcept: any;
 };
-const AddBillableService = () => {
+const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues, serviceId, serviceConcept }) => {
   const { t } = useTranslation();
+  useEffect(() => {
+    if (!serviceId) {
+      handleRedirectToAddService();
+    }
+  }, [serviceId, navigate]);
+
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const { serviceTypes, isLoading: isLoadingServicesTypes } = useServiceTypes();
   const {
@@ -64,6 +70,7 @@ const AddBillableService = () => {
     formState: { errors, isValid },
   } = useForm<FormData>({
     mode: 'all',
+    defaultValues: initialValues ?? { payment: [DEFAULT_PAYMENT_OPTION] },
     resolver: zodResolver(paymentFormSchema),
   });
 
@@ -76,7 +83,7 @@ const AddBillableService = () => {
   const searchInputRef = useRef(null);
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
-  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(null);
+  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(serviceConcept ?? null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
@@ -113,26 +120,51 @@ const AddBillableService = () => {
     payload.serviceStatus = 'ENABLED';
     payload.concept = selectedConcept?.concept?.uuid;
 
-    createBillableService(payload).then(
-      (resp) => {
-        showSnackbar({
-          title: t('billableService', 'Billable service'),
-          subtitle: 'Billable service created successfully',
-          kind: 'success',
-          isLowContrast: true,
-          timeoutInMs: 3000,
-        });
-        handleNavigateToServiceDashboard();
-      },
-      (error) => {
-        showSnackbar({
-          title: 'Error adding billable service',
-          kind: 'error',
-          subtitle: extractErrorMessagesFromResponse(error.responseBody),
-          isLowContrast: true,
-        });
-      },
-    );
+    if (initialValues && serviceId) {
+      // If editing, ensure uuid is passed
+      payload.uuid = serviceId;
+      createBillableService(payload).then(
+        (resp) => {
+          showSnackbar({
+            title: t('billableService', 'Billable Service'),
+            subtitle: 'Billable service updated successfully',
+            kind: 'success',
+            isLowContrast: true,
+            timeoutInMs: 3000,
+          });
+          handleNavigateToServiceDashboard();
+        },
+        (error) => {
+          showSnackbar({
+            title: 'Error updating billable service',
+            kind: 'error',
+            subtitle: extractErrorMessagesFromResponse(error.responseBody),
+            isLowContrast: true,
+          });
+        },
+      );
+    } else {
+      createBillableService(payload).then(
+        (resp) => {
+          showSnackbar({
+            title: t('billableService', 'Billable service'),
+            subtitle: 'Billable service created successfully',
+            kind: 'success',
+            isLowContrast: true,
+            timeoutInMs: 3000,
+          });
+          handleNavigateToServiceDashboard();
+        },
+        (error) => {
+          showSnackbar({
+            title: 'Error adding billable service',
+            kind: 'error',
+            subtitle: extractErrorMessagesFromResponse(error.responseBody),
+            isLowContrast: true,
+          });
+        },
+      );
+    }
   };
 
   if (isLoadingServicesTypes || isLoadingPaymentModes) {
@@ -266,6 +298,7 @@ const AddBillableService = () => {
           <Controller
             control={control}
             name="serviceTypeName"
+            defaultValue={initialValues?.serviceTypeName || ''}
             render={({ field }) => {
               return (
                 <ComboBox
@@ -292,6 +325,7 @@ const AddBillableService = () => {
             <Controller
               control={control}
               name={`payment.${index}.paymentMode`}
+              defaultValue={initialValues?.payment?.[index]?.paymentMode || ''}
               render={({ field }) => {
                 return (
                   <Layer>
@@ -364,4 +398,4 @@ function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; 
   return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
-export default AddBillableService;
+export default EditBillableService;
