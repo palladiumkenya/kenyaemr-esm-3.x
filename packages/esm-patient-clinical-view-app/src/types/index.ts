@@ -148,3 +148,57 @@ export interface HTSEncounter {
     };
   }[];
 }
+
+export interface BedDetails extends Bed {
+  patient: null | {
+    uuid: string;
+    person: {
+      gender: string;
+      age: number;
+      preferredName: {
+        givenName: string;
+        familyName: string;
+      };
+    };
+    identifiers: Array<{ identifier: string }>;
+  };
+}
+
+export type AdmissionLocation = {
+  ward: {
+    uuid: string;
+    display: string;
+    name: string;
+    description: string;
+  };
+  totalBeds: number;
+  occupiedBeds: number;
+  bedLayouts: Array<BedDetails>;
+};
+
+export interface Bed {
+  id: number;
+  bedId: number;
+  uuid: string;
+  bedNumber: string;
+  bedType: {
+    uuid: string;
+    name: string;
+    displayName: string;
+    description: string;
+    resourceVersion: string;
+  };
+  row: number;
+  column: number;
+  status: 'AVAILABLE' | string;
+  location: string;
+}
+
+export type MappedBedData = Array<{
+  id: number;
+  number: string;
+  name: string;
+  description: string;
+  status: string;
+  uuid: string;
+}>;
