@@ -53,6 +53,10 @@
       "name": "shr-authorization-form"
     },
     {
+      "component": "benefitsEligibilyRequestForm",
+      "name": "benefits-eligibility-request-form"
+    },
+    {
       "name": "billing-patient-summary",
       "component": "billingPatientSummary",
       "slot": "patient-chart-billing-dashboard-slot",
