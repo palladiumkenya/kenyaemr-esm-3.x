@@ -10,6 +10,7 @@ import { BillableServicesSideNav } from './billable-services-sidenav.component';
 import { navigate, showModal } from '@openmrs/esm-framework';
 import { ServiceConcept } from '../types';
 import EditBillableService from './create-edit/edit-billable-service.component copy';
+import ManageCommodityPrices from './manage-commodity-price/manage-commodity-price.component';
 
 const BillableServiceHome: React.FC = () => {
   const { t } = useTranslation();
@@ -75,6 +76,7 @@ const BillableServiceHome: React.FC = () => {
               }
             />
             <Route path="/bill-manager" element={<BillManager />} />
+            <Route path="/manage-commodity-prices" element={<ManageCommodityPrices />} />
           </Routes>
         </section>
       </main>
