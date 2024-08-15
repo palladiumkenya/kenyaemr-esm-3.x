@@ -73,7 +73,6 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
     defaultValues: initialValues ?? { payment: [DEFAULT_PAYMENT_OPTION] },
     resolver: zodResolver(paymentFormSchema),
   });
-
   const { fields, remove, append } = useFieldArray({ name: 'payment', control: control });
 
   const handleAppendPaymentMode = useCallback(() => append(DEFAULT_PAYMENT_OPTION), [append]);
@@ -119,52 +118,28 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
     payload.servicePrices = servicePrices;
     payload.serviceStatus = 'ENABLED';
     payload.concept = selectedConcept?.concept?.uuid;
+    payload.uuid = serviceId;
 
-    if (initialValues && serviceId) {
-      // If editing, ensure uuid is passed
-      payload.uuid = serviceId;
-      createBillableService(payload).then(
-        (resp) => {
-          showSnackbar({
-            title: t('billableService', 'Billable Service'),
-            subtitle: 'Billable service updated successfully',
-            kind: 'success',
-            isLowContrast: true,
-            timeoutInMs: 3000,
-          });
-          handleNavigateToServiceDashboard();
-        },
-        (error) => {
-          showSnackbar({
-            title: 'Error updating billable service',
-            kind: 'error',
-            subtitle: extractErrorMessagesFromResponse(error.responseBody),
-            isLowContrast: true,
-          });
-        },
-      );
-    } else {
-      createBillableService(payload).then(
-        (resp) => {
-          showSnackbar({
-            title: t('billableService', 'Billable service'),
-            subtitle: 'Billable service created successfully',
-            kind: 'success',
-            isLowContrast: true,
-            timeoutInMs: 3000,
-          });
-          handleNavigateToServiceDashboard();
-        },
-        (error) => {
-          showSnackbar({
-            title: 'Error adding billable service',
-            kind: 'error',
-            subtitle: extractErrorMessagesFromResponse(error.responseBody),
-            isLowContrast: true,
-          });
-        },
-      );
-    }
+    createBillableService(payload).then(
+      (resp) => {
+        showSnackbar({
+          title: t('billableService', 'Billable Service'),
+          subtitle: 'Billable service updated successfully',
+          kind: 'success',
+          isLowContrast: true,
+          timeoutInMs: 3000,
+        });
+        handleNavigateToServiceDashboard();
+      },
+      (error) => {
+        showSnackbar({
+          title: 'Error updating billable service',
+          kind: 'error',
+          subtitle: extractErrorMessagesFromResponse(error.responseBody),
+          isLowContrast: true,
+        });
+      },
+    );
   };
 
   if (isLoadingServicesTypes || isLoadingPaymentModes) {
@@ -298,7 +273,7 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
           <Controller
             control={control}
             name="serviceTypeName"
-            defaultValue={initialValues?.serviceTypeName || ''}
+            // defaultValue={initialValues?.serviceTypeName || null}
             render={({ field }) => {
               return (
                 <ComboBox
@@ -325,7 +300,6 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
             <Controller
               control={control}
               name={`payment.${index}.paymentMode`}
-              defaultValue={initialValues?.payment?.[index]?.paymentMode || ''}
               render={({ field }) => {
                 return (
                   <Layer>
