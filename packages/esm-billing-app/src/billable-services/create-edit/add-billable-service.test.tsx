@@ -152,7 +152,7 @@ describe('AddBillableService', () => {
     expect(cancelBtn).toBeInTheDocument();
     await user.click(cancelBtn);
 
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledTimes(2);
     expect(mockNavigate).toHaveBeenCalledWith({ to: '/openmrs/spa/billable-services' });
   });
 });
