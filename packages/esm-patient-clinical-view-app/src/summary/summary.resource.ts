@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 import { FetchResponse, openmrsFetch, showToast } from '@openmrs/esm-framework';
 import { Bed, AdmissionLocation, MappedBedData } from '../types';
-// import type { AdmissionLocation, Bed, MappedBedData } from '../types';
 
 export const useLocationsByTag = (locationUuid: string) => {
   const locationsUrl = `/ws/rest/v1/location?tag=Admission&v=full`;

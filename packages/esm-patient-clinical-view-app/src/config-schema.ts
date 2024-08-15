@@ -269,6 +269,26 @@ export interface ConfigObject {
   };
   familyRelationshipsTypeList: Array<{ uuid: string; display: string }>;
   pnsRelationships: Array<{ uuid: string; display: string; sexual: boolean }>;
+  admissionLocationTagUuid: {
+    _type: Type.UUID;
+    _description: 'UUID for the location tag of the `Admission Location`. Patients may only be admitted to inpatient care in a location with this tag';
+    _default: '233de33e-2778-4f9a-a398-fa09da9daa14';
+  };
+  inpatientVisitUuid: {
+    _type: Type.UUID;
+    _description: 'UUID for the inpatient visit';
+    _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914';
+  };
+  restrictWardAdministrationToLoginLocation: {
+    _type: Type.Boolean;
+    _description: 'UUID for the inpatient visit';
+    _default: false;
+  };
+  patientListForAdmissionUrl: {
+    _type: Type.String;
+    _description: 'Endpoint for fetching list of patients eligible for ward admission';
+    _default: '';
+  };
   inPatientForms: {
     _type: Type.Array;
     _description: 'List of forms that can be filled out for in-patients';
