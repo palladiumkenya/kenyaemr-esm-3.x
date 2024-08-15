@@ -13,7 +13,6 @@
   "diagnosis": "Diagnosis",
   "discard": "Discard",
   "emptyReferralsMessage": " referral data",
-  "errorSHRSummary": "Error loading SHR summary",
   "facilityRefer": "Patient referred successfully",
   "facilityWide": "Facility Wide",
   "filterTable": "Filter table",
@@ -26,7 +25,6 @@
   "missingNupiIdentiferMessage": "The patient is missing  national patient unique identifier (NUPI). Please register the patient with the client registry to retrieve their referrals.",
   "name": "Name",
   "noRecordsToDisplay": "There are no new referrals to this facility",
-  "noSharedHealthRecordsFound": "No Shared Health Records Found",
   "noSHRRecords": "SHR Records have not been pulled",
   "nupi": "UPI",
   "onsetDate": "Onset Date",
@@ -56,6 +54,7 @@
   "shrPatientSHRSummary": "Patient SHR Summary",
   "shrPortal": "SHR Portal",
   "shrRecords": "SHR Records",
+  "shrRecordSummary": "SHR Records Summary",
   "status": "Status",
   "value": "Value",
   "vitals": "Vitals"
