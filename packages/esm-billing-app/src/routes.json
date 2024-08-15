@@ -123,6 +123,10 @@
       "component": "cancelBillModal"
     },
     {
+      "name": "soft-delete-billableservice-modal",
+      "component": "softDeleteBillableServiceModal"   
+    },
+    {
       "name": "refund-bill-modal",
       "component": "refundBillModal"
     },

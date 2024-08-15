@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './add-billable-service.scss';
 import {
   Form,
@@ -11,7 +11,6 @@ import {
   Search,
   Tile,
   FormLabel,
-  NumberInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,11 +23,12 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Add, TrashCan, WarningFilled } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, selectPreferredName, showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { ServiceConcept } from '../../types';
 import { extractErrorMessagesFromResponse } from '../../utils';
 
 const servicePriceSchema = z.object({
+  uuid: z.string({ required_error: 'Payment method is required' }),
   paymentMode: z.string({ required_error: 'Payment method is required' }),
   price: z
     .string()
@@ -47,22 +47,30 @@ const paymentFormSchema = z.object({
   concept: z.string({ required_error: 'Concept search is required.' }),
 });
 
-type FormData = z.infer<typeof paymentFormSchema>;
-const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '1' };
-
-const AddBillableService: React.FC = () => {
+export type FormData = z.infer<typeof paymentFormSchema>;
+const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '1', uuid: null };
+type AddBillableServiceProps = {
+  initialValues?: FormData;
+  serviceId?: string;
+  serviceConcept?: any;
+};
+const AddBillableService: React.FC<AddBillableServiceProps> = ({ initialValues, serviceId, serviceConcept }) => {
   const { t } = useTranslation();
+  useEffect(() => {
+    if (!serviceId) {
+      handleRedirectToAddService();
+    }
+  }, [serviceId, navigate]);
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const { serviceTypes, isLoading: isLoadingServicesTypes } = useServiceTypes();
-
   const {
     control,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<FormData>({
     mode: 'all',
-    defaultValues: {},
+    defaultValues: initialValues ?? { payment: [DEFAULT_PAYMENT_OPTION] },
     resolver: zodResolver(paymentFormSchema),
   });
 
@@ -75,7 +83,7 @@ const AddBillableService: React.FC = () => {
   const searchInputRef = useRef(null);
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
-  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(null);
+  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(serviceConcept ?? null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
@@ -89,11 +97,16 @@ const AddBillableService: React.FC = () => {
       to: window.getOpenmrsSpaBase() + 'billable-services',
     });
 
+  const handleRedirectToAddService = () =>
+    navigate({
+      to: window.getOpenmrsSpaBase() + 'billable-services/add-service',
+    });
+
   const onSubmit = (data: FormData) => {
     const payload: any = {};
-
     let servicePrices = data.payment.map((element) => {
       return {
+        uuid: element.uuid,
         name: paymentModes.filter((p) => p.uuid === element.paymentMode)[0].name,
         price: element.price,
         paymentMode: element.paymentMode,
@@ -107,26 +120,51 @@ const AddBillableService: React.FC = () => {
     payload.serviceStatus = 'ENABLED';
     payload.concept = selectedConcept?.concept?.uuid;
 
-    createBillableService(payload).then(
-      (resp) => {
-        showSnackbar({
-          title: t('billableService', 'Billable service'),
-          subtitle: 'Billable service created successfully',
-          kind: 'success',
-          isLowContrast: true,
-          timeoutInMs: 3000,
-        });
-        handleNavigateToServiceDashboard();
-      },
-      (error) => {
-        showSnackbar({
-          title: 'Error adding billable service',
-          kind: 'error',
-          subtitle: extractErrorMessagesFromResponse(error.responseBody),
-          isLowContrast: true,
-        });
-      },
-    );
+    if (initialValues && serviceId) {
+      // If editing, ensure uuid is passed
+      payload.uuid = serviceId;
+      createBillableService(payload).then(
+        (resp) => {
+          showSnackbar({
+            title: t('billableService', 'Billable Service'),
+            subtitle: 'Billable service updated successfully',
+            kind: 'success',
+            isLowContrast: true,
+            timeoutInMs: 3000,
+          });
+          handleNavigateToServiceDashboard();
+        },
+        (error) => {
+          showSnackbar({
+            title: 'Error updating billable service',
+            kind: 'error',
+            subtitle: extractErrorMessagesFromResponse(error.responseBody),
+            isLowContrast: true,
+          });
+        },
+      );
+    } else {
+      createBillableService(payload).then(
+        (resp) => {
+          showSnackbar({
+            title: t('billableService', 'Billable service'),
+            subtitle: 'Billable service created successfully',
+            kind: 'success',
+            isLowContrast: true,
+            timeoutInMs: 3000,
+          });
+          handleNavigateToServiceDashboard();
+        },
+        (error) => {
+          showSnackbar({
+            title: 'Error adding billable service',
+            kind: 'error',
+            subtitle: extractErrorMessagesFromResponse(error.responseBody),
+            isLowContrast: true,
+          });
+        },
+      );
+    }
   };
 
   if (isLoadingServicesTypes || isLoadingPaymentModes) {
@@ -260,20 +298,24 @@ const AddBillableService: React.FC = () => {
           <Controller
             control={control}
             name="serviceTypeName"
-            render={({ field }) => (
-              <ComboBox
-                id="serviceType"
-                items={serviceTypes ?? []}
-                titleText={t('serviceType', 'Service Type')}
-                itemToString={(item: { display: string }) => (item ? item.display : '')}
-                placeholder="Select service type"
-                required
-                {...field}
-                onChange={({ selectedItem }) => field.onChange(selectedItem ? selectedItem.display : '')}
-                invalidText={errors.serviceTypeName?.message || ''}
-                invalid={!!errors.serviceTypeName}
-              />
-            )}
+            defaultValue={initialValues?.serviceTypeName || ''}
+            render={({ field }) => {
+              return (
+                <ComboBox
+                  id="serviceType"
+                  items={serviceTypes ?? []}
+                  titleText={t('serviceType', 'Service Type')}
+                  itemToString={(item) => (item ? item.display : '')}
+                  placeholder="Select service type"
+                  initialSelectedItem={serviceTypes.find((item) => item.uuid == field.value) ?? null}
+                  onChange={({ selectedItem }) => {
+                    field.onChange(selectedItem ? selectedItem?.uuid : '');
+                  }}
+                  invalidText={errors.serviceTypeName?.message || ''}
+                  invalid={!!errors.serviceTypeName}
+                />
+              );
+            }}
           />
         </div>
       </section>
@@ -283,21 +325,26 @@ const AddBillableService: React.FC = () => {
             <Controller
               control={control}
               name={`payment.${index}.paymentMode`}
-              render={({ field }) => (
-                <Layer>
-                  <Dropdown
-                    id={`paymentMode-${index}`}
-                    onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
-                    titleText={t('paymentMode', 'Payment Mode')}
-                    label={t('selectPaymentMethod', 'Select payment method')}
-                    items={paymentModes ?? []}
-                    itemToString={(item) => (item ? item.name : '')}
-                    invalid={!!errors?.payment?.[index]?.paymentMode}
-                    invalidText={errors?.payment?.[index]?.paymentMode?.message}
-                  />
-                </Layer>
-              )}
+              defaultValue={initialValues?.payment?.[index]?.paymentMode || ''}
+              render={({ field }) => {
+                return (
+                  <Layer>
+                    <Dropdown
+                      id={`paymentMode-${index}`}
+                      onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
+                      titleText={t('paymentMode', 'Payment Mode')}
+                      label={t('selectPaymentMethod', 'Select payment method')}
+                      items={paymentModes ?? []}
+                      itemToString={(item) => (item ? item.name : '')}
+                      invalid={!!errors?.payment?.[index]?.paymentMode}
+                      invalidText={errors?.payment?.[index]?.paymentMode?.message}
+                      initialSelectedItem={paymentModes?.find((item) => item.uuid === field.value) || null}
+                    />
+                  </Layer>
+                );
+              }}
             />
+
             <Controller
               control={control}
               name={`payment.${index}.price`}

@@ -38,6 +38,16 @@ export const createBillableService = (payload: any) => {
     },
   });
 };
+export const deleteBillableService = (payload: any) => {
+  const url = `/ws/rest/v1/cashier/api/deletebillable-service`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: payload,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
 
 export function useConceptsSearch(conceptToLookup: string) {
   const conditionsSearchUrl = `/ws/rest/v1/conceptsearch?q=${conceptToLookup}`;
