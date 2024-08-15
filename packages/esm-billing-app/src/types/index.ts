@@ -289,5 +289,17 @@ export enum PaymentStatus {
 
 export interface Package {
   uuid: string;
-  name: string;
+  shaPackageCode: string;
+  shaPackageName: string;
+  packageAccessPoint: 'OP' | 'IP' | 'Both';
+}
+
+export interface PatientBenefit {
+  shaPackageCode: string;
+  shaPackageName: string;
+  shaInterventionCode: string;
+  shaInterventionName?: string;
+  shaInterventioTariff: number;
+  requirePreauth: boolean;
+  status: 'APPROVED' | 'PENDING' | 'REJECTED';
 }

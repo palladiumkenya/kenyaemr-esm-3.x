@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Package } from '../types';
+import { PatientBenefit } from '../types';
 
 export const eligibilityRequestShema = z.object({
   patientUuid: z.string().uuid(),
@@ -11,5 +11,15 @@ export const eligibilityRequestShema = z.object({
 });
 
 export const requestEligibility = async (data: z.infer<typeof eligibilityRequestShema>) => {
-  return [] as Array<Package>;
+  return [
+    {
+      shaPackageCode: 'SHA-001',
+      shaPackageName: 'Eye Care',
+      shaInterventionCode: 'SHA-001-01',
+      shaInterventionName: '',
+      shaInterventioTariff: 50000,
+      requirePreauth: true,
+      status: 'APPROVED',
+    },
+  ] as Array<PatientBenefit>;
 };

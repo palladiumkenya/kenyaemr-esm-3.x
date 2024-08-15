@@ -5,7 +5,20 @@ import { generateOfflineUuid } from '@openmrs/esm-framework';
 const usePackages = () => {
   return {
     isLoading: false,
-    packages: [{ name: 'Package 1', uuid: generateOfflineUuid().split('+').at(-1) }] as Array<Package>,
+    packages: [
+      {
+        shaPackageName: 'Package 1',
+        uuid: generateOfflineUuid().split('+').at(-1),
+        packageAccessPoint: 'IP',
+        shaPackageCode: '',
+      },
+      {
+        shaPackageName: 'Package 2',
+        uuid: generateOfflineUuid().split('+').at(-1),
+        packageAccessPoint: 'IP',
+        shaPackageCode: '',
+      },
+    ] as Array<Package>,
     error: undefined,
   };
 };

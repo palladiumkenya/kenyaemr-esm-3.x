@@ -17,13 +17,13 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import usePackages from '../../hooks/usePackages';
 import useProvider from '../../hooks/useProvider';
-import { Package } from '../../types';
+import { Package, PatientBenefit } from '../../types';
 import { eligibilityRequestShema, requestEligibility } from '../benefits-package.resources';
 import styles from './benefits-eligibility-request-form.scss';
 
 interface BenefitsEligibilyRequestFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
-  onSuccess: (elibibleBenefits: Array<Package>) => {};
+  onSuccess: (elibibleBenefits: Array<PatientBenefit>) => {};
 }
 
 type EligibilityRequest = z.infer<typeof eligibilityRequestShema>;
@@ -175,7 +175,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                     initialSelectedItem={field.value}
                     label="Choose package"
                     items={packages.map((r) => r.uuid)}
-                    itemToString={(item) => packages.find((r) => r.uuid === item)?.name ?? ''}
+                    itemToString={(item) => packages.find((r) => r.uuid === item)?.shaPackageName ?? ''}
                   />
                 )}
               </>
