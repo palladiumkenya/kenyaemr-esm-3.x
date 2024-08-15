@@ -1,14 +1,16 @@
 import { Button, Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { CardHeader, EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType } from '@openmrs/esm-framework';
+import {
+  CardHeader,
+  EmptyDataIllustration,
+  getPatientUuidFromUrl,
+  launchPatientWorkspace,
+} from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './shr-tables.scss';
-import { useParams } from 'react-router-dom';
-import useCurrentPatient from '../../hooks/useCurrentPatient';
-import { ExpansionPannel } from '../expansion-pannel';
 import SharedHealthRecordsSummary from '../../shrpatient-summary/shrpatient-summary.component';
+import styles from './shr-tables.scss';
 
 interface PatientSHRSummartTableProps {}
 
@@ -17,11 +19,12 @@ const PatientSHRSummartTable: React.FC<PatientSHRSummartTableProps> = () => {
   const [pageSize, setPageSize] = useState(10);
   const layout = useLayoutType();
   const headerTitle = t('shrRecords', 'SHR Records');
-  const patientUuid = useCurrentPatient();
+
+  const patientUuid = getPatientUuidFromUrl();
   const [accessGranted, setAccessGranted] = useState(false);
 
   const handleInitiateAuthorization = () => {
-    launchWorkspace('shr-authorization-form', {
+    launchPatientWorkspace('shr-authorization-form', {
       workspaceTitle: 'SHR Pull Authorization Form',
       patientUuid,
       onVerified: () => {

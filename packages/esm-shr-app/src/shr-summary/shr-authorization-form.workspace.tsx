@@ -19,6 +19,7 @@ type SHRAuthorizationFormType = z.infer<typeof authorizationSchema>;
 const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({ closeWorkspace, patientUuid, onVerified }) => {
   const form = useForm<SHRAuthorizationFormType>({
     defaultValues: {
+      // To be replaced with patient and provider phone numbers
       sender: '+254793889658',
       receiver: '+254793889658',
     },

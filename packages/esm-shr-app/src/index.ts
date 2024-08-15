@@ -8,7 +8,7 @@ import ReferralReasonsDialogPopup from './referrals/referral-reasons/referral-re
 import ReferralChartView from './referrals/patient-chart/referral-chart-view.component';
 import FacilityRefferalForm from './workspace/referrals.workspace.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
-import SHRSummaryPanell from './shr-summary/shr-summary.component';
+import SHRSummaryPanel from './shr-summary/shr-summary.component';
 
 const moduleName = '@kenyaemr/esm-shr-app';
 
@@ -55,5 +55,5 @@ export const referralLink = getSyncLifecycle(createDashboardLink(referralDashboa
 export const facilityRefferalForm = getSyncLifecycle(FacilityRefferalForm, options);
 
 // SHR Summary
-export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanell, options);
+export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanel, options);
 export const shrAuthorizationForm = getSyncLifecycle(SHRAuthorizationForm, options);
