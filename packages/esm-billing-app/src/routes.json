@@ -6,7 +6,7 @@
   "pages": [
     {
       "component": "billableServicesHome",
-      "route":"billable-services"
+      "route": "billable-services"
     },
     {
       "component": "requirePaymentModal",
@@ -68,7 +68,6 @@
         "slot": "patient-chart-billing-dashboard-slot",
         "path": "Billing",
         "layoutMode": "anchored"
-
       }
     },
     
@@ -77,7 +76,6 @@
       "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
     },
-    
     {
       "slot": "system-admin-page-card-link-slot",
       "component": "billableServicesCardLink",
@@ -103,11 +101,11 @@
     },
     {
       "name": "cancel-bill-modal",
-      "component": "cancelBillModal"   
+      "component": "cancelBillModal"
     },
     {
       "name": "refund-bill-modal",
-      "component": "refundBillModal"   
+      "component": "refundBillModal"
     },
     {
       "name": "delete-bill-modal",

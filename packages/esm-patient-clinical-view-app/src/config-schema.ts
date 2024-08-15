@@ -17,8 +17,8 @@ export const configSchema = {
       {
         id: 'high-iit-intervention',
         title: 'High IIT Intervention Form',
-        formUuid: 'd86a77bd-769a-47ec-942a-716afbd907cc',
-        encounterTypeUuid: 'a0034eee-1940-4e35-847f-97537a35d05e',
+        formUuid: '6817d322-f938-4f38-8ccf-caa6fa7a499f',
+        encounterTypeUuid: '84d66c25-e2bd-48a2-8686-c1652eb9d283',
       },
       {
         id: 'home-visit-checklist',
