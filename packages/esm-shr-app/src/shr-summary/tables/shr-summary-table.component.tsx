@@ -8,6 +8,7 @@ import styles from './shr-tables.scss';
 import { useParams } from 'react-router-dom';
 import useCurrentPatient from '../../hooks/useCurrentPatient';
 import { ExpansionPannel } from '../expansion-pannel';
+import SharedHealthRecordsSummary from '../../shrpatient-summary/shrpatient-summary.component';
 
 interface PatientSHRSummartTableProps {}
 
@@ -53,8 +54,7 @@ const PatientSHRSummartTable: React.FC<PatientSHRSummartTableProps> = () => {
     );
   }
 
-  return <ExpansionPannel />;
-  // return <EmptyState displayText={t('shrRecords', 'SHR Records')} headerTitle={t('shrRecords', 'SHR Records')} />;
+  return <SharedHealthRecordsSummary patientUuid={patientUuid} />;
 };
 
 export default PatientSHRSummartTable;

@@ -33,6 +33,7 @@
         "columnSpan": 4
       }
     },
+    
     {
       "name": "referrals",
       "slot": "referrals-slot",

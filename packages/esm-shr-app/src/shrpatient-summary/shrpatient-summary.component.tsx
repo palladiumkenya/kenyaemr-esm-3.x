@@ -8,6 +8,7 @@ import { Printer } from '@carbon/react/icons';
 import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print-layout/print.component';
 import SHRDataTable from './shrDataTable.component';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 interface SHRSummaryProps {
   patientUuid: string;
@@ -43,7 +44,7 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
 
   // If there is an error
   if (isError) {
-    return <span>{t('errorSHRSummary', 'Error loading SHR summary')}</span>;
+    return <ErrorState error={isError} headerTitle={t('shrRecordSummary', 'SHR Records Summary')} />;
   }
 
   // If there is no data
@@ -267,11 +268,7 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
       </div>
     );
   } else {
-    return (
-      <div>
-        <h4 className={styles.title}> {t('noSharedHealthRecordsFound', 'No Shared Health Records Found')}</h4>
-      </div>
-    );
+    return <EmptyState displayText={t('shrRecords', 'SHR Records')} headerTitle={t('shrRecords', 'SHR Records')} />;
   }
 };
 
