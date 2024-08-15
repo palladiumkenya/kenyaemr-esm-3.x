@@ -15,7 +15,7 @@ const ManageCommodityPrices = () => {
     <div>
       <Tabs onChange={handleTabChange} selectedIndex={activeTabIndex}>
         <TabList>
-          <Tab>{t('search','Search')}</Tab>
+          <Tab>{t('search', 'Search')}</Tab>
         </TabList>
       </Tabs>
     </div>
