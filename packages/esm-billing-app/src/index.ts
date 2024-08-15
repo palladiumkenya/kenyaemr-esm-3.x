@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
@@ -26,6 +26,7 @@ import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
 import SHRSummaryPanell from './shr-summary/shr-summary.component';
+import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -63,18 +64,19 @@ export const claimsManagementSideNavGroup = getSyncLifecycle(
 );
 export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'claims-managment/claims-overview',
-    title: 'Overview',
+    name: 'billing/claims-overview',
+    title: 'Claims Overview',
   }),
   options,
 );
 export const preAuthRequestsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'claims-management/preauth-requests',
+    name: 'preauth-requests',
     title: 'Pre-Auth Requests',
   }),
   options,
 );
+export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 
 export const benefitsPackageDashboardLink = getSyncLifecycle(
   createDashboardLink({
