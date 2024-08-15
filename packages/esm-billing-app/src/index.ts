@@ -1,5 +1,5 @@
 import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
@@ -50,6 +50,28 @@ export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billing',
     title: 'Billing',
+  }),
+  options,
+);
+export const claimsManagementSideNavGroup = getSyncLifecycle(
+  createDashboardGroup({
+    title: 'Claims Management',
+    slotName: 'claims-management-dashboard-link-slot',
+    isExpanded: false,
+  }),
+  options,
+);
+export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'claims-managment/claims-overview',
+    title: 'Overview',
+  }),
+  options,
+);
+export const preAuthRequestsDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'claims-management/preauth-requests',
+    title: 'Pre-Auth Requests',
   }),
   options,
 );
