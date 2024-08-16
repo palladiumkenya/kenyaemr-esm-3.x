@@ -12,3 +12,9 @@
 .billsTableContainer {
   margin: layout.$spacing-03 layout.$spacing-01;
 }
+
+.loadingContainer,
+.errorStateContainer,
+.emptyStateContainer {
+  margin-top: layout.$spacing-05;
+}

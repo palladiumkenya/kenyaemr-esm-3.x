@@ -12,12 +12,11 @@ import {
   TableCell,
   Tile,
 } from '@carbon/react';
-import { convertToCurrency, extractBillableServiceReadableString, extractString } from '../helpers';
+import { convertToCurrency, extractString } from '../helpers';
 import { useTranslation } from 'react-i18next';
 import { MappedBill } from '../types';
 import styles from '../bills-table/bills-table.scss';
 import { ConfigurableLink } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 type PatientBillsProps = {
   bills: Array<MappedBill>;
@@ -45,14 +44,10 @@ export const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
         {bill.dateCreated}
       </ConfigurableLink>
     ),
-    billableService: extractBillableServiceReadableString(bill.billingService),
+    billableService: extractString(bill.billingService),
     totalAmount: convertToCurrency(bill.totalAmount),
     status: bill.status,
   }));
-
-  if (bills.length === 0) {
-    <EmptyState displayText={'Pending Patient Bills Found'} headerTitle={'No Pending Patient Bills Found'} />;
-  }
 
   return (
     <div className={styles.container}>
