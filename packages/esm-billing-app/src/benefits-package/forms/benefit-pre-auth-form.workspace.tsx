@@ -1,14 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  Column,
-  Dropdown,
-  DropdownSkeleton,
-  Form,
-  InlineNotification,
-  MultiSelect,
-  Stack,
-} from '@carbon/react';
+import { Button, Column, Dropdown, DropdownSkeleton, Form, MultiSelect, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showSnackbar, useSession, useVisit } from '@openmrs/esm-framework';
 import React from 'react';
@@ -16,25 +6,20 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import useInterventions from '../../hooks/useInterventions';
-import usePackages from '../../hooks/usePackages';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
 import { PatientBenefit } from '../../types';
-import { eligibilityRequestShema, requestEligibility } from '../benefits-package.resources';
+import { preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-eligibility-request-form.scss';
 
-interface BenefitsEligibilyRequestFormProps extends DefaultWorkspaceProps {
+type BenefitsPreAuth = z.infer<typeof preauthSchema>;
+
+interface BenefitPreAuthFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
-  onSuccess: (elibibleBenefits: Array<PatientBenefit>) => {};
+  benefit: PatientBenefit;
 }
 
-type EligibilityRequest = z.infer<typeof eligibilityRequestShema>;
-
-const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> = ({
-  closeWorkspace,
-  patientUuid,
-  onSuccess,
-}) => {
+const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid, benefit }) => {
   const { t } = useTranslation();
   const {
     currentVisit: { patient },
@@ -46,35 +31,54 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
     sessionLocation: { uuid: facilityUuid, display: facilityName },
   } = useSession();
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
-  const { isLoading: packagesLoading, error, packages } = usePackages();
   const { isLoading: intervensionsLoading, interventions } = useInterventions();
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
-  const form = useForm<EligibilityRequest>({
+  const form = useForm<BenefitsPreAuth>({
     defaultValues: {
       providerUuid,
       patientUuid,
       facilityUuid,
       diagnosisUuids: [],
-      isRefered: false,
+      patientBenefit: benefit.shaPackageCode,
       intervensions: [],
     },
-    resolver: zodResolver(eligibilityRequestShema),
+    resolver: zodResolver(preauthSchema),
   });
 
-  const onSubmit = async (values: EligibilityRequest) => {
+  const onSubmit = async (values: BenefitsPreAuth) => {
     try {
-      const response = await requestEligibility(values);
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Eligibility requested succesfully' });
-      closeWorkspace();
-      onSuccess(response);
+      // closeWorkspace();
+      // onSuccess(response);
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error requesting Eligibility' });
     }
   };
-
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
+        <Column>
+          <Controller
+            control={form.control}
+            name="patientBenefit"
+            render={({ field }) => (
+              <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                id="patientBenefit"
+                titleText={t('patientBenefit', 'Patient Benefit')}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
+                initialSelectedItem={field.value}
+                label="Choose option"
+                items={[benefit].map((r) => r.shaPackageCode)}
+                itemToString={(item) => [benefit].find((r) => r.shaPackageCode === item)?.shaPackageName ?? ''}
+              />
+            )}
+          />
+        </Column>
         <Column>
           <Controller
             control={form.control}
@@ -158,38 +162,6 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
         <Column>
           <Controller
             control={form.control}
-            name="packageUUid"
-            render={({ field }) => (
-              <>
-                {error ? (
-                  <InlineNotification
-                    kind="error"
-                    subtitle={t('errorFetchingPackages', 'Error fetching packeges')}
-                    lowContrast
-                  />
-                ) : (
-                  <Dropdown
-                    ref={field.ref}
-                    invalid={form.formState.errors[field.name]?.message}
-                    invalidText={form.formState.errors[field.name]?.message}
-                    id="package"
-                    titleText={t('package', 'Package')}
-                    onChange={(e) => {
-                      field.onChange(e.selectedItem);
-                    }}
-                    initialSelectedItem={field.value}
-                    label="Choose package"
-                    items={packages.map((r) => r.shaPackageCode)}
-                    itemToString={(item) => packages.find((r) => r.shaPackageCode === item)?.shaPackageName ?? ''}
-                  />
-                )}
-              </>
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
             name="diagnosisUuids"
             render={({ field }) => (
               <MultiSelect
@@ -233,20 +205,6 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
             )}
           />
         </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="isRefered"
-            render={({ field }) => (
-              <Checkbox
-                id="isRefred"
-                labelText="Is Referred"
-                checked={field.value}
-                onChange={(_, { checked }) => field.onChange(checked)}
-              />
-            )}
-          />
-        </Column>
       </Stack>
 
       <div className={styles.btnSet}>
@@ -261,4 +219,4 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
   );
 };
 
-export default BenefitsEligibilyRequestForm;
+export default BenefitPreAuthForm;

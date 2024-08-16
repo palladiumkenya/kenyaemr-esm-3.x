@@ -11,7 +11,12 @@ import {
 } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { usePagination } from '@openmrs/esm-framework';
-import { CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import {
+  CardHeader,
+  getPatientUuidFromUrl,
+  launchPatientWorkspace,
+  usePaginationInfo,
+} from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PatientBenefit } from '../../types';
@@ -22,25 +27,35 @@ type TableCoponentProps = {
 };
 const TableComponent: React.FC<TableCoponentProps> = ({ patientBenefits }) => {
   const { t } = useTranslation();
+  const patientUuid = getPatientUuidFromUrl();
   const headerTitle = t('benefits', 'Benefits');
   const [pageSize, setPageSize] = useState(10);
   const { results, totalPages, currentPage, goTo } = usePagination(patientBenefits, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
-
+  const handleLaunchPreAuthForm = (benefit: PatientBenefit) => {
+    // benefits-pre-auth-form
+    launchPatientWorkspace('benefits-pre-auth-form', {
+      workspaceTitle: 'Benefits Pre-Auth Form',
+      patientUuid,
+      benefit,
+    });
+  };
   const rows = patientBenefits.map((benefit) => ({
     id: benefit.shaPackageCode,
     ...benefit,
-    action: benefit.requirePreauth ? <Button renderIcon={ArrowRight}>Pre-Auth</Button> : '--',
+    action: benefit.requirePreauth ? (
+      <Button renderIcon={ArrowRight} onClick={() => handleLaunchPreAuthForm(benefit)}>
+        Pre-Auth
+      </Button>
+    ) : (
+      '--'
+    ),
   }));
 
   const headers = [
     {
       key: 'shaPackageCode',
-      header: 'Code',
-    },
-    {
-      key: 'status',
-      header: 'Approval status',
+      header: 'SHA Package Code',
     },
     {
       key: 'shaPackageName',
@@ -56,13 +71,18 @@ const TableComponent: React.FC<TableCoponentProps> = ({ patientBenefits }) => {
     },
     {
       key: 'shaInterventioTariff',
-      header: 'SHA Intervension Taarif',
+      header: 'SHA Intervension Tariff',
+    },
+    {
+      key: 'status',
+      header: 'Approval status',
     },
     {
       key: 'action',
       header: 'Action',
     },
   ];
+
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={headerTitle}>{''}</CardHeader>

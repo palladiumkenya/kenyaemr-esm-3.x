@@ -57,6 +57,10 @@
       "name": "benefits-eligibility-request-form"
     },
     {
+      "component": "benefitsPreAuthForm",
+      "name": "benefits-pre-auth-form"
+    },
+    {
       "name": "billing-patient-summary",
       "component": "billingPatientSummary",
       "slot": "patient-chart-billing-dashboard-slot",

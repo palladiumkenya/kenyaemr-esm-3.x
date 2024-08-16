@@ -198,4 +198,3 @@ export interface ReferralReasonsProps {
   messageId: number;
   referralDate?: string;
 }
-

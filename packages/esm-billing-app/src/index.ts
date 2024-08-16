@@ -27,6 +27,7 @@ import rootComponent from './root.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
 import SHRSummaryPanell from './shr-summary/shr-summary.component';
 import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
+import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -95,7 +96,7 @@ export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 export const benefitsEligibilyRequestForm = getSyncLifecycle(BenefitsEligibilyRequestForm, options);
-
+export const benefitsPreAuthForm = getSyncLifecycle(BenefitPreAuthForm, options);
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
