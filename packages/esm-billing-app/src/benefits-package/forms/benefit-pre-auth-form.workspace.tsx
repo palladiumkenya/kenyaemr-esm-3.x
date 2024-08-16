@@ -1,7 +1,7 @@
-import { Button, Column, Dropdown, DropdownSkeleton, Form, MultiSelect, Stack } from '@carbon/react';
+import { Button, Checkbox, Column, Dropdown, DropdownSkeleton, Form, MultiSelect, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showSnackbar, useSession, useVisit } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -9,7 +9,7 @@ import useInterventions from '../../hooks/useInterventions';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
 import { PatientBenefit } from '../../types';
-import { preauthSchema } from '../benefits-package.resources';
+import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-eligibility-request-form.scss';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
@@ -17,9 +17,10 @@ type BenefitsPreAuth = z.infer<typeof preauthSchema>;
 interface BenefitPreAuthFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   benefit: PatientBenefit;
+  onSuccess: (benefits: Array<PatientBenefit>) => void;
 }
 
-const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid, benefit }) => {
+const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid, benefit, onSuccess }) => {
   const { t } = useTranslation();
   const {
     currentVisit: { patient },
@@ -33,6 +34,8 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
   const { isLoading: intervensionsLoading, interventions } = useInterventions();
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
+  const [approve, setApprove] = useState<boolean | undefined>();
+
   const form = useForm<BenefitsPreAuth>({
     defaultValues: {
       providerUuid,
@@ -47,9 +50,10 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
 
   const onSubmit = async (values: BenefitsPreAuth) => {
     try {
-      showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Eligibility requested succesfully' });
-      // closeWorkspace();
-      // onSuccess(response);
+      const response = await preAuthenticateBenefit(values, approve);
+      showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Preauth Approved succesfully' });
+      closeWorkspace();
+      onSuccess(response);
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error requesting Eligibility' });
     }
@@ -203,6 +207,14 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
                 }
               />
             )}
+          />
+        </Column>
+        <Column>
+          <Checkbox
+            id="approved"
+            labelText="Approved"
+            checked={approve}
+            onChange={(_, { checked }) => setApprove(checked)}
           />
         </Column>
       </Stack>

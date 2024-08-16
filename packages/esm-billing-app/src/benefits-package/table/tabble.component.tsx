@@ -25,8 +25,9 @@ import styles from './benebfits-table.scss';
 type TableCoponentProps = {
   patientBenefits: Array<PatientBenefit>;
 };
-const TableComponent: React.FC<TableCoponentProps> = ({ patientBenefits }) => {
+const TableComponent: React.FC<TableCoponentProps> = ({ patientBenefits: benefits_ }) => {
   const { t } = useTranslation();
+  const [patientBenefits, setBenefits] = useState<Array<PatientBenefit>>(benefits_);
   const patientUuid = getPatientUuidFromUrl();
   const headerTitle = t('benefits', 'Benefits');
   const [pageSize, setPageSize] = useState(10);
@@ -38,6 +39,9 @@ const TableComponent: React.FC<TableCoponentProps> = ({ patientBenefits }) => {
       workspaceTitle: 'Benefits Pre-Auth Form',
       patientUuid,
       benefit,
+      onSuccess: (benefits) => {
+        setBenefits(benefits);
+      },
     });
   };
   const rows = patientBenefits.map((benefit) => ({
@@ -55,23 +59,23 @@ const TableComponent: React.FC<TableCoponentProps> = ({ patientBenefits }) => {
   const headers = [
     {
       key: 'shaPackageCode',
-      header: 'SHA Package Code',
+      header: 'Package Code',
     },
     {
       key: 'shaPackageName',
-      header: 'Name',
+      header: 'Package Name',
     },
     {
       key: 'shaInterventionCode',
-      header: 'SHA Intervension Code',
+      header: 'Intervension Code',
     },
     {
       key: 'shaInterventionName',
-      header: 'SHA Intervension Name',
+      header: 'Intervension Name',
     },
     {
       key: 'shaInterventioTariff',
-      header: 'SHA Intervension Tariff',
+      header: 'Intervension Tariff',
     },
     {
       key: 'status',

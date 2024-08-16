@@ -24,3 +24,17 @@ export const preauthSchema = z.object({
 export const requestEligibility = async (data: z.infer<typeof eligibilityRequestShema>) => {
   return [...patientBenefits] as Array<PatientBenefit>;
 };
+
+export const preAuthenticateBenefit = async (data: z.infer<typeof preauthSchema>, markeAsApproved?: boolean) => {
+  return patientBenefits.map((benefit) => ({
+    ...benefit,
+    status:
+      data.patientBenefit === benefit.shaPackageCode
+        ? markeAsApproved === true
+          ? 'APPROVED'
+          : markeAsApproved === false
+          ? 'REJECTED'
+          : 'PENDING'
+        : benefit.status,
+  }));
+};

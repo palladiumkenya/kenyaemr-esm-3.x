@@ -1,4 +1,4 @@
-import { Diagnosis, Package, SHAIntervension } from '../types';
+import { Diagnosis, Package, PatientBenefit, SHAIntervension } from '../types';
 
 export const patientBenefits = [
   {
@@ -19,7 +19,7 @@ export const patientBenefits = [
     requirePreauth: false,
     status: 'PENDING',
   },
-];
+] as Array<PatientBenefit>;
 
 export const packages = [
   {
