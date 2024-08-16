@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
@@ -96,4 +96,5 @@ export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
+  registerFeatureFlag('isPreAuthEnabled', 'Pre Auth form', 'Adds a form relating to pre auth request app.');
 }
