@@ -12,7 +12,7 @@ const useProvider = (uuid: string) => {
   return {
     provider: data?.data,
     error,
-    isLoading,
+    providerLoading: isLoading,
   };
 };
 

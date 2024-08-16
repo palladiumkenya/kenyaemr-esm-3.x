@@ -160,7 +160,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         </Button>
       </CardHeader>
       <DataTable
-       t('benefits', 'Benefits')
         rows={tableRows ?? []}
         headers={headers}
         render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (

@@ -1,24 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Package } from '../types';
 import { generateOfflineUuid } from '@openmrs/esm-framework';
+import { packages } from '../benefits-package/benefits-package.mock';
 
 const usePackages = () => {
+  const _package = useMemo(() => packages, []);
+
   return {
     isLoading: false,
-    packages: [
-      {
-        shaPackageName: 'Package 1',
-        uuid: generateOfflineUuid().split('+').at(-1),
-        packageAccessPoint: 'IP',
-        shaPackageCode: '',
-      },
-      {
-        shaPackageName: 'Package 2',
-        uuid: generateOfflineUuid().split('+').at(-1),
-        packageAccessPoint: 'IP',
-        shaPackageCode: '',
-      },
-    ] as Array<Package>,
+    packages: _package as Array<Package>,
     error: undefined,
   };
 };

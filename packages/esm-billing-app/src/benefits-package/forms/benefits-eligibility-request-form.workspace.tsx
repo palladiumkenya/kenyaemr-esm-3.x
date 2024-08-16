@@ -6,8 +6,8 @@ import {
   DropdownSkeleton,
   Form,
   InlineNotification,
-  Stack,
   MultiSelect,
+  Stack,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showSnackbar, useSession, useVisit } from '@openmrs/esm-framework';
@@ -15,9 +15,11 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import useInterventions from '../../hooks/useInterventions';
 import usePackages from '../../hooks/usePackages';
+import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
-import { Package, PatientBenefit } from '../../types';
+import { PatientBenefit } from '../../types';
 import { eligibilityRequestShema, requestEligibility } from '../benefits-package.resources';
 import styles from './benefits-eligibility-request-form.scss';
 
@@ -43,8 +45,10 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
     currentProvider: { uuid: providerUuid },
     sessionLocation: { uuid: facilityUuid, display: facilityName },
   } = useSession();
-  const { isLoading: providerLoading, provider } = useProvider(providerUuid);
-  const { isLoading, error, packages } = usePackages();
+  const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
+  const { isLoading: packagesLoading, error, packages } = usePackages();
+  const { isLoading: intervensionsLoading, interventions } = useInterventions();
+  const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
   const form = useForm<EligibilityRequest>({
     defaultValues: {
       providerUuid,
@@ -52,6 +56,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
       facilityUuid,
       diagnosisUuids: [],
       isRefered: false,
+      intervensions: [],
     },
     resolver: zodResolver(eligibilityRequestShema),
   });
@@ -174,8 +179,8 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                     }}
                     initialSelectedItem={field.value}
                     label="Choose package"
-                    items={packages.map((r) => r.uuid)}
-                    itemToString={(item) => packages.find((r) => r.uuid === item)?.shaPackageName ?? ''}
+                    items={packages.map((r) => r.shaPackageCode)}
+                    itemToString={(item) => packages.find((r) => r.shaPackageCode === item)?.shaPackageName ?? ''}
                   />
                 )}
               </>
@@ -198,13 +203,36 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                 }}
                 initialSelectedItem={field.value}
                 label="Choose option"
-                items={[].map((r) => r.id)}
-                itemToString={(item) => [].find((r) => r.id === item)?.type ?? ''}
+                items={diagnoses.map((r) => r.uuid)}
+                itemToString={(item) => diagnoses.find((r) => r.uuid === item)?.value ?? ''}
               />
             )}
           />
         </Column>
-
+        <Column>
+          <Controller
+            control={form.control}
+            name="intervensions"
+            render={({ field }) => (
+              <MultiSelect
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                id="intervensions"
+                titleText={t('intervensions', 'Intervensions')}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
+                initialSelectedItem={field.value}
+                label="Choose option"
+                items={interventions.map((r) => r.shaInterventionCode)}
+                itemToString={(item) =>
+                  interventions.find((r) => r.shaInterventionCode === item)?.shaInterventionName ?? ''
+                }
+              />
+            )}
+          />
+        </Column>
         <Column>
           <Controller
             control={form.control}

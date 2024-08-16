@@ -298,8 +298,20 @@ export interface PatientBenefit {
   shaPackageCode: string;
   shaPackageName: string;
   shaInterventionCode: string;
-  shaInterventionName?: string;
+  shaInterventionName: string;
   shaInterventioTariff: number;
   requirePreauth: boolean;
   status: 'APPROVED' | 'PENDING' | 'REJECTED';
+}
+
+export interface SHAIntervension {
+  shaInterventionCode: string;
+  shaInterventionName?: string;
+}
+
+export interface Diagnosis {
+  uuid: string;
+  name: string;
+  dateRecorded: string;
+  value: string;
 }
