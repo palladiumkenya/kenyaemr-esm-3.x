@@ -17,7 +17,7 @@ export const ClaimsManagementHeader: React.FC<ClaimsHeaderProps> = ({ title }) =
       <div className={styles['left-justified-items']}>
         <ClaimsIllustration />
         <div className={styles['page-labels']}>
-          <p>{t('claims', 'Claims Management')}</p>
+          <p>{t('claimsManagement', 'Claims management')}</p>
           <p className={styles['page-name']}>{title}</p>
         </div>
       </div>

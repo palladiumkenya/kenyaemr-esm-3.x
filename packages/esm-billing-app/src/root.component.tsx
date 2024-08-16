@@ -4,6 +4,7 @@ import { BillingDashboard } from './billing-dashboard/billing-dashboard.componen
 import Invoice from './invoice/invoice.component';
 import ClaimScreen from './claims/dashboard/claims-dashboard.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
+import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
@@ -15,7 +16,7 @@ const RootComponent: React.FC = () => {
         <Route path="/patient/:patientUuid/:billUuid" element={<Invoice />} />
         <Route path="/patient/:patientUuid/:billUuid/claims" element={<ClaimScreen />} />
         <Route path="/claims-overview" element={<ClaimsManagementOverview />} />
-        <Route path="/claims-overview" element={<ClaimsManagementOverview />} />
+        <Route path="/preauth-requests" element={<ClaimsManagementPreAuthRequest />} />
       </Routes>
     </BrowserRouter>
   );
