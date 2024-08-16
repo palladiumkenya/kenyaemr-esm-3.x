@@ -72,7 +72,7 @@ export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
 export const preAuthRequestsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'preauth-requests',
-    title: 'Pre-Auth Requests',
+    title: 'billing/Pre-auth-requests',
   }),
   options,
 );
