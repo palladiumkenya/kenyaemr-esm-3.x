@@ -43,7 +43,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
       facilityUuid,
       diagnosisUuids: [],
       patientBenefit: benefit.shaPackageCode,
-      intervensions: [],
+      intervensions: [benefit.shaInterventionCode],
     },
     resolver: zodResolver(preauthSchema),
   });
@@ -166,6 +166,27 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
         <Column>
           <Controller
             control={form.control}
+            name="intervensions"
+            render={({ field }) => (
+              <MultiSelect
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                id="intervensions"
+                titleText={t('intervensions', 'Intervensions')}
+                selectedItems={field.value}
+                label="Choose option"
+                items={interventions.map((r) => r.shaInterventionCode)}
+                itemToString={(item) =>
+                  interventions.find((r) => r.shaInterventionCode === item)?.shaInterventionName ?? ''
+                }
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            control={form.control}
             name="diagnosisUuids"
             render={({ field }) => (
               <MultiSelect
@@ -177,34 +198,10 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
                 onChange={(e) => {
                   field.onChange(e.selectedItems);
                 }}
-                initialSelectedItem={field.value}
+                initialSelectedItems={field.value}
                 label="Choose option"
                 items={diagnoses.map((r) => r.uuid)}
                 itemToString={(item) => diagnoses.find((r) => r.uuid === item)?.value ?? ''}
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="intervensions"
-            render={({ field }) => (
-              <MultiSelect
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="intervensions"
-                titleText={t('intervensions', 'Intervensions')}
-                onChange={(e) => {
-                  field.onChange(e.selectedItems);
-                }}
-                initialSelectedItem={field.value}
-                label="Choose option"
-                items={interventions.map((r) => r.shaInterventionCode)}
-                itemToString={(item) =>
-                  interventions.find((r) => r.shaInterventionCode === item)?.shaInterventionName ?? ''
-                }
               />
             )}
           />

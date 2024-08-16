@@ -201,7 +201,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                 onChange={(e) => {
                   field.onChange(e.selectedItems);
                 }}
-                initialSelectedItem={field.value}
+                initialSelectedItems={field.value}
                 label="Choose option"
                 items={diagnoses.map((r) => r.uuid)}
                 itemToString={(item) => diagnoses.find((r) => r.uuid === item)?.value ?? ''}
@@ -223,7 +223,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                 onChange={(e) => {
                   field.onChange(e.selectedItems);
                 }}
-                initialSelectedItem={field.value}
+                initialSelectedItems={field.value}
                 label="Choose option"
                 items={interventions.map((r) => r.shaInterventionCode)}
                 itemToString={(item) =>
