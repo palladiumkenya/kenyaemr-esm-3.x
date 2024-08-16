@@ -81,6 +81,20 @@ const AddBillableService = () => {
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
 
+  const getValidPaymentModes = (allPaymentModes) => {
+    const setModes = control?._formValues?.payment ?? [];
+    const newPaymentModes = [];
+
+    allPaymentModes.forEach((element) => {
+      // Check if any object in setModes has the same paymentMode as the current element
+      const isModePresent = setModes.some((mode) => mode.paymentMode === element.uuid);
+      if (!isModePresent) {
+        newPaymentModes.push(element);
+      }
+    });
+    return newPaymentModes;
+  };
+
   const handleConceptChange = useCallback((selectedConcept: ServiceConcept) => {
     setSelectedConcept(selectedConcept);
   }, []);
@@ -300,7 +314,7 @@ const AddBillableService = () => {
                       onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
                       titleText={t('paymentMode', 'Payment Mode')}
                       label={t('selectPaymentMethod', 'Select payment method')}
-                      items={paymentModes ?? []}
+                      items={getValidPaymentModes(paymentModes) ?? []}
                       itemToString={(item) => (item ? item.name : '')}
                       invalid={!!errors?.payment?.[index]?.paymentMode}
                       invalidText={errors?.payment?.[index]?.paymentMode?.message}

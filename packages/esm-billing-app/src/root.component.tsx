@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { BillingDashboard } from './billing-dashboard/billing-dashboard.component';
 import Invoice from './invoice/invoice.component';
 import ClaimScreen from './claims/dashboard/claims-dashboard.component';
+import InsuranceCovers from './billing-breakdown/insurance-covers.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
@@ -11,6 +12,7 @@ const RootComponent: React.FC = () => {
     <BrowserRouter basename={baseName}>
       <Routes>
         <Route path="/" element={<BillingDashboard />} />
+        <Route path="/insurancecovers" element={<InsuranceCovers />} />
         <Route path="/patient/:patientUuid/:billUuid" element={<Invoice />} />
         <Route path="/patient/:patientUuid/:billUuid/claims" element={<ClaimScreen />} />
       </Routes>

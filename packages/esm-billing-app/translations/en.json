@@ -6,6 +6,7 @@
   "addNewService": "Add new service",
   "addPaymentOptions": "Add payment option",
   "amount": "Amount",
+  "backToHome": "Back to Home",
   "billableService": "Billable service",
   "billableServices": "Billable Services",
   "billAmount": "Bill Amount",
@@ -143,6 +144,7 @@
   "shrRecords": "SHR Records",
   "status": "Service Status",
   "stockItem": "Stock Item",
+  "tabletOverlay": "Tablet overlay",
   "total": "Total",
   "totalAmount": "Total Amount",
   "totalTendered": "Total Tendered",
@@ -153,6 +155,7 @@
   "valid": "Valid SHA Number",
   "validatingSHANumber": "Validating SHA Number",
   "validSHANumber": "SHA number is valid, proceed with care",
+  "viewAll": "View All",
   "visitTime": "Visit time",
   "visittype": "Visit Type",
   "yes": "Yes"

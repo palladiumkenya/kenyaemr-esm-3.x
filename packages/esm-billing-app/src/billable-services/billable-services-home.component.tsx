@@ -9,7 +9,7 @@ import BillManager from './bill-manager/bill-manager.component';
 import { BillableServicesSideNav } from './billable-services-sidenav.component';
 import { navigate, showModal } from '@openmrs/esm-framework';
 import { ServiceConcept } from '../types';
-import EditBillableService from './create-edit/edit-billable-service.component copy';
+import EditBillableService from './create-edit/edit-billable-service.component';
 import ManageCommodityPrices from './manage-commodity-price/manage-commodity-price.component';
 
 const BillableServiceHome: React.FC = () => {
