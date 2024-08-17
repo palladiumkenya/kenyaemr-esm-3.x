@@ -1,4 +1,4 @@
-import { Button, Tile, Layer } from '@carbon/react';
+import { Button, Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import {
   CardHeader,
@@ -8,11 +8,10 @@ import {
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
-import styles from './benebfits-table.scss';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { Package, PatientBenefit } from '../../types';
-import TableComponent from './tabble.component';
+import { PatientBenefit } from '../../types';
+import styles from './benebfits-table.scss';
+import GenericDataTable from './generic_data_table.component';
 
 const BenefitsTable = () => {
   const { t } = useTranslation();
@@ -60,7 +59,62 @@ const BenefitsTable = () => {
     return <EmptyState headerTitle={headerTitle} displayText={headerTitle} />;
   }
 
-  return <TableComponent patientBenefits={eligibleBenefits} />;
+  const headers = [
+    {
+      key: 'shaPackageCode',
+      header: 'Package Code',
+    },
+    {
+      key: 'shaPackageName',
+      header: 'Package Name',
+    },
+    {
+      key: 'shaInterventionCode',
+      header: 'Intervension Code',
+    },
+    {
+      key: 'shaInterventionName',
+      header: 'Intervension Name',
+    },
+    {
+      key: 'shaInterventioTariff',
+      header: 'Intervension Tariff',
+    },
+    {
+      key: 'status',
+      header: 'Approval status',
+    },
+    {
+      key: 'action',
+      header: 'Action',
+    },
+  ];
+
+  const handleLaunchPreAuthForm = (benefit: PatientBenefit) => {
+    // benefits-pre-auth-form
+    launchPatientWorkspace('benefits-pre-auth-form', {
+      workspaceTitle: 'Benefits Pre-Auth Form',
+      patientUuid,
+      benefit,
+      onSuccess: (benefits) => {
+        // setBenefits(benefits);
+      },
+    });
+  };
+
+  const rows = eligibleBenefits.map((benefit) => ({
+    id: benefit.shaPackageCode,
+    ...benefit,
+    action: benefit.requirePreauth ? (
+      <Button renderIcon={ArrowRight} onClick={() => handleLaunchPreAuthForm(benefit)}>
+        Pre-Auth
+      </Button>
+    ) : (
+      '--'
+    ),
+  }));
+
+  return <GenericDataTable rows={rows} headers={headers} title={t('benefits', 'Benefits')} />;
 };
 
 export default BenefitsTable;
