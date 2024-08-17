@@ -47,7 +47,7 @@ interface ProviderLink {
   resourceAlias: string;
 }
 
-interface Provider {
+export interface Provider {
   uuid: string;
   display: string;
   links: ProviderLink[];
@@ -76,7 +76,7 @@ interface PatientLink {
   resourceAlias: string;
 }
 
-interface Patient {
+export interface Patient {
   uuid: string;
   display: string;
   links: PatientLink[];
@@ -285,4 +285,33 @@ export enum PaymentStatus {
   CANCELLED = 'CANCELLED',
   ADJUSTED = 'ADJUSTED',
   EXEMPTED = 'EXEMPTED',
+}
+
+export interface Package {
+  uuid: string;
+  shaPackageCode: string;
+  shaPackageName: string;
+  packageAccessPoint: 'OP' | 'IP' | 'Both';
+}
+
+export interface PatientBenefit {
+  shaPackageCode: string;
+  shaPackageName: string;
+  shaInterventionCode: string;
+  shaInterventionName: string;
+  shaInterventioTariff: number;
+  requirePreauth: boolean;
+  status: 'APPROVED' | 'PENDING' | 'REJECTED';
+}
+
+export interface SHAIntervension {
+  shaInterventionCode: string;
+  shaInterventionName?: string;
+}
+
+export interface Diagnosis {
+  uuid: string;
+  name: string;
+  dateRecorded: string;
+  value: string;
 }
