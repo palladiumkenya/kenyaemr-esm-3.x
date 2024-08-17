@@ -8,7 +8,7 @@ export const useSHRSummary = (patientUuid: string) => {
   // const { data, mutate, error, isLoading } = useSWR<{ data: SHRSummary }>(shrSummaryUrl, openmrsFetch);
   // return {
   //   data: data?.data ? data?.data : null,
-  //   isError: undefined,
+  //   isError: error,
   //   isLoading: isLoading,
   // };
   const [state, setState] = useState({ isError: undefined, isLoading: true, data: require('./visits.json') });

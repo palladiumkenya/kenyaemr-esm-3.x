@@ -2,11 +2,17 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { z } from 'zod';
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
+export const AUTH_TYPES = [
+  { value: 'otp', label: 'OTP' },
+  { value: 'pin', label: 'PIN' },
+  { value: 'biometrics', label: 'BIOMETRICS' },
+];
 
 export const authorizationSchema = z.object({
   otp: z.string().min(1, 'Required'),
   sender: z.string().regex(PHONE_NUMBER_REGEX),
   receiver: z.string().regex(PHONE_NUMBER_REGEX),
+  authMethod: z.string(),
 });
 
 export function generateOTP(length = 5) {

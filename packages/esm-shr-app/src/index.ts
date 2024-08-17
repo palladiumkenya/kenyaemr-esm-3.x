@@ -1,4 +1,11 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getFeatureFlag,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { referralDashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
@@ -21,11 +28,9 @@ export const importTranslation = require.context('../translations', false, /.jso
 
 export const shrPatientSummary = getSyncLifecycle(shrPatientSummaryComponent, options);
 
-// t('sharedhealthrecords', 'Shared Health Records')
-///export const shrSummaryDashboardLink = getSyncLifecycle(createDashboardLink({ ...dashboardMeta, moduleName }), options);
-
 export function startupApp() {
   registerBreadcrumbs([]);
+  registerFeatureFlag('shr-summary', 'SHR Summary', 'Adds authorization to pull a ptient SHR information');
   defineConfigSchema(moduleName, configSchema);
 }
 
@@ -37,10 +42,9 @@ export const ReferralsDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const shrSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
-  options,
-);
+export const shrSummaryDashboardLink = getFeatureFlag('shr-summary')
+  ? getSyncLifecycle(createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }), options)
+  : undefined;
 
 export const shrRoot = getAsyncLifecycle(() => import('./shr-root.component'), options);
 

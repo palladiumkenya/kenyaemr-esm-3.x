@@ -1,4 +1,4 @@
-import { Button, ButtonSet, Column, Form, Stack, TextInput } from '@carbon/react';
+import { Button, ButtonSet, Column, Form, RadioButton, RadioButtonGroup, Stack, TextInput } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showSnackbar } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
@@ -6,7 +6,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import styles from './shr-forms.scss';
-import { authorizationSchema, generateOTP, persistOTP, sendOtp, verifyOtp } from './shr-summary.resource';
+import { AUTH_TYPES, authorizationSchema, generateOTP, persistOTP, verifyOtp } from './shr-summary.resource';
 
 interface SHRAuthorizationFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
@@ -22,6 +22,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({ closeWorksp
       // To be replaced with patient and provider phone numbers
       sender: '+254793889658',
       receiver: '+254793889658',
+      authMethod: 'otp',
     },
     resolver: zodResolver(authorizationSchema),
   });
@@ -29,7 +30,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({ closeWorksp
 
   const onSubmit = async (values: SHRAuthorizationFormType) => {
     try {
-      verifyOtp(values.otp, patientUuid);
+      // verifyOtp(values.otp, patientUuid);
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Access granted successfully' });
       closeWorkspace();
       onVerified();
@@ -39,16 +40,36 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({ closeWorksp
   };
 
   useEffect(() => {
-    const otp = generateOTP(5);
-    alert('OTP SEND TO CLIENT: ' + otp);
+    // const otp = generateOTP(5);
+    // alert('OTP SEND TO CLIENT: ' + otp);
     // sendOtp({ otp, receiver: form.watch('receiver'), sender: form.watch('sender') });
-    persistOTP(otp, patientUuid);
+    // persistOTP(otp, patientUuid);
   }, []);
+
+  const observableAuthMethod = form.watch('authMethod');
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}>
+        <Column>
+          <Controller
+            control={form.control}
+            name="authMethod"
+            render={({ field }) => (
+              <RadioButtonGroup
+                legendText={t('sex', 'Sex')}
+                {...field}
+                invalid={form.formState.errors[field.name]?.message}
+                className={styles.radioGroupInput}
+                invalidText={form.formState.errors[field.name]?.message}>
+                {AUTH_TYPES.map(({ label, value }, index) => (
+                  <RadioButton labelText={label} value={value} id={`${index}-${value}`} key={index} />
+                ))}
+              </RadioButtonGroup>
+            )}
+          />
+        </Column>
         <Column>
           <Controller
             control={form.control}
@@ -58,8 +79,12 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({ closeWorksp
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 {...field}
-                placeholder="OTP authorization code"
-                labelText={t('otpCode', 'OTP Card')}
+                placeholder={
+                  AUTH_TYPES.find((auth) => auth.value === observableAuthMethod)?.label ?? 'OTP Authorization code'
+                }
+                labelText={
+                  AUTH_TYPES.find((auth) => auth.value === observableAuthMethod)?.label ?? 'OTP Authorization code'
+                }
               />
             )}
           />
