@@ -26,12 +26,9 @@ import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
 import SHRSummaryPanell from './shr-summary/shr-summary.component';
-<<<<<<< HEAD
-import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
-=======
 import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
 import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
->>>>>>> 890ccd649d7f251be24246019cf553256e047cdd
+import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
