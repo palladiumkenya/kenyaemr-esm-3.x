@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
@@ -98,5 +98,10 @@ export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 export const benefitsEligibilyRequestForm = getSyncLifecycle(BenefitsEligibilyRequestForm, options);
 export const benefitsPreAuthForm = getSyncLifecycle(BenefitPreAuthForm, options);
 export function startupApp() {
+  registerFeatureFlag(
+    'benefits-package',
+    'HIE Benefits package',
+    'Adds benefits package panel for reqesting coverage eligibility, displaying patient benefits and managing claims preauthorizations',
+  );
   defineConfigSchema(moduleName, configSchema);
 }
