@@ -30,9 +30,10 @@ describe('MetricsCards', () => {
   test('renders metrics cards', () => {
     mockUseBills.mockReturnValue({ isLoading: false, bills: billsSummary, error: null });
     renderMetricsCards();
-    expect(screen.getByRole('heading', { name: /cumulative bills/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /pending bills/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /paid bills/i })).toBeInTheDocument();
+    expect(screen.getByText('Cumulative Bills')).toBeInTheDocument();
+    expect(screen.getByText('Pending Bills')).toBeInTheDocument();
+    expect(screen.getByText('Paid Bills')).toBeInTheDocument();
+    expect(screen.getByText('Insurance Covers')).toBeInTheDocument();
   });
 });
 
