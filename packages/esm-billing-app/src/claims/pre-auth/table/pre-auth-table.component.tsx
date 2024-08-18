@@ -69,21 +69,34 @@ const PreAuthTable: React.FC<PreAuthTableProps> = ({ bill, isSelectable = true, 
   }, [filteredLineItems, currentPage, pageSize]);
 
   const tableHeaders: Array<typeof DataTableHeader> = [
-    { header: 'No', key: 'no' },
-    { header: 'Serial No.', key: 'serialno' },
-    { header: 'Bill Item', key: 'inventoryname' },
-    { header: 'Status', key: 'status' },
-    { header: 'Total amount', key: 'total' },
-    { header: 'Bill creation date', key: 'dateofbillcreation' },
+    {
+      header: t('serialNo', 'Serial No.'),
+      key: 'serialno',
+    },
+    {
+      header: t('billItem', 'Bill Item'),
+      key: 'inventoryname',
+    },
+    {
+      header: t('status', 'Status'),
+      key: 'status',
+    },
+    {
+      header: t('totalAmount', 'Total amount'),
+      key: 'total',
+    },
+    {
+      header: t('billCreationDate', 'Bill creation date'),
+      key: 'dateofbillcreation',
+    },
   ];
 
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
 
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
-      paginatedLineItems?.map((item, index) => {
+      paginatedLineItems?.map((item) => {
         return {
-          no: `${index + 1}`,
           id: `${item.uuid}`,
           inventoryname: processBillItem(item),
           serialno: bill.receiptNumber,
