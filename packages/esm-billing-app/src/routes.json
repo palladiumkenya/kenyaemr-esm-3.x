@@ -167,6 +167,31 @@
       "component": "testOrderAction",
       "slot": "tests-ordered-actions-slot",
       "order": 0
+    },
+    {
+      "component": "claimsManagementSideNavGroup",
+      "name": "claims-management-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "claims-management",
+        "title": "Claims management Overview",
+        "slot": "case-management-slot"
+      }
+    },
+     {
+      "component": "claimsManagementOverviewDashboardLink",
+      "name": "claims-management-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+     {
+      "component": "preAuthRequestsDashboardLink",
+      "name": "preauthrequest-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+    {
+      "component": "claimsOverview",
+      "name": "claims-overview-dashboard-link",
+      "slot": "claims-management-overview-slot"
     }
   ],
   "workspaces": [

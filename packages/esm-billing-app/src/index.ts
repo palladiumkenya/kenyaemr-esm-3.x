@@ -1,5 +1,12 @@
-import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getFeatureFlag,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
+import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
@@ -28,6 +35,7 @@ import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace
 import SHRSummaryPanell from './shr-summary/shr-summary.component';
 import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
 import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
+import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -50,11 +58,36 @@ export const shrSummaryDashboardLink = getSyncLifecycle(
 // t('billing', 'Billing')
 export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing',
+    name: '',
     title: 'Billing',
   }),
   options,
 );
+export const claimsManagementSideNavGroup = getFeatureFlag('claims-management')
+  ? getSyncLifecycle(
+      createDashboardGroup({
+        title: 'Claims Management',
+        slotName: 'claims-management-dashboard-link-slot',
+        isExpanded: false,
+      }),
+      options,
+    )
+  : undefined;
+export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'claims-overview',
+    title: 'Claims Overview',
+  }),
+  options,
+);
+export const preAuthRequestsDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'preauth-requests',
+    title: 'Pre-Auth Requests',
+  }),
+  options,
+);
+export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 
 export const benefitsPackageDashboardLink = getSyncLifecycle(
   createDashboardLink({
@@ -99,9 +132,10 @@ export const benefitsEligibilyRequestForm = getSyncLifecycle(BenefitsEligibilyRe
 export const benefitsPreAuthForm = getSyncLifecycle(BenefitPreAuthForm, options);
 export function startupApp() {
   registerFeatureFlag(
-    'benefits-package',
-    'HIE Benefits package',
-    'Adds benefits package panel for reqesting coverage eligibility, displaying patient benefits and managing claims preauthorizations',
+    'claims-management',
+    'Claims Management Dashboard',
+    'Controls the visibility of the Claims Management Dashboard in the side navigation.',
   );
+
   defineConfigSchema(moduleName, configSchema);
 }
