@@ -6,7 +6,6 @@
   "addNewService": "Add new service",
   "addPaymentOptions": "Add payment option",
   "amount": "Amount",
-  "backToHome": "Back to Home",
   "billableService": "Billable service",
   "billableServices": "Billable Services",
   "billAmount": "Bill Amount",
@@ -128,6 +127,7 @@
   "selectExemptionCategory": "Select exemption category",
   "selectitemstobeclaimed": "Select items that are to be included in the claims",
   "selectPaymentMethod": "Select payment method",
+  "selectServiceType": "Select service type",
   "sellingAmount": "Enter selling price",
   "sellingPrice": "Selling Price",
   "sendClaim": "Claim sent successfully",
@@ -155,7 +155,6 @@
   "valid": "Valid SHA Number",
   "validatingSHANumber": "Validating SHA Number",
   "validSHANumber": "SHA number is valid, proceed with care",
-  "viewAll": "View All",
   "visitTime": "Visit time",
   "visittype": "Visit Type",
   "yes": "Yes"
