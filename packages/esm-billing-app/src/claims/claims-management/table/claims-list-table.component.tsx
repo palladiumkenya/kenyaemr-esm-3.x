@@ -41,7 +41,7 @@ const ClaimsManagementTable: React.FC = () => {
       rows={rows}
       headers={headers}
       bills={[]}
-      renderExpandedRow={(row) => <div>{/* Custom content for expanded row goes here */}</div>}
+      renderExpandedRow={(row) => <div></div>}
     />
   );
 };
