@@ -162,6 +162,25 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
     },
   ];
 
+  const referralsHeaders = [
+    {
+      key: 'requesterCode',
+      header: t('requesterCode', 'Requester Code'),
+    },
+    {
+      key: 'Category',
+      header: t('Category', 'Category'),
+    },
+    {
+      key: 'priority',
+      header: t('priority', 'Priority'),
+    },
+    {
+      key: 'dateRequested',
+      header: t('dateRequested', 'Date Requested'),
+    },
+  ];
+
   const medicationsHeaders = [
     {
       key: 'name',
@@ -221,9 +240,12 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
                 <Tab className={styles.tab} id="conditions-tab" disabled={data?.conditions.length <= 0}>
                   {t('conditions', 'Conditions')}
                 </Tab>
-                {/* <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
+                <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
                   {t('medications', 'Medications')}
-                </Tab> */}
+                </Tab>
+                <Tab className={styles.tab} id="referrals-tab" disabled={data?.referrals.length <= 0}>
+                  {t('referrals', 'Referrals')}
+                </Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -256,11 +278,16 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
                     <SHRDataTable data={data?.conditions} tableHeaders={conditionsHeaders} />
                   </div>
                 </TabPanel>
-                {/* <TabPanel>
+                <TabPanel>
                   <div>
                     <SHRDataTable data={data?.medications} tableHeaders={medicationsHeaders} />
                   </div>
-                </TabPanel> */}
+                </TabPanel>
+                <TabPanel>
+                  <div>
+                    <SHRDataTable data={data?.referrals} tableHeaders={referralsHeaders} />
+                  </div>
+                </TabPanel>
               </TabPanels>
             </Tabs>
           </div>

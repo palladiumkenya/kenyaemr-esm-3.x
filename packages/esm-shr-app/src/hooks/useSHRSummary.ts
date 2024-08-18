@@ -2,22 +2,17 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { SHRSummary } from '../types/index';
 import { useState } from 'react';
+import { deepMerge } from '../utils/function';
 
 export const useSHRSummary = (patientUuid: string) => {
-  // const shrSummaryUrl = `/ws/rest/v1/kenyaemril/shrPatientSummary?patientUuid=${patientUuid}`;
-  // const { data, mutate, error, isLoading } = useSWR<{ data: SHRSummary }>(shrSummaryUrl, openmrsFetch);
-  // return {
-  //   data: data?.data ? data?.data : null,
-  //   isError: error,
-  //   isLoading: isLoading,
-  // };
-  const [state, setState] = useState({ isError: undefined, isLoading: true, data: require('./visits.json') });
+  const shrSummaryUrl = `/ws/rest/v1/kenyaemril/shrPatientSummary?patientUuid=${patientUuid}`;
+  const { data, mutate, error, isLoading } = useSWR<{ data: SHRSummary }>(shrSummaryUrl, openmrsFetch);
 
-  setTimeout(() => {
-    setState({ ...state, isLoading: false });
-  }, 3000);
-
-  return state;
+  return {
+    data: data?.data ? deepMerge({ ...data?.data, medications: [] }, require('./visits.json')) : null,
+    isError: error,
+    isLoading: isLoading,
+  };
 };
 
 export const useCommunityReferrals = (status: string) => {
