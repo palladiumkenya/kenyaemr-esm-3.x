@@ -1,23 +1,40 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors'; // Import Carbon colors
+
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.preAuthRequestContainer {
-  background-color: $ui-02;
-  border: 1px solid $ui-03;
-  border-bottom: none;
-  width: 100%;
-  margin: 0 auto;
-  max-width: 95vw;
-  padding-bottom: 0;
+.genericContainer {
+  margin: layout.$spacing-05;
 }
+
 .contentSwitcherWrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }
+
 .contentSwitcher {
-  width: 20rem;
+  width: 35rem;
+}
+
+.statusSuccessIcon {
+  color: colors.$green-50;
+}
+
+.statusWarningIcon {
+  color: colors.$red-60;
+}
+.statusPendingIcon {
+  color: colors.$yellow-30;
+}
+
+.statusIconWrapper {
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-right: 0.5rem;
+  }
 }
