@@ -1,4 +1,11 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getFeatureFlag,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
@@ -56,14 +63,16 @@ export const billingDashboardLink = getSyncLifecycle(
   }),
   options,
 );
-export const claimsManagementSideNavGroup = getSyncLifecycle(
-  createDashboardGroup({
-    title: 'Claims Management',
-    slotName: 'claims-management-dashboard-link-slot',
-    isExpanded: false,
-  }),
-  options,
-);
+export const claimsManagementSideNavGroup = getFeatureFlag('claims-management')
+  ? getSyncLifecycle(
+      createDashboardGroup({
+        title: 'Claims Management',
+        slotName: 'claims-management-dashboard-link-slot',
+        isExpanded: false,
+      }),
+      options,
+    )
+  : undefined;
 export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'claims-overview',
@@ -122,5 +131,11 @@ export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 export const benefitsEligibilyRequestForm = getSyncLifecycle(BenefitsEligibilyRequestForm, options);
 export const benefitsPreAuthForm = getSyncLifecycle(BenefitPreAuthForm, options);
 export function startupApp() {
+  registerFeatureFlag(
+    'claims-management',
+    'Claims Management Dashboard',
+    'Controls the visibility of the Claims Management Dashboard in the side navigation.',
+  );
+
   defineConfigSchema(moduleName, configSchema);
 }
