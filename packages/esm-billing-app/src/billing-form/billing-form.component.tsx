@@ -5,6 +5,7 @@ import {
   RadioButtonGroup,
   RadioButton,
   Search,
+  Form,
   Table,
   TableHead,
   TableBody,
@@ -192,108 +193,110 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   };
 
   return (
-    <div className={styles.billingFormContainer}>
-      <RadioButtonGroup
-        legendText={t('selectCategory', 'Select category')}
-        name="radio-button-group"
-        defaultSelected="radio-1"
-        className={styles.billingItem}
-        onChange={toggleSearch}>
-        <RadioButton labelText={t('stockItem', 'Stock Item')} value="Stock Item" id="radio-1" />
-        <RadioButton labelText={t('service', 'Service')} value="Service" id="radio-2" />
-      </RadioButtonGroup>
-      <div></div>
+    <Form className={styles.form}>
+      <div className={styles.billingFormContainer}>
+        <div className={styles.contentWrapper}>
+          <RadioButtonGroup
+            legendText={t('selectCategory', 'Select category')}
+            name="radio-button-group"
+            defaultSelected="radio-1"
+            className={styles.billingItem}
+            onChange={toggleSearch}>
+            <RadioButton labelText={t('stockItem', 'Stock Item')} value="Stock Item" id="radio-1" />
+            <RadioButton labelText={t('service', 'Service')} value="Service" id="radio-2" />
+          </RadioButtonGroup>
 
-      <div>
-        <Search
-          id="searchField"
-          size="lg"
-          placeholder="Find your drugs here..."
-          labelText="Search"
-          disabled
-          closeButtonLabelText="Clear search input"
-          onChange={() => {}}
-          className={styles.billingItem}
-          onKeyUp={(e) => {
-            filterItems(e.target.value);
-          }}
-        />
+          <div>
+            <Search
+              id="searchField"
+              size="lg"
+              placeholder="Find your drugs here..."
+              labelText="Search"
+              disabled
+              closeButtonLabelText="Clear search input"
+              onChange={() => {}}
+              className={styles.billingItem}
+              onKeyUp={(e) => {
+                filterItems(e.target.value);
+              }}
+            />
 
-        <ul className={styles.searchContent}>
-          {searchOptions.map((row) => (
-            <li className={styles.searchItem}>
-              <Button
-                id={row.uuid}
-                onClick={(e) => addItemToBill(e, row.uuid, row.Item, row.category, row.Price)}
-                style={{ background: 'inherit', color: 'black' }}>
-                {row.Item} Qnty.{row.Qnty} Ksh.{row.Price}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </div>
+            <ul className={styles.searchContent}>
+              {searchOptions.map((row) => (
+                <li className={styles.searchItem}>
+                  <Button
+                    id={row.uuid}
+                    onClick={(e) => addItemToBill(e, row.uuid, row.Item, row.category, row.Price)}
+                    style={{ background: 'inherit', color: 'black' }}>
+                    {row.Item} Qnty.{row.Qnty} Ksh.{row.Price}
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-      {/* <NumberInput id="carbon-number" min={0} max={100} value={50} ref={numberRef}
-      onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} 
-      className="testingNumberInput" label="NumberInput label" helperText="Optional helper text." invalidText="Number is not valid" /> */}
+          {/* <NumberInput id="carbon-number" min={0} max={100} value={50} ref={numberRef}
+        onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} 
+        className="testingNumberInput" label="NumberInput label" helperText="Optional helper text." invalidText="Number is not valid" /> */}
 
-      <Table aria-label="sample table" className={styles.billingItem}>
-        <TableHead>
-          <TableRow>
-            <TableHeader>Item</TableHeader>
-            <TableHeader>Quantity</TableHeader>
-            <TableHeader>Price</TableHeader>
-            <TableHeader>Total</TableHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {BillItems && Array.isArray(BillItems) ? (
-            BillItems.map((row) => (
+          <Table aria-label="sample table" className={styles.billingItem}>
+            <TableHead>
               <TableRow>
-                <TableCell>{row.Item}</TableCell>
-                <TableCell>
-                  <input
-                    type="number"
-                    className="form-control"
-                    id={row.Item}
-                    min={0}
-                    max={100}
-                    value={row.Qnty}
-                    onChange={(e) => {
-                      calculateTotal(e, row.Item);
-                      row.Qnty = e.target.value;
-                    }}
-                  />
-                  {/* <NumberInput id={row.Item} min={0} max={100} value={row.Qnty} ref={numberRef}
-                    onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} /> */}
-                </TableCell>
-                <TableCell id={row.Item + 'Price'}>{row.Price}</TableCell>
-                <TableCell id={row.Item + 'Total'} className="totalValue">
-                  {row.Total}
-                </TableCell>
+                <TableHeader>Item</TableHeader>
+                <TableHeader>Quantity</TableHeader>
+                <TableHeader>Price</TableHeader>
+                <TableHeader>Total</TableHeader>
               </TableRow>
-            ))
-          ) : (
-            <p>Loading...</p>
-          )}
-          <TableRow>
-            <TableCell></TableCell>
-            <TableCell></TableCell>
-            <TableCell style={{ fontWeight: 'bold' }}>Grand Total:</TableCell>
-            <TableCell id="GrandTotalSum">{GrandTotal}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-
+            </TableHead>
+            <TableBody>
+              {BillItems && Array.isArray(BillItems) ? (
+                BillItems.map((row) => (
+                  <TableRow>
+                    <TableCell>{row.Item}</TableCell>
+                    <TableCell>
+                      <input
+                        type="number"
+                        className="form-control"
+                        id={row.Item}
+                        min={0}
+                        max={100}
+                        value={row.Qnty}
+                        onChange={(e) => {
+                          calculateTotal(e, row.Item);
+                          row.Qnty = e.target.value;
+                        }}
+                      />
+                      {/* <NumberInput id={row.Item} min={0} max={100} value={row.Qnty} ref={numberRef}
+                        onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} /> */}
+                    </TableCell>
+                    <TableCell id={row.Item + 'Price'}>{row.Price}</TableCell>
+                    <TableCell id={row.Item + 'Total'} className="totalValue">
+                      {row.Total}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <p>Loading...</p>
+              )}
+              <TableRow>
+                <TableCell></TableCell>
+                <TableCell></TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>Grand Total:</TableCell>
+                <TableCell id="GrandTotalSum">{GrandTotal}</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </div>
       <ButtonSet className={styles.billingItem}>
-        <Button kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           Discard
         </Button>
-        <Button kind="primary" onClick={postBillItems}>
+        <Button className={styles.button} kind="primary" onClick={postBillItems}>
           Save & Close
         </Button>
       </ButtonSet>
-    </div>
+    </Form>
   );
 };
 
