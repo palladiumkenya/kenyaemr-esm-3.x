@@ -11,7 +11,6 @@ const RootComponent: React.FC = () => {
     <BrowserRouter basename={baseName}>
       <Routes>
         <Route path="/" element={<BillingDashboard />} />
-        <Route path="/insurancecovers" element={<InsuranceCovers />} />
         <Route path="/patient/:patientUuid/:billUuid" element={<Invoice />} />
         <Route path="/patient/:patientUuid/:billUuid/claims" element={<ClaimScreen />} />
       </Routes>
