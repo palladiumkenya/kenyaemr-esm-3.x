@@ -6,8 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { InlineLoading, Layer, Tile, Button } from '@carbon/react';
 import classNames from 'classnames';
-import { ConfigurableLink } from '@openmrs/esm-framework';
-import { ArrowRight } from '@carbon/react/icons';
 
 export default function MetricsCards() {
   const { t } = useTranslation();
@@ -16,10 +14,9 @@ export default function MetricsCards() {
 
   const cards = useMemo(
     () => [
-      { title: 'Cumulative Bills', count: cumulativeBills, extensionPage: '' },
-      { title: 'Pending Bills', count: pendingBills, extensionPage: 'pendingBills' },
-      { title: 'Paid Bills', count: paidBills, extensionPage: 'paidBills' },
-      { title: 'Insurance Covers', count: paidBills, extensionPage: 'insurancecovers' },
+      { title: 'Cumulative Bills', count: cumulativeBills },
+      { title: 'Pending Bills', count: pendingBills },
+      { title: 'Paid Bills', count: paidBills },
     ],
     [cumulativeBills, pendingBills, paidBills],
   );
@@ -45,16 +42,6 @@ export default function MetricsCards() {
                 <div className={styles.headerLabelContainer}>
                   <label className={styles.headerLabel}>{card.title}</label>
                 </div>
-                {card.extensionPage != '' ? (
-                  <div className={styles.link}>
-                    <ConfigurableLink className={styles.link} to={'billing/' + card.extensionPage}>
-                      {t('viewAll', 'View All')}
-                    </ConfigurableLink>
-                    <ArrowRight size={16} />
-                  </div>
-                ) : (
-                  ''
-                )}
               </div>
               <div>
                 <p className={styles.totalsValue}>{card.count}</p>

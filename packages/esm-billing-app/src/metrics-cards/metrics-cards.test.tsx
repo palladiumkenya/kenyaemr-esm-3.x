@@ -33,7 +33,6 @@ describe('MetricsCards', () => {
     expect(screen.getByText('Cumulative Bills')).toBeInTheDocument();
     expect(screen.getByText('Pending Bills')).toBeInTheDocument();
     expect(screen.getByText('Paid Bills')).toBeInTheDocument();
-    expect(screen.getByText('Insurance Covers')).toBeInTheDocument();
   });
 });
 

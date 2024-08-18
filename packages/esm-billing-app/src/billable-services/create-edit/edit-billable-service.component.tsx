@@ -235,14 +235,7 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
                     setSearchTerm('');
                     setSelectedConcept(null);
                   }}
-                  value={(() => {
-                    if (selectedConcept) {
-                      return selectedConcept.display;
-                    }
-                    if (debouncedSearchTerm) {
-                      return value;
-                    }
-                  })()}
+                  value={selectedConcept ? selectedConcept.display : debouncedSearchTerm ? value : undefined}
                 />
               </ResponsiveWrapper>
             )}
@@ -288,7 +281,6 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
           <Controller
             control={control}
             name="serviceTypeName"
-            // defaultValue={initialValues?.serviceTypeName || null}
             render={({ field }) => {
               return (
                 <ComboBox

@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { ModalHeader, ModalBody, ModalFooter, Button, Loading } from '@carbon/react';
 import styles from './cancel-bill.scss';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { OpenmrsResource, showSnackbar } from '@openmrs/esm-framework';
 import { deleteBillableService } from '../../billable-service.resource';
 
-export const SoftDeleteBillableServiceModal: React.FC<{
+export const DeleteBillableServiceModal: React.FC<{
   onClose: () => void;
-  service: any;
+  service: OpenmrsResource;
 }> = ({ onClose, service }) => {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
@@ -19,13 +19,17 @@ export const SoftDeleteBillableServiceModal: React.FC<{
       .then(() => {
         showSnackbar({
           title: t('billableService', 'Billable Service'),
-          subtitle: 'Service has been successfully deleted.',
+          subtitle: t('serviceHasBeenSuccessfullyDeleted', 'Service has been successfully deleted.'),
           kind: 'success',
           timeoutInMs: 3000,
         });
       })
       .catch((error) => {
-        showSnackbar({ title: 'An error occurred trying to delete service', kind: 'error', subtitle: error.message });
+        showSnackbar({
+          title: t('anErrorhasOccuredTryingToDeleteService', 'An error occurred trying to delete service'),
+          kind: 'error',
+          subtitle: error.message,
+        });
       })
       .finally(() => setIsLoading(false));
   };

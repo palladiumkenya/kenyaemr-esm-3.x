@@ -48,7 +48,7 @@ const paymentFormSchema = z.object({
 });
 
 export type FormData = z.infer<typeof paymentFormSchema>;
-const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '1', uuid: null };
+const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '', uuid: null };
 type AddBillableServiceProps = {
   initialValues?: FormData;
   serviceId?: string;
@@ -287,7 +287,7 @@ const AddBillableService = () => {
                   items={serviceTypes ?? []}
                   titleText={t('serviceType', 'Service Type')}
                   itemToString={(item) => (item ? item.display : '')}
-                  placeholder="Select service type"
+                  placeholder={t('selectServiceType', 'Select service type')}
                   initialSelectedItem={serviceTypes.find((item) => item.uuid == field.value) ?? null}
                   onChange={({ selectedItem }) => {
                     field.onChange(selectedItem ? selectedItem?.uuid : '');

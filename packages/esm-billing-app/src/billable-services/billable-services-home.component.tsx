@@ -45,7 +45,7 @@ const BillableServiceHome: React.FC = () => {
   };
 
   const handleDeleteService = (service) => {
-    const dispose = showModal('soft-delete-billableservice-modal', {
+    const dispose = showModal('delete-billableservice-modal', {
       onClose: () => dispose(),
       service: service,
     });

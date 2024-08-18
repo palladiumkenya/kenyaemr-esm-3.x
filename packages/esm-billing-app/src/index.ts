@@ -26,7 +26,7 @@ import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
 import SHRSummaryPanell from './shr-summary/shr-summary.component';
-import { SoftDeleteBillableServiceModal } from './billable-services/bill-manager/modals/softDeleteBillableService.modal';
+import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -67,7 +67,7 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billableServicesHome = getSyncLifecycle(BillableServiceHome, options);
-export const softDeleteBillableServiceModal = getSyncLifecycle(SoftDeleteBillableServiceModal, options);
+export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 
 export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
