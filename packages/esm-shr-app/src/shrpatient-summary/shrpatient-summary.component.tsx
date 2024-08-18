@@ -149,10 +149,6 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
       header: t('onsetDate', 'Onset Date'),
     },
     {
-      key: 'value',
-      header: t('value', 'Value'),
-    },
-    {
       key: 'status',
       header: t('status', 'Status'),
     },

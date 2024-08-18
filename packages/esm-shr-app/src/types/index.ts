@@ -198,3 +198,13 @@ export interface ReferralReasonsProps {
   messageId: number;
   referralDate?: string;
 }
+
+export interface PatientIdentifier {
+  display: string;
+  uuid: string;
+  identifier: string;
+  identifierType: {
+    uuid: string;
+    display: string;
+  };
+}
