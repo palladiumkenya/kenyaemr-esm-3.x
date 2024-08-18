@@ -17,26 +17,20 @@ import { useTranslation } from 'react-i18next';
 import { MappedBill } from '../types';
 import styles from '../bills-table/bills-table.scss';
 import { ConfigurableLink } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 type PatientBillsProps = {
-  patientUuid: string;
   bills: Array<MappedBill>;
-  setPatientUuid: (patientUuid: string) => void;
 };
 
-const PastPatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, setPatientUuid }) => {
+export const patientBillsHeaders = [
+  { header: 'Date', key: 'date' },
+  { header: 'Billable Service (s)', key: 'billableService' },
+  { header: 'Total Amount', key: 'totalAmount' },
+  { header: 'status', key: 'status' },
+];
+
+export const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   const { t } = useTranslation();
-
-  if (!patientUuid) {
-    <h3>Missing patient information</h3>;
-  }
-
-  const tableHeaders = [
-    { header: 'Date', key: 'date' },
-    { header: 'Billable Service', key: 'billableService' },
-    { header: 'Total Amount', key: 'totalAmount' },
-  ];
 
   const billingUrl = '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${uuid}';
 
@@ -52,29 +46,17 @@ const PastPatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, set
     ),
     billableService: extractString(bill.billingService),
     totalAmount: convertToCurrency(bill.totalAmount),
+    status: bill.status,
   }));
-
-  if (bills.length === 0 && patientUuid !== '') {
-    <EmptyState displayText={'Pending Patient Bills Found'} headerTitle={'No Pending Patient Bills Found'} />;
-  }
 
   return (
     <div className={styles.container}>
       <DataTable
         rows={tableRows}
-        headers={tableHeaders}
+        headers={patientBillsHeaders}
         size="sm"
         useZebraStyles
-        render={({
-          rows,
-          headers,
-          getHeaderProps,
-          getExpandHeaderProps,
-          getRowProps,
-          getExpandedRowProps,
-          getTableProps,
-          getTableContainerProps,
-        }) => (
+        render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
           <TableContainer
             title={t('patientBills', 'Patient bill')}
             description={t('patientBillsDescription', 'List of patient bills')}
@@ -82,7 +64,6 @@ const PastPatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, set
             <Table {...getTableProps()} aria-label="sample table">
               <TableHead>
                 <TableRow>
-                  <TableHeader enableToggle={true} {...getExpandHeaderProps()} />
                   {headers.map((header, i) => (
                     <TableHeader
                       key={i}
@@ -96,16 +77,14 @@ const PastPatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, set
               </TableHead>
               <TableBody>
                 {rows.map((row, index) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow
-                      {...getRowProps({
-                        row,
-                      })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                  </React.Fragment>
+                  <TableRow
+                    {...getRowProps({
+                      row,
+                    })}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    ))}
+                  </TableRow>
                 ))}
               </TableBody>
             </Table>
@@ -115,5 +94,3 @@ const PastPatientBills: React.FC<PatientBillsProps> = ({ patientUuid, bills, set
     </div>
   );
 };
-
-export default PastPatientBills;

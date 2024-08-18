@@ -1,0 +1,22 @@
+@use '@carbon/styles/scss/spacing';
+
+.observation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: spacing.$spacing-03;
+  margin-block: spacing.$spacing-05;
+  margin-inline: 0 spacing.$spacing-05;
+}
+
+.observation > span {
+  align-self: center;
+  justify-self: start;
+}
+
+.parentConcept {
+  font-weight: bold;
+}
+
+.childConcept {
+  padding-inline-start: 0.8rem;
+}
