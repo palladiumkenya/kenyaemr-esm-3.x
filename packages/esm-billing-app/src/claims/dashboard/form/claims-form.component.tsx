@@ -138,6 +138,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       visitType: visitUuid,
       // guaranteeId: data.guaranteeId,
       guaranteeId: 'G-001',
+      claimCode: 'C-001',
       cashier: user.uuid,
       use: 'claim',
       insurer: 'SHA',
