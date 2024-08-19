@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import "~@openmrs/esm-styleguide/src/vars";
+@import '~@openmrs/esm-styleguide/src/vars';
 
 $ui-01: #f4f4f4;
 $ui-02: #ffffff;
@@ -15,55 +15,55 @@ $warning-background: #fff8e1;
 $openmrs-background-grey: #f4f4f4;
 $danger: #da1e28;
 $interactive-01: #0f62fe;
-$brand-teal-01: #3197D9;
-$button-primary: #0078A6;
+$brand-teal-01: #3197d9;
+$button-primary: #0078a6;
 
 .productiveHeading01 {
-  @include type.type-style("heading-01");
+  @include type.type-style('heading-01');
 }
 
 .productiveHeading02 {
-  @include type.type-style("heading-02");
+  @include type.type-style('heading-02');
 }
 
 .productiveHeading03 {
-  @include type.type-style("productive-heading-03");
+  @include type.type-style('productive-heading-03');
 }
 
 .productiveHeading04 {
-  @include type.type-style("productive-heading-04");
+  @include type.type-style('productive-heading-04');
 }
 
 .productiveHeading05 {
-  @include type.type-style("productive-heading-05");
+  @include type.type-style('productive-heading-05');
 }
 
 .productiveHeading06 {
-  @include type.type-style("productive-heading-06");
+  @include type.type-style('productive-heading-06');
 }
 
 .bodyShort01 {
-  @include type.type-style("body-short-01");
+  @include type.type-style('body-short-01');
 }
 
 .helperText01 {
-  @include type.type-style("helper-text-01");
+  @include type.type-style('helper-text-01');
 }
 
 .bodyShort02 {
-  @include type.type-style("body-short-02");
+  @include type.type-style('body-short-02');
 }
 
 .bodyLong01 {
-  @include type.type-style("body-long-01");
+  @include type.type-style('body-long-01');
 }
 
 .bodyLong02 {
-  @include type.type-style("body-long-02");
+  @include type.type-style('body-long-02');
 }
 
 .label01 {
-  @include type.type-style("label-01");
+  @include type.type-style('label-01');
 }
 
 .text02 {
@@ -100,7 +100,7 @@ aside {
     display: inline-block;
     font-size: var(--cds-label-01-font-size);
     font-weight: bold;
-    letter-spacing: var(--cds-label-01-letter-spacing, .32px);
+    letter-spacing: var(--cds-label-01-letter-spacing, 0.32px);
     line-height: 1rem;
     margin-bottom: 0.5rem;
     vertical-align: baseline;
