@@ -55,7 +55,7 @@
   "RlshipError": "Referral request Failed.......",
   "serveClient": "Serve client",
   "severity": "Severity",
-  "shrError": "Cant pull patient SHR Records, Patient NUPI (CR) Number Needed",
+  "shrError": "Patient must have CR Number.Please register the patient with the client registry to retrieve their SHR Records",
   "shrPatientSHRSummary": "Patient SHR Summary",
   "shrPortal": "SHR Portal",
   "shrRecords": "SHR Records",

@@ -29,7 +29,10 @@ const SHRSummaryPanel = () => {
             <CardHeader title={t('shrRecords', 'SHR Records')}>{''}</CardHeader>
             <EmptyDataIllustration />
             <p className={styles.content}>
-              {t('shrError', 'Cant pull patient SHR Records, Patient NUPI (CR) Number Needed')}
+              {t(
+                'shrError',
+                'Patient must have CR Number.Please register the patient with the client registry to retrieve their SHR Records',
+              )}
             </p>
           </Tile>
         </Layer>
