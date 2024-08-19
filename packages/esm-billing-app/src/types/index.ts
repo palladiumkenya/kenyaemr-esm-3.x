@@ -303,7 +303,6 @@ export interface SHAPackage {
   shaPackageCode: string;
   shaPackageName: string;
 }
-=======
 export interface FHIRErrorResponse {
   resourceType: string;
   issue: Issue[];
@@ -373,7 +372,6 @@ export type FHIRPatientResponse = {
     }>;
   };
 };
-=======
 export interface Package {
   uuid: string;
   packageCode: string;
