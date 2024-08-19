@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { z } from 'zod';
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
@@ -10,7 +10,6 @@ export const AUTH_TYPES = [
 
 export const authorizationSchema = z.object({
   otp: z.string().min(1, 'Required'),
-  sender: z.string().regex(PHONE_NUMBER_REGEX),
   receiver: z.string().regex(PHONE_NUMBER_REGEX),
   authMethod: z.string(),
 });
@@ -35,20 +34,16 @@ export function persistOTP(otp: string, patientUuid: string) {
   );
 }
 
-export async function sendOtp({ otp, receiver, sender }: z.infer<typeof authorizationSchema>) {
-  const payload = parseMessage({ otp, name: 'Omosh' }, 'Dear {{name}}, Bellow is an SHR OTP: {{otp}}');
+export async function sendOtp({ otp, receiver }: z.infer<typeof authorizationSchema>, patientName: string) {
+  const payload = parseMessage(
+    { otp, patient_name: 'Omosh', expiry_time: 5 },
+    'Dear {{patient_name}}, your OTP for accessing your Shared Health Records (SHR) is {{otp}}. Please enter this code to proceed. The code is valid for {{expiry_time}} minutes.',
+  );
 
-  const res = await openmrsFetch('send-sms-endpoint', {
+  const url = `${restBaseUrl}/kenyaemr/send-kenyaemr-sms?message=${payload}&phone=${receiver}`;
+
+  const res = await openmrsFetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      destination: receiver,
-      msg: payload,
-      sender_id: sender,
-      gateway: 'Pal_KeHMIS',
-    }),
     redirect: 'follow',
   });
   if (res.ok) {

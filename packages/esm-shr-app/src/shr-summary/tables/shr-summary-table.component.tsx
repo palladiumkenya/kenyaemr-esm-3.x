@@ -1,14 +1,16 @@
-import { Button, Layer, Tile } from '@carbon/react';
+import { Button, DataTableSkeleton, Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyDataIllustration,
+  ErrorState,
   getPatientUuidFromUrl,
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import usePatient from '../../hooks/usePatient';
 import SharedHealthRecordsSummary from '../../shrpatient-summary/shrpatient-summary.component';
 import styles from './shr-tables.scss';
 
@@ -22,6 +24,14 @@ const PatientSHRSummartTable: React.FC<PatientSHRSummartTableProps> = () => {
 
   const patientUuid = getPatientUuidFromUrl();
   const [accessGranted, setAccessGranted] = useState(false);
+  const { error, isLoading, patientPhoneNumber, patientName } = usePatient(patientUuid);
+
+  if (isLoading) {
+    return <DataTableSkeleton />;
+  }
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('shrRecords', 'SHR Records')} />;
+  }
 
   const handleInitiateAuthorization = () => {
     launchPatientWorkspace('shr-authorization-form', {
@@ -30,8 +40,11 @@ const PatientSHRSummartTable: React.FC<PatientSHRSummartTableProps> = () => {
       onVerified: () => {
         setAccessGranted(true);
       },
+      patientPhoneNumber,
+      patientName,
     });
   };
+
   if (!accessGranted) {
     return (
       <div>
