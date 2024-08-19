@@ -37,7 +37,7 @@
         "columns": 1,
         "columnSpan": 1
       }
-    },
+    }, 
     {
       "component": "benefitsPackage",
       "name": "benefits-package",
@@ -49,8 +49,12 @@
       "slot": "billing-dashboard-slot"
     },
     {
-      "component": "shrAuthorizationForm",
-      "name": "shr-authorization-form"
+      "component": "benefitsEligibilyRequestForm",
+      "name": "benefits-eligibility-request-form"
+    },
+    {
+      "component": "benefitsPreAuthForm",
+      "name": "benefits-pre-auth-form"
     },
     {
       "name": "billing-patient-summary",
@@ -75,25 +79,9 @@
       }
     },
     {
-      "name": "patient-chart-shr-summary-dashboard-link",
-      "component": "shrSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-shr-summary-dashboard-slot",
-        "path": "SHR Summary"
-      }
-    },
-    {
       "name": "billing-check-in-form",
       "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
-    },
-    {
-      "name": "SHR Summary",
-      "slot": "patient-chart-shr-summary-dashboard-slot",
-      "component": "patientSHRSummary"
     },
     {
       "slot": "system-admin-page-card-link-slot",
@@ -159,6 +147,31 @@
       "component": "testOrderAction",
       "slot": "tests-ordered-actions-slot",
       "order": 0
+    },
+    {
+      "component": "claimsManagementSideNavGroup",
+      "name": "claims-management-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "claims-management",
+        "title": "Claims management Overview",
+        "slot": "case-management-slot"
+      }
+    },
+     {
+      "component": "claimsManagementOverviewDashboardLink",
+      "name": "claims-management-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+     {
+      "component": "preAuthRequestsDashboardLink",
+      "name": "preauthrequest-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+    {
+      "component": "claimsOverview",
+      "name": "claims-overview-dashboard-link",
+      "slot": "claims-management-overview-slot"
     }
   ],
   "workspaces": [

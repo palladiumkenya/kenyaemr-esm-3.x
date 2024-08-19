@@ -8,6 +8,7 @@ import { Printer } from '@carbon/react/icons';
 import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print-layout/print.component';
 import SHRDataTable from './shrDataTable.component';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 interface SHRSummaryProps {
   patientUuid: string;
@@ -43,7 +44,7 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
 
   // If there is an error
   if (isError) {
-    return <span>{t('errorSHRSummary', 'Error loading SHR summary')}</span>;
+    return <ErrorState error={isError} headerTitle={t('shrRecordSummary', 'SHR Records Summary')} />;
   }
 
   // If there is no data
@@ -148,16 +149,31 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
       header: t('onsetDate', 'Onset Date'),
     },
     {
-      key: 'value',
-      header: t('value', 'Value'),
-    },
-    {
       key: 'status',
       header: t('status', 'Status'),
     },
     {
       key: 'dateRecorded',
       header: t('dateRecorded', 'Date Recorded'),
+    },
+  ];
+
+  const referralsHeaders = [
+    {
+      key: 'requesterCode',
+      header: t('requesterCode', 'Requester Code'),
+    },
+    {
+      key: 'Category',
+      header: t('Category', 'Category'),
+    },
+    {
+      key: 'priority',
+      header: t('priority', 'Priority'),
+    },
+    {
+      key: 'dateRequested',
+      header: t('dateRequested', 'Date Requested'),
     },
   ];
 
@@ -220,9 +236,12 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
                 <Tab className={styles.tab} id="conditions-tab" disabled={data?.conditions.length <= 0}>
                   {t('conditions', 'Conditions')}
                 </Tab>
-                {/* <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
+                <Tab className={styles.tab} id="medications-tab" disabled={data?.medications.length <= 0}>
                   {t('medications', 'Medications')}
-                </Tab> */}
+                </Tab>
+                <Tab className={styles.tab} id="referrals-tab" disabled={data?.referrals.length <= 0}>
+                  {t('referrals', 'Referrals')}
+                </Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -255,11 +274,16 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
                     <SHRDataTable data={data?.conditions} tableHeaders={conditionsHeaders} />
                   </div>
                 </TabPanel>
-                {/* <TabPanel>
+                <TabPanel>
                   <div>
                     <SHRDataTable data={data?.medications} tableHeaders={medicationsHeaders} />
                   </div>
-                </TabPanel> */}
+                </TabPanel>
+                <TabPanel>
+                  <div>
+                    <SHRDataTable data={data?.referrals} tableHeaders={referralsHeaders} />
+                  </div>
+                </TabPanel>
               </TabPanels>
             </Tabs>
           </div>
@@ -267,11 +291,7 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
       </div>
     );
   } else {
-    return (
-      <div>
-        <h4 className={styles.title}> {t('noSharedHealthRecordsFound', 'No Shared Health Records Found')}</h4>
-      </div>
-    );
+    return <EmptyState displayText={t('shrRecords', 'SHR Records')} headerTitle={t('shrRecords', 'SHR Records')} />;
   }
 };
 

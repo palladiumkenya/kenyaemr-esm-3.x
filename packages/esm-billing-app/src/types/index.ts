@@ -47,7 +47,7 @@ interface ProviderLink {
   resourceAlias: string;
 }
 
-interface Provider {
+export interface Provider {
   uuid: string;
   display: string;
   links: ProviderLink[];
@@ -76,7 +76,7 @@ interface PatientLink {
   resourceAlias: string;
 }
 
-interface Patient {
+export interface Patient {
   uuid: string;
   display: string;
   links: PatientLink[];
@@ -373,3 +373,44 @@ export type FHIRPatientResponse = {
     }>;
   };
 };
+=======
+export interface Package {
+  uuid: string;
+  packageCode: string;
+  packageName: string;
+  packageAccessPoint: 'OP' | 'IP' | 'Both';
+}
+
+export interface PatientBenefit {
+  packageCode: string;
+  packageName: string;
+  interventionCode: string;
+  interventionName: string;
+  interventioTariff: number;
+  requirePreauth: boolean;
+  status: string;
+}
+
+export interface InsurersBenefits extends PatientBenefit {
+  insurer: string;
+}
+
+export interface CoverageEligibilityResponse {
+  inforce: boolean;
+  insurer: string;
+  start: string;
+  end: string;
+  benefits: Array<PatientBenefit>;
+}
+
+export interface SHAIntervension {
+  interventionCode: string;
+  interventionName?: string;
+}
+
+export interface Diagnosis {
+  uuid: string;
+  name: string;
+  dateRecorded: string;
+  value: string;
+}
