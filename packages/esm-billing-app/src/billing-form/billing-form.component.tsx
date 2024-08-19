@@ -12,11 +12,11 @@ import {
   TableHeader,
   TableRow,
   TableCell,
-  ComboBox,
+  InlineLoading,
 } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
-import { useFetchSearchResults, processBillItems, useInterventions } from '../billing.resource';
+import { useFetchSearchResults, processBillItems } from '../billing.resource';
 import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
@@ -29,17 +29,9 @@ type BillingFormProps = {
 const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
-  const interventions = useInterventions('');
-  const [filteredInterventions, setFilteredItems] = useState(interventions);
-  const [selectedIntervention, setselectedIntervention] = useState(null);
-
   const [GrandTotal, setGrandTotal] = useState(0);
-
   const [searchOptions, setsearchOptions] = useState([]);
-  const [defaultSearchItems, setdefaultSearchItems] = useState([]);
-
   const [BillItems, setBillItems] = useState([]);
-
   const [searchVal, setsearchVal] = useState('');
   const [category, setCategory] = useState('');
 
@@ -99,21 +91,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   //  filter items
   const { data, error, isLoading, isValidating } = useFetchSearchResults(searchVal, category);
 
-  const handleSelectedIntervention = (item) => {
-    if (item) {
-      setselectedIntervention(item);
-    }
-  };
-  const handleInputChange = (inputValue) => {
-    if (inputValue) {
-      const updatedItems = interventions.filter((item) =>
-        item.shaInterventionName.toLowerCase().includes(inputValue.toLowerCase()),
-      );
-      setFilteredItems(updatedItems);
-    } else {
-      setFilteredItems(interventions);
-    }
-  };
   const filterItems = (val) => {
     setsearchVal(val);
 
@@ -167,7 +144,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
       payments: [],
       patient: patientUuid,
       status: 'PENDING',
-      interventionCode: selectedIntervention,
     };
 
     BillItems.map((o) => {
@@ -216,14 +192,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
     <Form className={styles.form}>
       <div className={styles.billingFormContainer}>
         <div className={styles.contentWrapper}>
-          <ComboBox
-            items={filteredInterventions}
-            itemToString={(item) => (item ? item.shaInterventionName : '')}
-            placeholder="Search here"
-            titleText="Select Intervention"
-            onChange={(selectedItem) => handleSelectedIntervention(selectedItem)}
-            onInputChange={(data) => handleInputChange(data)}
-          />
           <RadioButtonGroup
             legendText={t('selectCategory', 'Select category')}
             name="radio-button-group"
@@ -240,32 +208,28 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
               size="lg"
               placeholder="Find your drugs here..."
               labelText="Search"
-              disabled
               closeButtonLabelText="Clear search input"
-              onChange={() => {}}
+              onChange={(e) => filterItems(e.target.value)}
               className={styles.billingItem}
-              onKeyUp={(e) => {
-                filterItems(e.target.value);
-              }}
             />
 
+            {isLoading && <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />}
+
             <ul className={styles.searchContent}>
-              {searchOptions.map((row) => (
-                <li className={styles.searchItem}>
-                  <Button
-                    id={row.uuid}
-                    onClick={(e) => addItemToBill(e, row.uuid, row.Item, row.category, row.Price)}
-                    style={{ background: 'inherit', color: 'black' }}>
-                    {row.Item} Qnty.{row.Qnty} Ksh.{row.Price}
-                  </Button>
-                </li>
-              ))}
+              {searchVal &&
+                searchOptions.map((row) => (
+                  <li className={`${styles.searchItem} ${parseInt(row.Price) === 0 && styles.searchDisable}`}>
+                    <Button
+                      disabled={row.Price == 0}
+                      id={row.uuid}
+                      onClick={(e) => addItemToBill(e, row.uuid, row.Item, row.category, row.Price)}
+                      style={{ background: 'inherit', color: 'black' }}>
+                      {row.Item} Qnty.{row.Qnty} Ksh.{row.Price}
+                    </Button>
+                  </li>
+                ))}
             </ul>
           </div>
-
-          {/* <NumberInput id="carbon-number" min={0} max={100} value={50} ref={numberRef}
-        onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} 
-        className="testingNumberInput" label="NumberInput label" helperText="Optional helper text." invalidText="Number is not valid" /> */}
 
           <Table aria-label="sample table" className={styles.billingItem}>
             <TableHead>
@@ -294,8 +258,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                           row.Qnty = e.target.value;
                         }}
                       />
-                      {/* <NumberInput id={row.Item} min={0} max={100} value={row.Qnty} ref={numberRef}
-                        onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} /> */}
                     </TableCell>
                     <TableCell id={row.Item + 'Price'}>{row.Price}</TableCell>
                     <TableCell id={row.Item + 'Total'} className="totalValue">
