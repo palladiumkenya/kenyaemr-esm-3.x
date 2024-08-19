@@ -55,10 +55,12 @@
   "RlshipError": "Referral request Failed.......",
   "serveClient": "Serve client",
   "severity": "Severity",
+  "shrError": "Cant pull patient SHR Records, Patient NUPI (CR) Number Needed",
   "shrPatientSHRSummary": "Patient SHR Summary",
   "shrPortal": "SHR Portal",
   "shrRecords": "SHR Records",
   "shrRecordSummary": "SHR Records Summary",
+  "shrSummary": "SHR Summary",
   "status": "Status",
   "value": "Value",
   "vitals": "Vitals"

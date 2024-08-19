@@ -36,7 +36,7 @@ export function persistOTP(otp: string, patientUuid: string) {
 
 export async function sendOtp({ otp, receiver }: z.infer<typeof authorizationSchema>, patientName: string) {
   const payload = parseMessage(
-    { otp, patient_name: 'Omosh', expiry_time: 5 },
+    { otp, patient_name: patientName, expiry_time: 5 },
     'Dear {{patient_name}}, your OTP for accessing your Shared Health Records (SHR) is {{otp}}. Please enter this code to proceed. The code is valid for {{expiry_time}} minutes.',
   );
 
