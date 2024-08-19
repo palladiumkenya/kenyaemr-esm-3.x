@@ -21,14 +21,13 @@ import {
   TableToolbarMenu,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
-import { isDesktop, launchWorkspace, restBaseUrl } from '@openmrs/esm-framework';
+import { isDesktop, launchWorkspace, restBaseUrl, useDebounce } from '@openmrs/esm-framework';
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResourceRepresentation } from './../api';
 import FilterStockItems from './filter-stock-items.component';
 import { useStockItemsPages } from './stock-items-table.resource';
 import styles from './stock-items-table.scss';
-import { useDebounce } from '../hooks/debounce-hook';
 import { handleMutate } from './../utils';
 
 interface StockItemsTableProps {
@@ -61,13 +60,11 @@ const StockItemsTableComponent: React.FC<StockItemsTableProps> = () => {
     setSearchInput(query);
   };
 
-  const debouncedSearch = useDebounce((query: string) => {
-    setSearchString(query);
-  }, 1000);
+  const debouncedSearch = useDebounce(searchInput, 1000);
 
   useEffect(() => {
-    debouncedSearch(searchInput);
-  }, [searchInput, debouncedSearch]);
+    setSearchString(debouncedSearch);
+  }, [debouncedSearch]);
 
   const tableHeaders = useMemo(
     () => [
@@ -112,7 +109,6 @@ const StockItemsTableComponent: React.FC<StockItemsTableProps> = () => {
       key: `key-${stockItem?.uuid}`,
       uuid: `${stockItem?.uuid}`,
       type: stockItem?.drugUuid ? t('drug', 'Drug') : t('other', 'Other'),
-      // genericName: <EditStockItemActionsMenu data={items[index]} />,
       commonName: stockItem?.commonName,
       tradeName: stockItem?.drugUuid ? stockItem?.conceptName : '',
       preferredVendorName: stockItem?.preferredVendorName,
@@ -126,7 +122,6 @@ const StockItemsTableComponent: React.FC<StockItemsTableProps> = () => {
             kind="ghost"
             size="md"
             onClick={() => {
-              // stockItem.isDrug = !!stockItem.drugUuid;
               launchWorkspace('edit-purchase-price-form', {
                 workspaceTitle: t('editPurchasePriceForm', 'Edit Purchase Price Form'),
                 stockItem: stockItem,

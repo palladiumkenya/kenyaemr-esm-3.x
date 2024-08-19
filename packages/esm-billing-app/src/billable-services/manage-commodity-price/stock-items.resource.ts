@@ -1,9 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { ResourceFilterCriteria, toQueryParams } from './../api';
 import { PageableResult } from './../PageableResult';
-// import {
-//   StockItemDTO,
-// } from "../core/api/types/stockItem/StockItem";
 import useSWR from 'swr';
 
 export interface StockItemFilter extends ResourceFilterCriteria {
