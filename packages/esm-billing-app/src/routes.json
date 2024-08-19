@@ -177,6 +177,12 @@
       "component": "editBillForm",
       "title": "Edit Bill Form",
       "type": "other-form"
+    },
+    {
+      "name": "edit-purchase-price-form",
+      "component": "editPurchasePriceForm",
+      "title": "Edit Purchase Price Form",
+      "type": "other-form"
     }
   ]
 }
