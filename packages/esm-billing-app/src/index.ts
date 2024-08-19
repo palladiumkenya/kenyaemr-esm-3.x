@@ -1,5 +1,6 @@
-import { defineConfigSchema, getFeatureFlag, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
-import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
+
+import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
 import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
@@ -131,4 +132,9 @@ export function startupApp() {
   );
 
   defineConfigSchema(moduleName, configSchema);
+  registerFeatureFlag(
+    'healthInformationExchange',
+    'Health Information Exchange (HIE)',
+    'HIE feature flag, this enables and disables the HIE feature',
+  );
 }
