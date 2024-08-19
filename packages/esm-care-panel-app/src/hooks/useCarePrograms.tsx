@@ -12,12 +12,19 @@ export type PatientCarePrograms = {
 
 export const useCarePrograms = (patientUuid: string) => {
   const url = `/ws/rest/v1/kenyaemr/eligiblePrograms?patientUuid=${patientUuid}`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: Array<PatientCarePrograms> }>(url, openmrsFetch);
+  const {
+    data,
+    error,
+    isLoading,
+    isValidating,
+    mutate: mutateEligiblePrograms,
+  } = useSWR<{ data: Array<PatientCarePrograms> }>(url, openmrsFetch);
 
   return {
     carePrograms: data?.data?.filter((careProgram) => careProgram.enrollmentStatus !== 'active') ?? [],
     error,
     isLoading,
     isValidating,
+    mutateEligiblePrograms,
   };
 };

@@ -5,7 +5,7 @@ import styles from './bill-manager.scss';
 import billTableStyles from '../../bills-table/bills-table.scss';
 import { useBills } from '../../billing.resource';
 import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 
 type BillManagerProps = {};
@@ -36,18 +36,10 @@ const BillManager: React.FC<BillManagerProps> = () => {
           }}
         />
         {!patientUuid ? (
-          <div style={{ marginTop: '0.625rem' }}>
-            <Layer className={billTableStyles.emptyStateContainer}>
-              <Tile className={billTableStyles.tile}>
-                <div className={billTableStyles.illo}>
-                  <EmptyDataIllustration />
-                </div>
-                <p className={billTableStyles.content}>
-                  {t('notSearchedState', 'Please search for a patient in the input above')}
-                </p>
-              </Tile>
-            </Layer>
-          </div>
+          <EmptyState
+            displayText={t('notSearchedState', 'Please search for a patient in the input above')}
+            headerTitle="Not Searched"
+          />
         ) : isLoading ? (
           <DataTableSkeleton
             headers={headers}

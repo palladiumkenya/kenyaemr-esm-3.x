@@ -6,7 +6,7 @@
   "pages": [
     {
       "component": "billableServicesHome",
-      "route":"billable-services"
+      "route": "billable-services"
     },
     {
       "component": "requirePaymentModal",
@@ -27,9 +27,30 @@
       }
     },
     {
+      "component": "benefitsPackageDashboardLink",
+      "name": "benefits-package-dashboard-link",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "benefits-package",
+        "slot": "patient-chart-benefits-dashboard-slot",
+        "path": "Benefits Package",
+        "columns": 1,
+        "columnSpan": 1
+      }
+    },
+    {
+      "component": "benefitsPackage",
+      "name": "benefits-package",
+      "slot": "patient-chart-benefits-dashboard-slot"
+    },
+    {
       "component": "root",
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
+    },
+    {
+      "component": "shrAuthorizationForm",
+      "name": "shr-authorization-form"
     },
     {
       "name": "billing-patient-summary",
@@ -49,13 +70,30 @@
         "columns": 1,
         "columnSpan": 1,
         "slot": "patient-chart-billing-dashboard-slot",
-        "path": "Billing"
+        "path": "Billing",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "patient-chart-shr-summary-dashboard-link",
+      "component": "shrSummaryDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-shr-summary-dashboard-slot",
+        "path": "SHR Summary"
       }
     },
     {
       "name": "billing-check-in-form",
       "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
+    },
+    {
+      "name": "SHR Summary",
+      "slot": "patient-chart-shr-summary-dashboard-slot",
+      "component": "patientSHRSummary"
     },
     {
       "slot": "system-admin-page-card-link-slot",
@@ -82,11 +120,11 @@
     },
     {
       "name": "cancel-bill-modal",
-      "component": "cancelBillModal"   
+      "component": "cancelBillModal"
     },
     {
       "name": "refund-bill-modal",
-      "component": "refundBillModal"   
+      "component": "refundBillModal"
     },
     {
       "name": "delete-bill-modal",

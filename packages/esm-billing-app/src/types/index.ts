@@ -276,3 +276,83 @@ export type QueueEntry = {
 };
 
 export type RequestStatus = 'INITIATED' | 'COMPLETE' | 'FAILED' | 'NOT-FOUND';
+
+export enum PaymentStatus {
+  POSTED = 'POSTED',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  CREDITED = 'CREDITED',
+  CANCELLED = 'CANCELLED',
+  ADJUSTED = 'ADJUSTED',
+  EXEMPTED = 'EXEMPTED',
+}
+
+export interface FHIRErrorResponse {
+  resourceType: string;
+  issue: Issue[];
+}
+
+export interface Issue {
+  severity: string;
+  code: string;
+  diagnostics: string;
+}
+
+export type FHIRPatientResponse = {
+  resourceType: string;
+  id: string;
+  extension: Array<{
+    url: string;
+    valueCoding?: {
+      system: string;
+      code: string;
+      display: string;
+    };
+    valueString?: string;
+    valueInteger?: number;
+  }>;
+  identifier: Array<{
+    use: string;
+    type: {
+      coding: Array<{
+        system: string;
+        code: string;
+        display: string;
+      }>;
+    };
+    value: string;
+  }>;
+  active: boolean;
+  name: Array<{
+    text: string;
+    family: string;
+    given: Array<string>;
+    prefix: Array<string>;
+  }>;
+  telecom: Array<{
+    system: string;
+    value: string;
+  }>;
+  gender: string;
+  birthDate: string;
+  deceasedBoolean: boolean;
+  address: Array<{
+    extension: Array<
+      Array<{
+        url: string;
+        valueString: string;
+      }>
+    >;
+    use: string;
+    text: string;
+    city: string;
+    postalCode: string;
+    country: string;
+  }>;
+  maritalStatus: {
+    coding: Array<{
+      system: string;
+      code: string;
+    }>;
+  };
+};
