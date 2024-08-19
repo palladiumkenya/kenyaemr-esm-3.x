@@ -9,14 +9,14 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PatientBenefit } from '../../types';
+import { InsurersBenefits, PatientBenefit } from '../../types';
 import styles from './benebfits-table.scss';
 import GenericDataTable from './generic_data_table.component';
 
 const BenefitsTable = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
-  const [eligibleBenefits, setEligibleBenefits] = useState<Array<PatientBenefit>>([]);
+  const [eligibleBenefits, setEligibleBenefits] = useState<Array<InsurersBenefits>>([]);
   const [eligible, setEligible] = useState(false);
   const headerTitle = t('benefits', 'Benefits');
 
@@ -24,8 +24,8 @@ const BenefitsTable = () => {
     launchPatientWorkspace('benefits-eligibility-request-form', {
       workspaceTitle: 'Benefits Eligibility Request Form',
       patientUuid,
-      onSuccess: (eligibleBenefits: Array<PatientBenefit>) => {
-        setEligibleBenefits(eligibleBenefits);
+      onSuccess: (benefits: Array<InsurersBenefits>) => {
+        setEligibleBenefits(benefits);
         setEligible(true);
       },
     });
@@ -69,6 +69,10 @@ const BenefitsTable = () => {
       header: 'Package Name',
     },
     {
+      key: 'insurer',
+      header: 'Insurer',
+    },
+    {
       key: 'interventionCode',
       header: 'Intervension Code',
     },
@@ -77,7 +81,7 @@ const BenefitsTable = () => {
       header: 'Intervension Name',
     },
     {
-      key: 'interventioTariff',
+      key: 'interventionTariff',
       header: 'Intervension Tariff',
     },
     {

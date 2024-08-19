@@ -301,7 +301,19 @@ export interface PatientBenefit {
   interventionName: string;
   interventioTariff: number;
   requirePreauth: boolean;
-  status: 'APPROVED' | 'PENDING' | 'REJECTED';
+  status: string;
+}
+
+export interface InsurersBenefits extends PatientBenefit {
+  insurer: string;
+}
+
+export interface CoverageEligibilityResponse {
+  inforce: boolean;
+  insurer: string;
+  start: string;
+  end: string;
+  benefits: Array<PatientBenefit>;
 }
 
 export interface SHAIntervension {

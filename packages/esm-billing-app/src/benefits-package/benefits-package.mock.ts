@@ -1,11 +1,11 @@
-import { Diagnosis, Package, PatientBenefit, SHAIntervension } from '../types';
+import { CoverageEligibilityResponse, Diagnosis, Package, PatientBenefit, SHAIntervension } from '../types';
 
 export const patientBenefits = [
   {
     packageCode: 'SHA-001',
     packageName: 'Eye Care',
     interventionCode: 'SHA-001-01',
-    interventionName: 'Intervension 1',
+    interventionName: 'Percutaneous coronary',
     interventioTariff: 50000,
     requirePreauth: true,
     status: 'PENDING',
@@ -14,7 +14,7 @@ export const patientBenefits = [
     packageCode: 'SHA-002',
     packageName: 'Malaria',
     interventionCode: 'SHA-001-02',
-    interventionName: 'Intervension 2',
+    interventionName: 'Optimal medical therapy',
     interventioTariff: 20000,
     requirePreauth: false,
     status: 'PENDING',
