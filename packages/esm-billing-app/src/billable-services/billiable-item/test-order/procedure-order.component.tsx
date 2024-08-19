@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useBillableItem } from '../useBillableItem';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
@@ -11,18 +11,11 @@ type ProcedureOrderProps = {
       conceptUuid: string;
     };
   };
-  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const ProcedureOrder: React.FC<ProcedureOrderProps> = ({ order, setHasPrice }) => {
+const ProcedureOrder: React.FC<ProcedureOrderProps> = ({ order }) => {
   const { t } = useTranslation();
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
-
-  useEffect(() => {
-    if (billableItem) {
-      setHasPrice(billableItem.servicePrices.length > 0);
-    }
-  }, [billableItem, setHasPrice]);
 
   if (isLoading) {
     return (
@@ -34,7 +27,7 @@ const ProcedureOrder: React.FC<ProcedureOrderProps> = ({ order, setHasPrice }) =
     );
   }
 
-  return <PriceInfoOrder billableItem={billableItem} error={error} setHasPrice={setHasPrice} />;
+  return <PriceInfoOrder billableItem={billableItem} error={error} />;
 };
 
 export default ProcedureOrder;
