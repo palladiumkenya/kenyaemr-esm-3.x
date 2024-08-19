@@ -44,6 +44,8 @@ import CaseEncounterOverviewComponent from './case-management/encounters/case-en
 import FamilyRelationshipForm from './family-partner-history/family-relationship.workspace';
 import { OtherRelationships } from './other-relationships/other-relationships.component';
 import { OtherRelationshipsForm } from './other-relationships/other-relationships.workspace';
+import InPatient from './in-patient/in-patient.component';
+import { inPatientMeta } from './in-patient/in-patient.meta';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -125,6 +127,9 @@ export const labourAndDeliveryLink = getSyncLifecycle(createDashboardLink(labour
 
 export const genericNavLinks = getSyncLifecycle(GenericNavLinks, options);
 export const genericDashboard = getSyncLifecycle(GenericDashboard, options);
+
+export const inPatientChartLink = getSyncLifecycle(createDashboardLink(inPatientMeta), options);
+export const inPatientChartDashboard = getSyncLifecycle(InPatient, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);

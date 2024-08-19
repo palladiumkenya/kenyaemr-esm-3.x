@@ -26,3 +26,18 @@
   // padding: 10px;
   cursor: pointer;
 }
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
