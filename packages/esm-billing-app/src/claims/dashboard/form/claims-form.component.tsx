@@ -23,7 +23,7 @@ import { processClaims, useInterventions, usePackages, useVisit } from './claims
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { extractNameString, formatDate } from '../../../helpers/functions';
+import { formatDate } from '../../../helpers/functions';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -31,7 +31,6 @@ type ClaimsFormProps = {
 };
 
 const ClaimsFormSchema = z.object({
-  // guaranteeId: z.string().nonempty({ message: 'Guarantee Id is required' }),
   claimExplanation: z.string().nonempty({ message: 'Claim explanation is required' }),
   claimJustification: z.string().nonempty({ message: 'Claim justification is required' }),
   diagnoses: z
@@ -95,7 +94,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     mode: 'all',
     resolver: zodResolver(ClaimsFormSchema),
     defaultValues: {
-      // guaranteeId: '',
       claimExplanation: '',
       claimJustification: '',
       diagnoses: [],
@@ -136,7 +134,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       paidInFacility: true,
       patient: patientUuid,
       visitType: visitUuid,
-      // guaranteeId: data.guaranteeId,
       guaranteeId: 'G-001',
       claimCode: 'C-001',
       cashier: user.uuid,
@@ -377,24 +374,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               />
             </Layer>
           </Column>
-          {/* <Column className={styles.formClaimColumn}>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="guaranteeId"
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="guaranteeId"
-                    placeholder="Guarantee Id"
-                    labelText={t('guaranteeId', 'Guarantee Id')}
-                    invalid={!!errors.guaranteeId}
-                    invalidText={errors.guaranteeId?.message}
-                  />
-                )}
-              />
-            </Layer>
-          </Column> */}
         </Row>
         <Column>
           <Layer className={styles.input}>

@@ -37,7 +37,7 @@ const Invoice: React.FC = () => {
   const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
-  const isProcessClaimsFormEnabled = useFeatureFlag('claims-form');
+  const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
 
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
