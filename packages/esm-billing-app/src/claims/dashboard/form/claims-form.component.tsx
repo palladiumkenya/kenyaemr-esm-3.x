@@ -13,13 +13,14 @@ import {
   FilterableMultiSelect,
   MultiSelect,
   InlineLoading,
+  Tag,
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill, LineItem } from '../../../types';
 import { navigate, showSnackbar } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
-import { processClaims, useProviders, useVisit } from './claims-form.resource';
+import { processClaims, useInterventions, usePackages, useProviders, useVisit } from './claims-form.resource';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -55,6 +56,8 @@ const ClaimsFormSchema = z.object({
   facility: z.string().nonempty({ message: 'Facility is required' }),
   treatmentStart: z.string().nonempty({ message: 'Treatment start date is required' }),
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
+  packages: z.array(z.string()).nonempty({ message: 'At least one package is required' }),
+  interventions: z.array(z.string()).nonempty({ message: 'At least one intervention is required' }),
 });
 
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
@@ -63,6 +66,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit } = useVisit(patientUuid);
   const visitUuid = recentVisit?.visitType.uuid;
+  const { interventions } = useInterventions();
+  const { packages } = usePackages();
 
   const { data } = useProviders();
   const [loading, setLoading] = useState(false);
@@ -110,6 +115,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
       treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
       treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
+      packages: [],
+      interventions: [],
     },
   });
 
@@ -264,18 +271,99 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           <Layer className={styles.input}>
             <Controller
               control={control}
+              name="packages"
+              render={({ field }) => (
+                <>
+                  <>
+                    <div>
+                      {field.value.map((item, index) => (
+                        <Tag key={index} type="high-contrast">
+                          {packages.find((pkg) => pkg.shaPackageCode === item)?.shaPackageName || ''}
+                        </Tag>
+                      ))}
+                    </div>
+                  </>
+                  <MultiSelect
+                    {...field}
+                    items={packages}
+                    titleText={t('packages', 'Packages')}
+                    itemToString={(item) => (item ? item.shaPackageName : '')}
+                    label={field.value.length === 0 ? t('packagesOptions', 'Choose packages') : ''}
+                    id="packages"
+                    invalid={!!errors.packages}
+                    invalidText={errors.packages?.message}
+                    placeholder="Select Packages"
+                    onChange={({ selectedItems }) => {
+                      field.onChange(selectedItems.map((item) => item.shaPackageCode));
+                    }}
+                  />
+                </>
+              )}
+            />
+          </Layer>
+        </Column>
+        <Column>
+          <Layer className={styles.input}>
+            <Controller
+              control={control}
+              name="interventions"
+              render={({ field }) => (
+                <>
+                  <div>
+                    {field.value.map((item, index) => {
+                      const intervention = interventions.find((interv) => interv.shaInterventionCode === item);
+                      return (
+                        <Tag key={index} type="high-contrast">
+                          {intervention ? intervention.shaInterventionName : ''}
+                        </Tag>
+                      );
+                    })}
+                  </div>
+                  <MultiSelect
+                    {...field}
+                    items={interventions}
+                    titleText={t('interventions', 'Interventions')}
+                    itemToString={(item) => (item ? item.shaInterventionName : '')}
+                    label={field.value.length === 0 ? t('interventionsOption', 'Choose interventions') : ''}
+                    id="interventions"
+                    invalid={!!errors.interventions}
+                    invalidText={errors.interventions?.message}
+                    placeholder="Select Interventions"
+                    onChange={({ selectedItems }) => {
+                      field.onChange(selectedItems.map((item) => item.shaInterventionCode));
+                    }}
+                  />
+                </>
+              )}
+            />
+          </Layer>
+        </Column>
+        <Column>
+          <Layer className={styles.input}>
+            <Controller
+              control={control}
               name="diagnoses"
               render={({ field }) => (
-                <MultiSelect
-                  {...field}
-                  id="diagnoses"
-                  titleText={t('diagnoses', 'Diagnoses')}
-                  items={diagnoses}
-                  itemToString={(item) => (item ? item.text : '')}
-                  selectionFeedback="top-after-reopen"
-                  selectedItems={field.value}
-                  onChange={({ selectedItems }) => field.onChange(selectedItems)}
-                />
+                <>
+                  <div>
+                    {field.value.map((item, index) => (
+                      <Tag key={index} type="high-contrast">
+                        {item.text}
+                      </Tag>
+                    ))}
+                  </div>
+                  <MultiSelect
+                    {...field}
+                    id="diagnoses"
+                    titleText={t('diagnoses', 'Diagnoses')}
+                    items={diagnoses}
+                    itemToString={(item) => (item ? item.text : '')}
+                    selectionFeedback="top-after-reopen"
+                    label={field.value.length === 0 ? t('chooseDiagnosis', 'Choose diagnosis') : ''}
+                    selectedItems={field.value}
+                    onChange={({ selectedItems }) => field.onChange(selectedItems)}
+                  />
+                </>
               )}
             />
           </Layer>
@@ -286,20 +374,31 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               control={control}
               name="providerName"
               render={({ field }) => (
-                <FilterableMultiSelect
-                  {...field}
-                  id="provider_name"
-                  titleText={t('provider_name', 'Provider Name')}
-                  items={providers}
-                  itemToString={(item) => (item ? extractNameString(item.text) : '')}
-                  selectionFeedback="top-after-reopen"
-                  selectedItems={field.value}
-                  onChange={({ selectedItems }) => field.onChange(selectedItems)}
-                />
+                <>
+                  <div>
+                    {(field.value || []).map((item, index) => (
+                      <Tag key={index} type="high-contrast">
+                        {item.text}
+                      </Tag>
+                    ))}
+                  </div>
+                  <FilterableMultiSelect
+                    {...field}
+                    id="provider_name"
+                    titleText={t('provider_name', 'Provider Name')}
+                    items={providers}
+                    itemToString={(item) => (item ? extractNameString(item.text) : '')}
+                    label={field.value.length === 0 ? t('chooseProvider', 'Choose provider') : ''}
+                    selectionFeedback="top-after-reopen"
+                    selectedItems={field.value || []}
+                    onChange={({ selectedItems }) => field.onChange(selectedItems)}
+                  />
+                </>
               )}
             />
           </Layer>
         </Column>
+
         <Row className={styles.formClaimRow}>
           <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>

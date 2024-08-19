@@ -286,3 +286,20 @@ export enum PaymentStatus {
   ADJUSTED = 'ADJUSTED',
   EXEMPTED = 'EXEMPTED',
 }
+
+export interface Benefits {
+  shaPackageCode: string;
+  shaPackageName: string;
+  shaInterventionCode: string;
+  shaInterventionName: string;
+}
+
+export interface Intervention {
+  shaInterventionCode: string;
+  shaInterventionName?: string;
+}
+export interface SHAPackage {
+  uuid: string;
+  shaPackageCode: string;
+  shaPackageName: string;
+}
