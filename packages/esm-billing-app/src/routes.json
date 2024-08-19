@@ -37,7 +37,7 @@
         "columns": 1,
         "columnSpan": 1
       }
-    },
+    }, 
     {
       "component": "benefitsPackage",
       "name": "benefits-package",
@@ -48,7 +48,15 @@
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
     },
-   {
+    {
+      "component": "benefitsEligibilyRequestForm",
+      "name": "benefits-eligibility-request-form"
+    },
+    {
+      "component": "benefitsPreAuthForm",
+      "name": "benefits-pre-auth-form"
+    },
+    {
       "name": "billing-patient-summary",
       "component": "billingPatientSummary",
       "slot": "patient-chart-billing-dashboard-slot",
@@ -70,7 +78,6 @@
         "layoutMode": "anchored"
       }
     },
-    
     {
       "name": "billing-check-in-form",
       "slot": "extra-visit-attribute-slot",
@@ -140,6 +147,31 @@
       "component": "testOrderAction",
       "slot": "tests-ordered-actions-slot",
       "order": 0
+    },
+    {
+      "component": "claimsManagementSideNavGroup",
+      "name": "claims-management-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "claims-management",
+        "title": "Claims management Overview",
+        "slot": "case-management-slot"
+      }
+    },
+     {
+      "component": "claimsManagementOverviewDashboardLink",
+      "name": "claims-management-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+     {
+      "component": "preAuthRequestsDashboardLink",
+      "name": "preauthrequest-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+    {
+      "component": "claimsOverview",
+      "name": "claims-overview-dashboard-link",
+      "slot": "claims-management-overview-slot"
     }
   ],
   "workspaces": [
