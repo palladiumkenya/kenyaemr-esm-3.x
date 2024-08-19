@@ -96,5 +96,9 @@ export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
-  registerFeatureFlag('claims-form', 'Claims form', 'enables claim form on the esm-billing-app');
+  registerFeatureFlag(
+    'healthInformationExchange',
+    'Health Information Exchange (HIE)',
+    'HIE feature flag, this enables and disables the HIE feature',
+  );
 }
