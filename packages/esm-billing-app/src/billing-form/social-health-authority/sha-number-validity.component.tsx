@@ -1,75 +1,97 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Form, TextInput, Button, InlineLoading, InlineNotification } from '@carbon/react';
+import { Form, InlineNotification, Tooltip, InlineLoading } from '@carbon/react';
+import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
+import { useFormContext } from 'react-hook-form';
+import { formatDate, useConfig, usePatient } from '@openmrs/esm-framework';
+import { useHIESubscription } from '../hie.resource';
+import capitalize from 'lodash-es/capitalize';
+import styles from './sha-number-validity.scss';
+import { BillingConfig } from '../../config-schema';
 
 type SHANumberValidityProps = {
   paymentMethod: any;
+  patientUuid: string;
 };
 
-const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod }) => {
+const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, patientUuid }) => {
   const { t } = useTranslation();
-  const [shaNumber, setNumber] = useState('');
-  const [message, setMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [validity, setValidity] = useState(false); // TODO: set validity based on api response
-  const isSHA = paymentMethod?.name === 'Social Health Insurance Fund (SHA)';
+  const { nationalPatientUniqueIdentifierTypeUuid } = useConfig<BillingConfig>();
+  const { patient, isLoading } = usePatient(patientUuid);
+  const { watch } = useFormContext();
+  const isSHA = watch('insuranceScheme')?.includes('SHA');
+  const { hieSubscriptions, isLoading: isLoadingHIE, error } = useHIESubscription(patientUuid);
 
-  const handleValidateSHANumber = () => {
-    setIsLoading(true);
-    const randomNumber = Math.floor(Math.random() * 10) + 1;
-    // TODO call api to validate sha number
-    setTimeout(() => {
-      // TODO: set validity based on api response and update the expiry date based on the response as visit attribute
-      randomNumber % 2 === 0 ? setValidity(false) : setValidity(true);
-      setMessage(
-        randomNumber % 2 === 0
-          ? t('invalidSHANumber', 'SHA number is invalid, advice patient to update payment or contact SHA')
-          : t('validSHANumber', 'SHA number is valid, proceed with care'),
-      );
-      setIsLoading(false);
-    }, 1500);
-  };
+  const nationalUniquePatientIdentifier = patient?.identifier
+    ?.filter((identifier) => identifier)
+    .filter((identifier) =>
+      identifier.type.coding.some((coding) => coding.code === nationalPatientUniqueIdentifierTypeUuid),
+    );
 
   if (!isSHA) {
     return null;
   }
 
-  return (
-    <Form>
-      <TextInput
-        id="sha-number"
-        onChange={(e) => setNumber(e.target.value)}
-        labelText={t('shaNumber', 'SHA Number')}
-        placeholder={t('enterSHANumber', 'Enter SHA Number')}
+  if (isLoadingHIE || isLoading) {
+    return <InlineLoading status="active" description={t('loading', 'Loading ...')} />;
+  }
+  if (error) {
+    return (
+      <InlineNotification
+        aria-label="closes notification"
+        kind="error"
+        lowContrast={true}
+        statusIconDescription="notification"
+        title={t('error', 'Error')}
+        subtitle={t('errorRetrievingHIESubscription', 'Error retrieving HIE subscription')}
       />
-      {isLoading ? (
-        <InlineLoading
-          style={{ minHeight: '3rem', marginTop: '0.625rem' }}
-          status="active"
-          iconDescription="Loading"
-          description={t('validatingSHANumber', 'Validating SHA Number')}
-        />
-      ) : (
-        <Button
-          disabled={shaNumber.length === 0}
-          kind="tertiary"
-          style={{ marginTop: '0.625rem' }}
-          onClick={handleValidateSHANumber}>
-          {t('checkValidity', 'Check Validity')}
-        </Button>
-      )}
-      {message !== '' && (
-        <p style={{ marginTop: '0.625rem' }}>
-          <InlineNotification
-            aria-label="closes notification"
-            kind={validity ? 'success' : 'error'}
-            statusIconDescription="notification"
-            subtitle={message}
-            title={validity ? t('valid', 'Valid SHA Number') : t('shaNotValid', 'Invalid SHA Number')}
-            lowContrast={true}
-          />
-        </p>
-      )}
+    );
+  }
+
+  if (nationalUniquePatientIdentifier?.length === 0) {
+    return (
+      <InlineNotification
+        aria-label="closes notification"
+        kind="error"
+        lowContrast={true}
+        statusIconDescription="notification"
+        title={t('patientMissingUniqueIdentifierTitle', 'Patient missing NUPI')}
+        subtitle={t(
+          'patientMissingUniqueIdentifier',
+          'Patient is missing National unique patient identifier, SHA validation cannot be done, Advise patient to visit registration desk',
+        )}
+      />
+    );
+  }
+
+  return (
+    <Form className={styles.formContainer}>
+      {hieSubscriptions?.map(({ inforce, insurer, start, end }, index) => {
+        return (
+          <div key={`${index}${insurer}`} className={styles.hieCard}>
+            <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+              <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
+              <span className={styles.hieInsurerValue}>{capitalize(insurer)}</span>
+              {start && end && (
+                <Tooltip
+                  className={styles.tooltip}
+                  align="bottom"
+                  label={`Active from ${formatDate(new Date(start))} to ${formatDate(new Date(end))}`}>
+                  <button className="sb-tooltip-trigger" type="button">
+                    <Information />
+                  </button>
+                </Tooltip>
+              )}
+            </div>
+            <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+              <CheckboxCheckedFilled />
+              <span className={Boolean(inforce) ? styles.activeSubscription : styles.inActiveSubscription}>
+                {inforce ? t('active', 'Active') : t('inactive', 'Inactive')}
+              </span>
+            </div>
+          </div>
+        );
+      })}
     </Form>
   );
 };
