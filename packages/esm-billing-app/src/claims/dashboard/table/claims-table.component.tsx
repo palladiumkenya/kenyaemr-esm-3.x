@@ -17,6 +17,7 @@ import {
   TableToolbarSearch,
   TableSelectRow,
   Tile,
+  Button,
   Pagination,
   type DataTableHeader,
   type DataTableRow,
@@ -24,6 +25,8 @@ import {
 import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import styles from './claims-table.scss';
 import { LineItem, MappedBill } from '../../../types';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
+import { Add } from '@carbon/react/icons';
 
 type ClaimsTableProps = {
   bill: MappedBill;
@@ -65,12 +68,12 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   }, [filteredLineItems, currentPage, pageSize]);
 
   const tableHeaders: Array<typeof DataTableHeader> = [
-    { header: 'No', key: 'no' },
-    { header: 'Serial No.', key: 'serialno' },
-    { header: 'Bill Item', key: 'inventoryname' },
-    { header: 'Status', key: 'status' },
-    { header: 'Total amount', key: 'total' },
-    { header: 'Bill creation date', key: 'dateofbillcreation' },
+    { header: t('no', 'No'), key: 'no' },
+    { header: t('serialNo', 'Serial No'), key: 'serialno' },
+    { header: t('billItem', 'Bill Item'), key: 'inventoryname' },
+    { header: t('status', 'Status'), key: 'status' },
+    { header: t('totalAmount', 'Total amount'), key: 'total' },
+    { header: t('billCreationDate', 'Bill creation date'), key: 'dateofbillcreation' },
   ];
 
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
@@ -120,6 +123,11 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
 
   return (
     <div className={styles.claimContainer}>
+      <CardHeader title={t('patientBilling', 'Patient billing')}>
+        <Button renderIcon={Add} onClick={''} kind="ghost">
+          {t('attachForm', 'Attach Claims form')}
+        </Button>
+      </CardHeader>
       <DataTable headers={tableHeaders} isSortable rows={tableRows} size={responsiveSize} useZebraStyles>
         {({ rows, headers, getRowProps, getSelectionProps, getTableProps, getToolbarProps }) => (
           <TableContainer

@@ -31,7 +31,7 @@ type ClaimsFormProps = {
 };
 
 const ClaimsFormSchema = z.object({
-  guaranteeId: z.string().nonempty({ message: 'Guarantee Id is required' }),
+  // guaranteeId: z.string().nonempty({ message: 'Guarantee Id is required' }),
   claimExplanation: z.string().nonempty({ message: 'Claim explanation is required' }),
   claimJustification: z.string().nonempty({ message: 'Claim justification is required' }),
   diagnoses: z
@@ -95,7 +95,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     mode: 'all',
     resolver: zodResolver(ClaimsFormSchema),
     defaultValues: {
-      guaranteeId: '',
+      // guaranteeId: '',
       claimExplanation: '',
       claimJustification: '',
       diagnoses: [],
@@ -136,7 +136,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       paidInFacility: true,
       patient: patientUuid,
       visitType: visitUuid,
-      guaranteeId: data.guaranteeId,
+      // guaranteeId: data.guaranteeId,
+      guaranteeId: 'G-001',
       cashier: user.uuid,
       use: 'claim',
       insurer: 'SHA',
@@ -375,7 +376,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               />
             </Layer>
           </Column>
-          <Column className={styles.formClaimColumn}>
+          {/* <Column className={styles.formClaimColumn}>
             <Layer className={styles.input}>
               <Controller
                 control={control}
@@ -392,7 +393,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                 )}
               />
             </Layer>
-          </Column>
+          </Column> */}
         </Row>
         <Column>
           <Layer className={styles.input}>
