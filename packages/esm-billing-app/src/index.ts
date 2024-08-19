@@ -1,13 +1,8 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getFeatureFlag,
-  getSyncLifecycle,
-  registerBreadcrumbs,
-  registerFeatureFlag,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getFeatureFlag, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
+import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
+import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
 import BillHistory from './bill-history/bill-history.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
@@ -24,18 +19,14 @@ import ProcedureOrder from './billable-services/billiable-item/test-order/proced
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
+import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 import { configSchema } from './config-schema';
-import { benefitsPackageDashboardMeta, dashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
+import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
-import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
-import SHRSummaryPanell from './shr-summary/shr-summary.component';
-import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
-import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
-import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -51,10 +42,6 @@ export const billingSummaryDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const shrSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
-  options,
-);
 // t('billing', 'Billing')
 export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
@@ -89,13 +76,15 @@ export const preAuthRequestsDashboardLink = getSyncLifecycle(
 );
 export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 
-export const benefitsPackageDashboardLink = getSyncLifecycle(
-  createDashboardLink({
-    ...benefitsPackageDashboardMeta,
-    moduleName,
-  }),
-  options,
-);
+export const benefitsPackageDashboardLink = getFeatureFlag('benefits-package')
+  ? getSyncLifecycle(
+      createDashboardLink({
+        ...benefitsPackageDashboardMeta,
+        moduleName,
+      }),
+      options,
+    )
+  : undefined;
 
 export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
@@ -114,8 +103,6 @@ export const procedureOrder = getSyncLifecycle(ProcedureOrder, options);
 export const imagingOrder = getSyncLifecycle(ImagingOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
-export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanell, options);
-export const shrAuthorizationForm = getSyncLifecycle(SHRAuthorizationForm, options);
 
 // bill manager modals
 export const cancelBillModal = getSyncLifecycle(CancelBillModal, options);
@@ -135,6 +122,12 @@ export function startupApp() {
     'claims-management',
     'Claims Management Dashboard',
     'Controls the visibility of the Claims Management Dashboard in the side navigation.',
+  );
+
+  registerFeatureFlag(
+    'benefits-package',
+    'Benefits Package',
+    'Benefits package adds listing of patient benefits per insurance scheme upon requesting coverage eligibility.For the benefits the required preauth it supports that as well',
   );
 
   defineConfigSchema(moduleName, configSchema);

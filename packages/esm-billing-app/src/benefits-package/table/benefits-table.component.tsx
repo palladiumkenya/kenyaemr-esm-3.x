@@ -61,23 +61,23 @@ const BenefitsTable = () => {
 
   const headers = [
     {
-      key: 'shaPackageCode',
+      key: 'packageCode',
       header: 'Package Code',
     },
     {
-      key: 'shaPackageName',
+      key: 'packageName',
       header: 'Package Name',
     },
     {
-      key: 'shaInterventionCode',
+      key: 'interventionCode',
       header: 'Intervension Code',
     },
     {
-      key: 'shaInterventionName',
+      key: 'interventionName',
       header: 'Intervension Name',
     },
     {
-      key: 'shaInterventioTariff',
+      key: 'interventioTariff',
       header: 'Intervension Tariff',
     },
     {
@@ -103,7 +103,7 @@ const BenefitsTable = () => {
   };
 
   const rows = eligibleBenefits.map((benefit) => ({
-    id: benefit.shaPackageCode,
+    id: benefit.packageCode,
     ...benefit,
     action: benefit.requirePreauth ? (
       <Button renderIcon={ArrowRight} onClick={() => handleLaunchPreAuthForm(benefit)}>

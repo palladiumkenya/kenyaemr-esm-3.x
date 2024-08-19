@@ -37,7 +37,7 @@
         "columns": 1,
         "columnSpan": 1
       }
-    },
+    }, 
     {
       "component": "benefitsPackage",
       "name": "benefits-package",
@@ -47,10 +47,6 @@
       "component": "root",
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
-    },
-    {
-      "component": "shrAuthorizationForm",
-      "name": "shr-authorization-form"
     },
     {
       "component": "benefitsEligibilyRequestForm",
@@ -82,26 +78,11 @@
         "layoutMode": "anchored"
       }
     },
-    {
-      "name": "patient-chart-shr-summary-dashboard-link",
-      "component": "shrSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-shr-summary-dashboard-slot",
-        "path": "SHR Summary"
-      }
-    },
+
     {
       "name": "billing-check-in-form",
       "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
-    },
-    {
-      "name": "SHR Summary",
-      "slot": "patient-chart-shr-summary-dashboard-slot",
-      "component": "patientSHRSummary"
     },
     {
       "slot": "system-admin-page-card-link-slot",

@@ -2,20 +2,20 @@ import { Diagnosis, Package, PatientBenefit, SHAIntervension } from '../types';
 
 export const patientBenefits = [
   {
-    shaPackageCode: 'SHA-001',
-    shaPackageName: 'Eye Care',
-    shaInterventionCode: 'SHA-001-01',
-    shaInterventionName: 'Intervension 1',
-    shaInterventioTariff: 50000,
+    packageCode: 'SHA-001',
+    packageName: 'Eye Care',
+    interventionCode: 'SHA-001-01',
+    interventionName: 'Intervension 1',
+    interventioTariff: 50000,
     requirePreauth: true,
     status: 'PENDING',
   },
   {
-    shaPackageCode: 'SHA-002',
-    shaPackageName: 'Malaria',
-    shaInterventionCode: 'SHA-001-02',
-    shaInterventionName: 'Intervension 2',
-    shaInterventioTariff: 20000,
+    packageCode: 'SHA-002',
+    packageName: 'Malaria',
+    interventionCode: 'SHA-001-02',
+    interventionName: 'Intervension 2',
+    interventioTariff: 20000,
     requirePreauth: false,
     status: 'PENDING',
   },
@@ -23,30 +23,30 @@ export const patientBenefits = [
 
 export const packages = [
   {
-    shaPackageCode: 'SHA-001',
-    shaPackageName: 'Eye Care',
+    packageCode: 'SHA-001',
+    packageName: 'Eye Care',
     packageAccessPoint: 'OP',
   },
   {
-    shaPackageCode: 'SHA-002',
-    shaPackageName: 'Dental Care',
+    packageCode: 'SHA-002',
+    packageName: 'Dental Care',
     packageAccessPoint: 'IP',
   },
   {
-    shaPackageCode: 'SHA-003',
-    shaPackageName: 'Surgical',
+    packageCode: 'SHA-003',
+    packageName: 'Surgical',
     packageAccessPoint: 'OP',
   },
   {
-    shaPackageCode: 'SHA-004',
-    shaPackageName: 'Haemo-oncology',
+    packageCode: 'SHA-004',
+    packageName: 'Haemo-oncology',
     packageAccessPoint: 'OP',
   },
 ] as Array<Package>;
 
-export const intervensions = patientBenefits.map(({ shaInterventionCode, shaInterventionName }) => ({
-  shaInterventionCode,
-  shaInterventionName,
+export const intervensions = patientBenefits.map(({ interventionCode, interventionName }) => ({
+  interventionCode,
+  interventionName,
 })) as Array<SHAIntervension>;
 
 export const diagnoses = [

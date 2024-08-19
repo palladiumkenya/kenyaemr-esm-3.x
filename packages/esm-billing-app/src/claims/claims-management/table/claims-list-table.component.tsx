@@ -24,10 +24,10 @@ const ClaimsManagementTable: React.FC = () => {
   ];
 
   const shaHeaders = [
-    { key: 'shaPackageCode', header: 'Package Code' },
-    { key: 'shaPackageName', header: 'Package Name' },
-    { key: 'shaInterventionCode', header: 'Intervention Code' },
-    { key: 'shaInterventionName', header: 'Intervention Name' },
+    { key: 'packageCode', header: 'Package Code' },
+    { key: 'packageName', header: 'Package Name' },
+    { key: 'interventionCode', header: 'Intervention Code' },
+    { key: 'interventionName', header: 'Intervention Name' },
     { key: 'shaInterventionTariff', header: 'Intervention Tariff' },
     { key: 'status', header: 'Status' },
   ];
@@ -57,7 +57,7 @@ const ClaimsManagementTable: React.FC = () => {
           <GenericDataTable
             headers={shaHeaders}
             rows={shaData.map((item, index) => ({
-              id: `${item.shaPackageCode}-${item.shaInterventionCode}-${index}`,
+              id: `${item.packageCode}-${item.interventionCode}-${index}`,
               ...item,
             }))}
             title={t('benefit', 'Benefits')}

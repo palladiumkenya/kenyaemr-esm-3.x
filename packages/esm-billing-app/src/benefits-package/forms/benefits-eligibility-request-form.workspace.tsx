@@ -179,8 +179,8 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                     }}
                     initialSelectedItem={field.value}
                     label="Choose package"
-                    items={packages.map((r) => r.shaPackageCode)}
-                    itemToString={(item) => packages.find((r) => r.shaPackageCode === item)?.shaPackageName ?? ''}
+                    items={packages.map((r) => r.packageCode)}
+                    itemToString={(item) => packages.find((r) => r.packageCode === item)?.packageName ?? ''}
                   />
                 )}
               </>
@@ -225,10 +225,8 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                 }}
                 initialSelectedItems={field.value}
                 label="Choose option"
-                items={interventions.map((r) => r.shaInterventionCode)}
-                itemToString={(item) =>
-                  interventions.find((r) => r.shaInterventionCode === item)?.shaInterventionName ?? ''
-                }
+                items={interventions.map((r) => r.interventionCode)}
+                itemToString={(item) => interventions.find((r) => r.interventionCode === item)?.interventionName ?? ''}
               />
             )}
           />

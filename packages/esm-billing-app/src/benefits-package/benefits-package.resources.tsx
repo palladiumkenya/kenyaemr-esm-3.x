@@ -36,7 +36,7 @@ export const preAuthenticateBenefit = async (data: z.infer<typeof preauthSchema>
   return patientBenefits.map((benefit) => ({
     ...benefit,
     status:
-      data.patientBenefit === benefit.shaPackageCode
+      data.patientBenefit === benefit.packageCode
         ? markeAsApproved === true
           ? 'APPROVED'
           : markeAsApproved === false

@@ -289,24 +289,24 @@ export enum PaymentStatus {
 
 export interface Package {
   uuid: string;
-  shaPackageCode: string;
-  shaPackageName: string;
+  packageCode: string;
+  packageName: string;
   packageAccessPoint: 'OP' | 'IP' | 'Both';
 }
 
 export interface PatientBenefit {
-  shaPackageCode: string;
-  shaPackageName: string;
-  shaInterventionCode: string;
-  shaInterventionName: string;
-  shaInterventioTariff: number;
+  packageCode: string;
+  packageName: string;
+  interventionCode: string;
+  interventionName: string;
+  interventioTariff: number;
   requirePreauth: boolean;
   status: 'APPROVED' | 'PENDING' | 'REJECTED';
 }
 
 export interface SHAIntervension {
-  shaInterventionCode: string;
-  shaInterventionName?: string;
+  interventionCode: string;
+  interventionName?: string;
 }
 
 export interface Diagnosis {

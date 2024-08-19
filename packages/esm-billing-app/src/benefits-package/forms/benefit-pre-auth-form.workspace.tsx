@@ -42,8 +42,8 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
       patientUuid,
       facilityUuid,
       diagnosisUuids: [],
-      patientBenefit: benefit.shaPackageCode,
-      intervensions: [benefit.shaInterventionCode],
+      patientBenefit: benefit.packageCode,
+      intervensions: [benefit.interventionCode],
     },
     resolver: zodResolver(preauthSchema),
   });
@@ -77,8 +77,8 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
                 }}
                 initialSelectedItem={field.value}
                 label="Choose option"
-                items={[benefit].map((r) => r.shaPackageCode)}
-                itemToString={(item) => [benefit].find((r) => r.shaPackageCode === item)?.shaPackageName ?? ''}
+                items={[benefit].map((r) => r.packageCode)}
+                itemToString={(item) => [benefit].find((r) => r.packageCode === item)?.packageName ?? ''}
               />
             )}
           />
@@ -176,10 +176,8 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
                 titleText={t('intervensions', 'Intervensions')}
                 selectedItems={field.value}
                 label="Choose option"
-                items={interventions.map((r) => r.shaInterventionCode)}
-                itemToString={(item) =>
-                  interventions.find((r) => r.shaInterventionCode === item)?.shaInterventionName ?? ''
-                }
+                items={interventions.map((r) => r.interventionCode)}
+                itemToString={(item) => interventions.find((r) => r.interventionCode === item)?.interventionName ?? ''}
               />
             )}
           />

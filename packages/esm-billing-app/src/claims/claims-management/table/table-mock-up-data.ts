@@ -75,26 +75,26 @@ export const Claimrows = [
 
 export const shaMap = [
   {
-    shaPackageCode: 'SHA-001',
-    shaPackageName: 'Eye Care',
-    shaInterventionCode: 'SHA-001-01',
-    shaInterventionName: 'Percutaneous coronary',
+    packageCode: 'SHA-001',
+    packageName: 'Eye Care',
+    interventionCode: 'SHA-001-01',
+    interventionName: 'Percutaneous coronary',
     shaInterventionTariff: '5,000',
     status: 'Approved',
   },
   {
-    shaPackageCode: 'SHA-004',
-    shaPackageName: 'Heart Care',
-    shaInterventionCode: 'SHA-004-01',
-    shaInterventionName: 'Peripheral artery disease',
+    packageCode: 'SHA-004',
+    packageName: 'Heart Care',
+    interventionCode: 'SHA-004-01',
+    interventionName: 'Peripheral artery disease',
     shaInterventionTariff: '10,000',
     status: 'Approved',
   },
   {
-    shaPackageCode: 'SHA-002',
-    shaPackageName: 'Therapy Care',
-    shaInterventionCode: 'SHA-002-09',
-    shaInterventionName: 'Optimal medical therapy',
+    packageCode: 'SHA-002',
+    packageName: 'Therapy Care',
+    interventionCode: 'SHA-002-09',
+    interventionName: 'Optimal medical therapy',
     shaInterventionTariff: '500',
     status: 'UnApproved',
   },
@@ -102,10 +102,10 @@ export const shaMap = [
 
 export const mapShaData = (shaMap) => {
   return shaMap.map((item) => ({
-    shaPackageCode: item.shaPackageCode,
-    shaPackageName: item.shaPackageName,
-    shaInterventionCode: item.shaInterventionCode,
-    shaInterventionName: item.shaInterventionName,
+    packageCode: item.packageCode,
+    packageName: item.packageName,
+    interventionCode: item.interventionCode,
+    interventionName: item.interventionName,
     shaInterventionTariff: parseFloat(item.shaInterventionTariff.replace(/,/g, '')),
     status: item.status,
   }));
