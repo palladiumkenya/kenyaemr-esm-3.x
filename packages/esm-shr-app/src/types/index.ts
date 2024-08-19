@@ -149,6 +149,7 @@ export type SHRSummary = {
   allergies: Array<itemDetails>;
   conditions: Array<itemDetails>;
   medications: Array<itemDetails>;
+  referrals: Array<itemDetails>;
 };
 
 export type itemDetails = {

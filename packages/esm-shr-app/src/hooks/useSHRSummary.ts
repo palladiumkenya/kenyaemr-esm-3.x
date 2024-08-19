@@ -9,7 +9,7 @@ export const useSHRSummary = (patientUuid: string) => {
   const { data, mutate, error, isLoading } = useSWR<{ data: SHRSummary }>(shrSummaryUrl, openmrsFetch);
 
   return {
-    data: data?.data ? deepMerge({ ...data?.data, medications: [] }, require('./visits.json')) : null,
+    data: data?.data ? { ...data?.data, medications: [] } : null,
     isError: error,
     isLoading: isLoading,
   };
