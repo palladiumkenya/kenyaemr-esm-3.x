@@ -17,7 +17,6 @@ import {
   TableToolbarSearch,
   TableSelectRow,
   Tile,
-  Button,
   Pagination,
   type DataTableHeader,
   type DataTableRow,
@@ -25,8 +24,6 @@ import {
 import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import styles from './claims-table.scss';
 import { LineItem, MappedBill } from '../../../types';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { Add } from '@carbon/react/icons';
 
 type ClaimsTableProps = {
   bill: MappedBill;
@@ -123,11 +120,6 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
 
   return (
     <div className={styles.claimContainer}>
-      <CardHeader title={t('patientBilling', 'Patient billing')}>
-        <Button renderIcon={Add} onClick={''} kind="ghost">
-          {t('attachForm', 'Attach Claims form')}
-        </Button>
-      </CardHeader>
       <DataTable headers={tableHeaders} isSortable rows={tableRows} size={responsiveSize} useZebraStyles>
         {({ rows, headers, getRowProps, getSelectionProps, getTableProps, getToolbarProps }) => (
           <TableContainer
