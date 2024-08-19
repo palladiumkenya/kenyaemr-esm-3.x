@@ -8,6 +8,7 @@ import BillingHeader from '../billing-header/billing-header.component';
 import BillManager from './bill-manager/bill-manager.component';
 import { BillableServicesSideNav } from './billable-services-sidenav.component';
 import ManageCommodityPrices from './manage-commodity-price/manage-commodity-price.component';
+import BillSummary from './bill-summary/bill-summary.component';
 
 const BillableServiceHome: React.FC = () => {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ const BillableServiceHome: React.FC = () => {
             <Route path="/" element={<BillableServicesDashboard />} />
             <Route path="/add-service" element={<AddBillableService />} />
             <Route path="/bill-manager" element={<BillManager />} />
+            <Route path="/bill-summary" element={<BillSummary />} />
             <Route path="/manage-commodity-prices" element={<ManageCommodityPrices />} />
           </Routes>
         </section>

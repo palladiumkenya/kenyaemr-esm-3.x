@@ -1,0 +1,11 @@
+@use '@carbon/layout';
+
+.table,
+.errorStateSkeleton,
+.dataTableSkeleton {
+  padding: layout.$spacing-05;
+}
+
+.checkBoxWrapper {
+  padding: layout.$spacing-05;
+}
