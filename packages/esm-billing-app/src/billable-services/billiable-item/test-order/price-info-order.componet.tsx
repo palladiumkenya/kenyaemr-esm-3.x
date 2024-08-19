@@ -46,7 +46,7 @@ const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error, se
             </StructuredListRow>
           </StructuredListHead>
           <StructuredListBody>
-            {billableItem.servicePrices.map((priceItem) => (
+            {billableItem.servicePrices.map((priceItem: any) => (
               <StructuredListRow key={priceItem.uuid}>
                 <StructuredListCell className={styles.cell}>{priceItem.paymentMode.name}</StructuredListCell>
                 <StructuredListCell className={styles.cell}>{convertToCurrency(priceItem.price)}</StructuredListCell>
