@@ -15,7 +15,7 @@ export const benefits: Benefits[] = [
   },
 ];
 
-export const packages: SHAPackage[] = [
+export const mockPackages: SHAPackage[] = [
   {
     uuid: 'SHA-PKG-001',
     shaPackageCode: 'SHA-001',
@@ -38,7 +38,7 @@ export const packages: SHAPackage[] = [
   },
 ];
 
-export const interventions: Intervention[] = benefits.map(({ shaInterventionCode, shaInterventionName }) => ({
+export const mockInterventions: Intervention[] = benefits.map(({ shaInterventionCode, shaInterventionName }) => ({
   shaInterventionCode,
   shaInterventionName,
 }));

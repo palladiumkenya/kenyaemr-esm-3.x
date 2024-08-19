@@ -1,20 +1,20 @@
 import { useMemo } from 'react';
-import { interventions, packages } from './pre-auth-mock-data';
+import { mockInterventions, mockPackages } from './pre-auth-mock-data';
 
 export const useInterventions = () => {
-  const _interventions = useMemo(() => interventions, []);
+  const interventions = useMemo(() => mockInterventions, []);
   return {
     isLoading: false,
-    interventions: _interventions,
+    interventions: interventions,
     error: undefined,
   };
 };
 
 export const usePackages = () => {
-  const _packages = useMemo(() => packages, []);
+  const packages = useMemo(() => mockPackages, []);
   return {
     isLoading: false,
-    packages: _packages,
+    packages: packages,
     error: undefined,
   };
 };
