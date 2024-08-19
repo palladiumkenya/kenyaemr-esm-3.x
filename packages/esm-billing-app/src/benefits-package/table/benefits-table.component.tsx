@@ -74,15 +74,15 @@ const BenefitsTable = () => {
     },
     {
       key: 'interventionCode',
-      header: 'Intervension Code',
+      header: 'Intervention Code',
     },
     {
       key: 'interventionName',
-      header: 'Intervension Name',
+      header: 'Intervention Name',
     },
     {
       key: 'interventionTariff',
-      header: 'Intervension Tariff',
+      header: 'Intervention Tariff',
     },
     {
       key: 'status',
@@ -109,13 +109,14 @@ const BenefitsTable = () => {
   const rows = eligibleBenefits.map((benefit) => ({
     id: benefit.packageCode,
     ...benefit,
-    action: benefit.requirePreauth ? (
-      <Button renderIcon={ArrowRight} onClick={() => handleLaunchPreAuthForm(benefit)}>
-        Pre-Auth
-      </Button>
-    ) : (
-      '--'
-    ),
+    action:
+      benefit.requirePreauth && benefit.status === 'Pending' ? (
+        <Button renderIcon={ArrowRight} onClick={() => handleLaunchPreAuthForm(benefit)}>
+          Pre-Auth
+        </Button>
+      ) : (
+        '--'
+      ),
   }));
 
   return <GenericDataTable rows={rows} headers={headers} title={t('benefits', 'Benefits')} />;

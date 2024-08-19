@@ -54,7 +54,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
       providerUuid,
       patientUuid,
       facilityUuid,
-      diagnosisUuids: [],
+      diagnosisUuids: ['18aac1664e2-ac2b5c17-fc83-4256-8299-f9b222d50175'],
       isRefered: false,
       intervensions: [],
     },
@@ -198,10 +198,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                 invalidText={form.formState.errors[field.name]?.message}
                 id="diagnoses"
                 titleText={t('diagnosis', 'Diagnosis')}
-                onChange={(e) => {
-                  field.onChange(e.selectedItems);
-                }}
-                initialSelectedItems={field.value}
+                selectedItems={field.value}
                 label="Choose option"
                 items={diagnoses.map((r) => r.uuid)}
                 itemToString={(item) => diagnoses.find((r) => r.uuid === item)?.value ?? ''}
