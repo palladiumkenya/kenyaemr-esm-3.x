@@ -37,16 +37,20 @@ export const requestEligibility = async (data: z.infer<typeof eligibilityRequest
   return insurerBenefits;
 };
 
-export const preAuthenticateBenefit = async (data: z.infer<typeof preauthSchema>, markeAsApproved?: boolean) => {
-  return patientBenefits.map((benefit) => ({
+export const preAuthenticateBenefit = async (
+  data: z.infer<typeof preauthSchema>,
+  markeAsApproved: boolean,
+  benefits: Array<InsurersBenefits>,
+) => {
+  return benefits.map((benefit) => ({
     ...benefit,
     status:
       data.patientBenefit === benefit.packageCode
         ? markeAsApproved === true
-          ? 'APPROVED'
+          ? 'Approved'
           : markeAsApproved === false
-          ? 'REJECTED'
-          : 'PENDING'
+          ? 'REjected'
+          : 'Pending'
         : benefit.status,
   }));
 };

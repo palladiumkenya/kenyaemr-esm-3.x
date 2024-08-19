@@ -8,7 +8,7 @@ import { z } from 'zod';
 import useInterventions from '../../hooks/useInterventions';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
-import { PatientBenefit } from '../../types';
+import { InsurersBenefits, PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-eligibility-request-form.scss';
 
@@ -18,9 +18,16 @@ interface BenefitPreAuthFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   benefit: PatientBenefit;
   onSuccess: (benefits: Array<PatientBenefit>) => void;
+  benefits: Array<InsurersBenefits>;
 }
 
-const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid, benefit, onSuccess }) => {
+const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
+  closeWorkspace,
+  patientUuid,
+  benefit,
+  onSuccess,
+  benefits,
+}) => {
   const { t } = useTranslation();
   const {
     currentVisit: { patient },
@@ -34,7 +41,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
   const { isLoading: intervensionsLoading, interventions } = useInterventions();
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
-  const [approve, setApprove] = useState<boolean | undefined>();
+  const [approve, setApprove] = useState<boolean>(false);
 
   const form = useForm<BenefitsPreAuth>({
     defaultValues: {
@@ -50,7 +57,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
 
   const onSubmit = async (values: BenefitsPreAuth) => {
     try {
-      const response = await preAuthenticateBenefit(values, approve);
+      const response = await preAuthenticateBenefit(values, approve, benefits);
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Preauth Approved succesfully' });
       closeWorkspace();
       onSuccess(response);

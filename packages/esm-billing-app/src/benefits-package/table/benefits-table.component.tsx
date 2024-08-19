@@ -82,7 +82,11 @@ const BenefitsTable = () => {
     },
     {
       key: 'interventionTariff',
-      header: 'Intervention Tariff',
+      header: 'Tariff',
+    },
+    {
+      key: 'pendingAmount',
+      header: 'Pending amount',
     },
     {
       key: 'status',
@@ -100,8 +104,9 @@ const BenefitsTable = () => {
       workspaceTitle: 'Benefits Pre-Auth Form',
       patientUuid,
       benefit,
+      benefits: eligibleBenefits,
       onSuccess: (benefits) => {
-        // setBenefits(benefits);
+        setEligibleBenefits(benefits);
       },
     });
   };
@@ -109,6 +114,7 @@ const BenefitsTable = () => {
   const rows = eligibleBenefits.map((benefit) => ({
     id: benefit.packageCode,
     ...benefit,
+    status: benefit.requirePreauth ? benefit.status : 'Approved',
     action:
       benefit.requirePreauth && benefit.status === 'Pending' ? (
         <Button renderIcon={ArrowRight} onClick={() => handleLaunchPreAuthForm(benefit)}>
