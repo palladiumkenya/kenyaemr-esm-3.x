@@ -149,6 +149,7 @@ export type SHRSummary = {
   allergies: Array<itemDetails>;
   conditions: Array<itemDetails>;
   medications: Array<itemDetails>;
+  referrals: Array<itemDetails>;
 };
 
 export type itemDetails = {
@@ -197,4 +198,14 @@ export interface ReferralReasonsProps {
   reasonCode: string;
   messageId: number;
   referralDate?: string;
+}
+
+export interface PatientIdentifier {
+  display: string;
+  uuid: string;
+  identifier: string;
+  identifierType: {
+    uuid: string;
+    display: string;
+  };
 }

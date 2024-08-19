@@ -18,14 +18,12 @@ import TestOrderAction from './billable-services/billiable-item/test-order/test-
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import { configSchema } from './config-schema';
-import { benefitsPackageDashboardMeta, dashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
+import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
-import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
-import SHRSummaryPanell from './shr-summary/shr-summary.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -41,10 +39,6 @@ export const billingSummaryDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const shrSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
-  options,
-);
 // t('billing', 'Billing')
 export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
@@ -79,8 +73,6 @@ export const procedureOrder = getSyncLifecycle(ProcedureOrder, options);
 export const imagingOrder = getSyncLifecycle(ImagingOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
-export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanell, options);
-export const shrAuthorizationForm = getSyncLifecycle(SHRAuthorizationForm, options);
 
 // bill manager modals
 export const cancelBillModal = getSyncLifecycle(CancelBillModal, options);

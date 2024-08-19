@@ -1,3 +1,6 @@
+import mergeWith from 'lodash/mergeWith';
+import isArray from 'lodash/isArray';
+
 export function extractNameString(formattedString) {
   if (!formattedString) {
     return '';
@@ -19,3 +22,13 @@ export const formatPatientName = (patient) => {
 export const uppercaseText = (text) => {
   return text.toUpperCase();
 };
+
+function customizer(objValue: Record<string, any>, srcValue: Record<string, any>) {
+  if (isArray(objValue)) {
+    return objValue.concat(srcValue);
+  }
+}
+
+export function deepMerge(obj1: Record<string, any>, obj2: Record<string, any>) {
+  return mergeWith({}, obj1, obj2, customizer);
+}
