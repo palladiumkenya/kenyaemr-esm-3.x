@@ -260,11 +260,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
           ))}
         </ul>
       </div>
-
-      {/* <NumberInput id="carbon-number" min={0} max={100} value={50} ref={numberRef}
-      onChange={(e)=> alert((numberRef.current as HTMLInputElement).value)} 
-      className="testingNumberInput" label="NumberInput label" helperText="Optional helper text." invalidText="Number is not valid" /> */}
-
       <Table aria-label="sample table" className={styles.billingItem}>
         <TableHead>
           <TableRow>
