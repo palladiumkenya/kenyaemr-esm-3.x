@@ -8,11 +8,24 @@ export const AUTH_TYPES = [
   { value: 'biometrics', label: 'BIOMETRICS' },
 ];
 
-export const authorizationSchema = z.object({
-  otp: z.string().min(1, 'Required'),
-  receiver: z.string().regex(PHONE_NUMBER_REGEX),
-  authMethod: z.string(),
-});
+export const authorizationSchema = z
+  .object({
+    otp: z.string().min(1, 'Required'),
+    receiver: z.string().regex(PHONE_NUMBER_REGEX).optional(),
+    authMethod: z.string(),
+  })
+  .refine(
+    (data) => {
+      if (data.authMethod === 'otp') {
+        return data.receiver;
+      }
+      return true;
+    },
+    {
+      message: 'Required',
+      path: ['receiver'],
+    },
+  );
 
 export function generateOTP(length = 5) {
   var string = '0123456789';

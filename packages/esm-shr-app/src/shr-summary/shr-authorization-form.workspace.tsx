@@ -85,7 +85,6 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
               name="receiver"
               render={({ field }) => (
                 <TextInput
-                  readOnly
                   invalid={form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   {...field}
