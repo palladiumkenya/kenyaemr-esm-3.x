@@ -10,7 +10,7 @@ export const eligibilityRequestShema = z.object({
   packageUUid: z.string(),
   diagnosisUuids: z.array(z.string()),
   isRefered: z.boolean(),
-  intervensions: z.array(z.string()),
+  interventions: z.array(z.string()),
 });
 
 export const preauthSchema = z.object({
@@ -18,7 +18,7 @@ export const preauthSchema = z.object({
   providerUuid: z.string().uuid(),
   facilityUuid: z.string().uuid(),
   diagnosisUuids: z.array(z.string()).nonempty('Require atleast 1 diagnoses'),
-  intervensions: z.array(z.string()).nonempty('Require atleast 1 intervension'),
+  interventions: z.array(z.string()).nonempty('Require atleast 1 intervention'),
   patientBenefit: z.string(),
 });
 

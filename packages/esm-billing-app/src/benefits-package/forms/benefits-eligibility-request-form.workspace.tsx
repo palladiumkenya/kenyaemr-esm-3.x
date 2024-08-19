@@ -56,7 +56,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
       facilityUuid,
       diagnosisUuids: ['18aac1664e2-ac2b5c17-fc83-4256-8299-f9b222d50175'],
       isRefered: false,
-      intervensions: [],
+      interventions: [],
     },
     resolver: zodResolver(eligibilityRequestShema),
   });
@@ -209,14 +209,14 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
         <Column>
           <Controller
             control={form.control}
-            name="intervensions"
+            name="interventions"
             render={({ field }) => (
               <MultiSelect
                 ref={field.ref}
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
-                id="intervensions"
-                titleText={t('intervensions', 'Intervensions')}
+                id="interventions"
+                titleText={t('interventions', 'Interventions')}
                 onChange={(e) => {
                   field.onChange(e.selectedItems);
                 }}

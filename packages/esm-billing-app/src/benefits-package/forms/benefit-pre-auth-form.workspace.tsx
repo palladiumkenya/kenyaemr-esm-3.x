@@ -43,7 +43,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
       facilityUuid,
       diagnosisUuids: ['18aac1664e2-ac2b5c17-fc83-4256-8299-f9b222d50175'],
       patientBenefit: benefit.packageCode,
-      intervensions: [benefit.interventionCode],
+      interventions: [benefit.interventionCode],
     },
     resolver: zodResolver(preauthSchema),
   });
@@ -166,14 +166,14 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
         <Column>
           <Controller
             control={form.control}
-            name="intervensions"
+            name="interventions"
             render={({ field }) => (
               <MultiSelect
                 ref={field.ref}
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
-                id="intervensions"
-                titleText={t('intervensions', 'Intervensions')}
+                id="interventions"
+                titleText={t('interventions', 'Interventions')}
                 selectedItems={field.value}
                 label="Choose option"
                 items={interventions.map((r) => r.interventionCode)}
