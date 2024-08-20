@@ -21,9 +21,15 @@
     position: relative;
     top: 0;
 
-    div {
+    > div {
       height: auto;
       align-items: center;
     }
   }
+}
+
+.skeletonIcon {
+  width: layout.$spacing-09;
+  height: layout.$spacing-09;
+  margin-right: layout.$spacing-05;
 }

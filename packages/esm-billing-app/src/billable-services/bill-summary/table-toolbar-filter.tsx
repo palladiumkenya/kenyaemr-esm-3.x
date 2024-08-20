@@ -1,7 +1,8 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Filter } from '@carbon/react/icons';
-import { Popover, PopoverContent, Button, Checkbox, usePrefix } from '@carbon/react';
+import { Popover, PopoverContent, Button, Checkbox, usePrefix, SkeletonIcon } from '@carbon/react';
 import styles from './bill-summary.scss';
+import { usePaymentModes } from '../../billing.resource';
 
 interface TableToolbarFilterProps {
   /**
@@ -18,6 +19,8 @@ interface TableToolbarFilterProps {
 export const TableToolbarFilter = ({ onApplyFilter, onResetFilter }: TableToolbarFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
+
+  const { isLoading, paymentModes } = usePaymentModes(false);
 
   const prefix = usePrefix();
 
@@ -49,6 +52,10 @@ export const TableToolbarFilter = ({ onApplyFilter, onResetFilter }: TableToolba
     }
   };
 
+  if (isLoading) {
+    return <SkeletonIcon className={styles.skeletonIcon} />;
+  }
+
   return (
     <Popover align={'left'} caret={true} open={isOpen} onRequestClose={() => setIsOpen(false)}>
       <button
@@ -65,30 +72,14 @@ export const TableToolbarFilter = ({ onApplyFilter, onResetFilter }: TableToolba
         <div className={styles.checkBoxWrapper}>
           <fieldset className={`${prefix}--fieldset`}>
             <legend className={`${prefix}--label`}>Filter options</legend>
-            <Checkbox
-              labelText="Marc"
-              id="checkbox1"
-              onChange={handleCheckboxChange}
-              checked={selectedCheckboxes.includes('Marc')}
-            />
-            <Checkbox
-              labelText="300"
-              id="checkbox2"
-              onChange={handleCheckboxChange}
-              checked={selectedCheckboxes.includes('300')}
-            />
-            <Checkbox
-              labelText="80"
-              id="checkbox3"
-              onChange={handleCheckboxChange}
-              checked={selectedCheckboxes.includes('80')}
-            />
-            <Checkbox
-              labelText="Robin"
-              id="checkbox4"
-              onChange={handleCheckboxChange}
-              checked={selectedCheckboxes.includes('Robin')}
-            />
+            {paymentModes.map((method) => (
+              <Checkbox
+                labelText={method.name}
+                id={`checkbox-${method.name}`}
+                onChange={handleCheckboxChange}
+                checked={selectedCheckboxes.includes(method.name)}
+              />
+            ))}
           </fieldset>
         </div>
         <Button kind="secondary" title="Reset filters" onClick={handleResetFilter}>

@@ -19,6 +19,8 @@ import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { TableToolbarFilter } from './table-toolbar-filter';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
+import flatMapDeep from 'lodash-es/flatMapDeep';
+import { MappedBill } from '../../types';
 
 const headers = [
   { header: 'date', key: 'dateCreated' },
@@ -30,17 +32,53 @@ const headers = [
 
 const BillSummary = () => {
   const { bills, isLoading, error } = usePaidBills();
-  const [renderedRows, setRenderedRows] = useState(bills);
+  const [renderedRows, setRenderedRows] = useState<null | MappedBill[]>(null);
 
   useEffect(() => {
-    if (renderedRows.length === 0 && bills.length > 1) {
+    if (bills.length > 0 && renderedRows === null) {
       setRenderedRows(bills);
     }
-  }, [bills, renderedRows.length]);
+  }, [bills, renderedRows]);
 
   const { t } = useTranslation();
 
-  if (isLoading) {
+  const getAllValues = (obj: Object) => {
+    return flatMapDeep(obj, (value) => {
+      if (typeof value === 'object' && value !== null) {
+        return getAllValues(value);
+      }
+      return value;
+    });
+  };
+
+  const handleTableFilter = (selectedCheckboxes: Array<string>) => {
+    setRenderedRows([]);
+    for (let i = 0; i < selectedCheckboxes.length; i++) {
+      // Filter the items inside the rows list
+      const filteredRows = bills.filter((row) => {
+        const rowValues: string[] = getAllValues(row);
+        return rowValues.some((value) => String(value).toLowerCase().includes(selectedCheckboxes[i].toLowerCase()));
+      });
+
+      setRenderedRows((prevData) => {
+        // Filter out duplicate rows
+        const uniqueRows = filteredRows.filter((row) => {
+          return !prevData.some((prevRow) => {
+            return Object.keys(row).every((key) => {
+              return row[key] === prevRow[key];
+            });
+          });
+        });
+        return [...prevData, ...uniqueRows];
+      });
+    }
+  };
+
+  const handleOnResetFilter = () => {
+    setRenderedRows(bills);
+  };
+
+  if (isLoading || renderedRows === null) {
     return (
       <div className={styles.dataTableSkeleton}>
         <DataTableSkeleton
@@ -64,36 +102,9 @@ const BillSummary = () => {
     );
   }
 
-  const handleTableFilter = (selectedCheckboxes: Array<string>) => {
-    setRenderedRows([]);
-    for (let i = 0; i < selectedCheckboxes.length; i++) {
-      // Filter the items inside the rows list
-      const filteredRows = bills.filter((row) => {
-        return Object.values(row).some((value) =>
-          String(value).toLowerCase().includes(selectedCheckboxes[i].toLowerCase()),
-        );
-      });
-      setRenderedRows((prevData) => {
-        // Filter out duplicate rows
-        const uniqueRows = filteredRows.filter((row) => {
-          return !prevData.some((prevRow) => {
-            return Object.keys(row).every((key) => {
-              return row[key] === prevRow[key];
-            });
-          });
-        });
-        return [...prevData, ...uniqueRows];
-      });
-    }
-  };
-
-  const handleOnResetFilter = () => {
-    setRenderedRows(bills);
-  };
-
   return (
     <div className={styles.table}>
-      <DataTable rows={bills} headers={headers}>
+      <DataTable rows={renderedRows} headers={headers}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, onInputChange }) => (
           <TableContainer title="Paid Bills" description="Paid Bills Summary">
             <div className={styles.tableToolBar}>
