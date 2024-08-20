@@ -11,9 +11,10 @@ type ProcedureOrderProps = {
       conceptUuid: string;
     };
   };
+  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const ProcedureOrder: React.FC<ProcedureOrderProps> = ({ order }) => {
+const ProcedureOrder: React.FC<ProcedureOrderProps> = ({ order, setHasPrice }) => {
   const { t } = useTranslation();
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
 
@@ -27,7 +28,7 @@ const ProcedureOrder: React.FC<ProcedureOrderProps> = ({ order }) => {
     );
   }
 
-  return <PriceInfoOrder billableItem={billableItem} error={error} />;
+  return <PriceInfoOrder billableItem={billableItem} error={error} setHasPrice={setHasPrice} />;
 };
 
 export default ProcedureOrder;

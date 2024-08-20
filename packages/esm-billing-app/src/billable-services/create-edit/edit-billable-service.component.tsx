@@ -48,25 +48,32 @@ const paymentFormSchema = z.object({
 });
 
 export type FormData = z.infer<typeof paymentFormSchema>;
-const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '', uuid: null };
+const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '1', uuid: null };
 type AddBillableServiceProps = {
-  initialValues?: FormData;
-  serviceId?: string;
-  serviceConcept?: any;
+  initialValues: FormData;
+  serviceId: string;
+  serviceConcept: any;
 };
-const AddBillableService = () => {
+const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues, serviceId, serviceConcept }) => {
   const { t } = useTranslation();
+  useEffect(() => {
+    if (!serviceId) {
+      handleRedirectToAddService();
+    }
+  }, [serviceId, navigate]);
+
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const { serviceTypes, isLoading: isLoadingServicesTypes } = useServiceTypes();
+  const [validPaymentModes, setValidPaymentModes] = useState(paymentModes);
   const {
     control,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<FormData>({
     mode: 'all',
+    defaultValues: initialValues ?? { payment: [DEFAULT_PAYMENT_OPTION] },
     resolver: zodResolver(paymentFormSchema),
   });
-
   const { fields, remove, append } = useFieldArray({ name: 'payment', control: control });
 
   const handleAppendPaymentMode = useCallback(() => append(DEFAULT_PAYMENT_OPTION), [append]);
@@ -76,7 +83,7 @@ const AddBillableService = () => {
   const searchInputRef = useRef(null);
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
-  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(null);
+  const [selectedConcept, setSelectedConcept] = useState(serviceConcept ?? null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
@@ -96,7 +103,11 @@ const AddBillableService = () => {
   };
 
   const handleConceptChange = useCallback((selectedConcept: ServiceConcept) => {
-    setSelectedConcept(selectedConcept);
+    const concept = {
+      uuid: selectedConcept.concept.uuid,
+      display: selectedConcept.concept.display,
+    };
+    setSelectedConcept(concept);
   }, []);
 
   const handleNavigateToServiceDashboard = () =>
@@ -125,13 +136,14 @@ const AddBillableService = () => {
     payload.serviceType = data.serviceTypeName;
     payload.servicePrices = servicePrices;
     payload.serviceStatus = 'ENABLED';
-    payload.concept = selectedConcept?.concept?.uuid;
+    payload.concept = selectedConcept?.uuid;
+    payload.uuid = serviceId;
 
     createBillableService(payload).then(
       (resp) => {
         showSnackbar({
-          title: t('billableService', 'Billable service'),
-          subtitle: 'Billable service created successfully',
+          title: t('billableService', 'Billable Service'),
+          subtitle: 'Billable service updated successfully.',
           kind: 'success',
           isLowContrast: true,
           timeoutInMs: 3000,
@@ -140,7 +152,7 @@ const AddBillableService = () => {
       },
       (error) => {
         showSnackbar({
-          title: 'Error adding billable service',
+          title: 'Error updating billable service',
           kind: 'error',
           subtitle: extractErrorMessagesFromResponse(error.responseBody),
           isLowContrast: true,
@@ -227,14 +239,7 @@ const AddBillableService = () => {
                     setSearchTerm('');
                     setSelectedConcept(null);
                   }}
-                  value={(() => {
-                    if (selectedConcept) {
-                      return selectedConcept.display;
-                    }
-                    if (debouncedSearchTerm) {
-                      return value;
-                    }
-                  })()}
+                  value={selectedConcept ? selectedConcept.display : debouncedSearchTerm ? value : undefined}
                 />
               </ResponsiveWrapper>
             )}
@@ -287,7 +292,7 @@ const AddBillableService = () => {
                   items={serviceTypes ?? []}
                   titleText={t('serviceType', 'Service Type')}
                   itemToString={(item) => (item ? item.display : '')}
-                  placeholder={t('selectServiceType', 'Select service type')}
+                  placeholder="Select service type"
                   initialSelectedItem={serviceTypes.find((item) => item.uuid == field.value) ?? null}
                   onChange={({ selectedItem }) => {
                     field.onChange(selectedItem ? selectedItem?.uuid : '');
@@ -378,4 +383,4 @@ function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; 
   return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
 }
 
-export default AddBillableService;
+export default EditBillableService;
