@@ -58,7 +58,6 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Controller
