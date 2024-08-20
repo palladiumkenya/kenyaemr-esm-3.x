@@ -5,6 +5,7 @@ import BillHistory from './bill-history/bill-history.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
+import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
@@ -15,17 +16,16 @@ import LabOrder from './billable-services/billiable-item/test-order/lab-order.co
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import { EditPurchasePriceForm } from './billable-services/manage-commodity-price/workspaces/edit-purchase-price-form.workspace';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import { configSchema } from './config-schema';
-import { benefitsPackageDashboardMeta, dashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
+import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
-import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
-import SHRSummaryPanell from './shr-summary/shr-summary.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -41,10 +41,6 @@ export const billingSummaryDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const shrSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
-  options,
-);
 // t('billing', 'Billing')
 export const billingDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
@@ -66,6 +62,7 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billableServicesHome = getSyncLifecycle(BillableServiceHome, options);
+export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 
 export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
@@ -79,8 +76,6 @@ export const procedureOrder = getSyncLifecycle(ProcedureOrder, options);
 export const imagingOrder = getSyncLifecycle(ImagingOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
-export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanell, options);
-export const shrAuthorizationForm = getSyncLifecycle(SHRAuthorizationForm, options);
 
 // bill manager modals
 export const cancelBillModal = getSyncLifecycle(CancelBillModal, options);
@@ -90,6 +85,9 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
+
+// bill commodities extensions
+export const editPurchasePriceForm = getSyncLifecycle(EditPurchasePriceForm, options);
 
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);

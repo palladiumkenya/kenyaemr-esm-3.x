@@ -1,23 +1,12 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @use '@carbon/layout';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .heading {
   @include type.type-style('heading-compact-01');
   margin: spacing.$spacing-05 0 spacing.$spacing-05;
-}
-
-.warningContainer {
-  background-color: $carbon--red-50;
-  padding: spacing.$spacing-04;
-  margin: spacing.$spacing-03 0 spacing.$spacing-03;
-  display: flex;
-  justify-content: space-between;
-  .warning {
-    @include type.type-style('heading-compact-01');
-    color: $ui-05;
-  }
 }
 
 .grid {
@@ -77,4 +66,21 @@
     justify-content: flex-end;
     gap: spacing.$spacing-05;
   }
+}
+
+.otpInputRow {
+  display: flex;
+  flex-direction: row;
+  gap: spacing.$spacing-03;
+  align-items: end;
+}
+
+.biometricContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: spacing.$spacing-05;
+  margin-top: spacing.$spacing-05;
+  border: colors.$gray-70 solid 0.1rem;
+  padding: spacing.$spacing-05;
 }

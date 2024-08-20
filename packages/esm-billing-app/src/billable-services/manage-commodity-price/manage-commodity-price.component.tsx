@@ -1,23 +1,12 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList } from '@carbon/react';
+import React from 'react';
+import StockItemsTableComponent from './stock-items-table.component';
+import { WorkspaceContainer } from '@openmrs/esm-framework';
 
 const ManageCommodityPrices = () => {
-  const [activeTabIndex, setActiveTabindex] = useState<number>(0);
-
-  const { t } = useTranslation();
-
-  const handleTabChange = ({ selectedIndex }: { selectedIndex: number }) => {
-    setActiveTabindex(selectedIndex);
-  };
-
   return (
     <div>
-      <Tabs onChange={handleTabChange} selectedIndex={activeTabIndex}>
-        <TabList>
-          <Tab>{t('search', 'Search')}</Tab>
-        </TabList>
-      </Tabs>
+      <StockItemsTableComponent />
+      <WorkspaceContainer overlay contextKey="manage-commodity-prices" />
     </div>
   );
 };

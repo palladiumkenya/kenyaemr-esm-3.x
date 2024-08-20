@@ -15,19 +15,19 @@ import {
 type PriceInfoOrderProps = {
   billableItem: any;
   error?: boolean;
+  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error }) => {
+const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error, setHasPrice }) => {
   const { t } = useTranslation();
 
-  if (error || !billableItem) {
+  const hasPrice = billableItem?.servicePrices?.length > 0;
+
+  setHasPrice(hasPrice);
+
+  if (error || !hasPrice) {
     return (
-      <InlineNotification
-        kind="info"
-        title={t('noprice', 'No price found')}
-        subtitle={t('noInfo', 'Please contact the cashier')}
-        lowContrast
-      />
+      <InlineNotification kind="warning" title={t('noprice', 'No price configured for this service')} lowContrast />
     );
   }
 
@@ -41,12 +41,12 @@ const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error }) 
                 {t('paymentMethods', 'Payment methods')}
               </StructuredListCell>
               <StructuredListCell head className={styles.cell}>
-                {t('prices', 'Prices(Ksh)')}
+                {t('prices', 'Prices (Ksh)')}
               </StructuredListCell>
             </StructuredListRow>
           </StructuredListHead>
           <StructuredListBody>
-            {billableItem.servicePrices.map((priceItem) => (
+            {billableItem.servicePrices.map((priceItem: any) => (
               <StructuredListRow key={priceItem.uuid}>
                 <StructuredListCell className={styles.cell}>{priceItem.paymentMode.name}</StructuredListCell>
                 <StructuredListCell className={styles.cell}>{convertToCurrency(priceItem.price)}</StructuredListCell>

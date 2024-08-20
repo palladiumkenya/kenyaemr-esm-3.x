@@ -36,7 +36,8 @@
         "path": "Benefits Package",
         "columns": 1,
         "columnSpan": 1
-      }
+      },
+      "featureFlag": "healthInformationExchange"
     },
     {
       "component": "benefitsPackage",
@@ -48,11 +49,7 @@
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
     },
-    {
-      "component": "shrAuthorizationForm",
-      "name": "shr-authorization-form"
-    },
-    {
+   {
       "name": "billing-patient-summary",
       "component": "billingPatientSummary",
       "slot": "patient-chart-billing-dashboard-slot",
@@ -74,26 +71,11 @@
         "layoutMode": "anchored"
       }
     },
-    {
-      "name": "patient-chart-shr-summary-dashboard-link",
-      "component": "shrSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-shr-summary-dashboard-slot",
-        "path": "SHR Summary"
-      }
-    },
+    
     {
       "name": "billing-check-in-form",
       "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
-    },
-    {
-      "name": "SHR Summary",
-      "slot": "patient-chart-shr-summary-dashboard-slot",
-      "component": "patientSHRSummary"
     },
     {
       "slot": "system-admin-page-card-link-slot",
@@ -121,6 +103,10 @@
     {
       "name": "cancel-bill-modal",
       "component": "cancelBillModal"
+    },
+    {
+      "name": "delete-billableservice-modal",
+      "component": "deleteBillableServiceModal"   
     },
     {
       "name": "refund-bill-modal",
@@ -172,6 +158,12 @@
       "name": "edit-bill-form",
       "component": "editBillForm",
       "title": "Edit Bill Form",
+      "type": "other-form"
+    },
+    {
+      "name": "edit-purchase-price-form",
+      "component": "editPurchasePriceForm",
+      "title": "Edit Purchase Price Form",
       "type": "other-form"
     }
   ]
