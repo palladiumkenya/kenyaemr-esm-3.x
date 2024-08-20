@@ -13,6 +13,7 @@ export interface MappedBill {
   status: string;
   identifier: string;
   dateCreated: string;
+  dateCreatedUnformatted: string;
   lineItems: Array<LineItem>;
   billingService: string;
   payments: Array<Payment>;

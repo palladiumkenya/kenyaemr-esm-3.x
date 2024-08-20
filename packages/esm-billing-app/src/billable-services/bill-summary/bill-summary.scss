@@ -1,6 +1,7 @@
 @use '@carbon/layout';
 
 .table,
+.emptyStateWrapper,
 .errorStateSkeleton,
 .dataTableSkeleton {
   padding: layout.$spacing-05;

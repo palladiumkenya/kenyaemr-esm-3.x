@@ -21,8 +21,10 @@ import { TableToolbarFilter } from './table-toolbar-filter';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 import flatMapDeep from 'lodash-es/flatMapDeep';
 import { MappedBill } from '../../types';
+import dayjs from 'dayjs';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
-const headers = [
+export const headers = [
   { header: 'date', key: 'dateCreated' },
   { header: 'Patient Name', key: 'patientName' },
   { header: 'status', key: 'status' },
@@ -31,12 +33,15 @@ const headers = [
 ];
 
 const BillSummary = () => {
-  const { bills, isLoading, error } = usePaidBills();
   const [renderedRows, setRenderedRows] = useState<null | MappedBill[]>(null);
+  const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
+  const [hasLoadedForTheFirstTime, setHasLoadedForTheFirstTime] = useState(false);
+  const { bills, isLoading, error, isValidating } = usePaidBills(dateRange[0], dateRange[1]);
 
   useEffect(() => {
-    if (bills.length > 0 && renderedRows === null) {
+    if (bills.length >= 0 && renderedRows === null) {
       setRenderedRows(bills);
+      setHasLoadedForTheFirstTime(true);
     }
   }, [bills, renderedRows]);
 
@@ -78,7 +83,11 @@ const BillSummary = () => {
     setRenderedRows(bills);
   };
 
-  if (isLoading || renderedRows === null) {
+  const handleFilterByDateRange = (dates: Date[]) => {
+    setDateRange(dates);
+  };
+
+  if ((isLoading && !hasLoadedForTheFirstTime) || renderedRows === null) {
     return (
       <div className={styles.dataTableSkeleton}>
         <DataTableSkeleton
@@ -112,38 +121,59 @@ const BillSummary = () => {
                 <TableToolbarContent>
                   <TableToolbarSearch onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(evt)} />
                   <TableToolbarFilter onApplyFilter={handleTableFilter} onResetFilter={handleOnResetFilter} />
-                  <TableToolBarDateRangePicker />
+                  <TableToolBarDateRangePicker onChange={handleFilterByDateRange} />
                 </TableToolbarContent>
               </TableToolbar>
             </div>
-            <Table {...getTableProps()} aria-label="sample table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      key={header.key}
-                      {...getHeaderProps({
-                        header,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    {...getRowProps({
-                      row,
-                    })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
+            {isValidating ? (
+              <div className={styles.dataTableSkeleton}>
+                <DataTableSkeleton
+                  headers={headers}
+                  aria-label="patient bills table"
+                  showToolbar={false}
+                  showHeader={false}
+                  rowCount={3}
+                  zebra
+                  columnCount={3}
+                />
+              </div>
+            ) : bills.length === 0 ? (
+              <div className={styles.emptyStateWrapper}>
+                <EmptyState
+                  displayText={t('noBillsFilter', 'No bills match that filter please adjust your filters')}
+                  headerTitle={t('noBillsHeader', 'No bills match the provided filters')}
+                />
+              </div>
+            ) : (
+              <Table {...getTableProps()} aria-label="sample table">
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        key={header.key}
+                        {...getHeaderProps({
+                          header,
+                        })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow
+                      key={row.id}
+                      {...getRowProps({
+                        row,
+                      })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </TableContainer>
         )}
       </DataTable>

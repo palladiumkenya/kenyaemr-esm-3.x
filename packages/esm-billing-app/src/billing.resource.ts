@@ -31,6 +31,7 @@ const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     cashPointName: bill?.cashPoint?.name,
     cashPointLocation: bill?.cashPoint?.location?.display,
     dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
+    dateCreatedUnformatted: bill.dateCreated,
     lineItems: bill.lineItems,
     billingService: extractString(bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  ')),
     payments: bill.payments,
@@ -69,17 +70,17 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
   };
 };
 
-export const usePaidBills = () => {
-  const defaultCreatedOnOrAfterDateTime = dayjs().startOf('day').toISOString();
-  const url = `/ws/rest/v1/cashier/bill?status=${PaymentStatus.PAID}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${defaultCreatedOnOrAfterDateTime}`;
+export const usePaidBills = (startingDate: Date, endDate: Date) => {
+  const startingDateISO = startingDate.toISOString();
+  // const endDateISO = endDate.toISOString();
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
-    url,
-    openmrsFetch,
-    {
-      errorRetryCount: 2,
-    },
-  );
+  const url = `/ws/rest/v1/cashier/bill?status=${PaymentStatus.PAID}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startingDateISO}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{
+    data: { results: Array<PatientInvoice> };
+  }>(url, openmrsFetch, {
+    errorRetryCount: 2,
+  });
 
   const bills = sortBy(data?.data?.results ?? [], ['dateCreated'])
     .reverse()
@@ -124,6 +125,7 @@ export const useBill = (billUuid: string) => {
       cashPointName: bill?.cashPoint?.name,
       cashPointLocation: bill?.cashPoint?.location?.display,
       dateCreated: bill?.dateCreated ?? '--',
+      dateCreatedUnformatted: bill.dateCreated,
       lineItems: bill.lineItems,
       billingService: bill.lineItems.map((bill) => bill.item).join(' '),
       payments: bill.payments,
