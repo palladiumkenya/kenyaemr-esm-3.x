@@ -83,7 +83,7 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
   const searchInputRef = useRef(null);
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
-  const [selectedConcept, setSelectedConcept] = useState<ServiceConcept>(serviceConcept ?? null);
+  const [selectedConcept, setSelectedConcept] = useState(serviceConcept ?? null);
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
@@ -103,7 +103,11 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
   };
 
   const handleConceptChange = useCallback((selectedConcept: ServiceConcept) => {
-    setSelectedConcept(selectedConcept);
+    const concept = {
+      uuid: selectedConcept.concept.uuid,
+      display: selectedConcept.concept.display,
+    };
+    setSelectedConcept(concept);
   }, []);
 
   const handleNavigateToServiceDashboard = () =>
@@ -132,14 +136,14 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
     payload.serviceType = data.serviceTypeName;
     payload.servicePrices = servicePrices;
     payload.serviceStatus = 'ENABLED';
-    payload.concept = selectedConcept?.concept?.uuid;
+    payload.concept = selectedConcept?.uuid;
     payload.uuid = serviceId;
 
     createBillableService(payload).then(
       (resp) => {
         showSnackbar({
           title: t('billableService', 'Billable Service'),
-          subtitle: 'Billable service updated successfully',
+          subtitle: 'Billable service updated successfully.',
           kind: 'success',
           isLowContrast: true,
           timeoutInMs: 3000,
