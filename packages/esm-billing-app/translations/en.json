@@ -164,6 +164,9 @@
   "type": "Type",
   "unitPrice": "Unit price",
   "unsettledBill": "Unsettled bill for test.",
+  "valid": "Valid SHA Number",
+  "validatingSHANumber": "Validating SHA Number",
+  "validSHANumber": "SHA number is valid, proceed with care",
   "visitTime": "Visit time",
   "visittype": "Visit Type",
   "yes": "Yes"
