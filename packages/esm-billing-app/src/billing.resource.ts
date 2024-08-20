@@ -68,49 +68,6 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
   };
 };
 
-export const useInterventions = (searchString: string = '') => {
-  const url = `/ws/rest/v1/cashier/interventions?q=${searchString}`;
-  const { data, error, isLoading } = useSWR(url, openmrsFetch, {
-    errorRetryCount: 2,
-  });
-
-  const results = [
-    {
-      shaPackageCode: 'SHA-001',
-      shaPackageName: 'Eye Care',
-      shaInterventionCode: 'SHA-001-01',
-      shaInterventionName: 'Treatment and Diagnosis',
-      shaInterventioTariff: 50000,
-      requirePreauth: true,
-    },
-    {
-      shaPackageCode: 'SHA-001',
-      shaPackageName: 'Eye Care',
-      shaInterventionCode: 'SHA-001-01',
-      shaInterventionName: 'X-ray Services',
-      shaInterventioTariff: 50000,
-      requirePreauth: true,
-    },
-    {
-      shaPackageCode: 'SHA-001',
-      shaPackageName: 'Eye Care',
-      shaInterventionCode: 'SHA-001-01',
-      shaInterventionName: 'Clinical Consultation',
-      shaInterventioTariff: 50000,
-      requirePreauth: false,
-    },
-    {
-      shaPackageCode: 'SHA-001',
-      shaPackageName: 'Eye Care',
-      shaInterventionCode: 'SHA-001-01',
-      shaInterventionName: 'Test Test',
-      shaInterventioTariff: 50000,
-      requirePreauth: true,
-    },
-  ];
-  return data ? results : results;
-};
-
 export const useBill = (billUuid: string) => {
   const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PatientInvoice }>(
