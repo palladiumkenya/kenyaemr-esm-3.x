@@ -18,6 +18,7 @@ import styles from './bill-summary.scss';
 import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { TableToolbarFilter } from './table-toolbar-filter';
+import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 
 const headers = [
   { header: 'date', key: 'dateCreated' },
@@ -63,7 +64,7 @@ const BillSummary = () => {
     );
   }
 
-  const handleTableFilter = (selectedCheckboxes) => {
+  const handleTableFilter = (selectedCheckboxes: Array<string>) => {
     setRenderedRows([]);
     for (let i = 0; i < selectedCheckboxes.length; i++) {
       // Filter the items inside the rows list
@@ -94,13 +95,16 @@ const BillSummary = () => {
     <div className={styles.table}>
       <DataTable rows={bills} headers={headers}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, onInputChange }) => (
-          <TableContainer title="DataTable" description="With filtering">
-            <TableToolbar>
-              <TableToolbarContent>
-                <TableToolbarSearch onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(evt)} />
-                <TableToolbarFilter onApplyFilter={handleTableFilter} onResetFilter={handleOnResetFilter} />
-              </TableToolbarContent>
-            </TableToolbar>
+          <TableContainer title="Paid Bills" description="Paid Bills Summary">
+            <div className={styles.tableToolBar}>
+              <TableToolbar>
+                <TableToolbarContent>
+                  <TableToolbarSearch onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(evt)} />
+                  <TableToolbarFilter onApplyFilter={handleTableFilter} onResetFilter={handleOnResetFilter} />
+                  <TableToolBarDateRangePicker />
+                </TableToolbarContent>
+              </TableToolbar>
+            </div>
             <Table {...getTableProps()} aria-label="sample table">
               <TableHead>
                 <TableRow>

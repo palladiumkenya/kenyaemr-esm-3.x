@@ -9,3 +9,21 @@
 .checkBoxWrapper {
   padding: layout.$spacing-05;
 }
+
+.dateRangePicker {
+  flex-grow: unset;
+}
+
+.tableToolBar {
+  position: relative;
+
+  > * {
+    position: relative;
+    top: 0;
+
+    div {
+      height: auto;
+      align-items: center;
+    }
+  }
+}
