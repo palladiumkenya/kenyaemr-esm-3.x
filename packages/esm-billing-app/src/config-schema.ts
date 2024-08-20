@@ -15,9 +15,16 @@ export interface BillingConfig {
   enforceBillPayment: boolean;
   billingStatusQueryUrl: string;
   mpesaAPIBaseUrl: string;
+  insuranceSchemes: Array<string>;
+  nationalPatientUniqueIdentifierTypeUuid: string;
 }
 
 export const configSchema = {
+  nationalPatientUniqueIdentifierTypeUuid: {
+    _type: Type.String,
+    _description: 'The national unique patient identifier',
+    _default: 'f85081e2-b4be-4e48-b3a4-7994b69bb101',
+  },
   inPatientVisitTypeUuid: {
     _type: Type.String,
     _description: 'The visit type uuid for in-patient',
@@ -99,5 +106,13 @@ export const configSchema = {
     _type: Type.String,
     _default: '${restBaseUrl}/cashier/billLineItem?orderUuid=${orderUuid}&v=full',
     _description: 'URL to query billing status',
+  },
+  insuranceSchemes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['(SHA) SHIF', 'NHIF', 'NHIF (Linda Mama)', 'Jubilee Insurance', 'AAR Insurance', 'Old Mutual Insurance'],
+    _description: 'List of insurance schemes',
   },
 };

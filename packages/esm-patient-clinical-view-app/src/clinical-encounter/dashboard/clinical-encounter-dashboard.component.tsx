@@ -71,7 +71,7 @@ const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({
     ],
   );
   return (
-    <>
+    <div>
       <Layer>
         <Tile>
           <div className={styles.desktopHeading}>
@@ -156,7 +156,7 @@ const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({
           </TabPanels>
         </Tabs>
       </Layer>
-    </>
+    </div>
   );
 };
 export default ClinicalEncounterDashboard;

@@ -1,30 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { ModalHeader, ModalBody, ModalFooter, Button, Loading } from '@carbon/react';
-import styles from './cancel-bill.scss';
 import { useTranslation } from 'react-i18next';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { processBillItems } from '../../../billing.resource';
 import { mutate } from 'swr';
 import { LineItem, MappedBill, PaymentStatus } from '../../../types';
+import styles from './cancel-bill.scss';
 
-export const RefundBillModal: React.FC<{
+interface RefundBillModalProps {
   onClose: () => void;
   bill: MappedBill;
   lineItem: LineItem;
-}> = ({ onClose, bill, lineItem }) => {
+}
+
+export const RefundBillModal: React.FC<RefundBillModalProps> = ({ onClose, bill, lineItem }) => {
   const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
-  const refundBillItems = () => {
+  const itemUuid = lineItem.item.split(':')[0];
+  const billableServiceUuid = lineItem.billableService.split(':')[0];
+
+  const refundBillItems = useCallback(async () => {
     const lineItemToBeRefunded = {
-      item: lineItem.uuid,
       quantity: lineItem.quantity,
       price: -lineItem.price,
       priceName: lineItem.priceName,
       priceUuid: lineItem.priceUuid,
       lineItemOrder: lineItem.lineItemOrder,
       paymentStatus: PaymentStatus.CREDITED,
-      billableService: lineItem.billableService.split(':').at(0),
+      ...(itemUuid && { item: itemUuid }),
+      ...(billableServiceUuid && { billableService: billableServiceUuid }),
     };
 
     const billWithRefund = {
@@ -38,27 +43,32 @@ export const RefundBillModal: React.FC<{
 
     setIsLoading(true);
     onClose();
-    processBillItems(billWithRefund)
-      .then(() => {
-        mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/cashier/bill'), undefined, {
-          revalidate: true,
-        });
-        showSnackbar({
-          title: t('refundItems', 'Refund Items'),
-          subtitle: 'Item has been successfully refunded.',
-          kind: 'success',
-          timeoutInMs: 3000,
-        });
-      })
-      .catch((error) => {
-        showSnackbar({ title: 'An error occurred trying to refund item', kind: 'error', subtitle: error.message });
-      })
-      .finally(() => setIsLoading(false));
-  };
+
+    try {
+      await processBillItems(billWithRefund);
+      mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/cashier/bill'), undefined, {
+        revalidate: true,
+      });
+      showSnackbar({
+        title: t('refundItems', 'Refund Items'),
+        subtitle: t('refundSuccessful', 'Item has been successfully refunded.'),
+        kind: 'success',
+        timeoutInMs: 5000,
+      });
+    } catch (error) {
+      showSnackbar({
+        title: t('refundError', 'An error occurred trying to refund item'),
+        kind: 'error',
+        subtitle: error.message,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [bill, lineItem, onClose, t]);
 
   return (
-    <React.Fragment>
-      <ModalHeader onClose={onClose} className={styles.modalHeaderLabel} closeModal={onClose}>
+    <>
+      <ModalHeader onClose={onClose} className={styles.modalHeaderLabel}>
         {t('refundBill', 'Refund Bill')}
       </ModalHeader>
       <ModalBody className={styles.modalHeaderHeading}>
@@ -68,7 +78,7 @@ export const RefundBillModal: React.FC<{
         <Button kind="secondary" onClick={onClose}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={refundBillItems}>
+        <Button kind="danger" onClick={refundBillItems} disabled={isLoading}>
           {isLoading ? (
             <div className={styles.loading_wrapper}>
               <Loading className={styles.button_spinner} withOverlay={false} small />
@@ -79,6 +89,6 @@ export const RefundBillModal: React.FC<{
           )}
         </Button>
       </ModalFooter>
-    </React.Fragment>
+    </>
   );
 };

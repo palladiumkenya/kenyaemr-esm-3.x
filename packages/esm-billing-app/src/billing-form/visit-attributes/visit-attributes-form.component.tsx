@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TextInput, InlineLoading, ComboBox, RadioButtonGroup, RadioButton } from '@carbon/react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useConfig } from '@openmrs/esm-framework';
@@ -15,41 +15,15 @@ type VisitAttributesFormProps = {
   setIsPatientExempted: (value: string) => void;
 };
 
-type VisitAttributesFormValue = {
-  isPatientExempted: string;
-  paymentMethods: { uuid: string; name: string } | null;
-  insuranceScheme: string;
-  policyNumber: string;
-  exemptionCategory: string;
-};
-
-const visitAttributesFormSchema = z.object({
-  isPatientExempted: z.string(),
-  paymentMethods: z.object({ uuid: z.string(), name: z.string() }).nullable(),
-  insuranceScheme: z.string().optional(),
-  policyNumber: z.string().optional(),
-  exemptionCategory: z.string().optional(),
-});
-
 const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
   setAttributes,
   setPaymentMethod,
   setIsPatientExempted,
 }) => {
   const { t } = useTranslation();
+  const { insuranceSchemes } = useConfig<BillingConfig>();
   const { visitAttributeTypes, patientExemptionCategories } = useConfig<BillingConfig>();
-  const { control, getValues, watch, setValue } = useForm<VisitAttributesFormValue>({
-    mode: 'all',
-    defaultValues: {
-      isPatientExempted: '',
-      paymentMethods: null,
-      insuranceScheme: '',
-      policyNumber: '',
-      exemptionCategory: '',
-    },
-    resolver: zodResolver(visitAttributesFormSchema),
-  });
-
+  const { setValue, watch, getValues, control } = useFormContext();
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const [isPatientExempted, paymentMethods] = watch(['isPatientExempted', 'paymentMethods']);
 
@@ -171,12 +145,14 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
                 control={control}
                 name="insuranceScheme"
                 render={({ field }) => (
-                  <TextInput
+                  <ComboBox
                     className={styles.sectionField}
-                    onChange={(e) => field.onChange(e.target.value)}
+                    onChange={({ selectedItem }) => field.onChange(selectedItem)}
                     id="insurance-scheme"
-                    type="text"
-                    labelText={t('insuranceScheme', 'Insurance scheme')}
+                    items={insuranceSchemes}
+                    itemToString={(item) => (item ? item : '')}
+                    titleText={t('insuranceScheme', 'Insurance scheme')}
+                    placeholder={t('selectInsuranceScheme', 'Select insurance scheme')}
                   />
                 )}
               />
@@ -192,6 +168,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
                     id="policy-number"
                     type="text"
                     labelText={t('policyNumber', 'Policy number')}
+                    placeholder={t('enterPolicyNumber', 'Enter policy number')}
                   />
                 )}
               />

@@ -96,5 +96,9 @@ export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
-  registerFeatureFlag('isPreAuthEnabled', 'Pre Auth form', 'Adds a form relating to pre auth request app.');
+  registerFeatureFlag(
+    'healthInformationExchange',
+    'Health Information Exchange (HIE)',
+    'HIE feature flag, this enables and disables the HIE feature',
+  );
 }
