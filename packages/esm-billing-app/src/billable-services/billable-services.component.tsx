@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import classNames from 'classnames';
 import {
   DataTable,
@@ -25,6 +25,7 @@ import {
   ErrorState,
   navigate,
   showModal,
+  launchWorkspace,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
@@ -32,7 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { useBillableServices } from './billable-service.resource';
 import { ArrowRight, Edit, TrashCan } from '@carbon/react/icons';
 
-const BillableServices = ({ onEditService, onDeleteService }) => {
+const BillableServices = () => {
   const { t } = useTranslation();
   const { billableServices, isLoading, isValidating, error, mutate } = useBillableServices();
   const layout = useLayoutType();
@@ -42,9 +43,6 @@ const BillableServices = ({ onEditService, onDeleteService }) => {
   const pageSizes = config?.billableServices?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.billableServices?.pageSize ?? 10);
 
-  //creating service state
-  const [showOverlay, setShowOverlay] = useState(false);
-  const [overlayHeader, setOverlayTitle] = useState('');
   const headerData = [
     {
       header: t('serviceName', 'Service Name'),
@@ -120,7 +118,7 @@ const BillableServices = ({ onEditService, onDeleteService }) => {
                 kind="ghost"
                 size="md"
                 onClick={() => {
-                  onDeleteService(service);
+                  handleDeleteService(service);
                 }}
                 iconDescription={t('deleteService', 'Delete Service')}
                 renderIcon={(props) => <TrashCan size={16} {...props} />}></Button>
@@ -143,10 +141,44 @@ const BillableServices = ({ onEditService, onDeleteService }) => {
     },
     [goTo, setSearchString],
   );
+  function getPayments(prices) {
+    let payments = [];
+    if (prices.length > 0) {
+      prices.forEach((element) => {
+        payments.push({
+          uuid: element.uuid,
+          paymentMode: element.paymentMode?.uuid,
+          price: element.price,
+        });
+      });
+    }
+    return payments;
+  }
   const handleEditService = (service) => {
-    onEditService(service);
+    let serviceData = {
+      serviceName: service?.name,
+      shortName: service?.shortName,
+      serviceTypeName: service?.serviceType?.uuid,
+      concept: service.concept?.uuid,
+      payment: getPayments(service?.servicePrices),
+    };
+    launchWorkspace('edit-billable-service-form', {
+      workspaceTitle: t('editBillableServiceForm', 'Edit Billable Service Form'),
+      initialValues: serviceData,
+      serviceConcept: service?.concept,
+      serviceId: service.uuid,
+    });
   };
 
+  const handleDeleteService = (service) => {
+    const dispose = showModal('delete-billableservice-modal', {
+      onClose: () => {
+        mutate();
+        dispose();
+      },
+      service: service,
+    });
+  };
   if (isLoading) {
     <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;
   }

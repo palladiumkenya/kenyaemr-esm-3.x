@@ -28,6 +28,7 @@ import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace
 import SHRSummaryPanell from './shr-summary/shr-summary.component';
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
 import { EditPurchasePriceForm } from './billable-services/manage-commodity-price/workspaces/edit-purchase-price-form.workspace';
+import EditBillableServiceForm from './billable-services/create-edit/workspaces/edit-billable-service.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -93,6 +94,9 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
+
+// billable services
+export const editBillableServiceForm = getSyncLifecycle(EditBillableServiceForm, options);
 
 // bill commodities extensions
 export const editPurchasePriceForm = getSyncLifecycle(EditPurchasePriceForm, options);
