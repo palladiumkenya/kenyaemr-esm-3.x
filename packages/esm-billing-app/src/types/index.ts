@@ -327,7 +327,6 @@ export interface Diagnosis {
   dateRecorded: string;
   value: string;
 }
-=======
 export interface FHIRErrorResponse {
   resourceType: string;
   issue: Issue[];

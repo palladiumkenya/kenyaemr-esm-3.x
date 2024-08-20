@@ -1,6 +1,5 @@
-
 import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
 import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
@@ -51,16 +50,14 @@ export const billingDashboardLink = getSyncLifecycle(
   }),
   options,
 );
-export const claimsManagementSideNavGroup = getFeatureFlag('claims-management')
-  ? getSyncLifecycle(
-      createDashboardGroup({
-        title: 'Claims Management',
-        slotName: 'claims-management-dashboard-link-slot',
-        isExpanded: false,
-      }),
-      options,
-    )
-  : undefined;
+export const claimsManagementSideNavGroup = getSyncLifecycle(
+  createDashboardGroup({
+    title: 'Claims Management',
+    slotName: 'claims-management-dashboard-link-slot',
+    isExpanded: false,
+  }),
+  options,
+);
 export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'claims-overview',
@@ -77,15 +74,13 @@ export const preAuthRequestsDashboardLink = getSyncLifecycle(
 );
 export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 
-export const benefitsPackageDashboardLink = getFeatureFlag('benefits-package')
-  ? getSyncLifecycle(
-      createDashboardLink({
-        ...benefitsPackageDashboardMeta,
-        moduleName,
-      }),
-      options,
-    )
-  : undefined;
+export const benefitsPackageDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...benefitsPackageDashboardMeta,
+    moduleName,
+  }),
+  options,
+);
 
 export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
@@ -119,18 +114,6 @@ export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 export const benefitsEligibilyRequestForm = getSyncLifecycle(BenefitsEligibilyRequestForm, options);
 export const benefitsPreAuthForm = getSyncLifecycle(BenefitPreAuthForm, options);
 export function startupApp() {
-  registerFeatureFlag(
-    'claims-management',
-    'Claims Management Dashboard',
-    'Controls the visibility of the Claims Management Dashboard in the side navigation.',
-  );
-
-  registerFeatureFlag(
-    'benefits-package',
-    'Benefits Package',
-    'Benefits package adds listing of patient benefits per insurance scheme upon requesting coverage eligibility.For the benefits the required preauth it supports that as well',
-  );
-
   defineConfigSchema(moduleName, configSchema);
   registerFeatureFlag(
     'healthInformationExchange',

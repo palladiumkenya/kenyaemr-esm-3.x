@@ -36,7 +36,8 @@
         "path": "Benefits Package",
         "columns": 1,
         "columnSpan": 1
-      }
+      },
+      "featureFlag": "healthInformationExchange"
     }, 
     {
       "component": "benefitsPackage",
@@ -157,7 +158,9 @@
         "name": "claims-management",
         "title": "Claims management Overview",
         "slot": "case-management-slot"
-      }
+      },
+      "featureFlag": "healthInformationExchange"
+
     },
      {
       "component": "claimsManagementOverviewDashboardLink",
