@@ -38,7 +38,7 @@
         "columnSpan": 1
       },
       "featureFlag": "healthInformationExchange"
-    }, 
+    },
     {
       "component": "benefitsPackage",
       "name": "benefits-package",
