@@ -83,7 +83,7 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
   const searchInputRef = useRef(null);
   const handleSearchTermChange = (event: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(event.target.value);
 
-  const [selectedConcept, setSelectedConcept] = useState(serviceConcept ?? null);
+  const [selectedConcept, setSelectedConcept] = useState(serviceConcept ?? null);  
   const [searchTerm, setSearchTerm] = useState('');
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
@@ -107,7 +107,7 @@ const EditBillableService: React.FC<AddBillableServiceProps> = ({ initialValues,
       uuid: selectedConcept.concept.uuid,
       display: selectedConcept.concept.display,
     };
-    setSelectedConcept(concept);
+    setSelectedConcept(concept); 
   }, []);
 
   const handleNavigateToServiceDashboard = () =>
