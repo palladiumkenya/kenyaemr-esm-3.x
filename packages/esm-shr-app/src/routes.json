@@ -11,24 +11,27 @@
   ],
   "extensions": [
     {
-      "name": "shr-patient-summary",
-      "component": "shrPatientSummary",
-      "slot": "patient-chart-shr-dashboard-slot",
-      "meta": {
-        "columnSpan": 4
-      }
+      "component": "shrAuthorizationForm",
+      "name": "shr-authorization-form"
     },
     {
-      "name": "shr-summary-dashboard-link",
+      "name": "patient-chart-shr-summary-dashboard-link",
       "component": "shrSummaryDashboardLink",
       "slot": "patient-chart-dashboard-slot",
-      "order": 21,
       "meta": {
         "columns": 1,
         "columnSpan": 1,
-        "slot": "patient-chart-shr-dashboard-slot",
-        "title": "SHARED HEALTH RECORDS",
-        "path": "SHR panel"
+        "slot": "patient-chart-shr-summary-dashboard-slot",
+        "path": "SHR Portal"
+      },
+      "featureFlag": "healthInformationExchange"
+    },
+    {
+      "name": "SHR Portal",
+      "slot": "patient-chart-shr-summary-dashboard-slot",
+      "component": "patientSHRSummary",
+      "meta": {
+        "columnSpan": 4
       }
     },
     {
@@ -50,7 +53,7 @@
       "name": "referral-reasons-dialog",
       "component": "referralReasonsDialogPopup"
     },
-     {
+    {
       "name": "facility-referral-form",
       "component": "facilityRefferalForm"
     },

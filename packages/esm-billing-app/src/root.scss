@@ -1,30 +1,93 @@
+@use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading01 {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('heading-01');
 }
 
 .productiveHeading02 {
-  @include type.type-style('heading-compact-02');
+  @include type.type-style('heading-02');
 }
 
-.bodyLong01 {
-  @include type.type-style('body-01');
+.productiveHeading03 {
+  @include type.type-style('productive-heading-03');
 }
 
-.caption01 {
-  @include type.type-style('legal-01');
+.productiveHeading04 {
+  @include type.type-style('productive-heading-04');
+}
+
+.productiveHeading05 {
+  @include type.type-style('productive-heading-05');
+}
+
+.productiveHeading06 {
+  @include type.type-style('productive-heading-06');
+}
+
+.bodyShort01 {
+  @include type.type-style('body-short-01');
+}
+
+.helperText01 {
+  @include type.type-style('helper-text-01');
 }
 
 .bodyShort02 {
-  @include type.type-style('body-compact-02');
+  @include type.type-style('body-short-02');
+}
+
+.bodyLong01 {
+  @include type.type-style('body-long-01');
+}
+
+.bodyLong02 {
+  @include type.type-style('body-long-02');
+}
+
+.label01 {
+  @include type.type-style('label-01');
 }
 
 .text02 {
   color: $text-02;
 }
 
-.text01 {
-  color: $ui-05;
+aside {
+  background-color: $ui-02 !important;
+}
+
+.container {
+  padding: spacing.$spacing-07;
+}
+
+.formContainer {
+  height: calc(100vh - 100px) !important;
+  overflow: scroll;
+  padding: 0 1rem;
+}
+
+.verticalForm {
+  display: flex;
+  grid-row-gap: 2em;
+  padding-top: 1rem;
+  align-content: space-between;
+  flex-direction: column;
+
+  :global(.cds--form-item) {
+    flex: none !important;
+  }
+
+  :global(.cds--label) {
+    color: black;
+    display: inline-block;
+    font-size: var(--cds-label-01-font-size);
+    font-weight: bold;
+    letter-spacing: var(--cds-label-01-letter-spacing, 0.32px);
+    line-height: 1rem;
+    margin-bottom: 0.5rem;
+    vertical-align: baseline;
+  }
 }
