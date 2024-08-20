@@ -12,10 +12,11 @@ import {
   TableHeader,
   TableRow,
   TableCell,
+  ComboBox,
 } from '@carbon/react';
 import styles from './billing-form.scss';
 import { useTranslation } from 'react-i18next';
-import { useFetchSearchResults, processBillItems } from '../billing.resource';
+import { useFetchSearchResults, processBillItems, useInterventions } from '../billing.resource';
 import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
@@ -28,6 +29,9 @@ type BillingFormProps = {
 const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
+  const interventions = useInterventions('');
+  const [filteredInterventions, setFilteredItems] = useState(interventions);
+  const [selectedIntervention, setselectedIntervention] = useState(null);
 
   const [GrandTotal, setGrandTotal] = useState(0);
 
@@ -95,6 +99,21 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   //  filter items
   const { data, error, isLoading, isValidating } = useFetchSearchResults(searchVal, category);
 
+  const handleSelectedIntervention = (item) => {
+    if (item) {
+      setselectedIntervention(item);
+    }
+  };
+  const handleInputChange = (inputValue) => {
+    if (inputValue) {
+      const updatedItems = interventions.filter((item) =>
+        item.shaInterventionName.toLowerCase().includes(inputValue.toLowerCase()),
+      );
+      setFilteredItems(updatedItems);
+    } else {
+      setFilteredItems(interventions);
+    }
+  };
   const filterItems = (val) => {
     setsearchVal(val);
 
@@ -148,6 +167,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
       payments: [],
       patient: patientUuid,
       status: 'PENDING',
+      interventionCode: selectedIntervention,
     };
 
     BillItems.map((o) => {
@@ -196,6 +216,14 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
     <Form className={styles.form}>
       <div className={styles.billingFormContainer}>
         <div className={styles.contentWrapper}>
+          <ComboBox
+            items={filteredInterventions}
+            itemToString={(item) => (item ? item.shaInterventionName : '')}
+            placeholder="Search here"
+            titleText="Select Intervention"
+            onChange={(selectedItem) => handleSelectedIntervention(selectedItem)}
+            onInputChange={(data) => handleInputChange(data)}
+          />
           <RadioButtonGroup
             legendText={t('selectCategory', 'Select category')}
             name="radio-button-group"

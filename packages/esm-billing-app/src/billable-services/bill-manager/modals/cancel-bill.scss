@@ -18,3 +18,12 @@
   display: flex;
   align-items: center;
 }
+
+.contentcontainer {
+  padding-left: layout.$spacing-05;
+}
+
+.contentvalue {
+  @include type.type-style('heading-compact-02');
+  margin-bottom: layout.$spacing-03;
+}

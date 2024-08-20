@@ -4,15 +4,15 @@ import styles from './dashboard.scss';
 import ServiceMetrics from './service-metrics.component';
 import BillableServices from '../billable-services.component';
 
-export function BillableServicesDashboard() {
+export const BillableServicesDashboard = ({ onEditService, onDeleteService }) => {
   const { t } = useTranslation();
 
   return (
     <main className={styles.container}>
       <ServiceMetrics />
       <main className={styles.servicesTableContainer}>
-        <BillableServices />
+        <BillableServices onEditService={onEditService} onDeleteService={onDeleteService} />
       </main>
     </main>
   );
-}
+};
