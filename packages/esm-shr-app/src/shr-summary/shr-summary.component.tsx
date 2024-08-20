@@ -3,7 +3,7 @@ import { CardHeader, EmptyDataIllustration, ErrorState, getPatientUuidFromUrl } 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePatientIdentifiers from '../hooks/usePatientIdentifiers';
-import PatientSHRSummartTable from './tables/shr-summary-table.component';
+import PatientSHRSummaryTable from './tables/shr-summary-table.component';
 import styles from './tables/shr-tables.scss';
 import { useConfig } from '@openmrs/esm-framework';
 import { ReferralConfigObject } from '../config-schema';
@@ -42,7 +42,7 @@ const SHRSummaryPanel = () => {
 
   return (
     <div className={`omrs-main-content`}>
-      <PatientSHRSummartTable />
+      <PatientSHRSummaryTable />
     </div>
   );
 };

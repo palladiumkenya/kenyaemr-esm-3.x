@@ -14,9 +14,9 @@ import usePatient from '../../hooks/usePatient';
 import SharedHealthRecordsSummary from '../../shrpatient-summary/shrpatient-summary.component';
 import styles from './shr-tables.scss';
 
-interface PatientSHRSummartTableProps {}
+interface PatientSHRSummaryTableProps {}
 
-const PatientSHRSummartTable: React.FC<PatientSHRSummartTableProps> = () => {
+const PatientSHRSummaryTable: React.FC<PatientSHRSummaryTableProps> = () => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
   const layout = useLayoutType();
@@ -73,4 +73,4 @@ const PatientSHRSummartTable: React.FC<PatientSHRSummartTableProps> = () => {
   return <SharedHealthRecordsSummary patientUuid={patientUuid} />;
 };
 
-export default PatientSHRSummartTable;
+export default PatientSHRSummaryTable;

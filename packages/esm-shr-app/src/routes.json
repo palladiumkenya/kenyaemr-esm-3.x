@@ -23,7 +23,8 @@
         "columnSpan": 1,
         "slot": "patient-chart-shr-summary-dashboard-slot",
         "path": "SHR Portal"
-      }
+      },
+      "featureFlag": "healthInformationExchange"
     },
     {
       "name": "SHR Portal",
