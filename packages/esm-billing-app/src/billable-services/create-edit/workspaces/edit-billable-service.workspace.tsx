@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import styles from './edit-billable-service.scss';
 import {
   Form,
@@ -24,14 +24,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Add, TrashCan, WarningFilled } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  DefaultWorkspaceProps,
-  navigate,
-  selectPreferredName,
-  showSnackbar,
-  useDebounce,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, navigate, showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { ServiceConcept } from '../../../types';
 import { extractErrorMessagesFromResponse } from '../../../utils';
 import classNames from 'classnames';
