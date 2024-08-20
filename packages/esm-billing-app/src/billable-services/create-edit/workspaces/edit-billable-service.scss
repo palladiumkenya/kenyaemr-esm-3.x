@@ -1,0 +1,168 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '@carbon/layout';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0px;
+}
+
+.subTitle {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.sectionTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-04;
+}
+
+.modalBody {
+  padding-bottom: spacing.$spacing-05;
+}
+
+.container {
+  margin: 1rem;
+}
+
+.paymentContainer {
+  margin: layout.$layout-01;
+  padding: layout.$layout-01;
+  width: 70%;
+  border-right: 1px solid colors.$cool-gray-40;
+}
+
+.paymentButtons {
+  margin: layout.$layout-01 0;
+}
+
+.paymentMethodContainer {
+  display: grid;
+  grid-template-columns: 40% 30% 20%;
+  column-gap: 1rem;
+  width: 100%;
+}
+
+.paymentTotals {
+  margin-top: layout.$spacing-01;
+}
+
+.processPayments {
+  display: flex;
+  justify-content: flex-end;
+  margin: layout.$spacing-05;
+  column-gap: layout.$spacing-04;
+}
+
+.errorPaymentContainer {
+  margin: layout.$spacing-04;
+  min-height: layout.$spacing-09;
+}
+
+.removeButtonContainer {
+  display: flex;
+  align-self: center;
+  cursor: pointer;
+  margin-left: layout.$spacing-04;
+}
+
+.removeButton {
+  color: colors.$red-60;
+}
+
+.service {
+  padding: 1rem 0.75rem;
+}
+
+.conceptsList {
+  background-color: $ui-02;
+  max-height: 14rem;
+  overflow-y: auto;
+  border: 1px solid $ui-03;
+
+  li:hover {
+    background-color: $ui-03;
+  }
+}
+
+.emptyResults {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
+  min-height: 1rem;
+  border: 1px solid $ui-03;
+}
+
+.conceptLabel {
+  @include type.type-style('label-02');
+  margin-bottom: 0.6rem;
+}
+
+.errorContainer {
+  margin: 1rem;
+}
+
+.serviceError {
+  :global(.cds--search-input):focus {
+    outline: 2.5px solid $danger;
+  }
+
+  :global(.cds--search-magnifier) {
+    svg {
+      fill: $danger;
+    }
+  }
+}
+
+.errorMessage {
+  @include type.type-style('label-02');
+  color: $danger;
+  margin-top: 0.5rem;
+}
+
+.spinner {
+  &:global(.cds--inline-loading) {
+    min-height: 1rem;
+  }
+}
+
+.loader {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  width: max-content;
+}
+
+.searchWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-items: center;
+}
+
+.contentSection {
+  padding: layout.$spacing-03;
+}
+
+.itemSection {
+  margin-top: layout.$spacing-05;
+  width: 100%;
+}
+
+.itemFirstSection {
+  width: 100%;
+}
+
+.button {
+  height: layout.$spacing-06;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
