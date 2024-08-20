@@ -1,4 +1,5 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
 
 .billingFormContainer {
   padding: layout.$spacing-05;
@@ -27,11 +28,8 @@
   cursor: pointer;
 }
 
-.form {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100%;
+.searchDisable {
+  background-color: colors.$cool-gray-30;
 }
 
 .button {
@@ -41,3 +39,4 @@
   align-items: baseline;
   min-width: 50%;
 }
+

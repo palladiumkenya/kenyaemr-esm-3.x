@@ -7,6 +7,7 @@ import BillHistory from './bill-history/bill-history.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
+import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
@@ -17,6 +18,7 @@ import LabOrder from './billable-services/billiable-item/test-order/lab-order.co
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import { EditPurchasePriceForm } from './billable-services/manage-commodity-price/workspaces/edit-purchase-price-form.workspace';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
@@ -90,6 +92,7 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billableServicesHome = getSyncLifecycle(BillableServiceHome, options);
+export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 
 export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
@@ -112,6 +115,9 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
+
+// bill commodities extensions
+export const editPurchasePriceForm = getSyncLifecycle(EditPurchasePriceForm, options);
 
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);

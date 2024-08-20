@@ -1,81 +1,82 @@
 {
-  "$schema": "https://json.openmrs.org/routes.schema.json",
-  "backendDependencies": {
-    "kenyaemr": "^19.0.0"
-  },
-  "pages": [
-    {
-      "component": "shrRoot",
-      "route": "referrals"
-    }
-  ],
-  "extensions": [
-    {
-      "component": "shrAuthorizationForm",
-      "name": "shr-authorization-form"
+    "$schema": "https://json.openmrs.org/routes.schema.json",
+    "backendDependencies": {
+        "kenyaemr": "^19.0.0"
     },
-    {
-      "name": "patient-chart-shr-summary-dashboard-link",
-      "component": "shrSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-shr-summary-dashboard-slot",
-        "path": "SHR Portal"
-      }
-    },
-    {
-      "name": "SHR Portal",
-      "slot": "patient-chart-shr-summary-dashboard-slot",
-      "component": "patientSHRSummary",
-      "meta": {
-        "columnSpan": 4
-      }
-    },
-    {
-      "name": "referrals",
-      "slot": "referrals-slot",
-      "component": "shrRoot"
-    },
-    {
-      "name": "referrals-link",
-      "slot": "homepage-dashboard-slot",
-      "component": "ReferralsDashboardLink",
-      "meta": {
-        "name": "referrals",
-        "title": "referrals",
-        "slot": "referrals-slot"
-      }
-    },
-    {
-      "name": "referral-reasons-dialog",
-      "component": "referralReasonsDialogPopup"
-    },
-    {
-      "name": "facility-referral-form",
-      "component": "facilityRefferalForm"
-    },
-    {
-      "name": "referral-view-link",
-      "component": "referralLink",
-      "slot": "patient-chart-dashboard-slot",
-      "order": 13,
-      "meta": {
-        "columns": 1,
-        "columnSpan": 1,
-        "slot": "patient-chart-referral-slot",
-        "path": "referral",
-        "layoutMode": "anchored"
-      }
-    },
-    {
-      "name": "referral-view",
-      "slot": "patient-chart-referral-slot",
-      "component": "referralWidget",
-      "order": 0,
-      "online": true,
-      "offline": false
-    }
-  ]
+    "pages": [
+        {
+            "component": "shrRoot",
+            "route": "referrals"
+        }
+    ],
+    "extensions": [
+        {
+            "component": "shrAuthorizationForm",
+            "name": "shr-authorization-form"
+        },
+        {
+            "name": "patient-chart-shr-summary-dashboard-link",
+            "component": "shrSummaryDashboardLink",
+            "slot": "patient-chart-dashboard-slot",
+            "meta": {
+                "columns": 1,
+                "columnSpan": 1,
+                "slot": "patient-chart-shr-summary-dashboard-slot",
+                "path": "SHR Portal"
+            },
+            "featureFlag": "healthInformationExchange"
+        },
+        {
+            "name": "SHR Portal",
+            "slot": "patient-chart-shr-summary-dashboard-slot",
+            "component": "patientSHRSummary",
+            "meta": {
+                "columnSpan": 4
+            }
+        },
+        {
+            "name": "referrals",
+            "slot": "referrals-slot",
+            "component": "shrRoot"
+        },
+        {
+            "name": "referrals-link",
+            "slot": "homepage-dashboard-slot",
+            "component": "ReferralsDashboardLink",
+            "meta": {
+                "name": "referrals",
+                "title": "referrals",
+                "slot": "referrals-slot"
+            }
+        },
+        {
+            "name": "referral-reasons-dialog",
+            "component": "referralReasonsDialogPopup"
+        },
+        {
+            "name": "facility-referral-form",
+            "component": "facilityRefferalForm"
+        },
+        {
+            "name": "referral-view-link",
+            "component": "referralLink",
+            "slot": "patient-chart-dashboard-slot",
+            "order": 13,
+            "meta": {
+                "columns": 1,
+                "columnSpan": 1,
+                "slot": "patient-chart-referral-slot",
+                "path": "referral",
+                "layoutMode": "anchored"
+            }
+        },
+        {
+            "name": "referral-view",
+            "slot": "patient-chart-referral-slot",
+            "component": "referralWidget",
+            "order": 0,
+            "online": true,
+            "offline": false
+        }
+    ]
 }

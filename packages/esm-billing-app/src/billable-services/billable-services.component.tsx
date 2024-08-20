@@ -15,6 +15,7 @@ import {
   TableRow,
   Tile,
   Button,
+  Tooltip,
 } from '@carbon/react';
 import {
   useLayoutType,
@@ -23,15 +24,15 @@ import {
   usePagination,
   ErrorState,
   navigate,
-  WorkspaceContainer,
+  showModal,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './billable-services.scss';
 import { useTranslation } from 'react-i18next';
 import { useBillableServices } from './billable-service.resource';
-import { ArrowRight } from '@carbon/react/icons';
+import { ArrowRight, Edit, TrashCan } from '@carbon/react/icons';
 
-const BillableServices = () => {
+const BillableServices = ({ onEditService, onDeleteService }) => {
   const { t } = useTranslation();
   const { billableServices, isLoading, isValidating, error, mutate } = useBillableServices();
   const layout = useLayoutType();
@@ -44,7 +45,6 @@ const BillableServices = () => {
   //creating service state
   const [showOverlay, setShowOverlay] = useState(false);
   const [overlayHeader, setOverlayTitle] = useState('');
-
   const headerData = [
     {
       header: t('serviceName', 'Service Name'),
@@ -103,7 +103,30 @@ const BillableServices = () => {
         serviceType: service?.serviceType?.display,
         status: service.serviceStatus,
         prices: '--',
-        actions: '--',
+        actions: (
+          <div>
+            <Tooltip align="bottom" label="Edit Service">
+              <Button
+                kind="ghost"
+                size="md"
+                onClick={() => {
+                  handleEditService(service);
+                }}
+                iconDescription={t('editService', 'Edit Service')}
+                renderIcon={(props) => <Edit size={16} {...props} />}></Button>
+            </Tooltip>
+            <Tooltip align="bottom" label="Edit Service">
+              <Button
+                kind="ghost"
+                size="md"
+                onClick={() => {
+                  onDeleteService(service);
+                }}
+                iconDescription={t('deleteService', 'Delete Service')}
+                renderIcon={(props) => <TrashCan size={16} {...props} />}></Button>
+            </Tooltip>
+          </div>
+        ),
       };
       let cost = '';
       service.servicePrices.forEach((price) => {
@@ -113,7 +136,6 @@ const BillableServices = () => {
       rowData.push(s);
     });
   }
-
   const handleSearch = useCallback(
     (e) => {
       goTo(1);
@@ -121,6 +143,9 @@ const BillableServices = () => {
     },
     [goTo, setSearchString],
   );
+  const handleEditService = (service) => {
+    onEditService(service);
+  };
 
   if (isLoading) {
     <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />;

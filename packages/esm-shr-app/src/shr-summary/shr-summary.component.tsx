@@ -42,7 +42,7 @@ const SHRSummaryPanel = () => {
 
   return (
     <div className={`omrs-main-content`}>
-      <PatientSHRSummartTable />
+      <PatientSHRSummaryTable />
     </div>
   );
 };

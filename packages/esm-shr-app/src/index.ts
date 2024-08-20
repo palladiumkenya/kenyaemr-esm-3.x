@@ -9,10 +9,12 @@ import {
 import { configSchema } from './config-schema';
 import { referralDashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import { createHomeDashboardLink } from './create-dashboard-link';
-import ReferralReasonsDialogPopup from './referrals/referral-reasons/referral-reasons.component';
 import ReferralChartView from './referrals/patient-chart/referral-chart-view.component';
+import ReferralReasonsDialogPopup from './referrals/referral-reasons/referral-reasons.component';
+import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
+import SHRSummaryPanel from './shr-summary/shr-summary.component';
+import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import FacilityRefferalForm from './workspace/referrals.workspace.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
 import SHRSummaryPanel from './shr-summary/shr-summary.component';
