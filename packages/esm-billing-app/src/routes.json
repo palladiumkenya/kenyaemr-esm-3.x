@@ -49,7 +49,7 @@
       "name": "billing-dashboard-root",
       "slot": "billing-dashboard-slot"
     },
-   {
+    {
       "name": "billing-patient-summary",
       "component": "billingPatientSummary",
       "slot": "patient-chart-billing-dashboard-slot",
@@ -71,7 +71,6 @@
         "layoutMode": "anchored"
       }
     },
-    
     {
       "name": "billing-check-in-form",
       "slot": "extra-visit-attribute-slot",
@@ -106,7 +105,7 @@
     },
     {
       "name": "delete-billableservice-modal",
-      "component": "deleteBillableServiceModal"   
+      "component": "deleteBillableServiceModal"
     },
     {
       "name": "refund-bill-modal",
@@ -164,6 +163,12 @@
       "name": "edit-purchase-price-form",
       "component": "editPurchasePriceForm",
       "title": "Edit Purchase Price Form",
+      "type": "other-form"
+    },
+    {
+      "name": "edit-billable-service-form",
+      "component": "editBillableServiceForm",
+      "title": "Edit Billable Service Form",
       "type": "other-form"
     }
   ]
