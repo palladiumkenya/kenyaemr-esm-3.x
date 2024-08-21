@@ -74,7 +74,7 @@ const EditBillableServiceForm: React.FC<AddBillableServiceProps> = ({
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid, isSubmitting, isDirty },
   } = useForm<FormData>({
     mode: 'all',
     defaultValues: initialValues ?? { payment: [DEFAULT_PAYMENT_OPTION] },
@@ -115,11 +115,6 @@ const EditBillableServiceForm: React.FC<AddBillableServiceProps> = ({
     };
     setSelectedConcept(concept);
   }, []);
-
-  const handleNavigateToServiceDashboard = () =>
-    navigate({
-      to: window.getOpenmrsSpaBase() + 'billable-services',
-    });
 
   const onSubmit = async (data: FormData) => {
     const payload: any = {};
@@ -378,7 +373,7 @@ const EditBillableServiceForm: React.FC<AddBillableServiceProps> = ({
         </Button>
         <Button
           className={styles.button}
-          disabled={!isValid || !selectedConcept}
+          disabled={!isValid || !selectedConcept || !isDirty}
           kind="primary"
           onClick={handleSubmit(onSubmit)}
           type="submit">

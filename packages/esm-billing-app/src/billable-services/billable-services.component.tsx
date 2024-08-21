@@ -151,7 +151,7 @@ const BillableServices = () => {
         payments.push({
           uuid: element.uuid,
           paymentMode: element.paymentMode?.uuid,
-          price: element.price,
+          price: element.price?.toString(),
         });
       });
     }

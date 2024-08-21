@@ -16,12 +16,12 @@
 
 .sectionTitle {
   @include type.type-style('heading-compact-02');
-  color: $text-02;
-  margin-bottom: spacing.$spacing-04;
+  color: colors.$black;
+  margin-bottom: layout.$spacing-04;
 }
 
 .modalBody {
-  padding-bottom: spacing.$spacing-05;
+  padding-bottom: layout.$spacing-05;
 }
 
 .container {
@@ -78,21 +78,21 @@
 }
 
 .conceptsList {
-  background-color: $ui-02;
+  background-color: colors.$warm-gray-20;
   max-height: 14rem;
   overflow-y: auto;
-  border: 1px solid $ui-03;
+  border: 1px solid colors.$blue-40;
 
   li:hover {
-    background-color: $ui-03;
+    background-color: colors.$warm-gray-20;
   }
 }
 
 .emptyResults {
   @include type.type-style('body-compact-01');
-  color: $text-02;
+  color: colors.$black;
   min-height: 1rem;
-  border: 1px solid $ui-03;
+  border: 1px solid colors.$black;
 }
 
 .conceptLabel {
@@ -106,19 +106,19 @@
 
 .serviceError {
   :global(.cds--search-input):focus {
-    outline: 2.5px solid $danger;
+    outline: 2.5px solid colors.$red-70;
   }
 
   :global(.cds--search-magnifier) {
     svg {
-      fill: $danger;
+      fill: colors.$red-70;
     }
   }
 }
 
 .errorMessage {
   @include type.type-style('label-02');
-  color: $danger;
+  color: colors.$red-70;
   margin-top: 0.5rem;
 }
 
