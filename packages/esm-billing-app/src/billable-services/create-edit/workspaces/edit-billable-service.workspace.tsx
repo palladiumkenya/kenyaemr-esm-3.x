@@ -207,7 +207,7 @@ const EditBillableServiceForm: React.FC<AddBillableServiceProps> = ({
                   type="text"
                   labelText={<span className={styles.subTitle}>{t('serviceShortName', 'Short Name')}</span>}
                   size="md"
-                  placeholder="Enter service short name"
+                  placeholder={t('enterServiceShortName', 'Enter Service Short Name')}
                   invalidText={errors.shortName?.message}
                   invaliShort
                   Name
@@ -218,7 +218,7 @@ const EditBillableServiceForm: React.FC<AddBillableServiceProps> = ({
           />
         </div>
         <div className={styles.itemSection}>
-          <FormLabel className={styles.subTitle}>Associated Concept</FormLabel>
+          <FormLabel className={styles.subTitle}>{t('associatedConcept', 'Associated Concept')}</FormLabel>
           <Controller
             name="concept"
             control={control}

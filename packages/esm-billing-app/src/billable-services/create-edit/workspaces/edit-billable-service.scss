@@ -1,8 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/colors';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
 
 .form {
   display: flex;
@@ -13,8 +11,7 @@
 }
 
 .subTitle {
-  font-weight: 600;
-  font-size: 14px;
+  @include type.type-style('heading-01');
 }
 
 .sectionTitle {
@@ -132,8 +129,8 @@
 }
 
 .loader {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
+  margin-top: layout.$layout-01;
+  margin-bottom: layout.$layout-01;
   margin-left: auto;
   margin-right: auto;
   width: max-content;
