@@ -1,12 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { z } from 'zod';
-const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
-export const AUTH_TYPES = [
-  { value: 'otp', label: 'OTP' },
-  { value: 'pin', label: 'PIN' },
-  { value: 'biometrics', label: 'BIOMETRICS' },
-];
+import { PHONE_NUMBER_REGEX } from '../constants';
 
 export const authorizationSchema = z
   .object({
@@ -28,11 +23,11 @@ export const authorizationSchema = z
   );
 
 export function generateOTP(length = 5) {
-  var string = '0123456789';
+  let otpNumbers = '0123456789';
   let OTP = '';
-  var len = string.length;
+  var len = otpNumbers.length;
   for (let i = 0; i < length; i++) {
-    OTP += string[Math.floor(Math.random() * len)];
+    OTP += otpNumbers[Math.floor(Math.random() * len)];
   }
   return OTP;
 }

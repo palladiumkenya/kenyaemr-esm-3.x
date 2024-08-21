@@ -11,7 +11,7 @@ const SHRSummaryPanel = () => {
   const patientUuid = getPatientUuidFromUrl();
   const { t } = useTranslation();
   const { nationalPatientUniqueIdentifier } = useConfig<ReferralConfigObject>();
-  const { error, isLoading, hasType, identifiers } = usePatientIdentifiers(patientUuid);
+  const { error, isLoading, hasType } = usePatientIdentifiers(patientUuid);
 
   if (isLoading) {
     return <DataTableSkeleton />;
