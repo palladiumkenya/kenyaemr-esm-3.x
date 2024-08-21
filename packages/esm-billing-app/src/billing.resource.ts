@@ -42,10 +42,16 @@ const mapBillProperties = (bill: PatientInvoice): MappedBill => {
   return mappedBill;
 };
 
-export const useBills = (patientUuid: string = '', billStatus: string = '') => {
-  // TODO: Should be provided from the UI
-  const defaultCreatedOnOrAfterDateTime = dayjs().startOf('day').toISOString();
-  const url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${defaultCreatedOnOrAfterDateTime}`;
+export const useBills = (
+  patientUuid: string = '',
+  billStatus: PaymentStatus | '' | string = '',
+  startingDate: Date = dayjs().startOf('day').toDate(),
+  endDate: Date = new Date(),
+) => {
+  const startingDateISO = startingDate.toISOString();
+  const endDateISO = endDate.toISOString();
+
+  let url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startingDateISO}&createdOnOrBefore=${endDateISO}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     patientUuid ? `${url}&patientUuid=${patientUuid}` : url,
@@ -63,31 +69,6 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
 
   return {
     bills: formattedBills,
-    error,
-    isLoading,
-    isValidating,
-    mutate,
-  };
-};
-
-export const usePaidBills = (startingDate: Date, endDate: Date) => {
-  const startingDateISO = startingDate.toISOString();
-  // const endDateISO = endDate.toISOString();
-
-  const url = `/ws/rest/v1/cashier/bill?status=${PaymentStatus.PAID}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startingDateISO}`;
-
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{
-    data: { results: Array<PatientInvoice> };
-  }>(url, openmrsFetch, {
-    errorRetryCount: 2,
-  });
-
-  const bills = sortBy(data?.data?.results ?? [], ['dateCreated'])
-    .reverse()
-    .map((bill) => mapBillProperties(bill));
-
-  return {
-    bills,
     error,
     isLoading,
     isValidating,

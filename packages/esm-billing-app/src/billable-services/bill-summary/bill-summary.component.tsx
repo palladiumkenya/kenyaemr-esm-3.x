@@ -1,28 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { usePaidBills } from '../../billing.resource';
+import { useBills } from '../../billing.resource';
 import {
-  DataTableSkeleton,
   DataTable,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
   TableContainer,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
+  Pagination,
 } from '@carbon/react';
 import styles from './bill-summary.scss';
-import { ErrorState } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { TableToolbarFilter } from './table-toolbar-filter';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 import flatMapDeep from 'lodash-es/flatMapDeep';
-import { MappedBill } from '../../types';
+import { MappedBill, PaymentStatus } from '../../types';
 import dayjs from 'dayjs';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { BillSummaryTable } from './bill-summary-table.component';
+import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 
 export const headers = [
   { header: 'date', key: 'dateCreated' },
@@ -35,17 +30,26 @@ export const headers = [
 const BillSummary = () => {
   const [renderedRows, setRenderedRows] = useState<null | MappedBill[]>(null);
   const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
-  const [hasLoadedForTheFirstTime, setHasLoadedForTheFirstTime] = useState(false);
-  const { bills, isLoading, error, isValidating } = usePaidBills(dateRange[0], dateRange[1]);
+  const paidBillsResponse = useBills('', PaymentStatus.PAID, dateRange[0], dateRange[1]);
+  const { bills } = paidBillsResponse;
+
+  const [pageSize, setPageSize] = useState(10);
+  const { paginated, goTo, results, currentPage } = usePagination(renderedRows ?? [], pageSize);
+  const { pageSizes } = usePaginationInfo(
+    pageSize,
+    renderedRows ? renderedRows.length : 0,
+    currentPage,
+    results?.length,
+  );
+  const { t } = useTranslation();
+
+  const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
 
   useEffect(() => {
-    if (bills.length >= 0 && renderedRows === null) {
+    if (bills.length > 0 && renderedRows === null) {
       setRenderedRows(bills);
-      setHasLoadedForTheFirstTime(true);
     }
   }, [bills, renderedRows]);
-
-  const { t } = useTranslation();
 
   const getAllValues = (obj: Object) => {
     return flatMapDeep(obj, (value) => {
@@ -56,7 +60,12 @@ const BillSummary = () => {
     });
   };
 
-  const handleTableFilter = (selectedCheckboxes: Array<string>) => {
+  const handlePaymentTypeFilter = (selectedCheckboxes: Array<string>) => {
+    if (selectedCheckboxes.length === 0) {
+      setRenderedRows(bills);
+      return;
+    }
+
     setRenderedRows([]);
     for (let i = 0; i < selectedCheckboxes.length; i++) {
       // Filter the items inside the rows list
@@ -87,92 +96,40 @@ const BillSummary = () => {
     setDateRange(dates);
   };
 
-  if ((isLoading && !hasLoadedForTheFirstTime) || renderedRows === null) {
-    return (
-      <div className={styles.dataTableSkeleton}>
-        <DataTableSkeleton
-          headers={headers}
-          aria-label="patient bills table"
-          showToolbar={false}
-          showHeader={false}
-          rowCount={3}
-          zebra
-          columnCount={3}
-        />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={styles.errorStateSkeleton}>
-        <ErrorState error={error} headerTitle={t('paidBillsErrorState', 'An error occurred fetching bills')} />
-      </div>
-    );
-  }
-
   return (
     <div className={styles.table}>
-      <DataTable rows={renderedRows} headers={headers}>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, onInputChange }) => (
+      <DataTable rows={results ?? []} headers={headers} isSortable>
+        {(tableData) => (
           <TableContainer title="Paid Bills" description="Paid Bills Summary">
             <div className={styles.tableToolBar}>
               <TableToolbar>
                 <TableToolbarContent>
-                  <TableToolbarSearch onChange={(evt: React.ChangeEvent<HTMLInputElement>) => onInputChange(evt)} />
-                  <TableToolbarFilter onApplyFilter={handleTableFilter} onResetFilter={handleOnResetFilter} />
-                  <TableToolBarDateRangePicker onChange={handleFilterByDateRange} />
+                  <TableToolbarSearch
+                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
+                  />
+                  <TableToolbarFilter onApplyFilter={handlePaymentTypeFilter} onResetFilter={handleOnResetFilter} />
+                  <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
                 </TableToolbarContent>
               </TableToolbar>
             </div>
-            {isValidating ? (
-              <div className={styles.dataTableSkeleton}>
-                <DataTableSkeleton
-                  headers={headers}
-                  aria-label="patient bills table"
-                  showToolbar={false}
-                  showHeader={false}
-                  rowCount={3}
-                  zebra
-                  columnCount={3}
-                />
-              </div>
-            ) : bills.length === 0 ? (
-              <div className={styles.emptyStateWrapper}>
-                <EmptyState
-                  displayText={t('noBillsFilter', 'No bills match that filter please adjust your filters')}
-                  headerTitle={t('noBillsHeader', 'No bills match the provided filters')}
-                />
-              </div>
-            ) : (
-              <Table {...getTableProps()} aria-label="sample table">
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader
-                        key={header.key}
-                        {...getHeaderProps({
-                          header,
-                        })}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      {...getRowProps({
-                        row,
-                      })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <BillSummaryTable tableData={tableData} paidBillsResponse={paidBillsResponse} />
+            {paginated && (
+              <Pagination
+                forwardText={t('nextPage', 'Next page')}
+                backwardText={t('previousPage', 'Previous page')}
+                page={currentPage}
+                pageSize={pageSize}
+                pageSizes={pageSizes}
+                totalItems={bills.length}
+                className={styles.pagination}
+                size={responsiveSize}
+                onChange={({ page: newPage, pageSize }) => {
+                  if (newPage !== currentPage) {
+                    goTo(newPage);
+                  }
+                  setPageSize(pageSize);
+                }}
+              />
             )}
           </TableContainer>
         )}
