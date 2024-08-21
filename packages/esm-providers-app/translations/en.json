@@ -1,8 +1,6 @@
 {
   "action": "Action",
-  "active": "Active Providers",
   "addNewProvider": "Add New Provider",
-  "all": "All Providers",
   "cancel": "Cancel",
   "date": "License expiry date",
   "enroll": "Enroll new provider",

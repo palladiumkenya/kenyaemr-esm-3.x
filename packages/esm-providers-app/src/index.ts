@@ -1,6 +1,6 @@
 import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createLeftPanelLink } from './providers-left-panel/providers-left-panel-link.component';
+import { createLeftPanelLink } from './left-panel/providers-left-panel-link.component';
 import { moduleName, providerBasePath } from './constants';
 
 const options = {
