@@ -107,7 +107,7 @@ const PreAuthForm: React.FC<PreAuthFormProps> = ({ bill, selectedLineItems }) =>
       showSnackbar({
         kind: 'success',
         title: t('requestPreAuth', 'Pre Authorization'),
-        subtitle: t('sendClaim', 'Pre Authorization request sent successfully'),
+        subtitle: t('sendClaim', 'Pre authorization request sent successfully'),
         timeoutInMs: 3000,
         isLowContrast: true,
       });
@@ -122,7 +122,7 @@ const PreAuthForm: React.FC<PreAuthFormProps> = ({ bill, selectedLineItems }) =>
       showSnackbar({
         kind: 'error',
         title: t('requestPreAuthError', 'Pre Authorization Error'),
-        subtitle: t('sendClaimError', 'Pre Authorization request failed, Please try later'),
+        subtitle: t('sendClaimError', 'Pre authorization request failed, please try later'),
         timeoutInMs: 2500,
         isLowContrast: true,
       });
@@ -132,14 +132,13 @@ const PreAuthForm: React.FC<PreAuthFormProps> = ({ bill, selectedLineItems }) =>
   };
 
   useEffect(() => {
-    // Set the default values dynamically
     reset({
       diagnoses: confirmedDiagnoses,
       visitType: recentVisit?.visitType?.display || '',
       facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
-      claimCode: '', // Keep existing default values if necessary
-      guaranteeId: '', // Keep existing default values if necessary
-      preAuthJustification: '', // Keep existing default values if necessary
+      claimCode: '',
+      guaranteeId: '',
+      preAuthJustification: '',
       packages: [],
       interventions: [],
     });
