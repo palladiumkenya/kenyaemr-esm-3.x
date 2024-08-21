@@ -1,30 +1,26 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AddBillableService from './add-billable-service.component';
 import {
-  useBillableServices,
   usePaymentModes,
   useServiceTypes,
   createBillableService,
   useConceptsSearch,
 } from '../billable-service.resource';
-import { FetchResponse, navigate, showSnackbar } from '@openmrs/esm-framework';
-
-const mockUseBillableServices = useBillableServices as jest.MockedFunction<typeof useBillableServices>;
-const mockUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
-const mockUseServiceTypes = useServiceTypes as jest.MockedFunction<typeof useServiceTypes>;
-const mockCreateBillableService = createBillableService as jest.MockedFunction<typeof createBillableService>;
-const mockUseConceptsSearch = useConceptsSearch as jest.MockedFunction<typeof useConceptsSearch>;
-const mockNavigate = navigate as jest.MockedFunction<typeof navigate>;
-const mockShowSnackbar = showSnackbar as jest.MockedFunction<typeof showSnackbar>;
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
 
 jest.mock('../billable-service.resource', () => ({
-  useBillableServices: jest.fn(),
   usePaymentModes: jest.fn(),
   useServiceTypes: jest.fn(),
   createBillableService: jest.fn(),
   useConceptsSearch: jest.fn(),
+}));
+
+jest.mock('@openmrs/esm-framework', () => ({
+  ...jest.requireActual('@openmrs/esm-framework'),
+  navigate: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 
 const mockPaymentModes = [
@@ -55,104 +51,91 @@ const mockServiceTypes = [
 
 const mockConcepts = [
   {
-    concept: { uuid: 'c9604249-db0a-4d03-b074-fc6bc2fa13e6', display: 'test' },
-    conceptName: { uuid: 'c9604249-db0a-4d03-b074-fc6bc2fa1334', display: 'test2' },
-    display: 'Lab service',
+    concept: { uuid: 'c9604249-db0a-4d03-b074-fc6bc2fa13e6', display: 'Lab Test' },
+    conceptName: { uuid: 'c9604249-db0a-4d03-b074-fc6bc2fa1334', display: 'Lab Test' },
+    display: 'Lab Test',
   },
 ];
 
 describe('AddBillableService', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
+    jest.clearAllMocks();
+    (usePaymentModes as jest.Mock).mockReturnValue({ paymentModes: mockPaymentModes, isLoading: false });
+    (useServiceTypes as jest.Mock).mockReturnValue({ serviceTypes: mockServiceTypes, isLoading: false });
+    (useConceptsSearch as jest.Mock).mockReturnValue({ searchResults: mockConcepts, isSearching: false });
+    (createBillableService as jest.Mock).mockResolvedValue({ status: 201, ok: true });
   });
 
-  test('should render billable services form and generate correct payload', async () => {
-    const user = userEvent.setup();
-    mockUseBillableServices.mockReturnValue({
-      billableServices: [],
-      isLoading: false,
-      error: null,
-      mutate: jest.fn(),
-      isValidating: false,
-    });
-    mockUsePaymentModes.mockReturnValue({ paymentModes: mockPaymentModes, error: null, isLoading: false });
-    mockUseServiceTypes.mockReturnValue({ serviceTypes: mockServiceTypes, error: false, isLoading: false });
-    mockUseConceptsSearch.mockReturnValue({ searchResults: mockConcepts, error: undefined, isSearching: false });
+  it('should render and submit the form correctly', async () => {
     render(<AddBillableService />);
 
-    const formTitle = screen.getByRole('heading', { name: /Add Billable Services/i });
-    expect(formTitle).toBeInTheDocument();
+    // Fill out the form
+    await userEvent.type(screen.getByLabelText(/Service Name/i), 'Test Service');
+    await userEvent.type(screen.getByLabelText(/Short Name/i), 'TST');
 
-    const serviceNameTextInp = screen.getByRole('textbox', { name: /Service Name/i });
-    expect(serviceNameTextInp).toBeInTheDocument();
+    // Search for concept
+    const conceptSearch = screen.getByPlaceholderText(/Search associated concept/i);
+    await userEvent.type(conceptSearch, 'Lab Test');
+    await waitFor(() => {
+      const conceptOption = screen.getByText('Lab Test');
+      userEvent.click(conceptOption);
+    });
 
-    const serviceShortNameTextInp = screen.getByRole('textbox', { name: /Short Name/i });
-    expect(serviceShortNameTextInp).toBeInTheDocument();
+    // Select service type
+    const serviceTypeCombobox = screen.getByLabelText(/Service Type/i);
+    await userEvent.click(serviceTypeCombobox);
+    const labServiceOption = await screen.findByText('Lab service');
+    await userEvent.click(labServiceOption);
 
-    await user.type(serviceNameTextInp, 'Test Service Name');
-    await user.type(serviceShortNameTextInp, 'Test Short Name');
+    // Add payment option
+    const addPaymentButton = screen.getByRole('button', { name: /Add payment option/i });
+    await userEvent.click(addPaymentButton);
 
-    expect(serviceNameTextInp).toHaveValue('Test Service Name');
-    expect(serviceShortNameTextInp).toHaveValue('Test Short Name');
+    // Select payment mode
+    const paymentModeDropdown = screen.getByText(/Select payment method/i);
+    await userEvent.click(paymentModeDropdown);
+    const cashOption = await screen.findByText('Cash');
+    await userEvent.click(cashOption);
 
-    const serviceTypeComboBox = screen.getByRole('combobox', { name: /Service Type/i });
-    expect(serviceTypeComboBox).toBeInTheDocument();
-    await user.click(serviceTypeComboBox);
-    const serviceTypeOptions = screen.getByRole('option', { name: /Lab service/i });
-    expect(serviceTypeOptions).toBeInTheDocument();
-    await user.click(serviceTypeOptions);
+    // Enter price
+    const priceInput = screen.getByLabelText(/Selling Price/i);
+    await userEvent.type(priceInput, '1000');
 
-    const addPaymentMethodBtn = screen.getByRole('button', { name: /Add payment option/i });
-    expect(addPaymentMethodBtn).toBeInTheDocument();
+    // Submit the form
+    const submitButton = screen.getByRole('button', { name: /Save/i });
+    expect(submitButton).toBeInTheDocument();
+    await userEvent.click(submitButton);
 
-    await user.click(addPaymentMethodBtn);
+    // Check if createBillableService was called with the correct data
+    await waitFor(() => {
+      expect(createBillableService).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Test Service',
+          shortName: 'TST',
+          serviceType: expect.any(String),
+          servicePrices: [
+            expect.objectContaining({
+              name: 'Cash',
+              price: '1000',
+              paymentMode: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74',
+            }),
+          ],
+          concept: 'c9604249-db0a-4d03-b074-fc6bc2fa13e6',
+        }),
+      );
+    });
 
-    const paymentMethodComboBox = screen.getByRole('combobox', { name: /Payment Mode/i });
-    expect(paymentMethodComboBox).toBeInTheDocument();
-    await user.click(paymentMethodComboBox);
-    const paymentMethodOptions = screen.getByRole('option', { name: /Cash/i });
-    expect(paymentMethodOptions).toBeInTheDocument();
-    await user.click(paymentMethodOptions);
-
-    const priceTextInp = screen.getByRole('textbox', { name: /Price/i });
-    expect(priceTextInp).toBeInTheDocument();
-    await user.type(priceTextInp, '1000');
-
-    // Should be able to add multiple payment methods and delete them
-    await user.click(addPaymentMethodBtn);
-    const deleteBtn0 = screen.getByRole('img', { name: /delete_0/i });
-    expect(deleteBtn0).toBeInTheDocument();
-    const deleteBtn1 = screen.getByRole('img', { name: /delete_1/i });
-
-    // Delete payment method on index 1
-    await user.click(deleteBtn1);
-
-    mockCreateBillableService.mockReturnValue(Promise.resolve({} as FetchResponse<any>));
-    const saveBtn = screen.getByRole('button', { name: /Save/i });
-
-    expect(saveBtn).toBeInTheDocument();
-    await user.click(saveBtn);
+    // Check if navigation occurred after successful submission
+    expect(navigate).toHaveBeenCalledWith({ to: `${window.getOpenmrsSpaBase()}billable-services` });
   });
 
-  test("should navigate back to billable services dashboard when 'Cancel' button is clicked", async () => {
-    const user = userEvent.setup();
-    mockUseBillableServices.mockReturnValue({
-      billableServices: [],
-      isLoading: false,
-      error: null,
-      mutate: jest.fn(),
-      isValidating: false,
-    });
-    mockUsePaymentModes.mockReturnValue({ paymentModes: mockPaymentModes, error: null, isLoading: false });
-    mockUseServiceTypes.mockReturnValue({ serviceTypes: mockServiceTypes, error: false, isLoading: false });
-    mockUseConceptsSearch.mockReturnValue({ searchResults: mockConcepts, error: undefined, isSearching: false });
+  it('should navigate back to billable services dashboard when Cancel button is clicked', async () => {
     render(<AddBillableService />);
 
-    const cancelBtn = screen.getByRole('button', { name: /Cancel/i });
-    expect(cancelBtn).toBeInTheDocument();
-    await user.click(cancelBtn);
+    const cancelButton = screen.getByRole('button', { name: /Cancel/i });
+    expect(cancelButton).toBeInTheDocument();
+    await userEvent.click(cancelButton);
 
-    expect(mockNavigate).toHaveBeenCalledTimes(1);
-    expect(mockNavigate).toHaveBeenCalledWith({ to: '/openmrs/spa/billable-services' });
+    expect(navigate).toHaveBeenCalledWith({ to: `${window.getOpenmrsSpaBase()}billable-services` });
   });
 });
