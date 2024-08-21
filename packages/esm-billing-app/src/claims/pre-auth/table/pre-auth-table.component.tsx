@@ -24,13 +24,13 @@ import {
 import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import styles from './pre-auth-table.scss';
 import { LineItem, MappedBill } from '../../../types';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 
 type PreAuthTableProps = {
   bill: MappedBill;
   isSelectable?: boolean;
   isLoadingBill?: boolean;
-  onSelectItem?: (selectedLineItems: LineItem[]) => void; // Fixed type signature
+  onSelectItem?: (selectedLineItems: LineItem[]) => void;
 };
 
 const PreAuthTable: React.FC<PreAuthTableProps> = ({ bill, isSelectable = true, isLoadingBill, onSelectItem }) => {
@@ -209,6 +209,9 @@ const PreAuthTable: React.FC<PreAuthTableProps> = ({ bill, isSelectable = true, 
         <div className={styles.filterEmptyState}>
           <Layer>
             <Tile className={styles.filterEmptyStateTile}>
+              <div className={styles.empty__state}>
+                <EmptyDataIllustration />
+              </div>
               <p className={styles.filterEmptyStateContent}>
                 {t('noMatchingItemsToDisplay', 'No matching items to display')}
               </p>
