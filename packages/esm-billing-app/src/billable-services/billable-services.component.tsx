@@ -24,6 +24,7 @@ import {
   usePagination,
   ErrorState,
   navigate,
+  launchWorkspace,
   showModal,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -32,7 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { useBillableServices } from './billable-service.resource';
 import { ArrowRight, Edit, TrashCan } from '@carbon/react/icons';
 
-const BillableServices = ({ onEditService, onDeleteService }) => {
+const BillableServices = () => {
   const { t } = useTranslation();
   const { billableServices, isLoading, isValidating, error, mutate } = useBillableServices();
   const layout = useLayoutType();
@@ -120,7 +121,7 @@ const BillableServices = ({ onEditService, onDeleteService }) => {
                 kind="ghost"
                 size="md"
                 onClick={() => {
-                  onDeleteService(service);
+                  handleDeleteService(service);
                 }}
                 iconDescription={t('deleteService', 'Delete Service')}
                 renderIcon={(props) => <TrashCan size={16} {...props} />}></Button>
@@ -143,8 +144,42 @@ const BillableServices = ({ onEditService, onDeleteService }) => {
     },
     [goTo, setSearchString],
   );
+  function getPayments(prices) {
+    let payments = [];
+    if (prices.length > 0) {
+      prices.forEach((element) => {
+        payments.push({
+          uuid: element.uuid,
+          paymentMode: element.paymentMode?.uuid,
+          price: element.price?.toString(),
+        });
+      });
+    }
+    return payments;
+  }
   const handleEditService = (service) => {
-    onEditService(service);
+    let serviceData = {
+      serviceName: service?.name,
+      shortName: service?.shortName,
+      serviceTypeName: service?.serviceType?.uuid,
+      concept: service.concept?.uuid,
+      payment: getPayments(service?.servicePrices),
+    };
+    launchWorkspace('edit-billable-service-form', {
+      workspaceTitle: t('editBillableServiceForm', 'Edit Billable Service Form'),
+      initialValues: serviceData,
+      serviceConcept: service?.concept,
+      serviceId: service.uuid,
+    });
+  };
+  const handleDeleteService = (service) => {
+    const dispose = showModal('delete-billableservice-modal', {
+      onClose: () => {
+        mutate();
+        dispose();
+      },
+      service: service,
+    });
   };
 
   if (isLoading) {

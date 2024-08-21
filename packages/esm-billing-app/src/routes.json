@@ -113,7 +113,7 @@
     },
     {
       "name": "delete-billableservice-modal",
-      "component": "deleteBillableServiceModal"   
+      "component": "deleteBillableServiceModal"
     },
     {
       "name": "refund-bill-modal",
@@ -198,6 +198,12 @@
       "name": "edit-purchase-price-form",
       "component": "editPurchasePriceForm",
       "title": "Edit Purchase Price Form",
+      "type": "other-form"
+    },
+    {
+      "name": "edit-billable-service-form",
+      "component": "editBillableServiceForm",
+      "title": "Edit Billable Service Form",
       "type": "other-form"
     }
   ]
