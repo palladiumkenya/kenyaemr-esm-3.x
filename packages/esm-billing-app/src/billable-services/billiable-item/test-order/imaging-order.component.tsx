@@ -11,9 +11,10 @@ type ImagingOrderProps = {
       conceptUuid: string;
     };
   };
+  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const ImagingOrder: React.FC<ImagingOrderProps> = ({ order }) => {
+const ImagingOrder: React.FC<ImagingOrderProps> = ({ order, setHasPrice }) => {
   const { t } = useTranslation();
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
 
@@ -27,7 +28,7 @@ const ImagingOrder: React.FC<ImagingOrderProps> = ({ order }) => {
     );
   }
 
-  return <PriceInfoOrder billableItem={billableItem} error={error} />;
+  return <PriceInfoOrder billableItem={billableItem} error={error} setHasPrice={setHasPrice} />;
 };
 
 export default ImagingOrder;

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styles from './add-billable-service.scss';
 import {
   Form,
@@ -11,7 +11,6 @@ import {
   Search,
   Tile,
   FormLabel,
-  NumberInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -24,11 +23,12 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { Add, TrashCan, WarningFilled } from '@carbon/react/icons';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, selectPreferredName, showSnackbar, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { ServiceConcept } from '../../types';
 import { extractErrorMessagesFromResponse } from '../../utils';
 
 const servicePriceSchema = z.object({
+  uuid: z.string({ required_error: 'Payment method is required' }),
   paymentMode: z.string({ required_error: 'Payment method is required' }),
   price: z
     .string()
@@ -47,22 +47,23 @@ const paymentFormSchema = z.object({
   concept: z.string({ required_error: 'Concept search is required.' }),
 });
 
-type FormData = z.infer<typeof paymentFormSchema>;
-const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '1' };
-
-const AddBillableService: React.FC = () => {
+export type FormData = z.infer<typeof paymentFormSchema>;
+const DEFAULT_PAYMENT_OPTION = { paymentMode: '', price: '', uuid: null };
+type AddBillableServiceProps = {
+  initialValues?: FormData;
+  serviceId?: string;
+  serviceConcept?: any;
+};
+const AddBillableService = () => {
   const { t } = useTranslation();
-
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const { serviceTypes, isLoading: isLoadingServicesTypes } = useServiceTypes();
-
   const {
     control,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<FormData>({
     mode: 'all',
-    defaultValues: {},
     resolver: zodResolver(paymentFormSchema),
   });
 
@@ -80,6 +81,20 @@ const AddBillableService: React.FC = () => {
   const debouncedSearchTerm = useDebounce(searchTerm);
   const { searchResults, isSearching } = useConceptsSearch(debouncedSearchTerm);
 
+  const getValidPaymentModes = (allPaymentModes) => {
+    const setModes = control?._formValues?.payment ?? [];
+    const newPaymentModes = [];
+
+    allPaymentModes.forEach((element) => {
+      // Check if any object in setModes has the same paymentMode as the current element
+      const isModePresent = setModes.some((mode) => mode.paymentMode === element.uuid);
+      if (!isModePresent) {
+        newPaymentModes.push(element);
+      }
+    });
+    return newPaymentModes;
+  };
+
   const handleConceptChange = useCallback((selectedConcept: ServiceConcept) => {
     setSelectedConcept(selectedConcept);
   }, []);
@@ -89,11 +104,16 @@ const AddBillableService: React.FC = () => {
       to: window.getOpenmrsSpaBase() + 'billable-services',
     });
 
+  const handleRedirectToAddService = () =>
+    navigate({
+      to: window.getOpenmrsSpaBase() + 'billable-services/add-service',
+    });
+
   const onSubmit = (data: FormData) => {
     const payload: any = {};
-
     let servicePrices = data.payment.map((element) => {
       return {
+        uuid: element.uuid,
         name: paymentModes.filter((p) => p.uuid === element.paymentMode)[0].name,
         price: element.price,
         paymentMode: element.paymentMode,
@@ -260,20 +280,23 @@ const AddBillableService: React.FC = () => {
           <Controller
             control={control}
             name="serviceTypeName"
-            render={({ field }) => (
-              <ComboBox
-                id="serviceType"
-                items={serviceTypes ?? []}
-                titleText={t('serviceType', 'Service Type')}
-                itemToString={(item: { display: string }) => (item ? item.display : '')}
-                placeholder="Select service type"
-                required
-                {...field}
-                onChange={({ selectedItem }) => field.onChange(selectedItem ? selectedItem.display : '')}
-                invalidText={errors.serviceTypeName?.message || ''}
-                invalid={!!errors.serviceTypeName}
-              />
-            )}
+            render={({ field }) => {
+              return (
+                <ComboBox
+                  id="serviceType"
+                  items={serviceTypes ?? []}
+                  titleText={t('serviceType', 'Service Type')}
+                  itemToString={(item) => (item ? item.display : '')}
+                  placeholder={t('selectServiceType', 'Select service type')}
+                  initialSelectedItem={serviceTypes.find((item) => item.uuid == field.value) ?? null}
+                  onChange={({ selectedItem }) => {
+                    field.onChange(selectedItem ? selectedItem?.uuid : '');
+                  }}
+                  invalidText={errors.serviceTypeName?.message || ''}
+                  invalid={!!errors.serviceTypeName}
+                />
+              );
+            }}
           />
         </div>
       </section>
@@ -283,21 +306,25 @@ const AddBillableService: React.FC = () => {
             <Controller
               control={control}
               name={`payment.${index}.paymentMode`}
-              render={({ field }) => (
-                <Layer>
-                  <Dropdown
-                    id={`paymentMode-${index}`}
-                    onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
-                    titleText={t('paymentMode', 'Payment Mode')}
-                    label={t('selectPaymentMethod', 'Select payment method')}
-                    items={paymentModes ?? []}
-                    itemToString={(item) => (item ? item.name : '')}
-                    invalid={!!errors?.payment?.[index]?.paymentMode}
-                    invalidText={errors?.payment?.[index]?.paymentMode?.message}
-                  />
-                </Layer>
-              )}
+              render={({ field }) => {
+                return (
+                  <Layer>
+                    <Dropdown
+                      id={`paymentMode-${index}`}
+                      onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
+                      titleText={t('paymentMode', 'Payment Mode')}
+                      label={t('selectPaymentMethod', 'Select payment method')}
+                      items={getValidPaymentModes(paymentModes) ?? []}
+                      itemToString={(item) => (item ? item.name : '')}
+                      invalid={!!errors?.payment?.[index]?.paymentMode}
+                      invalidText={errors?.payment?.[index]?.paymentMode?.message}
+                      initialSelectedItem={paymentModes?.find((item) => item.uuid === field.value) || null}
+                    />
+                  </Layer>
+                );
+              }}
             />
+
             <Controller
               control={control}
               name={`payment.${index}.price`}

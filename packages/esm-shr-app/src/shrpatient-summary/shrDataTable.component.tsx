@@ -17,8 +17,8 @@ const SHRDataTable: React.FC<SHRDataTableProps> = ({ data, tableHeaders }) => {
   const { results: paginatedData, goTo, currentPage } = usePagination(data ?? [], pagesize);
 
   const tableRows = useMemo(() => {
-    return paginatedData?.map((payload) => ({
-      id: `${payload.uuid}`,
+    return paginatedData?.map((payload, index) => ({
+      id: `${payload.uuid}-${index}`,
       ...payload,
     }));
   }, [paginatedData]);
