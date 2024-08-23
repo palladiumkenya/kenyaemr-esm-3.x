@@ -10,12 +10,12 @@ import {
 } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
-import { headers } from './bill-summary.component';
-import styles from './bill-summary.scss';
+import styles from './payment-history.scss';
 import { useTranslation } from 'react-i18next';
 import { useBills } from '../../billing.resource';
+import { headers } from './payment-history-viewer.component';
 
-export const BillSummaryTable = ({
+export const PaymentHistoryTable = ({
   tableData,
   paidBillsResponse,
 }: {
@@ -23,10 +23,10 @@ export const BillSummaryTable = ({
   paidBillsResponse: ReturnType<typeof useBills>;
 }) => {
   const { t } = useTranslation();
-  const { bills, error, isLoading, isValidating } = paidBillsResponse;
+  const { bills, error, isLoading } = paidBillsResponse;
   const { rows, getHeaderProps, getRowProps, getTableProps } = tableData;
 
-  if (isValidating || isLoading) {
+  if (isLoading) {
     return (
       <div className={styles.dataTableSkeleton}>
         <DataTableSkeleton

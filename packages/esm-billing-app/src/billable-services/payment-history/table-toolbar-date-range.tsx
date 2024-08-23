@@ -1,6 +1,6 @@
 import { DatePicker, DatePickerInput } from '@carbon/react';
 import React from 'react';
-import styles from './bill-summary.scss';
+import styles from './payment-history.scss';
 
 export const TableToolBarDateRangePicker = ({
   onChange,

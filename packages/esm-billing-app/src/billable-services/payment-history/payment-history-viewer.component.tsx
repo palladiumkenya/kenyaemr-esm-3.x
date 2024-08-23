@@ -8,16 +8,16 @@ import {
   TableToolbarSearch,
   Pagination,
 } from '@carbon/react';
-import styles from './bill-summary.scss';
+import styles from './payment-history.scss';
 import { TableToolbarFilter } from './table-toolbar-filter';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 import flatMapDeep from 'lodash-es/flatMapDeep';
 import { MappedBill, PaymentStatus } from '../../types';
 import dayjs from 'dayjs';
-import { BillSummaryTable } from './bill-summary-table.component';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
+import { PaymentHistoryTable } from './payment-history-table.component';
 
 export const headers = [
   { header: 'date', key: 'dateCreated' },
@@ -27,7 +27,7 @@ export const headers = [
   { header: 'Service', key: 'billingService' },
 ];
 
-const BillSummary = () => {
+const PaymentHistoryViewer = () => {
   const [renderedRows, setRenderedRows] = useState<null | MappedBill[]>(null);
   const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
   const paidBillsResponse = useBills('', PaymentStatus.PAID, dateRange[0], dateRange[1]);
@@ -112,7 +112,7 @@ const BillSummary = () => {
                 </TableToolbarContent>
               </TableToolbar>
             </div>
-            <BillSummaryTable tableData={tableData} paidBillsResponse={paidBillsResponse} />
+            <PaymentHistoryTable tableData={tableData} paidBillsResponse={paidBillsResponse} />
             {paginated && (
               <Pagination
                 forwardText={t('nextPage', 'Next page')}
@@ -138,4 +138,4 @@ const BillSummary = () => {
   );
 };
 
-export default BillSummary;
+export default PaymentHistoryViewer;

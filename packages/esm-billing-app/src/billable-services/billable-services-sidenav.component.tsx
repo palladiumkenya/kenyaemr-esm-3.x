@@ -32,10 +32,10 @@ export const BillableServicesSideNav = () => {
           </UserHasAccess>
           <UserHasAccess privilege="coreapps.systemAdministration">
             <SideNavLink
-              onClick={() => handleNavigation('bill-summary')}
+              onClick={() => handleNavigation('payment-history')}
               renderIcon={SummaryKpi}
-              isActive={pathname.includes('bill-summary')}>
-              {t('billSummary', 'Bill Summary')}
+              isActive={pathname.includes('payment-history')}>
+              {t('paymentHistory', 'Payment History')}
             </SideNavLink>
           </UserHasAccess>
           <UserHasAccess privilege="coreapps.systemAdministration">

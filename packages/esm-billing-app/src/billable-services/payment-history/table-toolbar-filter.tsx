@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
 import { Filter } from '@carbon/react/icons';
 import { Popover, PopoverContent, Button, Checkbox, usePrefix, SkeletonIcon } from '@carbon/react';
-import styles from './bill-summary.scss';
+import styles from './payment-history.scss';
 import { usePaymentModes } from '../../billing.resource';
 
 interface TableToolbarFilterProps {
