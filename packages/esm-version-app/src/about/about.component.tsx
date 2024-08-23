@@ -49,7 +49,7 @@ const About: React.FC<AboutProps> = () => {
             <p>Operational status</p>
             {defaultFacilityLoading ? <SkeletonText /> : <p>{defaultFacility?.operationalStatus}</p>}
             <p>Sha Contracted</p>
-            {defaultFacilityLoading ? <SkeletonText /> : <p>{defaultFacility?.shaContracted}</p>}
+            {defaultFacilityLoading ? <SkeletonText /> : <p>--</p>}
             <p>Expiry Date</p>
             {defaultFacilityLoading ? (
               <SkeletonText />
