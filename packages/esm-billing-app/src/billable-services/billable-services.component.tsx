@@ -105,7 +105,7 @@ const BillableServices = () => {
         status: service.serviceStatus,
         prices: '--',
         actions: (
-          <div>
+          <div className={styles.actionsContainer}>
             <Tooltip align="bottom" label="Edit Service">
               <Button
                 kind="ghost"
