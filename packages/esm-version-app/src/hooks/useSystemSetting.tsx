@@ -1,4 +1,4 @@
-import { FetchResponse, OpenmrsResource, openmrsFetch, useSession } from '@openmrs/esm-framework';
+import { FetchResponse, OpenmrsResource, openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import useSWR from 'swr';
 import { DefaultFacility } from '../types';
@@ -20,7 +20,7 @@ export function useSystemSetting(key: string) {
 
 export function useDefaultFacility() {
   const { authenticated } = useSession();
-  const url = '/ws/rest/v1/kenyaemr/default-facility';
+  const url = `${restBaseUrl}/kenyaemr/default-facility`;
   const { data, isLoading, error } = useSWR<FetchResponse<DefaultFacility>>(
     authenticated ? url : null,
     openmrsFetch,

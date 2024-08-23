@@ -9,5 +9,5 @@ export interface DefaultFacility {
   display: string;
   operationalStatus: string;
   shaContracted: string;
-  expiryDate: string;
+  shaFacilityExpiryDate: string;
 }

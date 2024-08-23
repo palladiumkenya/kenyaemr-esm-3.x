@@ -45,17 +45,13 @@ const About: React.FC<AboutProps> = () => {
             <p>Facility code</p>
             <p>{mflCode ?? '--'}</p>
             <p>Facility Name</p>
-            {defaultFacilityLoading ? <SkeletonText /> : <p>{defaultFacility?.display}</p>}
+            {defaultFacilityLoading ? <SkeletonText /> : <p>{defaultFacility?.display ?? '--'}</p>}
             <p>Operational status</p>
-            {defaultFacilityLoading ? <SkeletonText /> : <p>{defaultFacility?.operationalStatus}</p>}
+            {defaultFacilityLoading ? <SkeletonText /> : <p>{defaultFacility?.operationalStatus ?? '--'}</p>}
             <p>Sha Contracted</p>
             {defaultFacilityLoading ? <SkeletonText /> : <p>--</p>}
             <p>Expiry Date</p>
-            {defaultFacilityLoading ? (
-              <SkeletonText />
-            ) : (
-              <p>{defaultFacility?.expiryDate ?? formatDate(dayjs().add(10, 'days').toDate())}</p>
-            )}
+            {defaultFacilityLoading ? <SkeletonText /> : <p>{defaultFacility?.shaFacilityExpiryDate ?? '--'}</p>}
           </div>
         </div>
       </div>
