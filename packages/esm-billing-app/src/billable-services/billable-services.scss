@@ -63,7 +63,10 @@
   padding: layout.$spacing-04 layout.$spacing-05;
   background-color: $ui-02;
 }
-
+.actionsContainer {
+  display: flex;
+  align-items: center;
+}
 .backgroundDataFetchingIndicator {
   align-items: center;
   display: flex;
