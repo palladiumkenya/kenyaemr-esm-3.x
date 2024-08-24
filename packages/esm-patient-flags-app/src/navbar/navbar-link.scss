@@ -2,6 +2,17 @@
 @use '@carbon/colors';
 @use '@carbon/type';
 
+.warning {
+  background-color: colors.$red-30 !important;
+}
+
+.navError {
+  position: absolute;
+  color: colors.$red-70;
+  top: layout.$spacing-01;
+  right: layout.$spacing-01;
+}
+
 .navLinkItem {
   display: flex;
   flex-direction: column;
@@ -13,6 +24,7 @@
   background-color: colors.$cool-gray-10;
   cursor: pointer;
   row-gap: layout.$spacing-05;
+  position: relative;
 
   & > span {
     @include type.type-style('body-01');

@@ -1,6 +1,9 @@
 import React from 'react';
 import { navigate } from '@openmrs/esm-framework';
 import styles from './navbar-link.scss';
+import { useDefaultFacility } from '../hooks/useDefaultFacility';
+import dayjs from 'dayjs';
+import { Warning } from '@carbon/react/icons';
 
 type NavBarLinkItemProps = {
   icon: React.ReactNode;
@@ -11,6 +14,21 @@ type NavBarLinkItemProps = {
 };
 
 const NavBarLink: React.FC<NavBarLinkItemProps> = ({ icon, label, url, hideOverlay, onClick }) => {
+  const { defaultFacility } = useDefaultFacility();
+
+  const itemHasError = () => {
+    if (label === 'System Info') {
+      if (!dayjs(defaultFacility?.shaFacilityExpiryDate).isValid()) {
+        return true;
+      } else {
+        return dayjs(defaultFacility?.shaFacilityExpiryDate).isBefore(dayjs());
+      }
+    }
+    return false;
+  };
+
+  const hasError = itemHasError();
+
   const handleClick = (url) => {
     hideOverlay(false);
     if (!url) {
@@ -19,7 +37,12 @@ const NavBarLink: React.FC<NavBarLinkItemProps> = ({ icon, label, url, hideOverl
     navigate({ to: url });
   };
   return (
-    <div role="button" tabIndex={0} onClick={() => handleClick(url)} className={styles.navLinkItem}>
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => handleClick(url)}
+      className={`${styles.navLinkItem} ${hasError ? styles.warning : ''}`}>
+      {hasError && <Warning className={styles.navError} />}
       {icon}
       <span>{label}</span>
     </div>
