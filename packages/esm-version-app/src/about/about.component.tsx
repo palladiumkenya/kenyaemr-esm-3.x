@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './about.scss';
 import { useModules } from '../hooks/useModules';
 import { useDefaultFacility, useSystemSetting } from '../hooks/useSystemSetting';
-import { formatDate, formatDatetime } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, showNotification } from '@openmrs/esm-framework';
 import FrontendModule from '../frontend-modules/frontend-modules.component';
 import { SkeletonText } from '@carbon/react';
 import dayjs from 'dayjs';
@@ -18,6 +18,19 @@ const About: React.FC<AboutProps> = () => {
   const { title, container, aboutBody, aboutPage } = styles;
   const { VERSION } = packageInfo;
   const { defaultFacility, error, isLoading: defaultFacilityLoading } = useDefaultFacility();
+
+  useEffect(() => {
+    if (!defaultFacility) {
+      return;
+    }
+    if (!dayjs(defaultFacility?.shaFacilityExpiryDate).isValid()) {
+      showNotification({ kind: 'error', title: 'Error', description: 'Invalid SHA accreditation expiry date' });
+      return;
+    }
+    if (dayjs(defaultFacility?.shaFacilityExpiryDate).isBefore(dayjs())) {
+      showNotification({ kind: 'error', title: 'Error', description: 'SHA accreditation Licence has expired' });
+    }
+  }, [defaultFacility]);
 
   return (
     <div className={styles.main}>
