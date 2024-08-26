@@ -21,7 +21,7 @@ import {
 import { showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod'; // Import Zod
+import { z } from 'zod';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styles from './provider-form.scss';
@@ -58,7 +58,10 @@ const providerFormSchema = z
     path: ['confirmPassword'],
   });
 
-const ProviderForm: React.FC = () => {
+interface ProvideModalProps {
+  closeWorkspace: () => void;
+}
+const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
@@ -91,6 +94,7 @@ const ProviderForm: React.FC = () => {
   const handleFacilitySelect = (facility: Facility) => {
     setSelectedFacility(facility);
     setFacilitySearchTerm('');
+    setValue('primaryFacility', facility.uuid);
   };
 
   const handleRemoveFacility = () => {
@@ -168,10 +172,6 @@ const ProviderForm: React.FC = () => {
             attributeType: licenseNumberUuid,
             value: data.licenseNumber,
           },
-          // {
-          //   attributeType: defaultprimaryFacility,
-          //   value: data.primaryFacility,
-          // },
         ],
         retired: false,
       };
@@ -181,8 +181,8 @@ const ProviderForm: React.FC = () => {
         kind: 'success',
         subtitle: t('accountMsg', 'Account created successfully!'),
       });
+      closeWorkspace();
     } catch (error) {
-      console.error(JSON.stringify(error, null, 2));
       showSnackbar({
         title: 'Failure',
         kind: 'error',
@@ -193,7 +193,6 @@ const ProviderForm: React.FC = () => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
-      {JSON.stringify(errors)}
       <Stack gap={4} className={styles.form__grid}>
         <span className={styles.form__header__section}>
           {t('healthWorkVerify', 'Health worker registry verification')}
@@ -509,7 +508,7 @@ const ProviderForm: React.FC = () => {
         </Column>
       </Stack>
       <ButtonSet className={styles.form__button_set}>
-        <Button className={styles.form__button} size="sm" kind="secondary">
+        <Button className={styles.form__button} size="sm" kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.form__button} kind="primary" size="sm" type="submit">
