@@ -23,12 +23,16 @@ const About: React.FC<AboutProps> = () => {
     if (!defaultFacility) {
       return;
     }
-    if (!dayjs(defaultFacility?.shaFacilityExpiryDate).isValid()) {
+    // Uncomment when dates are availed
+    /*if (!dayjs(defaultFacility?.shaFacilityExpiryDate).isValid()) {
       showNotification({ kind: 'error', title: 'Error', description: 'Invalid SHA accreditation expiry date' });
       return;
     }
     if (dayjs(defaultFacility?.shaFacilityExpiryDate).isBefore(dayjs())) {
       showNotification({ kind: 'error', title: 'Error', description: 'SHA accreditation Licence has expired' });
+    }*/
+    if (defaultFacility?.operationalStatus !== 'Operational') {
+      showNotification({ kind: 'error', title: 'Error', description: 'The facility SHA status is is not operational' });
     }
   }, [defaultFacility]);
 

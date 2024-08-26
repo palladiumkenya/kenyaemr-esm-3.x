@@ -18,11 +18,14 @@ const NavBarLink: React.FC<NavBarLinkItemProps> = ({ icon, label, url, hideOverl
 
   const itemHasError = () => {
     if (label === 'System Info') {
-      if (!dayjs(defaultFacility?.shaFacilityExpiryDate).isValid()) {
+      // Enable once the date is availed
+      /* if (!dayjs(defaultFacility?.shaFacilityExpiryDate).isValid()) {
         return true;
       } else {
         return dayjs(defaultFacility?.shaFacilityExpiryDate).isBefore(dayjs());
       }
+        */
+      return defaultFacility?.operationalStatus !== 'Operational';
     }
     return false;
   };
