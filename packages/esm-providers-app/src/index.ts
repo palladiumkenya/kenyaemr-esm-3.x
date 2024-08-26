@@ -2,7 +2,7 @@ import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle, registerBreadc
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './providers-left-panel/providers-left-panel-link.component';
 import { moduleName, providerBasePath } from './constants';
-
+import providerMessageAlertComponent from './provider-alert-message/provider-alert-message.component';
 const options = {
   featureName: 'esm-providers-app',
   moduleName,
@@ -30,3 +30,4 @@ export const providersDashboardLink = getSyncLifecycle(
   }),
   options,
 );
+export const providerMessageAlert = getSyncLifecycle(providerMessageAlertComponent, options);
