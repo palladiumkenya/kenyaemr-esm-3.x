@@ -182,11 +182,11 @@ const ProviderForm: React.FC = () => {
         subtitle: t('accountMsg', 'Account created successfully!'),
       });
     } catch (error) {
-      const errors = await response.json();
+      console.error(JSON.stringify(error, null, 2));
       showSnackbar({
         title: 'Failure',
         kind: 'error',
-        subtitle: t('errorMsg', `Error creating provider! ${errors?.error?.message?.join(', ')}`),
+        subtitle: t('errorMsg', `Error creating provider! ${error?.responseBody?.error?.message}`),
       });
     }
   };
