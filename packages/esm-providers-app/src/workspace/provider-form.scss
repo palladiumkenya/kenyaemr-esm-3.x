@@ -3,7 +3,7 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.form__button{
+.form__button {
   height: layout.$spacing-09;
   display: flex;
   align-content: flex-start;
@@ -12,7 +12,7 @@
   margin-bottom: layout.$spacing-05;
 }
 
-.form__button_set{
+.form__button_set {
   margin-top: layout.$spacing-11;
   display: flex;
   justify-content: center;
