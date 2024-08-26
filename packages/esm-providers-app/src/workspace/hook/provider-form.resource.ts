@@ -59,3 +59,23 @@ export const searchHealthCareWork = async (identifierType: string, identifierNum
   const response = await openmrsFetch(url);
   return response.json();
 };
+export const createProvider = (payload) => {
+  const url = `${restBaseUrl}/provider`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+export const createUser = (payload) => {
+  const url = `${restBaseUrl}/user?v=custom:(person:(uuid,display,gender,attributes:(uuid,display)))`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};

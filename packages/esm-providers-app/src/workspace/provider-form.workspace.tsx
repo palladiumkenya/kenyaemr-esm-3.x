@@ -26,8 +26,16 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styles from './provider-form.scss';
 import { GenderFemale, GenderMale, Query } from '@carbon/react/icons';
-import { searchHealthCareWork, useFacility, useHWR, useIdentifierTypes, useRoles } from './hook/provider-form.resource';
-import { Facility, Practitioner } from '../types';
+import {
+  createProvider,
+  createUser,
+  searchHealthCareWork,
+  useFacility,
+  useHWR,
+  useIdentifierTypes,
+  useRoles,
+} from './hook/provider-form.resource';
+import { Facility, Practitioner, User } from '../types';
 import { ConfigObject } from '../config-schema';
 
 const providerFormSchema = z
@@ -37,7 +45,7 @@ const providerFormSchema = z
     nationalid: z.string().nonempty('National ID is required'),
     gender: z.enum(['male', 'female'], { required_error: 'Gender is required' }),
     licenseNumber: z.string().nonempty('License number is required'),
-    licenseExpiryDate: z.string().nonempty('License expiry date is required'),
+    licenseExpiryDate: z.date(),
     username: z.string().nonempty('Username is required'),
     password: z.string().nonempty('Password is required'),
     confirmPassword: z.string().nonempty('Confirm password is required'),
@@ -58,7 +66,8 @@ const ProviderForm: React.FC = () => {
   const { roles, isLoading: isLoadingRoles } = useRoles();
   const [facilitySearchTerm, setFacilitySearchTerm] = useState('');
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  const { nationalIDUuid } = useConfig<ConfigObject>();
+  const { nationalIDUuid, providerNationalIdUuid, licenseExpiryDateUuid, licenseNumberUuid, defaultprimaryFacility } =
+    useConfig<ConfigObject>();
 
   const [searchHWR, setSearchHWR] = useState({
     identifierType: nationalIDUuid,
@@ -66,7 +75,7 @@ const ProviderForm: React.FC = () => {
     isHWRLoading: false,
   });
   const { data: facilities } = useFacility(facilitySearchTerm);
-  const definedRoles = roles.map((role) => ({ id: role.uuid, text: role.display })) || [];
+  const definedRoles = roles.map((role) => role.uuid) || [];
   const {
     handleSubmit,
     setValue,
@@ -117,34 +126,74 @@ const ProviderForm: React.FC = () => {
       setSearchHWR({ ...searchHWR, isHWRLoading: false });
     }
   };
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: z.infer<typeof providerFormSchema>) => {
+    let response;
     try {
-      showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Account created successfully!' });
       const personPayload = {
         names: [
           {
-            givenName: 'Mohit',
-            familyName: 'Kumar',
+            givenName: data.firstname,
+            familyName: data.surname,
           },
         ],
-        gender: 'M',
-        birthdate: '1997-09-02',
-        addresses: [
-          {
-            address1: '30, Vivekananda Layout, Munnekolal,Marathahalli',
-            cityVillage: 'Bengaluru',
-            country: 'India',
-            postalCode: '560037',
-          },
-        ],
+        gender: data.gender,
       };
+      const userPayload = {
+        username: data.username,
+        password: data.password,
+        person: personPayload,
+        roles: data.roles,
+      };
+      response = await createUser(userPayload);
+      const user: User = await response.json();
+
+      showSnackbar({
+        title: 'Success',
+        kind: 'success',
+        subtitle: t('personMsg', 'Person created successfully!'),
+      });
+      const providerPayload = {
+        person: user.person.uuid,
+        identifier: data.providerId,
+        attributes: [
+          {
+            attributeType: providerNationalIdUuid,
+            value: data.nationalid,
+          },
+          {
+            attributeType: licenseExpiryDateUuid,
+            value: data.licenseExpiryDate.toISOString(),
+          },
+          {
+            attributeType: licenseNumberUuid,
+            value: data.licenseNumber,
+          },
+          // {
+          //   attributeType: defaultprimaryFacility,
+          //   value: data.primaryFacility,
+          // },
+        ],
+        retired: false,
+      };
+      response = await createProvider(providerPayload);
+      showSnackbar({
+        title: 'Success',
+        kind: 'success',
+        subtitle: t('accountMsg', 'Account created successfully!'),
+      });
     } catch (error) {
-      showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating an account' });
+      const errors = await response.json();
+      showSnackbar({
+        title: 'Failure',
+        kind: 'error',
+        subtitle: t('errorMsg', `Error creating provider! ${errors?.error?.message?.join(', ')}`),
+      });
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit(() => {})} className={styles.form__container}>
+    <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
+      {JSON.stringify(errors)}
       <Stack gap={4} className={styles.form__grid}>
         <span className={styles.form__header__section}>
           {t('healthWorkVerify', 'Health worker registry verification')}
@@ -258,7 +307,7 @@ const ProviderForm: React.FC = () => {
                       <GenderMale /> Male
                     </>
                   }
-                  selected={field.value === 'male'}
+                  selected={field.value === 'M'}
                 />
                 <Switch
                   name="female"
@@ -267,7 +316,7 @@ const ProviderForm: React.FC = () => {
                       <GenderFemale /> Female
                     </>
                   }
-                  selected={field.value === 'female'}
+                  selected={field.value === 'F'}
                 />
               </ContentSwitcher>
             )}
@@ -372,7 +421,10 @@ const ProviderForm: React.FC = () => {
                 id="form__roles"
                 titleText="Roles*"
                 items={definedRoles}
-                itemToString={(item) => (item ? item.text : '')}
+                itemToString={(item) => roles.find((r) => r.uuid === item)?.display ?? ''}
+                onChange={({ selectedItems }) => {
+                  field.onChange(selectedItems);
+                }}
                 selectionFeedback="top-after-reopen"
                 invalid={!!errors.roles}
                 invalidText={errors.roles?.message}
@@ -422,7 +474,10 @@ const ProviderForm: React.FC = () => {
                           key={facility.uuid}
                           className={styles.facilityTag}
                           type="blue"
-                          onClick={() => handleFacilitySelect(facility)}
+                          onClick={() => {
+                            handleFacilitySelect(facility);
+                            field.onChange(facility.uuid);
+                          }}
                           role="button"
                           tabIndex={0}
                           title={facility.name}>

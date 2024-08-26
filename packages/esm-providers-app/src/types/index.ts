@@ -128,7 +128,7 @@ interface Qualification {
       code?: string;
       display: string;
     }[];
-  }; // Added 'code' here
+  };
 }
 
 interface QualificationExtension {
@@ -139,4 +139,8 @@ interface QualificationExtension {
     display?: string;
   };
   valueString?: string;
+}
+
+export interface User {
+  person: Person;
 }
