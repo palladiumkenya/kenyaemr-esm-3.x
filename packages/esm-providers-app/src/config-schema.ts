@@ -4,12 +4,12 @@ export const configSchema = {
   nationalIDUuid: {
     _type: Type.String,
     _description: ' UUID for national identification',
-    _default: 'b2c38640-2603-4629-aebd-3b54f33f1e3a',
+    _default: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
   },
   passportNumberUuid: {
     _type: Type.String,
     _description: ' UUID for national identification',
-    _default: '3ca03c84-632d-4e53-95ad-91f1bd9d96d6',
+    _default: 'be9beef6-aacc-4e1f-ac4e-5babeaa1e303',
   },
 };
 

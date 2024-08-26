@@ -58,8 +58,10 @@ const ProviderForm: React.FC = () => {
   const { roles, isLoading: isLoadingRoles } = useRoles();
   const [facilitySearchTerm, setFacilitySearchTerm] = useState('');
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
+  const { nationalIDUuid } = useConfig<ConfigObject>();
+
   const [searchHWR, setSearchHWR] = useState({
-    identifierType: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
+    identifierType: nationalIDUuid,
     identifier: '',
     isHWRLoading: false,
   });
@@ -118,6 +120,24 @@ const ProviderForm: React.FC = () => {
   const onSubmit = async (data: any) => {
     try {
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Account created successfully!' });
+      const personPayload = {
+        names: [
+          {
+            givenName: 'Mohit',
+            familyName: 'Kumar',
+          },
+        ],
+        gender: 'M',
+        birthdate: '1997-09-02',
+        addresses: [
+          {
+            address1: '30, Vivekananda Layout, Munnekolal,Marathahalli',
+            cityVillage: 'Bengaluru',
+            country: 'India',
+            postalCode: '560037',
+          },
+        ],
+      };
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating an account' });
     }

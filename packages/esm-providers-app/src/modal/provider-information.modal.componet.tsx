@@ -94,7 +94,7 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
               label={t('licenseValid', 'License validity')}
               value={
                 <Tag type={healthWorker?.active ? 'green' : 'red'}>
-                  {healthWorker?.active ? 'license expired' : 'license valid'}
+                  {healthWorker?.active ? 'license valid' : 'license expired'}
                 </Tag>
               }
             />
