@@ -11,6 +11,11 @@
   min-width: layout.$spacing-09;
   margin-bottom: layout.$spacing-05;
 }
+.error_message {
+  color: colors.$red-60;
+  font-size: layout.$spacing-04;
+  line-height: layout.$spacing-05;
+}
 
 .form__button_set {
   margin-top: layout.$spacing-11;
@@ -73,7 +78,6 @@
   color: colors.$gray-70;
   display: inline-block;
   font-size: layout.$spacing-04;
-  line-height: layout.$spacing-05;
   line-height: layout.$spacing-05;
   margin-bottom: layout.$spacing-02;
   vertical-align: baseline;

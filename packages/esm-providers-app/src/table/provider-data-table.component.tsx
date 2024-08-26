@@ -21,7 +21,7 @@ import {
   Tag,
 } from '@carbon/react';
 import { Add, ArrowsVertical } from '@carbon/react/icons';
-import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
 import styles from './generic-data-table.scss';
 import { useProviders } from './provider-data-table.resource';
@@ -35,6 +35,11 @@ const ProviderListTable: React.FC = () => {
 
   const [pageSize, setPageSize] = React.useState(10);
   const { results, currentPage, goTo } = usePagination(provider, pageSize);
+  const handleUpdateProvider = () => {
+    launchWorkspace('provider-register-form', {
+      workspaceTitle: 'Update account form',
+    });
+  };
 
   const headerData = [
     { header: t('id', 'Identifier type'), key: 'id' },
@@ -67,7 +72,7 @@ const ProviderListTable: React.FC = () => {
           <OverflowMenuItem itemText="Sync" />
           <MenuItemDivider />
 
-          <OverflowMenuItem itemText="Edit" />
+          <OverflowMenuItem itemText="Edit" onClick={handleUpdateProvider} />
         </OverflowMenu>
       ),
       personUuid: provider.person.uuid,

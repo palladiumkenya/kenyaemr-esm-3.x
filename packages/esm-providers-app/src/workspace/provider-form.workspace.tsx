@@ -193,7 +193,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
-      {JSON.stringify(errors)}
       <Stack gap={4} className={styles.form__grid}>
         <span className={styles.form__header__section}>
           {t('healthWorkVerify', 'Health worker registry verification')}
