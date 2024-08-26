@@ -1,13 +1,13 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
-.header {
+
+.header__section__container {
   @include type.type-style('body-compact-02');
-  color: $text-02;
+  color: colors.$gray-70;
   height: layout.$spacing-12;
-  background-color: $ui-02;
-  border: 1px solid $ui-03;
+  background-color: white;
+  border: 1px solid colors.$gray-20;
   border-left: 0;
   display: flex;
   justify-content: space-between;
@@ -18,18 +18,18 @@
   padding: 0 layout.$spacing-05;
 }
 
-.left-justified-items {
+.left__justified__items {
   display: flex;
   flex-direction: row;
   align-items: center;
   margin-left: layout.$spacing-04;
 }
 
-.page-name {
+.page__name {
   @include type.type-style('heading-04');
 }
 
-.page-labels {
+.page__labels {
   margin-left: 1rem;
 
   p:first-of-type {
@@ -37,13 +37,13 @@
   }
 }
 
-.svgContainer svg {
+.svg__container svg {
   width: layout.$spacing-10;
   height: layout.$spacing-10;
   fill: var(--brand-03);
 }
 
-.metrics {
+.metrics__header {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
@@ -56,7 +56,7 @@
   height: auto;
 }
 
-.wrapMetrics {
+.warp__metrics {
   width: auto;
   height: auto;
   flex-grow: 1;
@@ -69,20 +69,20 @@
   min-width: layout.$spacing-12;
 }
 
-.metricLabel {
+.metric__label {
   flex-grow: 0;
   font-family: IBMPlexSans;
   font-size: layout.$spacing-04;
   line-height: layout.$spacing-06;
   letter-spacing: layout.$spacing-01;
-  color: $text-02;
+  color: colors.$gray-70;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.metricValue {
+.metric__value {
   flex-grow: 0;
   font-size: layout.$spacing-06;
   line-height: layout.$spacing-06;

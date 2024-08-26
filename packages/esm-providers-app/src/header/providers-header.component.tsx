@@ -4,6 +4,7 @@ import { Calendar, Location } from '@carbon/react/icons';
 import { useSession, formatDate } from '@openmrs/esm-framework';
 import styles from './providers-header.scss';
 import ProvidersIllustration from './providers-illustration.component';
+import { MetricCard } from './providers-metrics.component';
 
 interface ProviderHeaderProps {
   title: string;
@@ -14,32 +15,20 @@ export const ProvidersHeader: React.FC<ProviderHeaderProps> = ({ title }) => {
   const userLocation = userSession?.sessionLocation?.display;
 
   return (
-    <div className={styles.header}>
-      <div className={styles['left-justified-items']}>
+    <div className={styles.header__section__container}>
+      <div className={styles.left__justified__items}>
         <ProvidersIllustration />
-        <div className={styles['page-labels']}>
-          <p className={styles['page-name']}>{title}</p>
+        <div className={styles.page__label}>
+          <p className={styles.page__name}>{title}</p>
           <p>{t('providerManagement', 'Providers Management')}</p>
         </div>
       </div>
-      <div className={styles.metrics}>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('all', 'All')}</span>
-          <span className={styles.metricValue}>0</span>
-        </div>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('active', 'Active')}</span>
-          <span className={styles.metricValue}>0</span>
-        </div>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('licenceDue', 'License(s) due')}</span>
-          <span className={styles.metricValue}>0</span>
-        </div>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('expired', 'Expired License(s)')}</span>
-          <span className={styles.metricValue}>0</span>
-        </div>
-        <div className={styles.wrapMetrics}>
+      <div className={styles.metrics__header}>
+        <MetricCard label={t('all', 'All')} value={21} />
+        <MetricCard label={t('actives', 'Active')} value={17} />
+        <MetricCard label={t('licenceDue', 'License(s) due')} value={1} />
+        <MetricCard label={t('expired', 'Expired License(s)')} value={3} />
+        <div className={styles.warp__metrics}>
           <div className={styles.metricLocationDate}>
             <span className={styles.location}>
               <Location size={16} /> {userLocation}

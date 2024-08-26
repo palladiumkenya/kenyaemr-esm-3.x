@@ -21,6 +21,24 @@
       "slot": "providers-dashboard-slot"
     }
   ],
+  "workspaces": [
+    {
+      "name": "provider-register-form",
+      "component": "providerDetailsWorkspace",
+      "title": "provider Register Form",
+      "type": "other-form"
+    }
+  ],
+   "modals": [
+    {
+      "component": "hwrConfirmationModal",
+      "name": "hwr-confirmation-modal"
+    },
+    {
+      "component": "hwrEmptymodel",
+      "name": "hwr-empty-modal"
+    }
+  ],
   "pages": [
     {
       "component": "root",
