@@ -12,7 +12,7 @@ export const useIdentifierTypes = () => {
   );
   const { nationalIDUuid, passportNumberUuid } = useConfig<ConfigObject>();
 
-  const allowedUuids = ['49af6cdc-7968-4abb-bf46-de10d7f4859f', 'be9beef6-aacc-4e1f-ac4e-5babeaa1e303'];
+  const allowedUuids = [nationalIDUuid, passportNumberUuid];
 
   const filteredIdentifierTypes =
     data?.data.results.filter((identifier) => allowedUuids.includes(identifier.uuid)) ?? [];
@@ -58,4 +58,24 @@ export const searchHealthCareWork = async (identifierType: string, identifierNum
   )}=${identifierNumber}`;
   const response = await openmrsFetch(url);
   return response.json();
+};
+export const createProvider = (payload) => {
+  const url = `${restBaseUrl}/provider`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+export const createUser = (payload) => {
+  const url = `${restBaseUrl}/user?v=custom:(person:(uuid,display,gender,attributes:(uuid,display)))`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
