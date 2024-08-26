@@ -88,10 +88,10 @@ const ProviderListTable: React.FC = () => {
 
   return (
     <div className={styles.Container}>
-      <CardHeader title={t('providersAll', 'List of provider')}>
-        <></>
-      </CardHeader>
       <div className={styles.providerContainer}>
+        <CardHeader title={t('providersAll', 'List of provider')}>
+          <></>
+        </CardHeader>
         <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
           {({
             rows,
