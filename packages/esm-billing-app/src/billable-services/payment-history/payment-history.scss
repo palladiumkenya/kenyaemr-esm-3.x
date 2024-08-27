@@ -51,3 +51,11 @@
 .tile {
   border: 1px solid $ui-03;
 }
+
+.tagWrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid $ui-03;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+}
