@@ -18,7 +18,7 @@ import {
   Row,
   Tile,
 } from '@carbon/react';
-import { showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { showModal, showSnackbar, useConfig, useLayoutType, formatDate } from '@openmrs/esm-framework';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -30,9 +30,13 @@ import {
   createProvider,
   createUser,
   searchHealthCareWork,
+  updatePerson,
+  updateProvider,
   useFacility,
   useHWR,
   useIdentifierTypes,
+  usePersonDetails,
+  useProviderDetails,
   useRoles,
 } from './hook/provider-form.resource';
 import { Facility, Practitioner, User } from '../types';
@@ -60,8 +64,10 @@ const providerFormSchema = z
 
 interface ProvideModalProps {
   closeWorkspace: () => void;
+  providerUuid?: string;
+  personUuid?: string;
 }
-const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
+const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, providerUuid, personUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
@@ -78,6 +84,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
     isHWRLoading: false,
   });
   const { data: facilities } = useFacility(facilitySearchTerm);
+  const { currentProvider } = useProviderDetails(providerUuid);
+  const { currentPerson } = usePersonDetails(personUuid);
+
   const definedRoles = roles.map((role) => role.uuid) || [];
   const {
     handleSubmit,
@@ -130,7 +139,35 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
       setSearchHWR({ ...searchHWR, isHWRLoading: false });
     }
   };
-  const onSubmit = async (data: z.infer<typeof providerFormSchema>) => {
+  useEffect(() => {
+    if (providerUuid || personUuid) {
+      if (currentPerson) {
+        setValue('surname', currentPerson.names?.[0]?.familyName || '');
+        setValue('firstname', currentPerson.names?.[0]?.givenName || '');
+        setValue('gender', currentPerson.gender || '');
+      }
+      if (currentProvider) {
+        const licenseExpiryDate = currentProvider.attributes?.find(
+          (attr) => attr.attributeType.display === 'Practicing License Expiry Date',
+        )?.value;
+
+        const nationalId = currentProvider.attributes?.find(
+          (attr) => attr.attributeType.display === 'National ID',
+        )?.value;
+        setValue('nationalid', nationalId || '');
+
+        const licenseNumber = currentProvider.attributes?.find(
+          (attr) => attr.attributeType.display === 'Practising License Number',
+        )?.value;
+        setValue('licenseNumber', licenseNumber || '');
+
+        setValue('licenseExpiryDate', licenseExpiryDate ? new Date(licenseExpiryDate) : null);
+
+        setValue('providerId', currentProvider.identifier || '');
+      }
+    }
+  }, [providerUuid, personUuid, setValue, currentPerson, currentProvider]);
+  const onSubmit = async (data) => {
     let response;
     try {
       const personPayload = {
@@ -142,45 +179,85 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
         ],
         gender: data.gender,
       };
+
       const userPayload = {
         username: data.username,
         password: data.password,
         person: personPayload,
         roles: data.roles,
       };
-      response = await createUser(userPayload);
-      const user: User = await response.json();
 
-      showSnackbar({
-        title: 'Success',
-        kind: 'success',
-        subtitle: t('personMsg', 'Person created successfully!'),
-      });
-      const providerPayload = {
-        person: user.person.uuid,
-        identifier: data.providerId,
-        attributes: [
-          {
-            attributeType: providerNationalIdUuid,
-            value: data.nationalid,
-          },
-          {
-            attributeType: licenseExpiryDateUuid,
-            value: data.licenseExpiryDate.toISOString(),
-          },
-          {
-            attributeType: licenseNumberUuid,
-            value: data.licenseNumber,
-          },
-        ],
-        retired: false,
-      };
-      response = await createProvider(providerPayload);
-      showSnackbar({
-        title: 'Success',
-        kind: 'success',
-        subtitle: t('accountMsg', 'Account created successfully!'),
-      });
+      if (providerUuid && personUuid) {
+        const updatePayload = {
+          person: personUuid,
+          identifier: data.providerId,
+          attributes: [
+            {
+              attributeType: providerNationalIdUuid,
+              value: data.nationalid,
+            },
+            {
+              attributeType: licenseExpiryDateUuid,
+              value: data.licenseExpiryDate.toISOString(),
+            },
+            {
+              attributeType: licenseNumberUuid,
+              value: data.licenseNumber,
+            },
+          ],
+          retired: false,
+        };
+
+        await updateProvider(updatePayload, providerUuid);
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('providerUpdateMsg', 'Provider updated successfully!'),
+        });
+
+        await updatePerson(personPayload, personUuid);
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('personUpdateMsg', 'Person updated successfully!'),
+        });
+      } else {
+        response = await createUser(userPayload);
+        const user = await response.json();
+
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('personMsg', 'Person created successfully!'),
+        });
+
+        const providerPayload = {
+          person: user.person.uuid,
+          identifier: data.providerId,
+          attributes: [
+            {
+              attributeType: providerNationalIdUuid,
+              value: data.nationalid,
+            },
+            {
+              attributeType: licenseExpiryDateUuid,
+              value: data.licenseExpiryDate.toISOString(),
+            },
+            {
+              attributeType: licenseNumberUuid,
+              value: data.licenseNumber,
+            },
+          ],
+          retired: false,
+        };
+
+        response = await createProvider(providerPayload);
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('accountMsg', 'Account created successfully!'),
+        });
+      }
       closeWorkspace();
     } catch (error) {
       showSnackbar({
@@ -306,7 +383,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
                       <GenderMale /> Male
                     </>
                   }
-                  selected={field.value === 'M'}
+                  selected={['M', 'male'].includes(field?.value?.toLowerCase())}
                 />
                 <Switch
                   name="female"
@@ -315,7 +392,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
                       <GenderFemale /> Female
                     </>
                   }
-                  selected={field.value === 'F'}
+                  selected={['F', 'female'].includes(field?.value?.toLowerCase())}
                 />
               </ContentSwitcher>
             )}

@@ -35,12 +35,13 @@ const ProviderListTable: React.FC = () => {
 
   const [pageSize, setPageSize] = React.useState(10);
   const { results, currentPage, goTo } = usePagination(provider, pageSize);
-  const handleUpdateProvider = () => {
+  const handleUpdateProvider = (personUuid?: string, providerUuid?: string) => {
     launchWorkspace('provider-register-form', {
       workspaceTitle: 'Update account form',
+      personUuid,
+      providerUuid,
     });
   };
-
   const headerData = [
     { header: t('id', 'Identifier type'), key: 'id' },
     { header: t('idType', 'Identifier type'), key: 'idType' },
@@ -69,10 +70,9 @@ const ProviderListTable: React.FC = () => {
       ),
       action: (
         <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
-          <OverflowMenuItem itemText="Sync" />
+          <OverflowMenuItem itemText="Edit" onClick={() => handleUpdateProvider(provider.person.uuid, provider.uuid)} />
           <MenuItemDivider />
-
-          <OverflowMenuItem itemText="Edit" onClick={handleUpdateProvider} />
+          <OverflowMenuItem itemText="Sync" />
         </OverflowMenu>
       ),
       personUuid: provider.person.uuid,
@@ -131,7 +131,7 @@ const ProviderListTable: React.FC = () => {
                           <TableCell key={cell.id}>{cell.value}</TableCell>
                         ))}
                       </TableExpandRow>
-                      {row.isExpanded ? (
+                      {row && row.isExpanded ? (
                         <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
                           <div className={styles.container} key={i}>
                             <ProviderDetails personUuid={row.personUuid} license={row.license} />

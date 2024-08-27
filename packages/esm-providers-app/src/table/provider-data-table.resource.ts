@@ -13,15 +13,3 @@ export function useProviders() {
 
   return { provider, error, isLoading, mutate };
 }
-
-export function useUser() {
-  const customRepresentation =
-    'custom:(uuid,display,person:(uuid,display,gender,attributes:(uuid,display)),privileges:(uuid,display))';
-
-  const encodedRepresentation = encodeURIComponent(customRepresentation);
-  const url = `/ws/rest/v1/user?v=${encodedRepresentation}`;
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: UserRoles[] }>>(url, openmrsFetch);
-  const userRoles = data?.data?.results || [];
-
-  return { userRoles, error, isLoading, mutate };
-}

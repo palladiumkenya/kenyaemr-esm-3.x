@@ -1,7 +1,7 @@
 import { FetchResponse, openmrsFetch, OpenmrsResource, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { useCallback, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { FacilityResponse, Practitioner, RolesResponse } from '../../types';
+import { FacilityResponse, Practitioner, ProviderResponse, RolesResponse } from '../../types';
 import useSWR from 'swr';
 import { ConfigObject } from '../../config-schema';
 
@@ -71,6 +71,41 @@ export const createProvider = (payload) => {
 };
 export const createUser = (payload) => {
   const url = `${restBaseUrl}/user?v=custom:(person:(uuid,display,gender,attributes:(uuid,display)))`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const useProviderDetails = (personUuid: string) => {
+  const url = `${restBaseUrl}/provider/${personUuid}?v=full`;
+  const { data, error, isLoading } = useSWR<FetchResponse>(url, openmrsFetch);
+  const currentProvider = data?.data || [];
+  return { currentProvider, error, isLoading };
+};
+
+export const usePersonDetails = (providerUuid: string) => {
+  const url = `${restBaseUrl}/person/${providerUuid}?v=full`;
+  const { data, error, isLoading } = useSWR<FetchResponse>(url, openmrsFetch);
+  const currentPerson = data?.data || [];
+  return { currentPerson, error, isLoading };
+};
+
+export const updateProvider = (payload, providerUuid: string) => {
+  const url = `${restBaseUrl}/provider/${providerUuid}`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+export const updatePerson = (payload, personUuid: string) => {
+  const url = `${restBaseUrl}/person/${personUuid}`;
   return openmrsFetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),

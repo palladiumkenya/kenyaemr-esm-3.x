@@ -8,7 +8,7 @@ import {
   StructuredListCell,
   StructuredListBody,
 } from '@carbon/react';
-import { useUser } from './provider-data-table.resource';
+import { usePersonDetails } from '../workspace/hook/provider-form.resource';
 
 interface ProviderDetailsProps {
   personUuid: string;
@@ -17,7 +17,7 @@ interface ProviderDetailsProps {
 
 const ProviderDetails: React.FC<ProviderDetailsProps> = ({ personUuid, license }) => {
   const { t } = useTranslation();
-  const { userRoles, error, isLoading } = useUser();
+  const { currentPerson, isLoading, error } = usePersonDetails('89345921-60fc-4e12-bddb-4fab4e3e59d7');
 
   if (isLoading) {
     return <div>{t('loading', 'Loading...')}</div>;
@@ -27,8 +27,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ personUuid, license }
     return <div>{t('error', 'Error loading user details')}</div>;
   }
 
-  const userRole = userRoles.find((role) => role.person.uuid === personUuid);
-  const person = userRole?.person;
   return (
     <div className={styles.providerDetailsContainer}>
       <p className={styles.title}>{t('WorkerDetails', 'Health Worker details')}</p>
@@ -41,52 +39,23 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ personUuid, license }
             <p className={styles.label}>{license}</p>
           </div>
         </div>
-        {person && (
+
+        {currentPerson && (
           <>
             <div>
               <p className={styles.gridTitle}>{t('PersonDetails', 'Person Details')}</p>
               <div className={styles.labelContainer}>
                 <p className={styles.labelBold}>{t('PersonDisplay', 'Person Display')}: </p>
-                <p className={styles.label}>{person.display}</p>
+                <p className={styles.label}>{currentPerson.display}</p>
               </div>
               <div className={styles.labelContainer}>
                 <p className={styles.labelBold}>{t('Gender', 'Gender')}: </p>
-                <p className={styles.label}>{person.gender}</p>
+                <p className={styles.label}>{currentPerson.gender}</p>
               </div>
-              <div className={styles.labelContainer}>
-                <p className={styles.labelBold}>{t('Attributes', 'Attributes')}: </p>
-                <ul className={styles.attributesList}>
-                  {person.attributes.map((attr) => (
-                    <li key={attr.uuid}>{attr.display}</li>
-                  ))}
-                </ul>
-              </div>
+              {/* Add more details here as needed */}
             </div>
           </>
         )}
-        <div>
-          <p className={styles.gridTitle}>{t('userRoles', 'Roles')}</p>
-          <StructuredListWrapper isCondensed>
-            <StructuredListHead>
-              <StructuredListRow head>
-                <StructuredListCell head className={styles.cell}>
-                  {t('sNo', 'S.No')}
-                </StructuredListCell>
-                <StructuredListCell head className={styles.cell}>
-                  {t('sysRoles', 'Roles used by the Health Workflow')}
-                </StructuredListCell>
-              </StructuredListRow>
-            </StructuredListHead>
-            <StructuredListBody>
-              {userRoles.map((role, index) => (
-                <StructuredListRow key={role.uuid}>
-                  <StructuredListCell className={styles.cell}>{index + 1}</StructuredListCell>
-                  <StructuredListCell className={styles.cell}>{role.display}</StructuredListCell>
-                </StructuredListRow>
-              ))}
-            </StructuredListBody>
-          </StructuredListWrapper>
-        </div>
       </div>
     </div>
   );
