@@ -23,9 +23,9 @@ import { PaymentTypeFilter } from './payment-type-filter';
 import { AppliedFilterTags } from './applied-filter-tages.component';
 
 export const headers = [
-  { header: 'date', key: 'dateCreated' },
+  { header: 'Date', key: 'dateCreated' },
   { header: 'Patient Name', key: 'patientName' },
-  { header: 'status', key: 'status' },
+  { header: 'Status', key: 'status' },
   { header: 'Total Amount', key: 'totalAmount' },
   { header: 'Service', key: 'billingService' },
 ];
