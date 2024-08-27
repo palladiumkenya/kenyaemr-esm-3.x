@@ -15,15 +15,12 @@ import {
 type PriceInfoOrderProps = {
   billableItem: any;
   error?: boolean;
-  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error, setHasPrice }) => {
+const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error }) => {
   const { t } = useTranslation();
 
   const hasPrice = billableItem?.servicePrices?.length > 0;
-
-  setHasPrice(hasPrice);
 
   if (error || !hasPrice) {
     return (

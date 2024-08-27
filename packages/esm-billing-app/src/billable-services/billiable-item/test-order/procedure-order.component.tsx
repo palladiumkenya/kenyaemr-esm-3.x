@@ -28,7 +28,7 @@ const ProcedureOrder: React.FC<ProcedureOrderProps> = ({ order, setHasPrice }) =
     );
   }
 
-  return <PriceInfoOrder billableItem={billableItem} error={error} setHasPrice={setHasPrice} />;
+  return <PriceInfoOrder billableItem={billableItem} error={error} />;
 };
 
 export default ProcedureOrder;
