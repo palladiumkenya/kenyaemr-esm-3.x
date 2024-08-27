@@ -4,7 +4,6 @@
   "actives": "Active",
   "all": "All Providers",
   "allProviders": "All providers",
-  "Attributes": "Attributes",
   "cancel": "Cancel",
   "continue": "Continue to registration",
   "createAnAccount": "Create an account",
@@ -31,9 +30,6 @@
   "providerManagement": "Providers Management",
   "providersAll": "List of provider",
   "providersWithActiveLicense": "Active license",
-  "sNo": "S.No",
   "status": "Status",
-  "sysRoles": "Roles used by the Health Workflow",
-  "userRoles": "Roles",
   "WorkerDetails": "Health Worker details"
 }
