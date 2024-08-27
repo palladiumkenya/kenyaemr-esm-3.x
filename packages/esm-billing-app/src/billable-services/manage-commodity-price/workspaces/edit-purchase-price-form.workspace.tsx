@@ -44,7 +44,6 @@ export const EditPurchasePriceForm: React.FC<EditPurchasePriceFormProps> = ({ st
     resolver: zodResolver(schema),
     mode: 'all',
   });
-
   const inputPrice = watch('price');
 
   const inputDataAsObject = { price: inputPrice };
@@ -54,6 +53,9 @@ export const EditPurchasePriceForm: React.FC<EditPurchasePriceFormProps> = ({ st
     const updateBill = formData;
     formData['uuid'] = stockItem.uuid;
     formData['purchasePrice'] = formData.price;
+    if (stockItem.purchasePriceUoMUuid === null) {
+      formData['purchasePriceUoMUuid'] = stockItem.dispensingUnitPackagingUoMUuid;
+    }
 
     delete formData.price;
     stockItem.purchasePrice = formData.price;
