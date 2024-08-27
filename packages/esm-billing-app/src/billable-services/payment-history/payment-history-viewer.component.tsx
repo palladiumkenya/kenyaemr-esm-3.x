@@ -212,7 +212,9 @@ const PaymentHistoryViewer = () => {
     <div className={styles.table}>
       <DataTable rows={results ?? []} headers={headers} isSortable>
         {(tableData) => (
-          <TableContainer title="Paid Bills" description="Paid Bills Summary">
+          <TableContainer
+            title={t('paidBills', 'Paid Bills')}
+            description={t('paidBillsSummary', 'Paid Bills Summary')}>
             <div className={styles.tableToolBar}>
               <TableToolbar>
                 <TableToolbarContent>
