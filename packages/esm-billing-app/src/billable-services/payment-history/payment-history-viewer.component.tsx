@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useBills } from '../../billing.resource';
+import { useBills, usePaymentModes } from '../../billing.resource';
 import {
   DataTable,
   TableContainer,
@@ -9,7 +9,6 @@ import {
   Pagination,
 } from '@carbon/react';
 import styles from './payment-history.scss';
-import { TableToolbarFilter } from './table-toolbar-filter';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 import flatMapDeep from 'lodash-es/flatMapDeep';
 import { MappedBill, PaymentStatus } from '../../types';
@@ -18,6 +17,9 @@ import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework'
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { PaymentHistoryTable } from './payment-history-table.component';
+import { PaymentTotals } from './payment-totals';
+import { CashierFilter } from './cashier-filter';
+import { PaymentTypeFilter } from './payment-type-filter';
 
 export const headers = [
   { header: 'date', key: 'dateCreated' },
@@ -43,6 +45,9 @@ const PaymentHistoryViewer = () => {
   );
   const { t } = useTranslation();
 
+  const [selectedPaymentTypeCheckBoxes, setSelectedPaymentTypeCheckBoxes] = useState<string[]>([]);
+  const [selectedCashierCheckboxes, setSelectedCashierCheckboxes] = useState<string[]>([]);
+
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
 
   useEffect(() => {
@@ -50,6 +55,10 @@ const PaymentHistoryViewer = () => {
       setRenderedRows(bills);
     }
   }, [bills, renderedRows]);
+
+  const handleFilterByDateRange = (dates: Date[]) => {
+    setDateRange(dates);
+  };
 
   const getAllValues = (obj: Object) => {
     return flatMapDeep(obj, (value) => {
@@ -60,18 +69,19 @@ const PaymentHistoryViewer = () => {
     });
   };
 
-  const handlePaymentTypeFilter = (selectedCheckboxes: Array<string>) => {
-    if (selectedCheckboxes.length === 0) {
+  const onApplyCashierFilter = (appliedCheckboxes: Array<string>) => {
+    setSelectedCashierCheckboxes(selectedCashierCheckboxes);
+    if (appliedCheckboxes.length === 0) {
       setRenderedRows(bills);
       return;
     }
 
     setRenderedRows([]);
-    for (let i = 0; i < selectedCheckboxes.length; i++) {
+    for (let i = 0; i < appliedCheckboxes.length; i++) {
       // Filter the items inside the rows list
       const filteredRows = bills.filter((row) => {
         const rowValues: string[] = getAllValues(row);
-        return rowValues.some((value) => String(value).toLowerCase().includes(selectedCheckboxes[i].toLowerCase()));
+        return rowValues.some((value) => String(value).toLowerCase().includes(appliedCheckboxes[i].toLowerCase()));
       });
 
       setRenderedRows((prevData) => {
@@ -88,12 +98,41 @@ const PaymentHistoryViewer = () => {
     }
   };
 
-  const handleOnResetFilter = () => {
+  const onApplyPaymentTypeFilter = (appliedCheckboxes: Array<string>) => {
+    setSelectedPaymentTypeCheckBoxes(appliedCheckboxes);
+    if (appliedCheckboxes.length === 0) {
+      setRenderedRows(bills);
+      return;
+    }
+
+    setRenderedRows([]);
+    for (let i = 0; i < appliedCheckboxes.length; i++) {
+      // Filter the items inside the rows list
+      const filteredRows = bills.filter((row) => {
+        const rowValues: string[] = getAllValues(row);
+        return rowValues.some((value) => String(value).toLowerCase().includes(appliedCheckboxes[i].toLowerCase()));
+      });
+
+      setRenderedRows((prevData) => {
+        // Filter out duplicate rows
+        const uniqueRows = filteredRows.filter((row) => {
+          return !prevData.some((prevRow) => {
+            return Object.keys(row).every((key) => {
+              return row[key] === prevRow[key];
+            });
+          });
+        });
+        return [...prevData, ...uniqueRows];
+      });
+    }
+  };
+
+  const handleOnResetCashierFilter = () => {
     setRenderedRows(bills);
   };
 
-  const handleFilterByDateRange = (dates: Date[]) => {
-    setDateRange(dates);
+  const handleOnResetPaymentTypeFilter = () => {
+    setRenderedRows(bills);
   };
 
   return (
@@ -107,7 +146,15 @@ const PaymentHistoryViewer = () => {
                   <TableToolbarSearch
                     onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
                   />
-                  <TableToolbarFilter onApplyFilter={handlePaymentTypeFilter} onResetFilter={handleOnResetFilter} />
+                  <PaymentTypeFilter
+                    onApplyFilter={onApplyPaymentTypeFilter}
+                    onResetFilter={handleOnResetPaymentTypeFilter}
+                  />
+                  <CashierFilter
+                    bills={bills}
+                    onApplyFilter={onApplyCashierFilter}
+                    onResetFilter={handleOnResetCashierFilter}
+                  />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
                 </TableToolbarContent>
               </TableToolbar>
@@ -134,6 +181,7 @@ const PaymentHistoryViewer = () => {
           </TableContainer>
         )}
       </DataTable>
+      <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
     </div>
   );
 };

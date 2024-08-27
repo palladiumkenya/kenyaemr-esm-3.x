@@ -1,4 +1,6 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .table,
 .emptyStateWrapper,
@@ -33,4 +35,19 @@
   width: layout.$spacing-09;
   height: layout.$spacing-09;
   margin-right: layout.$spacing-05;
+}
+
+.paymentTotals {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
+}
+
+.paymentTotal {
+  color: colors.$blue-60;
+}
+
+.tile {
+  border: 1px solid $ui-03;
 }

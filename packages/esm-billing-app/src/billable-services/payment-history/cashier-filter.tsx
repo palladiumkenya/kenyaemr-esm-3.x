@@ -1,26 +1,20 @@
 import React, { ChangeEvent, useState } from 'react';
-import { Filter } from '@carbon/react/icons';
+import { IbmCloudLogging } from '@carbon/react/icons';
 import { Popover, PopoverContent, Button, Checkbox, usePrefix, SkeletonIcon } from '@carbon/react';
 import styles from './payment-history.scss';
-import { usePaymentModes } from '../../billing.resource';
+import { MappedBill } from '../../types';
 
-interface TableToolbarFilterProps {
-  /**
-   * Provide an function that is called when the apply button is clicked
-   */
+interface CashierFilterProps {
   onApplyFilter?: (selectedCheckboxes: Array<string>) => void;
-
-  /**
-   * Provide an function that is called when the reset button is clicked
-   */
   onResetFilter?: () => void;
+  bills: MappedBill[];
 }
 
-export const TableToolbarFilter = ({ onApplyFilter, onResetFilter }: TableToolbarFilterProps) => {
+export const CashierFilter = ({ onApplyFilter, onResetFilter, bills }: CashierFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
 
-  const { isLoading, paymentModes } = usePaymentModes(false);
+  const cashiers = Array.from(new Map(bills.map((bill) => [bill.cashier.uuid, bill.cashier])).values());
 
   const prefix = usePrefix();
 
@@ -52,10 +46,6 @@ export const TableToolbarFilter = ({ onApplyFilter, onResetFilter }: TableToolba
     }
   };
 
-  if (isLoading) {
-    return <SkeletonIcon className={styles.skeletonIcon} />;
-  }
-
   return (
     <Popover align={'left'} caret={true} open={isOpen} onRequestClose={() => setIsOpen(false)}>
       <button
@@ -66,18 +56,18 @@ export const TableToolbarFilter = ({ onApplyFilter, onResetFilter }: TableToolba
           setIsOpen(!isOpen);
         }}
         className={`${prefix}--toolbar-action ${prefix}--overflow-menu`}>
-        <Filter />
+        <IbmCloudLogging />
       </button>
       <PopoverContent id="containerCheckbox">
         <div className={styles.checkBoxWrapper}>
           <fieldset className={`${prefix}--fieldset`}>
-            <legend className={`${prefix}--label`}>Filter options</legend>
-            {paymentModes.map((method) => (
+            <legend className={`${prefix}--label`}>Filter by cashier</legend>
+            {cashiers.map((cashier) => (
               <Checkbox
-                labelText={method.name}
-                id={`checkbox-${method.name}`}
+                labelText={cashier.display}
+                id={`checkbox-${cashier.display}`}
                 onChange={handleCheckboxChange}
-                checked={selectedCheckboxes.includes(method.name)}
+                checked={selectedCheckboxes.includes(cashier.display)}
               />
             ))}
           </fieldset>
