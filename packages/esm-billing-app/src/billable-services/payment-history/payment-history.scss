@@ -41,7 +41,7 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: layout.$spacing-05;
-  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .paymentTotal {

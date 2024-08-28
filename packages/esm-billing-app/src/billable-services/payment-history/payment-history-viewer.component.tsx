@@ -210,6 +210,7 @@ const PaymentHistoryViewer = () => {
 
   return (
     <div className={styles.table}>
+      <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
       <DataTable rows={results ?? []} headers={headers} isSortable>
         {(tableData) => (
           <TableContainer
@@ -257,7 +258,6 @@ const PaymentHistoryViewer = () => {
           </TableContainer>
         )}
       </DataTable>
-      <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
     </div>
   );
 };
