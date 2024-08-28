@@ -13,7 +13,8 @@
         "name": "providers",
         "title": "providers",
         "slot": "providers-dashboard-slot"
-      }
+      },
+      "featureFlag": "healthInformationExchange"
     },
     {
       "component": "root",
@@ -29,7 +30,7 @@
       "type": "other-form"
     }
   ],
-   "modals": [
+  "modals": [
     {
       "component": "hwrConfirmationModal",
       "name": "hwr-confirmation-modal"
