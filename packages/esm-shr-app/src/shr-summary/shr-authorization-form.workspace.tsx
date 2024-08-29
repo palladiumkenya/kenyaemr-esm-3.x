@@ -66,7 +66,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
             name="authMethod"
             render={({ field }) => (
               <RadioButtonGroup
-                legendText={t('sex', 'Sex')}
+                legendText={t('authMethod', 'Authorization Method')}
                 {...field}
                 invalid={form.formState.errors[field.name]?.message}
                 className={styles.radioGroupInput}
@@ -118,7 +118,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
                       kind="tertiary"
                       onClick={handleGetOTP}
                       disabled={loadingState.isLoading || loadingState.isSuccess}>
-                      Get OTP
+                      Verify with OTP
                     </Button>
                   )}
                 </Row>
