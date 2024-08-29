@@ -20,7 +20,7 @@
 .tableToolBar {
   position: relative;
 
-  > * {
+  > section {
     position: relative;
     top: 0;
 
@@ -46,6 +46,7 @@
 
 .paymentTotal {
   color: colors.$blue-60;
+  margin-top: layout.$spacing-05;
 }
 
 .tile {

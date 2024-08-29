@@ -7,8 +7,8 @@ export const TableToolBarDateRangePicker = ({
   onChange,
   currentValues,
 }: {
-  onChange: (dates: Date[]) => void;
-  currentValues: Date[];
+  onChange: (dates: Array<Date>) => void;
+  currentValues: Array<Date>;
 }) => {
   const currentDate = new Date();
   const { t } = useTranslation();

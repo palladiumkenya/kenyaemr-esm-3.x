@@ -3,6 +3,7 @@ import { Filter } from '@carbon/react/icons';
 import { Popover, PopoverContent, Button, Checkbox, usePrefix, SkeletonIcon } from '@carbon/react';
 import styles from './payment-history.scss';
 import { usePaymentModes } from '../../billing.resource';
+import { useTranslation } from 'react-i18next';
 
 interface TableToolbarFilterProps {
   onApplyFilter?: (selectedCheckboxes: Array<string>) => void;
@@ -14,6 +15,7 @@ export const PaymentTypeFilter = ({ onApplyFilter, onResetFilter }: TableToolbar
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
 
   const { isLoading, paymentModes } = usePaymentModes(false);
+  const { t } = useTranslation();
 
   const prefix = usePrefix();
 
@@ -76,10 +78,10 @@ export const PaymentTypeFilter = ({ onApplyFilter, onResetFilter }: TableToolbar
           </fieldset>
         </div>
         <Button kind="secondary" title="Reset filters" onClick={handleResetFilter}>
-          Reset filters
+          {t('resetFilters', ' Reset filters')}
         </Button>
         <Button kind="primary" title="Reset filters" onClick={handleApplyFilter}>
-          Apply filter
+          {t('applyFilter', 'Apply filter')}
         </Button>
       </PopoverContent>
     </Popover>

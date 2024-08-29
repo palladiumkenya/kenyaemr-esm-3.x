@@ -20,8 +20,6 @@ export const PaymentTotals = ({
         {paymentTotals.map((total) => (
           <Tile className={styles.tile}>
             {total.type}
-            <br />
-            <br />
             <p className={styles.paymentTotal}>{convertToCurrency(total.total)}</p>
           </Tile>
         ))}
@@ -36,8 +34,6 @@ export const PaymentTotals = ({
         .map((total) => (
           <Tile className={styles.tile}>
             {total.type}
-            <br />
-            <br />
             <p className={styles.paymentTotal}>{convertToCurrency(total.total)}</p>
           </Tile>
         ))}
