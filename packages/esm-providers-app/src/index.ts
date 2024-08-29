@@ -1,7 +1,9 @@
 import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createLeftPanelLink } from './providers-left-panel/providers-left-panel-link.component';
+import { createLeftPanelLink } from './left-panel/providers-left-panel-link.component';
 import { moduleName, providerBasePath } from './constants';
+import HWREmptyModal from './modal/provider-empty-modal.component';
+import HWRConfirmModal from './modal/provider-information.modal.componet';
 
 const options = {
   featureName: 'esm-providers-app',
@@ -30,3 +32,7 @@ export const providersDashboardLink = getSyncLifecycle(
   }),
   options,
 );
+
+export const providerDetailsWorkspace = getAsyncLifecycle(() => import('./workspace/provider-form.workspace'), options);
+export const hwrConfirmationModal = getSyncLifecycle(HWRConfirmModal, options);
+export const hwrEmptymodel = getSyncLifecycle(HWREmptyModal, options);

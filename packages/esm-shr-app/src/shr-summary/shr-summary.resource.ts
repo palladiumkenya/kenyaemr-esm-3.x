@@ -25,7 +25,7 @@ export const authorizationSchema = z
 export function generateOTP(length = 5) {
   let otpNumbers = '0123456789';
   let OTP = '';
-  var len = otpNumbers.length;
+  const len = otpNumbers.length;
   for (let i = 0; i < length; i++) {
     OTP += otpNumbers[Math.floor(Math.random() * len)];
   }
