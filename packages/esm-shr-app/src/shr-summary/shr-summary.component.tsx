@@ -10,8 +10,8 @@ import { ReferralConfigObject } from '../config-schema';
 const SHRSummaryPanel = () => {
   const patientUuid = getPatientUuidFromUrl();
   const { t } = useTranslation();
-  const { nationalPatientUniqueIdentifier } = useConfig<ReferralConfigObject>();
-  const { error, isLoading, hasType, identifiers } = usePatientIdentifiers(patientUuid);
+  const { socialHealthAuthorityIdentifierType } = useConfig<ReferralConfigObject>();
+  const { error, isLoading, hasType } = usePatientIdentifiers(patientUuid);
 
   if (isLoading) {
     return <DataTableSkeleton />;
@@ -21,7 +21,7 @@ const SHRSummaryPanel = () => {
     return <ErrorState error={error} headerTitle={t('shrSummary', 'SHR Summary')} />;
   }
 
-  if (!hasType(nationalPatientUniqueIdentifier)) {
+  if (!hasType(socialHealthAuthorityIdentifierType)) {
     return (
       <div>
         <Layer>

@@ -1,18 +1,13 @@
-import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import useSWR from 'swr';
-import { PatientIdentifier } from '../types';
+import { usePatient } from '@openmrs/esm-framework';
 
 const usePatientIdentifiers = (uuid: string) => {
-  const customeRepresentation = 'custom:(display,uuid,identifier,identifierType:(uuid,display))';
-  const url = `${restBaseUrl}/patient/${uuid}/identifier?v=${customeRepresentation}`;
-  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<PatientIdentifier> }>>(url, openmrsFetch);
+  const { isLoading, error, patient } = usePatient(uuid);
 
   return {
     isLoading,
     error,
-    identifiers: data?.data?.results ?? [],
     hasType: (typeUuid: string) =>
-      (data?.data?.results ?? []).findIndex((id) => id.identifierType.uuid === typeUuid) !== -1,
+      patient?.identifier.findIndex((identifer) => identifer.type.coding[0]?.code === typeUuid) !== -1,
   };
 };
 

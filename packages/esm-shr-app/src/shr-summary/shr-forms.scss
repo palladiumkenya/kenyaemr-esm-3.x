@@ -11,7 +11,7 @@
 
 .grid {
   margin: 0 spacing.$spacing-05;
-  padding: 0rem;
+  padding: spacing.$spacing-05 0rem 0rem orem;
 }
 
 .buttonSet {
@@ -54,20 +54,6 @@
 .sectionHeader {
   @include type.type-style('heading-02');
 }
-
-:global(.omrs-breakpoint-lt-desktop) {
-  .form {
-    height: var(--tablet-workspace-window-height);
-  }
-
-  .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
-    justify-content: flex-end;
-    gap: spacing.$spacing-05;
-  }
-}
-
 .otpInputRow {
   display: flex;
   flex-direction: row;
