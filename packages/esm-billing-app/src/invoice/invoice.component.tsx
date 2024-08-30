@@ -1,10 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, InlineLoading } from '@carbon/react';
-import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
+import { BaggageClaim, Printer, Wallet, ConvertToCloud } from '@carbon/react/icons';
 import { useParams } from 'react-router-dom';
 import { useReactToPrint } from 'react-to-print';
 import { useTranslation } from 'react-i18next';
-import { ExtensionSlot, usePatient, showModal, formatDatetime, parseDate, navigate } from '@openmrs/esm-framework';
+import {
+  ExtensionSlot,
+  usePatient,
+  showModal,
+  formatDatetime,
+  parseDate,
+  navigate,
+  useFeatureFlag,
+} from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { convertToCurrency } from '../helpers';
 import { LineItem } from '../types';
@@ -29,6 +37,7 @@ const Invoice: React.FC = () => {
   const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
+  const isPreAuthEnabled = useFeatureFlag('healthInformationExchange');
 
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
@@ -138,6 +147,19 @@ const Invoice: React.FC = () => {
           tooltipPosition="bottom">
           {t('claim', 'Process claims')}
         </Button>
+        {isPreAuthEnabled && (
+          <Button
+            onClick={() =>
+              navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/pre-auth-request` })
+            }
+            kind="primary"
+            size="sm"
+            renderIcon={ConvertToCloud}
+            iconDescription="Add"
+            tooltipPosition="bottom">
+            {t('preauth', 'Create Pre-Auth Request')}
+          </Button>
+        )}
       </div>
 
       <InvoiceTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
