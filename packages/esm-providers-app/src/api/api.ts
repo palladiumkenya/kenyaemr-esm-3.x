@@ -42,14 +42,3 @@ export function GetProviderLicenceDate(patientId: string) {
     mutateListDetails: mutate,
   };
 }
-export function GetProviderId() {
-  const url = `${restBaseUrl}/session`;
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<ProviderSession>, Error>(url, openmrsFetch);
-  const patientUuid = data?.data?.currentProvider?.uuid;
-  return {
-    patientUuid,
-    error,
-    isLoading,
-    mutate,
-  };
-}

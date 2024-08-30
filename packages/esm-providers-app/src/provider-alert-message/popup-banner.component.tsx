@@ -1,10 +1,16 @@
 import React, { useEffect } from 'react';
 import { showToast } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
 
 interface PopupBannerProps {
   expiryDate: string;
 }
 const PopupBanner: React.FC<PopupBannerProps> = ({ expiryDate }) => {
+  const { t } = useTranslation();
+  const message = t(
+    'message',
+    `Your License Number will be expiring on ${expiryDate} Once expired, any services offered may not be claimed from SHA.`,
+  );
   useEffect(() => {
     const currentDate = new Date();
     const formattedExpiryDate = new Date(expiryDate);
@@ -13,12 +19,7 @@ const PopupBanner: React.FC<PopupBannerProps> = ({ expiryDate }) => {
       showToast({
         critical: false,
         kind: 'error',
-        description: (
-          <div>
-            Your Licence Number will be expiring on <strong>{expiryDate}</strong>. Once expired, any services offered
-            may not be claimed from SHA.
-          </div>
-        ),
+        description: <div>{message}</div>,
         title: 'Alert',
         onActionButtonClick: () => {},
       });
