@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { BillableServicesDashboard } from './dashboard/dashboard.component';
@@ -7,8 +7,8 @@ import styles from './billable-services.scss';
 import BillingHeader from '../billing-header/billing-header.component';
 import BillManager from './bill-manager/bill-manager.component';
 import { BillableServicesSideNav } from './billable-services-sidenav.component';
-import EditBillableService from './create-edit/edit-billable-service.component';
 import ManageCommodityPrices from './manage-commodity-price/manage-commodity-price.component';
+import PaymentHistoryViewer from './payment-history/payment-history-viewer.component';
 
 const BillableServiceHome: React.FC = () => {
   const { t } = useTranslation();
@@ -23,6 +23,7 @@ const BillableServiceHome: React.FC = () => {
             <Route path="/" element={<BillableServicesDashboard />} />
             <Route path="/add-service" element={<AddBillableService />} />
             <Route path="/bill-manager" element={<BillManager />} />
+            <Route path="/payment-history" element={<PaymentHistoryViewer />} />
             <Route path="/manage-commodity-prices" element={<ManageCommodityPrices />} />
           </Routes>
         </section>
