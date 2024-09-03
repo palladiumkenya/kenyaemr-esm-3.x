@@ -160,15 +160,15 @@
       "type": "other-form"
     },
     {
-      "name": "edit-purchase-price-form",
-      "component": "editPurchasePriceForm",
-      "title": "Edit Purchase Price Form",
+      "name": "billable-service-form",
+      "component": "addServiceForm",
+      "title": "Create Billable Service Form",
       "type": "other-form"
     },
     {
-      "name": "edit-billable-service-form",
-      "component": "editBillableServiceForm",
-      "title": "Edit Billable Service Form",
+      "name": "commodity-form",
+      "component": "addCommodityForm",
+      "title": "Create Commodity Form",
       "type": "other-form"
     }
   ]

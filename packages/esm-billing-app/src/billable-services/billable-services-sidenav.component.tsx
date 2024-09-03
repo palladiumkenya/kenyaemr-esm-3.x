@@ -20,7 +20,7 @@ export const BillableServicesSideNav = () => {
       <SideNav>
         <SideNavItems>
           <SideNavLink onClick={() => handleNavigation('')} renderIcon={Wallet} isActive={pathname === '/'}>
-            {t('billableServices', 'Billable Services')}
+            {t('billables', 'Billables')}
           </SideNavLink>
           <UserHasAccess privilege="coreapps.systemAdministration">
             <SideNavLink

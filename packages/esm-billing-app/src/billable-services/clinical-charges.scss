@@ -220,3 +220,7 @@
   display: grid;
   grid-template-columns: 16rem 1fr;
 }
+
+.tabHeader {
+  min-width: calc(layout.$layout-05 * 3);
+}

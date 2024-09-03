@@ -26,7 +26,8 @@ import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.co
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
-import EditBillableServiceForm from './billable-services/create-edit/workspaces/edit-billable-service.workspace';
+import AddServiceForm from './billable-services/billables/services/service-form.workspace';
+import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -87,9 +88,6 @@ export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 
-// billable services
-export const editBillableServiceForm = getSyncLifecycle(EditBillableServiceForm, options);
-
 // bill commodities extensions
 export const editPurchasePriceForm = getSyncLifecycle(EditPurchasePriceForm, options);
 
@@ -104,3 +102,6 @@ export function startupApp() {
     'HIE feature flag, this enables and disables the HIE feature',
   );
 }
+
+export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
+export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
