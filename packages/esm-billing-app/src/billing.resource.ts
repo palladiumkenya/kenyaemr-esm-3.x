@@ -44,9 +44,9 @@ const mapBillProperties = (bill: PatientInvoice): MappedBill => {
 
 export const useBills = (
   patientUuid: string = '',
-  billStatus: PaymentStatus | '' | string = '',
+  billStatus: PaymentStatus.PENDING | '' | string = '',
   startingDate: Date = dayjs().startOf('day').toDate(),
-  endDate: Date = new Date(),
+  endDate: Date = dayjs().endOf('day').toDate(),
 ) => {
   const startingDateISO = startingDate.toISOString();
   const endDateISO = endDate.toISOString();
