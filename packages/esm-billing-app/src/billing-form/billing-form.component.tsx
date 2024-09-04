@@ -166,8 +166,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                               const price = service.servicePrices.find((p) => p.uuid === e.selectedItem)?.price;
                               form.setValue(`lineItems.${index}.price`, price ?? 0);
                             }}
-                            initialSelectedItem={field.value}
-                            label="Choose price"
+                            selectedItem={field.value}
+                            label="Choose method"
                             items={service.servicePrices.map((r) => r.uuid)}
                             itemToString={(item) => service.servicePrices.find((r) => r.uuid === item)?.name ?? ''}
                           />
