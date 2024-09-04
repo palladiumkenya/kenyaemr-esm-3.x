@@ -47,7 +47,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification);
+  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification, closeModal);
 
   const {
     control,

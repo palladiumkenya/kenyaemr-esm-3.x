@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../config-schema';
 import { RequestStatus } from '../types';
+import { waitForASecond } from '../utils';
 
 type RequestData = { requestId: string; requestStatus: RequestStatus | null };
 
@@ -14,6 +15,7 @@ type RequestData = { requestId: string; requestStatus: RequestStatus | null };
  */
 export const useRequestStatus = (
   setNotification: React.Dispatch<SetStateAction<{ type: 'error' | 'success'; message: string } | null>>,
+  closeModal: () => void,
 ): [RequestData, React.Dispatch<React.SetStateAction<RequestData | null>>] => {
   const { t } = useTranslation();
   const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
@@ -30,6 +32,11 @@ export const useRequestStatus = (
       const fetchStatus = async () => {
         try {
           const status = await getRequestStatus(requestData.requestId, mpesaAPIBaseUrl);
+          if (status === 'COMPLETE') {
+            waitForASecond().then(() => {
+              closeModal();
+            });
+          }
           if (status === 'COMPLETE' || status === 'FAILED' || status === 'NOT-FOUND') {
             clearInterval(interval);
           }
@@ -49,7 +56,7 @@ export const useRequestStatus = (
 
       return () => clearInterval(interval);
     }
-  }, [mpesaAPIBaseUrl, requestData.requestId, requestData.requestStatus, setNotification, t]);
+  }, [closeModal, mpesaAPIBaseUrl, requestData.requestId, requestData.requestStatus, setNotification, t]);
 
   return [requestData, setRequestData];
 };
