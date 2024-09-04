@@ -1,5 +1,5 @@
 import { SideNav, SideNavLink, SideNavItems } from '@carbon/react';
-import { Wallet, Money, ResultDraft, SummaryKpi } from '@carbon/react/icons';
+import { Wallet, Money, SummaryKpi } from '@carbon/react/icons';
 import { navigate, UserHasAccess } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,14 +36,6 @@ export const BillableServicesSideNav = () => {
               renderIcon={SummaryKpi}
               isActive={pathname.includes('payment-history')}>
               {t('paymentHistory', 'Payment History')}
-            </SideNavLink>
-          </UserHasAccess>
-          <UserHasAccess privilege="coreapps.systemAdministration">
-            <SideNavLink
-              onClick={() => handleNavigation('manage-commodity-prices')}
-              renderIcon={ResultDraft}
-              isActive={pathname.includes('manage-commodity-prices')}>
-              {t('commodityManager', 'Manage Commodity Prices')}
             </SideNavLink>
           </UserHasAccess>
         </SideNavItems>

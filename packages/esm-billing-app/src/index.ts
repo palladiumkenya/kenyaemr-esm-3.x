@@ -16,7 +16,6 @@ import LabOrder from './billable-services/billiable-item/test-order/lab-order.co
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
-import { EditPurchasePriceForm } from './billable-services/manage-commodity-price/workspaces/edit-purchase-price-form.workspace';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import { configSchema } from './config-schema';
@@ -87,9 +86,6 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
-
-// bill commodities extensions
-export const editPurchasePriceForm = getSyncLifecycle(EditPurchasePriceForm, options);
 
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);

@@ -6,7 +6,6 @@ import styles from './clinical-charges.scss';
 import BillingHeader from '../billing-header/billing-header.component';
 import BillManager from './bill-manager/bill-manager.component';
 import { BillableServicesSideNav } from './billable-services-sidenav.component';
-import ManageCommodityPrices from './manage-commodity-price/manage-commodity-price.component';
 import PaymentHistoryViewer from './payment-history/payment-history-viewer.component';
 
 const BillableServiceHome: React.FC = () => {
@@ -22,7 +21,6 @@ const BillableServiceHome: React.FC = () => {
             <Route path="/" element={<BillableServicesDashboard />} />
             <Route path="/bill-manager" element={<BillManager />} />
             <Route path="/payment-history" element={<PaymentHistoryViewer />} />
-            <Route path="/manage-commodity-prices" element={<ManageCommodityPrices />} />
           </Routes>
         </section>
       </main>
