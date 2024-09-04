@@ -24,7 +24,9 @@ import useBillableServices from '../hooks/useBillableServices';
 import { BillingService } from '../types';
 import styles from './billing-form.scss';
 import { mutate } from 'swr';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { BillingConfig } from '../config-schema';
+import { TrashCan } from '@carbon/react/icons';
 
 type BillingFormProps = {
   patientUuid: string;
@@ -37,14 +39,14 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
   const { billableServices, error, isLoading } = useBillableServices();
-  const [BillItems, setBillItems] = useState([]);
   const [searchVal, setsearchVal] = useState('');
+  const { cashPointUuid, cashierUuid } = useConfig<BillingConfig>();
 
   const form = useForm<FormType>({
     resolver: zodResolver(billingFormSchema),
     defaultValues: {
-      cashPoint: '54065383-b4d4-42d2-af4d-d250a1fd2590',
-      cashier: 'f9badd80-ab76-11e2-9e96-0800200c9a66',
+      cashPoint: cashPointUuid,
+      cashier: cashierUuid,
       patient: patientUuid,
       status: 'PENDING',
       lineItems: [],
@@ -72,8 +74,10 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
 
   const handleSearch = async (searchText: string) => {
     setsearchVal(searchText);
-    return billableServices.filter((searvice) =>
-      searvice.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()),
+    return billableServices.filter(
+      (service) =>
+        service.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()) &&
+        lineItemsOnservable.findIndex((item) => item.billableService === service.uuid) === -1,
     );
   };
 
@@ -118,6 +122,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                 <TableHeader>PaymentMethod</TableHeader>
                 <TableHeader>Price</TableHeader>
                 <TableHeader>Total</TableHeader>
+                <TableHeader></TableHeader>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -140,7 +145,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                             type="number"
                             className="form-control"
                             id={billableService}
-                            min={0}
+                            min={1}
                             max={100}
                           />
                         )}
@@ -170,8 +175,19 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                       />
                     </TableCell>
                     <TableCell id={service.name + 'Price'}>{price}</TableCell>
-                    <TableCell id={service.name + 'Total'} className="totalValue">
-                      {price * quantity}
+                    <TableCell id={service.name + 'Total'}>{price * quantity}</TableCell>
+                    <TableCell id={service.name + 'Delete'}>
+                      <Button
+                        renderIcon={TrashCan}
+                        kind="danger"
+                        hasIconOnly
+                        onClick={() => {
+                          form.setValue(
+                            'lineItems',
+                            lineItemsOnservable.filter((item) => item.billableService !== billableService),
+                          );
+                        }}
+                      />
                     </TableCell>
                   </TableRow>
                 );
@@ -188,6 +204,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                     return prev + totoal;
                   }, 0)}
                 </TableCell>
+                <TableCell></TableCell>
               </TableRow>
             </TableBody>
           </Table>

@@ -82,10 +82,6 @@
       "name": "billable-services-admin-card-link"
     },
     {
-      "name": "billing-form",
-      "component": "billingForm"
-    },
-    {
       "name": "require-billing-modal",
       "component": "requirePaymentModal"
     },
@@ -170,6 +166,13 @@
       "component": "editBillableServiceForm",
       "title": "Edit Billable Service Form",
       "type": "other-form"
+    },
+    {
+      "name": "billing-form",
+      "component": "billingForm",
+      "title": "Billing Form",
+      "type": "other-form",
+      "width": "extra-wide"
     }
   ]
 }

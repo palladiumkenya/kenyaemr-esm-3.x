@@ -239,15 +239,17 @@ export const billingFormSchema = z.object({
   patient: z.string().uuid(),
   payments: z.array(z.string()),
   status: z.enum(['PENDING']),
-  lineItems: z.array(
-    z.object({
-      billableService: z.string().uuid(),
-      quantity: z.number({ coerce: true }).min(0).max(100),
-      price: z.number({ coerce: true }),
-      priceName: z.string().optional().default('Default'),
-      priceUuid: z.string().uuid(),
-      lineItemOrder: z.number().optional().default(0),
-      paymentStatus: z.enum(['PENDING']),
-    }),
-  ),
+  lineItems: z
+    .array(
+      z.object({
+        billableService: z.string().uuid(),
+        quantity: z.number({ coerce: true }).min(1).max(100),
+        price: z.number({ coerce: true }),
+        priceName: z.string().optional().default('Default'),
+        priceUuid: z.string().uuid(),
+        lineItemOrder: z.number().optional().default(0),
+        paymentStatus: z.enum(['PENDING']),
+      }),
+    )
+    .min(1),
 });
