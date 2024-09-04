@@ -97,7 +97,12 @@ export const configSchema = {
         _description: 'The label of the payment mode to be excluded',
       },
     },
-    _default: [],
+    _default: [
+      {
+        uuid: 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4',
+        label: 'Waiver',
+      },
+    ],
   },
   enforceBillPayment: {
     _type: Type.Boolean,
