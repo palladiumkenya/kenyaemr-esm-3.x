@@ -1,6 +1,6 @@
 import { FormPayment, LineItem, MappedBill } from '../../types';
 
-const hasLineItem = (lineItems: Array<LineItem>, item: LineItem) => {
+export const hasLineItem = (lineItems: Array<LineItem>, item: LineItem) => {
   if (lineItems?.length === 0) {
     return false;
   }
@@ -62,7 +62,7 @@ export const createPaymentPayload = (
   return processedPayment;
 };
 
-const processBillItem = (item) => (item.item || item.billableService)?.split(':')[0];
+export const processBillItem = (item: LineItem) => (item.item || item.billableService)?.split(':')[0];
 
 export function formatPhoneNumber(phone) {
   let phone_ = phone.toString().replace(/\D/g, ''); // Convert to string first
