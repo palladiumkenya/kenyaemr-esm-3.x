@@ -15,6 +15,7 @@ import dayjs from 'dayjs';
 import { BillingConfig } from './config-schema';
 import { useState } from 'react';
 import { extractString } from './helpers';
+import { z } from 'zod';
 
 const mapBillProperties = (bill: PatientInvoice): MappedBill => {
   // create base object
@@ -231,3 +232,24 @@ export const useConceptAnswers = (conceptUuid: string) => {
   const { data, isLoading, error } = useSWR<{ data: { answers: Array<OpenmrsResource> } }>(url, openmrsFetch);
   return { conceptAnswers: data?.data?.answers, isLoading, error };
 };
+
+export const billingFormSchema = z.object({
+  cashPoint: z.string().uuid(),
+  cashier: z.string().uuid(),
+  patient: z.string().uuid(),
+  payments: z.array(z.string()),
+  status: z.enum(['PENDING']),
+  lineItems: z
+    .array(
+      z.object({
+        billableService: z.string().uuid(),
+        quantity: z.number({ coerce: true }).min(1).max(100),
+        price: z.number({ coerce: true }),
+        priceName: z.string().optional().default('Default'),
+        priceUuid: z.string().uuid(),
+        lineItemOrder: z.number().optional().default(0),
+        paymentStatus: z.enum(['PENDING']),
+      }),
+    )
+    .min(1),
+});

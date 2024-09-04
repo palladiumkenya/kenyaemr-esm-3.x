@@ -166,6 +166,7 @@ export type BillingService = {
   serviceType: { display: string };
   shortName: string;
   uuid: string;
+  stockItem?: string;
 };
 
 export interface DrugOrderBasketItem extends OrderBasketItem {

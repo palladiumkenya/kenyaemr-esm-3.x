@@ -17,6 +17,8 @@ export interface BillingConfig {
   mpesaAPIBaseUrl: string;
   insuranceSchemes: Array<string>;
   nationalPatientUniqueIdentifierTypeUuid: string;
+  cashPointUuid: string;
+  cashierUuid: string;
 }
 
 export const configSchema = {
@@ -119,5 +121,15 @@ export const configSchema = {
     },
     _default: ['(SHA) SHIF', 'NHIF', 'NHIF (Linda Mama)', 'Jubilee Insurance', 'AAR Insurance', 'Old Mutual Insurance'],
     _description: 'List of insurance schemes',
+  },
+  cashPointUuid: {
+    _type: Type.String,
+    _description: 'Where bill is generated from',
+    _default: '54065383-b4d4-42d2-af4d-d250a1fd2590',
+  },
+  cashierUuid: {
+    _type: Type.String,
+    _description: 'Who Generated the bill',
+    _default: '54065383-b4d4-42d2-af4d-d250a1fd2590',
   },
 };
