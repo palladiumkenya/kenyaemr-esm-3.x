@@ -1,0 +1,11 @@
+@use '@carbon/layout';
+
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+
+  & > section {
+    position: relative;
+    margin-bottom: layout.$spacing-02;
+  }
+}
