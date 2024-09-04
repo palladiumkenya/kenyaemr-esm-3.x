@@ -118,8 +118,6 @@ export const useRequestStatus = (
               mobileMoneyPaymentMethodInstanceTypeUUID,
             );
 
-            console.log('mobileMoneyPayload', mobileMoneyPayload);
-
             processBillPayment(mobileMoneyPayload, bill.uuid).then(
               () => {
                 showSnackbar({
