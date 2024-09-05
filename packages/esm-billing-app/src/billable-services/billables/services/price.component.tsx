@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { BillableFormSchema } from '../form-schemas';
-import { Controller, type Control } from 'react-hook-form';
+import { Controller, useFormContext, type Control } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { usePaymentModes } from '../../../billing.resource';
 import styles from './service-form.scss';
@@ -18,6 +18,18 @@ interface PriceFieldProps {
 const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeServicePrice, errors }) => {
   const { t } = useTranslation();
   const { paymentModes, isLoading } = usePaymentModes();
+  const { watch } = useFormContext();
+  const servicePrices = watch('servicePrices');
+
+  // Filter out the payment modes that are already selected
+  const availablePaymentModes = useMemo(
+    () =>
+      paymentModes?.filter(
+        (paymentMode) => !servicePrices?.some((servicePrice) => servicePrice.paymentMode?.uuid === paymentMode.uuid),
+      ),
+    [paymentModes, servicePrices],
+  );
+
   return (
     <div key={field.id} className={styles.paymentMethods}>
       <Controller
@@ -27,7 +39,7 @@ const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeSe
           <ComboBox
             onChange={({ selectedItem }) => field.onChange(selectedItem)}
             titleText={t('paymentMethod', 'Payment method')}
-            items={paymentModes ?? []}
+            items={availablePaymentModes ?? []}
             itemToString={(item) => (item ? item.name : '')}
             placeholder={t('selectPaymentMode', 'Select payment mode')}
             disabled={isLoading}

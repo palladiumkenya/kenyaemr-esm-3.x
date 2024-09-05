@@ -75,3 +75,21 @@ export const formatStockItemToPayload = (stockItem: any): BillableFormSchema => 
     stockItem: stockItem.uuid,
   };
 };
+
+export const searchTableData = <T>(array: Array<T>, searchString: string) => {
+  if (array !== undefined && array.length > 0) {
+    if (searchString && searchString.trim() !== '') {
+      const search = searchString.toLowerCase();
+      return array?.filter((item) =>
+        Object.entries(item).some(([header, value]) => {
+          if (header === 'patientUuid') {
+            return false;
+          }
+          return `${value}`.toLowerCase().includes(search);
+        }),
+      );
+    }
+  }
+
+  return array;
+};

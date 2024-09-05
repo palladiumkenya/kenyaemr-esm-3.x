@@ -57,7 +57,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   const onSubmit = async (values: FormType) => {
     try {
       await processBillItems(values);
-      closeWorkspace();
       mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/cashier/bill`), undefined, {
         revalidate: true,
       });
@@ -67,6 +66,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
         kind: 'success',
         timeoutInMs: 3000,
       });
+      closeWorkspace();
     } catch (e) {
       showSnackbar({ title: 'Bill processing error', kind: 'error', subtitle: e });
     }
@@ -76,8 +76,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
     setsearchVal(searchText);
     return billableServices.filter(
       (service) =>
-        service.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()) &&
-        lineItemsOnservable.findIndex((item) => item.billableService === service.uuid) === -1,
+        service?.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()) &&
+        lineItemsOnservable.findIndex((item) => item.billableService === service?.uuid) === -1,
     );
   };
 
@@ -130,7 +130,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                 const service = billableServices.find((serv) => serv.uuid === billableService);
                 return (
                   <TableRow>
-                    <TableCell>{service.name}</TableCell>
+                    <TableCell>{service?.name}</TableCell>
                     <TableCell>
                       <Controller
                         control={form.control}
@@ -163,20 +163,20 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                             id="priceUuid"
                             onChange={(e) => {
                               field.onChange(e.selectedItem);
-                              const price = service.servicePrices.find((p) => p.uuid === e.selectedItem)?.price;
+                              const price = service?.servicePrices.find((p) => p.uuid === e.selectedItem)?.price;
                               form.setValue(`lineItems.${index}.price`, price ?? 0);
                             }}
                             selectedItem={field.value}
                             label="Choose method"
-                            items={service.servicePrices.map((r) => r.uuid)}
-                            itemToString={(item) => service.servicePrices.find((r) => r.uuid === item)?.name ?? ''}
+                            items={service?.servicePrices.map((r) => r.uuid) ?? []}
+                            itemToString={(item) => service?.servicePrices.find((r) => r.uuid === item)?.name ?? ''}
                           />
                         )}
                       />
                     </TableCell>
-                    <TableCell id={service.name + 'Price'}>{price}</TableCell>
-                    <TableCell id={service.name + 'Total'}>{price * quantity}</TableCell>
-                    <TableCell id={service.name + 'Delete'}>
+                    <TableCell id={service?.name + 'Price'}>{price}</TableCell>
+                    <TableCell id={service?.name + 'Total'}>{price * quantity}</TableCell>
+                    <TableCell id={service?.name + 'Delete'}>
                       <Button
                         renderIcon={TrashCan}
                         kind="danger"

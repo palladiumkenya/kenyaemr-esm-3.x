@@ -47,7 +47,9 @@
   "discardClaim": "Discard Claim",
   "discount": "Discount",
   "edit": "Edit",
+  "editBillableService": "Edit Billable Service",
   "editBillForm": "Edit Bill Form",
+  "editCommodity": "Edit Commodity",
   "enterAmount": "Enter amount",
   "enterPolicyNumber": "Enter policy number",
   "enterPrice": "Enter price",
@@ -161,5 +163,6 @@
   "unsettledBill": "Unsettled bill for test.",
   "visitTime": "Visit time",
   "visittype": "Visit Type",
+  "waiveBill": "Waive Bill",
   "yes": "Yes"
 }

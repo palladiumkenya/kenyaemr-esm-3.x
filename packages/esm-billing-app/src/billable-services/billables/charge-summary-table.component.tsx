@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { UseChargeSummaries } from './charge-summary.resource';
 import {
   DataTable,
@@ -20,11 +20,12 @@ import {
   ComboButton,
   MenuItem,
 } from '@carbon/react';
-import { ErrorState, launchWorkspace, showModal, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import styles from './charge-summary-table.scss';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { convertToCurrency } from '../../helpers';
+import { searchTableData } from './form-helper';
 
 const defaultPageSize = 10;
 
@@ -33,8 +34,15 @@ const ChargeSummaryTable: React.FC = () => {
   const size = 'sm';
   const { isLoading, isValidating, error, mutate, chargeSummaryItems } = UseChargeSummaries();
   const [pageSize, setPageSize] = useState(defaultPageSize);
-  const { results, goTo, currentPage } = usePagination(chargeSummaryItems, pageSize);
-  const { pageSizes } = usePaginationInfo(pageSize, chargeSummaryItems.length, currentPage, results.length);
+  const [searchString, setSearchString] = useState('');
+
+  const searchResults = useMemo(
+    () => searchTableData(chargeSummaryItems, searchString),
+    [chargeSummaryItems, searchString],
+  );
+
+  const { results, goTo, currentPage } = usePagination(searchResults, pageSize);
+  const { pageSizes } = usePaginationInfo(defaultPageSize, chargeSummaryItems.length, currentPage, results.length);
 
   const headers = [
     {
@@ -77,8 +85,14 @@ const ChargeSummaryTable: React.FC = () => {
 
   const handleEdit = (service) => {
     Boolean(service?.serviceType?.display)
-      ? launchWorkspace('billable-service-form', { initialValues: service })
-      : launchWorkspace('commodity-form', { initialValues: service });
+      ? launchWorkspace('billable-service-form', {
+          initialValues: service,
+          workspaceTitle: t('editBillableService', 'Edit Billable Service'),
+        })
+      : launchWorkspace('commodity-form', {
+          initialValues: service,
+          workspaceTitle: t('editCommodity', 'Edit Commodity'),
+        });
   };
 
   if (isLoading) {
@@ -102,16 +116,7 @@ const ChargeSummaryTable: React.FC = () => {
   return (
     <>
       <DataTable size={size} useZebraStyles rows={rows} headers={headers}>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getTableProps,
-          getToolbarProps,
-          onInputChange,
-          getTableContainerProps,
-        }) => (
+        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
           <TableContainer
             className={styles.tableContainer}
             title={t('clinicalCharges', 'Medical Invoice Items')}
@@ -121,7 +126,7 @@ const ChargeSummaryTable: React.FC = () => {
               <TableToolbarContent>
                 <TableToolbarSearch
                   placeHolder={t('searchForBillableService', 'Search for billable service')}
-                  onChange={onInputChange}
+                  onChange={(e) => setSearchString(e.target.value)}
                   persistent
                   size={size}
                 />
@@ -186,7 +191,7 @@ const ChargeSummaryTable: React.FC = () => {
           goTo(page);
         }}
         page={currentPage}
-        pageSize={pageSize}
+        pageSize={defaultPageSize}
         pageSizes={pageSizes}
         size="sm"
         totalItems={chargeSummaryItems.length}
