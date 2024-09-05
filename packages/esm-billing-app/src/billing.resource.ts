@@ -38,6 +38,7 @@ const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     payments: bill.payments,
     display: bill.display,
     totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
+    tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
   };
 
   return mappedBill;

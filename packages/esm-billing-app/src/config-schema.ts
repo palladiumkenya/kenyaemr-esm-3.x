@@ -73,7 +73,7 @@ export const configSchema = {
     _type: Type.Array,
     _elements: {
       value: {
-        _type: Type.UUID,
+        _type: Type.String,
         _description: 'The value of the exemption category',
       },
       label: {
