@@ -18,7 +18,7 @@ export const PhamacyHeader: React.FC<PharmacyHeaderProps> = ({ title }) => {
       <div className={styles['left-justified-items']}>
         <PharmacyIllustration />
         <div className={styles['page-labels']}>
-          <p>{t('pharmacy', 'Commity pharmacy')}</p>
+          <p>{t('pharmacy', 'Community pharmacy')}</p>
           <p className={styles['page-name']}>{title}</p>
         </div>
       </div>
