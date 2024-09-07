@@ -2,7 +2,6 @@
 @use '@carbon/type';
 @use '@carbon/colors';
 
-
 .providerName {
   @include type.type-style('label-01');
   color: $text-02;
