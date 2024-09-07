@@ -8,8 +8,15 @@ import { MetricCard } from './providers-metrics.component';
 
 interface ProviderHeaderProps {
   title: string;
+  summarize: {
+    all: number;
+    active: number;
+    expired: number;
+    missingNationalId: number;
+    missingLicenseOrExpiry: number;
+  };
 }
-export const ProvidersHeader: React.FC<ProviderHeaderProps> = ({ title }) => {
+export const ProvidersHeader: React.FC<ProviderHeaderProps> = ({ title, summarize }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
@@ -24,10 +31,12 @@ export const ProvidersHeader: React.FC<ProviderHeaderProps> = ({ title }) => {
         </div>
       </div>
       <div className={styles.metrics__header}>
-        <MetricCard label={t('all', 'All')} value={21} />
-        <MetricCard label={t('actives', 'Active')} value={17} />
-        <MetricCard label={t('licenceDue', 'License(s) due')} value={1} />
-        <MetricCard label={t('expired', 'Expired License(s)')} value={3} />
+        <MetricCard label={t('all', 'All')} value={summarize.all} />
+        <MetricCard label={t('actives', 'Active')} value={summarize.active} />
+        <MetricCard label={t('expiredlscs', 'Expiring license(s)')} value={summarize.expired} />
+        <MetricCard label={t('missingLicenses', 'Missing license(s)')} value={summarize.missingLicenseOrExpiry} />
+        <MetricCard label={t('missingNational', 'Missing national id')} value={summarize.missingNationalId} />
+
         <div className={styles.warp__metrics}>
           <div className={styles.metricLocationDate}>
             <span className={styles.location}>

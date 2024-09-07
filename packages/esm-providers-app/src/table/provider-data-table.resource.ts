@@ -1,5 +1,5 @@
 import { type FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { ProviderResponse, UserRoles } from '../types';
 
 export function useProviders() {
@@ -8,7 +8,7 @@ export function useProviders() {
 
   const encodedRepresentation = encodeURIComponent(customRepresentation);
   const url = `/ws/rest/v1/provider?v=${encodedRepresentation}`;
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: ProviderResponse[] }>>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: ProviderResponse[] }>>(url, openmrsFetch);
   const provider = data?.data?.results || [];
 
   return { provider, error, isLoading, mutate };
