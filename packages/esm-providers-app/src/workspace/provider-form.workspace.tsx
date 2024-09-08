@@ -249,7 +249,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
-      {JSON.stringify(errors)}
       <Stack gap={4} className={styles.form__grid}>
         <span className={styles.form__header__section}>
           {t('healthWorkVerify', 'Health worker registry verification')}
@@ -430,24 +429,25 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         ) : (
           <span className={styles.form__subheader__section}>{t('rolesHeader', 'Roles info')}</span>
         )}
+
+        <Column>
+          <Controller
+            name="username"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                placeholder="Username"
+                id="form__username"
+                labelText={t('username', 'Username*')}
+                invalid={!!errors.username}
+                invalidText={errors.username?.message}
+              />
+            )}
+          />
+        </Column>
         {!provider && (
           <>
-            <Column>
-              <Controller
-                name="username"
-                control={control}
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    placeholder="Username"
-                    id="form__username"
-                    labelText={t('username', 'Username*')}
-                    invalid={!!errors.username}
-                    invalidText={errors.username?.message}
-                  />
-                )}
-              />
-            </Column>
             <Column>
               <Controller
                 name="password"

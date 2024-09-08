@@ -22,9 +22,9 @@ import { ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-
 import styles from './generic-data-table.scss';
 import { useProviders } from './provider-data-table.resource';
 import ProviderDetails from './provider-details.component';
-import CustomActionMenu from '../overflow/overflow-component';
 import { ConfigObject } from '../config-schema';
 import dayjs from 'dayjs';
+import CustomActionMenu from '../overflow/overflow-component';
 
 const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ filter }) => {
   const { t } = useTranslation();
