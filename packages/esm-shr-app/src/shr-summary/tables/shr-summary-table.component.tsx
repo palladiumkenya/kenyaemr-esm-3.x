@@ -14,7 +14,6 @@ import usePatient from '../../hooks/usePatient';
 import SharedHealthRecordsSummary from '../../shrpatient-summary/shrpatient-summary.component';
 import styles from './shr-tables.scss';
 
-
 interface PatientSHRSummaryTableProps {}
 
 const PatientSHRSummaryTable: React.FC<PatientSHRSummaryTableProps> = () => {
@@ -73,6 +72,5 @@ const PatientSHRSummaryTable: React.FC<PatientSHRSummaryTableProps> = () => {
 
   return <SharedHealthRecordsSummary patientUuid={patientUuid} />;
 };
-
 
 export default PatientSHRSummaryTable;
