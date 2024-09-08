@@ -108,18 +108,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       providerId: provider?.identifier,
     },
   });
-  const handleFacilitySearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFacilitySearchTerm(event.target.value);
-  };
 
-  const handleFacilitySelect = (facility: Facility) => {
-    setSelectedFacility(facility);
-    setFacilitySearchTerm('');
-  };
-
-  const handleRemoveFacility = () => {
-    setSelectedFacility(null);
-  };
   const defualtValueCombox = providerIdentifierTypes?.find((item) => item.display === searchHWR.identifierType);
   const handleSearch = async () => {
     try {

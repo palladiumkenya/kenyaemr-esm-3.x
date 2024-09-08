@@ -23,8 +23,8 @@ export const configSchema = {
       {
         id: 'home-visit-checklist',
         title: 'Home Visit Checklist Form',
-        formUuid: 'dbe7db2d-abed-47b6-904f-1308b997d7bf',
-        encounterTypeUuid: '4224f8bf-11b2-4e47-a958-1dbdfd7fa41d',
+        formUuid: 'ac3152de-1728-4786-828a-7fb4db0fc384',
+        encounterTypeUuid: 'bfbb5dc2-d3e6-41ea-ad86-101336e3e38f',
       },
     ],
   },

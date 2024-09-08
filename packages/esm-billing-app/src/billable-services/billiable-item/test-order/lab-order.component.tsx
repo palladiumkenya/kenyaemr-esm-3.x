@@ -28,7 +28,7 @@ const LabOrder: React.FC<LabOrderProps> = ({ order, setHasPrice }) => {
     );
   }
 
-  return <PriceInfoOrder billableItem={billableItem} error={error} setHasPrice={setHasPrice} />;
+  return <PriceInfoOrder billableItem={billableItem} error={error} />;
 };
 
 export default LabOrder;

@@ -85,3 +85,11 @@ export const computeTotalPrice = (items) => {
 
   return totalPrice;
 };
+
+export function waitForASecond(): Promise<string> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('Resolved after a seconds');
+    }, 1000);
+  });
+}
