@@ -8,7 +8,6 @@ import {
   TextInput,
   Layer,
   InlineNotification,
-  InlineLoading,
   Loading,
   NumberInputSkeleton,
 } from '@carbon/react';
@@ -47,7 +46,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification);
+  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification, closeModal, bill);
 
   const {
     control,
@@ -83,8 +82,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
 
     setIsLoading(true);
     const requestId = await initiateStkPush(payload, setNotification, mpesaAPIBaseUrl);
+    pollingTrigger({ requestId, requestStatus: 'INITIATED', amount: amountBilled });
     setIsLoading(false);
-    pollingTrigger({ requestId, requestStatus: 'INITIATED' });
   };
 
   return (

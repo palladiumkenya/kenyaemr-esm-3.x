@@ -1,35 +1,62 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @use '@carbon/layout';
 @use '@carbon/colors';
 
-.billingFormContainer {
-  padding: layout.$spacing-05;
+.heading {
+  @include type.type-style('heading-compact-01');
+  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+}
+
+.grid {
+  margin: spacing.$spacing-05 spacing.$spacing-05;
+  padding: spacing.$spacing-05 0rem 0rem orem;
+}
+
+.buttonSet {
+  width: 100%;
+  padding-top: spacing.$spacing-05;
+  background-color: colors.$white-0;
+  justify-content: space-between;
+  bottom: 0;
+  position: absolute;
+  & > button {
+    max-width: 50% !important;
+    width: 50%;
+  }
 }
 
 .billingItem {
-  // padding: layout.$spacing-05;
-  margin-top: 30px;
+  margin-top: spacing.$spacing-10;
+  overflow-x: auto;
 }
 
-.searchContent {
-  // display: none;
-  position: absolute;
-  background-color: #fff;
-  min-width: 230px;
-  overflow: auto;
-  border: 1px solid #ddd;
-  z-index: 1;
-  width: 92%;
+.formTitle {
+  @include type.type-style('heading-02');
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: spacing.$spacing-05;
+  row-gap: 1.5rem;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 2rem;
+    border-bottom: 0.375rem solid var(--brand-03);
+    position: absolute;
+    bottom: -0.75rem;
+    left: 0;
+  }
+
+  & > span {
+    @include type.type-style('body-01');
+  }
 }
 
-.searchItem {
-  border-bottom: 0.1rem solid;
-  border-bottom-color: silver;
-  // padding: 10px;
-  cursor: pointer;
-}
-
-.searchDisable {
-  background-color: colors.$cool-gray-30;
+.sectionHeader {
+  @include type.type-style('heading-02');
 }
 .button {
   height: layout.$spacing-10;

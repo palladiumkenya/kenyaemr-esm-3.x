@@ -13,6 +13,7 @@ export interface MappedBill {
   status: string;
   identifier: string;
   dateCreated: string;
+  dateCreatedUnformatted: string;
   lineItems: Array<LineItem>;
   billingService: string;
   payments: Array<Payment>;
@@ -165,6 +166,7 @@ export type BillingService = {
   serviceType: { display: string };
   shortName: string;
   uuid: string;
+  stockItem?: string;
 };
 
 export interface DrugOrderBasketItem extends OrderBasketItem {

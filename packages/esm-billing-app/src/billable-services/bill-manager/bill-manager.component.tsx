@@ -21,7 +21,9 @@ const BillManager: React.FC<BillManagerProps> = () => {
   const { t } = useTranslation();
 
   const { bills, isLoading } = useBills(patientUuid);
-  const filteredBills = bills.filter((bill) => bill.status !== 'PAID' && patientUuid === bill.patientUuid) ?? [];
+  const filteredBills =
+    bills.filter((bill) => !Boolean(bill.totalAmount === bill.tenderedAmount) && patientUuid === bill.patientUuid) ??
+    [];
 
   return (
     <UserHasAccess privilege="coreapps.systemAdministration">

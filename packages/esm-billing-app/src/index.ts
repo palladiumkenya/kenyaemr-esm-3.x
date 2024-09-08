@@ -18,7 +18,6 @@ import LabOrder from './billable-services/billiable-item/test-order/lab-order.co
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
-import { EditPurchasePriceForm } from './billable-services/manage-commodity-price/workspaces/edit-purchase-price-form.workspace';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
@@ -29,7 +28,8 @@ import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.co
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
-import EditBillableServiceForm from './billable-services/create-edit/workspaces/edit-billable-service.workspace';
+import AddServiceForm from './billable-services/billables/services/service-form.workspace';
+import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -117,12 +117,6 @@ export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 
-// billable services
-export const editBillableServiceForm = getSyncLifecycle(EditBillableServiceForm, options);
-
-// bill commodities extensions
-export const editPurchasePriceForm = getSyncLifecycle(EditPurchasePriceForm, options);
-
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 export const benefitsEligibilyRequestForm = getSyncLifecycle(BenefitsEligibilyRequestForm, options);
@@ -147,3 +141,6 @@ export function startupApp() {
     'HIE feature flag, this enables and disables the HIE feature',
   );
 }
+
+export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
+export const addCommodityForm = getSyncLifecycle(CommodityForm, options);

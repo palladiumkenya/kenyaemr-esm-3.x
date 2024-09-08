@@ -31,6 +31,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@carbon/pictograms-react": "^11.64.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "^1.30.0",
@@ -42,6 +43,7 @@
     "@testing-library/react": "^13.3.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.5.1",
+    "@types/carbon__pictograms-react": "^11",
     "@types/jest": "^28.1.4",
     "@types/lodash-es": "^4.17.3",
     "@types/react": "^18.2.39",

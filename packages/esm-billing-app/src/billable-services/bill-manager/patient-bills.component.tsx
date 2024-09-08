@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Layer,
   DataTable,
@@ -15,10 +15,10 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { convertToCurrency, extractString } from '../../helpers';
+import { convertToCurrency } from '../../helpers';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { MappedBill } from '../../types';
+import { MappedBill, PaymentStatus } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
 import { Scalpel } from '@carbon/react/icons';
@@ -37,6 +37,7 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
     { header: 'Date', key: 'date' },
     { header: 'Status', key: 'status' },
     { header: 'Total Amount', key: 'totalAmount' },
+    { header: 'Amount Paid', key: 'amountPaid' },
   ];
 
   if (hasRefundedItems) {
@@ -47,14 +48,18 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
     id: `${bill.uuid}`,
     date: bill.dateCreated,
     totalAmount: convertToCurrency(bill.totalAmount),
-    status: bill.status,
-    creditAmount: hasRefundedItems
-      ? convertToCurrency(
-          bill.lineItems
-            .filter((li) => Math.sign(li.price) === -1)
-            .reduce((acc, curr) => acc + Math.abs(curr.price), 0),
-        )
-      : convertToCurrency(0),
+    status:
+      bill.totalAmount === bill.tenderedAmount
+        ? PaymentStatus.PAID
+        : bill.tenderedAmount === 0
+        ? PaymentStatus.PENDING
+        : PaymentStatus.POSTED,
+    amountPaid: convertToCurrency(bill.tenderedAmount),
+    ...(hasRefundedItems && {
+      creditAmount: convertToCurrency(
+        bill.lineItems.filter((li) => Math.sign(li.price) === -1).reduce((acc, curr) => acc + Math.abs(curr.price), 0),
+      ),
+    }),
   }));
 
   const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {
@@ -124,10 +129,14 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
                       <TableCell>
-                        <Scalpel
+                        <Button
+                          size="sm"
                           onClick={() => handleOpenWaiveBillWorkspace(bills[index])}
-                          className={styles.scalpel}
-                        />
+                          renderIcon={(props) => <Scalpel size={24} {...props} />}
+                          kind="danger--tertiary"
+                          iconDescription="TrashCan">
+                          {t('waiveBill', 'Waive Bill')}
+                        </Button>
                       </TableCell>
                     </TableExpandRow>
                     <TableExpandedRow
