@@ -122,7 +122,6 @@ interface Qualification {
       display: string;
     }[];
   };
-  };
 }
 
 interface QualificationExtension {
