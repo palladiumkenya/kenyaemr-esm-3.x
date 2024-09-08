@@ -7,7 +7,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import styles from './shr-forms.scss';
-import { AUTH_TYPES, authorizationSchema, generateOTP, persistOTP, sendOtp, verifyOtp } from './shr-summary.resource';
+import { authorizationSchema, generateOTP, persistOTP, sendOtp, verifyOtp } from './shr-summary.resource';
+import { AUTH_TYPES } from '../constants';
 
 interface SHRAuthorizationFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
@@ -58,7 +59,6 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
 
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
-      <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Controller
@@ -66,7 +66,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
             name="authMethod"
             render={({ field }) => (
               <RadioButtonGroup
-                legendText={t('sex', 'Sex')}
+                legendText={t('authMethod', 'Authorization Method')}
                 {...field}
                 invalid={form.formState.errors[field.name]?.message}
                 className={styles.radioGroupInput}
@@ -118,7 +118,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
                       kind="tertiary"
                       onClick={handleGetOTP}
                       disabled={loadingState.isLoading || loadingState.isSuccess}>
-                      Get OTP
+                      Verify with OTP
                     </Button>
                   )}
                 </Row>

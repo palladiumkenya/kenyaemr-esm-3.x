@@ -8,17 +8,52 @@ import {
   useConfig,
   OpenmrsResource,
 } from '@openmrs/esm-framework';
-import { FacilityDetail, MappedBill, PatientInvoice, PaymentMethod } from './types';
+import { FacilityDetail, MappedBill, PatientInvoice, PaymentMethod, PaymentStatus } from './types';
 import isEmpty from 'lodash-es/isEmpty';
 import sortBy from 'lodash-es/sortBy';
 import dayjs from 'dayjs';
 import { BillingConfig } from './config-schema';
 import { useState } from 'react';
+import { extractString } from './helpers';
+import { z } from 'zod';
 
-export const useBills = (patientUuid: string = '', billStatus: string = '') => {
-  // TODO: Should be provided from the UI
-  const defaultCreatedOnOrAfterDateTime = dayjs().startOf('day').toISOString();
-  const url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${defaultCreatedOnOrAfterDateTime}`;
+const mapBillProperties = (bill: PatientInvoice): MappedBill => {
+  // create base object
+  const mappedBill: MappedBill = {
+    id: bill?.id,
+    uuid: bill?.uuid,
+    patientName: bill?.patient?.display.split('-')?.[1],
+    identifier: bill?.patient?.display.split('-')?.[0],
+    patientUuid: bill?.patient?.uuid,
+    status: bill.lineItems.some((item) => item.paymentStatus === 'PENDING') ? 'PENDING' : 'PAID',
+    receiptNumber: bill?.receiptNumber,
+    cashier: bill?.cashier,
+    cashPointUuid: bill?.cashPoint?.uuid,
+    cashPointName: bill?.cashPoint?.name,
+    cashPointLocation: bill?.cashPoint?.location?.display,
+    dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
+    dateCreatedUnformatted: bill.dateCreated,
+    lineItems: bill.lineItems,
+    billingService: extractString(bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  ')),
+    payments: bill.payments,
+    display: bill.display,
+    totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
+    tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
+  };
+
+  return mappedBill;
+};
+
+export const useBills = (
+  patientUuid: string = '',
+  billStatus: PaymentStatus.PENDING | '' | string = '',
+  startingDate: Date = dayjs().startOf('day').toDate(),
+  endDate: Date = dayjs().endOf('day').toDate(),
+) => {
+  const startingDateISO = startingDate.toISOString();
+  const endDateISO = endDate.toISOString();
+
+  const url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startingDateISO}&createdOnOrBefore=${endDateISO}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     patientUuid ? `${url}&patientUuid=${patientUuid}` : url,
@@ -27,31 +62,6 @@ export const useBills = (patientUuid: string = '', billStatus: string = '') => {
       errorRetryCount: 2,
     },
   );
-
-  const mapBillProperties = (bill: PatientInvoice): MappedBill => {
-    // create base object
-    const mappedBill: MappedBill = {
-      id: bill?.id,
-      uuid: bill?.uuid,
-      patientName: bill?.patient?.display.split('-')?.[1],
-      identifier: bill?.patient?.display.split('-')?.[0],
-      patientUuid: bill?.patient?.uuid,
-      status: bill.lineItems.some((item) => item.paymentStatus === 'PENDING') ? 'PENDING' : 'PAID',
-      receiptNumber: bill?.receiptNumber,
-      cashier: bill?.cashier,
-      cashPointUuid: bill?.cashPoint?.uuid,
-      cashPointName: bill?.cashPoint?.name,
-      cashPointLocation: bill?.cashPoint?.location?.display,
-      dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
-      lineItems: bill.lineItems,
-      billingService: bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  '),
-      payments: bill.payments,
-      display: bill.display,
-      totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
-    };
-
-    return mappedBill;
-  };
 
   const sortBills = sortBy(data?.data?.results ?? [], ['dateCreated']).reverse();
   const filteredBills = billStatus === '' ? sortBills : sortBills?.filter((bill) => bill.status === billStatus);
@@ -98,6 +108,7 @@ export const useBill = (billUuid: string) => {
       cashPointName: bill?.cashPoint?.name,
       cashPointLocation: bill?.cashPoint?.location?.display,
       dateCreated: bill?.dateCreated ?? '--',
+      dateCreatedUnformatted: bill.dateCreated,
       lineItems: bill.lineItems,
       billingService: bill.lineItems.map((bill) => bill.item).join(' '),
       payments: bill.payments,
@@ -222,3 +233,24 @@ export const useConceptAnswers = (conceptUuid: string) => {
   const { data, isLoading, error } = useSWR<{ data: { answers: Array<OpenmrsResource> } }>(url, openmrsFetch);
   return { conceptAnswers: data?.data?.answers, isLoading, error };
 };
+
+export const billingFormSchema = z.object({
+  cashPoint: z.string().uuid(),
+  cashier: z.string().uuid(),
+  patient: z.string().uuid(),
+  payments: z.array(z.string()),
+  status: z.enum(['PENDING']),
+  lineItems: z
+    .array(
+      z.object({
+        billableService: z.string().uuid(),
+        quantity: z.number({ coerce: true }).min(1).max(100),
+        price: z.number({ coerce: true }),
+        priceName: z.string().optional().default('Default'),
+        priceUuid: z.string().uuid(),
+        lineItemOrder: z.number().optional().default(0),
+        paymentStatus: z.enum(['PENDING']),
+      }),
+    )
+    .min(1),
+});

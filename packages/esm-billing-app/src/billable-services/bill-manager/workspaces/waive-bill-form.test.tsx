@@ -4,13 +4,21 @@ import { processBillPayment, usePaymentModes } from '../../../billing.resource';
 import { WaiveBillForm } from './waive-bill-form.workspace';
 import userEvent from '@testing-library/user-event';
 import { MappedBill } from '../../../types';
+import { closeWorkspace, showSnackbar } from '@openmrs/esm-framework';
 
 const mockedUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
+const mockCloseWorkspace = closeWorkspace as jest.MockedFunction<typeof closeWorkspace>;
+const mockShowSnackbar = showSnackbar as jest.MockedFunction<typeof showSnackbar>;
 
 jest.mock('../../../billing.resource', () => ({
   processBillPayment: jest.fn(),
   usePaymentModes: jest.fn(),
+}));
+
+jest.mock('@openmrs/esm-framework', () => ({
+  closeWorkspace: jest.fn(),
+  showSnackbar: jest.fn(),
 }));
 
 const mockedBill: MappedBill = {
@@ -58,6 +66,7 @@ const mockedBill: MappedBill = {
   payments: [],
   display: '1937-2',
   totalAmount: 50,
+  dateCreatedUnformatted: '',
 };
 
 const mockedPaymentMode = [
@@ -78,7 +87,16 @@ describe('BillWaiverForm', () => {
       error: null,
       mutate: jest.fn(),
     });
-    render(<WaiveBillForm bill={mockedBill} />);
+    render(
+      <WaiveBillForm
+        bill={mockedBill}
+        closeWorkspace={jest.fn()}
+        patientUuid="some-patient-uuid"
+        promptBeforeClosing={jest.fn()}
+        setTitle={jest.fn()}
+        closeWorkspaceWithSavedChanges={jest.fn()}
+      />,
+    );
     expect(screen.getByText('Bill Items')).toBeInTheDocument();
 
     // get waiver amount input
@@ -140,5 +158,6 @@ describe('BillWaiverForm', () => {
     };
 
     expect(mockProcessBillPayment).toBeCalledWith(expectedBill, '45143fae-b83d-4768-ada5-621e8dc1229d');
+    expect(mockShowSnackbar).toBeCalledTimes(1);
   });
 });

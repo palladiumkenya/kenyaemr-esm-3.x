@@ -48,7 +48,7 @@ const GenericTable: React.FC<GenericTableProps> = ({ encounters, onEdit, onDelet
   return (
     <DataTable size="sm" useZebraStyles rows={computedRows} headers={headers}>
       {({ rows, headers, getHeaderProps, getRowProps, getExpandedRowProps, getTableProps, getTableContainerProps }) => (
-        <TableContainer title="Encounters" description="List of encounters" {...getTableContainerProps()}>
+        <TableContainer {...getTableContainerProps()}>
           <Table {...getTableProps()} aria-label="sample table">
             <TableHead>
               <TableRow>

@@ -12,8 +12,9 @@ import { mutate } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-type BillWaiverFormProps = {
+type BillWaiverFormProps = DefaultPatientWorkspaceProps & {
   bill: MappedBill;
 };
 
@@ -21,7 +22,7 @@ type FormData = {
   waiveAmount: string;
 };
 
-export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill }) => {
+export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorkspace }) => {
   const { lineItems } = bill;
 
   const { t } = useTranslation();
@@ -70,6 +71,7 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill }) => {
         mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/cashier/bill?v=full'), undefined, {
           revalidate: true,
         });
+        closeWorkspace();
       },
       (error) => {
         showSnackbar({

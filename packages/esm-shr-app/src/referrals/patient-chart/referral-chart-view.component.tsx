@@ -48,8 +48,8 @@ const ReferralReasonsView: React.FC<ReferralReasonsDialogPopupProps> = ({ patien
   if (isLoading) {
     return <DataTableSkeleton rowCount={5} />;
   }
-
-  if (referral === null) {
+  const isEmpty = Object.values(referral).every((arr) => Array.isArray(arr) && arr.length === 0);
+  if (isEmpty) {
     return <EmptyState displayText={t('emptyReferralsMessage', ' referral data')} headerTitle={headerTitle} />;
   }
 
@@ -62,10 +62,12 @@ const ReferralReasonsView: React.FC<ReferralReasonsDialogPopupProps> = ({ patien
         {isValidating && <InlineLoading description={t('loading', 'Loading...')} />}
       </CardHeader>
       <div className={styles.container}>
-        <ReferralCard
-          label={t('referralDate', 'Referral Date')}
-          value={formatDate(new Date(referral?.referralReasons?.referralDate))}
-        />
+        {referral?.referralReasons?.referralDate && (
+          <ReferralCard
+            label={t('referralDate', 'Referral Date')}
+            value={formatDate(new Date(referral?.referralReasons?.referralDate))}
+          />
+        )}
         <ReferralCard label={t('status', 'Status')} value={referral?.status} />
         <ReferralCard label={t('reasonCode', 'Reason Code')} value={referral?.referralReasons?.reasonCode} />
         <ReferralCard label={t('clinicalNote', 'Clinical Note')} value={referral?.referralReasons?.clinicalNote} />
