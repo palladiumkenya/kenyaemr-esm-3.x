@@ -11,5 +11,5 @@ export function useProviders() {
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: ProviderResponse[] }>>(url, openmrsFetch);
   const provider = data?.data?.results || [];
 
-  return { provider, error, isLoading, mutate };
+  return { provider, error, isLoading };
 }

@@ -12,6 +12,7 @@ import {
 import { disableLogin } from './overflow.resource';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
+import { mutate } from 'swr';
 
 type CustomActionMenuProps = {
   provider: ProviderResponse;
@@ -64,6 +65,9 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
           );
         }),
       );
+      mutate((key) => {
+        return typeof key === 'string' && key.startsWith('/ws/rest/v1/provider');
+      });
       showSnackbar({
         title: 'Success',
         kind: 'success',

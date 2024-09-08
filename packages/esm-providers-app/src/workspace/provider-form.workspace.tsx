@@ -20,7 +20,7 @@ import {
 } from '@carbon/react';
 import { GenderFemale, GenderMale, Query } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { parseDate, restBaseUrl, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +40,7 @@ import {
   useRoles,
 } from './hook/provider-form.resource';
 import styles from './provider-form.scss';
+import { mutate } from 'swr';
 
 const providerFormSchema = z
   .object({
@@ -175,7 +176,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         showSnackbar({
           title: 'Success',
           kind: 'success',
-          subtitle: t('accountUpatedMsg', 'Account upated successfully!'),
+          subtitle: t('accountUpatedMsgs', 'Account updated successfully!'),
         });
       } else {
         response = await createUser(userPayload);
@@ -224,6 +225,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               );
             }),
         );
+        mutate((key) => {
+          return typeof key === 'string' && key.startsWith('/ws/rest/v1/provider');
+        });
         showSnackbar({
           title: 'Success',
           kind: 'success',
@@ -231,6 +235,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         });
       } else {
         response = await createProvider(providerPayload);
+        mutate((key) => {
+          return typeof key === 'string' && key.startsWith('/ws/rest/v1/provider');
+        });
         showSnackbar({
           title: 'Success',
           kind: 'success',
@@ -253,6 +260,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
+      {JSON.stringify(errors)}
       <Stack gap={4} className={styles.form__grid}>
         <span className={styles.form__header__section}>
           {t('healthWorkVerify', 'Health worker registry verification')}
@@ -510,67 +518,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             )}
           />
         </Column>
-        {/* {!provider && (
+        {!provider && (
           <>
-            <Column>
-              <span className={styles.form__gender}>{t('primaryFacility', 'Primary facility*')}</span>
-              <br />
-              {selectedFacility && (
-                <Tag
-                  key={selectedFacility.uuid}
-                  type="high-contrast"
-                  onClick={handleRemoveFacility}
-                  role="button"
-                  tabIndex={0}
-                  title={selectedFacility.name}>
-                  {selectedFacility.name} - {selectedFacility.attributes[0]?.value}
-                </Tag>
-              )}
-              <br />
-              <Controller
-                name="primaryFacility"
-                control={control}
-                render={({ field }) => {
-                  const isSearchDisabled = !!selectedFacility;
-                  return (
-                    <>
-                      <Search
-                        {...field}
-                        size="lg"
-                        placeholder="Primary facility"
-                        labelText="Search"
-                        closeButtonLabelText="Clear"
-                        id="facility-search"
-                        value={facilitySearchTerm}
-                        onChange={handleFacilitySearchChange}
-                        invalid={!!errors.primaryFacility}
-                        invalidText={errors.primaryFacility?.message}
-                        disabled={isSearchDisabled}
-                      />
-                      {facilitySearchTerm && facilities && (
-                        <div className={styles.facilityList}>
-                          {facilities.map((facility) => (
-                            <Tile
-                              key={facility.uuid}
-                              className={styles.facilityTag}
-                              type="blue"
-                              onClick={() => {
-                                handleFacilitySelect(facility);
-                                field.onChange(facility.uuid);
-                              }}
-                              role="button"
-                              tabIndex={0}
-                              title={facility.name}>
-                              {facility.name} - {facility.attributes[0]?.value}
-                            </Tile>
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  );
-                }}
-              />
-            </Column>
             <Column>
               <Controller
                 name="providerId"
@@ -588,7 +537,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               />
             </Column>
           </>
-        )} */}
+        )}
       </Stack>
       <ButtonSet className={styles.form__button_set}>
         <Button className={styles.form__button} size="sm" kind="secondary" onClick={closeWorkspace}>
