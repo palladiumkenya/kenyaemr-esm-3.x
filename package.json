@@ -5,13 +5,13 @@
     "packages/*"
   ],
   "scripts": {
-    "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
-    "ci:publish": "lerna publish from-package --yes --no-git-reset --yes",
+    "ci:publish": "yarn workspaces foreach --all --topological --exclude @kenyaemr/esm-3.x-apps npm publish --access public --tag latest",
+    "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @kenyaemr/esm-3.x-apps npm publish --access public --tag next",
+    "release": "yarn workspaces foreach --all --topological version",
     "test-e2e": "playwright test",
     "coverage": "yarn test --coverage",
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
-    "release": "lerna version --no-git-tag-version",
     "start": "openmrs develop",
     "verify": "turbo run lint && turbo run typescript && turbo run test --color --concurrency=5"
   },
@@ -73,7 +73,6 @@
     "jest": "^28.1.2",
     "jest-cli": "^28.1.2",
     "jest-environment-jsdom": "^28.1.2",
-    "lerna": "^4.0.0",
     "lodash": "^4.17.21",
     "openmrs": "next",
     "pinst": "^3.0.0",
