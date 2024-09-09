@@ -1,16 +1,12 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 import { EditBillForm } from './edit-bill-form.workspace';
 import userEvent from '@testing-library/user-event';
 import { processBillPayment } from '../../../billing.resource';
 
-const mockedProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
-
 jest.mock('../../../billing.resource', () => ({
-  ...jest.requireActual('../../../billing.resource'),
-  processBillPayment: jest.fn(),
+  processBillPayment: jest.fn(), // Mock the function
 }));
-
 const mockedCloseWorkspace = jest.fn();
 const mockedPromptBeforeClosing = jest.fn();
 const mockedCloseWorkspaceWithSavedChanges = jest.fn();
@@ -22,7 +18,7 @@ const mockLineItem = {
   voided: false,
   voidReason: null,
   item: '',
-  billableService: 'b4254165-ed1a-48dd-b931-c5a9c3363242:Registration New',
+  billableService: '7c1ed871-8b45-4097-a9fa-12e6efba3686:Injection',
   quantity: 1,
   price: 1000,
   priceName: 'Default',
@@ -57,6 +53,7 @@ const mockBill = {
   cashPointName: 'OPD Cash Point',
   cashPointLocation: 'Moi Teaching Refferal Hospital',
   dateCreated: 'Today, 16:19',
+  dateCreatedUnformatted: 'Today, 16:19',
   lineItems: [
     {
       uuid: '4bf2fa1c-4460-4eb6-9a22-b587c3c831a5',
@@ -83,8 +80,11 @@ const mockBill = {
 };
 
 describe('EditBillForm', () => {
+  const mockedProcessBillPayment = processBillPayment; // Access the mock
+
   test('should generate the correct payload  when the form is submitted', async () => {
     const user = userEvent.setup();
+
     render(
       <EditBillForm
         promptBeforeClosing={mockedPromptBeforeClosing}
@@ -95,7 +95,8 @@ describe('EditBillForm', () => {
         lineItem={mockLineItem}
       />,
     );
-    const unitPrice = await screen.findByPlaceholderText(/price/i);
+
+    const unitPrice = await screen.findByPlaceholderText(/New price/i);
     expect(unitPrice).toHaveValue(mockLineItem.price);
 
     const quantity = screen.getByRole('spinbutton', { name: /quantity/i });
