@@ -2,18 +2,56 @@ import React, { useState } from 'react';
 import { ContentSwitcher, Switch, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './content-switcher.scss';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import { Friendship } from '@carbon/react/icons';
 import ProviderListTable from '../table/provider-data-table.component';
-
+import dayjs from 'dayjs';
+import { ConfigObject } from '../config-schema';
 export const ContentSwitchTabs: React.FC = () => {
   const { t } = useTranslation();
+  const { licenseNumberUuid, licenseExpiryDateUuid, providerNationalIdUuid } = useConfig<ConfigObject>();
 
   const switchTabs = [
-    { name: t('allProviders', 'All providers'), component: <ProviderListTable /> },
-    { name: t('providersWithActiveLicense', 'Active license'), component: '' },
-    { name: t('expiringLicense', 'Expiring licenses'), component: '' },
-    { name: t('expiredLicense', 'Expired licenses'), component: '' },
+    {
+      name: t('providersWithActiveLicenses', 'Active license'),
+      filter: (provider) => {
+        const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
+        const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+        const nationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
+        const licenseExpiryDate = expiryAttr ? dayjs(expiryAttr.value) : null;
+
+        return nationalId && licenseAttr && licenseExpiryDate && licenseExpiryDate.isAfter(dayjs());
+      },
+    },
+    {
+      name: t('expiringedLicenses', 'Expiring(ed) licenses'),
+      filter: (provider) => {
+        const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
+        const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+        const nationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
+        const licenseExpiryDate = expiryAttr ? dayjs(expiryAttr.value) : null;
+
+        return licenseAttr && nationalId && licenseExpiryDate && licenseExpiryDate.diff(dayjs(), 'day') <= 3;
+      },
+    },
+    {
+      name: t('missingNationalIDs', 'Missing national id'),
+      filter: (provider) => {
+        const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
+        const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+        const nationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
+        return !nationalId && !licenseAttr && !expiryAttr;
+      },
+    },
+    {
+      name: t('WithMissingLicenses', 'Missing license'),
+      filter: (provider) => {
+        const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
+        const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+        const nationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
+        return nationalId && (!licenseAttr || !expiryAttr);
+      },
+    },
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -24,6 +62,10 @@ export const ContentSwitchTabs: React.FC = () => {
     });
   };
 
+  const handleSwitchChange = (event) => {
+    setActiveIndex(event.index);
+  };
+
   return (
     <>
       <div className={styles.contentSwitcherWrapper}>
@@ -32,7 +74,7 @@ export const ContentSwitchTabs: React.FC = () => {
             className={styles.contentSwitcher}
             size="lg"
             selectedIndex={activeIndex}
-            onChange={(event) => setActiveIndex(event.index)}>
+            onChange={handleSwitchChange}>
             {switchTabs.map((tab, index) => (
               <Switch key={index} name={tab.name} text={tab.name} />
             ))}
@@ -48,7 +90,9 @@ export const ContentSwitchTabs: React.FC = () => {
         </Button>
       </div>
 
-      <div className={styles.tabContent}>{switchTabs[activeIndex].component}</div>
+      <div className={styles.tabContent}>
+        <ProviderListTable filter={switchTabs[activeIndex].filter} />
+      </div>
     </>
   );
 };
