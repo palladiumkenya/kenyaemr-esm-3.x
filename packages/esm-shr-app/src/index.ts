@@ -16,8 +16,6 @@ import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace
 import SHRSummaryPanel from './shr-summary/shr-summary.component';
 import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import FacilityRefferalForm from './workspace/referrals.workspace.component';
-import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
-import SHRSummaryPanel from './shr-summary/shr-summary.component';
 
 const moduleName = '@kenyaemr/esm-shr-app';
 
