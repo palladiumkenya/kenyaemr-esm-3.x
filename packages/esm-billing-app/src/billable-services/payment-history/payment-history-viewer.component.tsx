@@ -25,7 +25,6 @@ import { AppliedFilterTags } from './applied-filter-tages.component';
 export const headers = [
   { header: 'Date', key: 'dateCreated' },
   { header: 'Patient Name', key: 'patientName' },
-  { header: 'Status', key: 'status' },
   { header: 'Total Amount', key: 'totalAmount' },
   { header: 'Service', key: 'billingService' },
 ];
@@ -109,6 +108,7 @@ const PaymentHistoryViewer = () => {
     }
 
     setRenderedRows(filteredRows);
+    goTo(1);
   };
 
   const onApplyPaymentTypeFilter = (appliedCheckboxes: Array<string>) => {
@@ -150,6 +150,7 @@ const PaymentHistoryViewer = () => {
     }
 
     setRenderedRows(filteredRows);
+    goTo(1);
   };
 
   const handleOnResetCashierFilter = () => {
@@ -171,6 +172,7 @@ const PaymentHistoryViewer = () => {
 
       setRenderedRows(filteredRows);
     }
+    goTo(1);
   };
 
   const handleOnResetPaymentTypeFilter = () => {
@@ -192,6 +194,8 @@ const PaymentHistoryViewer = () => {
 
       setRenderedRows(filteredRows);
     }
+
+    goTo(1);
   };
 
   const cashierTags = selectedCashierCheckboxes.map((c) => {
