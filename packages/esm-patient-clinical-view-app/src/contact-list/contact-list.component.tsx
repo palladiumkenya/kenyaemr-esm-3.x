@@ -19,6 +19,7 @@ import {
   ErrorState,
   isDesktop,
   launchWorkspace,
+  useConfig,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -28,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import useContacts from '../hooks/useContacts';
 import styles from './contact-list.scss';
 import HIVStatus from './hiv-status.component';
+import { ConfigObject } from '../config-schema';
 
 interface ContactListProps {
   patientUuid: string;
@@ -38,7 +40,11 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('contactList', 'Contact list');
   const layout = useLayoutType();
-  const { contacts, error, isLoading } = useContacts(patientUuid);
+  const config = useConfig<ConfigObject>();
+
+  const { contacts, error, isLoading } = useContacts(patientUuid, (rel) =>
+    config.pnsRelationships.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
+  );
   const { results, totalPages, currentPage, goTo } = usePagination(contacts, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 

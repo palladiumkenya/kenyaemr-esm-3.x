@@ -256,6 +256,24 @@
       "order": 0,
       "online": true,
       "offline": false
+    },
+    {
+      "component": "peerCalendarDashboardLink",
+      "name": "peer-calendar-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "peer-calendar",
+        "title": "Peer Calendar",
+        "slot": "peer-calendar-dashboard-slot",
+        "path": "peer-management"
+      }
+    }, {
+      "name": "peer-calendar",
+      "slot": "peer-calendar-dashboard-slot",
+      "component": "peerCalendar",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [

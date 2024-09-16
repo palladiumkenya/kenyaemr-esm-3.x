@@ -118,7 +118,7 @@ function extractContactData(
   return relationshipsData;
 }
 
-const useContacts = (patientUuid: string) => {
+const useContacts = (patientUuid: string, filters: (relationship: Relationship) => boolean) => {
   const customeRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
   const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
@@ -129,13 +129,7 @@ const useContacts = (patientUuid: string) => {
   );
   const relationships = useMemo(() => {
     return data?.data?.results?.length
-      ? extractContactData(
-          patientUuid,
-          data?.data?.results.filter((rel) =>
-            config.pnsRelationships.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
-          ),
-          config,
-        )
+      ? extractContactData(patientUuid, data?.data?.results.filter(filters), config)
       : [];
   }, [data?.data?.results, patientUuid, config]);
   return {

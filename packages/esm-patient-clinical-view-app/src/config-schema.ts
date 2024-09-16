@@ -176,6 +176,11 @@ export const configSchema = {
       },
     ],
   },
+  peerEducatorRelationship: {
+    _type: Type.String,
+    _description: 'Peer Educator Relationship type',
+    _default: '96adecc2-e7cd-41d0-b577-08eb4834abcb',
+  },
   pnsRelationships: {
     _type: Type.Array,
     _description: 'List of Patner relationship (PNS - Patner Notification Service)',
@@ -238,6 +243,7 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  peerEducatorRelationship: string;
   caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
   encounterTypes: { mchMotherConsultation: string; hivTestingServices: string };
   formsList: {
