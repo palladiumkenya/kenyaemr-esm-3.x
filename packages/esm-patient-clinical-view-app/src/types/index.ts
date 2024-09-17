@@ -74,6 +74,7 @@ export interface Relationship {
     bIsToA: string;
   };
   startDate: string;
+  endDate: string | null;
 }
 
 export interface Contact {
@@ -89,11 +90,13 @@ export interface Contact {
   gender: string;
   contact: string | null;
   startDate: string | null;
+  endDate: string | null;
   baselineHIVStatus: string | null;
   personContactCreated: string | null;
   livingWithClient: string | null;
   pnsAproach: string | null;
   ipvOutcome: string | null;
+  age: number | null;
 }
 
 export interface Person {

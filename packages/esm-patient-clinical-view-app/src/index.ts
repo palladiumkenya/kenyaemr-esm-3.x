@@ -48,6 +48,7 @@ import { OtherRelationshipsForm } from './other-relationships/other-relationship
 import InPatient from './in-patient/in-patient.component';
 import { inPatientMeta } from './in-patient/in-patient.meta';
 import PeerCalendar from './peer-calendar/peer-calendar.component';
+import PeerForm from './peer-calendar/forms/peer-form.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -106,6 +107,7 @@ export const birthDateCalculator = getSyncLifecycle(BirthDateCalculator, options
 // Peer Clendar
 export const peerCalendar = getSyncLifecycle(PeerCalendar, options);
 export const peerCalendarDashboardLink = getSyncLifecycle(createLeftPanelLink(peerCalendarDashboardMeta), options);
+export const peersForm = getSyncLifecycle(PeerForm, options);
 
 // Navigation group for Maternal and Child Health in the patient chart sidebar
 export const maternalAndChildHealthSideNavGroup = getSyncLifecycle(

@@ -300,6 +300,13 @@
     "component": "otherRelationshipsForm",
     "title": "Other Relationships Form",
     "type": "form"
+  },
+  {
+    "name": "peers-form",
+    "component": "peersForm",
+    "title": "Add New Peer",
+    "type": "form"
   }
+
 ]
 }

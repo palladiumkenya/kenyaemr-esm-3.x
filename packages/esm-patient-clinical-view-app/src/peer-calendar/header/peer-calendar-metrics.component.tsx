@@ -1,6 +1,7 @@
 import { Button, Layer, Row, SkeletonText, Tile } from '@carbon/react';
-import { Edit, Printer } from '@carbon/react/icons';
+import { ArrowRight } from '@carbon/react/icons';
 import { useConfig, useSession } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../../config-schema';
@@ -21,6 +22,10 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = () =
     (rel) => rel.relationshipType.uuid === peerEducatorRelationship,
   );
   const { t } = useTranslation();
+
+  const handleAddPeer = () => {
+    launchPatientWorkspace('peers-form', {});
+  };
 
   if (isLoading) {
     return (
@@ -45,6 +50,8 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = () =
     <Layer className={styles.detailHeaderContainer}>
       <Tile className={styles.detailHeaderContent}>
         <Row className={styles.detailHeaderContentRow}>
+          <span>Reporting Period:</span>
+          <strong>{contacts.length ?? 0}</strong>
           <span>Completed:</span>
           <strong>{contacts.length ?? 0}</strong>
           <span>Pending:</span>
@@ -61,11 +68,8 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = () =
       <Row className={styles.btnSet}>
         <div />
         <Row className={styles.btnSetRight}>
-          <Button kind="primary" renderIcon={Edit}>
-            {t('editManifest', 'Edit Manifest')}
-          </Button>
-          <Button kind="secondary" renderIcon={Printer}>
-            {t('printManifest', 'Print Manifest')}
+          <Button kind="secondary" renderIcon={ArrowRight} onClick={handleAddPeer}>
+            {t('addPeer', 'Add Peer')}
           </Button>
         </Row>
       </Row>
