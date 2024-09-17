@@ -109,6 +109,7 @@
   "patientMissingUniqueIdentifierTitle": "Patient missing NUPI",
   "paymentHistory": "Payment History",
   "paymentMethod": "Payment method",
+  "paymentMethodDescription": "Payment method {{methodName}}",
   "paymentMethodsTitle": "Payment methods",
   "paymentPayment": "Bill Payment",
   "payments": "Payments",

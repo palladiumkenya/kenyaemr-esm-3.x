@@ -23,11 +23,9 @@
 }
 
 .paymentMethods {
-  display: grid;
-  grid-template-columns: 0.45fr 0.45fr 0.1fr;
-  column-gap: 0.25rem;
-  justify-content: space-between;
-  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  row-gap: layout.$spacing-05;
 }
 
 .searchResults {
