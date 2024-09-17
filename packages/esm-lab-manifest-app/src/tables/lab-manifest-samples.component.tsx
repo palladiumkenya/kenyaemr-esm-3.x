@@ -1,5 +1,6 @@
 import {
   Button,
+  ButtonSet,
   DataTable,
   DataTableSkeleton,
   Pagination,
@@ -10,15 +11,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectAll,
+  TableSelectRow,
 } from '@carbon/react';
-import { TrashCan, View } from '@carbon/react/icons';
-import { ErrorState, formatDate, navigate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ArrowRight, Printer, TrashCan } from '@carbon/react/icons';
+import { ErrorState, formatDate, parseDate, showModal, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './lab-manifest-table.scss';
 import { useLabManifest } from '../hooks';
+import { mutateManifestLinks, printSpecimentLabel, removeSampleFromTheManifest } from '../lab-manifest.resources';
 import { LabManifestSample } from '../types';
+import styles from './lab-manifest-table.scss';
 
 interface LabManifestSamplesProps {
   manifestUuid: string;
@@ -26,7 +30,7 @@ interface LabManifestSamplesProps {
 
 const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid }) => {
   const { error, isLoading, manifest } = useLabManifest(manifestUuid);
-  const samples = manifest?.samples ?? [];
+  const samples: Array<LabManifestSample> = manifest?.samples ?? [];
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('labManifestSamples', 'Lab Manifest Samples');
@@ -68,9 +72,49 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     },
   ];
 
-  const handleDeleteManifestSample = (manifestUuid: string) => {
-    // TODO Implement delete logic when endpoint is a ready
+  const handleDeleteManifestSample = (sampleUUid: string) => {
+    const dispose = showModal('sample-delete-confirm-dialog', {
+      onClose: () => dispose(),
+      samples: samples.filter((s) => s.uuid === sampleUUid),
+      onDelete: async () => {
+        try {
+          await removeSampleFromTheManifest(sampleUUid);
+          mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
+          dispose();
+          showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Sample removed from manifest successfully!' });
+        } catch (e) {
+          showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error removing sample from the manifest' });
+        }
+      },
+    });
   };
+
+  const handleDeleteSelectedSamples = (selected: Array<LabManifestSample>) => {
+    if (selected.length > 0) {
+      const dispose = showModal('sample-delete-confirm-dialog', {
+        onClose: () => dispose(),
+        samples: selected,
+        onDelete: async () => {
+          try {
+            const deleteMany = await Promise.allSettled(selected.map(({ uuid }) => removeSampleFromTheManifest(uuid)));
+            mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
+            dispose();
+            showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Sample removed from manifest successfully!' });
+          } catch (e) {
+            showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error removing sample from the manifest' });
+          }
+        },
+      });
+    }
+  };
+
+  async function handlePrintSpecimenLabel(sample: LabManifestSample) {
+    try {
+      await printSpecimentLabel(sample.uuid);
+    } catch (error) {
+      showSnackbar({ title: 'Failure', subtitle: 'Error specimen label', kind: 'error' });
+    }
+  }
 
   const tableRows =
     (results as LabManifestSample[])?.map((sample) => {
@@ -84,13 +128,24 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         resultDate: sample.resultDate ? formatDate(parseDate(sample.resultDate)) : '--',
         result: sample.result ?? '--',
         actions: (
-          <Button
-            renderIcon={TrashCan}
-            hasIconOnly
-            kind="tertiary"
-            iconDescription={t('removeFromManifest', 'Remove from Manifest')}
-            onClick={() => handleDeleteManifestSample(sample.uuid)}
-          />
+          <ButtonSet className={styles.btnSet}>
+            <Button
+              renderIcon={TrashCan}
+              className={styles.btn}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('removeFromManifest', 'Remove from Manifest')}
+              onClick={() => handleDeleteManifestSample(sample.uuid)}
+            />
+            <Button
+              className={styles.btn}
+              renderIcon={Printer}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('printSpecimenLabel', 'Print Specimen Label')}
+              onClick={() => handlePrintSpecimenLabel(sample)}
+            />
+          </ButtonSet>
         ),
       };
     }) ?? [];
@@ -112,41 +167,61 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
   }
   return (
     <div className={styles.widgetContainer}>
-      <CardHeader title={headerTitle}>{''}</CardHeader>
       <DataTable
         useZebraStyles
         size="sm"
         rows={tableRows ?? []}
         headers={headers}
-        render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}>
-                      {header.header?.content ?? header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
+        render={({
+          rows,
+          headers,
+          getHeaderProps,
+          getRowProps,
+          getSelectionProps,
+          getTableProps,
+          getTableContainerProps,
+          selectedRows,
+        }) => (
+          <>
+            <CardHeader title={headerTitle}>
+              <Button
+                onClick={() => {
+                  const data = selectedRows.map(({ id }) => samples.find((s) => s.uuid === id));
+                  handleDeleteSelectedSamples(data);
+                }}
+                renderIcon={ArrowRight}
+                kind="ghost">
+                {t('deleteSelectedSamples', 'Remove Selected Samples')}
+              </Button>
+            </CardHeader>
+            <TableContainer {...getTableContainerProps()}>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    <TableSelectAll {...getSelectionProps()} />
+                    {headers.map((header, i) => (
+                      <TableHeader key={i} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, i) => (
+                    <TableRow key={i} {...getRowProps({ row })} onClick={(evt) => {}}>
+                      <TableSelectRow {...getSelectionProps({ row })} />
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
         )}
       />
+
       <Pagination
         page={currentPage}
         pageSize={pageSize}

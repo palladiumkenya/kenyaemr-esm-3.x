@@ -42,7 +42,7 @@ export const convertToCurrency = (amountToConvert: number) => {
   let formattedAmount = formatter.format(Math.abs(amountToConvert));
 
   if (amountToConvert < 0) {
-    formattedAmount = `(${formattedAmount})`;
+    formattedAmount = `- ${formattedAmount}`;
   }
 
   return formattedAmount;
@@ -71,20 +71,22 @@ export const getGender = (gender: string, t) => {
  * @returns {string} The substring found after the first colon in the input string.
  */
 export function extractString(input: string): string {
-  const parts = input.split(':');
-  return removeUUID(parts.length < 2 ? input : parts[1]);
-}
+  const parts = input
+    .split(' ')
+    .map((s) => s.split(':')[1])
+    .filter((s) => Boolean(s));
 
-function removeUUID(str) {
-  // Regular expression to match a UUID
-  const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i;
+  const firstTwoBillableServices = parts.slice(0, 2);
 
-  // Replace the UUID with an empty string
-  return str.replace(uuidPattern, '');
+  if (parts.length <= 2) {
+    return firstTwoBillableServices.join(', ');
+  }
+
+  return `${firstTwoBillableServices.join(', ')} & ${parts.length - 2} other services`;
 }
 
 // cleans the provider display name
-export function extractNameString(formattedString) {
+export function extractNameString(formattedString: string) {
   if (!formattedString) {
     return '';
   }

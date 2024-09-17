@@ -1,0 +1,36 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.providerName {
+  @include type.type-style('label-01');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-02;
+  font-weight: 800;
+}
+
+.demographics {
+  display: flex;
+  align-items: center;
+  margin-bottom: spacing.$spacing-02;
+  color: $text-02;
+  text-transform: uppercase;
+}
+
+.identifiers {
+  display: flex;
+  flex-direction: column;
+}
+
+.middot {
+  margin: 0 0.25rem;
+}
+.formClaimRow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: spacing.$spacing-05;
+}
+
+.formClaimColumn {
+  flex: 1 1 0%;
+}

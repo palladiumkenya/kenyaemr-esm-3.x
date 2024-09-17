@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
   encounterTypes: {
@@ -16,14 +17,14 @@ export const configSchema = {
       {
         id: 'high-iit-intervention',
         title: 'High IIT Intervention Form',
-        formUuid: 'd86a77bd-769a-47ec-942a-716afbd907cc',
-        encounterTypeUuid: 'a0034eee-1940-4e35-847f-97537a35d05e',
+        formUuid: '6817d322-f938-4f38-8ccf-caa6fa7a499f',
+        encounterTypeUuid: '84d66c25-e2bd-48a2-8686-c1652eb9d283',
       },
       {
         id: 'home-visit-checklist',
         title: 'Home Visit Checklist Form',
-        formUuid: 'dbe7db2d-abed-47b6-904f-1308b997d7bf',
-        encounterTypeUuid: '4224f8bf-11b2-4e47-a958-1dbdfd7fa41d',
+        formUuid: 'ac3152de-1728-4786-828a-7fb4db0fc384',
+        encounterTypeUuid: 'bfbb5dc2-d3e6-41ea-ad86-101336e3e38f',
       },
     ],
   },
@@ -130,6 +131,7 @@ export const configSchema = {
       contactCreated: '7c94bd35-fba7-4ef7-96f5-29c89a318fcf',
       preferedPnsAproach: '59d1b886-90c8-4f7f-9212-08b20a9ee8cf',
       livingWithContact: '35a08d84-9f80-4991-92b4-c4ae5903536e',
+      contactIPVOutcome: '49c543c2-a72a-4b0a-8cca-39c375c0726f',
     },
   },
   familyRelationshipsTypeList: {
@@ -174,6 +176,65 @@ export const configSchema = {
       },
     ],
   },
+  pnsRelationships: {
+    _type: Type.Array,
+    _description: 'List of Patner relationship (PNS - Patner Notification Service)',
+    _default: [
+      {
+        uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
+        display: 'Spouse/Spouse',
+        sexual: true,
+      },
+      {
+        uuid: '007b765f-6725-4ae9-afee-9966302bace4',
+        display: 'Partner/Partner',
+        sexual: true,
+      },
+      {
+        uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
+        display: 'Co-wife/Co-wife',
+        sexual: false,
+      },
+      {
+        uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
+        display: 'Injectable-drug-user/Injectable-druguser',
+        sexual: false,
+      },
+    ],
+  },
+  admissionLocationTagUuid: {
+    _type: Type.UUID,
+    _description:
+      'UUID for the location tag of the `Admission Location`. Patients may only be admitted to inpatient care in a location with this tag',
+    _default: '233de33e-2778-4f9a-a398-fa09da9daa14',
+  },
+  inpatientVisitUuid: {
+    _type: Type.UUID,
+    _description: 'UUID for the inpatient visit',
+    _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914',
+  },
+  inPatientForms: {
+    _type: Type.Array,
+    _description: 'List of forms that can be filled out for in-patients',
+    _default: [
+      {
+        label: 'Cardex Nursing Plan',
+        uuid: '89891ea0-444f-48bf-98e6-f97e87607f7e',
+      },
+      {
+        label: 'IPD Procedure Form',
+        uuid: '3853ed6d-dddd-4459-b441-25cd6a459ed4',
+      },
+      {
+        label: 'Newborn Unit Admission ',
+        uuid: 'e8110437-e3cc-4238-bfc1-414bdd4de6a4',
+      },
+      {
+        label: 'Partograph Form',
+        uuid: '3791e5b7-2cdc-44fc-982b-a81135367c96',
+      },
+    ],
+  },
 };
 
 export interface ConfigObject {
@@ -204,8 +265,52 @@ export interface ConfigObject {
     contactCreated: string;
     preferedPnsAproach: string;
     livingWithContact: string;
+    contactIPVOutcome: string;
   };
   familyRelationshipsTypeList: Array<{ uuid: string; display: string }>;
+  pnsRelationships: Array<{ uuid: string; display: string; sexual: boolean }>;
+  admissionLocationTagUuid: {
+    _type: Type.UUID;
+    _description: 'UUID for the location tag of the `Admission Location`. Patients may only be admitted to inpatient care in a location with this tag';
+    _default: '233de33e-2778-4f9a-a398-fa09da9daa14';
+  };
+  inpatientVisitUuid: {
+    _type: Type.UUID;
+    _description: 'UUID for the inpatient visit';
+    _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914';
+  };
+  restrictWardAdministrationToLoginLocation: {
+    _type: Type.Boolean;
+    _description: 'UUID for the inpatient visit';
+    _default: false;
+  };
+  patientListForAdmissionUrl: {
+    _type: Type.String;
+    _description: 'Endpoint for fetching list of patients eligible for ward admission';
+    _default: '';
+  };
+  inPatientForms: {
+    _type: Type.Array;
+    _description: 'List of forms that can be filled out for in-patients';
+    _default: [
+      {
+        label: 'Cardex Nursing Plan';
+        uuid: '89891ea0-444f-48bf-98e6-f97e87607f7e';
+      },
+      {
+        label: 'IPD Procedure Form';
+        uuid: '3853ed6d-dddd-4459-b441-25cd6a459ed4';
+      },
+      {
+        label: 'Newborn Unit Admission ';
+        uuid: 'e8110437-e3cc-4238-bfc1-414bdd4de6a4';
+      },
+      {
+        label: 'Partograph Form';
+        uuid: '3791e5b7-2cdc-44fc-982b-a81135367c96';
+      },
+    ];
+  };
 }
 
 export interface PartograpyComponents {
@@ -224,3 +329,11 @@ export interface ConfigPartographyObject {
     descentOfHead: string;
   };
 }
+
+export type BedManagementConfig = {
+  admissionLocationTagUuid: string;
+  inpatientVisitUuid: string;
+  restrictWardAdministrationToLoginLocation: boolean;
+  patientListForAdmissionUrl: string;
+  inPatientForms: Array<{ label: string; uuid: string }>;
+};

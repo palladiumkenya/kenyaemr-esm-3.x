@@ -15,7 +15,7 @@
   display: flex;
   justify-content: space-between;
   .warning {
-    @include type.type-style('heading-compact-01');
+    @include type.type-style('heading-01');
     color: $ui-05;
   }
 }
@@ -46,10 +46,11 @@
   flex-wrap: nowrap;
   gap: spacing.$spacing-05; // Adjust gap between columns
   align-items: center;
+  width: 100%;
 }
 
 .datePickerInput {
-  width: 100%;
+  flex-grow: 1;
 }
 
 .button {
@@ -64,16 +65,23 @@
   padding: 0rem;
   margin-top: spacing.$spacing-05;
   display: flex;
-  justify-content: flex-end;
-  gap: spacing.$spacing-05;
+  justify-content: space-between;
+  width: 100%;
   margin-bottom: spacing.$spacing-05;
+}
+
+.datesContainer {
+  padding: 0rem;
+  justify-content: space-between;
+  width: 100%;
+  display: flex;
 }
 .inlineActions {
   display: flex;
   gap: spacing.$spacing-05; /* Adjust the spacing as needed */
 }
 
-.contactFormTitle {
+.formTitle {
   @include type.type-style('heading-02');
   display: flex;
   align-items: center;
@@ -114,13 +122,7 @@
   }
 }
 
-/* New Styles for Facility and Visit Type */
-.facilityVisitRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: spacing.$spacing-05; /* Adjust gap between columns */
-}
-
-.facilityColumn {
-  flex: 1 1 0%; /* Makes columns take up equal space */
+.previewContainer {
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-05;
 }

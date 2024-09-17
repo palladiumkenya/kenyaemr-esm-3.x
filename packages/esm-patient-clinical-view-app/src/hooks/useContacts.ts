@@ -1,4 +1,4 @@
-import { formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ConfigObject } from '../config-schema';
@@ -13,7 +13,7 @@ function extractName(display: string) {
   return display.trim();
 }
 
-function extractTelephone(display: string) {
+function extractValue(display: string) {
   const pattern = /=\s*(.*)$/;
   const match = display.match(pattern);
   if (match && match.length > 1) {
@@ -46,10 +46,11 @@ function extractAttributeData(person: Person, config: ConfigObject) {
     personContactCreated: string | null;
     pnsAproach: string | null;
     livingWithClient: string | null;
+    ipvOutcome: string | null;
   }>(
     (prev, attr) => {
       if (attr.attributeType.uuid === config.contactPersonAttributesUuid.telephone) {
-        return { ...prev, contact: attr.display ? extractTelephone(attr.display) : null };
+        return { ...prev, contact: attr.display ? extractValue(attr.display) : null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus) {
         return { ...prev, baselineHIVStatus: getConceptName(attr.value) ?? null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.contactCreated) {
@@ -58,10 +59,19 @@ function extractAttributeData(person: Person, config: ConfigObject) {
         return { ...prev, livingWithClient: getConceptName(attr.value) ?? null };
       } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach) {
         return { ...prev, pnsAproach: getConceptName(attr.value) ?? null };
+      } else if (attr.attributeType.uuid === config.contactPersonAttributesUuid.contactIPVOutcome) {
+        return { ...prev, ipvOutcome: attr.display ? extractValue(attr.display) : null };
       }
       return prev;
     },
-    { contact: null, baselineHIVStatus: null, personContactCreated: null, pnsAproach: null, livingWithClient: null },
+    {
+      contact: null,
+      baselineHIVStatus: null,
+      personContactCreated: null,
+      pnsAproach: null,
+      livingWithClient: null,
+      ipvOutcome: null,
+    },
   );
 }
 
@@ -86,9 +96,7 @@ function extractContactData(
         relationshipType: r.relationshipType.bIsToA,
         patientUuid: r.personB.uuid,
         gender: r.personB.gender,
-        startDate: !r.startDate
-          ? null
-          : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
+        startDate: !r.startDate ? null : formatDate(parseDate(r.startDate)),
       });
     } else {
       relationshipsData.push({
@@ -103,9 +111,7 @@ function extractContactData(
         relationshipType: r.relationshipType.aIsToB,
         patientUuid: r.personA.uuid,
         gender: r.personB.gender,
-        startDate: !r.startDate
-          ? null
-          : formatDatetime(parseDate(r.startDate), { day: true, mode: 'standard', year: true, noToday: true }),
+        startDate: !r.startDate ? null : formatDate(parseDate(r.startDate)),
       });
     }
   }
@@ -126,7 +132,7 @@ const useContacts = (patientUuid: string) => {
       ? extractContactData(
           patientUuid,
           data?.data?.results.filter((rel) =>
-            config.familyRelationshipsTypeList.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
+            config.pnsRelationships.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
           ),
           config,
         )

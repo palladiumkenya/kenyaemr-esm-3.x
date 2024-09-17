@@ -10,7 +10,7 @@ import { uppercaseText } from '../utils/expression-helper';
 import { saveRelationship } from '../case-management/workspace/case-management.resource';
 import PatientInfo from '../case-management/workspace/patient-info.component';
 import { mutate } from 'swr';
-import { useAllRelationshipTypes, useRelationships } from '../family-partner-history/relationships.resource';
+import { useMappedRelationshipTypes, usePatientRelationships } from '../family-partner-history/relationships.resource';
 import { ConfigObject } from '../config-schema';
 
 const schema = z.object({
@@ -29,18 +29,16 @@ type OtherRelationshipsFormProps = {
 export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
   const { t } = useTranslation();
   const [relatedPersonUuid, setRelatedPersonUuid] = useState<string | undefined>(undefined);
-  const { relationshipsUrl } = useRelationships(rootPersonUuid);
-  const { data: relationshipTypesData } = useAllRelationshipTypes();
+  const { relationshipsUrl } = usePatientRelationships(rootPersonUuid);
+  const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
   const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
-  const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
+  const familyRelationshipTypesUUIDs = new Set(familyRelationshipsTypeList.map((r) => r.uuid));
+  const otherRelationshipTypes = mappedRelationshipTypes.filter((type) => !familyRelationshipTypesUUIDs.has(type.uuid));
 
-  const relationshipTypes =
-    relationshipTypesData?.data.results
-      .map((relationship) => ({
-        id: relationship.uuid,
-        text: relationship.display,
-      }))
-      .filter((r) => !familyRelationshipTypeUUIDs.has(r.id)) || [];
+  const relationshipTypes = otherRelationshipTypes.map((relationship) => ({
+    id: relationship.uuid,
+    text: relationship.display,
+  }));
 
   const {
     control,

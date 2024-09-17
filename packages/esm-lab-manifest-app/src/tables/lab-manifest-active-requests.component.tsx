@@ -10,61 +10,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectAll,
+  TableSelectRow,
 } from '@carbon/react';
-import { View } from '@carbon/react/icons';
-import { ErrorState, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { Add, ArrowRight } from '@carbon/react/icons';
+import { ErrorState, showModal, showNotification, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './lab-manifest-table.scss';
 import useActiveRequests from '../hooks/useActiveRequests';
-import { ActiveRequests } from '../types';
+import styles from './lab-manifest-table.scss';
 
 interface LabManifestActiveRequestsProps {
   manifestUuid: string;
 }
 
 const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ manifestUuid }) => {
-  const { error, isLoading, requests } = useActiveRequests();
+  const { error, isLoading, request: request } = useActiveRequests(manifestUuid);
 
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('activeRequests', 'Active Requests');
-  const { results, totalPages, currentPage, goTo } = usePagination(requests, pageSize);
+  const { results, totalPages, currentPage, goTo } = usePagination(request?.Orders ?? [], pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
-
   const headers = [
     {
       header: t('patientName', 'Patient name'),
-      key: 'startDate',
+      key: 'patientName',
     },
     {
       header: t('cccKDODNumber', 'CCC/KDOD Number'),
-      key: 'cccKDODNumber',
+      key: 'cccKdod',
     },
     {
-      header: t('batchNumber', 'Batch Number'),
-      key: 'batchNumber',
-    },
-    {
-      header: t('sampleType', 'Sample type'),
-      key: 'sampleType',
-    },
-    {
-      header: t('manifestId', 'Manifest Id'),
-      key: 'manifestId',
-    },
-    {
-      header: t('labPersonContact', 'Lab person Contact'),
-      key: 'labPersonContact',
-    },
-    {
-      header: t('status', 'Status'),
-      key: 'status',
-    },
-    {
-      header: t('dispatch', 'Dispatch'),
-      key: 'dispatch',
+      header: t('dateRequested', 'Date Requested'),
+      key: 'dateRequested',
     },
     {
       header: t('actions', 'Actions'),
@@ -72,22 +52,66 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
     },
   ];
 
-  const handleViewManifestSamples = (manifestUuid: string) => {
-    navigate({ to: window.getOpenmrsSpaBase() + `home/lab-manifest/${manifestUuid}` });
+  const handleAddSelectedToManifest = (
+    selected: Array<{
+      labManifest: {
+        uuid: string;
+      };
+      order: {
+        uuid: string;
+      };
+      payload: string;
+    }>,
+  ) => {
+    if (selected.length > 0) {
+      const orders = request.Orders.filter((order) => selected.some((o) => o.order.uuid === order.orderUuid));
+      if (orders.every((order) => order.cccKdod)) {
+        const dispose = showModal('lab-manifest-order-modal-form', {
+          onClose: () => dispose(),
+          props: {
+            title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
+            selectedOrders: selected,
+            orders,
+          },
+        });
+      } else {
+        showNotification({
+          title: 'Failed to add samples to manifest',
+          kind: 'error',
+          description: 'All patients must have CCC/KDOD Number',
+        });
+      }
+    }
   };
 
   const tableRows =
-    (results as ActiveRequests[])?.map((activeRequest) => {
+    results?.map((activeRequest) => {
       return {
-        id: `${activeRequest.uuid}`,
+        id: `${activeRequest.orderUuid}`,
+        patientName: activeRequest.patientName ?? '--',
+        cccKdod: activeRequest.cccKdod ?? '--',
+        dateRequested: activeRequest.dateRequested,
         actions: (
           <Button
-            renderIcon={View}
+            kind="ghost"
+            iconDescription={t('addToManifest', 'Add To manifest')}
+            renderIcon={Add}
             hasIconOnly
-            kind="tertiary"
-            iconDescription={t('view', 'View')}
-            onClick={() => handleViewManifestSamples(activeRequest.uuid)}
-          />
+            onClick={() =>
+              handleAddSelectedToManifest([
+                {
+                  labManifest: {
+                    uuid: manifestUuid,
+                  },
+                  order: {
+                    uuid: activeRequest.orderUuid,
+                  },
+                  payload: activeRequest.payload,
+                },
+              ])
+            }>
+            Add To manifest
+          </Button>
         ),
       };
     }) ?? [];
@@ -99,7 +123,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (requests.length === 0) {
+  if ((request?.Orders ?? []).length === 0) {
     return (
       <EmptyState
         headerTitle={t('activeRequests', 'Active Requests')}
@@ -109,46 +133,75 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
   }
   return (
     <div className={styles.widgetContainer}>
-      <CardHeader title={headerTitle}>{''}</CardHeader>
       <DataTable
         useZebraStyles
         size="sm"
         rows={tableRows ?? []}
         headers={headers}
-        render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}>
-                      {header.header?.content ?? header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
+        render={({
+          rows,
+          headers,
+          getHeaderProps,
+          getRowProps,
+          getSelectionProps,
+          getTableProps,
+          getTableContainerProps,
+          selectedRows,
+        }) => (
+          <>
+            <CardHeader title={headerTitle}>
+              <Button
+                onClick={() => {
+                  const data = selectedRows.map(({ id }) => ({
+                    labManifest: {
+                      uuid: manifestUuid,
+                    },
+                    order: {
+                      uuid: id,
+                    },
+                    payload: request.Orders.find(({ orderUuid }) => orderUuid === id)?.payload ?? '',
+                  }));
+
+                  handleAddSelectedToManifest(data);
+                }}
+                renderIcon={ArrowRight}
+                kind="ghost">
+                {t('addSelectedSamples', 'Add Selected Samples')}
+              </Button>
+            </CardHeader>
+            <TableContainer {...getTableContainerProps()}>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    <TableSelectAll {...getSelectionProps()} />
+                    {headers.map((header, i) => (
+                      <TableHeader key={i} {...getHeaderProps({ header })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, i) => (
+                    <TableRow key={i} {...getRowProps({ row })} onClick={(evt) => {}}>
+                      <TableSelectRow {...getSelectionProps({ row })} />
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </>
         )}
       />
+
       <Pagination
         page={currentPage}
         pageSize={pageSize}
         pageSizes={pageSizes}
-        totalItems={requests.length}
+        totalItems={(request?.Orders ?? []).length}
         onChange={({ page, pageSize }) => {
           goTo(page);
           setPageSize(pageSize);

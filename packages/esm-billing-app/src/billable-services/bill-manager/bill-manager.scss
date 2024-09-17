@@ -1,4 +1,5 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
 
 .billManagerContainer {
   margin: layout.$layout-01;
@@ -6,9 +7,21 @@
 }
 
 .billListContainer {
-  background-color: white;
+  background-color: colors.$white-0;
 }
 
 .dataTableSkeleton {
-  margin-top: 0.625rem;
+  margin-top: layout.$spacing-05;
+}
+
+.refundedItem {
+  background-color: colors.$red-20;
+
+  &:hover {
+    background-color: colors.$red-30 !important;
+  }
+
+  &:active {
+    background-color: colors.$red-40 !important;
+  }
 }

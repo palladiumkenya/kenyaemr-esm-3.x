@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Layer,
   DataTable,
@@ -15,10 +15,10 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { convertToCurrency, extractString } from '../../helpers';
+import { convertToCurrency } from '../../helpers';
 import { useTranslation } from 'react-i18next';
-import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { MappedBill } from '../../types';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { MappedBill, PaymentStatus } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
 import { Scalpel } from '@carbon/react/icons';
@@ -31,17 +31,35 @@ type PatientBillsProps = {
 const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   const { t } = useTranslation();
 
+  const hasRefundedItems = bills.some((bill) => bill.lineItems.some((li) => Math.sign(li.price) === -1));
+
   const tableHeaders = [
     { header: 'Date', key: 'date' },
-    { header: 'Billable Service', key: 'billableService' },
+    { header: 'Status', key: 'status' },
     { header: 'Total Amount', key: 'totalAmount' },
+    { header: 'Amount Paid', key: 'amountPaid' },
   ];
+
+  if (hasRefundedItems) {
+    tableHeaders.splice(2, 0, { header: 'Refunded Amount', key: 'creditAmount' });
+  }
 
   const tableRows = bills.map((bill) => ({
     id: `${bill.uuid}`,
     date: bill.dateCreated,
-    billableService: extractString(bill.billingService),
     totalAmount: convertToCurrency(bill.totalAmount),
+    status:
+      bill.totalAmount === bill.tenderedAmount
+        ? PaymentStatus.PAID
+        : bill.tenderedAmount === 0
+        ? PaymentStatus.PENDING
+        : PaymentStatus.POSTED,
+    amountPaid: convertToCurrency(bill.tenderedAmount),
+    ...(hasRefundedItems && {
+      creditAmount: convertToCurrency(
+        bill.lineItems.filter((li) => Math.sign(li.price) === -1).reduce((acc, curr) => acc + Math.abs(curr.price), 0),
+      ),
+    }),
   }));
 
   const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {
@@ -111,10 +129,14 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
                       <TableCell>
-                        <Scalpel
+                        <Button
+                          size="sm"
                           onClick={() => handleOpenWaiveBillWorkspace(bills[index])}
-                          className={styles.scalpel}
-                        />
+                          renderIcon={(props) => <Scalpel size={24} {...props} />}
+                          kind="danger--tertiary"
+                          iconDescription="TrashCan">
+                          {t('waiveBill', 'Waive Bill')}
+                        </Button>
                       </TableCell>
                     </TableExpandRow>
                     <TableExpandedRow

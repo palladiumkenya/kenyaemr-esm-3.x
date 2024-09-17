@@ -1,17 +1,18 @@
 {
   "name": "@kenyaemr/esm-3.x-apps",
   "private": true,
+  "version": "5.3.4",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
-    "ci:publish": "lerna publish from-package --yes --no-git-reset --yes",
+    "ci:publish": "yarn workspaces foreach --all --topological --exclude @kenyaemr/esm-3.x-apps npm publish --access public --tag latest",
+    "ci:prepublish": "yarn workspaces foreach --all --topological --exclude @kenyaemr/esm-3.x-apps npm publish --access public --tag next",
+    "release": "yarn workspaces foreach --all --topological version",
     "test-e2e": "playwright test",
     "coverage": "yarn test --coverage",
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
-    "release": "lerna version --no-git-tag-version",
     "start": "openmrs develop",
     "verify": "turbo run lint && turbo run typescript && turbo run test --color --concurrency=5"
   },
@@ -31,6 +32,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@carbon/pictograms-react": "^11.64.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "^1.30.0",
@@ -42,6 +44,7 @@
     "@testing-library/react": "^13.3.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^14.5.1",
+    "@types/carbon__pictograms-react": "^11",
     "@types/jest": "^28.1.4",
     "@types/lodash-es": "^4.17.3",
     "@types/react": "^18.2.39",
@@ -71,7 +74,6 @@
     "jest": "^28.1.2",
     "jest-cli": "^28.1.2",
     "jest-environment-jsdom": "^28.1.2",
-    "lerna": "^4.0.0",
     "lodash": "^4.17.21",
     "openmrs": "next",
     "pinst": "^3.0.0",

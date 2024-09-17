@@ -27,7 +27,7 @@ import {
 } from '@openmrs/esm-framework';
 import type { ConfigObject } from '../config-schema';
 import styles from './other-relationships.scss';
-import { useRelationships } from '../family-partner-history/relationships.resource';
+import { usePatientRelationships } from '../family-partner-history/relationships.resource';
 import ConceptObservations from '../family-partner-history/concept-obs.component';
 
 interface OtherRelationshipsProps {
@@ -41,7 +41,7 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
   const { concepts, familyRelationshipsTypeList } = config;
   const [pageSize, setPageSize] = useState(10);
 
-  const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
+  const { relationships, error, isLoading, isValidating } = usePatientRelationships(patientUuid);
   const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
   const nonFamilyRelationships = relationships.filter((r) => !familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
 

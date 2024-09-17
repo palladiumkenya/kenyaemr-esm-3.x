@@ -18,7 +18,7 @@ export const LabManifestHeader: React.FC<LabManifestHeaderProps> = ({ title }) =
       <div className={styles['leftJustifiedItems']}>
         <LabManifestIllustration />
         <div className={styles['pageLabels']}>
-          <p>{t('labManifest', 'Lab manifest Management')}</p>
+          <p>{t('labManifest', 'Lab Manifest')}</p>
           <p className={styles['pageName']}>{title}</p>
         </div>
       </div>

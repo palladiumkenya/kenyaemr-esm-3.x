@@ -6,7 +6,7 @@
   "pages": [
     {
       "component": "billableServicesHome",
-      "route":"billable-services"
+      "route": "billable-services"
     },
     {
       "component": "requirePaymentModal",
@@ -25,6 +25,24 @@
         "title": "billing",
         "slot": "billing-dashboard-slot"
       }
+    },
+    {
+      "component": "benefitsPackageDashboardLink",
+      "name": "benefits-package-dashboard-link",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "benefits-package",
+        "slot": "patient-chart-benefits-dashboard-slot",
+        "path": "Benefits Package",
+        "columns": 1,
+        "columnSpan": 1
+      },
+      "featureFlag": "healthInformationExchange"
+    },
+    {
+      "component": "benefitsPackage",
+      "name": "benefits-package",
+      "slot": "patient-chart-benefits-dashboard-slot"
     },
     {
       "component": "root",
@@ -49,7 +67,8 @@
         "columns": 1,
         "columnSpan": 1,
         "slot": "patient-chart-billing-dashboard-slot",
-        "path": "Billing"
+        "path": "Billing",
+        "layoutMode": "anchored"
       }
     },
     {
@@ -61,10 +80,6 @@
       "slot": "system-admin-page-card-link-slot",
       "component": "billableServicesCardLink",
       "name": "billable-services-admin-card-link"
-    },
-    {
-      "name": "billing-form",
-      "component": "billingForm"
     },
     {
       "name": "require-billing-modal",
@@ -82,7 +97,15 @@
     },
     {
       "name": "cancel-bill-modal",
-      "component": "cancelBillModal"   
+      "component": "cancelBillModal"
+    },
+    {
+      "name": "delete-billableservice-modal",
+      "component": "deleteBillableServiceModal"
+    },
+    {
+      "name": "refund-bill-modal",
+      "component": "refundBillModal"
     },
     {
       "name": "delete-bill-modal",
@@ -131,6 +154,25 @@
       "component": "editBillForm",
       "title": "Edit Bill Form",
       "type": "other-form"
+    },
+    {
+      "name": "billable-service-form",
+      "component": "addServiceForm",
+      "title": "Create Billable Service Form",
+      "type": "other-form"
+    },
+    {
+      "name": "commodity-form",
+      "component": "addCommodityForm",
+      "title": "Create Commodity Form",
+      "type": "other-form"
+    },
+    {
+      "name": "billing-form",
+      "component": "billingForm",
+      "title": "Billing Form",
+      "type": "other-form",
+      "width": "extra-wide"
     }
   ]
 }

@@ -58,8 +58,22 @@ export interface LabManifestSample {
   order: Order;
 }
 
-export interface ActiveRequests {
-  uuid: string;
+export interface ActiveRequest {
+  Orders: Array<ActiveRequestOrder>;
+  cccNumberType: number;
+  heiNumberType: number;
+}
+
+export interface ActiveRequestOrder {
+  orderId: number;
+  orderUuid: string;
+  patientId: number;
+  patientUuid: string;
+  patientName: string;
+  cccKdod: string;
+  dateRequested: string;
+  payload: string;
+  hasProblem;
 }
 
 export interface Constiuency {
@@ -72,4 +86,55 @@ export interface County {
   number: string;
   capital: string;
   constituencies: Array<Constiuency>;
+}
+
+export interface ManifestMetricYearSummary {
+  year: number;
+  jan: number;
+  feb: number;
+  mar: number;
+  apr: number;
+  may: number;
+  jun: number;
+  jul: number;
+  aug: number;
+  sep: number;
+  oct: number;
+  nov: number;
+  dec: number;
+}
+
+export interface ManifestMetrics {
+  manifestsDraft: number;
+  manifestsOnHold: number;
+  manifestsReadyToSend: number;
+  manifestsSending: number;
+  manifestsSubmitted: number;
+  manifestsIncompleteWithErrors: number;
+  errorsOnIncomplete: number;
+  manifestsIncomplete: number;
+  manifestsCompleteWithErrors: number;
+  errorsOnComplete: number;
+  manifestsComplete: number;
+  summaryGraph: Array<ManifestMetricYearSummary>;
+  userHasSettingsEditRole: boolean;
+}
+
+export interface MappedManifestMetrics {
+  Draft: number;
+  'On Hold': number;
+  'Ready to send': number;
+  Sending: number;
+  Submitted: number;
+  'Incomplete errors': number;
+  'Incomplete results': number;
+  'Complete errors': number;
+  'Complete results': number;
+  summaryGraph: Array<ManifestMetricYearSummary>;
+  userHasSettingsEditRole: boolean;
+}
+export interface TransformedData {
+  group: string;
+  month: string;
+  value: number;
 }
