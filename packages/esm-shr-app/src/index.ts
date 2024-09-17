@@ -1,8 +1,15 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getFeatureFlag,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { createHomeDashboardLink } from './create-dashboard-link';
 import { referralDashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createHomeDashboardLink } from './create-dashboard-link';
 import ReferralChartView from './referrals/patient-chart/referral-chart-view.component';
 import ReferralReasonsDialogPopup from './referrals/referral-reasons/referral-reasons.component';
 import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
@@ -23,6 +30,7 @@ export const shrPatientSummary = getSyncLifecycle(shrPatientSummaryComponent, op
 
 export function startupApp() {
   registerBreadcrumbs([]);
+  registerFeatureFlag('shr-summary', 'SHR Summary', 'Adds authorization to pull a ptient SHR information');
   defineConfigSchema(moduleName, configSchema);
 }
 
@@ -34,10 +42,9 @@ export const ReferralsDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const shrSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
-  options,
-);
+export const shrSummaryDashboardLink = getFeatureFlag('shr-summary')
+  ? getSyncLifecycle(createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }), options)
+  : undefined;
 
 export const shrRoot = getAsyncLifecycle(() => import('./shr-root.component'), options);
 

@@ -1,0 +1,20 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.expanded_row_section {
+  display: flex;
+  align-items: center;
+
+  h4 {
+    margin-right: layout.$spacing-05;
+  }
+  gap: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+}
+.header {
+  @include type.type-style('heading-02');
+}
+.paragraph {
+  font-size: 15px;
+}

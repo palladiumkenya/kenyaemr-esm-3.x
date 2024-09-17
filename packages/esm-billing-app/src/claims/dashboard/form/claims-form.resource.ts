@@ -1,6 +1,8 @@
 import useSWR from 'swr';
 import { FetchResponse, openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
+import { useMemo } from 'react';
+import { mockInterventions, mockPackages } from './claims-form.mocks';
 
 interface Provider {
   uuid: string;
@@ -46,4 +48,22 @@ export const processClaims = (payload) => {
       'Content-Type': 'application/json',
     },
   });
+};
+
+export const useInterventions = () => {
+  const interventions = useMemo(() => mockInterventions, []);
+  return {
+    isLoading: false,
+    interventions: interventions,
+    error: undefined,
+  };
+};
+
+export const usePackages = () => {
+  const _packages = useMemo(() => mockPackages, []);
+  return {
+    isLoading: false,
+    packages: _packages,
+    error: undefined,
+  };
 };

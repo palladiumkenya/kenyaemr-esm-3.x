@@ -11,7 +11,7 @@ export interface LinkConfig {
 export function LinkExtension({ config }: { config: LinkConfig }) {
   const { name, title } = config;
   const location = useLocation();
-  const spaBasePath = window.getOpenmrsSpaBase() + 'home';
+  const spaBasePath = window.getOpenmrsSpaBase() + 'home/billing';
 
   let urlSegment = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
@@ -21,9 +21,8 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   };
 
   if (isUUID(urlSegment)) {
-    urlSegment = location.pathname.split('/').at(-2);
+    urlSegment = '';
   }
-
   return (
     <ConfigurableLink
       to={spaBasePath + '/' + name}
