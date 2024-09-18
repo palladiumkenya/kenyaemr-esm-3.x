@@ -23,7 +23,7 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
   const { peerEducatorRelationship } = useConfig<ConfigObject>();
   const form = useForm<PeerFormType>({
     defaultValues: {
-      personB: peerEducatorPerson.uuid,
+      personA: peerEducatorPerson.uuid,
       relationshipType: peerEducatorRelationship,
     },
     resolver: zodResolver(peerFormSchema),
@@ -100,7 +100,7 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
         <Column>
           <Controller
             control={form.control}
-            name="personB"
+            name="personA"
             render={({ field }) => (
               <Dropdown
                 ref={field.ref}
@@ -150,11 +150,11 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
         <Column>
           <Controller
             control={form.control}
-            name="personA"
+            name="personB"
             render={({ field }) => (
               <Autosuggest
                 className={styles.input}
-                labelText={t('patient', 'Patient/Peer')}
+                labelText={t('peer', 'Peer')}
                 placeholder={t('patientPlaceHolder', 'Search patient')}
                 invalid={Boolean(form.formState.errors[field.name]?.message)}
                 invalidText={form.formState.errors[field.name]?.message}
