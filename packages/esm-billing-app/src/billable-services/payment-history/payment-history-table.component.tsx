@@ -34,9 +34,9 @@ export const PaymentHistoryTable = ({
           aria-label="patient bills table"
           showToolbar={false}
           showHeader={false}
-          rowCount={3}
+          columnCount={Object.keys(headers).length}
           zebra
-          columnCount={3}
+          rowCount={3}
         />
       </div>
     );

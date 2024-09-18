@@ -140,6 +140,26 @@
       "component": "testOrderAction",
       "slot": "tests-ordered-actions-slot",
       "order": 0
+    },
+    {
+      "component": "billingOverviewLink",
+      "name": "billing-overview-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "paymentHistoryLink",
+      "name": "payment-history-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "billManagerLink",
+      "name": "bill-manager-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "billableServicesLink",
+      "name": "billable-services-link",
+      "slot": "billing-dashboard-link-slot"
     }
   ],
   "workspaces": [
