@@ -1,10 +1,12 @@
-import { DataTableSkeleton } from '@carbon/react';
-import { ConfigurableLink, useConfig, useSession } from '@openmrs/esm-framework';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { Button, DataTableSkeleton } from '@carbon/react';
+import { Launch } from '@carbon/react/icons';
+import { ConfigurableLink, launchWorkspace, useConfig, useSession } from '@openmrs/esm-framework';
+import { ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
 import useContacts from '../hooks/useContacts';
+import { Contact } from '../types';
 import { PeerCalendarHeader } from './header/peer-calendar-header.component';
 import PeerCalendarMetricsHeader from './header/peer-calendar-metrics.component';
 import GenericDataTable, { GenericTableEmptyState } from './table/generic-data-table';
@@ -16,12 +18,30 @@ const PeerCalendar = () => {
       person: { uuid: peerEducatorUuid, display },
     },
   } = useSession();
-  const { peerEducatorRelationship } = useConfig<ConfigObject>();
+  const {
+    peerEducatorRelationship,
+    encounterTypes: { kpPeerCalender: encounterUuid },
+    formsList: { peerCalendarOutreactForm: formUuid },
+  } = useConfig<ConfigObject>();
   const { contacts, error, isLoading } = useContacts(
     peerEducatorUuid,
     (rel) => rel.relationshipType.uuid === peerEducatorRelationship,
   );
   const peersTitle = t('peers', 'Peers');
+
+  const handleLauchPeerOutreachForm = ({ patientUuid }: Contact) => {
+    launchWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'KVP Peer Educator Outreach Calendar',
+      mutateForm: () => {},
+      formInfo: {
+        encounterUuid: '',
+        formUuid,
+        patientUuid,
+        visitTypeUuid: '',
+        visitUuid: '',
+      },
+    });
+  };
   return (
     <div className={`omrs-main-content`}>
       <PeerCalendarHeader title={t('peerCalendar', 'Peer Calendar')} />
@@ -57,7 +77,15 @@ const PeerCalendar = () => {
               </ConfigurableLink>
             ),
             endDate: contact.endDate ?? '--',
-            actions: '--',
+            actions: (
+              <Button
+                renderIcon={Launch}
+                hasIconOnly
+                iconDescription={t('launch', 'Launch outreact form')}
+                kind="ghost"
+                onClick={() => handleLauchPeerOutreachForm(contact)}
+              />
+            ),
           }))}
         />
       )}
