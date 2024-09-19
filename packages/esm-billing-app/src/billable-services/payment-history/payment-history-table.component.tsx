@@ -23,7 +23,7 @@ export const PaymentHistoryTable = ({
   paidBillsResponse: ReturnType<typeof useBills>;
 }) => {
   const { t } = useTranslation();
-  const { bills, error, isLoading } = paidBillsResponse;
+  const { error, isLoading } = paidBillsResponse;
   const { rows, getHeaderProps, getRowProps, getTableProps } = tableData;
 
   if (isLoading) {
@@ -50,7 +50,7 @@ export const PaymentHistoryTable = ({
     );
   }
 
-  if (bills.length === 0) {
+  if (rows.length === 0) {
     return (
       <div className={styles.emptyStateWrapper}>
         <EmptyState
