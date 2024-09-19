@@ -26,6 +26,7 @@ import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
 import AddServiceForm from './billable-services/billables/services/service-form.workspace';
 import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
+import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -62,6 +63,14 @@ export const paymentHistoryLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billing/payment-history',
     title: 'Payment History',
+  }),
+  options,
+);
+
+export const paymentPointsLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'billing/payment-points',
+    title: 'Payment Points',
   }),
   options,
 );
@@ -120,6 +129,11 @@ export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 
+export const createPaymentPoint = getSyncLifecycle(CreatePaymentPoint, options);
+
+export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
+export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
+
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
   registerFeatureFlag(
@@ -128,6 +142,3 @@ export function startupApp() {
     'HIE feature flag, this enables and disables the HIE feature',
   );
 }
-
-export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
-export const addCommodityForm = getSyncLifecycle(CommodityForm, options);

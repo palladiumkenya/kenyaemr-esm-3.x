@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+
+.tabs {
+  padding: layout.$spacing-05;
+}
+.tabPanel {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.tablistHeader {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cashPoint {
+  margin: layout.$spacing-05 0;
+}

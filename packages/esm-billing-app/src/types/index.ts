@@ -358,3 +358,11 @@ export type FHIRPatientResponse = {
     }>;
   };
 };
+
+export interface PaymentPoint {
+  uuid: string;
+  name: string;
+  description: string;
+  retired: boolean;
+  location: Location;
+}

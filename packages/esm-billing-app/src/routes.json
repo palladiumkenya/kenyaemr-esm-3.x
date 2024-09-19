@@ -152,6 +152,11 @@
       "slot": "billing-dashboard-link-slot"
     },
     {
+      "component": "paymentPointsLink",
+      "name": "payment-points-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
       "component": "billManagerLink",
       "name": "bill-manager-link",
       "slot": "billing-dashboard-link-slot"
@@ -194,5 +199,11 @@
       "type": "other-form",
       "width": "extra-wide"
     }
-  ]
+  ],
+  "modals": [
+    {
+      "name": "create-payment-point",
+      "component": "createPaymentPoint"
+    }
+ ]
 }

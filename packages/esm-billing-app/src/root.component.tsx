@@ -6,6 +6,8 @@ import ClaimScreen from './claims/dashboard/claims-dashboard.component';
 import PaymentHistoryViewer from './billable-services/payment-history/payment-history-viewer.component';
 import { BillableServicesDashboard } from './billable-services/dashboard/dashboard.component';
 import BillManager from './billable-services/bill-manager/bill-manager.component';
+import { PaymentPoints } from './payment-points/payment-points.component';
+import { PaymentPoint } from './payment-points/payment-point/payment-point.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
@@ -17,6 +19,8 @@ const RootComponent: React.FC = () => {
         <Route path="/patient/:patientUuid/:billUuid" element={<Invoice />} />
         <Route path="/patient/:patientUuid/:billUuid/claims" element={<ClaimScreen />} />
         <Route path="/payment-history" element={<PaymentHistoryViewer />} />
+        <Route path="/payment-points" element={<PaymentPoints />} />
+        <Route path="/payment-points/:paymentPointUUID" element={<PaymentPoint />} />
         <Route path="/bill-manager" element={<BillManager />} />
         <Route path="/billable-services" element={<BillableServicesDashboard />} />
       </Routes>
