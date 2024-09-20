@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './content-switcher.scss';
 import { WaitingQueue } from '../tables/waiting-queue.component';
 import { AdmittedQueue } from '../tables/admitted-queue.component';
+import { launchWorkspace } from '@openmrs/esm-framework';
 
 export const ContentSwitchTabs: React.FC = () => {
   const { t } = useTranslation();
@@ -15,6 +16,11 @@ export const ContentSwitchTabs: React.FC = () => {
   ];
 
   const [activeIndex, setActiveIndex] = useState(0);
+  const handleNewDeceased = () => {
+    launchWorkspace('morgue-enroll-form', {
+      workspaceTitle: 'Register account form',
+    });
+  };
 
   return (
     <>
@@ -31,7 +37,7 @@ export const ContentSwitchTabs: React.FC = () => {
           </ContentSwitcher>
         </div>
 
-        <Button className={styles.rightButton} kind="secondary">
+        <Button className={styles.rightButton} kind="secondary" onClick={handleNewDeceased}>
           {t('enrollingBtn', 'Add New Deceased')}
         </Button>
       </div>

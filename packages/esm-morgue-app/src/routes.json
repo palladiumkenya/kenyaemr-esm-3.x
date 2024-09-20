@@ -21,6 +21,14 @@
       "slot": "morgue-dashboard-slot"
     }
   ],
+   "workspaces": [
+    {
+      "name": "morgue-enroll-form",
+      "component": "morgueEnrollWorkspace",
+      "title": "Enroll new deceased",
+      "type": "other-form"
+    }
+  ],
   "pages": [
     {
       "component": "root",

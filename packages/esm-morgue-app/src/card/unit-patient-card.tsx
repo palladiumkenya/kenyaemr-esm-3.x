@@ -28,7 +28,6 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({ patient }) => {
     <div className={styles.wardPatientCard}>
       {patientCardRows.map((RowComponent, i) => (
         <div key={i} className={styles.wardPatientCardRow}>
-          {/* Pass patient props to RowComponent */}
           <RowComponent patient={patient} />
         </div>
       ))}
@@ -40,7 +39,6 @@ const WardPatientCard: React.FC<WardPatientCardProps> = ({ patient }) => {
             ...patient,
           });
         }}>
-        {/* Name will not be displayed; just there for a11y */}
         {getPatientName(patient.person)}
       </button>
     </div>
