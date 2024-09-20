@@ -1,27 +1,29 @@
-import React, { useEffect, useState } from 'react';
-import { useBills, usePaymentModes } from '../../billing.resource';
 import {
+  Button,
   DataTable,
+  Pagination,
   TableContainer,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Pagination,
 } from '@carbon/react';
-import styles from './payment-history.scss';
-import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
-import flatMapDeep from 'lodash-es/flatMapDeep';
-import { MappedBill, PaymentStatus } from '../../types';
-import dayjs from 'dayjs';
-import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { isDesktop, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import dayjs from 'dayjs';
+import flatMapDeep from 'lodash-es/flatMapDeep';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PaymentHistoryTable } from './payment-history-table.component';
-import { PaymentTotals } from './payment-totals';
-import { CashierFilter } from './cashier-filter';
-import { PaymentTypeFilter } from './payment-type-filter';
-import { AppliedFilterTags } from './applied-filter-tages.component';
 import { useParams } from 'react-router-dom';
+import { useBills } from '../../billing.resource';
+import { usePaymentPoints } from '../../payment-points/payment-points.resource';
+import { MappedBill, PaymentStatus } from '../../types';
+import { AppliedFilterTags } from './applied-filter-tages.component';
+import { CashierFilter } from './cashier-filter';
+import { PaymentHistoryTable } from './payment-history-table.component';
+import styles from './payment-history.scss';
+import { PaymentTotals } from './payment-totals';
+import { PaymentTypeFilter } from './payment-type-filter';
+import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 
 export const headers = [
   { header: 'Date', key: 'dateCreated' },
@@ -34,7 +36,9 @@ export const PaymentHistoryViewer = () => {
   const [renderedRows, setRenderedRows] = useState<null | MappedBill[]>(null);
   const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
   const { paymentPointUUID } = useParams();
-  const paidBillsResponse = useBills('', paymentPointUUID ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
+  const { paymentPoints } = usePaymentPoints();
+  const isOnPaymentPointPage = Boolean(paymentPointUUID);
+  const paidBillsResponse = useBills('', isOnPaymentPointPage ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
   const { bills } = paidBillsResponse;
 
   const [pageSize, setPageSize] = useState(10);
@@ -54,14 +58,14 @@ export const PaymentHistoryViewer = () => {
 
   useEffect(() => {
     if (bills.length > 0 && renderedRows === null) {
-      if (paymentPointUUID) {
+      if (isOnPaymentPointPage) {
         const filteredByCashPoint = bills.filter((bill) => bill.cashPointUuid === paymentPointUUID);
         setRenderedRows(filteredByCashPoint);
       } else {
         setRenderedRows(bills);
       }
     }
-  }, [bills, paymentPointUUID, renderedRows]);
+  }, [bills, isOnPaymentPointPage, paymentPointUUID, renderedRows]);
 
   const handleFilterByDateRange = (dates: Date[]) => {
     setDateRange(dates);
@@ -219,6 +223,20 @@ export const PaymentHistoryViewer = () => {
     };
   });
 
+  const openClockInModal = () => {
+    const dispose = showModal('clock-in-modal', {
+      closeModal: () => dispose(),
+      paymentPoint: paymentPoints.find((paymentPoint) => paymentPoint.uuid === paymentPointUUID),
+    });
+  };
+
+  const openClockOutModal = () => {
+    const dispose = showModal('clock-out-modal', {
+      closeModal: () => dispose(),
+      paymentPoint: paymentPoints.find((paymentPoint) => paymentPoint.uuid === paymentPointUUID),
+    });
+  };
+
   return (
     <div className={styles.table}>
       <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
@@ -242,6 +260,16 @@ export const PaymentHistoryViewer = () => {
                     onResetFilter={handleOnResetCashierFilter}
                   />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
+                  {isOnPaymentPointPage && (
+                    <Button className={styles.clockIn} onClick={openClockInModal}>
+                      Clock In
+                    </Button>
+                  )}
+                  {isOnPaymentPointPage && (
+                    <Button className={styles.clockIn} onClick={openClockOutModal} kind="danger">
+                      Clock Out
+                    </Button>
+                  )}
                 </TableToolbarContent>
               </TableToolbar>
             </div>

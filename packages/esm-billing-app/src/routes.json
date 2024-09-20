@@ -204,6 +204,14 @@
     {
       "name": "create-payment-point",
       "component": "createPaymentPoint"
+    },
+    {
+      "name": "clock-in-modal",
+      "component": "clockIn"
+    },
+    {
+      "name": "clock-out-modal",
+      "component": "clockOut"
     }
  ]
 }

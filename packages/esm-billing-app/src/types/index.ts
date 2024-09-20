@@ -366,3 +366,7 @@ export interface PaymentPoint {
   retired: boolean;
   location: Location;
 }
+
+export interface Timesheet {
+  //something
+}

@@ -9,6 +9,8 @@ import { DeleteBillableServiceModal } from './billable-services/bill-manager/mod
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
+import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
+import AddServiceForm from './billable-services/billables/services/service-form.workspace';
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
@@ -23,10 +25,10 @@ import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
-import rootComponent from './root.component';
-import AddServiceForm from './billable-services/billables/services/service-form.workspace';
-import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
 import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
+import { ClockIn } from './payment-points/payment-point/clock-in.component';
+import { ClockOut } from './payment-points/payment-point/clock-out.component';
+import rootComponent from './root.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -133,6 +135,9 @@ export const createPaymentPoint = getSyncLifecycle(CreatePaymentPoint, options);
 
 export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
 export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
+
+export const clockIn = getSyncLifecycle(ClockIn, options);
+export const clockOut = getSyncLifecycle(ClockOut, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);

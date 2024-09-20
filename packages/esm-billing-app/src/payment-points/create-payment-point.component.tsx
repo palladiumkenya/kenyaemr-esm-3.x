@@ -1,12 +1,12 @@
+import { Button, Form, Loading, ModalBody, ModalFooter, ModalHeader, TextInput } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
-import { ModalHeader, ModalBody, ModalFooter, TextInput, Form, Button, Loading } from '@carbon/react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import styles from './payment-points-styles.scss';
 import { createPaymentPoint, usePaymentPoints } from './payment-points.resource';
-import { showSnackbar, useLocations, useSession } from '@openmrs/esm-framework';
 
 const schema = z.object({
   cashPointName: z.string().nonempty({ message: 'Cash point name is required' }),
