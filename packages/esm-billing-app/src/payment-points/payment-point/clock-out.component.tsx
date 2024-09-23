@@ -36,7 +36,7 @@ export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void;
 
   return (
     <React.Fragment>
-      <ModalHeader closeModal={closeModal}>Clock In</ModalHeader>
+      <ModalHeader closeModal={closeModal}>Clock Out</ModalHeader>
       <ModalBody>You will be clocked out of {paymentPoint.name} right now. Do you want to proceed.</ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal} type="button">
