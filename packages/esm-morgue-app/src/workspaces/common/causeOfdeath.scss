@@ -1,5 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
+@use '@carbon/colors';
 @use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
@@ -17,21 +18,13 @@
 }
 
 .sectionTitle {
-  @include type.type-style('productive-heading-02');
-  color: $text-02;
+  color: colors.$gray-70;
+  display: inline-block;
+  font-size: layout.$spacing-04;
+  line-height: layout.$spacing-05;
+  vertical-align: baseline;
   margin: 0 0 layout.$spacing-03 0;
 }
-
-.conceptAnswerOverviewWrapper {
-  margin: layout.$spacing-03 0;
-  border: 0.0625rem solid $grey-2;
-  background-color: $ui-01;
-
-  :global(.cds--tile) {
-    border: none !important;
-  }
-}
-
 .errorOutline {
   outline: 1px solid $danger;
 }

@@ -26,11 +26,12 @@ interface ProvideModalProps {
   closeWorkspace: () => void;
 }
 
-const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
+const MorgueEnrollForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
 
   const [isPoliceCase, setIsPoliceCase] = useState<string | null>(null);
+  const [open, setOpen] = React.useState(false);
 
   const handlePoliceCaseChange = (selectedItem: string | null) => {
     setIsPoliceCase(selectedItem);
@@ -41,7 +42,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
       <Stack gap={4} className={styles.formGrid}>
         <span className={styles.formSubHeader}>{t('Decease', 'Deceased')}</span>
         <Column>
-          <TextInput placeholder="surname" id="form__surname" labelText={t('surname', 'Surname*')} />
+          <TextInput placeholder="surname" id="surname" labelText={t('surname', 'Surname*')} />
         </Column>
         <Column>
           <TextInput id="formFirstname" placeholder="firstname" labelText={t('firstname', 'First name*')} />
@@ -70,7 +71,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
         <Column>
           <DatePicker datePickerType="single" className={styles.formAdmissionDatepicker}>
             <DatePickerInput
-              className={styles.m}
               placeholder="mm/dd/yyyy"
               labelText="Date of  admission*"
               id="formAdmissionDate"
@@ -79,9 +79,12 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
           </DatePicker>
         </Column>
         <Column>
+          <TextInput placeholder="Tag number" id="form__surname" labelText={t('tagNo', 'Tag number*')} />
+        </Column>
+        <Column>
           <ComboBox
             onChange={(e) => handlePoliceCaseChange(e.selectedItem)}
-            id="carbon-combobox"
+            id="morgue-combobox"
             items={['Yes', 'No']}
             itemToString={(item) => (item ? item : '')}
             titleText="Is the body associated with a police case? If so, can you provide the OB number?*"
@@ -101,51 +104,38 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
 
         <CauseOfDeath />
         <Column>
-          <Row>
-            <DatePicker datePickerType="single" className={styles.form__date__picker}>
-              <DatePickerInput
-                className={styles.formDatepicker}
-                placeholder="mm/dd/yyyy"
-                labelText={t('DateAndTime', 'Date and Time of death*')}
-                id="form__license_date_picker"
-                size="md"
-              />
-            </DatePicker>
-            <TimePicker id="time-picker" className={styles.formTimeSelector}>
-              <TimePickerSelect id="time-picker-select-1">
-                <SelectItem value="AM" text="AM" />
-                <SelectItem value="PM" text="PM" />
-              </TimePickerSelect>
-            </TimePicker>
-          </Row>
-        </Column>
-
-        <Column>
-          <DatePicker datePickerType="single" className={styles.form__date__picker}>
+          <DatePicker datePickerType="single" className={styles.formDeathDatepicker}>
             <DatePickerInput
-              className={styles.form__date__picker}
+              className={styles.formDatepicker}
               placeholder="mm/dd/yyyy"
-              labelText="License expiry date*"
+              labelText={t('dateDeath', 'Date of death*')}
               id="form__license_date_picker"
               size="md"
             />
           </DatePicker>
         </Column>
-
         <Column>
-          <TextInput placeholder="Username" id="form__username" labelText={t('username', 'Username*')} />
+          <TimePicker
+            id="time-picker"
+            className={styles.formDeathTimepicker}
+            labelText={t('timeDeath', 'Time of death*')}>
+            <TimePickerSelect id="time-picker-select-1">
+              <SelectItem value="AM" text="AM" />
+              <SelectItem value="PM" text="PM" />
+            </TimePickerSelect>
+          </TimePicker>
         </Column>
       </Stack>
-      {/* <ButtonSet className={styles.formButtonSet}>
-        <Button className={styles.buttonButton} size="sm" kind="secondary" onClick={closeWorkspace}>
+      <ButtonSet className={styles.formButtonSet}>
+        <Button className={styles.buttonButton} size="lg" kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.buttonButton} kind="primary" size="sm" type="submit">
-          {t('submit', 'Submit')}
+        <Button className={styles.buttonButton} kind="primary" size="lg" type="submit">
+          {t('enroll', 'Enroll')}
         </Button>
-      </ButtonSet> */}
+      </ButtonSet>
     </Form>
   );
 };
 
-export default ProviderForm;
+export default MorgueEnrollForm;

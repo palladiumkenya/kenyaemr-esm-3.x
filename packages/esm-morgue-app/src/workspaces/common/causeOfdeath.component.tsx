@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import fuzzy from 'fuzzy';
 import { useTranslation } from 'react-i18next';
-import { ComboBox, RadioButtonGroup, RadioButton, Search, StructuredListSkeleton, TextInput } from '@carbon/react';
+import { FilterableMultiSelect, Search, StructuredListSkeleton, Tag, TextInput } from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -26,7 +26,9 @@ const CauseOfDeath: React.FC = () => {
   }, [searchTerm, causesOfDeath]);
 
   const schema = z.object({
-    causeOfDeath: z.string().nonempty({ message: t('causeOfDeathIsRequired', 'Please select the cause of death') }),
+    causeOfDeath: z
+      .array(z.string())
+      .nonempty({ message: t('causeOfDeathIsRequired', 'Please select the cause of death') }),
     nonCodedCauseOfDeath: z.string().optional(),
   });
 
@@ -38,7 +40,7 @@ const CauseOfDeath: React.FC = () => {
     mode: 'onSubmit',
     resolver: zodResolver(schema),
     defaultValues: {
-      causeOfDeath: '',
+      causeOfDeath: [],
       nonCodedCauseOfDeath: '',
     },
   });
@@ -47,34 +49,35 @@ const CauseOfDeath: React.FC = () => {
 
   return (
     <section>
-      <div className={styles.sectionTitle}>{t('causeOfDeath', 'Cause of death')}</div>
       <div className={styles.conceptAnswerOverviewWrapper}>
         {isLoadingCausesOfDeath ? <StructuredListSkeleton /> : null}
 
         {causesOfDeath?.length ? (
           <>
-            <Search
-              onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
-              labelText=""
-            />
             <Controller
               name="causeOfDeath"
               control={control}
-              render={({ field: { onChange } }) => (
-                <RadioButtonGroup className={styles.radioButtonGroup} orientation="vertical" onChange={onChange}>
-                  {(filteredCausesOfDeath.length ? filteredCausesOfDeath : causesOfDeath).map(
-                    ({ uuid, display, name }) => (
-                      <RadioButton
-                        key={uuid}
-                        className={styles.radioButton}
-                        id={name}
-                        labelText={display}
-                        value={uuid}
-                      />
-                    ),
-                  )}
-                </RadioButtonGroup>
+              render={({ field: { onChange, value } }) => (
+                <>
+                  <div className={styles.selectedTags}>
+                    {value.map((item, index) => (
+                      <Tag key={index} type="high-contrast">
+                        {causesOfDeath.find((cause) => cause.uuid === item)?.display || ''}
+                      </Tag>
+                    ))}
+                  </div>
+                  <FilterableMultiSelect
+                    id="causeOfDeathSelect"
+                    titleText={t('selectCauseOfDeath', 'Select Cause of Death')}
+                    placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
+                    items={filteredCausesOfDeath.map(({ uuid, display }) => ({
+                      id: uuid,
+                      text: display,
+                    }))}
+                    itemToString={(item) => (item ? item.text : '')}
+                    onChange={({ selectedItems }) => onChange(selectedItems.map((item) => item.id))}
+                  />
+                </>
               )}
             />
           </>
@@ -88,7 +91,7 @@ const CauseOfDeath: React.FC = () => {
         )}
       </div>
       {errors?.causeOfDeath && <p className={styles.errorMessage}>{errors.causeOfDeath.message}</p>}
-      {causeOfDeathValue === 'freeTextFieldConceptUuid' && (
+      {causeOfDeathValue.includes('freeTextFieldConceptUuid') && (
         <div className={styles.nonCodedCauseOfDeath}>
           <Controller
             name="nonCodedCauseOfDeath"

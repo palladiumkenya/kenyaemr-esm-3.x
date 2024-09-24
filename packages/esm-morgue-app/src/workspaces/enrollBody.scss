@@ -3,7 +3,7 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.formButton {
+.formButton{
   height: layout.$spacing-09;
   display: flex;
   align-content: flex-start;
@@ -12,11 +12,12 @@
   margin-bottom: layout.$spacing-05;
 }
 
-.formButtonSet {
+
+
+.formButtonSet{
   margin-top: layout.$spacing-11;
   display: flex;
   justify-content: center;
-  margin-left: layout.$spacing-05;
 }
 
 .formSubHeader {
@@ -44,40 +45,22 @@
   margin-top: layout.$spacing-04;
   margin-bottom: layout.$spacing-02;
 }
-.form__role_label {
-  color: colors.$gray-40;
-}
-.form__license_label {
-  color: colors.$gray-70;
-  display: inline-block;
-  font-size: layout.$spacing-04;
-  line-height: layout.$spacing-05;
-  margin-bottom: layout.$spacing-02;
-  vertical-align: baseline;
-}
-.form__license__tag {
-  width: layout.$spacing-13;
-  font-weight: 600;
-  padding: layout.$spacing-03;
-}
-.formDatepicker input {
-  min-width: 15rem;
-}
-.formAdmissionDatepicker input {
+
+.formAdmissionDatepicker input{
   min-width: 24rem;
 }
-.formTimeSelector {
+.formTimeSelector{
   min-width: 1.5rem;
+
 }
 .form__row {
   display: flex;
   align-items: center;
 }
+.formDeathDatepicker input{
+  min-width: 24rem;
+}
+.formDeathTimepicker input{
+  min-width: 18.6rem;
+}
 
-.form__search-button {
-  margin-left: layout.$spacing-03;
-}
-.form__combox_box {
-  align-items: center;
-  display: flex;
-}
