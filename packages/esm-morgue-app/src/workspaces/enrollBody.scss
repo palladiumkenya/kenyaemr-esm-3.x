@@ -3,7 +3,7 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.form__button {
+.formButton{
   height: layout.$spacing-09;
   display: flex;
   align-content: flex-start;
@@ -11,49 +11,22 @@
   min-width: layout.$spacing-09;
   margin-bottom: layout.$spacing-05;
 }
-.error_message {
-  color: colors.$red-60;
-  font-size: layout.$spacing-04;
-  line-height: layout.$spacing-05;
-}
 
-.form__button_set {
+.formButtonSet{
   margin-top: layout.$spacing-11;
   display: flex;
   justify-content: center;
   margin-left: layout.$spacing-05;
 }
 
-.form__header__section {
-  @include type.type-style('heading-02');
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  row-gap: layout.$spacing-06;
-  position: relative;
-
-  &::after {
-    content: '';
-    display: block;
-    width: layout.$spacing-07;
-    border-bottom: 0.375rem solid var(--brand-03);
-    position: absolute;
-    bottom: -0.75rem;
-    left: 0;
-  }
-
-  & > span {
-    @include type.type-style('body-01');
-  }
-}
-.form__subheader__section {
+.formSubHeader {
   @include type.type-style('heading-02');
   margin-top: layout.$spacing-05;
 }
-.form__container {
+.formContainer {
   width: 100%;
 }
-.form__grid {
+.formGrid {
   margin: 0 layout.$spacing-05;
   padding: 0rem;
 }
@@ -87,11 +60,14 @@
   font-weight: 600;
   padding: layout.$spacing-03;
 }
-.form__date__picker input {
-  min-width: 23rem;
+.formDatepicker input {
+  min-width: 15rem;
+}
+.formAdmissionDatepicker input{
+  min-width: 24rem;
 }
 .formTimeSelector{
-  min-width: 17.5rem;
+  min-width: 1.5rem;
 
 }
 .form__row {

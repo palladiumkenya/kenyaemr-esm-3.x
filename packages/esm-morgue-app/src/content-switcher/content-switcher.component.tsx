@@ -18,7 +18,7 @@ export const ContentSwitchTabs: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const handleNewDeceased = () => {
     launchWorkspace('morgue-enroll-form', {
-      workspaceTitle: 'Register account form',
+      workspaceTitle: 'Deceased Registration',
     });
   };
 
