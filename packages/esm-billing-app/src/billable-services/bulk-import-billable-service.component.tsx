@@ -68,11 +68,16 @@ export const BulkImportBillableServices = ({ closeModal }) => {
       mutate();
       setIsImporting(false);
       closeModal();
-      showSnackbar({
-        title: t('success', 'successfully'),
-        subtitle: t('successFullyUploadedItems', `Successfully uploaded ${payload.length} billable services.`),
-        kind: 'success',
-      });
+
+      if (erroredPayloads.length === 0 && payload.length > 1) {
+        showSnackbar({
+          title: t('success', 'successfully'),
+          subtitle: t('successFullyUploadedItems', `Successfully uploaded ${payload.length} billable services.`),
+          kind: 'success',
+        });
+
+        return;
+      }
 
       if (erroredPayloads.length) {
         createAndDownloadFailedUploadsExcelFile(erroredPayloads);
