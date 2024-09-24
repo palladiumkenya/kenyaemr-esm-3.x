@@ -1,5 +1,5 @@
 import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
-import { Download, Task } from '@carbon/react/icons';
+import { Task, Upload } from '@carbon/react/icons';
 import { showModal } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ const ClinicalCharges = () => {
           </Tab>
         </TabList>
         <Button onClick={openBulkUploadModal}>
-          Bulk Import <Download className={styles.iconMarginLeft} />
+          Bulk Upload <Upload className={styles.iconMarginLeft} />
         </Button>
       </div>
       <TabPanels>

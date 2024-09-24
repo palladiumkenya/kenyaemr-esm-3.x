@@ -24,7 +24,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../../helpers';
 import styles from './charge-summary-table.scss';
-import { UseChargeSummaries } from './charge-summary.resource';
+import { useChargeSummaries } from './charge-summary.resource';
 import { searchTableData } from './form-helper';
 
 const defaultPageSize = 10;
@@ -32,7 +32,7 @@ const defaultPageSize = 10;
 const ChargeSummaryTable: React.FC = () => {
   const { t } = useTranslation();
   const size = 'sm';
-  const { isLoading, isValidating, error, mutate, chargeSummaryItems } = UseChargeSummaries();
+  const { isLoading, isValidating, error, mutate, chargeSummaryItems } = useChargeSummaries();
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [searchString, setSearchString] = useState('');
 
@@ -96,7 +96,7 @@ const ChargeSummaryTable: React.FC = () => {
   };
 
   if (isLoading) {
-    return <DataTableSkeleton headers={headers} aria-label="sample table" />;
+    return <DataTableSkeleton headers={headers} aria-label="sample table" showHeader={false} showToolbar={false} />;
   }
 
   if (error) {
