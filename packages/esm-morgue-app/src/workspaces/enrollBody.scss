@@ -3,7 +3,7 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.formButton{
+.formButton {
   height: layout.$spacing-09;
   display: flex;
   align-content: flex-start;
@@ -12,7 +12,7 @@
   margin-bottom: layout.$spacing-05;
 }
 
-.formButtonSet{
+.formButtonSet {
   margin-top: layout.$spacing-11;
   display: flex;
   justify-content: center;
@@ -63,12 +63,11 @@
 .formDatepicker input {
   min-width: 15rem;
 }
-.formAdmissionDatepicker input{
+.formAdmissionDatepicker input {
   min-width: 24rem;
 }
-.formTimeSelector{
+.formTimeSelector {
   min-width: 1.5rem;
-
 }
 .form__row {
   display: flex;
