@@ -17,5 +17,6 @@
   "nonCodedCauseOfDeath": "Non-coded cause of death",
   "readyForAdmit": "Ready for Admission",
   "searchForCauseOfDeath": "Search for a cause of death",
+  "selectCauseOfDeath": "Select Cause of Death",
   "waitQueue": "Waiting queue"
 }
