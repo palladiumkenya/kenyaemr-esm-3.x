@@ -1,129 +1,92 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
-.wardPatientCard {
-  @include type.type-style('body-compact-01');
-  color: $text-02;
-
+.allPatientCardWrapper {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: spacing.$spacing-02;
-  background-color: $ui-02;
-
-  position: relative; // this allows positioning the button correctly
-
-  > .wardPatientCardRow:not(:first-child) {
-    border-top: 1px colors.$gray-20 solid;
-  }
-}
-
-.wardPatientCardButton {
-  border: none;
+  flex-direction: row; /* This ensures items are arranged in a row */
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: layout.$spacing-05;
   padding: 0;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    cursor: pointer;
-    border: 2px solid transparent;
-    transition: border-color 200ms;
-  }
-
-  &:hover::before,
-  &:focus::before {
-    border-color: $interactive-01;
-  }
-
-  &:focus {
-    outline: none;
-  }
+  width: 100%; /* Ensure the wrapper stretches across the entire width */
+  flex-wrap: wrap; /* Optional: Allows wrapping if there's insufficient space */
 }
 
-.activeWardPatientCardButton {
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    cursor: pointer;
-    border: 2px solid $interactive-01;
-    transition: border-color 200ms;
-  }
-}
 
-.wardPatientCardRow {
+.cardRow {
+  display: flex;
+  flex-direction: row; /* Aligns items in a row */
   width: 100%;
-  padding: spacing.$spacing-04;
 }
-
-.wardPatientCardRow:empty {
-  display: none;
-}
-
-.wardPatientCardHeader {
-  @extend .dotSeparatedChildren;
+.cardView {
+  width: 340px;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: layout.$spacing-04;
+  background-color: colors.$gray-80;
+  border-radius: 5px;
+  box-shadow: 0 layout.$spacing-02 layout.$spacing-03 rgba(0, 0, 0, 0.1);
+  gap: layout.$spacing-03;
 }
 
-.unitPatientName {
-  @include type.type-style('heading-compact-02');
-  color: $text-02;
+.cardRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: layout.$spacing-03;
 
-  &::before {
-    content: '' !important;
+  &.centeredContent {
+    justify-content: center;
+    text-align: center;
   }
 }
 
-.unitPatientUnitNumber {
-  @include type.type-style('heading-compact-01');
+.cardLabelWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: layout.$spacing-07;
+  height: layout.$spacing-07;
   border-radius: 50%;
-  color: $ui-02;
-  background-color: $color-blue-60-2;
-  padding: spacing.$spacing-04;
-  width: spacing.$spacing-04;
-  height: spacing.$spacing-04;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  &.empty {
-    background-color: $color-blue-10;
-    color: $color-blue-60-2;
-  }
+  background-color: colors.$white;
 }
 
-.UnitNumberBox {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.cardLabel {
+  font-size: 18px;
+  line-height: 1.29;
+    border-radius: 50%;
+  letter-spacing: 0.16px;
+  color: colors.$gray-80;
 }
 
-.unitPatientAddress {
-  @extend .dotSeparatedChildren;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: spacing.$spacing-02;
+.deceasedName,
+.noCompartment {
+  font-size: 16px;
+  font-weight: 600;
+  color: colors.$white;
+  text-align: center;
+  width: 100%;
 }
 
-.UnitPatientObsLabel {
-  padding-right: spacing.$spacing-02;
+.deceasedAge,
+.deceasedResidences,
+.deceasedDate,
+.causeofDeathTag,
+.causeofDeath,
+.compartmentStatus,
+.deceasedNoDays,
+.noDays {
+  font-size: 12px;
+  color: colors.$white;
 }
 
-.dotSeparatedChildren {
-  > div:not(div:first-of-type) {
-    display: flex;
-    align-items: center;
-
-    &::before {
-      content: '·';
-      padding: 0 spacing.$spacing-02;
-    }
-  }
+.assignButton {
+  width: 100%;
+  margin-top: layout.$spacing-05;
 }

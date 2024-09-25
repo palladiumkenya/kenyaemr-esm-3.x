@@ -1,6 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .genericTable {
   margin: 0 auto;
@@ -16,7 +17,7 @@
 
 .searchInput {
   width: 100%;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
   box-shadow: var(--cds-shadow);
 }
 
@@ -31,5 +32,5 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0 spacing.$spacing-04;
+  padding: 0 layout.$spacing-04;
 }
