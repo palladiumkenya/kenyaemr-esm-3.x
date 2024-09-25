@@ -1,8 +1,8 @@
 import React, { memo, useMemo } from 'react';
 import { DashboardGroupExtension } from './dashboard-group.component';
 import { usePatient } from '@openmrs/esm-framework';
-import { useActivePatientEnrollment } from '@openmrs/esm-patient-common-lib';
 import { evaluateExpression } from '../utils/expression-helper';
+import { usePatientEnrollment } from './clinical-view-group.resource';
 
 type DashboardGroupProps = {
   title: string;
@@ -16,11 +16,15 @@ type DashboardGroupProps = {
 const DashboardGroup = memo(
   ({ title, slotName, isExpanded, isChild, basePath, showWhenExpression }: DashboardGroupProps) => {
     const { patient, isLoading: isLoadingPatient } = usePatient();
-    const { activePatientEnrollment, isLoading: isLoadingActiveEnrollment } = useActivePatientEnrollment(patient?.id);
+    const {
+      patientEnrollments,
+      isLoading: isLoadingActiveEnrollment,
+      isValidating,
+    } = usePatientEnrollment(patient?.id);
 
     const showGroup = useMemo(
-      () => evaluateExpression(showWhenExpression, patient, activePatientEnrollment),
-      [showWhenExpression, patient, activePatientEnrollment],
+      () => evaluateExpression(showWhenExpression, patient, patientEnrollments),
+      [showWhenExpression, patient, patientEnrollments?.length, isValidating],
     );
 
     if (isLoadingPatient || isLoadingActiveEnrollment || !showGroup) {
