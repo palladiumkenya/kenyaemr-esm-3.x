@@ -57,9 +57,8 @@ export const useTimeSheets = () => {
   };
 };
 
-// TODO why v2?
 export const clockIn = (payload: { cashier: string; cashPoint: string; clockIn: string }) => {
-  const url = `/ws/rest/v2/cashier/timesheet`;
+  const url = `/ws/rest/v1/cashier/timesheet`;
   return openmrsFetch(url, {
     method: 'POST',
     body: payload,
@@ -71,7 +70,7 @@ export const clockIn = (payload: { cashier: string; cashPoint: string; clockIn: 
 
 // TODO temporary clock out request function.
 export const clockOut = (timesheetUUID: string, payload: { clockOut: string }) => {
-  const url = `/openmrs/ws/rest/v2/kenyaemr/cashier/timesheet/${timesheetUUID}`;
+  const url = `/openmrs/ws/rest/v1/kenyaemr/cashier/timesheet/${timesheetUUID}`;
   return openmrsFetch(url, {
     method: 'PUT',
     body: payload,
