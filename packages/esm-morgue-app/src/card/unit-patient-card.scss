@@ -14,7 +14,6 @@
   flex-wrap: wrap; /* Optional: Allows wrapping if there's insufficient space */
 }
 
-
 .cardRow {
   display: flex;
   flex-direction: row; /* Aligns items in a row */
@@ -60,7 +59,7 @@
 .cardLabel {
   font-size: 18px;
   line-height: 1.29;
-    border-radius: 50%;
+  border-radius: 50%;
   letter-spacing: 0.16px;
   color: colors.$gray-80;
 }
