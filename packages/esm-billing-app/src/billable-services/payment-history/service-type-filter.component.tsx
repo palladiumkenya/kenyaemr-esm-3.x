@@ -1,8 +1,7 @@
 import { Button, Checkbox, Popover, PopoverContent, SkeletonIcon, usePrefix } from '@carbon/react';
-import { Filter } from '@carbon/react/icons';
+import { CloudSatelliteServices } from '@carbon/react/icons';
 import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePaymentModes } from '../../billing.resource';
 import { MappedBill } from '../../types';
 import styles from './payment-history.scss';
 import { useBillsServiceTypes } from './use-bills-service-types';
@@ -16,9 +15,8 @@ interface TableToolbarFilterProps {
 export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: TableToolbarFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
-  const billsServiceTypes = useBillsServiceTypes(bills);
+  const { billsServiceTypes, isLoading } = useBillsServiceTypes(bills);
 
-  const { isLoading, paymentModes } = usePaymentModes(false);
   const { t } = useTranslation();
 
   const prefix = usePrefix();
@@ -65,18 +63,18 @@ export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: Table
           setIsOpen(!isOpen);
         }}
         className={`${prefix}--toolbar-action ${prefix}--overflow-menu`}>
-        <Filter />
+        <CloudSatelliteServices />
       </button>
       <PopoverContent id="containerCheckbox">
         <div className={styles.checkBoxWrapper}>
           <fieldset className={`${prefix}--fieldset`}>
             <legend className={`${prefix}--label`}>Filter options</legend>
-            {paymentModes.map((method) => (
+            {billsServiceTypes.map((type) => (
               <Checkbox
-                labelText={method.name}
-                id={`checkbox-${method.name}`}
+                labelText={type.display}
+                id={`checkbox-${type.display}`}
                 onChange={handleCheckboxChange}
-                checked={selectedCheckboxes.includes(method.name)}
+                checked={selectedCheckboxes.includes(type.display)}
               />
             ))}
           </fieldset>

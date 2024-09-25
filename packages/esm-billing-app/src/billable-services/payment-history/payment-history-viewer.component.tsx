@@ -49,6 +49,7 @@ const PaymentHistoryViewer = () => {
 
   const [selectedPaymentTypeCheckBoxes, setSelectedPaymentTypeCheckBoxes] = useState<string[]>([]);
   const [selectedCashierCheckboxes, setSelectedCashierCheckboxes] = useState<string[]>([]);
+  const [selectedServiceTypeCheckboxes, setSelectedServiceTypeCheckboxes] = useState<string[]>([]);
 
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
 
@@ -214,12 +215,34 @@ const PaymentHistoryViewer = () => {
     };
   });
 
+  const serviceTypeTags = selectedServiceTypeCheckboxes.map((t) => {
+    return {
+      tag: t,
+      type: 'Service Type',
+    };
+  });
+
   const onApplyServiceTypeFilter = () => {
     // TODO implement
   };
 
   const handleOnResetServiceTypeFilter = () => {
-    // TODO implement
+    // setSelectedServiceTypeCheckboxes([]);
+    // if (selectedPaymentTypeCheckBoxes.length === 0) {
+    //   setRenderedRows(bills);
+    // }
+    // {
+    //   let filteredRows = bills;
+    //   for (let i = 0; i < selectedPaymentTypeCheckBoxes.length; i++) {
+    //     const selectedPaymentType = selectedPaymentTypeCheckBoxes[i];
+    //     filteredRows = filteredRows.filter((row) => {
+    //       const rowValues: string[] = getAllValues(row);
+    //       return rowValues.some((value) => String(value).toLowerCase().includes(selectedPaymentType.toLowerCase()));
+    //     });
+    //   }
+    //   setRenderedRows(filteredRows);
+    // }
+    // goTo(1);
   };
 
   return (
@@ -241,7 +264,7 @@ const PaymentHistoryViewer = () => {
                       onResetFilter={handleOnResetServiceTypeFilter}
                       bills={bills}
                     />
-                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags]} />
+                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags, ...serviceTypeTags]} />
                     <PaymentTypeFilter
                       onApplyFilter={onApplyPaymentTypeFilter}
                       onResetFilter={handleOnResetPaymentTypeFilter}
