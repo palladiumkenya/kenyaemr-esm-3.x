@@ -156,7 +156,7 @@ export const BulkImportBillableServices = ({ closeModal }) => {
         <Button kind="secondary" onClick={closeModal} type="button">
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" onClick={importBillableServices} disabled={!uploadedFile}>
+        <Button type="submit" onClick={importBillableServices} disabled={!uploadedFile || isImporting}>
           {isImporting ? (
             <>
               <Loading withOverlay={false} small />

@@ -1,4 +1,5 @@
 import {
+  Button,
   ComboButton,
   DataTable,
   DataTableSkeleton,
@@ -18,7 +19,8 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { ErrorState, launchWorkspace, usePagination } from '@openmrs/esm-framework';
+import { Upload } from '@carbon/react/icons';
+import { ErrorState, launchWorkspace, showModal, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -95,6 +97,12 @@ const ChargeSummaryTable: React.FC = () => {
         });
   };
 
+  const openBulkUploadModal = () => {
+    const dispose = showModal('bulk-import-billable-services-modal', {
+      closeModal: () => dispose(),
+    });
+  };
+
   if (isLoading) {
     return <DataTableSkeleton headers={headers} aria-label="sample table" showHeader={false} showToolbar={false} />;
   }
@@ -129,6 +137,9 @@ const ChargeSummaryTable: React.FC = () => {
                 {isValidating && (
                   <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
                 )}
+                <Button onClick={openBulkUploadModal} className={styles.bulkUploadButton}>
+                  Bulk Upload <Upload className={styles.iconMarginLeft} />
+                </Button>
                 <ComboButton label={t('actions', 'Action')}>
                   <MenuItem
                     onClick={() => launchWorkspace('billable-service-form')}

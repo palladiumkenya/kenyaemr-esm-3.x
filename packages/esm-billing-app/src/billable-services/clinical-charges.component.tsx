@@ -1,6 +1,5 @@
-import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
-import { Task, Upload } from '@carbon/react/icons';
-import { showModal } from '@openmrs/esm-framework';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
+import { Task } from '@carbon/react/icons';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ChargeSummaryTable from './billables/charge-summary-table.component';
@@ -8,12 +7,6 @@ import styles from './clinical-charges.scss';
 
 const ClinicalCharges = () => {
   const { t } = useTranslation();
-
-  const openBulkUploadModal = () => {
-    const dispose = showModal('bulk-import-billable-services-modal', {
-      closeModal: () => dispose(),
-    });
-  };
 
   return (
     <Tabs>
@@ -26,9 +19,6 @@ const ClinicalCharges = () => {
             {t('clinicalCharges', 'Medical Invoice Items')}
           </Tab>
         </TabList>
-        <Button onClick={openBulkUploadModal}>
-          Bulk Upload <Upload className={styles.iconMarginLeft} />
-        </Button>
       </div>
       <TabPanels>
         <TabPanel className={styles.tabPanel}>
