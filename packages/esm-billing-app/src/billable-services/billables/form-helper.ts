@@ -115,6 +115,15 @@ export const searchTableData = <T>(array: Array<T>, searchString: string) => {
   return array;
 };
 
+export type ExcelFileRow = {
+  concept_id: number;
+  name: string;
+  price: number;
+  disable: 'false' | 'true';
+  category: number;
+  short_name: string;
+};
+
 export const getBulkUploadPayloadFromExcelFile = (
   fileData: Uint8Array,
   currentlyExistingBillableServices: ChargeAble[],
@@ -125,15 +134,7 @@ export const getBulkUploadPayloadFromExcelFile = (
   const firstSheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[firstSheetName];
 
-  type Row = {
-    concept_id: number;
-    name: string;
-    price: number;
-    disable: 'false' | 'true';
-    category: number;
-    short_name: string;
-  };
-  const jsonData: Array<Row> = XLSX.utils.sheet_to_json(worksheet);
+  const jsonData: Array<ExcelFileRow> = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
   if (jsonData.length === 0) {
     return [];
@@ -152,11 +153,11 @@ export const getBulkUploadPayloadFromExcelFile = (
     return 'INVALID_TEMPLATE';
   }
 
-  const rowsWithMissingCategories: Array<Row> = [];
+  const rowsWithMissingCategories: Array<ExcelFileRow> = [];
 
   const payload = jsonData
     .filter((row) => {
-      if (row.category) {
+      if (row.category.toString().length > 1) {
         return true;
       } else {
         rowsWithMissingCategories.push(row);
@@ -184,10 +185,5 @@ export const getBulkUploadPayloadFromExcelFile = (
       };
     });
 
-  return payload;
+  return [payload, rowsWithMissingCategories];
 };
-
-// TODO
-// 1.verify template DONE
-// 2.return an excel file of the backend failed rows. DONE
-// 3. return an excel file of failed to parse rows.

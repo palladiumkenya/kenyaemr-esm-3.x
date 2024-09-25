@@ -6,9 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { usePaymentModes } from '../billing.resource';
 import { createBillableService } from './billable-service.resource';
 import { useChargeSummaries } from './billables/charge-summary.resource';
-import { BillableServicePayload, getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
+import { BillableServicePayload, ExcelFileRow, getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
 import styles from './clinical-charges.scss';
-import { createAndDownloadFailedUploadsExcelFile } from './utils';
+import { createAndDownloadFailedUploadsExcelFile, createAndDownloadFilteredRowsFile } from './utils';
 
 export const BulkImportBillableServices = ({ closeModal }) => {
   const [isImporting, setIsImporting] = useState(false);
@@ -60,13 +60,25 @@ export const BulkImportBillableServices = ({ closeModal }) => {
         return;
       }
 
-      const payload = fileReadResponse;
+      const correctRowsPayload = fileReadResponse.at(0);
+      const filteredOutRows = fileReadResponse.at(1);
+
+      if (filteredOutRows.length > 0) {
+        createAndDownloadFilteredRowsFile(filteredOutRows as ExcelFileRow[]);
+        showSnackbar({
+          title: t(
+            'filteredOutRows',
+            'Some rows were missing categories and were filtered out. An excel file of the rows has been downloaded',
+          ),
+          kind: 'error',
+        });
+      }
 
       const erroredPayloads: BillableServicePayload[] = [];
 
       const chunkSize = 50;
-      for (let i = 0; i < payload.length; i += chunkSize) {
-        const chunk = payload.slice(i, i + chunkSize);
+      for (let i = 0; i < correctRowsPayload.length; i += chunkSize) {
+        const chunk = correctRowsPayload.slice(i, i + chunkSize);
 
         const promises = chunk.map(async (formPayload) => {
           try {
@@ -83,10 +95,13 @@ export const BulkImportBillableServices = ({ closeModal }) => {
       setIsImporting(false);
       closeModal();
 
-      if (erroredPayloads.length === 0 && payload.length > 1) {
+      if (erroredPayloads.length === 0 && correctRowsPayload.length > 1) {
         showSnackbar({
           title: t('success', 'successfully'),
-          subtitle: t('successFullyUploadedItems', `Successfully uploaded ${payload.length} billable services.`),
+          subtitle: t(
+            'successFullyUploadedItems',
+            `Successfully uploaded ${correctRowsPayload.length} billable services.`,
+          ),
           kind: 'success',
         });
 
