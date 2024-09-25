@@ -125,23 +125,51 @@ export const getBulkUploadPayloadFromExcelFile = (
   const firstSheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[firstSheetName];
 
-  const jsonData: {
+  type Row = {
     concept_id: number;
     name: string;
     price: number;
     disable: 'false' | 'true';
     category: number;
-  }[] = XLSX.utils.sheet_to_json(worksheet);
+    short_name: string;
+  };
+  const jsonData: Array<Row> = XLSX.utils.sheet_to_json(worksheet);
+
+  if (jsonData.length === 0) {
+    return [];
+  }
+
+  const firstRowKeys = Object.keys(jsonData.at(0));
+
+  if (
+    !firstRowKeys.includes('concept_id') ||
+    !firstRowKeys.includes('name') ||
+    !firstRowKeys.includes('price') ||
+    !firstRowKeys.includes('disable') ||
+    !firstRowKeys.includes('category') ||
+    !firstRowKeys.includes('short_name')
+  ) {
+    return 'INVALID_TEMPLATE';
+  }
+
+  const rowsWithMissingCategories: Array<Row> = [];
 
   const payload = jsonData
-    .filter((row) => row.category)
+    .filter((row) => {
+      if (row.category) {
+        return true;
+      } else {
+        rowsWithMissingCategories.push(row);
+        return false;
+      }
+    })
     .filter(
       (row) => !currentlyExistingBillableServices.some((item) => item.name.toLowerCase() === row.name.toLowerCase()),
     )
     .map((row) => {
       return {
         name: row.name,
-        shortName: row.name,
+        shortName: row.short_name ?? row.name,
         serviceType: row.category,
         servicePrices: [
           {
@@ -158,3 +186,8 @@ export const getBulkUploadPayloadFromExcelFile = (
 
   return payload;
 };
+
+// TODO
+// 1.verify template DONE
+// 2.return an excel file of the backend failed rows. DONE
+// 3. return an excel file of failed to parse rows.

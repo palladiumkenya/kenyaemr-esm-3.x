@@ -46,7 +46,21 @@ export const BulkImportBillableServices = ({ closeModal }) => {
     reader.onload = async (e) => {
       setIsImporting(true);
       const data = new Uint8Array(e.target.result as ArrayBuffer);
-      const payload = getBulkUploadPayloadFromExcelFile(data, chargeSummaryItems, paymentModes);
+      const fileReadResponse = getBulkUploadPayloadFromExcelFile(data, chargeSummaryItems, paymentModes);
+
+      if (fileReadResponse === 'INVALID_TEMPLATE') {
+        closeModal();
+        showSnackbar({
+          title: t(
+            'invalidFile',
+            'The file you uploaded is invalid. A valid template should include [concept_id, name, short_name, price, disable, category]',
+          ),
+          kind: 'error',
+        });
+        return;
+      }
+
+      const payload = fileReadResponse;
 
       const erroredPayloads: BillableServicePayload[] = [];
 

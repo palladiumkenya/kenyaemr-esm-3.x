@@ -11,7 +11,10 @@ export const handleMutate = (url: string) => {
 export const createAndDownloadFailedUploadsExcelFile = (data: BillableServicePayload[]) => {
   const worksheetData = data.map((item) => ({
     name: item.name,
-    concept: item.concept,
+    concept_id: item.concept,
+    price: item.servicePrices.at(0).price,
+    disable: item.serviceStatus === 'ENABLED' ? 'true' : 'false',
+    category: item.serviceType,
   }));
 
   const worksheet = XLSX.utils.json_to_sheet(worksheetData);
