@@ -4,19 +4,20 @@
 @use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .allPatientCardWrapper {
-  display: flex;
-  flex-direction: row; /* This ensures items are arranged in a row */
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: layout.$spacing-05;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: layout.$spacing-01;
+  width: 100%;
   padding: 0;
-  width: 100%; /* Ensure the wrapper stretches across the entire width */
-  flex-wrap: wrap; /* Optional: Allows wrapping if there's insufficient space */
+  justify-items: center;
+  align-items: start;
 }
+
+
 
 .cardRow {
   display: flex;
-  flex-direction: row; /* Aligns items in a row */
+  flex-direction: row;
   width: 100%;
 }
 .cardView {
@@ -30,6 +31,7 @@
   border-radius: 5px;
   box-shadow: 0 layout.$spacing-02 layout.$spacing-03 rgba(0, 0, 0, 0.1);
   gap: layout.$spacing-03;
+  margin-bottom: layout.$spacing-05;
 }
 
 .cardRow {
@@ -57,7 +59,7 @@
 }
 
 .cardLabel {
-  font-size: 18px;
+  font-size: layout.$spacing-05;
   line-height: 1.29;
   border-radius: 50%;
   letter-spacing: 0.16px;
@@ -66,7 +68,7 @@
 
 .deceasedName,
 .noCompartment {
-  font-size: 16px;
+  font-size: layout.$spacing-05;
   font-weight: 600;
   color: colors.$white;
   text-align: center;
@@ -81,7 +83,7 @@
 .compartmentStatus,
 .deceasedNoDays,
 .noDays {
-  font-size: 12px;
+  font-size: layout.$spacing-04;
   color: colors.$white;
 }
 

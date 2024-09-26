@@ -25,9 +25,7 @@ export const AdmittedQueue: React.FC = () => {
     <>
       <DeceasedFilter />
       <div className={styles.patientCardContainer}>
-        {deceasedPatients?.map((patient) => (
-          <CompartmentView key={patient.uuid} patient={patient} />
-        ))}
+        <CompartmentView patients={deceasedPatients || []} />
       </div>
     </>
   );

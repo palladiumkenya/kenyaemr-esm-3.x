@@ -1,19 +1,21 @@
 import React from 'react';
-import styles from './unit-patient-card.scss';
+import styles from './compartment.scss';
 import { DeceasedInfo } from '../tables/generic-table.resource';
 import EmptyCompartment from './empty-compartment.component';
 import AvailableCompartment from './avail-compartment.compartment';
 
 interface CompartmentViewProps {
-  patient?: DeceasedInfo | null;
+  patients: (DeceasedInfo | null)[];
 }
 
-const CompartmentView: React.FC<CompartmentViewProps> = ({ patient }) => {
+const CompartmentView: React.FC<CompartmentViewProps> = ({ patients }) => {
   return (
     <div className={styles.allPatientCardWrapper}>
-      <div className={styles.cardRow}>
-        {patient ? <AvailableCompartment patientInfo={patient} /> : <EmptyCompartment />}
-      </div>
+      {patients.map((patient, index) => (
+        <div key={index} className={styles.cardRow}>
+          {patient ? <AvailableCompartment patientInfo={patient} /> : <EmptyCompartment />}
+        </div>
+      ))}
     </div>
   );
 };
