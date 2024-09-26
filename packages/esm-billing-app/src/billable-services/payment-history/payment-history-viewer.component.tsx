@@ -72,170 +72,67 @@ const PaymentHistoryViewer = () => {
     });
   };
 
-  const onApplyCashierFilter = (appliedCheckboxes: Array<string>) => {
-    setSelectedCashierCheckboxes(appliedCheckboxes);
-
-    if (appliedCheckboxes.length === 0) {
-      // No cashier filter applied
-      if (selectedPaymentTypeCheckBoxes.length === 0 && selectedServiceTypeCheckboxes.length === 0) {
-        setRenderedRows(bills); // No filters applied
-      } else {
-        // Only payment type filter is applied
-        const filteredByPaymentTypeOrServiceType = bills.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return [...selectedPaymentTypeCheckBoxes, ...selectedServiceTypeCheckboxes].some((paymentType) =>
-            rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-          );
-        });
-        setRenderedRows(filteredByPaymentTypeOrServiceType);
-      }
+  useEffect(() => {
+    if (bills.length === 0) {
       return;
     }
+    const filteredBills = bills
+      .filter((row) => {
+        if (selectedCashierCheckboxes.length === 0) {
+          return true;
+        }
+        const rowValues: string[] = getAllValues(row);
+        return selectedCashierCheckboxes.some((cashier) =>
+          rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
+        );
+      })
+      .filter((row) => {
+        if (selectedPaymentTypeCheckBoxes.length === 0) {
+          return true;
+        }
+        const rowValues: string[] = getAllValues(row);
+        return selectedPaymentTypeCheckBoxes.some((paymentType) =>
+          rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
+        );
+      })
+      .filter((row) => {
+        if (selectedServiceTypeCheckboxes.length === 0) {
+          return true;
+        }
+        const rowValues: string[] = getAllValues(row);
+        return selectedServiceTypeCheckboxes.some((serviceType) =>
+          rowValues.some((value) => String(value).toLowerCase().includes(serviceType.toLowerCase())),
+        );
+      });
 
-    let filteredRows = bills.filter((row) => {
-      const rowValues: string[] = getAllValues(row);
-      return [...appliedCheckboxes, ...selectedPaymentTypeCheckBoxes, ...selectedServiceTypeCheckboxes].some(
-        (cashier) => rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
-      );
-    });
-
-    setRenderedRows(filteredRows);
+    setRenderedRows(filteredBills);
     goTo(1);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCashierCheckboxes, selectedPaymentTypeCheckBoxes, selectedServiceTypeCheckboxes]);
+
+  const onApplyCashierFilter = (appliedCashierCheckboxes: Array<string>) => {
+    setSelectedCashierCheckboxes(appliedCashierCheckboxes);
   };
 
-  const onApplyPaymentTypeFilter = (appliedCheckboxes: Array<string>) => {
-    setSelectedPaymentTypeCheckBoxes(appliedCheckboxes);
-
-    if (appliedCheckboxes.length === 0) {
-      // No payment type filter applied
-      if (selectedCashierCheckboxes.length === 0 && selectedServiceTypeCheckboxes.length === 0) {
-        setRenderedRows(bills); // No filters applied
-      } else {
-        // Only cashier filter is applied
-        const filteredByCashier = bills.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return [...selectedCashierCheckboxes, ...selectedServiceTypeCheckboxes].some((cashier) =>
-            rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
-          );
-        });
-        setRenderedRows(filteredByCashier);
-      }
-      return;
-    }
-
-    let filteredRows = bills.filter((row) => {
-      const rowValues: string[] = getAllValues(row);
-      return [...appliedCheckboxes, ...selectedCashierCheckboxes, ...selectedServiceTypeCheckboxes].some(
-        (paymentType) => rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-      );
-    });
-
-    setRenderedRows(filteredRows);
-    goTo(1);
+  const onApplyPaymentTypeFilter = (appliedPaymentTypeCheckboxes: Array<string>) => {
+    setSelectedPaymentTypeCheckBoxes(appliedPaymentTypeCheckboxes);
   };
 
-  const onApplyServiceTypeFilter = (appliedCheckboxes: Array<string>) => {
-    setSelectedServiceTypeCheckboxes(appliedCheckboxes);
-
-    if (appliedCheckboxes.length === 0) {
-      // No payment type filter applied
-      if (selectedCashierCheckboxes.length === 0 && selectedPaymentTypeCheckBoxes.length === 0) {
-        setRenderedRows(bills); // No filters applied
-      } else {
-        // Only cashier filter is applied
-        const filteredByCashier = bills.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return [...selectedCashierCheckboxes, ...selectedPaymentTypeCheckBoxes].some((cashier) =>
-            rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
-          );
-        });
-        setRenderedRows(filteredByCashier);
-      }
-      return;
-    }
-
-    let filteredRows = bills.filter((row) => {
-      const rowValues: string[] = getAllValues(row);
-      return [...appliedCheckboxes, ...selectedCashierCheckboxes, ...selectedPaymentTypeCheckBoxes].some(
-        (paymentType) => rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-      );
-    });
-
-    setRenderedRows(filteredRows);
-    goTo(1);
+  const onApplyServiceTypeFilter = (appliedServiceTypes: Array<string>) => {
+    setSelectedServiceTypeCheckboxes(appliedServiceTypes);
   };
 
   const handleOnResetCashierFilter = () => {
     setSelectedCashierCheckboxes([]);
-
-    if (selectedPaymentTypeCheckBoxes.length === 0 && selectedServiceTypeCheckboxes.length === 0) {
-      setRenderedRows(bills);
-    } else {
-      // here we are restoring the state to what was there before applying cashiers
-      let filteredRows = bills;
-
-      const paymentTypeAndServiceTypeCheckboxes = [...selectedPaymentTypeCheckBoxes, ...selectedServiceTypeCheckboxes];
-
-      for (let i = 0; i < paymentTypeAndServiceTypeCheckboxes.length; i++) {
-        const current = paymentTypeAndServiceTypeCheckboxes[i];
-
-        filteredRows = filteredRows.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return rowValues.some((value) => String(value).toLowerCase().includes(current.toLowerCase()));
-        });
-      }
-
-      setRenderedRows(filteredRows);
-    }
-    goTo(1);
   };
 
   const handleOnResetPaymentTypeFilter = () => {
     setSelectedPaymentTypeCheckBoxes([]);
-
-    if (selectedCashierCheckboxes.length === 0 && selectedServiceTypeCheckboxes.length === 0) {
-      setRenderedRows(bills);
-    } else {
-      let filteredRows = bills;
-      const selectedServiceTypesAndCashierCheckboxes = [...selectedCashierCheckboxes, ...selectedServiceTypeCheckboxes];
-
-      for (let j = 0; j < selectedCashierCheckboxes.length; j++) {
-        const current = selectedServiceTypesAndCashierCheckboxes[j];
-
-        filteredRows = filteredRows.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return rowValues.some((value) => String(value).toLowerCase().includes(current.toLowerCase()));
-        });
-      }
-
-      setRenderedRows(filteredRows);
-    }
-
-    goTo(1);
   };
 
   const handleOnResetServiceTypeFilter = () => {
     setSelectedServiceTypeCheckboxes([]);
-
-    if (selectedCashierCheckboxes.length === 0 && selectedPaymentTypeCheckBoxes.length === 0) {
-      setRenderedRows(bills);
-    } else {
-      let filteredRows = bills;
-      const selectedPaymentTypesAndCashierCheckboxes = [...selectedCashierCheckboxes, ...selectedPaymentTypeCheckBoxes];
-
-      for (let j = 0; j < selectedCashierCheckboxes.length; j++) {
-        const current = selectedPaymentTypesAndCashierCheckboxes[j];
-
-        filteredRows = filteredRows.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return rowValues.some((value) => String(value).toLowerCase().includes(current.toLowerCase()));
-        });
-      }
-
-      setRenderedRows(filteredRows);
-    }
-
-    goTo(1);
   };
 
   const cashierTags = selectedCashierCheckboxes.map((c) => {
@@ -273,12 +170,12 @@ const PaymentHistoryViewer = () => {
                     <TableToolbarSearch
                       onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
                     />
+                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags, ...serviceTypeTags]} />
                     <ServiceTypeFilter
                       onApplyFilter={onApplyServiceTypeFilter}
                       onResetFilter={handleOnResetServiceTypeFilter}
                       bills={bills}
                     />
-                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags, ...serviceTypeTags]} />
                     <PaymentTypeFilter
                       onApplyFilter={onApplyPaymentTypeFilter}
                       onResetFilter={handleOnResetPaymentTypeFilter}
@@ -292,7 +189,11 @@ const PaymentHistoryViewer = () => {
                   </TableToolbarContent>
                 </TableToolbar>
               </div>
-              <PaymentHistoryTable tableData={tableData} paidBillsResponse={paidBillsResponse} />
+              <PaymentHistoryTable
+                tableData={tableData}
+                paidBillsResponse={paidBillsResponse}
+                renderedRows={renderedRows}
+              />
               {paginated && (
                 <Pagination
                   forwardText={t('nextPage', 'Next page')}
@@ -300,7 +201,7 @@ const PaymentHistoryViewer = () => {
                   page={currentPage}
                   pageSize={pageSize}
                   pageSizes={pageSizes}
-                  totalItems={bills.length}
+                  totalItems={renderedRows.length}
                   className={styles.pagination}
                   size={responsiveSize}
                   onChange={({ page: newPage, pageSize }) => {

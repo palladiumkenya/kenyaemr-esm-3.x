@@ -1,8 +1,8 @@
-import React, { ChangeEvent, useState } from 'react';
+import { Button, Checkbox, Popover, PopoverContent, usePrefix } from '@carbon/react';
 import { IbmCloudLogging } from '@carbon/react/icons';
-import { Popover, PopoverContent, Button, Checkbox, usePrefix, SkeletonIcon } from '@carbon/react';
-import styles from './payment-history.scss';
+import React, { ChangeEvent, useState } from 'react';
 import { MappedBill } from '../../types';
+import styles from './payment-history.scss';
 
 interface CashierFilterProps {
   onApplyFilter?: (selectedCheckboxes: Array<string>) => void;
