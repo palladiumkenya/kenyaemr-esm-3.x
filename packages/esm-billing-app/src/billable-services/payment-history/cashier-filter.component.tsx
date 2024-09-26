@@ -62,6 +62,7 @@ export const CashierFilter = ({ onApplyFilter, onResetFilter, bills }: CashierFi
         <div className={styles.checkBoxWrapper}>
           <fieldset className={`${prefix}--fieldset`}>
             <legend className={`${prefix}--label`}>Filter by cashier</legend>
+            {cashiers.length === 0 && <p className={styles.noCashiersInRange}>No Cashiers In Bills Range</p>}
             {cashiers.map((cashier) => (
               <Checkbox
                 labelText={cashier.display}

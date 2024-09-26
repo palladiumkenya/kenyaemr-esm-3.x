@@ -16,11 +16,11 @@ import BillingHeader from '../../billing-header/billing-header.component';
 import { useBills } from '../../billing.resource';
 import { MappedBill, PaymentStatus } from '../../types';
 import { AppliedFilterTags } from './applied-filter-tages.component';
-import { CashierFilter } from './cashier-filter';
+import { CashierFilter } from './cashier-filter.component';
 import { PaymentHistoryTable } from './payment-history-table.component';
 import styles from './payment-history.scss';
 import { PaymentTotals } from './payment-totals';
-import { PaymentTypeFilter } from './payment-type-filter';
+import { PaymentTypeFilter } from './payment-type-filter.component';
 import { ServiceTypeFilter } from './service-type-filter.component';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 

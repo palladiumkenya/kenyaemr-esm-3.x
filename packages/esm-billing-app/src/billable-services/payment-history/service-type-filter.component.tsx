@@ -68,7 +68,8 @@ export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: Table
       <PopoverContent id="containerCheckbox">
         <div className={styles.checkBoxWrapper}>
           <fieldset className={`${prefix}--fieldset`}>
-            <legend className={`${prefix}--label`}>Filter options</legend>
+            <legend className={`${prefix}--label`}>Filter by service type</legend>
+            {billsServiceTypes.length === 0 && <p className={styles.noServiceTypes}>No Service Types In Bills Range</p>}
             {billsServiceTypes.map((type) => (
               <Checkbox
                 labelText={type.display}
