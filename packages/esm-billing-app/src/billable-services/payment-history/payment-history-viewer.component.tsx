@@ -37,6 +37,8 @@ export const PaymentHistoryViewer = () => {
   const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
   const { paymentPointUUID } = useParams();
   const { paymentPoints } = usePaymentPoints();
+  const isClockedIn = true;
+
   const isOnPaymentPointPage = Boolean(paymentPointUUID);
   const paidBillsResponse = useBills('', isOnPaymentPointPage ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
   const { bills } = paidBillsResponse;
@@ -260,12 +262,12 @@ export const PaymentHistoryViewer = () => {
                     onResetFilter={handleOnResetCashierFilter}
                   />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
-                  {isOnPaymentPointPage && (
+                  {isOnPaymentPointPage && isClockedIn && (
                     <Button className={styles.clockIn} onClick={openClockInModal}>
                       Clock In
                     </Button>
                   )}
-                  {isOnPaymentPointPage && (
+                  {isOnPaymentPointPage && isClockedIn && (
                     <Button className={styles.clockIn} onClick={openClockOutModal} kind="danger">
                       Clock Out
                     </Button>

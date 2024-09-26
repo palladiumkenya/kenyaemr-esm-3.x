@@ -1,19 +1,10 @@
-import {
-  DataTableSkeleton,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-  DataTable,
-} from '@carbon/react';
+import { DataTableSkeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
-import styles from './payment-history.scss';
 import { useTranslation } from 'react-i18next';
 import { useBills } from '../../billing.resource';
 import { headers } from './payment-history-viewer.component';
+import styles from './payment-history.scss';
 
 export const PaymentHistoryTable = ({
   tableData,

@@ -1,10 +1,10 @@
+import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
+import { showModal } from '@openmrs/esm-framework';
 import React from 'react';
-import BillingHeader from '../billing-header/billing-header.component';
 import { useTranslation } from 'react-i18next';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Button } from '@carbon/react';
+import BillingHeader from '../billing-header/billing-header.component';
 import styles from './payment-points-styles.scss';
 import { PaymentPointsTable } from './payment-points-table.component';
-import { showModal } from '@openmrs/esm-framework';
 
 export const PaymentPoints = () => {
   const { t } = useTranslation();
@@ -23,7 +23,6 @@ export const PaymentPoints = () => {
           <div className={styles.tablistHeader}>
             <TabList contained>
               <Tab>{t('paymentPoints', 'Payment Points')}</Tab>
-              <Tab>{t('cashiers', 'Cashiers')}</Tab>
             </TabList>
             <Button onClick={() => openPaymentPointModal()}>Create Payment Point</Button>
           </div>

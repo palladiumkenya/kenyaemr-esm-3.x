@@ -68,11 +68,10 @@ export const clockIn = (payload: { cashier: string; cashPoint: string; clockIn: 
   });
 };
 
-// TODO temporary clock out request function.
-export const clockOut = (timesheetUUID: string, payload: { clockOut: string }) => {
-  const url = `/openmrs/ws/rest/v1/kenyaemr/cashier/timesheet/${timesheetUUID}`;
+export const clockOut = (payload: { cashier: string; cashPoint: string; clockOut: string }) => {
+  const url = `/ws/rest/v1/cashier/timesheet`;
   return openmrsFetch(url, {
-    method: 'PUT',
+    method: 'POST',
     body: payload,
     headers: {
       'Content-Type': 'application/json',
@@ -109,3 +108,5 @@ export function useUsers() {
 
   return { users, error, isLoading };
 }
+
+// http://kenyaemr3x.healthit.uonbi.ac.ke/openmrs/ws/rest/v1/provider?v=custom:(uuid,person:(uuid))
