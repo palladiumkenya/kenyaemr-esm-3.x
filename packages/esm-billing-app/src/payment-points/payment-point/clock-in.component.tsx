@@ -3,17 +3,23 @@ import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PaymentPoint } from '../../types';
-import { clockIn, useTimeSheets } from '../payment-points.resource';
+import { clockIn, useProviders, useTimeSheets, useUsers } from '../payment-points.resource';
 
 export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint: PaymentPoint }) => {
   const { mutate } = useTimeSheets();
   const { user } = useSession();
+  const { providers, error, isLoading } = useProviders();
+  const { users, error: fetchingUsersError, isLoading: isLoadingUsers } = useUsers();
+
+  const userPerson = users.find((u) => u.uuid === user.uuid)?.person;
+  const providerUUID = providers.find((p) => p.person.uuid === userPerson?.uuid)?.uuid;
+
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onContinue = () => {
     setIsSubmitting(true);
-    clockIn({ cashier: user.uuid, cashPoint: paymentPoint.uuid, clockIn: new Date().toISOString() })
+    clockIn({ cashier: providerUUID, cashPoint: paymentPoint.uuid, clockIn: new Date().toISOString() })
       .then(() => {
         showSnackbar({
           title: t('success', 'Success'),
@@ -43,7 +49,10 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
         <Button kind="secondary" onClick={closeModal} type="button">
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" onClick={onContinue}>
+        <Button
+          type="submit"
+          onClick={onContinue}
+          disabled={isLoading || isLoadingUsers || error || fetchingUsersError || !providerUUID}>
           {isSubmitting ? (
             <>
               <Loading withOverlay={false} small />

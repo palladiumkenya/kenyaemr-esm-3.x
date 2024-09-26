@@ -1,4 +1,4 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { PaymentPoint, Timesheet } from '../types';
 
@@ -79,3 +79,33 @@ export const clockOut = (timesheetUUID: string, payload: { clockOut: string }) =
     },
   });
 };
+
+interface Person {
+  uuid: string;
+}
+
+interface ProviderResponse {
+  uuid: string;
+  person: Person;
+}
+
+interface UsersResponse {
+  uuid: string;
+  person: Person;
+}
+
+export function useProviders() {
+  const url = `/ws/rest/v1/provider?v=custom:(uuid,person:(uuid)`;
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: ProviderResponse[] }>>(url, openmrsFetch);
+  const providers = data?.data?.results || [];
+
+  return { providers, error, isLoading };
+}
+
+export function useUsers() {
+  const url = `/ws/rest/v1/user?v=custom:(uuid,person:(uuid)`;
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: UsersResponse[] }>>(url, openmrsFetch);
+  const users = data?.data?.results || [];
+
+  return { users, error, isLoading };
+}
