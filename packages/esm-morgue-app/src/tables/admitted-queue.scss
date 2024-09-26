@@ -20,13 +20,12 @@
   align-items: center;
   gap: layout.$spacing-03;
   padding: 0;
-  background-color: aqua;
   margin: 0.5rem;
 }
 
 .tile {
   width: 340px;
-  height: 48px;
+  height: layout.$spacing-09;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,12 +40,12 @@
 }
 
 .label {
-  width: 30px;
-  height: 30px;
+  width: layout.$spacing-07;
+  height: layout.$spacing-07;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: layout.$spacing-01;
   font-weight: 600;
   line-height: 1.29;
   background-color: colors.$cool-gray-20;

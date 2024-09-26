@@ -82,7 +82,7 @@ const GenericTable: React.FC<GenericTableProps> = ({ rows, headers, actionColumn
         <PatientChartPagination
           currentItems={paginatedData.length}
           totalItems={rows.length}
-          onPageNumberChange={goTo}
+          onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={pageSize}
         />

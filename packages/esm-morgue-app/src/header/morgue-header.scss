@@ -1,27 +1,28 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 .header {
   @include type.type-style('body-compact-02');
   color: $text-02;
-  height: spacing.$spacing-12;
+  height: layout.$spacing-12;
   background-color: $ui-02;
   border: 1px solid $ui-03;
-  border-left: 0px;
+  border-left: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: layout.$spacing-07;
   margin-right: 0;
   overflow-x: hidden;
-  padding: 0 1rem;
+  padding: 0 layout.$spacing-05;
 }
 
 .left-justified-items {
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-left: 0.75rem;
+  margin-left: layout.$spacing-04;
 }
 
 .page-name {
@@ -29,10 +30,10 @@
 }
 
 .page-labels {
-  margin-left: 1rem;
+  margin-left: layout.$spacing-05;
 
   p:first-of-type {
-    margin-bottom: 0.25rem;
+    margin-bottom: layout.$spacing-02;
   }
 }
 
@@ -43,8 +44,8 @@ svg.iconOverrides {
 }
 
 .svgContainer svg {
-  width: 72px;
-  height: 72px;
+  width: layout.$spacing-11;
+  height: layout.$spacing-11;
   fill: var(--brand-03);
 }
 
@@ -53,10 +54,10 @@ svg.iconOverrides {
   flex-direction: row;
   justify-content: flex-end;
   align-items: center;
-  gap: 24px;
+  gap: layout.$spacing-06;
   flex-wrap: wrap;
-  padding: 12px 16px 0 0;
-  margin-right: 3.75rem;
+  padding: layout.$spacing-04 layout.$spacing-05 0 0;
+  margin-right: layout.$spacing-10;
   width: auto;
   height: auto;
 }
@@ -69,15 +70,14 @@ svg.iconOverrides {
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  gap: 7px;
+  gap:layout.$spacing-03;
   padding: 0;
-  min-width: 100px;
+  min-width: layout.$spacing-12;
 }
 
 .metricLabel {
   flex-grow: 0;
-  font-family: IBMPlexSans;
-  font-size: 12px;
+  font-size: layout.$spacing-04;
   line-height: 1.33;
   letter-spacing: 0.32px;
   color: $text-02;
@@ -90,7 +90,7 @@ svg.iconOverrides {
 .metricValue {
   flex-grow: 0;
   font-family: IBMPlexSans;
-  font-size: 1.75rem;
+  font-size: layout.$spacing-06;
   line-height: 1.4;
   text-align: left;
   white-space: nowrap;
@@ -103,7 +103,7 @@ svg.iconOverrides {
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  gap: 15px;
+  gap: layout.$spacing-05;
   width: auto;
   max-width: 120px;
 }
@@ -112,7 +112,7 @@ svg.iconOverrides {
 .date {
   display: flex;
   align-items: center;
-  font-size: 15px;
+  font-size: layout.$spacing-05;
   line-height: 1.33;
   text-align: left;
   white-space: nowrap;
@@ -121,21 +121,21 @@ svg.iconOverrides {
 }
 
 .location {
-  margin-bottom: 4px;
+  margin-bottom: layout.$spacing-02;
 }
 
 @media (max-width: 768px) {
   .metrics {
     gap: 12px;
-    margin-right: 1rem;
+    margin-right: layout.$spacing-05;
   }
 
   .wrapMetrics {
-    min-width: 80px;
+    min-width: layout.$spacing-11;
   }
 
   .metricLabel,
   .metricValue {
-    font-size: 0.875rem;
+    font-size: layout.$spacing-04;
   }
 }

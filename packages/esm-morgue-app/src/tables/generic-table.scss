@@ -5,10 +5,6 @@
 
 .genericTable {
   margin: 0 auto;
-
-  @media (max-width: 768px) {
-    padding: 10px;
-  }
 }
 
 .searchContainer {
@@ -22,7 +18,7 @@
 }
 
 .tableContainer {
-  margin: 0 15px;
+  margin: 0 layout.$spacing-05;
 }
 
 .actionBtn {

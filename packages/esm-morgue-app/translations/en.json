@@ -8,6 +8,7 @@
   "causeOfDeathIsRequired": "Please select the cause of death",
   "discharged": "Discharged",
   "discharges": "Discharges",
+  "empty": "Empty",
   "enrollingBtn": "Add New Deceased",
   "enterNonCodedCauseOfDeath": "Enter non-coded cause of death",
   "error": "An error occurred:",
