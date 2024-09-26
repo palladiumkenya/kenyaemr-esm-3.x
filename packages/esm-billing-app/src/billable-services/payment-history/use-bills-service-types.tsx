@@ -10,12 +10,15 @@ export const useBillsServiceTypes = (bills: MappedBill[]) => {
     .map((bill) => [...bill.lineItems.map((item) => item.billableService.split(':').at(0))])
     .flat();
 
-  const uniqueServiceTypeUUID = Array.from(new Set(allLineItemBillableServicesUUIDs)).map(
+  //finding the billable service`s service type
+  const lineItemServiceTypeUUIDS = allLineItemBillableServicesUUIDs.map(
     (billableServiceUUID) => chargeSummaryItems.find((item) => item.uuid === billableServiceUUID)?.serviceType?.uuid,
   );
 
+  const uniqueLineItemServiceType = Array.from(new Set(lineItemServiceTypeUUIDS));
+
   return {
     isLoading: isLoading || isLoadingChargeSummaries,
-    billsServiceTypes: serviceTypes.filter((sType) => uniqueServiceTypeUUID.includes(sType.uuid)),
+    billsServiceTypes: serviceTypes.filter((sType) => uniqueLineItemServiceType.includes(sType.uuid)),
   };
 };

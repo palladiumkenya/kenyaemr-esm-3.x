@@ -194,7 +194,7 @@ const PaymentHistoryViewer = () => {
                 paidBillsResponse={paidBillsResponse}
                 renderedRows={renderedRows}
               />
-              {paginated && (
+              {paginated && !paidBillsResponse.isLoading && !paidBillsResponse.error && (
                 <Pagination
                   forwardText={t('nextPage', 'Next page')}
                   backwardText={t('previousPage', 'Previous page')}
