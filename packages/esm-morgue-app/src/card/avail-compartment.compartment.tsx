@@ -2,12 +2,12 @@ import React from 'react';
 import styles from './compartment.scss';
 import { Button, Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { DeceasedInfo } from '../tables/generic-table.resource';
 import { toUpperCase } from '../helpers/expression-helper';
 import { formatDate, navigate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { DeceasedInfo } from '../types';
 
 interface AvailableCompartmentProps {
   patientInfo: DeceasedInfo;

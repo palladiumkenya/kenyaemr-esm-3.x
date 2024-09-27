@@ -1,8 +1,8 @@
 import React from 'react';
 import styles from './compartment.scss';
-import { DeceasedInfo } from '../tables/generic-table.resource';
 import EmptyCompartment from './empty-compartment.component';
 import AvailableCompartment from './avail-compartment.compartment';
+import { DeceasedInfo } from '../types';
 
 interface CompartmentViewProps {
   patients: (DeceasedInfo | null)[];
