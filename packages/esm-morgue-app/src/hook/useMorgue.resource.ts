@@ -1,21 +1,8 @@
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-
-interface CauseOfDeathFetchResponse {
-  uuid: string;
-  value: string;
-}
-
-export interface ConceptAnswer {
-  display: string;
-  name: string;
-  uuid: string;
-}
-
-interface ConceptAnswersResponse {
-  answers?: Array<ConceptAnswer>;
-}
+import { ConceptAnswer, ConceptAnswersResponse, CauseOfDeathFetchResponse, DeceasedPatientResponse } from '../types';
+import useSWRImmutable from 'swr/immutable';
 
 export function useCausesOfDeath() {
   const { isCauseOfDeathLoading, isCauseOfDeathValidating, value: causeOfDeathConcept } = useCauseOfDeathConcept();
@@ -67,3 +54,14 @@ export function useCauseOfDeathConcept() {
   }, [data?.data?.value, error, isLoading, isValidating]);
   return result;
 }
+
+export const useDeceasedPatient = (deceasedPatientName: String) => {
+  const customRepresentation =
+    'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name)),person:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),preferredAddress:(uuid,stateProvince,countyDistrict,address4)))';
+  const url = `/ws/rest/v1/patient?v=${customRepresentation}&dead=true&q=${deceasedPatientName}`;
+  const { data, error, isLoading, mutate } = useSWRImmutable<{ data: DeceasedPatientResponse }>(url, openmrsFetch);
+
+  const deceasedPatient = data?.data?.results || null;
+
+  return { data: deceasedPatient, error, isLoading, mutate };
+};
