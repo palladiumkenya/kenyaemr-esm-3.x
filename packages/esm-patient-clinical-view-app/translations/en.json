@@ -94,6 +94,7 @@
   "inPatientVisitMessage": "in-patient encounter found for current  {{visitType}} visit",
   "ipvOutcome": "IPV Outcome",
   "labourAndDelivery": "Labour and Delivery",
+  "launch": "Launch outreact form",
   "listingDate": "Listing date",
   "livingWithClient": "Living with client",
   "managePeers": "Manage Peers",

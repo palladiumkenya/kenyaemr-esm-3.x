@@ -195,7 +195,7 @@
       "online": true,
       "offline": false
     },
-     {
+    {
       "component": "caseManagementDashboardLink",
       "name": "case-management-dashboard-link",
       "slot": "homepage-dashboard-slot",
@@ -245,11 +245,10 @@
         "columnSpan": 1,
         "slot": "patient-chart-case-encounter-slot",
         "path": "case-management-encounters",
-
         "layoutMode": "anchored"
       }
     },
-     {
+    {
       "name": "case-encounter-table",
       "slot": "patient-chart-case-encounter-slot",
       "component": "caseEncounterTable",
@@ -267,7 +266,8 @@
         "slot": "peer-calendar-dashboard-slot",
         "path": "peer-management"
       }
-    }, {
+    },
+    {
       "name": "peer-calendar",
       "slot": "peer-calendar-dashboard-slot",
       "component": "peerCalendar",
@@ -277,36 +277,43 @@
     }
   ],
   "modals": [
-	{
-	  "name": "birth-date-calculator",
-	  "component": "birthDateCalculator"
-	}
-],
-"workspaces": [
-  {
-    "name": "case-management-form",
-    "component": "caseManagementForm",
-    "title": "Case Management Form",
-    "type": "form"
-  },
-  {
-    "name": "family-relationship-form",
-    "component": "familyRelationshipForm",
-    "title": "Family Relationship Form",
-    "type": "form"
-  },
-  {
-    "name": "other-relationship-form",
-    "component": "otherRelationshipsForm",
-    "title": "Other Relationships Form",
-    "type": "form"
-  },
-  {
-    "name": "peers-form",
-    "component": "peersForm",
-    "title": "Add New Peer",
-    "type": "form"
-  }
-
-]
+    {
+      "name": "birth-date-calculator",
+      "component": "birthDateCalculator"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "case-management-form",
+      "component": "caseManagementForm",
+      "title": "Case Management Form",
+      "type": "form"
+    },
+    {
+      "name": "family-relationship-form",
+      "component": "familyRelationshipForm",
+      "title": "Family Relationship Form",
+      "type": "form"
+    },
+    {
+      "name": "other-relationship-form",
+      "component": "otherRelationshipsForm",
+      "title": "Other Relationships Form",
+      "type": "form"
+    },
+    {
+      "name": "peers-form",
+      "component": "peersForm",
+      "title": "Add New Peer",
+      "type": "form"
+    },
+    {
+      "name": "peer-calendar-form",
+      "component": "peerCalendarFormEntry",
+      "title": "Peer Calendar Form",
+      "type": "form",
+      "width": "wider",
+      "canMaximize": true
+    }
+  ]
 }

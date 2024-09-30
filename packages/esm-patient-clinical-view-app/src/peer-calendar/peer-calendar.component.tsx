@@ -30,16 +30,10 @@ const PeerCalendar = () => {
   const peersTitle = t('peers', 'Peers');
 
   const handleLauchPeerOutreachForm = ({ patientUuid }: Contact) => {
-    launchWorkspace('patient-form-entry-workspace', {
-      workspaceTitle: 'KVP Peer Educator Outreach Calendar',
-      mutateForm: () => {},
-      formInfo: {
-        encounterUuid: '',
-        formUuid,
-        patientUuid,
-        visitTypeUuid: '',
-        visitUuid: '',
-      },
+    launchWorkspace('peer-calendar-form', {
+      formUuid,
+      patientUuid,
+      encounterUuid: '',
     });
   };
   return (
