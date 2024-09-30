@@ -5,6 +5,10 @@ import { getPatientUuidFromUrl, launchPatientWorkspace } from '@openmrs/esm-pati
 import { Tile, Button, Tabs, TabList, Tab, TabPanels, TabPanel, Layer } from '@carbon/react';
 import { Report, Folders, Wallet, WatsonHealthBrushFreehand, Movement, Return } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
+import AttachmentView from '../panels/attachments.component';
+import BillingHistoryView from '../panels/billing-history.component';
+import AutopsyView from '../panels/autopsy.component';
+import MedicalHistoryView from '../panels/medical-history.component';
 
 const DeceasedDetailsView: React.FC = () => {
   const patientUuid = getPatientUuidFromUrl();
@@ -44,9 +48,18 @@ const DeceasedDetailsView: React.FC = () => {
               <Tab renderIcon={Report}>{t('attachments', 'Attachments')}</Tab>
             </TabList>
             <TabPanels>
-              <TabPanel></TabPanel>
-              <TabPanel></TabPanel>
-              <TabPanel></TabPanel>
+              <TabPanel>
+                <MedicalHistoryView />
+              </TabPanel>
+              <TabPanel>
+                <AutopsyView />
+              </TabPanel>
+              <TabPanel>
+                <BillingHistoryView />
+              </TabPanel>
+              <TabPanel>
+                <AttachmentView />
+              </TabPanel>
             </TabPanels>
           </Tabs>
         </div>
