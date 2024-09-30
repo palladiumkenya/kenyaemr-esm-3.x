@@ -1,10 +1,10 @@
 import { MappedBill } from '../../types';
 import { useServiceTypes } from '../billable-service.resource';
-import { UseChargeSummaries } from '../billables/charge-summary.resource';
+import { useChargeSummaries } from '../billables/charge-summary.resource';
 
 export const useBillsServiceTypes = (bills: MappedBill[]) => {
   const { serviceTypes, isLoading } = useServiceTypes();
-  const { isLoading: isLoadingChargeSummaries, chargeSummaryItems } = UseChargeSummaries();
+  const { isLoading: isLoadingChargeSummaries, chargeSummaryItems } = useChargeSummaries();
 
   const allLineItemBillableServicesUUIDs = bills
     .map((bill) => [...bill.lineItems.map((item) => item.billableService.split(':').at(0))])
