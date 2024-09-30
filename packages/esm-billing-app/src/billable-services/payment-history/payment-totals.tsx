@@ -1,9 +1,10 @@
 import React from 'react';
 import { usePaymentTotals } from './use-payment-totals';
-import { Tile } from '@carbon/react';
+import { Tile, SkeletonText } from '@carbon/react';
 import { convertToCurrency } from '../../helpers';
 import { MappedBill } from '../../types';
 import styles from './payment-history.scss';
+import { usePaymentModes } from '../../billing.resource';
 
 export const PaymentTotals = ({
   renderedRows,
@@ -12,7 +13,21 @@ export const PaymentTotals = ({
   renderedRows: MappedBill[] | null;
   selectedPaymentTypeCheckBoxes: string[];
 }) => {
+  const { isLoading } = usePaymentModes();
   const paymentTotals = usePaymentTotals(renderedRows);
+
+  if (isLoading) {
+    return (
+      <div className={styles.loadingPaymentTotals}>
+        {Array.from({ length: 4 }).map(() => (
+          <Tile className={styles.tile}>
+            <SkeletonText className={styles.loadingPaymentTotal} style={{ width: '50%' }} />
+            <SkeletonText />
+          </Tile>
+        ))}
+      </div>
+    );
+  }
 
   if (selectedPaymentTypeCheckBoxes.length === 0) {
     return (
