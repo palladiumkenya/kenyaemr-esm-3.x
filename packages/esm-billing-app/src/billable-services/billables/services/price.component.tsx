@@ -6,6 +6,7 @@ import { usePaymentModes } from '../../../billing.resource';
 import styles from './service-form.scss';
 import { ComboBox, NumberInput, IconButton } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
+import { ResponsiveWrapper } from '@openmrs/esm-framework';
 
 interface PriceFieldProps {
   field: Record<string, any>;
@@ -20,7 +21,6 @@ const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeSe
   const { paymentModes, isLoading } = usePaymentModes();
   const { watch } = useFormContext();
   const servicePrices = watch('servicePrices');
-
   // Filter out the payment modes that are already selected
   const availablePaymentModes = useMemo(
     () =>
@@ -32,38 +32,44 @@ const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeSe
 
   return (
     <div key={field.id} className={styles.paymentMethods}>
-      <Controller
-        name={`servicePrices.${index}.paymentMode`}
-        control={control}
-        render={({ field }) => (
-          <ComboBox
-            onChange={({ selectedItem }) => field.onChange(selectedItem)}
-            titleText={t('paymentMethod', 'Payment method')}
-            items={availablePaymentModes ?? []}
-            itemToString={(item) => (item ? item.name : '')}
-            placeholder={t('selectPaymentMode', 'Select payment mode')}
-            disabled={isLoading}
-            initialSelectedItem={field.value}
-            invalid={!!errors?.servicePrices?.[index]?.paymentMode}
-            invalidText={errors?.servicePrices?.[index]?.paymentMode?.message}
-          />
-        )}
-      />
-      <Controller
-        name={`servicePrices.${index}.price`}
-        control={control}
-        render={({ field }) => (
-          <NumberInput
-            onChange={(e) => field.onChange(parseInt(e.target.value))}
-            type="number"
-            labelText={t('price', 'Price')}
-            placeholder={t('enterPrice', 'Enter price')}
-            defaultValue={field.value}
-            invalid={!!errors?.servicePrices?.[index]?.price}
-            invalidText={errors?.servicePrices?.[index]?.price?.message}
-          />
-        )}
-      />
+      <ResponsiveWrapper>
+        <Controller
+          name={`servicePrices.${index}.paymentMode`}
+          control={control}
+          render={({ field }) => (
+            <ComboBox
+              onChange={({ selectedItem }) => field.onChange(selectedItem)}
+              titleText={t('paymentMethodDescription', 'Payment method {{methodName}}', {
+                methodName: servicePrices[index]?.paymentMode?.name ?? '',
+              })}
+              items={availablePaymentModes ?? []}
+              itemToString={(item) => (item ? item.name : '')}
+              placeholder={t('selectPaymentMode', 'Select payment mode')}
+              disabled={isLoading}
+              initialSelectedItem={field.value}
+              invalid={!!errors?.servicePrices?.[index]?.paymentMode}
+              invalidText={errors?.servicePrices?.[index]?.paymentMode?.message}
+            />
+          )}
+        />
+      </ResponsiveWrapper>
+      <ResponsiveWrapper>
+        <Controller
+          name={`servicePrices.${index}.price`}
+          control={control}
+          render={({ field }) => (
+            <NumberInput
+              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+              type="number"
+              labelText={t('price', 'Price')}
+              placeholder={t('enterPrice', 'Enter price')}
+              defaultValue={field.value}
+              invalid={!!errors?.servicePrices?.[index]?.price}
+              invalidText={errors?.servicePrices?.[index]?.price?.message}
+            />
+          )}
+        />
+      </ResponsiveWrapper>
       <IconButton
         kind="danger--tertiary"
         size="md"

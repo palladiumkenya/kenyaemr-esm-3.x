@@ -21,11 +21,11 @@ import { PaymentTotals } from './payment-totals';
 import { CashierFilter } from './cashier-filter';
 import { PaymentTypeFilter } from './payment-type-filter';
 import { AppliedFilterTags } from './applied-filter-tages.component';
+import BillingHeader from '../../billing-header/billing-header.component';
 
 export const headers = [
   { header: 'Date', key: 'dateCreated' },
   { header: 'Patient Name', key: 'patientName' },
-  { header: 'Status', key: 'status' },
   { header: 'Total Amount', key: 'totalAmount' },
   { header: 'Service', key: 'billingService' },
 ];
@@ -109,6 +109,7 @@ const PaymentHistoryViewer = () => {
     }
 
     setRenderedRows(filteredRows);
+    goTo(1);
   };
 
   const onApplyPaymentTypeFilter = (appliedCheckboxes: Array<string>) => {
@@ -150,6 +151,7 @@ const PaymentHistoryViewer = () => {
     }
 
     setRenderedRows(filteredRows);
+    goTo(1);
   };
 
   const handleOnResetCashierFilter = () => {
@@ -171,6 +173,7 @@ const PaymentHistoryViewer = () => {
 
       setRenderedRows(filteredRows);
     }
+    goTo(1);
   };
 
   const handleOnResetPaymentTypeFilter = () => {
@@ -192,6 +195,8 @@ const PaymentHistoryViewer = () => {
 
       setRenderedRows(filteredRows);
     }
+
+    goTo(1);
   };
 
   const cashierTags = selectedCashierCheckboxes.map((c) => {
@@ -209,56 +214,57 @@ const PaymentHistoryViewer = () => {
   });
 
   return (
-    <div className={styles.table}>
-      <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
-      <DataTable rows={results ?? []} headers={headers} isSortable>
-        {(tableData) => (
-          <TableContainer
-            title={t('paidBills', 'Paid Bills')}
-            description={t('paidBillsSummary', 'Paid Bills Summary')}>
-            <div className={styles.tableToolBar}>
-              <TableToolbar>
-                <TableToolbarContent>
-                  <TableToolbarSearch
-                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
-                  />
-                  <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags]} />
-                  <PaymentTypeFilter
-                    onApplyFilter={onApplyPaymentTypeFilter}
-                    onResetFilter={handleOnResetPaymentTypeFilter}
-                  />
-                  <CashierFilter
-                    bills={bills}
-                    onApplyFilter={onApplyCashierFilter}
-                    onResetFilter={handleOnResetCashierFilter}
-                  />
-                  <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
-                </TableToolbarContent>
-              </TableToolbar>
-            </div>
-            <PaymentHistoryTable tableData={tableData} paidBillsResponse={paidBillsResponse} />
-            {paginated && (
-              <Pagination
-                forwardText={t('nextPage', 'Next page')}
-                backwardText={t('previousPage', 'Previous page')}
-                page={currentPage}
-                pageSize={pageSize}
-                pageSizes={pageSizes}
-                totalItems={bills.length}
-                className={styles.pagination}
-                size={responsiveSize}
-                onChange={({ page: newPage, pageSize }) => {
-                  if (newPage !== currentPage) {
-                    goTo(newPage);
-                  }
-                  setPageSize(pageSize);
-                }}
-              />
-            )}
-          </TableContainer>
-        )}
-      </DataTable>
-    </div>
+    <>
+      <BillingHeader title={t('paymentHistory', 'Payment History')} />
+      <div className={styles.table}>
+        <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
+        <DataTable rows={results ?? []} headers={headers} isSortable>
+          {(tableData) => (
+            <TableContainer>
+              <div className={styles.tableToolBar}>
+                <TableToolbar>
+                  <TableToolbarContent>
+                    <TableToolbarSearch
+                      onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
+                    />
+                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags]} />
+                    <PaymentTypeFilter
+                      onApplyFilter={onApplyPaymentTypeFilter}
+                      onResetFilter={handleOnResetPaymentTypeFilter}
+                    />
+                    <CashierFilter
+                      bills={bills}
+                      onApplyFilter={onApplyCashierFilter}
+                      onResetFilter={handleOnResetCashierFilter}
+                    />
+                    <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
+                  </TableToolbarContent>
+                </TableToolbar>
+              </div>
+              <PaymentHistoryTable tableData={tableData} paidBillsResponse={paidBillsResponse} />
+              {paginated && (
+                <Pagination
+                  forwardText={t('nextPage', 'Next page')}
+                  backwardText={t('previousPage', 'Previous page')}
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={pageSizes}
+                  totalItems={bills.length}
+                  className={styles.pagination}
+                  size={responsiveSize}
+                  onChange={({ page: newPage, pageSize }) => {
+                    if (newPage !== currentPage) {
+                      goTo(newPage);
+                    }
+                    setPageSize(pageSize);
+                  }}
+                />
+              )}
+            </TableContainer>
+          )}
+        </DataTable>
+      </div>
+    </>
   );
 };
 
