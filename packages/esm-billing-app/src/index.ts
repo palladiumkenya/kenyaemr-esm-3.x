@@ -1,5 +1,5 @@
 import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
 import BillableServicesCardLink from './billable-services-admin-card-link.component';
@@ -9,7 +9,6 @@ import { DeleteBillableServiceModal } from './billable-services/bill-manager/mod
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
-import BillableServiceHome from './billable-services/billable-services-home.component';
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
@@ -42,11 +41,43 @@ export const billingSummaryDashboardLink = getSyncLifecycle(
   options,
 );
 
-// t('billing', 'Billing')
 export const billingDashboardLink = getSyncLifecycle(
+  createDashboardGroup({
+    title: 'Billing',
+    slotName: 'billing-dashboard-link-slot',
+    isExpanded: false,
+  }),
+  options,
+);
+
+export const billingOverviewLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billing',
-    title: 'Billing',
+    title: 'Overview',
+  }),
+  options,
+);
+
+export const paymentHistoryLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'billing/payment-history',
+    title: 'Payment History',
+  }),
+  options,
+);
+
+export const billManagerLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'billing/bill-manager',
+    title: 'Bill Manager',
+  }),
+  options,
+);
+
+export const billableServicesLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'billing/billable-services',
+    title: 'Billable Services',
   }),
   options,
 );
@@ -62,7 +93,6 @@ export const benefitsPackageDashboardLink = getSyncLifecycle(
 export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
-export const billableServicesHome = getSyncLifecycle(BillableServiceHome, options);
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 
 export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);

@@ -41,6 +41,7 @@ typings/
 
 # Optional npm cache directory
 .npm
+package-lock.json
 
 # ignores for Yarn v3 w/o PNP
 .pnp.*

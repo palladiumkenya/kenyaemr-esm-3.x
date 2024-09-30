@@ -13,7 +13,7 @@ const ServiceConceptSchema = z.object({
 });
 
 export const servicePriceSchema = z.object({
-  price: z.number().positive('Price must be a positive number').min(1, 'Price is required'),
+  price: z.number().gt(0.01, 'Price must be greater than 0').min(0.01, 'Price must be at least 0.01'),
   paymentMode: z.object({ uuid: z.string(), name: z.string() }),
 });
 

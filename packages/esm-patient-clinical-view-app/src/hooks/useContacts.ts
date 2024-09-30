@@ -120,7 +120,7 @@ function extractContactData(
 
 const useContacts = (patientUuid: string) => {
   const customeRepresentation =
-    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
+    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
   const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
   const config = useConfig<ConfigObject>();
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
