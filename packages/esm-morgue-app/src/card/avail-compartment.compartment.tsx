@@ -7,10 +7,10 @@ import { formatDate, navigate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
-import { DeceasedInfo } from '../types';
+import { Patient } from '../types';
 
 interface AvailableCompartmentProps {
-  patientInfo: DeceasedInfo;
+  patientInfo: Patient;
 }
 
 const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo }) => {

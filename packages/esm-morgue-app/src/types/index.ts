@@ -13,7 +13,7 @@ export interface ConceptAnswersResponse {
   answers?: Array<ConceptAnswer>;
 }
 
-export interface DeceasedInfo {
+export interface Patient {
   uuid: string;
   display: string;
   identifiers: Array<{
@@ -46,5 +46,5 @@ export interface DeceasedInfo {
   };
 }
 export interface DeceasedPatientResponse {
-  results: DeceasedInfo[];
+  results: Patient[];
 }
