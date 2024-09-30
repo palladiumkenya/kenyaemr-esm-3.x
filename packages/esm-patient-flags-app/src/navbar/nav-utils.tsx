@@ -87,12 +87,6 @@ export const useModuleLinks = () => {
       privilege: 'o3: View Lab Manifest',
     },
     {
-      label: 'Billable Services',
-      url: `${openmrsSpaBase}billable-services`,
-      icon: <InventoryManagement size={24} />,
-      privilege: 'o3: View Bill Management Dashboard',
-    },
-    {
       label: 'Bed Management',
       url: `${openmrsSpaBase}bed-management`,
       icon: <HospitalBed size={24} />,

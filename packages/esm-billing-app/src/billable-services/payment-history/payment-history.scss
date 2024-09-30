@@ -2,11 +2,14 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.table,
-.emptyStateWrapper,
-.errorStateSkeleton,
-.dataTableSkeleton {
+.table {
   padding: layout.$spacing-05;
+}
+
+.errorStateSkeleton,
+.dataTableSkeleton,
+.emptyStateWrapper {
+  padding-top: layout.$spacing-05;
 }
 
 .checkBoxWrapper {
@@ -37,6 +40,7 @@
   margin-right: layout.$spacing-05;
 }
 
+.loadingPaymentTotals,
 .paymentTotals {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -59,4 +63,8 @@
   border: 1px solid $ui-03;
   gap: layout.$spacing-03;
   padding: layout.$spacing-03;
+}
+
+.loadingPaymentTotal {
+  width: 50% !important;
 }
