@@ -12,8 +12,8 @@
 
 .headingContainer {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-between; // Align the heading and button at opposite ends
+  align-items: center; // Vertically center both the heading and button
 }
 
 .desktopHeading,

@@ -4,34 +4,29 @@ import DeceasedFilter from '../header/admitted-queue-header.component';
 import styles from './admitted-queue.scss';
 import CompartmentView from '../card/compartment-view.compartment';
 import { useDeceasedPatient } from '../hook/useMorgue.resource';
-import { InlineLoading } from '@carbon/react';
-import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 export const AdmittedQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient('test');
   const { t } = useTranslation();
 
   if (isLoading) {
-    return (
-      <InlineLoading
-        status="active"
-        iconDescription="Loading"
-        description={t('pullingCompartment', 'Pulling compartments data.....')}
-      />
-    );
+    return <p>{t('loading', 'Loading...')}</p>;
   }
 
   if (error) {
-    return <ErrorState error={error} headerTitle={t('allocation', 'Allocation')} />;
+    return (
+      <p>
+        {t('error', 'An error occurred:')} {error.message}
+      </p>
+    );
   }
 
   return (
-    <div className={styles.layoutWrapper}>
-      <CardHeader title={t('allocation', 'Allocation')} children={''} />
+    <>
       <DeceasedFilter />
       <div className={styles.patientCardContainer}>
         <CompartmentView patients={deceasedPatients || []} />
       </div>
-    </div>
+    </>
   );
 };

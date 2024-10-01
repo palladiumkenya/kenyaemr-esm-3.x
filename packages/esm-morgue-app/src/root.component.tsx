@@ -11,7 +11,6 @@ const Root: React.FC = () => {
     <BrowserRouter basename={baseName}>
       <Routes>
         <Route path="/" element={<MainComponent />} />
-        <Route path="/allocation" element={<AdmittedQueue />} />
         <Route path="/patient/:patientUuid/details" element={<DeceasedDetailsView />} />
       </Routes>
     </BrowserRouter>

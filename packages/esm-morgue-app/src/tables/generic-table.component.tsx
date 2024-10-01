@@ -30,7 +30,7 @@ const GenericTable: React.FC<GenericTableProps> = ({ rows, headers, actionColumn
   const isTablet = useLayoutType() === 'tablet';
 
   return (
-    <div className={styles.table}>
+    <>
       <CardHeader title={title} children={''} />
       <div className={styles.searchContainer}>
         <Search
@@ -87,7 +87,7 @@ const GenericTable: React.FC<GenericTableProps> = ({ rows, headers, actionColumn
           pageSize={pageSize}
         />
       </div>
-    </div>
+    </>
   );
 };
 
