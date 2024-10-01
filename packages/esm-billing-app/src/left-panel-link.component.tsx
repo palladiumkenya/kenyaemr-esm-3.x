@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import last from 'lodash-es/last';
-import { BrowserRouter, useLocation } from 'react-router-dom';
 import { ConfigurableLink } from '@openmrs/esm-framework';
+import last from 'lodash-es/last';
+import React, { useMemo } from 'react';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 
 export interface LinkConfig {
   name: string;
@@ -22,7 +22,11 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   };
 
   if (isUUID(urlSegment)) {
-    urlSegment = location.pathname.split('/').at(-4);
+    if (location.pathname.includes('payment-points')) {
+      urlSegment = location.pathname.split('/').at(-2);
+    } else {
+      urlSegment = location.pathname.split('/').at(-4);
+    }
   }
 
   if (location.pathname.includes('claims')) {

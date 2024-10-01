@@ -1,4 +1,4 @@
-import { Button, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
+import { Button } from '@carbon/react';
 import { showModal } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,21 +18,11 @@ export const PaymentPoints = () => {
   return (
     <div>
       <BillingHeader title={t('paymentPoints', 'Payment Points')} />
-      <div className={styles.tabs}>
-        <Tabs>
-          <div className={styles.tablistHeader}>
-            <TabList contained>
-              <Tab>{t('paymentPoints', 'Payment Points')}</Tab>
-            </TabList>
-            <Button onClick={() => openPaymentPointModal()}>Create Payment Point</Button>
-          </div>
-          <TabPanels>
-            <TabPanel className={styles.tabPanel}>
-              <PaymentPointsTable />
-            </TabPanel>
-            <TabPanel className={styles.tabPanel}>two</TabPanel>
-          </TabPanels>
-        </Tabs>
+      <div className={styles.paymentPoints}>
+        <Button onClick={() => openPaymentPointModal()} className={styles.createPaymentPointButton}>
+          Create Payment Point
+        </Button>
+        <PaymentPointsTable />
       </div>
     </div>
   );
