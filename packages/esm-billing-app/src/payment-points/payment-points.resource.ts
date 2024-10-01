@@ -121,9 +121,24 @@ export const useProviderUUID = () => {
   return { providerUUID, isLoading: isLoading || isLoadingUsers, error: error || fetchingUsersError };
 };
 
-export const useClockInStatus = (paymentPointUUID: string) => {
+export const useClockInStatus = (paymentPointUUID?: string) => {
   const { timesheets, error, isLoading } = useTimeSheets();
   const { providerUUID, isLoading: isLoadingProviderUUID, error: providerUUIDError } = useProviderUUID();
+
+  if (!paymentPointUUID) {
+    const userTimesheet: Timesheet | undefined = timesheets
+      ?.filter((ts) => ts.cashier.uuid === providerUUID)
+      .find((ts) => ts.clockIn && ts.clockOut);
+
+    const isClockedIn = Boolean(userTimesheet);
+
+    return {
+      isClockedIn,
+      userTimesheet,
+      error: error || providerUUIDError,
+      isLoading: isLoading || isLoadingProviderUUID,
+    };
+  }
 
   const userTimesheet: Timesheet | undefined = timesheets
     ?.filter((ts) => ts.cashier.uuid === providerUUID && ts.cashPoint.uuid === paymentPointUUID)
