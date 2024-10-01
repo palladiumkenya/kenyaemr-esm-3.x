@@ -1,7 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/colors';
 
-
 .observation {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -30,20 +29,18 @@
   padding-bottom: 0;
 }
 
-
 .filterContainer {
   display: flex;
-  justify-content: flex-end; // Aligns the content to the right
+  justify-content: flex-end;
   align-items: center;
   margin-bottom: 1rem;
-  gap: 0.5rem; // Ensures a gap of 1rem between the dropdown and search
+  gap: 0.5rem;
 }
 
 .search {
-  max-width: 300px; // Control the maximum width of the search input
+  max-width: 300px;
 }
 .table {
-      border: 1px solid colors.$gray-30;
-  padding: 1rem 1rem;
-
+  border: 1px solid colors.$gray-30;
+  padding: layout.$spacing-05 layout.$spacing-05;
 }
