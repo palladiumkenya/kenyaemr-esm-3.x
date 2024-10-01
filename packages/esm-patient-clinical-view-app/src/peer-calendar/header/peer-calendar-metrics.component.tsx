@@ -11,7 +11,7 @@ import styles from './peer-calendar-header.scss';
 interface PeerCalendarMetricsHeaderProps {
   reportigPeriod?: Partial<ReportingPeriod>;
   setReportingPeriod: React.Dispatch<React.SetStateAction<ReportingPeriod>>;
-  completedPeers?: Array<string>;
+  completedPeers?: Array<{ peerUUid: string; encounterUuid: string }>;
   contacts?: Array<Contact>;
   isLoading?: boolean;
 }

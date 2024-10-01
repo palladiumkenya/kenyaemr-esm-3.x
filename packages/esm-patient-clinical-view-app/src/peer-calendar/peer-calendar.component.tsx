@@ -29,7 +29,7 @@ const PeerCalendar = () => {
     month: timeStamp.getMonth() + 1,
     year: timeStamp.getFullYear(),
   });
-  const [completedPeers, setCompletedPeers] = useState<string[]>([]);
+  const [completedPeers, setCompletedPeers] = useState<Array<{ peerUUid: string; encounterUuid: string }>>([]);
 
   return (
     <div className={`omrs-main-content`}>
@@ -84,7 +84,7 @@ const PeerCalendar = () => {
                 completePeers={completedPeers}
               />
             ),
-            actions: <PeerCalendarActions contact={contact} />,
+            actions: <PeerCalendarActions contact={contact} reportingPeriod={reportigPeriod} />,
           }))}
         />
       )}
