@@ -13,7 +13,7 @@ const CompartmentView: React.FC<CompartmentViewProps> = ({ patients }) => {
     <div className={styles.allPatientCardWrapper}>
       {patients.map((patient, index) => (
         <div key={index} className={styles.cardRow}>
-          {patient ? <AvailableCompartment patientInfo={patient} /> : <EmptyCompartment />}
+          {patient ? <AvailableCompartment patientInfo={patient} index={index} /> : <EmptyCompartment />}
         </div>
       ))}
     </div>
