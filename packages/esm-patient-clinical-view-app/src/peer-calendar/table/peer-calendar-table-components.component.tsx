@@ -22,24 +22,27 @@ export const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({
     formsList: { peerCalendarOutreactForm: formUuid },
   } = useConfig<ConfigObject>();
   const { t } = useTranslation();
-  const handleLauchPeerOutreachForm = (encounterUuid?: string) => {
-    launchWorkspace('peer-calendar-form', {
-      formUuid,
-      patientUuid,
-      encounterUuid: encounterUuid ?? '',
-    });
-  };
+
   const {
     encounterTypes: { kpPeerCalender },
   } = useConfig<ConfigObject>();
   const timeStamp = new Date();
 
-  const { firstDay } = getFirstAndLastDayOfMonth(
+  const { firstDay, lastDay } = getFirstAndLastDayOfMonth(
     reportingPeriod?.month ?? timeStamp.getMonth() + 1,
     reportingPeriod?.year ?? timeStamp.getFullYear(),
   );
   const from = dayjs(firstDay).format('YYYY-MM-DD');
   const to = dayjs(firstDay).add(1, 'month').format('YYYY-MM-DD');
+
+  const handleLauchPeerOutreachForm = (encounterUuid?: string) => {
+    launchWorkspace('peer-calendar-form', {
+      formUuid,
+      patientUuid,
+      encounterUuid: encounterUuid ?? '',
+      encounterDatetime: lastDay?.toISOString() ?? '',
+    });
+  };
 
   const { encounters, error, isLoading, mutate } = useEncounters(patientUuid, kpPeerCalender, from, to);
   if (isLoading) {
@@ -59,8 +62,8 @@ export const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({
 type PeerCalendarStatusProps = {
   contact: Contact;
   reportingPeriod?: Partial<ReportingPeriod>;
-  setCompletePeers?: React.Dispatch<React.SetStateAction<Array<{ peerUUid: string; encounterUuid: string }>>>;
-  completePeers?: Array<{ peerUUid: string; encounterUuid: string }>;
+  setCompletePeers?: React.Dispatch<React.SetStateAction<Array<string>>>;
+  completePeers?: Array<string>;
 };
 
 export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
@@ -91,16 +94,16 @@ export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
     if (isLoading) {
       return;
     }
-    if (encounters.length > 0 && !completePeers.find((peer) => peer.peerUUid === contact.patientUuid)) {
-      setCompletePeers([...completePeers, { peerUUid: contact.patientUuid, encounterUuid: encounters[0].uuid }]);
-    } else if (completePeers.find((peer) => peer.peerUUid === contact.patientUuid) && encounters.length < 1) {
-      setCompletePeers(completePeers.filter((c) => c.peerUUid !== contact.patientUuid));
+    if (encounters.length > 0 && !completePeers.includes(contact.patientUuid)) {
+      setCompletePeers([...completePeers, contact.patientUuid]);
+    } else if (completePeers.includes(contact.patientUuid) && encounters.length < 1) {
+      setCompletePeers(completePeers.filter((c) => c !== contact.patientUuid));
     }
   }, [encounters]);
 
   if (isLoading) {
     return <TagSkeleton />;
   }
-  const isCompleted = completePeers.find((peer) => peer.peerUUid === contact.patientUuid);
+  const isCompleted = completePeers.includes(contact.patientUuid);
   return <Tag type={isCompleted ? 'green' : 'red'}>{isCompleted ? 'Complete' : 'Pending'}</Tag>;
 };
