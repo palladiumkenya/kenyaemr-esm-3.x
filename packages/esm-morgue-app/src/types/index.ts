@@ -48,3 +48,56 @@ export interface Patient {
 export interface DeceasedPatientResponse {
   results: Patient[];
 }
+
+export interface ChartConfig {
+  freeTextFieldConceptUuid: string;
+  offlineVisitTypeUuid: string;
+  visitTypeResourceUrl: string;
+  showRecommendedVisitTypeTab: boolean;
+  visitAttributeTypes: Array<{
+    uuid: string;
+    required: boolean;
+    displayInThePatientBanner: boolean;
+    showWhenExpression?: string;
+  }>;
+  showServiceQueueFields: boolean;
+  visitQueueNumberAttributeUuid: string;
+  showAllEncountersTab: boolean;
+  defaultFacilityUrl: string;
+  showUpcomingAppointments: boolean;
+  logo: {
+    src: string;
+    alt: string;
+    name: string;
+  };
+  disableChangingVisitLocation: boolean;
+  numberOfVisitsToLoad: number;
+  showExtraVisitAttributesSlot: boolean;
+}
+
+export interface Observation {
+  uuid: string;
+  concept: {
+    uuid: string;
+    display: string;
+    conceptClass: {
+      uuid: string;
+      display: string;
+    };
+  };
+  display: string;
+  groupMembers: null | Array<{
+    uuid: string;
+    concept: {
+      uuid: string;
+      display: string;
+    };
+    value: {
+      uuid: string;
+      display: string;
+    };
+    display: string;
+  }>;
+  value: any;
+  obsDatetime?: string;
+}
