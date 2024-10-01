@@ -310,10 +310,11 @@
     {
       "name": "peer-calendar-form",
       "component": "peerCalendarFormEntry",
-      "title": "Peer Calendar Form",
+      "title": "KVP Peer Educator Outreach Calendar",
       "type": "form",
-      "width": "wider",
-      "canMaximize": true
+      "width": "extra-wide",
+      "canMaximize": true,
+      "canHide": true
     }
   ]
 }

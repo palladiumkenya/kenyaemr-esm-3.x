@@ -75,54 +75,54 @@ function extractAttributeData(person: Person, config: ConfigObject) {
   );
 }
 
+function getContact(relationship: Relationship, config: ConfigObject, person: 'personA' | 'personB') {
+  return {
+    ...extractAttributeData(relationship[person], config),
+    uuid: relationship.uuid,
+    name: extractName(relationship[person].display),
+    display: relationship[person].display,
+    relativeAge: relationship[person].age,
+    dead: relationship[person].dead,
+    causeOfDeath: relationship[person].causeOfDeath,
+    relativeUuid: relationship[person].uuid,
+    relationshipType: relationship.relationshipType.bIsToA,
+    patientUuid: relationship[person].uuid,
+    gender: relationship[person].gender,
+    startDate: !relationship.startDate ? null : formatDate(parseDate(relationship.startDate)),
+    age: relationship[person].age,
+    endDate: !relationship.endDate ? null : formatDate(parseDate(relationship.endDate)),
+  } as Contact;
+}
+
 function extractContactData(
   patientIdentifier: string,
   relationships: Array<Relationship>,
   config: ConfigObject,
+  includeSelf: boolean,
 ): Array<Contact> {
   const relationshipsData: Contact[] = [];
-
+  let self: Contact | null = null;
   for (const r of relationships) {
     if (patientIdentifier === r.personA.uuid) {
-      relationshipsData.push({
-        ...extractAttributeData(r.personB, config),
-        uuid: r.uuid,
-        name: extractName(r.personB.display),
-        display: r.personB.display,
-        relativeAge: r.personB.age,
-        dead: r.personB.dead,
-        causeOfDeath: r.personB.causeOfDeath,
-        relativeUuid: r.personB.uuid,
-        relationshipType: r.relationshipType.bIsToA,
-        patientUuid: r.personB.uuid,
-        gender: r.personB.gender,
-        startDate: !r.startDate ? null : formatDate(parseDate(r.startDate)),
-        age: r.personB.age,
-        endDate: !r.endDate ? null : formatDate(parseDate(r.endDate)),
-      });
+      relationshipsData.push(getContact(r, config, 'personB'));
     } else {
-      relationshipsData.push({
-        ...extractAttributeData(r.personA, config),
-        uuid: r.uuid,
-        name: extractName(r.personA.display),
-        display: r.personA.display,
-        relativeAge: r.personA.age,
-        causeOfDeath: r.personA.causeOfDeath,
-        relativeUuid: r.personA.uuid,
-        dead: r.personA.dead,
-        relationshipType: r.relationshipType.aIsToB,
-        patientUuid: r.personA.uuid,
-        gender: r.personB.gender,
-        startDate: !r.startDate ? null : formatDate(parseDate(r.startDate)),
-        age: r.personB.age,
-        endDate: !r.endDate ? null : formatDate(parseDate(r.endDate)),
-      });
+      relationshipsData.push(getContact(r, config, 'personA'));
     }
+    if (includeSelf && self === null) {
+      if (patientIdentifier === r.personA.uuid) {
+        self = getContact(r, config, 'personA');
+      } else {
+        self = getContact(r, config, 'personB');
+      }
+    }
+  }
+  if (self) {
+    return [self, ...relationshipsData];
   }
   return relationshipsData;
 }
 
-const useContacts = (patientUuid: string, filters: (relationship: Relationship) => boolean) => {
+const useContacts = (patientUuid: string, filters: (relationship: Relationship) => boolean, includeSelf = false) => {
   const customeRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate,endDate)';
   const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
@@ -133,7 +133,7 @@ const useContacts = (patientUuid: string, filters: (relationship: Relationship) 
   );
   const relationships = useMemo(() => {
     return data?.data?.results?.length
-      ? extractContactData(patientUuid, data?.data?.results.filter(filters), config)
+      ? extractContactData(patientUuid, data?.data?.results.filter(filters), config, includeSelf)
       : [];
   }, [data?.data?.results, patientUuid, config]);
   return {

@@ -26,6 +26,7 @@ const PeerCalendar = () => {
   const { contacts, error, isLoading } = useContacts(
     peerEducatorUuid,
     (rel) => rel.relationshipType.uuid === peerEducatorRelationship,
+    true,
   );
   const peersTitle = t('peers', 'Peers');
 
@@ -70,7 +71,10 @@ const PeerCalendar = () => {
                 {contact.name}
               </ConfigurableLink>
             ),
-            endDate: contact.endDate ?? '--',
+            age: contact.age ?? '--',
+            contact: contact.contact ?? '--',
+            startDate: contact.patientUuid === peerEducatorUuid ? '--' : contact.startDate ?? '--',
+            endDate: contact.patientUuid === peerEducatorUuid ? '--' : contact.endDate ?? '--',
             actions: (
               <Button
                 renderIcon={Launch}
