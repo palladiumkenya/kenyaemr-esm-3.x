@@ -1,19 +1,13 @@
 import { Button, Loading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showSnackbar, useSession } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PaymentPoint } from '../../types';
-import { clockIn, useProviders, useTimeSheets, useUsers } from '../payment-points.resource';
+import { clockIn, useProviderUUID, useTimeSheets } from '../payment-points.resource';
 
 export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint: PaymentPoint }) => {
   const { mutate } = useTimeSheets();
-  const { user } = useSession();
-  const { providers, error, isLoading } = useProviders();
-  const { users, error: fetchingUsersError, isLoading: isLoadingUsers } = useUsers();
-
-  const userPerson = users.find((u) => u.uuid === user.uuid)?.person;
-  const providerUUID = providers.find((p) => p.person.uuid === userPerson?.uuid)?.uuid;
-
+  const { providerUUID, isLoading, error } = useProviderUUID();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -49,10 +43,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
         <Button kind="secondary" onClick={closeModal} type="button">
           {t('cancel', 'Cancel')}
         </Button>
-        <Button
-          type="submit"
-          onClick={onContinue}
-          disabled={isLoading || isLoadingUsers || error || fetchingUsersError || !providerUUID}>
+        <Button type="submit" onClick={onContinue} disabled={isLoading || error || !providerUUID}>
           {isSubmitting ? (
             <>
               <Loading withOverlay={false} small />

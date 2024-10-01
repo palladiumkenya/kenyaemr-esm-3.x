@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useBills } from '../../billing.resource';
-import { usePaymentPoints } from '../../payment-points/payment-points.resource';
+import { useClockInStatus, usePaymentPoints } from '../../payment-points/payment-points.resource';
 import { MappedBill, PaymentStatus } from '../../types';
 import { AppliedFilterTags } from './applied-filter-tages.component';
 import { CashierFilter } from './cashier-filter';
@@ -37,7 +37,7 @@ export const PaymentHistoryViewer = () => {
   const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
   const { paymentPointUUID } = useParams();
   const { paymentPoints } = usePaymentPoints();
-  const isClockedIn = true;
+  const { isClockedIn } = useClockInStatus(paymentPointUUID);
 
   const isOnPaymentPointPage = Boolean(paymentPointUUID);
   const paidBillsResponse = useBills('', isOnPaymentPointPage ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
@@ -262,7 +262,7 @@ export const PaymentHistoryViewer = () => {
                     onResetFilter={handleOnResetCashierFilter}
                   />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
-                  {isOnPaymentPointPage && isClockedIn && (
+                  {isOnPaymentPointPage && !isClockedIn && (
                     <Button className={styles.clockIn} onClick={openClockInModal}>
                       Clock In
                     </Button>

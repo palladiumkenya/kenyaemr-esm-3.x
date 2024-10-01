@@ -368,5 +368,23 @@ export interface PaymentPoint {
 }
 
 export interface Timesheet {
-  //something
+  uuid: string;
+  display: string;
+  cashier: Cashier;
+  cashPoint: CashPoint;
+  clockIn: string;
+  clockOut: null;
+  id: number;
+}
+
+export interface Cashier {
+  uuid: string;
+  display: string;
+  links: Link[];
+}
+
+export interface Link {
+  rel: string;
+  uri: string;
+  resourceAlias: string;
 }

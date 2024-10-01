@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, useSession } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { PaymentPoint, Timesheet } from '../types';
 
@@ -41,7 +41,7 @@ export const createPaymentPoint = (payload: {
 };
 
 export const useTimeSheets = () => {
-  const url = `/ws/rest/v2/cashier/timesheet`;
+  const url = `/ws/rest/v1/cashier/timesheet`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{
     data: { results: Timesheet[] };
   }>(url, openmrsFetch, {
@@ -68,7 +68,7 @@ export const clockIn = (payload: { cashier: string; cashPoint: string; clockIn: 
   });
 };
 
-export const clockOut = (payload: { cashier: string; cashPoint: string; clockOut: string }) => {
+export const clockOut = (payload: { cashier: string; cashPoint: string; clockIn: string; clockOut: string }) => {
   const url = `/ws/rest/v1/cashier/timesheet`;
   return openmrsFetch(url, {
     method: 'POST',
@@ -109,4 +109,32 @@ export function useUsers() {
   return { users, error, isLoading };
 }
 
-// http://kenyaemr3x.healthit.uonbi.ac.ke/openmrs/ws/rest/v1/provider?v=custom:(uuid,person:(uuid))
+// this hook gives you the providerUUID of the current signed in user.
+export const useProviderUUID = () => {
+  const { user } = useSession();
+  const { providers, error, isLoading } = useProviders();
+  const { users, error: fetchingUsersError, isLoading: isLoadingUsers } = useUsers();
+
+  const userPerson = users?.find((u) => u.uuid === user.uuid)?.person;
+  const providerUUID = providers?.find((p) => p.person.uuid === userPerson?.uuid)?.uuid;
+
+  return { providerUUID, isLoading: isLoading || isLoadingUsers, error: error || fetchingUsersError };
+};
+
+export const useClockInStatus = (paymentPointUUID: string) => {
+  const { timesheets, error, isLoading } = useTimeSheets();
+  const { providerUUID, isLoading: isLoadingProviderUUID, error: providerUUIDError } = useProviderUUID();
+
+  const userTimesheet: Timesheet | undefined = timesheets
+    ?.filter((ts) => ts.cashier.uuid === providerUUID && ts.cashPoint.uuid === paymentPointUUID)
+    .at(-1);
+
+  const isClockedIn = userTimesheet?.clockIn && !userTimesheet.clockOut;
+
+  return {
+    isClockedIn,
+    userTimesheet,
+    error: error || providerUUIDError,
+    isLoading: isLoading || isLoadingProviderUUID,
+  };
+};

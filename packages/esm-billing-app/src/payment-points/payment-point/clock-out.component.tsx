@@ -1,25 +1,27 @@
 import { Button, Loading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
-import { showSnackbar, useSession } from '@openmrs/esm-framework';
+import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PaymentPoint } from '../../types';
-import { clockOut, useProviders, useTimeSheets, useUsers } from '../payment-points.resource';
+import { clockOut, useClockInStatus, useProviderUUID, useTimeSheets } from '../payment-points.resource';
 
 export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint: PaymentPoint }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mutate } = useTimeSheets();
   const { t } = useTranslation();
-  const { providers } = useProviders();
-  const { user } = useSession();
-  const { users } = useUsers();
+  const { providerUUID, isLoading, error } = useProviderUUID();
 
-  const userPerson = users.find((u) => u.uuid === user.uuid)?.person;
-  const providerUUID = providers.find((p) => p.person.uuid === userPerson?.uuid)?.uuid;
+  const { userTimesheet } = useClockInStatus(paymentPoint.uuid);
 
   const onContinue = () => {
     setIsSubmitting(true);
-    clockOut({ clockOut: new Date().toISOString(), cashier: providerUUID, cashPoint: paymentPoint.uuid })
+    clockOut({
+      clockOut: new Date().toISOString(),
+      cashier: providerUUID,
+      cashPoint: paymentPoint.uuid,
+      clockIn: userTimesheet.clockIn,
+    })
       .then(() => {
         showSnackbar({
           title: t('success', 'Success'),
@@ -49,7 +51,7 @@ export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void;
         <Button kind="secondary" onClick={closeModal} type="button">
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" onClick={onContinue} kind="danger">
+        <Button type="submit" onClick={onContinue} kind="danger" disabled={isLoading || error}>
           {isSubmitting ? (
             <>
               <Loading withOverlay={false} small />
