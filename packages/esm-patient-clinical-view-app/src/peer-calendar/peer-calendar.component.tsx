@@ -1,15 +1,14 @@
-import { Button, DataTableSkeleton } from '@carbon/react';
-import { Launch } from '@carbon/react/icons';
-import { ConfigurableLink, launchWorkspace, useConfig, useSession } from '@openmrs/esm-framework';
-import { ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import React from 'react';
+import { DataTableSkeleton } from '@carbon/react';
+import { ConfigurableLink, useConfig, useSession } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
 import useContacts from '../hooks/useContacts';
-import { Contact } from '../types';
 import { PeerCalendarHeader } from './header/peer-calendar-header.component';
 import PeerCalendarMetricsHeader from './header/peer-calendar-metrics.component';
 import GenericDataTable, { GenericTableEmptyState } from './table/generic-data-table';
+import { PeerCalendarActions, PeerCalendarStatus } from './table/peer-calendar-table-components.component';
 
 const PeerCalendar = () => {
   const { t } = useTranslation();
@@ -18,29 +17,30 @@ const PeerCalendar = () => {
       person: { uuid: peerEducatorUuid, display },
     },
   } = useSession();
-  const {
-    peerEducatorRelationship,
-    encounterTypes: { kpPeerCalender: encounterUuid },
-    formsList: { peerCalendarOutreactForm: formUuid },
-  } = useConfig<ConfigObject>();
+  const { peerEducatorRelationship } = useConfig<ConfigObject>();
   const { contacts, error, isLoading } = useContacts(
     peerEducatorUuid,
     (rel) => rel.relationshipType.uuid === peerEducatorRelationship,
     true,
   );
   const peersTitle = t('peers', 'Peers');
+  const timeStamp = new Date();
+  const [reportigPeriod, setReportingPeriod] = useState({
+    month: timeStamp.getMonth() + 1,
+    year: timeStamp.getFullYear(),
+  });
+  const [completedPeers, setCompletedPeers] = useState<string[]>([]);
 
-  const handleLauchPeerOutreachForm = ({ patientUuid }: Contact) => {
-    launchWorkspace('peer-calendar-form', {
-      formUuid,
-      patientUuid,
-      encounterUuid: '',
-    });
-  };
   return (
     <div className={`omrs-main-content`}>
       <PeerCalendarHeader title={t('peerCalendar', 'Peer Calendar')} />
-      <PeerCalendarMetricsHeader />
+      <PeerCalendarMetricsHeader
+        reportigPeriod={reportigPeriod}
+        setReportingPeriod={setReportingPeriod}
+        isLoading={isLoading}
+        contacts={contacts}
+        completedPeers={completedPeers}
+      />
       {isLoading && <DataTableSkeleton />}
       {!isLoading && error && <ErrorState error={error} headerTitle={t('peerCalendar', 'Peer Calendar')} />}
       {!error && !isLoading && contacts.length === 0 && (
@@ -58,6 +58,7 @@ const PeerCalendar = () => {
             { header: 'Age', key: 'age' },
             { header: 'Start date', key: 'startDate' },
             { header: 'End date', key: 'endDate' },
+            { header: 'Status', key: 'status' },
             { header: 'Actions', key: 'actions' },
           ]}
           title={t('peers', 'Peers')}
@@ -75,15 +76,15 @@ const PeerCalendar = () => {
             contact: contact.contact ?? '--',
             startDate: contact.patientUuid === peerEducatorUuid ? '--' : contact.startDate ?? '--',
             endDate: contact.patientUuid === peerEducatorUuid ? '--' : contact.endDate ?? '--',
-            actions: (
-              <Button
-                renderIcon={Launch}
-                hasIconOnly
-                iconDescription={t('launch', 'Launch outreact form')}
-                kind="ghost"
-                onClick={() => handleLauchPeerOutreachForm(contact)}
+            status: (
+              <PeerCalendarStatus
+                contact={contact}
+                reportingPeriod={reportigPeriod}
+                setCompletePeers={setCompletedPeers}
+                completePeers={completedPeers}
               />
             ),
+            actions: <PeerCalendarActions contact={contact} />,
           }))}
         />
       )}

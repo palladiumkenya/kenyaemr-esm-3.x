@@ -1,4 +1,5 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 import { z } from 'zod';
 
 export const peerFormSchema = z
@@ -35,3 +36,29 @@ export const createRelationship = (payload: z.infer<typeof peerFormSchema>) => {
     },
   });
 };
+
+export function getAllMonthsInYear(monthFormart = 'MMMM'): { index: number; name: string }[] {
+  const months = [];
+  for (let month = 1; month <= 12; month++) {
+    const formattedMonth = dayjs(new Date(new Date().getFullYear(), month - 1)).format(monthFormart);
+    months.push({ index: month, name: formattedMonth });
+  }
+  return months;
+}
+
+export function getFirstAndLastDayOfMonth(month: number, year: number): { firstDay: Date; lastDay: Date } {
+  const firstDay = new Date(year, month - 1, 1);
+  const lastDay = new Date(year, month, 0);
+  return { firstDay, lastDay };
+}
+
+export function getYearsAroundCurrentYear(yearsToInclude: number = 10): number[] {
+  const currentYear = dayjs().year();
+  const years: number[] = [];
+
+  for (let i = currentYear - yearsToInclude; i <= currentYear + yearsToInclude; i++) {
+    years.push(i);
+  }
+
+  return years;
+}

@@ -205,3 +205,14 @@ export type MappedBedData = Array<{
   status: string;
   uuid: string;
 }>;
+
+export type ReportingPeriod = {
+  year: number;
+  month: number;
+};
+
+export interface Encounter {
+  uuid: string;
+  display: string;
+  encounterDatetime: string;
+}

@@ -3,6 +3,18 @@
 @use '@carbon/styles/scss/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.reportingPeriod {
+  display: flex;
+  flex-direction: row;
+  gap: spacing.$spacing-01;
+  width: 100%;
+  padding: spacing.$spacing-03 0 0 0;
+}
+
+.reportingPeriodInput {
+  flex-grow: 1;
+}
+
 .header {
   @include type.type-style('body-compact-02');
   color: $text-02;
