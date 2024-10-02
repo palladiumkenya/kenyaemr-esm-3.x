@@ -6,6 +6,7 @@
 .reportingPeriod {
   display: flex;
   flex-direction: row;
+  flex-flow: row wrap;
   gap: spacing.$spacing-01;
   width: 100%;
   padding: spacing.$spacing-03 0 0 0;

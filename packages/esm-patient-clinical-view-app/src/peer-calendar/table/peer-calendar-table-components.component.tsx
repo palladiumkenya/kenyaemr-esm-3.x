@@ -1,9 +1,10 @@
-import { Button, Loading, Tag, TagSkeleton } from '@carbon/react';
-import { Launch } from '@carbon/react/icons';
-import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { Button, Loading, Tag, TagSkeleton, Tooltip } from '@carbon/react';
+import { Error, Launch } from '@carbon/react/icons';
+import { launchWorkspace, useConfig, usePatient } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import { ConfigObject } from '../../config-schema';
 import useEncounters from '../../hooks/useEncounters';
 import { Contact, ReportingPeriod } from '../../types';
@@ -41,12 +42,29 @@ export const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({
       patientUuid,
       encounterUuid: encounterUuid ?? '',
       encounterDatetime: lastDay?.toISOString() ?? '',
+      mutateForm: () => {
+        mutate((key) => true, undefined, {
+          revalidate: true,
+        });
+      },
     });
   };
+  const { error: peerEducatorPatientError, isLoading: peerEducatorPatientLoading } = usePatient(patientUuid);
+  const { encounters, error, isLoading, mutate: mutate_ } = useEncounters(patientUuid, kpPeerCalender, from, to);
+  const label = `The peer needs full registration`;
 
-  const { encounters, error, isLoading, mutate } = useEncounters(patientUuid, kpPeerCalender, from, to);
-  if (isLoading) {
+  if (isLoading || peerEducatorPatientLoading) {
     return <Loading withOverlay={false} small />;
+  }
+
+  if (peerEducatorPatientError) {
+    return (
+      <Tooltip align="bottom" label={label}>
+        <button className="sb-tooltip-trigger" type="button">
+          <Error style={{ color: 'red' }} />
+        </button>
+      </Tooltip>
+    );
   }
   return (
     <Button

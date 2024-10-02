@@ -1,7 +1,7 @@
 import { DataTableSkeleton } from '@carbon/react';
 import { ConfigurableLink, useConfig, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
 import useContacts from '../hooks/useContacts';

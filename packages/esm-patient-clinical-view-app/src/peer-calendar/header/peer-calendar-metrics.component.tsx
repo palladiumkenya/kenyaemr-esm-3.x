@@ -1,5 +1,5 @@
 import { Button, Column, Dropdown, Layer, Row, SkeletonText, Tile } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
+import { Add, ArrowRight } from '@carbon/react/icons';
 import { useSession } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo } from 'react';
@@ -103,7 +103,7 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = ({
       <Row className={styles.btnSet}>
         <div />
         <Row className={styles.btnSetRight}>
-          <Button kind="secondary" renderIcon={ArrowRight} onClick={handleAddPeer}>
+          <Button kind="secondary" renderIcon={Add} onClick={handleAddPeer}>
             {t('addPeer', 'Add Peer')}
           </Button>
         </Row>

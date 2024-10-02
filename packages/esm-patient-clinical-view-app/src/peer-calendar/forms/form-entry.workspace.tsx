@@ -5,10 +5,11 @@ type FormEntryWorkspaceProps = DefaultWorkspaceProps & {
   formUuid?: string;
   patientUuid?: string;
   encounterUuid?: string;
+  mutateForm: () => void;
 };
 
 const FormEntryWorkspace: React.FC<FormEntryWorkspaceProps> = (props) => {
-  const { formUuid, patientUuid, encounterUuid } = props;
+  const { formUuid, patientUuid, encounterUuid, mutateForm, closeWorkspace, closeWorkspaceWithSavedChanges } = props;
   const { patient, isLoading } = usePatient(patientUuid);
   const isOnline = useConnectivity();
   const state = useMemo(
@@ -24,6 +25,14 @@ const FormEntryWorkspace: React.FC<FormEntryWorkspaceProps> = (props) => {
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: encounterUuid ?? null,
+      closeWorkspace: () => {
+        typeof mutateForm === 'function' && mutateForm();
+        closeWorkspace();
+      },
+      closeWorkspaceWithSavedChanges: () => {
+        typeof mutateForm === 'function' && mutateForm();
+        closeWorkspaceWithSavedChanges();
+      },
     }),
     [patient, patientUuid, encounterUuid, formUuid, isOnline, props],
   );
