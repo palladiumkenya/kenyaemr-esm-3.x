@@ -106,9 +106,9 @@ const ChargeSummaryTable: React.FC = () => {
   if (!chargeSummaryItems.length) {
     return (
       <EmptyState
-        headerTitle={t('clinicalCharges', 'Medical Invoice Items')}
+        headerTitle={t('chargeableServices', 'Chargeable Summary')}
         launchForm={() => launchWorkspace('billable-service-form')}
-        displayText={t('clinicalChargesDescription', 'Billable services and consumable prices')}
+        displayText={t('chargeableServicesDescription', 'Chargeable Summary')}
       />
     );
   }
@@ -119,8 +119,7 @@ const ChargeSummaryTable: React.FC = () => {
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
           <TableContainer
             className={styles.tableContainer}
-            title={t('clinicalCharges', 'Medical Invoice Items')}
-            description={t('clinicalChargesDescription', 'Billable services and consumable prices')}
+            title={t('chargeableServices', 'Chargeable Summary')}
             {...getTableContainerProps()}>
             <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
               <TableToolbarContent>
