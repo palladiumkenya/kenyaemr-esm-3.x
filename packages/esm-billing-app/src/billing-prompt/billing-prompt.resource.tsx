@@ -1,6 +1,6 @@
 import { Visit, useConfig, useVisit } from '@openmrs/esm-framework';
-import { useBills } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
+import { usePatientBills } from '../modal/require-payment.resource';
 
 const INPATIENT_VISIT_TYPE = 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914';
 const INSURANCE_PAYMENT_METHOD = 'beac329b-f1dc-4a33-9e7c-d95821a137a6';
@@ -16,7 +16,7 @@ export const useBillingPrompt = (patientUuid: string) => {
     visitAttributeTypes: { paymentMethods },
   } = useConfig<BillingConfig>();
   const { currentVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
-  const { bills, isLoading, error } = useBills(patientUuid);
+  const { patientBills: bills, isLoading, error } = usePatientBills(patientUuid);
 
   const flattenBills = bills
     .flatMap((bill) => bill.lineItems)
