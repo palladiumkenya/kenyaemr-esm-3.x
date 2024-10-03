@@ -11,13 +11,12 @@ import {
   Tile,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, showSnackbar } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
-import { ConfigObject } from '../../config-schema';
 import useRelationship from '../../hooks/useRelationship';
 import useRelationshipTypes from '../../hooks/useRelationshipTypes';
 import { relationshipUpdateFormSchema, updateRelationship } from '../relationship.resources';
@@ -148,14 +147,14 @@ const RelationshipUpdateForm: React.FC<RelationshipUpdateFormProps> = ({ closeWo
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 id="relationship"
-                titleText={t('relationshipType', 'RelationshipbType')}
+                titleText={t('relationshipType', 'Relationship Type')}
                 onChange={(e) => {
                   field.onChange(e.selectedItem);
                 }}
                 selectedItem={field.value}
                 label="Choose option"
                 items={relationshipTypes.map((r) => r.uuid)}
-                itemToString={(item) => relationshipTypes.find((r) => r.uuid === item)?.displayAIsToB ?? ''}
+                itemToString={(item) => relationshipTypes.find((r) => r.uuid === item)?.displayBIsToA ?? ''}
               />
             )}
           />

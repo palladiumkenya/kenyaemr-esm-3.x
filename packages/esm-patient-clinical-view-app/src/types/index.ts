@@ -126,6 +126,7 @@ export interface Patient {
 export interface RelationShipType {
   uuid: string;
   displayAIsToB: string;
+  displayBIsToA: String;
 }
 
 export interface Enrollment {
