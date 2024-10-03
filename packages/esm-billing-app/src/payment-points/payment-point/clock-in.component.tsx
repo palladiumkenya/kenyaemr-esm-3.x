@@ -12,7 +12,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PaymentPoint } from '../../types';
@@ -31,19 +31,21 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
 
+  const shouldPromptUser = !paymentPoint;
+
   const {
-    control,
+    register,
     handleSubmit,
     formState: { errors, isValid },
   } = useForm<FormData>({
-    defaultValues: { paymentPointUUID: paymentPoint.uuid ?? paymentPoints.at(0).uuid },
+    defaultValues: { paymentPointUUID: paymentPoint?.uuid ?? paymentPoints?.at(0)?.uuid },
     resolver: zodResolver(schema),
     mode: 'all',
   });
 
-  const onSubmit = () => {
+  const onSubmit: SubmitHandler<FormData> = (data) => {
     setIsSubmitting(true);
-    clockIn({ cashier: providerUUID, cashPoint: paymentPoint.uuid, clockIn: new Date().toISOString() })
+    clockIn({ cashier: providerUUID, cashPoint: data.paymentPointUUID, clockIn: new Date().toISOString() })
       .then(() => {
         showSnackbar({
           title: t('success', 'Success'),
@@ -51,6 +53,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
           kind: 'success',
         });
         mutate();
+        closeModal();
       })
       .catch(() => {
         showSnackbar({
@@ -58,48 +61,45 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
           subtitle: t('anErrorOccurredClockingIn', 'An error occurred clocking in'),
           kind: 'error',
         });
+
+        if (!shouldPromptUser) {
+          closeModal();
+        }
       })
       .finally(() => {
         setIsSubmitting(false);
-        closeModal();
       });
   };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <ModalHeader closeModal={closeModal}>Clock In</ModalHeader>
+      <ModalHeader closeModal={shouldPromptUser ? undefined : closeModal}>Clock In</ModalHeader>
       <ModalBody>
-        {paymentPoint ? (
+        {!shouldPromptUser ? (
           `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`
+        ) : isLoadingPaymentPoints ? (
+          <SelectSkeleton />
         ) : (
-          <Controller
-            control={control}
-            name="paymentPointUUID"
-            render={({ field }) => (
-              <Select
-                labelText={t('selectPaymentPoints', 'Select payment points')}
-                helperText={t(
-                  'selectPaymentPointsMessage',
-                  'Select the payment point on which you will be clocked in.',
-                )}
-                {...field}
-                label={t('quantity', 'Quantity')}
-                placeholder={t('pleaseEnterQuantity', 'Please enter Quantity')}
-                invalid={!!errors.paymentPointUUID}
-                invalidText={errors.paymentPointUUID?.message}
-                initialSelectedItem={field.value}>
-                {isLoadingPaymentPoints ? (
-                  <SelectSkeleton />
-                ) : (
-                  paymentPoints.map((point) => <SelectItem value={point.uuid} text={point.name} />)
-                )}
-              </Select>
-            )}
-          />
+          <Select
+            {...register('paymentPointUUID')}
+            labelText={t('selectPaymentPoint', 'Select payment point')}
+            helperText={t('selectPaymentPointMessage', 'Select the payment point on which you will be clocked in.')}
+            label={t('paymentPoint', 'Payment point')}
+            placeholder={t('pleaseSelectPaymentPoint', 'Please select a payment point')}
+            invalid={!!errors.paymentPointUUID}
+            invalidText={errors.paymentPointUUID?.message}>
+            {paymentPoints.map((point) => (
+              <SelectItem value={point.uuid} text={point.name} />
+            ))}
+          </Select>
         )}
       </ModalBody>
       <ModalFooter>
-        <Button kind="secondary" onClick={closeModal} type="button">
+        <Button
+          kind="secondary"
+          onClick={shouldPromptUser ? undefined : closeModal}
+          type="button"
+          disabled={shouldPromptUser}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button type="submit" disabled={isLoading || error || !providerUUID || !isValid}>
