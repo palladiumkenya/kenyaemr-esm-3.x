@@ -325,6 +325,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                         setStandardRegimen={setStandardRegimen}
                         setStandardRegimenLine={setStandardRegimenLine}
                         selectedRegimenType={selectedRegimenType}
+                        visitDate={visitDate}
                       />
                     ) : (
                       <NonStandardRegimen
@@ -332,6 +333,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                         setNonStandardRegimens={setNonStandardRegimens}
                         setStandardRegimenLine={setStandardRegimenLine}
                         selectedRegimenType={selectedRegimenType}
+                        visitDate={visitDate}
                       />
                     )}
                   </>
