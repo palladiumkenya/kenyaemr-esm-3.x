@@ -74,6 +74,7 @@ export interface Relationship {
     bIsToA: string;
   };
   startDate: string;
+  endDate: string | null;
 }
 
 export interface Contact {
