@@ -53,12 +53,16 @@ const RelationshipUpdateForm: React.FC<RelationshipUpdateFormProps> = ({ closeWo
     try {
       await updateRelationship(relationShipUuid, values);
       closeWorkspace();
-      showSnackbar({ title: 'Success', subtitle: 'Peer added succesfully!', kind: 'success' });
+      showSnackbar({ title: 'Success', subtitle: 'Relationship updated succesfully!', kind: 'success' });
       mutate((key) => {
         return typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship');
       });
     } catch (error) {
-      showSnackbar({ title: 'Success', subtitle: 'Failure adding peer !' + JSON.stringify(error), kind: 'error' });
+      showSnackbar({
+        title: 'Success',
+        subtitle: 'Failure updating relationship!' + JSON.stringify(error),
+        kind: 'error',
+      });
     }
   };
 
