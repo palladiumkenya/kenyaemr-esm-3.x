@@ -60,18 +60,18 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = ({
     <Layer className={styles.detailHeaderContainer}>
       <Tile className={styles.detailHeaderContent}>
         <Row className={styles.detailHeaderContentRow}>
-          <span>Peer educator:</span>
+          <span>{t('peerEducator', 'Peer educator:')}</span>
           <strong>{display}</strong>
-          <span>Completed:</span>
+          <span>{t('completed', 'Completed:')}</span>
           <strong>{completedPeers.length}</strong>
-          <span>Pending:</span>
+          <span>{t('pending', 'Pending')}:</span>
           <strong>{peers.length - completedPeers.length}</strong>
-          <span>Total:</span>
+          <span>{t('total', 'Total:')}</span>
           <strong>{peers.length}</strong>
         </Row>
         <hr />
         <Row>
-          <strong>Reporting Period</strong>
+          <strong>{t('reportingPeriod', 'Reporting Period')}</strong>
           <div className={styles.reportingPeriod}>
             <Column className={styles.reportingPeriodInput}>
               <Dropdown
