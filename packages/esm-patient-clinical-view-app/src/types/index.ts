@@ -74,6 +74,7 @@ export interface Relationship {
     bIsToA: string;
   };
   startDate: string;
+  endDate: string | null;
 }
 
 export interface Contact {
@@ -125,6 +126,7 @@ export interface Patient {
 export interface RelationShipType {
   uuid: string;
   displayAIsToB: string;
+  displayBIsToA: String;
 }
 
 export interface Enrollment {

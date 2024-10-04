@@ -46,6 +46,7 @@ import { OtherRelationships } from './other-relationships/other-relationships.co
 import { OtherRelationshipsForm } from './other-relationships/other-relationships.workspace';
 import InPatient from './in-patient/in-patient.component';
 import { inPatientMeta } from './in-patient/in-patient.meta';
+import RelationshipUpdateForm from './relationships/forms/relationships-update-form.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -94,6 +95,7 @@ export const otherRelationshipsForm = getSyncLifecycle(OtherRelationshipsForm, o
 // Relationships links for Family History and the corresponding view in the patient chart
 export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
 export const relationships = getSyncLifecycle(Relationships, options);
+export const relationshipUpdateForm = getSyncLifecycle(RelationshipUpdateForm, options);
 
 // Contacts
 export const contactList = getSyncLifecycle(ContactList, options);
