@@ -41,7 +41,11 @@ const PeerCalendar = () => {
     } else {
       setFilteredPeers((peers ?? [])?.filter((peer) => !completedPeers.includes(peer.patientUuid)));
     }
-  }, [filterStatus, completedPeers, peers, reportigPeriod]);
+  }, [filterStatus, completedPeers, peers]);
+
+  useEffect(() => {
+    setFilterStatus(null);
+  }, [reportigPeriod]);
 
   return (
     <div className={`omrs-main-content`}>

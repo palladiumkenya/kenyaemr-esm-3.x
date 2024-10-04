@@ -2,7 +2,7 @@ import { Button, Dropdown, Loading, Tag, TagSkeleton, Tooltip } from '@carbon/re
 import { Error, Launch } from '@carbon/react/icons';
 import { launchWorkspace, useConfig, usePatient } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { ConfigObject } from '../../config-schema';
@@ -130,9 +130,11 @@ type PeerCalenderFiltersHeaderProps = {
 
 export const PeerCalenderFiltersHeader: React.FC<PeerCalenderFiltersHeaderProps> = ({
   onUpdateFilterStatus,
-  filterStatus,
+  filterStatus = 'pending',
 }) => {
   const { t } = useTranslation();
+  const statuses = useMemo(() => ['completed', 'pending', 'all'], []);
+  const [_state, _setState] = useState<'completed' | 'pending' | 'all'>('completed');
   return (
     <div style={{ width: '200px' }}>
       <Dropdown
@@ -140,9 +142,9 @@ export const PeerCalenderFiltersHeader: React.FC<PeerCalenderFiltersHeaderProps>
         onChange={(e) => {
           onUpdateFilterStatus(e.selectedItem);
         }}
-        initialSelectedItem={filterStatus}
+        selectedItem={filterStatus}
         label={t('filterByStatus', 'Filter by status')}
-        items={['completed', 'pending', 'all']}
+        items={statuses}
         itemToString={(item) => item ?? ''}
       />
     </div>
