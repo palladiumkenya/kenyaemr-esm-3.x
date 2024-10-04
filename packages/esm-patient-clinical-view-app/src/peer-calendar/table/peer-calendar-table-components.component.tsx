@@ -79,7 +79,6 @@ type PeerCalendarStatusProps = {
   reportingPeriod?: Partial<ReportingPeriod>;
   setCompletePeers?: React.Dispatch<React.SetStateAction<Array<string>>>;
   completePeers?: Array<string>;
-  filterStatus?: 'completed' | 'pending' | 'all';
 };
 
 export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
@@ -87,7 +86,6 @@ export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
   reportingPeriod,
   completePeers = [],
   setCompletePeers,
-  filterStatus = 'all',
 }) => {
   const {
     encounterTypes: { kpPeerCalender },

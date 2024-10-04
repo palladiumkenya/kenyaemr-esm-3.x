@@ -37,11 +37,11 @@ const PeerCalendar = () => {
     if (filter === 'all') {
       setFilteredPeers(peers ?? []);
     } else if (filter === 'completed') {
-      setFilteredPeers((peers ?? [])?.filter((peer) => completedPeers.includes(peer.patientUuid)));
+      setFilteredPeers((peers ?? []).filter((peer) => completedPeers.includes(peer.patientUuid)));
     } else {
-      setFilteredPeers((peers ?? []).filter((peer) => !completedPeers.includes(peer.patientUuid)));
+      setFilteredPeers((peers ?? [])?.filter((peer) => !completedPeers.includes(peer.patientUuid)));
     }
-  }, [filterStatus, peers]);
+  }, [filterStatus, completedPeers, peers, reportigPeriod]);
 
   return (
     <div className={`omrs-main-content`}>
@@ -90,7 +90,6 @@ const PeerCalendar = () => {
             endDate: peer.patientUuid === peerEducatorUuid ? '--' : peer.endDate ?? '--',
             status: (
               <PeerCalendarStatus
-                filterStatus={filterStatus}
                 peer={peer}
                 reportingPeriod={reportigPeriod}
                 setCompletePeers={setCompletedPeers}
