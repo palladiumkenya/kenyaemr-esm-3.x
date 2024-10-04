@@ -1,7 +1,7 @@
 import { DataTableSkeleton } from '@carbon/react';
 import { ConfigurableLink, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import usePeers from '../hooks/usePeers';
 import { PeerCalendarHeader } from './header/peer-calendar-header.component';
@@ -12,6 +12,7 @@ import {
   PeerCalendarStatus,
   PeerCalenderFiltersHeader,
 } from './table/peer-calendar-table-components.component';
+import { Peer } from '../types';
 
 const PeerCalendar = () => {
   const { t } = useTranslation();
@@ -29,6 +30,18 @@ const PeerCalendar = () => {
   });
   const [completedPeers, setCompletedPeers] = useState<Array<string>>([]);
   const [filterStatus, setFilterStatus] = useState<'completed' | 'pending' | 'all'>();
+  const [filteredPeers, setFilteredPeers] = useState<Array<Peer>>([]);
+
+  useEffect(() => {
+    const filter = filterStatus ?? 'all';
+    if (filter === 'all') {
+      setFilteredPeers(peers ?? []);
+    } else if (filter === 'completed') {
+      setFilteredPeers((peers ?? [])?.filter((peer) => completedPeers.includes(peer.patientUuid)));
+    } else {
+      setFilteredPeers((peers ?? []).filter((peer) => !completedPeers.includes(peer.patientUuid)));
+    }
+  }, [filterStatus, peers]);
 
   return (
     <div className={`omrs-main-content`}>
@@ -61,7 +74,7 @@ const PeerCalendar = () => {
             { header: 'Actions', key: 'actions' },
           ]}
           title={t('peers', 'Peers')}
-          rows={peers.map((peer) => ({
+          rows={filteredPeers.map((peer) => ({
             ...peer,
             id: peer.relativeUuid,
             name: (
