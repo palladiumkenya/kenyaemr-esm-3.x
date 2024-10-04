@@ -1,6 +1,7 @@
 import { mutate } from 'swr';
 import * as XLSX from 'xlsx';
-import { BillableServicePayload, ExcelFileRow } from './billables/form-helper';
+import { ExcelFileRow } from '../types';
+import { BillableServicePayload } from './billables/form-helper';
 
 export const handleMutate = (url: string) => {
   mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, {

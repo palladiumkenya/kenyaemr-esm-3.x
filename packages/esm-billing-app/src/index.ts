@@ -17,7 +17,7 @@ import LabOrder from './billable-services/billiable-item/test-order/lab-order.co
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
-import { BulkImportBillableServices } from './billable-services/bulk-import-billable-service.component';
+import { BulkImportBillableServices } from './billable-services/bulk-import-billable-service.modal';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import { configSchema } from './config-schema';

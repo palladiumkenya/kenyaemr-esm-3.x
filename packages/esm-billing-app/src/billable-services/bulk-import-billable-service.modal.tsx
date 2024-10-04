@@ -4,9 +4,11 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePaymentModes } from '../billing.resource';
+import { MAX_ALLOWED_FILE_SIZE } from '../constants';
+import { ExcelFileRow } from '../types';
 import { createBillableService } from './billable-service.resource';
 import { useChargeSummaries } from './billables/charge-summary.resource';
-import { BillableServicePayload, ExcelFileRow, getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
+import { BillableServicePayload, getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
 import styles from './clinical-charges.scss';
 import { createAndDownloadFailedUploadsExcelFile, createAndDownloadFilteredRowsFile } from './utils';
 
@@ -27,7 +29,7 @@ export const BulkImportBillableServices = ({ closeModal }) => {
   const handleFileChange = () => {
     if (inputFileRef.current && inputFileRef.current.files) {
       const file = inputFileRef.current.files[0];
-      if (file.size > 2097152) {
+      if (file.size > MAX_ALLOWED_FILE_SIZE) {
         showSnackbar({
           title: t('fileTooBig', 'fileTooBig'),
           kind: 'error',

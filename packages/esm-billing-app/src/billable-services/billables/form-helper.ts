@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { PaymentMethod } from '../../types';
+import { ExcelFileRow, PaymentMethod } from '../../types';
 import { ChargeAble } from './charge-summary.resource';
 import { BillableFormSchema, ServicePriceSchema } from './form-schemas';
 
@@ -115,26 +115,22 @@ export const searchTableData = <T>(array: Array<T>, searchString: string) => {
   return array;
 };
 
-export type ExcelFileRow = {
-  concept_id: number;
-  name: string;
-  price: number;
-  disable: 'false' | 'true';
-  category: number;
-  short_name: string;
-};
-
 export const getBulkUploadPayloadFromExcelFile = (
   fileData: Uint8Array,
-  currentlyExistingBillableServices: ChargeAble[],
-  paymentModes: PaymentMethod[],
+  currentlyExistingBillableServices: Array<ChargeAble>,
+  paymentModes: Array<PaymentMethod>,
 ) => {
   const workbook = XLSX.read(fileData, { type: 'array' });
 
-  const firstSheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[firstSheetName];
+  let jsonData: Array<ExcelFileRow> = [];
 
-  const jsonData: Array<ExcelFileRow> = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+  for (let i = 0; i < workbook.SheetNames.length; i++) {
+    const sheetName = workbook.SheetNames[i];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const sheetJSONData: Array<ExcelFileRow> = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+    jsonData.push(...sheetJSONData);
+  }
 
   if (jsonData.length === 0) {
     return [];
