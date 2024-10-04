@@ -99,6 +99,23 @@ export interface Contact {
   age: number | null;
 }
 
+export interface Peer {
+  uuid: string;
+  name: string;
+  display: string;
+  relativeAge: number;
+  dead: boolean;
+  causeOfDeath: string;
+  relativeUuid: string;
+  relationshipType: string;
+  patientUuid: string;
+  gender: string;
+  contact: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  age: number | null;
+}
+
 export interface Person {
   uuid: string;
   age: number;

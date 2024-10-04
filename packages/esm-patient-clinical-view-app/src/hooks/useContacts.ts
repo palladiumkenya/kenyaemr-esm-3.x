@@ -1,4 +1,4 @@
-import { formatDate, formatDatetime, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ConfigObject } from '../config-schema';
@@ -93,38 +93,25 @@ function getContact(relationship: Relationship, config: ConfigObject, person: 'p
     endDate: !relationship.endDate ? null : formatDate(parseDate(relationship.endDate)),
   } as Contact;
 }
-
 function extractContactData(
   patientIdentifier: string,
   relationships: Array<Relationship>,
   config: ConfigObject,
-  includeSelf: boolean,
 ): Array<Contact> {
   const relationshipsData: Contact[] = [];
-  let self: Contact | null = null;
   for (const r of relationships) {
     if (patientIdentifier === r.personA.uuid) {
       relationshipsData.push(getContact(r, config, 'personB'));
     } else {
       relationshipsData.push(getContact(r, config, 'personA'));
     }
-    if (includeSelf && self === null) {
-      if (patientIdentifier === r.personA.uuid) {
-        self = getContact(r, config, 'personA');
-      } else {
-        self = getContact(r, config, 'personB');
-      }
-    }
-  }
-  if (self) {
-    return [self, ...relationshipsData];
   }
   return relationshipsData;
 }
 
-const useContacts = (patientUuid: string, filters: (relationship: Relationship) => boolean, includeSelf = false) => {
+const useContacts = (patientUuid: string) => {
   const customeRepresentation =
-    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate,endDate)';
+    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate)';
   const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${patientUuid}`;
   const config = useConfig<ConfigObject>();
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
@@ -133,7 +120,13 @@ const useContacts = (patientUuid: string, filters: (relationship: Relationship) 
   );
   const relationships = useMemo(() => {
     return data?.data?.results?.length
-      ? extractContactData(patientUuid, data?.data?.results.filter(filters), config, includeSelf)
+      ? extractContactData(
+          patientUuid,
+          data?.data?.results.filter((rel) =>
+            config.pnsRelationships.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
+          ),
+          config,
+        )
       : [];
   }, [data?.data?.results, patientUuid, config]);
   return {

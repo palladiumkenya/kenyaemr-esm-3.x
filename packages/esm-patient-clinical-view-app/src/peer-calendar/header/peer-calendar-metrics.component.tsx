@@ -1,10 +1,10 @@
 import { Button, Column, Dropdown, Layer, Row, SkeletonText, Tile } from '@carbon/react';
-import { Add, ArrowRight } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import { useSession } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Contact, ReportingPeriod } from '../../types';
+import type { Peer, ReportingPeriod } from '../../types';
 import { getAllMonthsInYear, getYearsAroundCurrentYear } from '../peer-calendar.resources';
 import styles from './peer-calendar-header.scss';
 
@@ -12,7 +12,7 @@ interface PeerCalendarMetricsHeaderProps {
   reportigPeriod?: Partial<ReportingPeriod>;
   setReportingPeriod: React.Dispatch<React.SetStateAction<ReportingPeriod>>;
   completedPeers?: Array<string>;
-  contacts?: Array<Contact>;
+  peers?: Array<Peer>;
   isLoading?: boolean;
 }
 
@@ -21,7 +21,7 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = ({
   reportigPeriod,
   isLoading = true,
   completedPeers = [],
-  contacts = [],
+  peers = [],
 }) => {
   const {
     user: {
@@ -65,9 +65,9 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = ({
           <span>Completed:</span>
           <strong>{completedPeers.length}</strong>
           <span>Pending:</span>
-          <strong>{contacts.length - completedPeers.length}</strong>
+          <strong>{peers.length - completedPeers.length}</strong>
           <span>Total:</span>
-          <strong>{contacts.length}</strong>
+          <strong>{peers.length}</strong>
         </Row>
         <hr />
         <Row>

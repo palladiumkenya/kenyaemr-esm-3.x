@@ -7,18 +7,15 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { ConfigObject } from '../../config-schema';
 import useEncounters from '../../hooks/useEncounters';
-import { Contact, ReportingPeriod } from '../../types';
+import { Peer, ReportingPeriod } from '../../types';
 import { getFirstAndLastDayOfMonth } from '../peer-calendar.resources';
 
 type PeerCalendarActionsProps = {
-  contact: Contact;
+  peer: Peer;
   reportingPeriod?: Partial<ReportingPeriod>;
 };
 
-export const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({
-  contact: { patientUuid },
-  reportingPeriod,
-}) => {
+export const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({ peer: { patientUuid }, reportingPeriod }) => {
   const {
     formsList: { peerCalendarOutreactForm: formUuid },
   } = useConfig<ConfigObject>();
@@ -78,14 +75,14 @@ export const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({
 };
 
 type PeerCalendarStatusProps = {
-  contact: Contact;
+  peer: Peer;
   reportingPeriod?: Partial<ReportingPeriod>;
   setCompletePeers?: React.Dispatch<React.SetStateAction<Array<string>>>;
   completePeers?: Array<string>;
 };
 
 export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
-  contact,
+  peer,
   reportingPeriod,
   completePeers = [],
   setCompletePeers,
@@ -102,7 +99,7 @@ export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
   const from = dayjs(firstDay).format('YYYY-MM-DD');
   const to = dayjs(firstDay).add(1, 'month').format('YYYY-MM-DD');
 
-  const { encounters, error, isLoading, mutate } = useEncounters(contact.patientUuid, kpPeerCalender, from, to);
+  const { encounters, error, isLoading, mutate } = useEncounters(peer.patientUuid, kpPeerCalender, from, to);
 
   useEffect(() => {
     mutate();
@@ -112,16 +109,16 @@ export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
     if (isLoading) {
       return;
     }
-    if (encounters.length > 0 && !completePeers.includes(contact.patientUuid)) {
-      setCompletePeers([...completePeers, contact.patientUuid]);
-    } else if (completePeers.includes(contact.patientUuid) && encounters.length < 1) {
-      setCompletePeers(completePeers.filter((c) => c !== contact.patientUuid));
+    if (encounters.length > 0 && !completePeers.includes(peer.patientUuid)) {
+      setCompletePeers([...completePeers, peer.patientUuid]);
+    } else if (completePeers.includes(peer.patientUuid) && encounters.length < 1) {
+      setCompletePeers(completePeers.filter((c) => c !== peer.patientUuid));
     }
   }, [encounters]);
 
   if (isLoading) {
     return <TagSkeleton />;
   }
-  const isCompleted = completePeers.includes(contact.patientUuid);
+  const isCompleted = completePeers.includes(peer.patientUuid);
   return <Tag type={isCompleted ? 'green' : 'red'}>{isCompleted ? 'Complete' : 'Pending'}</Tag>;
 };
