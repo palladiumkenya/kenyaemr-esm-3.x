@@ -4,15 +4,6 @@ import useSWR from 'swr';
 import { ConfigObject } from '../config-schema';
 import { Contact, Person, Relationship } from '../types';
 
-function extractName(display: string) {
-  const pattern = /-\s*(.*)$/;
-  const match = display.match(pattern);
-  if (match && match.length > 1) {
-    return match[1].trim();
-  }
-  return display.trim();
-}
-
 function extractValue(display: string) {
   const pattern = /=\s*(.*)$/;
   const match = display.match(pattern);
@@ -79,7 +70,7 @@ function getContact(relationship: Relationship, config: ConfigObject, person: 'p
   return {
     ...extractAttributeData(relationship[person], config),
     uuid: relationship.uuid,
-    name: extractName(relationship[person].display),
+    name: relationship[person].display,
     display: relationship[person].display,
     relativeAge: relationship[person].age,
     dead: relationship[person].dead,

@@ -59,7 +59,7 @@ const PeerCalendarTable: React.FC<PeerCalendarTableProps> = ({
       {!error && !isLoading && peers.length === 0 && (
         <GenericTableEmptyState
           headerTitle={peersTitle}
-          displayText={t('nopeers', 'No peers to display for this peer educatpr')}
+          displayText={t('nopeers', 'No peers to display for this peer educator')}
         />
       )}
       {!error && !isLoading && peers.length > 0 && (

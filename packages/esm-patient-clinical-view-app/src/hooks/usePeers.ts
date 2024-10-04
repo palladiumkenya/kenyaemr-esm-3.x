@@ -1,16 +1,8 @@
-import { formatDate, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { FetchResponse, formatDate, openmrsFetch, parseDate, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import { ConfigObject } from '../config-schema';
 import { Peer, Person, Relationship } from '../types';
-function extractName(display: string) {
-  const pattern = /-\s*(.*)$/;
-  const match = display.match(pattern);
-  if (match && match.length > 1) {
-    return match[1].trim();
-  }
-  return display.trim();
-}
 
 function extractValue(display: string) {
   const pattern = /=\s*(.*)$/;
@@ -41,7 +33,7 @@ function getPeer(relationship: Relationship, config: ConfigObject, person: 'pers
   return {
     ...extractAttributeData(relationship[person], config),
     uuid: relationship.uuid,
-    name: extractName(relationship[person].display),
+    name: relationship[person].display,
     display: relationship[person].display,
     relativeAge: relationship[person].age,
     dead: relationship[person].dead,
@@ -86,9 +78,9 @@ function extractPeerData(
 const usePeers = (peerEducatorUuid: string) => {
   const customeRepresentation =
     'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),personB:(uuid,age,display,dead,causeOfDeath,gender,attributes:(uuid,display,value,attributeType:(uuid,display))),relationshipType:(uuid,display,description,aIsToB,bIsToA),startDate,endDate)';
-  const url = `/ws/rest/v1/relationship?v=${customeRepresentation}&person=${peerEducatorUuid}`;
+  const url = `${restBaseUrl}/relationship?v=${customeRepresentation}&person=${peerEducatorUuid}`;
   const config = useConfig<ConfigObject>();
-  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Relationship[] } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<{ results: Array<Relationship> }>, Error>(
     url,
     openmrsFetch,
   );
@@ -96,7 +88,7 @@ const usePeers = (peerEducatorUuid: string) => {
     return data?.data?.results?.length
       ? extractPeerData(
           peerEducatorUuid,
-          data?.data?.results.filter((rel) => rel.relationshipType.uuid === config.peerEducatorRelationship),
+          data?.data?.results.filter((rel) => rel.relationshipType?.uuid === config.peerEducatorRelationship),
           config,
         )
       : [];
