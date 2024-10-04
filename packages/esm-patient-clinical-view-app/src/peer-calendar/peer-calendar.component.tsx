@@ -1,18 +1,10 @@
-import { DataTableSkeleton } from '@carbon/react';
-import { ConfigurableLink, useSession } from '@openmrs/esm-framework';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import usePeers from '../hooks/usePeers';
 import { PeerCalendarHeader } from './header/peer-calendar-header.component';
 import PeerCalendarMetricsHeader from './header/peer-calendar-metrics.component';
-import GenericDataTable, { GenericTableEmptyState } from './table/generic-data-table';
-import {
-  PeerCalendarActions,
-  PeerCalendarStatus,
-  PeerCalenderFiltersHeader,
-} from './table/peer-calendar-table-components.component';
-import { Peer } from '../types';
+import PeerCalendarTable from './table/peer-calendar-table.components';
+import usePeers from '../hooks/usePeers';
+import { useSession } from '@openmrs/esm-framework';
 
 const PeerCalendar = () => {
   const { t } = useTranslation();
@@ -21,32 +13,13 @@ const PeerCalendar = () => {
       person: { uuid: peerEducatorUuid, display },
     },
   } = useSession();
-  const { peers, error, isLoading } = usePeers(peerEducatorUuid);
-  const peersTitle = t('peers', 'Peers');
   const timeStamp = new Date();
   const [reportigPeriod, setReportingPeriod] = useState({
     month: timeStamp.getMonth() + 1,
     year: timeStamp.getFullYear(),
   });
   const [completedPeers, setCompletedPeers] = useState<Array<string>>([]);
-  const [filterStatus, setFilterStatus] = useState<'completed' | 'pending' | 'all'>();
-  const [filteredPeers, setFilteredPeers] = useState<Array<Peer>>([]);
-
-  useEffect(() => {
-    const filter = filterStatus ?? 'all';
-    if (filter === 'all') {
-      setFilteredPeers(peers ?? []);
-    } else if (filter === 'completed') {
-      setFilteredPeers((peers ?? []).filter((peer) => completedPeers.includes(peer.patientUuid)));
-    } else {
-      setFilteredPeers((peers ?? [])?.filter((peer) => !completedPeers.includes(peer.patientUuid)));
-    }
-  }, [filterStatus, completedPeers, peers]);
-
-  useEffect(() => {
-    setFilterStatus(null);
-  }, [reportigPeriod]);
-
+  const { peers, error, isLoading } = usePeers(peerEducatorUuid);
   return (
     <div className={`omrs-main-content`}>
       <PeerCalendarHeader title={t('peerCalendar', 'Peer Calendar')} />
@@ -57,56 +30,14 @@ const PeerCalendar = () => {
         peers={peers}
         completedPeers={completedPeers}
       />
-      {isLoading && <DataTableSkeleton />}
-      {!isLoading && error && <ErrorState error={error} headerTitle={t('peerCalendar', 'Peer Calendar')} />}
-      {!error && !isLoading && peers.length === 0 && (
-        <GenericTableEmptyState
-          headerTitle={peersTitle}
-          displayText={t('nopeers', 'No peers to display for this peer educatpr')}
-        />
-      )}
-      {!error && !isLoading && peers.length > 0 && (
-        <GenericDataTable
-          headers={[
-            { header: 'Peer', key: 'name' },
-            { header: 'Gender', key: 'gender' },
-            { header: 'Contact', key: 'contact' },
-            { header: 'Age', key: 'age' },
-            { header: 'Start date', key: 'startDate' },
-            { header: 'End date', key: 'endDate' },
-            { header: 'Status', key: 'status' },
-            { header: 'Actions', key: 'actions' },
-          ]}
-          title={t('peers', 'Peers')}
-          rows={filteredPeers.map((peer) => ({
-            ...peer,
-            id: peer.relativeUuid,
-            name: (
-              <ConfigurableLink
-                style={{ textDecoration: 'none' }}
-                to={window.getOpenmrsSpaBase() + `patient/${peer.relativeUuid}/chart/Patient Summary`}>
-                {peer.name}
-              </ConfigurableLink>
-            ),
-            age: peer.age ?? '--',
-            contact: peer.contact ?? '--',
-            startDate: peer.patientUuid === peerEducatorUuid ? '--' : peer.startDate ?? '--',
-            endDate: peer.patientUuid === peerEducatorUuid ? '--' : peer.endDate ?? '--',
-            status: (
-              <PeerCalendarStatus
-                peer={peer}
-                reportingPeriod={reportigPeriod}
-                setCompletePeers={setCompletedPeers}
-                completePeers={completedPeers}
-              />
-            ),
-            actions: <PeerCalendarActions peer={peer} reportingPeriod={reportigPeriod} />,
-          }))}
-          renderActionComponent={() => (
-            <PeerCalenderFiltersHeader filterStatus={filterStatus} onUpdateFilterStatus={setFilterStatus} />
-          )}
-        />
-      )}
+      <PeerCalendarTable
+        completedPeers={completedPeers}
+        reportigPeriod={reportigPeriod}
+        setCompletedPeers={setCompletedPeers}
+        peers={peers}
+        isLoading={isLoading}
+        error={error}
+      />
     </div>
   );
 };
