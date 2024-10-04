@@ -13,7 +13,7 @@ import {
 } from '@carbon/react';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import styles from './generic-data-table.scss';
 import { useTranslation } from 'react-i18next';
 
@@ -21,15 +21,16 @@ type GenericDataTableProps = {
   headers: Array<{ key: string; header: string }>;
   rows: Array<Record<string, any>>;
   title: string;
+  renderActionComponent?: () => ReactNode;
 };
-const GenericDataTable: React.FC<GenericDataTableProps> = ({ headers, rows, title }) => {
+const GenericDataTable: React.FC<GenericDataTableProps> = ({ headers, rows, title, renderActionComponent }) => {
   const [pageSize, setPageSize] = useState(10);
   const { results, totalPages, currentPage, goTo } = usePagination(rows, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   return (
     <div className={styles.widgetContainer}>
-      <CardHeader title={title}>{''}</CardHeader>
+      <CardHeader title={title}>{renderActionComponent?.()}</CardHeader>
       <DataTable useZebraStyles size="sm" rows={rows} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <Table {...getTableProps()}>

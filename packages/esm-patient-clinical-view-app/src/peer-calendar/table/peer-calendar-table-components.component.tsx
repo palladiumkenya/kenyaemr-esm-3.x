@@ -1,4 +1,4 @@
-import { Button, Loading, Tag, TagSkeleton, Tooltip } from '@carbon/react';
+import { Button, Dropdown, Loading, Tag, TagSkeleton, Tooltip } from '@carbon/react';
 import { Error, Launch } from '@carbon/react/icons';
 import { launchWorkspace, useConfig, usePatient } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
@@ -79,6 +79,7 @@ type PeerCalendarStatusProps = {
   reportingPeriod?: Partial<ReportingPeriod>;
   setCompletePeers?: React.Dispatch<React.SetStateAction<Array<string>>>;
   completePeers?: Array<string>;
+  filterStatus?: 'completed' | 'pending' | 'all';
 };
 
 export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
@@ -86,6 +87,7 @@ export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
   reportingPeriod,
   completePeers = [],
   setCompletePeers,
+  filterStatus = 'all',
 }) => {
   const {
     encounterTypes: { kpPeerCalender },
@@ -121,4 +123,30 @@ export const PeerCalendarStatus: React.FC<PeerCalendarStatusProps> = ({
   }
   const isCompleted = completePeers.includes(peer.patientUuid);
   return <Tag type={isCompleted ? 'green' : 'red'}>{isCompleted ? 'Complete' : 'Pending'}</Tag>;
+};
+
+type PeerCalenderFiltersHeaderProps = {
+  filterStatus?: 'completed' | 'pending' | 'all';
+  onUpdateFilterStatus: (status: 'completed' | 'pending' | 'all') => void;
+};
+
+export const PeerCalenderFiltersHeader: React.FC<PeerCalenderFiltersHeaderProps> = ({
+  onUpdateFilterStatus,
+  filterStatus,
+}) => {
+  const { t } = useTranslation();
+  return (
+    <div style={{ width: '200px' }}>
+      <Dropdown
+        id="filterByStatus"
+        onChange={(e) => {
+          onUpdateFilterStatus(e.selectedItem);
+        }}
+        initialSelectedItem={filterStatus}
+        label={t('filterByStatus', 'Filter by status')}
+        items={['completed', 'pending', 'all']}
+        itemToString={(item) => item ?? ''}
+      />
+    </div>
+  );
 };

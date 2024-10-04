@@ -7,7 +7,11 @@ import usePeers from '../hooks/usePeers';
 import { PeerCalendarHeader } from './header/peer-calendar-header.component';
 import PeerCalendarMetricsHeader from './header/peer-calendar-metrics.component';
 import GenericDataTable, { GenericTableEmptyState } from './table/generic-data-table';
-import { PeerCalendarActions, PeerCalendarStatus } from './table/peer-calendar-table-components.component';
+import {
+  PeerCalendarActions,
+  PeerCalendarStatus,
+  PeerCalenderFiltersHeader,
+} from './table/peer-calendar-table-components.component';
 
 const PeerCalendar = () => {
   const { t } = useTranslation();
@@ -24,6 +28,7 @@ const PeerCalendar = () => {
     year: timeStamp.getFullYear(),
   });
   const [completedPeers, setCompletedPeers] = useState<Array<string>>([]);
+  const [filterStatus, setFilterStatus] = useState<'completed' | 'pending' | 'all'>();
 
   return (
     <div className={`omrs-main-content`}>
@@ -72,6 +77,7 @@ const PeerCalendar = () => {
             endDate: peer.patientUuid === peerEducatorUuid ? '--' : peer.endDate ?? '--',
             status: (
               <PeerCalendarStatus
+                filterStatus={filterStatus}
                 peer={peer}
                 reportingPeriod={reportigPeriod}
                 setCompletePeers={setCompletedPeers}
@@ -80,6 +86,9 @@ const PeerCalendar = () => {
             ),
             actions: <PeerCalendarActions peer={peer} reportingPeriod={reportigPeriod} />,
           }))}
+          renderActionComponent={() => (
+            <PeerCalenderFiltersHeader filterStatus={filterStatus} onUpdateFilterStatus={setFilterStatus} />
+          )}
         />
       )}
     </div>
