@@ -8,6 +8,7 @@ import GenericDataTable, { GenericTableEmptyState } from './../table/generic-dat
 import PeerCalendarActions from './peer-calendar-actions.component';
 import PeerCalendarTableFilter from './peer-calendar-table-filter.component';
 import PeerCompletionStatus from './peer-completion-status.component';
+import { filterActivePeersWithDate } from '../peer-calendar.resources';
 
 interface PeerCalendarTableProps {
   reportigPeriod?: Partial<ReportingPeriod>;
@@ -39,14 +40,15 @@ const PeerCalendarTable: React.FC<PeerCalendarTableProps> = ({
 
   useEffect(() => {
     const filter = filterStatus ?? 'all';
+    const filtered = peers.filter((peer) => filterActivePeersWithDate(peer, reportigPeriod));
     if (filter === 'all') {
-      setFilteredPeers(peers ?? []);
+      setFilteredPeers(filtered ?? []);
     } else if (filter === 'completed') {
-      setFilteredPeers((peers ?? []).filter((peer) => completedPeers.includes(peer.patientUuid)));
+      setFilteredPeers((filtered ?? []).filter((peer) => completedPeers.includes(peer.patientUuid)));
     } else {
-      setFilteredPeers((peers ?? [])?.filter((peer) => !completedPeers.includes(peer.patientUuid)));
+      setFilteredPeers((filtered ?? [])?.filter((peer) => !completedPeers.includes(peer.patientUuid)));
     }
-  }, [filterStatus, completedPeers, peers]);
+  }, [filterStatus, completedPeers, peers, reportigPeriod]);
 
   useEffect(() => {
     setFilterStatus(null);
