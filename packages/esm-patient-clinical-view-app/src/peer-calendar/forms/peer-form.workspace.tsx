@@ -52,6 +52,80 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
         <Column>
           <Controller
             control={form.control}
+            name="personB"
+            render={({ field }) => (
+              <Autosuggest
+                className={styles.input}
+                labelText={t('peer', 'Peer')}
+                placeholder={t('patientPlaceHolder', 'Search patient')}
+                invalid={Boolean(form.formState.errors[field.name]?.message)}
+                invalidText={form.formState.errors[field.name]?.message}
+                getDisplayValue={(item) => item.display}
+                getFieldValue={(item) => item.uuid}
+                getSearchResults={searchPatient}
+                onClear={() => field.onChange('')}
+                onSuggestionSelected={(field_, value) => {
+                  if (value) {
+                    field.onChange(value);
+                  }
+                }}
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            control={form.control}
+            name="relationshipType"
+            render={({ field }) => (
+              <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                id="relationship"
+                titleText={t('relationshipType', 'RelationshipbType')}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
+                initialSelectedItem={field.value}
+                label="Choose option"
+                items={[field.value]}
+                itemToString={(item) =>
+                  [{ label: 'Peer Educator/Peer', value: peerEducatorRelationship }].find((r) => r.value === item)
+                    ?.label ?? ''
+                }
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            control={form.control}
+            name="personA"
+            render={({ field }) => (
+              <Dropdown
+                ref={field.ref}
+                invalid={form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                id="peerEducator"
+                titleText={t('peerEducator', 'Peer Educator')}
+                onChange={(e) => {
+                  field.onChange(e.selectedItem);
+                }}
+                initialSelectedItem={field.value}
+                label="Choose option"
+                items={[field.value]}
+                itemToString={(item) =>
+                  [{ label: peerEducatorPerson.display, value: peerEducatorPerson.uuid }].find((r) => r.value === item)
+                    ?.label ?? ''
+                }
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            control={form.control}
             name="startDate"
             render={({ field }) => (
               <DatePicker
@@ -94,80 +168,6 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
                   size="xl"
                 />
               </DatePicker>
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="personA"
-            render={({ field }) => (
-              <Dropdown
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="peerEducator"
-                titleText={t('peerEducator', 'Peer Educator')}
-                onChange={(e) => {
-                  field.onChange(e.selectedItem);
-                }}
-                initialSelectedItem={field.value}
-                label="Choose option"
-                items={[field.value]}
-                itemToString={(item) =>
-                  [{ label: peerEducatorPerson.display, value: peerEducatorPerson.uuid }].find((r) => r.value === item)
-                    ?.label ?? ''
-                }
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="relationshipType"
-            render={({ field }) => (
-              <Dropdown
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="relationship"
-                titleText={t('relationshipType', 'RelationshipbType')}
-                onChange={(e) => {
-                  field.onChange(e.selectedItem);
-                }}
-                initialSelectedItem={field.value}
-                label="Choose option"
-                items={[field.value]}
-                itemToString={(item) =>
-                  [{ label: 'Peer Educator/Peer', value: peerEducatorRelationship }].find((r) => r.value === item)
-                    ?.label ?? ''
-                }
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="personB"
-            render={({ field }) => (
-              <Autosuggest
-                className={styles.input}
-                labelText={t('peer', 'Peer')}
-                placeholder={t('patientPlaceHolder', 'Search patient')}
-                invalid={Boolean(form.formState.errors[field.name]?.message)}
-                invalidText={form.formState.errors[field.name]?.message}
-                getDisplayValue={(item) => item.display}
-                getFieldValue={(item) => item.uuid}
-                getSearchResults={searchPatient}
-                onClear={() => field.onChange('')}
-                onSuggestionSelected={(field_, value) => {
-                  if (value) {
-                    field.onChange(value);
-                  }
-                }}
-              />
             )}
           />
         </Column>
