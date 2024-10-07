@@ -9,12 +9,12 @@ const ClinicalCharges = () => {
   const { t } = useTranslation();
   return (
     <Tabs>
-      <TabList aria-label={t('chargeableDashboard', 'Chargeable Dashboard')} contained>
+      <TabList aria-label={t('chargeItems', 'Charge Items')} contained>
         <Tab
           className={styles.tabHeader}
           renderIcon={Task}
-          secondaryLabel={t('chargeableServicesDescription', 'Chargeable services and consumable prices')}>
-          {t('chargeableDashboard', 'Chargeable Dashboard')}
+          secondaryLabel={t('chargeItemsDescription', 'Charge Items and Services Dashboard')}>
+          {t('chargeItems', 'Charge Items')}
         </Tab>
       </TabList>
       <TabPanels>

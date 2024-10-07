@@ -2,7 +2,6 @@ import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@open
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
-import BillableServicesCardLink from './billable-services-admin-card-link.component';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
@@ -74,10 +73,10 @@ export const billManagerLink = getSyncLifecycle(
   options,
 );
 
-export const billableServicesLink = getSyncLifecycle(
+export const chargeableItemsLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing/billable-services',
-    title: 'Billable Services',
+    name: 'billing/charge-items',
+    title: 'Charge Items',
   }),
   options,
 );
@@ -95,7 +94,6 @@ export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 
-export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);
 export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
