@@ -20,7 +20,7 @@ import {
   TableToolbarSearch,
 } from '@carbon/react';
 import { Upload } from '@carbon/react/icons';
-import { ErrorState, launchWorkspace, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -96,6 +96,12 @@ const ChargeSummaryTable: React.FC = () => {
           initialValues: service,
           workspaceTitle: t('editChargeItem', 'Edit Charge Item'),
         });
+  };
+
+  const openBulkUploadModal = () => {
+    const dispose = showModal('bulk-import-billable-services-modal', {
+      closeModal: () => dispose(),
+    });
   };
 
   if (isLoading) {
