@@ -4,12 +4,12 @@ import styles from './dashboard.scss';
 import ClinicalCharges from '../clinical-charges.component';
 import BillingHeader from '../../billing-header/billing-header.component';
 
-export const BillableServicesDashboard = () => {
+export const ChargeItemsDashboard = () => {
   const { t } = useTranslation();
 
   return (
     <main className={styles.container}>
-      <BillingHeader title={t('billableServices', 'Billable Services')} />
+      <BillingHeader title={t('chargeItems', 'Charge Items')} />
       <main className={styles.servicesTableContainer}>
         <ClinicalCharges />
       </main>
