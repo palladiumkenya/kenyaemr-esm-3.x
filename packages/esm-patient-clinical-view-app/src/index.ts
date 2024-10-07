@@ -47,6 +47,7 @@ import { OtherRelationshipsForm } from './other-relationships/other-relationship
 import InPatient from './in-patient/in-patient.component';
 import { inPatientMeta } from './in-patient/in-patient.meta';
 import RelationshipUpdateForm from './relationships/forms/relationships-update-form.workspace';
+import DeleteRelationshipConfirmDialog from './relationships/modals/delete-relationship-dialog.modal';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -96,6 +97,7 @@ export const otherRelationshipsForm = getSyncLifecycle(OtherRelationshipsForm, o
 export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
 export const relationships = getSyncLifecycle(Relationships, options);
 export const relationshipUpdateForm = getSyncLifecycle(RelationshipUpdateForm, options);
+export const relationshipDeleteConfirmialog = getSyncLifecycle(DeleteRelationshipConfirmDialog, options);
 
 // Contacts
 export const contactList = getSyncLifecycle(ContactList, options);

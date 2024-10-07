@@ -13,7 +13,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   ErrorState,
@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import useContacts from '../hooks/useContacts';
 import styles from './contact-list.scss';
 import HIVStatus from './hiv-status.component';
+import { deleteRelationship } from '../relationships/relationship.resources';
 
 interface ContactListProps {
   patientUuid: string;
@@ -132,13 +133,22 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         pnsAproach: relation.pnsAproach ?? '--',
         ipvOutcome: relation.ipvOutcome ?? '--',
         actions: (
-          <Button
-            renderIcon={Edit}
-            hasIconOnly
-            kind="ghost"
-            iconDescription="Edit"
-            onClick={() => handleEditRelationship(relation.uuid)}
-          />
+          <>
+            <Button
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Edit"
+              onClick={() => handleEditRelationship(relation.uuid)}
+            />
+            <Button
+              renderIcon={TrashCan}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Delete"
+              onClick={() => deleteRelationship(relation.uuid)}
+            />
+          </>
         ),
       };
     }) ?? [];

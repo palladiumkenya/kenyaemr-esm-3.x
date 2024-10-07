@@ -261,6 +261,9 @@
     {
       "name": "birth-date-calculator",
       "component": "birthDateCalculator"
+    },{
+      "name": "relationship-delete-confirm-dialog",
+      "component": "relationshipDeleteConfirmialog"
     }
   ],
   "workspaces": [

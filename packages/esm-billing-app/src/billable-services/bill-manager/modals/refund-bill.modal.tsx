@@ -46,9 +46,12 @@ export const RefundBillModal: React.FC<RefundBillModalProps> = ({ onClose, bill,
 
     try {
       await processBillItems(billWithRefund);
-      mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/cashier/bill'), undefined, {
-        revalidate: true,
-      });
+      (key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/cashier/bill'),
+        undefined,
+        {
+          revalidate: true,
+        };
+      mutate;
       showSnackbar({
         title: t('refundItems', 'Refund Items'),
         subtitle: t('refundSuccessful', 'Item has been successfully refunded.'),
