@@ -33,7 +33,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
-    "@carbon/pictograms-react": "^11.64.0",
+    "@carbon/pictograms-react": "^11.66.0",
     "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "^1.30.0",

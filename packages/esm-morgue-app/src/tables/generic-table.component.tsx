@@ -30,7 +30,7 @@ const GenericTable: React.FC<GenericTableProps> = ({ rows, headers, actionColumn
   const isTablet = useLayoutType() === 'tablet';
 
   return (
-    <>
+    <div className={styles.table}>
       <CardHeader title={title} children={''} />
       <div className={styles.searchContainer}>
         <Search
@@ -82,12 +82,12 @@ const GenericTable: React.FC<GenericTableProps> = ({ rows, headers, actionColumn
         <PatientChartPagination
           currentItems={paginatedData.length}
           totalItems={rows.length}
-          onPageNumberChange={goTo}
+          onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={pageSize}
         />
       </div>
-    </>
+    </div>
   );
 };
 
