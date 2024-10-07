@@ -1,23 +1,9 @@
-import React from 'react';
 import { Tag } from '@carbon/react';
+import React from 'react';
+import { colorsArray } from '../../constants';
 import styles from './payment-history.scss';
 
 export const AppliedFilterTags = ({ tags }: { tags: { type: string; tag: string }[] }) => {
-  const colorsArray = [
-    'red',
-    'magenta',
-    'purple',
-    'blue',
-    'cyan',
-    'teal',
-    'green',
-    'gray',
-    'cool-gray',
-    'warm-gray',
-    'high-contrast',
-    'outline',
-  ];
-
   const getRandomTagColor = () => {
     const randomIndex = Math.floor(Math.random() * colorsArray.length);
     return colorsArray[randomIndex];

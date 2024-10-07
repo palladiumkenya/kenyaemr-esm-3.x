@@ -6,6 +6,7 @@
   "autopsyRecord": "Autopsy summary",
   "awaiting": "Awaiting",
   "billingHistory": "Billing history",
+  "awaiting": "Awaiting",
   "causeOfDeath": "Cause of death",
   "causeOfDeath_lower": "cause of death concepts configured in the system",
   "causeOfDeathIsRequired": "Please select the cause of death",
@@ -24,6 +25,9 @@
   "readyForAdmit": "Ready for Admission",
   "releaseBody": "Release Body",
   "return": "Return back",
+  "morgue": "Morgue Management",
+  "nonCodedCauseOfDeath": "Non-coded cause of death",
+  "readyForAdmit": "Ready for Admission",
   "searchForCauseOfDeath": "Search for a cause of death",
   "selectCauseOfDeath": "Select Cause of Death",
   "waitQueue": "Waiting queue"
