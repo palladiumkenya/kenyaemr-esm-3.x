@@ -10,16 +10,14 @@ const ClinicalCharges = () => {
 
   return (
     <Tabs>
-      <div className={styles.tabWrapper}>
-        <TabList aria-label={t('priceManagement', 'Price management')} contained>
-          <Tab
-            className={styles.tabHeader}
-            renderIcon={Task}
-            secondaryLabel={t('clinicalChargesDescription', 'Billable services and consumable prices')}>
-            {t('clinicalCharges', 'Medical Invoice Items')}
-          </Tab>
-        </TabList>
-      </div>
+      <TabList aria-label={t('chargeItems', 'Charge Items')} contained>
+        <Tab
+          className={styles.tabHeader}
+          renderIcon={Task}
+          secondaryLabel={t('chargeItemsDescription', 'Charge Items and Services Dashboard')}>
+          {t('chargeItems', 'Charge Items')}
+        </Tab>
+      </TabList>
       <TabPanels>
         <TabPanel className={styles.tabPanel}>
           <ChargeSummaryTable />
