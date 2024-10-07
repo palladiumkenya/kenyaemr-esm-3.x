@@ -20,6 +20,7 @@ export interface MappedBill {
   totalAmount?: number;
   tenderedAmount?: number;
   display?: string;
+  referenceCodes?: string;
 }
 
 interface LocationLink {

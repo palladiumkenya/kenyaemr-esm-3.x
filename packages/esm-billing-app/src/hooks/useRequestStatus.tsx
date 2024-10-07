@@ -23,7 +23,7 @@ const createMobileMoneyPaymentPayload = (
   const previousPayments = bill.payments.map((payment) => ({
     amount: payment.amount,
     amountTendered: payment.amountTendered,
-    attributes: [],
+    attributes: payment.attributes,
     instanceType: payment.instanceType.uuid,
   }));
 
