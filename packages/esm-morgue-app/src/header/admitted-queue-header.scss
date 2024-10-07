@@ -1,0 +1,33 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.metricsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: $ui-02;
+  padding: 0 spacing.$spacing-05;
+  height: 4rem;
+  margin-bottom: 0 spacing.$spacing-05;
+}
+
+.searchInput {
+  flex-grow: 1;
+  margin-right: spacing.$spacing-03;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  column-gap: spacing.$spacing-03;
+  min-width: 200px;
+}
+.comboBox input[type='text'] {
+  background-color: white;
+  cursor: default;
+}
+.searchInput input[type='text'] {
+  background-color: white;
+  cursor: default;
+}

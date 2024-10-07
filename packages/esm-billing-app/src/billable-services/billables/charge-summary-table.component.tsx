@@ -18,12 +18,12 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { ErrorState, launchWorkspace, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, launchWorkspace, usePagination, useLayoutType } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import styles from './charge-summary-table.scss';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../../helpers';
-import styles from './charge-summary-table.scss';
 import { useChargeSummaries } from './charge-summary.resource';
 import { searchTableData } from './form-helper';
 
@@ -31,7 +31,8 @@ const defaultPageSize = 10;
 
 const ChargeSummaryTable: React.FC = () => {
   const { t } = useTranslation();
-  const size = 'sm';
+  const layout = useLayoutType();
+  const size = layout === 'tablet' ? 'lg' : 'md';
   const { isLoading, isValidating, error, mutate, chargeSummaryItems } = useChargeSummaries();
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [searchString, setSearchString] = useState('');
@@ -87,11 +88,11 @@ const ChargeSummaryTable: React.FC = () => {
     Boolean(service?.serviceType?.display)
       ? launchWorkspace('billable-service-form', {
           initialValues: service,
-          workspaceTitle: t('editBillableService', 'Edit Billable Service'),
+          workspaceTitle: t('editServiceChargeItem', 'Edit Service Charge Item'),
         })
       : launchWorkspace('commodity-form', {
           initialValues: service,
-          workspaceTitle: t('editCommodity', 'Edit Commodity'),
+          workspaceTitle: t('editChargeItem', 'Edit Charge Item'),
         });
   };
 
@@ -106,9 +107,9 @@ const ChargeSummaryTable: React.FC = () => {
   if (!chargeSummaryItems.length) {
     return (
       <EmptyState
-        headerTitle={t('clinicalCharges', 'Medical Invoice Items')}
+        headerTitle={t('chargeItems', 'Charge Items')}
         launchForm={() => launchWorkspace('billable-service-form')}
-        displayText={t('clinicalChargesDescription', 'Billable services and consumable prices')}
+        displayText={t('chargeItemsDescription', 'Charge Items')}
       />
     );
   }
@@ -117,15 +118,11 @@ const ChargeSummaryTable: React.FC = () => {
     <>
       <DataTable size={size} useZebraStyles rows={rows} headers={headers}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
-          <TableContainer
-            className={styles.tableContainer}
-            title={t('clinicalCharges', 'Medical Invoice Items')}
-            description={t('clinicalChargesDescription', 'Billable services and consumable prices')}
-            {...getTableContainerProps()}>
+          <TableContainer className={styles.tableContainer} title={''} {...getTableContainerProps()}>
             <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
               <TableToolbarContent>
                 <TableToolbarSearch
-                  placeHolder={t('searchForBillableService', 'Search for billable service')}
+                  placeHolder={t('searchForChargeItem', 'Search for charge item')}
                   onChange={(e) => setSearchString(e.target.value)}
                   persistent
                   size={size}
@@ -133,19 +130,19 @@ const ChargeSummaryTable: React.FC = () => {
                 {isValidating && (
                   <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
                 )}
-                <ComboButton label={t('actions', 'Action')}>
+                <ComboButton tooltipAlignment="top-right" label={t('actions', 'Action')}>
                   <MenuItem
                     onClick={() => launchWorkspace('billable-service-form')}
-                    label={t('addService', 'Add service')}
+                    label={t('addServiceChargeItem', 'Add charge item')}
                   />
                   <MenuItem
                     onClick={() => launchWorkspace('commodity-form')}
-                    label={t('addCommodity', 'Add commodity')}
+                    label={t('addCommodityChargeItem', 'Add charge item')}
                   />
                 </ComboButton>
               </TableToolbarContent>
             </TableToolbar>
-            <Table {...getTableProps()} aria-label={t('billableService', 'Billable services table')}>
+            <Table {...getTableProps()} aria-label={t('chargeItem', 'Charge items table')}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -172,7 +169,10 @@ const ChargeSummaryTable: React.FC = () => {
                     ))}
                     <TableCell className="cds--table-column-menu">
                       <OverflowMenu size={size} flipped>
-                        <OverflowMenuItem itemText={t('edit', 'Edit')} onClick={() => handleEdit(results[index])} />
+                        <OverflowMenuItem
+                          itemText={t('editChargeItem', 'Edit charge item')}
+                          onClick={() => handleEdit(results[index])}
+                        />
                       </OverflowMenu>
                     </TableCell>
                   </TableRow>

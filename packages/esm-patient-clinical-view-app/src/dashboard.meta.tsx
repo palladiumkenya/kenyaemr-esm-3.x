@@ -92,6 +92,16 @@ export const caseManagementDashboardMeta = {
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
 };
+
+export const peerCalendarDashboardMeta = {
+  name: 'peer-calendar',
+  slot: 'peer-calendar-dashboard-slot',
+  title: 'Peer Calendar',
+  path: 'peer-calendar',
+  columns: 1,
+  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
+  config: {},
+};
 export const caseEncounterDashboardMeta = {
   slot: 'patient-chart-relationships-slot',
   columns: 1,
