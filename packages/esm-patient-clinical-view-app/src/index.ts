@@ -51,6 +51,7 @@ import PeerCalendar from './peer-calendar/peer-calendar.component';
 import PeerForm from './peer-calendar/forms/peer-form.workspace';
 import FormEntryWorkspace from './peer-calendar/forms/form-entry.workspace';
 import RelationshipUpdateForm from './relationships/forms/relationships-update-form.workspace';
+import DeleteRelationshipConfirmDialog from './relationships/modals/delete-relationship-dialog.modal';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -100,6 +101,7 @@ export const otherRelationshipsForm = getSyncLifecycle(OtherRelationshipsForm, o
 export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
 export const relationships = getSyncLifecycle(Relationships, options);
 export const relationshipUpdateForm = getSyncLifecycle(RelationshipUpdateForm, options);
+export const relationshipDeleteConfirmialog = getSyncLifecycle(DeleteRelationshipConfirmDialog, options);
 
 // Contacts
 export const contactList = getSyncLifecycle(ContactList, options);
