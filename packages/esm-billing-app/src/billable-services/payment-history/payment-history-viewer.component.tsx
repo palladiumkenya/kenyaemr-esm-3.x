@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import { useBills, usePaymentModes } from '../../billing.resource';
 import {
   DataTable,
+  Pagination,
   TableContainer,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Pagination,
 } from '@carbon/react';
-import styles from './payment-history.scss';
-import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
-import flatMapDeep from 'lodash-es/flatMapDeep';
-import { MappedBill, PaymentStatus } from '../../types';
-import dayjs from 'dayjs';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import dayjs from 'dayjs';
+import flatMapDeep from 'lodash-es/flatMapDeep';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PaymentHistoryTable } from './payment-history-table.component';
-import { PaymentTotals } from './payment-totals';
-import { CashierFilter } from './cashier-filter';
-import { PaymentTypeFilter } from './payment-type-filter';
-import { AppliedFilterTags } from './applied-filter-tages.component';
 import BillingHeader from '../../billing-header/billing-header.component';
+import { useBills } from '../../billing.resource';
+import { MappedBill, PaymentStatus } from '../../types';
+import { AppliedFilterTags } from './applied-filter-tages.component';
+import { CashierFilter } from './cashier-filter.component';
+import { PaymentHistoryTable } from './payment-history-table.component';
+import styles from './payment-history.scss';
+import { PaymentTotals } from './payment-totals';
+import { PaymentTypeFilter } from './payment-type-filter.component';
+import { ServiceTypeFilter } from './service-type-filter.component';
+import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 
 export const headers = [
   { header: 'Date', key: 'dateCreated' },
@@ -48,6 +49,7 @@ const PaymentHistoryViewer = () => {
 
   const [selectedPaymentTypeCheckBoxes, setSelectedPaymentTypeCheckBoxes] = useState<string[]>([]);
   const [selectedCashierCheckboxes, setSelectedCashierCheckboxes] = useState<string[]>([]);
+  const [selectedServiceTypeCheckboxes, setSelectedServiceTypeCheckboxes] = useState<string[]>([]);
 
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
 
@@ -70,133 +72,67 @@ const PaymentHistoryViewer = () => {
     });
   };
 
-  const onApplyCashierFilter = (appliedCheckboxes: Array<string>) => {
-    setSelectedCashierCheckboxes(appliedCheckboxes);
-
-    if (appliedCheckboxes.length === 0) {
-      // No cashier filter applied
-      if (selectedPaymentTypeCheckBoxes.length === 0) {
-        setRenderedRows(bills); // No filters applied
-      } else {
-        // Only payment type filter is applied
-        const filteredByPaymentType = bills.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return selectedPaymentTypeCheckBoxes.some((paymentType) =>
-            rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-          );
-        });
-        setRenderedRows(filteredByPaymentType);
-      }
+  useEffect(() => {
+    if (bills.length === 0) {
       return;
     }
-
-    // Apply cashier filter
-    let filteredRows = bills.filter((row) => {
-      const rowValues: string[] = getAllValues(row);
-      return appliedCheckboxes.some((cashier) =>
-        rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
-      );
-    });
-
-    // If payment type filter is also applied
-    if (selectedPaymentTypeCheckBoxes.length > 0) {
-      filteredRows = filteredRows.filter((row) => {
-        const rowValues: string[] = getAllValues(row);
-        return selectedPaymentTypeCheckBoxes.some((paymentType) =>
-          rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-        );
-      });
-    }
-
-    setRenderedRows(filteredRows);
-    goTo(1);
-  };
-
-  const onApplyPaymentTypeFilter = (appliedCheckboxes: Array<string>) => {
-    setSelectedPaymentTypeCheckBoxes(appliedCheckboxes);
-
-    if (appliedCheckboxes.length === 0) {
-      // No payment type filter applied
-      if (selectedCashierCheckboxes.length === 0) {
-        setRenderedRows(bills); // No filters applied
-      } else {
-        // Only cashier filter is applied
-        const filteredByCashier = bills.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return selectedCashierCheckboxes.some((cashier) =>
-            rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
-          );
-        });
-        setRenderedRows(filteredByCashier);
-      }
-      return;
-    }
-
-    // Apply payment type filter
-    let filteredRows = bills.filter((row) => {
-      const rowValues: string[] = getAllValues(row);
-      return appliedCheckboxes.some((paymentType) =>
-        rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-      );
-    });
-
-    // If cashier filter is also applied
-    if (selectedCashierCheckboxes.length > 0) {
-      filteredRows = filteredRows.filter((row) => {
+    const filteredBills = bills
+      .filter((row) => {
+        if (selectedCashierCheckboxes.length === 0) {
+          return true;
+        }
         const rowValues: string[] = getAllValues(row);
         return selectedCashierCheckboxes.some((cashier) =>
           rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
         );
+      })
+      .filter((row) => {
+        if (selectedPaymentTypeCheckBoxes.length === 0) {
+          return true;
+        }
+        const rowValues: string[] = getAllValues(row);
+        return selectedPaymentTypeCheckBoxes.some((paymentType) =>
+          rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
+        );
+      })
+      .filter((row) => {
+        if (selectedServiceTypeCheckboxes.length === 0) {
+          return true;
+        }
+        const rowValues: string[] = getAllValues(row);
+        return selectedServiceTypeCheckboxes.some((serviceType) =>
+          rowValues.some((value) => String(value).toLowerCase().includes(serviceType.toLowerCase())),
+        );
       });
-    }
 
-    setRenderedRows(filteredRows);
+    setRenderedRows(filteredBills);
     goTo(1);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedCashierCheckboxes, selectedPaymentTypeCheckBoxes, selectedServiceTypeCheckboxes]);
+
+  const onApplyCashierFilter = (appliedCashierCheckboxes: Array<string>) => {
+    setSelectedCashierCheckboxes(appliedCashierCheckboxes);
+  };
+
+  const onApplyPaymentTypeFilter = (appliedPaymentTypeCheckboxes: Array<string>) => {
+    setSelectedPaymentTypeCheckBoxes(appliedPaymentTypeCheckboxes);
+  };
+
+  const onApplyServiceTypeFilter = (appliedServiceTypes: Array<string>) => {
+    setSelectedServiceTypeCheckboxes(appliedServiceTypes);
   };
 
   const handleOnResetCashierFilter = () => {
     setSelectedCashierCheckboxes([]);
-
-    if (selectedPaymentTypeCheckBoxes.length === 0) {
-      setRenderedRows(bills);
-    } else {
-      let filteredRows = bills;
-
-      for (let i = 0; i < selectedPaymentTypeCheckBoxes.length; i++) {
-        const selectedPaymentType = selectedPaymentTypeCheckBoxes[i];
-
-        filteredRows = filteredRows.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return rowValues.some((value) => String(value).toLowerCase().includes(selectedPaymentType.toLowerCase()));
-        });
-      }
-
-      setRenderedRows(filteredRows);
-    }
-    goTo(1);
   };
 
   const handleOnResetPaymentTypeFilter = () => {
     setSelectedPaymentTypeCheckBoxes([]);
+  };
 
-    if (selectedCashierCheckboxes.length === 0) {
-      setRenderedRows(bills);
-    } else {
-      let filteredRows = bills;
-
-      for (let j = 0; j < selectedCashierCheckboxes.length; j++) {
-        const selectedCashier = selectedCashierCheckboxes[j];
-
-        filteredRows = filteredRows.filter((row) => {
-          const rowValues: string[] = getAllValues(row);
-          return rowValues.some((value) => String(value).toLowerCase().includes(selectedCashier.toLowerCase()));
-        });
-      }
-
-      setRenderedRows(filteredRows);
-    }
-
-    goTo(1);
+  const handleOnResetServiceTypeFilter = () => {
+    setSelectedServiceTypeCheckboxes([]);
   };
 
   const cashierTags = selectedCashierCheckboxes.map((c) => {
@@ -210,6 +146,13 @@ const PaymentHistoryViewer = () => {
     return {
       tag: t,
       type: 'Payment Type',
+    };
+  });
+
+  const serviceTypeTags = selectedServiceTypeCheckboxes.map((t) => {
+    return {
+      tag: t,
+      type: 'Service Type',
     };
   });
 
@@ -227,7 +170,12 @@ const PaymentHistoryViewer = () => {
                     <TableToolbarSearch
                       onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
                     />
-                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags]} />
+                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags, ...serviceTypeTags]} />
+                    <ServiceTypeFilter
+                      onApplyFilter={onApplyServiceTypeFilter}
+                      onResetFilter={handleOnResetServiceTypeFilter}
+                      bills={bills}
+                    />
                     <PaymentTypeFilter
                       onApplyFilter={onApplyPaymentTypeFilter}
                       onResetFilter={handleOnResetPaymentTypeFilter}
@@ -241,15 +189,19 @@ const PaymentHistoryViewer = () => {
                   </TableToolbarContent>
                 </TableToolbar>
               </div>
-              <PaymentHistoryTable tableData={tableData} paidBillsResponse={paidBillsResponse} />
-              {paginated && (
+              <PaymentHistoryTable
+                tableData={tableData}
+                paidBillsResponse={paidBillsResponse}
+                renderedRows={renderedRows}
+              />
+              {paginated && !paidBillsResponse.isLoading && !paidBillsResponse.error && (
                 <Pagination
                   forwardText={t('nextPage', 'Next page')}
                   backwardText={t('previousPage', 'Previous page')}
                   page={currentPage}
                   pageSize={pageSize}
                   pageSizes={pageSizes}
-                  totalItems={bills.length}
+                  totalItems={renderedRows.length}
                   className={styles.pagination}
                   size={responsiveSize}
                   onChange={({ page: newPage, pageSize }) => {
