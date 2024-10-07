@@ -15,7 +15,7 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { Add, Edit } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   ConfigurableLink,
@@ -74,12 +74,18 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
       header: t('chronicDisease', 'Chronic Disease'),
       key: 'chronicDisease',
     },
+    { header: t('actions', 'Actions'), key: 'actions' },
   ];
 
   const handleAddHistory = () => {
     launchWorkspace('family-relationship-form', {
       workspaceTitle: 'Family Relationship Form',
       rootPersonUuid: patientUuid,
+    });
+  };
+  const handleEditRelationship = (relationShipUuid: string) => {
+    launchWorkspace('relationship-update-form', {
+      relationShipUuid,
     });
   };
 
@@ -104,6 +110,15 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
         ),
         patientUuid: relation,
         chronicDisease: <ConceptObservations patientUuid={patientUuid} conceptUuid={concepts.problemListConceptUuid} />,
+        actions: (
+          <Button
+            renderIcon={Edit}
+            hasIconOnly
+            kind="ghost"
+            iconDescription="Edit"
+            onClick={() => handleEditRelationship(relation.uuid)}
+          />
+        ),
       };
     }) ?? [];
 

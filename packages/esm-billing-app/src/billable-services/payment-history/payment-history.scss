@@ -63,8 +63,14 @@
   border: 1px solid $ui-03;
   gap: layout.$spacing-03;
   padding: layout.$spacing-03;
+  flex-wrap: wrap;
 }
 
 .loadingPaymentTotal {
   width: 50% !important;
+}
+
+.noServiceTypes,
+.noCashiersInRange {
+  font-size: small;
 }

@@ -15,7 +15,7 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { Add, Edit } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   ConfigurableLink,
@@ -49,6 +49,12 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
   const { results, totalPages, currentPage, goTo } = usePagination(nonFamilyRelationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
+  const handleEditRelationship = (relationShipUuid: string) => {
+    launchWorkspace('relationship-update-form', {
+      relationShipUuid,
+    });
+  };
+
   const headers = [
     {
       header: t('name', 'Name'),
@@ -74,6 +80,7 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
       header: t('chronicDisease', 'Chronic Disease'),
       key: 'chronicDisease',
     },
+    { header: t('actions', 'Actions'), key: 'actions' },
   ];
 
   const handleAddHistory = () => {
@@ -104,6 +111,15 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
         ),
         patientUuid: relation,
         chronicDisease: <ConceptObservations patientUuid={patientUuid} conceptUuid={concepts.problemListConceptUuid} />,
+        actions: (
+          <Button
+            renderIcon={Edit}
+            hasIconOnly
+            kind="ghost"
+            iconDescription="Edit"
+            onClick={() => handleEditRelationship(relation.uuid)}
+          />
+        ),
       };
     }) ?? [];
 
