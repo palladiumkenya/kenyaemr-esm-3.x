@@ -16,3 +16,6 @@ export const colorsArray = [
   'high-contrast',
   'outline',
 ];
+
+// Size in MegaBits
+export const MAX_ALLOWED_FILE_SIZE = 2097152;

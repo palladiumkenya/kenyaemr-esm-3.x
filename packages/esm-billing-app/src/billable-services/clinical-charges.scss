@@ -224,3 +224,32 @@
 .tabHeader {
   min-width: calc(layout.$layout-05 * 5);
 }
+
+.tabPanel {
+  padding: layout.$spacing-05 0;
+}
+
+.tabWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.iconMarginLeft {
+  margin-left: layout.$spacing-05;
+}
+
+.csvreq {
+  margin-bottom: layout.$spacing-05;
+}
+
+.uploadButtonWrapper {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: center;
+  font-size: medium;
+}
+
+.noFile {
+  font-size: medium;
+}
