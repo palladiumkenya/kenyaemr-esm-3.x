@@ -92,9 +92,23 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
     [fields, control, remove, errors],
   );
 
+  const handleError = (err) => {
+    console.error(JSON.stringify(err, null, 2));
+    showSnackbar({
+      title: t('commodityBillableCreationFailed', 'Commodity price creation failed'),
+      subtitle: t(
+        'commodityBillableCreationFailedSubtitle',
+        'The commodity price creation failed, view browser console for more details',
+      ),
+      kind: 'error',
+      isLowContrast: true,
+      timeoutInMs: 5000,
+    });
+  };
+
   return (
     <FormProvider {...formMethods}>
-      <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <form onSubmit={handleSubmit(onSubmit, handleError)} className={styles.form}>
         <div className={styles.formContainer}>
           <Stack className={styles.formStackControl} gap={7}>
             <StockItemSearch setValue={setValue} defaultStockItem={initialValues?.name} />

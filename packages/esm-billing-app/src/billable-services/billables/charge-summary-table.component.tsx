@@ -138,10 +138,7 @@ const ChargeSummaryTable: React.FC = () => {
                 {isValidating && (
                   <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
                 )}
-                <Button onClick={openBulkUploadModal} className={styles.bulkUploadButton}>
-                  Bulk Upload <Upload className={styles.iconMarginLeft} />
-                </Button>
-                <ComboButton label={t('actions', 'Action')}>
+                <ComboButton tooltipAlignment="top-right" label={t('actions', 'Action')}>
                   <MenuItem
                     onClick={() => launchWorkspace('billable-service-form')}
                     label={t('addServiceChargeItem', 'Add charge item')}
@@ -150,6 +147,7 @@ const ChargeSummaryTable: React.FC = () => {
                     onClick={() => launchWorkspace('commodity-form')}
                     label={t('addCommodityChargeItem', 'Add charge item')}
                   />
+                  <MenuItem onClick={openBulkUploadModal} label={t('bulkUpload', 'Bulk Upload')} renderIcon={Upload} />
                 </ComboButton>
               </TableToolbarContent>
             </TableToolbar>

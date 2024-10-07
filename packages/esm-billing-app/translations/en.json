@@ -24,6 +24,7 @@
   "billPaymentRequiredMessage": "The current patient has pending bill. Advice patient to settle bill before receiving services",
   "billsList": "Bill list",
   "billTotal": "Bill total",
+  "bulkUpload": "Bulk Upload",
   "cancel": "Cancel",
   "chargeItem": "Charge items table",
   "chargeItems": "Charge Items",
