@@ -315,6 +315,18 @@
       "width": "extra-wide",
       "canMaximize": true,
       "canHide": true
+    },
+    {
+      "name": "relationship-update-form",
+      "component": "relationshipUpdateForm",
+      "title": "Relationship Update Form",
+      "type": "form"
+    },
+    {
+      "name": "other-relationship-form",
+      "component": "otherRelationshipsForm",
+      "title": "Other Relationships Form",
+      "type": "form"
     }
   ]
 }

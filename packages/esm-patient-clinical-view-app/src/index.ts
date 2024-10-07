@@ -50,6 +50,7 @@ import { inPatientMeta } from './in-patient/in-patient.meta';
 import PeerCalendar from './peer-calendar/peer-calendar.component';
 import PeerForm from './peer-calendar/forms/peer-form.workspace';
 import FormEntryWorkspace from './peer-calendar/forms/form-entry.workspace';
+import RelationshipUpdateForm from './relationships/forms/relationships-update-form.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -98,6 +99,7 @@ export const otherRelationshipsForm = getSyncLifecycle(OtherRelationshipsForm, o
 // Relationships links for Family History and the corresponding view in the patient chart
 export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
 export const relationships = getSyncLifecycle(Relationships, options);
+export const relationshipUpdateForm = getSyncLifecycle(RelationshipUpdateForm, options);
 
 // Contacts
 export const contactList = getSyncLifecycle(ContactList, options);

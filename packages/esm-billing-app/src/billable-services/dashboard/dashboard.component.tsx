@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './dashboard.scss';
-import { WorkspaceContainer } from '@openmrs/esm-framework';
 import ClinicalCharges from '../clinical-charges.component';
 import BillingHeader from '../../billing-header/billing-header.component';
 
@@ -14,7 +13,6 @@ export const BillableServicesDashboard = () => {
       <main className={styles.servicesTableContainer}>
         <ClinicalCharges />
       </main>
-      <WorkspaceContainer overlay contextKey="billable-services" />
     </main>
   );
 };
