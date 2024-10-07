@@ -1,21 +1,21 @@
-import useSWR from 'swr';
 import {
   formatDate,
-  parseDate,
   openmrsFetch,
+  OpenmrsResource,
+  parseDate,
+  useConfig,
   useSession,
   useVisit,
-  useConfig,
-  OpenmrsResource,
 } from '@openmrs/esm-framework';
-import { FacilityDetail, MappedBill, PatientInvoice, PaymentMethod, PaymentStatus } from './types';
+import dayjs from 'dayjs';
 import isEmpty from 'lodash-es/isEmpty';
 import sortBy from 'lodash-es/sortBy';
-import dayjs from 'dayjs';
-import { BillingConfig } from './config-schema';
 import { useState } from 'react';
-import { extractString } from './helpers';
+import useSWR from 'swr';
 import { z } from 'zod';
+import { BillingConfig } from './config-schema';
+import { extractString } from './helpers';
+import { FacilityDetail, MappedBill, PatientInvoice, PaymentMethod, PaymentStatus } from './types';
 
 const mapBillProperties = (bill: PatientInvoice): MappedBill => {
   // create base object
@@ -186,7 +186,7 @@ export const processBillItems = (payload) => {
 
 export const usePaymentModes = (excludeWaiver: boolean = true) => {
   const { excludedPaymentMode } = useConfig<BillingConfig>();
-  const url = `/ws/rest/v1/cashier/paymentMode`;
+  const url = `/ws/rest/v1/cashier/paymentMode?v=full`;
   const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<PaymentMethod> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });

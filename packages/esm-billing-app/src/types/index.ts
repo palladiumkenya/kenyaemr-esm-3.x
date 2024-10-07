@@ -243,12 +243,36 @@ export interface CommonMedicationValueCoded extends CommonMedicationProps {
   valueCoded: string;
 }
 
-export type PaymentMethod = {
+export interface AuditInfo {
+  creator: Creator;
+  dateCreated: string;
+  changedBy: null;
+  dateChanged: null;
+}
+
+export interface Link {
+  rel: string;
+  uri: string;
+  resourceAlias: string;
+}
+
+export interface Creator {
   uuid: string;
-  description: string;
+  display: string;
+  links: Link[];
+}
+
+export interface PaymentMethod {
+  uuid: string;
   name: string;
+  description: string;
   retired: boolean;
-};
+  retireReason: null;
+  auditInfo: AuditInfo;
+  attributeTypes: AttributeType[];
+  sortOrder: null;
+  resourceVersion: string;
+}
 
 export interface Payment {
   uuid: string;
