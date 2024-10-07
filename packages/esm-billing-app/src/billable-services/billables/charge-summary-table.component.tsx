@@ -19,7 +19,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { Upload } from '@carbon/react/icons';
+import { Download, Upload } from '@carbon/react/icons';
 import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../../helpers';
 import styles from './charge-summary-table.scss';
 import { useChargeSummaries } from './charge-summary.resource';
-import { searchTableData } from './form-helper';
+import { downloadExcelTemplateFile, searchTableData } from './form-helper';
 
 const defaultPageSize = 10;
 
@@ -148,6 +148,11 @@ const ChargeSummaryTable: React.FC = () => {
                     label={t('addCommodityChargeItem', 'Add charge item')}
                   />
                   <MenuItem onClick={openBulkUploadModal} label={t('bulkUpload', 'Bulk Upload')} renderIcon={Upload} />
+                  <MenuItem
+                    onClick={downloadExcelTemplateFile}
+                    label={t('downloadTemplate', 'Download template')}
+                    renderIcon={Download}
+                  />
                 </ComboButton>
               </TableToolbarContent>
             </TableToolbar>

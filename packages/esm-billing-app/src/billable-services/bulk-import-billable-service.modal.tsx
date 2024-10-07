@@ -62,10 +62,10 @@ export const BulkImportBillableServices = ({ closeModal }) => {
         return;
       }
 
-      const correctRowsPayload = fileReadResponse.at(0);
-      const filteredOutRows = fileReadResponse.at(1);
+      const correctRowsPayload = fileReadResponse.at(0) ?? [];
+      const filteredOutRows = fileReadResponse.at(1) ?? [];
 
-      if (filteredOutRows.length > 0) {
+      if (filteredOutRows?.length > 0) {
         createAndDownloadFilteredRowsFile(filteredOutRows as ExcelFileRow[]);
         showSnackbar({
           title: t(

@@ -183,3 +183,40 @@ export const getBulkUploadPayloadFromExcelFile = (
 
   return [payload, rowsWithMissingCategories];
 };
+
+export function createExcelTemplateFile(): Uint8Array {
+  const headers = ['concept_id', 'name', 'short_name', 'price', 'disable', 'category'];
+
+  const worksheet = XLSX.utils.aoa_to_sheet([headers]);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Charge Items');
+
+  // Set column widths for better readability
+  const colWidths = [
+    { wch: 15 }, // concept_id
+    { wch: 30 }, // name
+    { wch: 20 }, // short_name
+    { wch: 10 }, // price
+    { wch: 10 }, // disable
+    { wch: 20 }, // category
+  ];
+  worksheet['!cols'] = colWidths;
+
+  // Generate the Excel file as a Uint8Array
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+  return new Uint8Array(excelBuffer);
+}
+
+export const downloadExcelTemplateFile = () => {
+  const excelBuffer = createExcelTemplateFile();
+  const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.style.display = 'none';
+  a.href = url;
+  a.download = 'charge_items_template.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
