@@ -1,4 +1,4 @@
-import { OverflowMenuItem } from '@carbon/react';
+import { OverflowMenuItem, Button } from '@carbon/react';
 import { Order } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,13 +37,9 @@ const TestOrderAction: React.FC<TestOrderProps> = ({ order }) => {
   }
 
   return (
-    <OverflowMenuItem
-      onClick={launchModal}
-      disabled={hasPendingPayment}
-      itemText={
-        hasPendingPayment ? t('unsettledBill', 'Unsettled bill for test.') : t('pickLabRequest', 'Pick Lab Request')
-      }
-    />
+    <Button kind="primary" disabled={hasPendingPayment} key={`${order.uuid}`} onClick={launchModal}>
+      {hasPendingPayment ? t('unsettledBill', 'Unsettled bill for test.') : t('pickLabRequest', 'Pick Lab Request')}
+    </Button>
   );
 };
 
