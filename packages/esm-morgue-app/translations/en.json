@@ -1,6 +1,7 @@
 {
   "admitted": "Admitted Bodies",
   "admittedOnes": "Admitted",
+  "allocation": "Allocation",
   "amountCollected": "Amount(s)",
   "attachment": "Attachments",
   "attachments": "Attachments",
@@ -17,7 +18,6 @@
   "empty": "Empty",
   "enrollingBtn": "Add New Deceased",
   "enterNonCodedCauseOfDeath": "Enter non-coded cause of death",
-  "error": "An error occurred:",
   "fromHosp": "From Hospital",
   "loading": "Loading...",
   "MedicalHistory": "Medical history",
@@ -29,6 +29,7 @@
   "return": "Return back",
   "morgue": "Morgue Management",
   "nonCodedCauseOfDeath": "Non-coded cause of death",
+  "pullingCompartment": "Pulling compartments data.....",
   "readyForAdmit": "Ready for Admission",
   "searchForCauseOfDeath": "Search for a cause of death",
   "selectCauseOfDeath": "Select Cause of Death",

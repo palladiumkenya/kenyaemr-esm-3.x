@@ -15,7 +15,7 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   ConfigurableLink,
@@ -29,6 +29,7 @@ import { usePatientRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
+import { deleteRelationship } from '../relationships/relationship.resources';
 
 interface FamilyHistoryProps {
   patientUuid: string;
@@ -111,13 +112,22 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
         patientUuid: relation,
         chronicDisease: <ConceptObservations patientUuid={patientUuid} conceptUuid={concepts.problemListConceptUuid} />,
         actions: (
-          <Button
-            renderIcon={Edit}
-            hasIconOnly
-            kind="ghost"
-            iconDescription="Edit"
-            onClick={() => handleEditRelationship(relation.uuid)}
-          />
+          <>
+            <Button
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Edit"
+              onClick={() => handleEditRelationship(relation.uuid)}
+            />
+            <Button
+              renderIcon={TrashCan}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Delete"
+              onClick={() => deleteRelationship(relation.uuid)}
+            />
+          </>
         ),
       };
     }) ?? [];

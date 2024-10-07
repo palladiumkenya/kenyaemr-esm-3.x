@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './compartment.scss';
 import { Button, Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
@@ -11,12 +11,10 @@ import { Patient } from '../types';
 
 interface AvailableCompartmentProps {
   patientInfo: Patient;
-  index: number;
 }
 
-const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
+const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo }) => {
   const { t } = useTranslation();
-  const [count, setCount] = useState(3);
 
   const handleNavigateToDeceasedDetailsView = () =>
     navigate({
@@ -27,7 +25,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
     <div className={styles.cardView}>
       <div className={styles.cardRow}>
         <div className={styles.cardLabelWrapper}>
-          <div className={styles.cardLabel}>{index + 1}</div> {/* Use index + 1 here */}
+          <div className={styles.cardLabel}>3</div>
         </div>
         <span className={styles.deceasedName}>{toUpperCase(patientInfo.person.display)}</span>
       </div>
