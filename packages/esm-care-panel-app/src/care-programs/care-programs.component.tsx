@@ -47,6 +47,11 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       undefined,
       { revalidate: true },
     );
+    mutate(
+      (key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/programenrollment?patient=${patientUuid}`),
+      undefined,
+      { revalidate: true },
+    );
   };
 
   const handleCareProgramClick = useCallback(

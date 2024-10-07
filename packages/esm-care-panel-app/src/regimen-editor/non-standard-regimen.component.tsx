@@ -6,13 +6,14 @@ import styles from './standard-regimen.scss';
 import { useNonStandardRegimen } from '../hooks/useNonStandardRegimen';
 import { Regimen } from '../types';
 import { usePatient } from '@openmrs/esm-framework';
-import { filterRegimenData, calculateAge } from './utils';
+import { calculateAge, filterRegimenData } from './utils';
 
 interface NonStandardRegimenProps {
   category: string;
   setNonStandardRegimens: (value: any) => void;
   setStandardRegimenLine: (value: any) => void;
   selectedRegimenType: string;
+  visitDate: Date;
 }
 
 const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
@@ -20,6 +21,7 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
   selectedRegimenType,
   setNonStandardRegimens,
   setStandardRegimenLine,
+  visitDate,
 }) => {
   const { t } = useTranslation();
   const { standardRegimen } = useStandardRegimen();
@@ -29,7 +31,7 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
   const [selectedRegimens, setSelectedRegimens] = useState(Array(5).fill(''));
   const [nonStandardRegimenObjects, setStandardRegimenObjects] = useState([]);
   const { patient } = usePatient();
-  const patientAge = calculateAge(patient?.birthDate);
+  const patientAge = calculateAge(patient?.birthDate, visitDate);
   const filteredRegimenLineByAge = filterRegimenData(matchingCategory?.category, patientAge);
 
   const handleRegimenLineChange = (e) => {

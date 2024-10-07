@@ -210,7 +210,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                     labelText={t('status', 'Status')}
                     labelA="Off"
                     labelB="On"
-                    defaultToggled
+                    defaultToggled={field.value === 'ENABLED'}
                     id="serviceStatus"
                     onToggle={(value) => (value ? field.onChange('ENABLED') : field.onChange('DISABLED'))}
                   />

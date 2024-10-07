@@ -1,20 +1,23 @@
+import { Button, Checkbox, Popover, PopoverContent, SkeletonIcon, usePrefix } from '@carbon/react';
+import { CloudSatelliteServices } from '@carbon/react/icons';
 import React, { ChangeEvent, useState } from 'react';
-import { IbmCloudLogging } from '@carbon/react/icons';
-import { Popover, PopoverContent, Button, Checkbox, usePrefix, SkeletonIcon } from '@carbon/react';
-import styles from './payment-history.scss';
+import { useTranslation } from 'react-i18next';
 import { MappedBill } from '../../types';
+import styles from './payment-history.scss';
+import { useBillsServiceTypes } from './use-bills-service-types';
 
-interface CashierFilterProps {
-  onApplyFilter?: (selectedCheckboxes: Array<string>) => void;
-  onResetFilter?: () => void;
+interface TableToolbarFilterProps {
+  onApplyFilter: (selectedCheckboxes: Array<string>) => void;
+  onResetFilter: () => void;
   bills: MappedBill[];
 }
 
-export const CashierFilter = ({ onApplyFilter, onResetFilter, bills }: CashierFilterProps) => {
+export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: TableToolbarFilterProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
+  const { billsServiceTypes, isLoading } = useBillsServiceTypes(bills);
 
-  const cashiers = Array.from(new Map(bills.map((bill) => [bill.cashier.uuid, bill.cashier])).values());
+  const { t } = useTranslation();
 
   const prefix = usePrefix();
 
@@ -46,6 +49,10 @@ export const CashierFilter = ({ onApplyFilter, onResetFilter, bills }: CashierFi
     }
   };
 
+  if (isLoading) {
+    return <SkeletonIcon className={styles.skeletonIcon} />;
+  }
+
   return (
     <Popover align={'left'} caret={true} open={isOpen} onRequestClose={() => setIsOpen(false)}>
       <button
@@ -56,27 +63,28 @@ export const CashierFilter = ({ onApplyFilter, onResetFilter, bills }: CashierFi
           setIsOpen(!isOpen);
         }}
         className={`${prefix}--toolbar-action ${prefix}--overflow-menu`}>
-        <IbmCloudLogging />
+        <CloudSatelliteServices />
       </button>
       <PopoverContent id="containerCheckbox">
         <div className={styles.checkBoxWrapper}>
           <fieldset className={`${prefix}--fieldset`}>
-            <legend className={`${prefix}--label`}>Filter by cashier</legend>
-            {cashiers.map((cashier) => (
+            <legend className={`${prefix}--label`}>Filter by service type</legend>
+            {billsServiceTypes.length === 0 && <p className={styles.noServiceTypes}>No Service Types In Bills Range</p>}
+            {billsServiceTypes.map((type) => (
               <Checkbox
-                labelText={cashier.display}
-                id={`checkbox-${cashier.display}`}
+                labelText={type.display}
+                id={`checkbox-${type.display}`}
                 onChange={handleCheckboxChange}
-                checked={selectedCheckboxes.includes(cashier.display)}
+                checked={selectedCheckboxes.includes(type.display)}
               />
             ))}
           </fieldset>
         </div>
         <Button kind="secondary" title="Reset filters" onClick={handleResetFilter}>
-          Reset filters
+          {t('resetFilters', ' Reset filters')}
         </Button>
         <Button kind="primary" title="Reset filters" onClick={handleApplyFilter}>
-          Apply filter
+          {t('applyFilter', 'Apply filter')}
         </Button>
       </PopoverContent>
     </Popover>
