@@ -189,5 +189,11 @@
       "type": "other-form",
       "width": "extra-wide"
     }
+  ],
+  "modals": [
+    {
+      "name": "bulk-import-billable-services-modal",
+      "component": "bulkImportBillableServicesModal"
+    }
   ]
 }
