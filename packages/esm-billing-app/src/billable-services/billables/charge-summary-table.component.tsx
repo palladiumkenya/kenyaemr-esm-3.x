@@ -1,30 +1,30 @@
-import React, { useMemo, useState } from 'react';
-import { UseChargeSummaries } from './charge-summary.resource';
 import {
+  ComboButton,
   DataTable,
   DataTableSkeleton,
+  InlineLoading,
+  MenuItem,
+  OverflowMenu,
+  OverflowMenuItem,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
   TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  Pagination,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-  InlineLoading,
-  OverflowMenu,
-  OverflowMenuItem,
-  ComboButton,
-  MenuItem,
 } from '@carbon/react';
 import { ErrorState, launchWorkspace, usePagination } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import styles from './charge-summary-table.scss';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../../helpers';
+import styles from './charge-summary-table.scss';
+import { useChargeSummaries } from './charge-summary.resource';
 import { searchTableData } from './form-helper';
 
 const defaultPageSize = 10;
@@ -32,7 +32,7 @@ const defaultPageSize = 10;
 const ChargeSummaryTable: React.FC = () => {
   const { t } = useTranslation();
   const size = 'sm';
-  const { isLoading, isValidating, error, mutate, chargeSummaryItems } = UseChargeSummaries();
+  const { isLoading, isValidating, error, mutate, chargeSummaryItems } = useChargeSummaries();
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [searchString, setSearchString] = useState('');
 
