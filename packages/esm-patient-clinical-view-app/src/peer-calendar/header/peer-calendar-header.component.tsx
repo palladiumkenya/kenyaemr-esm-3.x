@@ -1,10 +1,10 @@
-import { Calendar, Location } from '@carbon/react/icons';
+import { Calendar, EventSchedule, Location } from '@carbon/react/icons';
 import { formatDate, useSession } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ReportingPeriod } from '../../types';
 import styles from './peer-calendar-header.scss';
 import ReportingPeriodInput from './reporting-period-input.component';
-import { ReportingPeriod } from '../../types';
 
 interface PeerCalendarHeaderProps {
   title: string;
@@ -23,7 +23,7 @@ export const PeerCalendarHeader: React.FC<PeerCalendarHeaderProps> = ({
   return (
     <div className={styles.header}>
       <div className={styles['left-justified-items']}>
-        <Calendar className={styles.illustration} />
+        <EventSchedule className={styles.illustration} />
         <div className={styles['page-labels']}>
           <p>{t('managePeers', 'Manage Peers')}</p>
           <p className={styles['page-name']}>{title}</p>
