@@ -3,7 +3,6 @@ import { formatDate, useSession } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './peer-calendar-header.scss';
-import PeerCalendarIllustration from './peer-calendar-illustration.component';
 
 interface PeerCalendarHeaderProps {
   title: string;
@@ -16,7 +15,7 @@ export const PeerCalendarHeader: React.FC<PeerCalendarHeaderProps> = ({ title })
   return (
     <div className={styles.header}>
       <div className={styles['left-justified-items']}>
-        <PeerCalendarIllustration />
+        <Calendar className={styles.illustration} />
         <div className={styles['page-labels']}>
           <p>{t('managePeers', 'Manage Peers')}</p>
           <p className={styles['page-name']}>{title}</p>
