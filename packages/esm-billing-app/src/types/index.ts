@@ -358,3 +358,12 @@ export type FHIRPatientResponse = {
     }>;
   };
 };
+
+export type ExcelFileRow = {
+  concept_id: number;
+  name: string;
+  price: number;
+  disable: 'false' | 'true';
+  category: number;
+  short_name: string;
+};

@@ -1,12 +1,13 @@
-import React from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
+import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { Task } from '@carbon/react/icons';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './clinical-charges.scss';
 import ChargeSummaryTable from './billables/charge-summary-table.component';
+import styles from './clinical-charges.scss';
 
 const ClinicalCharges = () => {
   const { t } = useTranslation();
+
   return (
     <Tabs>
       <TabList aria-label={t('chargeItems', 'Charge Items')} contained>
@@ -18,7 +19,9 @@ const ClinicalCharges = () => {
         </Tab>
       </TabList>
       <TabPanels>
-        <ChargeSummaryTable />
+        <TabPanel className={styles.tabPanel}>
+          <ChargeSummaryTable />
+        </TabPanel>
       </TabPanels>
     </Tabs>
   );

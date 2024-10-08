@@ -27,7 +27,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
     <div className={styles.cardView}>
       <div className={styles.cardRow}>
         <div className={styles.cardLabelWrapper}>
-          <div className={styles.cardLabel}>{index + 1}</div> {/* Use index + 1 here */}
+          <div className={styles.cardLabel}>{index + 1}</div>
         </div>
         <span className={styles.deceasedName}>{toUpperCase(patientInfo.person.display)}</span>
       </div>

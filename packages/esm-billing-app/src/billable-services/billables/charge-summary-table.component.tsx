@@ -1,4 +1,5 @@
 import {
+  Button,
   ComboButton,
   DataTable,
   DataTableSkeleton,
@@ -18,12 +19,13 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { ErrorState, launchWorkspace, usePagination, useLayoutType } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import styles from './charge-summary-table.scss';
+import { Upload } from '@carbon/react/icons';
+import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../../helpers';
+import styles from './charge-summary-table.scss';
 import { useChargeSummaries } from './charge-summary.resource';
 import { searchTableData } from './form-helper';
 
@@ -96,8 +98,14 @@ const ChargeSummaryTable: React.FC = () => {
         });
   };
 
+  const openBulkUploadModal = () => {
+    const dispose = showModal('bulk-import-billable-services-modal', {
+      closeModal: () => dispose(),
+    });
+  };
+
   if (isLoading) {
-    return <DataTableSkeleton headers={headers} aria-label="sample table" />;
+    return <DataTableSkeleton headers={headers} aria-label="sample table" showHeader={false} showToolbar={false} />;
   }
 
   if (error) {
@@ -118,7 +126,7 @@ const ChargeSummaryTable: React.FC = () => {
     <>
       <DataTable size={size} useZebraStyles rows={rows} headers={headers}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
-          <TableContainer className={styles.tableContainer} title={''} {...getTableContainerProps()}>
+          <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
             <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
               <TableToolbarContent>
                 <TableToolbarSearch
@@ -130,7 +138,10 @@ const ChargeSummaryTable: React.FC = () => {
                 {isValidating && (
                   <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
                 )}
-                <ComboButton tooltipAlignment="top-right" label={t('actions', 'Action')}>
+                <Button onClick={openBulkUploadModal} className={styles.bulkUploadButton}>
+                  Bulk Upload <Upload className={styles.iconMarginLeft} />
+                </Button>
+                <ComboButton label={t('actions', 'Action')}>
                   <MenuItem
                     onClick={() => launchWorkspace('billable-service-form')}
                     label={t('addServiceChargeItem', 'Add charge item')}
