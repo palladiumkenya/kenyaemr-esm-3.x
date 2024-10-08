@@ -1,7 +1,7 @@
 import { FetchResponse, openmrsFetch, OpenmrsResource, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { useCallback, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import { FacilityResponse, Practitioner, ProviderResponse, RolesResponse, User } from '../../types';
+import { FacilityResponse, Practitioner, Provider, ProviderResponse, RolesResponse, User } from '../../types';
 import useSWR, { mutate } from 'swr';
 import { ConfigObject } from '../../config-schema';
 
@@ -152,3 +152,43 @@ export const createProviderAttribute = (payload, providerUuid: string) => {
     },
   });
 };
+const providerUrl = `${restBaseUrl}/provider`;
+export const custom = `?v=custom:(uuid,identifier,display,person:(uuid,display),attributes:(uuid,display),retired)`;
+export const customLicence = `?v=custom:(uuid,display,person:(uuid,display),attributes:(attributeType:ref,display,uuid,value))`;
+
+export const UseAllProviders = () => {
+  const { data, isLoading, error, isValidating } = useSWR<{ data: { results: Array<Provider> } }>(
+    `${providerUrl}${custom}`,
+    openmrsFetch,
+  );
+
+  return {
+    providers: data?.data.results ?? [],
+    isLoading,
+    error,
+    isValidating,
+  };
+};
+
+export const searchUsers = async (name: string, ac = new AbortController()) => {
+  const results = await openmrsFetch(`${restBaseUrl}/user?q=${name}&v=custom:(uuid,display,person)`, {
+    signal: ac.signal,
+  });
+  return results.data.results;
+};
+
+export function GetProviderLicenceDate(patientId: string) {
+  const url = `${providerUrl}/${patientId}${customLicence}`;
+
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<Provider>, Error>(
+    patientId ? url : null,
+    openmrsFetch,
+  );
+
+  return {
+    listDetails: data?.data,
+    error,
+    isLoading,
+    mutateListDetails: mutate,
+  };
+}
