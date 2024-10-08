@@ -20,7 +20,7 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
   const {
     user: { person: peerEducatorPerson },
   } = useSession();
-  const { peerEducatorRelationship } = useConfig<ConfigObject>();
+  const { peerEducatorRelationship, kvpProgramUuid } = useConfig<ConfigObject>();
   const form = useForm<PeerFormType>({
     defaultValues: {
       personA: peerEducatorPerson.uuid,
@@ -44,7 +44,7 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
 
   const searchPatient = async (query: string) => {
     const abortController = new AbortController();
-    return await fetchPerson(query, abortController);
+    return await fetchPerson(query, abortController, kvpProgramUuid);
   };
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>

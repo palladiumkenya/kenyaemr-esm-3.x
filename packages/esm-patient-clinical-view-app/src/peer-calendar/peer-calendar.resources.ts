@@ -1,7 +1,7 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { boolean, z } from 'zod';
-import { Peer, ReportingPeriod } from '../types';
+import { Patient, Peer, ReportingPeriod } from '../types';
 
 export const peerFormSchema = z
   .object({
@@ -21,11 +21,26 @@ export const peerFormSchema = z
     { message: 'End date must be after start date', path: ['endDate'] },
   );
 
-export async function fetchPerson(query: string, abortController: AbortController) {
-  const patientsRes = await openmrsFetch(`${restBaseUrl}/patient?q=${query}`, {
+const isPatientEnrolledToProgram = async (patientUuid: string, programUuid: string): Promise<boolean> => {
+  const customRep = 'custom:(uuid,program:(name,uuid))';
+  const url = `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRep}`;
+  const resp = await openmrsFetch<{ results: Array<{ uuid: string; program: { name: string; uuid: string } }> }>(url);
+  return (resp.data?.results ?? [])?.findIndex((en) => en.program.uuid === programUuid) !== -1;
+};
+
+export async function fetchPerson(query: string, abortController: AbortController, kvpProgramUuid: string) {
+  const patientsRes = await openmrsFetch<{ results: Array<Patient> }>(`${restBaseUrl}/patient?q=${query}`, {
     signal: abortController.signal,
   });
-  return patientsRes.data.results;
+
+  const patients = [];
+  for (const patient of patientsRes.data.results ?? []) {
+    if (await isPatientEnrolledToProgram(patient.uuid, kvpProgramUuid)) {
+      patients.push(patient);
+    }
+  }
+
+  return patients;
 }
 
 export const createRelationship = (payload: z.infer<typeof peerFormSchema>) => {
