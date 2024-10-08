@@ -16,7 +16,14 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PaymentPoint } from '../../types';
-import { clockIn, usePaymentPoints, useProviderUUID, useTimeSheets } from '../payment-points.resource';
+import {
+  clockIn,
+  clockOut,
+  useClockInStatus,
+  usePaymentPoints,
+  useProviderUUID,
+  useTimeSheets,
+} from '../payment-points.resource';
 
 const schema = z.object({
   paymentPointUUID: z.string({ required_error: 'Payment point is required.' }),
@@ -30,6 +37,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
+  const { latestSheet, isClockedIn } = useClockInStatus();
 
   const shouldPromptUser = !paymentPoint;
 
@@ -43,9 +51,8 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
     mode: 'all',
   });
 
-  const onSubmit: SubmitHandler<FormData> = (data) => {
-    setIsSubmitting(true);
-    clockIn({ cashier: providerUUID, cashPoint: data.paymentPointUUID, clockIn: new Date().toISOString() })
+  const clockInWrapper = (paymentPointUUID: string) => {
+    clockIn({ cashier: providerUUID, cashPoint: paymentPointUUID, clockIn: new Date().toISOString() })
       .then(() => {
         showSnackbar({
           title: t('success', 'Success'),
@@ -71,13 +78,47 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
       });
   };
 
-  return (
+  const onSubmit: SubmitHandler<FormData> = (data) => {
+    setIsSubmitting(true);
+    if (isClockedIn) {
+      clockOut({
+        clockOut: new Date().toISOString(),
+        cashier: providerUUID,
+        cashPoint: latestSheet.cashPoint.uuid,
+        clockIn: latestSheet.clockIn,
+      })
+        .then(() => {
+          showSnackbar({
+            title: t('success', 'Success'),
+            subtitle: t('successfullyClockedOut', 'Successfully Clocked Out'),
+            kind: 'success',
+          });
+          mutate();
+          clockInWrapper(data.paymentPointUUID);
+        })
+        .catch(() => {
+          showSnackbar({
+            title: t('anErrorOccurred', 'An Error Occurred'),
+            subtitle: t('anErrorOccurredClockingOut', 'An error occurred clocking out'),
+            kind: 'error',
+          });
+        })
+        .finally(() => {
+          setIsSubmitting(false);
+          closeModal();
+        });
+
+      return;
+    }
+
+    clockInWrapper(data.paymentPointUUID);
+  };
+
+  if (shouldPromptUser) {
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <ModalHeader closeModal={shouldPromptUser ? undefined : closeModal}>Clock In</ModalHeader>
+      <ModalHeader closeModal={undefined}>Clock In</ModalHeader>
       <ModalBody>
-        {!shouldPromptUser ? (
-          `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`
-        ) : isLoadingPaymentPoints ? (
+        {isLoadingPaymentPoints ? (
           <SelectSkeleton />
         ) : (
           <Select
@@ -93,6 +134,36 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
             ))}
           </Select>
         )}
+      </ModalBody>
+      <ModalFooter>
+        <Button
+          kind="secondary"
+          onClick={shouldPromptUser ? undefined : closeModal}
+          type="button"
+          disabled={shouldPromptUser}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button type="submit" disabled={isLoading || error || !providerUUID || !isValid}>
+          {isSubmitting ? (
+            <>
+              <Loading withOverlay={false} small />
+              {t('clockingIn', 'Clocking in')}
+            </>
+          ) : (
+            t('clockIn', 'Clock In')
+          )}
+        </Button>
+      </ModalFooter>
+    </Form>;
+  }
+
+  return (
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      <ModalHeader closeModal={closeModal}>Clock In</ModalHeader>
+      <ModalBody>
+        {isClockedIn
+          ? `You will be clocked in on ${paymentPoint.name} right now but you will be automatically be clocked out of ${latestSheet.cashPoint.name} first. Do you want to proceed.`
+          : `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`}
       </ModalBody>
       <ModalFooter>
         <Button

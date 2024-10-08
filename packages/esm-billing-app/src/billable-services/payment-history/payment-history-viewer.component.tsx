@@ -1,4 +1,5 @@
 import {
+  Button,
   DataTable,
   Pagination,
   TableContainer,
@@ -13,7 +14,6 @@ import flatMapDeep from 'lodash-es/flatMapDeep';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import BillingHeader from '../../billing-header/billing-header.component';
 import { useBills } from '../../billing.resource';
 import { useClockInStatus, usePaymentPoints } from '../../payment-points/payment-points.resource';
 import { MappedBill, PaymentStatus } from '../../types';
@@ -39,7 +39,7 @@ export const PaymentHistoryViewer = () => {
   const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
   const { paymentPointUUID } = useParams();
   const { paymentPoints } = usePaymentPoints();
-  const { isClockedIn } = useClockInStatus(paymentPointUUID);
+  const { isClockedInCurrentPaymentPoint } = useClockInStatus(paymentPointUUID);
 
   const isOnPaymentPointPage = Boolean(paymentPointUUID);
   const paidBillsResponse = useBills('', isOnPaymentPointPage ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
@@ -185,65 +185,72 @@ export const PaymentHistoryViewer = () => {
   };
 
   return (
-    <>
-      <BillingHeader title={t('paymentHistory', 'Payment History')} />
-      <div className={styles.table}>
-        <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
-        <DataTable rows={results ?? []} headers={headers} isSortable>
-          {(tableData) => (
-            <TableContainer>
-              <div className={styles.tableToolBar}>
-                <TableToolbar>
-                  <TableToolbarContent>
-                    <TableToolbarSearch
-                      onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
-                    />
-                    <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags, ...serviceTypeTags]} />
-                    <ServiceTypeFilter
-                      onApplyFilter={onApplyServiceTypeFilter}
-                      onResetFilter={handleOnResetServiceTypeFilter}
-                      bills={bills}
-                    />
-                    <PaymentTypeFilter
-                      onApplyFilter={onApplyPaymentTypeFilter}
-                      onResetFilter={handleOnResetPaymentTypeFilter}
-                    />
-                    <CashierFilter
-                      bills={bills}
-                      onApplyFilter={onApplyCashierFilter}
-                      onResetFilter={handleOnResetCashierFilter}
-                    />
-                    <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
-                  </TableToolbarContent>
-                </TableToolbar>
-              </div>
-              <PaymentHistoryTable
-                tableData={tableData}
-                paidBillsResponse={paidBillsResponse}
-                renderedRows={renderedRows}
+    <div className={styles.table}>
+      <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
+      <DataTable rows={results ?? []} headers={headers} isSortable>
+        {(tableData) => (
+          <TableContainer>
+            <div className={styles.tableToolBar}>
+              <TableToolbar>
+                <TableToolbarContent>
+                  <TableToolbarSearch
+                    onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
+                  />
+                  <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags, ...serviceTypeTags]} />
+                  <ServiceTypeFilter
+                    onApplyFilter={onApplyServiceTypeFilter}
+                    onResetFilter={handleOnResetServiceTypeFilter}
+                    bills={bills}
+                  />
+                  <PaymentTypeFilter
+                    onApplyFilter={onApplyPaymentTypeFilter}
+                    onResetFilter={handleOnResetPaymentTypeFilter}
+                  />
+                  <CashierFilter
+                    bills={bills}
+                    onApplyFilter={onApplyCashierFilter}
+                    onResetFilter={handleOnResetCashierFilter}
+                  />
+                  <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
+                  {isOnPaymentPointPage && !isClockedInCurrentPaymentPoint && (
+                    <Button className={styles.clockIn} onClick={openClockInModal}>
+                      Clock In
+                    </Button>
+                  )}
+                  {isOnPaymentPointPage && isClockedInCurrentPaymentPoint && (
+                    <Button className={styles.clockIn} onClick={openClockOutModal} kind="danger">
+                      Clock Out
+                    </Button>
+                  )}
+                </TableToolbarContent>
+              </TableToolbar>
+            </div>
+            <PaymentHistoryTable
+              tableData={tableData}
+              paidBillsResponse={paidBillsResponse}
+              renderedRows={renderedRows}
+            />
+            {paginated && !paidBillsResponse.isLoading && !paidBillsResponse.error && (
+              <Pagination
+                forwardText={t('nextPage', 'Next page')}
+                backwardText={t('previousPage', 'Previous page')}
+                page={currentPage}
+                pageSize={pageSize}
+                pageSizes={pageSizes}
+                totalItems={renderedRows.length}
+                className={styles.pagination}
+                size={responsiveSize}
+                onChange={({ page: newPage, pageSize }) => {
+                  if (newPage !== currentPage) {
+                    goTo(newPage);
+                  }
+                  setPageSize(pageSize);
+                }}
               />
-              {paginated && !paidBillsResponse.isLoading && !paidBillsResponse.error && (
-                <Pagination
-                  forwardText={t('nextPage', 'Next page')}
-                  backwardText={t('previousPage', 'Previous page')}
-                  page={currentPage}
-                  pageSize={pageSize}
-                  pageSizes={pageSizes}
-                  totalItems={renderedRows.length}
-                  className={styles.pagination}
-                  size={responsiveSize}
-                  onChange={({ page: newPage, pageSize }) => {
-                    if (newPage !== currentPage) {
-                      goTo(newPage);
-                    }
-                    setPageSize(pageSize);
-                  }}
-                />
-              )}
-            </TableContainer>
-          )}
-        </DataTable>
-      </div>
-    </>
+            )}
+          </TableContainer>
+        )}
+      </DataTable>
+    </div>
   );
 };

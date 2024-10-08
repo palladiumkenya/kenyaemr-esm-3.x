@@ -12,7 +12,7 @@ export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void;
   const { t } = useTranslation();
   const { providerUUID, isLoading, error } = useProviderUUID();
 
-  const { userTimesheet } = useClockInStatus(paymentPoint.uuid);
+  const { latestSheet } = useClockInStatus(paymentPoint.uuid);
 
   const onContinue = () => {
     setIsSubmitting(true);
@@ -20,7 +20,7 @@ export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void;
       clockOut: new Date().toISOString(),
       cashier: providerUUID,
       cashPoint: paymentPoint.uuid,
-      clockIn: userTimesheet.clockIn,
+      clockIn: latestSheet.clockIn,
     })
       .then(() => {
         showSnackbar({
