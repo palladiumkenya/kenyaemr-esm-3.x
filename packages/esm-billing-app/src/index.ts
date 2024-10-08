@@ -25,6 +25,9 @@ import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
+import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
+import { ClockIn } from './payment-points/payment-point/clock-in.component';
+import { ClockOut } from './payment-points/payment-point/clock-out.component';
 import rootComponent from './root.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
@@ -62,6 +65,14 @@ export const paymentHistoryLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billing/payment-history',
     title: 'Payment History',
+  }),
+  options,
+);
+
+export const paymentPointsLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'billing/payment-points',
+    title: 'Payment Points',
   }),
   options,
 );
@@ -119,6 +130,14 @@ export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 
+export const createPaymentPoint = getSyncLifecycle(CreatePaymentPoint, options);
+
+export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
+export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
+
+export const clockIn = getSyncLifecycle(ClockIn, options);
+export const clockOut = getSyncLifecycle(ClockOut, options);
+
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
   registerFeatureFlag(
@@ -127,8 +146,5 @@ export function startupApp() {
     'HIE feature flag, this enables and disables the HIE feature',
   );
 }
-
-export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
-export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
 
 export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);

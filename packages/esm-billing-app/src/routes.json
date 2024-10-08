@@ -147,6 +147,11 @@
       "slot": "billing-dashboard-link-slot"
     },
     {
+      "component": "paymentPointsLink",
+      "name": "payment-points-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
       "component": "billManagerLink",
       "name": "bill-manager-link",
       "slot": "billing-dashboard-link-slot"
@@ -191,6 +196,18 @@
     }
   ],
   "modals": [
+    {
+      "name": "create-payment-point",
+      "component": "createPaymentPoint"
+    },
+    {
+      "name": "clock-in-modal",
+      "component": "clockIn"
+    },
+    {
+      "name": "clock-out-modal",
+      "component": "clockOut"
+    },
     {
       "name": "bulk-import-billable-services-modal",
       "component": "bulkImportBillableServicesModal"
