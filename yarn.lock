@@ -2620,7 +2620,7 @@ __metadata:
     "@carbon/pictograms-react": "npm:^11.66.0"
     "@hookform/resolvers": "npm:^3.1.1"
     "@openmrs/esm-framework": "npm:next"
-    "@openmrs/esm-patient-common-lib": "npm:next"
+    "@openmrs/esm-patient-common-lib": "npm:^8.2.1-pre.5737"
     "@playwright/test": "npm:^1.30.0"
     "@swc/cli": "npm:^0.1.57"
     "@swc/core": "npm:^1.2.165"
@@ -3170,9 +3170,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-patient-common-lib@npm:next":
-  version: 7.1.1-pre.4504
-  resolution: "@openmrs/esm-patient-common-lib@npm:7.1.1-pre.4504"
+"@openmrs/esm-patient-common-lib@npm:^8.2.1-pre.5737":
+  version: 8.2.1-pre.5737
+  resolution: "@openmrs/esm-patient-common-lib@npm:8.2.1-pre.5737"
   dependencies:
     "@carbon/react": "npm:^1.12.0"
     lodash-es: "npm:^4.17.21"
@@ -3181,7 +3181,7 @@ __metadata:
     "@openmrs/esm-framework": 5.x
     react: 18.x
     single-spa: 6.x
-  checksum: 5a6edfe16e0c6833a7bf83bf5fd8e770070d33625cc057d6d5e58b22a51cda59b0ab01ba3935ed391cd3bdb450f5120737776483b4906db7aade7e064d82ec30
+  checksum: 49e626e380efcafe19a17ddf765fcf2b4c10ba6172032d4a8789a2562be0870be3c643cdeef43745095019d1fa5a449d042fd787ce1b602340af061018712f21
   languageName: node
   linkType: hard
 
