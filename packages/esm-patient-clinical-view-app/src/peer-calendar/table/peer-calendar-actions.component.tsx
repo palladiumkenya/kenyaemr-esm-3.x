@@ -67,7 +67,7 @@ const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({ peer: { patie
     <Button
       renderIcon={Launch}
       hasIconOnly
-      iconDescription={t('launch', 'Launch outreact form')}
+      iconDescription={encounters[0]?.uuid ? t('updateForm', 'Mordify form') : t('enterForm', 'Enter form')}
       kind="ghost"
       onClick={() => handleLauchPeerOutreachForm(encounters[0]?.uuid)}
     />

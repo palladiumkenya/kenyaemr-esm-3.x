@@ -1,23 +1,21 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/layout';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
 
 .heading {
   @include type.type-style('heading-compact-01');
-  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+  margin: layout.$spacing-05 0 layout.$spacing-05;
 }
 
 .grid {
-  margin: spacing.$spacing-05 spacing.$spacing-05;
-  padding: spacing.$spacing-05 0rem 0rem orem;
+  margin: layout.$spacing-05 layout.$spacing-05;
+  padding: layout.$spacing-05 0 0 0;
 }
 
 .buttonSet {
   width: 100%;
-  padding-top: spacing.$spacing-05;
-  background-color: $ui-02;
+  padding-top: layout.$spacing-05;
+  background-color: colors.$white;
   justify-content: space-between;
   bottom: 0;
   position: absolute;
@@ -32,7 +30,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   row-gap: 1.5rem;
   position: relative;
 
