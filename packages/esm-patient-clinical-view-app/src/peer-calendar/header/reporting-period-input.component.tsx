@@ -19,10 +19,12 @@ const ReportingPeriodInput: React.FC<ReportingPeriodInputProps> = ({
   const years = useMemo(() => getYearsAroundCurrentYear(), []);
   return (
     <div className={styles.reportingPeriod}>
+      <Column className={styles.reportingPeriodInput}>Select Period:</Column>
       <Column className={styles.reportingPeriodInput}>
         <Dropdown
           type="inline"
           id="reportingMonth"
+          autoAlign={true}
           onChange={(e) => {
             setReportingPeriod((state) => ({ ...state, month: e.selectedItem }));
           }}
@@ -35,6 +37,7 @@ const ReportingPeriodInput: React.FC<ReportingPeriodInputProps> = ({
       <Column className={styles.reportingPeriodInput}>
         <Dropdown
           type="inline"
+          autoAlign={true}
           id="reportingYear"
           onChange={(e) => {
             setReportingPeriod((state) => ({ ...state, year: e.selectedItem }));
