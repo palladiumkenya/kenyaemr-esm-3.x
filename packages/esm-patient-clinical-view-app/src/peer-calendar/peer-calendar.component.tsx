@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PeerCalendarHeader } from './header/peer-calendar-header.component';
-import PeerCalendarMetricsHeader from './header/peer-calendar-metrics.component';
+import PeerCalendarMetricsHeader from './metrics/peer-calendar-metrics.component';
 import PeerCalendarTable from './table/peer-calendar-table.components';
 import usePeers from '../hooks/usePeers';
 import { useSession } from '@openmrs/esm-framework';
@@ -22,7 +22,11 @@ const PeerCalendar = () => {
   const { peers, error, isLoading } = usePeers(peerEducatorUuid);
   return (
     <div className={`omrs-main-content`}>
-      <PeerCalendarHeader title={t('peerCalendar', 'Peer Calendar')} />
+      <PeerCalendarHeader
+        title={t('peerCalendar', 'Peer Calendar')}
+        reportigPeriod={reportigPeriod}
+        onReportingPeriodChange={setReportingPeriod}
+      />
       <PeerCalendarMetricsHeader
         reportigPeriod={reportigPeriod}
         setReportingPeriod={setReportingPeriod}

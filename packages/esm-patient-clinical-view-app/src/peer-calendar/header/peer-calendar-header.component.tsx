@@ -3,11 +3,19 @@ import { formatDate, useSession } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './peer-calendar-header.scss';
+import ReportingPeriodInput from './reporting-period-input.component';
+import { ReportingPeriod } from '../../types';
 
 interface PeerCalendarHeaderProps {
   title: string;
+  reportigPeriod: Partial<ReportingPeriod>;
+  onReportingPeriodChange: React.Dispatch<React.SetStateAction<ReportingPeriod>>;
 }
-export const PeerCalendarHeader: React.FC<PeerCalendarHeaderProps> = ({ title }) => {
+export const PeerCalendarHeader: React.FC<PeerCalendarHeaderProps> = ({
+  title,
+  onReportingPeriodChange,
+  reportigPeriod,
+}) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
@@ -29,6 +37,7 @@ export const PeerCalendarHeader: React.FC<PeerCalendarHeaderProps> = ({ title })
           <Calendar size={16} />
           <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
         </div>
+        <ReportingPeriodInput onReportingPeriodChange={onReportingPeriodChange} reportigPeriod={reportigPeriod} />
       </div>
     </div>
   );
