@@ -364,6 +364,6 @@ export type ExcelFileRow = {
   name: string;
   price: number;
   disable: 'false' | 'true';
-  category: number;
+  service_type_id: number;
   short_name: string;
 };
