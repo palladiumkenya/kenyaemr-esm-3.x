@@ -44,6 +44,10 @@
     {
       "component": "root",
       "route": "providers"
+    },
+    {
+      "component": "providerMessageAlert",
+      "route": true
     }
   ]
 }
