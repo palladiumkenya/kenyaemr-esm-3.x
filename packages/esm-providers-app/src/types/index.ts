@@ -1,3 +1,4 @@
+import { OpenmrsResource } from '@openmrs/esm-framework';
 import { Value } from 'classnames';
 
 export interface Roles {
@@ -141,3 +142,18 @@ export interface User {
   allRoles: Array<UserRoles>;
   retired: boolean;
 }
+export type ProviderSession = {
+  authenticated: boolean;
+  user?: string;
+  currentProvider?: string[];
+  sessionLocation?: string;
+};
+export type Provider = {
+  id?: string;
+  uuid?: string;
+  identifier?: string;
+  display: string;
+  person: OpenmrsResource;
+  attributes?: Array<OpenmrsResource> | null;
+  retired: boolean;
+};

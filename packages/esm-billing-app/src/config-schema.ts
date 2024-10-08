@@ -19,6 +19,7 @@ export interface BillingConfig {
   nationalPatientUniqueIdentifierTypeUuid: string;
   cashPointUuid: string;
   cashierUuid: string;
+  patientBillsUrl: string;
 }
 
 export const configSchema = {
@@ -131,5 +132,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'Who Generated the bill',
     _default: '54065383-b4d4-42d2-af4d-d250a1fd2590',
+  },
+  patientBillsUrl: {
+    _type: Type.String,
+    _description: 'The url to fetch patient bills',
+    _default:
+      '${restBaseUrl}/cashier/bill?v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))',
   },
 };

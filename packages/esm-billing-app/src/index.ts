@@ -2,7 +2,6 @@ import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@open
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
-import BillableServicesCardLink from './billable-services-admin-card-link.component';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
@@ -17,6 +16,7 @@ import LabOrder from './billable-services/billiable-item/test-order/lab-order.co
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import { BulkImportBillableServices } from './billable-services/bulk-import-billable-service.modal';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import { configSchema } from './config-schema';
@@ -85,10 +85,10 @@ export const billManagerLink = getSyncLifecycle(
   options,
 );
 
-export const billableServicesLink = getSyncLifecycle(
+export const chargeableItemsLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing/billable-services',
-    title: 'Billable Services',
+    name: 'billing/charge-items',
+    title: 'Charge Items',
   }),
   options,
 );
@@ -106,7 +106,6 @@ export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 
-export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);
 export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
@@ -147,3 +146,5 @@ export function startupApp() {
     'HIE feature flag, this enables and disables the HIE feature',
   );
 }
+
+export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);

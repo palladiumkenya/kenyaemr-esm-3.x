@@ -1,39 +1,54 @@
-import { useState, useEffect, SetStateAction } from 'react';
-import { getRequestStatus, readableStatusMap, getErrorMessage } from '../m-pesa/mpesa-resource';
-import { useTranslation } from 'react-i18next';
 import { showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { SetStateAction, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
+import { processBillPayment, usePaymentModes } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
+import { processBillItem } from '../invoice/payments/utils';
+import { getErrorMessage, getRequestStatus, readableStatusMap } from '../m-pesa/mpesa-resource';
 import { LineItem, MappedBill, PaymentStatus, RequestStatus } from '../types';
 import { extractErrorMessagesFromResponse, waitForASecond } from '../utils';
-import { processBillPayment, usePaymentModes } from '../billing.resource';
-import { mutate } from 'swr';
-import { processBillItem } from '../invoice/payments/utils';
 
-const createMobileMoneyPaymentPayload = (bill: MappedBill, amount: number, mobileMoneyInstanceTypeUUID: string) => {
+const createMobileMoneyPaymentPayload = (
+  bill: MappedBill,
+  amount: number,
+  mobileMoneyInstanceTypeUUID: string,
+  paymentReference: { uuid: string; value: string },
+) => {
   const { cashier } = bill;
   const totalAmount = bill?.totalAmount;
-  const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + amount);
+  const tenderedAmount = Number(bill.tenderedAmount);
+  const amountDue = Number(bill.totalAmount) - (tenderedAmount + amount);
   const paymentStatus = amountDue <= 0 ? PaymentStatus.PAID : PaymentStatus.PENDING;
 
   const previousPayments = bill.payments.map((payment) => ({
     amount: payment.amount,
     amountTendered: payment.amountTendered,
-    attributes: [],
+    attributes: payment.attributes.map((att) => {
+      return {
+        attributeType: att.attributeType.uuid,
+        value: att.value,
+      };
+    }),
     instanceType: payment.instanceType.uuid,
   }));
 
   const newPayment = {
     amount: parseFloat(totalAmount.toFixed(2)),
     amountTendered: parseFloat(amount.toFixed(2)),
-    attributes: [],
+    attributes: [
+      {
+        attributeType: paymentReference.uuid,
+        value: paymentReference.value,
+      },
+    ],
     instanceType: mobileMoneyInstanceTypeUUID,
   };
 
   const updatedPayments = [...previousPayments, newPayment];
-
   const updatedLineItems: LineItem[] = [];
 
-  let remainder = amount;
+  let remainingPayment = tenderedAmount + amount;
 
   for (let i = 0; i < bill.lineItems.length; i++) {
     const lineItem = bill.lineItems[i];
@@ -44,8 +59,8 @@ const createMobileMoneyPaymentPayload = (bill: MappedBill, amount: number, mobil
       item: processBillItem(lineItem),
     };
 
-    if (remainder >= totalLineItemAmount) {
-      remainder -= totalLineItemAmount;
+    if (remainingPayment >= totalLineItemAmount) {
+      remainingPayment -= totalLineItemAmount;
       updatedLineItems.push({ ...newLineItem, paymentStatus: PaymentStatus.PAID });
     } else {
       updatedLineItems.push(newLineItem);
@@ -87,6 +102,9 @@ export const useRequestStatus = (
   const { t } = useTranslation();
   const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
   const { paymentModes } = usePaymentModes();
+  const paymentReferenceUUID = paymentModes
+    .find((mode) => mode.name === 'Mobile Money')
+    ?.attributeTypes.find((type) => type.description === 'Reference Number').uuid;
 
   const [requestData, setRequestData] = useState<RequestData>({
     requestId: null,
@@ -100,7 +118,7 @@ export const useRequestStatus = (
     if (requestData.requestId && !['COMPLETE', 'FAILED', 'NOT-FOUND'].includes(requestData.requestStatus)) {
       const fetchStatus = async () => {
         try {
-          const status = await getRequestStatus(requestData.requestId, mpesaAPIBaseUrl);
+          const { status, referenceCode } = await getRequestStatus(requestData.requestId, mpesaAPIBaseUrl);
           if (status === 'COMPLETE') {
             clearInterval(interval);
 
@@ -116,6 +134,7 @@ export const useRequestStatus = (
               bill,
               parseInt(requestData.amount),
               mobileMoneyPaymentMethodInstanceTypeUUID,
+              { uuid: paymentReferenceUUID, value: referenceCode },
             );
 
             processBillPayment(mobileMoneyPayload, bill.uuid).then(
@@ -169,6 +188,7 @@ export const useRequestStatus = (
     closeModal,
     mpesaAPIBaseUrl,
     paymentModes,
+    paymentReferenceUUID,
     requestData.amount,
     requestData.requestId,
     requestData.requestStatus,

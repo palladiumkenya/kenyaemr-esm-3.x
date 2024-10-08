@@ -20,6 +20,7 @@
   "licenseExpiringSoon": "License is expiring soon",
   "licenseNumber": "License Number",
   "loading": "Loading...",
+  "messageText": "",
   "missingExpiryDate": "Missing Expiry Date",
   "missingIDno": "Missing National ID",
   "missingLicenses": "Missing license(s)",

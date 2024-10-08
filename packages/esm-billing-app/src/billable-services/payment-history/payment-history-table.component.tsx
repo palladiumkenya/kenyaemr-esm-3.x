@@ -3,18 +3,21 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBills } from '../../billing.resource';
+import { MappedBill } from '../../types';
 import { headers } from './payment-history-viewer.component';
 import styles from './payment-history.scss';
 
 export const PaymentHistoryTable = ({
   tableData,
   paidBillsResponse,
+  renderedRows,
 }: {
   tableData: any;
   paidBillsResponse: ReturnType<typeof useBills>;
+  renderedRows: MappedBill[];
 }) => {
   const { t } = useTranslation();
-  const { error, isLoading } = paidBillsResponse;
+  const { bills, error, isLoading } = paidBillsResponse;
   const { rows, getHeaderProps, getRowProps, getTableProps } = tableData;
 
   if (isLoading) {
@@ -41,7 +44,7 @@ export const PaymentHistoryTable = ({
     );
   }
 
-  if (rows.length === 0) {
+  if (bills.length === 0 || renderedRows?.length === 0) {
     return (
       <div className={styles.emptyStateWrapper}>
         <EmptyState
