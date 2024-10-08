@@ -2620,7 +2620,7 @@ __metadata:
     "@carbon/pictograms-react": "npm:^11.66.0"
     "@hookform/resolvers": "npm:^3.1.1"
     "@openmrs/esm-framework": "npm:next"
-    "@openmrs/esm-patient-common-lib": "npm:^8.2.1-pre.5737"
+    "@openmrs/esm-patient-common-lib": "npm:next"
     "@playwright/test": "npm:^1.30.0"
     "@swc/cli": "npm:^0.1.57"
     "@swc/core": "npm:^1.2.165"
@@ -2677,7 +2677,7 @@ __metadata:
     swc-loader: "npm:^0.2.3"
     swr: "npm:^2.2.4"
     ts-dotenv: "npm:^0.9.1"
-    turbo: "npm:^1.5.5"
+    turbo: "npm:^2.1.3"
     typescript: "npm:^4.0.3"
     uuid: "npm:^9.0.1"
     webpack-cli: "npm:^4.10.0"
@@ -3170,7 +3170,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-patient-common-lib@npm:^8.2.1-pre.5737":
+"@openmrs/esm-patient-common-lib@npm:next":
   version: 8.2.1-pre.5737
   resolution: "@openmrs/esm-patient-common-lib@npm:8.2.1-pre.5737"
   dependencies:
@@ -16392,58 +16392,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo-darwin-64@npm:1.6.3":
-  version: 1.6.3
-  resolution: "turbo-darwin-64@npm:1.6.3"
+"turbo-darwin-64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "turbo-darwin-64@npm:2.1.3"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-darwin-arm64@npm:1.6.3":
-  version: 1.6.3
-  resolution: "turbo-darwin-arm64@npm:1.6.3"
+"turbo-darwin-arm64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "turbo-darwin-arm64@npm:2.1.3"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-linux-64@npm:1.6.3":
-  version: 1.6.3
-  resolution: "turbo-linux-64@npm:1.6.3"
+"turbo-linux-64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "turbo-linux-64@npm:2.1.3"
   conditions: os=linux & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-linux-arm64@npm:1.6.3":
-  version: 1.6.3
-  resolution: "turbo-linux-arm64@npm:1.6.3"
+"turbo-linux-arm64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "turbo-linux-arm64@npm:2.1.3"
   conditions: os=linux & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo-windows-64@npm:1.6.3":
-  version: 1.6.3
-  resolution: "turbo-windows-64@npm:1.6.3"
+"turbo-windows-64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "turbo-windows-64@npm:2.1.3"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"turbo-windows-arm64@npm:1.6.3":
-  version: 1.6.3
-  resolution: "turbo-windows-arm64@npm:1.6.3"
+"turbo-windows-arm64@npm:2.1.3":
+  version: 2.1.3
+  resolution: "turbo-windows-arm64@npm:2.1.3"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"turbo@npm:^1.5.5":
-  version: 1.6.3
-  resolution: "turbo@npm:1.6.3"
+"turbo@npm:^2.1.3":
+  version: 2.1.3
+  resolution: "turbo@npm:2.1.3"
   dependencies:
-    turbo-darwin-64: "npm:1.6.3"
-    turbo-darwin-arm64: "npm:1.6.3"
-    turbo-linux-64: "npm:1.6.3"
-    turbo-linux-arm64: "npm:1.6.3"
-    turbo-windows-64: "npm:1.6.3"
-    turbo-windows-arm64: "npm:1.6.3"
+    turbo-darwin-64: "npm:2.1.3"
+    turbo-darwin-arm64: "npm:2.1.3"
+    turbo-linux-64: "npm:2.1.3"
+    turbo-linux-arm64: "npm:2.1.3"
+    turbo-windows-64: "npm:2.1.3"
+    turbo-windows-arm64: "npm:2.1.3"
   dependenciesMeta:
     turbo-darwin-64:
       optional: true
@@ -16459,7 +16459,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 131b55ba794cf2368671e117b842c5f67d540e5a8df981534573f4c6bd9e014867288123f167690db52f75b90783da2aa9a0d31daa8202d5ae89a4ea38816249
+  checksum: b8e90a38f47dc5c07e5f1c0bd708f9dc6b00b744847a45c06e5de5a5379a32bb155e8ad994eb03e60f697afc87f0815dd02fc680e22c0fad83d65c0a1fb6fc96
   languageName: node
   linkType: hard
 
