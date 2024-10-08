@@ -1,0 +1,35 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
+
+.genericTable {
+  margin: 0 auto;
+}
+
+.searchContainer {
+  display: flex;
+}
+
+.searchInput {
+  width: 100%;
+  margin: 0 layout.$spacing-05;
+  box-shadow: var(--cds-shadow);
+}
+
+.tableContainer {
+  margin: 0 layout.$spacing-05;
+}
+
+.actionBtn {
+  --cds-layout-size-height-context: var(--cds-layout-size-height-sm, 2rem);
+  --cds-layout-size-height: var(--cds-layout-size-height-context);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 layout.$spacing-04;
+}
+.table {
+  border: 1px solid colors.$gray-30;
+}

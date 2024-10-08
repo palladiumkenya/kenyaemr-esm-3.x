@@ -2,19 +2,21 @@ import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@open
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BillHistory from './bill-history/bill-history.component';
-import BillableServicesCardLink from './billable-services-admin-card-link.component';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
+import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
+import AddServiceForm from './billable-services/billables/services/service-form.workspace';
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
 import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
 import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
+import { BulkImportBillableServices } from './billable-services/bulk-import-billable-service.modal';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import { configSchema } from './config-schema';
@@ -24,8 +26,6 @@ import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.co
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
 import rootComponent from './root.component';
-import AddServiceForm from './billable-services/billables/services/service-form.workspace';
-import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -74,10 +74,10 @@ export const billManagerLink = getSyncLifecycle(
   options,
 );
 
-export const billableServicesLink = getSyncLifecycle(
+export const chargeableItemsLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing/billable-services',
-    title: 'Billable Services',
+    name: 'billing/charge-items',
+    title: 'Charge Items',
   }),
   options,
 );
@@ -95,7 +95,6 @@ export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 
-export const billableServicesCardLink = getSyncLifecycle(BillableServicesCardLink, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);
 export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
@@ -131,3 +130,5 @@ export function startupApp() {
 
 export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
 export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
+
+export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);

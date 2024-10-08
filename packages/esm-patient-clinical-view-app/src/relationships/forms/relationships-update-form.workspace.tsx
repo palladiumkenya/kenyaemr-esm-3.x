@@ -21,6 +21,7 @@ import useRelationship from '../../hooks/useRelationship';
 import useRelationshipTypes from '../../hooks/useRelationshipTypes';
 import { relationshipUpdateFormSchema, updateRelationship } from '../relationship.resources';
 import styles from './form.scss';
+import PatientInfo from '../../case-management/workspace/patient-info.component';
 
 interface RelationshipUpdateFormProps extends DefaultWorkspaceProps {
   relationShipUuid: string;
@@ -93,6 +94,9 @@ const RelationshipUpdateForm: React.FC<RelationshipUpdateFormProps> = ({ closeWo
   return (
     <Form onSubmit={form.handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
+        <Column>
+          <PatientInfo patientUuid={relationship.personB.uuid} />
+        </Column>
         <Column>
           <Controller
             control={form.control}

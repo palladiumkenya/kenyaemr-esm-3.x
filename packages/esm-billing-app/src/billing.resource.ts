@@ -17,7 +17,7 @@ import { BillingConfig } from './config-schema';
 import { extractString } from './helpers';
 import { FacilityDetail, MappedBill, PatientInvoice, PaymentMethod, PaymentStatus } from './types';
 
-const mapBillProperties = (bill: PatientInvoice): MappedBill => {
+export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
   // create base object
   const mappedBill: MappedBill = {
     id: bill?.id,

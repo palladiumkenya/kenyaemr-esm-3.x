@@ -77,11 +77,6 @@
       "component": "billingCheckInForm"
     },
     {
-      "slot": "system-admin-page-card-link-slot",
-      "component": "billableServicesCardLink",
-      "name": "billable-services-admin-card-link"
-    },
-    {
       "name": "require-billing-modal",
       "component": "requirePaymentModal"
     },
@@ -157,8 +152,8 @@
       "slot": "billing-dashboard-link-slot"
     },
     {
-      "component": "billableServicesLink",
-      "name": "billable-services-link",
+      "component": "chargeableItemsLink",
+      "name": "chargeable-items-link",
       "slot": "billing-dashboard-link-slot"
     }
   ],
@@ -178,13 +173,13 @@
     {
       "name": "billable-service-form",
       "component": "addServiceForm",
-      "title": "Create Billable Service Form",
+      "title": "Create Charge Item Form",
       "type": "other-form"
     },
     {
       "name": "commodity-form",
       "component": "addCommodityForm",
-      "title": "Create Commodity Form",
+      "title": "Create Charge Item Form",
       "type": "other-form"
     },
     {
@@ -193,6 +188,12 @@
       "title": "Billing Form",
       "type": "other-form",
       "width": "extra-wide"
+    }
+  ],
+  "modals": [
+    {
+      "name": "bulk-import-billable-services-modal",
+      "component": "bulkImportBillableServicesModal"
     }
   ]
 }
