@@ -48,6 +48,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const [isLoading, setIsLoading] = useState(false);
   const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification, closeModal, bill);
 
+  const pendingAmount = bill.totalAmount - bill.tenderedAmount;
+
   const {
     control,
     handleSubmit,
@@ -57,7 +59,10 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     reset,
   } = useForm<FormData>({
     mode: 'all',
-    defaultValues: { billAmount: String(bill.totalAmount), phoneNumber: phoneNumber },
+    defaultValues: {
+      billAmount: pendingAmount.toString(),
+      phoneNumber: phoneNumber,
+    },
     resolver: zodResolver(initiatePaymentSchema),
   });
 

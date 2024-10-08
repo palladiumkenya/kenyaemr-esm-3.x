@@ -17,13 +17,19 @@ const createMobileMoneyPaymentPayload = (
 ) => {
   const { cashier } = bill;
   const totalAmount = bill?.totalAmount;
-  const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + amount);
+  const tenderedAmount = Number(bill.tenderedAmount);
+  const amountDue = Number(bill.totalAmount) - (tenderedAmount + amount);
   const paymentStatus = amountDue <= 0 ? PaymentStatus.PAID : PaymentStatus.PENDING;
 
   const previousPayments = bill.payments.map((payment) => ({
     amount: payment.amount,
     amountTendered: payment.amountTendered,
-    attributes: payment.attributes,
+    attributes: payment.attributes.map((att) => {
+      return {
+        attributeType: att.attributeType.uuid,
+        value: att.value,
+      };
+    }),
     instanceType: payment.instanceType.uuid,
   }));
 
@@ -40,10 +46,9 @@ const createMobileMoneyPaymentPayload = (
   };
 
   const updatedPayments = [...previousPayments, newPayment];
-
   const updatedLineItems: LineItem[] = [];
 
-  let remainder = amount;
+  let remainingPayment = tenderedAmount + amount;
 
   for (let i = 0; i < bill.lineItems.length; i++) {
     const lineItem = bill.lineItems[i];
@@ -54,8 +59,8 @@ const createMobileMoneyPaymentPayload = (
       item: processBillItem(lineItem),
     };
 
-    if (remainder >= totalLineItemAmount) {
-      remainder -= totalLineItemAmount;
+    if (remainingPayment >= totalLineItemAmount) {
+      remainingPayment -= totalLineItemAmount;
       updatedLineItems.push({ ...newLineItem, paymentStatus: PaymentStatus.PAID });
     } else {
       updatedLineItems.push(newLineItem);
