@@ -6,12 +6,6 @@ import { navigate, useDebounce } from '@openmrs/esm-framework';
 
 const mockUseDebounce = useDebounce as jest.MockedFunction<typeof useDebounce>;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useOnClickOutside: jest.fn(),
-  useDebounce: jest.fn(),
-}));
-
 describe('Navbar Action Button', () => {
   test('should render navbar action button', async () => {
     const { baseElement } = renderNavbarActionButton();
