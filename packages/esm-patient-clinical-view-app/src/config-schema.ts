@@ -124,6 +124,11 @@ export const configSchema = {
     _description: 'HIV Program UUID',
     _default: 'dfdc6d40-2f2f-463d-ba90-cc97350441a8',
   },
+  kvpProgramUuid: {
+    _type: Type.String,
+    _description: 'KVP Program UUID',
+    _default: '7447305a-18a7-11e9-ab14-d663bd873d93',
+  },
   contactPersonAttributesUuid: {
     _type: Type.Object,
     _description: 'Contact created patient attributes UUID',
@@ -267,6 +272,7 @@ export interface ConfigObject {
   openmrsIdentifierSourceUuid: string;
   maritalStatusUuid: string;
   hivProgramUuid: string;
+  kvpProgramUuid: string;
   concepts: Record<string, string>;
   specialClinics: Array<{ id: string; formUuid: string; encounterTypeUuid: string; title: string }>;
   contactPersonAttributesUuid: {
