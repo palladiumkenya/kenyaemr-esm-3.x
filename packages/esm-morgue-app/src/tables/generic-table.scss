@@ -1,13 +1,10 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .genericTable {
   margin: 0 auto;
-
-  @media (max-width: 768px) {
-    padding: 10px;
-  }
 }
 
 .searchContainer {
@@ -16,12 +13,12 @@
 
 .searchInput {
   width: 100%;
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
   box-shadow: var(--cds-shadow);
 }
 
 .tableContainer {
-  margin: 0 15px;
+  margin: 0 layout.$spacing-05;
 }
 
 .actionBtn {
@@ -31,5 +28,8 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0 spacing.$spacing-04;
+  padding: 0 layout.$spacing-04;
+}
+.table {
+  border: 1px solid colors.$gray-30;
 }

@@ -1,11 +1,11 @@
 import React from 'react';
 import GenericTable from './generic-table.component';
-import { useDeceasedPatient } from './generic-table.resource';
 import { formatDate } from '@openmrs/esm-framework';
 import { toUpperCase } from '../helpers/expression-helper';
 import { Tag, Button } from '@carbon/react';
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
+import { useDeceasedPatient } from '../hook/useMorgue.resource';
 
 export const WaitingQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient('Test');

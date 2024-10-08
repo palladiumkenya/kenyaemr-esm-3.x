@@ -1,12 +1,13 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  margin: spacing.$spacing-04;
+  margin: layout.$spacing-04;
 }
 
 .column {
@@ -17,35 +18,34 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  gap: spacing.$spacing-03;
+  gap: layout.$spacing-03;
   padding: 0;
-  background-color: aqua;
   margin: 0.5rem;
 }
 
 .tile {
   width: 340px;
-  height: 48px;
+  height: layout.$spacing-09;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: spacing.$spacing-03 0;
+  margin: layout.$spacing-03 0;
 }
 
 .tileContent {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: spacing.$spacing-04;
+  gap: layout.$spacing-04;
 }
 
 .label {
-  width: 30px;
-  height: 30px;
+  width: layout.$spacing-07;
+  height: layout.$spacing-07;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: layout.$spacing-01;
   font-weight: 600;
   line-height: 1.29;
   background-color: colors.$cool-gray-20;
@@ -55,4 +55,8 @@
 
 .emptyunit {
   line-height: 1.38;
+}
+.layoutWrapper {
+  border: 1px solid colors.$gray-30;
+  padding: layout.$spacing-05 layout.$spacing-05;
 }

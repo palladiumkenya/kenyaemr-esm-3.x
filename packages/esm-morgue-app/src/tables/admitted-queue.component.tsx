@@ -1,39 +1,37 @@
 import React from 'react';
-import { useDeceasedPatient } from './generic-table.resource';
 import { useTranslation } from 'react-i18next';
 import DeceasedFilter from '../header/admitted-queue-header.component';
 import styles from './admitted-queue.scss';
-import WardPatientCard from '../card/unit-patient-card';
+import CompartmentView from '../card/compartment-view.compartment';
+import { useDeceasedPatient } from '../hook/useMorgue.resource';
+import { InlineLoading } from '@carbon/react';
+import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
 
-// Fixed TypeScript type for deceasedPatientName parameter
 export const AdmittedQueue: React.FC = () => {
-  // Fetch data using the hook
-  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient('test'); // Replace 'test' with the actual query name
+  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient('test');
   const { t } = useTranslation();
 
-  // Handle loading state
   if (isLoading) {
-    return <p>{t('loading', 'Loading...')}</p>;
-  }
-
-  // Handle error state
-  if (error) {
     return (
-      <p>
-        {t('error', 'An error occurred:')} {error.message}
-      </p>
+      <InlineLoading
+        status="active"
+        iconDescription="Loading"
+        description={t('pullingCompartment', 'Pulling compartments data.....')}
+      />
     );
   }
 
-  // Render list of patients
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('allocation', 'Allocation')} />;
+  }
+
   return (
-    <>
+    <div className={styles.layoutWrapper}>
+      <CardHeader title={t('allocation', 'Allocation')} children={''} />
       <DeceasedFilter />
       <div className={styles.patientCardContainer}>
-        {deceasedPatients?.map((patient) => (
-          <WardPatientCard key={patient.uuid} patient={patient} />
-        ))}
+        <CompartmentView patients={deceasedPatients || []} />
       </div>
-    </>
+    </div>
   );
 };
