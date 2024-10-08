@@ -29,6 +29,7 @@ export const headers = [
   { header: 'Patient Name', key: 'patientName' },
   { header: 'Total Amount', key: 'totalAmount' },
   { header: 'Service', key: 'billingService' },
+  { header: 'Reference Codes', key: 'referenceCodes' },
 ];
 
 const PaymentHistoryViewer = () => {
@@ -45,6 +46,7 @@ const PaymentHistoryViewer = () => {
     currentPage,
     results?.length,
   );
+
   const { t } = useTranslation();
 
   const [selectedPaymentTypeCheckBoxes, setSelectedPaymentTypeCheckBoxes] = useState<string[]>([]);
