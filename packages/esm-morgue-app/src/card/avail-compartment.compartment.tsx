@@ -2,17 +2,24 @@ import React from 'react';
 import styles from './compartment.scss';
 import { Button, Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { DeceasedInfo } from '../tables/generic-table.resource';
 import { toUpperCase } from '../helpers/expression-helper';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, navigate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { Patient } from '../types';
 
 interface AvailableCompartmentProps {
-  patientInfo: DeceasedInfo;
+  patientInfo: Patient;
 }
 
 const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo }) => {
   const { t } = useTranslation();
+
+  const handleNavigateToDeceasedDetailsView = () =>
+    navigate({
+      to: window.getOpenmrsSpaBase() + `home/morgue/patient/${patientInfo.uuid}/details`,
+    });
 
   return (
     <div className={styles.cardView}>
@@ -43,7 +50,11 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
         <span className={styles.deceasedNoDays}>{t('daysOnUnit', 'Days on this unit:')}</span>
         <span className={styles.noDays}>4 days</span>
       </div>
-      <Button className={styles.assignButton} kind="primary" renderIcon={View}>
+      <Button
+        className={styles.assignButton}
+        kind="primary"
+        renderIcon={View}
+        onClick={handleNavigateToDeceasedDetailsView}>
         {t('viewDetails', 'View details')}
       </Button>
     </div>

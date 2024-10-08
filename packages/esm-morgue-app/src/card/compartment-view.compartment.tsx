@@ -1,11 +1,11 @@
 import React from 'react';
 import styles from './compartment.scss';
-import { DeceasedInfo } from '../tables/generic-table.resource';
 import EmptyCompartment from './empty-compartment.component';
 import AvailableCompartment from './avail-compartment.compartment';
+import { Patient } from '../types';
 
 interface CompartmentViewProps {
-  patients: (DeceasedInfo | null)[];
+  patients: (Patient | null)[];
 }
 
 const CompartmentView: React.FC<CompartmentViewProps> = ({ patients }) => {

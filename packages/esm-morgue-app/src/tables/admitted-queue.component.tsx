@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import DeceasedFilter from '../header/admitted-queue-header.component';
 import styles from './admitted-queue.scss';
 import CompartmentView from '../card/compartment-view.compartment';
+import { useDeceasedPatient } from '../hook/useMorgue.resource';
 import { InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { useDeceasedPatient } from './generic-table.resource';
 
 export const AdmittedQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient('test');
