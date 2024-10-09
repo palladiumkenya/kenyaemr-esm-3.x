@@ -34,3 +34,4 @@ export const morgueDashboardLink = getSyncLifecycle(
 );
 
 export const morgueEnrollWorkspace = getAsyncLifecycle(() => import('./workspaces/enrollBody.workspace'), options);
+export const autopsyForm = getAsyncLifecycle(() => import('./workspaces/autopsy.workspace'), options);
