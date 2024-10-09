@@ -1,8 +1,8 @@
 import React from 'react';
 import GenericTable from './generic-table.component';
-import { formatDate } from '@openmrs/esm-framework';
+import { ErrorState, formatDate } from '@openmrs/esm-framework';
 import { toUpperCase } from '../helpers/expression-helper';
-import { Tag, Button } from '@carbon/react';
+import { Tag, Button, DataTableSkeleton } from '@carbon/react';
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
 import { useDeceasedPatient } from '../hook/useMorgue.resource';
