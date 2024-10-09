@@ -16,12 +16,6 @@ export const MorgueTabs: React.FC = () => {
     { name: t('discharged', 'Discharged'), component: '' },
   ];
 
-  const handleNewDeceased = () => {
-    launchWorkspace('morgue-enroll-form', {
-      workspaceTitle: 'Deceased Registration',
-    });
-  };
-
   return (
     <>
       <div className={styles.referralsList} data-testid="referralsList-list">
@@ -32,15 +26,6 @@ export const MorgueTabs: React.FC = () => {
                 <Tab key={index}>{tab.name}</Tab>
               ))}
             </TabList>
-            <div className={styles.actionBtn}>
-              <Button
-                className={styles.rightButton}
-                kind="secondary"
-                renderIcon={Touch_1Filled}
-                onClick={handleNewDeceased}>
-                {t('enrollingBtn', 'Add New Deceased')}
-              </Button>
-            </div>
           </div>
 
           <TabPanels>

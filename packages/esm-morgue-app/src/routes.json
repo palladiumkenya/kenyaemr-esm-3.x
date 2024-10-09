@@ -23,9 +23,9 @@
   ],
    "workspaces": [
     {
-      "name": "morgue-enroll-form",
-      "component": "morgueEnrollWorkspace",
-      "title": "Enroll new deceased",
+      "name": "add-more-details-form",
+      "component": "addMoreDetailsWorkspace",
+      "title": "add more details",
       "type": "other-form"
     }
   ],
