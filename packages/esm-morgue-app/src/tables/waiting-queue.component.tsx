@@ -1,8 +1,8 @@
 import React from 'react';
 import GenericTable from './generic-table.component';
-import { formatDate } from '@openmrs/esm-framework';
+import { ErrorState, formatDate } from '@openmrs/esm-framework';
 import { toUpperCase } from '../helpers/expression-helper';
-import { Tag, Button } from '@carbon/react';
+import { Tag, Button, DataTableSkeleton } from '@carbon/react';
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
 import { useDeceasedPatient } from '../hook/useMorgue.resource';
@@ -23,6 +23,23 @@ export const WaitingQueue: React.FC = () => {
     { header: 'Status Death', key: 'status' },
     { header: 'Residence', key: 'address4' },
   ];
+
+  if (isLoading) {
+    return (
+      <DataTableSkeleton
+        headers={genericTableHeader}
+        aria-label="awaiting-datatable"
+        showToolbar={false}
+        showHeader={false}
+        rowCount={3}
+        zebra
+        columnCount={3}
+      />
+    );
+  }
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('waitingQueue', 'Waiting queue')} />;
+  }
 
   const rows =
     deceasedPatients?.map((patient, index) => ({
