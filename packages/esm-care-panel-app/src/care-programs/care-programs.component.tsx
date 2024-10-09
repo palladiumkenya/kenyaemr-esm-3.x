@@ -83,9 +83,12 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const rows = useMemo(
     () =>
       carePrograms.map((careProgram) => {
+        const displayName =
+          careProgram.display === 'Key Population' ? 'Key and Vulnerable Population' : careProgram.display;
+
         return {
           id: `${careProgram.uuid}`,
-          programName: careProgram.display,
+          programName: displayName,
           status: (
             <div className={styles.careProgramButtonContainer}>
               <span>
@@ -116,11 +119,11 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const headers = [
     {
       key: 'programName',
-      header: 'Program name',
+      header: t('programName', 'Program name'),
     },
     {
       key: 'status',
-      header: 'Status',
+      header: t('status', 'Status'),
     },
   ];
 
