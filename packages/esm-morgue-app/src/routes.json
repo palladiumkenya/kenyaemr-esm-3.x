@@ -27,6 +27,12 @@
       "component": "morgueEnrollWorkspace",
       "title": "Enroll new deceased",
       "type": "other-form"
+    },
+     {
+      "name": "autopsy-form",
+      "component": "autopsyForm",
+      "title": "Autopsy form",
+      "type": "other-form"
     }
   ],
   "pages": [
