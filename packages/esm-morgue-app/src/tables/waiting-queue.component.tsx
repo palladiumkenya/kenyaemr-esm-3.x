@@ -24,6 +24,23 @@ export const WaitingQueue: React.FC = () => {
     { header: 'Residence', key: 'address4' },
   ];
 
+  if (isLoading) {
+    return (
+      <DataTableSkeleton
+        headers={genericTableHeader}
+        aria-label="awaiting-datatable"
+        showToolbar={false}
+        showHeader={false}
+        rowCount={3}
+        zebra
+        columnCount={3}
+      />
+    );
+  }
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('waitingQueue', 'Waiting queue')} />;
+  }
+
   const rows =
     deceasedPatients?.map((patient, index) => ({
       id: patient.uuid,
