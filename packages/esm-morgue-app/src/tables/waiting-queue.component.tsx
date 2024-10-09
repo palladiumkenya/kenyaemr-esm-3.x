@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { useDeceasedPatient } from '../hook/useMorgue.resource';
 
 export const WaitingQueue: React.FC = () => {
-  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient('Test');
+  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
   const { t } = useTranslation();
   const fromHospital = t('fromHosp', 'From Hospital');
 

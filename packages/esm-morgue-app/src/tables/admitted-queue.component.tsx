@@ -8,7 +8,7 @@ import { InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 export const AdmittedQueue: React.FC = () => {
-  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient('test');
+  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
   const { t } = useTranslation();
 
   if (isLoading) {
