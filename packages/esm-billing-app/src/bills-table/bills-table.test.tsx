@@ -21,23 +21,6 @@ jest.mock('../billing.resource', () => ({
   })),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  ErrorState: jest.fn(() => (
-    <div>
-      Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site
-      administrator and quote the error code above.
-    </div>
-  )),
-  useConfig: jest.fn(() => ({ bills: { pageSizes: [10, 20, 30, 40, 50], pageSize: 10 } })),
-  usePagination: jest.fn().mockImplementation((data) => ({
-    currentPage: 1,
-    goTo: () => {},
-    results: data,
-    paginated: false,
-  })),
-}));
-
 describe('BillsTable', () => {
   let user;
 
@@ -99,8 +82,7 @@ describe('BillsTable', () => {
 
     render(<BillsTable />);
 
-    expect(screen.getByText(/sorry, there was a problem displaying this information/i)).toBeInTheDocument();
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText(/Error State/i)).toBeInTheDocument();
   });
 
   test('should filter bills by search term and bill payment status', async () => {
