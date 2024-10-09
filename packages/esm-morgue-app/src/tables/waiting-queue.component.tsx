@@ -1,6 +1,6 @@
 import React from 'react';
 import GenericTable from './generic-table.component';
-import { ErrorState, formatDate } from '@openmrs/esm-framework';
+import { ErrorState, formatDate, launchWorkspace } from '@openmrs/esm-framework';
 import { toUpperCase } from '../helpers/expression-helper';
 import { Tag, Button, DataTableSkeleton } from '@carbon/react';
 import styles from './generic-table.scss';
@@ -26,15 +26,17 @@ export const WaitingQueue: React.FC = () => {
 
   if (isLoading) {
     return (
-      <DataTableSkeleton
-        headers={genericTableHeader}
-        aria-label="awaiting-datatable"
-        showToolbar={false}
-        showHeader={false}
-        rowCount={3}
-        zebra
-        columnCount={3}
-      />
+      <div className={styles.table}>
+        <DataTableSkeleton
+          headers={genericTableHeader}
+          aria-label="awaiting-datatable"
+          showToolbar={false}
+          showHeader={false}
+          rowCount={10}
+          zebra
+          columnCount={9}
+        />
+      </div>
     );
   }
   if (error) {
@@ -54,10 +56,14 @@ export const WaitingQueue: React.FC = () => {
       Ids: patient.identifiers[0]?.identifier || 'N/A',
       address4: patient.person.preferredAddress?.address4 || 'N/A',
     })) || [];
-
+  const handleMoreDetails = () => {
+    launchWorkspace('add-more-details-form', {
+      workspaceTitle: 'Admission form',
+    });
+  };
   const actionColumn = () => (
-    <Button kind="tertiary" className={styles.actionBtn}>
-      {t('readyForAdmit', 'Ready for Admission')}
+    <Button kind="tertiary" className={styles.actionBtn} onClick={handleMoreDetails}>
+      {t('admit', 'Admit')}
     </Button>
   );
 

@@ -13,9 +13,10 @@
 }
 
 .formButtonSet {
-  margin-top: layout.$spacing-11;
+  margin-top: layout.$spacing-13;
   display: flex;
   justify-content: center;
+  align-items: baseline;
 }
 
 .formSubHeader {
@@ -28,20 +29,6 @@
 .formGrid {
   margin: 0 layout.$spacing-05;
   padding: 0rem;
-}
-.form__gender {
-  color: colors.$gray-70;
-  display: inline-block;
-  font-size: layout.$spacing-04;
-  line-height: layout.$spacing-05;
-  line-height: layout.$spacing-05;
-  margin-bottom: layout.$spacing-03;
-  vertical-align: baseline;
-}
-.form__header__section {
-  @include type.type-style('heading-02');
-  margin-top: layout.$spacing-04;
-  margin-bottom: layout.$spacing-02;
 }
 
 .formAdmissionDatepicker input {
@@ -59,4 +46,7 @@
 }
 .formDeathTimepicker input {
   min-width: 18.6rem;
+}
+.fileUploader{
+  min-width: 24rem;
 }
