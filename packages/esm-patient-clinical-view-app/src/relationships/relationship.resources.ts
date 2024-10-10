@@ -1,6 +1,7 @@
 import { openmrsFetch, restBaseUrl, showModal, showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { z } from 'zod';
+import { Patient } from '../types';
 
 export const relationshipUpdateFormSchema = z
   .object({
@@ -50,3 +51,10 @@ export const deleteRelationship = async (relationshipUuid: string) => {
     },
   });
 };
+
+export async function fetchPerson(query: string, abortController: AbortController) {
+  const patientsRes = await openmrsFetch<{ results: Array<Patient> }>(`${restBaseUrl}/patient?q=${query}`, {
+    signal: abortController.signal,
+  });
+  return patientsRes?.data?.results ?? [];
+}

@@ -1,6 +1,6 @@
-import React, { type HTMLAttributes, useEffect, useRef, useState } from 'react';
 import { Layer, Search, type SearchProps } from '@carbon/react';
 import classNames from 'classnames';
+import React, { type HTMLAttributes, ReactNode, useEffect, useRef, useState } from 'react';
 import styles from './autosuggest.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -104,6 +104,7 @@ interface AutosuggestProps extends SearchProps {
   onSuggestionSelected: (field: string, value: string) => void;
   invalid?: boolean | undefined;
   invalidText?: string | undefined;
+  renderEmptyState?: (searchValue: string) => ReactNode;
 }
 
 export const Autosuggest: React.FC<AutosuggestProps> = ({
@@ -113,6 +114,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   onSuggestionSelected,
   invalid,
   invalidText,
+  renderEmptyState,
   ...searchProps
 }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -180,6 +182,9 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
             </li>
           ))}
         </ul>
+      )}
+      {suggestions.length < 1 && searchBox.current?.value?.length >= 3 && typeof renderEmptyState === 'function' && (
+        <span className={styles.suggestions}>{renderEmptyState(searchBox.current?.value)}</span>
       )}
       {invalid ? <label className={classNames(styles.invalidMsg)}>{invalidText}</label> : <></>}
     </div>
