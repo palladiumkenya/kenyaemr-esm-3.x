@@ -38,13 +38,12 @@ const MedicalHistoryView: React.FC = () => {
   const patientUuid = getPatientUuidFromUrl();
   const { visits, isLoading, error } = useInfiniteVisits(patientUuid);
   const layout = useLayoutType();
-  const [pageSize, setPageSize] = useState(10);
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEncounterType, setSelectedEncounterType] = useState<string | null>(null);
 
-  const { paginated, goTo, results: paginatedVisits, currentPage } = usePagination(visits || [], pageSize);
-  const { pageSizes } = usePaginationInfo(pageSize, visits?.length || 0, currentPage, visits?.length || 0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const encounterTypes = useMemo(() => {
     const types =
@@ -81,15 +80,19 @@ const MedicalHistoryView: React.FC = () => {
     });
   }, [encounters, selectedEncounterType, searchTerm, t]);
 
-  const rows = filteredEncounters?.map((encounter, idx) => {
-    return {
-      id: `encounter-${idx}`,
-      encounterDatetime: formatDate(new Date(encounter.encounterDatetime)),
-      visitType: encounter.visitType,
-      encounterType: encounter.encounterType,
-      formName: encounter.form,
-    };
-  });
+  const paginatedEncounterItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredEncounters.slice(startIndex, endIndex);
+  }, [filteredEncounters, currentPage, pageSize]);
+
+  const rows = paginatedEncounterItems?.map((encounter, idx) => ({
+    id: `encounter-${idx}`,
+    encounterDatetime: formatDate(new Date(encounter.encounterDatetime)),
+    visitType: encounter.visitType,
+    encounterType: encounter.encounterType,
+    formName: encounter.form,
+  }));
 
   if (isLoading) {
     return <DataTableSkeleton rowCount={10} />;
@@ -141,7 +144,7 @@ const MedicalHistoryView: React.FC = () => {
         />
       </div>
 
-      <div className={styles.billHistoryContainer}>
+      <div className={styles.medicalHistoryContainer}>
         <DataTable className={styles.table} rows={rows} headers={headers} size={responsiveSize} useZebraStyles>
           {({
             rows,
@@ -175,7 +178,7 @@ const MedicalHistoryView: React.FC = () => {
                       {row.isExpanded ? (
                         <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
                           <div className={styles.container}>
-                            <EncounterObservations observations={encounters[index]['obs'] ?? []} />
+                            <EncounterObservations observations={paginatedEncounterItems[index]['obs'] ?? []} />
                           </div>
                         </TableExpandedRow>
                       ) : null}
@@ -186,26 +189,20 @@ const MedicalHistoryView: React.FC = () => {
             </TableContainer>
           )}
         </DataTable>
-        {paginated && (
-          <Pagination
-            forwardText={t('nextPage', 'Next page')}
-            backwardText={t('previousPage', 'Previous page')}
-            page={currentPage}
-            pageSize={pageSize}
-            pageSizes={pageSizes}
-            totalItems={filteredEncounters.length}
-            className={styles.pagination}
-            size={responsiveSize}
-            onChange={({ page: newPage, pageSize: newPageSize }) => {
-              if (newPage !== currentPage) {
-                goTo(newPage);
-              }
-              if (newPageSize !== pageSize) {
-                setPageSize(newPageSize);
-              }
-            }}
-          />
-        )}
+        <Pagination
+          forwardText="Next page"
+          backwardText="Previous page"
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={[5, 10, 20, 50, 100]}
+          totalItems={filteredEncounters.length}
+          className={styles.pagination}
+          size={responsiveSize}
+          onChange={({ pageSize: newPageSize, page: newPage }) => {
+            setPageSize(newPageSize);
+            setCurrentPage(newPage);
+          }}
+        />
       </div>
     </div>
   );
