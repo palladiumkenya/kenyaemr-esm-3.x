@@ -4,7 +4,6 @@
   "all": "All",
   "allocation": "Allocation",
   "amountCollected": "Amount(s)",
-  "attachment": "Attachments",
   "attachments": "Attachments",
   "autopsyRecord": "Autopsy summary",
   "autopsyRecords": "Autopsy records",
@@ -38,5 +37,6 @@
   "searchThisList": "Search this list",
   "selectCauseOfDeath": "Select Cause of Death",
   "visitType": "Visit Type",
+  "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"
 }
