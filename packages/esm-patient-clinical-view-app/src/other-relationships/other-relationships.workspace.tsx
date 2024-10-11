@@ -25,7 +25,6 @@ type OtherRelationshipsFormProps = {
 
 export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
   const { t } = useTranslation();
-  const { relationshipsUrl } = usePatientRelationships(rootPersonUuid);
   const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
   const config = useConfig<ConfigObject>();
   const { familyRelationshipsTypeList } = config;
