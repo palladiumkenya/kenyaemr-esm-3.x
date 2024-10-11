@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Column, TextArea, Form, Stack, ButtonSet, ComboBox, Button, DatePicker, DatePickerInput } from '@carbon/react';
-import { useForm, Controller, SubmitHandler, FormProvider } from 'react-hook-form';
+import { Button, ButtonSet, Column, ComboBox, DatePicker, DatePickerInput, Form, Stack, TextArea } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import styles from './other-relationships.scss';
-import { ExtensionSlot, showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { uppercaseText } from '../utils/expression-helper';
-import { saveRelationship } from '../case-management/workspace/case-management.resource';
-import PatientInfo from '../case-management/workspace/patient-info.component';
+import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import React, { useState } from 'react';
+import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
-import { useMappedRelationshipTypes, usePatientRelationships } from '../family-partner-history/relationships.resource';
+import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
+import { useMappedRelationshipTypes, usePatientRelationships } from '../family-partner-history/relationships.resource';
 import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
+import { relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
+import { uppercaseText } from '../utils/expression-helper';
+import styles from './other-relationships.scss';
 
-const schema = z.object({
-  relationship: z.string({ required_error: 'Relationship is required' }),
-  startDate: z.date({ required_error: 'Start date is required' }),
-  endDate: z.date().optional(),
+const schema = relationshipFormSchema.extend({
   notes: z.string().optional(),
 });
 type FormData = z.infer<typeof schema>;
@@ -29,13 +25,13 @@ type OtherRelationshipsFormProps = {
 
 export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
   const { t } = useTranslation();
-  const [relatedPersonUuid, setRelatedPersonUuid] = useState<string | undefined>(undefined);
   const { relationshipsUrl } = usePatientRelationships(rootPersonUuid);
   const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
-  const { familyRelationshipsTypeList } = useConfig<ConfigObject>();
+  const config = useConfig<ConfigObject>();
+  const { familyRelationshipsTypeList } = config;
   const familyRelationshipTypesUUIDs = new Set(familyRelationshipsTypeList.map((r) => r.uuid));
   const otherRelationshipTypes = mappedRelationshipTypes.filter((type) => !familyRelationshipTypesUUIDs.has(type.uuid));
-
+  const session = useSession();
   const relationshipTypes = otherRelationshipTypes.map((relationship) => ({
     id: relationship.uuid,
     text: relationship.display,
@@ -43,6 +39,10 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
 
   const form = useForm<FormData>({
     mode: 'all',
+    defaultValues: {
+      personA: rootPersonUuid,
+      mode: 'search',
+    },
     resolver: zodResolver(schema),
   });
 
@@ -53,39 +53,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
   } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const payload = {
-      personA: rootPersonUuid,
-      personB: relatedPersonUuid,
-      relationshipType: data.relationship,
-      startDate: data.startDate.toISOString(),
-      endDate: data.endDate ? data.endDate.toISOString() : null,
-    };
-
-    try {
-      await saveRelationship(payload);
-      mutate(relationshipsUrl);
-      showSnackbar({
-        kind: 'success',
-        title: t('saveRelationship', 'Save Relationship'),
-        subtitle: t('savedRlship', 'Relationship saved successfully'),
-        timeoutInMs: 3000,
-        isLowContrast: true,
-      });
-
-      closeWorkspace();
-    } catch (err) {
-      showSnackbar({
-        kind: 'error',
-        title: t('relationshpError', 'Relationship Error'),
-        subtitle: t('RlshipError', 'Request Failed.......'),
-        timeoutInMs: 2500,
-        isLowContrast: true,
-      });
-    }
-  };
-
-  const selectPatient = (relatedPersonUuid: string) => {
-    setRelatedPersonUuid(relatedPersonUuid);
+    await saveRelationship(data, config, session, []);
   };
 
   return (
@@ -94,23 +62,58 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
         <span className={styles.caseFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
         <Stack gap={5} className={styles.grid}>
           <PatientSearchCreate />
-          {relatedPersonUuid && <PatientInfo patientUuid={relatedPersonUuid} />}
-          {!relatedPersonUuid && (
-            <Column>
-              <ExtensionSlot
-                name="patient-search-bar-slot"
-                state={{
-                  selectPatientAction: selectPatient,
-                  buttonProps: {
-                    kind: 'primary',
-                  },
-                }}
-              />
-            </Column>
-          )}
+          <span className={styles.sectionHeader}>{t('relationship', 'Relationship')}</span>
           <Column>
             <Controller
-              name="relationship"
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <DatePicker
+                  className={styles.datePickerInput}
+                  dateFormat="d/m/Y"
+                  id="startDate"
+                  datePickerType="single"
+                  {...field}
+                  invalid={form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}>
+                  <DatePickerInput
+                    invalid={form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}
+                    placeholder="mm/dd/yyyy"
+                    labelText={t('startDate', 'Start Date')}
+                    size="xl"
+                  />
+                </DatePicker>
+              )}
+            />
+          </Column>
+          <Column>
+            <Controller
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <DatePicker
+                  className={styles.datePickerInput}
+                  dateFormat="d/m/Y"
+                  id="endDate"
+                  datePickerType="single"
+                  {...field}
+                  invalid={form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}>
+                  <DatePickerInput
+                    invalid={form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}
+                    placeholder="mm/dd/yyyy"
+                    labelText={t('endDate', 'End Date')}
+                    size="xl"
+                  />
+                </DatePicker>
+              )}
+            />
+          </Column>
+          <Column>
+            <Controller
+              name="relationshipType"
               control={control}
               render={({ field, fieldState }) => (
                 <ComboBox
@@ -123,52 +126,6 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
                 />
-              )}
-            />
-          </Column>
-
-          <Column>
-            <Controller
-              name="startDate"
-              control={control}
-              render={({ field, fieldState }) => (
-                <DatePicker
-                  datePickerType="single"
-                  onChange={(e) => field.onChange(e[0])}
-                  className={styles.datePickerInput}>
-                  <DatePickerInput
-                    placeholder="mm/dd/yyyy"
-                    labelText="Start Date"
-                    id="case-start-date-picker"
-                    size="md"
-                    className={styles.datePickerInput}
-                    invalid={!!fieldState.error}
-                    invalidText={fieldState.error?.message}
-                  />
-                </DatePicker>
-              )}
-            />
-          </Column>
-
-          <Column className={styles.component}>
-            <Controller
-              name="endDate"
-              control={control}
-              render={({ field, fieldState }) => (
-                <DatePicker
-                  datePickerType="single"
-                  onChange={(e) => field.onChange(e[0])}
-                  className={styles.datePickerInput}>
-                  <DatePickerInput
-                    placeholder="mm/dd/yyyy"
-                    labelText="End Date"
-                    id="case-end-date-picker"
-                    size="md"
-                    className={styles.datePickerInput}
-                    invalid={!!fieldState.error}
-                    invalidText={fieldState.error?.message}
-                  />
-                </DatePicker>
               )}
             />
           </Column>
@@ -193,7 +150,11 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button className={styles.button} kind="primary" type="submit" disabled={!isValid || !relatedPersonUuid}>
+          <Button
+            className={styles.button}
+            kind="primary"
+            type="submit"
+            disabled={!isValid || form.formState.isSubmitting}>
             {t('save', 'Save')}
           </Button>
         </ButtonSet>

@@ -25,6 +25,13 @@
   margin: spacing.$spacing-05 0 spacing.$spacing-05;
 }
 
+.datePickerInput span,
+.datePickerInput div,
+.datePickerInput input,
+.datePickerInput {
+  width: 100% !important;
+}
+
 .grid {
   margin: spacing.$spacing-05 spacing.$spacing-05;
   padding: spacing.$spacing-05 0rem 0rem orem;

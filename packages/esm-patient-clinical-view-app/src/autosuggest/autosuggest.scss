@@ -1,5 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .label01 {
@@ -17,26 +18,26 @@
   width: 100%;
   position: absolute;
   left: 0;
-  background-color: #fff;
+  background-color: colors.$white;
   margin-bottom: 20px;
   z-index: 99;
 }
 
 .suggestions li {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   line-height: 1.29;
-  color: #525252;
-  border-bottom: 1px solid #8d8d8d;
+  color: colors.$gray-70;
+  border-bottom: 1px solid colors.$gray-50;
 }
 
 .suggestions li:hover {
   background-color: #e5e5e5;
-  color: #161616;
+  color: colors.$gray-100;
   cursor: pointer;
 }
 
 .suggestions li:not(:last-of-type) {
-  border-bottom: 1px solid #999;
+  border-bottom: 1px solid colors.$gray-40-hover;
 }
 
 .autocomplete {
@@ -53,10 +54,12 @@
 }
 
 .invalid input {
-  outline: 2px solid var(--cds-support-error, #da1e28);
+  outline: 2px solid var(--cds-support-error, colors.$red-60);
   outline-offset: -2px;
+  margin-bottom: layout.$spacing-02;
 }
 
 .invalidMsg {
-  color: var(--cds-text-error, #da1e28);
+  color: var(--cds-text-error, colors.$red-60);
+  font-size: small;
 }

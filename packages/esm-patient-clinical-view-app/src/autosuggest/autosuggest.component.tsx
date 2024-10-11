@@ -118,6 +118,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   ...searchProps
 }) => {
   const [suggestions, setSuggestions] = useState([]);
+  const [showEmptyState, setShowEmptyState] = useState(false);
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const { id: name, labelText } = searchProps;
@@ -133,6 +134,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   const handleClickOutsideComponent = (e) => {
     if (wrapper.current && !wrapper.current.contains(e.target)) {
       setSuggestions([]);
+      setShowEmptyState(false);
     }
   };
 
@@ -142,6 +144,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
 
     if (query) {
       getSearchResults(query).then((suggestions) => {
+        setShowEmptyState(suggestions.length < 1);
         setSuggestions(suggestions);
       });
     } else {
@@ -183,7 +186,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           ))}
         </ul>
       )}
-      {suggestions.length < 1 && searchBox.current?.value?.length >= 3 && typeof renderEmptyState === 'function' && (
+      {showEmptyState && searchBox.current?.value?.length >= 3 && typeof renderEmptyState === 'function' && (
         <span className={styles.suggestions}>{renderEmptyState(searchBox.current?.value)}</span>
       )}
       {invalid ? <label className={classNames(styles.invalidMsg)}>{invalidText}</label> : <></>}

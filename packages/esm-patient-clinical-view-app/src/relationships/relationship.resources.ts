@@ -1,7 +1,9 @@
-import { openmrsFetch, restBaseUrl, showModal, showSnackbar } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, Session, showModal, showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { z } from 'zod';
 import { Patient } from '../types';
+import { ConfigObject } from '../config-schema';
+import omit from 'lodash/omit';
 
 export const relationshipUpdateFormSchema = z
   .object({
@@ -58,3 +60,135 @@ export async function fetchPerson(query: string, abortController: AbortControlle
   });
   return patientsRes?.data?.results ?? [];
 }
+
+export const relationshipFormSchema = z.object({
+  personA: z.string().uuid('Invalid person'),
+  personB: z.string().uuid('Invalid person').optional(),
+  relationshipType: z.string().uuid(),
+  startDate: z.date({ coerce: true }),
+  endDate: z.date({ coerce: true }).optional(),
+  mode: z.enum(['create', 'search']).default('search'),
+  personBInfo: z
+    .object({
+      givenName: z.string().min(1, 'Required'),
+      middleName: z.string().min(1, 'Required'),
+      familyName: z.string().min(1, 'Required'),
+      gender: z.enum(['M', 'F']),
+      birthdate: z.date({ coerce: true }).max(new Date(), 'Must not be a future date'),
+      maritalStatus: z.string().optional(),
+      address: z.string().optional(),
+      phoneNumber: z.string().optional(),
+    })
+    .optional(),
+});
+
+export function generateOpenmrsIdentifier(source: string) {
+  const abortController = new AbortController();
+  return openmrsFetch(`${restBaseUrl}/idgen/identifiersource/${source}/identifier`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: {},
+    signal: abortController.signal,
+  });
+}
+
+export const saveRelationship = async (
+  data: z.infer<typeof relationshipFormSchema>,
+  config: ConfigObject,
+  session: Session,
+  extraAttributes: Array<{ attributeType: string; value: string }> = [],
+) => {
+  // Handle patient creation
+  let patient: string = data.personB;
+  if (data.mode === 'create') {
+    try {
+      const identifier = await generateOpenmrsIdentifier(config.openmrsIdentifierSourceUuid);
+      const { address, birthdate, familyName, gender, givenName, middleName, phoneNumber } = data.personBInfo;
+      const response = await openmrsFetch<Patient>(`/ws/rest/v1/patient`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          identifiers: [
+            {
+              identifier: identifier.data.identifier,
+              identifierType: config.openmrsIDUuid,
+              location: session.sessionLocation.uuid,
+            },
+          ],
+          person: {
+            names: [{ givenName, middleName, familyName }],
+            gender,
+            birthdate,
+            addresses: address ? [{ preferred: true, address1: address }] : undefined,
+            dead: false,
+            attributes: [
+              ...(phoneNumber
+                ? [
+                    {
+                      attributeType: config.contactPersonAttributesUuid.telephone,
+                      value: phoneNumber,
+                    },
+                  ]
+                : []),
+              ...extraAttributes,
+            ],
+          },
+        }),
+      });
+      patient = response.data?.uuid;
+      showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Patient created succesfully' });
+    } catch (error) {
+      showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating patient' });
+      return; // Don't contunue if an erro ocuures
+    }
+  }
+
+  // Handle storage of patient demographics in obs
+  if (data.mode === 'create' && data.personBInfo?.maritalStatus) {
+    try {
+      await openmrsFetch(`/ws/rest/v1/encounter`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          location: session.sessionLocation.uuid,
+          encounterProviders: [
+            {
+              provider: session.currentProvider.uuid,
+              encounterRole: config.registrationObs.encounterProviderRoleUuid,
+            },
+          ],
+          form: config.registrationObs.registrationFormUuid,
+          encounterType: config.registrationEncounterUuid,
+          patient: patient,
+          obs: [{ concept: config.maritalStatusUuid, value: data.personBInfo.maritalStatus }],
+        }),
+      });
+      showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Patient Demographics saved succesfuly' });
+    } catch (error) {
+      showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error saving patient demographics' });
+    }
+  }
+  // Handle Relationship Creation
+  try {
+    await openmrsFetch(`/ws/rest/v1/relationship`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...omit(data, ['personBInfo', 'mode']),
+        personB: patient,
+      }),
+    });
+    showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Relationship saved succesfully' });
+    mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship'));
+  } catch (error) {
+    showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error saving relationship' });
+  }
+};

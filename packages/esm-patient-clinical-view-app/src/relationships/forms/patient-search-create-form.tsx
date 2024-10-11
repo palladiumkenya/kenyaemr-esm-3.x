@@ -1,44 +1,38 @@
 import {
   Button,
   Column,
+  ContentSwitcher,
   DatePicker,
   DatePickerInput,
   Dropdown,
   RadioButton,
   RadioButtonGroup,
+  Switch,
   TextInput,
 } from '@carbon/react';
 import { Calculator } from '@carbon/react/icons';
 import { showModal } from '@openmrs/esm-framework';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import { Autosuggest } from '../../autosuggest/autosuggest.component';
 import SearchEmptyState from '../../autosuggest/search-empty-state.component';
 import { contactListConceptMap } from '../../contact-list/contact-list-concept-map';
-import { fetchPerson } from '../relationship.resources';
+import { fetchPerson, relationshipFormSchema } from '../relationship.resources';
 import styles from './form.scss';
 
-const PatientSearchCreate = () => {
-  const form = useFormContext<{
-    personB: string;
-    givenName: string;
-    familyName: string;
-    middleName: string;
-    gender: 'M' | 'F';
-    birthdate: Date;
-    maritalStatus: string;
-    address: string;
-    phoneNumber: string;
-  }>();
+type PatientSearchCreateProps = {};
+
+const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
+  const form = useFormContext<z.infer<typeof relationshipFormSchema>>();
   const { t } = useTranslation();
-  const [mode, setMode] = useState<'search' | 'create'>('search');
   const searchPatient = async (query: string) => {
     const abortController = new AbortController();
     return await fetchPerson(query, abortController);
   };
 
-  const handleAdd = () => setMode('create');
+  const handleAdd = () => form.setValue('mode', 'create');
   const maritalStatus = useMemo(
     () =>
       Object.entries(contactListConceptMap['1056AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].answers).map(([uuid, display]) => ({
@@ -51,12 +45,31 @@ const PatientSearchCreate = () => {
   const handleCalculateBirthDate = () => {
     const dispose = showModal('birth-date-calculator', {
       onClose: () => dispose(),
-      props: { date: new Date(), onBirthDateChange: (date) => form.setValue('birthdate', date) },
+      props: { date: new Date(), onBirthDateChange: (date) => form.setValue('personBInfo.birthdate', date) },
     });
   };
 
+  const mode = form.watch('mode');
+
   return (
     <>
+      <Column>
+        <Controller
+          control={form.control}
+          name="mode"
+          render={({ field }) => (
+            <ContentSwitcher
+              selectedIndex={field.value == 'search' ? 0 : 1}
+              onChange={(value) => {
+                let { index, name, text } = value;
+                field.onChange(name);
+              }}>
+              <Switch name="search" text="Search patient" />
+              <Switch name="create" text="Create patient" />
+            </ContentSwitcher>
+          )}
+        />
+      </Column>
       {mode === 'search' && (
         <Column>
           <Controller
@@ -65,7 +78,7 @@ const PatientSearchCreate = () => {
             render={({ field }) => (
               <Autosuggest
                 className={styles.input}
-                labelText={t('peer', 'Peer')}
+                labelText={t('patient', 'Patient')}
                 placeholder={t('patientPlaceHolder', 'Search patient')}
                 invalid={Boolean(form.formState.errors[field.name]?.message)}
                 invalidText={form.formState.errors[field.name]?.message}
@@ -96,7 +109,7 @@ const PatientSearchCreate = () => {
           <Column>
             <Controller
               control={form.control}
-              name="givenName"
+              name="personBInfo.givenName"
               render={({ field }) => (
                 <TextInput
                   invalid={form.formState.errors[field.name]?.message}
@@ -111,7 +124,7 @@ const PatientSearchCreate = () => {
           <Column>
             <Controller
               control={form.control}
-              name="middleName"
+              name="personBInfo.middleName"
               render={({ field }) => (
                 <TextInput
                   invalid={form.formState.errors[field.name]?.message}
@@ -126,7 +139,7 @@ const PatientSearchCreate = () => {
           <Column>
             <Controller
               control={form.control}
-              name="familyName"
+              name="personBInfo.familyName"
               render={({ field }) => (
                 <TextInput
                   invalid={form.formState.errors[field.name]?.message}
@@ -141,7 +154,7 @@ const PatientSearchCreate = () => {
           <Column>
             <Controller
               control={form.control}
-              name="gender"
+              name="personBInfo.gender"
               render={({ field }) => (
                 <RadioButtonGroup
                   legendText={t('sex', 'Sex')}
@@ -155,19 +168,18 @@ const PatientSearchCreate = () => {
               )}
             />
           </Column>
-          <Column className={styles.facilityColumn}>
+          <Column>
             <Controller
               control={form.control}
-              name="birthdate"
+              name="personBInfo.birthdate"
               render={({ field }) => (
-                <DatePicker datePickerType="single" {...field}>
+                <DatePicker datePickerType="single" {...field} className={styles.datePickerInput}>
                   <DatePickerInput
                     invalid={form.formState.errors[field.name]?.message}
                     invalidText={form.formState.errors[field.name]?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('dateOfBirth', 'Date of birth')}
                     size="xl"
-                    className={styles.datePickerInput}
                   />
                 </DatePicker>
               )}
@@ -179,7 +191,7 @@ const PatientSearchCreate = () => {
           <Column>
             <Controller
               control={form.control}
-              name="maritalStatus"
+              name="personBInfo.maritalStatus"
               render={({ field }) => (
                 <Dropdown
                   ref={field.ref}
@@ -202,7 +214,7 @@ const PatientSearchCreate = () => {
           <Column>
             <Controller
               control={form.control}
-              name="address"
+              name="personBInfo.address"
               render={({ field }) => (
                 <TextInput
                   invalid={form.formState.errors[field.name]?.message}
@@ -217,7 +229,7 @@ const PatientSearchCreate = () => {
           <Column>
             <Controller
               control={form.control}
-              name="phoneNumber"
+              name="personBInfo.phoneNumber"
               render={({ field }) => (
                 <TextInput
                   {...field}
