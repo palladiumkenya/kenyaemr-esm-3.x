@@ -41,11 +41,12 @@ export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: Table
     const isChecked = e.target.checked;
 
     const checkboxValue: HTMLSpanElement | null = document.querySelector(`label[for="${checkboxId}"]`);
+    const serviceTypeUUID = billsServiceTypes.find((s) => s.display === checkboxValue.innerText).uuid;
 
     if (isChecked && checkboxValue) {
-      setSelectedCheckboxes([...selectedCheckboxes, checkboxValue.innerText]);
+      setSelectedCheckboxes([...selectedCheckboxes, serviceTypeUUID]);
     } else {
-      setSelectedCheckboxes(selectedCheckboxes.filter((item) => item !== checkboxValue?.innerText));
+      setSelectedCheckboxes(selectedCheckboxes.filter((item) => item !== serviceTypeUUID));
     }
   };
 
@@ -75,7 +76,7 @@ export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: Table
                 labelText={type.display}
                 id={`checkbox-${type.display}`}
                 onChange={handleCheckboxChange}
-                checked={selectedCheckboxes.includes(type.display)}
+                checked={selectedCheckboxes.includes(type.uuid)}
               />
             ))}
           </fieldset>

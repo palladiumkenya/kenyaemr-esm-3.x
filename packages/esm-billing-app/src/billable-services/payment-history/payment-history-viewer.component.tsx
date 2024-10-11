@@ -17,6 +17,7 @@ import { useParams } from 'react-router-dom';
 import { useBills } from '../../billing.resource';
 import { useClockInStatus, usePaymentPoints } from '../../payment-points/payment-points.resource';
 import { MappedBill, PaymentStatus } from '../../types';
+import { useServiceTypes } from '../billable-service.resource';
 import { AppliedFilterTags } from './applied-filter-tages.component';
 import { CashierFilter } from './cashier-filter.component';
 import { PaymentHistoryTable } from './payment-history-table.component';
@@ -40,6 +41,7 @@ export const PaymentHistoryViewer = () => {
   const { paymentPointUUID } = useParams();
   const { paymentPoints } = usePaymentPoints();
   const { isClockedInCurrentPaymentPoint } = useClockInStatus(paymentPointUUID);
+  const { serviceTypes } = useServiceTypes();
 
   const isOnPaymentPointPage = Boolean(paymentPointUUID);
   const paidBillsResponse = useBills('', isOnPaymentPointPage ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
@@ -165,7 +167,7 @@ export const PaymentHistoryViewer = () => {
 
   const serviceTypeTags = selectedServiceTypeCheckboxes.map((t) => {
     return {
-      tag: t,
+      tag: serviceTypes.find((sT) => sT.uuid === t)?.display,
       type: 'Service Type',
     };
   });
