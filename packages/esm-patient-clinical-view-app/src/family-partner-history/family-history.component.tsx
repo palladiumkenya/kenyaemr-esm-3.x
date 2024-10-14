@@ -81,7 +81,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const handleAddHistory = () => {
     launchWorkspace('family-relationship-form', {
       workspaceTitle: 'Family Relationship Form',
-      rootPersonUuid: patientUuid,
+      patientUuid,
     });
   };
   const handleEditRelationship = (relationShipUuid: string) => {

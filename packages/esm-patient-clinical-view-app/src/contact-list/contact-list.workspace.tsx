@@ -19,6 +19,11 @@ import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
 import { useMappedRelationshipTypes } from '../family-partner-history/relationships.resource';
 import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
+import {
+  LIVING_WITH_PATIENT_CONCEPT_UUID,
+  PARTNER_HIV_STATUS_CONCEPT_UUID,
+  PNS_APROACH_CONCEPT_UUID,
+} from '../relationships/relationships-constants';
 import { contactListConceptMap } from './contact-list-concept-map';
 import styles from './contact-list-form.scss';
 import {
@@ -70,7 +75,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
 
   const hivStatus = useMemo(
     () =>
-      Object.entries(contactListConceptMap['1436AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].answers).map(([uuid, display]) => ({
+      Object.entries(contactListConceptMap[PARTNER_HIV_STATUS_CONCEPT_UUID].answers).map(([uuid, display]) => ({
         label: display,
         value: uuid,
       })),
@@ -79,7 +84,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
 
   const pnsAproach = useMemo(
     () =>
-      Object.entries(contactListConceptMap['7b827b42-9733-4d4f-8015-b40a07ac3052'].answers).map(([uuid, display]) => ({
+      Object.entries(contactListConceptMap[PNS_APROACH_CONCEPT_UUID].answers).map(([uuid, display]) => ({
         label: display,
         value: uuid,
       })),
@@ -88,7 +93,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
 
   const contactLivingWithPatient = useMemo(
     () =>
-      Object.entries(contactListConceptMap['36906d55-ade7-4d1a-b3b7-18fd59bffb0f'].answers).map(([uuid, display]) => ({
+      Object.entries(contactListConceptMap[LIVING_WITH_PATIENT_CONCEPT_UUID].answers).map(([uuid, display]) => ({
         label: display,
         value: uuid,
       })),

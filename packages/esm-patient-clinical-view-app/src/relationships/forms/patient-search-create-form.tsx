@@ -21,6 +21,7 @@ import SearchEmptyState from '../../autosuggest/search-empty-state.component';
 import { contactListConceptMap } from '../../contact-list/contact-list-concept-map';
 import { fetchPerson, relationshipFormSchema } from '../relationship.resources';
 import styles from './form.scss';
+import { MARITAL_STATUS_CONCEPT_UUID } from '../relationships-constants';
 
 type PatientSearchCreateProps = {};
 
@@ -35,7 +36,7 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
   const handleAdd = () => form.setValue('mode', 'create');
   const maritalStatus = useMemo(
     () =>
-      Object.entries(contactListConceptMap['1056AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'].answers).map(([uuid, display]) => ({
+      Object.entries(contactListConceptMap[MARITAL_STATUS_CONCEPT_UUID].answers).map(([uuid, display]) => ({
         label: display,
         value: uuid,
       })),

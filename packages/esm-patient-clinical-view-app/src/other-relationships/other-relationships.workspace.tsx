@@ -32,10 +32,10 @@ type FormData = z.infer<typeof schema>;
 
 type OtherRelationshipsFormProps = {
   closeWorkspace: () => void;
-  rootPersonUuid: string;
+  patientUuid: string;
 };
 
-export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
+export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
   const config = useConfig<ConfigObject>();
@@ -51,7 +51,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
   const form = useForm<FormData>({
     mode: 'all',
     defaultValues: {
-      personA: rootPersonUuid,
+      personA: patientUuid,
       mode: 'search',
     },
     resolver: zodResolver(schema),
@@ -73,6 +73,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
   return (
     <FormProvider {...form}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        \{' '}
         <Stack gap={5} className={styles.grid}>
           <PatientSearchCreate />
           <span className={styles.sectionHeader}>{t('relationship', 'Relationship')}</span>
@@ -158,7 +159,6 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
             />
           </Column>
         </Stack>
-
         <ButtonSet className={styles.buttonSet}>
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}

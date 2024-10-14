@@ -32,10 +32,10 @@ type FormData = z.infer<typeof schema>;
 
 type RelationshipFormProps = {
   closeWorkspace: () => void;
-  rootPersonUuid: string;
+  patientUuid: string;
 };
 
-const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
+const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
   const config = useConfig<ConfigObject>();
@@ -52,7 +52,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
   const form = useForm<FormData>({
     mode: 'all',
     defaultValues: {
-      personA: rootPersonUuid,
+      personA: patientUuid,
       mode: 'search',
     },
     resolver: zodResolver(schema),
