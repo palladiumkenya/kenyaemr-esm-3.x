@@ -1,18 +1,3 @@
-export interface CauseOfDeathFetchResponse {
-  uuid: string;
-  value: string;
-}
-
-export interface ConceptAnswer {
-  display: string;
-  name: string;
-  uuid: string;
-}
-
-export interface ConceptAnswersResponse {
-  answers?: Array<ConceptAnswer>;
-}
-
 export interface Patient {
   uuid: string;
   display: string;
