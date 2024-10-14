@@ -22,6 +22,7 @@ import { contactListConceptMap } from '../../contact-list/contact-list-concept-m
 import { fetchPerson, relationshipFormSchema } from '../relationship.resources';
 import styles from './form.scss';
 import { MARITAL_STATUS_CONCEPT_UUID } from '../relationships-constants';
+import PatientSearchInfo from '../../autosuggest/patient-search-info.component';
 
 type PatientSearchCreateProps = {};
 
@@ -83,7 +84,8 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
                 placeholder={t('patientPlaceHolder', 'Search patient')}
                 invalid={Boolean(form.formState.errors[field.name]?.message)}
                 invalidText={form.formState.errors[field.name]?.message}
-                getDisplayValue={(item) => item.display}
+                getDisplayValue={(item) => item.person.display}
+                renderSuggestionItem={(item) => <PatientSearchInfo patient={item} />}
                 getFieldValue={(item) => item.uuid}
                 getSearchResults={searchPatient}
                 renderEmptyState={(value) => (

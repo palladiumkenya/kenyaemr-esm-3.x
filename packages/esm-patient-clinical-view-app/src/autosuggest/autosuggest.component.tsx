@@ -105,6 +105,7 @@ interface AutosuggestProps extends SearchProps {
   invalid?: boolean | undefined;
   invalidText?: string | undefined;
   renderEmptyState?: (searchValue: string) => ReactNode;
+  renderSuggestionItem?: (item: any) => ReactNode;
 }
 
 export const Autosuggest: React.FC<AutosuggestProps> = ({
@@ -115,6 +116,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   invalid,
   invalidText,
   renderEmptyState,
+  renderSuggestionItem,
   ...searchProps
 }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -180,8 +182,14 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>
           {suggestions.map((suggestion, index) => (
-            <li key={index} onClick={(e) => handleClick(index)} role="presentation">
-              {getDisplayValue(suggestion)}
+            <li
+              key={index}
+              onClick={(e) => handleClick(index)}
+              role="presentation"
+              className={typeof renderSuggestionItem !== 'function' && styles.displayText}>
+              {typeof renderSuggestionItem === 'function'
+                ? renderSuggestionItem(suggestion)
+                : getDisplayValue(suggestion)}
             </li>
           ))}
         </ul>
