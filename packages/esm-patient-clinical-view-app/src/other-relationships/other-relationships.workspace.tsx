@@ -64,7 +64,10 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
   } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    await saveRelationship(data, config, session, []);
+    try {
+      await saveRelationship(data, config, session, []);
+      closeWorkspace();
+    } catch (error) {}
   };
 
   return (

@@ -38,7 +38,6 @@ type RelationshipFormProps = {
 
 const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspace, rootPersonUuid }) => {
   const { t } = useTranslation();
-  const [relatedPersonUuid, setRelatedPersonUuid] = useState<string | undefined>(undefined);
   const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
   const config = useConfig<ConfigObject>();
   const { familyRelationshipsTypeList } = config;
@@ -67,11 +66,10 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
   } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    await saveRelationship(data, config, session, []);
-  };
-
-  const selectPatient = (relatedPersonUuid: string) => {
-    setRelatedPersonUuid(relatedPersonUuid);
+    try {
+      await saveRelationship(data, config, session, []);
+      closeWorkspace();
+    } catch (error) {}
   };
 
   return (

@@ -194,7 +194,6 @@ export const saveRelationship = async (
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Patient Demographics saved succesfuly' });
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error saving patient demographics' });
-      throw error;
     }
   }
 
