@@ -1,67 +1,21 @@
 import React, { useState } from 'react';
 import styles from './patient-bills-dashboard.scss';
-import { ErrorState, ExtensionSlot } from '@openmrs/esm-framework';
-import { useBills } from '../../billing.resource';
+import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { DataTableSkeleton } from '@carbon/react';
-import { patientBillsHeaders, PatientBills } from '../patient-bills.component';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { PatientBills } from '../patient-bills.component';
+import { usePatientBills } from '../../modal/require-payment.resource';
+import PatientSearchExtension from './patient-search-extension.component';
+import EmptyPatientBill from './empty-patient-bill.component';
 
 const PatientBillsScreen: React.FC = () => {
-  const [patientUuid, setPatientUuid] = useState<string | undefined>();
-
-  return (
-    <main className={styles.container}>
-      <ExtensionSlot
-        name="patient-search-bar-slot"
-        state={{
-          selectPatientAction: (patientUuid: string) => setPatientUuid(patientUuid),
-          buttonProps: {
-            kind: 'primary',
-          },
-        }}
-      />
-      <PatientBillsWrapper patientUUID={patientUuid} />
-    </main>
-  );
-};
-
-const PatientBillsWrapper = ({ patientUUID }: { patientUUID?: string }) => {
-  const { bills, isLoading, error } = useBills(patientUUID);
-
   const { t } = useTranslation();
-
-  if (!patientUUID) {
-    return (
-      <div className={styles.emptyStateContainer}>
-        <EmptyState
-          displayText={t('notSearchedState', 'Please search for a patient in the input above')}
-          headerTitle="Not Searched"
-        />
-      </div>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <DataTableSkeleton
-          headers={patientBillsHeaders}
-          aria-label="patient bills table"
-          showToolbar={false}
-          showHeader={false}
-          rowCount={3}
-          zebra
-          columnCount={3}
-          className={styles.dataTableSkeleton}
-        />
-      </div>
-    );
-  }
+  const [patientUuid, setPatientUuid] = useState<string | undefined>();
+  const { patientBills: bills, isLoading, error } = usePatientBills(patientUuid);
 
   if (error) {
     return (
-      <div className={styles.errorStateContainer}>
+      <div className={`${styles.emptyStateContainer} ${styles.container}`}>
+        <PatientSearchExtension setPatientUuid={setPatientUuid} />
         <ErrorState
           error={t('anErrorOccurredLoadingPatientBills', 'An error occurred loading patient bills')}
           headerTitle={t('errorLoadingPatientBills', 'Error loading patient bills')}
@@ -70,18 +24,21 @@ const PatientBillsWrapper = ({ patientUUID }: { patientUUID?: string }) => {
     );
   }
 
-  if (bills.length === 0) {
+  if (!patientUuid) {
     return (
-      <div className={styles.emptyStateContainer}>
-        <EmptyState
-          headerTitle={t('noBillsState', 'No Patient Bills Found')}
-          displayText={t('noBillsFoundToDisplay', 'No bills to dipsplay')}
-        />
-      </div>
+      <>
+        <PatientSearchExtension setPatientUuid={setPatientUuid} />
+        <EmptyPatientBill />
+      </>
     );
   }
 
-  return <PatientBills bills={bills} />;
+  return (
+    <main className={styles.container}>
+      <PatientSearchExtension setPatientUuid={setPatientUuid} />
+      <PatientBills patientUuid={patientUuid} bills={bills} onCancel={setPatientUuid} />
+    </main>
+  );
 };
 
 export default PatientBillsScreen;
