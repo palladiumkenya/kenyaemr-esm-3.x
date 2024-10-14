@@ -20,7 +20,6 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './enrollBody.scss';
-import CauseOfDeath from './common/causeOfdeath.component';
 
 interface ProvideModalProps {
   closeWorkspace: () => void;
@@ -101,8 +100,6 @@ const MorgueEnrollForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
             </Column>
           </>
         )}
-
-        <CauseOfDeath />
         <Column>
           <DatePicker datePickerType="single" className={styles.formDeathDatepicker}>
             <DatePickerInput
