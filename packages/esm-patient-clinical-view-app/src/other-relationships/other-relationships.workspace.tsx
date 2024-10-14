@@ -73,7 +73,6 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
   return (
     <FormProvider {...form}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-        <span className={styles.caseFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
         <Stack gap={5} className={styles.grid}>
           <PatientSearchCreate />
           <span className={styles.sectionHeader}>{t('relationship', 'Relationship')}</span>

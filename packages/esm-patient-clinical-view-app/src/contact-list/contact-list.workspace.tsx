@@ -99,6 +99,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   const observablePhysicalAssault = form.watch('physicalAssault');
   const observableThreatened = form.watch('threatened');
   const observableSexualAssault = form.watch('sexualAssault');
+  const observableMode = form.watch('mode');
   const showIPVRelatedFields =
     config.pnsRelationships.findIndex((r) => r.uuid === observableRelationship && r.sexual) !== -1;
 
@@ -118,7 +119,6 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   return (
     <FormProvider {...form}>
       <Form onSubmit={form.handleSubmit(onSubmit)} className={styles.form}>
-        <span className={styles.formTitle}>{t('formTitle', 'Fill in the form details')}</span>
         <Stack gap={4} className={styles.grid}>
           <PatientSearchCreate />
           <span className={styles.sectionHeader}>{t('relationship', 'Relationship')}</span>
@@ -192,163 +192,167 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
               )}
             />
           </Column>
-          <Column>
-            <Controller
-              control={form.control}
-              name="livingWithClient"
-              render={({ field }) => (
-                <Dropdown
-                  ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
-                  id="livingWithClient"
-                  titleText={t('livingWithClient', 'Living with client')}
-                  onChange={(e) => {
-                    field.onChange(e.selectedItem);
-                  }}
-                  initialSelectedItem={field.value}
-                  label="Select"
-                  items={contactLivingWithPatient.map((r) => r.value)}
-                  itemToString={(item) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            />
-          </Column>
-          {showIPVRelatedFields && (
+          {observableMode === 'create' && (
             <>
-              <span className={styles.sectionHeader}>{t('ipvQuestions', 'IPV Questions')}</span>
               <Column>
                 <Controller
                   control={form.control}
-                  name="physicalAssault"
-                  render={({ field }) => (
-                    <RadioButtonGroup
-                      id="physicalAssault"
-                      legendText={t(
-                        'physicalAssault',
-                        '1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?',
-                      )}
-                      {...field}
-                      invalid={form.formState.errors[field.name]?.message}
-                      invalidText={form.formState.errors[field.name]?.message}
-                      className={styles.billingItem}>
-                      <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="physicalAssault_yes" />
-                      <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="physicalAssault_no" />
-                    </RadioButtonGroup>
-                  )}
-                />
-              </Column>
-              <Column>
-                <Controller
-                  control={form.control}
-                  name="threatened"
-                  render={({ field }) => (
-                    <RadioButtonGroup
-                      id="threatened"
-                      legendText={t('threatened', '2. Has he/she ever threatened to hurt you?')}
-                      {...field}
-                      invalid={form.formState.errors[field.name]?.message}
-                      invalidText={form.formState.errors[field.name]?.message}
-                      className={styles.billingItem}>
-                      <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="threatened_yes" />
-                      <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="threatened_no" />
-                    </RadioButtonGroup>
-                  )}
-                />
-              </Column>
-              <Column>
-                <Controller
-                  control={form.control}
-                  name="sexualAssault"
-                  render={({ field }) => (
-                    <RadioButtonGroup
-                      id="sexualAssault"
-                      legendText={t(
-                        'sexualAssault',
-                        '3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?',
-                      )}
-                      {...field}
-                      invalid={form.formState.errors[field.name]?.message}
-                      invalidText={form.formState.errors[field.name]?.message}
-                      className={styles.billingItem}>
-                      <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="sexualAssault_yes" />
-                      <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="sexualAssault_no" />
-                    </RadioButtonGroup>
-                  )}
-                />
-              </Column>
-              <span className={styles.sectionHeader}>{t('ipvOutcome', 'IPV Outcome')}</span>
-              <Column>
-                <Controller
-                  control={form.control}
-                  name="ipvOutCome"
+                  name="livingWithClient"
                   render={({ field }) => (
                     <Dropdown
                       ref={field.ref}
                       invalid={form.formState.errors[field.name]?.message}
                       invalidText={form.formState.errors[field.name]?.message}
-                      id="ipvOutCome"
-                      titleText={t('ipvOutCome', 'IPV Outcome')}
+                      id="livingWithClient"
+                      titleText={t('livingWithClient', 'Living with client')}
                       onChange={(e) => {
                         field.onChange(e.selectedItem);
                       }}
-                      selectedItem={field.value}
-                      label="Choose option"
-                      items={contactIPVOutcomeOptions.map((r) => r.value)}
-                      itemToString={(item) => {
-                        return contactIPVOutcomeOptions.find((r) => r.value === item)?.label ?? '';
+                      initialSelectedItem={field.value}
+                      label="Select"
+                      items={contactLivingWithPatient.map((r) => r.value)}
+                      itemToString={(item) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
+                    />
+                  )}
+                />
+              </Column>
+              {showIPVRelatedFields && (
+                <>
+                  <span className={styles.sectionHeader}>{t('ipvQuestions', 'IPV Questions')}</span>
+                  <Column>
+                    <Controller
+                      control={form.control}
+                      name="physicalAssault"
+                      render={({ field }) => (
+                        <RadioButtonGroup
+                          id="physicalAssault"
+                          legendText={t(
+                            'physicalAssault',
+                            '1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?',
+                          )}
+                          {...field}
+                          invalid={form.formState.errors[field.name]?.message}
+                          invalidText={form.formState.errors[field.name]?.message}
+                          className={styles.billingItem}>
+                          <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="physicalAssault_yes" />
+                          <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="physicalAssault_no" />
+                        </RadioButtonGroup>
+                      )}
+                    />
+                  </Column>
+                  <Column>
+                    <Controller
+                      control={form.control}
+                      name="threatened"
+                      render={({ field }) => (
+                        <RadioButtonGroup
+                          id="threatened"
+                          legendText={t('threatened', '2. Has he/she ever threatened to hurt you?')}
+                          {...field}
+                          invalid={form.formState.errors[field.name]?.message}
+                          invalidText={form.formState.errors[field.name]?.message}
+                          className={styles.billingItem}>
+                          <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="threatened_yes" />
+                          <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="threatened_no" />
+                        </RadioButtonGroup>
+                      )}
+                    />
+                  </Column>
+                  <Column>
+                    <Controller
+                      control={form.control}
+                      name="sexualAssault"
+                      render={({ field }) => (
+                        <RadioButtonGroup
+                          id="sexualAssault"
+                          legendText={t(
+                            'sexualAssault',
+                            '3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?',
+                          )}
+                          {...field}
+                          invalid={form.formState.errors[field.name]?.message}
+                          invalidText={form.formState.errors[field.name]?.message}
+                          className={styles.billingItem}>
+                          <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="sexualAssault_yes" />
+                          <RadioButton labelText={t('no', 'No')} value={BOOLEAN_NO} id="sexualAssault_no" />
+                        </RadioButtonGroup>
+                      )}
+                    />
+                  </Column>
+                  <span className={styles.sectionHeader}>{t('ipvOutcome', 'IPV Outcome')}</span>
+                  <Column>
+                    <Controller
+                      control={form.control}
+                      name="ipvOutCome"
+                      render={({ field }) => (
+                        <Dropdown
+                          ref={field.ref}
+                          invalid={form.formState.errors[field.name]?.message}
+                          invalidText={form.formState.errors[field.name]?.message}
+                          id="ipvOutCome"
+                          titleText={t('ipvOutCome', 'IPV Outcome')}
+                          onChange={(e) => {
+                            field.onChange(e.selectedItem);
+                          }}
+                          selectedItem={field.value}
+                          label="Choose option"
+                          items={contactIPVOutcomeOptions.map((r) => r.value)}
+                          itemToString={(item) => {
+                            return contactIPVOutcomeOptions.find((r) => r.value === item)?.label ?? '';
+                          }}
+                        />
+                      )}
+                    />
+                  </Column>
+                </>
+              )}
+              <span className={styles.sectionHeader}>{t('baselineInformation', 'Baseline Information')}</span>
+              <Column>
+                <Controller
+                  control={form.control}
+                  name="baselineStatus"
+                  render={({ field }) => (
+                    <Dropdown
+                      ref={field.ref}
+                      invalid={form.formState.errors[field.name]?.message}
+                      invalidText={form.formState.errors[field.name]?.message}
+                      id="baselineStatus"
+                      titleText={t('baselineStatus', 'HIV Status')}
+                      onChange={(e) => {
+                        field.onChange(e.selectedItem);
                       }}
+                      initialSelectedItem={field.value}
+                      label="Select HIV Status"
+                      items={hivStatus.map((r) => r.value)}
+                      itemToString={(item) => hivStatus.find((r) => r.value === item)?.label ?? ''}
+                    />
+                  )}
+                />
+              </Column>
+              <Column>
+                <Controller
+                  control={form.control}
+                  name="preferedPNSAproach"
+                  render={({ field }) => (
+                    <Dropdown
+                      ref={field.ref}
+                      invalid={form.formState.errors[field.name]?.message}
+                      invalidText={form.formState.errors[field.name]?.message}
+                      id="preferedPNSAproach"
+                      titleText={t('preferedPNSAproach', 'Prefered PNS Aproach')}
+                      onChange={(e) => {
+                        field.onChange(e.selectedItem);
+                      }}
+                      initialSelectedItem={field.value}
+                      label="Select Aproach"
+                      items={pnsAproach.map((r) => r.value)}
+                      itemToString={(item) => pnsAproach.find((r) => r.value === item)?.label ?? ''}
                     />
                   )}
                 />
               </Column>
             </>
           )}
-          <span className={styles.sectionHeader}>{t('baselineInformation', 'Baseline Information')}</span>
-          <Column>
-            <Controller
-              control={form.control}
-              name="baselineStatus"
-              render={({ field }) => (
-                <Dropdown
-                  ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
-                  id="baselineStatus"
-                  titleText={t('baselineStatus', 'HIV Status')}
-                  onChange={(e) => {
-                    field.onChange(e.selectedItem);
-                  }}
-                  initialSelectedItem={field.value}
-                  label="Select HIV Status"
-                  items={hivStatus.map((r) => r.value)}
-                  itemToString={(item) => hivStatus.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            />
-          </Column>
-          <Column>
-            <Controller
-              control={form.control}
-              name="preferedPNSAproach"
-              render={({ field }) => (
-                <Dropdown
-                  ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
-                  id="preferedPNSAproach"
-                  titleText={t('preferedPNSAproach', 'Prefered PNS Aproach')}
-                  onChange={(e) => {
-                    field.onChange(e.selectedItem);
-                  }}
-                  initialSelectedItem={field.value}
-                  label="Select Aproach"
-                  items={pnsAproach.map((r) => r.value)}
-                  itemToString={(item) => pnsAproach.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            />
-          </Column>
         </Stack>
 
         <ButtonSet className={styles.buttonSet}>

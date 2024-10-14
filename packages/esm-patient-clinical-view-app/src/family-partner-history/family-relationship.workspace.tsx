@@ -1,17 +1,16 @@
 import { Button, ButtonSet, Column, ComboBox, DatePicker, DatePickerInput, Form, Stack, TextArea } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ExtensionSlot, useConfig, useSession } from '@openmrs/esm-framework';
-import React, { useState } from 'react';
+import { useConfig, useSession } from '@openmrs/esm-framework';
+import React from 'react';
 import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import PatientInfo from '../case-management/workspace/patient-info.component';
 import { ConfigObject } from '../config-schema';
+import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
 import { relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
 import { uppercaseText } from '../utils/expression-helper';
 import styles from './family-relationship.scss';
 import { useMappedRelationshipTypes } from './relationships.resource';
-import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
 
 const schema = relationshipFormSchema
   .extend({
@@ -75,7 +74,6 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
   return (
     <FormProvider {...form}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-        <span className={styles.caseFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
         <Stack gap={5} className={styles.grid}>
           <PatientSearchCreate />
           <span className={styles.sectionHeader}>{t('relationship', 'Relationship')}</span>
