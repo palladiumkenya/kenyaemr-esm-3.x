@@ -13,9 +13,22 @@ import styles from './family-relationship.scss';
 import { useMappedRelationshipTypes } from './relationships.resource';
 import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
 
-const schema = relationshipFormSchema.extend({
-  notes: z.string().optional(),
-});
+const schema = relationshipFormSchema
+  .extend({
+    notes: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      return !(data.mode === 'search' && !data.personB);
+    },
+    { message: 'Required', path: ['personB'] },
+  )
+  .refine(
+    (data) => {
+      return !(data.mode === 'create' && !data.personBInfo);
+    },
+    { path: ['personBInfo'], message: 'Please provide patient information' },
+  );
 type FormData = z.infer<typeof schema>;
 
 type RelationshipFormProps = {

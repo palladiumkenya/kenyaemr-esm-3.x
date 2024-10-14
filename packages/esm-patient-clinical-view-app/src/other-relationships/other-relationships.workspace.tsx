@@ -1,21 +1,33 @@
 import { Button, ButtonSet, Column, ComboBox, DatePicker, DatePickerInput, Form, Stack, TextArea } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
-import React, { useState } from 'react';
+import { useConfig, useSession } from '@openmrs/esm-framework';
+import React from 'react';
 import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
-import { useMappedRelationshipTypes, usePatientRelationships } from '../family-partner-history/relationships.resource';
+import { useMappedRelationshipTypes } from '../family-partner-history/relationships.resource';
 import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
 import { relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
 import { uppercaseText } from '../utils/expression-helper';
 import styles from './other-relationships.scss';
 
-const schema = relationshipFormSchema.extend({
-  notes: z.string().optional(),
-});
+const schema = relationshipFormSchema
+  .extend({
+    notes: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      return !(data.mode === 'search' && !data.personB);
+    },
+    { message: 'Required', path: ['personB'] },
+  )
+  .refine(
+    (data) => {
+      return !(data.mode === 'create' && !data.personBInfo);
+    },
+    { path: ['personBInfo'], message: 'Please provide patient information' },
+  );
 type FormData = z.infer<typeof schema>;
 
 type OtherRelationshipsFormProps = {

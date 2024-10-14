@@ -143,8 +143,30 @@ export const saveRelationship = async (
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Patient created succesfully' });
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating patient' });
-      return; // Don't contunue if an erro ocuures
+      throw error; // Don't contunue if an erro ocuures
     }
+  }
+
+  // Hanldle add personB attributes if search mode
+  if (data.mode === 'search' && extraAttributes.length > 0) {
+    const results = await Promise.allSettled(
+      extraAttributes.map((attr) =>
+        openmrsFetch(`${restBaseUrl}/person/${patient}/attribute`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            attr,
+          }),
+        }),
+      ),
+    );
+    results.forEach((res) => {
+      if (res.status === 'rejected') {
+        return showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating patient attribute' });
+      }
+    });
   }
 
   // Handle storage of patient demographics in obs
@@ -172,8 +194,10 @@ export const saveRelationship = async (
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Patient Demographics saved succesfuly' });
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error saving patient demographics' });
+      throw error;
     }
   }
+
   // Handle Relationship Creation
   try {
     await openmrsFetch(`/ws/rest/v1/relationship`, {
@@ -190,5 +214,6 @@ export const saveRelationship = async (
     mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship'));
   } catch (error) {
     showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error saving relationship' });
+    throw error;
   }
 };

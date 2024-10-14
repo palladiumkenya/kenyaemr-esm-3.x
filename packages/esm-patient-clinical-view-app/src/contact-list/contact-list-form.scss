@@ -1,84 +1,46 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
 
 .heading {
   @include type.type-style('heading-compact-01');
-  margin: spacing.$spacing-05 0 spacing.$spacing-05;
-}
-
-.warningContainer {
-  background-color: $carbon--red-50;
-  padding: spacing.$spacing-04;
-  margin: spacing.$spacing-03 0 spacing.$spacing-03;
-  display: flex;
-  justify-content: space-between;
-  .warning {
-    @include type.type-style('heading-compact-01');
-    color: $ui-05;
-  }
+  margin: layout.$spacing-05 0 layout.$spacing-05;
 }
 
 .form {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  width: 50%;
-}
-
-.grid {
-  margin: 0 spacing.$spacing-05;
-  padding: 0rem;
-}
-
-.input {
-  margin-top: spacing.$spacing-05;
-}
-
-.inputRow {
-  margin-top: spacing.$spacing-05;
-  width: 50%; // Adjust width as per your design requirements
-}
-
-.datePickersRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: spacing.$spacing-05; // Adjust gap between columns
-  align-items: center;
-}
-
-.datePickerInput {
   width: 100%;
 }
 
+.grid {
+  margin: layout.$spacing-05 layout.$spacing-05;
+  padding: layout.$spacing-05 0 0 0;
+}
+
 .button {
-  height: spacing.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
-  min-width: 20%;
+  min-width: 50% !important;
 }
 
 .buttonSet {
   padding: 0rem;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   display: flex;
-  justify-content: flex-end;
-  gap: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-05;
-}
-.inlineActions {
-  display: flex;
-  gap: spacing.$spacing-05; /* Adjust the spacing as needed */
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: layout.$spacing-05;
 }
 
-.contactFormTitle {
+.formTitle {
   @include type.type-style('heading-02');
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   row-gap: 1.5rem;
   position: relative;
 
@@ -101,26 +63,9 @@
   @include type.type-style('heading-02');
 }
 
-:global(.omrs-breakpoint-lt-desktop) {
-  .form {
-    height: var(--tablet-workspace-window-height);
-  }
-
-  .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
-    justify-content: flex-end;
-    gap: spacing.$spacing-05;
-  }
-}
-
-/* New Styles for Facility and Visit Type */
-.facilityVisitRow {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: spacing.$spacing-05; /* Adjust gap between columns */
-}
-
-.facilityColumn {
-  flex: 1 1 0%; /* Makes columns take up equal space */
+.datePickerInput span,
+.datePickerInput div,
+.datePickerInput input,
+.datePickerInput {
+  width: 100% !important;
 }
