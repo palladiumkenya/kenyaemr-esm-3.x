@@ -56,13 +56,13 @@ export const WaitingQueue: React.FC = () => {
       Ids: patient.identifiers[0]?.identifier || 'N/A',
       address4: patient.person.preferredAddress?.address4 || 'N/A',
     })) || [];
-  const handleMoreDetails = () => {
-    launchWorkspace('add-more-details-form', {
-      workspaceTitle: 'Admission form',
+  const handleAdmissionForm = () => {
+    launchWorkspace('patient-additional-info-form', {
+      workspaceTitle: t('admissionForm', 'Admission form'),
     });
   };
   const actionColumn = () => (
-    <Button kind="tertiary" className={styles.actionBtn} onClick={handleMoreDetails}>
+    <Button kind="tertiary" className={styles.actionBtn} onClick={handleAdmissionForm}>
       {t('admit', 'Admit')}
     </Button>
   );

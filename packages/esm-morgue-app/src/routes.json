@@ -23,8 +23,8 @@
   ],
    "workspaces": [
     {
-      "name": "add-more-details-form",
-      "component": "addMoreDetailsWorkspace",
+      "name": "patient-additional-info-form",
+      "component": "patientAdditionalInfoForm",
       "title": "add more details",
       "type": "other-form"
     }

@@ -33,7 +33,7 @@ export const morgueDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const addMoreDetailsWorkspace = getAsyncLifecycle(
-  () => import('./workspaces/addmoredetails.workspace'),
+export const patientAdditionalInfoForm = getAsyncLifecycle(
+  () => import('./workspaces/patientAdditionalInfoForm.workspace'),
   options,
 );

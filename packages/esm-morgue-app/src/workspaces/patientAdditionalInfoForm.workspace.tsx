@@ -21,13 +21,13 @@ import {
 import { useLayoutType } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './addmoredetails.scss';
+import styles from './patientAdditionalInfoForm.scss';
 
-interface ProvideModalProps {
+interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
 }
 
-const MorgueEnrollForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
+const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
 
@@ -108,11 +108,11 @@ const MorgueEnrollForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
           />
         </Column>
       </Stack>
-      <ButtonSet className={styles.formButtonSet}>
-        <Button className={styles.buttonButton} size="lg" kind="secondary" onClick={closeWorkspace}>
+      <ButtonSet className={styles.buttonSet}>
+        <Button className={styles.button} size="lg" kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.buttonButton} kind="primary" size="lg" type="submit">
+        <Button className={styles.button} kind="primary" size="lg" type="submit">
           {t('admit', 'Admit')}
         </Button>
       </ButtonSet>
@@ -120,4 +120,4 @@ const MorgueEnrollForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
   );
 };
 
-export default MorgueEnrollForm;
+export default PatientAdditionalInfoForm;
