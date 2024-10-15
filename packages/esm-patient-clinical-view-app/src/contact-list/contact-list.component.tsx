@@ -189,8 +189,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         </Button>
       </CardHeader>
       <DataTable
-        useZebraStyles
-        size="sm"
         rows={tableRows ?? []}
         headers={headers}
         render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (

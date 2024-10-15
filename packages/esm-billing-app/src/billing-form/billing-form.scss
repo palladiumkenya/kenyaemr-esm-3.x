@@ -58,3 +58,11 @@
 .sectionHeader {
   @include type.type-style('heading-02');
 }
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
