@@ -87,7 +87,7 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
   const handleAddHistory = () => {
     launchWorkspace('other-relationship-form', {
       workspaceTitle: 'Other Relationship Form',
-      rootPersonUuid: patientUuid,
+      patientUuid,
     });
   };
 

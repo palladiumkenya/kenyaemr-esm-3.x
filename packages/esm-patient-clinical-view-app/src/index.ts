@@ -5,7 +5,7 @@ import ClinicalEncounterDashboard from './clinical-encounter/dashboard/clinical-
 import ClinicalViewSection from './clinical-view-group/clinical-view-section.component';
 import { createDashboardGroup } from './clinical-view-group/createDashboardGroup';
 import { configSchema } from './config-schema';
-import BirthDateCalculator from './contact-list/birthdate-calculator.component';
+import BirthDateCalculator from './relationships/modals/birthdate-calculator.modal';
 import ContactList from './contact-list/contact-list.component';
 import ContactListForm from './contact-list/contact-list.workspace';
 import {

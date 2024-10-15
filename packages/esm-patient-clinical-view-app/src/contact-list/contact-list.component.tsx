@@ -100,6 +100,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const handleAddContact = () => {
     launchWorkspace('contact-list-form', {
       workspaceTitle: 'Contact Form',
+      patientUuid,
     });
   };
 
