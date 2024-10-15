@@ -1,40 +1,20 @@
-import { Button, Checkbox, Popover, PopoverContent, SkeletonIcon, usePrefix } from '@carbon/react';
-import { CloudSatelliteServices } from '@carbon/react/icons';
-import React, { ChangeEvent, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Checkbox, SkeletonIcon, usePrefix } from '@carbon/react';
+import React, { ChangeEvent } from 'react';
 import { MappedBill } from '../../types';
 import styles from './payment-history.scss';
 import { useBillsServiceTypes } from './use-bills-service-types';
 
-interface TableToolbarFilterProps {
-  onApplyFilter: (selectedCheckboxes: Array<string>) => void;
-  onResetFilter: () => void;
-  bills: MappedBill[];
-}
-
-export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: TableToolbarFilterProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
+export const ServiceTypeFilter = ({
+  selectedServiceTypeCheckboxes,
+  bills,
+  applyServiceTypeFilter,
+}: {
+  selectedServiceTypeCheckboxes: Array<string>;
+  bills: Array<MappedBill>;
+  applyServiceTypeFilter: (filters: Array<string>) => void;
+}) => {
   const { billsServiceTypes, isLoading } = useBillsServiceTypes(bills);
-
-  const { t } = useTranslation();
-
   const prefix = usePrefix();
-
-  const handleApplyFilter = () => {
-    setIsOpen(false);
-    if (onApplyFilter) {
-      onApplyFilter(selectedCheckboxes);
-    }
-  };
-
-  const handleResetFilter = () => {
-    setIsOpen(false);
-    setSelectedCheckboxes([]);
-    if (onResetFilter) {
-      onResetFilter();
-    }
-  };
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const checkboxId = e.target.id;
@@ -44,9 +24,9 @@ export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: Table
     const serviceTypeUUID = billsServiceTypes.find((s) => s.display === checkboxValue.innerText).uuid;
 
     if (isChecked && checkboxValue) {
-      setSelectedCheckboxes([...selectedCheckboxes, serviceTypeUUID]);
+      applyServiceTypeFilter([...selectedServiceTypeCheckboxes, serviceTypeUUID]);
     } else {
-      setSelectedCheckboxes(selectedCheckboxes.filter((item) => item !== serviceTypeUUID));
+      applyServiceTypeFilter(selectedServiceTypeCheckboxes.filter((item) => item !== serviceTypeUUID));
     }
   };
 
@@ -55,39 +35,19 @@ export const ServiceTypeFilter = ({ onApplyFilter, onResetFilter, bills }: Table
   }
 
   return (
-    <Popover align={'left'} caret={true} open={isOpen} onRequestClose={() => setIsOpen(false)}>
-      <button
-        aria-label="Filtering"
-        type="button"
-        aria-expanded={isOpen}
-        onClick={() => {
-          setIsOpen(!isOpen);
-        }}
-        className={`${prefix}--toolbar-action ${prefix}--overflow-menu`}>
-        <CloudSatelliteServices />
-      </button>
-      <PopoverContent id="containerCheckbox">
-        <div className={styles.checkBoxWrapper}>
-          <fieldset className={`${prefix}--fieldset`}>
-            <legend className={`${prefix}--label`}>Filter by service type</legend>
-            {billsServiceTypes.length === 0 && <p className={styles.noServiceTypes}>No Service Types In Bills Range</p>}
-            {billsServiceTypes.map((type) => (
-              <Checkbox
-                labelText={type.display}
-                id={`checkbox-${type.display}`}
-                onChange={handleCheckboxChange}
-                checked={selectedCheckboxes.includes(type.uuid)}
-              />
-            ))}
-          </fieldset>
-        </div>
-        <Button kind="secondary" title="Reset filters" onClick={handleResetFilter}>
-          {t('resetFilters', ' Reset filters')}
-        </Button>
-        <Button kind="primary" title="Reset filters" onClick={handleApplyFilter}>
-          {t('applyFilter', 'Apply filter')}
-        </Button>
-      </PopoverContent>
-    </Popover>
+    <div className={styles.checkBoxWrapper}>
+      <fieldset className={`${prefix}--fieldset`}>
+        <legend className={`${prefix}--label`}>Service type</legend>
+        {billsServiceTypes.length === 0 && <p className={styles.noServiceTypes}>No Service Types In Bills Range</p>}
+        {billsServiceTypes.map((type) => (
+          <Checkbox
+            labelText={type.display}
+            id={`checkbox-${type.display}`}
+            onChange={handleCheckboxChange}
+            checked={selectedServiceTypeCheckboxes.includes(type.uuid)}
+          />
+        ))}
+      </fieldset>
+    </div>
   );
 };
