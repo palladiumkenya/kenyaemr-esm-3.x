@@ -21,7 +21,7 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   };
 
   if (isUUID(urlSegment)) {
-    urlSegment = 'morgue';
+    urlSegment = location.pathname.split('/').at(-3);
   }
 
   return (

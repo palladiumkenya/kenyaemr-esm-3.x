@@ -1,0 +1,40 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors'; // Import Carbon colors
+
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.genericContainer {
+  margin: layout.$spacing-05;
+}
+
+.contentSwitcherWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: layout.$spacing-05;
+}
+
+.contentSwitcher {
+  width: 35rem;
+}
+
+.statusSuccessIcon {
+  color: colors.$green-50;
+}
+
+.statusWarningIcon {
+  color: colors.$red-60;
+}
+.statusPendingIcon {
+  color: colors.$yellow-30;
+}
+
+.statusIconWrapper {
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-right: 0.5rem;
+  }
+}

@@ -1,7 +1,7 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   margin: 2rem 0;

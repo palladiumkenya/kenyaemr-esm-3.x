@@ -1,7 +1,7 @@
 import { DatePicker, DatePickerInput } from '@carbon/react';
 import React from 'react';
-import styles from './payment-history.scss';
 import { useTranslation } from 'react-i18next';
+import styles from './payment-history.scss';
 
 export const TableToolBarDateRangePicker = ({
   onChange,
@@ -24,12 +24,14 @@ export const TableToolBarDateRangePicker = ({
         placeholder="mm/dd/yyyy"
         labelText={t('startDate', 'Start date')}
         size="md"
+        maxDate={currentDate.toISOString()}
       />
       <DatePickerInput
         id="date-picker-input-id-finish"
         placeholder="mm/dd/yyyy"
         labelText={t('endDate', 'End date')}
         size="md"
+        maxDate={currentDate.toISOString()}
       />
     </DatePicker>
   );

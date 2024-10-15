@@ -20,7 +20,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
 
   const handleNavigateToDeceasedDetailsView = () =>
     navigate({
-      to: window.getOpenmrsSpaBase() + `home/morgue/patient/${patientInfo.uuid}/details`,
+      to: window.getOpenmrsSpaBase() + `home/morgue/patient/${patientInfo.uuid}`,
     });
 
   return (

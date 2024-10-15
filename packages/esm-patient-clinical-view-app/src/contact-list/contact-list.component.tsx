@@ -100,6 +100,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const handleAddContact = () => {
     launchWorkspace('contact-list-form', {
       workspaceTitle: 'Contact Form',
+      patientUuid,
     });
   };
 
@@ -188,8 +189,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         </Button>
       </CardHeader>
       <DataTable
-        useZebraStyles
-        size="sm"
         rows={tableRows ?? []}
         headers={headers}
         render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
