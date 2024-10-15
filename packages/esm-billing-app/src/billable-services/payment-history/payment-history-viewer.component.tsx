@@ -10,20 +10,18 @@ import {
 import { isDesktop, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
-import flatMapDeep from 'lodash-es/flatMapDeep';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useBills } from '../../billing.resource';
+import { useRenderedRows } from '../../hooks/use-rendered-rows';
 import { useClockInStatus, usePaymentPoints } from '../../payment-points/payment-points.resource';
-import { MappedBill, PaymentStatus } from '../../types';
+import { PaymentStatus } from '../../types';
 import { AppliedFilterTags } from './applied-filter-tages.component';
-import { CashierFilter } from './cashier-filter.component';
+import { Filter } from './filter.component';
 import { PaymentHistoryTable } from './payment-history-table.component';
 import styles from './payment-history.scss';
 import { PaymentTotals } from './payment-totals';
-import { PaymentTypeFilter } from './payment-type-filter.component';
-import { ServiceTypeFilter } from './service-type-filter.component';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 
 export const headers = [
@@ -35,140 +33,31 @@ export const headers = [
 ];
 
 export const PaymentHistoryViewer = () => {
-  const [renderedRows, setRenderedRows] = useState<null | MappedBill[]>(null);
-  const [dateRange, setDateRange] = useState<Date[]>([dayjs().startOf('day').toDate(), new Date()]);
+  const [dateRange, setDateRange] = useState<Array<Date>>([dayjs().startOf('day').toDate(), new Date()]);
   const { paymentPointUUID } = useParams();
-  const { paymentPoints } = usePaymentPoints();
-  const { isClockedInCurrentPaymentPoint } = useClockInStatus(paymentPointUUID);
-
   const isOnPaymentPointPage = Boolean(paymentPointUUID);
+
+  const { isClockedInCurrentPaymentPoint } = useClockInStatus(paymentPointUUID);
+  const { paymentPoints } = usePaymentPoints();
+
   const paidBillsResponse = useBills('', isOnPaymentPointPage ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
   const { bills } = paidBillsResponse;
 
   const [pageSize, setPageSize] = useState(10);
-  const { paginated, goTo, results, currentPage } = usePagination(renderedRows ?? [], pageSize);
-  const { pageSizes } = usePaginationInfo(
-    pageSize,
-    renderedRows ? renderedRows.length : 0,
-    currentPage,
-    results?.length,
-  );
+  const [appliedFilters, setAppliedFilters] = useState<Array<string>>([]);
+
+  const renderedRows = useRenderedRows(bills, appliedFilters);
+
+  const { paginated, goTo, results, currentPage } = usePagination(renderedRows, pageSize);
+  const { pageSizes } = usePaginationInfo(pageSize, renderedRows.length, currentPage, results?.length);
 
   const { t } = useTranslation();
 
-  const [selectedPaymentTypeCheckBoxes, setSelectedPaymentTypeCheckBoxes] = useState<string[]>([]);
-  const [selectedCashierCheckboxes, setSelectedCashierCheckboxes] = useState<string[]>([]);
-  const [selectedServiceTypeCheckboxes, setSelectedServiceTypeCheckboxes] = useState<string[]>([]);
-
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
 
-  useEffect(() => {
-    if (bills.length > 0 && renderedRows === null) {
-      if (isOnPaymentPointPage) {
-        const filteredByCashPoint = bills.filter((bill) => bill.cashPointUuid === paymentPointUUID);
-        setRenderedRows(filteredByCashPoint);
-      } else {
-        setRenderedRows(bills);
-      }
-    }
-  }, [bills, isOnPaymentPointPage, paymentPointUUID, renderedRows]);
-
-  const handleFilterByDateRange = (dates: Date[]) => {
+  const handleFilterByDateRange = (dates: Array<Date>) => {
     setDateRange(dates);
   };
-
-  const getAllValues = (obj: Object) => {
-    return flatMapDeep(obj, (value) => {
-      if (typeof value === 'object' && value !== null) {
-        return getAllValues(value);
-      }
-      return value;
-    });
-  };
-
-  useEffect(() => {
-    if (bills.length === 0) {
-      return;
-    }
-    const filteredBills = bills
-      .filter((row) => {
-        if (selectedCashierCheckboxes.length === 0) {
-          return true;
-        }
-        const rowValues: string[] = getAllValues(row);
-        return selectedCashierCheckboxes.some((cashier) =>
-          rowValues.some((value) => String(value).toLowerCase().includes(cashier.toLowerCase())),
-        );
-      })
-      .filter((row) => {
-        if (selectedPaymentTypeCheckBoxes.length === 0) {
-          return true;
-        }
-        const rowValues: string[] = getAllValues(row);
-        return selectedPaymentTypeCheckBoxes.some((paymentType) =>
-          rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-        );
-      })
-      .filter((row) => {
-        if (selectedServiceTypeCheckboxes.length === 0) {
-          return true;
-        }
-        const rowValues: string[] = getAllValues(row);
-        return selectedServiceTypeCheckboxes.some((serviceType) =>
-          rowValues.some((value) => String(value).toLowerCase().includes(serviceType.toLowerCase())),
-        );
-      });
-
-    setRenderedRows(filteredBills);
-    goTo(1);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCashierCheckboxes, selectedPaymentTypeCheckBoxes, selectedServiceTypeCheckboxes]);
-
-  const onApplyCashierFilter = (appliedCashierCheckboxes: Array<string>) => {
-    setSelectedCashierCheckboxes(appliedCashierCheckboxes);
-  };
-
-  const onApplyPaymentTypeFilter = (appliedPaymentTypeCheckboxes: Array<string>) => {
-    setSelectedPaymentTypeCheckBoxes(appliedPaymentTypeCheckboxes);
-  };
-
-  const onApplyServiceTypeFilter = (appliedServiceTypes: Array<string>) => {
-    setSelectedServiceTypeCheckboxes(appliedServiceTypes);
-  };
-
-  const handleOnResetCashierFilter = () => {
-    setSelectedCashierCheckboxes([]);
-  };
-
-  const handleOnResetPaymentTypeFilter = () => {
-    setSelectedPaymentTypeCheckBoxes([]);
-  };
-
-  const handleOnResetServiceTypeFilter = () => {
-    setSelectedServiceTypeCheckboxes([]);
-  };
-
-  const cashierTags = selectedCashierCheckboxes.map((c) => {
-    return {
-      tag: c,
-      type: 'Cashier',
-    };
-  });
-
-  const paymentTypeTags = selectedPaymentTypeCheckBoxes.map((t) => {
-    return {
-      tag: t,
-      type: 'Payment Type',
-    };
-  });
-
-  const serviceTypeTags = selectedServiceTypeCheckboxes.map((t) => {
-    return {
-      tag: t,
-      type: 'Service Type',
-    };
-  });
 
   const openClockInModal = () => {
     const dispose = showModal('clock-in-modal', {
@@ -184,10 +73,17 @@ export const PaymentHistoryViewer = () => {
     });
   };
 
+  const resetFilters = () => setAppliedFilters([]);
+
+  const applyFilters = (filters: string[]) => {
+    setAppliedFilters(filters);
+    goTo(1);
+  };
+
   return (
     <div className={styles.table}>
-      <PaymentTotals renderedRows={renderedRows} selectedPaymentTypeCheckBoxes={selectedPaymentTypeCheckBoxes} />
-      <DataTable rows={results ?? []} headers={headers} isSortable>
+      <PaymentTotals renderedRows={renderedRows} appliedFilters={appliedFilters} />
+      <DataTable rows={results} headers={headers} isSortable>
         {(tableData) => (
           <TableContainer>
             <div className={styles.tableToolBar}>
@@ -196,21 +92,8 @@ export const PaymentHistoryViewer = () => {
                   <TableToolbarSearch
                     onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
                   />
-                  <AppliedFilterTags tags={[...cashierTags, ...paymentTypeTags, ...serviceTypeTags]} />
-                  <ServiceTypeFilter
-                    onApplyFilter={onApplyServiceTypeFilter}
-                    onResetFilter={handleOnResetServiceTypeFilter}
-                    bills={bills}
-                  />
-                  <PaymentTypeFilter
-                    onApplyFilter={onApplyPaymentTypeFilter}
-                    onResetFilter={handleOnResetPaymentTypeFilter}
-                  />
-                  <CashierFilter
-                    bills={bills}
-                    onApplyFilter={onApplyCashierFilter}
-                    onResetFilter={handleOnResetCashierFilter}
-                  />
+                  <AppliedFilterTags appliedFilters={appliedFilters} />
+                  <Filter applyFilters={applyFilters} resetFilters={resetFilters} bills={bills} />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
                   {isOnPaymentPointPage && !isClockedInCurrentPaymentPoint && (
                     <Button className={styles.clockIn} onClick={openClockInModal}>

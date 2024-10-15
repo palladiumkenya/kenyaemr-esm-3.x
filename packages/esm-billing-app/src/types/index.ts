@@ -70,6 +70,7 @@ export interface LineItem {
   resourceVersion: string;
   paymentStatus: string;
   itemOrServiceConceptUuid: string;
+  serviceTypeUuid: string;
 }
 
 interface PatientLink {
