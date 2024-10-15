@@ -58,7 +58,7 @@ export const billingDashboardLink = getSyncLifecycle(
 
 export const billingOverviewLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing',
+    name: '',
     title: 'Overview',
   }),
   options,
@@ -66,7 +66,7 @@ export const billingOverviewLink = getSyncLifecycle(
 
 export const paymentHistoryLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing/payment-history',
+    name: 'payment-history',
     title: 'Payment History',
   }),
   options,
@@ -74,7 +74,7 @@ export const paymentHistoryLink = getSyncLifecycle(
 
 export const paymentPointsLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing/payment-points',
+    name: 'payment-points',
     title: 'Payment Points',
   }),
   options,
@@ -82,7 +82,7 @@ export const paymentPointsLink = getSyncLifecycle(
 
 export const billManagerLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing/bill-manager',
+    name: 'bill-manager',
     title: 'Bill Manager',
   }),
   options,
@@ -90,7 +90,7 @@ export const billManagerLink = getSyncLifecycle(
 
 export const chargeableItemsLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'billing/charge-items',
+    name: 'charge-items',
     title: 'Charge Items',
   }),
   options,

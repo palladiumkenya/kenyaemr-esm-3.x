@@ -25,12 +25,11 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
     if (location.pathname.includes('payment-points')) {
       urlSegment = location.pathname.split('/').at(-2);
     } else {
-      urlSegment = location.pathname.split('/').at(-4);
+      urlSegment = '';
     }
-  }
-
-  if (location.pathname.includes('claims')) {
-    urlSegment = location.pathname.split('/').at(-5);
+  } else if (location.pathname.endsWith('claims') || location.pathname.endsWith('claims/')) {
+    // Filling claims form screen
+    urlSegment = '';
   }
 
   const isActive = nameSegment === urlSegment;
