@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import ProvidersComponent from './providers-component/providers.component';
+import ProvidersComponent from './component/providers.component';
 import { providerBasePath } from './constants';
 
 const Root: React.FC = () => {

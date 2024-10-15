@@ -17,100 +17,48 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       actions: read
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "18"
 
       - name: Cache dependencies
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      - name: Set yarn version
-        run: yarn set version berry
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: YARN_ENABLE_IMMUTABLE_INSTALLS=false yarn install
+        run: yarn install --immutable
 
       - name: Setup local cache server for Turborepo
-        uses: felixmosh/turborepo-gh-artifacts@v1
+        uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
+          server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: Run lint, typechecking and tests
-        run: yarn run verify
+      - name: Run lint, type checks and tests
+        run: yarn verify
 
       - name: Run build
-        run: yarn turbo run build --color
+        run: yarn turbo run build --concurrency=5
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: packages
           path: |
             packages/**/dist
+          overwrite: true
 
-
-  deploy_esm_patient_flags_app:
-    runs-on: ubuntu-latest
-
-    env:
-      DIR_NAME: "esm-patient-flags-app"
-      ESM_NAME: "@kenyaemr/esm-patient-flags-app"
-      JS_NAME: "kenyaemr-esm-patient-flags-app.js"
-
-    needs: build
-
-    if: ${{ github.event_name == 'push' }}
-
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
-
-      - name: Compute Timestamp
-        run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-      - name: Prepare Directory
-        shell: bash
-        run: |
-          mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
-          mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
-          ls dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
-
-  deploy_esm_version_app:
-    runs-on: ubuntu-latest
-
-    env:
-      DIR_NAME: "esm-version-app"
-      ESM_NAME: "@kenyaemr/esm-version-app"
-      JS_NAME: "kenyaemr-esm-version-app.js"
-
-    needs: build
-
-    if: ${{ github.event_name == 'push' }}
-
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
-
-      - name: Compute Timestamp
-        run: echo "TIMESTAMP=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
-
-      - name: Prepare Directory
-        shell: bash
-        run: |
-          mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
-          mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
-          ls dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
   pre_release:
     runs-on: ubuntu-latest
 
@@ -119,59 +67,46 @@ jobs:
     if: ${{ github.event_name == 'push' }}
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: "18"
           registry-url: "https://registry.npmjs.org"
 
       - name: Cache dependencies
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap
-
-      - name: Build
-        run: yarn turbo run build --color
-
-      - name: Patch
-        run: yarn lerna version patch --no-git-tag-version --no-push --yes
+        run: yarn install --immutable
 
       - name: Version
-        run: npx lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
+        run: yarn workspaces foreach --worktree --topological --exclude @kenyaemr/esm-3.x-apps version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
+
+      - name: Build
+        run: yarn turbo run build --concurrency=5
 
       - run: git config user.email "info@thepalladiumgroup.com" && git config user.name "KenyaEMR CI"
       - run: git add . && git commit -m "Prerelease version" --no-verify
 
       - name: Pre-release
-        run: yarn run ci:prepublish
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      - name: see directory
-        shell: bash
-        run: |
-          ls -alh
 
-  Trigger_server_build:
-    runs-on: ubuntu-latest
-    needs: pre_release
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Invoke workflow without inputs. Don't wait for result
-        uses: aurelien-baudet/workflow-dispatch@v2
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          workflow: KenyaEMR CI
-          repo: palladiumkenya/openmrs-config-kenyaemr
-          token: ${{ secrets.PERSONAL_TOKENS }}
-          wait-for-completion: false 
+          name: packages
+          path: |
+            packages/**/dist
+          overwrite: true
+
   release:
     runs-on: ubuntu-latest
 
@@ -180,28 +115,25 @@ jobs:
     if: ${{ github.event_name == 'release' }}
 
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: "16"
+          node-version: "18"
           registry-url: "https://registry.npmjs.org"
 
       - name: Cache dependencies
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap
+        run: yarn install --immutable
 
-      - name: Build
-        run: yarn turbo run build --color
-
-      - name: Publish
-        run: yarn run ci:publish
+      - run: yarn turbo run build --color
+      - run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

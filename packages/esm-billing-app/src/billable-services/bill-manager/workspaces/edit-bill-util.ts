@@ -1,5 +1,6 @@
 export const createEditBillPayload = (lineItem, data, bill) => {
-  const updatedLineItem = { ...lineItem, quantity: parseInt(data?.quantity) };
+  const updatedQuantityLineItem = { ...lineItem, quantity: parseInt(data?.quantity) };
+  const updatedLineItem = { ...updatedQuantityLineItem, price: parseInt(data?.price) };
 
   const updatedBill = {
     ...bill,

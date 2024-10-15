@@ -20,14 +20,6 @@ const emptyTestProps = {
   formConceptMap: [],
 };
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-  };
-});
-
 describe('EncounterObservations Component', () => {
   it('renders observations correctly', () => {
     render(<EncounterObservations {...testProps} />);

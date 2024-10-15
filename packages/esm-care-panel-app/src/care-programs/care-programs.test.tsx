@@ -42,13 +42,6 @@ const mockAPIResponse: Array<PatientCarePrograms> = [
   },
 ];
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useVisit: jest.fn().mockReturnValue({ currentVisit: { uuid: 'some-visitUuid' } }),
-  useLayoutType: jest.fn().mockReturnValue('tablet'),
-  launchWorkspace: jest.fn(),
-}));
-
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   launchStartVisitPrompt: jest.fn(),

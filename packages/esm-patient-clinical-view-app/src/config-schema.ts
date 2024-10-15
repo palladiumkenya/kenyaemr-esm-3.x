@@ -8,6 +8,7 @@ export const configSchema = {
     _default: {
       mchMotherConsultation: 'c6d09e05-1f25-4164-8860-9f32c5a02df0',
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
+      kpPeerCalender: 'c4f9db39-2c18-49a6-bf9b-b243d673c64d',
     },
   },
   caseManagementForms: {
@@ -23,8 +24,8 @@ export const configSchema = {
       {
         id: 'home-visit-checklist',
         title: 'Home Visit Checklist Form',
-        formUuid: 'dbe7db2d-abed-47b6-904f-1308b997d7bf',
-        encounterTypeUuid: '4224f8bf-11b2-4e47-a958-1dbdfd7fa41d',
+        formUuid: 'ac3152de-1728-4786-828a-7fb4db0fc384',
+        encounterTypeUuid: 'bfbb5dc2-d3e6-41ea-ad86-101336e3e38f',
       },
     ],
   },
@@ -42,6 +43,7 @@ export const configSchema = {
       htsLinkage: '050a7f12-5c52-4cad-8834-863695af335d',
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
       clinicalEncounterFormUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
+      peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
     },
   },
   defaulterTracingEncounterUuid: {
@@ -122,6 +124,11 @@ export const configSchema = {
     _description: 'HIV Program UUID',
     _default: 'dfdc6d40-2f2f-463d-ba90-cc97350441a8',
   },
+  kvpProgramUuid: {
+    _type: Type.String,
+    _description: 'KVP Program UUID',
+    _default: '7447305a-18a7-11e9-ab14-d663bd873d93',
+  },
   contactPersonAttributesUuid: {
     _type: Type.Object,
     _description: 'Contact created patient attributes UUID',
@@ -175,6 +182,11 @@ export const configSchema = {
         display: 'SNS/SNS',
       },
     ],
+  },
+  peerEducatorRelationship: {
+    _type: Type.String,
+    _description: 'Peer Educator Relationship type',
+    _default: '96adecc2-e7cd-41d0-b577-08eb4834abcb',
   },
   pnsRelationships: {
     _type: Type.Array,
@@ -238,8 +250,10 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  peerEducatorRelationship: string;
   caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
-  encounterTypes: { mchMotherConsultation: string; hivTestingServices: string };
+  peerCalendarOutreactForm: string;
+  encounterTypes: { mchMotherConsultation: string; hivTestingServices: string; kpPeerCalender: string };
   formsList: {
     labourAndDelivery: string;
     antenatal: string;
@@ -249,6 +263,7 @@ export interface ConfigObject {
     htsRetest: string;
     defaulterTracingFormUuid: string;
     clinicalEncounterFormUuid: string;
+    peerCalendarOutreactForm: string;
   };
   defaulterTracingEncounterUuid: string;
   clinicalEncounterUuid: string;
@@ -257,6 +272,7 @@ export interface ConfigObject {
   openmrsIdentifierSourceUuid: string;
   maritalStatusUuid: string;
   hivProgramUuid: string;
+  kvpProgramUuid: string;
   concepts: Record<string, string>;
   specialClinics: Array<{ id: string; formUuid: string; encounterTypeUuid: string; title: string }>;
   contactPersonAttributesUuid: {

@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useConfig, formatDate, showModal, showSnackbar, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { ComboBox, DataTableSkeleton, Dropdown, Layer, Pagination, Tile } from '@carbon/react';
+import { formatDate, showModal, showSnackbar, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyDataIllustration,
   launchPatientWorkspace,
-  PatientChartPagination,
+  usePaginationInfo,
 } from '@openmrs/esm-patient-common-lib';
-import { ComboBox, Dropdown, DataTableSkeleton, Layer, Tile } from '@carbon/react';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { KeyedMutator } from 'swr';
-import styles from './case-encounter-header.scss';
-import GenericTable from '../../specialized-clinics/generic-nav-links/generic-table.component';
-import { useInfiniteVisits, deleteEncounter } from './case-encounter-table.resource';
 import { ConfigObject } from '../../config-schema';
+import GenericTable from '../../specialized-clinics/generic-nav-links/generic-table.component';
+import styles from './case-encounter-header.scss';
+import { deleteEncounter, useInfiniteVisits } from './case-encounter-table.resource';
 
 interface CaseEncounterProps {
   mutate: KeyedMutator<any>;
@@ -61,33 +61,31 @@ const CaseEncounterHeader = ({ patientUuid, mutate, onFilterChange }: CaseEncoun
   };
 
   return (
-    <>
-      <div className={styles.widgetCard}>
-        <CardHeader title={title}>
-          <div className={styles.elementContainer}>
-            <Dropdown
-              id="serviceFilter"
-              initialSelectedItem={{ text: t('all', 'All'), filterUuid: '' }}
-              label=""
-              titleText={t('filterByForm', 'Filter by form') + ':'}
-              type="inline"
-              items={[{ text: t('all', 'All'), filterUuid: '' }, ...items]}
-              itemToString={(item) => (item ? item.text : '')}
-              onChange={handleEncounterTypeChange}
-              size="lg"
-            />
-            <ComboBox
-              onChange={handleComboBoxChange}
-              id="select-form"
-              items={items}
-              itemToString={(item) => (item ? item.text : '')}
-              placeholder="Select forms"
-              className={styles.comboBox}
-            />
-          </div>
-        </CardHeader>
-      </div>
-    </>
+    <div className={styles.widgetCard}>
+      <CardHeader title={title}>
+        <div className={styles.elementContainer}>
+          <Dropdown
+            id="serviceFilter"
+            initialSelectedItem={{ text: t('all', 'All'), filterUuid: '' }}
+            label=""
+            titleText={t('filterByForm', 'Filter by formz') + ':'}
+            type="inline"
+            items={[{ text: t('all', 'All'), filterUuid: '' }, ...items]}
+            itemToString={(item) => (item ? item.text : '')}
+            onChange={handleEncounterTypeChange}
+            size="lg"
+          />
+          <ComboBox
+            onChange={handleComboBoxChange}
+            id="select-form"
+            items={items}
+            itemToString={(item) => (item ? item.text : '')}
+            placeholder="Select forms"
+            className={styles.comboBox}
+          />
+        </div>
+      </CardHeader>
+    </div>
   );
 };
 
@@ -97,7 +95,6 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
   const { t } = useTranslation();
   const { caseManagementForms } = useConfig<ConfigObject>();
   const [filterFormUuid, setFilterFormUuid] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const layout = useLayoutType();
 
@@ -117,7 +114,8 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
     return acc;
   }, {} as Record<string, string>);
 
-  const paginatedEncounters = filteredEncounters.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+  const { results, totalPages, currentPage, goTo } = usePagination(filteredEncounters, pageSize);
+  const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const genericTableHeader = [
     { header: 'Date', key: 'encounterDatetime' },
@@ -133,7 +131,7 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
     return display.split(':')[0].trim();
   }
 
-  const rows = paginatedEncounters.map((encounter) => ({
+  const rows = results.map((encounter) => ({
     id: `${encounter.uuid}`,
     encounterDatetime: formatDate(new Date(encounter.encounterDatetime)),
     visitType: visitTypeMap[encounter.uuid] ?? '--',
@@ -142,7 +140,7 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
   }));
 
   const handleWorkspaceEditForm = (encounterUuid: string) => {
-    const encounter = paginatedEncounters.find((enc) => enc.uuid === encounterUuid);
+    const encounter = results.find((enc) => enc.uuid === encounterUuid);
     const workspaceTitle = encounter.form?.display ?? '';
     const encounterTypeUuid = encounter.encounterType?.uuid ?? '';
     const formUuid = encounter.form?.uuid ?? '';
@@ -192,10 +190,6 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
     [t, mutateVisits],
   );
 
-  const handlePageChange = ({ page }) => {
-    setCurrentPage(page);
-  };
-
   if (isLoading) {
     return <DataTableSkeleton rowCount={10} />;
   }
@@ -213,24 +207,25 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
           </Tile>
         </Layer>
       ) : (
-        <>
+        <div className={styles.widgetContainer}>
           <GenericTable
-            encounters={paginatedEncounters}
+            encounters={results}
             onEdit={handleWorkspaceEditForm}
             onDelete={handleDeleteEncounter}
             headers={genericTableHeader}
             rows={rows}
           />
-          {filteredEncounters.length > pageSize && (
-            <PatientChartPagination
-              currentItems={paginatedEncounters.length}
-              onPageNumberChange={handlePageChange}
-              pageNumber={currentPage}
-              pageSize={pageSize}
-              totalItems={filteredEncounters.length}
-            />
-          )}
-        </>
+          <Pagination
+            page={currentPage}
+            pageSize={pageSize}
+            pageSizes={pageSizes}
+            totalItems={filteredEncounters.length}
+            onChange={({ page, pageSize }) => {
+              goTo(page);
+              setPageSize(pageSize);
+            }}
+          />
+        </div>
       )}
     </>
   );
