@@ -2,12 +2,13 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import ReferralReasonsView from './referral-chart-view.component';
 import * as resource from '../refferals.resource';
+import * as mock from '@openmrs/esm-framework/mock';
 
 jest.mock('../refferals.resource');
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(() => ({ nationalPatientUniqueIdentifier: '12f85081e2-b4be-4e48-b3a4-7994b69bb101' })),
-}));
+
+jest.spyOn(mock, 'useConfig').mockReturnValue({
+  nationalPatientUniqueIdentifier: '12f85081e2-b4be-4e48-b3a4-7994b69bb101',
+});
 
 const mockFhirPatient = {
   resourceType: 'Patient',

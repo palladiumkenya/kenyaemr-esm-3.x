@@ -1,0 +1,67 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.formContainer {
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-right: layout.$spacing-03;
+}
+
+.formButton {
+  height: layout.$spacing-09;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: layout.$spacing-11;
+  margin-bottom: layout.$spacing-05;
+}
+
+.buttonSet {
+  width: 100%;
+  padding-top: layout.$spacing-05;
+  background-color: $ui-02;
+  bottom: 0;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  & > button {
+    max-width: 50%;
+    width: 50%;
+  }
+}
+
+.formSubHeader {
+  @include type.type-style('heading-02');
+  margin-top: layout.$spacing-05;
+}
+.formContainer {
+  width: 100%;
+}
+.formGrid {
+  margin: 0 layout.$spacing-05;
+  padding: 0rem;
+}
+
+.formAdmissionDatepicker input {
+  min-width: 24rem;
+}
+.formTimeSelector {
+  min-width: 1.5rem;
+}
+.form__row {
+  display: flex;
+  align-items: center;
+}
+.formDeathDatepicker input {
+  min-width: 24rem;
+}
+.formDeathTimepicker input {
+  min-width: 18.6rem;
+}
+.fileUploader {
+  min-width: 24rem;
+}

@@ -34,10 +34,9 @@ interface PatientTracingProps {
 
 const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const {
-    formsList: { defaulterTracingFormUuid },
-  } = useConfig<ConfigObject>();
-  const headerTitle = t('defaulterTracing', 'Defaulter Tracing===');
+  const config = useConfig<ConfigObject>();
+  const { formsList } = config ?? {};
+  const headerTitle = t('defaulterTracing', 'Defaulter Tracing');
   const { encounters, isLoading, error, mutate, isValidating } = usePatientTracing(
     patientUuid,
     defaulterTracingEncounterUuid,
@@ -48,7 +47,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
       mutateForm: () => mutate(),
       formInfo: {
         encounterUuid: encounterUUID,
-        formUuid: defaulterTracingFormUuid,
+        formUuid: formsList?.defaulterTracingFormUuid,
         patientUuid,
         visitTypeUuid: '',
         visitUuid: '',

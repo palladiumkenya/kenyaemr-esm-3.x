@@ -50,6 +50,14 @@
       "slot": "billing-dashboard-slot"
     },
     {
+      "component": "benefitsEligibilyRequestForm",
+      "name": "benefits-eligibility-request-form"
+    },
+    {
+      "component": "benefitsPreAuthForm",
+      "name": "benefits-pre-auth-form"
+    },
+    {
       "name": "billing-patient-summary",
       "component": "billingPatientSummary",
       "slot": "patient-chart-billing-dashboard-slot",
@@ -75,11 +83,6 @@
       "name": "billing-check-in-form",
       "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
-    },
-    {
-      "slot": "system-admin-page-card-link-slot",
-      "component": "billableServicesCardLink",
-      "name": "billable-services-admin-card-link"
     },
     {
       "name": "require-billing-modal",
@@ -140,6 +143,57 @@
       "component": "testOrderAction",
       "slot": "tests-ordered-actions-slot",
       "order": 0
+    },
+    {
+      "component": "billingOverviewLink",
+      "name": "billing-overview-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "paymentHistoryLink",
+      "name": "payment-history-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "paymentPointsLink",
+      "name": "payment-points-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "billManagerLink",
+      "name": "bill-manager-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "chargeableItemsLink",
+      "name": "chargeable-items-link",
+      "slot": "billing-dashboard-link-slot"
+    },{
+      "component": "claimsManagementSideNavGroup",
+      "name": "claims-management-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "claims-management",
+        "title": "Claims management Overview",
+        "slot": "case-management-slot"
+      },
+      "featureFlag": "healthInformationExchange"
+
+    },
+     {
+      "component": "claimsManagementOverviewDashboardLink",
+      "name": "claims-management-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+     {
+      "component": "preAuthRequestsDashboardLink",
+      "name": "preauthrequest-overview-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
+    {
+      "component": "claimsOverview",
+      "name": "claims-overview-dashboard-link",
+      "slot": "claims-management-overview-slot"
     }
   ],
   "workspaces": [
@@ -158,13 +212,13 @@
     {
       "name": "billable-service-form",
       "component": "addServiceForm",
-      "title": "Create Billable Service Form",
+      "title": "Create Charge Item Form",
       "type": "other-form"
     },
     {
       "name": "commodity-form",
       "component": "addCommodityForm",
-      "title": "Create Commodity Form",
+      "title": "Create Charge Item Form",
       "type": "other-form"
     },
     {
@@ -173,6 +227,24 @@
       "title": "Billing Form",
       "type": "other-form",
       "width": "extra-wide"
+    }
+  ],
+  "modals": [
+    {
+      "name": "create-payment-point",
+      "component": "createPaymentPoint"
+    },
+    {
+      "name": "clock-in-modal",
+      "component": "clockIn"
+    },
+    {
+      "name": "clock-out-modal",
+      "component": "clockOut"
+    },
+    {
+      "name": "bulk-import-billable-services-modal",
+      "component": "bulkImportBillableServicesModal"
     }
   ]
 }

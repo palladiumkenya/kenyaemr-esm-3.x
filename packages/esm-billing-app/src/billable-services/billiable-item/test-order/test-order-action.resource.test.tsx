@@ -98,13 +98,6 @@ const mockedPatientQueue = [
 
 const mockSWR = useSWR as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  restBaseUrl: '/ws/rest/v1',
-  useConfig: jest.fn(),
-  useVisit: jest.fn(),
-}));
-
 jest.mock('swr', () => ({
   __esModule: true,
   default: jest.fn(),

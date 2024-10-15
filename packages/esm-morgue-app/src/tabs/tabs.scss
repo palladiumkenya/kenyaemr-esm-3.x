@@ -1,0 +1,11 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
+
+.tabsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 1rem;
+}

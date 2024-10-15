@@ -6,8 +6,14 @@ export type PaymentTypeTotal = { type: string; total: number };
 export const usePaymentTotals = (renderedRows: MappedBill[] | null) => {
   const { paymentModes } = usePaymentModes(false);
 
-  if (!renderedRows || !paymentModes) {
+  if (!paymentModes) {
     return [];
+  }
+
+  if (!renderedRows) {
+    return paymentModes.map((mode) => {
+      return { total: 0, type: mode.name };
+    });
   }
 
   const paymentTotals: PaymentTypeTotal[] = [];

@@ -32,16 +32,6 @@ const testProps = {
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: jest.fn(() => 'small-desktop'),
-  usePagination: jest.fn().mockImplementation(() => ({
-    currentPage: 1,
-    goTo: () => {},
-    results: [],
-  })),
-}));
-
 describe('EncounterList', () => {
   afterEach(() => jest.clearAllMocks());
 

@@ -7,6 +7,7 @@ import { useBills } from '../../billing.resource';
 import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
 import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
+import BillingHeader from '../../billing-header/billing-header.component';
 
 type BillManagerProps = {};
 
@@ -27,6 +28,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
 
   return (
     <UserHasAccess privilege="coreapps.systemAdministration">
+      <BillingHeader title={t('billManager', 'Bill Manager')} />
       <div className={styles.billManagerContainer}>
         <ExtensionSlot
           name="patient-search-bar-slot"
@@ -38,10 +40,12 @@ const BillManager: React.FC<BillManagerProps> = () => {
           }}
         />
         {!patientUuid ? (
-          <EmptyState
-            displayText={t('notSearchedState', 'Please search for a patient in the input above')}
-            headerTitle="Not Searched"
-          />
+          <div className={billTableStyles.emptyStateContainer}>
+            <EmptyState
+              displayText={t('notSearchedState', 'Please search for a patient in the input above')}
+              headerTitle="Not Searched"
+            />
+          </div>
         ) : isLoading ? (
           <DataTableSkeleton
             headers={headers}

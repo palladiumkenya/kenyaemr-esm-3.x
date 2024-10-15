@@ -1,18 +1,35 @@
+import { SkeletonText, Tile } from '@carbon/react';
 import React from 'react';
-import { usePaymentTotals } from './use-payment-totals';
-import { Tile } from '@carbon/react';
+import { usePaymentModes } from '../../billing.resource';
 import { convertToCurrency } from '../../helpers';
 import { MappedBill } from '../../types';
 import styles from './payment-history.scss';
+import { usePaymentTotals } from './use-payment-totals';
 
 export const PaymentTotals = ({
   renderedRows,
-  selectedPaymentTypeCheckBoxes,
+  appliedFilters,
 }: {
-  renderedRows: MappedBill[] | null;
-  selectedPaymentTypeCheckBoxes: string[];
+  renderedRows: Array<MappedBill> | null;
+  appliedFilters: Array<string>;
 }) => {
+  const { isLoading, paymentModes } = usePaymentModes();
   const paymentTotals = usePaymentTotals(renderedRows);
+
+  const selectedPaymentTypeCheckBoxes = appliedFilters.filter((f) => paymentModes.find((m) => m.name === f));
+
+  if (isLoading) {
+    return (
+      <div className={styles.loadingPaymentTotals}>
+        {Array.from({ length: 4 }).map(() => (
+          <Tile className={styles.tile}>
+            <SkeletonText className={styles.loadingPaymentTotal} style={{ width: '50%' }} />
+            <SkeletonText />
+          </Tile>
+        ))}
+      </div>
+    );
+  }
 
   if (selectedPaymentTypeCheckBoxes.length === 0) {
     return (

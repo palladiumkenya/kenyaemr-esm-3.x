@@ -14,36 +14,37 @@ import {
   TableExpandHeader,
   TableExpandRow,
   TableExpandedRow,
-  Button,
-  OverflowMenu,
-  OverflowMenuItem,
-  MenuItemDivider,
+  Search,
   Tag,
 } from '@carbon/react';
-import { Add, ArrowsVertical } from '@carbon/react/icons';
-import { isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
+import { isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import styles from './generic-data-table.scss';
 import { useProviders } from './provider-data-table.resource';
 import ProviderDetails from './provider-details.component';
+import { ConfigObject } from '../config-schema';
+import dayjs from 'dayjs';
+import CustomActionMenu from '../overflow/overflow-component';
 
-const ProviderListTable: React.FC = () => {
+const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ filter }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const { provider, error, isLoading } = useProviders();
-
+  const { licenseNumberUuid, licenseExpiryDateUuid, providerNationalIdUuid } = useConfig<ConfigObject>();
   const [pageSize, setPageSize] = React.useState(10);
-  const { results, currentPage, goTo } = usePagination(provider, pageSize);
-  const handleUpdateProvider = () => {
-    launchWorkspace('provider-register-form', {
-      workspaceTitle: 'Update account form',
-    });
-  };
+  const [searchQuery, setSearchQuery] = React.useState('');
+
+  const filteredProviders = Array.isArray(provider)
+    ? provider.filter((p) => filter(p) && p.person.display.toLowerCase().includes(searchQuery.toLowerCase()))
+    : [];
+
+  const { paginated, goTo, results, currentPage } = usePagination(filteredProviders, pageSize);
+  const { pageSizes } = usePaginationInfo(pageSize, filteredProviders.length, currentPage, results?.length);
 
   const headerData = [
-    { header: t('id', 'Identifier type'), key: 'id' },
-    { header: t('idType', 'Identifier type'), key: 'idType' },
+    { header: t('serial', 'SNo'), key: 'serial' },
+    { header: t('identifier', 'National ID'), key: 'identifier' },
     { header: t('name', 'Name'), key: 'name' },
     { header: t('license', 'License Number'), key: 'license' },
     { header: t('date', 'License expiry date'), key: 'date' },
@@ -51,31 +52,54 @@ const ProviderListTable: React.FC = () => {
     { header: t('action', 'Action'), key: 'action' },
   ];
 
-  const rowData = results.map((provider) => {
-    const licenseAttr = provider.attributes.find((attr) => attr.attributeType.display === 'Practising License Number');
+  const maskNationalId = (id) => {
+    if (id && id.length > 5) {
+      const start = id.slice(0, 3);
+      const end = id.slice(-3);
+      return `${start}***${end}`;
+    }
+    return id;
+  };
 
-    const dateAttr = provider.attributes.find((attr) => attr.attributeType.display === 'License Expiry Date');
+  const rowData = results.map((provider, index) => {
+    const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
+    const dateAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+    const nationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
+
+    const licenseExpiryDate = dateAttr ? dayjs(dateAttr.value) : null;
+    const today = dayjs();
+    const daysUntilExpiry = licenseExpiryDate ? licenseExpiryDate.diff(today, 'day') : null;
+
+    let statusTag;
+
+    if (!licenseExpiryDate) {
+      statusTag = <Tag type="red">{t('missingExpiryDate', 'Missing expiry date')}</Tag>;
+    } else if (daysUntilExpiry < 0) {
+      statusTag = <Tag type="red">{t('licenseExpired', 'License has expired')}</Tag>;
+    } else if (daysUntilExpiry <= 3) {
+      statusTag = <Tag type="cyan">{t('licenseExpiringSoon', 'License is expiring soon')}</Tag>;
+    } else {
+      statusTag = <Tag type="green">{t('activeLicensed', 'Active License')}</Tag>;
+    }
 
     return {
-      id: provider.identifier,
-      idType: provider.person.uuid,
+      id: provider.uuid,
+      serial: (currentPage - 1) * pageSize + (index + 1),
+      identifier: nationalId ? (
+        maskNationalId(nationalId?.value)
+      ) : (
+        <Tag type="red">{t('missingIDno', 'Missing National ID')}</Tag>
+      ),
       name: provider.person.display,
-      license: licenseAttr ? licenseAttr?.value : '--',
-      date: dateAttr ? dateAttr?.value : '--',
-      status: (
-        <Tag className="some-class" type="green">
-          {t('activeLicense', 'Active')}
-        </Tag>
+      license: licenseAttr ? licenseAttr?.value : <Tag type="magenta">{t('unlicensed', 'Unlicensed')}</Tag>,
+      date: licenseExpiryDate ? (
+        licenseExpiryDate.format('YYYY-MM-DD')
+      ) : (
+        <Tag type="magenta">{t('missingExpiryDate', 'Missing expiry date')}</Tag>
       ),
-      action: (
-        <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
-          <OverflowMenuItem itemText="Sync" />
-          <MenuItemDivider />
-
-          <OverflowMenuItem itemText="Edit" onClick={handleUpdateProvider} />
-        </OverflowMenu>
-      ),
-      personUuid: provider.person.uuid,
+      status: statusTag,
+      action: <CustomActionMenu provider={provider} />,
+      providerUuid: provider?.uuid,
     };
   });
 
@@ -97,6 +121,12 @@ const ProviderListTable: React.FC = () => {
         <CardHeader title={t('providersAll', 'List of provider')}>
           <></>
         </CardHeader>
+        <Search
+          labelText=""
+          placeholder={t('searchProvider', 'Search for provider')}
+          onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+          size={isDesktop(layout) ? 'sm' : 'lg'}
+        />
         <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
           {({
             rows,
@@ -107,17 +137,13 @@ const ProviderListTable: React.FC = () => {
             getHeaderProps,
             getRowProps,
           }) => (
-            <TableContainer {...getTableContainerProps}>
+            <TableContainer {...getTableContainerProps()}>
               <Table className={styles.table} {...getTableProps()} aria-label="Provider list">
                 <TableHead>
                   <TableRow>
                     <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
                     {headers.map((header, i) => (
-                      <TableHeader
-                        key={i}
-                        {...getHeaderProps({
-                          header,
-                        })}>
+                      <TableHeader key={i} {...getHeaderProps({ header })}>
                         {header.header}
                       </TableHeader>
                     ))}
@@ -131,10 +157,10 @@ const ProviderListTable: React.FC = () => {
                           <TableCell key={cell.id}>{cell.value}</TableCell>
                         ))}
                       </TableExpandRow>
-                      {row.isExpanded ? (
+                      {row && row.isExpanded ? (
                         <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
                           <div className={styles.container} key={i}>
-                            <ProviderDetails personUuid={row.personUuid} license={row.license} />
+                            <ProviderDetails providerUuid={row.id} />
                           </div>
                         </TableExpandedRow>
                       ) : (
@@ -147,20 +173,24 @@ const ProviderListTable: React.FC = () => {
             </TableContainer>
           )}
         </DataTable>
-        <Pagination
-          forwardText={t('nextPage', 'Next page')}
-          backwardText={t('previousPage', 'Previous page')}
-          page={currentPage}
-          pageSize={pageSize}
-          pageSizes={[5, 10, 20, 50]}
-          totalItems={provider.length}
-          className={styles.pagination}
-          size={responsiveSize}
-          onChange={({ page: newPage, pageSize }) => {
-            goTo(newPage);
-            setPageSize(pageSize);
-          }}
-        />
+        {paginated && (
+          <Pagination
+            forwardText={t('nextPage', 'Next page')}
+            backwardText={t('previousPage', 'Previous page')}
+            page={currentPage}
+            pageSize={pageSize}
+            pageSizes={pageSizes}
+            totalItems={filteredProviders.length}
+            className={styles.pagination}
+            size={responsiveSize}
+            onChange={({ page: newPage, pageSize }) => {
+              if (newPage !== currentPage) {
+                goTo(newPage);
+              }
+              setPageSize(pageSize);
+            }}
+          />
+        )}
       </div>
     </div>
   );

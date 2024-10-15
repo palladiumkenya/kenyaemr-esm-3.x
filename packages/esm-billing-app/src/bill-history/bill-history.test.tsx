@@ -41,17 +41,6 @@ jest.mock('../billing.resource', () => ({
   })),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: jest.fn(() => 'small-desktop'),
-  usePagination: jest.fn().mockImplementation((data) => ({
-    currentPage: 1,
-    goTo: () => {},
-    results: data,
-    paginated: true,
-  })),
-}));
-
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   useLaunchWorkspaceRequiringVisit: jest.fn(),

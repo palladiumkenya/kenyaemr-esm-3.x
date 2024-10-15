@@ -20,6 +20,7 @@ export interface MappedBill {
   totalAmount?: number;
   tenderedAmount?: number;
   display?: string;
+  referenceCodes?: string;
 }
 
 interface LocationLink {
@@ -69,6 +70,7 @@ export interface LineItem {
   resourceVersion: string;
   paymentStatus: string;
   itemOrServiceConceptUuid: string;
+  serviceTypeUuid: string;
 }
 
 interface PatientLink {
@@ -243,12 +245,36 @@ export interface CommonMedicationValueCoded extends CommonMedicationProps {
   valueCoded: string;
 }
 
-export type PaymentMethod = {
+export interface AuditInfo {
+  creator: Creator;
+  dateCreated: string;
+  changedBy: null;
+  dateChanged: null;
+}
+
+export interface Link {
+  rel: string;
+  uri: string;
+  resourceAlias: string;
+}
+
+export interface Creator {
   uuid: string;
-  description: string;
+  display: string;
+  links: Link[];
+}
+
+export interface PaymentMethod {
+  uuid: string;
   name: string;
+  description: string;
   retired: boolean;
-};
+  retireReason: null;
+  auditInfo: AuditInfo;
+  attributeTypes: AttributeType[];
+  sortOrder: null;
+  resourceVersion: string;
+}
 
 export interface Payment {
   uuid: string;
@@ -305,6 +331,34 @@ export interface SHAPackage {
   shaPackageCode: string;
   shaPackageName: string;
 }
+
+export interface PatientBenefit {
+  packageCode: string;
+  packageName: string;
+  interventionCode: string;
+  interventionName: string;
+  interventioTariff: number;
+  requirePreauth: boolean;
+  status: string;
+}
+
+export interface InsurersBenefits extends PatientBenefit {
+  insurer: string;
+}
+
+export interface CoverageEligibilityResponse {
+  inforce: boolean;
+  insurer: string;
+  start: string;
+  end: string;
+  benefits: Array<PatientBenefit>;
+}
+
+export interface SHAIntervension {
+  interventionCode: string;
+  interventionName?: string;
+}
+
 export interface FHIRErrorResponse {
   resourceType: string;
   issue: Issue[];
@@ -381,36 +435,48 @@ export interface Package {
   packageAccessPoint: 'OP' | 'IP' | 'Both';
 }
 
-export interface PatientBenefit {
-  packageCode: string;
-  packageName: string;
-  interventionCode: string;
-  interventionName: string;
-  interventioTariff: number;
-  requirePreauth: boolean;
-  status: string;
-}
-
-export interface InsurersBenefits extends PatientBenefit {
-  insurer: string;
-}
-
-export interface CoverageEligibilityResponse {
-  inforce: boolean;
-  insurer: string;
-  start: string;
-  end: string;
-  benefits: Array<PatientBenefit>;
-}
-
-export interface SHAIntervension {
-  interventionCode: string;
-  interventionName?: string;
-}
-
 export interface Diagnosis {
   uuid: string;
   name: string;
   dateRecorded: string;
   value: string;
 }
+
+export interface PaymentPoint {
+  uuid: string;
+  name: string;
+  description: string;
+  retired: boolean;
+  location: Location;
+}
+
+export interface Timesheet {
+  uuid: string;
+  display: string;
+  cashier: Cashier;
+  cashPoint: CashPoint;
+  clockIn: string;
+  clockOut: null;
+  id: number;
+}
+
+export interface Cashier {
+  uuid: string;
+  display: string;
+  links: Link[];
+}
+
+export interface Link {
+  rel: string;
+  uri: string;
+  resourceAlias: string;
+}
+
+export type ExcelFileRow = {
+  concept_id: number;
+  name: string;
+  price: number;
+  disable: 'false' | 'true';
+  service_type_id: number;
+  short_name: string;
+};

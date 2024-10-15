@@ -21,6 +21,14 @@
       "slot": "morgue-dashboard-slot"
     }
   ],
+   "workspaces": [
+    {
+      "name": "patient-additional-info-form",
+      "component": "patientAdditionalInfoForm",
+      "title": "add more details",
+      "type": "other-form"
+    }
+  ],
   "pages": [
     {
       "component": "root",

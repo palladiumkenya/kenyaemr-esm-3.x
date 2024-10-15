@@ -1,8 +1,13 @@
+import { OpenmrsResource } from '@openmrs/esm-framework';
 import { Value } from 'classnames';
 
 export interface Roles {
   uuid: string;
   display: string;
+  privileges: {
+    uuid: string;
+    description: string;
+  };
 }
 
 export interface RolesResponse {
@@ -26,10 +31,7 @@ export interface FacilityResponse {
 export interface ProviderResponse {
   uuid: string;
   display: string;
-  person: {
-    uuid: string;
-    display: string;
-  };
+  person: Person;
   identifier: string;
   attributes: Array<{
     uuid: string;
@@ -38,15 +40,10 @@ export interface ProviderResponse {
       uuid: string;
       display: string;
     };
-    value: {
-      uuid: string;
-      display: string;
-      tags: Array<{
-        uuid: string;
-        display: string;
-      }>;
-    };
+    value: string;
   }>;
+  retired: boolean;
+  voided: boolean;
 }
 
 interface PersonAttribute {
@@ -57,20 +54,17 @@ interface PersonAttribute {
 interface Person {
   uuid: string;
   display: string;
+  names: {
+    givenName: string;
+    familyName: string;
+  };
   gender: string;
   attributes: PersonAttribute[];
-}
-
-interface PersonPrivileges {
-  uuid: string;
-  display: string;
 }
 
 export interface UserRoles {
   uuid: string;
   display: string;
-  person: Person;
-  privileges: PersonPrivileges[];
 }
 export interface Practitioner {
   id: string;
@@ -142,5 +136,24 @@ interface QualificationExtension {
 }
 
 export interface User {
+  uuid: string;
   person: Person;
+  username: string;
+  allRoles: Array<UserRoles>;
+  retired: boolean;
 }
+export type ProviderSession = {
+  authenticated: boolean;
+  user?: string;
+  currentProvider?: string[];
+  sessionLocation?: string;
+};
+export type Provider = {
+  id?: string;
+  uuid?: string;
+  identifier?: string;
+  display: string;
+  person: OpenmrsResource;
+  attributes?: Array<OpenmrsResource> | null;
+  retired: boolean;
+};
