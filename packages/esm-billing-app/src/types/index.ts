@@ -330,7 +330,7 @@ export interface SHAPackage {
   uuid: string;
   shaPackageCode: string;
   shaPackageName: string;
-=======
+}
 export interface Package {
   uuid: string;
   packageCode: string;
