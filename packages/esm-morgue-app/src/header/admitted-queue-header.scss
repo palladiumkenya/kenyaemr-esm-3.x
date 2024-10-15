@@ -1,13 +1,12 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@carbon/colors';
-@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .metricsContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: $ui-02;
+  // background-color: $ui-02;
   padding: 0 layout.$spacing-05;
   height: 4rem;
   margin-bottom: 0 layout.$spacing-05;

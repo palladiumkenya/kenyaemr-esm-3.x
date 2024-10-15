@@ -7,7 +7,7 @@ import {
   PatientChartPagination,
   usePaginationInfo,
 } from '@openmrs/esm-patient-common-lib';
-import { useInfiniteVisits } from '../hook/useMorgue.resource';
+import { useInfiniteVisits, usePatientPaginatedVisits } from '../hook/useMorgue.resource';
 import {
   DataTable,
   TableContainer,
@@ -36,24 +36,26 @@ import styles from './panels.scss';
 const MedicalHistoryView: React.FC = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
-  const { visits, isLoading, error } = useInfiniteVisits(patientUuid);
+  const paginatedVisits = usePatientPaginatedVisits(patientUuid);
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEncounterType, setSelectedEncounterType] = useState<string | null>(null);
+  const error = paginatedVisits?.error;
 
-  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
   const encounterTypes = useMemo(() => {
     const types =
-      visits?.flatMap((visit) => visit.encounters.map((encounter) => encounter.encounterType.display)) || [];
+      paginatedVisits?.data?.flatMap((visit: any) =>
+        visit.encounters.map((encounter) => encounter.encounterType.display),
+      ) || [];
     return Array.from(new Set(types));
-  }, [visits]);
+  }, [paginatedVisits]);
 
   const encounters = useMemo(
     () =>
-      visits?.flatMap((visit) =>
+      paginatedVisits?.data?.flatMap((visit: any) =>
         visit?.encounters?.map((encounter) => ({
           visitType: visit?.visitType?.name,
           form: encounter?.form?.display,
@@ -62,7 +64,7 @@ const MedicalHistoryView: React.FC = () => {
           obs: encounter?.obs,
         })),
       ) || [],
-    [visits],
+    [paginatedVisits],
   );
 
   const filteredEncounters = useMemo(() => {
@@ -80,13 +82,7 @@ const MedicalHistoryView: React.FC = () => {
     });
   }, [encounters, selectedEncounterType, searchTerm, t]);
 
-  const paginatedEncounterItems = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    const endIndex = startIndex + pageSize;
-    return filteredEncounters.slice(startIndex, endIndex);
-  }, [filteredEncounters, currentPage, pageSize]);
-
-  const rows = paginatedEncounterItems?.map((encounter, idx) => ({
+  const rows = filteredEncounters?.map((encounter, idx) => ({
     id: `encounter-${idx}`,
     encounterDatetime: formatDate(new Date(encounter.encounterDatetime)),
     visitType: encounter.visitType,
@@ -94,9 +90,10 @@ const MedicalHistoryView: React.FC = () => {
     formName: encounter.form,
   }));
 
-  if (isLoading) {
+  if (paginatedVisits?.isLoading) {
     return <DataTableSkeleton rowCount={10} />;
   }
+
   if (error) {
     return (
       <Layer>
@@ -104,7 +101,7 @@ const MedicalHistoryView: React.FC = () => {
       </Layer>
     );
   }
-  if (!visits || visits.length === 0) {
+  if (paginatedVisits?.data?.length === 0) {
     return (
       <EmptyState
         displayText={t('medicalHistory', 'Medical history')}
@@ -178,7 +175,7 @@ const MedicalHistoryView: React.FC = () => {
                       {row.isExpanded ? (
                         <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
                           <div className={styles.container}>
-                            <EncounterObservations observations={paginatedEncounterItems[index]['obs'] ?? []} />
+                            <EncounterObservations observations={filteredEncounters[index]['obs'] ?? []} />
                           </div>
                         </TableExpandedRow>
                       ) : null}
@@ -192,15 +189,15 @@ const MedicalHistoryView: React.FC = () => {
         <Pagination
           forwardText="Next page"
           backwardText="Previous page"
-          page={currentPage}
-          pageSize={pageSize}
-          pageSizes={[5, 10, 20, 50, 100]}
-          totalItems={filteredEncounters.length}
+          page={paginatedVisits?.currentPage}
+          pageSize={paginatedVisits?.currentPageSize?.current}
+          pageSizes={[1]}
+          totalItems={paginatedVisits?.totalCount}
           className={styles.pagination}
           size={responsiveSize}
           onChange={({ pageSize: newPageSize, page: newPage }) => {
             setPageSize(newPageSize);
-            setCurrentPage(newPage);
+            paginatedVisits?.goTo(newPage);
           }}
         />
       </div>
