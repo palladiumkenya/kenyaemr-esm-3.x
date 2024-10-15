@@ -85,15 +85,6 @@
       "component": "billingCheckInForm"
     },
     {
-      "slot": "system-admin-page-card-link-slot",
-      "component": "billableServicesCardLink",
-      "name": "billable-services-admin-card-link"
-    },
-    {
-      "name": "billing-form",
-      "component": "billingForm"
-    },
-    {
       "name": "require-billing-modal",
       "component": "requirePaymentModal"
     },
@@ -154,6 +145,30 @@
       "order": 0
     },
     {
+      "component": "billingOverviewLink",
+      "name": "billing-overview-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "paymentHistoryLink",
+      "name": "payment-history-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "paymentPointsLink",
+      "name": "payment-points-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "billManagerLink",
+      "name": "bill-manager-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "chargeableItemsLink",
+      "name": "chargeable-items-link",
+      "slot": "billing-dashboard-link-slot"
+    },{
       "component": "claimsManagementSideNavGroup",
       "name": "claims-management-dashboard-link",
       "slot": "homepage-dashboard-slot",
@@ -195,16 +210,41 @@
       "type": "other-form"
     },
     {
-      "name": "edit-purchase-price-form",
-      "component": "editPurchasePriceForm",
-      "title": "Edit Purchase Price Form",
+      "name": "billable-service-form",
+      "component": "addServiceForm",
+      "title": "Create Charge Item Form",
       "type": "other-form"
     },
     {
-      "name": "edit-billable-service-form",
-      "component": "editBillableServiceForm",
-      "title": "Edit Billable Service Form",
+      "name": "commodity-form",
+      "component": "addCommodityForm",
+      "title": "Create Charge Item Form",
       "type": "other-form"
+    },
+    {
+      "name": "billing-form",
+      "component": "billingForm",
+      "title": "Billing Form",
+      "type": "other-form",
+      "width": "extra-wide"
+    }
+  ],
+  "modals": [
+    {
+      "name": "create-payment-point",
+      "component": "createPaymentPoint"
+    },
+    {
+      "name": "clock-in-modal",
+      "component": "clockIn"
+    },
+    {
+      "name": "clock-out-modal",
+      "component": "clockOut"
+    },
+    {
+      "name": "bulk-import-billable-services-modal",
+      "component": "bulkImportBillableServicesModal"
     }
   ]
 }

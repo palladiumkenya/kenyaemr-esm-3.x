@@ -2,47 +2,35 @@
 @use '@carbon/type';
 @use '@carbon/colors';
 
-.providerDetailsContainer {
-  min-height: fit-content;
-  background-color: colors.$white;
-  padding: layout.$spacing-05;
-  margin: layout.$spacing-03;
-}
-
-.title {
-  @include type.type-style('heading-compact-01');
-  color: colors.$gray-90;
-}
-
-.subTitle {
+.providerName {
   @include type.type-style('label-01');
-  color: colors.$gray-70;
+  color: $text-02;
+  margin-bottom: spacing.$spacing-02;
+  font-weight: 800;
 }
 
-.tags {
-  margin-top: layout.$spacing-05;
+.demographics {
   display: flex;
-  column-gap: layout.$spacing-03;
-
-  & > div {
-    margin: 0;
-  }
+  align-items: center;
+  margin-bottom: spacing.$spacing-02;
+  color: $text-02;
+  text-transform: uppercase;
 }
 
-.providerInfoGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  column-gap: layout.$spacing-05;
-  margin-top: layout.$spacing-05;
+.identifiers {
+  display: flex;
+  flex-direction: column;
 }
 
-.gridTitle {
-  @include type.type-style('label-02');
-  margin-bottom: layout.$spacing-04;
-  color: colors.$gray-70;
+.middot {
+  margin: 0 0.25rem;
+}
+.formClaimRow {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: spacing.$spacing-05;
 }
 
-.label {
-  @include type.type-style('label-01');
-  color: colors.$gray-70;
+.formClaimColumn {
+  flex: 1 1 0%;
 }

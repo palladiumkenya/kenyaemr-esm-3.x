@@ -11,11 +11,6 @@ const testProps = {
   isExpandable: false,
 };
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useLayoutType: jest.fn(() => 'small-desktop'),
-}));
-
 describe('ObsTable', () => {
   afterEach(() => {
     jest.clearAllMocks();

@@ -10,11 +10,6 @@ const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof 
 const mockUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockShowSnackbar = showSnackbar as jest.MockedFunction<typeof showSnackbar>;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  showSnackbar: jest.fn(),
-}));
-
 jest.mock('../../billing.resource', () => ({
   processBillPayment: jest.fn(),
   usePaymentModes: jest.fn(),

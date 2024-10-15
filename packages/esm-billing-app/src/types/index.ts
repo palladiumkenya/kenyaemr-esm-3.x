@@ -13,12 +13,14 @@ export interface MappedBill {
   status: string;
   identifier: string;
   dateCreated: string;
+  dateCreatedUnformatted: string;
   lineItems: Array<LineItem>;
   billingService: string;
   payments: Array<Payment>;
   totalAmount?: number;
   tenderedAmount?: number;
   display?: string;
+  referenceCodes?: string;
 }
 
 interface LocationLink {
@@ -165,6 +167,7 @@ export type BillingService = {
   serviceType: { display: string };
   shortName: string;
   uuid: string;
+  stockItem?: string;
 };
 
 export interface DrugOrderBasketItem extends OrderBasketItem {
@@ -241,12 +244,36 @@ export interface CommonMedicationValueCoded extends CommonMedicationProps {
   valueCoded: string;
 }
 
-export type PaymentMethod = {
+export interface AuditInfo {
+  creator: Creator;
+  dateCreated: string;
+  changedBy: null;
+  dateChanged: null;
+}
+
+export interface Link {
+  rel: string;
+  uri: string;
+  resourceAlias: string;
+}
+
+export interface Creator {
   uuid: string;
-  description: string;
+  display: string;
+  links: Link[];
+}
+
+export interface PaymentMethod {
+  uuid: string;
   name: string;
+  description: string;
   retired: boolean;
-};
+  retireReason: null;
+  auditInfo: AuditInfo;
+  attributeTypes: AttributeType[];
+  sortOrder: null;
+  resourceVersion: string;
+}
 
 export interface Payment {
   uuid: string;
@@ -395,4 +422,43 @@ export type FHIRPatientResponse = {
       code: string;
     }>;
   };
+};
+
+export interface PaymentPoint {
+  uuid: string;
+  name: string;
+  description: string;
+  retired: boolean;
+  location: Location;
+}
+
+export interface Timesheet {
+  uuid: string;
+  display: string;
+  cashier: Cashier;
+  cashPoint: CashPoint;
+  clockIn: string;
+  clockOut: null;
+  id: number;
+}
+
+export interface Cashier {
+  uuid: string;
+  display: string;
+  links: Link[];
+}
+
+export interface Link {
+  rel: string;
+  uri: string;
+  resourceAlias: string;
+}
+
+export type ExcelFileRow = {
+  concept_id: number;
+  name: string;
+  price: number;
+  disable: 'false' | 'true';
+  service_type_id: number;
+  short_name: string;
 };

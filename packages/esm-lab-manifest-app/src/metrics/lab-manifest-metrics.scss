@@ -6,12 +6,12 @@
 .cardContainer {
   display: flex;
   flex-flow: row wrap;
-  margin-top: spacing.$spacing-05;
+  margin-top: spacing.$spacing-03;
   gap: spacing.$spacing-05;
 }
 
 .metricContainer {
-  padding: spacing.$spacing-05;
+  padding: spacing.$spacing-03;
 }
 
 .labManifestStatusMetricValue {
@@ -33,7 +33,7 @@
 }
 
 .metricCardContainer {
-  border: $color-gray-30 solid spacing.$spacing-01;
+  border: colors.$gray-20 solid 1px;
   padding: spacing.$spacing-03;
   flex-grow: 1;
   & > p {
@@ -63,13 +63,18 @@
 }
 
 .metricDanger {
+  font-size: 0.625rem !important;
   color: $danger;
 }
 
 .metricWarning {
+  font-size: 0.625rem !important;
+
   color: colors.$orange-40;
 }
 
 .metricSuccess {
+  font-size: 0.625rem !important;
+
   color: colors.$green-40;
 }

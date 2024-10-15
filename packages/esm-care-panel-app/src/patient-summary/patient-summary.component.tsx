@@ -173,7 +173,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                   {data?.firstCd4Date === 'N/A' || data?.firstCd4Date === '' ? (
                     <span>None</span>
                   ) : (
-                    <span>{formatDate(new Date(data?.firstCd4Date))}</span>
+                    <span>{data?.firstCd4Date ? formatDate(new Date(data?.firstCd4Date)) : '--'}</span>
                   )}
                 </span>
               </p>
@@ -339,7 +339,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                   {data?.dateEnrolledInTb === 'None' || data?.dateEnrolledInTb === '' ? (
                     <span>None</span>
                   ) : (
-                    <span>{formatDate(new Date(data?.dateEnrolledInTb))}</span>
+                    <span>{data?.dateEnrolledInTb ? formatDate(new Date(data?.dateEnrolledInTb)) : '--'}</span>
                   )}
                 </span>
               </p>
@@ -351,7 +351,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                   {data?.dateCompletedInTb === 'None' || data?.dateCompletedInTb === '' ? (
                     <span>None</span>
                   ) : (
-                    <span>{formatDate(new Date(data?.dateCompletedInTb))}</span>
+                    <span>{data?.dateCompletedInTb ? formatDate(new Date(data?.dateCompletedInTb)) : '--'}</span>
                   )}
                 </span>
               </p>
@@ -544,7 +544,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                   {data?.transferOutDate === 'N/A' || data?.transferOutDate === '' ? (
                     <span>None</span>
                   ) : (
-                    <span>{formatDate(new Date(data?.transferOutDate))}</span>
+                    <span>{data?.transferOutDate ? formatDate(new Date(data?.transferOutDate)) : '--'}</span>
                   )}
                 </span>
               </p>
@@ -562,7 +562,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                   {data?.deathDate === 'N/A' || data?.deathDate === '' ? (
                     <span>None</span>
                   ) : (
-                    <span>{formatDate(new Date(data?.deathDate))}</span>
+                    <span>{data?.deathDate ? formatDate(new Date(data?.deathDate)) : '--'}</span>
                   )}
                 </span>
               </p>
@@ -578,7 +578,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                   {data?.mostRecentCd4Date === 'N/A' || data?.mostRecentCd4Date === '' ? (
                     <span>None</span>
                   ) : (
-                    <span>{formatDate(new Date(data?.mostRecentCd4Date))}</span>
+                    <span>{data?.mostRecentCd4Date ? formatDate(new Date(data?.mostRecentCd4Date)) : '--'}</span>
                   )}
                 </span>
               </p>
@@ -591,7 +591,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                   {data?.viralLoadDate === 'N/A' || data?.viralLoadDate === '' ? (
                     <span>None</span>
                   ) : (
-                    <span>{data?.viralLoadDate}</span>
+                    <span>{data?.viralLoadDate ? formatDate(new Date(data?.viralLoadDate)) : '--'}</span>
                   )}
                 </span>
               </p>
@@ -600,7 +600,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               <p className={styles.label}>{t('nextAppointmentDate', ' Next appointment')}</p>
               <p>
                 <span className={styles.value}>
-                  {data?.nextAppointmentDate ? formatDate(new Date(data?.nextAppointmentDate)) : '--'}
+                  {data?.nextAppointmentDate ? formatDate(new Date(data?.nextAppointmentDate)) : 'None'}
                 </span>
               </p>
             </div>
@@ -614,7 +614,11 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                     return (
                       <div key={`vl-${index}`}>
                         <span className={styles.value}> {vl.vl} </span>
-                        {vl?.vlDate === 'N/A' || vl?.vlDate === '' ? <span>None</span> : <span>{vl.vlDate}</span>}
+                        {vl?.vlDate === 'N/A' || vl?.vlDate === '' ? (
+                          <span>None</span>
+                        ) : (
+                          <span>{vl.vlDate ? formatDate(new Date(vl.vlDate)) : '--'}</span>
+                        )}
                         <br />
                       </div>
                     );
@@ -625,23 +629,35 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               <p className={styles.label}>{t('cd4Trends', 'CD4 Trends')}</p>
               {data?.allCd4CountResults?.length > 0
                 ? data?.allCd4CountResults?.map((cd4, index) => {
-                    let formattedDate: Date;
+                    let formattedDate: Date | null = null;
 
                     if (dayjs(cd4.cd4CountDate, 'DD/MM/YYYY', true).isValid()) {
                       const parts = cd4.cd4CountDate?.split('/');
-                      const day = parseInt(parts[0], 10);
-                      const month = parseInt(parts[1], 10) - 1; // Subtract 1 since months are zero-based
-                      const year = parseInt(parts[2], 10);
-                      formattedDate = new Date(year, month, day);
+                      if (parts && parts.length === 3) {
+                        const day = parseInt(parts[0], 10);
+                        const month = parseInt(parts[1], 10) - 1; // Subtract 1 since months are zero-based
+                        const year = parseInt(parts[2], 10);
 
-                      return (
-                        <div key={`cd4Trend-${cd4}-${index}`}>
-                          <span className={styles.value}> {cd4.cd4Count} </span>
-                          <span className={styles.label}> {cd4.cd4CountDate ? formatDate(formattedDate) : '--'}</span>
-                          <br />
-                        </div>
-                      );
+                        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                          formattedDate = new Date(year, month, day);
+
+                          // Check if the date is valid
+                          if (isNaN(formattedDate.getTime())) {
+                            formattedDate = null;
+                          }
+                        }
+                      }
                     }
+
+                    return (
+                      <div key={`cd4Trend-${cd4}-${index}`}>
+                        <span className={styles.value}> {cd4.cd4Count} </span>
+                        <span className={styles.label}>
+                          {formattedDate ? formatDate(formattedDate) : 'Invalid date'}
+                        </span>
+                        <br />
+                      </div>
+                    );
                   })
                 : '--'}
             </div>

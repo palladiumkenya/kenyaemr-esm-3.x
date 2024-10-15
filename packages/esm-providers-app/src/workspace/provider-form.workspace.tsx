@@ -2,48 +2,52 @@ import {
   Button,
   ButtonSet,
   Column,
+  ComboBox,
+  ContentSwitcher,
   DatePicker,
   DatePickerInput,
-  MultiSelect,
-  ContentSwitcher,
-  Tag,
-  Switch,
-  PasswordInput,
-  InlineLoading,
   Form,
-  Stack,
-  TextInput,
-  Search,
-  ComboBox,
+  InlineLoading,
+  MultiSelect,
+  PasswordInput,
   Row,
+  Search,
+  Stack,
+  Switch,
+  Tag,
+  TextInput,
   Tile,
 } from '@carbon/react';
-import { showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import React, { useEffect, useState } from 'react';
+import { GenderFemale, GenderMale, Query } from '@carbon/react/icons';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { parseDate, restBaseUrl, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import React, { useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { useForm, Controller } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import styles from './provider-form.scss';
-import { GenderFemale, GenderMale, Query } from '@carbon/react/icons';
+import { ConfigObject } from '../config-schema';
+import { Facility, Practitioner, ProviderResponse, User } from '../types';
 import {
   createProvider,
   createUser,
   searchHealthCareWork,
+  createProviderAttribute,
+  updateProviderAttributes,
+  updateProviderPerson,
+  updateProviderUser,
   useFacility,
-  useHWR,
   useIdentifierTypes,
   useRoles,
 } from './hook/provider-form.resource';
-import { Facility, Practitioner, User } from '../types';
-import { ConfigObject } from '../config-schema';
+import styles from './provider-form.scss';
+import { mutate } from 'swr';
 
 const providerFormSchema = z
   .object({
     surname: z.string().nonempty('Surname is required'),
     firstname: z.string().nonempty('First name is required'),
     nationalid: z.string().nonempty('National ID is required'),
-    gender: z.enum(['male', 'female'], { required_error: 'Gender is required' }),
+    gender: z.enum(['M', 'F'], { required_error: 'Gender is required' }),
     licenseNumber: z.string().nonempty('License number is required'),
     licenseExpiryDate: z.date(),
     username: z.string().nonempty('Username is required'),
@@ -51,7 +55,7 @@ const providerFormSchema = z
     confirmPassword: z.string().nonempty('Confirm password is required'),
     roles: z.array(z.string()).min(1, 'At least one role is required'),
     providerId: z.string().nonempty('Provider ID is required'),
-    primaryFacility: z.string().nonempty('Primary facility is required'),
+    primaryFacility: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -60,8 +64,10 @@ const providerFormSchema = z
 
 interface ProvideModalProps {
   closeWorkspace: () => void;
+  provider?: ProviderResponse;
+  user?: User;
 }
-const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
+const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, user }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
@@ -69,7 +75,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
   const { roles, isLoading: isLoadingRoles } = useRoles();
   const [facilitySearchTerm, setFacilitySearchTerm] = useState('');
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  const { nationalIDUuid, providerNationalIdUuid, licenseExpiryDateUuid, licenseNumberUuid, defaultprimaryFacility } =
+  const { nationalIDUuid, providerNationalIdUuid, licenseExpiryDateUuid, licenseNumberUuid } =
     useConfig<ConfigObject>();
 
   const [searchHWR, setSearchHWR] = useState({
@@ -79,6 +85,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
   });
   const { data: facilities } = useFacility(facilitySearchTerm);
   const definedRoles = roles.map((role) => role.uuid) || [];
+  const licenseDate = provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid)?.value;
+
   const {
     handleSubmit,
     setValue,
@@ -86,20 +94,21 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(providerFormSchema),
+    defaultValues: {
+      surname: provider?.person?.display?.split(' ').at(-1),
+      firstname: provider?.person?.display?.split(' ').at(0),
+      nationalid: provider?.attributes?.find((attr) => attr.attributeType.uuid === providerNationalIdUuid)?.value,
+      gender: provider?.person?.gender,
+      licenseNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseNumberUuid)?.value,
+      licenseExpiryDate: licenseDate ? parseDate(licenseDate) : undefined,
+      username: user?.username,
+      password: provider ? '*****' : '',
+      confirmPassword: provider ? '*****' : '',
+      roles: user?.allRoles?.map((role) => role.uuid) ?? [],
+      providerId: provider?.identifier,
+    },
   });
-  const handleFacilitySearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFacilitySearchTerm(event.target.value);
-  };
 
-  const handleFacilitySelect = (facility: Facility) => {
-    setSelectedFacility(facility);
-    setFacilitySearchTerm('');
-    setValue('primaryFacility', facility.uuid);
-  };
-
-  const handleRemoveFacility = () => {
-    setSelectedFacility(null);
-  };
   const defualtValueCombox = providerIdentifierTypes?.find((item) => item.display === searchHWR.identifierType);
   const handleSearch = async () => {
     try {
@@ -121,7 +130,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
           setValue('firstname', healthWorker?.name?.[0]?.given?.[0]);
           setValue('nationalid', nationalId);
           setValue('licenseNumber', licenseNumber);
-          setValue('active', healthWorker?.active);
         },
       });
     } catch (error) {
@@ -130,7 +138,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
       setSearchHWR({ ...searchHWR, isHWRLoading: false });
     }
   };
-  const onSubmit = async (data: z.infer<typeof providerFormSchema>) => {
+  const onSubmit = async (data) => {
     let response;
     try {
       const personPayload = {
@@ -142,22 +150,35 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
         ],
         gender: data.gender,
       };
+
       const userPayload = {
         username: data.username,
         password: data.password,
         person: personPayload,
         roles: data.roles,
       };
-      response = await createUser(userPayload);
-      const user: User = await response.json();
+      let _user;
+      if (provider) {
+        const userResponse = await updateProviderUser({ roles: userPayload.roles }, user!.uuid);
+        response = await updateProviderPerson(personPayload, user!.person.uuid);
+        _user = await userResponse.json();
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('accountUpatedMsgs', 'Account updated successfully!'),
+        });
+      } else {
+        response = await createUser(userPayload);
+        _user = await response.json();
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('personMsg', 'Person created successfully!'),
+        });
+      }
 
-      showSnackbar({
-        title: 'Success',
-        kind: 'success',
-        subtitle: t('personMsg', 'Person created successfully!'),
-      });
       const providerPayload = {
-        person: user.person.uuid,
+        person: _user.person.uuid,
         identifier: data.providerId,
         attributes: [
           {
@@ -175,18 +196,53 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
         ],
         retired: false,
       };
-      response = await createProvider(providerPayload);
-      showSnackbar({
-        title: 'Success',
-        kind: 'success',
-        subtitle: t('accountMsg', 'Account created successfully!'),
-      });
+      if (provider) {
+        const updatableAttributes = [providerNationalIdUuid, licenseNumberUuid, licenseExpiryDateUuid];
+        await Promise.all(
+          providerPayload.attributes
+            .filter((attr) => updatableAttributes.includes(attr.attributeType))
+            .map((attr) => {
+              const _attribute = provider.attributes.find((at) => at.attributeType.uuid === attr.attributeType)?.uuid;
+              if (!_attribute) {
+                return createProviderAttribute(attr, provider.uuid);
+              }
+
+              return updateProviderAttributes(
+                { value: attr.value },
+                provider.uuid,
+                provider.attributes.find((at) => at.attributeType.uuid === attr.attributeType)?.uuid,
+              );
+            }),
+        );
+        mutate((key) => {
+          return typeof key === 'string' && key.startsWith('/ws/rest/v1/provider');
+        });
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('accountUpatedMsg', 'Account updated successfully!'),
+        });
+      } else {
+        response = await createProvider(providerPayload);
+        mutate((key) => {
+          return typeof key === 'string' && key.startsWith('/ws/rest/v1/provider');
+        });
+        showSnackbar({
+          title: 'Success',
+          kind: 'success',
+          subtitle: t('accountMsg', 'Account created successfully!'),
+        });
+      }
+
       closeWorkspace();
     } catch (error) {
       showSnackbar({
         title: 'Failure',
         kind: 'error',
-        subtitle: t('errorMsg', `Error creating provider! ${error?.responseBody?.error?.message}`),
+        subtitle: t(
+          'errorMsg',
+          `Error ${provider ? 'upating' : 'creating'} provider! ${error?.responseBody?.error?.message}`,
+        ),
       });
     }
   };
@@ -242,7 +298,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
             </Column>
           </>
         )}
-
         <span className={styles.form__subheader__section}>{t('personinfo', 'Person info')}</span>
         <Column>
           <Controller
@@ -298,9 +353,13 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
             name="gender"
             control={control}
             render={({ field }) => (
-              <ContentSwitcher id="form__content_switch" onChange={({ name }) => field.onChange(name)}>
+              <ContentSwitcher
+                id="form__content_switch"
+                selectedIndex={field.value === 'F' ? 1 : 0}
+                selectionMode="manual"
+                onChange={(event) => field.onChange(event.index === 0 ? 'M' : 'F')}>
                 <Switch
-                  name="male"
+                  name="M"
                   text={
                     <>
                       <GenderMale /> Male
@@ -309,7 +368,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
                   selected={field.value === 'M'}
                 />
                 <Switch
-                  name="female"
+                  name="F"
                   text={
                     <>
                       <GenderFemale /> Female
@@ -346,7 +405,12 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
               <DatePicker
                 datePickerType="single"
                 className={styles.form__date__picker}
-                onChange={(date) => field.onChange(date[0])}>
+                onChange={(event) => {
+                  if (event.length) {
+                    field.onChange(event[0]);
+                  }
+                }}
+                value={field.value}>
                 <DatePickerInput
                   className={styles.form__date__picker}
                   placeholder="mm/dd/yyyy"
@@ -360,7 +424,12 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
             )}
           />
         </Column>
-        <span className={styles.form__subheader__section}>{t('loginIn', 'Login info')}</span>
+        {!provider ? (
+          <span className={styles.form__subheader__section}>{t('loginIn', 'Login info')}</span>
+        ) : (
+          <span className={styles.form__subheader__section}>{t('rolesHeader', 'Roles info')}</span>
+        )}
+
         <Column>
           <Controller
             name="username"
@@ -377,135 +446,87 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace }) => {
             )}
           />
         </Column>
-        <Column>
-          <Controller
-            name="password"
-            control={control}
-            render={({ field }) => (
-              <PasswordInput
-                {...field}
-                id="form__password"
-                placeholder="Password"
-                labelText={t('password', 'Password*')}
-                invalid={!!errors.password}
-                invalidText={errors.password?.message}
+        {!provider && (
+          <>
+            <Column>
+              <Controller
+                name="password"
+                control={control}
+                render={({ field }) => (
+                  <PasswordInput
+                    {...field}
+                    id="form__password"
+                    placeholder="Password"
+                    labelText={t('password', 'Password*')}
+                    invalid={!!errors.password}
+                    invalidText={errors.password?.message}
+                  />
+                )}
               />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            name="confirmPassword"
-            control={control}
-            render={({ field }) => (
-              <PasswordInput
-                {...field}
-                id="form__confirm__password"
-                placeholder="Confirm password"
-                labelText={t('confirmPasword', 'Confirm password*')}
-                invalid={!!errors.confirmPassword}
-                invalidText={errors.confirmPassword?.message}
+            </Column>
+            <Column>
+              <Controller
+                name="confirmPassword"
+                control={control}
+                render={({ field }) => (
+                  <PasswordInput
+                    {...field}
+                    id="form__confirm__password"
+                    placeholder="Confirm password"
+                    labelText={t('confirmPasword', 'Confirm password*')}
+                    invalid={!!errors.confirmPassword}
+                    invalidText={errors.confirmPassword?.message}
+                  />
+                )}
               />
-            )}
-          />
-        </Column>
+            </Column>
+          </>
+        )}
         <Column>
           <Controller
             name="roles"
             control={control}
             render={({ field }) => (
-              <MultiSelect
-                {...field}
-                label={<span className={styles.form__role_label}>Roles</span>}
-                id="form__roles"
-                titleText="Roles*"
-                items={definedRoles}
-                itemToString={(item) => roles.find((r) => r.uuid === item)?.display ?? ''}
-                onChange={({ selectedItems }) => {
-                  field.onChange(selectedItems);
-                }}
-                selectionFeedback="top-after-reopen"
-                invalid={!!errors.roles}
-                invalidText={errors.roles?.message}
-              />
+              <>
+                <MultiSelect
+                  ref={field.ref}
+                  label={<span className={styles.form__role_label}>Roles</span>}
+                  id="form__roles"
+                  titleText="Roles*"
+                  initialSelectedItems={field.value}
+                  items={definedRoles}
+                  itemToString={(item) => roles.find((r) => r.uuid === item)?.display ?? ''}
+                  onChange={({ selectedItems }) => {
+                    field.onChange(selectedItems);
+                  }}
+                  selectionFeedback="top-after-reopen"
+                  invalid={!!errors.roles}
+                  invalidText={errors.roles?.message}
+                />
+              </>
             )}
           />
         </Column>
-        <Column>
-          <span className={styles.form__gender}>{t('primaryFacility', 'Primary facility*')}</span>
-          <br />
-          {selectedFacility && (
-            <Tag
-              key={selectedFacility.uuid}
-              type="high-contrast"
-              onClick={handleRemoveFacility}
-              role="button"
-              tabIndex={0}
-              title={selectedFacility.name}>
-              {selectedFacility.name} - {selectedFacility.attributes[0]?.value}
-            </Tag>
-          )}
-          <br />
-          <Controller
-            name="primaryFacility"
-            control={control}
-            render={({ field }) => {
-              const isSearchDisabled = !!selectedFacility;
-              return (
-                <>
-                  <Search
+        {!provider && (
+          <>
+            <Column>
+              <Controller
+                name="providerId"
+                control={control}
+                render={({ field }) => (
+                  <TextInput
                     {...field}
-                    size="lg"
-                    placeholder="Primary facility"
-                    labelText="Search"
-                    closeButtonLabelText="Clear"
-                    id="facility-search"
-                    value={facilitySearchTerm}
-                    onChange={handleFacilitySearchChange}
-                    invalid={!!errors.primaryFacility}
-                    invalidText={errors.primaryFacility?.message}
-                    disabled={isSearchDisabled}
+                    placeholder="Provider ID"
+                    id="form__provide__id"
+                    labelText={t('providerId', 'Provider ID*')}
+                    invalid={!!errors.providerId}
+                    invalidText={errors.providerId?.message}
                   />
-                  {facilitySearchTerm && facilities && (
-                    <div className={styles.facilityList}>
-                      {facilities.map((facility) => (
-                        <Tile
-                          key={facility.uuid}
-                          className={styles.facilityTag}
-                          type="blue"
-                          onClick={() => {
-                            handleFacilitySelect(facility);
-                            field.onChange(facility.uuid);
-                          }}
-                          role="button"
-                          tabIndex={0}
-                          title={facility.name}>
-                          {facility.name} - {facility.attributes[0]?.value}
-                        </Tile>
-                      ))}
-                    </div>
-                  )}
-                </>
-              );
-            }}
-          />
-        </Column>
-        <Column>
-          <Controller
-            name="providerId"
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                placeholder="Provider ID"
-                id="form__provide__id"
-                labelText={t('providerId', 'Provider ID*')}
-                invalid={!!errors.providerId}
-                invalidText={errors.providerId?.message}
+                )}
               />
-            )}
-          />
-        </Column>
+            </Column>
+          </>
+        )}
       </Stack>
       <ButtonSet className={styles.form__button_set}>
         <Button className={styles.form__button} size="sm" kind="secondary" onClick={closeWorkspace}>

@@ -1,0 +1,79 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.reportingPeriod {
+  display: flex;
+  flex-direction: row;
+  flex-flow: row wrap;
+  gap: layout.$spacing-01;
+  width: 100%;
+  padding: layout.$spacing-03 layout.$spacing-05 0 0;
+  align-items: center;
+}
+
+.reportingPeriodInput {
+  flex-grow: 1;
+}
+
+.header {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-70;
+  height: layout.$spacing-12;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-20;
+  border-left: 0px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.left-justified-items {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-left: 0.75rem;
+}
+
+.right-justified-items {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-70;
+  padding-top: 1rem;
+}
+
+.page-name {
+  @include type.type-style('heading-04');
+}
+
+.page-labels {
+  margin-left: 1rem;
+
+  p:first-of-type {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.date-and-location {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.value {
+  margin-left: 0.25rem;
+}
+
+.middot {
+  margin: 0 0.5rem;
+}
+
+.view {
+  @include type.type-style('label-01');
+}
+
+.illustration {
+  width: 72px;
+  height: 72px;
+  fill: var(--brand-03);
+}

@@ -1,0 +1,54 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.heading {
+  @include type.type-style('heading-compact-01');
+  margin: layout.$spacing-05 0 layout.$spacing-05;
+}
+
+.grid {
+  margin: layout.$spacing-05 layout.$spacing-05;
+  padding: layout.$spacing-05 0 0 0;
+}
+
+.buttonSet {
+  width: 100%;
+  padding-top: layout.$spacing-05;
+  background-color: colors.$white;
+  justify-content: space-between;
+  bottom: 0;
+  position: absolute;
+  & > button {
+    max-width: 50% !important;
+    width: 50%;
+  }
+}
+
+.formTitle {
+  @include type.type-style('heading-02');
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: layout.$spacing-05;
+  row-gap: 1.5rem;
+  position: relative;
+
+  &::after {
+    content: '';
+    display: block;
+    width: 2rem;
+    border-bottom: 0.375rem solid var(--brand-03);
+    position: absolute;
+    bottom: -0.75rem;
+    left: 0;
+  }
+
+  & > span {
+    @include type.type-style('body-01');
+  }
+}
+
+.sectionHeader {
+  @include type.type-style('heading-02');
+}
