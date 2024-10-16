@@ -1,18 +1,17 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
 
 .grid {
   margin: 0 spacing.$spacing-05;
   padding: spacing.$spacing-05 0rem 0rem 0rem;
-}
 
-form {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
 }
 
 .formTitle {
