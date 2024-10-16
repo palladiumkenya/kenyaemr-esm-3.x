@@ -10,6 +10,8 @@ import Invoice from './invoice/invoice.component';
 import { ClockInBoundary } from './payment-points/clock-in-boundary.component';
 import { PaymentPoint } from './payment-points/payment-point/payment-point.component';
 import { PaymentPoints } from './payment-points/payment-points.component';
+import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
+import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
