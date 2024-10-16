@@ -16,7 +16,6 @@
   "discharges": "Discharges",
   "empty": "Empty",
   "encounterType": "Encounter Type",
-  "enrollingBtn": "Add New Deceased",
   "formName": "Form Name",
   "fromHosp": "From Hospital",
   "home": "Home View",
@@ -29,7 +28,6 @@
   "releaseBody": "Release Body",
   "searchThisList": "Search this list",
   "visitType": "Visit Type",
-  "waitingQueue": "Waiting queue",
   "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"
 }
