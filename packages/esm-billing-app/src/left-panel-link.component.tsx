@@ -33,7 +33,6 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   }
 
   const isActive = nameSegment === urlSegment;
-
   return (
     <ConfigurableLink
       to={spaBasePath + '/' + name}

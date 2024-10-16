@@ -37,8 +37,8 @@ const Invoice: React.FC = () => {
   const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
+  const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
   const isPreAuthEnabled = useFeatureFlag('healthInformationExchange');
-
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems([...lineItems, ...paidLineItems]);
@@ -138,15 +138,17 @@ const Invoice: React.FC = () => {
           tooltipPosition="left">
           {t('mpesaPayment', 'MPESA Payment')}
         </Button>
-        <Button
-          onClick={() => navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` })}
-          kind="danger"
-          size="sm"
-          renderIcon={BaggageClaim}
-          iconDescription="Add"
-          tooltipPosition="bottom">
-          {t('claim', 'Process claims')}
-        </Button>
+        {isProcessClaimsFormEnabled && (
+          <Button
+            onClick={() => navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` })}
+            kind="danger"
+            size="sm"
+            renderIcon={BaggageClaim}
+            iconDescription="Add"
+            tooltipPosition="bottom">
+            {t('claim', 'Process claims')}
+          </Button>
+        )}
         {isPreAuthEnabled && (
           <Button
             onClick={() =>

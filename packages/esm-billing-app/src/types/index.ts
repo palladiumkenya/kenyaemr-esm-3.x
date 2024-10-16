@@ -331,12 +331,6 @@ export interface SHAPackage {
   shaPackageCode: string;
   shaPackageName: string;
 }
-export interface Package {
-  uuid: string;
-  packageCode: string;
-  packageName: string;
-  packageAccessPoint: 'OP' | 'IP' | 'Both';
-}
 
 export interface PatientBenefit {
   packageCode: string;
@@ -365,12 +359,6 @@ export interface SHAIntervension {
   interventionName?: string;
 }
 
-export interface Diagnosis {
-  uuid: string;
-  name: string;
-  dateRecorded: string;
-  value: string;
-}
 export interface FHIRErrorResponse {
   resourceType: string;
   issue: Issue[];
@@ -440,6 +428,19 @@ export type FHIRPatientResponse = {
     }>;
   };
 };
+export interface Package {
+  uuid: string;
+  packageCode: string;
+  packageName: string;
+  packageAccessPoint: 'OP' | 'IP' | 'Both';
+}
+
+export interface Diagnosis {
+  uuid: string;
+  name: string;
+  dateRecorded: string;
+  value: string;
+}
 
 export interface PaymentPoint {
   uuid: string;

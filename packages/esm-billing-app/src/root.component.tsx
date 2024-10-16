@@ -10,6 +10,8 @@ import Invoice from './invoice/invoice.component';
 import { ClockInBoundary } from './payment-points/clock-in-boundary.component';
 import { PaymentPoint } from './payment-points/payment-point/payment-point.component';
 import { PaymentPoints } from './payment-points/payment-points.component';
+import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
+import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
@@ -18,6 +20,8 @@ const RootComponent: React.FC = () => {
     <BrowserRouter basename={baseName}>
       <Routes>
         <Route path="/" element={<BillingDashboard />} />
+        <Route path="/claims-overview" element={<ClaimsManagementOverview />} />
+        <Route path="/preauth-requests" element={<ClaimsManagementPreAuthRequest />} />
         <Route path="/patient/:patientUuid/:billUuid/pre-auth-request" element={<PreAuthRequestDashboard />} />
         <Route
           path="/patient/:patientUuid/:billUuid"
