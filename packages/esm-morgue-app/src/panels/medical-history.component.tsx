@@ -1,19 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  CardHeader,
-  EmptyState,
-  getPatientUuidFromUrl,
-  PatientChartPagination,
-  usePaginationInfo,
-} from '@openmrs/esm-patient-common-lib';
-import { useInfiniteVisits, usePatientPaginatedVisits } from '../hook/useMorgue.resource';
+import { CardHeader, EmptyState, getPatientUuidFromUrl, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   TableContainer,
   Table,
   TableHead,
-  TableToolbarSearch,
   TableRow,
   TableExpandHeader,
   TableHeader,
@@ -24,48 +16,51 @@ import {
   Layer,
   DataTableSkeleton,
   Pagination,
-  TableToolbar,
-  TableToolbarContent,
   Dropdown,
   Search,
 } from '@carbon/react';
 import EncounterObservations from './encounter-obs.component';
 import { ErrorState, formatDate, isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './panels.scss';
+import { usePatientPaginatedEncounters } from '../hook/useMorgue.resource';
+
+const defaultPageSize = 10;
 
 const MedicalHistoryView: React.FC = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
-  const paginatedVisits = usePatientPaginatedVisits(patientUuid);
+  const paginatedEncounter = usePatientPaginatedEncounters(patientUuid);
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedEncounterType, setSelectedEncounterType] = useState<string | null>(null);
-  const error = paginatedVisits?.error;
+  const error = paginatedEncounter?.error;
 
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(defaultPageSize);
+  const { results, currentPage } = usePagination(paginatedEncounter?.data, pageSize);
+  const { pageSizes } = usePaginationInfo(
+    defaultPageSize,
+    paginatedEncounter?.data?.length,
+    currentPage,
+    results.length,
+  );
 
   const encounterTypes = useMemo(() => {
-    const types =
-      paginatedVisits?.data?.flatMap((visit: any) =>
-        visit.encounters.map((encounter) => encounter.encounterType.display),
-      ) || [];
+    const types = paginatedEncounter?.data?.flatMap((encounter: any) => encounter?.encounterType?.display);
     return Array.from(new Set(types));
-  }, [paginatedVisits]);
+  }, [paginatedEncounter]);
 
-  const encounters = useMemo(
-    () =>
-      paginatedVisits?.data?.flatMap((visit: any) =>
-        visit?.encounters?.map((encounter) => ({
-          visitType: visit?.visitType?.name,
-          form: encounter?.form?.display,
-          encounterType: encounter?.encounterType?.display,
-          encounterDatetime: encounter?.encounterDatetime,
-          obs: encounter?.obs,
-        })),
-      ) || [],
-    [paginatedVisits],
-  );
+  const encounters = useMemo(() => {
+    return (
+      paginatedEncounter?.data?.flatMap((encounter: any) => ({
+        visitType: encounter?.visit?.visitType?.display || 'Outpatient',
+        form: encounter?.form?.display || 'Order',
+        encounterType: encounter?.encounterType?.display || '',
+        encounterDatetime: encounter?.encounterDatetime || '',
+        obs: encounter?.obs || null,
+      })) || []
+    );
+  }, [paginatedEncounter]);
 
   const filteredEncounters = useMemo(() => {
     return encounters?.filter((encounter) => {
@@ -74,9 +69,9 @@ const MedicalHistoryView: React.FC = () => {
         selectedEncounterType === t('all', 'All') ||
         encounter.encounterType === selectedEncounterType;
       const matchesSearch =
-        encounter.encounterType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        encounter.visitType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        encounter.form?.toLowerCase().includes(searchTerm.toLowerCase());
+        encounter?.encounterType.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        encounter?.visitType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        encounter?.form?.toLowerCase().includes(searchTerm.toLowerCase());
 
       return matchesEncounterType && matchesSearch;
     });
@@ -90,7 +85,7 @@ const MedicalHistoryView: React.FC = () => {
     formName: encounter.form,
   }));
 
-  if (paginatedVisits?.isLoading) {
+  if (paginatedEncounter?.isLoading) {
     return <DataTableSkeleton rowCount={10} />;
   }
 
@@ -101,7 +96,7 @@ const MedicalHistoryView: React.FC = () => {
       </Layer>
     );
   }
-  if (paginatedVisits?.data?.length === 0) {
+  if (paginatedEncounter?.data?.length === 0) {
     return (
       <EmptyState
         displayText={t('medicalHistory', 'Medical history')}
@@ -189,15 +184,15 @@ const MedicalHistoryView: React.FC = () => {
         <Pagination
           forwardText="Next page"
           backwardText="Previous page"
-          page={paginatedVisits?.currentPage}
-          pageSize={paginatedVisits?.currentPageSize?.current}
-          pageSizes={[1]}
-          totalItems={paginatedVisits?.totalCount}
+          page={paginatedEncounter?.currentPage}
+          pageSize={paginatedEncounter?.currentPageSize?.current}
+          pageSizes={pageSizes}
+          totalItems={paginatedEncounter?.totalCount}
           className={styles.pagination}
           size={responsiveSize}
           onChange={({ pageSize: newPageSize, page: newPage }) => {
             setPageSize(newPageSize);
-            paginatedVisits?.goTo(newPage);
+            paginatedEncounter?.goTo(newPage);
           }}
         />
       </div>
