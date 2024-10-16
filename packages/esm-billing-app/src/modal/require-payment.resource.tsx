@@ -31,7 +31,7 @@ export const usePatientBills = (patientUuid: string) => {
   }, [data?.data?.results]);
 
   return {
-    patientBills,
+    patientBills: patientBills ?? [],
     isLoading,
     error,
     isValidating,

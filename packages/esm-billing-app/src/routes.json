@@ -139,7 +139,7 @@
       "slot": "medication-info-slot"
     },
     {
-      "name": "test-order-action",
+      "name": "billing-test-order-action",
       "component": "testOrderAction",
       "slot": "tests-ordered-actions-slot",
       "order": 0

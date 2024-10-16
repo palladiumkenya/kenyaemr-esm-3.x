@@ -22,7 +22,7 @@ describe('TestOrderAction', () => {
   test("should display `Unsettled bill for test` when there's a pending payment", () => {
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValue({ isLoading: false, hasPendingPayment: true });
     render(<TestOrderAction order={{ uuid: '123', patient: { uuid: '456' } } as Order} />);
-    expect(screen.getByText('Unsettled bill for test.')).toBeInTheDocument();
+    expect(screen.getByText('Unsettled test bill.')).toBeInTheDocument();
   });
 
   test("should display `Pick Lab Request` when there's no pending payment", async () => {
@@ -32,7 +32,7 @@ describe('TestOrderAction', () => {
     const pickLabRequestMenuItem = screen.getByText('Pick Lab Request');
     await user.click(pickLabRequestMenuItem);
 
-    expect(screen.queryByText('Unsettled bill for test.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Unsettled test bill.')).not.toBeInTheDocument();
     expect(showModal).toBeCalledWith('pickup-lab-request-modal', {
       closeModal: expect.any(Function),
       order: { patient: { uuid: '456' }, uuid: '123' },

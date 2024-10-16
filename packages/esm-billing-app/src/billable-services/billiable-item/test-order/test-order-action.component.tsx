@@ -1,6 +1,6 @@
 import { OverflowMenuItem, Button } from '@carbon/react';
 import { Order } from '@openmrs/esm-patient-common-lib';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTestOrderBillStatus } from './test-order-action.resource';
 import { showModal } from '@openmrs/esm-framework';
@@ -11,7 +11,7 @@ enum FulfillerStatus {
   IN_PROGRESS = 'IN_PROGRESS',
 }
 
-const TestOrderAction: React.FC<TestOrderProps> = ({ order }) => {
+const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order }) => {
   const { t } = useTranslation();
   const { isLoading, hasPendingPayment } = useTestOrderBillStatus(order.uuid, order.patient.uuid);
 
@@ -37,10 +37,10 @@ const TestOrderAction: React.FC<TestOrderProps> = ({ order }) => {
   }
 
   return (
-    <Button kind="primary" disabled={hasPendingPayment} key={`${order.uuid}`} onClick={launchModal}>
-      {hasPendingPayment ? t('unsettledBill', 'Unsettled bill for test.') : t('pickLabRequest', 'Pick Lab Request')}
+    <Button kind="primary" disabled={hasPendingPayment} onClick={launchModal}>
+      {hasPendingPayment ? t('unsettledTestBill', 'Unsettled test bill.') : t('pickLabRequest', 'Pick Lab Request')}
     </Button>
   );
-};
+});
 
 export default TestOrderAction;
