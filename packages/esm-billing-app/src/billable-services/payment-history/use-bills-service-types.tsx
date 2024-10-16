@@ -1,24 +1,15 @@
 import { MappedBill } from '../../types';
 import { useServiceTypes } from '../billable-service.resource';
-import { useChargeSummaries } from '../billables/charge-summary.resource';
 
 export const useBillsServiceTypes = (bills: MappedBill[]) => {
   const { serviceTypes, isLoading } = useServiceTypes();
-  const { isLoading: isLoadingChargeSummaries, chargeSummaryItems } = useChargeSummaries();
-
-  const allLineItemBillableServicesUUIDs = bills
-    .map((bill) => [...bill.lineItems.map((item) => item.billableService.split(':').at(0))])
+  const lineItemServiceTypeUUIDS = bills
+    .map((bill) => bill.lineItems.map((lineItem) => lineItem.serviceTypeUuid))
     .flat();
-
-  //finding the billable service`s service type
-  const lineItemServiceTypeUUIDS = allLineItemBillableServicesUUIDs.map(
-    (billableServiceUUID) => chargeSummaryItems.find((item) => item.uuid === billableServiceUUID)?.serviceType?.uuid,
-  );
-
-  const uniqueLineItemServiceType = Array.from(new Set(lineItemServiceTypeUUIDS));
+  const uniqueLineItemServiceTypeUUIDs = Array.from(new Set(lineItemServiceTypeUUIDS));
 
   return {
-    isLoading: isLoading || isLoadingChargeSummaries,
-    billsServiceTypes: serviceTypes.filter((sType) => uniqueLineItemServiceType.includes(sType.uuid)),
+    isLoading: isLoading,
+    billsServiceTypes: serviceTypes.filter((sType) => uniqueLineItemServiceTypeUUIDs.includes(sType.uuid)),
   };
 };

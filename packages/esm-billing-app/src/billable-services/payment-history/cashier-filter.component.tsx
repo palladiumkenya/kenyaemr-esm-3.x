@@ -1,37 +1,20 @@
-import { Button, Checkbox, Popover, PopoverContent, usePrefix } from '@carbon/react';
-import { IbmCloudLogging } from '@carbon/react/icons';
-import React, { ChangeEvent, useState } from 'react';
+import { Checkbox, usePrefix } from '@carbon/react';
+import React, { ChangeEvent } from 'react';
 import { MappedBill } from '../../types';
 import styles from './payment-history.scss';
 
-interface CashierFilterProps {
-  onApplyFilter?: (selectedCheckboxes: Array<string>) => void;
-  onResetFilter?: () => void;
+export const CashierFilter = ({
+  selectedCashierCheckboxes,
+  bills,
+  applyCashierFilter,
+}: {
+  selectedCashierCheckboxes: Array<string>;
   bills: MappedBill[];
-}
-
-export const CashierFilter = ({ onApplyFilter, onResetFilter, bills }: CashierFilterProps) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedCheckboxes, setSelectedCheckboxes] = useState<string[]>([]);
-
+  applyCashierFilter: (filters: Array<string>) => void;
+}) => {
   const cashiers = Array.from(new Map(bills.map((bill) => [bill.cashier.uuid, bill.cashier])).values());
 
   const prefix = usePrefix();
-
-  const handleApplyFilter = () => {
-    setIsOpen(false);
-    if (onApplyFilter) {
-      onApplyFilter(selectedCheckboxes);
-    }
-  };
-
-  const handleResetFilter = () => {
-    setIsOpen(false);
-    setSelectedCheckboxes([]);
-    if (onResetFilter) {
-      onResetFilter();
-    }
-  };
 
   const handleCheckboxChange = (e: ChangeEvent<HTMLInputElement>) => {
     const checkboxId = e.target.id;
@@ -40,46 +23,26 @@ export const CashierFilter = ({ onApplyFilter, onResetFilter, bills }: CashierFi
     const checkboxValue: HTMLSpanElement | null = document.querySelector(`label[for="${checkboxId}"]`);
 
     if (isChecked && checkboxValue) {
-      setSelectedCheckboxes([...selectedCheckboxes, checkboxValue.innerText]);
+      applyCashierFilter([...selectedCashierCheckboxes, checkboxValue.innerText]);
     } else {
-      setSelectedCheckboxes(selectedCheckboxes.filter((item) => item !== checkboxValue?.innerText));
+      applyCashierFilter(selectedCashierCheckboxes.filter((item) => item !== checkboxValue?.innerText));
     }
   };
 
   return (
-    <Popover align={'left'} caret={true} open={isOpen} onRequestClose={() => setIsOpen(false)}>
-      <button
-        aria-label="Filtering"
-        type="button"
-        aria-expanded={isOpen}
-        onClick={() => {
-          setIsOpen(!isOpen);
-        }}
-        className={`${prefix}--toolbar-action ${prefix}--overflow-menu`}>
-        <IbmCloudLogging />
-      </button>
-      <PopoverContent id="containerCheckbox">
-        <div className={styles.checkBoxWrapper}>
-          <fieldset className={`${prefix}--fieldset`}>
-            <legend className={`${prefix}--label`}>Filter by cashier</legend>
-            {cashiers.length === 0 && <p className={styles.noCashiersInRange}>No Cashiers In Bills Range</p>}
-            {cashiers.map((cashier) => (
-              <Checkbox
-                labelText={cashier.display}
-                id={`checkbox-${cashier.display}`}
-                onChange={handleCheckboxChange}
-                checked={selectedCheckboxes.includes(cashier.display)}
-              />
-            ))}
-          </fieldset>
-        </div>
-        <Button kind="secondary" title="Reset filters" onClick={handleResetFilter}>
-          Reset filters
-        </Button>
-        <Button kind="primary" title="Reset filters" onClick={handleApplyFilter}>
-          Apply filter
-        </Button>
-      </PopoverContent>
-    </Popover>
+    <div className={styles.checkBoxWrapper}>
+      <fieldset className={`${prefix}--fieldset`}>
+        <legend className={`${prefix}--label`}>Cashiers</legend>
+        {cashiers.length === 0 && <p className={styles.noCashiersInRange}>No Cashiers In Bills Range</p>}
+        {cashiers.map((cashier) => (
+          <Checkbox
+            labelText={cashier.display}
+            id={`checkbox-${cashier.display}`}
+            onChange={handleCheckboxChange}
+            checked={selectedCashierCheckboxes.includes(cashier.display)}
+          />
+        ))}
+      </fieldset>
+    </div>
   );
 };

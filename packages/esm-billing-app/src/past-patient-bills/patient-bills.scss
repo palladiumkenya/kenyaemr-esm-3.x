@@ -2,10 +2,41 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-.button {
-  margin-left: layout.$spacing-04;
+.container {
+  margin-top: layout.$spacing-03;
+  border: 1px solid colors.$gray-20;
+  padding: layout.$spacing-03;
+  background-color: colors.$gray-10;
 }
 
-.billsTableContainer {
-  margin: 2rem 1rem;
+.patientHeaderContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: layout.$spacing-03;
+  border-bottom: 2px solid colors.$gray-10;
+  background-color: colors.$white;
+
+  .patientNameContainer {
+    display: flex;
+    width: 100%;
+    padding-left: layout.$spacing-05;
+    column-gap: layout.$spacing-05;
+    align-items: center;
+
+    .patientName {
+      @include type.type-style('heading-03');
+      color: colors.$gray-100;
+    }
+
+    .patientGender,
+    .identifier {
+      @include type.type-style('body-compact-01');
+      color: colors.$gray-70;
+    }
+  }
+
+  .headerActions {
+    display: flex;
+  }
 }
