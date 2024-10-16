@@ -5,8 +5,7 @@ import { ChargeItemsDashboard } from './billable-services/dashboard/dashboard.co
 import { PaymentHistory } from './billable-services/payment-history/payment-history.component';
 import { BillingDashboard } from './billing-dashboard/billing-dashboard.component';
 import ClaimScreen from './claims/dashboard/claims-dashboard.component';
-import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
-import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
+import PreAuthRequestDashboard from './claims/pre-auth/pre-auth-dashboard.component';
 import Invoice from './invoice/invoice.component';
 import { ClockInBoundary } from './payment-points/clock-in-boundary.component';
 import { PaymentPoint } from './payment-points/payment-point/payment-point.component';
@@ -19,10 +18,9 @@ const RootComponent: React.FC = () => {
     <BrowserRouter basename={baseName}>
       <Routes>
         <Route path="/" element={<BillingDashboard />} />
-        <Route path="/patient/:patientUuid/:billUuid" element={<Invoice />} />
-        <Route path="/patient/:patientUuid/:billUuid/claims" element={<ClaimScreen />} />
         <Route path="/claims-overview" element={<ClaimsManagementOverview />} />
         <Route path="/preauth-requests" element={<ClaimsManagementPreAuthRequest />} />
+        <Route path="/patient/:patientUuid/:billUuid/pre-auth-request" element={<PreAuthRequestDashboard />} />
         <Route
           path="/patient/:patientUuid/:billUuid"
           element={
