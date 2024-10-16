@@ -10,20 +10,20 @@ import {
   Row,
   ButtonSet,
   Button,
-  FilterableMultiSelect,
   MultiSelect,
   InlineLoading,
+  Tag,
 } from '@carbon/react';
 import styles from './claims-form.scss';
 import { MappedBill, LineItem } from '../../../types';
-import { navigate, showSnackbar } from '@openmrs/esm-framework';
+import { navigate, showSnackbar, useSession } from '@openmrs/esm-framework';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import { useParams } from 'react-router-dom';
-import { processClaims, useProviders, useVisit } from './claims-form.resource';
+import { processClaims, useInterventions, usePackages, useVisit } from './claims-form.resource';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { extractNameString, formatDate } from '../../../helpers/functions';
+import { formatDate } from '../../../helpers/functions';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -31,18 +31,8 @@ type ClaimsFormProps = {
 };
 
 const ClaimsFormSchema = z.object({
-  claimCode: z.string().nonempty({ message: 'Claim code is required' }),
-  guaranteeId: z.string().nonempty({ message: 'Guarantee Id is required' }),
   claimExplanation: z.string().nonempty({ message: 'Claim explanation is required' }),
   claimJustification: z.string().nonempty({ message: 'Claim justification is required' }),
-  providerName: z
-    .array(
-      z.object({
-        id: z.string(),
-        text: z.string(),
-      }),
-    )
-    .nonempty({ message: 'At least one provider is required' }),
   diagnoses: z
     .array(
       z.object({
@@ -55,6 +45,9 @@ const ClaimsFormSchema = z.object({
   facility: z.string().nonempty({ message: 'Facility is required' }),
   treatmentStart: z.string().nonempty({ message: 'Treatment start date is required' }),
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
+  packages: z.array(z.string()).nonempty({ message: 'At least one package is required' }),
+  interventions: z.array(z.string()).nonempty({ message: 'At least one intervention is required' }),
+  cashier: z.string().nonempty({ message: 'Cashier is required' }),
 });
 
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
@@ -63,10 +56,11 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit } = useVisit(patientUuid);
   const visitUuid = recentVisit?.visitType.uuid;
+  const { interventions } = useInterventions();
+  const { packages } = usePackages();
 
-  const { data } = useProviders();
   const [loading, setLoading] = useState(false);
-  const providers = data?.data.results.map((provider) => ({ id: provider.uuid, text: provider.display })) || [];
+  const { user } = useSession();
 
   const handleNavigateToBillingOptions = () =>
     navigate({
@@ -100,16 +94,16 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     mode: 'all',
     resolver: zodResolver(ClaimsFormSchema),
     defaultValues: {
-      claimCode: '',
-      guaranteeId: '',
       claimExplanation: '',
       claimJustification: '',
-      providerName: [],
       diagnoses: [],
       visitType: recentVisit?.visitType?.display || '',
       facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
       treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
       treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
+      packages: [],
+      interventions: [],
+      cashier: user?.display || '',
     },
   });
 
@@ -129,7 +123,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       };
       return acc;
     }, {});
-
     const payload = {
       providedItems,
       claimExplanation: data.claimExplanation,
@@ -141,12 +134,14 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       paidInFacility: true,
       patient: patientUuid,
       visitType: visitUuid,
-      guaranteeId: data.guaranteeId,
-      providers: data.providerName.map((provider) => provider.id),
-      claimCode: data.claimCode,
+      guaranteeId: 'G-001',
+      claimCode: 'C-001',
+      cashier: user.uuid,
       use: 'claim',
       insurer: 'SHA',
       billNumber: billUuid,
+      packages: data.packages,
+      interventions: data.interventions,
     };
     try {
       await processClaims(payload);
@@ -264,18 +259,33 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           <Layer className={styles.input}>
             <Controller
               control={control}
-              name="diagnoses"
+              name="packages"
               render={({ field }) => (
-                <MultiSelect
-                  {...field}
-                  id="diagnoses"
-                  titleText={t('diagnoses', 'Diagnoses')}
-                  items={diagnoses}
-                  itemToString={(item) => (item ? item.text : '')}
-                  selectionFeedback="top-after-reopen"
-                  selectedItems={field.value}
-                  onChange={({ selectedItems }) => field.onChange(selectedItems)}
-                />
+                <>
+                  <>
+                    <div>
+                      {field.value.map((item, index) => (
+                        <Tag key={index} type="high-contrast">
+                          {packages.find((pkg) => pkg.shaPackageCode === item)?.shaPackageName || ''}
+                        </Tag>
+                      ))}
+                    </div>
+                  </>
+                  <MultiSelect
+                    {...field}
+                    items={packages}
+                    titleText={t('packages', 'Packages')}
+                    itemToString={(item) => (item ? item.shaPackageName : '')}
+                    label={field.value.length === 0 ? t('packagesOptions', 'Choose packages') : ''}
+                    id="packages"
+                    invalid={!!errors.packages}
+                    invalidText={errors.packages?.message}
+                    placeholder="Select Packages"
+                    onChange={({ selectedItems }) => {
+                      field.onChange(selectedItems.map((item) => item.shaPackageCode));
+                    }}
+                  />
+                </>
               )}
             />
           </Layer>
@@ -284,18 +294,64 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           <Layer className={styles.input}>
             <Controller
               control={control}
-              name="providerName"
+              name="interventions"
               render={({ field }) => (
-                <FilterableMultiSelect
-                  {...field}
-                  id="provider_name"
-                  titleText={t('provider_name', 'Provider Name')}
-                  items={providers}
-                  itemToString={(item) => (item ? extractNameString(item.text) : '')}
-                  selectionFeedback="top-after-reopen"
-                  selectedItems={field.value}
-                  onChange={({ selectedItems }) => field.onChange(selectedItems)}
-                />
+                <>
+                  <div>
+                    {field.value.map((item, index) => {
+                      const intervention = interventions.find((interv) => interv.shaInterventionCode === item);
+                      return (
+                        <Tag key={index} type="high-contrast">
+                          {intervention ? intervention.shaInterventionName : ''}
+                        </Tag>
+                      );
+                    })}
+                  </div>
+                  <MultiSelect
+                    {...field}
+                    items={interventions}
+                    titleText={t('interventions', 'Interventions')}
+                    itemToString={(item) => (item ? item.shaInterventionName : '')}
+                    label={field.value.length === 0 ? t('interventionsOption', 'Choose interventions') : ''}
+                    id="interventions"
+                    invalid={!!errors.interventions}
+                    invalidText={errors.interventions?.message}
+                    placeholder="Select Interventions"
+                    onChange={({ selectedItems }) => {
+                      field.onChange(selectedItems.map((item) => item.shaInterventionCode));
+                    }}
+                  />
+                </>
+              )}
+            />
+          </Layer>
+        </Column>
+        <Column>
+          <Layer className={styles.input}>
+            <Controller
+              control={control}
+              name="diagnoses"
+              render={({ field }) => (
+                <>
+                  <div>
+                    {field.value.map((item, index) => (
+                      <Tag key={index} type="high-contrast">
+                        {item.text}
+                      </Tag>
+                    ))}
+                  </div>
+                  <MultiSelect
+                    {...field}
+                    id="diagnoses"
+                    titleText={t('diagnoses', 'Diagnoses')}
+                    items={diagnoses}
+                    itemToString={(item) => (item ? item.text : '')}
+                    selectionFeedback="top-after-reopen"
+                    label={field.value.length === 0 ? t('chooseDiagnosis', 'Choose diagnosis') : ''}
+                    selectedItems={field.value}
+                    onChange={({ selectedItems }) => field.onChange(selectedItems)}
+                  />
+                </>
               )}
             />
           </Layer>
@@ -305,33 +361,14 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             <Layer className={styles.input}>
               <Controller
                 control={control}
-                name="guaranteeId"
+                name="cashier"
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    id="guaranteeId"
-                    placeholder="Guarantee Id"
-                    labelText={t('guaranteeId', 'Guarantee Id')}
-                    invalid={!!errors.guaranteeId}
-                    invalidText={errors.guaranteeId?.message}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
-          <Column className={styles.formClaimColumn}>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="claimCode"
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="claimcode"
-                    placeholder="Claim Code"
-                    labelText={t('claimcode', 'Claim Code')}
-                    invalid={!!errors.claimCode}
-                    invalidText={errors.claimCode?.message}
+                    id="cashier"
+                    labelText={t('cashierName', 'Cashier Name')}
+                    readOnly
+                    value={field.value}
                   />
                 )}
               />

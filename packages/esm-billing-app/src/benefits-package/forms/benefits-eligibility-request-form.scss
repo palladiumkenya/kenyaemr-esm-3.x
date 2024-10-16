@@ -1,0 +1,31 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+
+.grid {
+  margin: 0 spacing.$spacing-05;
+  padding: spacing.$spacing-05 0rem 0rem 0rem;
+
+  form {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+
+.formTitle {
+  @include type.type-style('heading-02');
+}
+
+.btnSet {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-01;
+
+  & > button {
+    display: flex;
+    width: 50%;
+  }
+}

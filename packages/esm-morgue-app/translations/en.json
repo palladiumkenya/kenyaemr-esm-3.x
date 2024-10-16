@@ -1,10 +1,11 @@
 {
+  "admissionForm": "Admission form",
+  "admit": "Admit",
   "admitted": "Admitted Bodies",
   "admittedOnes": "Admitted",
   "all": "All",
   "allocation": "Allocation",
   "amountCollected": "Amount(s)",
-  "attachment": "Attachments",
   "attachments": "Attachments",
   "autopsyRecord": "Autopsy summary",
   "autopsyRecords": "Autopsy records",
@@ -25,10 +26,10 @@
   "noObservationsFound": "No observations found",
   "overview": "Overview panel",
   "pullingCompartment": "Pulling compartments data.....",
-  "readyForAdmit": "Ready for Admission",
   "releaseBody": "Release Body",
   "searchThisList": "Search this list",
   "visitType": "Visit Type",
+  "waitingQueue": "Waiting queue",
   "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"
 }

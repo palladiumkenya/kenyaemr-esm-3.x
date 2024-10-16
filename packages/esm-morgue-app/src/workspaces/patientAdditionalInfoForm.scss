@@ -2,19 +2,34 @@
 @use '@carbon/type';
 @use '@carbon/colors';
 
+.formContainer {
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding-right: layout.$spacing-03;
+}
+
 .formButton {
   height: layout.$spacing-09;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
-  min-width: layout.$spacing-09;
+  min-width: layout.$spacing-11;
   margin-bottom: layout.$spacing-05;
 }
 
-.formButtonSet {
-  margin-top: layout.$spacing-11;
+.buttonSet {
+  width: 100%;
+  padding-top: layout.$spacing-05;
+  bottom: 0;
+  position: absolute;
   display: flex;
   justify-content: center;
+  align-items: center;
+  & > button {
+    max-width: 50%;
+    width: 50%;
+  }
 }
 
 .formSubHeader {
@@ -27,20 +42,6 @@
 .formGrid {
   margin: 0 layout.$spacing-05;
   padding: 0rem;
-}
-.form__gender {
-  color: colors.$gray-70;
-  display: inline-block;
-  font-size: layout.$spacing-04;
-  line-height: layout.$spacing-05;
-  line-height: layout.$spacing-05;
-  margin-bottom: layout.$spacing-03;
-  vertical-align: baseline;
-}
-.form__header__section {
-  @include type.type-style('heading-02');
-  margin-top: layout.$spacing-04;
-  margin-bottom: layout.$spacing-02;
 }
 
 .formAdmissionDatepicker input {
@@ -58,4 +59,7 @@
 }
 .formDeathTimepicker input {
   min-width: 18.6rem;
+}
+.fileUploader {
+  min-width: 24rem;
 }

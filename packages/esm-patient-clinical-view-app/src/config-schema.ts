@@ -104,6 +104,25 @@ export const configSchema = {
     _description: 'Registration encounter UUID',
     _default: 'de1f9d67-b73e-4e1b-90d0-036166fc6995',
   },
+  registrationObs: {
+    encounterTypeUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'Obs created during registration will be associated with an encounter of this type. This must be set in order to use fields of type `obs`.',
+    },
+    encounterProviderRoleUuid: {
+      _type: Type.UUID,
+      _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
+      _description: "The provider role to use for the registration encounter. Default is 'Unkown'.",
+    },
+    registrationFormUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'The form UUID to associate with the registration encounter. By default no form will be associated.',
+    },
+  },
   openmrsIDUuid: {
     _type: Type.String,
     _description: 'OpenMRS Identifier  UUID',
@@ -268,6 +287,11 @@ export interface ConfigObject {
   defaulterTracingEncounterUuid: string;
   clinicalEncounterUuid: string;
   registrationEncounterUuid: string;
+  registrationObs: {
+    encounterTypeUuid: string | null;
+    encounterProviderRoleUuid: string;
+    registrationFormUuid: string | null;
+  };
   openmrsIDUuid: string;
   openmrsIdentifierSourceUuid: string;
   maritalStatusUuid: string;

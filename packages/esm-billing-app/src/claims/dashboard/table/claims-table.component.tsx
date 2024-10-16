@@ -43,7 +43,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const paidLineItems = useMemo(() => lineItems.filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
+  const paidLineItems = useMemo(() => (lineItems || []).filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
 
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {
@@ -65,12 +65,12 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   }, [filteredLineItems, currentPage, pageSize]);
 
   const tableHeaders: Array<typeof DataTableHeader> = [
-    { header: 'No', key: 'no' },
-    { header: 'Serial No.', key: 'serialno' },
-    { header: 'Bill Item', key: 'inventoryname' },
-    { header: 'Status', key: 'status' },
-    { header: 'Total amount', key: 'total' },
-    { header: 'Bill creation date', key: 'dateofbillcreation' },
+    { header: t('no', 'No'), key: 'no' },
+    { header: t('serialNo', 'Serial No'), key: 'serialno' },
+    { header: t('billItem', 'Bill Item'), key: 'inventoryname' },
+    { header: t('status', 'Status'), key: 'status' },
+    { header: t('totalAmount', 'Total amount'), key: 'total' },
+    { header: t('billCreationDate', 'Bill creation date'), key: 'dateofbillcreation' },
   ];
 
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
