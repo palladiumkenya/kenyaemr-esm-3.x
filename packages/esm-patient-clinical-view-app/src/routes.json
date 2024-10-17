@@ -274,6 +274,27 @@
       "order": 0,
       "online": true,
       "offline": false
+    },
+     {
+      "name": "deceased-panel-dashboard-link",
+      "component": "deceasedPanelDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 15,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-deceased-panel-slot",
+        "path": "deceased-panel",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "deceased-details-tabs",
+      "slot": "patient-chart-deceased-panel-slot",
+      "component": "deceasedDetailsTabs",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [

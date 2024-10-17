@@ -1,7 +1,6 @@
 import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel/morgue-left-panel-link.component';
-import FormEntryWorkspace from './workspaces/formEntry.workspace';
 const moduleName = '@kenyaemr/esm-morgue-app';
 
 const options = {
@@ -38,5 +37,3 @@ export const patientAdditionalInfoForm = getAsyncLifecycle(
   () => import('./workspaces/patientAdditionalInfoForm.workspace'),
   options,
 );
-
-export const morgueFormEntry = getSyncLifecycle(FormEntryWorkspace, options);

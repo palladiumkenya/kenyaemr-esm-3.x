@@ -1,3 +1,4 @@
+import { makeUrl } from '@openmrs/esm-framework';
 import { PatientProgram } from '@openmrs/esm-patient-common-lib';
 
 /**
@@ -80,3 +81,7 @@ export const formatPatientName = (patient) => {
 export const uppercaseText = (text) => {
   return text.toUpperCase();
 };
+
+export function makeUrlUrl(path: string) {
+  return new URL(makeUrl(path), window.location.toString());
+}
