@@ -71,6 +71,7 @@ export interface LineItem {
   paymentStatus: string;
   itemOrServiceConceptUuid: string;
   serviceTypeUuid: string;
+  order: OpenmrsResource;
 }
 
 interface PatientLink {
