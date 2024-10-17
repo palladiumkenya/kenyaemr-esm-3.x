@@ -19,7 +19,7 @@ export function filterRegimenData(regimenData: RegimenLineGroup[] | undefined, p
   }
 
   const filterCriterion = patientAge > 14 ? 'Adult' : 'Child';
-  return regimenData.filter((group) => group.regimenline.includes(filterCriterion));
+  regimenData.filter((group) => group.regimenline && group.regimenline.includes(filterCriterion));
 }
 
 export function calculateAge(birthDateString: string | null | undefined, visitDate: Date): number {
