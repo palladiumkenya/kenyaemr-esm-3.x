@@ -1,7 +1,6 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
 
 .formContainer {
   width: 100%;
@@ -22,7 +21,6 @@
 .buttonSet {
   width: 100%;
   padding-top: layout.$spacing-05;
-  background-color: $ui-02;
   bottom: 0;
   position: absolute;
   display: flex;

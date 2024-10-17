@@ -1,18 +1,3 @@
-export interface CauseOfDeathFetchResponse {
-  uuid: string;
-  value: string;
-}
-
-export interface ConceptAnswer {
-  display: string;
-  name: string;
-  uuid: string;
-}
-
-export interface ConceptAnswersResponse {
-  answers?: Array<ConceptAnswer>;
-}
-
 export interface Patient {
   uuid: string;
   display: string;
@@ -47,32 +32,6 @@ export interface Patient {
 }
 export interface DeceasedPatientResponse {
   results: Patient[];
-}
-
-export interface ChartConfig {
-  freeTextFieldConceptUuid: string;
-  offlineVisitTypeUuid: string;
-  visitTypeResourceUrl: string;
-  showRecommendedVisitTypeTab: boolean;
-  visitAttributeTypes: Array<{
-    uuid: string;
-    required: boolean;
-    displayInThePatientBanner: boolean;
-    showWhenExpression?: string;
-  }>;
-  showServiceQueueFields: boolean;
-  visitQueueNumberAttributeUuid: string;
-  showAllEncountersTab: boolean;
-  defaultFacilityUrl: string;
-  showUpcomingAppointments: boolean;
-  logo: {
-    src: string;
-    alt: string;
-    name: string;
-  };
-  disableChangingVisitLocation: boolean;
-  numberOfVisitsToLoad: number;
-  showExtraVisitAttributesSlot: boolean;
 }
 
 export interface Observation {
