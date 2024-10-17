@@ -197,11 +197,11 @@ export function startupApp() {
   );
 
   defineConfigSchema(moduleName, configSchema);
-  // registerFeatureFlag(
-  //   'healthInformationExchange',
-  //   'Health Information Exchange (HIE)',
-  //   'HIE feature flag, this enables and disables the HIE feature',
-  // );
+  registerFeatureFlag(
+    'healthInformationExchange',
+    'Health Information Exchange (HIE)',
+    'HIE feature flag, this enables and disables the HIE feature',
+  );
 }
 
 export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);
