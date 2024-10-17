@@ -12,6 +12,7 @@ import { PaymentPoint } from './payment-points/payment-point/payment-point.compo
 import { PaymentPoints } from './payment-points/payment-points.component';
 import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
+import PaymentModeHome from './payment-modes/payment-mode-home.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
@@ -44,6 +45,7 @@ const RootComponent: React.FC = () => {
         <Route path="/payment-points/:paymentPointUUID" element={<PaymentPoint />} />
         <Route path="/bill-manager" element={<BillManager />} />
         <Route path="/charge-items" element={<ChargeItemsDashboard />} />
+        <Route path="/payment-modes" element={<PaymentModeHome />} />
       </Routes>
     </BrowserRouter>
   );

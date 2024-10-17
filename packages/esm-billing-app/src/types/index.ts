@@ -480,3 +480,15 @@ export type ExcelFileRow = {
   service_type_id: number;
   short_name: string;
 };
+
+export type PaymentMode = {
+  uuid: string;
+  name: string;
+  description: string;
+  retired: boolean;
+  retireReason?: string | null;
+  auditInfo: AuditInfo;
+  attributeTypes?: Array<AttributeType>;
+  sortOrder?: number | null;
+  resourceVersion: string;
+};

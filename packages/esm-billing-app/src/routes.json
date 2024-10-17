@@ -160,6 +160,11 @@
       "slot": "billing-dashboard-link-slot"
     },
     {
+      "component": "paymentModesLink",
+      "name": "payment-modes-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
       "component": "billManagerLink",
       "name": "bill-manager-link",
       "slot": "billing-dashboard-link-slot"
@@ -168,7 +173,8 @@
       "component": "chargeableItemsLink",
       "name": "chargeable-items-link",
       "slot": "billing-dashboard-link-slot"
-    },{
+    },
+    {
       "component": "claimsManagementSideNavGroup",
       "name": "claims-management-dashboard-link",
       "slot": "homepage-dashboard-slot",
@@ -178,14 +184,13 @@
         "slot": "case-management-slot"
       },
       "featureFlag": "healthInformationExchange"
-
     },
-     {
+    {
       "component": "claimsManagementOverviewDashboardLink",
       "name": "claims-management-overview-link",
       "slot": "claims-management-dashboard-link-slot"
     },
-     {
+    {
       "component": "preAuthRequestsDashboardLink",
       "name": "preauthrequest-overview-link",
       "slot": "claims-management-dashboard-link-slot"
@@ -227,6 +232,12 @@
       "title": "Billing Form",
       "type": "other-form",
       "width": "extra-wide"
+    },
+    {
+      "name": "payment-mode-workspace",
+      "component": "paymentModeWorkspace",
+      "title": "Payment Mode Workspace",
+      "type": "other-form"
     }
   ],
   "modals": [
@@ -245,6 +256,10 @@
     {
       "name": "bulk-import-billable-services-modal",
       "component": "bulkImportBillableServicesModal"
+    },
+    {
+      "name": "delete-payment-mode-modal",
+      "component": "deletePaymentModeModal"
     }
   ]
 }

@@ -32,6 +32,8 @@ import { CreatePaymentPoint } from './payment-points/create-payment-point.compon
 import { ClockIn } from './payment-points/payment-point/clock-in.component';
 import { ClockOut } from './payment-points/payment-point/clock-out.component';
 import rootComponent from './root.component';
+import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
+import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -76,6 +78,14 @@ export const paymentPointsLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'payment-points',
     title: 'Payment Points',
+  }),
+  options,
+);
+
+export const paymentModesLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'payment-modes',
+    title: 'Payment Modes',
   }),
   options,
 );
@@ -170,6 +180,9 @@ export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
 export const clockIn = getSyncLifecycle(ClockIn, options);
 export const clockOut = getSyncLifecycle(ClockOut, options);
 
+export const paymentModeWorkspace = getSyncLifecycle(PaymentModeWorkspace, options);
+export const deletePaymentModeModal = getSyncLifecycle(DeletePaymentModeModal, options);
+
 export function startupApp() {
   registerFeatureFlag(
     'claims-management',
@@ -184,11 +197,11 @@ export function startupApp() {
   );
 
   defineConfigSchema(moduleName, configSchema);
-  registerFeatureFlag(
-    'healthInformationExchange',
-    'Health Information Exchange (HIE)',
-    'HIE feature flag, this enables and disables the HIE feature',
-  );
+  // registerFeatureFlag(
+  //   'healthInformationExchange',
+  //   'Health Information Exchange (HIE)',
+  //   'HIE feature flag, this enables and disables the HIE feature',
+  // );
 }
 
 export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);
