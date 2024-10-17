@@ -19,7 +19,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { Download, Upload } from '@carbon/react/icons';
+import { Add, CategoryAdd, Download, Upload, WatsonHealthScalpelSelect } from '@carbon/react/icons';
 import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
@@ -138,12 +138,14 @@ const ChargeSummaryTable: React.FC = () => {
                 {isValidating && (
                   <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
                 )}
-                <ComboButton tooltipAlignment="top-right" label={t('actions', 'Action')}>
+                <ComboButton tooltipAlignment="left" label={t('actions', 'Action')}>
                   <MenuItem
+                    renderIcon={CategoryAdd}
                     onClick={() => launchWorkspace('billable-service-form')}
-                    label={t('addServiceChargeItem', 'Add charge item')}
+                    label={t('addServiceChargeItem', 'Add charge service')}
                   />
                   <MenuItem
+                    renderIcon={WatsonHealthScalpelSelect}
                     onClick={() => launchWorkspace('commodity-form')}
                     label={t('addCommodityChargeItem', 'Add charge item')}
                   />
