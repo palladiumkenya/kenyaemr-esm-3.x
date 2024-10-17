@@ -5,22 +5,28 @@ import { useTranslation } from 'react-i18next';
 import { useTestOrderBillStatus } from './test-order-action.resource';
 import { showModal } from '@openmrs/esm-framework';
 
-type TestOrderProps = { order: Order };
+type TestOrderProps = {
+  order: Order;
+  modalName?: string;
+  additionalProps?: Record<string, unknown>;
+  actionText?: string;
+};
 
 enum FulfillerStatus {
   IN_PROGRESS = 'IN_PROGRESS',
 }
 
-const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order }) => {
+const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order, modalName, additionalProps, actionText }) => {
   const { t } = useTranslation();
   const { isLoading, hasPendingPayment } = useTestOrderBillStatus(order.uuid, order.patient.uuid);
 
   const launchModal = useCallback(() => {
-    const dispose = showModal('pickup-lab-request-modal', {
+    const dispose = showModal(modalName ?? 'pickup-lab-request-modal', {
       closeModal: () => dispose(),
       order,
+      ...(additionalProps && { additionalProps }),
     });
-  }, [order]);
+  }, [order, additionalProps, modalName]);
 
   // Show the test order if the following conditions are met:
   // 1. The current visit is in-patient
@@ -38,7 +44,9 @@ const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order }) => {
 
   return (
     <Button kind="primary" disabled={hasPendingPayment} onClick={launchModal}>
-      {hasPendingPayment ? t('unsettledTestBill', 'Unsettled test bill.') : t('pickLabRequest', 'Pick Lab Request')}
+      {hasPendingPayment
+        ? t('unsettledBill', 'Unsettled bill.')
+        : actionText ?? t('pickLabRequest', 'Pick Lab Request')}
     </Button>
   );
 });
