@@ -133,6 +133,13 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         },
       });
     } catch (error) {
+      if (error.message == 'NO_API_CREDENNTIALS') {
+        showSnackbar({
+          kind: 'error',
+          title: 'Error',
+          subtitle: t('noApiCredentials', 'Health Care Worker Registry API credentials not configured'),
+        });
+      }
       showModal('hwr-empty-modal');
     } finally {
       setSearchHWR({ ...searchHWR, isHWRLoading: false });
