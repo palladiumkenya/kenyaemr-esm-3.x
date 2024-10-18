@@ -43,7 +43,7 @@
 .loadingPaymentTotals,
 .paymentTotals {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
   gap: layout.$spacing-05;
   margin-bottom: layout.$spacing-05;
 }
@@ -78,4 +78,9 @@
 .noServiceTypes,
 .noCashiersInRange {
   font-size: small;
+}
+
+.timesheetsFilter {
+  flex-grow: unset;
+  margin-right: layout.$spacing-01;
 }

@@ -32,10 +32,14 @@ export const useRenderedRows = (bills: MappedBill[], filters: Array<string>, tim
         return true;
       }
 
+      if (timesheet.cashier.uuid !== bill.cashier.uuid) {
+        return true;
+      }
+
       const billCreatedOn = new Date(bill.dateCreatedUnformatted);
       const timesheetStartDate = new Date(timesheet.clockIn);
       const timesheetEndDate = timesheet.clockOut ? new Date(timesheet.clockOut) : new Date();
-      return timesheetStartDate < billCreatedOn && timesheetEndDate > billCreatedOn;
+      return timesheetStartDate <= billCreatedOn && timesheetEndDate >= billCreatedOn;
     });
 
   if (bills.length === 0 || !bills) {

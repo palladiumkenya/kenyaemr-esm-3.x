@@ -50,6 +50,8 @@ export const PaymentHistoryViewer = () => {
 
   const renderedRows = useRenderedRows(bills, appliedFilters, appliedTimesheet);
 
+  // console.log('payment-history-viewer', { renderedRows, bills, appliedFilters, appliedTimesheet });
+
   const { paginated, goTo, results, currentPage } = usePagination(renderedRows, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, renderedRows.length, currentPage, results?.length);
 
@@ -75,7 +77,10 @@ export const PaymentHistoryViewer = () => {
     });
   };
 
-  const resetFilters = () => setAppliedFilters([]);
+  const resetFilters = () => {
+    setAppliedFilters([]);
+    setAppliedTimesheet(undefined);
+  };
 
   const applyFilters = (filters: string[]) => {
     setAppliedFilters(filters);
@@ -98,12 +103,13 @@ export const PaymentHistoryViewer = () => {
                   <TableToolbarSearch
                     onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
                   />
-                  <AppliedFilterTags appliedFilters={appliedFilters} />
+                  <AppliedFilterTags appliedFilters={[...appliedFilters, appliedTimesheet?.display]} />
                   <Filter applyFilters={applyFilters} resetFilters={resetFilters} bills={bills} />
                   <TimesheetsFilter
                     appliedFilters={appliedFilters}
                     applyTimeSheetFilter={applyTimeSheetFilter}
                     bills={bills}
+                    dateRange={dateRange}
                   />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
                   {isOnPaymentPointPage && !isClockedInCurrentPaymentPoint && (

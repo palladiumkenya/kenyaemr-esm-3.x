@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@carbon/react';
+import { Form, Select, SelectItem } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { useTimeSheets } from '../../payment-points/payment-points.resource';
 import { MappedBill, Timesheet } from '../../types';
+import styles from './payment-history.scss';
 
 const schema = z.object({
   timesheet: z.string(),
@@ -17,25 +18,48 @@ export const TimesheetsFilter = ({
   appliedFilters,
   bills,
   applyTimeSheetFilter,
+  dateRange,
 }: {
   appliedFilters: Array<string>;
   bills: MappedBill[];
-  applyTimeSheetFilter: (sheet: Timesheet) => void;
+  applyTimeSheetFilter: (sheet: Timesheet | undefined) => void;
+  dateRange: Array<Date>;
 }) => {
-  const billCashiers = bills.map((bill) => bill.cashier.uuid);
-  const selectedCashiers = appliedFilters.filter((filter) => billCashiers.includes(filter));
   const { timesheets } = useTimeSheets();
-  const selectedCashiersTimesheets = timesheets.filter((sheet) => selectedCashiers.includes(sheet.cashier.uuid));
+
+  const billCashiers = bills.map((bill) => bill.cashier);
+  const billsCashiersUUIDS = billCashiers
+    .filter((cashier) => appliedFilters.includes(cashier.display))
+    .map((c) => c.uuid);
+
+  const uniqueBillsCashiersUUIDS = Array.from(new Set(billsCashiersUUIDS));
+
+  const selectedCashiersTimesheets = timesheets
+    .filter((sheet) => billsCashiersUUIDS.includes(sheet.cashier.uuid))
+    .filter((sheet) => {
+      const sheetClockInTime = new Date(sheet.clockIn);
+      const sheetClockOutTime = sheet.clockOut ? new Date(sheet.clockOut) : new Date();
+      return sheetClockInTime >= dateRange.at(0) && sheetClockOutTime <= dateRange.at(1);
+    });
 
   const { t } = useTranslation();
-  const { register, watch } = useForm<FormData>({
+  const form = useForm<FormData>({
     resolver: zodResolver(schema),
     mode: 'onChange',
+    defaultValues: {
+      timesheet: undefined,
+    },
   });
+
+  const { register, watch } = form;
 
   const selectedSheetUUID = watch('timesheet');
 
   useEffect(() => {
+    if (!selectedSheetUUID) {
+      applyTimeSheetFilter(undefined);
+      return;
+    }
     if (selectedSheetUUID) {
       applyTimeSheetFilter(timesheets.find((sheet) => sheet.uuid === selectedSheetUUID));
     }
@@ -46,14 +70,21 @@ export const TimesheetsFilter = ({
   }
 
   return (
-    <Select
-      {...register('timesheet')}
-      labelText={t('selectCashier', 'Select cashier')}
-      label={t('cashier', 'Cashier')}
-      placeholder={t('filterByTimesheet', 'Filter by timesheet')}>
-      {selectedCashiersTimesheets.map((sheet) => (
-        <SelectItem value={sheet.uuid} text={sheet.display} />
-      ))}
-    </Select>
+    <Form {...form}>
+      <Select
+        {...register('timesheet')}
+        label={t('selectTimesheet', 'Select timesheet')}
+        labelText={t('timesheet', 'Timesheet')}
+        placeholder={t('filterByTimesheet', 'Filter by timesheet')}
+        className={styles.timesheetsFilter}>
+        <SelectItem value={undefined} text={'No timesheet'} />
+        {selectedCashiersTimesheets.map((sheet) => (
+          <SelectItem
+            value={sheet.uuid}
+            text={`${sheet.display} ${uniqueBillsCashiersUUIDS.length > 1 ? `(${sheet.cashier.display})` : ''}`}
+          />
+        ))}
+      </Select>
+    </Form>
   );
 };
