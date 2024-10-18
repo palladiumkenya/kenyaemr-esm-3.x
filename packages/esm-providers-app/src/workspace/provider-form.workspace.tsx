@@ -133,7 +133,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         },
       });
     } catch (error) {
-      if (error.message == 'NO_API_CREDENNTIALS') {
+      if (error.message === 'NO_API_CREDENNTIALS') {
         showSnackbar({
           kind: 'error',
           title: 'Error',
