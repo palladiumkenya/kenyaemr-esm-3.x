@@ -16,13 +16,14 @@ import { useParams } from 'react-router-dom';
 import { useBills } from '../../billing.resource';
 import { useRenderedRows } from '../../hooks/use-rendered-rows';
 import { useClockInStatus, usePaymentPoints } from '../../payment-points/payment-points.resource';
-import { PaymentStatus } from '../../types';
+import { PaymentStatus, Timesheet } from '../../types';
 import { AppliedFilterTags } from './applied-filter-tages.component';
 import { Filter } from './filter.component';
 import { PaymentHistoryTable } from './payment-history-table.component';
 import styles from './payment-history.scss';
 import { PaymentTotals } from './payment-totals';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
+import { TimesheetsFilter } from './timesheets-filter.component';
 
 export const headers = [
   { header: 'Date', key: 'dateCreated' },
@@ -45,8 +46,9 @@ export const PaymentHistoryViewer = () => {
 
   const [pageSize, setPageSize] = useState(10);
   const [appliedFilters, setAppliedFilters] = useState<Array<string>>([]);
+  const [appliedTimesheet, setAppliedTimesheet] = useState<Timesheet>();
 
-  const renderedRows = useRenderedRows(bills, appliedFilters);
+  const renderedRows = useRenderedRows(bills, appliedFilters, appliedTimesheet);
 
   const { paginated, goTo, results, currentPage } = usePagination(renderedRows, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, renderedRows.length, currentPage, results?.length);
@@ -80,6 +82,10 @@ export const PaymentHistoryViewer = () => {
     goTo(1);
   };
 
+  const applyTimeSheetFilter = (sheet: Timesheet) => {
+    setAppliedTimesheet(sheet);
+  };
+
   return (
     <div className={styles.table}>
       <PaymentTotals renderedRows={renderedRows} appliedFilters={appliedFilters} />
@@ -94,6 +100,11 @@ export const PaymentHistoryViewer = () => {
                   />
                   <AppliedFilterTags appliedFilters={appliedFilters} />
                   <Filter applyFilters={applyFilters} resetFilters={resetFilters} bills={bills} />
+                  <TimesheetsFilter
+                    appliedFilters={appliedFilters}
+                    applyTimeSheetFilter={applyTimeSheetFilter}
+                    bills={bills}
+                  />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
                   {isOnPaymentPointPage && !isClockedInCurrentPaymentPoint && (
                     <Button className={styles.clockIn} onClick={openClockInModal}>
