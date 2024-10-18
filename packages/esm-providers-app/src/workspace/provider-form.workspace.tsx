@@ -350,14 +350,15 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         <Column>
           <span className={styles.form__gender}>{t('gender', 'Gender*')}</span>
           <Controller
-            name="gender"
             control={control}
+            name="gender"
             render={({ field }) => (
               <ContentSwitcher
-                id="form__content_switch"
-                selectedIndex={field.value === 'F' ? 1 : 0}
-                selectionMode="manual"
-                onChange={(event) => field.onChange(event.index === 0 ? 'M' : 'F')}>
+                selectedIndex={field.value == 'M' ? 0 : 1}
+                onChange={(value) => {
+                  let { index, name, text } = value;
+                  field.onChange(name);
+                }}>
                 <Switch
                   name="M"
                   text={
@@ -365,7 +366,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                       <GenderMale /> Male
                     </>
                   }
-                  selected={field.value === 'M'}
                 />
                 <Switch
                   name="F"
@@ -374,7 +374,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                       <GenderFemale /> Female
                     </>
                   }
-                  selected={field.value === 'F'}
                 />
               </ContentSwitcher>
             )}
