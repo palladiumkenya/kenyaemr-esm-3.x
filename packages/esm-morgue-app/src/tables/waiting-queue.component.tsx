@@ -2,10 +2,10 @@ import React from 'react';
 import GenericTable from './generic-table.component';
 import { ErrorState, formatDate, launchWorkspace } from '@openmrs/esm-framework';
 import { toUpperCase } from '../helpers/expression-helper';
-import { Tag, Button, DataTableSkeleton } from '@carbon/react';
+import { Tag, Button, DataTableSkeleton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
-import { useDeceasedPatient } from '../hook/useMorgue.resource';
+import { useDeceasedPatient, useVisitType } from '../hook/useMorgue.resource';
 
 export const WaitingQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
@@ -62,9 +62,10 @@ export const WaitingQueue: React.FC = () => {
     });
   };
   const actionColumn = () => (
-    <Button kind="tertiary" className={styles.actionBtn} onClick={handleAdmissionForm}>
-      {t('admit', 'Admit')}
-    </Button>
+    <OverflowMenu aria-label="queue-menu" align="bottom" flipped>
+      <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={handleAdmissionForm} />
+      <OverflowMenuItem hasDivider isDelete itemText={t('release', 'Release body')} />
+    </OverflowMenu>
   );
 
   return <GenericTable rows={rows} headers={genericTableHeader} actionColumn={actionColumn} title={fromHospital} />;
