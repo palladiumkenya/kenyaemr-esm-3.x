@@ -34,20 +34,19 @@ export const TimesheetsFilter = ({
 
   const uniqueBillsCashiersUUIDS = Array.from(new Set(billsCashiersUUIDS));
 
-  const openCashierSheets = [];
-
   const sortedByClockInTimeSheets = timesheets.sort(
     (a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
   );
 
-  for (let i = 0; i < uniqueBillsCashiersUUIDS.length; i++) {
-    const uuid = uniqueBillsCashiersUUIDS[i];
+  const openCashierSheets = uniqueBillsCashiersUUIDS.reduce((acc, uuid) => {
     const openSheet = sortedByClockInTimeSheets.find((s) => s.clockIn && !s.clockOut && s.cashier.uuid === uuid);
 
     if (openSheet) {
-      openCashierSheets.push(openSheet);
+      acc.push(openSheet);
     }
-  }
+
+    return acc;
+  }, []);
 
   const collectedSheets = [...sortedByClockInTimeSheets.filter((s) => s.clockOut && s.clockIn), ...openCashierSheets];
 
