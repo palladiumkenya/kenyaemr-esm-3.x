@@ -6,12 +6,11 @@ import {
   useConfig,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
-import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse } from '../types';
+import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location } from '../types';
 import useSWRImmutable from 'swr/immutable';
-import useSWRInfinite from 'swr/infinite';
 import { makeUrlUrl } from '../utils/utils';
 import useSWR from 'swr';
-import { BillingConfig } from '../config-schema';
+import { BillingConfig, ConfigObject } from '../config-schema';
 import { useState } from 'react';
 
 export const useDeceasedPatient = () => {
@@ -74,5 +73,18 @@ export const useBillableItems = () => {
     error,
     searchTerm,
     setSearchTerm,
+  };
+};
+
+export const useMorgueCompartment = () => {
+  const { morgueCompartmentTagUuid } = useConfig<ConfigObject>();
+  const customRepresentation = 'custom:(uuid,display,name)';
+  const url = `${restBaseUrl}/location?v=${customRepresentation}&tag=${morgueCompartmentTagUuid}`;
+  const { data, isLoading, error } = useSWR<FetchResponse<{ results: Array<Location> }>>(url, openmrsFetch);
+
+  return {
+    morgueCompartments: data?.data?.results ?? [],
+    isLoading,
+    error,
   };
 };

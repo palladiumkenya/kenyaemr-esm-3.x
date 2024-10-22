@@ -23,6 +23,16 @@ export const configSchema = {
     _description: ' UUID for morgue department service type',
     _default: '61a12cde-f3b7-4b73-a0ba-94d22cdc642b',
   },
+  insurancepaymentModeUuid: {
+    _type: Type.String,
+    _description: ' UUID for insurance payment mode',
+    _default: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
+  },
+  morgueCompartmentTagUuid: {
+    _type: Type.String,
+    _description: 'UUID for morgue compartment tag',
+    _default: '8ff46770-6ac7-478f-85ba-439a53546bf0',
+  },
 };
 
 export interface BillingConfig {
@@ -54,4 +64,6 @@ export type ConfigObject = {
   autopsyEncounterUuid: string;
   morgueVisitTypeUuid: string;
   morgueDepartmentServiceTypeUuid: string;
+  insurancepaymentModeUuid: string;
+  morgueCompartmentTagUuid: string;
 };

@@ -18,20 +18,21 @@ import {
   Tile,
   Search,
   FilterableMultiSelect,
+  Dropdown,
 } from '@carbon/react';
 import { ResponsiveWrapper, useLayoutType, useConfig } from '@openmrs/esm-framework';
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import styles from './patientAdditionalInfoForm.scss';
-import { useBillableItems, usePaymentModes, useVisitType } from '../hook/useMorgue.resource';
+import { useBillableItems, useMorgueCompartment, usePaymentModes, useVisitType } from '../hook/useMorgue.resource';
 import fuzzy from 'fuzzy';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import isEmpty from 'lodash-es/isEmpty';
-import { BillingConfig, ConfigObject } from '../config-schema';
+import { ConfigObject } from '../config-schema';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -48,8 +49,9 @@ const patientInfoSchema = z.object({
   tagNumber: z.string().nonempty('Tag number is required'),
   obNumber: z.string().optional(),
   policeReport: z.string().optional(),
-  visitType: z.string().nonempty('Visit type is required'),
-  availableCompartment: z.string().optional(),
+  visitType: z.string().uuid('invalid visit type'),
+  availableCompartment: z.string(),
+  services: z.array(z.string().uuid('invalid service')).nonempty('Must select one service'),
 });
 
 const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ closeWorkspace }) => {
@@ -58,11 +60,12 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const { data: visitTypes, isLoading: isLoadingVisitTypes } = useVisitType();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
 
-  const { insuranceSchemes } = useConfig<BillingConfig>();
+  const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
+  const { morgueCompartments } = useMorgueCompartment();
 
-  const { morgueVisitTypeUuid, morgueDepartmentServiceTypeUuid } = useConfig<ConfigObject>();
+  const { morgueVisitTypeUuid, morgueDepartmentServiceTypeUuid, insurancepaymentModeUuid } = useConfig<ConfigObject>();
 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isPoliceCase, setIsPoliceCase] = useState<string | null>(null);
@@ -86,12 +89,12 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
       paymentMethods: '',
       insuranceScheme: '',
       policyNumber: '',
-      services: '',
+      services: [],
     },
   });
 
   const visitTypeValue = watch('visitType');
-  const paymentMethods = watch('paymentMethods');
+  const paymentMethodObservable = watch('paymentMethods');
 
   const filteredVisitTypes = useMemo(() => {
     if (!visitTypes) {
@@ -107,11 +110,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
 
   const truncatedResults = filteredVisitTypes.slice(0, MAX_RESULTS);
 
-  const onSubmit = (data: any) => {
-    if (!isEmpty(data)) {
-      // console.log('Form submitted with data: ', data);
-    }
-  };
+  const onSubmit = (data: any) => {};
 
   useEffect(() => {
     if (visitTypeValue === morgueVisitTypeUuid) {
@@ -122,9 +121,9 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const handlePoliceCaseChange = (selectedItem: string | null) => {
     setIsPoliceCase(selectedItem);
   };
-
   return (
     <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
+      <pre>{JSON.stringify(errors)}</pre>
       <Stack gap={4} className={styles.formGrid}>
         <span className={styles.formSubHeader}>{t('moreDetails', 'More Details')}</span>
         <Column>
@@ -212,7 +211,9 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 orientation="vertical"
                 onChange={(visitType) => setValue('visitType', visitType)}
                 name="radio-button-group"
-                valueSelected={visitTypeValue}>
+                valueSelected={visitTypeValue}
+                invalid={!!errors.visitType}
+                invalidText={errors.visitType?.message}>
                 {truncatedResults.map(({ uuid, display }) => (
                   <RadioButton
                     key={uuid}
@@ -235,7 +236,6 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
               </Layer>
             )}
           </div>
-          {errors.visitType && <span>{errors.visitType.message}</span>}
         </Column>
         <Column>
           <div className={styles.sectionFieldLayer}>
@@ -243,56 +243,62 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
               control={control}
               name="paymentMethods"
               render={({ field }) => (
-                <ComboBox
+                <Dropdown
+                  {...field}
+                  initialSelectedItem={field.value}
                   className={styles.sectionField}
                   onChange={({ selectedItem }) => field.onChange(selectedItem)}
                   id="paymentMethods"
-                  items={paymentModes}
-                  itemToString={(item) => (item ? item.name : '')}
+                  items={paymentModes.map((mode) => mode.uuid)}
+                  itemToString={(item) => paymentModes.find((mode) => mode.uuid === item)?.name ?? ''}
                   titleText={t('selectPaymentMethod', 'Select payment method')}
-                  placeholder={t('selectPaymentMethod', 'Select payment method')}
+                  label={t('selectPaymentMethod', 'Select payment method')}
                 />
               )}
             />
           </div>
         </Column>
-
-        {/* <>
-          <div className={styles.sectionFieldLayer}>
-            <Controller
-              control={control}
-              name="insuranceScheme"
-              render={({ field }) => (
-                <ComboBox
-                  className={styles.sectionField}
-                  onChange={({ selectedItem }) => field.onChange(selectedItem)}
-                  id="insurance-scheme"
-                  items={insuranceSchemes}
-                  itemToString={(item) => (item ? item : '')}
-                  titleText={t('insuranceScheme', 'Insurance scheme')}
-                  placeholder={t('selectInsuranceScheme', 'Select insurance scheme')}
+        {paymentMethodObservable === insurancepaymentModeUuid && (
+          <>
+            <Column>
+              <div className={styles.sectionFieldLayer}>
+                <Controller
+                  control={control}
+                  name="insuranceScheme"
+                  render={({ field }) => (
+                    <ComboBox
+                      className={styles.sectionField}
+                      onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                      id="insurance-scheme"
+                      items={insuranceSchemes}
+                      itemToString={(item) => (item ? item : '')}
+                      titleText={t('insuranceScheme', 'Insurance scheme')}
+                      label={t('selectInsuranceScheme', 'Select insurance scheme')}
+                    />
+                  )}
                 />
-              )}
-            />
-          </div>
-
-          <div className={styles.sectionFieldLayer}>
-            <Controller
-              control={control}
-              name="policyNumber"
-              render={({ field }) => (
-                <TextInput
-                  className={styles.sectionField}
-                  onChange={(e) => field.onChange(e.target.value)}
-                  id="policy-number"
-                  type="text"
-                  labelText={t('policyNumber', 'Policy number')}
-                  placeholder={t('enterPolicyNumber', 'Enter policy number')}
+              </div>
+            </Column>
+            <Column>
+              <div className={styles.sectionFieldLayer}>
+                <Controller
+                  control={control}
+                  name="policyNumber"
+                  render={({ field }) => (
+                    <TextInput
+                      className={styles.sectionField}
+                      onChange={(e) => field.onChange(e.target.value)}
+                      id="policy-number"
+                      type="text"
+                      labelText={t('policyNumber', 'Policy number')}
+                      placeholder={t('enterPolicyNumber', 'Enter policy number')}
+                    />
+                  )}
                 />
-              )}ChartCO
-            />
-          </div>
-        </> */}
+              </div>
+            </Column>
+          </>
+        )}
         <Column>
           <div className={styles.sectionField}>
             <Controller
@@ -302,9 +308,15 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 <FilterableMultiSelect
                   id="billing-service"
                   titleText={t('searchServices', 'Search services')}
-                  items={lineItems.filter((service) => service?.serviceType?.uuid === morgueDepartmentServiceTypeUuid)}
-                  itemToString={(item) => (item ? item?.name : '')}
-                  onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                  items={lineItems
+                    .filter((service) => service?.serviceType?.uuid === morgueDepartmentServiceTypeUuid)
+                    .map((service) => service.uuid)}
+                  itemToString={(item) => lineItems.find((i) => i.uuid === item)?.name ?? ''}
+                  onChange={({ selectedItems }) => {
+                    field.onChange(selectedItems);
+                  }}
+                  placeholder={t('Service', 'Service')}
+                  initialSelectedItems={field.value}
                 />
               )}
             />
@@ -374,18 +386,21 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           </>
         )}
 
-        {/* Available Compartment */}
         <Column>
           <Controller
             name="availableCompartment"
             control={control}
             render={({ field }) => (
-              <ComboBox
+              <Dropdown
                 {...field}
                 id="avail-compartment"
-                items={['empty-compartment-1', 'empty-compartment-2']}
-                itemToString={(item) => (item ? item : '')}
+                items={morgueCompartments.map((compartment) => compartment.uuid)}
+                itemToString={(item) =>
+                  morgueCompartments.find((compartment) => compartment.uuid === item)?.display ?? ''
+                }
                 titleText={t('availableCompartment', 'Available Compartment')}
+                onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                initialSelectedItems={field.value}
               />
             )}
           />

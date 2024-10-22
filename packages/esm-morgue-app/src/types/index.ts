@@ -141,3 +141,9 @@ export interface PaymentMethod {
   sortOrder: null;
   resourceVersion: string;
 }
+
+export interface Location {
+  name: string;
+  uuid: string;
+  display: string;
+}
