@@ -34,11 +34,33 @@ export const TimesheetsFilter = ({
 
   const uniqueBillsCashiersUUIDS = Array.from(new Set(billsCashiersUUIDS));
 
-  const selectedCashiersTimesheets = timesheets
+  const openCashierSheets = [];
+
+  const sortedByClockInTimeSheets = timesheets.sort(
+    (a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
+  );
+
+  for (let i = 0; i < uniqueBillsCashiersUUIDS.length; i++) {
+    const uuid = uniqueBillsCashiersUUIDS[i];
+    const openSheet = sortedByClockInTimeSheets.find((s) => s.clockIn && !s.clockOut && s.cashier.uuid === uuid);
+
+    if (openSheet) {
+      openCashierSheets.push(openSheet);
+    }
+  }
+
+  const collectedSheets = [...sortedByClockInTimeSheets.filter((s) => s.clockOut && s.clockIn), ...openCashierSheets];
+
+  const selectedCashiersTimesheets = collectedSheets
+    .sort((a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime())
     .filter((sheet) => billsCashiersUUIDS.includes(sheet.cashier.uuid))
     .filter((sheet) => {
       const sheetClockInTime = new Date(sheet.clockIn);
-      const sheetClockOutTime = sheet.clockOut ? new Date(sheet.clockOut) : new Date();
+      const isOpenTimeSheet = !sheet.clockOut;
+      if (isOpenTimeSheet) {
+        return sheetClockInTime >= dateRange.at(0);
+      }
+      const sheetClockOutTime = new Date(sheet.clockOut);
       return sheetClockInTime >= dateRange.at(0) && sheetClockOutTime <= dateRange.at(1);
     });
 
@@ -52,7 +74,6 @@ export const TimesheetsFilter = ({
   });
 
   const { register, watch } = form;
-
   const selectedSheetUUID = watch('timesheet');
 
   useEffect(() => {
@@ -63,7 +84,8 @@ export const TimesheetsFilter = ({
     if (selectedSheetUUID) {
       applyTimeSheetFilter(timesheets.find((sheet) => sheet.uuid === selectedSheetUUID));
     }
-  }, [applyTimeSheetFilter, selectedSheetUUID, timesheets]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSheetUUID]);
 
   if (selectedCashiersTimesheets.length === 0) {
     return null;

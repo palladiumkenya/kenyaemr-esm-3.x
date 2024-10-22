@@ -50,8 +50,6 @@ export const PaymentHistoryViewer = () => {
 
   const renderedRows = useRenderedRows(bills, appliedFilters, appliedTimesheet);
 
-  // console.log('payment-history-viewer', { renderedRows, bills, appliedFilters, appliedTimesheet });
-
   const { paginated, goTo, results, currentPage } = usePagination(renderedRows, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, renderedRows.length, currentPage, results?.length);
 
@@ -103,7 +101,12 @@ export const PaymentHistoryViewer = () => {
                   <TableToolbarSearch
                     onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
                   />
-                  <AppliedFilterTags appliedFilters={[...appliedFilters, appliedTimesheet?.display]} />
+                  <AppliedFilterTags
+                    appliedFilters={[
+                      ...appliedFilters,
+                      appliedTimesheet && `${appliedTimesheet?.display} (${appliedTimesheet?.cashier.display})`,
+                    ]}
+                  />
                   <Filter applyFilters={applyFilters} resetFilters={resetFilters} bills={bills} />
                   <TimesheetsFilter
                     appliedFilters={appliedFilters}

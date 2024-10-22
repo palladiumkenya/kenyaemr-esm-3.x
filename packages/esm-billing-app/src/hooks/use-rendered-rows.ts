@@ -1,5 +1,5 @@
 import flatMapDeep from 'lodash-es/flatMapDeep';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useBillsServiceTypes } from '../billable-services/payment-history/use-bills-service-types';
 import { usePaymentModes } from '../billing.resource';
 import { MappedBill, Timesheet } from '../types';
@@ -14,6 +14,7 @@ const getAllValues = (obj: Object): Array<any> => {
 };
 
 export const useRenderedRows = (bills: MappedBill[], filters: Array<string>, timesheet?: Timesheet) => {
+  const { pathname } = useLocation();
   const { billsServiceTypes } = useBillsServiceTypes(bills);
   const { paymentModes } = usePaymentModes(false);
   const { paymentPointUUID } = useParams();
@@ -36,10 +37,15 @@ export const useRenderedRows = (bills: MappedBill[], filters: Array<string>, tim
         return true;
       }
 
-      const billCreatedOn = new Date(bill.dateCreatedUnformatted);
+      const billPaymentTime = bill.payments.sort((a, b) => b.dateCreated - a.dateCreated).at(0).dateCreated;
+      const billCreatedOnTime = new Date(bill.dateCreatedUnformatted);
+
+      const isOnPaidBillsOnlyPage = pathname === '/payment-history';
+      const pivot = isOnPaidBillsOnlyPage ? new Date(billPaymentTime) : billCreatedOnTime;
+
       const timesheetStartDate = new Date(timesheet.clockIn);
       const timesheetEndDate = timesheet.clockOut ? new Date(timesheet.clockOut) : new Date();
-      return timesheetStartDate <= billCreatedOn && timesheetEndDate >= billCreatedOn;
+      return timesheetStartDate <= pivot && timesheetEndDate >= pivot;
     });
 
   if (bills.length === 0 || !bills) {
