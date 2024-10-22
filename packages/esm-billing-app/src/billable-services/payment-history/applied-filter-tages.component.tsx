@@ -12,11 +12,13 @@ export const AppliedFilterTags = ({ appliedFilters }: { appliedFilters: Array<st
     return colorsArray[randomIndex];
   };
 
-  const tags = appliedFilters.map((f) => {
-    const serviceType = serviceTypes.find((sT) => sT.uuid === f);
-    const isServiceTypeUUID = Boolean(serviceType);
-    return isServiceTypeUUID ? serviceType.display : f;
-  });
+  const tags = appliedFilters
+    .filter((f) => Boolean(f))
+    .map((f) => {
+      const serviceType = serviceTypes.find((sT) => sT.uuid === f);
+      const isServiceTypeUUID = Boolean(serviceType);
+      return isServiceTypeUUID ? serviceType.display : f;
+    });
 
   if (tags.length === 0) {
     return;

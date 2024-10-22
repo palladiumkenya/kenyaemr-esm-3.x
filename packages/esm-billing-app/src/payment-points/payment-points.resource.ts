@@ -49,7 +49,7 @@ export const useTimeSheets = () => {
   });
 
   return {
-    timesheets: data?.data.results,
+    timesheets: data?.data.results ?? [],
     error,
     isLoading,
     isValidating,
