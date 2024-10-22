@@ -111,7 +111,7 @@ export const caseEncounterDashboardMeta = {
 };
 
 export const morgueDeceasedDetailsDashboardMeta = {
-  slot: 'patient-chart-relationships-slot',
+  slot: 'patient-chart-deceased-panel-slot',
   columns: 1,
   title: 'Deceased Panel',
   path: 'deceased-panel',

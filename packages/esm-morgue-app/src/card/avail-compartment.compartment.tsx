@@ -16,7 +16,6 @@ interface AvailableCompartmentProps {
 
 const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
   const { t } = useTranslation();
-  const patientChartUrl = '${openmrsSpaBase}/patient/${patientInfo.uuid}/chart/case-management-encounters';
 
   return (
     <div className={styles.cardView}>
