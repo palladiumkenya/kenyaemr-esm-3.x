@@ -13,11 +13,12 @@ import {
   Tile,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, showSnackbar, useSession, useVisit } from '@openmrs/esm-framework';
-import React from 'react';
+import { DefaultWorkspaceProps, showSnackbar, useSession } from '@openmrs/esm-framework';
+import React, { useEffect } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import { useVisit } from '../../claims/dashboard/form/claims-form.resource';
 import usePackages from '../../hooks/usePackages';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
@@ -39,10 +40,8 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
   onSuccess,
 }) => {
   const { t } = useTranslation();
-  const {
-    currentVisit: { patient },
-    activeVisit,
-  } = useVisit(patientUuid);
+  const { visits: recentVisist, isLoading } = useVisit(patientUuid);
+  const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
 
   const {
     currentProvider: { uuid: providerUuid },
@@ -50,13 +49,12 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
   } = useSession();
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
   const { isLoading: packagesLoading, error: packageError, packages } = usePackages();
-  const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
   const form = useForm<EligibilityRequest>({
     defaultValues: {
       providerUuid,
       patientUuid,
       facilityUuid,
-      diagnosisUuids: ['18aac1664e2-ac2b5c17-fc83-4256-8299-f9b222d50175'],
+      diagnosisUuids: [],
       isRefered: false,
       interventions: [],
     },
@@ -74,7 +72,16 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
     }
   };
 
-  if (packagesLoading) {
+  useEffect(() => {
+    if (Array.isArray(diagnoses)) {
+      form.setValue(
+        'diagnosisUuids',
+        diagnoses?.map((d) => d.id),
+      );
+    }
+  }, [diagnoses]);
+
+  if (packagesLoading || diagnosesLoading || isLoading) {
     return (
       <Layer className={styles.loading}>
         <Loading withOverlay={false} small />
@@ -112,8 +119,8 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                   }}
                   initialSelectedItem={field.value}
                   label="Choose option"
-                  items={[patient].map((r) => r.uuid)}
-                  itemToString={(item) => [patient].find((r) => r.uuid === item)?.display ?? ''}
+                  items={[recentVisist.patient].map((r) => r.uuid)}
+                  itemToString={(item) => [recentVisist.patient].find((r) => r.uuid === item)?.display ?? ''}
                 />
               )}
             />
@@ -228,8 +235,8 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                   titleText={t('diagnosis', 'Diagnosis')}
                   selectedItems={field.value}
                   label="Choose option"
-                  items={diagnoses.map((r) => r.uuid)}
-                  itemToString={(item) => diagnoses.find((r) => r.uuid === item)?.value ?? ''}
+                  items={diagnoses.map((r) => r.id)}
+                  itemToString={(item) => diagnoses.find((r) => r.id === item)?.text ?? ''}
                 />
               )}
             />

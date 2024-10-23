@@ -7,10 +7,10 @@ export const eligibilityRequestShema = z.object({
   patientUuid: z.string().uuid(),
   providerUuid: z.string().uuid(),
   facilityUuid: z.string().uuid(),
-  packageUUid: z.string(),
   diagnosisUuids: z.array(z.string()),
-  isRefered: z.boolean(),
+  packageUUid: z.string(),
   interventions: z.array(z.string()),
+  isRefered: z.boolean(),
 });
 
 export const preauthSchema = z.object({
@@ -18,6 +18,7 @@ export const preauthSchema = z.object({
   providerUuid: z.string().uuid(),
   facilityUuid: z.string().uuid(),
   diagnosisUuids: z.array(z.string()).nonempty('Require atleast 1 diagnoses'),
+  packageUUid: z.string(),
   interventions: z.array(z.string()).nonempty('Require atleast 1 intervention'),
   patientBenefit: z.string(),
 });
@@ -54,3 +55,15 @@ export const preAuthenticateBenefit = async (
         : benefit.status,
   }));
 };
+
+export const ENCOUNTER_CUSTOME_REPRESENTATION =
+  'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
+  'encounters:(uuid,display,encounterDatetime,' +
+  'form:(uuid,name),location:ref,' +
+  'encounterType:ref,' +
+  'encounterProviders:(uuid,display,' +
+  'provider:(uuid,display))),' +
+  'patient:(uuid,display),' +
+  'visitType:(uuid,name,display),' +
+  'attributes:(uuid,display,attributeType:(name,datatypeClassname,uuid),value),' +
+  'location:(uuid,name,display))';
