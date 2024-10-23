@@ -355,11 +355,6 @@ export interface CoverageEligibilityResponse {
   benefits: Array<PatientBenefit>;
 }
 
-export interface SHAIntervension {
-  interventionCode: string;
-  interventionName?: string;
-}
-
 export interface FHIRErrorResponse {
   resourceType: string;
   issue: Issue[];
@@ -433,7 +428,7 @@ export interface Package {
   uuid: string;
   packageCode: string;
   packageName: string;
-  packageAccessPoint: 'OP' | 'IP' | 'Both';
+  packageAccessPoint?: 'OP' | 'IP' | 'Both';
 }
 
 export interface Diagnosis {
@@ -493,3 +488,56 @@ export type PaymentMode = {
   sortOrder?: number | null;
   resourceVersion: string;
 };
+
+export type SHAIntervension = {
+  interventionCode: string;
+  shaCategory: string;
+  accessCode: string;
+  subCategoryBenefitsPackage: string;
+  interventionName: string;
+  needsPreAuth: string;
+  categoryHealthFacility: string;
+  providerPaymentMechanism: string;
+  gender: string;
+  limitIndividualHousehold: string;
+  interventionQuantityYear: string;
+  tariffs: string;
+  limitIndividual: string;
+  minAge: string;
+  maxAge: string;
+  limitsIndividualHousehold: string;
+  phc: string;
+  shif: string;
+  eccif: string;
+  automateManual: string;
+};
+
+export interface _SHAIntervension {
+  id: number;
+  intervention_code: string;
+  sha_category: string;
+  access_code: string;
+  sub_category_benefits_package: string;
+  intervention_name: string;
+  needs_pre_auth: string;
+  category_health_facility: string;
+  provider_payment_mechanism: string;
+  gender: string;
+  limit_individual_household: string;
+  intervention_quantity_year: string;
+  tariffs: string;
+  limit_individual: string;
+  min_age: string;
+  max_age: string;
+  limits_individual_household: string;
+  phc: string;
+  shif: string;
+  eccif: string;
+  automate_manual: string;
+  status: string;
+  created_date: string;
+  last_modified_date: string;
+  created_by: any;
+  last_modified_by: any;
+  state: any;
+}

@@ -1,16 +1,16 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { z } from 'zod';
-import { patientBenefits } from './benefits-package.mock';
+import { coverageEligibilityResponse, patientBenefits } from './benefits-package.mock';
 import { CoverageEligibilityResponse, InsurersBenefits } from '../types';
 
 export const eligibilityRequestShema = z.object({
   patientUuid: z.string().uuid(),
   providerUuid: z.string().uuid(),
   facilityUuid: z.string().uuid(),
-  packageUUid: z.string(),
   diagnosisUuids: z.array(z.string()),
-  isRefered: z.boolean(),
+  packageUUid: z.string(),
   interventions: z.array(z.string()),
+  isRefered: z.boolean(),
 });
 
 export const preauthSchema = z.object({
@@ -18,6 +18,7 @@ export const preauthSchema = z.object({
   providerUuid: z.string().uuid(),
   facilityUuid: z.string().uuid(),
   diagnosisUuids: z.array(z.string()).nonempty('Require atleast 1 diagnoses'),
+  packageUUid: z.string(),
   interventions: z.array(z.string()).nonempty('Require atleast 1 intervention'),
   patientBenefit: z.string(),
 });

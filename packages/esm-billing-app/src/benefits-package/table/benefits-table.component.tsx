@@ -12,13 +12,16 @@ import { useTranslation } from 'react-i18next';
 import { InsurersBenefits, PatientBenefit } from '../../types';
 import styles from './benebfits-table.scss';
 import GenericDataTable from './generic_data_table.component';
+import useEligibleBenefits from '../../hooks/useEligibleBenefits';
 
 const BenefitsTable = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
-  const [eligibleBenefits, setEligibleBenefits] = useState<Array<InsurersBenefits>>([]);
-  const [eligible, setEligible] = useState(false);
+  const [eligible, setEligible] = useState(true);
   const headerTitle = t('benefits', 'Benefits');
+  const paientUuid = getPatientUuidFromUrl();
+  const { benefits } = useEligibleBenefits(patientUuid);
+  const [eligibleBenefits, setEligibleBenefits] = useState<Array<InsurersBenefits>>(benefits);
 
   const handleLaunchRequestEligibility = () => {
     launchPatientWorkspace('benefits-eligibility-request-form', {
@@ -125,7 +128,23 @@ const BenefitsTable = () => {
       ),
   }));
 
-  return <GenericDataTable rows={rows} headers={headers} title={t('benefits', 'Benefits')} />;
+  return (
+    <GenericDataTable
+      rows={rows}
+      headers={headers}
+      title={t('benefits', 'Benefits')}
+      renderActionComponent={() => (
+        <Button
+          kind="ghost"
+          renderIcon={ArrowRight}
+          onClick={handleLaunchRequestEligibility}
+          // className={styles.btnOutline}
+        >
+          {t('requestEligibility', 'Pull Eligibility')}
+        </Button>
+      )}
+    />
+  );
 };
 
 export default BenefitsTable;
