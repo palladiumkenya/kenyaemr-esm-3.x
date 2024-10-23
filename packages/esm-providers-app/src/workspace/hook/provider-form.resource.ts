@@ -3,6 +3,7 @@ import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { ConfigObject } from '../../config-schema';
 import { FacilityResponse, Provider, ProviderResponse, RolesResponse, User } from '../../types';
+import { HWR_API_NO_CREDENTIALS, NOT_FOUND, UNKNOWN } from '../../constants';
 
 export const useIdentifierTypes = () => {
   const { isLoading, data, error } = useSWRImmutable<{ data: { results: Array<OpenmrsResource> } }>(
@@ -54,9 +55,11 @@ export const searchHealthCareWork = async (identifierType: string, identifierNum
     return await response.json();
   }
   if (response.status === 401) {
-    throw new Error('NO_API_CREDENNTIALS');
+    throw new Error(HWR_API_NO_CREDENTIALS);
+  } else if (response.status === 404) {
+    throw new Error(NOT_FOUND);
   }
-  throw new Error();
+  throw new Error(UNKNOWN);
 };
 export const createProvider = (payload) => {
   const url = `${restBaseUrl}/provider`;

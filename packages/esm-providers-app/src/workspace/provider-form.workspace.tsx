@@ -40,6 +40,7 @@ import {
   useRoles,
 } from './hook/provider-form.resource';
 import styles from './provider-form.scss';
+import { HWR_API_NO_CREDENTIALS, NOT_FOUND, UNKNOWN } from '../constants';
 
 const providerFormSchema = z
   .object({
@@ -132,11 +133,17 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         },
       });
     } catch (error) {
-      if (error.message === 'NO_API_CREDENNTIALS') {
+      if (error.message === HWR_API_NO_CREDENTIALS) {
         showSnackbar({
           kind: 'error',
           title: 'Error',
           subtitle: t('noApiCredentials', 'Health Care Worker Registry API credentials not configured'),
+        });
+      } else if (error.message === NOT_FOUND || error.message === UNKNOWN) {
+        showSnackbar({
+          kind: 'error',
+          title: 'Error',
+          subtitle: t('errorMessage', 'Error Occured while searching Healthcare work.'),
         });
       }
       showModal('hwr-empty-modal');
@@ -367,12 +374,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             control={control}
             name="gender"
             render={({ field }) => (
-              <ContentSwitcher
-                selectedIndex={field.value == 'M' ? 0 : 1}
-                onChange={(value) => {
-                  let { index, name, text } = value;
-                  field.onChange(name);
-                }}>
+              <ContentSwitcher selectedIndex={field.value == 'M' ? 0 : 1} onChange={({ name }) => field.onChange(name)}>
                 <Switch
                   name="M"
                   text={
