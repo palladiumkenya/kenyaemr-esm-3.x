@@ -1,13 +1,13 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Form, InlineNotification, Tooltip, InlineLoading } from '@carbon/react';
+import { ActionableNotification, Form, InlineLoading, InlineNotification, Tooltip } from '@carbon/react';
 import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
-import { useFormContext } from 'react-hook-form';
-import { formatDate, useConfig, usePatient } from '@openmrs/esm-framework';
-import { useHIESubscription } from '../hie.resource';
+import { formatDate, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
-import styles from './sha-number-validity.scss';
+import React from 'react';
+import { useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { BillingConfig } from '../../config-schema';
+import { useHIESubscription } from '../hie.resource';
+import styles from './sha-number-validity.scss';
 
 type SHANumberValidityProps = {
   paymentMethod: any;
@@ -28,6 +28,8 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
       identifier.type.coding.some((coding) => coding.code === nationalPatientUniqueIdentifierTypeUuid),
     );
 
+  const crNumber = undefined;
+
   if (!isSHA) {
     return null;
   }
@@ -35,6 +37,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
   if (isLoadingHIE || isLoading) {
     return <InlineLoading status="active" description={t('loading', 'Loading ...')} />;
   }
+
   if (error) {
     return (
       <InlineNotification
@@ -60,6 +63,21 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
           'patientMissingUniqueIdentifier',
           'Patient is missing National unique patient identifier, SHA validation cannot be done, Advise patient to visit registration desk',
         )}
+      />
+    );
+  }
+
+  if (!crNumber) {
+    return (
+      <ActionableNotification
+        title={t('pendingHIEVerification', 'Pending HIE verification')}
+        closeOnEscape
+        inline={false}
+        actionButtonLabel={t('verify', 'Verify')}
+        onActionButtonClick={() => {
+          navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
+        }}
+        className={styles.missingCRNumber}
       />
     );
   }
