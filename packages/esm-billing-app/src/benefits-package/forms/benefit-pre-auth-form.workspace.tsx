@@ -39,7 +39,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
     sessionLocation: { uuid: facilityUuid, display: facilityName },
   } = useSession();
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
-  const { isLoading: intervensionsLoading, interventions } = useInterventions();
+  // const { isLoading: intervensionsLoading, interventions } = useInterventions();
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
   const [approve, setApprove] = useState<boolean>(false);
 
@@ -170,7 +170,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
             )}
           />
         </Column>
-        <Column>
+        {/* <Column>
           <Controller
             control={form.control}
             name="interventions"
@@ -188,7 +188,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
               />
             )}
           />
-        </Column>
+        </Column> */}
         <Column>
           <Controller
             control={form.control}

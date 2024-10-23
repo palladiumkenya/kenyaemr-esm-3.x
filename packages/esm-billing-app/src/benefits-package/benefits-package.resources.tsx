@@ -1,6 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { z } from 'zod';
-import { patientBenefits } from './benefits-package.mock';
+import { coverageEligibilityResponse, patientBenefits } from './benefits-package.mock';
 import { CoverageEligibilityResponse, InsurersBenefits } from '../types';
 
 export const eligibilityRequestShema = z.object({
@@ -23,13 +23,13 @@ export const preauthSchema = z.object({
 });
 
 export const requestEligibility = async (data: z.infer<typeof eligibilityRequestShema>) => {
-  const url = `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest`;
-  const resp = await openmrsFetch(url, {
-    body: JSON.stringify(data),
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const benefits = (await resp.json()) as Array<CoverageEligibilityResponse>;
+  // const url = `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest`;
+  // const resp = await openmrsFetch(url, {
+  //   body: JSON.stringify(data),
+  //   method: 'POST',
+  //   headers: { 'Content-Type': 'application/json' },
+  // });
+  const benefits = coverageEligibilityResponse as Array<CoverageEligibilityResponse>;
   const insurerBenefits = benefits.reduce<Array<InsurersBenefits>>(
     (prev, curr) => [...prev, ...curr.benefits.map((b) => ({ ...b, insurer: curr.insurer }))],
     [],

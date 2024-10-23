@@ -81,3 +81,36 @@ export const diagnoses = [
     value: 'Juvenile Fucosidosis',
   },
 ] as Array<Diagnosis>;
+
+export const coverageEligibilityResponse = [
+  {
+    insurer: 'SHAX001',
+    inforce: true,
+    benefits: [
+      {
+        packageCode: 'SHA-001',
+        packageName: 'Surgical Services',
+        interventionCode: 'SHA-001-01',
+        interventionName: '',
+        interventioTariff: 50000,
+        requirePreauth: true,
+      },
+      {
+        packageCode: 'SHA-002',
+        packageName: 'Medical Imaging',
+        interventionCode: 'SHA-001-02',
+        interventionName: '',
+        interventioTariff: 50000,
+        requirePreauth: false,
+      },
+      {
+        packageCode: 'SHA-003',
+        packageName: 'Medical Imaging',
+        interventionCode: 'SHA-001-03',
+        interventionName: '',
+        interventioTariff: 50000,
+        requirePreauth: false,
+      },
+    ],
+  },
+] as Array<CoverageEligibilityResponse>;

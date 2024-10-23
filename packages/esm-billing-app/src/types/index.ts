@@ -355,11 +355,6 @@ export interface CoverageEligibilityResponse {
   benefits: Array<PatientBenefit>;
 }
 
-export interface SHAIntervension {
-  interventionCode: string;
-  interventionName?: string;
-}
-
 export interface FHIRErrorResponse {
   resourceType: string;
   issue: Issue[];
@@ -433,7 +428,7 @@ export interface Package {
   uuid: string;
   packageCode: string;
   packageName: string;
-  packageAccessPoint: 'OP' | 'IP' | 'Both';
+  packageAccessPoint?: 'OP' | 'IP' | 'Both';
 }
 
 export interface Diagnosis {
@@ -492,4 +487,27 @@ export type PaymentMode = {
   attributeTypes?: Array<AttributeType>;
   sortOrder?: number | null;
   resourceVersion: string;
+};
+
+export type SHAIntervension = {
+  interventionCode: string;
+  shaCategory: string;
+  accessCode: string;
+  subCategoryBenefitsPackage: string;
+  interventionName: string;
+  needsPreAuth: string;
+  categoryHealthFacility: string;
+  providerPaymentMechanism: string;
+  gender: string;
+  limitIndividualHousehold: string;
+  interventionQuantityYear: string;
+  tariffs: string;
+  limitIndividual: string;
+  minAge: string;
+  maxAge: string;
+  limitsIndividualHousehold: string;
+  phc: string;
+  shif: string;
+  eccif: string;
+  automateManual: string;
 };
