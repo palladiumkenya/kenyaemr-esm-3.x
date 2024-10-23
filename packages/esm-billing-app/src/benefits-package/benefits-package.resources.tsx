@@ -24,13 +24,13 @@ export const preauthSchema = z.object({
 });
 
 export const requestEligibility = async (data: z.infer<typeof eligibilityRequestShema>) => {
-  // const url = `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest`;
-  // const resp = await openmrsFetch(url, {
-  //   body: JSON.stringify(data),
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  // });
-  const benefits = coverageEligibilityResponse as Array<CoverageEligibilityResponse>;
+  const url = `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest`;
+  const resp = await openmrsFetch(url, {
+    body: JSON.stringify(data),
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const benefits = (await resp.json()) as Array<CoverageEligibilityResponse>;
   const insurerBenefits = benefits.reduce<Array<InsurersBenefits>>(
     (prev, curr) => [...prev, ...curr.benefits.map((b) => ({ ...b, insurer: curr.insurer }))],
     [],
@@ -55,15 +55,3 @@ export const preAuthenticateBenefit = async (
         : benefit.status,
   }));
 };
-
-export const ENCOUNTER_CUSTOME_REPRESENTATION =
-  'custom:(uuid,display,voided,indication,startDatetime,stopDatetime,' +
-  'encounters:(uuid,display,encounterDatetime,' +
-  'form:(uuid,name),location:ref,' +
-  'encounterType:ref,' +
-  'encounterProviders:(uuid,display,' +
-  'provider:(uuid,display))),' +
-  'patient:(uuid,display),' +
-  'visitType:(uuid,name,display),' +
-  'attributes:(uuid,display,attributeType:(name,datatypeClassname,uuid),value),' +
-  'location:(uuid,name,display))';

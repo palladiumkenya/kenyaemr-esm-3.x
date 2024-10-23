@@ -242,7 +242,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
             />
           </Column>
 
-          <Column>
+          {/* <Column>
             <Controller
               control={form.control}
               name="isRefered"
@@ -255,7 +255,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
                 />
               )}
             />
-          </Column>
+          </Column> */}
         </Stack>
 
         <div className={styles.btnSet}>

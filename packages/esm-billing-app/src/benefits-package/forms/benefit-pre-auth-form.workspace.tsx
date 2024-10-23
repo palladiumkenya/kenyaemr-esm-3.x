@@ -60,17 +60,21 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
       patientUuid,
       facilityUuid,
       diagnosisUuids: [],
-      patientBenefit: benefit.packageCode,
       interventions: [benefit.interventionCode],
     },
     resolver: zodResolver(preauthSchema),
   });
-
   useEffect(() => {
     if (Array.isArray(diagnoses)) {
       form.setValue('diagnosisUuids', diagnoses!.map((d) => d.id) as any);
     }
   }, [diagnoses]);
+
+  useEffect(() => {
+    if (packages.length && !form.watch('packageUUid')) {
+      form.setValue('packageUUid', packages.find((package_) => package_.packageCode === benefit.packageCode)?.uuid);
+    }
+  }, [packages]);
 
   const onSubmit = async (values: BenefitsPreAuth) => {
     try {
@@ -83,7 +87,6 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
     }
   };
   const selectedPackageObservable = form.watch('packageUUid');
-
   if (packagesLoading || diagnosesLoading || isLoading) {
     return (
       <Layer className={styles.loading}>

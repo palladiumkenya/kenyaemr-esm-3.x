@@ -105,16 +105,14 @@ export const chargeableItemsLink = getSyncLifecycle(
   }),
   options,
 );
-export const claimsManagementSideNavGroup = getFeatureFlag('claims-management')
-  ? getSyncLifecycle(
-      createDashboardGroup({
-        title: 'Claims Management',
-        slotName: 'claims-management-dashboard-link-slot',
-        isExpanded: false,
-      }),
-      options,
-    )
-  : undefined;
+export const claimsManagementSideNavGroup = getSyncLifecycle(
+  createDashboardGroup({
+    title: 'Claims Management',
+    slotName: 'claims-management-dashboard-link-slot',
+    isExpanded: false,
+  }),
+  options,
+);
 export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'claims-overview',
@@ -131,15 +129,13 @@ export const preAuthRequestsDashboardLink = getSyncLifecycle(
 );
 export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 
-export const benefitsPackageDashboardLink = getFeatureFlag('benefits-package')
-  ? getSyncLifecycle(
-      createDashboardLink({
-        ...benefitsPackageDashboardMeta,
-        moduleName,
-      }),
-      options,
-    )
-  : undefined;
+export const benefitsPackageDashboardLink = getSyncLifecycle(
+  createDashboardLink({
+    ...benefitsPackageDashboardMeta,
+    moduleName,
+  }),
+  options,
+);
 
 export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
@@ -184,18 +180,6 @@ export const paymentModeWorkspace = getSyncLifecycle(PaymentModeWorkspace, optio
 export const deletePaymentModeModal = getSyncLifecycle(DeletePaymentModeModal, options);
 
 export function startupApp() {
-  registerFeatureFlag(
-    'claims-management',
-    'Claims Management Dashboard',
-    'Controls the visibility of the Claims Management Dashboard in the side navigation.',
-  );
-
-  registerFeatureFlag(
-    'benefits-package',
-    'Benefits Package',
-    'Benefits package adds listing of patient benefits per insurance scheme upon requesting coverage eligibility.For the benefits the required preauth it supports that as well',
-  );
-
   defineConfigSchema(moduleName, configSchema);
   registerFeatureFlag(
     'healthInformationExchange',
