@@ -56,14 +56,15 @@ export const WaitingQueue: React.FC = () => {
       Ids: patient.identifiers[0]?.identifier || 'N/A',
       address4: patient.person.preferredAddress?.address4 || 'N/A',
     })) || [];
-  const handleAdmissionForm = () => {
+  const handleAdmissionForm = (patientUuid: string) => {
     launchWorkspace('patient-additional-info-form', {
       workspaceTitle: t('admissionForm', 'Admission form'),
+      patientUuid,
     });
   };
-  const actionColumn = () => (
+  const actionColumn = (row) => (
     <OverflowMenu aria-label="queue-menu" align="bottom" flipped>
-      <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={handleAdmissionForm} />
+      <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
       <OverflowMenuItem hasDivider isDelete itemText={t('release', 'Release body')} />
     </OverflowMenu>
   );

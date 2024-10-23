@@ -20,7 +20,7 @@ import {
   FilterableMultiSelect,
   Dropdown,
 } from '@carbon/react';
-import { ResponsiveWrapper, useLayoutType, useConfig } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, useLayoutType, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
@@ -36,12 +36,13 @@ import { ConfigObject } from '../config-schema';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
+  patientUuid: string;
 }
 
 const MAX_RESULTS = 5;
 
 const patientInfoSchema = z.object({
-  dateOfAdmission: z.date().refine((date) => !!date, 'Date of admission is required'),
+  dateOfAdmission: z.date({ coerce: true }).refine((date) => !!date, 'Date of admission is required'),
   timeOfDeath: z
     .string()
     .nonempty('Time of death is required')
@@ -52,9 +53,13 @@ const patientInfoSchema = z.object({
   visitType: z.string().uuid('invalid visit type'),
   availableCompartment: z.string(),
   services: z.array(z.string().uuid('invalid service')).nonempty('Must select one service'),
+  paymentMethod: z.string().uuid('invalid payment method'),
+  insuranceScheme: z.string().uuid('invalid insurance scheme'),
+  policyNumber: z.string().optional(),
+  additionalInformation: z.string().optional(),
 });
 
-const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ closeWorkspace }) => {
+const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { data: visitTypes, isLoading: isLoadingVisitTypes } = useVisitType();
@@ -64,8 +69,19 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const { morgueCompartments } = useMorgueCompartment();
+  const {
+    sessionLocation: { uuid: locationUuid },
+    currentProvider: { uuid: currentProviderUuid },
+    user: { roles },
+  } = useSession();
 
-  const { morgueVisitTypeUuid, morgueDepartmentServiceTypeUuid, insurancepaymentModeUuid } = useConfig<ConfigObject>();
+  const {
+    morgueVisitTypeUuid,
+    morgueDepartmentServiceTypeUuid,
+    insurancepaymentModeUuid,
+    visitPaymentMethodAttributeUuid,
+    morgueAdmissionEncounterType,
+  } = useConfig<ConfigObject>();
 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isPoliceCase, setIsPoliceCase] = useState<string | null>(null);
@@ -76,17 +92,17 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm({
+  } = useForm<z.infer<typeof patientInfoSchema>>({
     resolver: zodResolver(patientInfoSchema),
     defaultValues: {
-      dateOfAdmission: '',
+      dateOfAdmission: new Date(),
       timeOfDeath: '',
       tagNumber: '',
       obNumber: '',
       policeReport: '',
       visitType: morgueVisitTypeUuid,
       availableCompartment: '',
-      paymentMethods: '',
+      paymentMethod: '',
       insuranceScheme: '',
       policyNumber: '',
       services: [],
@@ -94,7 +110,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   });
 
   const visitTypeValue = watch('visitType');
-  const paymentMethodObservable = watch('paymentMethods');
+  const paymentMethodObservable = watch('paymentMethod');
 
   const filteredVisitTypes = useMemo(() => {
     if (!visitTypes) {
@@ -110,7 +126,32 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
 
   const truncatedResults = filteredVisitTypes.slice(0, MAX_RESULTS);
 
-  const onSubmit = (data: any) => {};
+  const onSubmit = (data: z.infer<typeof patientInfoSchema>) => {
+    const encounterPayload = {
+      encounterDatetime: new Date().toISOString(),
+      patient: patientUuid,
+      encounterType: morgueAdmissionEncounterType,
+      location: data.availableCompartment,
+      encounterProviders: [
+        {
+          provider: currentProviderUuid,
+          encounterRole: roles,
+        },
+      ],
+      visit: {
+        patient: patientUuid,
+        startDatetime: new Date().toISOString(),
+        visitType: data.visitType,
+        location: locationUuid,
+        attributes: [
+          {
+            attributeType: visitPaymentMethodAttributeUuid,
+            value: data.paymentMethod,
+          },
+        ],
+      },
+    };
+  };
 
   useEffect(() => {
     if (visitTypeValue === morgueVisitTypeUuid) {
@@ -123,7 +164,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   };
   return (
     <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
-      <pre>{JSON.stringify(errors)}</pre>
+      <pre>{JSON.stringify(patientUuid)}</pre>
       <Stack gap={4} className={styles.formGrid}>
         <span className={styles.formSubHeader}>{t('moreDetails', 'More Details')}</span>
         <Column>
@@ -241,7 +282,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           <div className={styles.sectionFieldLayer}>
             <Controller
               control={control}
-              name="paymentMethods"
+              name="paymentMethod"
               render={({ field }) => (
                 <Dropdown
                   {...field}

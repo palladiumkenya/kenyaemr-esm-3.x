@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import { visitAttributeTags } from '../../esm-billing-app/src/index';
 
 export const configSchema = {
   autopsyEncounterUuid: {
@@ -21,7 +22,7 @@ export const configSchema = {
   morgueDepartmentServiceTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue department service type',
-    _default: '61a12cde-f3b7-4b73-a0ba-94d22cdc642b',
+    _default: 'c9abc980-7580-4247-9164-1a87ef25febb',
   },
   insurancepaymentModeUuid: {
     _type: Type.String,
@@ -32,6 +33,21 @@ export const configSchema = {
     _type: Type.String,
     _description: 'UUID for morgue compartment tag',
     _default: '8ff46770-6ac7-478f-85ba-439a53546bf0',
+  },
+  tagNumberConceptUuid: {
+    _type: Type.String,
+    _description: 'UUID for tag number concept',
+    _default: '9a953c7b-7aa2-481c-8aac-b8bc9be742ee',
+  },
+  morgueAdmissionEncounterType: {
+    _type: Type.String,
+    _description: 'Encounter type for morgue admission',
+    _default: 'a0c999e3-4a2d-4caf-8142-19c0bb092c60',
+  },
+  visitPaymentMethodAttributeUuid: {
+    _type: Type.String,
+    _description: 'UUID for visit payment method attribute',
+    _default: 'e6cb0c3b-04b0-4117-9bc6-ce24adbda802',
   },
 };
 
@@ -66,4 +82,7 @@ export type ConfigObject = {
   morgueDepartmentServiceTypeUuid: string;
   insurancepaymentModeUuid: string;
   morgueCompartmentTagUuid: string;
+  tagNumberConceptUuid: string;
+  morgueAdmissionEncounterType: string;
+  visitPaymentMethodAttributeUuid: string;
 };
