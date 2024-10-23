@@ -283,7 +283,7 @@ export interface Payment {
   attributes: Attribute[];
   amount: number;
   amountTendered: number;
-  dateCreated: string;
+  dateCreated: number;
   voided: boolean;
   resourceVersion: string;
 }

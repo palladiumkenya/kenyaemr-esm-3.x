@@ -44,7 +44,7 @@ export const PaymentHistoryTable = ({
     );
   }
 
-  if (bills.length === 0 || renderedRows?.length === 0) {
+  if (bills.length === 0 || renderedRows.length === 0) {
     return (
       <div className={styles.emptyStateWrapper}>
         <EmptyState
