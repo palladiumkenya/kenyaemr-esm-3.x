@@ -218,7 +218,7 @@ const BenefitsEligibilyRequestForm: React.FC<BenefitsEligibilyRequestFormProps> 
           {selectedPackageObservable && (
             <Column>
               <PackageIntervensions
-                category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageName ?? ''}
+                category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
               />
             </Column>
           )}
