@@ -1,5 +1,6 @@
 @use '@carbon/type';
 @use '@carbon/layout';
+@use '@carbon/colors';
 
 form {
   height: 100%;
@@ -43,4 +44,19 @@ form {
   justify-content: center;
   width: 100%;
   padding: layout.$spacing-08;
+}
+
+.uploadButtonWrapper {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: center;
+  font-size: medium;
+  border: solid 1px colors.$gray-30;
+  justify-content: space-between;
+  // border-radius: layout.;
+
+  & > p {
+    flex-grow: 1;
+    padding-left: layout.$spacing-05;
+  }
 }

@@ -60,7 +60,8 @@ export const coverageEligibilityResponse = [
         interventionCode: 'SHA-16-005',
         interventionName: 'Insertion of Continuous Ambulatory Peritoneal Dialysis (CAPD) catheter',
         interventioTariff: 50000,
-        requirePreauth: true,
+        requirePreauth: false,
+        status: 'Pending',
       },
       {
         packageCode: 'SHA-01',
@@ -68,7 +69,8 @@ export const coverageEligibilityResponse = [
         interventionCode: 'SHA-001-02',
         interventionName: 'Ambulance services (Intra-metro within 25KM radius )',
         interventioTariff: 50000,
-        requirePreauth: false,
+        requirePreauth: true,
+        status: 'Pending',
       },
       {
         packageCode: 'SHA-19',
@@ -77,6 +79,7 @@ export const coverageEligibilityResponse = [
         interventionName: 'Thoracic endovascular aortic repair (TEVAR)',
         interventioTariff: 50000,
         requirePreauth: false,
+        status: 'Pending',
       },
     ],
   },

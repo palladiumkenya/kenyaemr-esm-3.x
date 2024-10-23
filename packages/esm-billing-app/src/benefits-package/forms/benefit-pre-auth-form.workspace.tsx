@@ -4,6 +4,7 @@ import {
   Dropdown,
   DropdownSkeleton,
   Form,
+  FormLabel,
   InlineNotification,
   Layer,
   Loading,
@@ -11,9 +12,10 @@ import {
   Stack,
   Tile,
 } from '@carbon/react';
+import { DocumentAttachment } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showSnackbar, useSession } from '@openmrs/esm-framework';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -45,6 +47,8 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
   const { t } = useTranslation();
   const { visits: recentVisist, isLoading } = useVisit(patientUuid);
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
+  const inputFileRef = useRef<HTMLInputElement>();
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const {
     currentProvider: { uuid: providerUuid },
@@ -53,6 +57,26 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
   const [approve, setApprove] = useState<boolean>(false);
   const { isLoading: packagesLoading, error: packageError, packages } = usePackages();
+
+  const attachFiles = () => {
+    inputFileRef.current.click();
+  };
+
+  const handleFileChange = () => {
+    const MAX_ALLOWED_FILE_SIZE = 2097152;
+    if (inputFileRef.current && inputFileRef.current.files) {
+      const file = inputFileRef.current.files[0];
+      if (file.size > MAX_ALLOWED_FILE_SIZE) {
+        showSnackbar({
+          title: t('fileTooBig', 'fileTooBig'),
+          kind: 'error',
+        });
+
+        return;
+      }
+      setUploadedFile(file);
+    }
+  };
 
   const form = useForm<BenefitsPreAuth>({
     defaultValues: {
@@ -222,7 +246,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
           {selectedPackageObservable && (
             <Column>
               <PackageIntervensions
-                category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageName ?? ''}
+                category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
               />
             </Column>
           )}
@@ -244,6 +268,16 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
                 />
               )}
             />
+          </Column>
+          <Column>
+            <FormLabel>Attach file</FormLabel>
+            <div className={styles.uploadButtonWrapper}>
+              <input type="file" ref={inputFileRef} hidden onChange={handleFileChange} accept="image/*, .pdf" />
+              {uploadedFile ? <p className={styles.selectedFile}>{uploadedFile.name}</p> : 'No file selected'}
+              <Button onClick={attachFiles}>
+                Attach File <DocumentAttachment className={styles.iconMarginLeft} />
+              </Button>
+            </div>
           </Column>
         </Stack>
 
