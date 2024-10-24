@@ -5,6 +5,7 @@ import {
   restBaseUrl,
   useConfig,
   useOpenmrsPagination,
+  type Visit,
 } from '@openmrs/esm-framework';
 import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location } from '../types';
 import useSWRImmutable from 'swr/immutable';
@@ -105,3 +106,21 @@ export const startVisitWithEncounter = (payload) => {
   const postUrl = `/ws/rest/v1/encounter`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
+
+export function useVisit(patientUuid: string) {
+  const customRepresentation =
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,certainty,diagnosis:(coded:(uuid,display))),encounterDatetime,encounterType:(uuid,display),encounterProviders:(uuid,display,provider:(uuid,person:(uuid,display)))),location:(uuid,name,display),visitType:(uuid,name,display),startDatetime,stopDatetime)&limit=1';
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+    `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    openmrsFetch,
+  );
+
+  return {
+    visits: data ? data?.data?.results[0] : null,
+    error,
+    isLoading,
+    isValidating,
+    mutateVisits: mutate,
+  };
+}

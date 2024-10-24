@@ -20,7 +20,15 @@ import {
   FilterableMultiSelect,
   Dropdown,
 } from '@carbon/react';
-import { ResponsiveWrapper, useLayoutType, useConfig, useSession, showSnackbar } from '@openmrs/esm-framework';
+import {
+  ResponsiveWrapper,
+  useLayoutType,
+  useConfig,
+  useSession,
+  showSnackbar,
+  formatTime,
+  parseDate,
+} from '@openmrs/esm-framework';
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
@@ -43,6 +51,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import { ConfigObject } from '../config-schema';
 import { PENDING_PAYMENT_STATUS } from '../constants';
 import { mutate } from 'swr';
+import dayjs from 'dayjs';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -59,7 +68,6 @@ const patientInfoSchema = z.object({
     .regex(/^(0[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i, 'Time of death must be in the format hh:mm AM/PM'),
   tagNumber: z.string().nonempty('Tag number is required'),
   obNumber: z.string().optional(),
-  policeReport: z.string().optional(),
   visitType: z.string().uuid('invalid visit type'),
   availableCompartment: z.string(),
   services: z.array(z.string().uuid('invalid service')).nonempty('Must select one service'),
@@ -114,7 +122,6 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
       timeOfDeath: '',
       tagNumber: '',
       obNumber: '',
-      policeReport: '',
       visitType: morgueVisitTypeUuid,
       availableCompartment: '',
       paymentMethod: '',
@@ -160,10 +167,21 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           paymentStatus: PENDING_PAYMENT_STATUS,
         };
       });
+
+    const encounterDateTime = dayjs(data.dateOfAdmission).toISOString();
+
+    const obs = [];
+    if (data.tagNumber) {
+      obs.push({ concept: tagNumberUuid, value: data.tagNumber });
+    }
+    if (data.obNumber) {
+      obs.push({ concept: obNumberUuid, value: data.obNumber });
+    }
+
     const encounterPayload = {
       visit: {
         patient: patientUuid,
-        startDatetime: new Date().toISOString(),
+        startDatetime: encounterDateTime,
         visitType: data.visitType,
         location: locationUuid,
         attributes: [
@@ -183,13 +201,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           encounterRole: encounterProviderRoleUuid,
         },
       ],
-      obs: [
-        { concept: tagNumberUuid, value: data.tagNumber },
-        { concept: policeStatementUuid, value: data.policeReport },
-        { concept: obNumberUuid, value: data.obNumber },
-      ],
+      obs: obs.length > 0 ? obs : undefined,
     };
-
     await startVisitWithEncounter(encounterPayload).then(
       () => {
         showSnackbar({ title: 'Start visit', subtitle: ' visit has been started successfully', kind: 'success' });
@@ -204,6 +217,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
         });
       },
     );
+
     const billPayload = {
       lineItems: linesItems,
       cashPoint: cashPointUuid,
@@ -211,6 +225,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
       status: PENDING_PAYMENT_STATUS,
       payments: [],
     };
+
     await createPatientBill(billPayload).then(
       () => {
         showSnackbar({ title: 'Patient Bill', subtitle: 'Patient has been billed successfully', kind: 'success' });
@@ -225,6 +240,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
         });
       },
     );
+
     mutate((key) => {
       return typeof key === 'string' && key.startsWith('/ws/rest/v1/morgue');
     });
@@ -379,52 +395,53 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
         {paymentMethodObservable === insurancepaymentModeUuid && (
           <>
             <Column>
-              <div className={styles.sectionFieldLayer}>
-                <Controller
-                  control={control}
-                  name="insuranceScheme"
-                  render={({ field }) => (
-                    <ComboBox
-                      className={styles.sectionField}
-                      onChange={({ selectedItem }) => field.onChange(selectedItem)}
-                      id="insurance-scheme"
-                      items={insuranceSchemes}
-                      itemToString={(item) => (item ? item : '')}
-                      titleText={t('insuranceScheme', 'Insurance scheme')}
-                      label={t('selectInsuranceScheme', 'Select insurance scheme')}
-                    />
-                  )}
-                />
-              </div>
+              <Controller
+                control={control}
+                name="insuranceScheme"
+                render={({ field }) => (
+                  <ComboBox
+                    className={styles.sectionField}
+                    onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                    id="insurance-scheme"
+                    items={insuranceSchemes}
+                    itemToString={(item) => (item ? item : '')}
+                    titleText={t('insuranceScheme', 'Insurance scheme')}
+                    label={t('selectInsuranceScheme', 'Select insurance scheme')}
+                    invalid={!!errors.insuranceScheme}
+                    invalidText={errors.insuranceScheme?.message}
+                  />
+                )}
+              />
             </Column>
             <Column>
-              <div className={styles.sectionFieldLayer}>
-                <Controller
-                  control={control}
-                  name="policyNumber"
-                  render={({ field }) => (
-                    <TextInput
-                      className={styles.sectionField}
-                      onChange={(e) => field.onChange(e.target.value)}
-                      id="policy-number"
-                      type="text"
-                      labelText={t('policyNumber', 'Policy number')}
-                      placeholder={t('enterPolicyNumber', 'Enter policy number')}
-                    />
-                  )}
-                />
-              </div>
+              <Controller
+                control={control}
+                name="policyNumber"
+                render={({ field }) => (
+                  <TextInput
+                    className={styles.sectionField}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    id="policy-number"
+                    type="text"
+                    labelText={t('policyNumber', 'Policy number')}
+                    placeholder={t('enterPolicyNumber', 'Enter policy number')}
+                    invalid={!!errors.policyNumber}
+                    invalidText={errors.policyNumber?.message}
+                  />
+                )}
+              />
             </Column>
           </>
         )}
-        <Column>
-          <div className={styles.sectionField}>
+        {paymentMethodObservable && (
+          <Column>
             <Controller
               control={control}
               name="services"
               render={({ field }) => (
                 <FilterableMultiSelect
                   id="billing-service"
+                  className={styles.formAdmissionDatepicker}
                   titleText={t('searchServices', 'Search services')}
                   items={lineItems
                     .filter((service) => service?.serviceType?.uuid === morgueDepartmentServiceTypeUuid)
@@ -435,11 +452,13 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                   }}
                   placeholder={t('Service', 'Service')}
                   initialSelectedItems={field.value}
+                  invalid={!!errors.services}
+                  invalidText={errors.services?.message}
                 />
               )}
             />
-          </div>
-        </Column>
+          </Column>
+        )}
         <Column>
           <Controller
             name="tagNumber"
@@ -448,6 +467,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
               <TextInput
                 {...field}
                 id="tagNumber"
+                className={styles.sectionField}
                 placeholder={t('tagNumber', 'Tag Number*')}
                 labelText={t('tagNumber', 'Tag Number*')}
                 invalid={!!errors.tagNumber}
@@ -461,6 +481,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           <ComboBox
             onChange={(e) => handlePoliceCaseChange(e.selectedItem)}
             id="morgue-combobox"
+            className={styles.formAdmissionDatepicker}
             items={['Yes', 'No']}
             itemToString={(item) => (item ? item : '')}
             titleText={t(
@@ -480,23 +501,11 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                   <TextInput
                     {...field}
                     id="obNumber"
+                    className={styles.formAdmissionDatepicker}
                     placeholder={t('obNumber', 'OB Number*')}
                     labelText={t('obNumber', 'OB Number*')}
-                  />
-                )}
-              />
-              {errors.obNumber && <span>{errors.obNumber.message}</span>}
-            </Column>
-            <Column>
-              <Controller
-                name="policeReport"
-                control={control}
-                render={({ field }) => (
-                  <TextArea
-                    {...field}
-                    labelText={t('policeReport', "Police's report")}
-                    rows={4}
-                    id="police-report-text-area"
+                    invalid={!!errors.obNumber}
+                    invalidText={errors.obNumber?.message}
                   />
                 )}
               />
@@ -512,6 +521,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
               <Dropdown
                 {...field}
                 id="avail-compartment"
+                className={styles.sectionField}
                 items={morgueCompartments.map((compartment) => compartment.uuid)}
                 itemToString={(item) =>
                   morgueCompartments.find((compartment) => compartment.uuid === item)?.display ?? ''
@@ -519,20 +529,21 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 titleText={t('availableCompartment', 'Available Compartment')}
                 onChange={({ selectedItem }) => field.onChange(selectedItem)}
                 initialSelectedItems={field.value}
+                invalid={!!errors.availableCompartment}
+                invalidText={errors.availableCompartment?.message}
               />
             )}
           />
         </Column>
+        <ButtonSet className={styles.buttonSet}>
+          <Button style={{ maxWidth: '65%' }} size="lg" kind="secondary" onClick={closeWorkspace}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button style={{ maxWidth: '60%' }} kind="primary" size="lg" type="submit">
+            {t('admit', 'Admit')}
+          </Button>
+        </ButtonSet>
       </Stack>
-
-      <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} size="lg" kind="secondary" onClick={closeWorkspace}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button className={styles.button} kind="primary" size="lg" type="submit">
-          {t('admit', 'Admit')}
-        </Button>
-      </ButtonSet>
     </Form>
   );
 };

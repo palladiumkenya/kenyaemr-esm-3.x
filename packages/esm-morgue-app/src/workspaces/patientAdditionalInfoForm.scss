@@ -5,7 +5,6 @@
 .formContainer {
   width: 100%;
   max-height: 100vh;
-  padding-right: layout.$spacing-03;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -30,13 +29,12 @@
 }
 
 .buttonSet {
-  width: 100%;
-  padding-top: layout.$spacing-05;
-  bottom: 0;
-  // position: absolute;
+  width: 80%;
+  padding-top: layout.$spacing-10;
   display: flex;
-  justify-content: center;
   align-items: center;
+  margin-bottom: layout.$spacing-03;
+  position: relative;
   & > button {
     max-width: 50%;
     width: 50%;
@@ -55,10 +53,10 @@
 }
 
 .formAdmissionDatepicker input {
-  min-width: 24rem;
+  min-width: 23rem;
 }
 .formAdmissionTimepicker input {
-  min-width: 13rem;
+  min-width: 11rem;
 }
 
 .visitTypeOverviewWrapper {
@@ -98,3 +96,7 @@
   min-width: layout.$spacing-05;
   margin-top: layout.$spacing-06;
 }
+
+// .sectionField {
+//   width: 24rem; /* Adjust this value as needed */
+// }
