@@ -16,14 +16,8 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PaymentPoint } from '../../types';
-import {
-  clockIn,
-  clockOut,
-  useClockInStatus,
-  usePaymentPoints,
-  useProviderUUID,
-  useTimeSheets,
-} from '../payment-points.resource';
+import { clockIn, clockOut, usePaymentPoints, useProviderUUID, useTimeSheets } from '../payment-points.resource';
+import { useClockInStatus } from '../use-clock-in-status';
 
 const schema = z.object({
   paymentPointUUID: z.string({ required_error: 'Payment point is required.' }),
@@ -37,7 +31,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
-  const { latestSheet, isClockedIn } = useClockInStatus();
+  const { globalActiveSheet, isClockedInSomewhere } = useClockInStatus(paymentPoint?.uuid);
 
   const shouldPromptUser = !paymentPoint;
 
@@ -56,7 +50,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
       .then(() => {
         showSnackbar({
           title: t('success', 'Success'),
-          subtitle: t('successfullyClockedIn', 'Successfully Clocked In'),
+          subtitle: t('successfullyClockedIn', `Successfully Clocked In ${paymentPoint.name}`),
           kind: 'success',
         });
         mutate();
@@ -65,7 +59,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
       .catch(() => {
         showSnackbar({
           title: t('anErrorOccurred', 'An Error Occurred'),
-          subtitle: t('anErrorOccurredClockingIn', 'An error occurred clocking in'),
+          subtitle: t('anErrorOccurredClockingIn', `An error occurred clocking in ${paymentPoint.name}`),
           kind: 'error',
         });
 
@@ -80,17 +74,14 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     setIsSubmitting(true);
-    if (isClockedIn) {
-      clockOut({
+    if (isClockedInSomewhere) {
+      clockOut(globalActiveSheet.uuid, {
         clockOut: new Date().toISOString(),
-        cashier: providerUUID,
-        cashPoint: latestSheet.cashPoint.uuid,
-        clockIn: latestSheet.clockIn,
       })
         .then(() => {
           showSnackbar({
             title: t('success', 'Success'),
-            subtitle: t('successfullyClockedOut', 'Successfully Clocked Out'),
+            subtitle: t('successfullyClockedOut', `Successfully Clocked Out Of ${globalActiveSheet.cashPoint.name}`),
             kind: 'success',
           });
           mutate();
@@ -99,7 +90,10 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
         .catch(() => {
           showSnackbar({
             title: t('anErrorOccurred', 'An Error Occurred'),
-            subtitle: t('anErrorOccurredClockingOut', 'An error occurred clocking out'),
+            subtitle: t(
+              'anErrorOccurredClockingOut',
+              `An error occurred clocking out of ${globalActiveSheet.cashPoint.name}`,
+            ),
             kind: 'error',
           });
         })
@@ -163,8 +157,8 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
     <Form onSubmit={handleSubmit(onSubmit)}>
       <ModalHeader closeModal={closeModal}>Clock In</ModalHeader>
       <ModalBody>
-        {isClockedIn
-          ? `You will be clocked in on ${paymentPoint.name} right now but you will be automatically be clocked out of ${latestSheet.cashPoint.name} first. Do you want to proceed.`
+        {isClockedInSomewhere
+          ? `You will be clocked in on ${paymentPoint.name} right now but you will be automatically be clocked out of ${globalActiveSheet.cashPoint.name} first. Do you want to proceed.`
           : `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`}
       </ModalBody>
       <ModalFooter>
