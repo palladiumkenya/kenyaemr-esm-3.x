@@ -228,6 +228,7 @@
   "type": "Type",
   "unfulfilled": "Unfulfilled",
   "unitPrice": "Unit price",
+  "unsettledTestBill": "Unsettled test bill.",
   "unsettledBill": "Unsettled bill.",
   "verifyingOrderBillStatus": "Verifying order bill status...",
   "visitTime": "Visit time",

@@ -1,9 +1,9 @@
 import React from 'react';
 import { ExtensionSlot, launchWorkspace, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, getPatientUuidFromUrl, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mutate } from 'swr';
-import { ConfigObject } from '../config-schema';
+import { ConfigObject } from '../../config-schema';
 
 const AutopsyView: React.FC = () => {
   const { t } = useTranslation();
@@ -11,7 +11,7 @@ const AutopsyView: React.FC = () => {
   const { formsList } = useConfig<ConfigObject>();
 
   const handleLaunchAutopsyForm = (encounterUuid?: string) => {
-    launchWorkspace('autopsy-form-workspace', {
+    launchPatientWorkspace('patient-form-entry-workspace', {
       patientUuid,
       encounterUuid: encounterUuid ?? '',
       formUuid: formsList?.autopsyFormUuid,
