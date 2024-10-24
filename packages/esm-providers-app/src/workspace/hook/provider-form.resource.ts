@@ -1,9 +1,9 @@
-import { FetchResponse, openmrsFetch, OpenmrsResource, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { useCallback, useState } from 'react';
-import useSWRImmutable from 'swr/immutable';
-import { FacilityResponse, Practitioner, Provider, ProviderResponse, RolesResponse, User } from '../../types';
+import { FetchResponse, makeUrl, openmrsFetch, OpenmrsResource, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import useSWR, { mutate } from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { ConfigObject } from '../../config-schema';
+import { FacilityResponse, Provider, ProviderResponse, RolesResponse, User } from '../../types';
+import { HWR_API_NO_CREDENTIALS, NOT_FOUND, UNKNOWN } from '../../constants';
 
 export const useIdentifierTypes = () => {
   const { isLoading, data, error } = useSWRImmutable<{ data: { results: Array<OpenmrsResource> } }>(
@@ -49,8 +49,17 @@ export const searchHealthCareWork = async (identifierType: string, identifierNum
   const url = `${restBaseUrl}/kenyaemr/practitionersearch?${convertToIdenitifertype(
     identifierType,
   )}=${identifierNumber}`;
-  const response = await openmrsFetch(url);
-  return response.json();
+  // Not using openmrsfetch to avoid automatic ending of current session due to 401(Unauthorized) status error it throws
+  const response = await fetch(makeUrl(url));
+  if (response.ok) {
+    return await response.json();
+  }
+  if (response.status === 401) {
+    throw new Error(HWR_API_NO_CREDENTIALS);
+  } else if (response.status === 404) {
+    throw new Error(NOT_FOUND);
+  }
+  throw new Error(UNKNOWN);
 };
 export const createProvider = (payload) => {
   const url = `${restBaseUrl}/provider`;

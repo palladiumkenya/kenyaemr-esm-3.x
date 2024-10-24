@@ -146,7 +146,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
             <Table {...getTableProps()} aria-label="claim line items" className={styles.table}>
               <TableHead>
                 <TableRow>
-                  {rows.length > 1 && isSelectable ? <TableHeader /> : null}
+                  {isSelectable ? <TableHeader /> : null}
                   {headers.map((header) => (
                     <TableHeader key={header.key}>{header.header}</TableHeader>
                   ))}
@@ -160,7 +160,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
                       {...getRowProps({
                         row,
                       })}>
-                      {rows.length > 1 && isSelectable && (
+                      {isSelectable && (
                         <TableSelectRow
                           aria-label="Select row"
                           {...getSelectionProps({ row })}
