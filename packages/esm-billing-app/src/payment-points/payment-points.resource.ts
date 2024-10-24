@@ -41,7 +41,7 @@ export const createPaymentPoint = (payload: {
 };
 
 export const useTimeSheets = () => {
-  const url = `/ws/rest/v1/cashier/timesheet`;
+  const url = `/ws/rest/v1/cashier/timesheet?v=full`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{
     data: { results: Timesheet[] };
   }>(url, openmrsFetch, {
@@ -49,7 +49,7 @@ export const useTimeSheets = () => {
   });
 
   return {
-    timesheets: data?.data.results,
+    timesheets: data?.data.results ?? [],
     error,
     isLoading,
     isValidating,
@@ -68,8 +68,8 @@ export const clockIn = (payload: { cashier: string; cashPoint: string; clockIn: 
   });
 };
 
-export const clockOut = (payload: { cashier: string; cashPoint: string; clockIn: string; clockOut: string }) => {
-  const url = `/ws/rest/v1/cashier/timesheet`;
+export const clockOut = (timesheetUUID: string, payload: { clockOut: string }) => {
+  const url = `/ws/rest/v1/cashier/timesheet/${timesheetUUID}`;
   return openmrsFetch(url, {
     method: 'POST',
     body: payload,
@@ -119,35 +119,4 @@ export const useProviderUUID = () => {
   const providerUUID = providers?.find((p) => p.person.uuid === userPerson?.uuid)?.uuid;
 
   return { providerUUID, isLoading: isLoading || isLoadingUsers, error: error || fetchingUsersError };
-};
-
-export const useClockInStatus = (paymentPointUUID?: string) => {
-  const { timesheets, error, isLoading } = useTimeSheets();
-  const { providerUUID, isLoading: isLoadingProviderUUID, error: providerUUIDError } = useProviderUUID();
-
-  const latestSheetGlobal = timesheets?.filter((ts) => ts.cashier.uuid === providerUUID)?.at(-1);
-  const isClockedIn = latestSheetGlobal?.clockIn && !latestSheetGlobal?.clockOut;
-
-  if (!paymentPointUUID) {
-    return {
-      isClockedIn,
-      latestSheet: latestSheetGlobal,
-      error: error || providerUUIDError,
-      isLoading: isLoading || isLoadingProviderUUID,
-    };
-  }
-
-  const latestSheet: Timesheet | undefined = timesheets
-    ?.filter((ts) => ts.cashier.uuid === providerUUID && ts.cashPoint.uuid === paymentPointUUID)
-    ?.at(-1);
-
-  const isClockedInCurrentPaymentPoint = latestSheet?.clockIn && !latestSheet?.clockOut;
-
-  return {
-    isClockedIn,
-    isClockedInCurrentPaymentPoint,
-    latestSheet,
-    error: error || providerUUIDError,
-    isLoading: isLoading || isLoadingProviderUUID,
-  };
 };

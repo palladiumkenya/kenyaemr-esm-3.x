@@ -15,14 +15,16 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useBills } from '../../billing.resource';
 import { useRenderedRows } from '../../hooks/use-rendered-rows';
-import { useClockInStatus, usePaymentPoints } from '../../payment-points/payment-points.resource';
-import { PaymentStatus } from '../../types';
+import { usePaymentPoints } from '../../payment-points/payment-points.resource';
+import { useClockInStatus } from '../../payment-points/use-clock-in-status';
+import { PaymentStatus, Timesheet } from '../../types';
 import { AppliedFilterTags } from './applied-filter-tages.component';
 import { Filter } from './filter.component';
 import { PaymentHistoryTable } from './payment-history-table.component';
 import styles from './payment-history.scss';
 import { PaymentTotals } from './payment-totals';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
+import { TimesheetsFilter } from './timesheets-filter.component';
 
 export const headers = [
   { header: 'Date', key: 'dateCreated' },
@@ -45,8 +47,9 @@ export const PaymentHistoryViewer = () => {
 
   const [pageSize, setPageSize] = useState(10);
   const [appliedFilters, setAppliedFilters] = useState<Array<string>>([]);
+  const [appliedTimesheet, setAppliedTimesheet] = useState<Timesheet>();
 
-  const renderedRows = useRenderedRows(bills, appliedFilters);
+  const renderedRows = useRenderedRows(bills, appliedFilters, appliedTimesheet);
 
   const { paginated, goTo, results, currentPage } = usePagination(renderedRows, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, renderedRows.length, currentPage, results?.length);
@@ -73,11 +76,18 @@ export const PaymentHistoryViewer = () => {
     });
   };
 
-  const resetFilters = () => setAppliedFilters([]);
+  const resetFilters = () => {
+    setAppliedFilters([]);
+    setAppliedTimesheet(undefined);
+  };
 
   const applyFilters = (filters: string[]) => {
     setAppliedFilters(filters);
     goTo(1);
+  };
+
+  const applyTimeSheetFilter = (sheet: Timesheet) => {
+    setAppliedTimesheet(sheet);
   };
 
   return (
@@ -92,8 +102,19 @@ export const PaymentHistoryViewer = () => {
                   <TableToolbarSearch
                     onChange={(evt: React.ChangeEvent<HTMLInputElement>) => tableData.onInputChange(evt)}
                   />
-                  <AppliedFilterTags appliedFilters={appliedFilters} />
+                  <AppliedFilterTags
+                    appliedFilters={[
+                      ...appliedFilters,
+                      appliedTimesheet && `${appliedTimesheet?.display} (${appliedTimesheet?.cashier.display})`,
+                    ]}
+                  />
                   <Filter applyFilters={applyFilters} resetFilters={resetFilters} bills={bills} />
+                  <TimesheetsFilter
+                    appliedFilters={appliedFilters}
+                    applyTimeSheetFilter={applyTimeSheetFilter}
+                    bills={bills}
+                    dateRange={dateRange}
+                  />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
                   {isOnPaymentPointPage && !isClockedInCurrentPaymentPoint && (
                     <Button className={styles.clockIn} onClick={openClockInModal}>
