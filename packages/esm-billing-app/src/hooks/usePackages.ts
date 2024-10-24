@@ -1,15 +1,30 @@
-import React, { useMemo } from 'react';
-import { Package } from '../types';
-import { generateOfflineUuid } from '@openmrs/esm-framework';
-import { packages } from '../benefits-package/benefits-package.mock';
+import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import useSWR from 'swr';
+import { Package, SHAPackage } from '../types';
 
+/**
+ * Hook that return a list of sha benefits category/packages
+ * @returns
+ */
 const usePackages = () => {
-  const _package = useMemo(() => packages, []);
+  const url = `https://payers.apeiro-digital.com/api/master/category/all`;
+
+  const { data, isLoading, error } = useSWR<FetchResponse<Array<{ id: number; code: string; categoryName: string }>>>(
+    url,
+    openmrsFetch,
+  );
 
   return {
-    isLoading: false,
-    packages: _package as Array<Package>,
-    error: undefined,
+    isLoading,
+    packages: (data?.data ?? []).map(
+      (category) =>
+        ({
+          uuid: `${category.id}`,
+          packageCode: category.code,
+          packageName: category.categoryName,
+        } as Package),
+    ),
+    error,
   };
 };
 

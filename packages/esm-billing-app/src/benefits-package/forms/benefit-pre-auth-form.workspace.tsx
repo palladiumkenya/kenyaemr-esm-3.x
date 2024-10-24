@@ -1,16 +1,32 @@
-import { Button, Checkbox, Column, Dropdown, DropdownSkeleton, Form, MultiSelect, Stack } from '@carbon/react';
+import {
+  Button,
+  Column,
+  Dropdown,
+  DropdownSkeleton,
+  Form,
+  FormLabel,
+  InlineNotification,
+  Layer,
+  Loading,
+  MultiSelect,
+  Stack,
+  Tile,
+} from '@carbon/react';
+import { DocumentAttachment } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, showSnackbar, useSession, useVisit } from '@openmrs/esm-framework';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { DefaultWorkspaceProps, showSnackbar, useSession } from '@openmrs/esm-framework';
+import React, { useEffect, useRef, useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import useInterventions from '../../hooks/useInterventions';
+import { useVisit } from '../../claims/dashboard/form/claims-form.resource';
+import usePackages from '../../hooks/usePackages';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
 import { InsurersBenefits, PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-eligibility-request-form.scss';
+import PackageIntervensions from './package-intervensions.component';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
 
@@ -29,31 +45,60 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
   benefits,
 }) => {
   const { t } = useTranslation();
-  const {
-    currentVisit: { patient },
-    activeVisit,
-  } = useVisit(patientUuid);
+  const { visits: recentVisist, isLoading } = useVisit(patientUuid);
+  const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
+  const inputFileRef = useRef<HTMLInputElement>();
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const {
     currentProvider: { uuid: providerUuid },
     sessionLocation: { uuid: facilityUuid, display: facilityName },
   } = useSession();
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
-  const { isLoading: intervensionsLoading, interventions } = useInterventions();
-  const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
   const [approve, setApprove] = useState<boolean>(false);
+  const { isLoading: packagesLoading, error: packageError, packages } = usePackages();
+
+  const attachFiles = () => {
+    inputFileRef.current.click();
+  };
+
+  const handleFileChange = () => {
+    const MAX_ALLOWED_FILE_SIZE = 2097152;
+    if (inputFileRef.current && inputFileRef.current.files) {
+      const file = inputFileRef.current.files[0];
+      if (file.size > MAX_ALLOWED_FILE_SIZE) {
+        showSnackbar({
+          title: t('fileTooBig', 'fileTooBig'),
+          kind: 'error',
+        });
+
+        return;
+      }
+      setUploadedFile(file);
+    }
+  };
 
   const form = useForm<BenefitsPreAuth>({
     defaultValues: {
       providerUuid,
       patientUuid,
       facilityUuid,
-      diagnosisUuids: ['18aac1664e2-ac2b5c17-fc83-4256-8299-f9b222d50175'],
-      patientBenefit: benefit.packageCode,
+      diagnosisUuids: [],
       interventions: [benefit.interventionCode],
     },
     resolver: zodResolver(preauthSchema),
   });
+  useEffect(() => {
+    if (Array.isArray(diagnoses)) {
+      form.setValue('diagnosisUuids', diagnoses!.map((d) => d.id) as any);
+    }
+  }, [diagnoses]);
+
+  useEffect(() => {
+    if (packages.length && !form.watch('packageUUid')) {
+      form.setValue('packageUUid', packages.find((package_) => package_.packageCode === benefit.packageCode)?.uuid);
+    }
+  }, [packages]);
 
   const onSubmit = async (values: BenefitsPreAuth) => {
     try {
@@ -65,168 +110,187 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error requesting Eligibility' });
     }
   };
+  const selectedPackageObservable = form.watch('packageUUid');
+  if (packagesLoading || diagnosesLoading || isLoading) {
+    return (
+      <Layer className={styles.loading}>
+        <Loading withOverlay={false} small />
+      </Layer>
+    );
+  }
+
+  if (packageError) {
+    return (
+      <Layer className={styles.error}>
+        <Tile>{packageError?.message}</Tile>
+      </Layer>
+    );
+  }
+
   return (
-    <Form onSubmit={form.handleSubmit(onSubmit)}>
-      <Stack gap={4} className={styles.grid}>
-        <Column>
-          <Controller
-            control={form.control}
-            name="patientBenefit"
-            render={({ field }) => (
-              <Dropdown
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="patientBenefit"
-                titleText={t('patientBenefit', 'Patient Benefit')}
-                onChange={(e) => {
-                  field.onChange(e.selectedItem);
-                }}
-                initialSelectedItem={field.value}
-                label="Choose option"
-                items={[benefit].map((r) => r.packageCode)}
-                itemToString={(item) => [benefit].find((r) => r.packageCode === item)?.packageName ?? ''}
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="patientUuid"
-            render={({ field }) => (
-              <Dropdown
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="patient"
-                titleText={t('patient', 'Patient')}
-                onChange={(e) => {
-                  field.onChange(e.selectedItem);
-                }}
-                initialSelectedItem={field.value}
-                label="Choose option"
-                items={[patient].map((r) => r.uuid)}
-                itemToString={(item) => [patient].find((r) => r.uuid === item)?.display ?? ''}
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="providerUuid"
-            render={({ field }) => (
-              <>
-                {provider && (
-                  <Dropdown
-                    ref={field.ref}
-                    invalid={form.formState.errors[field.name]?.message}
-                    invalidText={form.formState.errors[field.name]?.message}
-                    id="provider"
-                    titleText={t('provider', 'Provider')}
-                    onChange={(e) => {
-                      field.onChange(e.selectedItem);
-                    }}
-                    initialSelectedItem={field.value}
-                    label="Choose option"
-                    items={[provider].map((r) => r.uuid)}
-                    itemToString={(item) =>
-                      [provider]
-                        .find((r) => r.uuid === item)
-                        ?.display.split('-')
-                        .at(-1)
-                        .trim() ?? ''
-                    }
-                  />
-                )}
-                {providerLoading && <DropdownSkeleton />}
-              </>
-            )}
-          />
-        </Column>
+    <FormProvider {...form}>
+      <Form onSubmit={form.handleSubmit(onSubmit)}>
+        <Stack gap={4} className={styles.grid}>
+          <Column>
+            <Controller
+              control={form.control}
+              name="patientUuid"
+              render={({ field }) => (
+                <Dropdown
+                  ref={field.ref}
+                  invalid={form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}
+                  id="patient"
+                  titleText={t('patient', 'Patient')}
+                  onChange={(e) => {
+                    field.onChange(e.selectedItem);
+                  }}
+                  initialSelectedItem={field.value}
+                  label="Choose option"
+                  items={[recentVisist.patient].map((r) => r.uuid)}
+                  itemToString={(item) => [recentVisist.patient].find((r) => r.uuid === item)?.display ?? ''}
+                />
+              )}
+            />
+          </Column>
+          <Column>
+            <Controller
+              control={form.control}
+              name="providerUuid"
+              render={({ field }) => (
+                <>
+                  {provider && (
+                    <Dropdown
+                      ref={field.ref}
+                      invalid={form.formState.errors[field.name]?.message}
+                      invalidText={form.formState.errors[field.name]?.message}
+                      id="provider"
+                      titleText={t('provider', 'Provider')}
+                      onChange={(e) => {
+                        field.onChange(e.selectedItem);
+                      }}
+                      initialSelectedItem={field.value}
+                      label="Choose option"
+                      items={[provider].map((r) => r.uuid)}
+                      itemToString={(item) =>
+                        [provider]
+                          .find((r) => r.uuid === item)
+                          ?.display.split('-')
+                          .at(-1)
+                          .trim() ?? ''
+                      }
+                    />
+                  )}
+                  {providerLoading && <DropdownSkeleton />}
+                </>
+              )}
+            />
+          </Column>
 
-        <Column>
-          <Controller
-            control={form.control}
-            name="facilityUuid"
-            render={({ field }) => (
-              <Dropdown
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="facility"
-                titleText={t('facility', 'Facility')}
-                onChange={(e) => {
-                  field.onChange(e.selectedItem);
-                }}
-                initialSelectedItem={field.value}
-                label="Choose option"
-                items={[{ uuid: facilityUuid, display: facilityName }].map((r) => r.uuid)}
-                itemToString={(item) =>
-                  [{ uuid: facilityUuid, display: facilityName }].find((r) => r.uuid === item)?.display ?? ''
-                }
+          <Column>
+            <Controller
+              control={form.control}
+              name="facilityUuid"
+              render={({ field }) => (
+                <Dropdown
+                  ref={field.ref}
+                  invalid={form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}
+                  id="facility"
+                  titleText={t('facility', 'Facility')}
+                  onChange={(e) => {
+                    field.onChange(e.selectedItem);
+                  }}
+                  initialSelectedItem={field.value}
+                  label="Choose option"
+                  items={[{ uuid: facilityUuid, display: facilityName }].map((r) => r.uuid)}
+                  itemToString={(item) =>
+                    [{ uuid: facilityUuid, display: facilityName }].find((r) => r.uuid === item)?.display ?? ''
+                  }
+                />
+              )}
+            />
+          </Column>
+          <Column>
+            <Controller
+              control={form.control}
+              name="packageUUid"
+              render={({ field }) => (
+                <>
+                  {packageError ? (
+                    <InlineNotification
+                      kind="error"
+                      subtitle={t('errorFetchingPackages', 'Error fetching packeges')}
+                      lowContrast
+                    />
+                  ) : (
+                    <Dropdown
+                      ref={field.ref}
+                      invalid={form.formState.errors[field.name]?.message}
+                      invalidText={form.formState.errors[field.name]?.message}
+                      id="package"
+                      titleText={t('package', 'Package')}
+                      onChange={(e) => {
+                        field.onChange(e.selectedItem);
+                      }}
+                      initialSelectedItem={field.value}
+                      label="Choose package"
+                      items={packages.map((r) => r.uuid)}
+                      itemToString={(item) => packages.find((r) => r.uuid === item)?.packageName ?? ''}
+                    />
+                  )}
+                </>
+              )}
+            />
+          </Column>
+          {selectedPackageObservable && (
+            <Column>
+              <PackageIntervensions
+                category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
               />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="interventions"
-            render={({ field }) => (
-              <MultiSelect
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="interventions"
-                titleText={t('interventions', 'Interventions')}
-                selectedItems={field.value}
-                label="Choose option"
-                items={interventions.map((r) => r.interventionCode)}
-                itemToString={(item) => interventions.find((r) => r.interventionCode === item)?.interventionName ?? ''}
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            control={form.control}
-            name="diagnosisUuids"
-            render={({ field }) => (
-              <MultiSelect
-                ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
-                invalidText={form.formState.errors[field.name]?.message}
-                id="diagnoses"
-                titleText={t('diagnosis', 'Diagnosis')}
-                selectedItems={field.value}
-                label="Choose option"
-                items={diagnoses.map((r) => r.uuid)}
-                itemToString={(item) => diagnoses.find((r) => r.uuid === item)?.value ?? ''}
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Checkbox
-            id="approved"
-            labelText="Approved"
-            checked={approve}
-            onChange={(_, { checked }) => setApprove(checked)}
-          />
-        </Column>
-      </Stack>
+            </Column>
+          )}
+          <Column>
+            <Controller
+              control={form.control}
+              name="diagnosisUuids"
+              render={({ field }) => (
+                <MultiSelect
+                  ref={field.ref}
+                  invalid={form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}
+                  id="diagnoses"
+                  titleText={t('diagnosis', 'Diagnosis')}
+                  selectedItems={field.value}
+                  label="Choose option"
+                  items={diagnoses.map((r) => r.id)}
+                  itemToString={(item) => diagnoses.find((r) => r.id === item)?.text ?? ''}
+                />
+              )}
+            />
+          </Column>
+          <Column>
+            <FormLabel>Attach file</FormLabel>
+            <div className={styles.uploadButtonWrapper}>
+              <input type="file" ref={inputFileRef} hidden onChange={handleFileChange} accept="image/*, .pdf" />
+              {uploadedFile ? <p className={styles.selectedFile}>{uploadedFile.name}</p> : 'No file selected'}
+              <Button onClick={attachFiles}>
+                Attach File <DocumentAttachment className={styles.iconMarginLeft} />
+              </Button>
+            </div>
+          </Column>
+        </Stack>
 
-      <div className={styles.btnSet}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
-          {t('discard', 'Discard')}
-        </Button>
-        <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">
-          {t('submit', 'Submit')}
-        </Button>
-      </div>
-    </Form>
+        <div className={styles.btnSet}>
+          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+            {t('discard', 'Discard')}
+          </Button>
+          <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">
+            {t('submit', 'Submit')}
+          </Button>
+        </div>
+      </Form>
+    </FormProvider>
   );
 };
 

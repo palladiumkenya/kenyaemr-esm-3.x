@@ -1,29 +1,34 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
-  Column,
-  TextArea,
-  Form,
-  Layer,
-  Stack,
-  TextInput,
-  Row,
-  ButtonSet,
   Button,
-  MultiSelect,
+  ButtonSet,
+  Column,
+  Dropdown,
+  Form,
   InlineLoading,
-  Tag,
+  InlineNotification,
+  Layer,
+  MultiSelect,
+  Row,
+  Stack,
+  TextArea,
+  TextInput,
+  TextInputSkeleton,
 } from '@carbon/react';
-import styles from './claims-form.scss';
-import { MappedBill, LineItem } from '../../../types';
-import { navigate, showSnackbar, useSession } from '@openmrs/esm-framework';
-import { useSystemSetting } from '../../../hooks/getMflCode';
-import { useParams } from 'react-router-dom';
-import { processClaims, useInterventions, usePackages, useVisit } from './claims-form.resource';
-import { useForm, Controller } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { navigate, showSnackbar, useSession } from '@openmrs/esm-framework';
+import React, { useEffect, useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { z } from 'zod';
+import PackageIntervensions from '../../../benefits-package/forms/package-intervensions.component';
 import { formatDate } from '../../../helpers/functions';
+import { useSystemSetting } from '../../../hooks/getMflCode';
+import usePackages from '../../../hooks/usePackages';
+import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
+import { LineItem, MappedBill } from '../../../types';
+import { processClaims, useVisit } from './claims-form.resource';
+import styles from './claims-form.scss';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -33,31 +38,25 @@ type ClaimsFormProps = {
 const ClaimsFormSchema = z.object({
   claimExplanation: z.string().nonempty({ message: 'Claim explanation is required' }),
   claimJustification: z.string().nonempty({ message: 'Claim justification is required' }),
-  diagnoses: z
-    .array(
-      z.object({
-        id: z.string(),
-        text: z.string(),
-      }),
-    )
-    .nonempty({ message: 'At least one diagnosis is required' }),
+  diagnoses: z.array(z.string()).nonempty({ message: 'At least one diagnosis is required' }),
   visitType: z.string().nonempty({ message: 'Visit type is required' }),
   facility: z.string().nonempty({ message: 'Facility is required' }),
   treatmentStart: z.string().nonempty({ message: 'Treatment start date is required' }),
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
-  packages: z.array(z.string()).nonempty({ message: 'At least one package is required' }),
+  package: z.string().min(1, 'Package Required'),
   interventions: z.array(z.string()).nonempty({ message: 'At least one intervention is required' }),
-  cashier: z.string().nonempty({ message: 'Cashier is required' }),
+  provider: z.string().nonempty({ message: 'provider is provider' }),
 });
 
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const { patientUuid, billUuid } = useParams();
-  const { visits: recentVisit } = useVisit(patientUuid);
-  const visitUuid = recentVisit?.visitType.uuid;
-  const { interventions } = useInterventions();
-  const { packages } = usePackages();
+  const { visits: recentVisit, error: visitError, isLoading: visitLoading } = useVisit(patientUuid);
+  const { diagnoses, error: diagnosisError, isLoading: diagnosisLoading } = usePatientDiagnosis(patientUuid);
+  const { error: packagesError, isLoading: packagesLoading, packages } = usePackages();
+  const encounterUuid = recentVisit?.encounters[0]?.uuid;
+  const visitTypeUuid = recentVisit?.visitType.uuid;
 
   const [loading, setLoading] = useState(false);
   const { user } = useSession();
@@ -67,30 +66,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       to: window.getOpenmrsSpaBase() + `home/billing/patient/${patientUuid}/${billUuid}`,
     });
 
-  const diagnoses = useMemo(() => {
-    return (
-      recentVisit?.encounters?.flatMap(
-        (encounter) =>
-          encounter.diagnoses.map((diagnosis) => ({
-            id: diagnosis.diagnosis.coded.uuid,
-            text: diagnosis.display,
-            certainty: diagnosis.certainty,
-          })) || [],
-      ) || []
-    );
-  }, [recentVisit]);
-
-  const confirmedDiagnoses = useMemo(() => {
-    return diagnoses.filter((diagnosis) => diagnosis.certainty === 'CONFIRMED');
-  }, [diagnoses]);
-
-  const {
-    control,
-    handleSubmit,
-    formState: { errors, isValid },
-    setValue,
-    reset,
-  } = useForm({
+  const form = useForm<z.infer<typeof ClaimsFormSchema>>({
     mode: 'all',
     resolver: zodResolver(ClaimsFormSchema),
     defaultValues: {
@@ -101,13 +77,21 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
       treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
       treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
-      packages: [],
+      package: '',
       interventions: [],
-      cashier: user?.display || '',
+      provider: user?.display || '',
     },
   });
 
-  const onSubmit = async (data) => {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+    setValue,
+    reset,
+  } = form;
+
+  const onSubmit = async (data: z.infer<typeof ClaimsFormSchema>) => {
     setLoading(true);
     const providedItems = selectedLineItems.reduce((acc, item) => {
       acc[item.uuid] = {
@@ -130,17 +114,19 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       startDate: data.treatmentStart,
       endDate: data.treatmentEnd,
       location: mflCodeValue,
-      diagnoses: data.diagnoses.map((diagnosis) => diagnosis.id),
+      diagnoses: data.diagnoses,
       paidInFacility: true,
       patient: patientUuid,
-      visitType: visitUuid,
+      visitType: visitTypeUuid,
       guaranteeId: 'G-001',
       claimCode: 'C-001',
-      cashier: user.uuid,
+      provider: user.uuid,
+      visitUuid: recentVisit.uuid,
+      encounterUuid: encounterUuid,
       use: 'claim',
       insurer: 'SHA',
       billNumber: billUuid,
-      packages: data.packages,
+      packages: [data.package],
       interventions: data.interventions,
     };
     try {
@@ -171,262 +157,257 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       setLoading(false);
     }
   };
+  const selectedPackageObservable = form.watch('package');
 
   useEffect(() => {
-    setValue('diagnoses', confirmedDiagnoses);
+    setValue('diagnoses', diagnoses?.map((d) => d.id) ?? ([] as any));
     setValue('visitType', recentVisit?.visitType?.display || '');
     setValue('facility', `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`);
     setValue('treatmentStart', recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '');
     setValue('treatmentEnd', recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '');
-  }, [confirmedDiagnoses, recentVisit, mflCodeValue, setValue]);
+  }, [diagnoses, recentVisit, mflCodeValue, setValue]);
+
+  if (visitLoading || diagnosisLoading || packagesLoading) {
+    return (
+      <Layer className={styles.loading}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <TextInputSkeleton key={index} />
+        ))}
+      </Layer>
+    );
+  }
+
+  if (visitError || diagnosisError || packagesError) {
+    return (
+      <Layer className={styles.loading}>
+        <InlineNotification
+          kind="error"
+          subtitle={
+            visitError?.message ??
+            diagnosisError?.message ??
+            packagesError?.message ??
+            'Error occured while loading claims form'
+          }
+          lowContrast
+        />
+      </Layer>
+    );
+  }
+
   return (
-    <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap={4} className={styles.grid}>
-        <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
-        <Row className={styles.formClaimRow}>
-          <Column className={styles.formClaimColumn}>
+    <FormProvider {...form}>
+      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        <Stack gap={4} className={styles.grid}>
+          <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
+          <Row className={styles.formClaimRow}>
+            <Column className={styles.formClaimColumn}>
+              <Layer className={styles.input}>
+                <Controller
+                  control={control}
+                  name="visitType"
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="visittype"
+                      labelText={t('visittype', 'Visit Type')}
+                      readOnly
+                      value={field.value}
+                    />
+                  )}
+                />
+              </Layer>
+            </Column>
+            <Column className={styles.formClaimColumn}>
+              <Layer className={styles.input}>
+                <Controller
+                  control={control}
+                  name="facility"
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="facility"
+                      labelText={t('facility', 'Facility')}
+                      readOnly
+                      value={field.value}
+                    />
+                  )}
+                />
+              </Layer>
+            </Column>
+          </Row>
+          <Row className={styles.formClaimRow}>
+            <Column className={styles.formClaimColumn}>
+              <Layer className={styles.input}>
+                <Controller
+                  control={control}
+                  name="treatmentStart"
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="treatmentStart"
+                      labelText={t('treatmentstart', 'Treatment Start')}
+                      readOnly
+                      value={field.value}
+                    />
+                  )}
+                />
+              </Layer>
+            </Column>
+            <Column className={styles.formClaimColumn}>
+              <Layer className={styles.input}>
+                <Controller
+                  control={control}
+                  name="treatmentEnd"
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="treatmentEnd"
+                      labelText={t('treatmentend', 'Treatment End')}
+                      readOnly
+                      value={field.value}
+                    />
+                  )}
+                />
+              </Layer>
+            </Column>
+          </Row>
+          <Column>
             <Layer className={styles.input}>
               <Controller
-                control={control}
-                name="visitType"
+                control={form.control}
+                name="package"
                 render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="visittype"
-                    labelText={t('visittype', 'Visit Type')}
-                    readOnly
-                    value={field.value}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
-          <Column className={styles.formClaimColumn}>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="facility"
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="facility"
-                    labelText={t('facility', 'Facility')}
-                    readOnly
-                    value={field.value}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
-        </Row>
-        <Row className={styles.formClaimRow}>
-          <Column className={styles.formClaimColumn}>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="treatmentStart"
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="treatmentStart"
-                    labelText={t('treatmentstart', 'Treatment Start')}
-                    readOnly
-                    value={field.value}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
-          <Column className={styles.formClaimColumn}>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="treatmentEnd"
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="treatmentEnd"
-                    labelText={t('treatmentend', 'Treatment End')}
-                    readOnly
-                    value={field.value}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
-        </Row>
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={control}
-              name="packages"
-              render={({ field }) => (
-                <>
                   <>
-                    <div>
-                      {field.value.map((item, index) => (
-                        <Tag key={index} type="high-contrast">
-                          {packages.find((pkg) => pkg.shaPackageCode === item)?.shaPackageName || ''}
-                        </Tag>
-                      ))}
-                    </div>
+                    {packagesError ? (
+                      <InlineNotification
+                        kind="error"
+                        subtitle={t('errorFetchingPackages', 'Error fetching packeges')}
+                        lowContrast
+                      />
+                    ) : (
+                      <Dropdown
+                        ref={field.ref}
+                        invalid={form.formState.errors[field.name]?.message}
+                        invalidText={form.formState.errors[field.name]?.message}
+                        id="package"
+                        titleText={t('package', 'Package')}
+                        onChange={(e) => {
+                          field.onChange(e.selectedItem);
+                        }}
+                        initialSelectedItem={field.value}
+                        label="Choose package"
+                        items={packages.map((r) => r.uuid)}
+                        itemToString={(item) => packages.find((r) => r.uuid === item)?.packageName ?? ''}
+                      />
+                    )}
                   </>
-                  <MultiSelect
-                    {...field}
-                    items={packages}
-                    titleText={t('packages', 'Packages')}
-                    itemToString={(item) => (item ? item.shaPackageName : '')}
-                    label={field.value.length === 0 ? t('packagesOptions', 'Choose packages') : ''}
-                    id="packages"
-                    invalid={!!errors.packages}
-                    invalidText={errors.packages?.message}
-                    placeholder="Select Packages"
-                    onChange={({ selectedItems }) => {
-                      field.onChange(selectedItems.map((item) => item.shaPackageCode));
-                    }}
-                  />
-                </>
-              )}
-            />
-          </Layer>
-        </Column>
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={control}
-              name="interventions"
-              render={({ field }) => (
-                <>
-                  <div>
-                    {field.value.map((item, index) => {
-                      const intervention = interventions.find((interv) => interv.shaInterventionCode === item);
-                      return (
-                        <Tag key={index} type="high-contrast">
-                          {intervention ? intervention.shaInterventionName : ''}
-                        </Tag>
-                      );
-                    })}
-                  </div>
-                  <MultiSelect
-                    {...field}
-                    items={interventions}
-                    titleText={t('interventions', 'Interventions')}
-                    itemToString={(item) => (item ? item.shaInterventionName : '')}
-                    label={field.value.length === 0 ? t('interventionsOption', 'Choose interventions') : ''}
-                    id="interventions"
-                    invalid={!!errors.interventions}
-                    invalidText={errors.interventions?.message}
-                    placeholder="Select Interventions"
-                    onChange={({ selectedItems }) => {
-                      field.onChange(selectedItems.map((item) => item.shaInterventionCode));
-                    }}
-                  />
-                </>
-              )}
-            />
-          </Layer>
-        </Column>
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={control}
-              name="diagnoses"
-              render={({ field }) => (
-                <>
-                  <div>
-                    {field.value.map((item, index) => (
-                      <Tag key={index} type="high-contrast">
-                        {item.text}
-                      </Tag>
-                    ))}
-                  </div>
-                  <MultiSelect
-                    {...field}
-                    id="diagnoses"
-                    titleText={t('diagnoses', 'Diagnoses')}
-                    items={diagnoses}
-                    itemToString={(item) => (item ? item.text : '')}
-                    selectionFeedback="top-after-reopen"
-                    label={field.value.length === 0 ? t('chooseDiagnosis', 'Choose diagnosis') : ''}
-                    selectedItems={field.value}
-                    onChange={({ selectedItems }) => field.onChange(selectedItems)}
-                  />
-                </>
-              )}
-            />
-          </Layer>
-        </Column>
-        <Row className={styles.formClaimRow}>
-          <Column className={styles.formClaimColumn}>
+                )}
+              />
+            </Layer>
+          </Column>
+          {selectedPackageObservable && (
+            <Column>
+              <Layer className={styles.input}>
+                <PackageIntervensions
+                  category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
+                />
+              </Layer>
+            </Column>
+          )}
+
+          <Column>
             <Layer className={styles.input}>
               <Controller
-                control={control}
-                name="cashier"
+                control={form.control}
+                name="diagnoses"
                 render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="cashier"
-                    labelText={t('cashierName', 'Cashier Name')}
-                    readOnly
-                    value={field.value}
+                  <MultiSelect
+                    ref={field.ref}
+                    invalid={form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}
+                    id="diagnoses"
+                    titleText={t('diagnosis', 'Diagnosis')}
+                    selectedItems={field.value}
+                    label="Choose option"
+                    items={diagnoses.map((r) => r.id)}
+                    itemToString={(item) => diagnoses.find((r) => r.id === item)?.text ?? ''}
                   />
                 )}
               />
             </Layer>
           </Column>
-        </Row>
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={control}
-              name="claimExplanation"
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  labelText={t('claimExplanation', 'Claim Explanation')}
-                  rows={3}
-                  placeholder="Claim Explanation"
-                  id="claimExplanation"
-                  invalid={!!errors.claimExplanation}
-                  invalidText={errors.claimExplanation?.message}
+          <Row className={styles.formClaimRow}>
+            <Column className={styles.formClaimColumn}>
+              <Layer className={styles.input}>
+                <Controller
+                  control={control}
+                  name="provider"
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="provider"
+                      labelText={t('providerName', 'Provider Name')}
+                      readOnly
+                      value={field.value}
+                    />
+                  )}
                 />
+              </Layer>
+            </Column>
+          </Row>
+          <Column>
+            <Layer className={styles.input}>
+              <Controller
+                control={control}
+                name="claimExplanation"
+                render={({ field }) => (
+                  <TextArea
+                    {...field}
+                    labelText={t('claimExplanation', 'Claim Explanation')}
+                    rows={3}
+                    placeholder="Claim Explanation"
+                    id="claimExplanation"
+                    invalid={!!errors.claimExplanation}
+                    invalidText={errors.claimExplanation?.message}
+                  />
+                )}
+              />
+            </Layer>
+          </Column>
+          <Column>
+            <Layer className={styles.input}>
+              <Controller
+                control={control}
+                name="claimJustification"
+                render={({ field }) => (
+                  <TextArea
+                    {...field}
+                    labelText={t('claimJustification', 'Claim Justification')}
+                    rows={3}
+                    placeholder="Claim Justification"
+                    id="claimJustification"
+                    invalid={!!errors.claimJustification}
+                    invalidText={errors.claimJustification?.message}
+                  />
+                )}
+              />
+            </Layer>
+          </Column>
+          <ButtonSet className={styles.buttonSet}>
+            <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
+              {t('discardClaim', 'Discard Claim')}
+            </Button>
+            <Button className={styles.button} kind="primary" type="submit" disabled={!isValid || loading}>
+              {loading ? (
+                <InlineLoading description={t('processing', 'Processing...')} />
+              ) : (
+                t('processClaim', 'Process Claim')
               )}
-            />
-          </Layer>
-        </Column>
-        <Column>
-          <Layer className={styles.input}>
-            <Controller
-              control={control}
-              name="claimJustification"
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  labelText={t('claimJustification', 'Claim Justification')}
-                  rows={3}
-                  placeholder="Claim Justification"
-                  id="claimJustification"
-                  invalid={!!errors.claimJustification}
-                  invalidText={errors.claimJustification?.message}
-                />
-              )}
-            />
-          </Layer>
-        </Column>
-        <ButtonSet className={styles.buttonSet}>
-          <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
-            {t('discardClaim', 'Discard Claim')}
-          </Button>
-          <Button className={styles.button} kind="primary" type="submit" disabled={!isValid || loading}>
-            {loading ? (
-              <InlineLoading description={t('processing', 'Processing...')} />
-            ) : (
-              t('processClaim', 'Process Claim')
-            )}
-          </Button>
-        </ButtonSet>
-      </Stack>
-    </Form>
+            </Button>
+          </ButtonSet>
+        </Stack>
+      </Form>
+    </FormProvider>
   );
 };
 
