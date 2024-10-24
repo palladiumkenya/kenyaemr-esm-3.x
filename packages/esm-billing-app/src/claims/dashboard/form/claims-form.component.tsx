@@ -47,7 +47,7 @@ const ClaimsFormSchema = z.object({
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
   packages: z.array(z.string()).nonempty({ message: 'At least one package is required' }),
   interventions: z.array(z.string()).nonempty({ message: 'At least one intervention is required' }),
-  cashier: z.string().nonempty({ message: 'Cashier is required' }),
+  provider: z.string().nonempty({ message: 'provider is provider' }),
 });
 
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
@@ -105,7 +105,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
       packages: [],
       interventions: [],
-      cashier: user?.display || '',
+      provider: user?.display || '',
     },
   });
 
@@ -365,12 +365,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             <Layer className={styles.input}>
               <Controller
                 control={control}
-                name="cashier"
+                name="provider"
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    id="cashier"
-                    labelText={t('cashierName', 'Cashier Name')}
+                    id="provider"
+                    labelText={t('providerName', 'Provider Name')}
                     readOnly
                     value={field.value}
                   />
