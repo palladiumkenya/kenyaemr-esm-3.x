@@ -88,3 +88,20 @@ export const useMorgueCompartment = () => {
     error,
   };
 };
+
+export const createPatientBill = (payload) => {
+  const postUrl = `/ws/rest/v1/cashier/bill`;
+  return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
+};
+
+export const useCashPoint = () => {
+  const url = `/ws/rest/v1/cashier/cashPoint`;
+  const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
+
+  return { isLoading, error, cashPoints: data?.data?.results ?? [] };
+};
+
+export const startVisitWithEncounter = (payload) => {
+  const postUrl = `/ws/rest/v1/encounter`;
+  return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
+};

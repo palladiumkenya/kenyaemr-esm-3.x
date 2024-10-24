@@ -34,10 +34,15 @@ export const configSchema = {
     _description: 'UUID for morgue compartment tag',
     _default: '8ff46770-6ac7-478f-85ba-439a53546bf0',
   },
-  tagNumberConceptUuid: {
+  tagNumberUuid: {
     _type: Type.String,
     _description: 'UUID for tag number concept',
     _default: '9a953c7b-7aa2-481c-8aac-b8bc9be742ee',
+  },
+  policeStatementUuid: {
+    _type: Type.String,
+    _description: 'UUID for police statement concept',
+    _default: ' 287d2d27-04e4-4cc0-864f-15295e476fa8',
   },
   morgueAdmissionEncounterType: {
     _type: Type.String,
@@ -48,6 +53,16 @@ export const configSchema = {
     _type: Type.String,
     _description: 'UUID for visit payment method attribute',
     _default: 'e6cb0c3b-04b0-4117-9bc6-ce24adbda802',
+  },
+  obNumberUuid: {
+    _type: Type.String,
+    _description: 'UUID for ob number concept',
+    _default: '682bd161-1ff0-40d6-95b6-f7c5d955bb4d',
+  },
+  encounterProviderRoleUuid: {
+    _type: Type.UUID,
+    _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
+    _description: "The provider role to use for the registration encounter. Default is 'Unkown'.",
   },
 };
 
@@ -82,7 +97,10 @@ export type ConfigObject = {
   morgueDepartmentServiceTypeUuid: string;
   insurancepaymentModeUuid: string;
   morgueCompartmentTagUuid: string;
-  tagNumberConceptUuid: string;
+  tagNumberUuid: string;
   morgueAdmissionEncounterType: string;
   visitPaymentMethodAttributeUuid: string;
+  policeStatementUuid: string;
+  obNumberUuid: string;
+  encounterProviderRoleUuid: string;
 };

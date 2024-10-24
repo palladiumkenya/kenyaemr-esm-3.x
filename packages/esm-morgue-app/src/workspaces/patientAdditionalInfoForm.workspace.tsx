@@ -20,12 +20,20 @@ import {
   FilterableMultiSelect,
   Dropdown,
 } from '@carbon/react';
-import { ResponsiveWrapper, useLayoutType, useConfig, useSession } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, useLayoutType, useConfig, useSession, showSnackbar } from '@openmrs/esm-framework';
 import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import styles from './patientAdditionalInfoForm.scss';
-import { useBillableItems, useMorgueCompartment, usePaymentModes, useVisitType } from '../hook/useMorgue.resource';
+import {
+  createPatientBill,
+  startVisitWithEncounter,
+  useBillableItems,
+  useCashPoint,
+  useMorgueCompartment,
+  usePaymentModes,
+  useVisitType,
+} from '../hook/useMorgue.resource';
 import fuzzy from 'fuzzy';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -33,6 +41,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import isEmpty from 'lodash-es/isEmpty';
 import { ConfigObject } from '../config-schema';
+import { PENDING_PAYMENT_STATUS } from '../constants';
+import { mutate } from 'swr';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -54,9 +64,8 @@ const patientInfoSchema = z.object({
   availableCompartment: z.string(),
   services: z.array(z.string().uuid('invalid service')).nonempty('Must select one service'),
   paymentMethod: z.string().uuid('invalid payment method'),
-  insuranceScheme: z.string().uuid('invalid insurance scheme'),
+  insuranceScheme: z.string().optional(),
   policyNumber: z.string().optional(),
-  additionalInformation: z.string().optional(),
 });
 
 const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ closeWorkspace, patientUuid }) => {
@@ -64,6 +73,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const layout = useLayoutType();
   const { data: visitTypes, isLoading: isLoadingVisitTypes } = useVisitType();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
+  const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
+  const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
 
   const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
 
@@ -81,6 +92,10 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     insurancepaymentModeUuid,
     visitPaymentMethodAttributeUuid,
     morgueAdmissionEncounterType,
+    tagNumberUuid,
+    policeStatementUuid,
+    obNumberUuid,
+    encounterProviderRoleUuid,
   } = useConfig<ConfigObject>();
 
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -126,18 +141,26 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
 
   const truncatedResults = filteredVisitTypes.slice(0, MAX_RESULTS);
 
-  const onSubmit = (data: z.infer<typeof patientInfoSchema>) => {
+  const onSubmit = async (data: z.infer<typeof patientInfoSchema>) => {
+    const serviceUuid = data.services;
+
+    const linesItems = lineItems
+      .filter((item) => serviceUuid.includes(item.uuid))
+      .map((item, index) => {
+        const priceForPaymentMode =
+          item.servicePrices.find((p) => p.paymentMode?.uuid === paymentModes) || item?.servicePrices[0];
+
+        return {
+          billableService: item.uuid,
+          quantity: 1,
+          price: priceForPaymentMode ? priceForPaymentMode.price : '0.000',
+          priceName: 'Default',
+          priceUuid: priceForPaymentMode ? priceForPaymentMode.uuid : '',
+          lineItemOrder: index,
+          paymentStatus: PENDING_PAYMENT_STATUS,
+        };
+      });
     const encounterPayload = {
-      encounterDatetime: new Date().toISOString(),
-      patient: patientUuid,
-      encounterType: morgueAdmissionEncounterType,
-      location: data.availableCompartment,
-      encounterProviders: [
-        {
-          provider: currentProviderUuid,
-          encounterRole: roles,
-        },
-      ],
       visit: {
         patient: patientUuid,
         startDatetime: new Date().toISOString(),
@@ -150,7 +173,62 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           },
         ],
       },
+      encounterDatetime: new Date().toISOString(),
+      patient: patientUuid,
+      encounterType: morgueAdmissionEncounterType,
+      location: data.availableCompartment,
+      encounterProviders: [
+        {
+          provider: currentProviderUuid,
+          encounterRole: encounterProviderRoleUuid,
+        },
+      ],
+      obs: [
+        { concept: tagNumberUuid, value: data.tagNumber },
+        { concept: policeStatementUuid, value: data.policeReport },
+        { concept: obNumberUuid, value: data.obNumber },
+      ],
     };
+
+    await startVisitWithEncounter(encounterPayload).then(
+      () => {
+        showSnackbar({ title: 'Start visit', subtitle: ' visit has been started successfully', kind: 'success' });
+      },
+      (error) => {
+        const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
+        showSnackbar({
+          title: 'Visit Error',
+          subtitle: `An error has occurred while starting visit, Contact system administrator quoting this error ${errorMessage}`,
+          kind: 'error',
+          isLowContrast: true,
+        });
+      },
+    );
+    const billPayload = {
+      lineItems: linesItems,
+      cashPoint: cashPointUuid,
+      patient: patientUuid,
+      status: PENDING_PAYMENT_STATUS,
+      payments: [],
+    };
+    await createPatientBill(billPayload).then(
+      () => {
+        showSnackbar({ title: 'Patient Bill', subtitle: 'Patient has been billed successfully', kind: 'success' });
+      },
+      (error) => {
+        const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
+        showSnackbar({
+          title: 'Patient Bill Error',
+          subtitle: `An error has occurred while creating patient bill, Contact system administrator quoting this error ${errorMessage}`,
+          kind: 'error',
+          isLowContrast: true,
+        });
+      },
+    );
+    mutate((key) => {
+      return typeof key === 'string' && key.startsWith('/ws/rest/v1/morgue');
+    });
+    closeWorkspace();
   };
 
   useEffect(() => {
@@ -164,7 +242,6 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   };
   return (
     <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
-      <pre>{JSON.stringify(patientUuid)}</pre>
       <Stack gap={4} className={styles.formGrid}>
         <span className={styles.formSubHeader}>{t('moreDetails', 'More Details')}</span>
         <Column>
