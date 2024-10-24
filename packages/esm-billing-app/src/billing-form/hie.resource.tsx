@@ -1,11 +1,13 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
+type EligibilityResponse = { message: { eligible: 0 | 1; possible_solution: string; reason: string } };
+
 type HIEAPIResponse = {
   insurer: string;
   inforce: boolean;
   start: string;
-  end: string;
+  eligibility_response: EligibilityResponse;
 };
 
 export const useHIESubscription = (patientUuid: string) => {
@@ -15,7 +17,13 @@ export const useHIESubscription = (patientUuid: string) => {
   });
 
   return {
-    hieSubscriptions: data?.data ?? [],
+    data:
+      data?.data.map((d) => {
+        return {
+          ...d,
+          eligibility_response: JSON.parse(d.eligibility_response as unknown as string) as EligibilityResponse,
+        };
+      }) ?? [],
     isLoading,
     error,
     mutate,

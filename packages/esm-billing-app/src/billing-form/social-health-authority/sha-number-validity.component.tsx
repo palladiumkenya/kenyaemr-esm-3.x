@@ -1,7 +1,5 @@
-import { ActionableNotification, Form, InlineLoading, InlineNotification, Tooltip } from '@carbon/react';
-import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
-import { formatDate, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
-import capitalize from 'lodash-es/capitalize';
+import { ActionableNotification, Form, InlineLoading, InlineNotification } from '@carbon/react';
+import { navigate, useConfig, usePatient } from '@openmrs/esm-framework';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -20,15 +18,13 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
   const { patient, isLoading } = usePatient(patientUuid);
   const { watch } = useFormContext();
   const isSHA = watch('insuranceScheme')?.includes('SHA');
-  const { hieSubscriptions, isLoading: isLoadingHIE, error } = useHIESubscription(patientUuid);
+  const { data, isLoading: isLoadingHIE, error } = useHIESubscription(patientUuid);
 
   const nationalUniquePatientIdentifier = patient?.identifier
     ?.filter((identifier) => identifier)
     .filter((identifier) =>
       identifier.type.coding.some((coding) => coding.code === nationalPatientUniqueIdentifierTypeUuid),
     );
-
-  const crNumber = undefined;
 
   if (!isSHA) {
     return null;
@@ -67,10 +63,11 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (!crNumber) {
+  if (data[0].eligibility_response.message.eligible === 0) {
     return (
       <ActionableNotification
         title={t('pendingHIEVerification', 'Pending HIE verification')}
+        subtitle={t('pendingVerificationReason', data[0].eligibility_response.message.reason)}
         closeOnEscape
         inline={false}
         actionButtonLabel={t('verify', 'Verify')}
@@ -84,7 +81,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
 
   return (
     <Form className={styles.formContainer}>
-      {hieSubscriptions?.map(({ inforce, insurer, start, end }, index) => {
+      {/* {hieSubscriptions?.map(({ inforce, insurer, start, end }, index) => {
         return (
           <div key={`${index}${insurer}`} className={styles.hieCard}>
             <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
@@ -109,7 +106,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
             </div>
           </div>
         );
-      })}
+      })} */}
     </Form>
   );
 };
