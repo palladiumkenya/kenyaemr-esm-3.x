@@ -24,6 +24,7 @@ import { useVisit } from '../../dashboard/form/claims-form.resource';
 import styles from './pre-auth-form.scss';
 import { LineItem, MappedBill } from '../../../types';
 import { useInterventions, usePackages } from './pre-auth-form.resource';
+import { Service } from '../../../../../esm-lab-manifest-app/src/metrics/lab-manifest-metrics.component';
 
 type PreAuthFormProps = {
   bill: MappedBill;
@@ -252,7 +253,7 @@ const PreAuthForm: React.FC<PreAuthFormProps> = ({ bill, selectedLineItems }) =>
                     <div>
                       {field.value.map((item, index) => (
                         <Tag key={index} type="high-contrast">
-                          {packages.find((pkg) => pkg.shaPackageCode === item)?.shaPackageName || ''}
+                          {item}
                         </Tag>
                       ))}
                     </div>
