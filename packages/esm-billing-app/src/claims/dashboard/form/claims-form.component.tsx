@@ -55,7 +55,9 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit } = useVisit(patientUuid);
-  const visitUuid = recentVisit?.visitType.uuid;
+  const visitUuid = recentVisit?.uuid;
+  const encounterUuid = recentVisit?.encounters[0]?.uuid;
+  const visitTypeUuid = recentVisit?.visitType.uuid;
   const { interventions } = useInterventions();
   const { packages } = usePackages();
 
@@ -133,10 +135,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       diagnoses: data.diagnoses.map((diagnosis) => diagnosis.id),
       paidInFacility: true,
       patient: patientUuid,
-      visitType: visitUuid,
+      visitType: visitTypeUuid,
       guaranteeId: 'G-001',
       claimCode: 'C-001',
-      cashier: user.uuid,
+      provider: user.uuid,
+      visitUuid: visitUuid,
+      encounterUuid: encounterUuid,
       use: 'claim',
       insurer: 'SHA',
       billNumber: billUuid,
