@@ -6,7 +6,7 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BillingConfig } from '../../config-schema';
-import { useHIEEligibility, useHIESubscription } from '../hie.resource';
+import { useHIEEligibility } from '../hie.resource';
 import styles from './sha-number-validity.scss';
 
 type SHANumberValidityProps = {
@@ -21,28 +21,22 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
   const { watch } = useFormContext();
   const isSHA = watch('insuranceScheme')?.includes('SHA');
   const { data, isLoading: isLoadingHIEEligibility, error } = useHIEEligibility(patientUuid);
-  const {
-    hieSubscriptions,
-    isLoading: isLoadingHIESubscription,
-    error: hieSubscriptionError,
-  } = useHIESubscription(patientUuid);
 
   const shaIdentificationNumber = patient?.identifier
     ?.filter((identifier) => identifier)
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === shaIdentificationNumberUUID));
 
-  // TODO correctly get eligibility from the backend
   const isHIEEligible = true;
 
   if (!isSHA) {
     return null;
   }
 
-  if (isLoadingHIEEligibility || isLoading || isLoadingHIESubscription) {
+  if (isLoadingHIEEligibility || isLoading) {
     return <InlineLoading status="active" description={t('loading', 'Loading ...')} />;
   }
 
-  if (error || hieSubscriptionError) {
+  if (error) {
     return (
       <InlineNotification
         aria-label="closes notification"
@@ -92,17 +86,14 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
 
   return (
     <Form className={styles.formContainer}>
-      {hieSubscriptions?.map(({ inforce, insurer, start, end }, index) => {
+      {data?.map(({ inforce, insurer, start }, index) => {
         return (
           <div key={`${index}${insurer}`} className={styles.hieCard}>
             <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
               <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
               <span className={styles.hieInsurerValue}>{capitalize(insurer)}</span>
-              {start && end && (
-                <Tooltip
-                  className={styles.tooltip}
-                  align="bottom"
-                  label={`Active from ${formatDate(new Date(start))} to ${formatDate(new Date(end))}`}>
+              {start && (
+                <Tooltip className={styles.tooltip} align="bottom" label={`Active from ${formatDate(new Date(start))}`}>
                   <button className="sb-tooltip-trigger" type="button">
                     <Information />
                   </button>
