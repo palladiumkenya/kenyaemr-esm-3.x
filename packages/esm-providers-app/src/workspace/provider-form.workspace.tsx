@@ -98,7 +98,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       surname: provider?.person?.display?.split(' ').at(-1),
       firstname: provider?.person?.display?.split(' ').at(0),
       nationalid: provider?.attributes?.find((attr) => attr.attributeType.uuid === providerNationalIdUuid)?.value,
-      gender: provider?.person?.gender,
+      gender: provider?.person?.gender ?? 'M',
       licenseNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseNumberUuid)?.value,
       licenseExpiryDate: licenseDate ? parseDate(licenseDate) : undefined,
       username: user?.username,
@@ -361,7 +361,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             control={control}
             name="gender"
             render={({ field }) => (
-              <ContentSwitcher selectedIndex={field.value == 'M' ? 0 : 1} onChange={({ name }) => field.onChange(name)}>
+              <ContentSwitcher
+                selectedIndex={field.value && field.value == 'M' ? 0 : 1}
+                onChange={({ name }) => field.onChange(name)}>
                 <Switch
                   name="M"
                   text={
