@@ -17,17 +17,17 @@ export interface BillingConfig {
   mpesaAPIBaseUrl: string;
   hieBaseUrl: string;
   insuranceSchemes: Array<string>;
-  nationalPatientUniqueIdentifierTypeUuid: string;
+  shaIdentificationNumberUUID: string;
   cashPointUuid: string;
   cashierUuid: string;
   patientBillsUrl: string;
 }
 
 export const configSchema = {
-  nationalPatientUniqueIdentifierTypeUuid: {
+  shaIdentificationNumberUUID: {
     _type: Type.String,
-    _description: 'The national unique patient identifier',
-    _default: 'f85081e2-b4be-4e48-b3a4-7994b69bb101',
+    _description: 'Social Health Authority Identification Number',
+    _default: '24aedd37-b5be-4e08-8311-3721b8d5100d',
   },
   inPatientVisitTypeUuid: {
     _type: Type.String,
