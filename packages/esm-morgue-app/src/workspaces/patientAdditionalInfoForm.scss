@@ -96,3 +96,9 @@
   min-width: layout.$spacing-05;
   margin-top: layout.$spacing-06;
 }
+.content {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-30;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}

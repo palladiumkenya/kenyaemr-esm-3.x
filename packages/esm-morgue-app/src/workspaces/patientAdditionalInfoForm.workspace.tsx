@@ -338,7 +338,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 labelText=""
               />
             </ResponsiveWrapper>
-            {truncatedResults.length > 0 ? (
+            {truncatedResults.some(({ uuid }) => uuid === morgueVisitTypeUuid) ? (
               <RadioButtonGroup
                 className={styles.radioButtonGroup}
                 defaultSelected={morgueVisitTypeUuid}
@@ -348,16 +348,18 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 valueSelected={visitTypeValue}
                 invalid={!!errors.visitType}
                 invalidText={errors.visitType?.message}>
-                {truncatedResults.map(({ uuid, display }) => (
-                  <RadioButton
-                    key={uuid}
-                    className={styles.radioButton}
-                    id={uuid}
-                    labelText={display}
-                    value={uuid}
-                    disabled={visitTypeValue === morgueVisitTypeUuid && uuid !== morgueVisitTypeUuid}
-                  />
-                ))}
+                {truncatedResults
+                  .filter(({ uuid }) => uuid === morgueVisitTypeUuid)
+                  .map(({ uuid, display }) => (
+                    <RadioButton
+                      key={uuid}
+                      className={styles.radioButton}
+                      id={uuid}
+                      labelText={display}
+                      value={uuid}
+                      disabled={visitTypeValue === morgueVisitTypeUuid && uuid !== morgueVisitTypeUuid}
+                    />
+                  ))}
               </RadioButtonGroup>
             ) : (
               <Layer>
