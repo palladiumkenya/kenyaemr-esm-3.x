@@ -1,23 +1,21 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/layout';
 @use '@carbon/colors';
-@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .heading {
   @include type.type-style('heading-compact-01');
-  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+  margin: layout.$spacing-05 0 layout.$spacing-05;
 }
 
 .warningContainer {
-  background-color: $carbon--red-50;
-  padding: spacing.$spacing-04;
-  margin: spacing.$spacing-03 0 spacing.$spacing-03;
+  background-color: colors.$red-50;
+  padding: layout.$spacing-04;
+  margin: layout.$spacing-03 0 layout.$spacing-03;
   display: flex;
   justify-content: space-between;
   .warning {
     @include type.type-style('heading-compact-01');
-    color: $ui-05;
+    color: colors.$gray-100;
   }
 }
 
@@ -27,11 +25,11 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: white;
+  background-color: colors.$white;
 
   :global(.omrs-breakpoint-lt-desktop) {
     width: 50%;
-    padding: spacing.$spacing-06 spacing.$spacing-05;
+    padding: layout.$spacing-06 layout.$spacing-05;
   }
 
   .claimFormTitle {
@@ -39,7 +37,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: spacing.$spacing-05 0 1rem;
+    margin: layout.$spacing-05 0 1rem;
     row-gap: 1.5rem;
     position: relative;
 
@@ -60,11 +58,11 @@
 
   .buttonSet {
     padding: 0rem;
-    margin-top: spacing.$spacing-03;
+    margin-top: layout.$spacing-03;
     display: flex;
     justify-content: flex-end;
-    gap: spacing.$spacing-05;
-    margin-bottom: spacing.$spacing-07;
+    gap: layout.$spacing-05;
+    margin-bottom: layout.$spacing-07;
 
     :global(.omrs-breakpoint-lt-desktop) {
       justify-content: center;
@@ -77,16 +75,16 @@
 }
 
 .grid {
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
   padding: 0rem;
 }
 
 .input {
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }
 
 .button {
-  height: spacing.$spacing-08;
+  height: layout.$spacing-08;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -95,11 +93,11 @@
 
 .buttonSet {
   padding: 0rem;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   display: flex;
   justify-content: flex-end;
-  gap: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-07;
+  gap: layout.$spacing-05;
+  margin-bottom: layout.$spacing-07;
 }
 
 .claimFormTitle {
@@ -107,7 +105,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: spacing.$spacing-05 0 spacing.$spacing-03;
+  margin: layout.$spacing-05 0 layout.$spacing-03;
   row-gap: 1.5rem;
   position: relative;
 
@@ -128,17 +126,17 @@
 
 :global(.omrs-breakpoint-lt-desktop) {
   .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
+    padding: layout.$spacing-06 layout.$spacing-05;
+    background-color: colors.$white;
     justify-content: flex-end;
-    gap: spacing.$spacing-05;
+    gap: layout.$spacing-05;
   }
 }
 
 .formClaimRow {
   display: flex;
   flex-wrap: nowrap;
-  gap: spacing.$spacing-05;
+  gap: layout.$spacing-05;
 }
 
 .formClaimColumn {

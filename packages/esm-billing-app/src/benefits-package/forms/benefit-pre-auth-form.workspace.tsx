@@ -129,7 +129,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({
 
   return (
     <FormProvider {...form}>
-      <Form onSubmit={form.handleSubmit(onSubmit)}>
+      <Form onSubmit={form.handleSubmit(onSubmit)} className={styles.form}>
         <Stack gap={4} className={styles.grid}>
           <Column>
             <Controller

@@ -3,7 +3,7 @@ import useSWR, { mutate } from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { ConfigObject } from '../../config-schema';
 import { FacilityResponse, Provider, ProviderResponse, RolesResponse, User } from '../../types';
-import { HWR_API_NO_CREDENTIALS, NOT_FOUND, UNKNOWN } from '../../constants';
+import { HWR_API_NO_CREDENTIALS, PROVIDER_NOT_FOUND, RESOURCE_NOT_FOUND, UNKNOWN } from '../../constants';
 
 export const useIdentifierTypes = () => {
   const { isLoading, data, error } = useSWRImmutable<{ data: { results: Array<OpenmrsResource> } }>(
@@ -52,12 +52,16 @@ export const searchHealthCareWork = async (identifierType: string, identifierNum
   // Not using openmrsfetch to avoid automatic ending of current session due to 401(Unauthorized) status error it throws
   const response = await fetch(makeUrl(url));
   if (response.ok) {
-    return await response.json();
+    const responseData = await response.json();
+    if (responseData?.issue) {
+      throw new Error(PROVIDER_NOT_FOUND);
+    }
+    return responseData;
   }
   if (response.status === 401) {
     throw new Error(HWR_API_NO_CREDENTIALS);
   } else if (response.status === 404) {
-    throw new Error(NOT_FOUND);
+    throw new Error(RESOURCE_NOT_FOUND);
   }
   throw new Error(UNKNOWN);
 };
