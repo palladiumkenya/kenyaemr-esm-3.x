@@ -65,7 +65,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
         closeOnEscape
         inline={false}
         actionButtonLabel={t('verify', 'Verify')}
-        className={styles.missingCRNumber}
+        className={styles.missingSHANumber}
         onActionButtonClick={() => {
           navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
         }}
@@ -81,7 +81,10 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
         closeOnEscape
         inline={false}
         actionButtonLabel={t('verify', 'Verify')}
-        className={styles.missingCRNumber}
+        className={styles.missingSHANumber}
+        onActionButtonClick={() => {
+          navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
+        }}
       />
     );
   }
