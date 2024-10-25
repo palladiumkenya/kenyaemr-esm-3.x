@@ -1,6 +1,5 @@
-import { openmrsFetch, restBaseUrl, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, Visit } from '@openmrs/esm-framework';
 import { z } from 'zod';
-import { CoverageEligibilityResponse, InsurersBenefits } from '../types';
 
 export const eligibilityRequestShema = z.object({
   patientUuid: z.string().uuid(),
@@ -20,21 +19,6 @@ export const preauthSchema = z.object({
   packageUUid: z.string(),
   interventions: z.array(z.string()).nonempty('Require atleast 1 intervention'),
 });
-
-export const requestEligibility = async (data: z.infer<typeof eligibilityRequestShema>) => {
-  const url = `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest`;
-  const resp = await openmrsFetch(url, {
-    body: JSON.stringify(data),
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  const benefits = (await resp.json()) as Array<CoverageEligibilityResponse>;
-  const insurerBenefits = benefits.reduce<Array<InsurersBenefits>>(
-    (prev, curr) => [...prev, ...curr.benefits.map((b) => ({ ...b, insurer: curr.insurer }))],
-    [],
-  );
-  return insurerBenefits;
-};
 
 export const preAuthenticateBenefit = async (
   data: z.infer<typeof preauthSchema>,
