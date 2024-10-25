@@ -48,7 +48,7 @@ export const configSchema = {
   hieBaseUrl: {
     _type: Type.String,
     _description: 'HIE Base URL for getting intervensions and benefit packages',
-    _default: 'https://payers.apeiro-digital.com/api/v1/master',
+    _default: 'https://payers.apeiro-digital.com/api/v1',
   },
   visitAttributeTypes: {
     isPatientExempted: {

@@ -1,6 +1,7 @@
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import preAuthRequests from '../benefits-package/table/temporary-pre-auth-responses.json';
+import { BillingConfig } from '../config-schema';
 import { useSystemSetting } from './getMflCode';
 
 export interface PreAuthRequest {
@@ -168,7 +169,8 @@ export interface Payee {
 
 export const usePreAuthRequests = (patientUuid: string) => {
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
-  const url = `https://payers.apeiro-digital.com/api/v1/claim/byFacility?facilityCode=Organization/${mflCodeValue}&type=preauthorization&claimResponseId=`;
+  const { hieBaseUrl } = useConfig<BillingConfig>();
+  const url = `${hieBaseUrl}/claim/byFacility?facilityCode=Organization/${mflCodeValue}&type=preauthorization&claimResponseId=`;
 
   const { data, error, isLoading, mutate } = useSWR<{ data: Array<PreAuthRequest> }>(url, openmrsFetch);
 
