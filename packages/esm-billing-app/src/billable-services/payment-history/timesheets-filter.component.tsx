@@ -26,33 +26,16 @@ export const TimesheetsFilter = ({
   dateRange: Array<Date>;
 }) => {
   const { timesheets } = useTimeSheets();
-
-  const billCashiers = bills.map((bill) => bill.cashier);
-  const billsCashiersUUIDS = billCashiers
+  const billsCashierUUIDs = bills
+    .map((bill) => bill.cashier)
     .filter((cashier) => appliedFilters.includes(cashier.display))
     .map((c) => c.uuid);
 
-  const uniqueBillsCashiersUUIDS = Array.from(new Set(billsCashiersUUIDS));
+  const uniqueBillsCashiersUUIDS = Array.from(new Set(billsCashierUUIDs));
 
-  const sortedByClockInTimeSheets = timesheets.sort(
-    (a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime(),
-  );
-
-  const openCashierSheets = uniqueBillsCashiersUUIDS.reduce((acc, uuid) => {
-    const openSheet = sortedByClockInTimeSheets.find((s) => s.clockIn && !s.clockOut && s.cashier.uuid === uuid);
-
-    if (openSheet) {
-      acc.push(openSheet);
-    }
-
-    return acc;
-  }, []);
-
-  const collectedSheets = [...sortedByClockInTimeSheets.filter((s) => s.clockOut && s.clockIn), ...openCashierSheets];
-
-  const selectedCashiersTimesheets = collectedSheets
+  const selectedCashiersTimesheets = timesheets
     .sort((a, b) => new Date(b.clockIn).getTime() - new Date(a.clockIn).getTime())
-    .filter((sheet) => billsCashiersUUIDS.includes(sheet.cashier.uuid))
+    .filter((sheet) => uniqueBillsCashiersUUIDS.includes(sheet.cashier.uuid))
     .filter((sheet) => {
       const sheetClockInTime = new Date(sheet.clockIn);
       const isOpenTimeSheet = !sheet.clockOut;
@@ -83,7 +66,6 @@ export const TimesheetsFilter = ({
     if (selectedSheetUUID) {
       applyTimeSheetFilter(timesheets.find((sheet) => sheet.uuid === selectedSheetUUID));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedSheetUUID]);
 
   if (selectedCashiersTimesheets.length === 0) {
