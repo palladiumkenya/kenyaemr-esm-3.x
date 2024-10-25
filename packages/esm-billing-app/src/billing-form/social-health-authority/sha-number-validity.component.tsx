@@ -1,10 +1,12 @@
-import { ActionableNotification, Form, InlineLoading, InlineNotification } from '@carbon/react';
-import { navigate, useConfig, usePatient } from '@openmrs/esm-framework';
+import { ActionableNotification, Form, InlineLoading, InlineNotification, Tooltip } from '@carbon/react';
+import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
+import { formatDate, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
+import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BillingConfig } from '../../config-schema';
-import { useHIESubscription } from '../hie.resource';
+import { useHIEEligibility, useHIESubscription } from '../hie.resource';
 import styles from './sha-number-validity.scss';
 
 type SHANumberValidityProps = {
@@ -14,27 +16,32 @@ type SHANumberValidityProps = {
 
 const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, patientUuid }) => {
   const { t } = useTranslation();
-  const { nationalPatientUniqueIdentifierTypeUuid } = useConfig<BillingConfig>();
+  const { shaIdentificationNumberUUID } = useConfig<BillingConfig>();
   const { patient, isLoading } = usePatient(patientUuid);
   const { watch } = useFormContext();
   const isSHA = watch('insuranceScheme')?.includes('SHA');
-  const { data, isLoading: isLoadingHIE, error } = useHIESubscription(patientUuid);
+  const { data, isLoading: isLoadingHIEEligibility, error } = useHIEEligibility(patientUuid);
+  const {
+    hieSubscriptions,
+    isLoading: isLoadingHIESubscription,
+    error: hieSubscriptionError,
+  } = useHIESubscription(patientUuid);
 
-  const nationalUniquePatientIdentifier = patient?.identifier
+  const shaIdentificationNumber = patient?.identifier
     ?.filter((identifier) => identifier)
-    .filter((identifier) =>
-      identifier.type.coding.some((coding) => coding.code === nationalPatientUniqueIdentifierTypeUuid),
-    );
+    .filter((identifier) => identifier.type.coding.some((coding) => coding.code === shaIdentificationNumberUUID));
+
+  const hieEligibility = true;
 
   if (!isSHA) {
     return null;
   }
 
-  if (isLoadingHIE || isLoading) {
+  if (isLoadingHIEEligibility || isLoading || isLoadingHIESubscription) {
     return <InlineLoading status="active" description={t('loading', 'Loading ...')} />;
   }
 
-  if (error) {
+  if (error || hieSubscriptionError) {
     return (
       <InlineNotification
         aria-label="closes notification"
@@ -47,23 +54,26 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (nationalUniquePatientIdentifier?.length === 0) {
+  if (shaIdentificationNumber?.length === 0) {
     return (
-      <InlineNotification
-        aria-label="closes notification"
-        kind="error"
-        lowContrast={true}
-        statusIconDescription="notification"
-        title={t('patientMissingUniqueIdentifierTitle', 'Patient missing NUPI')}
+      <ActionableNotification
+        title={t('patientMissingSHAId', 'Patient missing SHA identification number')}
         subtitle={t(
-          'patientMissingUniqueIdentifier',
-          'Patient is missing National unique patient identifier, SHA validation cannot be done, Advise patient to visit registration desk',
+          'patientMissingSHANumber',
+          'Patient is missing SHA number, SHA validation cannot be done, Advise patient to visit registration desk',
         )}
+        closeOnEscape
+        inline={false}
+        actionButtonLabel={t('verify', 'Verify')}
+        className={styles.missingCRNumber}
+        onActionButtonClick={() => {
+          navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
+        }}
       />
     );
   }
 
-  if (data[0].eligibility_response.message.eligible === 0) {
+  if (!hieEligibility) {
     return (
       <ActionableNotification
         title={t('pendingHIEVerification', 'Pending HIE verification')}
@@ -71,9 +81,6 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
         closeOnEscape
         inline={false}
         actionButtonLabel={t('verify', 'Verify')}
-        onActionButtonClick={() => {
-          navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
-        }}
         className={styles.missingCRNumber}
       />
     );
@@ -81,7 +88,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
 
   return (
     <Form className={styles.formContainer}>
-      {/* {hieSubscriptions?.map(({ inforce, insurer, start, end }, index) => {
+      {hieSubscriptions?.map(({ inforce, insurer, start, end }, index) => {
         return (
           <div key={`${index}${insurer}`} className={styles.hieCard}>
             <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
@@ -106,7 +113,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
             </div>
           </div>
         );
-      })} */}
+      })}
     </Form>
   );
 };
