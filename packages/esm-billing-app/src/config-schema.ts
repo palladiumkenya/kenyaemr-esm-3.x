@@ -21,6 +21,7 @@ export interface BillingConfig {
   cashPointUuid: string;
   cashierUuid: string;
   patientBillsUrl: string;
+  nationalIdUUID: string;
 }
 
 export const configSchema = {
@@ -28,6 +29,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'Social Health Authority Identification Number',
     _default: '24aedd37-b5be-4e08-8311-3721b8d5100d',
+  },
+  nationalIdUUID: {
+    _type: Type.String,
+    _description: 'National Identification Number',
+    _default: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
   },
   inPatientVisitTypeUuid: {
     _type: Type.String,
@@ -42,7 +48,7 @@ export const configSchema = {
   hieBaseUrl: {
     _type: Type.String,
     _description: 'HIE Base URL for getting intervensions and benefit packages',
-    _default: 'https://payers.apeiro-digital.com/api/v1/master',
+    _default: 'https://payers.apeiro-digital.com/api/v1',
   },
   visitAttributeTypes: {
     isPatientExempted: {

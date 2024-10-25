@@ -3,10 +3,10 @@ import useSWR from 'swr';
 import { BillingConfig } from '../config-schema';
 import { SHAIntervension } from '../types';
 
-const useInterventions = (code: string) => {
+export const useInterventions = (code: string) => {
   const { hieBaseUrl } = useConfig<BillingConfig>();
 
-  const url = `${hieBaseUrl}/benefit-master/code?searchKey=${code}`;
+  const url = `${hieBaseUrl}/master/benefit-master/code?searchKey=${code}`;
   const { isLoading, error, data } = useSWR<FetchResponse<Array<SHAIntervension>>>(url, openmrsFetch);
   return {
     isLoading,
@@ -14,5 +14,3 @@ const useInterventions = (code: string) => {
     error,
   };
 };
-
-export default useInterventions;
