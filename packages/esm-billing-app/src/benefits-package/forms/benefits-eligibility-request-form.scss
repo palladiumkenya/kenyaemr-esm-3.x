@@ -15,7 +15,6 @@
   width: 100%;
   display: flex;
   flex-direction: row;
-  gap: layout.$spacing-01;
 
   & > button {
     display: flex;
@@ -52,4 +51,8 @@
     flex-grow: 1;
     padding-left: layout.$spacing-05;
   }
+}
+
+.attachFileLabel {
+  margin-bottom: layout.$spacing-02;
 }
