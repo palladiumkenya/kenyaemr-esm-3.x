@@ -31,7 +31,8 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     ?.filter((identifier) => identifier)
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === shaIdentificationNumberUUID));
 
-  const hieEligibility = true;
+  // TODO correctly get eligibility from the backend
+  const isHIEEligible = true;
 
   if (!isSHA) {
     return null;
@@ -73,7 +74,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (!hieEligibility) {
+  if (!isHIEEligible) {
     return (
       <ActionableNotification
         title={t('pendingHIEVerification', 'Pending HIE verification')}
