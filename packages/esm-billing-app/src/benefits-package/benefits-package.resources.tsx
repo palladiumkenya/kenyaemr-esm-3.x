@@ -15,7 +15,7 @@ export const preauthSchema = z.object({
   patientUuid: z.string().uuid(),
   providerUuid: z.string().uuid(),
   facilityUuid: z.string().uuid(),
-  diagnosisUuids: z.array(z.string()).nonempty('Require atleast 1 diagnoses'),
+  diagnosisUuids: z.array(z.string()),
   packageUUid: z.string(),
   interventions: z.array(z.string()).nonempty('Require atleast 1 intervention'),
 });

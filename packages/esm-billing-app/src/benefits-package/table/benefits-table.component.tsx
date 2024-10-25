@@ -3,38 +3,38 @@ import { ArrowRight } from '@carbon/react/icons';
 import { getPatientUuidFromUrl, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePreAuthRequests } from '../../hooks/use-pre-auth-form';
+import { usePreAuthRequests } from '../../hooks/use-pre-auth-requests';
 import GenericDataTable from './generic_data_table.component';
 
 const headers = [
+  // {
+  //   key: 'packageCode',
+  //   header: 'Package Code',
+  // },
+  // {
+  //   key: 'packageName',
+  //   header: 'Package Name',
+  // },
+  // {
+  //   key: 'insurer',
+  //   header: 'Insurer',
+  // },
   {
-    key: 'packageCode',
-    header: 'Package Code',
+    key: 'productCode',
+    header: 'Product',
   },
   {
-    key: 'packageName',
-    header: 'Package Name',
-  },
-  {
-    key: 'insurer',
-    header: 'Insurer',
-  },
-  {
-    key: 'interventionCode',
-    header: 'Intervention Code',
-  },
-  {
-    key: 'interventionName',
-    header: 'Intervention Name',
+    key: 'created',
+    header: 'Created',
   },
   {
     key: 'status',
     header: 'Approval status',
   },
-  {
-    key: 'action',
-    header: 'Action',
-  },
+  // {
+  //   key: 'action',
+  //   header: 'Action',
+  // },
 ];
 
 const BenefitsTable = () => {

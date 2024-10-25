@@ -25,9 +25,9 @@ import { useSystemSetting } from '../../hooks/getMflCode';
 import usePackages from '../../hooks/usePackages';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
-import { InsurersBenefits, PatientBenefit } from '../../types';
+import { PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
-import styles from './benefits-eligibility-request-form.scss';
+import styles from './benefits-pre-auth-form.scss';
 import PackageIntervensions from './package-intervensions.component';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
@@ -36,10 +36,9 @@ interface BenefitPreAuthFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   benefit: PatientBenefit;
   onSuccess: (benefits: Array<PatientBenefit>) => void;
-  benefits: Array<InsurersBenefits>;
 }
 
-const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid, benefit }) => {
+const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const { visits: recentVisit, isLoading } = useVisit(patientUuid);
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
@@ -61,7 +60,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
       patientUuid,
       facilityUuid,
       diagnosisUuids: [],
-      interventions: [benefit.interventionCode],
+      interventions: [],
     },
     resolver: zodResolver(preauthSchema),
   });
@@ -90,12 +89,6 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
       form.setValue('diagnosisUuids', diagnoses!.map((d) => d.id) as any);
     }
   }, [diagnoses, form]);
-
-  useEffect(() => {
-    if (packages.length && !form.watch('packageUUid')) {
-      form.setValue('packageUUid', packages.find((package_) => package_.packageCode === benefit.packageCode)?.uuid);
-    }
-  }, [benefit.packageCode, form, packages]);
 
   const onSubmit = async (values: BenefitsPreAuth) => {
     setIsSubmitting(true);
