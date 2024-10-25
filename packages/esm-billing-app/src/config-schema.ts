@@ -15,6 +15,7 @@ export interface BillingConfig {
   enforceBillPayment: boolean;
   billingStatusQueryUrl: string;
   mpesaAPIBaseUrl: string;
+  hieBaseUrl: string;
   insuranceSchemes: Array<string>;
   nationalPatientUniqueIdentifierTypeUuid: string;
   cashPointUuid: string;
@@ -37,6 +38,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'The base url that will be used to make any backend calls related to mpesa.',
     _default: 'https://billing.kenyahmis.org',
+  },
+  hieBaseUrl: {
+    _type: Type.String,
+    _description: 'HIE Base URL for getting intervensions and benefit packages',
+    _default: 'https://payers.apeiro-digital.com/api/master',
   },
   visitAttributeTypes: {
     isPatientExempted: {
