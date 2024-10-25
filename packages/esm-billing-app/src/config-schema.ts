@@ -15,18 +15,19 @@ export interface BillingConfig {
   enforceBillPayment: boolean;
   billingStatusQueryUrl: string;
   mpesaAPIBaseUrl: string;
+  hieBaseUrl: string;
   insuranceSchemes: Array<string>;
-  nationalPatientUniqueIdentifierTypeUuid: string;
+  shaIdentificationNumberUUID: string;
   cashPointUuid: string;
   cashierUuid: string;
   patientBillsUrl: string;
 }
 
 export const configSchema = {
-  nationalPatientUniqueIdentifierTypeUuid: {
+  shaIdentificationNumberUUID: {
     _type: Type.String,
-    _description: 'The national unique patient identifier',
-    _default: 'f85081e2-b4be-4e48-b3a4-7994b69bb101',
+    _description: 'Social Health Authority Identification Number',
+    _default: '24aedd37-b5be-4e08-8311-3721b8d5100d',
   },
   inPatientVisitTypeUuid: {
     _type: Type.String,
@@ -37,6 +38,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'The base url that will be used to make any backend calls related to mpesa.',
     _default: 'https://billing.kenyahmis.org',
+  },
+  hieBaseUrl: {
+    _type: Type.String,
+    _description: 'HIE Base URL for getting intervensions and benefit packages',
+    _default: 'https://payers.apeiro-digital.com/api/v1/master',
   },
   visitAttributeTypes: {
     isPatientExempted: {

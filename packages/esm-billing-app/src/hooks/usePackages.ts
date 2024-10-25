@@ -1,5 +1,6 @@
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { BillingConfig } from '../config-schema';
 import { Package } from '../types';
 
 /**
@@ -7,7 +8,8 @@ import { Package } from '../types';
  * @returns
  */
 const usePackages = () => {
-  const url = `https://payers.apeiro-digital.com/api/v1/master/category/all`;
+  const { hieBaseUrl } = useConfig<BillingConfig>();
+  const url = `${hieBaseUrl}/category/all`;
 
   const { data, isLoading, error } = useSWR<FetchResponse<Array<{ id: number; code: string; categoryName: string }>>>(
     url,
