@@ -105,7 +105,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
 
   const selectedPackageObservable = form.watch('packageUUid');
 
-  if (packagesLoading || diagnosesLoading || isLoading) {
+  if (packagesLoading || diagnosesLoading || isLoading || providerLoading) {
     return (
       <Layer className={styles.loading}>
         <Loading withOverlay={false} small />
