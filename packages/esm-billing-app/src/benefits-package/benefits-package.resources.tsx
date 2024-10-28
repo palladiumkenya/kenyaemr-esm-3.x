@@ -43,6 +43,8 @@ export const preAuthenticateBenefit = async (
     use: 'preauthorization',
     insurer: 'SHA',
     billNumber: '',
+    encounterUuid: visit?.encounters[0]?.uuid,
+    visitUuid: visit.uuid,
   };
 
   const url = `/ws/rest/v1/insuranceclaims/claims`;

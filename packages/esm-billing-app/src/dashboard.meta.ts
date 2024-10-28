@@ -14,6 +14,6 @@ export const shrSummaryDashboardMeta = {
 export const benefitsPackageDashboardMeta = {
   slot: 'patient-chart-benefits-dashboard-slot',
   columns: 2,
-  title: 'Eligible Benefits Package',
-  path: 'Benefits Package',
+  title: 'Benefits Preauths',
+  path: 'Benefits Preauths',
 };
