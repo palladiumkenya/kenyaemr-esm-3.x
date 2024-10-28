@@ -11,7 +11,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './claims-list-table.scss';
@@ -22,8 +22,8 @@ const ClaimsManagementTable: React.FC = () => {
   const [pageSize, setPageSize] = useState(5);
   const { paginated, goTo, results, currentPage } = usePagination(claims, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, claims.length, currentPage, results.length);
-  const { t } = useTranslation();
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
+  const { t } = useTranslation();
 
   const headers = [
     { key: 'claimCode', header: 'Claim Code' },
@@ -43,6 +43,17 @@ const ClaimsManagementTable: React.FC = () => {
           columnCount={Object.keys(headers).length}
           zebra
           rowCount={pageSize}
+        />
+      </div>
+    );
+  }
+
+  if (claims.length === 0) {
+    return (
+      <div className={styles.claimsTable}>
+        <EmptyState
+          displayText={t('emptyClaimsState', 'There are no claims to display')}
+          headerTitle={t('emptyClaimsHeader', 'No Claims')}
         />
       </div>
     );
