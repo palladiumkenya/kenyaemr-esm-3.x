@@ -1,70 +1,115 @@
-import React from 'react';
+import {
+  DataTable,
+  DataTableSkeleton,
+  Pagination,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@carbon/react';
+import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import GenericClaimsDataTable from '../generic-table/generic-table.component';
-import GenericDataTable from '../../../benefits-package/table/generic_data_table.component';
-import { Tag } from '@carbon/react';
 import styles from './claims-list-table.scss';
-import { Claimrows, preAuthRows } from './table-mock-up-data';
-import useShaData from './hook/table.resource';
+import { useFacilityClaims } from './use-facility-claims';
 
 const ClaimsManagementTable: React.FC = () => {
+  const { claims, isLoading } = useFacilityClaims();
+  const [pageSize, setPageSize] = useState(5);
+  const { paginated, goTo, results, currentPage } = usePagination(claims, pageSize);
+  const { pageSizes } = usePaginationInfo(pageSize, claims.length, currentPage, results.length);
+  const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { t } = useTranslation();
-  const shaData = useShaData();
 
   const headers = [
-    { key: 'visitTime', header: t('visitTime', 'Visit Time') },
-    { key: 'patientName', header: t('patientName', 'Patient Name') },
-    { key: 'claimCode', header: t('claimCode', 'Claim Code') },
-    { key: 'status', header: t('status', 'Status') },
-  ];
-
-  const switchTabs = [
-    { name: t('fulfilled', 'Fulfilled'), component: '' },
-    { name: t('unfulfilled', 'Unfulfilled'), component: '' },
-  ];
-
-  const shaHeaders = [
-    { key: 'packageCode', header: 'Package Code' },
-    { key: 'packageName', header: 'Package Name' },
-    { key: 'interventionCode', header: 'Intervention Code' },
-    { key: 'interventionName', header: 'Intervention Name' },
-    { key: 'shaInterventionTariff', header: 'Intervention Tariff' },
+    { key: 'claimCode', header: 'Claim Code' },
     { key: 'status', header: 'Status' },
+    { key: 'providerName', header: 'Provider' },
+    { key: 'claimedTotal', header: 'Claimed Amount' },
+    { key: 'approvedTotal', header: 'Approved Amount' },
   ];
+
+  if (isLoading) {
+    return (
+      <div className={styles.dataTableSkeleton}>
+        <DataTableSkeleton
+          headers={headers}
+          showToolbar={false}
+          showHeader={false}
+          columnCount={Object.keys(headers).length}
+          zebra
+          rowCount={pageSize}
+        />
+      </div>
+    );
+  }
+
+  if (claims.length === 0) {
+    return (
+      <div className={styles.claimsTable}>
+        <EmptyState
+          displayText={t('emptyClaimsState', 'There are no claims to display')}
+          headerTitle={t('emptyClaimsHeader', 'No Claims')}
+        />
+      </div>
+    );
+  }
 
   return (
-    <GenericClaimsDataTable
-      cardTitle={t('claimList', 'Claim List')}
-      contentSwitcherTabs={switchTabs}
-      rows={Claimrows}
-      headers={headers}
-      totalRows={Claimrows.length}
-      renderExpandedRow={() => (
-        <div>
-          <div className={styles.expanded_row_section}>
-            <h4 className={styles.header}> {t('claimList', 'Claim List')}</h4>
-            <p className={styles.paragraph}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
-            </p>
-          </div>
-          <div className={styles.expanded_row_section}>
-            <h4 className={styles.header}> {t('diagnosis', 'Diagnosis')}</h4>
-            <Tag className="some-class" type="red">
-              <p className={styles.paragraph}>{t('malaria', 'Malaria')}</p>
-            </Tag>
-          </div>
-          <GenericDataTable
-            headers={shaHeaders}
-            rows={shaData.map((item, index) => ({
-              id: `${item.packageCode}-${item.interventionCode}-${index}`,
-              ...item,
-            }))}
-            title={t('benefit', 'Benefits')}
-          />{' '}
-        </div>
+    <DataTable rows={results} headers={headers} isSortable>
+      {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+        <TableContainer className={styles.claimsTable}>
+          <Table {...getTableProps()} aria-label="sample table">
+            <TableHead>
+              <TableRow>
+                {headers.map((header) => (
+                  <TableHeader
+                    key={header.key}
+                    {...getHeaderProps({
+                      header,
+                    })}>
+                    {header.header}
+                  </TableHeader>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow
+                  {...getRowProps({
+                    row,
+                  })}>
+                  {row.cells.map((cell) => (
+                    <TableCell key={cell.id}>{cell.value}</TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          {paginated && !isLoading && (
+            <Pagination
+              forwardText=""
+              backwardText=""
+              page={currentPage}
+              pageSize={pageSize}
+              pageSizes={pageSizes}
+              totalItems={claims.length}
+              size={responsiveSize}
+              onChange={({ page: newPage, pageSize }) => {
+                if (newPage !== currentPage) {
+                  goTo(newPage);
+                }
+                setPageSize(pageSize);
+              }}
+            />
+          )}
+        </TableContainer>
       )}
-    />
+    </DataTable>
   );
 };
 
