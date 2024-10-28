@@ -1,7 +1,6 @@
 import {
   defineConfigSchema,
   getAsyncLifecycle,
-  getFeatureFlag,
   getSyncLifecycle,
   registerBreadcrumbs,
   registerFeatureFlag,
@@ -30,7 +29,7 @@ export const shrPatientSummary = getSyncLifecycle(shrPatientSummaryComponent, op
 
 export function startupApp() {
   registerBreadcrumbs([]);
-  registerFeatureFlag('shr-summary', 'SHR Summary', 'Adds authorization to pull a ptient SHR information');
+  registerFeatureFlag('shr-summary', 'SHR Summary', 'Adds authorization to pull a patient SHR information');
   defineConfigSchema(moduleName, configSchema);
 }
 
@@ -42,9 +41,10 @@ export const ReferralsDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const shrSummaryDashboardLink = getFeatureFlag('shr-summary')
-  ? getSyncLifecycle(createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }), options)
-  : undefined;
+export const shrSummaryDashboardLink = getSyncLifecycle(
+  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
+  options,
+);
 
 export const shrRoot = getAsyncLifecycle(() => import('./shr-root.component'), options);
 
