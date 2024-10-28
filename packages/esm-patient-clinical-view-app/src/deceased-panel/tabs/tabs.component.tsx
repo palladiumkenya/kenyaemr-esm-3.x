@@ -1,14 +1,13 @@
 import React from 'react';
-import styles from './deceased-details.scss';
+import styles from './tabs.scss';
 import { ExtensionSlot, navigate, usePatient } from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
 import { Tile, Button, Tabs, TabList, Tab, TabPanels, TabPanel, Layer } from '@carbon/react';
 import { Report, Folders, Wallet, WatsonHealthBrushFreehand, Movement, Return, Home } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import AttachmentView from '../panels/attachments.component';
+import AttachmentView from '../panels/attachement.component';
 import BillingHistoryView from '../panels/billing-history.component';
 import AutopsyView from '../panels/autopsy.component';
-import MedicalHistoryView from '../panels/medical-history.component';
 
 const DeceasedDetailsView: React.FC = () => {
   const patientUuid = getPatientUuidFromUrl();
@@ -24,7 +23,6 @@ const DeceasedDetailsView: React.FC = () => {
     });
   return (
     <div className={styles.deceasedDetailsContainer}>
-      {patient && <ExtensionSlot name="patient-header-slot" state={{ patientUuid: patientUuid, patient }} />}
       <Layer className={styles.container}>
         <Tile>
           <div className={styles.headingContainer}>
@@ -38,7 +36,7 @@ const DeceasedDetailsView: React.FC = () => {
                 size="sm"
                 renderIcon={Home}
                 onClick={handleNavigateToHomePage}>
-                {t('home', 'Home View')}
+                {t('morgueView', 'Morgue View')}
               </Button>
               <Button
                 className={styles.rightButton}
@@ -59,15 +57,11 @@ const DeceasedDetailsView: React.FC = () => {
         <div className={styles.tabs}>
           <Tabs>
             <TabList contained activation="manual" aria-label="List of panels">
-              <Tab renderIcon={Folders}>{t('MedicalHistory', 'Medical history')}</Tab>
               <Tab renderIcon={WatsonHealthBrushFreehand}>{t('autopsyRecord', 'Autopsy summary')}</Tab>
               <Tab renderIcon={Wallet}>{t('billingHistory', 'Billing history')}</Tab>
               <Tab renderIcon={Report}>{t('attachments', 'Attachments')}</Tab>
             </TabList>
             <TabPanels>
-              <TabPanel>
-                <MedicalHistoryView />
-              </TabPanel>
               <TabPanel>
                 <AutopsyView />
               </TabPanel>
