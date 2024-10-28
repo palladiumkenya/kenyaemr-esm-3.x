@@ -29,6 +29,7 @@ import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
 import { LineItem, MappedBill } from '../../../types';
 import { processClaims, useVisit } from './claims-form.resource';
 import styles from './claims-form.scss';
+import useProvider from '../../../hooks/useProvider';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -55,6 +56,11 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { visits: recentVisit, error: visitError, isLoading: visitLoading } = useVisit(patientUuid);
   const { diagnoses, error: diagnosisError, isLoading: diagnosisLoading } = usePatientDiagnosis(patientUuid);
   const { error: packagesError, isLoading: packagesLoading, packages } = usePackages();
+  const {
+    currentProvider: { uuid: providerUuid },
+  } = useSession();
+  const { providerLoading: providerLoading, provider, error: providerError } = useProvider(providerUuid);
+
   const encounterUuid = recentVisit?.encounters[0]?.uuid;
   const visitTypeUuid = recentVisit?.visitType.uuid;
 
@@ -79,7 +85,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
       package: '',
       interventions: [],
-      provider: user?.display || '',
+      provider: providerUuid,
     },
   });
 
@@ -120,7 +126,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       visitType: visitTypeUuid,
       guaranteeId: 'G-001',
       claimCode: 'C-001',
-      provider: user.uuid,
+      provider: data.provider,
       visitUuid: recentVisit.uuid,
       encounterUuid: encounterUuid,
       use: 'claim',
@@ -165,9 +171,9 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     setValue('facility', `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`);
     setValue('treatmentStart', recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '');
     setValue('treatmentEnd', recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '');
-  }, [diagnoses, recentVisit, mflCodeValue, setValue]);
+  }, [diagnoses, recentVisit, mflCodeValue, setValue, provider]);
 
-  if (visitLoading || diagnosisLoading || packagesLoading) {
+  if (visitLoading || diagnosisLoading || packagesLoading || providerLoading) {
     return (
       <Layer className={styles.loading}>
         {Array.from({ length: 6 }).map((_, index) => (
@@ -177,7 +183,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     );
   }
 
-  if (visitError || diagnosisError || packagesError) {
+  if (visitError || diagnosisError || packagesError || providerError) {
     return (
       <Layer className={styles.loading}>
         <InlineNotification
@@ -186,6 +192,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             visitError?.message ??
             diagnosisError?.message ??
             packagesError?.message ??
+            providerError?.message ??
             'Error occured while loading claims form'
           }
           lowContrast
@@ -343,12 +350,25 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                   control={control}
                   name="provider"
                   render={({ field }) => (
-                    <TextInput
-                      {...field}
+                    <Dropdown
+                      ref={field.ref}
+                      invalid={form.formState.errors[field.name]?.message}
+                      invalidText={form.formState.errors[field.name]?.message}
                       id="provider"
-                      labelText={t('providerName', 'Provider Name')}
-                      readOnly
-                      value={field.value}
+                      titleText={t('provider', 'Provider')}
+                      onChange={(e) => {
+                        field.onChange(e.selectedItem);
+                      }}
+                      initialSelectedItem={field.value}
+                      label="Choose option"
+                      items={[provider].map((r) => r.uuid)}
+                      itemToString={(item) =>
+                        [provider]
+                          .find((r) => r.uuid === item)
+                          ?.display.split('-')
+                          .at(-1)
+                          .trim() ?? ''
+                      }
                     />
                   )}
                 />
