@@ -8,11 +8,11 @@ import {
   type Visit,
 } from '@openmrs/esm-framework';
 import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location } from '../types';
-import useSWRInfinite from 'swr/infinite';
-import { makeUrlUrl } from '../utils/utils';
 import useSWR from 'swr';
 import { BillingConfig, ConfigObject } from '../config-schema';
 import { useState } from 'react';
+import useSWRImmutable from 'swr/immutable';
+import { makeUrlUrl } from '../utils/utils';
 
 export const useDeceasedPatient = () => {
   const customRepresentation =
