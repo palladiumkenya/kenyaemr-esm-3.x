@@ -80,7 +80,6 @@ const ClaimsManagementTable: React.FC = () => {
             <TableBody>
               {rows.map((row) => (
                 <TableRow
-                  key={row.id}
                   {...getRowProps({
                     row,
                   })}>

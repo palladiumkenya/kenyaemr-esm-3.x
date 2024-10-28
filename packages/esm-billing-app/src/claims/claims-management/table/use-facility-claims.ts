@@ -8,15 +8,16 @@ export type FacilityClaim = {
   dateTo: string;
   claimedTotal: number;
   approvedTotal: null;
-  status: string;
+  status: 'REJECTED' | 'ENTERED' | 'CHECKED' | 'VALUATED' | 'ERRORED';
   provider: {
     display: string;
   } | null;
+  externalId: string;
 };
 
 export const useFacilityClaims = () => {
   const customPresentation =
-    'custom:(uuid,claimCode,dateFrom,dateTo,claimedTotal,approvedTotal,status,provider:(display),)';
+    'custom:(uuid,claimCode,dateFrom,dateTo,claimedTotal,approvedTotal,status,externalId,provider:(display),)';
   const url = `${restBaseUrl}/claim?v=${customPresentation}`;
 
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<FacilityClaim> }>>(url, openmrsFetch);
@@ -28,6 +29,11 @@ export const useFacilityClaims = () => {
           ...claim,
           providerName: claim.provider?.display,
           approvedTotal: claim.approvedTotal ?? 0,
+          status:
+            claim.status !== 'ENTERED' && claim.status !== 'ERRORED'
+              ? `${claim.status} - ${claim.externalId}`
+              : claim.status,
+          id: claim.uuid,
         };
       }) ?? [],
     error,
