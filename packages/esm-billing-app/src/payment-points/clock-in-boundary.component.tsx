@@ -12,7 +12,10 @@ export const ClockInBoundary = ({ children }: { children: React.ReactNode }) => 
   };
 
   useEffect(() => {
-    if (!isClockedInSomewhere && !isLoading) {
+    if (isLoading) {
+      return;
+    }
+    if (!isClockedInSomewhere) {
       openClockInModal();
     }
   }, [isClockedInSomewhere, isLoading]);

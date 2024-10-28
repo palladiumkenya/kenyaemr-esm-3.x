@@ -1,8 +1,7 @@
-import { defineConfigSchema, getFeatureFlag, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
-import BenefitsEligibilyRequestForm from './benefits-package/forms/benefits-eligibility-request-form.workspace';
 import BillHistory from './bill-history/bill-history.component';
 import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
@@ -28,12 +27,12 @@ import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import { createLeftPanelLink } from './left-panel-link.component';
 import RequirePaymentModal from './modal/require-payment-modal.component';
+import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
+import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
 import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
 import { ClockIn } from './payment-points/payment-point/clock-in.component';
 import { ClockOut } from './payment-points/payment-point/clock-out.component';
 import rootComponent from './root.component';
-import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
-import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -165,7 +164,6 @@ export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
-export const benefitsEligibilyRequestForm = getSyncLifecycle(BenefitsEligibilyRequestForm, options);
 export const benefitsPreAuthForm = getSyncLifecycle(BenefitPreAuthForm, options);
 
 export const createPaymentPoint = getSyncLifecycle(CreatePaymentPoint, options);

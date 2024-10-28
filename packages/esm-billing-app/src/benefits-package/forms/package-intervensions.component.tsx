@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import useInterventions from '../../hooks/useInterventions';
+import { useInterventions } from '../../hooks/useInterventions';
 import { eligibilityRequestShema } from '../benefits-package.resources';
 
 type EligibilityRequest = z.infer<typeof eligibilityRequestShema>;
