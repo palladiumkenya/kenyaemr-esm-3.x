@@ -2,10 +2,10 @@ import React from 'react';
 import GenericTable from './generic-table.component';
 import { ErrorState, formatDate, launchWorkspace } from '@openmrs/esm-framework';
 import { toUpperCase } from '../helpers/expression-helper';
-import { Tag, Button, DataTableSkeleton } from '@carbon/react';
+import { Tag, Button, DataTableSkeleton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
-import { useDeceasedPatient } from '../hook/useMorgue.resource';
+import { useDeceasedPatient, useVisitType } from '../hook/useMorgue.resource';
 
 export const WaitingQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
@@ -56,15 +56,17 @@ export const WaitingQueue: React.FC = () => {
       Ids: patient.identifiers[0]?.identifier || 'N/A',
       address4: patient.person.preferredAddress?.address4 || 'N/A',
     })) || [];
-  const handleAdmissionForm = () => {
+  const handleAdmissionForm = (patientUuid: string) => {
     launchWorkspace('patient-additional-info-form', {
       workspaceTitle: t('admissionForm', 'Admission form'),
+      patientUuid,
     });
   };
-  const actionColumn = () => (
-    <Button kind="tertiary" className={styles.actionBtn} onClick={handleAdmissionForm}>
-      {t('admit', 'Admit')}
-    </Button>
+  const actionColumn = (row) => (
+    <OverflowMenu aria-label="queue-menu" align="bottom" flipped>
+      <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
+      <OverflowMenuItem hasDivider isDelete itemText={t('releaseBody', 'Release body')} />
+    </OverflowMenu>
   );
 
   return <GenericTable rows={rows} headers={genericTableHeader} actionColumn={actionColumn} title={fromHospital} />;
