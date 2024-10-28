@@ -1,11 +1,12 @@
-import React, { useMemo } from 'react';
-import { intervensions, patientBenefits } from '../benefits-package/benefits-package.mock';
+import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
-import { _SHAIntervension, SHAIntervension } from '../types';
+import { BillingConfig } from '../config-schema';
+import { SHAIntervension } from '../types';
 
-const useInterventions = (code: string) => {
-  const url = `https://payers.apeiro-digital.com/api/master/benefit-master/code?searchKey=${code}`;
+export const useInterventions = (code: string) => {
+  const { hieBaseUrl } = useConfig<BillingConfig>();
+
+  const url = `${hieBaseUrl}/master/benefit-master/code?searchKey=${code}`;
   const { isLoading, error, data } = useSWR<FetchResponse<Array<SHAIntervension>>>(url, openmrsFetch);
   return {
     isLoading,
@@ -13,5 +14,3 @@ const useInterventions = (code: string) => {
     error,
   };
 };
-
-export default useInterventions;
