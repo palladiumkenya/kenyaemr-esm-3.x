@@ -46,7 +46,7 @@ export const useVisitType = () => {
 
 export const usePaymentModes = (excludeWaiver: boolean = true) => {
   const { excludedPaymentMode } = useConfig<BillingConfig>();
-  const url = `/ws/rest/v1/cashier/paymentMode?v=full`;
+  const url = `${restBaseUrl}/cashier/paymentMode?v=full`;
   const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<PaymentMethod> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
@@ -63,7 +63,7 @@ export const usePaymentModes = (excludeWaiver: boolean = true) => {
 };
 
 export const useBillableItems = () => {
-  const url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(uuid,display),servicePrices:(uuid,name,price,paymentMode))`;
+  const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(uuid,display),servicePrices:(uuid,name,price,paymentMode))`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
   const [searchTerm, setSearchTerm] = useState('');
   const filteredItems =
@@ -91,7 +91,7 @@ export const useMorgueCompartment = () => {
 };
 
 export const createPatientBill = (payload) => {
-  const postUrl = `/ws/rest/v1/cashier/bill`;
+  const postUrl = `${restBaseUrl}/cashier/bill`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
 
@@ -103,7 +103,7 @@ export const useCashPoint = () => {
 };
 
 export const startVisitWithEncounter = (payload) => {
-  const postUrl = `/ws/rest/v1/encounter`;
+  const postUrl = `${restBaseUrl}/encounter`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
 

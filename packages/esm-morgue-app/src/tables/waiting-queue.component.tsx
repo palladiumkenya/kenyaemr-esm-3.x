@@ -65,7 +65,7 @@ export const WaitingQueue: React.FC = () => {
   const actionColumn = (row) => (
     <OverflowMenu aria-label="queue-menu" align="bottom" flipped>
       <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
-      <OverflowMenuItem hasDivider isDelete itemText={t('release', 'Release body')} />
+      <OverflowMenuItem hasDivider isDelete itemText={t('releaseBody', 'Release body')} />
     </OverflowMenu>
   );
 
