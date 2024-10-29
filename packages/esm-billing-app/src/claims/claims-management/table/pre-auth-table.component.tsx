@@ -1,5 +1,6 @@
-import { Tag } from '@carbon/react';
+import { DataTableSkeleton, Tag } from '@carbon/react';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import GenericDataTable from '../../../benefits-package/table/generic_data_table.component';
@@ -13,7 +14,8 @@ type PreAuthTableProps = {
 const PreAuthTable: React.FC<PreAuthTableProps> = ({ status }) => {
   const { t } = useTranslation();
   const shaData = useShaData();
-  const { preAuthRequests } = usePreAuthRequests();
+  const { preAuthRequests, isLoading, error } = usePreAuthRequests();
+  const title = t('preAuthRequests', 'Pre-auth requests');
 
   const headers = [
     { key: 'lastUpdatedAt', header: t('created', 'Created') },
@@ -25,9 +27,21 @@ const PreAuthTable: React.FC<PreAuthTableProps> = ({ status }) => {
     { key: 'actions', header: t('actions', 'Actions') },
   ];
 
+  if (isLoading) {
+    return <DataTableSkeleton />;
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={title} />;
+  }
+
+  if (preAuthRequests.length < 1) {
+    return <EmptyState headerTitle={title} displayText={title} />;
+  }
+
   return (
     <GenericDataTable
-      title={t('preAuthRequests', 'Pre-auth requests')}
+      title={title}
       rows={preAuthRequests
         .filter((pr) => pr.status === status || status === 'all')
         .map((p) => ({
