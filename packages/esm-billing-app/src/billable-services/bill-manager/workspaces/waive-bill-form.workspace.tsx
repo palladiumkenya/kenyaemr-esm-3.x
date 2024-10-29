@@ -1,5 +1,5 @@
-import React, { ChangeEvent, useState } from 'react';
-import { Form, Stack, FormGroup, Layer, Button, NumberInput } from '@carbon/react';
+import React from 'react';
+import { Form, Stack, FormGroup, Layer, Button, NumberInput, TextArea } from '@carbon/react';
 import { TaskAdd } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './waive-bill-form.scss';
@@ -18,10 +18,6 @@ type BillWaiverFormProps = DefaultPatientWorkspaceProps & {
   bill: MappedBill;
 };
 
-type FormData = {
-  waiveAmount: string;
-};
-
 export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorkspace }) => {
   const { lineItems } = bill;
 
@@ -32,10 +28,19 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
 
   const schema = z.object({
     waiveAmount: z
-      .string({ required_error: 'Waive amount is required' })
-      .refine((n) => parseInt(n) > 0, { message: 'Amount to waive should be greater than zero' })
-      .refine((n) => parseInt(n) < totalAmount + 1, { message: 'Amount to waive cannot be greater than total amount' }),
+      .string({ required_error: t('waiveAmountRequired', 'Waive amount is required') })
+      .refine((n) => parseInt(n) > 0, {
+        message: t('waiveAmountGreaterThanZero', 'Amount to waive should be greater than zero'),
+      })
+      .refine((n) => parseInt(n) < totalAmount + 1, {
+        message: t('waiveAmountCannotBeGreaterThanTotal', 'Amount to waive cannot be greater than total amount'),
+      }),
+    waiverReason: z
+      .string({ required_error: t('waiverReasonRequired', 'Waiver reason is required') })
+      .min(1, { message: t('waiverReasonRequired', 'Waiver reason is required') }),
   });
+
+  type FormData = z.infer<typeof schema>;
 
   const {
     control,
@@ -50,13 +55,14 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
     return null;
   }
 
-  const onSubmit: SubmitHandler<FormData> = ({ waiveAmount }) => {
+  const onSubmit: SubmitHandler<FormData> = ({ waiveAmount, waiverReason }) => {
     const waiverEndPointPayload = createBillWaiverPayload(
       bill,
       parseInt(waiveAmount),
       totalAmount,
       lineItems,
       paymentModes,
+      waiverReason,
     );
 
     processBillPayment(waiverEndPointPayload, bill.uuid).then(
@@ -90,9 +96,9 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
   return (
     <Form className={styles.form} aria-label={t('waiverForm', 'Waiver form')} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={7}>
-        <FormGroup>
+        <FormGroup legendText={t('billItemsSummary', 'Bill Items Summary')}>
           <section className={styles.billWaiverDescription}>
-            <label className={styles.label}>{t('billItems', 'Bill Items')}</label>
+            <label className={styles.label}>{t('waiverBillItems', 'Bill Items')}</label>
             <p className={styles.value}>
               {t('billName', ' {{billName}} ', {
                 billName: lineItems.map((item) => extractString(item.item || item.billableService)).join(', ') ?? '--',
@@ -120,9 +126,15 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
                   {...field}
                   invalidText={errors.waiveAmount?.message || 'Invalid'}
                   invalid={!!errors.waiveAmount}
-                  data-testid="waiverAmountInput"
                 />
               </Layer>
+            )}
+          />
+          <Controller
+            control={control}
+            name="waiverReason"
+            render={({ field }) => (
+              <TextArea labelText={t('waiverReasonLabel', 'Waiver reason')} rows={4} id="waiverReason" {...field} />
             )}
           />
         </FormGroup>
