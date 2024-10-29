@@ -12,6 +12,7 @@
   "fromHosp": "From Hospital",
   "morgue": "Morgue Management",
   "pullingCompartment": "Pulling compartments data.....",
+  "releaseBody": "Release body",
   "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"
 }
