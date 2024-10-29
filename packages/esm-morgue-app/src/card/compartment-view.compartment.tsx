@@ -2,10 +2,10 @@ import React from 'react';
 import styles from './compartment.scss';
 import EmptyCompartment from './empty-compartment.component';
 import AvailableCompartment from './avail-compartment.compartment';
-import { Patient } from '../types';
+import { Visit } from '@openmrs/esm-framework';
 
 interface CompartmentViewProps {
-  patients: (Patient | null)[];
+  patients: Visit[];
 }
 
 const CompartmentView: React.FC<CompartmentViewProps> = ({ patients }) => {

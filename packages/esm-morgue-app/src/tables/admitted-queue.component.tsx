@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 import DeceasedFilter from '../header/admitted-queue-header.component';
 import styles from './admitted-queue.scss';
 import CompartmentView from '../card/compartment-view.compartment';
-import { useDeceasedPatient } from '../hook/useMorgue.resource';
+import { useActiveMorgueVisit, useDeceasedPatient } from '../hook/useMorgue.resource';
 import { InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 export const AdmittedQueue: React.FC = () => {
-  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
+  const { data: activeDeceased, error, isLoading } = useActiveMorgueVisit();
   const { t } = useTranslation();
 
   if (isLoading) {
@@ -30,7 +30,7 @@ export const AdmittedQueue: React.FC = () => {
       <CardHeader title={t('allocation', 'Allocation')} children={''} />
       <DeceasedFilter />
       <div className={styles.patientCardContainer}>
-        <CompartmentView patients={deceasedPatients || []} />
+        <CompartmentView patients={activeDeceased} />
       </div>
     </div>
   );
