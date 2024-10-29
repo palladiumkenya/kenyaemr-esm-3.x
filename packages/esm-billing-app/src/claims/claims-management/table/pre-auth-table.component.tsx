@@ -1,71 +1,43 @@
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import GenericClaimsDataTable from '../generic-table/generic-table.component';
-import styles from './claims-list-table.scss';
 import { Tag } from '@carbon/react';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import GenericDataTable from '../../../benefits-package/table/generic_data_table.component';
-import { preAuthRows } from './table-mock-up-data';
+import { usePreAuthRequests } from '../../../hooks/use-pre-auth-requests';
 import useShaData from './hook/table.resource';
 
-const PreAuthTable: React.FC = () => {
+type PreAuthTableProps = {
+  status: 'active' | 'draft' | 'cancelled' | 'entered-in-error' | 'all';
+};
+
+const PreAuthTable: React.FC<PreAuthTableProps> = ({ status }) => {
   const { t } = useTranslation();
   const shaData = useShaData();
+  const { preAuthRequests } = usePreAuthRequests();
 
   const headers = [
-    { key: 'visitTime', header: t('visitTime', 'Visit Time') },
+    { key: 'lastUpdatedAt', header: t('created', 'Created') },
+    { key: 'insurer', header: t('insurer', 'Insurer') },
     { key: 'patientName', header: t('patientName', 'Patient Name') },
-    { key: 'preAuthCode', header: t('preAuthCode', 'Pre-Auth Code') },
+    { key: 'providerName', header: t('providerName', 'Provider Name') },
+    { key: 'interventionCode', header: t('interventionCode', 'Intervention Code') },
     { key: 'status', header: t('status', 'Status') },
-  ];
-
-  const switchTabs = [
-    { name: t('all', 'All'), component: '' },
-    { name: t('approved', 'Approved'), component: '' },
-    { name: t('rejected', 'Rejected'), component: '' },
-    { name: t('pending', 'Pending'), component: '' },
-  ];
-
-  const shaHeaders = [
-    { key: 'packageCode', header: 'Package Code' },
-    { key: 'packageName', header: 'Package Name' },
-    { key: 'interventionCode', header: 'Intervention Code' },
-    { key: 'interventionName', header: 'Intervention Name' },
-    { key: 'shaInterventionTariff', header: 'Intervention Tariff' },
-    { key: 'status', header: 'Status' },
+    { key: 'actions', header: t('actions', 'Actions') },
   ];
 
   return (
-    <GenericClaimsDataTable
-      cardTitle={t('preAuthRequests', 'Pre-auth requests')}
-      contentSwitcherTabs={switchTabs}
-      rows={preAuthRows}
+    <GenericDataTable
+      title={t('preAuthRequests', 'Pre-auth requests')}
+      rows={preAuthRequests
+        .filter((pr) => pr.status === status || status === 'all')
+        .map((p) => ({
+          ...p,
+          patientName: p.patient.name,
+          providerName: p.provider.name,
+          lastUpdatedAt: formatDate(parseDate(p.lastUpdatedAt)),
+          status: <Tag>{p.status}</Tag>,
+        }))}
       headers={headers}
-      totalRows={preAuthRows.length}
-      renderExpandedRow={() => (
-        <div>
-          <div className={styles.expanded_row_section}>
-            <h4 className={styles.header}> {t('preAuthJustification', 'Pre-auth Justification')}</h4>
-            <p className={styles.paragraph}>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-              dolore magna aliqua.
-            </p>
-          </div>
-          <div className={styles.expanded_row_section}>
-            <h4 className={styles.header}> {t('diagnosis', 'Diagnosis')}</h4>
-            <Tag className="some-class" type="red">
-              <p className={styles.paragraph}>{t('malaria', 'Malaria')}</p>
-            </Tag>
-          </div>
-          <GenericDataTable
-            headers={shaHeaders}
-            rows={shaData.map((item, index) => ({
-              id: `${item.packageCode}-${item.interventionCode}-${index}`,
-              ...item,
-            }))}
-            title={t('benefit', 'Benefits')}
-          />
-        </div>
-      )}
     />
   );
 };
