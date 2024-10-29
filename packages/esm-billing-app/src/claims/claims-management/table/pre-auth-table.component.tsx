@@ -35,22 +35,22 @@ const PreAuthTable: React.FC<PreAuthTableProps> = ({ status }) => {
     return <ErrorState error={error} headerTitle={title} />;
   }
 
-  if (preAuthRequests.length < 1) {
-    return <EmptyState headerTitle={title} displayText={title} />;
+  const filteredPreauth = preAuthRequests.filter((pr) => pr.status === status || status === 'all');
+
+  if (filteredPreauth.length < 1) {
+    return <EmptyState headerTitle={title} displayText={status === 'all' ? 'Preauths' : `${status} preauths`} />;
   }
 
   return (
     <GenericDataTable
       title={title}
-      rows={preAuthRequests
-        .filter((pr) => pr.status === status || status === 'all')
-        .map((p) => ({
-          ...p,
-          patientName: p.patient.name,
-          providerName: p.provider.name,
-          lastUpdatedAt: formatDate(parseDate(p.lastUpdatedAt)),
-          status: <Tag>{p.status}</Tag>,
-        }))}
+      rows={filteredPreauth.map((p) => ({
+        ...p,
+        patientName: p.patient.name,
+        providerName: p.provider.name,
+        lastUpdatedAt: formatDate(parseDate(p.lastUpdatedAt)),
+        status: <Tag>{p.status}</Tag>,
+      }))}
       headers={headers}
     />
   );
