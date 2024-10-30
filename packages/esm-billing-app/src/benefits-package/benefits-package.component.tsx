@@ -1,35 +1,37 @@
 import React, { useState } from 'react';
 import BenefitsTable from './table/benefits-table.component';
-import { ContentSwitcher, Switch } from '@carbon/react';
 import styles from './benefits-package.scss';
 import { useTranslation } from 'react-i18next';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType } from '@openmrs/esm-framework';
 import Benefits from './benefits/benefits.component';
+import { Layer, Tile, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
+import { Task, Upload } from '@carbon/react/icons';
 
 const BenefitsPackage = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const isTablet = useLayoutType() === 'tablet';
   const { t } = useTranslation();
-
-  const switchTabs = [
-    { name: t('eligibleBenefits', 'Eligible benefits'), component: <Benefits /> },
-    { name: t('preauthRequest', 'Preauth requests'), component: <BenefitsTable /> },
-  ];
-
   return (
-    <div className={styles.widgetCard}>
-      <CardHeader title={t('sha', 'SHA')}>
-        <div className={styles.contentSwitcherWrapper}>
-          <ContentSwitcher size={isTablet ? 'md' : 'sm'} onChange={(event) => setActiveIndex(event.index)}>
-            {switchTabs.map((tab, index) => (
-              <Switch key={index} name={tab.name} text={tab.name} />
-            ))}
-          </ContentSwitcher>
-        </div>
-      </CardHeader>
-      <div className={styles.tabContent}>{switchTabs[activeIndex].component}</div>
-    </div>
+    <Layer className={styles.container}>
+      <Tile>
+        <CardHeader title={t('shaBenefits', 'SHA benefits')} children={''} />
+      </Tile>
+      <div className={styles.tabs}>
+        <Tabs>
+          <TabList contained activation="manual" aria-label="List of panels">
+            <Tab renderIcon={Task}>{t('eligibleBenefits', 'Eligible benefits')}</Tab>
+            <Tab renderIcon={Upload}>{t('preauthRequest', 'Preauth requests')}</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <Benefits />
+            </TabPanel>
+            <TabPanel>
+              <BenefitsTable />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </div>
+    </Layer>
   );
 };
 

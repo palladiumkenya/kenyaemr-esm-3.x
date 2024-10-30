@@ -541,3 +541,17 @@ export interface _SHAIntervension {
   last_modified_by: any;
   state: any;
 }
+
+export interface BenefitDataResponse {
+  title?: string;
+  allocation?: string;
+  expenditure?: string;
+  balance?: string;
+  isActive?: boolean;
+  description?: string;
+}
+
+export interface shifIdentifiersResponse {
+  identiferNumber: string;
+  identiferType: string;
+}

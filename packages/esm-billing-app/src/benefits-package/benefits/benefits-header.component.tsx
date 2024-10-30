@@ -1,21 +1,25 @@
 import React from 'react';
 import styles from './benefits.scss';
 import { useTranslation } from 'react-i18next';
+import { useShifIdentifiersData } from '../benefits-package.mock';
 
 interface BenefitsHeaderProps {}
 
 const BenefitsHeader: React.FC<BenefitsHeaderProps> = () => {
   const { t } = useTranslation();
+  const shifIdentifiers = useShifIdentifiersData();
 
   return (
     <div className={styles.headerContainer}>
       <h4>{t('benefitsHeader', 'Benefits')}</h4>
       <div>
         <h6>{t('SHIF', 'Social Health Insurance Fund')}</h6>
-        <h6>
-          <span> {t('shifNo', 'SHIF NUMBER:')}</span>
-          <span>32JFFN23B</span>
-        </h6>
+        {shifIdentifiers.map((identifier) => (
+          <h6 key={identifier.identiferNumber}>
+            <span>{t('shifNo', 'SHIF NUMBER: ')}</span>
+            <span>{identifier.identiferNumber}</span>
+          </h6>
+        ))}
       </div>
     </div>
   );

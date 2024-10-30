@@ -29,12 +29,13 @@
 
 .accordionLayer {
   background-color: colors.$white;
-  width: 100%;
+  width: 130%;
   padding: layout.$spacing-03;
   border: solid colors.$gray-30 0.1rem;
   display: flex;
   flex-direction: column;
   gap: layout.$spacing-03;
+  margin: 0 auto;
 
   & > hr {
     width: 100%;
@@ -42,7 +43,11 @@
 }
 
 .activeIcon {
-  color: green;
+  color: colors.$green-40;
+}
+
+.inactiveIcon {
+  color: colors.$red-60;
 }
 
 .activeContainer {
