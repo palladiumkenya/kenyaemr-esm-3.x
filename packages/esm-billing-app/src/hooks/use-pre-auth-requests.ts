@@ -200,14 +200,15 @@ export const usePreAuthRequests = () => {
   return {
     preAuthRequests: (data?.data?.length ? data?.data : preAuthRequests).map((r) => {
       const insurerReference = r?.insurer?.reference?.split('/')?.at(-1);
+      const findResource = (type: string) => (r.contained as any).find((resource) => resource.resourceType === type);
 
-      const patientNationalId = (r.contained as any)
-        .find((resource) => resource.resourceType === 'Patient')
-        ?.identifier?.find((identifier) => identifier.system === 'http://itm/identifier/nationalid')?.value;
+      const patientNationalId = findResource('Patient')?.identifier?.find(
+        (identifier) => identifier.system === 'http://itm/identifier/nationalid',
+      )?.value;
 
-      const providerLicentNumber = (r.contained as any)
-        .find((resource) => resource.resourceType === 'Practitioner')
-        ?.identifier?.find((identifier) => identifier.system === 'http://itm/license/provider-license')?.value;
+      const providerLicentNumber = findResource('Practitioner')?.identifier?.find(
+        (identifier) => identifier.system === 'http://itm/license/provider-license',
+      )?.value;
 
       const insurer = (r.contained as any)
         ?.find((resource) => resource.id === insurerReference)

@@ -17,11 +17,11 @@ const ClaimsManagementPreAuthRequest = () => {
 
       <div className={styles.headerContainer}>
         <ContentSwitcher onChange={({ name }) => setStatusFilter(name)} className={styles.contentSwitch}>
-          <Switch name="all" text="All" />
-          <Switch name="active" text="Active" />
-          <Switch name="draft" text="Draft" />
-          <Switch name="cancelled" text="Cancelled" />
-          <Switch name="entered-in-error" text="Entered in error" />
+          <Switch name="all" text={t('all', 'All')} />
+          <Switch name="active" text={t('active', 'Active')} />
+          <Switch name="draft" text={t('draft', 'Draft')} />
+          <Switch name="cancelled" text={t('cancelled', 'Cancelled')} />
+          <Switch name="entered-in-error" text={t('enteredInError', 'Entered in error')} />
         </ContentSwitcher>
       </div>
       <PreAuthTable status={statusFilter} />
