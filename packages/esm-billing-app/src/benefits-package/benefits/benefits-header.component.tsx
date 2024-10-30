@@ -11,7 +11,7 @@ const BenefitsHeader: React.FC<BenefitsHeaderProps> = () => {
 
   return (
     <div className={styles.headerContainer}>
-      <h4>{t('benefitsHeader', 'Benefits')}</h4>
+      <h4>{t('benefits', 'Benefits')}</h4>
       <div>
         <h6>{t('SHIF', 'Social Health Insurance Fund')}</h6>
         {shifIdentifiers.map((identifier) => (
