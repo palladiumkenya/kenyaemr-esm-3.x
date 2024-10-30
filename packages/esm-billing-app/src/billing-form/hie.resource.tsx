@@ -18,7 +18,7 @@ export const useHIEEligibility = (patientUuid: string) => {
   const nationalId = patient?.identifier
     ?.filter((identifier) => identifier)
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === nationalIdUUID))
-    ?.at(0).value;
+    ?.at(0)?.value;
 
   const url = `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?patientUuid=${patientUuid}&nationalId=${nationalId}`;
   const { data, error, isLoading, mutate } = useSWR<{ data: Array<HIEEligibilityResponse> }>(url, openmrsFetch, {

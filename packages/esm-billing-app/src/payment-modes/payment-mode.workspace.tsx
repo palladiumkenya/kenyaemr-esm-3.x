@@ -7,31 +7,17 @@ import {
   showSnackbar,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styles from './payment-mode.workspace.scss';
-import { TextInput, ButtonSet, Button, InlineLoading, Stack } from '@carbon/react';
+import { TextInput, ButtonSet, Button, InlineLoading, Stack, Toggle } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
 import { createPaymentMode, handleMutation } from './payment-mode.resource';
 import { PaymentMode } from '../types';
-
-const paymentModeFormSchema = z.object({
-  name: z
-    .string({
-      required_error: 'Payment mode name is required',
-      invalid_type_error: 'Payment mode name is required',
-    })
-    .min(1, 'Payment mode name is required'),
-  description: z
-    .string({
-      required_error: 'Payment mode description is required',
-      invalid_type_error: 'Payment mode description is required',
-    })
-    .min(1, 'Payment mode description is required'),
-});
-
-type PaymentModeFormSchema = z.infer<typeof paymentModeFormSchema>;
+import usePaymentModeFormSchema from './usePaymentModeFormSchema';
+import PaymentModeAttributeFields from './payment-attributes/payment-mode-attributes.component';
+import { Add } from '@carbon/react/icons';
 
 type PaymentModeWorkspaceProps = DefaultWorkspaceProps & {
   initialPaymentMode?: PaymentMode;
@@ -45,20 +31,49 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const { paymentModeFormSchema } = usePaymentModeFormSchema();
+  type PaymentModeFormSchema = z.infer<typeof paymentModeFormSchema>;
+  const formDefaultValues = Object.keys(initialPaymentMode).length > 0 ? initialPaymentMode : {};
 
   const formMethods = useForm<PaymentModeFormSchema>({
     resolver: zodResolver(paymentModeFormSchema),
     mode: 'all',
-    defaultValues: Object.keys(initialPaymentMode).length > 0 ? initialPaymentMode : {},
+    defaultValues: formDefaultValues,
   });
 
   const { errors, isSubmitting, isDirty } = formMethods.formState;
 
+  // field array
+  const {
+    fields: attributeTypeFields,
+    append: appendAttributeType,
+    remove: removeAttributeType,
+  } = useFieldArray({
+    control: formMethods.control,
+    name: 'attributeTypes',
+  });
+
+  const mappedAttributeTypes = (attributes) => {
+    return {
+      name: attributes.name,
+      description: attributes.description,
+      retired: attributes.retired,
+      attributeOrder: attributes?.attributeOrder ?? 0,
+      format: attributes?.format ?? '',
+      foreignKey: attributes?.foreignKey ?? null,
+      regExp: attributes?.regExp ?? '',
+      required: attributes.required,
+    };
+  };
+
   const onSubmit = async (data: PaymentModeFormSchema) => {
-    const payload = {
+    const payload: Partial<PaymentMode> = {
       name: data.name,
       description: data.description,
+      retired: data.retired,
+      attributeTypes: data.attributeTypes.map(mappedAttributeTypes),
     };
+
     try {
       const response = await createPaymentMode(payload, initialPaymentMode?.uuid ?? '');
       if (response.ok) {
@@ -87,6 +102,19 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
     }
   };
 
+  const handleError = (error) => {
+    showSnackbar({
+      title: t('paymentModeCreationFailed', 'Payment mode creation failed'),
+      subtitle: t(
+        'paymentModeCreationFailedSubtitle',
+        'An error occurred while creating the payment mode {{errorMessage}}',
+        { errorMessage: JSON.stringify(error, null, 2) },
+      ),
+      kind: 'error',
+      isLowContrast: true,
+    });
+  };
+
   useEffect(() => {
     if (isDirty) {
       promptBeforeClosing(() => isDirty);
@@ -95,7 +123,7 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
 
   return (
     <FormProvider {...formMethods}>
-      <form onSubmit={formMethods.handleSubmit(onSubmit)} className={styles.form}>
+      <form onSubmit={formMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
         <div className={styles.formContainer}>
           <Stack className={styles.formStackControl} gap={7}>
             <ResponsiveWrapper>
@@ -108,6 +136,7 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
                     id="name"
                     type="text"
                     labelText={t('paymentModeName', 'Payment mode name')}
+                    placeholder={t('paymentModeNamePlaceholder', 'Enter payment mode name')}
                     invalid={!!errors.name}
                     invalidText={errors.name?.message}
                   />
@@ -124,12 +153,43 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
                     id="description"
                     type="text"
                     labelText={t('paymentModeDescription', 'Payment mode description')}
+                    placeholder={t('paymentModeDescriptionPlaceholder', 'Enter payment mode description')}
                     invalid={!!errors.description}
                     invalidText={errors.description?.message}
                   />
                 )}
               />
             </ResponsiveWrapper>
+            <ResponsiveWrapper>
+              <Controller
+                name="retired"
+                control={formMethods.control}
+                render={({ field }) => (
+                  <Toggle
+                    {...field}
+                    labelText={t('paymentModeRetired', 'Retired')}
+                    labelA="Off"
+                    labelB="On"
+                    toggled={field.value}
+                    id="retired"
+                    onToggle={(value) => (value ? field.onChange(true) : field.onChange(false))}
+                  />
+                )}
+              />
+            </ResponsiveWrapper>
+            <Button size="sm" kind="tertiary" renderIcon={Add} onClick={() => appendAttributeType({})}>
+              {t('addAttributeType', 'Add attribute type')}
+            </Button>
+            {attributeTypeFields.map((field, index) => (
+              <PaymentModeAttributeFields
+                key={field.id}
+                field={field}
+                index={index}
+                control={formMethods.control}
+                removeAttributeType={removeAttributeType}
+                errors={errors}
+              />
+            ))}
           </Stack>
         </div>
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>

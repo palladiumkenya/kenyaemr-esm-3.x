@@ -132,7 +132,7 @@ export const configSchema = {
     _elements: {
       _type: Type.String,
     },
-    _default: ['(SHA) SHIF', 'NHIF', 'NHIF (Linda Mama)', 'Jubilee Insurance', 'AAR Insurance', 'Old Mutual Insurance'],
+    _default: ['SHA', 'Jubilee Insurance', 'AAR Insurance', 'Old Mutual Insurance'],
     _description: 'List of insurance schemes',
   },
   cashPointUuid: {

@@ -59,7 +59,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
         )}
         closeOnEscape
         inline={false}
-        actionButtonLabel={t('verify', 'Verify')}
+        actionButtonLabel={t('updateRegistration', 'Update registration')}
         className={styles.missingSHANumber}
         onActionButtonClick={() => {
           navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });

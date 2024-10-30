@@ -87,14 +87,14 @@ export interface Patient {
 }
 
 interface AttributeType {
-  uuid: string;
+  uuid?: string;
   name: string;
   description: string;
   retired: boolean;
-  attributeOrder: number;
-  format: string;
-  foreignKey: string | null;
-  regExp: string | null;
+  attributeOrder?: number;
+  format?: string;
+  foreignKey?: string | null;
+  regExp?: string | null;
   required: boolean;
 }
 
@@ -478,15 +478,15 @@ export type ExcelFileRow = {
 };
 
 export type PaymentMode = {
-  uuid: string;
+  uuid?: string;
   name: string;
   description: string;
   retired: boolean;
-  retireReason?: string | null;
-  auditInfo: AuditInfo;
+  retiredReason?: string | null;
+  auditInfo?: AuditInfo;
   attributeTypes?: Array<AttributeType>;
   sortOrder?: number | null;
-  resourceVersion: string;
+  resourceVersion?: string;
 };
 
 export type SHAIntervension = {

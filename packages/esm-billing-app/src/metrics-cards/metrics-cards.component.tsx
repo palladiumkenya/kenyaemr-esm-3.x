@@ -36,7 +36,7 @@ export default function MetricsCards() {
     <div>
       <section className={styles.container}>
         {cards.map((card) => (
-          <Layer className={classNames(styles.cardContainer)}>
+          <Layer key={card.title} className={classNames(styles.cardContainer)}>
             <Tile className={styles.tileContainer}>
               <div className={styles.tileHeader}>
                 <div className={styles.headerLabelContainer}>
