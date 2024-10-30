@@ -6,12 +6,13 @@ import { useTranslation } from 'react-i18next';
 import GenericDataTable from '../../../benefits-package/table/generic_data_table.component';
 import { usePreAuthRequests } from '../../../hooks/use-pre-auth-requests';
 import useShaData from './hook/table.resource';
+import { ClaimsPreAuthFilter } from '../../../types';
 
 type PreAuthTableProps = {
-  status: 'active' | 'draft' | 'cancelled' | 'entered-in-error' | 'all';
+  filters: ClaimsPreAuthFilter;
 };
 
-const PreAuthTable: React.FC<PreAuthTableProps> = ({ status }) => {
+const PreAuthTable: React.FC<PreAuthTableProps> = ({ filters }) => {
   const { t } = useTranslation();
   const shaData = useShaData();
   const { preAuthRequests, isLoading, error } = usePreAuthRequests();
@@ -35,7 +36,28 @@ const PreAuthTable: React.FC<PreAuthTableProps> = ({ status }) => {
     return <ErrorState error={error} headerTitle={title} />;
   }
 
-  const filteredPreauth = preAuthRequests.filter((pr) => pr.status === status || status === 'all');
+  const filteredPreauth = preAuthRequests.filter((pr) => {
+    const status = filters?.status;
+    const search = filters?.search?.toLowerCase();
+    const fromDate = filters?.fromDate ? new Date(filters.fromDate) : null;
+    const toDate = filters?.toDate ? new Date(filters.toDate) : null;
+    const patientName = pr.patient.name.toLowerCase();
+    const providerName = pr.provider.name.toLowerCase();
+    const timeStamp = new Date(pr.lastUpdatedAt);
+    const preauthStatus = pr.status;
+
+    // Check status (allow 'all' to bypass the filter)
+    const statusMatch = preauthStatus === status || status === 'all';
+
+    // Check search filter (patient name or provider name contains the search term)
+    const searchMatch = !search || patientName.includes(search) || providerName.includes(search);
+
+    // Check date range filter (timestamp is between fromDate and toDate if provided)
+    const dateMatch = (!fromDate || timeStamp >= fromDate) && (!toDate || timeStamp <= toDate);
+
+    // Return true if all conditions match
+    return statusMatch && searchMatch && dateMatch;
+  });
 
   if (filteredPreauth.length < 1) {
     return <EmptyState headerTitle={title} displayText={status === 'all' ? 'Preauths' : `${status} preauths`} />;

@@ -512,32 +512,9 @@ export type SHAIntervension = {
   automateManual: string;
 };
 
-export interface _SHAIntervension {
-  id: number;
-  intervention_code: string;
-  sha_category: string;
-  access_code: string;
-  sub_category_benefits_package: string;
-  intervention_name: string;
-  needs_pre_auth: string;
-  category_health_facility: string;
-  provider_payment_mechanism: string;
-  gender: string;
-  limit_individual_household: string;
-  intervention_quantity_year: string;
-  tariffs: string;
-  limit_individual: string;
-  min_age: string;
-  max_age: string;
-  limits_individual_household: string;
-  phc: string;
-  shif: string;
-  eccif: string;
-  automate_manual: string;
-  status: string;
-  created_date: string;
-  last_modified_date: string;
-  created_by: any;
-  last_modified_by: any;
-  state: any;
+export interface ClaimsPreAuthFilter {
+  fromDate?: Date;
+  toDate?: Date;
+  status: 'active' | 'draft' | 'cancelled' | 'entered-in-error' | 'all';
+  search?: string;
 }
