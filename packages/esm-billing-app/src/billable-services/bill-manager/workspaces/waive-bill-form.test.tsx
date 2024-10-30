@@ -3,12 +3,11 @@ import { render, screen } from '@testing-library/react';
 import { processBillPayment, usePaymentModes } from '../../../billing.resource';
 import { WaiveBillForm } from './waive-bill-form.workspace';
 import userEvent from '@testing-library/user-event';
-import { MappedBill } from '../../../types';
-import { closeWorkspace, showSnackbar } from '@openmrs/esm-framework';
+import { LineItem, MappedBill, PaymentMethod } from '../../../types';
+import { showSnackbar } from '@openmrs/esm-framework';
 
 const mockedUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
-const mockCloseWorkspace = closeWorkspace as jest.MockedFunction<typeof closeWorkspace>;
 const mockShowSnackbar = showSnackbar as jest.MockedFunction<typeof showSnackbar>;
 
 jest.mock('../../../billing.resource', () => ({
@@ -32,13 +31,7 @@ const mockedBill: MappedBill = {
   cashier: {
     uuid: '48b55692-e061-4ffa-b1f2-fd4aaf506224',
     display: 'admin - Super User',
-    links: [
-      {
-        rel: 'self',
-        uri: 'http://localhost:8080/openmrs/ws/rest/v1/provider/48b55692-e061-4ffa-b1f2-fd4aaf506224',
-        resourceAlias: 'provider',
-      },
-    ],
+    links: [],
   },
   cashPointUuid: '54065383-b4d4-42d2-af4d-d250a1fd2590',
   cashPointName: 'OPD Cash Point',
@@ -60,7 +53,7 @@ const mockedBill: MappedBill = {
       paymentStatus: 'PENDING',
       resourceVersion: '1.8',
       itemOrServiceConceptUuid: '',
-    },
+    } as unknown as LineItem,
   ],
   billingService: '3f5d0684-a280-477e-a67b-2a956a1f6dca:Registration Revist',
   payments: [],
@@ -75,7 +68,19 @@ const mockedPaymentMode = [
     name: 'Waiver',
     description: 'Waiver payment',
     retired: false,
-  },
+    retireReason: null,
+    auditInfo: null,
+    sortOrder: 0,
+    resourceVersion: '1.8',
+    attributeTypes: [
+      {
+        uuid: 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4',
+        name: 'Waiver',
+        description: 'Waiver payment',
+        retired: false,
+      },
+    ],
+  } as unknown as PaymentMethod,
 ];
 
 describe('BillWaiverForm', () => {
@@ -100,8 +105,12 @@ describe('BillWaiverForm', () => {
     expect(screen.getByText('Bill Items')).toBeInTheDocument();
 
     // get waiver amount input
-    const waiverAmountInput = screen.getByTestId('waiverAmountInput');
+    const waiverAmountInput = screen.getByRole('spinbutton', { name: 'Enter amount to waive' });
+    const waiverReasonInput = screen.getByRole('textbox', { name: 'Waiver reason' });
+
+    // Input waiver amount and reason
     await user.type(waiverAmountInput, '50');
+    await user.type(waiverReasonInput, 'Test reason');
 
     // should display error if amount keyed in is greater than total amount
     expect(screen.queryByText('Amount to waive cannot be greater than total amount')).toBeNull();
@@ -123,7 +132,7 @@ describe('BillWaiverForm', () => {
     await user.type(waiverAmountInput, '50');
     await user.click(screen.getByRole('button', { name: 'Post waiver' }));
 
-    expect(mockProcessBillPayment).toBeCalledTimes(1);
+    expect(mockProcessBillPayment).toHaveBeenCalledTimes(1);
 
     const expectedBill = {
       cashPoint: mockedBill.cashPointUuid,
@@ -150,14 +159,20 @@ describe('BillWaiverForm', () => {
         {
           amount: 50,
           amountTendered: 50,
-          attributes: [],
+          attributes: [{ attributeType: mockedPaymentMode[0].uuid, value: 'Test reason' }],
           instanceType: mockedPaymentMode[0].uuid,
         },
       ],
       patient: mockedBill.patientUuid,
     };
 
-    expect(mockProcessBillPayment).toBeCalledWith(expectedBill, '45143fae-b83d-4768-ada5-621e8dc1229d');
-    expect(mockShowSnackbar).toBeCalledTimes(1);
+    expect(mockProcessBillPayment).toHaveBeenCalledWith(expectedBill, '45143fae-b83d-4768-ada5-621e8dc1229d');
+    expect(mockShowSnackbar).toHaveBeenCalledWith({
+      title: 'Bill waiver',
+      subtitle: 'Bill waiver successful',
+      kind: 'success',
+      timeoutInMs: 3500,
+      isLowContrast: true,
+    });
   });
 });

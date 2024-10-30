@@ -1,27 +1,35 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
-import { LineItem, MappedBill } from './types';
+import { LineItem, MappedBill, PaymentMethod, PaymentStatus } from './types';
 
 export const createBillWaiverPayload = (
   bill: MappedBill,
   amountWaived: number,
   totalAmount: number,
   lineItems: Array<LineItem>,
-  paymentModes: Array<OpenmrsResource>,
+  paymentModes: Array<PaymentMethod>,
+  waiveReason: string,
 ) => {
   const { cashier } = bill;
+  // TODO: This is a temporary solution to find the waiver payment mode attribute type.
+  // We need to find a more permanent solution to this.
+  const waiverPaymentMode = paymentModes?.find((mode) => mode.name.toLowerCase().includes('waiver'));
+  const { uuid: waiverPaymentModeUuid, attributeTypes } = waiverPaymentMode ?? {};
+
+  const waiverAttributes = [
+    ...(waiverPaymentModeUuid ? [{ attributeType: attributeTypes[0].uuid, value: waiveReason }] : []),
+  ];
 
   const billPayment = {
     amount: parseFloat(totalAmount.toFixed(2)),
     amountTendered: parseFloat(Number(amountWaived).toFixed(2)),
-    attributes: [],
-    instanceType: paymentModes?.find((mode) => mode.name.toLowerCase().includes('waiver'))?.uuid,
+    attributes: waiverAttributes,
+    instanceType: waiverPaymentModeUuid,
   };
 
   const processedLineItems = lineItems.map((lineItem) => ({
     ...lineItem,
     billableService: processBillItem(lineItem),
     item: processBillItem(lineItem),
-    paymentStatus: 'PAID',
+    paymentStatus: totalAmount === amountWaived ? PaymentStatus.PAID : PaymentStatus.POSTED,
   }));
 
   const processedPayment = {
