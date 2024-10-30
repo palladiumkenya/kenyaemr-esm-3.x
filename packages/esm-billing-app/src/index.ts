@@ -33,6 +33,7 @@ import { CreatePaymentPoint } from './payment-points/create-payment-point.compon
 import { ClockIn } from './payment-points/payment-point/clock-in.component';
 import { ClockOut } from './payment-points/payment-point/clock-out.component';
 import rootComponent from './root.component';
+import Benefits from './benefits-package/benefits/benefits.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -164,6 +165,7 @@ export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
 
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
+export const benefits = getSyncLifecycle(Benefits, options);
 export const benefitsPreAuthForm = getSyncLifecycle(BenefitPreAuthForm, options);
 
 export const createPaymentPoint = getSyncLifecycle(CreatePaymentPoint, options);
