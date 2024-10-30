@@ -20,6 +20,7 @@ import { formatDate, useVisit } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
 import { getPatientUuidFromUrl, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { useHeiOutcome } from '../hooks/useHeiOutcome';
 
 export interface ProgramEnrollmentProps {
   patientUuid: string;
@@ -65,6 +66,7 @@ const programDetailsMap = {
 const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [], programName }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(getPatientUuidFromUrl());
+  const { heiOutcome } = useHeiOutcome(currentVisit?.patient?.uuid);
   const orderedEnrollments = orderBy(enrollments, 'dateEnrolled', 'desc');
   const headers = useMemo(
     () =>
@@ -106,6 +108,24 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
         additionalProps:
           { enrollmentDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
           {},
+      },
+    });
+  };
+
+  const handleHeiOutcome = () => {
+    launchPatientWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'HEI Outcome',
+      mutateForm: () => {
+        mutate((key) => true, undefined, {
+          revalidate: true,
+        });
+      },
+      formInfo: {
+        encounterUuid: '',
+        visitTypeUuid: currentVisit?.visitType?.uuid ?? '',
+        visitUuid: currentVisit?.uuid ?? '',
+        formUuid: 'd823f1ef-0973-44ee-b113-7090dc23257b',
+        additionalProps: {},
       },
     });
   };
@@ -182,9 +202,23 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
                               itemText={t('edit', 'Edit')}
                               onClick={() => handleEditEnrollment(orderedEnrollments[index])}
                             />
+                            {heiOutcome?.heiNumber &&
+                              !heiOutcome?.heiOutcomeEncounterUuid &&
+                              orderedEnrollments[index]?.programName === 'MCH - Child Services' && (
+                                <OverflowMenuItem
+                                  hasDivider
+                                  itemText={t('heiOutcome', 'Hei Outcome')}
+                                  onClick={handleHeiOutcome}
+                                />
+                              )}
                             <OverflowMenuItem
                               isDelete
                               hasDivider
+                              disabled={
+                                heiOutcome?.heiNumber &&
+                                !heiOutcome?.heiOutcomeEncounterUuid &&
+                                orderedEnrollments[index]?.programName === 'MCH - Child Services'
+                              }
                               itemText={t('discontinue', 'Discontinue')}
                               onClick={() => handleDiscontinue(orderedEnrollments[index])}
                             />
