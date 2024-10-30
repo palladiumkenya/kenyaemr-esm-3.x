@@ -13,6 +13,9 @@ import {
   OverflowMenuItem,
   TableCell,
   OverflowMenu,
+  TableExpandRow,
+  TableExpandedRow,
+  TableExpandHeader,
   Search,
   DataTableSkeleton,
   Button,
@@ -21,11 +24,13 @@ import {
 import styles from './payment-mode-dashboard.scss';
 import { formatDate, launchWorkspace, showModal, useDebounce } from '@openmrs/esm-framework';
 import { PaymentMode } from '../types';
+import startCase from 'lodash/startCase';
 
 type PaymentModeDashboardProps = {};
 
 const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
   const { t } = useTranslation();
+  const size = 'md';
   const { paymentModes, isLoading } = usePaymentModes();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -79,6 +84,10 @@ const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
       key: 'description',
       header: t('description', 'Description'),
     },
+    {
+      key: 'retired',
+      header: t('retired', 'Retired'),
+    },
   ];
 
   const rows = filteredPaymentModes.map((paymentMode) => ({
@@ -90,6 +99,7 @@ const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
       time: false,
       noToday: true,
     }),
+    retired: paymentMode.retired ? t('yes', 'Yes') : t('no', 'No'),
   }));
 
   return (
@@ -100,29 +110,30 @@ const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
             launchWorkspace('payment-mode-workspace', { workspaceTitle: t('addPaymentMode', 'Add Payment Mode') })
           }
           className={styles.addPaymentModeButton}
-          size="md"
+          size={size}
           kind="ghost">
           {t('addPaymentMode', 'Add Payment Mode')}
         </Button>
       </CardHeader>
       <div className={styles.dataTable}>
         <Search
-          size="md"
+          size={size}
           placeholder={t('searchPaymentMode', 'Search payment mode table')}
           labelText={t('searchLabel', 'Search')}
           closeButtonLabelText={t('clearSearch', 'Clear search input')}
           id="search-1"
           onChange={(event) => handleSearch(event.target.value)}
         />
-        <DataTable useZebraStyles size="md" rows={rows} headers={headers}>
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+        <DataTable useZebraStyles size={size} rows={rows} headers={headers}>
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getExpandedRowProps }) => (
             <TableContainer>
               <Table {...getTableProps()} aria-label="sample table">
                 <TableHead>
                   <TableRow>
-                    {headers.map((header) => (
+                    <TableExpandHeader aria-label="expand row" />
+                    {headers.map((header, i) => (
                       <TableHeader
-                        key={header.key}
+                        key={i}
                         {...getHeaderProps({
                           header,
                         })}>
@@ -134,34 +145,43 @@ const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
                 </TableHead>
                 <TableBody>
                   {rows.map((row, index) => (
-                    <TableRow
-                      key={row.id}
-                      {...getRowProps({
-                        row,
-                      })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                      <TableCell className="cds--table-column-menu">
-                        <OverflowMenu size="sm" flipped>
-                          <OverflowMenuItem
-                            onClick={() =>
-                              launchWorkspace('payment-mode-workspace', {
-                                workspaceTitle: t('editPaymentMode', 'Edit Payment Mode'),
-                                initialPaymentMode: paymentModes[index],
-                              })
-                            }
-                            itemText={t('edit', 'Edit')}
-                          />
-                          <OverflowMenuItem
-                            hasDivider
-                            isDelete
-                            onClick={() => showDeletePaymentModeModal(paymentModes[index])}
-                            itemText={t('delete', 'Delete')}
-                          />
-                        </OverflowMenu>
-                      </TableCell>
-                    </TableRow>
+                    <React.Fragment key={row.id}>
+                      <TableExpandRow
+                        {...getRowProps({
+                          row,
+                        })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                        <TableCell className="cds--table-column-menu">
+                          <OverflowMenu size={size} iconDescription={t('actions', 'Actions')} flipped>
+                            <OverflowMenuItem
+                              onClick={() =>
+                                launchWorkspace('payment-mode-workspace', {
+                                  workspaceTitle: t('editPaymentMode', 'Edit Payment Mode'),
+                                  initialPaymentMode: paymentModes[index],
+                                })
+                              }
+                              itemText={t('edit', 'Edit')}
+                            />
+                            <OverflowMenuItem
+                              hasDivider
+                              isDelete
+                              onClick={() => showDeletePaymentModeModal(paymentModes[index])}
+                              itemText={t('delete', 'Delete')}
+                            />
+                          </OverflowMenu>
+                        </TableCell>
+                      </TableExpandRow>
+                      <TableExpandedRow
+                        colSpan={headers.length + 1}
+                        className="demo-expanded-td"
+                        {...getExpandedRowProps({
+                          row,
+                        })}>
+                        <PaymentModeAttributes {...paymentModes[index]} />
+                      </TableExpandedRow>
+                    </React.Fragment>
                   ))}
                 </TableBody>
               </Table>
@@ -174,3 +194,27 @@ const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
 };
 
 export default PaymentModeDashboard;
+
+const PaymentModeAttributes: React.FC<PaymentMode> = (paymentMode) => {
+  const { t } = useTranslation();
+  const { attributeTypes } = paymentMode;
+
+  return (
+    <div className={styles.attributeContainer}>
+      {attributeTypes.map((attributeType) =>
+        Object.entries(attributeType).map(([key, value]) => {
+          return <AttributeCard key={key} label={key} value={JSON.stringify(value)} />;
+        }),
+      )}
+    </div>
+  );
+};
+
+const AttributeCard: React.FC<{ label: string; value: string }> = ({ label, value }) => {
+  return (
+    <div className={styles.attributeCard}>
+      <div className={styles.attributeLabel}>{startCase(label).replace(/\s+/g, ' ')}</div>
+      <div className={styles.attributeValue}>{value.replace(/['"]/g, '')}</div>
+    </div>
+  );
+};

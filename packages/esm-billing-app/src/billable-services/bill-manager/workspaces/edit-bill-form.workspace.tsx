@@ -104,6 +104,7 @@ export const EditBillForm: React.FC<EditBillFormProps> = ({ lineItem, closeWorks
           name="price"
           render={({ field }) => (
             <ComboBox
+              id={`${field.name}-${field.value}`}
               onChange={({ selectedItem }) => {
                 if (selectedItem) {
                   setSelectedPrice(selectedItem?.price?.toString());
@@ -148,8 +149,8 @@ export const EditBillForm: React.FC<EditBillFormProps> = ({ lineItem, closeWorks
                 invalidText={errors.quantity?.message}
                 className={styles.formField}
                 min={1}
-                initialSelectedItem={field.value}
-                id="quantity"
+                value={field.value}
+                id={`${field.name}-${field.value}`}
                 hideSteppers
                 disableWheel
               />
