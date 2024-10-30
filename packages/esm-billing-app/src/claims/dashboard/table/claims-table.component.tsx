@@ -1,10 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import fuzzy from 'fuzzy';
 import {
   DataTable,
   DataTableSkeleton,
   Layer,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -12,18 +10,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectRow,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  TableSelectRow,
   Tile,
-  Pagination,
   type DataTableHeader,
   type DataTableRow,
 } from '@carbon/react';
 import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
-import styles from './claims-table.scss';
+import fuzzy from 'fuzzy';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LineItem, MappedBill } from '../../../types';
+import styles from './claims-table.scss';
 
 type ClaimsTableProps = {
   bill: MappedBill;
@@ -191,20 +191,22 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           </Layer>
         </div>
       )}
-      <Pagination
-        forwardText="Next page"
-        backwardText="Previous page"
-        page={currentPage}
-        pageSize={pageSize}
-        pageSizes={[5, 10, 20, 50]}
-        totalItems={filteredLineItems.length}
-        className={styles.pagination}
-        size={responsiveSize}
-        onChange={({ pageSize: newPageSize, page: newPage }) => {
-          setPageSize(newPageSize);
-          setCurrentPage(newPage);
-        }}
-      />
+      {tableRows.length > pageSize && (
+        <Pagination
+          forwardText="Next page"
+          backwardText="Previous page"
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={[5, 10, 20, 50]}
+          totalItems={filteredLineItems.length}
+          className={styles.pagination}
+          size={responsiveSize}
+          onChange={({ pageSize: newPageSize, page: newPage }) => {
+            setPageSize(newPageSize);
+            setCurrentPage(newPage);
+          }}
+        />
+      )}
     </div>
   );
 };
