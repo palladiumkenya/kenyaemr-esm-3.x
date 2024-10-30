@@ -229,6 +229,7 @@
   "type": "Type",
   "unitPrice": "Unit price",
   "unsettledBill": "Unsettled bill.",
+  "updateRegistration": "Update registration",
   "verify": "Verify",
   "verifyingOrderBillStatus": "Verifying order bill status...",
   "visitTime": "Visit time",
