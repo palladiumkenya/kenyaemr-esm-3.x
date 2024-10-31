@@ -22,3 +22,13 @@
 .claimsTable {
   padding: layout.$spacing-05;
 }
+
+.claimStatus {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+
+  > :nth-child(2) {
+    font-size: 0.7rem;
+  }
+}

@@ -260,6 +260,10 @@
     {
       "name": "delete-payment-mode-modal",
       "component": "deletePaymentModeModal"
+    },
+    {
+      "name": "retry-claim-request-modal",
+      "component": "retryClaimRequestModal"
     }
   ]
 }
