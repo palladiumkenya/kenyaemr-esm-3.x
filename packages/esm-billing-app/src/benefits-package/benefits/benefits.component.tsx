@@ -4,8 +4,11 @@ import styles from './benefits.scss';
 import { CheckmarkFilled } from '@carbon/react/icons';
 import { useBenefitsData } from '../benefits-package.mock';
 import BenefitsHeader from './benefits-header.component';
+import { useTranslation } from 'react-i18next';
 
 const Benefits: React.FC = () => {
+  const { t } = useTranslation();
+
   const benefitsData = useBenefitsData();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -18,8 +21,8 @@ const Benefits: React.FC = () => {
       <BenefitsHeader />
       <div className={styles.search}>
         <Search
-          labelText="Search benefits"
-          placeHolderText="Search by benefit"
+          labelText={t('searchBenefits', 'Search benefits')}
+          placeHolderText={t('searchByBenefit', 'Search by benefit')}
           onChange={(e) => setSearchTerm(e.target.value)}
           value={searchTerm}
         />
