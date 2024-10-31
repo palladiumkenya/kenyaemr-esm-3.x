@@ -21,6 +21,7 @@ import { BulkImportBillableServices } from './billable-services/bulk-import-bill
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
+import { RetryClaimRequest } from './claims/claims-management/table/retry-claim-request.modal';
 import { configSchema } from './config-schema';
 import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
@@ -176,6 +177,8 @@ export const clockOut = getSyncLifecycle(ClockOut, options);
 
 export const paymentModeWorkspace = getSyncLifecycle(PaymentModeWorkspace, options);
 export const deletePaymentModeModal = getSyncLifecycle(DeletePaymentModeModal, options);
+
+export const retryClaimRequestModal = getSyncLifecycle(RetryClaimRequest, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
