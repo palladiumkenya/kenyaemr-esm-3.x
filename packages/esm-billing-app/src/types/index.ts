@@ -518,3 +518,17 @@ export interface ClaimsPreAuthFilter {
   status: 'active' | 'draft' | 'cancelled' | 'entered-in-error' | 'all';
   search?: string;
 }
+
+export type FacilityClaim = {
+  uuid: string;
+  claimCode: string;
+  dateFrom: string;
+  dateTo: string;
+  claimedTotal: number;
+  approvedTotal: null | number;
+  status: 'REJECTED' | 'ENTERED' | 'CHECKED' | 'VALUATED' | 'ERRORED';
+  provider: {
+    display: string;
+  } | null;
+  externalId: string;
+};
