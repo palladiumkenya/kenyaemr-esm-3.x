@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.filterContainer {
+  display: flex;
+  margin-top: layout.$spacing-05;
+  gap: layout.$spacing-01;
+}
+
+.input {
+  min-width: 200px;
+}
