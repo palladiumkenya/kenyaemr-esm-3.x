@@ -213,6 +213,8 @@
   "retryRequest": "Retry request",
   "saveAndClose": "Save & Close",
   "search": "Search",
+  "searchBenefits": "Search benefits",
+  "searchByBenefit": "Search by benefit",
   "searchForAPatient": "Search for a patient",
   "searchForChargeItem": "Search for charge item",
   "searchForCommodity": "Search for commodity ",
