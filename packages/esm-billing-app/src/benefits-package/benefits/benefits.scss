@@ -55,3 +55,7 @@
   align-items: center;
   gap: layout.$spacing-03;
 }
+.search {
+  margin-bottom: layout.$spacing-07;
+  border: solid colors.$gray-30 0.1rem;
+}

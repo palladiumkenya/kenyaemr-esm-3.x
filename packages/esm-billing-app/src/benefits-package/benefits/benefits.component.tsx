@@ -1,5 +1,5 @@
-import { Accordion, AccordionItem, Layer } from '@carbon/react';
-import React from 'react';
+import { Accordion, AccordionItem, Layer, Search } from '@carbon/react';
+import React, { useState } from 'react';
 import styles from './benefits.scss';
 import { CheckmarkFilled } from '@carbon/react/icons';
 import { useBenefitsData } from '../benefits-package.mock';
@@ -7,11 +7,24 @@ import BenefitsHeader from './benefits-header.component';
 
 const Benefits: React.FC = () => {
   const benefitsData = useBenefitsData();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredBenefits = benefitsData.filter((benefit) =>
+    benefit.title.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
 
   return (
     <div className={`omrs-main-content`}>
       <BenefitsHeader />
-      {benefitsData.map((benefit) => (
+      <div className={styles.search}>
+        <Search
+          labelText="Search benefits"
+          placeHolderText="Search by benefit"
+          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchTerm}
+        />
+      </div>
+      {filteredBenefits.map((benefit) => (
         <Accordion key={benefit.title}>
           <AccordionItem title={benefit.title}>
             <Layer className={styles.accordionLayer}>
