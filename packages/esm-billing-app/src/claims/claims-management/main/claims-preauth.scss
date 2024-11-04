@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.headerContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.contentSwitch {
+  max-width: 600px;
+  margin: layout.$spacing-05;
+}
