@@ -109,7 +109,7 @@ export const startVisitWithEncounter = (payload) => {
 export const useActiveMorgueVisit = () => {
   const { morgueVisitTypeUuid } = useConfig<ConfigObject>();
   const url = `${restBaseUrl}/visit?v=full&includeInactive=false&totalCount=true&visitType=${morgueVisitTypeUuid}`;
-  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Visit[] }>>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<Visit> }>>(url, openmrsFetch);
   const activeDeceased = data?.data?.results;
 
   return { data: activeDeceased, error, isLoading };

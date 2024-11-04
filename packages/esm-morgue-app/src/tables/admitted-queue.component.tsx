@@ -30,7 +30,7 @@ export const AdmittedQueue: React.FC = () => {
       <CardHeader title={t('allocation', 'Allocation')} children={''} />
       <DeceasedFilter />
       <div className={styles.patientCardContainer}>
-        <CompartmentView patients={activeDeceased} />
+        <CompartmentView patientVisit={activeDeceased} />
       </div>
     </div>
   );

@@ -8,15 +8,15 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 
 interface AvailableCompartmentProps {
-  patientInfo: Visit;
+  patientVisitInfo: Visit;
   index: number;
 }
 
-const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
+const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisitInfo, index }) => {
   const { t } = useTranslation();
-  const { patient } = usePatient(patientInfo?.patient?.uuid);
+  const { patient } = usePatient(patientVisitInfo?.patient?.uuid);
   const deceasedName = patient?.name.map((names) => names.text).join(' ');
-  const deceasedResidence = patient?.address.map((residence) => residence.district);
+  const deceasedResidence = patient?.address.map((residence) => residence?.city);
   const deathDate = patient?.deceasedDateTime;
   const formatDeathDate = dayjs(deathDate).format('YYYY-MM-DD');
 
@@ -51,7 +51,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
       </div>
       <ConfigurableLink
         className={styles.configurableLink}
-        to={`\${openmrsSpaBase}/patient/${patientInfo?.uuid}/chart/deceased-panel`}>
+        to={`\${openmrsSpaBase}/patient/${patientVisitInfo?.uuid}/chart/deceased-panel`}>
         <Button className={styles.assignButton} kind="primary" renderIcon={View}>
           {t('viewDetails', 'View details')}
         </Button>
