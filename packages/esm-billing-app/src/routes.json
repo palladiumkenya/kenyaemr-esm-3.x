@@ -33,7 +33,7 @@
       "meta": {
         "name": "benefits-package",
         "slot": "patient-chart-benefits-dashboard-slot",
-        "path": "benefits-portal",
+        "path": "insurance-benefits",
         "columns": 1,
         "columnSpan": 1
       },

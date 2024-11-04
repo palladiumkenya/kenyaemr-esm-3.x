@@ -14,6 +14,6 @@ export const shrSummaryDashboardMeta = {
 export const benefitsPackageDashboardMeta = {
   slot: 'patient-chart-benefits-dashboard-slot',
   columns: 2,
-  title: 'Benefits Portal',
-  path: 'benefits-portal',
+  title: 'Insurance benefits',
+  path: 'insurance-benefits',
 };
