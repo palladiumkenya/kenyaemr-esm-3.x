@@ -5,42 +5,39 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePreAuthRequests } from '../../hooks/use-pre-auth-requests';
 import GenericDataTable from './generic_data_table.component';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 
 const headers = [
-  // {
-  //   key: 'packageCode',
-  //   header: 'Package Code',
-  // },
-  // {
-  //   key: 'packageName',
-  //   header: 'Package Name',
-  // },
-  // {
-  //   key: 'insurer',
-  //   header: 'Insurer',
-  // },
   {
-    key: 'productCode',
+    key: 'provider',
+    header: 'Provider',
+  },
+  {
+    key: 'insurer',
+    header: 'Insurer',
+  },
+  {
+    key: 'interventionCode',
     header: 'Product',
   },
   {
-    key: 'created',
+    key: 'lastUpdatedAt',
     header: 'Created',
   },
   {
     key: 'status',
     header: 'Approval status',
   },
-  // {
-  //   key: 'action',
-  //   header: 'Action',
-  // },
+  {
+    key: 'action',
+    header: 'Action',
+  },
 ];
 
 const BenefitsTable = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
-  const { isLoading, preAuthRequests } = usePreAuthRequests(patientUuid);
+  const { isLoading, preAuthRequests } = usePreAuthRequests();
 
   if (isLoading) {
     return (
@@ -64,16 +61,22 @@ const BenefitsTable = () => {
   };
 
   return (
-    <GenericDataTable
-      rows={preAuthRequests}
-      headers={headers}
-      title={t('preAuthRequests', 'Pre Auth Requests')}
-      renderActionComponent={() => (
-        <Button kind="ghost" renderIcon={ArrowRight} onClick={handleLaunchPreAuthForm}>
-          {t('makePreAuthRequests', 'Make Pre Auth Request')}
-        </Button>
-      )}
-    />
+    <>
+      <GenericDataTable
+        rows={preAuthRequests.map((r) => ({
+          ...r,
+          lastUpdatedAt: formatDate(parseDate(r.lastUpdatedAt)),
+          provider: r.provider.name,
+        }))}
+        headers={headers}
+        title={t('preAuthRequests', 'Pre Auth Requests')}
+        renderActionComponent={() => (
+          <Button kind="ghost" renderIcon={ArrowRight} onClick={handleLaunchPreAuthForm}>
+            {t('makePreAuthRequests', 'Make Pre Auth Request')}
+          </Button>
+        )}
+      />
+    </>
   );
 };
 

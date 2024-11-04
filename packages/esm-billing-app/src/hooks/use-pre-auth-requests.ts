@@ -167,7 +167,30 @@ export interface Payee {
   type: Priority;
 }
 
-export const usePreAuthRequests = (patientUuid: string) => {
+export interface MappedPreAuthRequest {
+  id: string;
+  lastUpdatedAt: string;
+  patient: {
+    nationalId?: string;
+    reference: string;
+    name: string;
+    gender: string;
+    birthDate: string;
+    active: boolean;
+  };
+  provider: {
+    reference: string;
+    name: string;
+    licenceNumber: string;
+    active: boolean;
+  };
+  status: 'active' | 'cancelled' | 'draft' | 'entered-in-error';
+  category?: string;
+  type: 'preauthorization' | 'claim';
+  insurer?: string;
+}
+
+export const usePreAuthRequests = () => {
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const { hieBaseUrl } = useConfig<BillingConfig>();
   const url = `${hieBaseUrl}/claim/byFacility?facilityCode=Organization/${mflCodeValue}&type=preauthorization&claimResponseId=`;
@@ -175,14 +198,45 @@ export const usePreAuthRequests = (patientUuid: string) => {
   const { data, error, isLoading, mutate } = useSWR<{ data: Array<PreAuthRequest> }>(url, openmrsFetch);
 
   return {
-    preAuthRequests: preAuthRequests
-      // .filter((req) => req.contained.find((c) => c.resourceType === 'Patient').identifier.find(i => ))
-      .map((r) => {
-        return {
-          ...r,
-          productCode: r.item.map((i) => i.productOrService.coding.map((c) => c.code).join(', ')).join(', '),
-        };
-      }),
+    preAuthRequests: (data?.data?.length ? data?.data : preAuthRequests).map((r) => {
+      const insurerReference = r?.insurer?.reference?.split('/')?.at(-1);
+      const findResource = (type: string) => (r.contained as any).find((resource) => resource.resourceType === type);
+
+      const patientNationalId = findResource('Patient')?.identifier?.find(
+        (identifier) => identifier.system === 'http://itm/identifier/nationalid',
+      )?.value;
+
+      const providerLicentNumber = findResource('Practitioner')?.identifier?.find(
+        (identifier) => identifier.system === 'http://itm/license/provider-license',
+      )?.value;
+
+      const insurer = (r.contained as any)
+        ?.find((resource) => resource.id === insurerReference)
+        ?.identifier?.find((identifier) => identifier.system === 'http://itm/license/payer-license')?.value;
+
+      return {
+        id: r.id,
+        lastUpdatedAt: r.meta.lastUpdated,
+        patient: {
+          name: (r.contained.find((resource) => resource.resourceType === 'Patient')?.name as any)[0]?.text,
+          reference: r.contained.find((resource) => resource.resourceType === 'Patient')?.id,
+          active: r.contained.find((resource) => resource.resourceType === 'Patient')?.active,
+          birthDate: r.contained.find((resource) => resource.resourceType === 'Patient')?.birthDate,
+          gender: r.contained.find((resource) => resource.resourceType === 'Patient')?.gender,
+          nationalId: patientNationalId,
+        },
+        provider: {
+          name: (r.contained.find((resource) => resource.resourceType === 'Practitioner')?.name as any)[0]?.text,
+          active: r.contained.find((resource) => resource.resourceType === 'Practitioner')?.active,
+          reference: r.contained.find((resource) => resource.resourceType === 'Practitioner')?.id,
+          licenceNumber: providerLicentNumber,
+        },
+        status: r.status,
+        type: r.use,
+        interventionCode: r.item.map((i) => i.productOrService.coding.map((c) => c.code).join(', ')).join(', '),
+        insurer,
+      } as MappedPreAuthRequest;
+    }),
     error,
     isLoading,
     mutate,
