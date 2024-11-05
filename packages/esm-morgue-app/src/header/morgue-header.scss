@@ -1,13 +1,9 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@carbon/colors';
-// @use '~@openmrs/esm-styleguide/src/vars' as *;
 .header {
   @include type.type-style('body-compact-02');
-  // color: $text-02;
   height: layout.$spacing-12;
-  // background-color: $ui-02;
-  // border: 1px solid $ui-03;
   border-left: 0;
   display: flex;
   justify-content: space-between;
@@ -80,7 +76,6 @@ svg.iconOverrides {
   font-size: layout.$spacing-04;
   line-height: 1.33;
   letter-spacing: 0.32px;
-  // color: $text-02;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
