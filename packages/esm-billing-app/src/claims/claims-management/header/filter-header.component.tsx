@@ -7,20 +7,15 @@ import styles from './filter-header.scss';
 type ClaimsFilterHeaderProps = {
   filters: ClaimsPreAuthFilter;
   onFilterChanged: React.Dispatch<React.SetStateAction<ClaimsPreAuthFilter>>;
+  statusOptions?: Array<{ value: string; label: string }>;
 };
 
-const ClaimsFilterHeader: React.FC<ClaimsFilterHeaderProps> = ({ filters, onFilterChanged }) => {
+const ClaimsFilterHeader: React.FC<ClaimsFilterHeaderProps> = ({
+  filters,
+  onFilterChanged,
+  statusOptions: status = [],
+}) => {
   const { t } = useTranslation();
-  const status = useMemo(
-    () => [
-      { value: 'all', label: t('all', 'All') },
-      { value: 'draft', label: t('draft', 'Draft') },
-      { value: 'active', label: t('active', 'Active') },
-      { value: 'cancelled', label: t('cancelled', 'Cancelled') },
-      { value: 'entered-in-error', label: t('enteredInError', 'Entered in error') },
-    ],
-    [],
-  );
   return (
     <div className={styles.filterContainer}>
       <Search
