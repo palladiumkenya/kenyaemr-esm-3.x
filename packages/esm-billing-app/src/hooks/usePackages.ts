@@ -9,7 +9,7 @@ import { Package } from '../types';
  */
 const usePackages = () => {
   const { hieBaseUrl } = useConfig<BillingConfig>();
-  const url = `${hieBaseUrl}/master/category/all`;
+  const url = `${hieBaseUrl}/master/category/all-`;
 
   const { data, isLoading, error } = useSWR<FetchResponse<Array<{ id: number; code: string; categoryName: string }>>>(
     url,
