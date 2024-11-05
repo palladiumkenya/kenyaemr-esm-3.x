@@ -11,8 +11,12 @@
   "empty": "Empty",
   "fromHosp": "From Hospital",
   "morgue": "Morgue Management",
+  "noDeceasedPersons": "There are no deceased persons on the waiting list",
+  "noResultFound": "Sorry, no results found",
+  "noWaitingList": "Waiting List",
   "pullingCompartment": "Pulling compartments data.....",
   "releaseBody": "Release body",
+  "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
   "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"
 }
