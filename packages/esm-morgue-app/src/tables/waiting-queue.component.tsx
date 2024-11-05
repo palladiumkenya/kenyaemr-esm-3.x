@@ -6,17 +6,16 @@ import { Tag, Button, DataTableSkeleton, OverflowMenu, OverflowMenuItem } from '
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
 import { useDeceasedPatient, useVisitType } from '../hook/useMorgue.resource';
-import { formatToReadableDate } from '../utils/utils';
 
 export const WaitingQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
   const { t } = useTranslation();
-  const fromHospital = t('waitingInLine', 'Waiting In Line');
+  const waitingInLine = t('waitingInLine', 'Waiting In Line');
 
   const genericTableHeader = [
     { header: 'Patient Name', key: 'name' },
     { header: 'Gender', key: 'gender' },
-    { header: 'Identifier ', key: 'Ids' },
+    { header: 'Identifier ', key: 'identifier' },
     { header: 'Age', key: 'age' },
     { header: 'Date of Death', key: 'deathDate' },
     { header: 'Cause of Death', key: 'causeOfDeath' },
@@ -33,7 +32,7 @@ export const WaitingQueue: React.FC = () => {
           showHeader={false}
           rowCount={10}
           zebra
-          columnCount={9}
+          columnCount={7}
         />
       </div>
     );
@@ -47,8 +46,8 @@ export const WaitingQueue: React.FC = () => {
     name: toUpperCase(patient.person.display),
     gender: patient.person.gender,
     age: patient?.person?.age,
-    Ids: patient?.identifiers[0]?.identifier,
-    deathDate: formatToReadableDate(patient.person.deathDate),
+    identifier: patient?.identifiers[0]?.identifier,
+    deathDate: formatDate(new Date(patient.person.deathDate)),
     causeOfDeath: patient.person.causeOfDeath?.display,
   }));
   const handleAdmissionForm = (patientUuid: string) => {
@@ -58,15 +57,11 @@ export const WaitingQueue: React.FC = () => {
     });
   };
   const actionColumn = (row) => (
-    <div className={styles.groupButtons}>
-      <Button kind="primary" className={styles.actionBtn} size="sm" onClick={() => handleAdmissionForm(row.id)}>
-        {t('admit', 'Admit')}
-      </Button>
-      <Button kind="tertiary" className={styles.actionBtn} size="sm">
-        {t('release', 'Release')}
-      </Button>
-    </div>
+    <OverflowMenu size="sm" flipped>
+      <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
+      <OverflowMenuItem isDelete itemText={t('release', 'Release')} />
+    </OverflowMenu>
   );
 
-  return <GenericTable rows={rows} headers={genericTableHeader} actionColumn={actionColumn} title={fromHospital} />;
+  return <GenericTable rows={rows} headers={genericTableHeader} actionColumn={actionColumn} title={waitingInLine} />;
 };
