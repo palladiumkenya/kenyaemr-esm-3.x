@@ -16,7 +16,7 @@ const BenefitsHeader: React.FC<BenefitsHeaderProps> = () => {
         <h6>{t('SHIF', 'Social Health Insurance Fund')}</h6>
         {shifIdentifiers.map((identifier) => (
           <h6 key={identifier.identiferNumber}>
-            <span>{t('shifNo', 'SHIF NUMBER: ')}</span>
+            <span>{t('shaNo', 'SHA NUMBER: ')}</span>
             <span>{identifier.identiferNumber}</span>
           </h6>
         ))}
