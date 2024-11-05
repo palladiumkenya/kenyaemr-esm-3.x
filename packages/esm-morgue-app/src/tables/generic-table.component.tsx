@@ -62,7 +62,7 @@ const GenericTable: React.FC<GenericTableProps> = ({ rows, headers, actionColumn
                         {header.header}
                       </TableHeader>
                     ))}
-                    {actionColumn && <TableHeader>Action</TableHeader>}
+                    {<TableHeader>{''}</TableHeader>}
                   </TableRow>
                 </TableHead>
                 <TableBody>

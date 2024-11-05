@@ -6,22 +6,21 @@ import { Tag, Button, DataTableSkeleton, OverflowMenu, OverflowMenuItem } from '
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
 import { useDeceasedPatient, useVisitType } from '../hook/useMorgue.resource';
+import { formatToReadableDate } from '../utils/utils';
 
 export const WaitingQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
   const { t } = useTranslation();
-  const fromHospital = t('fromHosp', 'From Hospital');
+  const fromHospital = t('waitingInLine', 'Waiting In Line');
 
   const genericTableHeader = [
-    { header: 'S/No', key: 'serialNumber' },
-    { header: 'Deceased Name', key: 'name' },
-    { header: 'ID No ', key: 'Ids' },
+    { header: 'Patient Name', key: 'name' },
     { header: 'Gender', key: 'gender' },
-    { header: 'Dob', key: 'birthdate' },
+    { header: 'Identifier ', key: 'Ids' },
+    { header: 'Age', key: 'age' },
     { header: 'Date of Death', key: 'deathDate' },
     { header: 'Cause of Death', key: 'causeOfDeath' },
-    { header: 'Status Death', key: 'status' },
-    { header: 'Residence', key: 'address4' },
+    ,
   ];
 
   if (isLoading) {
@@ -43,19 +42,15 @@ export const WaitingQueue: React.FC = () => {
     return <ErrorState error={error} headerTitle={t('waitingQueue', 'Waiting queue')} />;
   }
 
-  const rows =
-    deceasedPatients?.map((patient, index) => ({
-      id: patient.uuid,
-      serialNumber: index + 1,
-      name: toUpperCase(patient.person.display),
-      gender: patient.person.gender,
-      birthdate: formatDate(new Date(patient.person.birthdate)),
-      deathDate: formatDate(new Date(patient.person.deathDate)),
-      causeOfDeath: patient.person.causeOfDeath?.display || 'N/A',
-      status: <Tag type="green">{patient.person.dead ? 'Known' : 'Unknown'}</Tag>,
-      Ids: patient.identifiers[0]?.identifier || 'N/A',
-      address4: patient.person.preferredAddress?.address4 || 'N/A',
-    })) || [];
+  const rows = deceasedPatients?.map((patient, index) => ({
+    id: patient.uuid,
+    name: toUpperCase(patient.person.display),
+    gender: patient.person.gender,
+    age: patient?.person?.age,
+    Ids: patient?.identifiers[0]?.identifier,
+    deathDate: formatToReadableDate(patient.person.deathDate),
+    causeOfDeath: patient.person.causeOfDeath?.display,
+  }));
   const handleAdmissionForm = (patientUuid: string) => {
     launchWorkspace('patient-additional-info-form', {
       workspaceTitle: t('admissionForm', 'Admission form'),
@@ -63,10 +58,14 @@ export const WaitingQueue: React.FC = () => {
     });
   };
   const actionColumn = (row) => (
-    <OverflowMenu aria-label="queue-menu" align="bottom" flipped>
-      <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
-      <OverflowMenuItem hasDivider isDelete itemText={t('releaseBody', 'Release body')} />
-    </OverflowMenu>
+    <div className={styles.groupButtons}>
+      <Button kind="primary" className={styles.actionBtn} size="sm" onClick={() => handleAdmissionForm(row.id)}>
+        {t('admit', 'Admit')}
+      </Button>
+      <Button kind="tertiary" className={styles.actionBtn} size="sm">
+        {t('release', 'Release')}
+      </Button>
+    </div>
   );
 
   return <GenericTable rows={rows} headers={genericTableHeader} actionColumn={actionColumn} title={fromHospital} />;
