@@ -16,7 +16,7 @@ import {
 import styles from './program-enrollment.scss';
 import isEmpty from 'lodash/isEmpty';
 import dayjs from 'dayjs';
-import { formatDate, useVisit } from '@openmrs/esm-framework';
+import { formatDate, restBaseUrl, useVisit } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
 import { getPatientUuidFromUrl, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -92,14 +92,21 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
     [orderedEnrollments],
   );
 
+  const handleMutation = () => {
+    const endPoints = [
+      `${restBaseUrl}/kenyaemr/patientHistoricalEnrollment?patientUuid=`,
+      `${restBaseUrl}/kenyaemr/patientCurrentEnrollment?patientUuid=`,
+      `${restBaseUrl}/kenyaemr/eligiblePrograms?patientUuid=`,
+    ];
+    endPoints.forEach((endpoint) => {
+      mutate((key) => typeof key === 'string' && key.startsWith(endpoint), undefined, { revalidate: true });
+    });
+  };
+
   const handleDiscontinue = (enrollment) => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: enrollment?.discontinuationFormName,
-      mutateForm: () => {
-        mutate((key) => true, undefined, {
-          revalidate: true,
-        });
-      },
+      mutateForm: handleMutation,
       formInfo: {
         encounterUuid: '',
         visitTypeUuid: currentVisit?.visitType?.uuid ?? '',
