@@ -29,6 +29,7 @@ import { PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-pre-auth-form.scss';
 import PackageIntervensions from './package-intervensions.component';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
 
@@ -116,7 +117,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
   if (packageError) {
     return (
       <Layer className={styles.error}>
-        <Tile>{packageError?.message}</Tile>
+        <ErrorState error={packageError} headerTitle={t('errorMessage', 'Error')} />
       </Layer>
     );
   }

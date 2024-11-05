@@ -1,6 +1,9 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+
+.tableHeader {
+  padding: 0 layout.$spacing-05 0 layout.$spacing-05;
+}
 
 .expanded_row_section {
   display: flex;

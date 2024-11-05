@@ -515,7 +515,7 @@ export type SHAIntervension = {
 export interface ClaimsPreAuthFilter {
   fromDate?: Date;
   toDate?: Date;
-  status: 'active' | 'draft' | 'cancelled' | 'entered-in-error' | 'all';
+  status: string;
   search?: string;
 }
 
@@ -543,5 +543,6 @@ export type FacilityClaim = {
   provider: {
     display: string;
   } | null;
+  patient?: { display: string };
   externalId: string;
 };
