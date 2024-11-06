@@ -21,6 +21,7 @@ export interface MappedBill {
   tenderedAmount?: number;
   display?: string;
   referenceCodes?: string;
+  adjustmentReason?: string;
 }
 
 interface LocationLink {
