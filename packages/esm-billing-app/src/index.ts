@@ -7,8 +7,8 @@ import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
-import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill-form.workspace';
-import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill-form.workspace';
+import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill/edit-bill-form.workspace';
+import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill/waive-bill-form.workspace';
 import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
 import AddServiceForm from './billable-services/billables/services/service-form.workspace';
 import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';

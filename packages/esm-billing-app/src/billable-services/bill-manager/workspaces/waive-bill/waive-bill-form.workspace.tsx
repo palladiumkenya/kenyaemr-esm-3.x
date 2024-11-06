@@ -3,10 +3,10 @@ import { Form, Stack, FormGroup, Layer, Button, NumberInput, TextArea } from '@c
 import { TaskAdd } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './waive-bill-form.scss';
-import { MappedBill } from '../../../types';
-import { createBillWaiverPayload, extractErrorMessagesFromResponse } from '../../../utils';
-import { convertToCurrency, extractString } from '../../../helpers';
-import { processBillPayment, usePaymentModes } from '../../../billing.resource';
+import { MappedBill } from '../../../../types';
+import { createBillWaiverPayload, extractErrorMessagesFromResponse } from '../../../../utils';
+import { convertToCurrency, extractString } from '../../../../helpers';
+import { processBillPayment, usePaymentModes } from '../../../../billing.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { z } from 'zod';
