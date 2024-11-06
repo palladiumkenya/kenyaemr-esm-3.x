@@ -10,7 +10,10 @@
 }
 
 .formContainer {
+  display: flex;
+  flex-direction: column;
   margin: layout.$spacing-05;
+  row-gap: layout.$spacing-03;
 }
 
 .formField {

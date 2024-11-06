@@ -11,14 +11,9 @@
   "discharges": "Discharges",
   "empty": "Empty",
   "morgue": "Morgue Management",
-  "noDeceasedPersons": "There are no deceased persons on the waiting list",
-  "noResultFound": "Sorry, no results found",
-  "noWaitingList": "Waiting List",
   "pullingCompartment": "Pulling compartments data.....",
   "release": "Release",
   "waitingInLine": "Waiting In Line",
-  "releaseBody": "Release body",
-  "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
   "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"
 }

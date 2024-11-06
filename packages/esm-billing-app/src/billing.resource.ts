@@ -53,6 +53,7 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
       .flat()
       .map((ref) => `${ref.paymentMode}: ${ref.value}`)
       .join(', '),
+    adjustmentReason: bill?.adjustmentReason,
   };
 
   return mappedBill;
