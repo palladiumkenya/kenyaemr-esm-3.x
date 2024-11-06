@@ -1,6 +1,8 @@
 import {
   DataTable,
   DataTableSkeleton,
+  OverflowMenu,
+  OverflowMenuItem,
   Pagination,
   Table,
   TableBody,
@@ -9,8 +11,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tag,
 } from '@carbon/react';
-import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { isDesktop, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,13 +27,16 @@ const ClaimsManagementTable: React.FC = () => {
   const { pageSizes } = usePaginationInfo(pageSize, claims.length, currentPage, results.length);
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const size = layout === 'tablet' ? 'lg' : 'md';
 
   const headers = [
-    { key: 'claimCode', header: 'Claim Code' },
-    { key: 'status', header: 'Status' },
-    { key: 'providerName', header: 'Provider' },
-    { key: 'claimedTotal', header: 'Claimed Amount' },
-    { key: 'approvedTotal', header: 'Approved Amount' },
+    { key: 'claimCode', header: t('claimCode', 'Claim Code') },
+    { key: 'status', header: t('status', 'Status') },
+    { key: 'providerName', header: t('provider', 'Provider') },
+    { key: 'claimedTotal', header: t('claimedAmount', 'Claimed Amount') },
+    { key: 'approvedTotal', header: t('approvedTotal', 'Approved Total') },
+    { key: 'action', header: t('action', 'Action') },
   ];
 
   if (isLoading) {
@@ -59,6 +65,13 @@ const ClaimsManagementTable: React.FC = () => {
     );
   }
 
+  const handleRetry = (claimId: string) => {
+    const dispose = showModal('retry-claim-request-modal', {
+      closeModal: () => dispose(),
+      claimId,
+    });
+  };
+
   return (
     <DataTable rows={results} headers={headers} isSortable>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
@@ -78,16 +91,32 @@ const ClaimsManagementTable: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
-                <TableRow
-                  {...getRowProps({
-                    row,
-                  })}>
-                  {row.cells.map((cell) => (
-                    <TableCell key={cell.id}>{cell.value}</TableCell>
-                  ))}
-                </TableRow>
-              ))}
+              {rows.map((row) => {
+                const rowStatus = row.cells.find((cell) => cell.info.header === 'status')?.value;
+                return (
+                  <TableRow
+                    {...getRowProps({
+                      row,
+                    })}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>
+                        {cell.info.header === 'status' ? (
+                          <ClaimStatus cell={cell} row={row} />
+                        ) : cell.info.header === 'action' && ['ENTERED', 'ERRORED'].includes(rowStatus) ? (
+                          <OverflowMenu size={size} flipped>
+                            <OverflowMenuItem
+                              itemText={t('retryRequest', 'Retry request')}
+                              onClick={() => handleRetry(row.id)}
+                            />
+                          </OverflowMenu>
+                        ) : (
+                          cell.value
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
           {paginated && !isLoading && (
@@ -114,3 +143,15 @@ const ClaimsManagementTable: React.FC = () => {
 };
 
 export default ClaimsManagementTable;
+
+const ClaimStatus = ({ cell, row }: { cell: { value: string }; row: any }) => {
+  const { claims } = useFacilityClaims();
+
+  const claim = claims.find((claim) => claim.id === row.id);
+  return (
+    <div className={styles.claimStatus}>
+      <p>{cell.value}</p>
+      {claim.externalId && <Tag type="blue">{claim.externalId}</Tag>}
+    </div>
+  );
+};

@@ -1,7 +1,7 @@
-import useSWR from 'swr';
-import { FetchResponse, openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
-import useSWRImmutable from 'swr/immutable';
+import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
+import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { mockInterventions, mockPackages } from './claims-form.mocks';
 
 interface Provider {
@@ -47,6 +47,13 @@ export const processClaims = (payload) => {
     headers: {
       'Content-Type': 'application/json',
     },
+  });
+};
+
+export const retryClaim = (claimUUID: string) => {
+  const url = `/ws/rest/v1/insuranceclaims/claims/sendToExternal?claimUuid=${claimUUID}`;
+  return openmrsFetch(url, {
+    method: 'GET',
   });
 };
 
