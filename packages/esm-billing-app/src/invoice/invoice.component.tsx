@@ -36,11 +36,10 @@ const Invoice: React.FC = () => {
   const [isPrinting, setIsPrinting] = useState(false);
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
-  const { currentVisit, isLoading: visitloading, error: visitError } = useVisit(patientUuid);
+  const { currentVisit, isLoading: isVisitLoading, error: visitError } = useVisit(patientUuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
-  const isPreAuthEnabled = useFeatureFlag('healthInformationExchange');
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems([...lineItems, ...paidLineItems]);
@@ -80,7 +79,7 @@ const Invoice: React.FC = () => {
     'Invoice Status': bill?.status,
   };
 
-  if (isLoadingPatient || isLoadingBill || visitloading) {
+  if (isLoadingPatient || isLoadingBill || isVisitLoading) {
     return (
       <div className={styles.invoiceContainer}>
         <InlineLoading
