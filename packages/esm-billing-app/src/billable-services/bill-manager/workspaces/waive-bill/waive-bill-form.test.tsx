@@ -15,11 +15,6 @@ jest.mock('../../../../billing.resource', () => ({
   usePaymentModes: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  closeWorkspace: jest.fn(),
-  showSnackbar: jest.fn(),
-}));
-
 const mockedBill: MappedBill = {
   id: 1909,
   uuid: '45143fae-b83d-4768-ada5-621e8dc1229d',
