@@ -1,4 +1,4 @@
-import { OverflowMenuItem, Button } from '@carbon/react';
+import { InlineLoading, Button } from '@carbon/react';
 import { Order } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
