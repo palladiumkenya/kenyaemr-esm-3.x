@@ -86,3 +86,6 @@ e2e/storageState.json
 
 #vscode
 .vscode/settings.json
+
+# npm in all directories
+**/package-lock.json

@@ -21,6 +21,7 @@ export interface MappedBill {
   tenderedAmount?: number;
   display?: string;
   referenceCodes?: string;
+  adjustmentReason?: string;
 }
 
 interface LocationLink {
@@ -519,6 +520,19 @@ export interface ClaimsPreAuthFilter {
   search?: string;
 }
 
+export interface BenefitDataResponse {
+  title?: string;
+  allocation?: string;
+  expenditure?: string;
+  balance?: string;
+  isActive?: boolean;
+  description?: string;
+}
+
+export interface shifIdentifiersResponse {
+  identiferNumber: string;
+  identiferType: string;
+}
 export type FacilityClaim = {
   uuid: string;
   claimCode: string;

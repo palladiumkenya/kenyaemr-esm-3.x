@@ -2,18 +2,18 @@ import React from 'react';
 import styles from './compartment.scss';
 import EmptyCompartment from './empty-compartment.component';
 import AvailableCompartment from './avail-compartment.compartment';
-import { Patient } from '../types';
+import { Visit } from '@openmrs/esm-framework';
 
 interface CompartmentViewProps {
-  patients: (Patient | null)[];
+  patientVisit: Array<Visit>;
 }
 
-const CompartmentView: React.FC<CompartmentViewProps> = ({ patients }) => {
+const CompartmentView: React.FC<CompartmentViewProps> = ({ patientVisit }) => {
   return (
     <div className={styles.allPatientCardWrapper}>
-      {patients.map((patient, index) => (
+      {patientVisit.map((patient, index) => (
         <div key={index} className={styles.cardRow}>
-          {patient ? <AvailableCompartment patientInfo={patient} index={index} /> : <EmptyCompartment />}
+          {patient ? <AvailableCompartment patientVisitInfo={patient} index={index} /> : <EmptyCompartment />}
         </div>
       ))}
     </div>

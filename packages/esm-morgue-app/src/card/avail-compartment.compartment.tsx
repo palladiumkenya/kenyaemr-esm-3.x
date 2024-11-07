@@ -1,21 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './compartment.scss';
 import { Button, Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
 import { toUpperCase } from '../helpers/expression-helper';
-import { ConfigurableLink, formatDate, navigate } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDate, usePatient, Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
-import { Patient } from '../types';
+import dayjs from 'dayjs';
 
 interface AvailableCompartmentProps {
-  patientInfo: Patient;
+  patientVisitInfo: Visit;
   index: number;
 }
 
-const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
+const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisitInfo, index }) => {
   const { t } = useTranslation();
+  const { patient } = usePatient(patientVisitInfo?.patient?.uuid);
+  const deceasedName = patient?.name.map((names) => names.text).join(' ');
+  const deceasedResidence = patient?.address.map((residence) => residence?.city);
+  const deathDate = patient?.deceasedDateTime;
+  const formatDeathDate = dayjs(deathDate).format('YYYY-MM-DD');
 
   return (
     <div className={styles.cardView}>
@@ -23,19 +26,19 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
         <div className={styles.cardLabelWrapper}>
           <div className={styles.cardLabel}>{index + 1}</div>
         </div>
-        <span className={styles.deceasedName}>{toUpperCase(patientInfo.person.display)}</span>
+        <span className={styles.deceasedName}>{toUpperCase(deceasedName)}</span>
       </div>
       <div className={styles.cardRow}>
+        <span className={styles.deceasedAge}>
+          {t('gender', 'Gender: ')}
+          {toUpperCase(patient?.gender)}
+        </span>
         <span className={styles.deceasedDate}>
           {t('deathDate', 'Death date: ')}
-          {formatDate(new Date(patientInfo.person.deathDate))}
-        </span>
-        <span className={styles.deceasedAge}>
-          {t('age', 'Age: ')}
-          {patientInfo?.person?.age}
+          {formatDeathDate}
         </span>
         <span className={styles.deceasedResidences}>
-          {t('area', 'Area: ')} {patientInfo.person.preferredAddress?.address4}
+          {t('area', 'Area: ')} {deceasedResidence}
         </span>
       </div>
       <div className={styles.cardRow}>
@@ -48,7 +51,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
       </div>
       <ConfigurableLink
         className={styles.configurableLink}
-        to={`\${openmrsSpaBase}/patient/${patientInfo.uuid}/chart/deceased-panel`}>
+        to={`\${openmrsSpaBase}/patient/${patientVisitInfo?.uuid}/chart/deceased-panel`}>
         <Button className={styles.assignButton} kind="primary" renderIcon={View}>
           {t('viewDetails', 'View details')}
         </Button>

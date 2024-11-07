@@ -1,5 +1,5 @@
 import { Button, InlineLoading } from '@carbon/react';
-import { BaggageClaim, ConvertToCloud, Printer, Wallet } from '@carbon/react/icons';
+import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
 import {
   ExtensionSlot,
   formatDatetime,
@@ -8,6 +8,7 @@ import {
   showModal,
   useFeatureFlag,
   usePatient,
+  useVisit,
 } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import React, { useEffect, useRef, useState } from 'react';
@@ -34,13 +35,13 @@ const Invoice: React.FC = () => {
   const { data: facilityInfo } = useDefaultFacility();
   const { billUuid, patientUuid } = useParams();
   const [isPrinting, setIsPrinting] = useState(false);
-  const { patient, isLoading: isLoadingPatient } = usePatient(patientUuid);
-  const { bill, isLoading: isLoadingBill, error } = useBill(billUuid);
+  const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
+  const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
   usePaymentsReconciler(billUuid);
+  const { currentVisit, isLoading: isVisitLoading, error: visitError } = useVisit(patientUuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
-  const isPreAuthEnabled = useFeatureFlag('healthInformationExchange');
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems([...lineItems, ...paidLineItems]);
@@ -80,7 +81,7 @@ const Invoice: React.FC = () => {
     'Invoice Status': bill?.status,
   };
 
-  if (isLoadingPatient && isLoadingBill) {
+  if (isLoadingPatient || isLoadingBill || isVisitLoading) {
     return (
       <div className={styles.invoiceContainer}>
         <InlineLoading
@@ -93,13 +94,27 @@ const Invoice: React.FC = () => {
     );
   }
 
-  if (error) {
+  if (billingError || patientError || visitError) {
     return (
       <div className={styles.errorContainer}>
-        <ErrorState headerTitle={t('invoiceError', 'Invoice error')} error={error} />
+        <ErrorState
+          headerTitle={t('invoiceError', 'Invoice error')}
+          error={billingError ?? patientError ?? visitError}
+        />
       </div>
     );
   }
+
+  const handleViewClaims = () => {
+    if (currentVisit) {
+      const dispose = showModal('end-visit-dialog', {
+        closeModal: () => dispose(),
+        patientUuid,
+      });
+    } else {
+      navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
+    }
+  };
 
   return (
     <div className={styles.invoiceContainer}>
@@ -142,26 +157,13 @@ const Invoice: React.FC = () => {
         </Button>
         {isProcessClaimsFormEnabled && (
           <Button
-            onClick={() => navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` })}
+            onClick={handleViewClaims}
             kind="danger"
             size="sm"
             renderIcon={BaggageClaim}
             iconDescription="Add"
             tooltipPosition="bottom">
-            {t('claim', 'Process claims')}
-          </Button>
-        )}
-        {isPreAuthEnabled && (
-          <Button
-            onClick={() =>
-              navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/pre-auth-request` })
-            }
-            kind="primary"
-            size="sm"
-            renderIcon={ConvertToCloud}
-            iconDescription="Add"
-            tooltipPosition="bottom">
-            {t('preauth', 'Create Pre-Auth Request')}
+            {currentVisit ? t('endVisitAndClaim', 'End visit and Process claims') : t('claim', 'Process claims')}
           </Button>
         )}
       </div>

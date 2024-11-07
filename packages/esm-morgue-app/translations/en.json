@@ -1,4 +1,5 @@
 {
+  "action": "Action",
   "admissionForm": "Admission form",
   "admit": "Admit",
   "admitted": "Admitted Bodies",
@@ -9,10 +10,10 @@
   "discharged": "Discharged",
   "discharges": "Discharges",
   "empty": "Empty",
-  "fromHosp": "From Hospital",
   "morgue": "Morgue Management",
   "pullingCompartment": "Pulling compartments data.....",
-  "releaseBody": "Release body",
+  "release": "Release",
+  "waitingInLine": "Waiting In Line",
   "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"
 }
