@@ -7,10 +7,10 @@ import { createMobileMoneyPaymentPayload } from './useRequestStatus';
 
 const fetchPaymentStatus = async ({
   url,
-  receiptNumber,
+  billUUID,
 }: {
   url: string;
-  receiptNumber: string;
+  billUUID: string;
 }): Promise<Array<{ requestStatus: RequestStatus; referenceNumber: string | null; amount: string }>> => {
   const res = await fetch(url, {
     method: 'POST',
@@ -18,7 +18,7 @@ const fetchPaymentStatus = async ({
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      billId: receiptNumber.substring(0, receiptNumber.indexOf('-')),
+      billId: billUUID,
     }),
   });
 
@@ -43,9 +43,7 @@ export const usePaymentsReconciler = (billUUID: string) => {
     .find((mode) => mode.name === 'Mobile Money')
     ?.attributeTypes.find((type) => type.description === 'Reference Number').uuid;
 
-  const { data: billPayments } = useSWR(url + bill.uuid, () =>
-    fetchPaymentStatus({ url: url, receiptNumber: bill.uuid }),
-  );
+  const { data: billPayments } = useSWR(url + bill.uuid, () => fetchPaymentStatus({ url: url, billUUID: bill.uuid }));
   const aggregatorReferenceNumbers = billPayments?.map((pd) => pd.referenceNumber) ?? [];
   const billReferenceNumbers =
     bill.payments
