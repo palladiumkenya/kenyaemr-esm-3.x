@@ -71,22 +71,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
 
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Setup Turborepo cache
+      - name: Setup local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v3
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ env.TURBO_TOKEN }}
 
-      - name: Version and Build
-        run: |
-          yarn workspaces foreach --worktree --topological --exclude @kenyaemr/esm-3.x-apps version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
-          yarn turbo run build --concurrency=10
+      - name: Version
+        run: yarn workspaces foreach --worktree --topological --exclude @kenyaemr/esm-3.x-apps version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
+
+      - name: Run build
+        run: yarn turbo run build --concurrency=10
 
       - name: Git config and commit
         run: |
@@ -114,13 +114,25 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
 
-      - name: Install and Build
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Setup local cache server for Turborepo
+        uses: felixmosh/turborepo-gh-artifacts@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ env.TURBO_TOKEN }}
+
+      - name: Run build
+        run: yarn turbo run build --concurrency=10
+
+      - name: Git config and commit
         run: |
-          yarn install --immutable
-          yarn turbo run build --concurrency=10
+          git config user.email "info@thepalladiumgroup.com"
+          git config user.name "KenyaEMR CI"
+          git add . && git commit -m "Prerelease version" --no-verify
           
       - name: Publish
         run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:publish
