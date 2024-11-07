@@ -1,10 +1,8 @@
-import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import fuzzy from 'fuzzy';
 import {
   DataTable,
   DataTableSkeleton,
   Layer,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -12,18 +10,20 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableSelectRow,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  TableSelectRow,
   Tile,
-  Pagination,
   type DataTableHeader,
   type DataTableRow,
 } from '@carbon/react';
 import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
-import styles from './claims-table.scss';
+import fuzzy from 'fuzzy';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LineItem, MappedBill } from '../../../types';
+import styles from './claims-table.scss';
 
 type ClaimsTableProps = {
   bill: MappedBill;
@@ -43,7 +43,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const paidLineItems = useMemo(() => lineItems.filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
+  const paidLineItems = useMemo(() => (lineItems || []).filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
 
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {
@@ -65,12 +65,12 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   }, [filteredLineItems, currentPage, pageSize]);
 
   const tableHeaders: Array<typeof DataTableHeader> = [
-    { header: 'No', key: 'no' },
-    { header: 'Serial No.', key: 'serialno' },
-    { header: 'Bill Item', key: 'inventoryname' },
-    { header: 'Status', key: 'status' },
-    { header: 'Total amount', key: 'total' },
-    { header: 'Bill creation date', key: 'dateofbillcreation' },
+    { header: t('no', 'No'), key: 'no' },
+    { header: t('serialNo', 'Serial No'), key: 'serialno' },
+    { header: t('billItem', 'Bill Item'), key: 'inventoryname' },
+    { header: t('status', 'Status'), key: 'status' },
+    { header: t('totalAmount', 'Total amount'), key: 'total' },
+    { header: t('billCreationDate', 'Bill creation date'), key: 'dateofbillcreation' },
   ];
 
   const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
@@ -146,7 +146,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
             <Table {...getTableProps()} aria-label="claim line items" className={styles.table}>
               <TableHead>
                 <TableRow>
-                  {rows.length > 1 && isSelectable ? <TableHeader /> : null}
+                  {isSelectable ? <TableHeader /> : null}
                   {headers.map((header) => (
                     <TableHeader key={header.key}>{header.header}</TableHeader>
                   ))}
@@ -160,7 +160,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
                       {...getRowProps({
                         row,
                       })}>
-                      {rows.length > 1 && isSelectable && (
+                      {isSelectable && (
                         <TableSelectRow
                           aria-label="Select row"
                           {...getSelectionProps({ row })}
@@ -191,20 +191,22 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           </Layer>
         </div>
       )}
-      <Pagination
-        forwardText="Next page"
-        backwardText="Previous page"
-        page={currentPage}
-        pageSize={pageSize}
-        pageSizes={[5, 10, 20, 50]}
-        totalItems={filteredLineItems.length}
-        className={styles.pagination}
-        size={responsiveSize}
-        onChange={({ pageSize: newPageSize, page: newPage }) => {
-          setPageSize(newPageSize);
-          setCurrentPage(newPage);
-        }}
-      />
+      {tableRows.length > pageSize && (
+        <Pagination
+          forwardText="Next page"
+          backwardText="Previous page"
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={[5, 10, 20, 50]}
+          totalItems={filteredLineItems.length}
+          className={styles.pagination}
+          size={responsiveSize}
+          onChange={({ pageSize: newPageSize, page: newPage }) => {
+            setPageSize(newPageSize);
+            setCurrentPage(newPage);
+          }}
+        />
+      )}
     </div>
   );
 };

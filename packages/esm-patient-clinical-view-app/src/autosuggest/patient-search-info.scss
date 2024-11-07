@@ -1,0 +1,37 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.patientInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  background-color: colors.$white;
+}
+
+.patientInfo:hover {
+  background-color: colors.$gray-10;
+}
+
+.patientDetails {
+  flex: 1;
+}
+
+.patientName {
+  @include type.type-style('heading-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-02;
+}
+
+.demographics {
+  display: flex;
+  align-items: center;
+  margin-bottom: layout.$spacing-02;
+  color: colors.$gray-70;
+  text-transform: uppercase;
+}
+
+.middot {
+  margin: 0 0.25rem;
+}

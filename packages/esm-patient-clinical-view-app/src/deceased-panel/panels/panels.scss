@@ -1,0 +1,46 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.observation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: layout.$spacing-03;
+  margin-block: layout.$spacing-05;
+  margin-inline: 0 layout.$spacing-05;
+}
+
+.observation > span {
+  align-self: center;
+  justify-self: start;
+}
+
+.parentConcept {
+  font-weight: bold;
+}
+
+.childConcept {
+  padding-inline-start: layout.$spacing-04;
+}
+.medicalHistoryContainer {
+  background-color: colors.$gray-30;
+  width: 98%;
+  margin: 0 auto;
+  max-width: 95vw;
+  padding-bottom: 0;
+}
+
+.filterContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+
+.search {
+  max-width: 300px;
+}
+.table {
+  border: 1px solid colors.$gray-30;
+  padding: layout.$spacing-05 layout.$spacing-05;
+}

@@ -37,23 +37,6 @@ jest.mock('react-to-print', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    usePatient: jest.fn().mockReturnValue({
-      patient: {
-        id: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
-        name: [{ given: ['John'], family: 'Doe' }],
-      },
-      patientUuid: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
-      isLoading: false,
-      error: null,
-    }),
-  };
-});
-
 xdescribe('Invoice', () => {
   beforeEach(() => {
     mockedBill.mockReturnValue({

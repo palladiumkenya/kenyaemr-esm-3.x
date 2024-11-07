@@ -68,7 +68,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
             {!selectedRegimenLine || selectedRegimenLine == '--' ? (
               <SelectItem text={t('selectRegimenLine', 'Select Regimen Line')} value="" />
             ) : null}
-            {filteredRegimenLineByAge.map((line) => (
+            {filteredRegimenLineByAge?.map((line) => (
               <SelectItem key={line.regimenline} text={line.regimenline} value={line.regimenLineValue}>
                 {line.regimenline}
               </SelectItem>

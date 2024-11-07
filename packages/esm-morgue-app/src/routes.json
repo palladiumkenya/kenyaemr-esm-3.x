@@ -16,9 +16,37 @@
       }
     },
     {
+      "component": "peerCalendarDashboardLink",
+      "name": "peer-calendar-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "peer-calendar",
+        "title": "Peer Calendar",
+        "slot": "peer-calendar-dashboard-slot",
+        "path": "peer-management"
+      }
+    },
+    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot"
+    }
+  ],
+   "workspaces": [
+    {
+      "name": "patient-additional-info-form",
+      "component": "patientAdditionalInfoForm",
+      "title": "add more details",
+      "type": "other-form"
+    },
+     {
+      "name": "autopsy-form-workspace",
+      "component": "morgueFormEntry",
+      "title": "Autopsy form entry",
+      "type": "form",
+      "width": "extra-wide",
+      "canMaximize": true,
+      "canHide": true
     }
   ],
   "pages": [

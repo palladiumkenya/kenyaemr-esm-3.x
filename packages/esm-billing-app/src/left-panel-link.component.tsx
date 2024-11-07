@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
-import last from 'lodash-es/last';
-import { BrowserRouter, useLocation } from 'react-router-dom';
 import { ConfigurableLink } from '@openmrs/esm-framework';
+import last from 'lodash-es/last';
+import React, { useMemo } from 'react';
+import { BrowserRouter, useLocation } from 'react-router-dom';
 
 export interface LinkConfig {
   name: string;
@@ -12,7 +12,7 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   const { name, title } = config;
   const nameSegment = name.split('/').at(-1);
   const location = useLocation();
-  const spaBasePath = window.getOpenmrsSpaBase() + 'home';
+  const spaBasePath = window.getOpenmrsSpaBase() + 'home/billing';
 
   let urlSegment = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
@@ -22,15 +22,17 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   };
 
   if (isUUID(urlSegment)) {
-    urlSegment = location.pathname.split('/').at(-4);
-  }
-
-  if (location.pathname.includes('claims')) {
-    urlSegment = location.pathname.split('/').at(-5);
+    if (location.pathname.includes('payment-points')) {
+      urlSegment = location.pathname.split('/').at(-2);
+    } else {
+      urlSegment = '';
+    }
+  } else if (location.pathname.endsWith('claims') || location.pathname.endsWith('claims/')) {
+    // Filling claims form screen
+    urlSegment = '';
   }
 
   const isActive = nameSegment === urlSegment;
-
   return (
     <ConfigurableLink
       to={spaBasePath + '/' + name}

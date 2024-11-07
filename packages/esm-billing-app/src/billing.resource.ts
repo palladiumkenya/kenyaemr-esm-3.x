@@ -1,23 +1,23 @@
-import useSWR from 'swr';
 import {
   formatDate,
-  parseDate,
   openmrsFetch,
+  OpenmrsResource,
+  parseDate,
+  useConfig,
   useSession,
   useVisit,
-  useConfig,
-  OpenmrsResource,
 } from '@openmrs/esm-framework';
-import { FacilityDetail, MappedBill, PatientInvoice, PaymentMethod, PaymentStatus } from './types';
+import dayjs from 'dayjs';
 import isEmpty from 'lodash-es/isEmpty';
 import sortBy from 'lodash-es/sortBy';
-import dayjs from 'dayjs';
-import { BillingConfig } from './config-schema';
 import { useState } from 'react';
-import { extractString } from './helpers';
+import useSWR from 'swr';
 import { z } from 'zod';
+import { BillingConfig } from './config-schema';
+import { extractString } from './helpers';
+import { FacilityDetail, MappedBill, PatientInvoice, PaymentMethod, PaymentStatus } from './types';
 
-const mapBillProperties = (bill: PatientInvoice): MappedBill => {
+export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
   // create base object
   const mappedBill: MappedBill = {
     id: bill?.id,
@@ -39,6 +39,21 @@ const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     display: bill.display,
     totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
     tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
+    referenceCodes: bill?.payments
+      .map((payment) =>
+        payment.attributes
+          .filter((attr) => attr.attributeType.description === 'Reference Number')
+          .map((attr) => {
+            return {
+              paymentMode: payment.instanceType.name,
+              value: attr.value,
+            };
+          }),
+      )
+      .flat()
+      .map((ref) => `${ref.paymentMode}: ${ref.value}`)
+      .join(', '),
+    adjustmentReason: bill?.adjustmentReason,
   };
 
   return mappedBill;
@@ -186,7 +201,7 @@ export const processBillItems = (payload) => {
 
 export const usePaymentModes = (excludeWaiver: boolean = true) => {
   const { excludedPaymentMode } = useConfig<BillingConfig>();
-  const url = `/ws/rest/v1/cashier/paymentMode`;
+  const url = `/ws/rest/v1/cashier/paymentMode?v=full`;
   const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<PaymentMethod> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });

@@ -1,0 +1,16 @@
+@use '@carbon/layout';
+
+.paymentPoints {
+  padding: layout.$spacing-05;
+  display: flex;
+  flex-direction: column;
+}
+
+.createPaymentPointButton {
+  margin-bottom: layout.$spacing-05;
+  margin-left: auto;
+}
+
+.cashPoint {
+  margin: layout.$spacing-05 0;
+}

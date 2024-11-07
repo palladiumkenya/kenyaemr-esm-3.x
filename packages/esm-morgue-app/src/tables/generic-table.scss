@@ -1,0 +1,37 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.genericTable {
+  margin: 0 auto;
+}
+
+.searchContainer {
+  margin-bottom: layout.$spacing-05;
+  border: solid colors.$gray-30 0.1rem;
+  margin-left: layout.$spacing-06;
+  margin-right: layout.$spacing-06;
+}
+
+.tableContainer {
+  margin: 0 layout.$spacing-05;
+}
+
+.actionBtn {
+  --cds-layout-size-height-context: var(--cds-layout-size-height-sm, 2rem);
+  --cds-layout-size-height: var(--cds-layout-size-height-context);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 layout.$spacing-04;
+}
+.table {
+  border: 1px solid colors.$gray-30;
+  width: 98%;
+  margin: 0 auto;
+}
+.groupButtons {
+  display: flex;
+  gap: layout.$spacing-05;
+}

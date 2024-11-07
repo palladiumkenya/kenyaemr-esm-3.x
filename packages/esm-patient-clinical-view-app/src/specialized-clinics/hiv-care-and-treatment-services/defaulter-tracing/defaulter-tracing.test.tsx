@@ -4,6 +4,7 @@ import DefaulterTracing from './defaulter-tracing.component';
 import { usePatientTracing } from '../../../hooks/usePatientTracing';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import useEvent from '@testing-library/user-event';
+import * as mock from '@openmrs/esm-framework/mock';
 
 const usePatientTracingMock = usePatientTracing as jest.MockedFunction<typeof usePatientTracing>;
 const launchPatientWorkspaceMock = launchPatientWorkspace as jest.MockedFunction<typeof launchPatientWorkspace>;
@@ -18,14 +19,11 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
   launchPatientWorkspace: jest.fn(),
 }));
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-  useConfig: jest.fn(() => ({
-    formsList: {
-      defaulterTracingFormUuid: 'defaulterTracingFormUuid',
-    },
-  })),
-}));
+jest.spyOn(mock, 'useConfig').mockReturnValue({
+  formsList: {
+    defaulterTracingFormUuid: 'defaulterTracingFormUuid',
+  },
+});
 
 describe('DefaulterTracing', () => {
   test('should launch `Defaulter Tracing` form', async () => {

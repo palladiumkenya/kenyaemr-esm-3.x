@@ -1,3 +1,5 @@
+@use '@carbon/layout';
+
 .mainContainer {
   display: flex;
   margin: 0 auto;
@@ -7,6 +9,7 @@
 .content {
   display: flex;
   width: 100%;
+  gap: layout.$spacing-05;
 }
 
 :global(.omrs-breakpoint-lt-desktop) {

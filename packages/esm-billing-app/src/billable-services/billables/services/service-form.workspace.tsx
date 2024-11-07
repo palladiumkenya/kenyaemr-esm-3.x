@@ -133,9 +133,23 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
     [servicePriceFields, control, removeServicePrice, errors],
   );
 
+  const handleError = (err) => {
+    console.error(JSON.stringify(err, null, 2));
+    showSnackbar({
+      title: t('serviceCreationFailed', 'Service creation failed'),
+      subtitle: t(
+        'serviceCreationFailedSubtitle',
+        'The service creation failed, view browser console for more details',
+      ),
+      kind: 'error',
+      isLowContrast: true,
+      timeoutInMs: 5000,
+    });
+  };
+
   return (
     <FormProvider {...formMethods}>
-      <form onSubmit={handleSubmit(onSubmit, (err) => console.error(err))} className={styles.form}>
+      <form onSubmit={handleSubmit(onSubmit, handleError)} className={styles.form}>
         <div className={styles.formContainer}>
           <Stack className={styles.formStackControl} gap={7}>
             <ResponsiveWrapper>
@@ -210,7 +224,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                     labelText={t('status', 'Status')}
                     labelA="Off"
                     labelB="On"
-                    defaultToggled
+                    defaultToggled={field.value === 'ENABLED'}
                     id="serviceStatus"
                     onToggle={(value) => (value ? field.onChange('ENABLED') : field.onChange('DISABLED'))}
                   />

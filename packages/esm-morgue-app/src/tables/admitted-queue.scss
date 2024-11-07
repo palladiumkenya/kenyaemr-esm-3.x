@@ -1,0 +1,62 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+// @use '~@openmrs/esm-styleguide/src/vars' as *;
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin: layout.$spacing-04;
+}
+
+.column {
+  width: calc(25% - 1rem);
+  height: 776px;
+  flex-grow: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: layout.$spacing-03;
+  padding: 0;
+  margin: 0.5rem;
+}
+
+.tile {
+  width: 340px;
+  height: layout.$spacing-09;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: layout.$spacing-03 0;
+}
+
+.tileContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: layout.$spacing-04;
+}
+
+.label {
+  width: layout.$spacing-07;
+  height: layout.$spacing-07;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: layout.$spacing-01;
+  font-weight: 600;
+  line-height: 1.29;
+  background-color: colors.$cool-gray-20;
+  border: 1px solid colors.$cool-gray-20;
+  border-radius: 50%;
+}
+
+.emptyunit {
+  line-height: 1.38;
+}
+.layoutWrapper {
+  border: 1px solid colors.$gray-30;
+  padding: layout.$spacing-05 layout.$spacing-05;
+}

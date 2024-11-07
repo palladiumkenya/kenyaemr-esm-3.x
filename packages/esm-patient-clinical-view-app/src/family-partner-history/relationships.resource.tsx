@@ -94,7 +94,7 @@ export const useAllRelationshipTypes = () => {
 
 export const useMappedRelationshipTypes = () => {
   const url = `${restBaseUrl}/relationshiptype?v=default`;
-  const { data, error } = useSWRImmutable<{ data?: RelationshipTypeResponse }>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<{ data?: RelationshipTypeResponse }>(url, openmrsFetch);
 
   const relations: RelationshipType[] = [];
 
@@ -120,7 +120,7 @@ export const useMappedRelationshipTypes = () => {
       : relations.push(aIsToB, bIsToA);
   });
 
-  return { data: relations, error };
+  return { data: relations, error, isLoading };
 };
 
 export function usePatientRelationships(patientUuid: string) {

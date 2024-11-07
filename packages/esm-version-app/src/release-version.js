@@ -2,27 +2,27 @@
 /* tslint:disable */
 export const VERSION = {
   dirty: true,
-  raw: 'v5.3.2-3-g8b28c5d-dirty',
-  hash: 'g8b28c5d',
-  distance: 3,
-  tag: 'v5.3.2',
+  raw: 'v5.3.4-26-gf403234-dirty',
+  hash: 'gf403234',
+  distance: 26,
+  tag: 'v5.3.4',
   semver: {
     options: {
       loose: false,
       includePrerelease: false,
     },
     loose: false,
-    raw: 'v5.3.2',
+    raw: 'v5.3.4',
     major: 5,
     minor: 3,
-    patch: 2,
+    patch: 4,
     prerelease: [],
     build: [],
-    version: '5.3.2',
+    version: '5.3.4',
   },
-  suffix: '3-g8b28c5d-dirty',
-  semverString: '5.3.2+3.g8b28c5d',
-  version: '5.3.2',
-  buildDate: '2024-09-09T15:55:19.525Z',
+  suffix: '26-gf403234-dirty',
+  semverString: '5.3.4+26.gf403234',
+  version: '5.3.4',
+  buildDate: '2024-10-08T14:17:48.889Z',
 };
 /* tslint:enable */

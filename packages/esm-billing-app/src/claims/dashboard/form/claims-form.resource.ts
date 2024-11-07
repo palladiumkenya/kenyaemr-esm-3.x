@@ -1,6 +1,8 @@
+import { openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 import useSWR from 'swr';
-import { FetchResponse, openmrsFetch, restBaseUrl, type Visit } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
+import { mockInterventions, mockPackages } from './claims-form.mocks';
 
 interface Provider {
   uuid: string;
@@ -13,7 +15,7 @@ interface ProvidersResponse {
 
 export function useVisit(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,certainty,diagnosis:(coded:(uuid,display))),encounterDatetime,encounterType:(uuid,display),encounterProviders:(uuid,display,provider:(uuid,person:(uuid,display)))),location:(uuid,name,display),visitType:(uuid,name,display),startDatetime,stopDatetime)&limit=1';
+    'custom:(uuid,patient,encounters:(uuid,diagnoses:(uuid,display,certainty,diagnosis:(coded:(uuid,display))),encounterDatetime,encounterType:(uuid,display),encounterProviders:(uuid,display,provider:(uuid,person:(uuid,display)))),location:(uuid,name,display),visitType:(uuid,name,display),startDatetime,stopDatetime)&limit=1';
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -46,4 +48,29 @@ export const processClaims = (payload) => {
       'Content-Type': 'application/json',
     },
   });
+};
+
+export const retryClaim = (claimUUID: string) => {
+  const url = `/ws/rest/v1/insuranceclaims/claims/sendToExternal?claimUuid=${claimUUID}`;
+  return openmrsFetch(url, {
+    method: 'GET',
+  });
+};
+
+export const useInterventions = () => {
+  const interventions = useMemo(() => mockInterventions, []);
+  return {
+    isLoading: false,
+    interventions: interventions,
+    error: undefined,
+  };
+};
+
+export const usePackages = () => {
+  const _packages = useMemo(() => mockPackages, []);
+  return {
+    isLoading: false,
+    packages: _packages,
+    error: undefined,
+  };
 };

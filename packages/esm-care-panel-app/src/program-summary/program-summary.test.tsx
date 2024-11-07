@@ -4,10 +4,6 @@ import { mockProgram } from '../../../../__mocks__/program-summary.mock';
 import { formatDate } from '@openmrs/esm-framework';
 import ProgramSummary, { ProgramSummaryProps } from './program-summary.component';
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework'),
-}));
-
 jest.mock('../hooks/useProgramSummary', () => ({
   useProgramSummary: jest.fn(() => ({
     data: mockProgram,

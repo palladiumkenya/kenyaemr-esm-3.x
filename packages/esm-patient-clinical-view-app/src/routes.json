@@ -195,7 +195,7 @@
       "online": true,
       "offline": false
     },
-     {
+    {
       "component": "caseManagementDashboardLink",
       "name": "case-management-dashboard-link",
       "slot": "homepage-dashboard-slot",
@@ -245,43 +245,113 @@
         "columnSpan": 1,
         "slot": "patient-chart-case-encounter-slot",
         "path": "case-management-encounters",
-
         "layoutMode": "anchored"
       }
     },
-     {
+    {
       "name": "case-encounter-table",
       "slot": "patient-chart-case-encounter-slot",
       "component": "caseEncounterTable",
       "order": 0,
       "online": true,
       "offline": false
+    },
+    {
+      "component": "peerCalendarDashboardLink",
+      "name": "peer-calendar-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "peer-calendar",
+        "title": "Peer Calendar",
+        "slot": "peer-calendar-dashboard-slot",
+        "path": "peer-management"
+      }
+    },
+    {
+      "name": "peer-calendar",
+      "slot": "peer-calendar-dashboard-slot",
+      "component": "peerCalendar",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+     {
+      "name": "deceased-panel-dashboard-link",
+      "component": "deceasedPanelDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 15,
+      "meta": {
+        "columns": 1,
+        "columnSpan": 1,
+        "slot": "patient-chart-deceased-panel-slot",
+        "path": "deceased-panel",
+        "layoutMode": "anchored"
+      }
+    },
+    {
+      "name": "deceased-details-tabs",
+      "slot": "patient-chart-deceased-panel-slot",
+      "component": "deceasedDetailsTabs",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [
-	{
-	  "name": "birth-date-calculator",
-	  "component": "birthDateCalculator"
-	}
-],
-"workspaces": [
-  {
-    "name": "case-management-form",
-    "component": "caseManagementForm",
-    "title": "Case Management Form",
-    "type": "form"
-  },
-  {
-    "name": "family-relationship-form",
-    "component": "familyRelationshipForm",
-    "title": "Family Relationship Form",
-    "type": "form"
-  },
-  {
-    "name": "other-relationship-form",
-    "component": "otherRelationshipsForm",
-    "title": "Other Relationships Form",
-    "type": "form"
-  }
-]
+    {
+      "name": "birth-date-calculator",
+      "component": "birthDateCalculator"
+    },
+    {
+      "name": "relationship-delete-confirm-dialog",
+      "component": "relationshipDeleteConfirmialog"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "case-management-form",
+      "component": "caseManagementForm",
+      "title": "Case Management Form",
+      "type": "form"
+    },
+    {
+      "name": "family-relationship-form",
+      "component": "familyRelationshipForm",
+      "title": "Family Relationship Form",
+      "type": "form"
+    },
+    {
+      "name": "other-relationship-form",
+      "component": "otherRelationshipsForm",
+      "title": "Other Relationships Form",
+      "type": "form"
+    },
+    {
+      "name": "peers-form",
+      "component": "peersForm",
+      "title": "Add New Peer",
+      "type": "form"
+    },
+    {
+      "name": "peer-calendar-form",
+      "component": "peerCalendarFormEntry",
+      "title": "KVP Peer Educator Outreach Calendar",
+      "type": "form",
+      "width": "extra-wide",
+      "canMaximize": true,
+      "canHide": true
+    },
+    {
+      "name": "relationship-update-form",
+      "component": "relationshipUpdateForm",
+      "title": "Relationship Update Form",
+      "type": "form"
+    },
+    {
+      "name": "other-relationship-form",
+      "component": "otherRelationshipsForm",
+      "title": "Other Relationships Form",
+      "type": "form"
+    }
+  ]
 }

@@ -8,30 +8,30 @@ import {
   DatePickerInput,
   Form,
   InlineLoading,
+  Loading,
   MultiSelect,
   PasswordInput,
   Row,
   Search,
   Stack,
   Switch,
-  Tag,
   TextInput,
-  Tile,
 } from '@carbon/react';
 import { GenderFemale, GenderMale, Query } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, restBaseUrl, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { parseDate, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
 import { Facility, Practitioner, ProviderResponse, User } from '../types';
 import {
   createProvider,
+  createProviderAttribute,
   createUser,
   searchHealthCareWork,
-  createProviderAttribute,
   updateProviderAttributes,
   updateProviderPerson,
   updateProviderUser,
@@ -40,7 +40,7 @@ import {
   useRoles,
 } from './hook/provider-form.resource';
 import styles from './provider-form.scss';
-import { mutate } from 'swr';
+import { HWR_API_NO_CREDENTIALS, RESOURCE_NOT_FOUND, UNKNOWN } from '../constants';
 
 const providerFormSchema = z
   .object({
@@ -71,7 +71,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
   const { t } = useTranslation();
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
-  const { providerIdentifierTypes } = useIdentifierTypes();
+  const { providerIdentifierTypes, isLoading } = useIdentifierTypes();
   const { roles, isLoading: isLoadingRoles } = useRoles();
   const [facilitySearchTerm, setFacilitySearchTerm] = useState('');
   const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
@@ -98,7 +98,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       surname: provider?.person?.display?.split(' ').at(-1),
       firstname: provider?.person?.display?.split(' ').at(0),
       nationalid: provider?.attributes?.find((attr) => attr.attributeType.uuid === providerNationalIdUuid)?.value,
-      gender: provider?.person?.gender,
+      gender: provider?.person?.gender ?? 'M',
       licenseNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseNumberUuid)?.value,
       licenseExpiryDate: licenseDate ? parseDate(licenseDate) : undefined,
       username: user?.username,
@@ -109,7 +109,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     },
   });
 
-  const defualtValueCombox = providerIdentifierTypes?.find((item) => item.display === searchHWR.identifierType);
+  const defualtValueCombox = providerIdentifierTypes?.find((item) => item.uuid === searchHWR.identifierType);
   const handleSearch = async () => {
     try {
       setSearchHWR({ ...searchHWR, isHWRLoading: true });
@@ -133,7 +133,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         },
       });
     } catch (error) {
-      showModal('hwr-empty-modal');
+      showModal('hwr-empty-modal', { errorCode: error.message });
     } finally {
       setSearchHWR({ ...searchHWR, isHWRLoading: false });
     }
@@ -247,6 +247,14 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <Loading small withOverlay={false} />
+      </div>
+    );
+  }
+
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
       <Stack gap={4} className={styles.form__grid}>
@@ -350,14 +358,12 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         <Column>
           <span className={styles.form__gender}>{t('gender', 'Gender*')}</span>
           <Controller
-            name="gender"
             control={control}
+            name="gender"
             render={({ field }) => (
               <ContentSwitcher
-                id="form__content_switch"
-                selectedIndex={field.value === 'F' ? 1 : 0}
-                selectionMode="manual"
-                onChange={(event) => field.onChange(event.index === 0 ? 'M' : 'F')}>
+                selectedIndex={field.value && field.value == 'M' ? 0 : 1}
+                onChange={({ name }) => field.onChange(name)}>
                 <Switch
                   name="M"
                   text={
@@ -365,7 +371,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                       <GenderMale /> Male
                     </>
                   }
-                  selected={field.value === 'M'}
                 />
                 <Switch
                   name="F"
@@ -374,7 +379,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                       <GenderFemale /> Female
                     </>
                   }
-                  selected={field.value === 'F'}
                 />
               </ContentSwitcher>
             )}

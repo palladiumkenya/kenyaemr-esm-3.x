@@ -1,28 +1,28 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   Button,
   Form,
+  InlineNotification,
+  Layer,
+  Loading,
   ModalBody,
   ModalHeader,
-  TextInput,
-  Layer,
-  InlineNotification,
-  Loading,
   NumberInputSkeleton,
+  TextInput,
 } from '@carbon/react';
-import styles from './initiate-payment.scss';
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
-import { MappedBill } from '../../../types';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formatPhoneNumber } from '../utils';
-import { useSystemSetting } from '../../../hooks/getMflCode';
-import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
-import { useRequestStatus } from '../../../hooks/useRequestStatus';
 import { useConfig } from '@openmrs/esm-framework';
+import React, { useEffect, useState } from 'react';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { z } from 'zod';
 import { BillingConfig } from '../../../config-schema';
+import { useSystemSetting } from '../../../hooks/getMflCode';
 import { usePatientAttributes } from '../../../hooks/usePatientAttributes';
+import { useRequestStatus } from '../../../hooks/useRequestStatus';
+import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
+import { MappedBill } from '../../../types';
+import { formatPhoneNumber } from '../utils';
+import styles from './initiate-payment.scss';
 
 const initiatePaymentSchema = z.object({
   phoneNumber: z
@@ -48,6 +48,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const [isLoading, setIsLoading] = useState(false);
   const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification, closeModal, bill);
 
+  const pendingAmount = bill.totalAmount - bill.tenderedAmount;
+
   const {
     control,
     handleSubmit,
@@ -57,7 +59,10 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     reset,
   } = useForm<FormData>({
     mode: 'all',
-    defaultValues: { billAmount: String(bill.totalAmount), phoneNumber: phoneNumber },
+    defaultValues: {
+      billAmount: pendingAmount.toString(),
+      phoneNumber: phoneNumber,
+    },
     resolver: zodResolver(initiatePaymentSchema),
   });
 

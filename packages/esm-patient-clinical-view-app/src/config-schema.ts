@@ -8,6 +8,7 @@ export const configSchema = {
     _default: {
       mchMotherConsultation: 'c6d09e05-1f25-4164-8860-9f32c5a02df0',
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
+      kpPeerCalender: 'c4f9db39-2c18-49a6-bf9b-b243d673c64d',
     },
   },
   caseManagementForms: {
@@ -42,12 +43,19 @@ export const configSchema = {
       htsLinkage: '050a7f12-5c52-4cad-8834-863695af335d',
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
       clinicalEncounterFormUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
+      peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
+      autopsyFormUuid: '',
     },
   },
   defaulterTracingEncounterUuid: {
     _type: Type.String,
     _description: 'Encounter UUID for defaulter tracing',
     _default: '1495edf8-2df2-11e9-b210-d663bd873d93',
+  },
+  autopsyEncounterUuid: {
+    _type: Type.String,
+    _description: 'Encounter UUID for autopsy',
+    _default: '',
   },
   clinicalEncounterUuid: {
     _type: Type.String,
@@ -102,6 +110,25 @@ export const configSchema = {
     _description: 'Registration encounter UUID',
     _default: 'de1f9d67-b73e-4e1b-90d0-036166fc6995',
   },
+  registrationObs: {
+    encounterTypeUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'Obs created during registration will be associated with an encounter of this type. This must be set in order to use fields of type `obs`.',
+    },
+    encounterProviderRoleUuid: {
+      _type: Type.UUID,
+      _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
+      _description: "The provider role to use for the registration encounter. Default is 'Unkown'.",
+    },
+    registrationFormUuid: {
+      _type: Type.UUID,
+      _default: null,
+      _description:
+        'The form UUID to associate with the registration encounter. By default no form will be associated.',
+    },
+  },
   openmrsIDUuid: {
     _type: Type.String,
     _description: 'OpenMRS Identifier  UUID',
@@ -121,6 +148,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'HIV Program UUID',
     _default: 'dfdc6d40-2f2f-463d-ba90-cc97350441a8',
+  },
+  kvpProgramUuid: {
+    _type: Type.String,
+    _description: 'KVP Program UUID',
+    _default: '7447305a-18a7-11e9-ab14-d663bd873d93',
   },
   contactPersonAttributesUuid: {
     _type: Type.Object,
@@ -175,6 +207,11 @@ export const configSchema = {
         display: 'SNS/SNS',
       },
     ],
+  },
+  peerEducatorRelationship: {
+    _type: Type.String,
+    _description: 'Peer Educator Relationship type',
+    _default: '96adecc2-e7cd-41d0-b577-08eb4834abcb',
   },
   pnsRelationships: {
     _type: Type.Array,
@@ -238,8 +275,10 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  peerEducatorRelationship: string;
   caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
-  encounterTypes: { mchMotherConsultation: string; hivTestingServices: string };
+  peerCalendarOutreactForm: string;
+  encounterTypes: { mchMotherConsultation: string; hivTestingServices: string; kpPeerCalender: string };
   formsList: {
     labourAndDelivery: string;
     antenatal: string;
@@ -249,14 +288,22 @@ export interface ConfigObject {
     htsRetest: string;
     defaulterTracingFormUuid: string;
     clinicalEncounterFormUuid: string;
+    peerCalendarOutreactForm: string;
+    autopsyFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
   clinicalEncounterUuid: string;
   registrationEncounterUuid: string;
+  registrationObs: {
+    encounterTypeUuid: string | null;
+    encounterProviderRoleUuid: string;
+    registrationFormUuid: string | null;
+  };
   openmrsIDUuid: string;
   openmrsIdentifierSourceUuid: string;
   maritalStatusUuid: string;
   hivProgramUuid: string;
+  kvpProgramUuid: string;
   concepts: Record<string, string>;
   specialClinics: Array<{ id: string; formUuid: string; encounterTypeUuid: string; title: string }>;
   contactPersonAttributesUuid: {

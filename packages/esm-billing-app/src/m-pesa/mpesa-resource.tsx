@@ -7,7 +7,11 @@ readableStatusMap.set('INITIATED', 'Waiting for user...');
 readableStatusMap.set('NOT-FOUND', 'Request not found');
 
 export const initiateStkPush = async (
-  payload,
+  payload: {
+    AccountReference: string;
+    PhoneNumber: string;
+    Amount: string;
+  },
   setNotification: (notification: { type: 'error' | 'success'; message: string }) => void,
   MPESA_PAYMENT_API_BASE_URL: string,
 ): Promise<string> => {
@@ -55,7 +59,7 @@ export const initiateStkPush = async (
 export const getRequestStatus = async (
   requestId: string,
   MPESA_PAYMENT_API_BASE_URL: string,
-): Promise<RequestStatus> => {
+): Promise<{ status: RequestStatus; referenceCode?: string }> => {
   const requestResponse = await fetch(`${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/check-payment-state`, {
     method: 'POST',
     headers: {
@@ -75,9 +79,9 @@ export const getRequestStatus = async (
     throw error;
   }
 
-  const requestStatus: { status: RequestStatus } = await requestResponse.json();
+  const requestStatus: { status: RequestStatus; referenceCode?: string } = await requestResponse.json();
 
-  return requestStatus.status;
+  return requestStatus;
 };
 
 export const getErrorMessage = (err: { message: string }, t) => {

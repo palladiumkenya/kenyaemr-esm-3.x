@@ -14,12 +14,12 @@ const doesObjectExistInArray = (obsArray, objectToCheck) =>
   obsArray.some((obs) => obs.concept === objectToCheck.concept);
 
 export function filterRegimenData(regimenData: RegimenLineGroup[] | undefined, patientAge: number): RegimenLineGroup[] {
-  if (!regimenData) {
+  if (!regimenData?.length) {
     return [];
   }
 
   const filterCriterion = patientAge > 14 ? 'Adult' : 'Child';
-  return regimenData.filter((group) => group.regimenline.startsWith(filterCriterion));
+  return regimenData.filter(({ regimenline }) => regimenline?.includes(filterCriterion));
 }
 
 export function calculateAge(birthDateString: string | null | undefined, visitDate: Date): number {

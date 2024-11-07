@@ -11,7 +11,7 @@ on:
 
 env:
   TURBO_API: 'http://127.0.0.1:9080'
-  TURBO_TOKEN: ${{ secrets.TURBO_SERVER_TOKEN }}
+  TURBO_TOKEN: 'turbo-token'
   TURBO_TEAM: ${{ github.repository_owner }}
 
 jobs:
@@ -23,20 +23,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          cache: 'yarn'
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Setup local cache server for Turborepo
@@ -46,94 +42,99 @@ jobs:
           server-token: ${{ env.TURBO_TOKEN }}
 
       - name: Run lint, type checks and tests
-        run: yarn verify
+        run: yarn verify --cache-dir=.turbo
 
       - name: Run build
-        run: yarn turbo run build --concurrency=5
+        run: yarn turbo run build --concurrency=10
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: packages
-          path: |
-            packages/**/dist
+          path: packages/**/dist
+          compression-level: 0
           overwrite: true
+          
 
   pre_release:
     runs-on: ubuntu-latest
-
     needs: build
-
     if: ${{ github.event_name == 'push' }}
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          cache: 'yarn'
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
+
+      - name: Setup local cache server for Turborepo
+        uses: felixmosh/turborepo-gh-artifacts@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ env.TURBO_TOKEN }}
 
       - name: Version
         run: yarn workspaces foreach --worktree --topological --exclude @kenyaemr/esm-3.x-apps version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
 
-      - name: Build
-        run: yarn turbo run build --concurrency=5
+      - name: Run build
+        run: yarn turbo run build --concurrency=10
 
-      - run: git config user.email "info@thepalladiumgroup.com" && git config user.name "KenyaEMR CI"
-      - run: git add . && git commit -m "Prerelease version" --no-verify
+      - name: Git config and commit
+        run: |
+          git config user.email "info@thepalladiumgroup.com"
+          git config user.name "KenyaEMR CI"
+          git add . && git commit -m "Prerelease version" --no-verify
 
       - name: Pre-release
         run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: packages
-          path: |
-            packages/**/dist
-          overwrite: true
-
   release:
     runs-on: ubuntu-latest
-
     needs: build
-
     if: ${{ github.event_name == 'release' }}
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
-          registry-url: "https://registry.npmjs.org"
-
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+          cache: 'yarn'
 
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
-      - run: yarn turbo run build --color
-      - run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:publish
+      - name: Setup local cache server for Turborepo
+        uses: felixmosh/turborepo-gh-artifacts@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ env.TURBO_TOKEN }}
+
+      - name: Run build
+        run: yarn turbo run build --concurrency=10
+
+      - name: Git config and commit
+        run: |
+          git config user.email "info@thepalladiumgroup.com"
+          git config user.name "KenyaEMR CI"
+          git add . && git commit -m "Prerelease version" --no-verify
+          
+      - name: Publish
+        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

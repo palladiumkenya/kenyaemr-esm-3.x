@@ -6,6 +6,14 @@
 
   & > section {
     position: relative;
-    margin-bottom: layout.$spacing-02;
+    margin-bottom: layout.$spacing-01;
   }
+}
+
+.iconMarginLeft {
+  margin-left: layout.$spacing-05;
+}
+
+.bulkUploadButton {
+  margin-right: layout.$spacing-05;
 }

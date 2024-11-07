@@ -1,0 +1,32 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+.dataTable {
+  margin: layout.$spacing-05;
+}
+
+.addPaymentModeButton {
+  margin-right: layout.$spacing-05;
+}
+
+.attributeContainer {
+  background-color: colors.$gray-10;
+  padding: layout.$spacing-05;
+
+  .attributeCard {
+    display: grid;
+    grid-template-columns: layout.$layout-07 calc(layout.$layout-07 * 2);
+    gap: layout.$spacing-05;
+    row-gap: layout.$spacing-05;
+    padding: layout.$spacing-02;
+
+    .attributeLabel {
+      @include type.type-style('label-02');
+      color: colors.$gray-70;
+    }
+
+    .attributeValue {
+      @include type.type-style('legal-01');
+    }
+  }
+}
