@@ -25,6 +25,8 @@ import ProviderDetails from './provider-details.component';
 import { ConfigObject } from '../config-schema';
 import dayjs from 'dayjs';
 import CustomActionMenu from '../overflow/overflow-component';
+import EmptyProviderState from './empty-state.component';
+import { Report, SearchLocate } from '@carbon/react/icons';
 
 const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ filter }) => {
   const { t } = useTranslation();
@@ -124,55 +126,65 @@ const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ f
         <Search
           labelText=""
           placeholder={t('searchProvider', 'Search for provider')}
-          onChange={(e) => setSearchQuery(e.target.value)} // Update search query
+          onChange={(e) => setSearchQuery(e.target.value)}
           size={isDesktop(layout) ? 'sm' : 'lg'}
+          value={searchQuery}
         />
-        <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
-          {({
-            rows,
-            headers,
-            getExpandHeaderProps,
-            getTableProps,
-            getTableContainerProps,
-            getHeaderProps,
-            getRowProps,
-          }) => (
-            <TableContainer {...getTableContainerProps()}>
-              <Table className={styles.table} {...getTableProps()} aria-label="Provider list">
-                <TableHead>
-                  <TableRow>
-                    <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
-                    {headers.map((header, i) => (
-                      <TableHeader key={i} {...getHeaderProps({ header })}>
-                        {header.header}
-                      </TableHeader>
+
+        {filteredProviders.length === 0 ? (
+          <EmptyProviderState
+            title={t('noProvidersAvailable', 'No providers available')}
+            subTitle={t('adjustFilterOrSwitch', 'Try adjusting your search or switch to a different category above.')}
+            icon={<Report className={styles.iconOverrides} />}
+          />
+        ) : (
+          <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
+            {({
+              rows,
+              headers,
+              getExpandHeaderProps,
+              getTableProps,
+              getTableContainerProps,
+              getHeaderProps,
+              getRowProps,
+            }) => (
+              <TableContainer {...getTableContainerProps()}>
+                <Table className={styles.table} {...getTableProps()} aria-label="Provider list">
+                  <TableHead>
+                    <TableRow>
+                      <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
+                      {headers.map((header, i) => (
+                        <TableHeader key={i} {...getHeaderProps({ header })}>
+                          {header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, i) => (
+                      <React.Fragment key={row.id}>
+                        <TableExpandRow {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          ))}
+                        </TableExpandRow>
+                        {row && row.isExpanded ? (
+                          <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
+                            <div className={styles.container} key={i}>
+                              <ProviderDetails providerUuid={row.id} />
+                            </div>
+                          </TableExpandedRow>
+                        ) : (
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
+                        )}
+                      </React.Fragment>
                     ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, i) => (
-                    <React.Fragment key={row.id}>
-                      <TableExpandRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
-                        ))}
-                      </TableExpandRow>
-                      {row && row.isExpanded ? (
-                        <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
-                          <div className={styles.container} key={i}>
-                            <ProviderDetails providerUuid={row.id} />
-                          </div>
-                        </TableExpandedRow>
-                      ) : (
-                        <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
-                      )}
-                    </React.Fragment>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+        )}
         {paginated && (
           <Pagination
             forwardText={t('nextPage', 'Next page')}
