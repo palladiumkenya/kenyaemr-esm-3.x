@@ -81,6 +81,12 @@ export const useModuleLinks = () => {
       privilege: 'o3: View Dispensing Dashboard',
     },
     {
+      label: 'Supplies Dispensing',
+      url: `${openmrsSpaBase}supplies-dispensing`,
+      icon: <Medication size={24} />,
+      privilege: 'o3: View Dispensing Dashboard',
+    },
+    {
       label: 'Lab Manifest App',
       url: `${openmrsSpaBase}home/lab-manifest`,
       icon: <ChemistryReference size={24} />,
