@@ -31,7 +31,7 @@ type PaymentModeDashboardProps = {};
 const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
   const { t } = useTranslation();
   const size = 'md';
-  const { paymentModes, isLoading } = usePaymentModes();
+  const { paymentModes = [], isLoading } = usePaymentModes(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);

@@ -79,7 +79,7 @@ const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order, modalName
     : actionText ?? t('pickLabRequest', 'Pick Lab Request');
 
   return (
-    <Button kind="primary" disabled={hasPendingPayment} onClick={launchModal}>
+    <Button kind="primary" disabled={hasPendingPayment} key={`${order.uuid}`} onClick={launchModal}>
       {buttonText}
     </Button>
   );

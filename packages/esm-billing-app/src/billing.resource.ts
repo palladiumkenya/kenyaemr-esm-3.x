@@ -3,6 +3,7 @@ import {
   openmrsFetch,
   OpenmrsResource,
   parseDate,
+  restBaseUrl,
   useConfig,
   useSession,
   useVisit,
@@ -68,7 +69,7 @@ export const useBills = (
   const startingDateISO = startingDate.toISOString();
   const endDateISO = endDate.toISOString();
 
-  const url = `/ws/rest/v1/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startingDateISO}&createdOnOrBefore=${endDateISO}`;
+  const url = `${restBaseUrl}/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startingDateISO}&createdOnOrBefore=${endDateISO}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     patientUuid ? `${url}&patientUuid=${patientUuid}` : url,
@@ -94,7 +95,7 @@ export const useBills = (
 };
 
 export const useBill = (billUuid: string) => {
-  const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
+  const url = `${restBaseUrl}/cashier/bill/${billUuid}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PatientInvoice }>(
     billUuid ? url : null,
     openmrsFetch,
@@ -146,7 +147,7 @@ export const useBill = (billUuid: string) => {
 };
 
 export const processBillPayment = (payload, billUuid: string) => {
-  const url = `/ws/rest/v1/cashier/bill/${billUuid}`;
+  const url = `${restBaseUrl}/cashier/bill/${billUuid}`;
   return openmrsFetch(url, {
     method: 'POST',
     body: payload,
@@ -158,7 +159,7 @@ export const processBillPayment = (payload, billUuid: string) => {
 
 export function useDefaultFacility() {
   const { authenticated } = useSession();
-  const url = '/ws/rest/v1/kenyaemr/default-facility';
+  const url = '${restBaseUrl}/kenyaemr/default-facility';
   const { data, isLoading } = useSWR<{ data: FacilityDetail }>(authenticated ? url : null, openmrsFetch, {});
   return { data: data?.data, isLoading: isLoading };
 }
@@ -166,9 +167,9 @@ export function useDefaultFacility() {
 export function useFetchSearchResults(searchVal, category) {
   let url = ``;
   if (category == 'Stock Item') {
-    url = `/ws/rest/v1/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}`;
+    url = `${restBaseUrl}/stockmanagement/stockitem?v=default&limit=10&q=${searchVal}`;
   } else {
-    url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
+    url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
   }
   const { data, error, isLoading, isValidating } = useSWR(searchVal ? url : null, openmrsFetch, {});
 
@@ -189,7 +190,7 @@ export const usePatientPaymentInfo = (patientUuid: string) => {
 };
 
 export const processBillItems = (payload) => {
-  const url = `/ws/rest/v1/cashier/bill`;
+  const url = `${restBaseUrl}/cashier/bill`;
   return openmrsFetch(url, {
     method: 'POST',
     body: payload,
@@ -201,7 +202,7 @@ export const processBillItems = (payload) => {
 
 export const usePaymentModes = (excludeWaiver: boolean = true) => {
   const { excludedPaymentMode } = useConfig<BillingConfig>();
-  const url = `/ws/rest/v1/cashier/paymentMode?v=full`;
+  const url = `${restBaseUrl}/cashier/paymentMode?v=full`;
   const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<PaymentMethod> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
@@ -218,7 +219,7 @@ export const usePaymentModes = (excludeWaiver: boolean = true) => {
 };
 
 export const useBillableItems = () => {
-  const url = `/ws/rest/v1/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
+  const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
   const [searchTerm, setSearchTerm] = useState('');
   const filteredItems =
@@ -232,19 +233,19 @@ export const useBillableItems = () => {
   };
 };
 export const useCashPoint = () => {
-  const url = `/ws/rest/v1/cashier/cashPoint`;
+  const url = `${restBaseUrl}/cashier/cashPoint`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
 
   return { isLoading, error, cashPoints: data?.data?.results ?? [] };
 };
 
 export const createPatientBill = (payload) => {
-  const postUrl = `/ws/rest/v1/cashier/bill`;
+  const postUrl = `${restBaseUrl}/cashier/bill`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
 
 export const useConceptAnswers = (conceptUuid: string) => {
-  const url = `/ws/rest/v1/concept/${conceptUuid}`;
+  const url = `${restBaseUrl}/concept/${conceptUuid}`;
   const { data, isLoading, error } = useSWR<{ data: { answers: Array<OpenmrsResource> } }>(url, openmrsFetch);
   return { conceptAnswers: data?.data?.answers, isLoading, error };
 };
