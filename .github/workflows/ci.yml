@@ -102,7 +102,7 @@ jobs:
       - name: Publish pre-release
         run: |
           yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
-          yarn run ci:publish
+          yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
