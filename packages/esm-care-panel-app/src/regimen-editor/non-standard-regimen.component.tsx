@@ -84,7 +84,7 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
             {!selectedRegimenLine || selectedRegimenLine == '--' ? (
               <SelectItem text={t('selectRegimenLine', 'Select Regimen Line')} value="" />
             ) : null}
-            {filteredRegimenLineByAge.map((line) => (
+            {filteredRegimenLineByAge?.map((line) => (
               <SelectItem key={line.regimenline} text={line.regimenline} value={line.regimenLineValue}>
                 {line.regimenline}
               </SelectItem>
@@ -94,7 +94,7 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
 
         {selectedRegimenLine && (
           <div>
-            {selectedRegimens.map((selectedRegimen, index) => {
+            {selectedRegimens?.map((selectedRegimen, index) => {
               const availableRegimens = nonStandardRegimen.filter(
                 (regimen) => !selectedRegimens.includes(regimen.uuid) || regimen.uuid === selectedRegimen,
               );
