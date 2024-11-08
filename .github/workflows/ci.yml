@@ -10,9 +10,9 @@ on:
       - created
 
 env:
-  TURBO_API: 'http://127.0.0.1:9080'
   TURBO_TOKEN: 'turbo-token'
   TURBO_TEAM: ${{ github.repository_owner }}
+  FORCE_COLOR: true
 
 jobs:
   build:
@@ -20,121 +20,127 @@ jobs:
     timeout-minutes: 15
     permissions:
       actions: read
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-          
+          fetch-depth: 2
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      # Use Turborepo Remote Caching
+      - name: Setup Turborepo Remote Cache
+        uses: dtinth/setup-github-actions-caching-for-turbo@v1
 
-      - name: Setup local cache server for Turborepo
-        uses: felixmosh/turborepo-gh-artifacts@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Run lint, type checks and tests
-        run: yarn verify --cache-dir=.turbo
+        run: yarn verify --cache-dir=".turbo"
+        env:
+          TURBO_CACHE_KEY: ${{ github.sha }}
 
-      - name: Run build
-        run: yarn turbo run build --concurrency=10
+      - name: Build packages
+        run: |
+          yarn turbo run build \
+            --cache-dir=".turbo" \
+            --concurrency=5 \
+            --no-daemon
+        env:
+          TURBO_CACHE_KEY: ${{ github.sha }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: packages
           path: packages/**/dist
-          compression-level: 0
-          overwrite: true
-          
+          compression-level: 9
+          retention-days: 7
 
   pre_release:
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event_name == 'push' }}
-    timeout-minutes: 20
+    if: github.event_name == 'push'
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-          
+          fetch-depth: 0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
+          registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Setup local cache server for Turborepo
-        uses: felixmosh/turborepo-gh-artifacts@v3
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
+        run: yarn install --frozen-lockfile
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Version
         run: yarn workspaces foreach --worktree --topological --exclude @kenyaemr/esm-3.x-apps version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
 
-      - name: Run build
-        run: yarn turbo run build --concurrency=10
+      - name: Build
+        run: yarn turbo run build --cache-dir=".turbo" --concurrency=5 --no-daemon
+        env:
+          TURBO_CACHE_KEY: ${{ github.sha }}
 
-      - name: Git config and commit
+      - name: Configure Git
         run: |
           git config user.email "info@thepalladiumgroup.com"
           git config user.name "KenyaEMR CI"
-          git add . && git commit -m "Prerelease version" --no-verify
 
-      - name: Pre-release
-        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:prepublish
+      - name: Publish pre-release
+        run: |
+          yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
+          yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          NPM_CONFIG_PROVENANCE: true
 
   release:
     runs-on: ubuntu-latest
     needs: build
-    if: ${{ github.event_name == 'release' }}
-    timeout-minutes: 15
+    if: github.event_name == 'release'
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-          
+          fetch-depth: 0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "18"
+          registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
 
-      - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Setup local cache server for Turborepo
-        uses: felixmosh/turborepo-gh-artifacts@v3
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
         with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          server-token: ${{ env.TURBO_TOKEN }}
+          name: packages
+          path: packages
 
-      - name: Run build
-        run: yarn turbo run build --concurrency=10
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+        env:
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
+      
+      - name: Build
+        run: yarn turbo run build --cache-dir=".turbo" --concurrency=5 --no-daemon
 
-      - name: Git config and commit
+      - name: Publish release
         run: |
-          git config user.email "info@thepalladiumgroup.com"
-          git config user.name "KenyaEMR CI"
-          git add . && git commit -m "Prerelease version" --no-verify
-          
-      - name: Publish
-        run: yarn config set npmAuthToken "${NODE_AUTH_TOKEN}" && yarn run ci:publish
+          yarn config set npmAuthToken "${NODE_AUTH_TOKEN}"
+          yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
