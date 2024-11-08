@@ -1,5 +1,14 @@
-import React from 'react';
-import { Form, Stack, FormGroup, Layer, Button, NumberInput, TextArea } from '@carbon/react';
+import React, { useEffect } from 'react';
+import {
+  FormGroup,
+  Layer,
+  Button,
+  NumberInput,
+  TextArea,
+  InlineNotification,
+  InlineLoading,
+  ButtonSet,
+} from '@carbon/react';
 import { TaskAdd } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './waive-bill-form.scss';
@@ -7,24 +16,36 @@ import { MappedBill } from '../../../../types';
 import { createBillWaiverPayload, extractErrorMessagesFromResponse } from '../../../../utils';
 import { convertToCurrency, extractString } from '../../../../helpers';
 import { processBillPayment, usePaymentModes } from '../../../../billing.resource';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import first from 'lodash-es/first';
+import classNames from 'classnames';
 
 type BillWaiverFormProps = DefaultPatientWorkspaceProps & {
   bill: MappedBill;
 };
 
-export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorkspace }) => {
+export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({
+  bill,
+  closeWorkspace,
+  promptBeforeClosing,
+  closeWorkspaceWithSavedChanges,
+}) => {
   const { lineItems } = bill;
+  const isTablet = useLayoutType() === 'tablet';
 
   const { t } = useTranslation();
 
   const totalAmount = lineItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
-  const { paymentModes } = usePaymentModes(false);
+  const { isLoading, paymentModes = [] } = usePaymentModes(false);
+  const waiverPaymentMode =
+    first(paymentModes.filter((mode) => mode.name.toLowerCase().includes('waiver')))?.attributeTypes ?? [];
+  // calculate amount already waived or paid this is to ensure that the amount to waive is not greater than the total amount
+  const amountAlreadyWaivedOrPaid = bill.payments.reduce((acc, curr) => acc + curr.amountTendered, 0);
 
   const schema = z.object({
     waiveAmount: z
@@ -32,9 +53,24 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
       .refine((n) => parseInt(n) > 0, {
         message: t('waiveAmountGreaterThanZero', 'Amount to waive should be greater than zero'),
       })
-      .refine((n) => parseInt(n) < totalAmount + 1, {
-        message: t('waiveAmountCannotBeGreaterThanTotal', 'Amount to waive cannot be greater than total amount'),
-      }),
+      .refine(
+        (n) =>
+          amountAlreadyWaivedOrPaid > 0
+            ? parseInt(n) < totalAmount - amountAlreadyWaivedOrPaid + 1
+            : parseInt(n) < totalAmount + 1,
+        {
+          message:
+            amountAlreadyWaivedOrPaid > 0
+              ? t(
+                  'waiveAmountCannotBeGreaterThanRemainingAmount',
+                  'Amount to waive cannot be greater than the remaining amount {{remainingAmount}}',
+                  {
+                    remainingAmount: totalAmount - amountAlreadyWaivedOrPaid,
+                  },
+                )
+              : t('waiveAmountCannotBeGreaterThanTotal', 'Amount to waive cannot be greater than total amount'),
+        },
+      ),
     waiverReason: z
       .string({ required_error: t('waiverReasonRequired', 'Waiver reason is required') })
       .min(1, { message: t('waiverReasonRequired', 'Waiver reason is required') }),
@@ -45,11 +81,15 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isDirty, isSubmitting, isValid },
   } = useForm<FormData>({
     mode: 'all',
     resolver: zodResolver(schema),
   });
+
+  useEffect(() => {
+    promptBeforeClosing(() => isDirty);
+  }, [isDirty]);
 
   if (lineItems?.length === 0) {
     return null;
@@ -74,10 +114,10 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
           timeoutInMs: 3500,
           isLowContrast: true,
         });
-        mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/cashier/bill?v=full'), undefined, {
+        mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/cashier/bill?status`), undefined, {
           revalidate: true,
         });
-        closeWorkspace();
+        closeWorkspaceWithSavedChanges();
       },
       (error) => {
         showSnackbar({
@@ -93,9 +133,29 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
     );
   };
 
+  if (isLoading) {
+    return <InlineLoading description={t('loading', 'Loading')} />;
+  }
+
+  if (waiverPaymentMode.length === 0) {
+    return (
+      <div className={styles.waiverPaymentModeNotFound}>
+        <InlineNotification
+          title={t('waiverPaymentModeNotFound', 'Waiver payment mode not found')}
+          subtitle={t(
+            'waiverPaymentModeNotFoundSubtitle',
+            'Contact your administrator to create a waiver payment attribute type to waive a bill',
+          )}
+          kind="error"
+          lowContrast
+        />
+      </div>
+    );
+  }
+
   return (
-    <Form className={styles.form} aria-label={t('waiverForm', 'Waiver form')} onSubmit={handleSubmit(onSubmit)}>
-      <Stack gap={7}>
+    <form className={styles.form} aria-label={t('waiverForm', 'Waiver form')} onSubmit={handleSubmit(onSubmit)}>
+      <div className={styles.formContainer}>
         <FormGroup legendText={t('billItemsSummary', 'Bill Items Summary')}>
           <section className={styles.billWaiverDescription}>
             <label className={styles.label}>{t('waiverBillItems', 'Bill Items')}</label>
@@ -109,6 +169,12 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
             <label className={styles.label}>{t('billTotal', 'Bill total')}</label>
             <p className={styles.value}>{convertToCurrency(totalAmount)}</p>
           </section>
+          {amountAlreadyWaivedOrPaid > 0 && (
+            <section className={styles.billWaiverDescription}>
+              <label className={styles.label}>{t('amountAlreadyWaivedOrPaid', 'Total paid / waived')}</label>
+              <p className={styles.value}>{convertToCurrency(amountAlreadyWaivedOrPaid)}</p>
+            </section>
+          )}
           <Controller
             control={control}
             name="waiveAmount"
@@ -138,12 +204,25 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({ bill, closeWorksp
             )}
           />
         </FormGroup>
-        <div className={styles.buttonContainer}>
-          <Button kind="tertiary" renderIcon={TaskAdd} disabled={!isValid} role="button" type="submit">
-            {t('postWaiver', 'Post waiver')}
-          </Button>
-        </div>
-      </Stack>
-    </Form>
+      </div>
+      <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
+        <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button
+          disabled={isSubmitting || !isDirty || !isValid}
+          style={{ maxWidth: '50%' }}
+          kind="primary"
+          type="submit">
+          {isSubmitting ? (
+            <span style={{ display: 'flex', justifyItems: 'center' }}>
+              {t('submitting', 'Submitting...')} <InlineLoading status="active" iconDescription="Loading" />
+            </span>
+          ) : (
+            t('postWaiver', 'Post waiver')
+          )}
+        </Button>
+      </ButtonSet>
+    </form>
   );
 };
