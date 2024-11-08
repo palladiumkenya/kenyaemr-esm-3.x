@@ -43,8 +43,8 @@ export const configSchema = {
     _type: Type.Object,
     _description: 'The credentials for authenticating with the PDSL server',
     _default: {
-      email: 'kenyaemr@gmail.com',
-      password: 'emr@2020#',
+      email: '',
+      password: '',
     },
   },
   shaIdentificationNumberUUID: {
