@@ -512,8 +512,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 className={styles.sectionField}
                 placeholder={t('dischargeArea', 'Discharge Area')}
                 labelText={t('dischargeArea', 'Discharge Area')}
-                invalid={!!errors.tagNumber}
-                invalidText={errors.tagNumber?.message}
+                invalid={!!errors.dischargeArea}
+                invalidText={errors.dischargeArea?.message}
               />
             )}
           />
