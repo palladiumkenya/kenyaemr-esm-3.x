@@ -68,6 +68,9 @@ const patientInfoSchema = z.object({
     .regex(/^(0[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i, 'Time of death must be in the format hh:mm AM/PM'),
   tagNumber: z.string().nonempty('Tag number is required'),
   obNumber: z.string().optional(),
+  policeName: z.string().optional(),
+  policeIDNo: z.string().optional(),
+  burialPermitNo: z.string().nonempty('Burial Permit is required'),
   visitType: z.string().uuid('invalid visit type'),
   availableCompartment: z.string(),
   services: z.array(z.string().uuid('invalid service')).nonempty('Must select one service'),
@@ -101,7 +104,9 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     visitPaymentMethodAttributeUuid,
     morgueAdmissionEncounterType,
     tagNumberUuid,
-    policeStatementUuid,
+    policeIDNumber,
+    policeNameUuid,
+    burialPermitNumberUuid,
     obNumberUuid,
     encounterProviderRoleUuid,
   } = useConfig<ConfigObject>();
@@ -122,6 +127,9 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
       timeOfDeath: '',
       tagNumber: '',
       obNumber: '',
+      policeName: '',
+      policeIDNo: '',
+      burialPermitNo: '',
       visitType: morgueVisitTypeUuid,
       availableCompartment: '',
       paymentMethod: '',
@@ -176,6 +184,15 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     }
     if (data.obNumber) {
       obs.push({ concept: obNumberUuid, value: data.obNumber });
+    }
+    if (data.policeName) {
+      obs.push({ concept: policeNameUuid, value: data.policeName });
+    }
+    if (data.policeIDNo) {
+      obs.push({ concept: policeIDNumber, value: data.policeIDNo });
+    }
+    if (data.burialPermitNo) {
+      obs.push({ concept: burialPermitNumberUuid, value: data.burialPermitNo });
     }
 
     const encounterPayload = {
@@ -480,12 +497,13 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
         </Column>
 
         <Column>
-          <ComboBox
+          <Dropdown
             onChange={(e) => handlePoliceCaseChange(e.selectedItem)}
             id="morgue-combobox"
             className={styles.formAdmissionDatepicker}
             items={['Yes', 'No']}
             itemToString={(item) => (item ? item : '')}
+            label={t('ChooseOptions', 'Choose option')}
             titleText={t(
               'isPoliceCase',
               'Is the body associated with a police case? If so, can you provide the OB number?*',
@@ -504,10 +522,45 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                     {...field}
                     id="obNumber"
                     className={styles.formAdmissionDatepicker}
-                    placeholder={t('obNumber', 'OB Number*')}
-                    labelText={t('obNumber', 'OB Number*')}
+                    placeholder={t('obNos', 'OB Number')}
+                    labelText={t('obNumber', 'OB Number')}
                     invalid={!!errors.obNumber}
                     invalidText={errors.obNumber?.message}
+                    label={t('ChooseOptions', 'Choose option')}
+                  />
+                )}
+              />
+            </Column>
+            <Column>
+              <Controller
+                name="policeName"
+                control={control}
+                render={({ field }) => (
+                  <TextInput
+                    {...field}
+                    id="policeName"
+                    className={styles.formAdmissionDatepicker}
+                    placeholder={t('policeNames', 'Police Name')}
+                    labelText={t('policeName', 'Police name')}
+                    invalid={!!errors.policeName}
+                    invalidText={errors.policeName?.message}
+                  />
+                )}
+              />
+            </Column>
+            <Column>
+              <Controller
+                name="policeIDNo"
+                control={control}
+                render={({ field }) => (
+                  <TextInput
+                    {...field}
+                    id="policeIDNo"
+                    className={styles.formAdmissionDatepicker}
+                    placeholder={t('policeID', 'Police ID number')}
+                    labelText={t('policeIDNo', 'Police ID number')}
+                    invalid={!!errors.policeIDNo}
+                    invalidText={errors.policeIDNo?.message}
                   />
                 )}
               />
@@ -529,10 +582,28 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                   morgueCompartments.find((compartment) => compartment.uuid === item)?.display ?? ''
                 }
                 titleText={t('availableCompartment', 'Available Compartment')}
+                label={t('ChooseOptions', 'Choose option')}
                 onChange={({ selectedItem }) => field.onChange(selectedItem)}
                 initialSelectedItems={field.value}
                 invalid={!!errors.availableCompartment}
                 invalidText={errors.availableCompartment?.message}
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            name="burialPermitNo"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                id="burialPermitNo"
+                className={styles.formAdmissionDatepicker}
+                placeholder={t('burialPermitNo', 'Burial permit number')}
+                labelText={t('burialPermitNumber', 'Burial permit number')}
+                invalid={!!errors.burialPermitNo}
+                invalidText={errors.burialPermitNo?.message}
               />
             )}
           />

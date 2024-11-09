@@ -59,6 +59,21 @@ export const configSchema = {
     _description: 'UUID for ob number concept',
     _default: '682bd161-1ff0-40d6-95b6-f7c5d955bb4d',
   },
+  policeNameUuid: {
+    _type: Type.String,
+    _description: 'UUID for police name concept',
+    _default: '18ad3028-94c5-4ac0-80de-97267bd96ffa',
+  },
+  burialPermitNumberUuid: {
+    _type: Type.String,
+    _description: 'UUID for burial permit number concept',
+    _default: 'a4157d5d-deb2-438e-9948-8152ed1fe157',
+  },
+  policeIDNumber: {
+    _type: Type.String,
+    _description: 'UUID for police id number concept',
+    _default: 'c8d5a5b4-6589-4833-83f4-af75d74d3d38',
+  },
   encounterProviderRoleUuid: {
     _type: Type.UUID,
     _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
@@ -103,4 +118,7 @@ export type ConfigObject = {
   policeStatementUuid: string;
   obNumberUuid: string;
   encounterProviderRoleUuid: string;
+  policeNameUuid: string;
+  burialPermitNumberUuid: string;
+  policeIDNumber: string;
 };
