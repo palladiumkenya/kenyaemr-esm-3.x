@@ -79,6 +79,11 @@ export const configSchema = {
     _default: 'a0b03050-c99b-11e0-9572-0800200c9a66',
     _description: "The provider role to use for the registration encounter. Default is 'Unkown'.",
   },
+  dischargeAreaUuid: {
+    _type: Type.String,
+    _description: 'UUID for discharge area concept',
+    _default: '3f908c18-6ef6-4f7d-a217-254d067cc148',
+  },
 };
 
 export interface BillingConfig {
@@ -121,4 +126,5 @@ export type ConfigObject = {
   policeNameUuid: string;
   burialPermitNumberUuid: string;
   policeIDNumber: string;
+  dischargeAreaUuid: string;
 };

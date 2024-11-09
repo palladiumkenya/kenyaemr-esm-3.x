@@ -70,6 +70,7 @@ const patientInfoSchema = z.object({
   obNumber: z.string().optional(),
   policeName: z.string().optional(),
   policeIDNo: z.string().optional(),
+  dischargeArea: z.string().optional(),
   burialPermitNo: z.string().nonempty('Burial Permit is required'),
   visitType: z.string().uuid('invalid visit type'),
   availableCompartment: z.string(),
@@ -109,6 +110,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     burialPermitNumberUuid,
     obNumberUuid,
     encounterProviderRoleUuid,
+    dischargeAreaUuid,
   } = useConfig<ConfigObject>();
 
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -134,6 +136,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
       availableCompartment: '',
       paymentMethod: '',
       insuranceScheme: '',
+      dischargeArea: '',
       policyNumber: '',
       services: [],
     },
@@ -193,6 +196,9 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     }
     if (data.burialPermitNo) {
       obs.push({ concept: burialPermitNumberUuid, value: data.burialPermitNo });
+    }
+    if (data.dischargeArea) {
+      obs.push({ concept: dischargeAreaUuid, value: data.dischargeArea });
     }
 
     const encounterPayload = {
@@ -489,6 +495,23 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 className={styles.sectionField}
                 placeholder={t('tagNumber', 'Tag Number*')}
                 labelText={t('tagNumber', 'Tag Number*')}
+                invalid={!!errors.tagNumber}
+                invalidText={errors.tagNumber?.message}
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            name="dischargeArea"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                id="dischargeArea"
+                className={styles.sectionField}
+                placeholder={t('dischargeArea', 'Discharge Area')}
+                labelText={t('dischargeArea', 'Discharge Area')}
                 invalid={!!errors.tagNumber}
                 invalidText={errors.tagNumber?.message}
               />
