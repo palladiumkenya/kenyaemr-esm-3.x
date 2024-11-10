@@ -547,3 +547,8 @@ export type FacilityClaim = {
   patient?: { display: string };
   externalId: string;
 };
+
+export type PDSLIntegrationCredential = {
+  email: string;
+  password: string;
+};
