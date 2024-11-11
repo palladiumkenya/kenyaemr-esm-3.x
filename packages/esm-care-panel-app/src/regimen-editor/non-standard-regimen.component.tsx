@@ -11,9 +11,10 @@ import { calculateAge, filterRegimenData } from './utils';
 interface NonStandardRegimenProps {
   category: string;
   setNonStandardRegimens: (value: any) => void;
-  setStandardRegimenLine: (value: any) => void;
+  setStandardRegimenLine: (value: string) => void;
   selectedRegimenType: string;
   visitDate: Date;
+  errors: { [key: string]: string };
 }
 
 const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
@@ -22,6 +23,7 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
   setNonStandardRegimens,
   setStandardRegimenLine,
   visitDate,
+  errors,
 }) => {
   const { t } = useTranslation();
   const { standardRegimen } = useStandardRegimen();
@@ -76,7 +78,8 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
         {selectedRegimenType === 'nonStandardUuid' ? (
           <Select
             id="regimenLine"
-            invalidText="Required"
+            invalid={!!errors?.standardRegimenLine}
+            invalidText={errors?.standardRegimenLine}
             labelText={t('selectRegimenLine', 'Select Regimen Line')}
             className={styles.inputContainer}
             value={selectedRegimenLine}
@@ -94,6 +97,7 @@ const NonStandardRegimen: React.FC<NonStandardRegimenProps> = ({
 
         {selectedRegimenLine && (
           <div>
+            {errors?.nonStandardRegimens && <div className={styles.errorText}>{errors.nonStandardRegimens}</div>}
             {selectedRegimens?.map((selectedRegimen, index) => {
               const availableRegimens = nonStandardRegimen.filter(
                 (regimen) => !selectedRegimens.includes(regimen.uuid) || regimen.uuid === selectedRegimen,

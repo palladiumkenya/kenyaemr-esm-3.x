@@ -11,6 +11,10 @@ type TestOrderProps = {
   modalName?: string;
   additionalProps?: Record<string, unknown>;
   actionText?: string;
+  medicationRequestBundle?: {
+    request: fhir.MedicationRequest;
+  };
+  handleOpenDispenseForm?: () => void;
 };
 
 enum FulfillerStatus {
@@ -19,30 +23,33 @@ enum FulfillerStatus {
 
 // Memoize the comparison function
 const areEqual = (prevProps: TestOrderProps, nextProps: TestOrderProps) => {
-  if (prevProps.order.uuid !== nextProps.order.uuid) {
+  if (prevProps?.order?.uuid !== nextProps?.order?.uuid) {
     return false;
   }
-  if (prevProps.modalName !== nextProps.modalName) {
+  if (prevProps?.modalName !== nextProps?.modalName) {
     return false;
   }
-  if (prevProps.actionText !== nextProps.actionText) {
+  if (prevProps?.actionText !== nextProps?.actionText) {
+    return false;
+  }
+  if (prevProps?.medicationRequestBundle?.request?.id !== nextProps?.medicationRequestBundle?.request?.id) {
     return false;
   }
 
   // Only stringify additionalProps if everything else matches
-  return JSON.stringify(prevProps.additionalProps) === JSON.stringify(nextProps.additionalProps);
+  return JSON.stringify(prevProps?.additionalProps) === JSON.stringify(nextProps?.additionalProps);
 };
 
 // Show the test order if the following conditions are met:
 // 1. The current visit is in-patient
 // 2. The test order has been paid in full
 // 3. The patient is an emergency patient
-const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order, modalName, additionalProps, actionText }) => {
+const TestOrderAction: React.FC<TestOrderProps> = React.memo((props) => {
+  const { order, modalName, additionalProps, actionText, medicationRequestBundle } = props;
   const { t } = useTranslation();
 
-  const orderUuid = order?.uuid ?? '';
-  const patientUuid = order?.patient?.uuid ?? '';
-
+  const orderUuid = order?.uuid ?? medicationRequestBundle?.request?.id;
+  const patientUuid = order?.patient?.uuid ?? medicationRequestBundle?.request?.subject?.reference?.split('/')[1];
   const { isLoading, hasPendingPayment } = useTestOrderBillStatus(orderUuid, patientUuid);
 
   const handleModalClose = useCallback(() => {
@@ -52,6 +59,12 @@ const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order, modalName
   }, [additionalProps?.mutateUrl]);
 
   const launchModal = useCallback(() => {
+    // TODO: Remove this once we have dispensing form using workspaces
+    if (props.handleOpenDispenseForm) {
+      props.handleOpenDispenseForm();
+      return;
+    }
+
     const dispose = showModal(modalName ?? 'pickup-lab-request-modal', {
       closeModal: () => {
         handleModalClose();
@@ -65,21 +78,23 @@ const TestOrderAction: React.FC<TestOrderProps> = React.memo(({ order, modalName
   if (isLoading) {
     return (
       <Button kind="ghost" size="md" disabled>
-        <InlineLoading description={t('verifyingOrderBillStatus', 'Verifying order bill status...')} status="active" />
+        <InlineLoading description={t('verifyingBillStatus', 'Verifying bill status...')} status="active" />
       </Button>
     );
   }
 
-  if (order.fulfillerStatus === FulfillerStatus.IN_PROGRESS) {
+  if (order?.fulfillerStatus === FulfillerStatus.IN_PROGRESS) {
     return null;
   }
 
   const buttonText = hasPendingPayment
     ? t('unsettledBill', 'Unsettled bill.')
-    : actionText ?? t('pickLabRequest', 'Pick Lab Request');
+    : actionText ?? Object.hasOwn(props, 'medicationRequestBundle')
+    ? t('dispense', 'Dispense')
+    : t('pickLabRequest', 'Pick Lab Request');
 
   return (
-    <Button kind="primary" disabled={hasPendingPayment} key={`${order.uuid}`} onClick={launchModal}>
+    <Button kind="primary" disabled={hasPendingPayment} key={`${orderUuid}`} onClick={launchModal}>
       {buttonText}
     </Button>
   );

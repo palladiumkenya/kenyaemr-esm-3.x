@@ -1,4 +1,5 @@
-import { Type } from '@openmrs/esm-framework';
+import { ConfigSchema, Type } from '@openmrs/esm-framework';
+import { PDSLIntegrationCredential } from './types';
 
 export interface BillingConfig {
   visitAttributeTypes: {
@@ -22,9 +23,41 @@ export interface BillingConfig {
   cashierUuid: string;
   patientBillsUrl: string;
   nationalIdUUID: string;
+  isPDSLFacility: boolean;
+  pdslBaseURL: string;
+  pdslCredentials: PDSLIntegrationCredential;
+  concepts: {
+    emergencyPriorityConceptUuid: string;
+  };
 }
 
-export const configSchema = {
+export const configSchema: ConfigSchema = {
+  isPDSLFacility: {
+    _type: Type.Boolean,
+    _description: 'A flag for PDSL facilities',
+    _default: false,
+  },
+  pdslBaseURL: {
+    _type: Type.String,
+    _description: 'The base url for PDSL facility',
+    _default: 'https://siaya.tsconect.com',
+  },
+  pdslCredentials: {
+    _type: Type.Object,
+    _description: 'The credentials for authenticating with the PDSL server',
+    _default: {
+      email: '',
+      password: '',
+    },
+    email: {
+      _type: Type.String,
+      _description: 'The email address',
+    },
+    password: {
+      _type: Type.String,
+      _description: 'The password',
+    },
+  },
   shaIdentificationNumberUUID: {
     _type: Type.String,
     _description: 'Social Health Authority Identification Number',
@@ -150,5 +183,12 @@ export const configSchema = {
     _description: 'The url to fetch patient bills',
     _default:
       '${restBaseUrl}/cashier/bill?v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))',
+  },
+  concepts: {
+    emergencyPriorityConceptUuid: {
+      _type: Type.String,
+      _description: 'The concept uuid for emergency priority',
+      _default: '037446f4-adfc-40b3-928c-a39a4826b1bf',
+    },
   },
 };
