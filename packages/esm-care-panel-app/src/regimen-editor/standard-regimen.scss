@@ -28,6 +28,11 @@
   padding: spacing.$spacing-06 spacing.$spacing-05;
   background-color: $ui-02;
 }
+.errorText {
+  color: colors.$red-60;
+  font-size: 0.875rem;
+  margin-top: 0.313rem;
+}
 
 .desktop {
   padding: 0rem;

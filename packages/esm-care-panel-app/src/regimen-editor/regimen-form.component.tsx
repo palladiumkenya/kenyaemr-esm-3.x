@@ -31,6 +31,7 @@ import { CarePanelConfig } from '../config-schema';
 import { mutate } from 'swr';
 import NonStandardRegimen from './non-standard-regimen.component';
 import { addOrUpdateObsObject } from './utils';
+import { z } from 'zod';
 
 interface RegimenFormProps {
   patientUuid: string;
@@ -44,6 +45,58 @@ interface RegimenFormProps {
   };
   closeWorkspace: () => void;
 }
+// Base schema with common fields
+const baseSchema = z.object({
+  regimenEvent: z.string().min(1, { message: 'Please select a regimen event' }),
+  visitDate: z.date({ required_error: 'Please select a visit date' }),
+});
+
+// Schema for standard regimen fields
+const standardRegimenSchema = z.object({
+  standardRegimenLine: z.string().min(1, { message: 'Please select a regimen line' }),
+  standardRegimen: z.string().min(1, { message: 'Please select a regimen' }),
+});
+
+// Schema for regimen type selection
+const regimenTypeSchema = z.object({
+  selectedRegimenType: z.string().min(1, 'Please select a regimen type'),
+});
+
+// Schema for regimen reason
+const regimenReasonSchema = z.object({
+  regimenReason: z.string().min(1, { message: 'Please provide a reason for regimen change/stop' }),
+});
+
+// Schema for non standard regimen fields
+const nonStandardRegimenSchema = z.object({
+  standardRegimenLine: z.string().min(1, { message: 'Please select a regimen line' }),
+  nonStandardRegimens: z.array(z.string()).min(1, { message: 'Please select at least one drug regimen' }),
+});
+
+// Function to get dynamic schema based on regimen event and type
+const getRegimenFormSchema = (regimenEvent: string, selectedRegimenType: string) => {
+  let schema = baseSchema;
+
+  if (regimenEvent === Regimen.stopRegimenConcept) {
+    schema = schema.merge(regimenReasonSchema);
+  } else if (regimenEvent === Regimen.changeRegimenConcept) {
+    schema = schema.merge(regimenReasonSchema).merge(regimenTypeSchema);
+    if (selectedRegimenType === 'standardUuid') {
+      schema = schema.merge(standardRegimenSchema);
+    } else if (selectedRegimenType === 'nonStandardUuid') {
+      schema = schema.merge(nonStandardRegimenSchema);
+    }
+  } else if (regimenEvent === Regimen.startOrRestartConcept) {
+    schema = schema.merge(regimenTypeSchema);
+    if (selectedRegimenType === 'standardUuid') {
+      schema = schema.merge(standardRegimenSchema);
+    } else if (selectedRegimenType === 'nonStandardUuid') {
+      schema = schema.merge(nonStandardRegimenSchema);
+    }
+  }
+
+  return schema;
+};
 
 const RegimenForm: React.FC<RegimenFormProps> = ({
   patientUuid,
@@ -53,6 +106,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
   closeWorkspace,
 }) => {
   const { t } = useTranslation();
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const isTablet = useLayoutType() === 'tablet';
   const sessionUser = useSession();
   const config = useConfig() as CarePanelConfig;
@@ -149,9 +203,46 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
     }
   }, [selectedRegimenType, nonStandardRegimens, regimenEvent]);
 
+  const validateForm = useCallback(() => {
+    const formData = {
+      regimenEvent,
+      selectedRegimenType,
+      standardRegimenLine,
+      standardRegimen,
+      regimenReason,
+      visitDate,
+      nonStandardRegimens: nonStandardRegimens.map((reg) => reg.value),
+    };
+
+    try {
+      const schema = getRegimenFormSchema(regimenEvent, selectedRegimenType);
+      schema.parse(formData);
+      setErrors({});
+      return true;
+    } catch (validationError) {
+      const errorMap = validationError.errors.reduce((acc: Record<string, string>, err) => {
+        acc[err.path[0]] = err.message;
+        return acc;
+      }, {});
+      setErrors(errorMap);
+      return false;
+    }
+  }, [
+    regimenEvent,
+    selectedRegimenType,
+    standardRegimenLine,
+    standardRegimen,
+    regimenReason,
+    visitDate,
+    nonStandardRegimens,
+  ]);
+
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
+      if (!validateForm()) {
+        return;
+      }
       setIsSubmitting(true);
 
       const encounterToSave: Encounter = {
@@ -215,16 +306,18 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
       }
     },
     [
-      patientUuid,
-      t,
-      category,
+      validateForm,
       visitDate,
+      patientUuid,
+      sessionUser?.sessionLocation?.uuid,
+      sessionUser?.currentProvider?.uuid,
+      config.regimenObs.encounterProviderRoleUuid,
       obsArray,
       obsArrayForPrevEncounter,
-      sessionUser,
-      config,
       regimenEncounter.uuid,
       closeWorkspace,
+      t,
+      category,
     ],
   );
 
@@ -253,10 +346,12 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
           labelText={t('date', 'Date')}
           placeholder="dd/mm/yyyy"
           style={{ width: '100%' }}
+          invalid={!!errors.visitDate}
+          invalidText={errors.visitDate}
         />
       </DatePicker>
     ),
-    [visitDate, t],
+    [visitDate, t, errors.visitDate],
   );
 
   return (
@@ -302,6 +397,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                 onClick={launchDeleteRegimenDialog}
               />
             </RadioButtonGroup>
+            {errors.regimenEvent && <div className={styles.errorText}>{errors.regimenEvent}</div>}
             {regimenEvent ? (
               <>
                 {regimenEvent !== 'undo' && regimenDatePicker}
@@ -319,6 +415,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                         disabled={category !== 'ARV'}
                       />
                     </RadioButtonGroup>
+                    {errors.selectedRegimenType && <div className={styles.errorText}>{errors.selectedRegimenType}</div>}
                     {selectedRegimenType === 'standardUuid' ? (
                       <StandardRegimen
                         category={category}
@@ -326,6 +423,7 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                         setStandardRegimenLine={setStandardRegimenLine}
                         selectedRegimenType={selectedRegimenType}
                         visitDate={visitDate}
+                        errors={errors}
                       />
                     ) : (
                       <NonStandardRegimen
@@ -334,13 +432,14 @@ const RegimenForm: React.FC<RegimenFormProps> = ({
                         setStandardRegimenLine={setStandardRegimenLine}
                         selectedRegimenType={selectedRegimenType}
                         visitDate={visitDate}
+                        errors={errors}
                       />
                     )}
                   </>
                 ) : null}
                 {(regimenEvent === Regimen.stopRegimenConcept ||
                   (regimenEvent === Regimen.changeRegimenConcept && selectedRegimenType)) && (
-                  <RegimenReason category={category} setRegimenReason={setRegimenReason} />
+                  <RegimenReason category={category} setRegimenReason={setRegimenReason} errors={errors} />
                 )}
               </>
             ) : null}
