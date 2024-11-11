@@ -1,11 +1,13 @@
 import React from 'react';
 import styles from './compartment.scss';
-import { Button, Tag } from '@carbon/react';
+import { Button, Tag, InlineLoading } from '@carbon/react';
 import { View } from '@carbon/react/icons';
 import { toUpperCase } from '../helpers/expression-helper';
-import { ConfigurableLink, formatDate, usePatient, Visit } from '@openmrs/esm-framework';
+import { ConfigurableLink, usePatient, Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
+import usePerson from '../hook/useMorgue.resource';
+import { convertDateToDays } from '../utils/utils';
+import capitalize from 'lodash-es/capitalize';
 
 interface AvailableCompartmentProps {
   patientVisitInfo: Visit;
@@ -14,11 +16,24 @@ interface AvailableCompartmentProps {
 
 const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisitInfo, index }) => {
   const { t } = useTranslation();
-  const { patient } = usePatient(patientVisitInfo?.patient?.uuid);
-  const deceasedName = patient?.name.map((names) => names.text).join(' ');
-  const deceasedResidence = patient?.address.map((residence) => residence?.city);
-  const deathDate = patient?.deceasedDateTime;
-  const formatDeathDate = dayjs(deathDate).format('YYYY-MM-DD');
+  const patientUuid = patientVisitInfo?.patient?.uuid;
+  const { isLoading, error, person } = usePerson(patientUuid);
+
+  if (isLoading) {
+    return (
+      <InlineLoading
+        status="active"
+        iconDescription="Loading"
+        description={t('pullingCompartment', 'Pulling compartments data.....')}
+      />
+    );
+  }
+
+  const daysSpent = convertDateToDays(patientVisitInfo?.startDatetime);
+  const timeSpentTagType = daysSpent > 17 ? 'red' : 'blue';
+
+  const causeOfDeathDisplay = person?.causeOfDeath?.display;
+  const causeOfDeathTagType = causeOfDeathDisplay?.toLowerCase() === 'unknown' ? 'red' : 'undefined';
 
   return (
     <div className={styles.cardView}>
@@ -26,36 +41,39 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisi
         <div className={styles.cardLabelWrapper}>
           <div className={styles.cardLabel}>{index + 1}</div>
         </div>
-        <span className={styles.deceasedName}>{toUpperCase(deceasedName)}</span>
-      </div>
-      <div className={styles.cardRow}>
-        <span className={styles.deceasedAge}>
-          {t('gender', 'Gender: ')}
-          {toUpperCase(patient?.gender)}
-        </span>
-        <span className={styles.deceasedDate}>
-          {t('deathDate', 'Death date: ')}
-          {formatDeathDate}
-        </span>
-        <span className={styles.deceasedResidences}>
-          {t('area', 'Area: ')} {deceasedResidence}
+        <span className={styles.deceasedName}>
+          {toUpperCase(person?.display)}
+          <span className={styles.middot}>&middot;</span>
+          <span className={styles.age}>{person?.age} Yrs</span>
         </span>
       </div>
       <div className={styles.cardRow}>
-        <span className={styles.compartmentStatus}>
-          {t('status', 'Status: ')}
-          <Tag type="green">{t('logged', 'Logged')}</Tag>
+        <span className={styles.deceasedReason}>
+          {t('Reason', 'REASON: ')}
+          {causeOfDeathTagType === 'red' ? (
+            <Tag size="md" type={causeOfDeathTagType}>
+              {causeOfDeathDisplay}
+            </Tag>
+          ) : (
+            <span className={styles.causeDisplay}>{capitalize(causeOfDeathDisplay)}</span>
+          )}
         </span>
-        <span className={styles.deceasedNoDays}>{t('daysOnUnit', 'Days on this unit:')}</span>
-        <span className={styles.noDays}>4 days</span>
+        <span className={styles.viewDetails}>
+          <ConfigurableLink
+            className={styles.viewDetailsLink}
+            to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/deceased-panel`}>
+            <View size={20} />
+          </ConfigurableLink>
+        </span>
       </div>
-      <ConfigurableLink
-        className={styles.configurableLink}
-        to={`\${openmrsSpaBase}/patient/${patientVisitInfo?.uuid}/chart/deceased-panel`}>
-        <Button className={styles.assignButton} kind="primary" renderIcon={View}>
-          {t('viewDetails', 'View details')}
-        </Button>
-      </ConfigurableLink>
+      <div className={styles.cardRow}>
+        <span className={styles.deceasedReason}>
+          {t('timeSpent', 'Time spent ')}
+          <Tag size="md" type={timeSpentTagType}>
+            {daysSpent} {t('days', 'days')}
+          </Tag>
+        </span>
+      </div>
     </div>
   );
 };
