@@ -70,6 +70,10 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
       header: t('billedItems', 'Billed Items'),
       key: 'billedItems',
     },
+    {
+      header: t('status', 'Status'),
+      key: 'status',
+    },
   ];
 
   const searchResults = useMemo(() => {
@@ -116,6 +120,7 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
     department: '--',
     billedItems: setBilledItems(bill),
     billingPrice: '--',
+    status: bill.status,
   }));
 
   const handleSearch = useCallback(
