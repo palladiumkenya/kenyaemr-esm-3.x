@@ -8,10 +8,11 @@ import { calculateAge, filterRegimenData } from './utils';
 
 interface StandardRegimenProps {
   category: string;
-  setStandardRegimen: (value: any) => void;
-  setStandardRegimenLine: (value: any) => void;
+  setStandardRegimen: (value: string) => void;
+  setStandardRegimenLine: (value: string) => void;
   selectedRegimenType: string;
   visitDate: Date;
+  errors: { [key: string]: string };
 }
 
 const StandardRegimen: React.FC<StandardRegimenProps> = ({
@@ -20,6 +21,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
   setStandardRegimenLine,
   selectedRegimenType,
   visitDate,
+  errors,
 }) => {
   const { t } = useTranslation();
   const { standardRegimen, isLoading, error } = useStandardRegimen();
@@ -60,7 +62,8 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
         {selectedRegimenType === 'standardUuid' ? (
           <Select
             id="regimenLine"
-            invalidText="Required"
+            invalid={!!errors?.standardRegimenLine}
+            invalidText={errors?.standardRegimenLine}
             labelText={t('selectRegimenLine', 'Select Regimen Line')}
             className={styles.inputContainer}
             value={selectedRegimenLine}
@@ -79,7 +82,8 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
         {selectedRegimenLine && (
           <Select
             id="regimen"
-            invalidText="Required"
+            invalid={!!errors?.standardRegimen}
+            invalidText={errors?.standardRegimen}
             labelText={t('selectRegimen', 'Select Regimen')}
             className={styles.inputContainer}
             value={selectedRegimen}
