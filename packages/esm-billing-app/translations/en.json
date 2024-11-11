@@ -274,5 +274,7 @@
   "visitTime": "Visit time",
   "visittype": "Visit Type",
   "waiveBill": "Waive Bill",
-  "yes": "Yes"
+  "yes": "Yes",
+  "referenceCodes": "Reference Codes",
+  "billingService": "Service"
 }
