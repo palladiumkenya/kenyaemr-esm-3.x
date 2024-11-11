@@ -26,6 +26,9 @@ export interface BillingConfig {
   isPDSLFacility: boolean;
   pdslBaseURL: string;
   pdslCredentials: PDSLIntegrationCredential;
+  concepts: {
+    emergencyPriorityConceptUuid: string;
+  };
 }
 
 export const configSchema = {
@@ -172,5 +175,12 @@ export const configSchema = {
     _description: 'The url to fetch patient bills',
     _default:
       '${restBaseUrl}/cashier/bill?v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))',
+  },
+  concepts: {
+    emergencyPriorityConceptUuid: {
+      _type: Type.String,
+      _description: 'The concept uuid for emergency priority',
+      _default: '037446f4-adfc-40b3-928c-a39a4826b1bf',
+    },
   },
 };
