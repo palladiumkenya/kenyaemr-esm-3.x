@@ -1,4 +1,5 @@
 import { Type } from '@openmrs/esm-framework';
+import { PDSLIntegrationCredential } from './types';
 
 export interface BillingConfig {
   visitAttributeTypes: {
@@ -22,9 +23,30 @@ export interface BillingConfig {
   cashierUuid: string;
   patientBillsUrl: string;
   nationalIdUUID: string;
+  isPDSLFacility: boolean;
+  pdslBaseURL: string;
+  pdslCredentials: PDSLIntegrationCredential;
 }
 
 export const configSchema = {
+  isPDSLFacility: {
+    _type: Type.Boolean,
+    _description: 'A flag for PDSL facilities',
+    _default: false,
+  },
+  pdslBaseURL: {
+    _type: Type.String,
+    _description: 'The base url for PDSL facility',
+    _default: 'https://siaya.tsconect.com',
+  },
+  pdslCredentials: {
+    _type: Type.Object,
+    _description: 'The credentials for authenticating with the PDSL server',
+    _default: {
+      email: '',
+      password: '',
+    },
+  },
   shaIdentificationNumberUUID: {
     _type: Type.String,
     _description: 'Social Health Authority Identification Number',
