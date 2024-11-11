@@ -26,6 +26,7 @@
   "billableServicesError": "Billable services error",
   "billAmount": "Bill Amount",
   "billCreationDate": "Bill creation date",
+  "billDate": "Date",
   "billedItems": "Billed Items",
   "billedTo": "Billed to",
   "billErrorService": "Bill service error",
@@ -276,6 +277,5 @@
   "visitTime": "Visit time",
   "visittype": "Visit Type",
   "waiveBill": "Waive Bill",
-  "yes": "Yes",
-  "billDate": "Date"
+  "yes": "Yes"
 }
