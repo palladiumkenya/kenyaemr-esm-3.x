@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { ConfigSchema, Type } from '@openmrs/esm-framework';
 import { PDSLIntegrationCredential } from './types';
 
 export interface BillingConfig {
@@ -28,7 +28,7 @@ export interface BillingConfig {
   pdslCredentials: PDSLIntegrationCredential;
 }
 
-export const configSchema = {
+export const configSchema: ConfigSchema = {
   isPDSLFacility: {
     _type: Type.Boolean,
     _description: 'A flag for PDSL facilities',
@@ -45,6 +45,14 @@ export const configSchema = {
     _default: {
       email: '',
       password: '',
+    },
+    email: {
+      _type: Type.String,
+      _description: 'The email address',
+    },
+    password: {
+      _type: Type.String,
+      _description: 'The password',
     },
   },
   shaIdentificationNumberUUID: {
