@@ -98,9 +98,10 @@ export const useRequestStatus = (
   setNotification: React.Dispatch<SetStateAction<{ type: 'error' | 'success'; message: string } | null>>,
   closeModal: () => void,
   bill: MappedBill,
+  pdslToken: string | null,
 ): [RequestData, React.Dispatch<React.SetStateAction<RequestData | null>>] => {
   const { t } = useTranslation();
-  const { mpesaAPIBaseUrl } = useConfig<BillingConfig>();
+  const { mpesaAPIBaseUrl, isPDSLFacility, pdslBaseURL } = useConfig<BillingConfig>();
   const { paymentModes } = usePaymentModes();
   const paymentReferenceUUID = paymentModes
     .find((mode) => mode.name === 'Mobile Money')
@@ -118,7 +119,12 @@ export const useRequestStatus = (
     if (requestData.requestId && !['COMPLETE', 'FAILED', 'NOT-FOUND'].includes(requestData.requestStatus)) {
       const fetchStatus = async () => {
         try {
-          const { status, referenceCode } = await getRequestStatus(requestData.requestId, mpesaAPIBaseUrl);
+          const { status, referenceCode } = await getRequestStatus(
+            requestData.requestId,
+            isPDSLFacility ? pdslBaseURL : mpesaAPIBaseUrl,
+            isPDSLFacility,
+            pdslToken,
+          );
           if (status === 'COMPLETE') {
             clearInterval(interval);
 
@@ -194,6 +200,9 @@ export const useRequestStatus = (
     requestData.requestStatus,
     setNotification,
     t,
+    isPDSLFacility,
+    pdslBaseURL,
+    pdslToken,
   ]);
 
   return [requestData, setRequestData];

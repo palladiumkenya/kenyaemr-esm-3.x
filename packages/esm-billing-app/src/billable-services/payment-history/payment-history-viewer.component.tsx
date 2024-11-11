@@ -32,6 +32,7 @@ export const headers = [
   { header: 'Total Amount', key: 'totalAmount' },
   { header: 'Service', key: 'billingService' },
   { header: 'Reference Codes', key: 'referenceCodes' },
+  { header: 'Status', key: 'status' },
 ];
 
 export const PaymentHistoryViewer = () => {

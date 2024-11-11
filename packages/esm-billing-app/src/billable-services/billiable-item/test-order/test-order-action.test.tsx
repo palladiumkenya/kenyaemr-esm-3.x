@@ -20,7 +20,7 @@ describe('TestOrderAction', () => {
   test('should render loading when isLoading is true', () => {
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValue({ isLoading: true, hasPendingPayment: false });
     render(<TestOrderAction {...testProps} />);
-    expect(screen.getByText('Verifying order bill status...')).toBeInTheDocument();
+    expect(screen.getByText('Verifying bill status...')).toBeInTheDocument();
   });
 
   test("should display `Unsettled bill for test` when there's a pending payment", () => {
