@@ -21,7 +21,7 @@ export const PaymentHistoryTable = ({
   const { rows, getHeaderProps, getRowProps, getTableProps } = tableData;
 
   const headers = [
-    { header: t('dateCreated', 'Date'), key: 'dateCreated' },
+    { header: t('billDate', 'Date'), key: 'dateCreated' },
     { header: t('patientName', 'Patient Name'), key: 'patientName' },
     { header: t('totalAmount', 'Total Amount'), key: 'totalAmount' },
     { header: t('billingService', 'Service'), key: 'billingService' },

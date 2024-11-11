@@ -31,6 +31,7 @@
   "billErrorService": "Bill service error",
   "billing": "Billing",
   "billingForm": "Billing Form",
+  "billingService": "Service",
   "billingStatus": "Billing status",
   "billItem": "Bill Item",
   "billItems": "Save Bill",
@@ -213,6 +214,7 @@
   "providerMessage": "By clicking Proceed to care, you acknowledge that you have advised the patient to settle the bill.",
   "providerName": "Provider Name",
   "quantity": "Quantity",
+  "referenceCodes": "Reference Codes",
   "referenceNumber": "Reference number",
   "regExp": "Regular expression",
   "rejected": "Rejected",
@@ -275,6 +277,5 @@
   "visittype": "Visit Type",
   "waiveBill": "Waive Bill",
   "yes": "Yes",
-  "referenceCodes": "Reference Codes",
-  "billingService": "Service"
+  "billDate": "Date"
 }
