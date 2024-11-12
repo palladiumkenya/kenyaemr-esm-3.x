@@ -82,7 +82,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     const phoneNumber = formatPhoneNumber(data.phoneNumber);
     const amountBilled = data.billAmount;
-    const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
+    const accountReference = `${mflCodeValue}#${bill.uuid}`;
 
     const payload = {
       AccountReference: accountReference,

@@ -9,7 +9,7 @@ import { getErrorMessage, getRequestStatus, readableStatusMap } from '../m-pesa/
 import { LineItem, MappedBill, PaymentStatus, RequestStatus } from '../types';
 import { extractErrorMessagesFromResponse, waitForASecond } from '../utils';
 
-const createMobileMoneyPaymentPayload = (
+export const createMobileMoneyPaymentPayload = (
   bill: MappedBill,
   amount: number,
   mobileMoneyInstanceTypeUUID: string,
