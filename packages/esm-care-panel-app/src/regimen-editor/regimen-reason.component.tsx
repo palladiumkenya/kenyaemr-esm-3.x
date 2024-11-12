@@ -6,10 +6,11 @@ import { useRegimenReason } from '../hooks/useRegimenReason';
 
 interface RegimenReasonProps {
   category: string;
-  setRegimenReason: (value: any) => void;
+  setRegimenReason: (value: string) => void;
+  errors: { [key: string]: string };
 }
 
-const RegimenReason: React.FC<RegimenReasonProps> = ({ category, setRegimenReason }) => {
+const RegimenReason: React.FC<RegimenReasonProps> = ({ category, setRegimenReason, errors }) => {
   const { t } = useTranslation();
   const { regimenReason, isLoading, error } = useRegimenReason();
 
@@ -26,7 +27,8 @@ const RegimenReason: React.FC<RegimenReasonProps> = ({ category, setRegimenReaso
       <>
         <Select
           id="regimenReason"
-          invalidText="Required"
+          invalid={!!errors?.regimenReason}
+          invalidText={errors?.regimenReason}
           labelText={t('selectReason', 'Select Reason')}
           className={styles.inputContainer}
           value={selectedRegimenReason}
