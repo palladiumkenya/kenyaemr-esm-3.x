@@ -52,12 +52,12 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = ({
         <MetricsCard title={t('total', 'Total')} header={t('totalPeers', 'Total Peers')} value={peers.length} />
         <MetricsCard
           title={t('pending', 'Pending')}
-          header={t('pendingPeers', 'Pending Peers')}
+          header={t('pendingDocumentations', 'Pending Documentation')}
           value={peers.length - completedPeers.length}
         />
         <MetricsCard
           title={t('completed', 'Completed')}
-          header={t('completedPeers', 'Completed Peers')}
+          header={t('completedDocumentations', 'Completed Documentation')}
           value={completedPeers.length}
         />
       </Layer>
