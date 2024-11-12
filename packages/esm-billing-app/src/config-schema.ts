@@ -29,6 +29,7 @@ export interface BillingConfig {
   concepts: {
     emergencyPriorityConceptUuid: string;
   };
+  paymentMethodsUuidsThatShouldNotShowPrompt: Array<string>;
 }
 
 export const configSchema: ConfigSchema = {
@@ -190,5 +191,13 @@ export const configSchema: ConfigSchema = {
       _description: 'The concept uuid for emergency priority',
       _default: '037446f4-adfc-40b3-928c-a39a4826b1bf',
     },
+  },
+  paymentMethodsUuidsThatShouldNotShowPrompt: {
+    _type: Type.Array,
+    _description: 'The payment methods that should not show the billing prompt',
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['beac329b-f1dc-4a33-9e7c-d95821a137a6'],
   },
 };
