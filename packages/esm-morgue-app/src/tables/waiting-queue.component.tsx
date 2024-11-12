@@ -56,10 +56,17 @@ export const WaitingQueue: React.FC = () => {
       patientUuid,
     });
   };
+  const handleDischargeForm = (patientUuid: string) => {
+    launchWorkspace('discharge-body-form', {
+      workspaceTitle: t('dischargeForm', 'Discharge form'),
+      patientUuid,
+    });
+  };
+
   const actionColumn = (row) => (
     <OverflowMenu size="sm" flipped>
       <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
-      <OverflowMenuItem isDelete itemText={t('release', 'Release')} />
+      <OverflowMenuItem isDelete itemText={t('release', 'Release')} onClick={() => handleDischargeForm(row.id)} />
     </OverflowMenu>
   );
 

@@ -37,3 +37,4 @@ export const patientAdditionalInfoForm = getAsyncLifecycle(
   () => import('./workspaces/patientAdditionalInfoForm.workspace'),
   options,
 );
+export const dischargeBodyForm = getAsyncLifecycle(() => import('./workspaces/discharge-body.workspace'), options);

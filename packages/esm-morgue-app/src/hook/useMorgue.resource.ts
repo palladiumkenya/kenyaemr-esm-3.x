@@ -7,7 +7,7 @@ import {
   useOpenmrsPagination,
   type Visit,
 } from '@openmrs/esm-framework';
-import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location } from '../types';
+import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location, Patient } from '../types';
 import useSWR from 'swr';
 import { BillingConfig, ConfigObject } from '../config-schema';
 import { useState } from 'react';
@@ -114,3 +114,13 @@ export const useActiveMorgueVisit = () => {
 
   return { data: activeDeceased, error, isLoading };
 };
+
+const usePerson = (uuid: string) => {
+  const customRepresentation = `custom:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display))`;
+  const url = `${restBaseUrl}/person/${uuid}?v=${customRepresentation}`;
+  const { isLoading, error, data } = useSWR<FetchResponse<Patient['person']>>(url, openmrsFetch);
+  const person = data?.data;
+  return { isLoading, error, person };
+};
+
+export default usePerson;
