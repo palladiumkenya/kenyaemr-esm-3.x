@@ -10,13 +10,13 @@ import {
   SelectSkeleton,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { showSnackbar } from '@openmrs/esm-framework';
-import React, { useState } from 'react';
+import { showSnackbar, useSession } from '@openmrs/esm-framework';
+import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PaymentPoint } from '../../types';
-import { clockIn, clockOut, usePaymentPoints, useProviderUUID, useTimeSheets } from '../payment-points.resource';
+import { clockIn, clockOut, usePaymentPoints, useTimeSheets } from '../payment-points.resource';
 import { useClockInStatus } from '../use-clock-in-status';
 
 const schema = z.object({
@@ -25,11 +25,18 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint?: PaymentPoint }) => {
+type ClockInProps = {
+  closeModal: () => void;
+  paymentPoint?: PaymentPoint;
+  onSuccess?: () => void;
+};
+
+export const ClockIn: React.FC<ClockInProps> = ({ closeModal, paymentPoint, onSuccess }) => {
   const { mutate } = useTimeSheets();
-  const { providerUUID, isLoading, error } = useProviderUUID();
+  const {
+    currentProvider: { uuid: providerUUID },
+  } = useSession();
   const { t } = useTranslation();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
   const { globalActiveSheet, isClockedInSomewhere } = useClockInStatus(paymentPoint?.uuid);
 
@@ -38,7 +45,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isSubmitting },
   } = useForm<FormData>({
     defaultValues: { paymentPointUUID: paymentPoint?.uuid ?? paymentPoints?.at(0)?.uuid },
     resolver: zodResolver(schema),
@@ -50,30 +57,27 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
       .then(() => {
         showSnackbar({
           title: t('success', 'Success'),
-          subtitle: t('successfullyClockedIn', `Successfully Clocked In ${paymentPoint.name}`),
+          subtitle: t('successfullyClockedIn', `Successfully Clocked In `) + (paymentPoint?.name ?? ''),
           kind: 'success',
         });
+        onSuccess?.();
         mutate();
         closeModal();
       })
       .catch(() => {
         showSnackbar({
           title: t('anErrorOccurred', 'An Error Occurred'),
-          subtitle: t('anErrorOccurredClockingIn', `An error occurred clocking in ${paymentPoint.name}`),
+          subtitle: t('anErrorOccurredClockingIn', `An error occurred clocking in `) + (paymentPoint?.name ?? ''),
           kind: 'error',
         });
 
         if (!shouldPromptUser) {
           closeModal();
         }
-      })
-      .finally(() => {
-        setIsSubmitting(false);
       });
   };
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
-    setIsSubmitting(true);
     if (isClockedInSomewhere) {
       clockOut(globalActiveSheet.uuid, {
         clockOut: new Date().toISOString(),
@@ -81,24 +85,23 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
         .then(() => {
           showSnackbar({
             title: t('success', 'Success'),
-            subtitle: t('successfullyClockedOut', `Successfully Clocked Out Of ${globalActiveSheet.cashPoint.name}`),
+            subtitle:
+              t('successfullyClockedOut', `Successfully Clocked Out Of `) + (globalActiveSheet.cashPoint.name ?? ''),
             kind: 'success',
           });
+          onSuccess?.();
           mutate();
           clockInWrapper(data.paymentPointUUID);
         })
         .catch(() => {
           showSnackbar({
             title: t('anErrorOccurred', 'An Error Occurred'),
-            subtitle: t(
-              'anErrorOccurredClockingOut',
-              `An error occurred clocking out of ${globalActiveSheet.cashPoint.name}`,
-            ),
+            subtitle:
+              t('anErrorOccurredClockingOut', `An error occurred clocking out of `) + globalActiveSheet.cashPoint.name,
             kind: 'error',
           });
         })
         .finally(() => {
-          setIsSubmitting(false);
           closeModal();
         });
 
@@ -131,14 +134,10 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
           )}
         </ModalBody>
         <ModalFooter>
-          <Button
-            kind="secondary"
-            onClick={shouldPromptUser ? undefined : closeModal}
-            type="button"
-            disabled={shouldPromptUser}>
+          <Button kind="secondary" onClick={closeModal} type="button">
             {t('cancel', 'Cancel')}
           </Button>
-          <Button type="submit" disabled={isLoading || error || !providerUUID || !isValid}>
+          <Button type="submit" disabled={!isValid || isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loading withOverlay={false} small />
@@ -162,14 +161,10 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
           : `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`}
       </ModalBody>
       <ModalFooter>
-        <Button
-          kind="secondary"
-          onClick={shouldPromptUser ? undefined : closeModal}
-          type="button"
-          disabled={shouldPromptUser}>
+        <Button kind="secondary" onClick={closeModal} type="button">
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" disabled={isLoading || error || !providerUUID || !isValid}>
+        <Button type="submit" disabled={!isValid || isSubmitting}>
           {isSubmitting ? (
             <>
               <Loading withOverlay={false} small />

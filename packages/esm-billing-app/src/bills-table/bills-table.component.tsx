@@ -29,6 +29,7 @@ import {
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import styles from './bills-table.scss';
+import ClickablePatientNameField from './clickable-patient-name-field.component';
 
 const filterItems = [
   { id: '', text: 'All bills' },
@@ -107,14 +108,7 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
   const rowData = results?.map((bill, index) => ({
     id: `${index}`,
     uuid: bill.uuid,
-    patientName: (
-      <ConfigurableLink
-        style={{ textDecoration: 'none', maxWidth: '50%' }}
-        to={billingUrl}
-        templateParams={{ patientUuid: bill.patientUuid, uuid: bill.uuid }}>
-        {bill.patientName}
-      </ConfigurableLink>
-    ),
+    patientName: <ClickablePatientNameField bill={bill} itemToString={(b) => b.patientName} />,
     visitTime: bill.dateCreated,
     identifier: bill.identifier,
     department: '--',
