@@ -45,12 +45,8 @@ const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ f
   const { pageSizes } = usePaginationInfo(pageSize, filteredProviders.length, currentPage, results?.length);
 
   const headerData = [
-    { header: t('serial', 'SNo'), key: 'serial' },
-    { header: t('identifier', 'National ID'), key: 'identifier' },
     { header: t('name', 'Name'), key: 'name' },
     { header: t('license', 'License Number'), key: 'license' },
-    { header: t('date', 'License expiry date'), key: 'date' },
-    { header: t('status', 'Status'), key: 'status' },
     { header: t('action', 'Action'), key: 'action' },
   ];
 
@@ -65,41 +61,10 @@ const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ f
 
   const rowData = results.map((provider, index) => {
     const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
-    const dateAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
-    const nationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
-
-    const licenseExpiryDate = dateAttr ? dayjs(dateAttr.value) : null;
-    const today = dayjs();
-    const daysUntilExpiry = licenseExpiryDate ? licenseExpiryDate.diff(today, 'day') : null;
-
-    let statusTag;
-
-    if (!licenseExpiryDate) {
-      statusTag = <Tag type="red">{t('missingExpiryDate', 'Missing expiry date')}</Tag>;
-    } else if (daysUntilExpiry < 0) {
-      statusTag = <Tag type="red">{t('licenseExpired', 'License has expired')}</Tag>;
-    } else if (daysUntilExpiry <= 3) {
-      statusTag = <Tag type="cyan">{t('licenseExpiringSoon', 'License is expiring soon')}</Tag>;
-    } else {
-      statusTag = <Tag type="green">{t('activeLicensed', 'Active License')}</Tag>;
-    }
-
     return {
       id: provider.uuid,
-      serial: (currentPage - 1) * pageSize + (index + 1),
-      identifier: nationalId ? (
-        maskNationalId(nationalId?.value)
-      ) : (
-        <Tag type="red">{t('missingIDno', 'Missing National ID')}</Tag>
-      ),
       name: provider.person.display,
-      license: licenseAttr ? licenseAttr?.value : <Tag type="magenta">{t('unlicensed', 'Unlicensed')}</Tag>,
-      date: licenseExpiryDate ? (
-        licenseExpiryDate.format('YYYY-MM-DD')
-      ) : (
-        <Tag type="magenta">{t('missingExpiryDate', 'Missing expiry date')}</Tag>
-      ),
-      status: statusTag,
+      license: licenseAttr ? licenseAttr?.value : '--',
       action: <CustomActionMenu provider={provider} />,
       providerUuid: provider?.uuid,
     };
