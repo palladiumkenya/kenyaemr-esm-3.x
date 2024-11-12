@@ -4,12 +4,12 @@ import { MappedBill } from '../types';
 import { useClockInStatus } from '../payment-points/use-clock-in-status';
 import { Loading } from '@carbon/react';
 
-type ClickablePatientNameFieldProps = {
+type ClickableTableCellProps = {
   bill: MappedBill;
   itemToString: (bill: MappedBill) => string;
 };
 
-const ClickablePatientNameField: React.FC<ClickablePatientNameFieldProps> = ({ bill, itemToString }) => {
+const ClickableTableCell: React.FC<ClickableTableCellProps> = ({ bill, itemToString }) => {
   const { isClockedInSomewhere, isLoading } = useClockInStatus();
 
   const billingUrl = '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${uuid}';
@@ -39,4 +39,4 @@ const ClickablePatientNameField: React.FC<ClickablePatientNameFieldProps> = ({ b
   );
 };
 
-export default ClickablePatientNameField;
+export default ClickableTableCell;

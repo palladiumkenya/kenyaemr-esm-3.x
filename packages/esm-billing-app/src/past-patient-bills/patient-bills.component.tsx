@@ -20,7 +20,7 @@ import { ConfigurableLink, getPatientName, usePatient } from '@openmrs/esm-frame
 import capitalize from 'lodash/capitalize';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import EmptyPatientBill from './patient-bills-dashboard/empty-patient-bill.component';
-import ClickablePatientNameField from '../bills-table/clickable-patient-name-field.component';
+import ClickableTableCell from '../bills-table/clickable-table-cell.component';
 
 type PatientBillsProps = {
   patientUuid: string;
@@ -61,7 +61,7 @@ export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, pat
     id: `${bill.uuid}`,
     date: bill.dateCreated,
     chargeItem: (
-      <ClickablePatientNameField
+      <ClickableTableCell
         bill={bill}
         itemToString={(b) => b.lineItems.map((item) => extractString(item.billableService)).join(', ')}
       />
