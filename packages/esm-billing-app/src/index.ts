@@ -3,9 +3,6 @@ import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
 import BillHistory from './bill-history/bill-history.component';
-import { CancelBillModal } from './billable-services/bill-manager/modals/cancel-bill.modal';
-import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
-import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/DeleteBillableService.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill/waive-bill-form.workspace';
@@ -35,6 +32,9 @@ import { ClockIn } from './payment-points/payment-point/clock-in.component';
 import { ClockOut } from './payment-points/payment-point/clock-out.component';
 import rootComponent from './root.component';
 import Benefits from './benefits-package/benefits/benefits.component';
+import CancelBillWorkspace from './billable-services/bill-manager/workspaces/cancel-bill/cancel-bill.workspace';
+import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/serviceItemCard.component';
+import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -156,14 +156,13 @@ export const drugOrder = getSyncLifecycle(DrugOrder, options);
 export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
 
 // bill manager modals
-export const cancelBillModal = getSyncLifecycle(CancelBillModal, options);
 export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 
 // bill manager extensions
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
-
+export const cancelBillWorkspace = getSyncLifecycle(CancelBillWorkspace, options);
 // Benefits
 export const benefitsPackage = getSyncLifecycle(BenefitsPackage, options);
 export const benefits = getSyncLifecycle(Benefits, options);
