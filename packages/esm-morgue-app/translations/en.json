@@ -1,5 +1,4 @@
 {
-  "action": "Action",
   "admissionForm": "Admission form",
   "admit": "Admit",
   "admitted": "Admitted Bodies",
@@ -11,8 +10,13 @@
   "empty": "Empty",
   "mortuaryLabel": "Mortuary management",
   "mortuaryTitle": "Mortuary",
+  "morgue": "Morgue Management",
+  "noDeceasedPersons": "There are no deceased persons on the waiting list",
+  "noResultFound": "Sorry, no results found",
+  "noWaitingList": "Waiting List",
   "pullingCompartment": "Pulling compartments data.....",
   "release": "Release",
+  "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
   "waitingInLine": "Waiting In Line",
   "waitingQueue": "Waiting queue",
   "waitQueue": "Waiting queue"

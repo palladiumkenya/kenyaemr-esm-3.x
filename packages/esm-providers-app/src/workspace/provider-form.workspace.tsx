@@ -499,6 +499,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                   titleText="Roles*"
                   initialSelectedItems={field.value}
                   items={definedRoles}
+                  placeholder="Confirm password"
                   itemToString={(item) => roles.find((r) => r.uuid === item)?.display ?? ''}
                   onChange={({ selectedItems }) => {
                     field.onChange(selectedItems);

@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBills } from '../../billing.resource';
 import { MappedBill } from '../../types';
-import { headers } from './payment-history-viewer.component';
+// import { headers } from './payment-history-viewer.component';
 import styles from './payment-history.scss';
 
 export const PaymentHistoryTable = ({
@@ -19,6 +19,15 @@ export const PaymentHistoryTable = ({
   const { t } = useTranslation();
   const { bills, error, isLoading } = paidBillsResponse;
   const { rows, getHeaderProps, getRowProps, getTableProps } = tableData;
+
+  const headers = [
+    { header: t('billDate', 'Date'), key: 'dateCreated' },
+    { header: t('patientName', 'Patient Name'), key: 'patientName' },
+    { header: t('totalAmount', 'Total Amount'), key: 'totalAmount' },
+    { header: t('billingService', 'Service'), key: 'billingService' },
+    { header: t('referenceCodes', ' Reference Codes'), key: 'referenceCodes' },
+    { header: t('status', 'Status'), key: 'status' },
+  ];
 
   if (isLoading) {
     return (
