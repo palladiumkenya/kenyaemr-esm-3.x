@@ -26,15 +26,6 @@ import { PaymentTotals } from './payment-totals';
 import { TableToolBarDateRangePicker } from './table-toolbar-date-range';
 import { TimesheetsFilter } from './timesheets-filter.component';
 
-export const headers = [
-  { header: 'Date', key: 'dateCreated' },
-  { header: 'Patient Name', key: 'patientName' },
-  { header: 'Total Amount', key: 'totalAmount' },
-  { header: 'Service', key: 'billingService' },
-  { header: 'Reference Codes', key: 'referenceCodes' },
-  { header: 'Status', key: 'status' },
-];
-
 export const PaymentHistoryViewer = () => {
   const [dateRange, setDateRange] = useState<Array<Date>>([dayjs().startOf('day').toDate(), new Date()]);
   const { paymentPointUUID } = useParams();
@@ -56,7 +47,14 @@ export const PaymentHistoryViewer = () => {
   const { pageSizes } = usePaginationInfo(pageSize, renderedRows.length, currentPage, results?.length);
 
   const { t } = useTranslation();
-
+  const headers = [
+    { header: t('billDate', 'Date'), key: 'dateCreated' },
+    { header: t('patientName', 'Patient Name'), key: 'patientName' },
+    { header: t('totalAmount', 'Total Amount'), key: 'totalAmount' },
+    { header: t('billingService', 'Service'), key: 'billingService' },
+    { header: t('referenceCodes', ' Reference Codes'), key: 'referenceCodes' },
+    { header: t('status', 'Status'), key: 'status' },
+  ];
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
 
   const handleFilterByDateRange = (dates: Array<Date>) => {

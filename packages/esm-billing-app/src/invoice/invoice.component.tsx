@@ -1,28 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { Button, InlineLoading } from '@carbon/react';
-import { BaggageClaim, Printer, Wallet, ConvertToCloud } from '@carbon/react/icons';
-import { useParams } from 'react-router-dom';
-import { useReactToPrint } from 'react-to-print';
-import { useTranslation } from 'react-i18next';
+import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
 import {
   ExtensionSlot,
-  usePatient,
-  showModal,
   formatDatetime,
-  parseDate,
   navigate,
+  parseDate,
+  showModal,
   useFeatureFlag,
+  usePatient,
   useVisit,
 } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { convertToCurrency } from '../helpers';
-import { LineItem } from '../types';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
+import { useReactToPrint } from 'react-to-print';
 import { useBill, useDefaultFacility } from '../billing.resource';
+import { spaBasePath } from '../constants';
+import { convertToCurrency } from '../helpers';
+import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
+import { LineItem } from '../types';
 import InvoiceTable from './invoice-table.component';
+import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
-import styles from './invoice.scss';
-import { spaBasePath } from '../constants';
 
 interface InvoiceDetailsProps {
   label: string;
@@ -36,6 +37,7 @@ const Invoice: React.FC = () => {
   const [isPrinting, setIsPrinting] = useState(false);
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
+  usePaymentsReconciler(billUuid);
   const { currentVisit, isLoading: isVisitLoading, error: visitError } = useVisit(patientUuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
