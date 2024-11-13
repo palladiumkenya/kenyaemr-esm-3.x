@@ -1,0 +1,28 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.modalHeaderLabel {
+  @include type.type-style('heading-02');
+  padding: layout.$spacing-05 layout.$spacing-05 0 layout.$spacing-05;
+}
+
+.modalHeaderHeading {
+  @include type.type-style('heading-compact-01');
+  margin-bottom: layout.$spacing-03;
+  color: colors.$red-60;
+}
+
+.button_spinner {
+  padding: 0;
+  margin-right: layout.$spacing-03;
+}
+
+.loading_wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.formField {
+  margin-top: layout.$spacing-05;
+}

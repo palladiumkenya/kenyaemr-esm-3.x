@@ -1,19 +1,14 @@
-import { ComboBox, Search } from '@carbon/react';
+import { Search } from '@carbon/react';
 import React, { useState } from 'react';
 import styles from './admitted-queue-header.scss';
 
-const DeceasedFilter: React.FC = () => {
-  const items = [
-    { id: 'all', text: 'All' },
-    { id: 'male', text: 'Male' },
-    { id: 'female', text: 'Female' },
-    { id: 'children', text: 'Children' },
-  ];
+const DeceasedFilter: React.FC<{ onSearchChange: (searchQuery: string) => void }> = ({ onSearchChange }) => {
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const [selectedItem, setSelectedItem] = useState(items[0]);
-
-  const handleChange = (selected) => {
-    setSelectedItem(selected.selectedItem);
+  const handleSearchChange = (event) => {
+    const query = event.target.value;
+    setSearchQuery(query);
+    onSearchChange(query);
   };
 
   return (
@@ -24,21 +19,10 @@ const DeceasedFilter: React.FC = () => {
         labelText="Search"
         closeButtonLabelText="Clear search input"
         id="search-deceased"
-        onChange={() => {}}
-        onKeyDown={() => {}}
+        onChange={handleSearchChange}
+        value={searchQuery}
         className={styles.searchInput}
       />
-      <div className={styles.actionBtn}>
-        <ComboBox
-          onChange={handleChange}
-          id="filter"
-          items={items}
-          className={styles.comboBox}
-          size="sm"
-          itemToString={(item) => (item ? item.text : '')}
-          initialSelectedItem={items[0]}
-        />
-      </div>
     </div>
   );
 };

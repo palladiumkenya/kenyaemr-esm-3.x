@@ -46,11 +46,12 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
   });
 
   const clockInWrapper = (paymentPointUUID: string) => {
+    const selectedPaymentPoint = paymentPoints.find((point) => point.uuid === paymentPointUUID);
     clockIn({ cashier: providerUUID, cashPoint: paymentPointUUID, clockIn: new Date().toISOString() })
       .then(() => {
         showSnackbar({
           title: t('success', 'Success'),
-          subtitle: t('successfullyClockedIn', `Successfully Clocked In ${paymentPoint.name}`),
+          subtitle: t('successfullyClockedIn', `Successfully Clocked In ${selectedPaymentPoint.name}`),
           kind: 'success',
         });
         mutate();
@@ -59,7 +60,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
       .catch(() => {
         showSnackbar({
           title: t('anErrorOccurred', 'An Error Occurred'),
-          subtitle: t('anErrorOccurredClockingIn', `An error occurred clocking in ${paymentPoint.name}`),
+          subtitle: t('anErrorOccurredClockingIn', `An error occurred clocking in ${selectedPaymentPoint.name}`),
           kind: 'error',
         });
 
