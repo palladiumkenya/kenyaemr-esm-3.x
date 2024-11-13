@@ -8,24 +8,19 @@ import { useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
 import { usePaymentModes } from '../../billing.resource';
 import styles from './visit-attributes-form.scss';
+import { VisitAttributesFormValue } from '../check-in-form.utils';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
-  setPaymentMethod?: (value: any) => void;
-  setIsPatientExempted: (value: string) => void;
 };
 
-const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
-  setAttributes,
-  setPaymentMethod,
-  setIsPatientExempted,
-}) => {
+const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes }) => {
   const { t } = useTranslation();
   const { insuranceSchemes } = useConfig<BillingConfig>();
   const { visitAttributeTypes, patientExemptionCategories } = useConfig<BillingConfig>();
-  const { setValue, watch, getValues, control } = useFormContext();
+  const { setValue, watch, getValues, control } = useFormContext<VisitAttributesFormValue>();
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
-  const [isPatientExempted, paymentMethods] = watch(['isPatientExempted', 'paymentMethods']);
+  const [isPatientExempted, paymentMethods, exc] = watch(['isPatientExempted', 'paymentMethods', 'exemptionCategory']);
 
   const resetFormFieldsForNonExemptedPatients = useCallback(() => {
     setValue('insuranceScheme', '');
@@ -38,12 +33,10 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
     if (isPatientExempted === 'true') {
       resetFormFieldsForNonExemptedPatients();
     }
-    setIsPatientExempted(isPatientExempted);
-  }, [isPatientExempted, resetFormFieldsForNonExemptedPatients, setIsPatientExempted]);
+  }, [isPatientExempted, resetFormFieldsForNonExemptedPatients]);
 
   const createVisitAttributesPayload = useCallback(() => {
     const values = getValues();
-    setPaymentMethod?.(values.paymentMethods);
     const formPayload = [
       { uuid: visitAttributeTypes.isPatientExempted, value: values.isPatientExempted },
       { uuid: visitAttributeTypes.paymentMethods, value: values.paymentMethods?.uuid },
@@ -58,7 +51,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
       attributeType: uuid,
       value,
     }));
-  }, [getValues, visitAttributeTypes, setPaymentMethod]);
+  }, [getValues, visitAttributeTypes]);
 
   useEffect(() => {
     setAttributes(createVisitAttributesPayload());
@@ -86,7 +79,6 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
               <RadioButtonGroup
                 onChange={(selected) => {
                   field.onChange(selected);
-                  setValue('isPatientExempted', selected);
                 }}
                 orientation="horizontal"
                 legendText={t('isPatientExemptedLegend', 'Is patient exempted from payment?')}
@@ -106,7 +98,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
               render={({ field }) => (
                 <ComboBox
                   className={styles.sectionField}
-                  onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
+                  onChange={({ selectedItem }) => field.onChange(selectedItem?.value)}
                   id="exemptionCategory"
                   items={patientExemptionCategories}
                   itemToString={(item) => (item ? item.label : '')}

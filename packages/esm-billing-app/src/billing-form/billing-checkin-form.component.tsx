@@ -28,8 +28,6 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const [attributes, setAttributes] = useState([]);
-  const [paymentMethod, setPaymentMethod] = useState<any>();
-  const [isPatientExemptedValue, setIsPatientExemptedValue] = useState<string | null>(null);
   const formMethods = useForm<VisitAttributesFormValue>({
     mode: 'all',
     defaultValues: {
@@ -41,6 +39,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     },
     resolver: zodResolver(visitAttributesFormSchema),
   });
+  const [isPatientExemptedValue, paymentMethod] = formMethods.watch(['isPatientExempted', 'paymentMethods']);
 
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
@@ -67,7 +66,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
 
     const lineItems = selectedItems.map((item, index) => {
       const priceForPaymentMode =
-        item.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod) || item?.servicePrices[0];
+        item.servicePrices.find((p) => p.paymentMode?.uuid === paymentMethod?.uuid) || item?.servicePrices[0];
       return {
         billableService: item?.uuid ?? '',
         quantity: 1,
@@ -123,11 +122,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
 
   return (
     <FormProvider {...formMethods}>
-      <VisitAttributesForm
-        setAttributes={setAttributes}
-        setPaymentMethod={setPaymentMethod}
-        setIsPatientExempted={setIsPatientExemptedValue}
-      />
+      <VisitAttributesForm setAttributes={setAttributes} />
       {hieFeatureFlags && <SHANumberValidity paymentMethod={attributes} patientUuid={patientUuid} />}
       {paymentMethod && (
         <section className={styles.sectionContainer}>
