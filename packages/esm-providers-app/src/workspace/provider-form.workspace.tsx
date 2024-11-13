@@ -71,7 +71,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
   const { t } = useTranslation();
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
-  // const { providerIdentifierTypes, isLoading } = useIdentifierTypes();
   const { roles, isLoading: isLoadingRoles } = useRoles();
   const { nationalIDUuid, providerNationalIdUuid, licenseExpiryDateUuid, licenseNumberUuid, identifierTypes } =
     useConfig<ConfigObject>();

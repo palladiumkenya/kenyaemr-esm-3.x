@@ -122,6 +122,10 @@ interface Qualification {
       code?: string;
       display: string;
     }[];
+    period: {
+      start: string;
+      end: string;
+    };
   };
 }
 

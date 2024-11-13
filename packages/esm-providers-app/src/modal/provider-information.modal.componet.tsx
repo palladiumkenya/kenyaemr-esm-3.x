@@ -66,11 +66,7 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
             />
             <HealthWorkerInfo
               label={t('renewalDuration', 'Renewal duration')}
-              value={
-                healthWorker?.qualification[0]?.extension.find(
-                  (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/license-renewal-duration',
-                )?.valueCoding?.display || 'Unknown'
-              }
+              value={healthWorker?.qualification[0]?.code?.period?.end || 'Unknown'}
             />
             <HealthWorkerInfo
               label={t('licensingBody', 'Licensing Body')}
