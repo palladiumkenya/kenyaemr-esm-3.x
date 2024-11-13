@@ -114,11 +114,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       const nationalId = healthWorker?.identifier?.find((id) =>
         id.type?.coding?.some((code) => code.code === 'national-id'),
       )?.value;
-      const licenseNumber =
-        healthWorker?.qualification?.[0]?.extension?.find(
-          (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/current-license-number',
-        )?.valueString || 'Unknown';
-      healthWorker?.active;
+      const licenseNumber = healthWorker?.identifier?.find((id) =>
+        id.type?.coding?.some((code) => code.code === 'license-number'),
+      )?.value;
       const dispose = showModal('hwr-confirmation-modal', {
         healthWorker,
         onConfirm: () => {

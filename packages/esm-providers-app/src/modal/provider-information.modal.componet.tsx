@@ -60,9 +60,8 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
             <HealthWorkerInfo
               label={t('licenseNo', 'License Number')}
               value={
-                healthWorker?.qualification[0]?.extension.find(
-                  (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/current-license-number',
-                )?.valueString || 'Unknown'
+                healthWorker?.identifier?.find((id) => id.type?.coding?.some((code) => code.code === 'license-number'))
+                  ?.value
               }
             />
             <HealthWorkerInfo
@@ -76,9 +75,9 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
             <HealthWorkerInfo
               label={t('licensingBody', 'Licensing Body')}
               value={
-                healthWorker?.qualification[0]?.extension.find(
-                  (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/licensing-body',
-                )?.valueString || 'Unknown'
+                healthWorker?.identifier?.find((id) =>
+                  id.type?.coding?.some((code) => code.code === 'board-registration-number'),
+                )?.value
               }
             />
             <HealthWorkerInfo
@@ -86,7 +85,8 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
               value={
                 healthWorker?.qualification[0]?.code?.coding.find(
                   (coding) =>
-                    coding.system === 'https://shr.tiberbuapps.com/fhir' && coding.display === 'Medical Doctor License',
+                    coding.system === 'https://ts.kenya-hie.health/Codesystem/regulatory-body' &&
+                    coding.display === 'Kenya Medical Practitioners and Dentists Council',
                 )?.display || 'Unknown'
               }
             />
