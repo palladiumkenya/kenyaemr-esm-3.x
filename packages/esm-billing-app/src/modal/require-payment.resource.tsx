@@ -1,9 +1,9 @@
 import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
-import { PatientInvoice } from '../types';
+import { PatientInvoice, PaymentStatus } from '../types';
 import useSWR from 'swr';
 import { useMemo } from 'react';
 import { mapBillProperties } from '../billing.resource';
-import { config } from 'rxjs';
+import { BillingConfig } from '../config-schema';
 /*
  Custom hook to fetch patient bills
  @param patientUuid - The UUID of the patient
@@ -16,19 +16,24 @@ import { config } from 'rxjs';
  }
 */
 export const usePatientBills = (patientUuid: string) => {
-  const { patientBillsUrl } = useConfig();
+  const { patientBillsUrl } = useConfig<BillingConfig>();
   const url = patientBillsUrl.replace('${restBaseUrl}', restBaseUrl);
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
-    patientUuid ? `${url}&patientUuid=${patientUuid}` : url,
+    patientUuid ? `${url}&patientUuid=${patientUuid}&includeVoided=false` : url,
     openmrsFetch,
     {
       errorRetryCount: 2,
     },
   );
 
+  // filter out adjusted bills and whose line items are paid
+  const filteredBills = data?.data?.results
+    ?.filter((bill) => bill.lineItems.every((li) => li.paymentStatus !== PaymentStatus.PAID))
+    .filter((bill) => bill.status !== PaymentStatus.PAID);
+
   const patientBills = useMemo(() => {
-    return data?.data?.results?.map(mapBillProperties) ?? [];
-  }, [data?.data?.results]);
+    return filteredBills?.map(mapBillProperties) ?? [];
+  }, [filteredBills]);
 
   return {
     patientBills: patientBills ?? [],

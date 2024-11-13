@@ -4,6 +4,7 @@ import { QueueEntry } from '../../../types';
 import { BillingConfig } from '../../../config-schema';
 import { usePatientBills } from '../../../modal/require-payment.resource';
 import { useMemo } from 'react';
+import { checkPaymentMethodExclusion } from '../../../billing-prompt/billing-prompt.resource';
 
 export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) => {
   const config = useConfig<BillingConfig>();
@@ -11,12 +12,22 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
   const { isEmergencyPatient, isLoading: isLoadingQueue } = usePatientQueue(patientUuid);
   const { isLoading: isLoadingBill, hasPendingPayment } = useOrderPendingPaymentStatus(patientUuid, orderUuid);
 
+  // We want to check if the payment method is in the excluded list this includes insurances, where patient do not need to pay immediately
+  const isExcludedPaymentMethod = checkPaymentMethodExclusion(
+    currentVisit,
+    config?.paymentMethodsUuidsThatShouldNotShowPrompt,
+  );
+
   return useMemo(() => {
     if (isLoadingQueue || isLoadingBill) {
       return { hasPendingPayment: false, isLoading: true };
     }
 
     if (currentVisit?.visitType?.uuid === config?.inPatientVisitTypeUuid || isEmergencyPatient) {
+      return { hasPendingPayment: false, isLoading: false };
+    }
+
+    if (isExcludedPaymentMethod) {
       return { hasPendingPayment: false, isLoading: false };
     }
 
