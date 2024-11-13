@@ -21,8 +21,8 @@ import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedBill, PaymentStatus } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
-import { Scalpel } from '@carbon/react/icons';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { Scalpel, ShoppingCartMinus, TrashCan } from '@carbon/react/icons';
+import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 
 type PatientBillsProps = {
   bills: Array<MappedBill>;
@@ -66,6 +66,13 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
     launchWorkspace('waive-bill-form', {
       workspaceTitle: 'Waive Bill Form',
       bill,
+    });
+  };
+
+  const handleOpenDeleteBillModal = (bill: MappedBill) => {
+    const dispose = showModal('delete-bill-modal', {
+      bill,
+      onClose: () => dispose(),
     });
   };
 
@@ -133,9 +140,17 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
                           size="sm"
                           onClick={() => handleOpenWaiveBillWorkspace(bills[index])}
                           renderIcon={(props) => <Scalpel size={24} {...props} />}
-                          kind="danger--tertiary"
+                          kind="danger--ghost"
                           iconDescription="TrashCan">
                           {t('waiveBill', 'Waive Bill')}
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleOpenDeleteBillModal(bills[index])}
+                          renderIcon={(props) => <ShoppingCartMinus size={24} {...props} />}
+                          kind="danger--tertiary"
+                          iconDescription="TrashCan">
+                          {t('deleteBill', 'Delete Bill')}
                         </Button>
                       </TableCell>
                     </TableExpandRow>

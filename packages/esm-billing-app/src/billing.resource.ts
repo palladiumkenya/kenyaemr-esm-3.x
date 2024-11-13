@@ -34,7 +34,7 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     cashPointLocation: bill?.cashPoint?.location?.display,
     dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
     dateCreatedUnformatted: bill.dateCreated,
-    lineItems: bill.lineItems,
+    lineItems: bill.lineItems.filter((li) => !li.voided),
     billingService: extractString(bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  ')),
     payments: bill.payments,
     display: bill.display,
@@ -95,7 +95,7 @@ export const useBills = (
 };
 
 export const useBill = (billUuid: string) => {
-  const url = `${restBaseUrl}/cashier/bill/${billUuid}`;
+  const url = `${restBaseUrl}/cashier/bill/${billUuid}?includeVoided=false`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PatientInvoice }>(
     billUuid ? url : null,
     openmrsFetch,
@@ -135,7 +135,13 @@ export const useBill = (billUuid: string) => {
     return mappedBill;
   };
 
-  const formattedBill = data?.data ? mapBillProperties(data?.data) : ({} as MappedBill);
+  // filter out voided line items to prevent them from being included in the bill
+  // TODO: add backend support for voided line items
+  // https://thepalladiumgroup.atlassian.net/browse/KHP3-7068
+  const filteredLineItems = data?.data?.lineItems?.filter((li) => !li.voided) ?? [];
+  const formattedBill = data?.data
+    ? mapBillProperties({ ...data?.data, lineItems: filteredLineItems })
+    : ({} as MappedBill);
 
   return {
     bill: formattedBill,

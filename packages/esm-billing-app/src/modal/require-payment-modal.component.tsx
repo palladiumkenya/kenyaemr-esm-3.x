@@ -42,7 +42,7 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
   const lineItems = bills
     .filter((bill) => bill.status !== 'PAID')
     .flatMap((bill) => bill.lineItems)
-    .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED');
+    .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED' && !lineItem.voided);
 
   if (!shouldShowBillingPrompt) {
     return null;

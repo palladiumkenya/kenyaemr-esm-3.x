@@ -28,7 +28,7 @@ export const root = getAsyncLifecycle(() => import('./root.component'), options)
 export const morgueDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'morgue',
-    title: 'Morgue',
+    title: 'Mortuary',
   }),
   options,
 );

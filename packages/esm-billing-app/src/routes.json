@@ -99,10 +99,6 @@
       "component": "initiatePaymentDialog"
     },
     {
-      "name": "cancel-bill-modal",
-      "component": "cancelBillModal"
-    },
-    {
       "name": "delete-billableservice-modal",
       "component": "deleteBillableServiceModal"
     },
@@ -237,6 +233,12 @@
       "name": "payment-mode-workspace",
       "component": "paymentModeWorkspace",
       "title": "Payment Mode Workspace",
+      "type": "other-form"
+    },
+    {
+      "name": "cancel-bill-workspace",
+      "component": "cancelBillWorkspace",
+      "title": "Cancel Bill Workspace",
       "type": "other-form"
     }
   ],

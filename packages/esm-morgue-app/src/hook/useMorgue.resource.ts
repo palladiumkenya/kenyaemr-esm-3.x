@@ -114,7 +114,6 @@ export const useActiveMorgueVisit = () => {
 
   return { data: activeDeceased, error, isLoading };
 };
-
 const usePerson = (uuid: string) => {
   const customRepresentation = `custom:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display))`;
   const url = `${restBaseUrl}/person/${uuid}?v=${customRepresentation}`;
