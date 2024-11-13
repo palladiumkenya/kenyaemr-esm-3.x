@@ -95,9 +95,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
 
   useEffect(() => {
     setExtraVisitInfo({
-      handleCreateExtraVisitInfo: () => {
-        alert('Handle create extra');
-      },
+      handleCreateExtraVisitInfo: () => {},
       attributes,
     });
   }, [attributes, setExtraVisitInfo]);
