@@ -10,6 +10,7 @@ export interface BillingConfig {
     exemptionCategory: string;
     billPaymentStatus: string;
   };
+  insurancePaymentMethod: string;
   inPatientVisitTypeUuid: string;
   patientExemptionCategories: Array<{ value: string; label: string }>;
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
@@ -114,6 +115,11 @@ export const configSchema: ConfigSchema = {
       _description: 'The bill payment status visit attribute uuid',
       _default: '919b51c9-8e2e-468f-8354-181bf3e55786',
     },
+  },
+  insurancePaymentMethod: {
+    _type: Type.String,
+    _description: 'Insurance Payment method UUID',
+    _default: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
   },
   patientExemptionCategories: {
     _type: Type.Array,
