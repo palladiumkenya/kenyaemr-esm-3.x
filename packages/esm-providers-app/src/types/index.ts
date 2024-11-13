@@ -69,49 +69,47 @@ export interface UserRoles {
 export interface Practitioner {
   id: string;
   meta: Metadata;
-  extension: ExtensionCadre[];
-  identifier: IdentifierType[];
-  active: boolean;
-  name: PractitionerName[];
-  telecom: ContactList[];
-  qualification: Qualification[];
+  entry: Entry[];
 }
 
 interface Metadata {
   lastUpdated: string;
-  profile: string[];
 }
 
-interface ExtensionCadre {
-  url: string;
-  valueCoding?: {
-    system?: string;
-    code?: string;
-    display?: string;
+interface Entry {
+  resource: {
+    id: string;
+    identifier: IdentifierType[];
+    active: boolean;
+    name: Name[];
+    telecom: ContactList[];
+    gender: string;
+    qualification: Qualification[];
   };
-  valueString?: string;
 }
 
 interface IdentifierType {
-  use: string;
   type: {
     coding: {
       code: string;
+      display: string;
+      system?: string;
     }[];
   };
   value: string;
-}
-
-interface PractitionerName {
-  family: string;
-  given: string[];
-  prefix: string[];
+  period?: {
+    start?: string;
+    end?: string;
+  };
 }
 
 interface ContactList {
   system: string;
-  use: string;
   value?: string;
+}
+
+interface Name {
+  text: string;
 }
 
 interface Qualification {
@@ -122,10 +120,10 @@ interface Qualification {
       code?: string;
       display: string;
     }[];
-    period: {
-      start: string;
-      end: string;
-    };
+  };
+  period: {
+    start: string;
+    end: string;
   };
 }
 
@@ -137,6 +135,13 @@ interface QualificationExtension {
     display?: string;
   };
   valueString?: string;
+  valueCodeableConcept?: {
+    coding: {
+      system: string;
+      code: string;
+      display: string;
+    }[];
+  };
 }
 
 export interface User {
