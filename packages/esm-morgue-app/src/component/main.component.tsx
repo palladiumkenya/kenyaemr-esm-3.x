@@ -7,7 +7,7 @@ const MainComponent: React.FC = () => {
   const { t } = useTranslation();
   return (
     <div className={`omrs-main-content`}>
-      <MorgueHeader title={t('mortuaryTitle', 'Mortuary')} />
+      <MorgueHeader title={t('mortuary', 'Mortuary')} />
       <MorgueTabs />
     </div>
   );

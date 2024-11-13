@@ -20,7 +20,7 @@ export const MorgueHeader: React.FC<MorgueHeaderProps> = ({ title }) => {
         <MorgueIllustration />
         <div className={styles['page-labels']}>
           <p className={styles['page-name']}>{title}</p>
-          <p>{t('mortuaryLabel', 'Mortuary management')}</p>
+          <p>{t('mortuaryManagement', 'Mortuary management')}</p>
         </div>
       </div>
       <div className={styles.metrics}>

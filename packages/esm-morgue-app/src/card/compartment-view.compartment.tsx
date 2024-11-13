@@ -28,7 +28,7 @@ const CompartmentView: React.FC<CompartmentViewProps> = ({ patientVisit, searchQ
   ) : (
     <div className={styles.emptyStateContainer}>
       <EmptyDeceasedSearch
-        title={t('noResultNotFound', 'No Result Found')}
+        title={t('noResultNotFound', 'No result found')}
         subTitle={t('adjustFilterOrSwitch', 'Try adjusting your search.')}
       />
     </div>

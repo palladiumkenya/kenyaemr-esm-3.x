@@ -49,7 +49,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisi
       </div>
       <div className={styles.cardRow}>
         <span className={styles.deceasedReason}>
-          {t('Reason', 'REASON: ')}
+          {t('Reason', 'Reason ')}
           {causeOfDeathTagType === 'red' ? (
             <Tag size="md" type={causeOfDeathTagType}>
               {causeOfDeathDisplay}
