@@ -1,52 +1,40 @@
-import React, { useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { TextInput, InlineLoading, ComboBox, RadioButtonGroup, RadioButton } from '@carbon/react';
-import { Controller, useForm, useFormContext } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { ComboBox, InlineLoading, RadioButton, RadioButtonGroup, TextInput } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { BillingConfig } from '../../config-schema';
+import React, { useCallback, useEffect } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { usePaymentModes } from '../../billing.resource';
+import { BillingConfig } from '../../config-schema';
+import { VisitAttributesFormValue } from '../check-in-form.utils';
 import styles from './visit-attributes-form.scss';
 
 type VisitAttributesFormProps = {
   setAttributes: (state) => void;
-  setPaymentMethod?: (value: any) => void;
-  setIsPatientExempted: (value: string) => void;
 };
 
-const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
-  setAttributes,
-  setPaymentMethod,
-  setIsPatientExempted,
-}) => {
+const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes }) => {
   const { t } = useTranslation();
   const { insuranceSchemes } = useConfig<BillingConfig>();
-  const { visitAttributeTypes, patientExemptionCategories } = useConfig<BillingConfig>();
-  const { setValue, watch, getValues, control } = useFormContext();
+  const { visitAttributeTypes, patientExemptionCategories, insurancePaymentMethod } = useConfig<BillingConfig>();
+  const { setValue, watch, control, getValues } = useFormContext<VisitAttributesFormValue>();
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const [isPatientExempted, paymentMethods] = watch(['isPatientExempted', 'paymentMethods']);
-
   const resetFormFieldsForNonExemptedPatients = useCallback(() => {
     setValue('insuranceScheme', '');
     setValue('policyNumber', '');
     setValue('exemptionCategory', '');
-    setValue('paymentMethods', null);
+    setValue('paymentMethods', '');
   }, [setValue]);
 
   useEffect(() => {
-    if (isPatientExempted === 'true') {
-      resetFormFieldsForNonExemptedPatients();
-    }
-    setIsPatientExempted(isPatientExempted);
-  }, [isPatientExempted, resetFormFieldsForNonExemptedPatients, setIsPatientExempted]);
+    resetFormFieldsForNonExemptedPatients();
+  }, [isPatientExempted, resetFormFieldsForNonExemptedPatients]);
 
   const createVisitAttributesPayload = useCallback(() => {
     const values = getValues();
-    setPaymentMethod?.(values.paymentMethods);
     const formPayload = [
       { uuid: visitAttributeTypes.isPatientExempted, value: values.isPatientExempted },
-      { uuid: visitAttributeTypes.paymentMethods, value: values.paymentMethods?.uuid },
+      { uuid: visitAttributeTypes.paymentMethods, value: values.paymentMethods },
       { uuid: visitAttributeTypes.policyNumber, value: values.policyNumber },
       { uuid: visitAttributeTypes.insuranceScheme, value: values.insuranceScheme },
       { uuid: visitAttributeTypes.exemptionCategory, value: values.exemptionCategory },
@@ -58,11 +46,19 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
       attributeType: uuid,
       value,
     }));
-  }, [getValues, visitAttributeTypes, setPaymentMethod]);
+  }, [visitAttributeTypes, getValues]);
 
   useEffect(() => {
     setAttributes(createVisitAttributesPayload());
-  }, [isPatientExempted, paymentMethods, getValues, createVisitAttributesPayload, setAttributes]);
+  }, [
+    isPatientExempted,
+    paymentMethods,
+    setAttributes,
+    createVisitAttributesPayload,
+    watch('policyNumber'),
+    watch('exemptionCategory'),
+    watch('insuranceScheme'),
+  ]);
 
   if (isLoadingPaymentModes) {
     return (
@@ -86,7 +82,6 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
               <RadioButtonGroup
                 onChange={(selected) => {
                   field.onChange(selected);
-                  setValue('isPatientExempted', selected);
                 }}
                 orientation="horizontal"
                 legendText={t('isPatientExemptedLegend', 'Is patient exempted from payment?')}
@@ -106,7 +101,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
               render={({ field }) => (
                 <ComboBox
                   className={styles.sectionField}
-                  onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
+                  onChange={({ selectedItem }) => field.onChange(selectedItem?.value)}
                   id="exemptionCategory"
                   items={patientExemptionCategories}
                   itemToString={(item) => (item ? item.label : '')}
@@ -127,9 +122,10 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
                 <ComboBox
                   className={styles.sectionField}
                   onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                  initialSelectedItem={field.value}
                   id="paymentMethods"
-                  items={paymentModes}
-                  itemToString={(item) => (item ? item.name : '')}
+                  items={paymentModes?.map((method) => method.uuid)}
+                  itemToString={(item) => paymentModes.find((mode) => mode.uuid === item)?.name ?? ''}
                   titleText={t('paymentMethodsTitle', 'Payment method')}
                   placeholder={t('selectPaymentMethod', 'Select payment method')}
                 />
@@ -138,7 +134,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
           </div>
         )}
 
-        {paymentMethods?.name?.toLowerCase() === 'insurance' && isPatientExempted === 'false' && (
+        {paymentMethods === insurancePaymentMethod && isPatientExempted === 'false' && (
           <>
             <div className={styles.sectionFieldLayer}>
               <Controller
@@ -163,6 +159,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({
                 name="policyNumber"
                 render={({ field }) => (
                   <TextInput
+                    {...field}
                     className={styles.sectionField}
                     onChange={(e) => field.onChange(e.target.value)}
                     id="policy-number"
