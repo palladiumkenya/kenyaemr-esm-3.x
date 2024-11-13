@@ -3,7 +3,9 @@ import { LineItem, PaymentStatus } from '../../../../types';
 export const createCancelBillPayload = (bill, lineItem, reason) => {
   // Void the line item to prevent it from being included in the bill
   const updatedLineItems = bill.lineItems.map((currentLineItem) =>
-    currentLineItem.uuid === lineItem.uuid ? { ...currentLineItem, voided: true, voidReason: reason } : currentLineItem,
+    currentLineItem.uuid === lineItem.uuid
+      ? { ...currentLineItem, voided: true, voidReason: reason, paymentStatus: PaymentStatus.CANCELLED }
+      : currentLineItem,
   );
 
   const formatLineItem = (props: LineItem) => ({

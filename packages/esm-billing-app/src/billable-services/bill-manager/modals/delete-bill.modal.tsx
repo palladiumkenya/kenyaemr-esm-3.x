@@ -22,19 +22,20 @@ const formatLineItem = (props: LineItem) => ({
   priceName: props.priceName,
   priceUuid: props.priceUuid,
   lineItemOrder: props.lineItemOrder,
-  paymentStatus: props.paymentStatus,
+  paymentStatus: PaymentStatus.CANCELLED,
   voided: props.voided,
   voidReason: props.voidReason,
 });
-const deleteBillPayload = (bill: MappedBill) => {
+const deleteBillPayload = (bill: MappedBill, reason: string) => {
   return {
     cashPoint: bill.cashPointUuid,
     cashier: bill.cashier.uuid,
-    lineItems: bill.lineItems.map((li) => formatLineItem(li)),
+    lineItems: bill.lineItems.map((li) => formatLineItem({ ...li, voided: true, voidReason: reason })),
     payments: bill.payments,
     patient: bill.patientUuid,
     status: PaymentStatus.CANCELLED,
     voided: true,
+    voidReason: reason,
     billAdjusted: bill.uuid,
   };
 };
@@ -55,7 +56,7 @@ export const DeleteBillModal: React.FC<DeleteBillModalProps> = ({ onClose, bill 
     resolver: zodResolver(deleteSchema),
   });
   const onSubmit = async (formData: DeleteBillFormData) => {
-    const payload = deleteBillPayload(bill);
+    const payload = deleteBillPayload(bill, formData.reason);
     try {
       const response = await processBillPayment(payload, bill.uuid);
       if (response.ok) {
