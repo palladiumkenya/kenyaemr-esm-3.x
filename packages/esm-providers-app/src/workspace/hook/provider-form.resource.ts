@@ -46,9 +46,7 @@ const convertToIdenitifertype = (identifierType) => {
   return identifierType.toLowerCase().replace(/\s+/g, '-');
 };
 export const searchHealthCareWork = async (identifierType: string, identifierNumber: string) => {
-  const url = `${restBaseUrl}/kenyaemr/practitionersearch?${convertToIdenitifertype(
-    identifierType,
-  )}=${identifierNumber}`;
+  const url = `${restBaseUrl}/kenyaemr/practitionersearch?identifierType=${identifierType}&identifierNumber=${identifierNumber}`;
   // Not using openmrsfetch to avoid automatic ending of current session due to 401(Unauthorized) status error it throws
   const response = await fetch(makeUrl(url));
   if (response.ok) {

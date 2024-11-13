@@ -4,12 +4,12 @@ import _default from 'react-hook-form/dist/logic/appendErrors';
 export const configSchema = {
   nationalIDUuid: {
     _type: Type.String,
-    _description: ' UUID for national identification',
+    _description: 'UUID for national identification',
     _default: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
   },
   passportNumberUuid: {
     _type: Type.String,
-    _description: ' UUID for national identification',
+    _description: 'UUID for national identification',
     _default: 'be9beef6-aacc-4e1f-ac4e-5babeaa1e303',
   },
   licenseExpiryDateUuid: {
@@ -20,7 +20,7 @@ export const configSchema = {
   licenseBodyUuid: {
     _type: Type.String,
     _description: 'UUID for license body',
-    _defualt: 'ba18bb97-d17c-4640-80d2-58e7df90ca4c',
+    _default: 'ba18bb97-d17c-4640-80d2-58e7df90ca4c',
   },
   providerNationalIdUuid: {
     _type: Type.String,
@@ -32,15 +32,31 @@ export const configSchema = {
     _description: 'UUID for provider licensing body',
     _default: 'bcaaa67b-cc72-4662-90c2-e1e992ceda66',
   },
-  defaultprimaryFacility: {
+  defaultPrimaryFacility: {
     _type: Type.String,
     _description: 'Default facility for a provider',
     _default: '5a53dddd-b382-4245-9bf1-03bce973f24b',
   },
-  defualtTelephonePhone: {
+  defaultTelephonePhone: {
     _type: Type.String,
     _description: 'Default Telephone number for a provider',
     _default: 'b2c38640-2603-4629-aebd-3b54f33f1e3a',
+  },
+  identifierTypes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.Object,
+      properties: {
+        key: { _type: Type.String },
+        name: { _type: Type.String },
+      },
+    },
+    _default: [
+      { key: 'national-id', name: 'National ID' },
+      { key: 'registration_number', name: 'Registration Number' },
+      { key: 'passport-number', name: 'Passport Number' },
+    ],
+    _description: 'List of identifier types with unique keys for each.',
   },
 };
 
@@ -51,5 +67,10 @@ export interface ConfigObject {
   licenseBodyUuid: string;
   providerNationalIdUuid: string;
   licenseNumberUuid: string;
-  defaultprimaryFacility: string;
+  defaultPrimaryFacility: string;
+  defaultTelephonePhone: string;
+  identifierTypes: Array<{
+    key: string;
+    name: string;
+  }>;
 }

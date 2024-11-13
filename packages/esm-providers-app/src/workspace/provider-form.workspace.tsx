@@ -71,19 +71,16 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
   const { t } = useTranslation();
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
-  const { providerIdentifierTypes, isLoading } = useIdentifierTypes();
+  // const { providerIdentifierTypes, isLoading } = useIdentifierTypes();
   const { roles, isLoading: isLoadingRoles } = useRoles();
-  const [facilitySearchTerm, setFacilitySearchTerm] = useState('');
-  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  const { nationalIDUuid, providerNationalIdUuid, licenseExpiryDateUuid, licenseNumberUuid } =
+  const { nationalIDUuid, providerNationalIdUuid, licenseExpiryDateUuid, licenseNumberUuid, identifierTypes } =
     useConfig<ConfigObject>();
 
   const [searchHWR, setSearchHWR] = useState({
-    identifierType: nationalIDUuid,
+    identifierType: identifierTypes[0]?.key ?? '',
     identifier: '',
     isHWRLoading: false,
   });
-  const { data: facilities } = useFacility(facilitySearchTerm);
   const definedRoles = roles.map((role) => role.uuid) || [];
   const licenseDate = provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid)?.value;
 
@@ -109,7 +106,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     },
   });
 
-  const defualtValueCombox = providerIdentifierTypes?.find((item) => item.uuid === searchHWR.identifierType);
+  const defaultIdentifierType = identifierTypes.find((item) => item.key === searchHWR.identifierType);
   const handleSearch = async () => {
     try {
       setSearchHWR({ ...searchHWR, isHWRLoading: true });
@@ -247,13 +244,13 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <Loading small withOverlay={false} />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className={styles.loadingContainer}>
+  //       <Loading small withOverlay={false} />
+  //     </div>
+  //   );
+  // }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
@@ -272,14 +269,14 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             <Column>
               <ComboBox
                 onChange={({ selectedItem }) => {
-                  setSearchHWR({ ...searchHWR, identifierType: selectedItem?.display ?? '' });
+                  setSearchHWR({ ...searchHWR, identifierType: selectedItem?.key ?? '' });
                 }}
                 id="form__identifier__type"
                 titleText={t('identificationType', 'Identification Type')}
                 placeholder={t('chooseIdentifierType', 'Choose identifier type')}
-                initialSelectedItem={defualtValueCombox}
-                items={providerIdentifierTypes ?? []}
-                itemToString={(item) => (item ? item.display : '')}
+                initialSelectedItem={defaultIdentifierType}
+                items={identifierTypes}
+                itemToString={(item) => (item ? item.name : '')}
               />
             </Column>
             <Column>
