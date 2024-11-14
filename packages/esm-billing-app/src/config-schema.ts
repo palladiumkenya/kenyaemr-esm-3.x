@@ -23,6 +23,10 @@ export interface BillingConfig {
   patientBillsUrl: string;
   nationalIdUUID: string;
   isPDSLFacility: boolean;
+  concepts: {
+    emergencyPriorityConceptUuid: string;
+  };
+  paymentMethodsUuidsThatShouldNotShowPrompt: Array<string>;
 }
 
 export const configSchema: ConfigSchema = {
