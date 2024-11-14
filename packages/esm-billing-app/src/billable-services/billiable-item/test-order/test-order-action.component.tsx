@@ -89,9 +89,9 @@ const TestOrderAction: React.FC<TestOrderProps> = React.memo((props) => {
 
   const buttonText = hasPendingPayment
     ? t('unsettledBill', 'Unsettled bill.')
-    : actionText ?? Object.hasOwn(props, 'medicationRequestBundle')
-    ? t('dispense', 'Dispense')
-    : t('pickLabRequest', 'Pick Lab Request');
+    : Object.hasOwn(props, 'medicationRequestBundle')
+    ? actionText ?? t('dispense', 'Dispense')
+    : actionText ?? t('pickLabRequest', 'Pick Lab Request');
 
   return (
     <Button kind="primary" disabled={hasPendingPayment} key={`${orderUuid}`} onClick={launchModal}>
