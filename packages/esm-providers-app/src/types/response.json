@@ -1,0 +1,121 @@
+{
+    "resourceType": "Bundle",
+    "id": "5d128494-9bf9-4642-9359-32f6dac3261c",
+    "meta": {
+        "lastUpdated": "2024-11-13T18:16:43.872+03:00"
+    },
+    "type": "searchset",
+    "total": 1,
+    "link": [
+        {
+            "relation": "self",
+            "url": "https://hie-professionals-registry-service/fhir/Practitioner?identifierNumber=A6364&identifierType=registration_number"
+        }
+    ],
+    "entry": [
+        {
+            "resource": {
+                "resourceType": "Practitioner",
+                "id": "PUID-2024-0120641-1",
+                "identifier": [
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "https://ts.kenya-hie.health/Codesystem/professional-identifier-types",
+                                    "code": "board-registration-number",
+                                    "display": "Board Registration Number"
+                                }
+                            ]
+                        },
+                        "value": "A6364"
+                    },
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "https://ts.kenya-hie.health/Codesystem/professional-identifier-types",
+                                    "code": "license-number",
+                                    "display": "License Number"
+                                }
+                            ]
+                        },
+                        "value": "SP/2024/613915",
+                        "period": {
+                            "start": "2023-12-31T00:00:00+03:00",
+                            "end": "2024-12-31T00:00:00+03:00"
+                        }
+                    },
+                    {
+                        "type": {
+                            "coding": [
+                                {
+                                    "system": "https://ts.kenya-hie.health/Codesystem/identifier-types",
+                                    "code": "national-id",
+                                    "display": "National ID"
+                                }
+                            ]
+                        },
+                        "value": "22625781"
+                    }
+                ],
+                "active": true,
+                "name": [
+                    {
+                        "text": " DR MAOGA KAZIMOTO"
+                    }
+                ],
+                "telecom": [
+                    {
+                        "system": "email",
+                        "value": "DKAZIMOTO@YAHOO.COM"
+                    },
+                    {
+                        "system": "phone",
+                        "value": "721580337"
+                    }
+                ],
+                "gender": "unknown",
+                "qualification": [
+                    {
+                        "extension": [
+                            {
+                                "url": "https://hwr-kenyahie/StructureDefinition/qualification-type",
+                                "valueString": "license"
+                            },
+                            {
+                                "url": "https://hwr-kenyahie/StructureDefinition/license-status",
+                                "valueString": "active"
+                            },
+                            {
+                                "url": "https://hwr-kenyahie/StructureDefinition/licensing-body",
+                                "valueCodeableConcept": {
+                                    "coding": [
+                                        {
+                                            "system": "https://ts.kenya-hie.health/Codesystem/regulatory-body",
+                                            "code": "KMPDC",
+                                            "display": "Kenya Medical Practitioners and Dentists Council"
+                                        }
+                                    ]
+                                }
+                            }
+                        ],
+                        "code": {
+                            "coding": [
+                                {
+                                    "system": "https://ts.kenya-hie.health/Codesystem/specialities",
+                                    "code": "262",
+                                    "display": "Other"
+                                }
+                            ]
+                        },
+                        "period": {
+                            "start": "2023-12-31T00:00:00+03:00",
+                            "end": "2024-12-31T00:00:00+03:00"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

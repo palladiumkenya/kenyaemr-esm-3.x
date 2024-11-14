@@ -22,10 +22,14 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
   const { user, isLoading, error } = useProviderUser(provider.uuid);
   const { t } = useTranslation();
   const [syncLoading, setSyncLoading] = useState(false);
-  const { licenseNumberUuid, licenseExpiryDateUuid, providerNationalIdUuid } = useConfig<ConfigObject>();
-  const { providerIdentifierTypes } = useIdentifierTypes();
+  const { licenseNumberUuid, licenseExpiryDateUuid, providerNationalIdUuid, licenseBodyUuid } =
+    useConfig<ConfigObject>();
 
   const providerNationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
+  const registrationNumber = provider.attributes.find((attr) => attr.attributeType.uuid === licenseBodyUuid);
+  if (isLoading) {
+    return null;
+  }
 
   const handleUpdateProvider = (provider: ProviderResponse) => {
     launchWorkspace('provider-register-form', {
@@ -38,26 +42,22 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
   const handleSync = async () => {
     try {
       setSyncLoading(true);
-      const healthWorker: Practitioner = await searchHealthCareWork('National id', providerNationalId.value);
-      const licenseNumber =
-        healthWorker?.qualification?.[0]?.extension?.find(
-          (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/current-license-number',
-        )?.valueString || 'Unknown';
-
+      const healthWorker: Practitioner = await searchHealthCareWork('registration_number', registrationNumber.value);
+      const licenseNumber = healthWorker.entry[0]?.resource.identifier?.find((id) =>
+        id.type?.coding?.some((code) => code.code === 'license-number'),
+      )?.value;
       const updatableAttributes = [
         {
           attributeType: licenseNumberUuid,
           value: licenseNumber,
         },
       ];
-
       await Promise.all(
         updatableAttributes.map((attr) => {
           const _attribute = provider.attributes.find((at) => at.attributeType.uuid === attr.attributeType)?.uuid;
           if (!_attribute) {
             return createProviderAttribute(attr, provider.uuid);
           }
-
           return updateProviderAttributes(
             { value: attr.value },
             provider.uuid,
@@ -77,7 +77,7 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
       showSnackbar({
         title: 'Failure',
         kind: 'error',
-        subtitle: t('errorMsg', 'Failed to sync the account'),
+        subtitle: t('errorMsg', `Failed to sync the account ${err}`),
       });
     } finally {
       setSyncLoading(false);
