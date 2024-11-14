@@ -3,7 +3,7 @@ import { mutate } from 'swr';
 import { z } from 'zod';
 import { LabManifest, ManifestMetricYearSummary, MappedLabManifest, TransformedData } from './types';
 
-export const printableManifestStatus = ['Submitted', 'Complete results'];
+export const printableManifestStatus = ['Submitted', 'Complete results', 'Ready to send'];
 export const editableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
 

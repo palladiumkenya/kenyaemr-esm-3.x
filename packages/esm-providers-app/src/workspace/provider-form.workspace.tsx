@@ -19,7 +19,7 @@ import {
 } from '@carbon/react';
 import { GenderFemale, GenderMale, Query } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { formatDate, parseDate, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -49,6 +49,7 @@ const providerFormSchema = z
     nationalid: z.string().nonempty('National ID is required'),
     gender: z.enum(['M', 'F'], { required_error: 'Gender is required' }),
     licenseNumber: z.string().nonempty('License number is required'),
+    registrationNumber: z.string().nonempty('License number is required'),
     licenseExpiryDate: z.date(),
     username: z.string().nonempty('Username is required'),
     password: z.string().nonempty('Password is required'),
@@ -71,19 +72,21 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
   const { t } = useTranslation();
   const layout = useLayoutType();
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
-  const { providerIdentifierTypes, isLoading } = useIdentifierTypes();
   const { roles, isLoading: isLoadingRoles } = useRoles();
-  const [facilitySearchTerm, setFacilitySearchTerm] = useState('');
-  const [selectedFacility, setSelectedFacility] = useState<Facility | null>(null);
-  const { nationalIDUuid, providerNationalIdUuid, licenseExpiryDateUuid, licenseNumberUuid } =
-    useConfig<ConfigObject>();
+  const {
+    nationalIDUuid,
+    providerNationalIdUuid,
+    licenseExpiryDateUuid,
+    licenseNumberUuid,
+    licenseBodyUuid,
+    identifierTypes,
+  } = useConfig<ConfigObject>();
 
   const [searchHWR, setSearchHWR] = useState({
-    identifierType: nationalIDUuid,
+    identifierType: identifierTypes[0]?.key ?? '',
     identifier: '',
     isHWRLoading: false,
   });
-  const { data: facilities } = useFacility(facilitySearchTerm);
   const definedRoles = roles.map((role) => role.uuid) || [];
   const licenseDate = provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid)?.value;
 
@@ -100,6 +103,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       nationalid: provider?.attributes?.find((attr) => attr.attributeType.uuid === providerNationalIdUuid)?.value,
       gender: provider?.person?.gender ?? 'M',
       licenseNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseNumberUuid)?.value,
+      registrationNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseBodyUuid)?.value,
       licenseExpiryDate: licenseDate ? parseDate(licenseDate) : undefined,
       username: user?.username,
       password: provider ? '*****' : '',
@@ -109,27 +113,37 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     },
   });
 
-  const defualtValueCombox = providerIdentifierTypes?.find((item) => item.uuid === searchHWR.identifierType);
+  const defaultIdentifierType = identifierTypes.find((item) => item.key === searchHWR.identifierType);
   const handleSearch = async () => {
     try {
       setSearchHWR({ ...searchHWR, isHWRLoading: true });
       const healthWorker: Practitioner = await searchHealthCareWork(searchHWR.identifierType, searchHWR.identifier);
-      const nationalId = healthWorker?.identifier?.find((id) =>
+      const nationalId = healthWorker?.entry[0]?.resource.identifier?.find((id) =>
         id.type?.coding?.some((code) => code.code === 'national-id'),
       )?.value;
-      const licenseNumber =
-        healthWorker?.qualification?.[0]?.extension?.find(
-          (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/current-license-number',
-        )?.valueString || 'Unknown';
-      healthWorker?.active;
+      const licenseNumber = healthWorker?.entry[0]?.resource.identifier?.find((id) =>
+        id.type?.coding?.some((code) => code.code === 'license-number'),
+      )?.value;
+      const registrationNumber = healthWorker?.entry[0]?.resource.identifier?.find((id) =>
+        id.type?.coding?.some((code) => code.code === 'board-registration-number'),
+      )?.value;
+      const licenseDate = formatDate(
+        new Date(
+          healthWorker?.entry[0]?.resource.identifier?.find((id) =>
+            id.type?.coding?.some((code) => code.code === 'license-number'),
+          )?.period?.end || t('unknown', 'Unknown'),
+        ),
+      );
+      const Names = healthWorker?.entry[0].resource?.name[0].text;
       const dispose = showModal('hwr-confirmation-modal', {
         healthWorker,
         onConfirm: () => {
           dispose();
-          setValue('surname', `${healthWorker?.name?.[0]?.family}`);
-          setValue('firstname', healthWorker?.name?.[0]?.given?.[0]);
+          setValue('surname', Names);
           setValue('nationalid', nationalId);
           setValue('licenseNumber', licenseNumber);
+          setValue('registrationNumber', registrationNumber);
+          setValue('licenseExpiryDate', parseDate(licenseDate));
         },
       });
     } catch (error) {
@@ -193,11 +207,15 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             attributeType: licenseNumberUuid,
             value: data.licenseNumber,
           },
+          {
+            attributeType: licenseBodyUuid,
+            value: data.registrationNumber,
+          },
         ],
         retired: false,
       };
       if (provider) {
-        const updatableAttributes = [providerNationalIdUuid, licenseNumberUuid, licenseExpiryDateUuid];
+        const updatableAttributes = [providerNationalIdUuid, licenseBodyUuid, licenseNumberUuid, licenseExpiryDateUuid];
         await Promise.all(
           providerPayload.attributes
             .filter((attr) => updatableAttributes.includes(attr.attributeType))
@@ -247,14 +265,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <Loading small withOverlay={false} />
-      </div>
-    );
-  }
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
       <Stack gap={4} className={styles.form__grid}>
@@ -272,14 +282,14 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             <Column>
               <ComboBox
                 onChange={({ selectedItem }) => {
-                  setSearchHWR({ ...searchHWR, identifierType: selectedItem?.display ?? '' });
+                  setSearchHWR({ ...searchHWR, identifierType: selectedItem?.key ?? '' });
                 }}
                 id="form__identifier__type"
                 titleText={t('identificationType', 'Identification Type')}
                 placeholder={t('chooseIdentifierType', 'Choose identifier type')}
-                initialSelectedItem={defualtValueCombox}
-                items={providerIdentifierTypes ?? []}
-                itemToString={(item) => (item ? item.display : '')}
+                initialSelectedItem={defaultIdentifierType}
+                items={identifierTypes}
+                itemToString={(item) => (item ? item.name : '')}
               />
             </Column>
             <Column>
@@ -395,6 +405,22 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 placeholder="license number"
                 id="form__license_number"
                 labelText={t('licenseNumber', 'License number*')}
+                invalid={!!errors.licenseNumber}
+                invalidText={errors.licenseNumber?.message}
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            name="registrationNumber"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                placeholder="Registration number"
+                id="form__license_number"
+                labelText={t('registrationNumber', 'Registration number*')}
                 invalid={!!errors.licenseNumber}
                 invalidText={errors.licenseNumber?.message}
               />
