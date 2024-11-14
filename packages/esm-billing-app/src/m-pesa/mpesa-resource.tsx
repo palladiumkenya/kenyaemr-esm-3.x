@@ -19,7 +19,7 @@ export const initiateStkPush = async (
 ): Promise<string> => {
   if (isPDSLFacility) {
     const billReference = payload.AccountReference.split('#').at(-1);
-    const stkPushURL = `${restBaseUrl}/cashier/api/rmsstkpush`;
+    const stkPushURL = `${restBaseUrl}/rmsdataexchange/api/rmsstkpush`;
 
     const stkPushResponse = await openmrsFetch(stkPushURL, {
       method: 'POST',
@@ -99,7 +99,7 @@ export const getRequestStatus = async (
 
   if (isPDSLFacility) {
     try {
-      response = await openmrsFetch(`${restBaseUrl}/cashier/api/rmsstkcheck`, {
+      response = await openmrsFetch(`${restBaseUrl}/rmsdataexchange/api/rmsstkcheck`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
