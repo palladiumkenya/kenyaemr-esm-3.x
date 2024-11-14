@@ -107,7 +107,6 @@
       width: 2rem;
       padding-top: 3px;
       border-bottom: 0.375rem solid;
-      // @include brand-03(border-bottom-color);
     }
   }
 }
@@ -144,4 +143,10 @@
   tr[data-child-row] td {
     padding-left: 2rem !important;
   }
+}
+
+svg.iconOverrides {
+  width: layout.$spacing-11;
+  height: layout.$spacing-11;
+  fill: var(--brand-03);
 }
