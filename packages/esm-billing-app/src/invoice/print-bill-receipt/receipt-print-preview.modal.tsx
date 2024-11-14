@@ -34,9 +34,6 @@ const ReceiptPrintPreviewModal: React.FC<ReceiptPrintPreviewModalProps> = ({ onC
         <Button kind="secondary" onClick={onClose} type="button" className={styles.btn}>
           {t('close', 'Close')}
         </Button>
-        {/* <Button type="submit" disabled={isLoading || error} onClick={() => window.open(url as any, '_blank')}>
-          {t('print', 'Print')}
-        </Button> */}
       </ModalFooter>
     </>
   );

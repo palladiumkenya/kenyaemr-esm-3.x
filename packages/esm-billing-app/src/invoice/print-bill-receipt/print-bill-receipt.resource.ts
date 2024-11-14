@@ -9,8 +9,7 @@ const fetcher = async (url: string) => {
   });
   const fileData = await res.arrayBuffer();
   const blob = new Blob([fileData], { type: 'application/pdf' });
-  const _url = URL.createObjectURL(blob);
-  return _url;
+  return URL.createObjectURL(blob);
 };
 
 export const usePaidBillReceiptFileObjectUrl = (billId: number) => {
