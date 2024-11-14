@@ -10,11 +10,6 @@
   overflow-y: auto;
 }
 
-.dateTimeSection {
-  display: flex;
-  margin-top: layout.$spacing-05;
-}
-
 .formButton {
   height: layout.$spacing-09;
   display: flex;
@@ -36,4 +31,24 @@
     max-width: 40%;
     width: 40%;
   }
+}
+.formAdmissionDatepicker input {
+  min-width: 25rem;
+}
+.formAdmissionTimepicker input {
+  min-width: 12rem;
+}
+.dateTimeSection {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-02;
+  align-items: center;
+  margin-top: layout.$spacing-04;
+}
+.formDeathTimepickerSelector {
+  margin-top: layout.$spacing-06;
+  margin-right: layout.$spacing-03;
+}
+.dateTimePickerContainer {
+  margin-left: layout.$spacing-04;
 }

@@ -8,6 +8,7 @@ import {
   TimePicker,
   TimePickerSelect,
   SelectItem,
+  Column,
 } from '@carbon/react';
 import { ExtensionSlot, ResponsiveWrapper, useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
@@ -28,38 +29,42 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     <Form className={styles.formContainer}>
       <Stack gap={4} className={styles.formGrid}>
         <DeceasedInfo patientUuid={patientUuid} />
-        <div className={styles.dateTimeSection}>
-          <DatePicker
-            datePickerType="single"
-            style={{ paddingBottom: '1rem', marginLeft: '1rem' }}
-            id="visitDate"
-            maxDate={new Date().toISOString()}>
-            <DatePickerInput
-              labelText={t('dateDischarge', 'Date of Discharge')}
-              id="visitEndDateInput"
-              placeholder="mm/dd/yyyy"
-              style={{ width: '100%' }}
-            />
-          </DatePicker>
-          <ResponsiveWrapper>
-            <TimePicker
-              id="visitEndTime"
-              labelText={t('timeDischarge', 'Time of Discharge')}
-              pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-              style={{ marginLeft: '0.125rem', flex: 'none' }}
-              className={styles.timePicker}>
-              <TimePickerSelect id="visitStartTimeSelect" labelText={t('time', 'Time')} aria-label={t('time', 'Time')}>
-                <SelectItem value="AM" text="AM" />
-                <SelectItem value="PM" text="PM" />
-              </TimePickerSelect>
-            </TimePicker>
-          </ResponsiveWrapper>
+        <div className={styles.dateTimePickerContainer}>
+          <Column>
+            <DatePicker datePickerType="single" className={styles.formAdmissionDatepicker}>
+              <DatePickerInput
+                id="date-of-admission"
+                placeholder="mm/dd/yyyy"
+                labelText={t('dateOfAdmission', 'Date of admission*')}
+              />
+            </DatePicker>
+          </Column>
+
+          <Column>
+            <div className={styles.dateTimeSection}>
+              <ResponsiveWrapper>
+                <TimePicker
+                  id="time-of-death-picker"
+                  labelText={t('timeofDischarge', 'Time of discharge*')}
+                  className={styles.formAdmissionTimepicker}
+                />
+                <TimePickerSelect
+                  className={styles.formDeathTimepickerSelector}
+                  id="time-picker-select"
+                  labelText={t('selectPeriod', 'AM/PM')}>
+                  <SelectItem value="AM" text="AM" />
+                  <SelectItem value="PM" text="PM" />
+                </TimePickerSelect>
+              </ResponsiveWrapper>
+            </div>
+          </Column>
         </div>
+
         <ButtonSet className={styles.buttonSet}>
-          <Button style={{ maxWidth: '57%' }} size="lg" kind="secondary" onClick={closeWorkspace}>
+          <Button size="lg" kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button style={{ maxWidth: '57%' }} kind="primary" size="lg" type="submit">
+          <Button kind="primary" size="lg" type="submit">
             {t('admit', 'Admit')}
           </Button>
         </ButtonSet>
