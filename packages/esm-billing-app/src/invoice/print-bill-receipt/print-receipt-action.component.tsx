@@ -22,7 +22,7 @@ const PrintPaidBillReceiptAction: React.FC<PrintPaidBillReceiptActionProps> = ({
     <Button
       kind="secondary"
       size="sm"
-      // disabled={bill?.status !== 'PAID'}
+      disabled={bill?.status !== 'PAID'}
       onClick={handleClick}
       renderIcon={Printer}
       iconDescription="Add">
