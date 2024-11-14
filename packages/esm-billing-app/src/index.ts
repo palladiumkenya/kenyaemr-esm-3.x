@@ -35,6 +35,7 @@ import Benefits from './benefits-package/benefits/benefits.component';
 import CancelBillWorkspace from './billable-services/bill-manager/workspaces/cancel-bill/cancel-bill.workspace';
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/serviceItemCard.component';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
+import ReceiptPrintPreviewModal from './invoice/print-bill-receipt/receipt-print-preview.modal';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -180,6 +181,8 @@ export const paymentModeWorkspace = getSyncLifecycle(PaymentModeWorkspace, optio
 export const deletePaymentModeModal = getSyncLifecycle(DeletePaymentModeModal, options);
 
 export const retryClaimRequestModal = getSyncLifecycle(RetryClaimRequest, options);
+
+export const paidBillReceiptPrintPreviewModal = getSyncLifecycle(ReceiptPrintPreviewModal, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
