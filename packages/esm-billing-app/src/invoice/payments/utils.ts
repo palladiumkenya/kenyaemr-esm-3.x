@@ -52,7 +52,7 @@ export const createPaymentPayload = (
     updatedLineItems.filter((item) => item.paymentStatus === 'PENDING').length === 0 ? 'PAID' : 'PENDING';
 
   const processedPayment = {
-    cashPoint: timesheet.cashPoint.uuid,
+    cashPoint: timesheet?.cashPoint?.uuid,
     cashier: cashier.uuid,
     lineItems: updatedLineItems,
     payments: [...updatedPayments],
