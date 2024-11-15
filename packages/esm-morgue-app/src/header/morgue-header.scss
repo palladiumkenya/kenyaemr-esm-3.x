@@ -26,8 +26,6 @@
 }
 
 .page-labels {
-  margin-left: layout.$spacing-05;
-
   p:first-of-type {
     margin-bottom: layout.$spacing-02;
   }
@@ -53,7 +51,6 @@ svg.iconOverrides {
   gap: layout.$spacing-06;
   flex-wrap: wrap;
   padding: layout.$spacing-04 layout.$spacing-05 0 0;
-  margin-right: layout.$spacing-10;
   width: auto;
   height: auto;
 }
@@ -101,36 +98,4 @@ svg.iconOverrides {
   gap: layout.$spacing-05;
   width: auto;
   max-width: 120px;
-}
-
-.location,
-.date {
-  display: flex;
-  align-items: center;
-  font-size: layout.$spacing-05;
-  line-height: 1.33;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.location {
-  margin-bottom: layout.$spacing-02;
-}
-
-@media (max-width: 768px) {
-  .metrics {
-    gap: 12px;
-    margin-right: layout.$spacing-05;
-  }
-
-  .wrapMetrics {
-    min-width: layout.$spacing-11;
-  }
-
-  .metricLabel,
-  .metricValue {
-    font-size: layout.$spacing-04;
-  }
 }

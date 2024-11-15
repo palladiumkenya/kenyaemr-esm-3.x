@@ -23,6 +23,7 @@ import { LineItem } from '../types';
 import InvoiceTable from './invoice-table.component';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
+import PrintPaidBillReceiptAction from './print-bill-receipt/print-receipt-action.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 
 interface InvoiceDetailsProps {
@@ -127,15 +128,7 @@ const Invoice: React.FC = () => {
         </section>
       </div>
       <div className={styles.actionArea}>
-        <Button
-          kind="secondary"
-          size="sm"
-          disabled={bill?.status !== 'PAID'}
-          onClick={() => navigate({ to: `\${openmrsBase}/ws/rest/v1/cashier/receipt?billId=${bill.id}` })}
-          renderIcon={Printer}
-          iconDescription="Add">
-          {t('printRecept', 'Print receipt')}
-        </Button>
+        <PrintPaidBillReceiptAction bill={bill} />
         <Button
           onClick={handlePrint}
           kind="tertiary"

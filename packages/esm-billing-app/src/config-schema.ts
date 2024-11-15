@@ -1,5 +1,4 @@
 import { ConfigSchema, Type } from '@openmrs/esm-framework';
-import { PDSLIntegrationCredential } from './types';
 
 export interface BillingConfig {
   visitAttributeTypes: {
@@ -10,6 +9,7 @@ export interface BillingConfig {
     exemptionCategory: string;
     billPaymentStatus: string;
   };
+  insurancePaymentMethod: string;
   inPatientVisitTypeUuid: string;
   patientExemptionCategories: Array<{ value: string; label: string }>;
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
@@ -24,8 +24,6 @@ export interface BillingConfig {
   patientBillsUrl: string;
   nationalIdUUID: string;
   isPDSLFacility: boolean;
-  pdslBaseURL: string;
-  pdslCredentials: PDSLIntegrationCredential;
   concepts: {
     emergencyPriorityConceptUuid: string;
   };
@@ -37,27 +35,6 @@ export const configSchema: ConfigSchema = {
     _type: Type.Boolean,
     _description: 'A flag for PDSL facilities',
     _default: false,
-  },
-  pdslBaseURL: {
-    _type: Type.String,
-    _description: 'The base url for PDSL facility',
-    _default: 'https://siaya.tsconect.com',
-  },
-  pdslCredentials: {
-    _type: Type.Object,
-    _description: 'The credentials for authenticating with the PDSL server',
-    _default: {
-      email: '',
-      password: '',
-    },
-    email: {
-      _type: Type.String,
-      _description: 'The email address',
-    },
-    password: {
-      _type: Type.String,
-      _description: 'The password',
-    },
   },
   shaIdentificationNumberUUID: {
     _type: Type.String,
@@ -115,6 +92,11 @@ export const configSchema: ConfigSchema = {
       _description: 'The bill payment status visit attribute uuid',
       _default: '919b51c9-8e2e-468f-8354-181bf3e55786',
     },
+  },
+  insurancePaymentMethod: {
+    _type: Type.String,
+    _description: 'Insurance Payment method UUID',
+    _default: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
   },
   patientExemptionCategories: {
     _type: Type.Array,

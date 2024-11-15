@@ -64,7 +64,7 @@ const CancelBillWorkspace: React.FC<CancelBillWorkspaceProps> = ({
         });
       }
       // mutate the bill
-      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/cashier/bill?status`), undefined, {
+      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/cashier/bill`), undefined, {
         revalidate: true,
       });
       closeWorkspaceWithSavedChanges();

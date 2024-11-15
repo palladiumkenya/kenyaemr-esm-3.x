@@ -266,6 +266,10 @@
     {
       "name": "retry-claim-request-modal",
       "component": "retryClaimRequestModal"
+    },
+    {
+      "name": "paid-bill-receipt-print-preview-modal",
+      "component": "paidBillReceiptPrintPreviewModal"
     }
   ]
 }
