@@ -1,4 +1,4 @@
-import { FormPayment, LineItem, MappedBill } from '../../types';
+import { FormPayment, LineItem, MappedBill, Timesheet } from '../../types';
 
 export const hasLineItem = (lineItems: Array<LineItem>, item: LineItem) => {
   if (lineItems?.length === 0) {
@@ -14,6 +14,7 @@ export const createPaymentPayload = (
   formValues: Array<FormPayment>,
   amountDue: number,
   selectedLineItems: Array<LineItem>,
+  timesheet: Timesheet,
 ) => {
   const { cashier } = bill;
   const totalAmount = bill?.totalAmount;
@@ -51,7 +52,7 @@ export const createPaymentPayload = (
     updatedLineItems.filter((item) => item.paymentStatus === 'PENDING').length === 0 ? 'PAID' : 'PENDING';
 
   const processedPayment = {
-    cashPoint: bill.cashPointUuid,
+    cashPoint: timesheet?.cashPoint?.uuid,
     cashier: cashier.uuid,
     lineItems: updatedLineItems,
     payments: [...updatedPayments],

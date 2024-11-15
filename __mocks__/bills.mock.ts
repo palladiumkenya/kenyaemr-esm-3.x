@@ -662,3 +662,57 @@ export const mockPaymentModes = [
   },
   { uuid: 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4', name: 'Waiver', description: 'Waiver payment', retired: false },
 ];
+
+export const mockedActiveSheet = {
+  uuid: 'cbf56e9a-5db1-41d3-8d34-e228aa2e31c0',
+  display: '14 Nov 2024, 08:11 to  open',
+  voided: false,
+  voidReason: null,
+  auditInfo: {
+    creator: {
+      uuid: 'e02c40e5-04e7-11e5-ae3c-a0b3cc4f922f',
+      display: 'admin',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://dev.kenyahmis.org/openmrs/ws/rest/v1/user/e02c40e5-04e7-11e5-ae3c-a0b3cc4f922f',
+          resourceAlias: 'user',
+        },
+      ],
+    },
+    dateCreated: '2024-11-14T08:11:27.000+0300',
+    changedBy: null,
+    dateChanged: null,
+  },
+  cashier: {
+    uuid: '48b55692-e061-4ffa-b1f2-fd4aaf506224',
+    display: 'admin - Barbara Stewart Lopez',
+    links: [
+      {
+        rel: 'self',
+        uri: 'http://dev.kenyahmis.org/openmrs/ws/rest/v1/provider/48b55692-e061-4ffa-b1f2-fd4aaf506224',
+        resourceAlias: 'provider',
+      },
+    ],
+  },
+  cashPoint: {
+    uuid: '65dd568e-4124-4e89-a4f8-0b07c58ec6fe',
+    name: 'MNCH Pay Point',
+    description: 'Payment done at the MNCH department',
+    retired: false,
+    location: {
+      uuid: '233de33e-2778-4f9a-a398-fa09da9daa14',
+      display: 'Wamagana Health Centre',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://dev.kenyahmis.org/openmrs/ws/rest/v1/location/233de33e-2778-4f9a-a398-fa09da9daa14',
+          resourceAlias: 'location',
+        },
+      ],
+    },
+  },
+  clockIn: '2024-11-14T08:11:27.000+0300',
+  clockOut: null,
+  resourceVersion: '1.8',
+};
