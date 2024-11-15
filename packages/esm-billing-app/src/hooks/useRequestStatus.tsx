@@ -6,7 +6,8 @@ import { processBillPayment, usePaymentModes } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
 import { processBillItem } from '../invoice/payments/utils';
 import { getErrorMessage, getRequestStatus, readableStatusMap } from '../m-pesa/mpesa-resource';
-import { LineItem, MappedBill, PaymentStatus, RequestStatus } from '../types';
+import { useClockInStatus } from '../payment-points/use-clock-in-status';
+import { LineItem, MappedBill, PaymentStatus, RequestStatus, Timesheet } from '../types';
 import { extractErrorMessagesFromResponse, waitForASecond } from '../utils';
 
 export const createMobileMoneyPaymentPayload = (
@@ -14,6 +15,7 @@ export const createMobileMoneyPaymentPayload = (
   amount: number,
   mobileMoneyInstanceTypeUUID: string,
   paymentReference: { uuid: string; value: string },
+  timesheet?: Timesheet,
 ) => {
   const { cashier } = bill;
   const totalAmount = bill?.totalAmount;
@@ -72,7 +74,7 @@ export const createMobileMoneyPaymentPayload = (
     : PaymentStatus.PAID;
 
   const processedPayment = {
-    cashPoint: bill.cashPointUuid,
+    cashPoint: timesheet ? timesheet.cashPoint.uuid : bill.cashPointUuid,
     cashier: cashier.uuid,
     lineItems: updatedLineItems,
     payments: updatedPayments,
@@ -112,6 +114,8 @@ export const useRequestStatus = (
     amount: null,
   });
 
+  const { globalActiveSheet } = useClockInStatus();
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
@@ -139,6 +143,7 @@ export const useRequestStatus = (
               parseInt(requestData.amount),
               mobileMoneyPaymentMethodInstanceTypeUUID,
               { uuid: paymentReferenceUUID, value: referenceCode },
+              globalActiveSheet,
             );
 
             processBillPayment(mobileMoneyPayload, bill.uuid).then(
@@ -199,6 +204,7 @@ export const useRequestStatus = (
     setNotification,
     t,
     isPDSLFacility,
+    globalActiveSheet,
   ]);
 
   return [requestData, setRequestData];

@@ -1,21 +1,22 @@
+import { Button } from '@carbon/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { navigate, showSnackbar } from '@openmrs/esm-framework';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { FormProvider, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar } from '@openmrs/esm-framework';
-import { Button } from '@carbon/react';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { LineItem, PaymentFormValue, type MappedBill } from '../../types';
-import { convertToCurrency } from '../../helpers';
-import { createPaymentPayload } from './utils';
-import { processBillPayment } from '../../billing.resource';
-import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
-import PaymentHistory from './payment-history/payment-history.component';
-import PaymentForm from './payment-form/payment-form.component';
-import styles from './payments.scss';
-import { computeTotalPrice, extractErrorMessagesFromResponse } from '../../utils';
 import { mutate } from 'swr';
+import { z } from 'zod';
+import { processBillPayment } from '../../billing.resource';
+import { convertToCurrency } from '../../helpers';
+import { useClockInStatus } from '../../payment-points/use-clock-in-status';
+import { LineItem, PaymentFormValue, type MappedBill } from '../../types';
+import { computeTotalPrice, extractErrorMessagesFromResponse } from '../../utils';
+import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
+import PaymentForm from './payment-form/payment-form.component';
+import PaymentHistory from './payment-history/payment-history.component';
+import styles from './payments.scss';
+import { createPaymentPayload } from './utils';
 
 type PaymentProps = {
   bill: MappedBill;
@@ -31,6 +32,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
       .lte(bill.totalAmount - bill.tenderedAmount, { message: 'Amount paid should not be greater than amount due' }),
     referenceCode: z.union([z.number(), z.string()]).optional(),
   });
+  const { globalActiveSheet } = useClockInStatus();
 
   const methods = useForm<PaymentFormValue>({
     mode: 'all',
@@ -47,7 +49,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
 
   const hasMoreThanOneLineItem = bill?.lineItems?.length > 1;
   const computedTotal = hasMoreThanOneLineItem ? computeTotalPrice(selectedLineItems) : bill.totalAmount ?? 0;
-  const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount) ?? 0, 0) ?? 0;
+  const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount), 0) ?? 0;
   const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + Number(totalAmountTendered));
 
   const handleNavigateToBillingDashboard = () =>
@@ -57,7 +59,14 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
 
   const handleProcessPayment = () => {
     const { remove } = formArrayMethods;
-    const paymentPayload = createPaymentPayload(bill, bill.patientUuid, formValues, amountDue, selectedLineItems);
+    const paymentPayload = createPaymentPayload(
+      bill,
+      bill.patientUuid,
+      formValues,
+      amountDue,
+      selectedLineItems,
+      globalActiveSheet,
+    );
     remove();
     processBillPayment(paymentPayload, bill.uuid).then(
       (resp) => {
@@ -104,13 +113,13 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
           <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill.totalAmount)} />
           <InvoiceBreakDown
             label={t('totalTendered', 'Total Tendered')}
-            value={convertToCurrency(bill.tenderedAmount + totalAmountTendered ?? 0)}
+            value={convertToCurrency(bill.tenderedAmount + totalAmountTendered)}
           />
           <InvoiceBreakDown label={t('discount', 'Discount')} value={'--'} />
           <InvoiceBreakDown
-            hasBalance={amountDue < 0 ?? false}
+            hasBalance={amountDue < 0}
             label={amountDueDisplay(amountDue)}
-            value={convertToCurrency(amountDue ?? 0)}
+            value={convertToCurrency(amountDue)}
           />
           <div className={styles.processPayments}>
             <Button onClick={handleNavigateToBillingDashboard} kind="secondary">
