@@ -547,3 +547,4 @@ export type FacilityClaim = {
   patient?: { display: string };
   externalId: string;
 };
+export type BillingPromptType = 'patient-chart' | 'billing-orders';

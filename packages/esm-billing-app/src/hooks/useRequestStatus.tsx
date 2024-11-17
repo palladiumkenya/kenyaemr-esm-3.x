@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { processBillPayment, usePaymentModes } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
-import { processBillItem } from '../invoice/payments/utils';
+import { extractServiceIdentifier } from '../invoice/payments/utils';
 import { getErrorMessage, getRequestStatus, readableStatusMap } from '../m-pesa/mpesa-resource';
 import { useClockInStatus } from '../payment-points/use-clock-in-status';
 import { LineItem, MappedBill, PaymentStatus, RequestStatus, Timesheet } from '../types';
@@ -57,8 +57,8 @@ export const createMobileMoneyPaymentPayload = (
     const totalLineItemAmount = lineItem.price * lineItem.quantity;
     const newLineItem: LineItem = {
       ...lineItem,
-      billableService: processBillItem(lineItem),
-      item: processBillItem(lineItem),
+      billableService: extractServiceIdentifier(lineItem),
+      item: extractServiceIdentifier(lineItem),
     };
 
     if (remainingPayment >= totalLineItemAmount) {

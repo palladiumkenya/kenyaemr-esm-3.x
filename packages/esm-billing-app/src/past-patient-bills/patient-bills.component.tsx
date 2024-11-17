@@ -18,7 +18,6 @@ import { MappedBill } from '../types';
 import styles from './patient-bills.scss';
 import { ConfigurableLink, getPatientName, usePatient } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import EmptyPatientBill from './patient-bills-dashboard/empty-patient-bill.component';
 
 type PatientBillsProps = {
