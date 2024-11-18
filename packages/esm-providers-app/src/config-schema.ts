@@ -52,9 +52,9 @@ export const configSchema = {
       },
     },
     _default: [
-      { key: 'national-id', name: 'National ID' },
+      { key: 'National ID', name: 'National ID' },
       { key: 'registration_number', name: 'Registration Number' },
-      { key: 'passport-number', name: 'Passport Number' },
+      { key: 'Passport', name: 'Passport Number' },
     ],
     _description: 'List of identifier types with unique keys for each.',
   },
