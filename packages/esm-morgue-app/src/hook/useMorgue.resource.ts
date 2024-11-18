@@ -21,7 +21,7 @@ export const useDeceasedPatient = () => {
 
   const { data, error, isLoading, mutate } = useSWRImmutable<{ data: DeceasedPatientResponse }>(url, openmrsFetch);
 
-  const deceasedPatient = data?.data?.results || null;
+  const deceasedPatient = data?.data[0]?.results || null;
 
   return { data: deceasedPatient, error, isLoading, mutate };
 };
@@ -106,13 +106,21 @@ export const startVisitWithEncounter = (payload) => {
   const postUrl = `${restBaseUrl}/encounter`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
+export const useInactiveMorgueVisit = (uuid: string, state: boolean) => {
+  const { morgueVisitTypeUuid } = useConfig<ConfigObject>();
+  const url = `${restBaseUrl}/visit?v=full&includeInactive=${state}&totalCount=true&visitType=${morgueVisitTypeUuid}&q=${uuid}`;
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Visit> }>>(url, openmrsFetch);
+  const activeDeceased = data?.data?.results;
+
+  return { data: activeDeceased, error, isLoading, mutate };
+};
 export const useActiveMorgueVisit = () => {
   const { morgueVisitTypeUuid } = useConfig<ConfigObject>();
   const url = `${restBaseUrl}/visit?v=full&includeInactive=false&totalCount=true&visitType=${morgueVisitTypeUuid}`;
-  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<Visit> }>>(url, openmrsFetch);
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Visit> }>>(url, openmrsFetch);
   const activeDeceased = data?.data?.results;
 
-  return { data: activeDeceased, error, isLoading };
+  return { data: activeDeceased, error, isLoading, mutate };
 };
 const usePerson = (uuid: string) => {
   const customRepresentation = `custom:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display))`;

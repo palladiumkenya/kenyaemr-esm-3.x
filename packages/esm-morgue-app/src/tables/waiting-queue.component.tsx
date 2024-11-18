@@ -5,10 +5,17 @@ import { toUpperCase } from '../helpers/expression-helper';
 import { Tag, Button, DataTableSkeleton, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
-import { useDeceasedPatient, useVisitType } from '../hook/useMorgue.resource';
+import { useDeceasedPatient, useInactiveMorgueVisit, useVisitType } from '../hook/useMorgue.resource';
 
 export const WaitingQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
+  const patientUuid = deceasedPatients.map((uuid) => uuid?.uuid);
+  const {
+    data: activeDeceased,
+    error: inactiveError,
+    isLoading: isLoadingInactive,
+    mutate,
+  } = useInactiveMorgueVisit(patientUuid, true);
   const { t } = useTranslation();
   const waitingInLine = t('waitingInLine', 'Waiting In Line');
 
