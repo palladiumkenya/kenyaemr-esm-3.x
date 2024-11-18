@@ -52,6 +52,7 @@ import { ConfigObject } from '../config-schema';
 import { PENDING_PAYMENT_STATUS } from '../constants';
 import { mutate } from 'swr';
 import dayjs from 'dayjs';
+import DeceasedHeader from '../component/deceasedInfo/deceased-header.component';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -282,7 +283,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   return (
     <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.formGrid}>
-        <span className={styles.formSubHeader}>{t('moreDetails', 'More Details')}</span>
+        <br />
+        <DeceasedHeader patientUuid={patientUuid} />
         <Column>
           <Controller
             name="dateOfAdmission"
