@@ -50,6 +50,7 @@ const providerFormSchema = z
     gender: z.enum(['M', 'F'], { required_error: 'Gender is required' }),
     licenseNumber: z.string().nonempty('License number is required'),
     registrationNumber: z.string().nonempty('License number is required'),
+    passportNumber: z.string().optional(),
     licenseExpiryDate: z.date(),
     username: z.string().nonempty('Username is required'),
     password: z.string().nonempty('Password is required'),
@@ -127,6 +128,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       const registrationNumber = healthWorker?.entry[0]?.resource.identifier?.find((id) =>
         id.type?.coding?.some((code) => code.code === 'board-registration-number'),
       )?.value;
+
       const licenseDate = formatDate(
         new Date(
           healthWorker?.entry[0]?.resource.identifier?.find((id) =>
@@ -135,11 +137,16 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         ),
       );
       const Names = healthWorker?.entry[0].resource?.name[0].text;
+      const nameParts = Names.split(' ');
+      const surname = nameParts.pop();
+      const firstName = nameParts.join(' ');
+
       const dispose = showModal('hwr-confirmation-modal', {
         healthWorker,
         onConfirm: () => {
           dispose();
-          setValue('surname', Names);
+          setValue('surname', surname);
+          setValue('firstname', firstName);
           setValue('nationalid', nationalId);
           setValue('licenseNumber', licenseNumber);
           setValue('registrationNumber', registrationNumber);
@@ -214,6 +221,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         ],
         retired: false,
       };
+
       if (provider) {
         const updatableAttributes = [providerNationalIdUuid, licenseBodyUuid, licenseNumberUuid, licenseExpiryDateUuid];
         await Promise.all(
@@ -349,22 +357,21 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             )}
           />
         </Column>
-        <Column>
-          <Controller
-            name="nationalid"
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                id="form__national__id"
-                placeholder="National ID"
-                labelText={t('nationalID', 'National ID*')}
-                invalid={!!errors.firstname}
-                invalidText={errors.firstname?.message}
-              />
-            )}
-          />
-        </Column>
+        <Controller
+          name="nationalid"
+          control={control}
+          render={({ field }) => (
+            <TextInput
+              {...field}
+              id="form__national__id"
+              placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
+              labelText={t('nationalID', 'National ID*')}
+              invalid={!!errors.nationalid}
+              invalidText={errors.nationalid?.message}
+            />
+          )}
+        />
+
         <Column>
           <span className={styles.form__gender}>{t('gender', 'Gender*')}</span>
           <Controller
@@ -421,8 +428,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 placeholder="Registration number"
                 id="form__license_number"
                 labelText={t('registrationNumber', 'Registration number*')}
-                invalid={!!errors.licenseNumber}
-                invalidText={errors.licenseNumber?.message}
+                invalid={!!errors.registrationNumber}
+                invalidText={errors.registrationNumber?.message}
               />
             )}
           />

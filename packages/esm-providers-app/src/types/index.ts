@@ -68,6 +68,7 @@ export interface UserRoles {
 }
 export interface Practitioner {
   id: string;
+  link: Link[];
   meta: Metadata;
   entry: Entry[];
 }
@@ -75,7 +76,10 @@ export interface Practitioner {
 interface Metadata {
   lastUpdated: string;
 }
-
+interface Link {
+  relation: string;
+  url: string;
+}
 interface Entry {
   resource: {
     id: string;

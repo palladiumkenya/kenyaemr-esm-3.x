@@ -9,8 +9,8 @@ export const configSchema = {
   },
   passportNumberUuid: {
     _type: Type.String,
-    _description: 'UUID for national identification',
-    _default: 'be9beef6-aacc-4e1f-ac4e-5babeaa1e303',
+    _description: 'UUID for passport number identification for provider',
+    _default: 'b2a8819f-13ae-46b1-b730-f42193724dbc',
   },
   licenseExpiryDateUuid: {
     _type: Type.String,
