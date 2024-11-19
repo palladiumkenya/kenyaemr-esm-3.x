@@ -26,7 +26,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
   const { user, isLoading, error } = useProviderUser(providerUuid);
 
   const licenseAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'Practising License Number');
-  const nationalID = provider?.attributes?.find((attr) => attr.attributeType.display === 'National ID');
+  const nationalID = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider National Id Number');
   const dateAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Expiry Date');
 
   const formattedExpiryDate = dateAttr?.value ? dayjs(dateAttr.value).format('YYYY-MM-DD') : null;
