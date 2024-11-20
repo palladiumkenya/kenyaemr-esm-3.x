@@ -5,25 +5,79 @@ import {
   restBaseUrl,
   useConfig,
   useOpenmrsPagination,
-  type Visit,
 } from '@openmrs/esm-framework';
-import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location, Patient } from '../types';
+import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location, Patient, Visit } from '../types';
 import useSWR from 'swr';
 import { BillingConfig, ConfigObject } from '../config-schema';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { makeUrlUrl } from '../utils/utils';
 
+const getMorguePatientStatus = async (
+  patientUuid: string,
+  morgueVisitTypeUuid: string,
+  morgueDischargeEncounter: string,
+): Promise<'discharged' | 'admitted' | 'awaiting'> => {
+  const customRepresentation = 'custom:(visitType:(uuid),startDatetime,stopDatetime,encounters:(encounterType:(uuid)))';
+  const url = `${restBaseUrl}/visit?v=${customRepresentation}&includeInactive=false&patient=${patientUuid}&limit=1`;
+  const response = await openmrsFetch<{
+    results: Array<{
+      visitType: { uuid: string };
+      startDatetime: string;
+      stopDatetime: any;
+      encounters: Array<{
+        encounterType: {
+          uuid: string;
+        };
+      }>;
+    }>;
+  }>(url);
+  const visit = response?.data?.results[0];
+  const hasDischargeEncounter = visit?.encounters?.some(
+    (encounter) => encounter.encounterType.uuid === morgueDischargeEncounter,
+  );
+  const isMorgueVisit = visit?.visitType?.uuid === morgueVisitTypeUuid;
+  const isVisitActive = !(typeof visit?.stopDatetime === 'string');
+  if (!isMorgueVisit) {
+    return 'awaiting';
+  }
+  if (hasDischargeEncounter) {
+    return 'discharged';
+  }
+  return 'admitted';
+};
 export const useDeceasedPatient = () => {
+  const { morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid } = useConfig<ConfigObject>();
+  const [deceasedPatient, setDeceasedPatient] = useState([]);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(false);
+  const [statusError, setStatusError] = useState();
   const customRepresentation =
     'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name)),person:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),preferredAddress:(uuid,stateProvince,countyDistrict,address4)))';
   const url = `${restBaseUrl}/morgue/patient?v=${customRepresentation}&dead=true`;
 
-  const { data, error, isLoading, mutate } = useSWRImmutable<{ data: DeceasedPatientResponse }>(url, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<{ data: DeceasedPatientResponse }>(url, openmrsFetch);
+  useEffect(() => {
+    if (data?.data?.results?.length) {
+      (async () => {
+        try {
+          setIsLoadingStatus(true);
+          const status = await Promise.all(
+            data.data.results.map((data) => {
+              return getMorguePatientStatus(data?.uuid, morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid);
+            }),
+          );
 
-  const deceasedPatient = data?.data[0]?.results || null;
+          setDeceasedPatient(data.data.results.map((patient, index) => ({ ...patient, status: status[index] })));
+        } catch (error) {
+          setStatusError(error);
+        } finally {
+          setIsLoadingStatus(false);
+        }
+      })();
+    }
+  }, [morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid, data]);
 
-  return { data: deceasedPatient, error, isLoading, mutate };
+  return { data: deceasedPatient, error: error ?? statusError, isLoading: isLoading || isLoadingStatus };
 };
 
 export const usePatientPaginatedEncounters = (patientUuid: string) => {
@@ -106,21 +160,13 @@ export const startVisitWithEncounter = (payload) => {
   const postUrl = `${restBaseUrl}/encounter`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
-export const useInactiveMorgueVisit = (uuid: string, state: boolean) => {
-  const { morgueVisitTypeUuid } = useConfig<ConfigObject>();
-  const url = `${restBaseUrl}/visit?v=full&includeInactive=${state}&totalCount=true&visitType=${morgueVisitTypeUuid}&q=${uuid}`;
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Visit> }>>(url, openmrsFetch);
+export const useActiveMorgueVisit = (patientUuid: string) => {
+  const customRepresentation = 'custom:(visitType:(uuid),startDatetime,stopDatetime,encounters:(encounterType:(uuid)))';
+  const url = `${restBaseUrl}/visit?v=${customRepresentation}&includeInactive=false&patient=${patientUuid}&limit=1`;
+  const { data, error, isLoading } = useSWR<FetchResponse<{ results: Array<Visit> }>>(url, openmrsFetch);
   const activeDeceased = data?.data?.results;
 
-  return { data: activeDeceased, error, isLoading, mutate };
-};
-export const useActiveMorgueVisit = () => {
-  const { morgueVisitTypeUuid } = useConfig<ConfigObject>();
-  const url = `${restBaseUrl}/visit?v=full&includeInactive=false&totalCount=true&visitType=${morgueVisitTypeUuid}`;
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Visit> }>>(url, openmrsFetch);
-  const activeDeceased = data?.data?.results;
-
-  return { data: activeDeceased, error, isLoading, mutate };
+  return { data: activeDeceased, error, isLoading };
 };
 const usePerson = (uuid: string) => {
   const customRepresentation = `custom:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display))`;

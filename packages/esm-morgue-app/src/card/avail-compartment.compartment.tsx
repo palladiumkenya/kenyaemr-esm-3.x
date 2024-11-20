@@ -3,23 +3,30 @@ import styles from './compartment.scss';
 import { Button, Tag, InlineLoading } from '@carbon/react';
 import { View } from '@carbon/react/icons';
 import { toUpperCase } from '../helpers/expression-helper';
-import { ConfigurableLink, usePatient, Visit } from '@openmrs/esm-framework';
+import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import usePerson from '../hook/useMorgue.resource';
 import { convertDateToDays } from '../utils/utils';
 import capitalize from 'lodash-es/capitalize';
+import { DeceasedInfo } from '../types';
+import usePerson, { useActiveMorgueVisit } from '../hook/useMorgue.resource';
 
 interface AvailableCompartmentProps {
-  patientVisitInfo: Visit;
+  patientInfo: DeceasedInfo;
   index: number;
 }
 
-const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisitInfo, index }) => {
+const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
   const { t } = useTranslation();
-  const patientUuid = patientVisitInfo?.patient?.uuid;
-  const { isLoading, error, person } = usePerson(patientUuid);
+  const { isLoading, error, person } = usePerson(patientInfo.uuid);
+  const {
+    data: activeDeceased,
+    error: isActiveError,
+    isLoading: isActiveLoading,
+  } = useActiveMorgueVisit(patientInfo?.uuid);
 
-  if (isLoading) {
+  const startVisitDate = activeDeceased?.[0]?.startDatetime;
+
+  if (isLoading || isActiveLoading) {
     return (
       <InlineLoading
         status="active"
@@ -29,7 +36,11 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisi
     );
   }
 
-  const daysSpent = convertDateToDays(patientVisitInfo?.startDatetime);
+  if (error || isActiveError) {
+    return <ErrorState error={error} headerTitle={t('allocation', 'Allocation')} />;
+  }
+
+  const daysSpent = convertDateToDays(startVisitDate);
   const timeSpentTagType = daysSpent > 17 ? 'red' : 'blue';
 
   const causeOfDeathDisplay = person?.causeOfDeath?.display;
@@ -61,11 +72,12 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisi
         <span className={styles.viewDetails}>
           <ConfigurableLink
             className={styles.viewDetailsLink}
-            to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/deceased-panel`}>
+            to={`\${openmrsSpaBase}/patient/${patientInfo.uuid}/chart/deceased-panel`}>
             <View size={20} />
           </ConfigurableLink>
         </span>
       </div>
+      <div className={styles.borderLine}></div>
       <div className={styles.cardRow}>
         <span className={styles.deceasedReason}>
           {t('timeSpent', 'Time spent ')}
@@ -73,6 +85,9 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientVisi
             {daysSpent} {t('days', 'days')}
           </Tag>
         </span>
+        <Tag size="md" type="green">
+          {patientInfo?.status}
+        </Tag>
       </div>
     </div>
   );
