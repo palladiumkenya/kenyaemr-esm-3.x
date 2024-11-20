@@ -138,7 +138,7 @@ export const useBill = (billUuid: string) => {
   // filter out voided line items to prevent them from being included in the bill
   // TODO: add backend support for voided line items
   // https://thepalladiumgroup.atlassian.net/browse/KHP3-7068
-  const filteredLineItems = data?.data?.lineItems?.filter((li) => !li.voided) ?? [];
+  const filteredLineItems = data?.data?.lineItems?.filter((li) => (li ? li.voided : true)) ?? [];
   const formattedBill = data?.data
     ? mapBillProperties({ ...data?.data, lineItems: filteredLineItems })
     : ({} as MappedBill);
