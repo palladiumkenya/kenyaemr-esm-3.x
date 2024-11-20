@@ -34,7 +34,7 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     cashPointLocation: bill?.cashPoint?.location?.display,
     dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
     dateCreatedUnformatted: bill.dateCreated,
-    lineItems: bill.lineItems.filter((li) => !li.voided),
+    lineItems: bill.lineItems.filter((li) => (li ? !li.voided : true)),
     billingService: extractString(bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  ')),
     payments: bill.payments,
     display: bill.display,
