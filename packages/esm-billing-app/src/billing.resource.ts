@@ -26,20 +26,22 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     patientName: bill?.patient?.display.split('-')?.[1],
     identifier: bill?.patient?.display.split('-')?.[0],
     patientUuid: bill?.patient?.uuid,
-    status: bill.lineItems.some((item) => item.paymentStatus === 'PENDING') ? 'PENDING' : 'PAID',
+    status: bill.lineItems.some((item) => item?.paymentStatus === 'PENDING') ? 'PENDING' : 'PAID',
     receiptNumber: bill?.receiptNumber,
     cashier: bill?.cashier,
     cashPointUuid: bill?.cashPoint?.uuid,
     cashPointName: bill?.cashPoint?.name,
     cashPointLocation: bill?.cashPoint?.location?.display,
-    dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
+    dateCreated: bill?.dateCreated ? formatDate(parseDate(bill?.dateCreated), { mode: 'wide' }) : '--',
     dateCreatedUnformatted: bill.dateCreated,
-    lineItems: bill.lineItems.filter((li) => !li.voided),
-    billingService: extractString(bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  ')),
-    payments: bill.payments,
-    display: bill.display,
-    totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
-    tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
+    lineItems: bill?.lineItems.filter((li) => !li?.voided),
+    billingService: extractString(
+      bill?.lineItems.map((bill) => bill?.item || bill?.billableService || '--').join('  '),
+    ),
+    payments: bill?.payments,
+    display: bill?.display,
+    totalAmount: bill?.lineItems?.map((item) => item?.price * item?.quantity).reduce((prev, curr) => prev + curr, 0),
+    tenderedAmount: bill?.payments?.map((item) => item?.amountTendered).reduce((prev, curr) => prev + curr, 0),
     referenceCodes: bill?.payments
       .map((payment) =>
         payment.attributes
@@ -138,7 +140,7 @@ export const useBill = (billUuid: string) => {
   // filter out voided line items to prevent them from being included in the bill
   // TODO: add backend support for voided line items
   // https://thepalladiumgroup.atlassian.net/browse/KHP3-7068
-  const filteredLineItems = data?.data?.lineItems?.filter((li) => !li.voided) ?? [];
+  const filteredLineItems = data?.data?.lineItems?.filter((li) => !li?.voided) ?? [];
   const formattedBill = data?.data
     ? mapBillProperties({ ...data?.data, lineItems: filteredLineItems })
     : ({} as MappedBill);
