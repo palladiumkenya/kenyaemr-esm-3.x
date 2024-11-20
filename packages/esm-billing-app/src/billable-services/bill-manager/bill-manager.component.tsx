@@ -3,11 +3,11 @@ import { ExtensionSlot, UserHasAccess, WorkspaceContainer } from '@openmrs/esm-f
 import PatientBills from './patient-bills.component';
 import styles from './bill-manager.scss';
 import billTableStyles from '../../bills-table/bills-table.scss';
-import { useBills } from '../../billing.resource';
-import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
-import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { DataTableSkeleton } from '@carbon/react';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import BillingHeader from '../../billing-header/billing-header.component';
+import { usePatientBills } from '../../prompt-payment/prompt-payment.resource';
 
 type BillManagerProps = {};
 
@@ -20,8 +20,7 @@ const headers = [
 const BillManager: React.FC<BillManagerProps> = () => {
   const [patientUuid, setPatientUuid] = React.useState<string>(undefined);
   const { t } = useTranslation();
-
-  const { bills, isLoading } = useBills(patientUuid);
+  const { patientBills: bills, isLoading } = usePatientBills(patientUuid);
   const filteredBills =
     bills.filter((bill) => !Boolean(bill.totalAmount === bill.tenderedAmount) && patientUuid === bill.patientUuid) ??
     [];

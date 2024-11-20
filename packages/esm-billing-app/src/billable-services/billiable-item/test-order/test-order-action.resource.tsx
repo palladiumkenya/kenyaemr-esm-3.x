@@ -2,9 +2,8 @@ import { openmrsFetch, restBaseUrl, useConfig, useVisit } from '@openmrs/esm-fra
 import useSWR from 'swr';
 import { QueueEntry } from '../../../types';
 import { BillingConfig } from '../../../config-schema';
-import { usePatientBills } from '../../../modal/require-payment.resource';
 import { useMemo } from 'react';
-import { checkPaymentMethodExclusion } from '../../../billing-prompt/billing-prompt.resource';
+import { checkPaymentMethodExclusion, usePatientBills } from '../../../prompt-payment/prompt-payment.resource';
 
 export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) => {
   const config = useConfig<BillingConfig>();
@@ -19,7 +18,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
   );
 
   return useMemo(() => {
-    if (isLoadingQueue || isLoadingBill) {
+    if (isLoadingBill || isLoadingQueue) {
       return { hasPendingPayment: false, isLoading: true };
     }
 
@@ -37,6 +36,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
     isLoadingBill,
     currentVisit?.visitType?.uuid,
     config?.inPatientVisitTypeUuid,
+    isExcludedPaymentMethod,
     isEmergencyPatient,
     hasPendingPayment,
   ]);
@@ -59,7 +59,6 @@ export const usePatientQueue = (patientUuid: string) => {
 
 export const useOrderPendingPaymentStatus = (patientUuid: string, orderUuid: string) => {
   const { patientBills, isLoading, error } = usePatientBills(patientUuid);
-
   const flattenedLineItems = useMemo(() => {
     return patientBills
       ?.map((bill) => bill.lineItems)

@@ -9,8 +9,8 @@ export const configSchema = {
   },
   passportNumberUuid: {
     _type: Type.String,
-    _description: 'UUID for national identification',
-    _default: 'be9beef6-aacc-4e1f-ac4e-5babeaa1e303',
+    _description: 'UUID for passport number identification for provider',
+    _default: 'b2a8819f-13ae-46b1-b730-f42193724dbc',
   },
   licenseExpiryDateUuid: {
     _type: Type.String,
@@ -52,9 +52,9 @@ export const configSchema = {
       },
     },
     _default: [
-      { key: 'national-id', name: 'National ID' },
+      { key: 'National ID', name: 'National ID' },
       { key: 'registration_number', name: 'Registration Number' },
-      { key: 'passport-number', name: 'Passport Number' },
+      { key: 'Passport', name: 'Passport Number' },
     ],
     _description: 'List of identifier types with unique keys for each.',
   },

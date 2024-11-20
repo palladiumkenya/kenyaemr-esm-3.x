@@ -26,6 +26,13 @@ interface HWRConfirmModalProps {
 
 const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, healthWorker }) => {
   const { t } = useTranslation();
+  const passportNumber = healthWorker?.link
+    ?.find(
+      (link: { relation: string; url: string }) =>
+        link.relation === 'self' && link.url.includes('identifierType=Passport'),
+    )
+    ?.url.split('identifierNumber=')[1]
+    ?.split('&')[0];
 
   return (
     <>
@@ -64,6 +71,10 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
                 value={identifier.value || t('unknown', 'Unknown')}
               />
             ))}
+
+            {passportNumber && (
+              <HealthWorkerInfo label={t('passportNumber', 'Passport Number')} value={passportNumber} />
+            )}
 
             <HealthWorkerInfo
               label={t('renewalDate', 'Renewal Date')}

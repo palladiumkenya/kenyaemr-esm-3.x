@@ -82,7 +82,7 @@ export const EditBillForm: React.FC<EditBillFormProps> = ({
         timeoutInMs: 5000,
       });
     } finally {
-      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/cashier/bill?status`), undefined, {
+      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/cashier/bill`), undefined, {
         revalidate: true,
       });
       closeWorkspaceWithSavedChanges();
