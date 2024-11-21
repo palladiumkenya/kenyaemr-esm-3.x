@@ -27,7 +27,9 @@ const MortuarySummary: React.FC = () => {
       <InlineLoading
         status="active"
         iconDescription="Loading"
-        description={t('loadData', 'Loading summary data.........')}
+        Suggested
+        change
+        description={t('loadData', 'Loading summary data...')}
       />
     );
   }
@@ -42,7 +44,7 @@ const MortuarySummary: React.FC = () => {
             <span className={styles.metricValue}>{formatDateTime(startDate)}</span>
           </div>
           <div className={styles.wrapMetrics}>
-            <span className={styles.metricLabel}>{t('dateandTimeofDeath', 'Date and time of death')}</span>
+            <span className={styles.metricLabel}>{t('dateAndTimeofDeath', 'Date and time of death')}</span>{' '}
             <span className={styles.metricValue}>{formatDateTime(person?.deathDate)}</span>
           </div>
           <div className={styles.wrapMetrics}>

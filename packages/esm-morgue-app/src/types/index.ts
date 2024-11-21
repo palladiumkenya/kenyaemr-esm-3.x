@@ -30,10 +30,6 @@ export interface Patient {
     } | null;
   };
 }
-// export interface DeceasedPatientResponse {
-//   results: Patient[];
-// }
-
 export interface DeceasedInfo {
   uuid: string;
   status?: string;
