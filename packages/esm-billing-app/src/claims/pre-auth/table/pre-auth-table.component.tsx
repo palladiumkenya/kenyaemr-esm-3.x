@@ -91,7 +91,7 @@ const PreAuthTable: React.FC<PreAuthTableProps> = ({ bill, isSelectable = true, 
     },
   ];
 
-  const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
+  const processBillItem = (item) => (item.item || item?.billableService)?.split(':')[1];
 
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>

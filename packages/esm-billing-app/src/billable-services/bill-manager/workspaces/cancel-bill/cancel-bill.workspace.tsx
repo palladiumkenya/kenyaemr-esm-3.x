@@ -81,13 +81,13 @@ const CancelBillWorkspace: React.FC<CancelBillWorkspaceProps> = ({
   const subtitleText = `${t('currentPriceAndQuantity', 'Current price and quantity')}: ${t(
     'price',
     'Price',
-  )}: ${convertToCurrency(lineItem.price)} ${t('quantity', 'Quantity')}: ${lineItem.quantity}`;
+  )}: ${convertToCurrency(lineItem?.price)} ${t('quantity', 'Quantity')}: ${lineItem?.quantity}`;
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.formContainer}>
         <InlineNotification
-          title={lineItem.billableService?.split(':')[1]}
+          title={lineItem?.billableService?.split(':')[1]}
           subtitle={subtitleText}
           kind="info"
           lowContrast
