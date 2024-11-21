@@ -1,0 +1,36 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.modalContainer {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  gap: layout.$spacing-05;
+  margin-top: layout.$spacing-03;
+  margin-bottom: layout.$spacing-10;
+  height: auto;
+  align-items: center;
+  width: 100%;
+}
+
+.identifierTypeColumn {
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-10;
+  flex-grow: 1; /* Allow it to grow to take available space */
+  min-width: 250px; /* Ensure a minimum width for the search */
+}
+
+.identifierTypeHeader {
+  color: colors.$gray-70;
+  display: inline-block;
+  font-size: layout.$spacing-04;
+  line-height: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+  vertical-align: baseline;
+}
+
+// .ComboBox,
+// .Search {
+//   width: 100%; /* Full width to fill available space */
+//   max-width: 500px; /* Set a max width for better visibility */
+// }

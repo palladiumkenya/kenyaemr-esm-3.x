@@ -1,11 +1,11 @@
-import React from 'react';
-import { render, screen } from '@testing-library/react';
-import Payments from './payments.component';
-import { mockBill, mockLineItems, mockPaymentModes } from '../../../../../__mocks__/bills.mock';
-import { processBillPayment, usePaymentModes } from '../../billing.resource';
-import userEvent from '@testing-library/user-event';
 import { showSnackbar } from '@openmrs/esm-framework';
-
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { mockBill, mockedActiveSheet, mockLineItems, mockPaymentModes } from '../../../../../__mocks__/bills.mock';
+import { processBillPayment, usePaymentModes } from '../../billing.resource';
+import { useClockInStatus } from '../../payment-points/use-clock-in-status';
+import Payments from './payments.component';
 const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
 const mockUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockShowSnackbar = showSnackbar as jest.MockedFunction<typeof showSnackbar>;
@@ -14,6 +14,9 @@ jest.mock('../../billing.resource', () => ({
   processBillPayment: jest.fn(),
   usePaymentModes: jest.fn(),
 }));
+
+jest.mock('../../payment-points/use-clock-in-status');
+const mockedUseClockInStatus = useClockInStatus as jest.Mock;
 
 describe('Payment', () => {
   test('should display error when posting payment fails', async () => {
@@ -35,6 +38,16 @@ describe('Payment', () => {
       error: null,
       mutate: jest.fn(),
     });
+
+    mockedUseClockInStatus.mockReturnValue({
+      globalActiveSheet: mockedActiveSheet,
+      localActiveSheet: undefined,
+      isClockedInSomewhere: true,
+      error: null,
+      isLoading: false,
+      isClockedInCurrentPaymentPoint: false,
+    });
+
     render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
@@ -51,7 +64,7 @@ describe('Payment', () => {
     expect(mockProcessBillPayment).toHaveBeenCalledTimes(1);
     expect(mockProcessBillPayment).toHaveBeenCalledWith(
       {
-        cashPoint: '54065383-b4d4-42d2-af4d-d250a1fd2590',
+        cashPoint: mockedActiveSheet.cashPoint.uuid,
         cashier: 'fe00dd43-4c39-4ce9-9832-bc3620c80c6c',
         lineItems: [
           {

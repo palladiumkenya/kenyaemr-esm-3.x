@@ -24,7 +24,7 @@ import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import { createLeftPanelLink } from './left-panel-link.component';
-import RequirePaymentModal from './modal/require-payment-modal.component';
+import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
 import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
 import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
 import { CreatePaymentPoint } from './payment-points/create-payment-point.component';

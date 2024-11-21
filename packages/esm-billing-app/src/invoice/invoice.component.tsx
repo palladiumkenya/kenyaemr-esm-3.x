@@ -45,7 +45,9 @@ const Invoice: React.FC = () => {
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
-    setSelectedLineItems([...lineItems, ...paidLineItems]);
+    // remove duplicates
+    const uniqueLineItems = [...new Set([...lineItems, ...paidLineItems])];
+    setSelectedLineItems(uniqueLineItems);
   };
 
   const handlePrint = useReactToPrint({
@@ -72,7 +74,7 @@ const Invoice: React.FC = () => {
   useEffect(() => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems(paidLineItems);
-  }, [bill.lineItems]);
+  }, [bill?.lineItems?.length]);
 
   const invoiceDetails = {
     'Total Amount': convertToCurrency(bill?.totalAmount),

@@ -145,7 +145,7 @@ export const computeTotalPrice = (items) => {
 
   let totalPrice = 0;
 
-  items?.forEach((item) => {
+  items.forEach((item) => {
     const { price, quantity } = item;
     totalPrice += price * quantity;
   });
@@ -160,3 +160,9 @@ export function waitForASecond(): Promise<string> {
     }, 1000);
   });
 }
+
+export const computeWaivedAmount = (bill: MappedBill) => {
+  return bill.payments
+    .filter((payment) => payment.instanceType.name.toLowerCase() === 'waiver')
+    .reduce((curr: number, prev) => curr + Number(prev.amountTendered), 0);
+};
