@@ -73,7 +73,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
     { header: t('billCreationDate', 'Bill creation date'), key: 'dateofbillcreation' },
   ];
 
-  const processBillItem = (item) => (item.item || item.billableService)?.split(':')[1];
+  const processBillItem = (item) => (item?.item || item?.billableService)?.split(':')[1];
 
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>

@@ -40,7 +40,7 @@ const createPaymentPayload = (
       attributeType: attribute.attributeType?.uuid,
       value: attribute.value,
     })),
-    instanceType: payment.instanceType?.uuid,
+    instanceType: payment?.instanceType?.uuid,
   };
 };
 
@@ -102,7 +102,7 @@ export const createBillWaiverPayload = (
   };
 };
 
-const processBillItem = (item) => (item.item || item.billableService)?.split(':')[0];
+const processBillItem = (item) => (item?.item || item?.billableService)?.split(':')[0];
 
 function extractMessage(input: string): string | null {
   const parts = input?.split('=>');
