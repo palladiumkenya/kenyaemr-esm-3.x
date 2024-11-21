@@ -53,9 +53,9 @@ export type EditBillFormData = z.infer<ReturnType<typeof useEditBillFormSchema>>
  */
 export const useDefaultEditBillFormValues = (billLineItem: LineItem, existingBill: MappedBill): EditBillFormData => {
   return {
-    price: billLineItem.price.toString(),
-    quantity: billLineItem.quantity.toString(),
-    adjustmentReason: existingBill.adjustmentReason,
+    price: billLineItem?.price.toString(),
+    quantity: billLineItem?.quantity.toString(),
+    adjustmentReason: existingBill?.adjustmentReason,
   };
 };
 
@@ -68,7 +68,7 @@ export const useFormInitialValues = (billLineItem: LineItem) => {
   const { billableServices, isLoading: isLoadingServices } = useBillableServices();
 
   const selectedBillableService = useMemo(() => {
-    const billableServiceId = billLineItem.billableService?.split(':')[0];
+    const billableServiceId = billLineItem?.billableService?.split(':')[0];
     return billableServiceId ? billableServices.find((service) => service.uuid === billableServiceId) ?? null : null;
   }, [billableServices, billLineItem.billableService]);
 
