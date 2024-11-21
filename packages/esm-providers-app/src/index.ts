@@ -4,6 +4,7 @@ import { createLeftPanelLink } from './left-panel/providers-left-panel-link.comp
 import { moduleName, providerBasePath } from './constants';
 import HWREmptyModal from './modal/provider-empty-modal.component';
 import HWRConfirmModal from './modal/provider-information.modal.componet';
+import HWRSyncModal from './modal/provider-sync-modal.component';
 
 const options = {
   featureName: 'esm-providers-app',
@@ -35,4 +36,5 @@ export const providersDashboardLink = getSyncLifecycle(
 
 export const providerDetailsWorkspace = getAsyncLifecycle(() => import('./workspace/provider-form.workspace'), options);
 export const hwrConfirmationModal = getSyncLifecycle(HWRConfirmModal, options);
+export const hwrSyncmodal = getSyncLifecycle(HWRSyncModal, options);
 export const hwrEmptymodel = getSyncLifecycle(HWREmptyModal, options);

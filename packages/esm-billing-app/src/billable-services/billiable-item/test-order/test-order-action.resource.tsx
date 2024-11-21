@@ -2,8 +2,8 @@ import { openmrsFetch, restBaseUrl, useConfig, useVisit } from '@openmrs/esm-fra
 import useSWR from 'swr';
 import { QueueEntry } from '../../../types';
 import { BillingConfig } from '../../../config-schema';
-import { usePatientBills } from '../../../modal/require-payment.resource';
 import { useMemo } from 'react';
+import { checkPaymentMethodExclusion, usePatientBills } from '../../../prompt-payment/prompt-payment.resource';
 
 export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) => {
   const config = useConfig<BillingConfig>();
@@ -11,12 +11,22 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
   const { isEmergencyPatient, isLoading: isLoadingQueue } = usePatientQueue(patientUuid);
   const { isLoading: isLoadingBill, hasPendingPayment } = useOrderPendingPaymentStatus(patientUuid, orderUuid);
 
+  // We want to check if the payment method is in the excluded list this includes insurances, where patient do not need to pay immediately
+  const isExcludedPaymentMethod = checkPaymentMethodExclusion(
+    currentVisit,
+    config?.paymentMethodsUuidsThatShouldNotShowPrompt,
+  );
+
   return useMemo(() => {
-    if (isLoadingQueue || isLoadingBill) {
+    if (isLoadingBill || isLoadingQueue) {
       return { hasPendingPayment: false, isLoading: true };
     }
 
     if (currentVisit?.visitType?.uuid === config?.inPatientVisitTypeUuid || isEmergencyPatient) {
+      return { hasPendingPayment: false, isLoading: false };
+    }
+
+    if (isExcludedPaymentMethod) {
       return { hasPendingPayment: false, isLoading: false };
     }
 
@@ -26,6 +36,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
     isLoadingBill,
     currentVisit?.visitType?.uuid,
     config?.inPatientVisitTypeUuid,
+    isExcludedPaymentMethod,
     isEmergencyPatient,
     hasPendingPayment,
   ]);
@@ -48,7 +59,6 @@ export const usePatientQueue = (patientUuid: string) => {
 
 export const useOrderPendingPaymentStatus = (patientUuid: string, orderUuid: string) => {
   const { patientBills, isLoading, error } = usePatientBills(patientUuid);
-
   const flattenedLineItems = useMemo(() => {
     return patientBills
       ?.map((bill) => bill.lineItems)

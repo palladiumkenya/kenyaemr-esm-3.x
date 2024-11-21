@@ -99,10 +99,6 @@
       "component": "initiatePaymentDialog"
     },
     {
-      "name": "cancel-bill-modal",
-      "component": "cancelBillModal"
-    },
-    {
       "name": "delete-billableservice-modal",
       "component": "deleteBillableServiceModal"
     },
@@ -238,6 +234,12 @@
       "component": "paymentModeWorkspace",
       "title": "Payment Mode Workspace",
       "type": "other-form"
+    },
+    {
+      "name": "cancel-bill-workspace",
+      "component": "cancelBillWorkspace",
+      "title": "Cancel Bill Workspace",
+      "type": "other-form"
     }
   ],
   "modals": [
@@ -264,6 +266,10 @@
     {
       "name": "retry-claim-request-modal",
       "component": "retryClaimRequestModal"
+    },
+    {
+      "name": "paid-bill-receipt-print-preview-modal",
+      "component": "paidBillReceiptPrintPreviewModal"
     }
   ]
 }

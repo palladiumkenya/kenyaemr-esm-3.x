@@ -42,9 +42,9 @@ function getPeer(relationship: Relationship, config: ConfigObject, person: 'pers
     relationshipType: relationship.relationshipType.bIsToA,
     patientUuid: relationship[person].uuid,
     gender: relationship[person].gender,
-    startDate: !relationship.startDate ? null : formatDate(parseDate(relationship.startDate)),
+    startDate: !relationship.startDate ? null : relationship.startDate,
     age: relationship[person].age,
-    endDate: !relationship.endDate ? null : formatDate(parseDate(relationship.endDate)),
+    endDate: !relationship.endDate ? null : relationship.endDate,
   } as Peer;
 }
 

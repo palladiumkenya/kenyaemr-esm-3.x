@@ -617,7 +617,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
                         {vl?.vlDate === 'N/A' || vl?.vlDate === '' ? (
                           <span>None</span>
                         ) : (
-                          <span>{vl.vlDate ? formatDate(new Date(vl.vlDate)) : '--'}</span>
+                          <span>({vl?.vlDate ? vl?.vlDate : '--'})</span>
                         )}
                         <br />
                       </div>

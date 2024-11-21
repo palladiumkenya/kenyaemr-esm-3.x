@@ -547,8 +547,4 @@ export type FacilityClaim = {
   patient?: { display: string };
   externalId: string;
 };
-
-export type PDSLIntegrationCredential = {
-  email: string;
-  password: string;
-};
+export type BillingPromptType = 'patient-chart' | 'billing-orders';

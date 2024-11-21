@@ -13,19 +13,19 @@ import {
   ComposedModal,
   Heading,
 } from '@carbon/react';
-import styles from './require-payment.scss';
+import styles from './prompt-payment.scss';
 import { convertToCurrency, extractString } from '../helpers';
 import { navigate, useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../config-schema';
-import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
-import { useBillingPrompt } from '../billing-prompt/billing-prompt.resource';
+import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
+import { useBillingPrompt } from './prompt-payment.resource';
 
-type RequirePaymentModalProps = {};
+type PromptPaymentModalProps = {};
 
-const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
+const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromUrl();
-  const { shouldShowBillingPrompt, isLoading, bills } = useBillingPrompt(patientUuid);
+  const patientUuid = getPatientUuidFromStore();
+  const { shouldShowBillingPrompt, isLoading, bills } = useBillingPrompt(patientUuid, 'patient-chart');
   const [showModal, setShowModal] = useState({ loadingModal: true, billingModal: true });
   const { enforceBillPayment } = useConfig<BillingConfig>();
 
@@ -42,7 +42,7 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
   const lineItems = bills
     .filter((bill) => bill.status !== 'PAID')
     .flatMap((bill) => bill.lineItems)
-    .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED');
+    .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED' && !lineItem.voided);
 
   if (!shouldShowBillingPrompt) {
     return null;
@@ -109,4 +109,4 @@ const RequirePaymentModal: React.FC<RequirePaymentModalProps> = () => {
   );
 };
 
-export default RequirePaymentModal;
+export default PromptPaymentModal;

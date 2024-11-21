@@ -26,20 +26,22 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     patientName: bill?.patient?.display.split('-')?.[1],
     identifier: bill?.patient?.display.split('-')?.[0],
     patientUuid: bill?.patient?.uuid,
-    status: bill.lineItems.some((item) => item.paymentStatus === 'PENDING') ? 'PENDING' : 'PAID',
+    status: bill?.lineItems.some((item) => item?.paymentStatus === 'PENDING') ? 'PENDING' : 'PAID',
     receiptNumber: bill?.receiptNumber,
     cashier: bill?.cashier,
     cashPointUuid: bill?.cashPoint?.uuid,
     cashPointName: bill?.cashPoint?.name,
     cashPointLocation: bill?.cashPoint?.location?.display,
-    dateCreated: bill?.dateCreated ? formatDate(parseDate(bill.dateCreated), { mode: 'wide' }) : '--',
-    dateCreatedUnformatted: bill.dateCreated,
-    lineItems: bill.lineItems,
-    billingService: extractString(bill.lineItems.map((bill) => bill.item || bill.billableService || '--').join('  ')),
-    payments: bill.payments,
-    display: bill.display,
-    totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
-    tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
+    dateCreated: bill?.dateCreated ? formatDate(parseDate(bill?.dateCreated), { mode: 'wide' }) : '--',
+    dateCreatedUnformatted: bill?.dateCreated,
+    lineItems: bill?.lineItems.filter((li) => !li?.voided),
+    billingService: extractString(
+      bill?.lineItems.map((bill) => bill?.item || bill?.billableService || '--').join('  '),
+    ),
+    payments: bill?.payments,
+    display: bill?.display,
+    totalAmount: bill?.lineItems?.map((item) => item?.price * item?.quantity).reduce((prev, curr) => prev + curr, 0),
+    tenderedAmount: bill?.payments?.map((item) => item?.amountTendered).reduce((prev, curr) => prev + curr, 0),
     referenceCodes: bill?.payments
       .map((payment) =>
         payment.attributes
@@ -80,7 +82,7 @@ export const useBills = (
   );
 
   const sortBills = sortBy(data?.data?.results ?? [], ['dateCreated']).reverse();
-  const filteredBills = billStatus === '' ? sortBills : sortBills?.filter((bill) => bill.status === billStatus);
+  const filteredBills = billStatus === '' ? sortBills : sortBills?.filter((bill) => bill?.status === billStatus);
   const mappedResults = filteredBills?.map((bill) => mapBillProperties(bill));
   const filteredResults = mappedResults?.filter((res) => res.patientUuid === patientUuid);
   const formattedBills = isEmpty(patientUuid) ? mappedResults : filteredResults || [];
@@ -95,7 +97,7 @@ export const useBills = (
 };
 
 export const useBill = (billUuid: string) => {
-  const url = `${restBaseUrl}/cashier/bill/${billUuid}`;
+  const url = `${restBaseUrl}/cashier/bill/${billUuid}?includeVoided=false`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PatientInvoice }>(
     billUuid ? url : null,
     openmrsFetch,
@@ -113,21 +115,21 @@ export const useBill = (billUuid: string) => {
       identifier: bill?.patient?.display.split('-')?.[0],
       patientUuid: bill?.patient?.uuid,
       status:
-        bill.lineItems.length > 1
-          ? bill.lineItems.some((item) => item.paymentStatus === 'PENDING')
+        bill?.lineItems.length > 1
+          ? bill?.lineItems.some((item) => item?.paymentStatus === 'PENDING')
             ? 'PENDING'
             : 'PAID'
-          : bill.status,
+          : bill?.status,
       receiptNumber: bill?.receiptNumber,
       cashier: bill?.cashier,
       cashPointUuid: bill?.cashPoint?.uuid,
       cashPointName: bill?.cashPoint?.name,
       cashPointLocation: bill?.cashPoint?.location?.display,
       dateCreated: bill?.dateCreated ?? '--',
-      dateCreatedUnformatted: bill.dateCreated,
-      lineItems: bill.lineItems,
-      billingService: bill.lineItems.map((bill) => bill.item).join(' '),
-      payments: bill.payments,
+      dateCreatedUnformatted: bill?.dateCreated,
+      lineItems: bill?.lineItems,
+      billingService: bill?.lineItems.map((bill) => bill?.item).join(' '),
+      payments: bill?.payments,
       totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
       tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
     };
@@ -135,7 +137,13 @@ export const useBill = (billUuid: string) => {
     return mappedBill;
   };
 
-  const formattedBill = data?.data ? mapBillProperties(data?.data) : ({} as MappedBill);
+  // filter out voided line items to prevent them from being included in the bill
+  // TODO: add backend support for voided line items
+  // https://thepalladiumgroup.atlassian.net/browse/KHP3-7068
+  const filteredLineItems = data?.data?.lineItems?.filter((li) => !li?.voided) ?? [];
+  const formattedBill = data?.data
+    ? mapBillProperties({ ...data?.data, lineItems: filteredLineItems })
+    : ({} as MappedBill);
 
   return {
     bill: formattedBill,

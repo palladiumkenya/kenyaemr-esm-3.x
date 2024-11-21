@@ -21,7 +21,7 @@ import { usePatientAttributes } from '../../../hooks/usePatientAttributes';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
 import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
 import { MappedBill } from '../../../types';
-import { formatPhoneNumber } from '../utils';
+import { formatKenyanPhoneNumber } from '../utils';
 import styles from './initiate-payment.scss';
 
 const initiatePaymentSchema = z.object({
@@ -42,16 +42,11 @@ export interface InitiatePaymentDialogProps {
 const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
   const { t } = useTranslation();
   const { phoneNumber, isLoading: isLoadingPhoneNumber } = usePatientAttributes(bill.patientUuid);
-  const { mpesaAPIBaseUrl, isPDSLFacility, pdslBaseURL, pdslCredentials } = useConfig<BillingConfig>();
+  const { mpesaAPIBaseUrl, isPDSLFacility } = useConfig<BillingConfig>();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [pdslToken, setPdslToken] = useState(null);
-  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification, closeModal, bill, pdslToken);
-
-  const updatePDSLtoken = (token: string) => {
-    setPdslToken(token);
-  };
+  const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification, closeModal, bill);
 
   const pendingAmount = bill.totalAmount - bill.tenderedAmount;
 
@@ -80,9 +75,9 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   }, [watchedPhoneNumber, setValue, phoneNumber, reset]);
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const phoneNumber = formatPhoneNumber(data.phoneNumber);
+    const phoneNumber = formatKenyanPhoneNumber(data.phoneNumber);
     const amountBilled = data.billAmount;
-    const accountReference = `${mflCodeValue}#${bill.receiptNumber}`;
+    const accountReference = `${mflCodeValue}#${bill.uuid}`;
 
     const payload = {
       AccountReference: accountReference,
@@ -91,14 +86,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     };
 
     setIsLoading(true);
-    const requestId = await initiateStkPush(
-      payload,
-      setNotification,
-      isPDSLFacility ? pdslBaseURL : mpesaAPIBaseUrl,
-      isPDSLFacility,
-      pdslCredentials,
-      updatePDSLtoken,
-    );
+    const requestId = await initiateStkPush(payload, setNotification, mpesaAPIBaseUrl, isPDSLFacility);
     pollingTrigger({ requestId, requestStatus: 'INITIATED', amount: amountBilled });
     setIsLoading(false);
   };

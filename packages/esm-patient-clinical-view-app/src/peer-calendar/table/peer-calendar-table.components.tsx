@@ -1,5 +1,5 @@
 import { DataTableSkeleton } from '@carbon/react';
-import { ConfigurableLink, useSession } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDate, parseDate, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -89,8 +89,14 @@ const PeerCalendarTable: React.FC<PeerCalendarTableProps> = ({
             ),
             age: peer.age ?? '--',
             contact: peer.contact ?? '--',
-            startDate: peer.patientUuid === peerEducatorUuid ? '--' : peer.startDate ?? '--',
-            endDate: peer.patientUuid === peerEducatorUuid ? '--' : peer.endDate ?? '--',
+            startDate:
+              peer.patientUuid === peerEducatorUuid
+                ? '--'
+                : peer.startDate
+                ? formatDate(parseDate(peer.startDate))
+                : '--',
+            endDate:
+              peer.patientUuid === peerEducatorUuid ? '--' : peer.endDate ? formatDate(parseDate(peer.endDate)) : '--',
             status: (
               <PeerCompletionStatus
                 peer={peer}

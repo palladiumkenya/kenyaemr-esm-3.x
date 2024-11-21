@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
-import { displayName, ExtensionSlot } from '@openmrs/esm-framework';
+import { displayName, ExtensionSlot, formatDate } from '@openmrs/esm-framework';
 import { Practitioner } from '../types';
-import { boolean } from 'zod';
-
+import capitalize from 'lodash/capitalize';
 interface HealthWorkerInfoProps {
   label: string;
   value: string | boolean | React.ReactNode;
@@ -27,10 +26,18 @@ interface HWRConfirmModalProps {
 
 const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, healthWorker }) => {
   const { t } = useTranslation();
+  const passportNumber = healthWorker?.link
+    ?.find(
+      (link: { relation: string; url: string }) =>
+        link.relation === 'self' && link.url.includes('identifierType=Passport'),
+    )
+    ?.url.split('identifierNumber=')[1]
+    ?.split('&')[0];
+
   return (
     <>
       <div className="cds--modal-header">
-        <h3 className="cds--modal-header__heading">{t('healthWorkerRegistry', `Health worker registry`)}</h3>
+        <h3 className="cds--modal-header__heading">{t('healthWorkerRegistry', 'Health worker registry')}</h3>
       </div>
       <div className="cds--modal-content">
         <p>
@@ -43,58 +50,59 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
           <ExtensionSlot
             style={{ display: 'flex', alignItems: 'center' }}
             name="patient-photo-slot"
-            state={{ patientName: `${healthWorker?.name?.[0]?.given?.join(' ')} ${healthWorker?.name?.[0]?.family}` }}
+            state={{
+              patientName: healthWorker?.entry[0]?.resource?.name[0]?.text || '',
+            }}
           />
           <div style={{ width: '100%', marginLeft: '0.625rem' }}>
-            <HealthWorkerInfo label={t('healthWorkerName', 'Health worker name')} value={displayName(healthWorker)} />
-            {healthWorker?.telecom?.map((telecom, index) => (
-              <HealthWorkerInfo key={index} label={telecom.system} value={telecom.use || ''} />
+            <HealthWorkerInfo
+              label={t('healthWorkerName', 'Health worker name')}
+              value={healthWorker?.entry[0]?.resource?.name[0]?.text}
+            />
+
+            {healthWorker?.entry[0]?.resource?.telecom?.map((telecom, index) => (
+              <HealthWorkerInfo key={index} label={capitalize(telecom?.system)} value={telecom?.value || ''} />
             ))}
-            {healthWorker?.identifier?.map((identifier, index) => (
+
+            {healthWorker?.entry[0]?.resource?.identifier?.map((identifier, index) => (
               <HealthWorkerInfo
                 key={index}
-                label={identifier.type?.coding?.map((code) => code.code).join('') || 'Unknown'}
-                value={identifier.value || 'Unknown'}
+                label={identifier.type?.coding?.map((code) => code.display).join(' ') || t('unknown', 'Unknown')}
+                value={identifier.value || t('unknown', 'Unknown')}
               />
             ))}
+
+            {passportNumber && (
+              <HealthWorkerInfo label={t('passportNumber', 'Passport Number')} value={passportNumber} />
+            )}
+
             <HealthWorkerInfo
-              label={t('licenseNo', 'License Number')}
-              value={
-                healthWorker?.qualification[0]?.extension.find(
-                  (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/current-license-number',
-                )?.valueString || 'Unknown'
-              }
+              label={t('renewalDate', 'Renewal Date')}
+              value={formatDate(
+                new Date(
+                  healthWorker?.entry[0]?.resource.identifier?.find((id) =>
+                    id.type?.coding?.some((code) => code.code === 'license-number'),
+                  )?.period?.end || t('unknown', 'Unknown'),
+                ),
+              )}
             />
-            <HealthWorkerInfo
-              label={t('renewalDuration', 'Renewal duration')}
-              value={
-                healthWorker?.qualification[0]?.extension.find(
-                  (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/license-renewal-duration',
-                )?.valueCoding?.display || 'Unknown'
-              }
-            />
+
             <HealthWorkerInfo
               label={t('licensingBody', 'Licensing Body')}
               value={
-                healthWorker?.qualification[0]?.extension.find(
-                  (ext) => ext.url === 'https://shr.tiberbuapps.com/fhir/StructureDefinition/licensing-body',
-                )?.valueString || 'Unknown'
+                healthWorker?.entry[0]?.resource?.qualification?.[0]?.extension?.find(
+                  (ext) => ext.url === 'https://hwr-kenyahie/StructureDefinition/licensing-body',
+                )?.valueCodeableConcept?.coding?.[0]?.display || t('unknown', 'Unknown')
               }
             />
+
             <HealthWorkerInfo
-              label={t('qualificationType', 'Qualification Type')}
+              label={t('licenseValid', 'License Validity')}
               value={
-                healthWorker?.qualification[0]?.code?.coding.find(
-                  (coding) =>
-                    coding.system === 'https://shr.tiberbuapps.com/fhir' && coding.display === 'Medical Doctor License',
-                )?.display || 'Unknown'
-              }
-            />
-            <HealthWorkerInfo
-              label={t('licenseValid', 'License validity')}
-              value={
-                <Tag type={healthWorker?.active ? 'green' : 'red'}>
-                  {healthWorker?.active ? 'license valid' : 'license expired'}
+                <Tag type={healthWorker?.entry[0]?.resource?.active ? 'green' : 'red'}>
+                  {healthWorker?.entry[0]?.resource?.active
+                    ? t('licenseValid', 'License Valid')
+                    : t('licenseExpired', 'License Expired')}
                 </Tag>
               }
             />

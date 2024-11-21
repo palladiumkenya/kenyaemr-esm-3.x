@@ -70,15 +70,19 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
     });
   };
 
-  const handleOpenCancelLineItemModal = () => {
-    const dispose = showModal('cancel-bill-modal', {
-      onClose: () => dispose(),
+  const handleCancelLineItemWorkspace = () => {
+    launchWorkspace('cancel-bill-workspace', {
+      workspaceTitle: t('cancelBillForm', 'Cancel Bill Form'),
+      bill,
+      lineItem,
     });
   };
 
-  const handleOpenDeleteLineItemModal = () => {
+  const handleOpenDeleteLineItemModal = (lineItem: LineItem) => {
     const dispose = showModal('delete-bill-modal', {
       onClose: () => dispose(),
+      bill,
+      lineItem,
     });
   };
 
@@ -92,12 +96,17 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
       <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
       <StructuredListCell>
         <OverflowMenu aria-label="overflow-menu">
-          <OverflowMenuItem itemText="Edit Item" onClick={() => handleOpenEditLineItemWorkspace(lineItem)} />
-          <OverflowMenuItem itemText="Cancel Item" onClick={handleOpenCancelLineItemModal} />
+          <OverflowMenuItem
+            itemText={t('editItem', 'Edit item')}
+            onClick={() => handleOpenEditLineItemWorkspace(lineItem)}
+          />
+          <OverflowMenuItem itemText={t('cancelItem', 'Cancel item')} onClick={handleCancelLineItemWorkspace} />
           {!isRefundedBillableService && (
-            <OverflowMenuItem itemText="Refund Item" onClick={() => handleOpenRefundLineItemModal(lineItem)} />
+            <OverflowMenuItem
+              itemText={t('refundItem', 'Refund item')}
+              onClick={() => handleOpenRefundLineItemModal(lineItem)}
+            />
           )}
-          <OverflowMenuItem itemText="Delete Item" onClick={handleOpenDeleteLineItemModal} />
         </OverflowMenu>
       </StructuredListCell>
     </StructuredListRow>

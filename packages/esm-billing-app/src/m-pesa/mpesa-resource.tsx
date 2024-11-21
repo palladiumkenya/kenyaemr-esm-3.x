@@ -1,4 +1,5 @@
-import { PDSLIntegrationCredential, RequestStatus } from '../types';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { RequestStatus } from '../types';
 
 export const readableStatusMap = new Map<RequestStatus, string>();
 readableStatusMap.set('COMPLETE', 'Complete');
@@ -15,52 +16,30 @@ export const initiateStkPush = async (
   setNotification: (notification: { type: 'error' | 'success'; message: string }) => void,
   MPESA_PAYMENT_API_BASE_URL: string,
   isPDSLFacility: boolean,
-  pdslCredentials: PDSLIntegrationCredential,
-  updatePDSLtoken: (token: string) => void,
 ): Promise<string> => {
   if (isPDSLFacility) {
-    const url = `${MPESA_PAYMENT_API_BASE_URL}/api/login`;
+    const billReference = payload.AccountReference.split('#').at(-1);
+    const stkPushURL = `${restBaseUrl}/rmsdataexchange/api/rmsstkpush`;
 
-    const formData = new FormData();
-    formData.append('email', pdslCredentials.email);
-    formData.append('password', pdslCredentials.password);
-
-    const loginResponse = await fetch(url, {
+    const stkPushResponse = await openmrsFetch(stkPushURL, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        bill_reference: billReference,
+        amount: payload.Amount,
+        msisdn: payload.PhoneNumber,
+      }),
     });
 
-    if (loginResponse.ok) {
-      const response: { token: string; api_token: string; expires_at: string } = await loginResponse.json();
-      const billReference = payload.AccountReference.split('#').at(-1);
-      const stkPushURL = `${MPESA_PAYMENT_API_BASE_URL}/api/stk-push?bill_reference=${billReference}&amount=${payload.Amount}&msisdn=${payload.PhoneNumber}`;
-
-      const stkPushResponse = await fetch(stkPushURL, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${response.token}`,
-        },
-      });
-
-      updatePDSLtoken(response.token);
-
-      if (stkPushResponse.ok) {
-        const response: { requestId: string } = await stkPushResponse.json();
-        setNotification({ message: 'STK Push sent successfully', type: 'success' });
-        return response.requestId;
-      }
-
-      if (!stkPushResponse.ok) {
-        setNotification({
-          message: 'An error occurred making the request',
-          type: 'error',
-        });
-
-        return;
-      }
+    if (stkPushResponse.ok) {
+      const response: { requestId: string } = await stkPushResponse.json();
+      setNotification({ message: 'STK Push sent successfully', type: 'success' });
+      return response.requestId;
     }
 
-    if (!loginResponse.ok) {
+    if (!stkPushResponse.ok) {
       setNotification({
         message: 'An error occurred making the request',
         type: 'error',
@@ -115,17 +94,23 @@ export const getRequestStatus = async (
   requestId: string,
   MPESA_PAYMENT_API_BASE_URL: string,
   isPDSLFacility: boolean,
-  pdslToken: string | null,
 ): Promise<{ status: RequestStatus; referenceCode?: string }> => {
   let response: Response;
 
   if (isPDSLFacility) {
-    response = await fetch(`${MPESA_PAYMENT_API_BASE_URL}/api/stk-push-query?requestId=${requestId}`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${pdslToken}`,
-      },
-    });
+    try {
+      response = await openmrsFetch(`${restBaseUrl}/rmsdataexchange/api/rmsstkcheck`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: {
+          requestId,
+        },
+      });
+    } catch (error) {
+      throw new Error(error.message ?? error.statusText ?? 'An error occurred');
+    }
   } else {
     response = await fetch(`${MPESA_PAYMENT_API_BASE_URL}/api/mpesa/check-payment-state`, {
       method: 'POST',

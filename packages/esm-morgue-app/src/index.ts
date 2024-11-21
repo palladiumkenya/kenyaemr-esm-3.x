@@ -28,7 +28,7 @@ export const root = getAsyncLifecycle(() => import('./root.component'), options)
 export const morgueDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'morgue',
-    title: 'Morgue',
+    title: 'Mortuary',
   }),
   options,
 );
@@ -37,3 +37,4 @@ export const patientAdditionalInfoForm = getAsyncLifecycle(
   () => import('./workspaces/patientAdditionalInfoForm.workspace'),
   options,
 );
+export const dischargeBodyForm = getAsyncLifecycle(() => import('./workspaces/discharge-body.workspace'), options);

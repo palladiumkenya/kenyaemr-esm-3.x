@@ -19,8 +19,8 @@ export const MorgueHeader: React.FC<MorgueHeaderProps> = ({ title }) => {
       <div className={styles['left-justified-items']}>
         <MorgueIllustration />
         <div className={styles['page-labels']}>
-          <p>{t('morgue', 'Morgue Management')}</p>
           <p className={styles['page-name']}>{title}</p>
+          <p>{t('mortuaryManagement', 'Mortuary management')}</p>
         </div>
       </div>
       <div className={styles.metrics}>
@@ -35,20 +35,6 @@ export const MorgueHeader: React.FC<MorgueHeaderProps> = ({ title }) => {
         <div className={styles.wrapMetrics}>
           <span className={styles.metricLabel}>{t('discharges', 'Discharges')}</span>
           <span className={styles.metricValue}>0</span>
-        </div>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('amountCollected', 'Amount(s)')}</span>
-          <span className={styles.metricValue}>0</span>
-        </div>
-        <div className={styles.wrapMetrics}>
-          <div className={styles.metricLocationDate}>
-            <span className={styles.location}>
-              <Location size={16} /> {userLocation}
-            </span>
-            <span className={styles.date}>
-              <Calendar size={16} /> {formatDate(new Date(), { mode: 'standard' })}
-            </span>
-          </div>
         </div>
       </div>
     </div>
