@@ -68,6 +68,13 @@ export const billingOverviewLink = getSyncLifecycle(
   options,
 );
 
+export const billableExemptionsLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'billable-exemptions',
+    title: 'Exemptions',
+  }),
+  options,
+);
 export const paymentHistoryLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'payment-history',

@@ -13,6 +13,7 @@ import { PaymentPoints } from './payment-points/payment-points.component';
 import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 import PaymentModeHome from './payment-modes/payment-mode-home.component';
+import { BillableExemptions } from './billable-services/billable-exemptions/billable-exemptions.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
@@ -40,6 +41,7 @@ const RootComponent: React.FC = () => {
             </ClockInBoundary>
           }
         />
+        <Route path="/billable-exemptions" element={<BillableExemptions />} />
         <Route path="/payment-history" element={<PaymentHistory />} />
         <Route path="/payment-points" element={<PaymentPoints />} />
         <Route path="/payment-points/:paymentPointUUID" element={<PaymentPoint />} />

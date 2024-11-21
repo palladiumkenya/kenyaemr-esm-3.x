@@ -285,5 +285,6 @@
   "visitTime": "Visit time",
   "visittype": "Visit Type",
   "waiveBill": "Waive Bill",
-  "yes": "Yes"
+  "yes": "Yes",
+  "billableExemptions": "Exemptions"
 }
