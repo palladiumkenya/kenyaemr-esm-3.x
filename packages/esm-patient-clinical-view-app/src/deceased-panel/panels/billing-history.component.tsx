@@ -7,11 +7,7 @@ import styles from './panels.scss';
 const BillingHistoryView: React.FC = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromUrl();
-  return (
-    <div className={styles.table}>
-      <ExtensionSlot name="patient-chart-billing-dashboard-slot" state={{ patientUuid }} />
-    </div>
-  );
+  return <ExtensionSlot name="patient-chart-billing-dashboard-slot" state={{ patientUuid }} />;
 };
 
 export default BillingHistoryView;

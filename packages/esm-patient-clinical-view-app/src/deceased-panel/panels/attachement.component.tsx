@@ -9,14 +9,12 @@ const AttachmentView: React.FC = () => {
   const patientUuid = getPatientUuidFromUrl();
 
   return (
-    <div className={styles.table}>
-      <ExtensionSlot
-        name="patient-chart-attachments-dashboard-slot"
-        state={{
-          patientUuid,
-        }}
-      />
-    </div>
+    <ExtensionSlot
+      name="patient-chart-attachments-dashboard-slot"
+      state={{
+        patientUuid,
+      }}
+    />
   );
 };
 
