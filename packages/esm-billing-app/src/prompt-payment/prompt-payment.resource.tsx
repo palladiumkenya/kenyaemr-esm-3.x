@@ -1,9 +1,9 @@
 import { Visit, openmrsFetch, restBaseUrl, useConfig, useVisit } from '@openmrs/esm-framework';
-import { BillingConfig } from '../config-schema';
-import { BillingPromptType, MappedBill, PatientInvoice, PaymentStatus } from '../types';
-import useSWR from 'swr';
 import { useMemo } from 'react';
+import useSWR from 'swr';
 import { mapBillProperties } from '../billing.resource';
+import { BillingConfig } from '../config-schema';
+import { BillingPromptType, MappedBill, PatientInvoice } from '../types';
 
 interface BillingPromptResult {
   shouldShowBillingPrompt: boolean;
@@ -140,7 +140,7 @@ export const usePatientBills = (patientUuid: string) => {
   const { patientBillsUrl } = useConfig<BillingConfig>();
   const url = patientBillsUrl.replace('${restBaseUrl}', restBaseUrl);
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
-    patientUuid ? `${url}&patientUuid=${patientUuid}&includeVoided=true` : url,
+    patientUuid ? `${url}&patientUuid=${patientUuid}&includeVoided=true` : null,
     openmrsFetch,
     {
       errorRetryCount: 2,
