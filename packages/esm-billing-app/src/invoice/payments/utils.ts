@@ -110,7 +110,7 @@ export const createPaymentPayload = (
   selectedBillableItems,
   timesheetDetails,
 ) => {
-  const { cashier, totalAmount, payments = [], lineItems = [] } = billDetails;
+  const { totalAmount, payments = [], lineItems = [] } = billDetails;
   const initialPaymentStatus = remainingBalance <= 0 ? PaymentStatus.PAID : PaymentStatus.PENDING;
 
   // Transform existing payments
@@ -149,7 +149,7 @@ export const createPaymentPayload = (
 
   return {
     cashPoint: timesheetDetails?.cashPoint?.uuid,
-    cashier: cashier.uuid,
+    cashier: timesheetDetails?.cashier?.uuid,
     lineItems: processedLineItems,
     payments: consolidatedPayments,
     patient: patientUuid,
