@@ -1,5 +1,6 @@
 import { makeUrl } from '@openmrs/esm-framework';
 import { PatientProgram } from '@openmrs/esm-patient-common-lib';
+import dayjs from 'dayjs';
 
 /**
  * Evaluates a given expression using patient data and their program enrollments.
@@ -84,4 +85,29 @@ export const uppercaseText = (text) => {
 
 export function makeUrlUrl(path: string) {
   return new URL(makeUrl(path), window.location.toString());
+}
+
+/**
+ * Formats a given date string into "DD-MMM-YYYY, hh:mm A" format.
+ *
+ * @param {string | Date | undefined} date - The date to format.
+ * @returns {string} - The formatted date or an empty string if no date is provided.
+ */
+export const formatDateTime = (date) => {
+  if (!date) {
+    return '--';
+  }
+  return dayjs(date).format('DD-MMM-YYYY, hh:mm A');
+};
+
+/**
+ * Calculates the number of days from the given date to today.
+ *
+ * @param startDate - The starting date in string or Date format.
+ * @returns The number of days from the start date to today.
+ */
+export function convertDateToDays(startDate: string | Date): number {
+  const today = dayjs();
+  const start = dayjs(startDate);
+  return today.diff(start, 'day');
 }
