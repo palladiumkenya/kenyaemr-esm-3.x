@@ -125,21 +125,22 @@ export const useBillingPrompt = (
   };
 };
 
-/*
- Custom hook to fetch patient bills
- @param patientUuid - The UUID of the patient
- @returns {
-    patientBills: Array<PatientInvoice>,
-    isLoading: boolean,
-    error: Error,
-    isValidating: boolean,
-    mutate: () => void
- }
-*/
+/**
+ * Custom hook to fetch patient bills.
+ *
+ * @param {string} patientUuid - The UUID of the patient.
+ * @returns {Object} The response object containing patient bills and hook states.
+ * @returns {Array<PatientInvoice>} [returns.patientBills] - An array of patient invoices.
+ * @returns {boolean} [returns.isLoading] - Whether the data is currently being loaded.
+ * @returns {Error|null} [returns.error] - Any error that occurred during the fetch, or null if none.
+ * @returns {boolean} [returns.isValidating] - Whether the data is being revalidated.
+ * @returns {Function} [returns.mutate] - A function to manually trigger a re-fetch of the data.
+ */
 export const usePatientBills = (patientUuid: string) => {
   const { patientBillsUrl } = useConfig<BillingConfig>();
   const url = patientBillsUrl.replace('${restBaseUrl}', restBaseUrl);
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
+    // a null key in useSWR essentially disables the fetch call until a patientUUID is available
     patientUuid ? `${url}&patientUuid=${patientUuid}&includeVoided=true` : null,
     openmrsFetch,
     {
