@@ -123,6 +123,7 @@ export interface Person {
   display: string;
   causeOfDeath: string;
   gender: string;
+  deathDate: string;
   attributes: {
     uuid: string;
     display: string;
@@ -233,4 +234,11 @@ export interface Encounter {
   uuid: string;
   display: string;
   encounterDatetime: string;
+}
+
+export interface Visit {
+  uuid: string;
+  display?: string;
+  startDatetime: string;
+  stopDatetime?: string;
 }
