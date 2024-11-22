@@ -75,7 +75,7 @@ export const createMobileMoneyPaymentPayload = (
 
   const processedPayment = {
     cashPoint: timesheet ? timesheet.cashPoint.uuid : bill.cashPointUuid,
-    cashier: cashier.uuid,
+    cashier: timesheet ? timesheet.cashier.uuid : cashier.uuid,
     lineItems: updatedLineItems,
     payments: updatedPayments,
     patient: bill.patientUuid,
