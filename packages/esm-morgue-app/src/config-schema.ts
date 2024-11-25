@@ -43,6 +43,11 @@ export const configSchema = {
     _description: 'Encounter type for morgue admission',
     _default: '3d2df845-6f3c-45e7-b91a-d828a1f9c2e8',
   },
+  morgueDischargeEncounterTypeUuid: {
+    type: Type.String,
+    _description: 'Encounter type for morgue discharge',
+    _default: ' d618f40b-b5a3-4f17-81c8-2f04e2aad58e',
+  },
   visitPaymentMethodAttributeUuid: {
     _type: Type.String,
     _description: 'UUID for visit payment method attribute',
@@ -121,4 +126,5 @@ export type ConfigObject = {
   burialPermitNumberUuid: string;
   policeIDNumber: string;
   dischargeAreaUuid: string;
+  morgueDischargeEncounterTypeUuid: string;
 };

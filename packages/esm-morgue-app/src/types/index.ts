@@ -30,12 +30,9 @@ export interface Patient {
     } | null;
   };
 }
-export interface DeceasedPatientResponse {
-  results: Patient[];
-}
-
 export interface DeceasedInfo {
   uuid: string;
+  status?: string;
   display: string;
   identifiers: Array<{
     identifier: string;
@@ -120,4 +117,66 @@ export interface Location {
   name: string;
   uuid: string;
   display: string;
+}
+
+export interface Visit {
+  uuid: string;
+  display?: string;
+  encounters: EncounterList[];
+  patient?: {
+    uuid: string;
+    display: string;
+    person: {
+      uuid: string;
+      display: string;
+      gender: string;
+      birthdate: string;
+      dead: boolean;
+      age: number;
+      deathDate: string;
+      causeOfDeath: {
+        uuid: string;
+        display: string;
+      };
+    };
+  };
+  visitType: VisitType;
+  location?: Location;
+  startDatetime: string;
+  stopDatetime?: string;
+}
+
+export interface VisitType {
+  uuid: string;
+  display: string;
+  name?: string;
+}
+
+export interface EncounterList {
+  uuid: string;
+  display: string;
+  encounterDatetime: string;
+  patient: {
+    uuid: string;
+    display: string;
+    person: {
+      uuid: string;
+      display: string;
+      gender: string;
+      birthdate: string;
+      dead: boolean;
+      age: number;
+      deathDate: string;
+      causeOfDeath: {
+        uuid: string;
+        display: string;
+      };
+    };
+  };
+  form: string;
+  encounterType: {
+    uuid: string;
+    display: string;
+    name: string;
+  };
 }

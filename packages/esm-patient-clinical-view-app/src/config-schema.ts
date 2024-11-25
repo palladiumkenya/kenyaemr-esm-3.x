@@ -250,6 +250,11 @@ export const configSchema = {
     _description: 'UUID for the inpatient visit',
     _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914',
   },
+  morgueVisitTypeUuid: {
+    _type: Type.String,
+    _description: ' UUID for morgue visit',
+    _default: '6307dbe2-f336-4c11-a393-50c2769f455a',
+  },
   inPatientForms: {
     _type: Type.Array,
     _description: 'List of forms that can be filled out for in-patients',
@@ -276,6 +281,7 @@ export const configSchema = {
 
 export interface ConfigObject {
   peerEducatorRelationship: string;
+  morgueVisitTypeUuid: string;
   caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
   peerCalendarOutreactForm: string;
   encounterTypes: { mchMotherConsultation: string; hivTestingServices: string; kpPeerCalender: string };

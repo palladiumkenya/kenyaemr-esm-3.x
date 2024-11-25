@@ -65,7 +65,7 @@ describe('Payment', () => {
     expect(mockProcessBillPayment).toHaveBeenCalledWith(
       {
         cashPoint: mockedActiveSheet.cashPoint.uuid,
-        cashier: 'fe00dd43-4c39-4ce9-9832-bc3620c80c6c',
+        cashier: mockedActiveSheet.cashier.uuid,
         lineItems: [
           {
             billableService: 'Hemoglobin',
