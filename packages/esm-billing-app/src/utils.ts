@@ -40,7 +40,7 @@ const createPaymentPayload = (
       attributeType: attribute.attributeType?.uuid,
       value: attribute.value,
     })),
-    instanceType: payment.instanceType?.uuid,
+    instanceType: payment?.instanceType?.uuid,
   };
 };
 
@@ -102,7 +102,7 @@ export const createBillWaiverPayload = (
   };
 };
 
-const processBillItem = (item) => (item.item || item.billableService)?.split(':')[0];
+const processBillItem = (item) => (item?.item || item?.billableService)?.split(':')[0];
 
 function extractMessage(input: string): string | null {
   const parts = input?.split('=>');
@@ -145,7 +145,7 @@ export const computeTotalPrice = (items) => {
 
   let totalPrice = 0;
 
-  items?.forEach((item) => {
+  items.forEach((item) => {
     const { price, quantity } = item;
     totalPrice += price * quantity;
   });
@@ -160,3 +160,9 @@ export function waitForASecond(): Promise<string> {
     }, 1000);
   });
 }
+
+export const computeWaivedAmount = (bill: MappedBill) => {
+  return bill.payments
+    .filter((payment) => payment.instanceType.name.toLowerCase() === 'waiver')
+    .reduce((curr: number, prev) => curr + Number(prev.amountTendered), 0);
+};

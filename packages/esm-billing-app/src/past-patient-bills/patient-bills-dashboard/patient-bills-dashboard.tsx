@@ -3,7 +3,7 @@ import styles from './patient-bills-dashboard.scss';
 import { ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { PatientBills } from '../patient-bills.component';
-import { usePatientBills } from '../../modal/require-payment.resource';
+import { usePatientBills } from '../../prompt-payment/prompt-payment.resource';
 import PatientSearchExtension from './patient-search-extension.component';
 import EmptyPatientBill from './empty-patient-bill.component';
 

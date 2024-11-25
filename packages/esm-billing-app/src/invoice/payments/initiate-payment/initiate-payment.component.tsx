@@ -21,7 +21,7 @@ import { usePatientAttributes } from '../../../hooks/usePatientAttributes';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
 import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
 import { MappedBill } from '../../../types';
-import { formatPhoneNumber } from '../utils';
+import { formatKenyanPhoneNumber } from '../utils';
 import styles from './initiate-payment.scss';
 
 const initiatePaymentSchema = z.object({
@@ -75,7 +75,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
   }, [watchedPhoneNumber, setValue, phoneNumber, reset]);
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
-    const phoneNumber = formatPhoneNumber(data.phoneNumber);
+    const phoneNumber = formatKenyanPhoneNumber(data.phoneNumber);
     const amountBilled = data.billAmount;
     const accountReference = `${mflCodeValue}#${bill.uuid}`;
 

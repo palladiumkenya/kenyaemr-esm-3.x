@@ -39,14 +39,11 @@
       "title": "add more details",
       "type": "other-form"
     },
-     {
-      "name": "autopsy-form-workspace",
-      "component": "morgueFormEntry",
-      "title": "Autopsy form entry",
-      "type": "form",
-      "width": "extra-wide",
-      "canMaximize": true,
-      "canHide": true
+    {
+      "name": "discharge-body-form",
+      "component": "dischargeBodyForm",
+      "title": "discharge body form",
+      "type": "other-form"
     }
   ],
   "pages": [

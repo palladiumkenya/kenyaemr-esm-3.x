@@ -1,7 +1,9 @@
-import { Visit, useConfig, useVisit } from '@openmrs/esm-framework';
+import { Visit, openmrsFetch, restBaseUrl, useConfig, useVisit } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
+import useSWR from 'swr';
+import { mapBillProperties } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
-import { usePatientBills } from '../modal/require-payment.resource';
-import { MappedBill } from '../types';
+import { BillingPromptType, MappedBill, PatientInvoice } from '../types';
 
 interface BillingPromptResult {
   shouldShowBillingPrompt: boolean;
@@ -52,28 +54,33 @@ const calculateBillBalance = (bills: Array<MappedBill>): number => {
  * Determines whether a billing prompt should be shown based on visit and balance criteria
  * @param currentVisit - The current visit object or null if no active visit
  * @param patientBillBalance - The patient's current bill balance
- * @param paymentMethods - String containing payment method information
  * @param inPatientVisitTypeUuid - UUID identifying inpatient visit type
  * @returns boolean indicating whether the billing prompt should be shown
  */
 const shouldShowPrompt = (
   currentVisit: Visit | null,
   patientBillBalance: number,
-  paymentMethods: string,
   inPatientVisitTypeUuid: string,
 ): boolean => {
   const isInPatient = isCurrentVisitInPatient(currentVisit, inPatientVisitTypeUuid);
   return patientBillBalance > 0 && !isInPatient;
 };
+// Check if all line items are orders
+const hasOnlyOrderBills = (bills: Array<MappedBill>): boolean => {
+  const flattenedBills = bills.flatMap((bill) => bill.lineItems);
+  // check if all line items are orders, line item with order has order not set to null
+  return flattenedBills.every((item) => item.order);
+};
 
 /**
  * A custom hook that determines whether a billing prompt should be displayed for a patient
- * based on their visit type, bill balance, and payment method.
+ * or processes medical orders for a patient, checking their visit type, bill balance, and payment method.
  *
  * The prompt will be shown if:
  * 1. The current visit is not an inpatient visit
  * 2. The patient has a positive bill balance
  * 3. The payment method is not in the excluded payment methods list
+ * 4. For patient-chart, prompt is not shown if the line items in the bill are only orders
  *
  * @param patientUuid - The UUID of the patient to check billing status for
  * @returns {BillingPromptResult} An object containing:
@@ -83,28 +90,73 @@ const shouldShowPrompt = (
  *  - currentVisit: the current visit object or null
  *  - bills: array of the patient's bills
  */
-export const useBillingPrompt = (patientUuid: string): BillingPromptResult => {
+export const useBillingPrompt = (
+  patientUuid: string,
+  promptType: BillingPromptType = 'billing-orders',
+): BillingPromptResult => {
   const config = useConfig<BillingConfig>();
   const { currentVisit, isLoading: isLoadingVisit } = useVisit(patientUuid);
   const { patientBills: bills, isLoading: isLoadingBills, error } = usePatientBills(patientUuid);
 
-  const {
-    visitAttributeTypes: { paymentMethods },
-    paymentMethodsUuidsThatShouldNotShowPrompt,
-    inPatientVisitTypeUuid,
-  } = config;
+  const { paymentMethodsUuidsThatShouldNotShowPrompt, inPatientVisitTypeUuid } = config;
 
   const isExcludedPaymentMethod = checkPaymentMethodExclusion(currentVisit, paymentMethodsUuidsThatShouldNotShowPrompt);
 
   const patientBillBalance = calculateBillBalance(bills);
+  const hasOnlyOrders = hasOnlyOrderBills(bills);
+
+  if (promptType === 'patient-chart' && hasOnlyOrders) {
+    return {
+      shouldShowBillingPrompt: false,
+      isLoading: isLoadingBills || isLoadingVisit,
+      error,
+      currentVisit,
+      bills,
+    };
+  }
 
   return {
     shouldShowBillingPrompt:
-      !isExcludedPaymentMethod &&
-      shouldShowPrompt(currentVisit, patientBillBalance, paymentMethods, inPatientVisitTypeUuid),
+      !isExcludedPaymentMethod && shouldShowPrompt(currentVisit, patientBillBalance, inPatientVisitTypeUuid),
     isLoading: isLoadingBills || isLoadingVisit,
     error,
     currentVisit,
     bills,
+  };
+};
+
+/**
+ * Custom hook to fetch patient bills.
+ *
+ * @param {string} patientUuid - The UUID of the patient.
+ * @returns {Object} The response object containing patient bills and hook states.
+ * @returns {Array<PatientInvoice>} [returns.patientBills] - An array of patient invoices.
+ * @returns {boolean} [returns.isLoading] - Whether the data is currently being loaded.
+ * @returns {Error|null} [returns.error] - Any error that occurred during the fetch, or null if none.
+ * @returns {boolean} [returns.isValidating] - Whether the data is being revalidated.
+ * @returns {Function} [returns.mutate] - A function to manually trigger a re-fetch of the data.
+ */
+export const usePatientBills = (patientUuid: string) => {
+  const { patientBillsUrl } = useConfig<BillingConfig>();
+  const url = patientBillsUrl.replace('${restBaseUrl}', restBaseUrl);
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
+    // a null key in useSWR essentially disables the fetch call until a patientUUID is available
+    patientUuid ? `${url}&patientUuid=${patientUuid}&includeVoided=true` : null,
+    openmrsFetch,
+    {
+      errorRetryCount: 2,
+    },
+  );
+
+  const patientBills = useMemo(() => {
+    return data?.data?.results?.map(mapBillProperties) ?? [];
+  }, [data?.data?.results]);
+
+  return {
+    patientBills: patientBills ?? [],
+    isLoading,
+    error,
+    isValidating,
+    mutate,
   };
 };
