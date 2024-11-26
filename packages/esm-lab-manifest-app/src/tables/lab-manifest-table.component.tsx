@@ -56,14 +56,17 @@ const LabManifestsTable = () => {
     {
       header: t('startDate', 'Start date'),
       key: 'startDate',
+      isSortable: true,
     },
     {
       header: t('endDate', 'End Date'),
       key: 'endDate',
+      isSortable: true,
     },
     {
       header: t('type', 'Type'),
       key: 'type',
+      isSortable: true,
     },
     {
       header: t('courrier', 'Courrier'),
@@ -84,6 +87,7 @@ const LabManifestsTable = () => {
     {
       header: t('dispatch', 'Dispatch'),
       key: 'dispatch',
+      isSortable: true,
     },
     {
       header: t('samples', 'Samples'),

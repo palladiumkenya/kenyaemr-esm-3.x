@@ -45,6 +45,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
     {
       header: t('dateRequested', 'Date Requested'),
       key: 'dateRequested',
+      isSortable: true,
     },
     {
       header: t('actions', 'Actions'),
@@ -175,7 +176,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
                   <TableRow>
                     <TableSelectAll {...getSelectionProps()} />
                     {headers.map((header, i) => (
-                      <TableHeader key={i} {...getHeaderProps({ header })}>
+                      <TableHeader key={i} {...getHeaderProps({ header, isSortable: header.isSortable })}>
                         {header.header}
                       </TableHeader>
                     ))}

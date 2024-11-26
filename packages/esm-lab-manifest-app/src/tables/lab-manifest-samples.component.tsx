@@ -57,10 +57,12 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     {
       header: t('dateRequested', 'Date Requested'),
       key: 'dateRequested',
+      isSortable: true,
     },
     {
       header: t('resultDate', 'Result Date'),
       key: 'resultDate',
+      isSortable: true,
     },
     {
       header: t('result', 'Result'),
@@ -200,7 +202,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
                   <TableRow>
                     <TableSelectAll {...getSelectionProps()} />
                     {headers.map((header, i) => (
-                      <TableHeader key={i} {...getHeaderProps({ header })}>
+                      <TableHeader key={i} {...getHeaderProps({ header, isSortable: header.isSortable })}>
                         {header.header}
                       </TableHeader>
                     ))}
