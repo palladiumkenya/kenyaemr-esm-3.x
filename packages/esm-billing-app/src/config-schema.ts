@@ -28,7 +28,6 @@ export interface BillingConfig {
     emergencyPriorityConceptUuid: string;
   };
   paymentMethodsUuidsThatShouldNotShowPrompt: Array<string>;
-  openMRSIDUUID: string;
 }
 
 export const configSchema: ConfigSchema = {
@@ -36,11 +35,6 @@ export const configSchema: ConfigSchema = {
     _type: Type.Boolean,
     _description: 'A flag for PDSL facilities',
     _default: false,
-  },
-  openMRSIDUUID: {
-    _type: Type.String,
-    _description: 'OpenMRS ID uuid',
-    _default: 'dfacd928-0370-4315-99d7-6ec1c9f7ae76',
   },
   shaIdentificationNumberUUID: {
     _type: Type.String,
