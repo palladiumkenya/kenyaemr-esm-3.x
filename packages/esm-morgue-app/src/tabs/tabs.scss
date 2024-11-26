@@ -59,7 +59,6 @@
   justify-content: space-between;
   align-items: center;
   padding: layout.$spacing-04 layout.$spacing-05;
-  // background-color: $ui-02;
 }
 
 .backgroundDataFetchingIndicator {
@@ -183,7 +182,7 @@
 .actionBtn {
   display: flex;
   gap: 0.5rem;
-  margin-right: layout.$spacing-05;
+  margin-right: layout.$spacing-07;
 }
 
 .mainSection {

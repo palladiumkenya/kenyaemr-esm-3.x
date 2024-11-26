@@ -6,6 +6,7 @@ import CompartmentView from '../card/compartment-view.compartment';
 import { useDeceasedPatient } from '../hook/useMorgue.resource';
 import { InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
+import EmptyDeceasedSearch from '../empty-state/empty-search-deceased.component';
 
 export const AdmittedQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
@@ -17,7 +18,6 @@ export const AdmittedQueue: React.FC = () => {
   };
 
   const admittedPatients = deceasedPatients?.filter((patient) => patient.status === 'admitted') || [];
-
   if (isLoading) {
     return (
       <InlineLoading
@@ -30,6 +30,15 @@ export const AdmittedQueue: React.FC = () => {
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('allocation', 'Allocation')} />;
+  }
+
+  if (admittedPatients?.length === 0) {
+    return (
+      <EmptyDeceasedSearch
+        title={t('allocations', 'Allocation')}
+        subTitle={t('noAdmittedPersons', 'There are no admitted bodies on the any compartments')}
+      />
+    );
   }
 
   return (

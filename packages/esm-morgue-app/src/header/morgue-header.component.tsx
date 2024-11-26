@@ -4,15 +4,33 @@ import { Calendar, Location } from '@carbon/react/icons';
 import { useSession, formatDate } from '@openmrs/esm-framework';
 import styles from './morgue-header.scss';
 import MorgueIllustration from './morgue-illustration.component';
+import { InlineLoading } from '@carbon/react';
 
 interface MorgueHeaderProps {
   title: string;
+  awaitingCount: number;
+  admittedCount: number;
+  dischargedCount: number;
+  isLoading: boolean;
 }
 
-export const MorgueHeader: React.FC<MorgueHeaderProps> = ({ title }) => {
+export const MorgueHeader: React.FC<MorgueHeaderProps> = ({
+  title,
+  awaitingCount,
+  admittedCount,
+  dischargedCount,
+  isLoading,
+}) => {
   const { t } = useTranslation();
-  const userSession = useSession();
-  const userLocation = userSession?.sessionLocation?.display;
+  const renderMetricValue = (value: number) => {
+    return isLoading ? (
+      <span className={styles.loadingSpinner}>
+        <InlineLoading />
+      </span>
+    ) : (
+      <span className={styles.metricValue}>{value}</span>
+    );
+  };
 
   return (
     <div className={styles.header}>
@@ -26,15 +44,15 @@ export const MorgueHeader: React.FC<MorgueHeaderProps> = ({ title }) => {
       <div className={styles.metrics}>
         <div className={styles.wrapMetrics}>
           <span className={styles.metricLabel}>{t('awaiting', 'Awaiting')}</span>
-          <span className={styles.metricValue}>0</span>
+          {renderMetricValue(awaitingCount)}
         </div>
         <div className={styles.wrapMetrics}>
           <span className={styles.metricLabel}>{t('admittedOnes', 'Admitted')}</span>
-          <span className={styles.metricValue}>0</span>
+          {renderMetricValue(admittedCount)}
         </div>
         <div className={styles.wrapMetrics}>
           <span className={styles.metricLabel}>{t('discharges', 'Discharges')}</span>
-          <span className={styles.metricValue}>0</span>
+          {renderMetricValue(dischargedCount)}
         </div>
       </div>
     </div>
