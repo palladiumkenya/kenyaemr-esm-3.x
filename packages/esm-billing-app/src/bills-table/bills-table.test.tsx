@@ -104,11 +104,11 @@ describe('BillsTable', () => {
     const billCategorySelect = screen.getByRole('combobox');
     expect(billCategorySelect).toBeInTheDocument();
     await user.click(billCategorySelect, { name: 'All bills' });
-    expect(mockbills).toHaveBeenCalledWith('', '');
+    expect(mockbills).toHaveBeenCalledWith('', '', expect.any(Date), expect.any(Date));
 
     await user.click(screen.getByText('Pending bills'));
     expect(screen.getByText('Pending bills')).toBeInTheDocument();
-    expect(mockbills).toHaveBeenCalledWith('', 'PENDING');
+    expect(mockbills).toHaveBeenCalledWith('', 'PENDING', expect.any(Date), expect.any(Date));
   });
 
   test('should show the loading spinner while retrieving data', () => {
