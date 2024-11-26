@@ -17,7 +17,7 @@ import { useBills } from '../../billing.resource';
 import { useRenderedRows } from '../../hooks/use-rendered-rows';
 import { usePaymentPoints } from '../../payment-points/payment-points.resource';
 import { useClockInStatus } from '../../payment-points/use-clock-in-status';
-import { PaymentStatus, Timesheet } from '../../types';
+import { MappedBill, PaymentStatus, Timesheet } from '../../types';
 import { AppliedFilterTags } from './applied-filter-tages.component';
 import { Filter } from './filter.component';
 import { PaymentHistoryTable } from './payment-history-table.component';
@@ -91,7 +91,7 @@ export const PaymentHistoryViewer = () => {
 
   return (
     <div className={styles.table}>
-      <PaymentTotals renderedRows={renderedRows} appliedFilters={appliedFilters} />
+      <PaymentTotals renderedRows={renderedRows as unknown as MappedBill[]} appliedFilters={appliedFilters} />
       <DataTable rows={results} headers={headers} isSortable>
         {(tableData) => (
           <TableContainer>
@@ -131,7 +131,7 @@ export const PaymentHistoryViewer = () => {
             <PaymentHistoryTable
               tableData={tableData}
               paidBillsResponse={paidBillsResponse}
-              renderedRows={renderedRows}
+              renderedRows={renderedRows as unknown as MappedBill[]}
             />
             {paginated && !paidBillsResponse.isLoading && !paidBillsResponse.error && (
               <Pagination

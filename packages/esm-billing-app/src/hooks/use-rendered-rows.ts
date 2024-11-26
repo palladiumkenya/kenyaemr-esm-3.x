@@ -26,7 +26,14 @@ export const useRenderedRows = (bills: MappedBill[], filters: Array<string>, tim
   const serviceTypeFilters = billsServiceTypes.filter((st) => filters.includes(st.uuid)).map((st) => st.uuid);
   const paymentModeFilters = paymentModes?.filter((pm) => filters.includes(pm.name)).map((pm) => pm.name);
 
-  const preFiltered = bills
+  const mappedBills = bills.map((bill) => {
+    return {
+      ...bill,
+      id: bill.patientUuid,
+    };
+  });
+
+  const preFiltered = mappedBills
     .filter((b) => (isOnPaymentPointPage ? b.cashPointUuid === paymentPointUUID : true))
     .filter((bill) => {
       if (!timesheet) {

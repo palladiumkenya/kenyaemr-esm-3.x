@@ -1,10 +1,21 @@
-import { DataTableSkeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@carbon/react';
+import {
+  DataTableSkeleton,
+  SkeletonText,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useBills } from '../../billing.resource';
 import { MappedBill } from '../../types';
 // import { headers } from './payment-history-viewer.component';
+import { useConfig, usePatient } from '@openmrs/esm-framework';
+import { BillingConfig } from '../../config-schema';
 import styles from './payment-history.scss';
 
 export const PaymentHistoryTable = ({
@@ -87,11 +98,40 @@ export const PaymentHistoryTable = ({
               row,
             })}>
             {row.cells.map((cell) => (
-              <TableCell key={cell.id}>{cell.value}</TableCell>
+              <CustomTableCell cell={cell} patientUUID={row.id} />
             ))}
           </TableRow>
         ))}
       </TableBody>
     </Table>
   );
+};
+
+const CustomTableCell = ({
+  cell,
+  patientUUID,
+}: {
+  cell: { id: string; value: string; info: { header: string } };
+  patientUUID: string;
+}) => {
+  const { openMRSIDUUID } = useConfig<BillingConfig>();
+  const { patient, isLoading } = usePatient(patientUUID);
+
+  const openMRSId = patient?.identifier
+    ?.filter((identifier) => identifier)
+    .filter((identifier) => identifier.type.coding.some((coding) => coding.code === openMRSIDUUID))
+    .at(0)?.value;
+
+  if (cell.info.header === 'patientName') {
+    if (isLoading) {
+      return <SkeletonText className={styles.patientNameSkeleton} />;
+    }
+    return (
+      <TableCell key={cell.id}>
+        {openMRSId}:{cell.value}
+      </TableCell>
+    );
+  }
+
+  return <TableCell key={cell.id}>{cell.value}</TableCell>;
 };
