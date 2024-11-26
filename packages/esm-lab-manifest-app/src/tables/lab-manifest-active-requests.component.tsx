@@ -14,7 +14,7 @@ import {
   TableSelectRow,
 } from '@carbon/react';
 import { Add, ArrowRight } from '@carbon/react/icons';
-import { ErrorState, showModal, showNotification, usePagination } from '@openmrs/esm-framework';
+import { ConfigurableLink, ErrorState, showModal, showNotification, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -87,9 +87,19 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
 
   const tableRows =
     results?.map((activeRequest) => {
+      const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient Summary';
       return {
         id: `${activeRequest.orderUuid}`,
-        patientName: activeRequest.patientName ?? '--',
+        patientName: activeRequest.patientName ? (
+          <ConfigurableLink
+            to={patientChartUrl}
+            templateParams={{ patientUuid: activeRequest.patientUuid }}
+            style={{ textDecoration: 'none' }}>
+            {activeRequest.patientName}
+          </ConfigurableLink>
+        ) : (
+          '--'
+        ),
         cccKdod: activeRequest.cccKdod ?? '--',
         dateRequested: activeRequest.dateRequested,
         actions: (

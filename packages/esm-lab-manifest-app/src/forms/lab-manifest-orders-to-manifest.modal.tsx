@@ -13,7 +13,7 @@ import {
   Stack,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -24,11 +24,11 @@ import {
   addOrderToManifest,
   labManifestOrderToManifestFormSchema,
   mutateManifestLinks,
-  sampleTypes,
 } from '../lab-manifest.resources';
 import { ActiveRequestOrder } from '../types';
 import ActiveOrdersSelectionPreview from './active-order-selection-preview';
 import styles from './lab-manifest-form.scss';
+import { LabManifestConfig } from '../config-schema';
 
 interface LabManifestOrdersToManifestFormProps {
   onClose: () => void;
@@ -57,6 +57,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
     defaultValues: {},
     resolver: zodResolver(labManifestOrderToManifestFormSchema),
   });
+  const { sampleTypes } = useConfig<LabManifestConfig>();
 
   const { error, isLoading, manifest } = useLabManifest(selectedOrders[0]?.labManifest?.uuid);
   const onSubmit = async (values: OrderToManifestFormType) => {
@@ -102,8 +103,10 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
                     }}
                     initialSelectedItem={field.value}
                     label="Choose option"
-                    items={sampleTypes.map((r) => r.value)}
-                    itemToString={(item) => sampleTypes.find((r) => r.value === item)?.label ?? ''}
+                    items={sampleTypes
+                      .filter((type) => type.labManifestType.includes(`${manifest?.manifestType}`))
+                      .map((r) => r.sampleType)}
+                    itemToString={(item) => item ?? ''}
                   />
                 )}
               />

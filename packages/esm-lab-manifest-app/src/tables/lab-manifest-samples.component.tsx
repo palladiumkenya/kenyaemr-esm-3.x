@@ -20,7 +20,12 @@ import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
-import { mutateManifestLinks, printSpecimentLabel, removeSampleFromTheManifest } from '../lab-manifest.resources';
+import {
+  mutateManifestLinks,
+  printSpecimentLabel,
+  removeSampleFromTheManifest,
+  sampleRemovableManifestStatus,
+} from '../lab-manifest.resources';
 import { LabManifestSample } from '../types';
 import styles from './lab-manifest-table.scss';
 
@@ -131,14 +136,16 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         result: sample.result ?? '--',
         actions: (
           <ButtonSet className={styles.btnSet}>
-            <Button
-              renderIcon={TrashCan}
-              className={styles.btn}
-              hasIconOnly
-              kind="ghost"
-              iconDescription={t('removeFromManifest', 'Remove from Manifest')}
-              onClick={() => handleDeleteManifestSample(sample.uuid)}
-            />
+            {sampleRemovableManifestStatus.includes(manifest?.manifestStatus) && (
+              <Button
+                renderIcon={TrashCan}
+                className={styles.btn}
+                hasIconOnly
+                kind="ghost"
+                iconDescription={t('removeFromManifest', 'Remove from Manifest')}
+                onClick={() => handleDeleteManifestSample(sample.uuid)}
+              />
+            )}
             <Button
               className={styles.btn}
               renderIcon={Printer}
