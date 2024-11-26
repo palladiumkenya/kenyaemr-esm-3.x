@@ -26,21 +26,14 @@
 
 .filterContainer {
   flex: 1;
-
-  :global(.cds--dropdown__wrapper--inline) {
-    gap: 0;
-  }
-
-  :global(.cds--list-box__menu-icon) {
-    height: 1rem;
-  }
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: layout.$spacing-03;
 
   :global(.cds--list-box__menu) {
     min-width: max-content;
-  }
-
-  :global(.cds--list-box) {
-    margin-left: layout.$spacing-03;
   }
 }
 

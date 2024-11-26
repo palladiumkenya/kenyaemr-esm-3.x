@@ -16,6 +16,8 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  DatePicker,
+  DatePickerInput,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -29,6 +31,7 @@ import {
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { useBills } from '../billing.resource';
 import styles from './bills-table.scss';
+import dayjs from 'dayjs';
 
 const filterItems = [
   { id: '', text: 'All bills' },
@@ -50,7 +53,16 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
   const [billPaymentStatus, setBillPaymentStatus] = useState(defaultBillPaymentStatus);
   const pageSizes = config?.bills?.pageSizes ?? [10, 20, 30, 40, 50];
   const [pageSize, setPageSize] = useState(config?.bills?.pageSize ?? 10);
-  const { bills, isLoading, isValidating, error } = useBills('', billPaymentStatus);
+  const [dateRange, setDateRange] = useState({
+    startDate: dayjs().startOf('day').toDate(),
+    endDate: dayjs().endOf('day').toDate(),
+  });
+  const { bills, isLoading, isValidating, error } = useBills(
+    '',
+    billPaymentStatus,
+    dateRange.startDate,
+    dateRange.endDate,
+  );
   const [searchString, setSearchString] = useState('');
 
   const headerData = [
@@ -133,6 +145,13 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
 
   const handleFilterChange = ({ selectedItem }) => setBillPaymentStatus(selectedItem.id);
 
+  const handleDateChange = ([startDate, endDate]) => {
+    // Update if both startDate and endDate are provided
+    if (startDate && endDate) {
+      setDateRange({ startDate, endDate });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={styles.loaderContainer}>
@@ -172,8 +191,22 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
           onChange={handleFilterChange}
           size={responsiveSize}
           titleText={t('filterBy', 'Filter by') + ':'}
-          type="inline"
         />
+
+        <DatePicker value={[dateRange.startDate, dateRange.endDate]} onChange={handleDateChange} datePickerType="range">
+          <DatePickerInput
+            size={responsiveSize}
+            id="start-date"
+            placeholder="mm/dd/yyyy"
+            labelText={t('startDate', 'Start date')}
+          />
+          <DatePickerInput
+            size={responsiveSize}
+            id="end-date"
+            placeholder="mm/dd/yyyy"
+            labelText={t('endDate', 'End date')}
+          />
+        </DatePicker>
       </div>
 
       {bills?.length > 0 ? (

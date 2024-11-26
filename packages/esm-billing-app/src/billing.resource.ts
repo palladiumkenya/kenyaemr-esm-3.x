@@ -65,13 +65,13 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
 export const useBills = (
   patientUuid: string = '',
   billStatus: PaymentStatus.PENDING | '' | string = '',
-  startingDate: Date = dayjs().startOf('day').toDate(),
-  endDate: Date = dayjs().endOf('day').toDate(),
+  createdOnOrAfter: Date = dayjs().startOf('day').toDate(),
+  createdOnOrBefore: Date = dayjs().endOf('day').toDate(),
 ) => {
-  const startingDateISO = startingDate.toISOString();
-  const endDateISO = endDate.toISOString();
+  const createdOnOrAfterISO = createdOnOrAfter.toISOString();
+  const createdOnOrBeforeISO = createdOnOrBefore.toISOString();
 
-  const url = `${restBaseUrl}/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${startingDateISO}&createdOnOrBefore=${endDateISO}`;
+  const url = `${restBaseUrl}/cashier/bill?status=${billStatus}&v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))&createdOnOrAfter=${createdOnOrAfterISO}&createdOnOrBefore=${createdOnOrBeforeISO}`;
 
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<PatientInvoice> } }>(
     patientUuid ? `${url}&patientUuid=${patientUuid}` : url,
