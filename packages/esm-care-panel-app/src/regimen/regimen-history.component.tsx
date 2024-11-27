@@ -38,18 +38,26 @@ const RegimenHistory: React.FC<RegimenHistoryProps> = ({ patientUuid, category }
 
   if (regimen?.length) {
     const structuredListBodyRowGenerator = () => {
-      return regimen.map((regimen, i) => (
-        <StructuredListRow key={`row-${i}`} className={styles.structuredList}>
-          <StructuredListCell>{formatDate(parseDate(regimen.startDate), { mode: 'wide' })}</StructuredListCell>
-          <StructuredListCell>
-            {regimen.endDate ? formatDate(parseDate(regimen.endDate), { mode: 'wide' }) : ''}
-          </StructuredListCell>
-          <StructuredListCell>{regimen.regimenShortDisplay ? regimen.regimenShortDisplay : '——'}</StructuredListCell>
-          <StructuredListCell>{regimen.regimenLine ? regimen.regimenLine : '——'}</StructuredListCell>
-          <StructuredListCell>{regimen.changeReasons ? regimen.changeReasons.slice(1, -1) : '——'}</StructuredListCell>
-          <StructuredListCell></StructuredListCell>
-        </StructuredListRow>
-      ));
+      return regimen
+        .filter((regimen) => regimen?.startDate)
+        .map((regimen, i) => (
+          <StructuredListRow key={`row-${i}`} className={styles.structuredList}>
+            <StructuredListCell>
+              {regimen?.startDate ? formatDate(parseDate(regimen?.startDate), { mode: 'wide' }) : ''}
+            </StructuredListCell>
+            <StructuredListCell>
+              {regimen?.endDate ? formatDate(parseDate(regimen?.endDate), { mode: 'wide' }) : ''}
+            </StructuredListCell>
+            <StructuredListCell>
+              {regimen?.regimenShortDisplay ? regimen?.regimenShortDisplay : '——'}
+            </StructuredListCell>
+            <StructuredListCell>{regimen?.regimenLine ? regimen?.regimenLine : '——'}</StructuredListCell>
+            <StructuredListCell>
+              {regimen?.changeReasons ? regimen?.changeReasons.slice(1, -1) : '——'}
+            </StructuredListCell>
+            <StructuredListCell></StructuredListCell>
+          </StructuredListRow>
+        ));
     };
 
     return (
