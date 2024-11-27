@@ -19,7 +19,6 @@ import { Edit, Printer, View } from '@carbon/react/icons';
 import {
   ErrorState,
   formatDate,
-  isDesktop,
   launchWorkspace,
   navigate,
   parseDate,
@@ -175,27 +174,26 @@ const LabManifestsTable = () => {
 
   if (manifests.length === 0) {
     return (
-      <Layer>
-        <Tile className={styles.tile}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{headerTitle}</h4>
-            <div style={{ padding: '10px' }}>
-              <Dropdown
-                style={{ minWidth: '300px' }}
-                id="manifestStatus"
-                onChange={({ selectedItem }) => {
-                  setCurrFilter(LabManifestFilters.find((lb) => lb.value === selectedItem).params);
-                }}
-                initialSelectedItem={LabManifestFilters.find((lb) => lb.params === currFilter).value}
-                label={t('selectManifestStatus', 'Select manifest status')}
-                items={LabManifestFilters.map((mn) => mn.value)}
-                itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
-              />
-            </div>
-          </div>
-          <EmptyDataIllustration />
-          <p className={styles.content}>{t('notLabManifetToDisplay', 'There is no lab manifets data to display.')}</p>
-        </Tile>
+      <Layer className={styles.tile}>
+        <CardHeader title={headerTitle}>
+          <Dropdown
+            className={styles.dropDownFilter}
+            id="manifestStatus"
+            onChange={({ selectedItem }) => {
+              setCurrFilter(LabManifestFilters.find((lb) => lb.value === selectedItem).params);
+            }}
+            initialSelectedItem={LabManifestFilters.find((lb) => lb.params === currFilter).value}
+            label={t('selectManifestStatus', 'Select manifest status')}
+            items={LabManifestFilters.map((mn) => mn.value)}
+            itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
+          />
+        </CardHeader>
+        <EmptyDataIllustration />
+        <p className={styles.content}>
+          {t('notLabManifetToDisplay', 'There are no {{status}} lab manifets data to display.', {
+            status: LabManifestFilters.find((lm) => lm.params === currFilter)?.label ?? '',
+          })}
+        </p>
       </Layer>
     );
   }
