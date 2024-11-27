@@ -36,6 +36,11 @@ import CancelBillWorkspace from './billable-services/bill-manager/workspaces/can
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/serviceItemCard.component';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import ReceiptPrintPreviewModal from './invoice/print-bill-receipt/receipt-print-preview.modal';
+import WaiveBillActionButton from './billable-services/bill-manager/bill-actions/waive-bill-action-button.component';
+import DeleteBillActionButton from './billable-services/bill-manager/bill-actions/delete-bill-action-button.component';
+import RefundLineItem from './billable-services/bill-manager/bill-actions/refund-line-item.component';
+import CancelLineItem from './billable-services/bill-manager/bill-actions/cancel-line-item.component';
+import EditLineItem from './billable-services/bill-manager/bill-actions/edit-line-item.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -194,3 +199,8 @@ export function startupApp() {
 }
 
 export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);
+export const waiveBillActionButton = getSyncLifecycle(WaiveBillActionButton, options);
+export const deleteBillActionButton = getSyncLifecycle(DeleteBillActionButton, options);
+export const refundLineItem = getSyncLifecycle(RefundLineItem, options);
+export const cancelLineItem = getSyncLifecycle(CancelLineItem, options);
+export const editLineItem = getSyncLifecycle(EditLineItem, options);

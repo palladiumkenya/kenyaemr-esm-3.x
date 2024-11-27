@@ -22,7 +22,7 @@ import { MappedBill, PaymentStatus } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
 import { Scalpel, ShoppingCartMinus, TrashCan } from '@carbon/react/icons';
-import { launchWorkspace, showModal } from '@openmrs/esm-framework';
+import { ExtensionSlot, launchWorkspace, showModal } from '@openmrs/esm-framework';
 
 type PatientBillsProps = {
   bills: Array<MappedBill>;
@@ -61,20 +61,6 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
       ),
     }),
   }));
-
-  const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {
-    launchWorkspace('waive-bill-form', {
-      workspaceTitle: 'Waive Bill Form',
-      bill,
-    });
-  };
-
-  const handleOpenDeleteBillModal = (bill: MappedBill) => {
-    const dispose = showModal('delete-bill-modal', {
-      bill,
-      onClose: () => dispose(),
-    });
-  };
 
   if (bills.length === 0) {
     return (
@@ -136,22 +122,11 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
                       <TableCell>
-                        <Button
-                          size="sm"
-                          onClick={() => handleOpenWaiveBillWorkspace(bills[index])}
-                          renderIcon={(props) => <Scalpel size={24} {...props} />}
-                          kind="danger--ghost"
-                          iconDescription="TrashCan">
-                          {t('waiveBill', 'Waive Bill')}
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleOpenDeleteBillModal(bills[index])}
-                          renderIcon={(props) => <ShoppingCartMinus size={24} {...props} />}
-                          kind="danger--tertiary"
-                          iconDescription="TrashCan">
-                          {t('deleteBill', 'Delete Bill')}
-                        </Button>
+                        <ExtensionSlot
+                          name="bill-actions-slot"
+                          style={{ display: 'flex', gap: '0.5rem' }}
+                          state={{ bill: bills[index] }}
+                        />
                       </TableCell>
                     </TableExpandRow>
                     <TableExpandedRow
