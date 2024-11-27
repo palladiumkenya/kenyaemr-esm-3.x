@@ -19,7 +19,17 @@ export const configSchema = {
       },
     ],
   },
+  sampleTypes: {
+    _type: Type.Array,
+    _description: 'List of sample types and list of manifest type id it applies',
+    _default: [
+      { sampleType: 'Frozen plasma', labManifestType: ['2', '3'] },
+      { sampleType: 'Whole Blood', labManifestType: ['2', '3'] },
+      { sampleType: 'DBS', labManifestType: ['1'] },
+    ],
+  },
 };
 export interface LabManifestConfig {
   labmanifestTypes: Array<{ id: number; type: string }>;
+  sampleTypes: Array<{ sampleType: string; labManifestType: Array<string> }>;
 }
