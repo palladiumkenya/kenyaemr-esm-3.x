@@ -1,8 +1,8 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
-import MetricsCards from './metrics-cards.component';
-import { useBills } from '../billing.resource';
+import React from 'react';
 import { billsSummary } from '../../../../__mocks__/bills.mock';
+import { useBills } from '../billing.resource';
+import MetricsCards from './metrics-cards.component';
 
 const mockUseBills = useBills as jest.Mock;
 
@@ -30,9 +30,9 @@ describe('MetricsCards', () => {
   test('renders metrics cards', () => {
     mockUseBills.mockReturnValue({ isLoading: false, bills: billsSummary, error: null });
     renderMetricsCards();
-    expect(screen.getByText('Cumulative Bills')).toBeInTheDocument();
-    expect(screen.getByText('Pending Bills')).toBeInTheDocument();
-    expect(screen.getByText('Paid Bills')).toBeInTheDocument();
+    expect(screen.getByText(`Today's Total Bills`)).toBeInTheDocument();
+    expect(screen.getByText(`Today's Paid Bills`)).toBeInTheDocument();
+    expect(screen.getByText(`Today's Pending Bills`)).toBeInTheDocument();
   });
 });
 
