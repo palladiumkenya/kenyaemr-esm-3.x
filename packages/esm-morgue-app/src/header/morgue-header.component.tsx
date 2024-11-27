@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Location } from '@carbon/react/icons';
+import { Calendar, Location, UserFollow } from '@carbon/react/icons';
 import { useSession, formatDate } from '@openmrs/esm-framework';
 import styles from './morgue-header.scss';
 import MorgueIllustration from './morgue-illustration.component';
@@ -8,29 +8,12 @@ import { InlineLoading } from '@carbon/react';
 
 interface MorgueHeaderProps {
   title: string;
-  awaitingCount: number;
-  admittedCount: number;
-  dischargedCount: number;
-  isLoading: boolean;
 }
 
-export const MorgueHeader: React.FC<MorgueHeaderProps> = ({
-  title,
-  awaitingCount,
-  admittedCount,
-  dischargedCount,
-  isLoading,
-}) => {
+export const MorgueHeader: React.FC<MorgueHeaderProps> = ({ title }) => {
   const { t } = useTranslation();
-  const renderMetricValue = (value: number) => {
-    return isLoading ? (
-      <span className={styles.loadingSpinner}>
-        <InlineLoading />
-      </span>
-    ) : (
-      <span className={styles.metricValue}>{value}</span>
-    );
-  };
+  const session = useSession();
+  const location = session?.sessionLocation?.display;
 
   return (
     <div className={styles.header}>
@@ -41,18 +24,13 @@ export const MorgueHeader: React.FC<MorgueHeaderProps> = ({
           <p>{t('mortuaryManagement', 'Mortuary management')}</p>
         </div>
       </div>
-      <div className={styles.metrics}>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('awaiting', 'Awaiting')}</span>
-          {renderMetricValue(awaitingCount)}
-        </div>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('admittedOnes', 'Admitted')}</span>
-          {renderMetricValue(admittedCount)}
-        </div>
-        <div className={styles.wrapMetrics}>
-          <span className={styles.metricLabel}>{t('discharges', 'Discharges')}</span>
-          {renderMetricValue(dischargedCount)}
+      <div className={styles['right-justified-items']}>
+        <div className={styles['date-and-location']}>
+          <Location size={16} />
+          <span className={styles.value}>{location}</span>
+          <span className={styles.middot}>&middot;</span>
+          <Calendar size={16} />
+          <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
         </div>
       </div>
     </div>

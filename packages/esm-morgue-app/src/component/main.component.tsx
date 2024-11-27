@@ -14,13 +14,7 @@ const MainComponent: React.FC = () => {
 
   return (
     <div className={`omrs-main-content`}>
-      <MorgueHeader
-        title={t('mortuary', 'Mortuary')}
-        awaitingCount={awaitingCount}
-        admittedCount={admittedCount}
-        dischargedCount={dischargedCount}
-        isLoading={isLoading}
-      />
+      <MorgueHeader title={t('mortuary', 'Mortuary')} />
       <MorgueTabs />
     </div>
   );
