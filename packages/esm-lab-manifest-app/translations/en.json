@@ -21,6 +21,7 @@
   "labPersonContact": "Lab person Contact",
   "manifestId": "Manifest Id",
   "manifestSamples": "Manifest samples",
+  "notLabManifetToDisplay": "There are no {{status}} lab manifets data to display.",
   "patient": "Patient",
   "patientName": "Patient name",
   "printManifest": "Print Manifest",
