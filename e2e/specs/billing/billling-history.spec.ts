@@ -1,6 +1,6 @@
-import { test } from '../../core';
 import { expect } from '@playwright/test';
-import { HomePage, BillingPage } from '../../pages';
+import { test } from '../../core';
+import { BillingPage, HomePage } from '../../pages';
 
 test('Accessing the Billing page dashboard from home', async ({ page }) => {
   const homePage = new HomePage(page);
@@ -15,10 +15,10 @@ test('Accessing the Billing page dashboard from home', async ({ page }) => {
     await expect(page).toHaveURL(`${process.env.E2E_BASE_URL}/spa/home/billing`);
   });
 
-  await test.step('Then should be able to view Cumulative, Pending and Paid bills', async () => {
-    await expect(page.getByRole('heading', { name: 'Cumulative Bills' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Pending Bills' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Paid Bills' })).toBeVisible();
+  await test.step('Then should be able to view Total, Pending and Paid bills', async () => {
+    await expect(page.getByRole('heading', { name: `Today's Total Bills` })).toBeVisible();
+    await expect(page.getByRole('heading', { name: `Today's Paid Bills` })).toBeVisible();
+    await expect(page.getByRole('heading', { name: `Today's Pending Bills` })).toBeVisible();
   });
 });
 
