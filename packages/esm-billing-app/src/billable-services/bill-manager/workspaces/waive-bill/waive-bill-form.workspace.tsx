@@ -35,7 +35,7 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({
   promptBeforeClosing,
   closeWorkspaceWithSavedChanges,
 }) => {
-  const { lineItems } = bill;
+  const { lineItems = [], payments = [] } = bill ?? {};
   const isTablet = useLayoutType() === 'tablet';
 
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({
   const waiverPaymentMode =
     first(paymentModes.filter((mode) => mode.name.toLowerCase().includes('waiver')))?.attributeTypes ?? [];
   // calculate amount already waived or paid this is to ensure that the amount to waive is not greater than the total amount
-  const amountAlreadyWaivedOrPaid = bill.payments.reduce((acc, curr) => acc + curr.amountTendered, 0);
+  const amountAlreadyWaivedOrPaid = payments.reduce((acc, curr) => acc + curr.amountTendered, 0);
 
   const schema = z.object({
     waiveAmount: z
