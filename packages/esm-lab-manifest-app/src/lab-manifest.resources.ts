@@ -6,6 +6,7 @@ import { LabManifest, ManifestMetricYearSummary, MappedLabManifest, TransformedD
 export const printableManifestStatus = ['Submitted', 'Complete results', 'Ready to send'];
 export const editableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
+export const sampleRemovableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 
 export const LabManifestFilters = [
   {
@@ -55,11 +56,6 @@ export const LabManifestFilters = [
   },
 ];
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
-
-export const sampleTypes = [
-  { label: 'Frozen plasma', value: 'Frozen plasma' },
-  { label: 'Whole Blood', value: 'Whole Blood' },
-];
 
 export const labManifestFormSchema = z.object({
   startDate: z.date({ coerce: true }),
