@@ -200,6 +200,31 @@
       "component": "claimsOverview",
       "name": "claims-overview-dashboard-link",
       "slot": "claims-management-overview-slot"
+    },
+    {
+      "component": "waiveBillActionButton",
+      "name": "waive-bill-action-button",
+      "slot": "bill-actions-slot"
+    },
+    {
+      "component": "deleteBillActionButton",
+      "name": "delete-bill-action-button",
+      "slot": "bill-actions-slot"
+    },
+    {
+      "component": "refundLineItem",
+      "name": "refund-line-item",
+      "slot": "bill-actions-overflow-menu-slot"
+    },
+    {
+      "name": "edit-line-item",
+      "component": "editLineItem",
+      "slot": "bill-actions-overflow-menu-slot"
+    },
+    {
+      "name": "cancel-line-item",
+      "component": "cancelLineItem",
+      "slot": "bill-actions-overflow-menu-slot"
     }
   ],
   "workspaces": [
