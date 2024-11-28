@@ -9,7 +9,7 @@ interface EmptyDeceasedSearchProps {
   subTitle: string;
 }
 
-const EmptyDeceasedSearch: React.FC<EmptyDeceasedSearchProps> = ({ title, subTitle }) => {
+const EmptyMorgueAdmission: React.FC<EmptyDeceasedSearchProps> = ({ title, subTitle }) => {
   const { t } = useTranslation();
 
   return (
@@ -21,4 +21,4 @@ const EmptyDeceasedSearch: React.FC<EmptyDeceasedSearchProps> = ({ title, subTit
   );
 };
 
-export default EmptyDeceasedSearch;
+export default EmptyMorgueAdmission;

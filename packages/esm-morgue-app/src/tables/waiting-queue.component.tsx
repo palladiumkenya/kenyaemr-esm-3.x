@@ -56,7 +56,7 @@ export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedP
     gender: patient.person.gender,
     age: patient?.person?.age,
     identifier: patient?.identifiers[0]?.identifier,
-    deathDate: new Date(patient.person.deathDate).toLocaleString(),
+    deathDate: patient.person.deathDate ? new Date(patient.person.deathDate).toLocaleString() : t('nullDate', '--'),
     causeOfDeath: patient.person.causeOfDeath?.display,
     status: <Tag type="magenta">{patient.status}</Tag>,
   }));
