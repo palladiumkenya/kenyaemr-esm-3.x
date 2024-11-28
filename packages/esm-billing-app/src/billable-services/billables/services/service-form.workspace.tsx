@@ -57,12 +57,14 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
     setValue,
     control,
     handleSubmit,
+    trigger,
     formState: { errors, isDirty, defaultValues, isSubmitting },
   } = formMethods;
 
   useEffect(() => {
     if (initialValues) {
       setConceptToLookup(initialValues.concept?.concept?.display);
+      trigger();
     }
   }, [initialValues]);
 
@@ -152,6 +154,13 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
       <form onSubmit={handleSubmit(onSubmit, handleError)} className={styles.form}>
         <div className={styles.formContainer}>
           <Stack className={styles.formStackControl} gap={7}>
+            {errors.concept && (
+              <InlineNotification
+                kind="error"
+                title={t('conceptMissing', 'Concept missing')}
+                subtitle={t('conceptMissingSubtitle', 'Please select a stock item')}
+              />
+            )}
             <ResponsiveWrapper>
               <Controller
                 name="name"
