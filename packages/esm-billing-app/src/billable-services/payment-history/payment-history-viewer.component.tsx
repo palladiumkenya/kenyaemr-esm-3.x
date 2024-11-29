@@ -50,6 +50,7 @@ export const PaymentHistoryViewer = () => {
   const headers = [
     { header: t('billDate', 'Date'), key: 'dateCreated' },
     { header: t('patientName', 'Patient Name'), key: 'patientName' },
+    { header: t('id', 'Id'), key: 'identifier' },
     { header: t('totalAmount', 'Total Amount'), key: 'totalAmount' },
     { header: t('billingService', 'Service'), key: 'billingService' },
     { header: t('referenceCodes', ' Reference Codes'), key: 'referenceCodes' },
