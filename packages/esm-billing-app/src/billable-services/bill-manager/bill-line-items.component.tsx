@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   StructuredListHead,
   StructuredListRow,
@@ -7,13 +7,12 @@ import {
   StructuredListWrapper,
   Layer,
   OverflowMenu,
-  OverflowMenuItem,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
 import { LineItem, MappedBill } from '../../types';
 import styles from './bill-manager.scss';
-import { launchWorkspace, showModal } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
   const { t } = useTranslation();
@@ -41,6 +40,7 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
 };
 
 const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill }) => {
+  const { t } = useTranslation();
   const refundedLineItemUUIDs = bill.lineItems.filter((li) => Math.sign(li.price) === -1).map((li) => li.uuid);
   const isRefundedLineItem = refundedLineItemUUIDs.includes(lineItem.uuid);
 
@@ -52,40 +52,6 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
     lineItem.billableService.split(':').at(0),
   );
 
-  const { t } = useTranslation();
-
-  const handleOpenEditLineItemWorkspace = (lineItem: LineItem) => {
-    launchWorkspace('edit-bill-form', {
-      workspaceTitle: t('editBillForm', 'Edit Bill Form'),
-      lineItem,
-      bill,
-    });
-  };
-
-  const handleOpenRefundLineItemModal = (lineItem: LineItem) => {
-    const dispose = showModal('refund-bill-modal', {
-      onClose: () => dispose(),
-      bill,
-      lineItem,
-    });
-  };
-
-  const handleCancelLineItemWorkspace = () => {
-    launchWorkspace('cancel-bill-workspace', {
-      workspaceTitle: t('cancelBillForm', 'Cancel Bill Form'),
-      bill,
-      lineItem,
-    });
-  };
-
-  const handleOpenDeleteLineItemModal = (lineItem: LineItem) => {
-    const dispose = showModal('delete-bill-modal', {
-      onClose: () => dispose(),
-      bill,
-      lineItem,
-    });
-  };
-
   return (
     <StructuredListRow className={isRefundedLineItem && styles.refundedItem}>
       <StructuredListCell>
@@ -96,17 +62,12 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
       <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
       <StructuredListCell>
         <OverflowMenu aria-label="overflow-menu">
-          <OverflowMenuItem
-            itemText={t('editItem', 'Edit item')}
-            onClick={() => handleOpenEditLineItemWorkspace(lineItem)}
+          <ExtensionSlot
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: '7.5rem' }}
+            className="cds--overflow-menu-options__option"
+            name="bill-actions-overflow-menu-slot"
+            state={{ lineItem, bill, isRefundedBillableService }}
           />
-          <OverflowMenuItem itemText={t('cancelItem', 'Cancel item')} onClick={handleCancelLineItemWorkspace} />
-          {!isRefundedBillableService && (
-            <OverflowMenuItem
-              itemText={t('refundItem', 'Refund item')}
-              onClick={() => handleOpenRefundLineItemModal(lineItem)}
-            />
-          )}
         </OverflowMenu>
       </StructuredListCell>
     </StructuredListRow>
