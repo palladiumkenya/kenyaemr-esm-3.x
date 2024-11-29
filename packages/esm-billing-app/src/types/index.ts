@@ -10,7 +10,7 @@ export interface MappedBill {
   cashPointLocation: string;
   cashier: Provider;
   receiptNumber: string;
-  status: string;
+  status: PaymentStatus;
   identifier: string;
   dateCreated: string;
   dateCreatedUnformatted: string;
@@ -131,7 +131,7 @@ export interface PatientInvoice {
   patient: Patient;
   payments: Payment[];
   receiptNumber: string;
-  status: string;
+  status: PaymentStatus;
   adjustmentReason: any;
   id: number;
   resourceVersion: string;

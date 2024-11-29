@@ -19,6 +19,7 @@ test('Accessing the Billing page dashboard from home', async ({ page }) => {
     await expect(page.getByRole('heading', { name: `Today's Total Bills` })).toBeVisible();
     await expect(page.getByRole('heading', { name: `Today's Paid Bills` })).toBeVisible();
     await expect(page.getByRole('heading', { name: `Today's Pending Bills` })).toBeVisible();
+    await expect(page.getByRole('heading', { name: `Today's Exempted Bills` })).toBeVisible();
   });
 });
 
