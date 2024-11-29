@@ -33,6 +33,7 @@ describe('MetricsCards', () => {
     expect(screen.getByText(`Today's Total Bills`)).toBeInTheDocument();
     expect(screen.getByText(`Today's Paid Bills`)).toBeInTheDocument();
     expect(screen.getByText(`Today's Pending Bills`)).toBeInTheDocument();
+    expect(screen.getByText(`Today's Exempted Bills`)).toBeInTheDocument();
   });
 });
 
