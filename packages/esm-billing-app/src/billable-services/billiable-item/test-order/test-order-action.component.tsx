@@ -89,7 +89,7 @@ const TestOrderAction: React.FC<TestOrderProps> = React.memo((props) => {
   }
 
   const buttonText = hasPendingPayment
-    ? t('unsettledBill', 'Unsettled bill.')
+    ? t('unsettledBill', 'Unsettled bill')
     : Object.hasOwn(props, 'medicationRequestBundle')
     ? actionText ?? t('dispense', 'Dispense')
     : actionText ?? t('pickLabRequest', 'Pick Lab Request');

@@ -3,8 +3,6 @@
 @use '@carbon/colors';
 
 .actionButton {
-  --cds-layout-size-height-context: var(--cds-layout-size-height-sm, 2rem);
-  --cds-layout-size-height: var(--cds-layout-size-height-context);
   display: flex;
   align-items: center;
   justify-content: center;
