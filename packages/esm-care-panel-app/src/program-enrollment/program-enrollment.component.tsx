@@ -85,7 +85,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
           id: `${enrollment.enrollmentUuid}`,
           ...enrollment,
           ...firstEncounter,
-          changeReasons: enrollment?.firstEncounter?.changeReasons?.join(', '),
+          changeReasons: Array.isArray(firstEncounter?.changeReasons) ? firstEncounter.changeReasons.join(', ') : '',
           enrollmentEncounterUuid: enrollmentEncounterUuid,
         };
       }),

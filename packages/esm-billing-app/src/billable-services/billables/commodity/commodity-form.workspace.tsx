@@ -39,6 +39,7 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
     setValue,
     control,
     handleSubmit,
+    trigger,
     formState: { errors, isDirty, isSubmitting },
   } = formMethods;
 
@@ -46,6 +47,12 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
     control,
     name: 'servicePrices',
   });
+
+  useEffect(() => {
+    if (initialValues) {
+      trigger();
+    }
+  }, [initialValues]);
 
   const onSubmit = async (formValues: BillableFormSchema) => {
     const payload = formatBillableServicePayloadForSubmission(formValues, initialValues?.['uuid']);
@@ -112,6 +119,14 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
         <div className={styles.formContainer}>
           <Stack className={styles.formStackControl} gap={7}>
             <StockItemSearch setValue={setValue} defaultStockItem={initialValues?.name} />
+            {errors.concept && (
+              <InlineNotification
+                kind="error"
+                lowContrast={true}
+                title={t('conceptMissing', 'Concept missing for {{name}}', { name: initialValues?.name })}
+                subtitle={t('conceptMissingSubtitle', 'Please delete the current item and re-create the charge item')}
+              />
+            )}
             <ResponsiveWrapper>
               <Controller
                 control={control}

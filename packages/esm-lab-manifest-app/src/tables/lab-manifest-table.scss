@@ -1,13 +1,18 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .widgetContainer {
-  background-color: colors.$white-0;
-  border: spacing.$spacing-01 solid colors.$gray-20;
-  margin-bottom: spacing.$spacing-02;
+  background-color: colors.$white;
+  border: layout.$spacing-01 solid colors.$gray-20;
+  margin-bottom: layout.$spacing-02;
+}
+
+.dropDownFilter {
+  margin-right: layout.$spacing-03;
+  min-width: 200px;
+  text-align: start;
 }
 
 .widgetContainer :global(.cds--data-table) thead th button span {
@@ -16,6 +21,8 @@
 
 .tile {
   text-align: center;
+  border: 1px solid colors.$gray-20;
+  margin: layout.$spacing-03;
 }
 
 .content {
@@ -40,9 +47,9 @@
     &:after {
       content: '';
       display: block;
-      width: spacing.$spacing-01;
-      padding-top: spacing.$spacing-03;
-      border-bottom: spacing.$spacing-01 solid;
+      width: layout.$spacing-01;
+      padding-top: layout.$spacing-03;
+      border-bottom: layout.$spacing-01 solid;
       @include brand-03(border-bottom-color);
     }
   }
@@ -50,12 +57,12 @@
 
 .btnSet {
   flex-flow: row wrap;
-  gap: spacing.$spacing-03;
+  gap: layout.$spacing-03;
 }
 
 .btn {
-  padding-left: spacing.$spacing-05;
-  padding-right: spacing.$spacing-05;
+  padding-left: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
 }
 
 .sectionHeader {
@@ -63,11 +70,11 @@
 }
 
 .modalQuiz {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
 
 .button {
-  height: spacing.$spacing-10;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -76,9 +83,9 @@
 
 .buttonSet {
   padding: 0rem;
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
 }
