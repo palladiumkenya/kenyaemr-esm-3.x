@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './empty-deceased.scss';
+import styles from './empty-morgue-admission.scss';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { DocumentUnknown, IbmWatsonKnowledgeStudio } from '@carbon/react/icons';
 
