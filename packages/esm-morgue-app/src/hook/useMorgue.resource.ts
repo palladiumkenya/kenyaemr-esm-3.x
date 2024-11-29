@@ -63,14 +63,14 @@ const getMorguePatientStatus = async (
   }
   return 'admitted';
 };
-export const useDeceasedPatient = () => {
+export const useDeceasedPatient = (searchTerm?: string) => {
   const { morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid } = useConfig<ConfigObject>();
   const [deceasedPatient, setDeceasedPatient] = useState([]);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
   const [statusError, setStatusError] = useState();
   const customRepresentation =
     'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name)),person:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),preferredAddress:(uuid,stateProvince,countyDistrict,address4)))';
-  const uril = makeUrlUrl(`${restBaseUrl}/morgue/patient?v=${customRepresentation}&dead=true`);
+  const uril = makeUrlUrl(`${restBaseUrl}/morgue/patient?v=${customRepresentation}&dead=true&q=${searchTerm}`);
   const pageSize = 10;
   const {
     data: paginatedData,
