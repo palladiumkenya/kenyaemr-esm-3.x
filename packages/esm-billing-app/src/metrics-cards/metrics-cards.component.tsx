@@ -10,15 +10,16 @@ import { useBillMetrics } from './metrics.resource';
 export default function MetricsCards() {
   const { t } = useTranslation();
   const { bills, isLoading, error } = useBills('');
-  const { totalBills, pendingBills, paidBills } = useBillMetrics(bills);
+  const { totalBills, pendingBills, paidBills, exemptedBills } = useBillMetrics(bills);
 
   const cards = useMemo(
     () => [
       { title: `Today's Total Bills`, count: totalBills },
       { title: `Today's Paid Bills`, count: paidBills },
       { title: `Today's Pending Bills`, count: pendingBills },
+      { title: `Today's Exempted Bills`, count: exemptedBills },
     ],
-    [totalBills, pendingBills, paidBills],
+    [totalBills, paidBills, pendingBills, exemptedBills],
   );
 
   if (isLoading) {
