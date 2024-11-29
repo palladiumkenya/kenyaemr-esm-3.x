@@ -126,6 +126,7 @@
   "generatedMessage": "The invoice has been electronically generated and is a valid document. It was created by {{userName}} on {{date}} at {{time}}",
   "guaranteeId": "Guarantee Id",
   "home": "Home",
+  "id": "Id",
   "identifier": "Identifier",
   "inactive": "Inactive",
   "incompletePayment": "Incomplete payment",
