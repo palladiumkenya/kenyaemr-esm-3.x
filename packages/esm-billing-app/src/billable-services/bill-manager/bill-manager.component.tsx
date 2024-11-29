@@ -26,7 +26,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
     [];
 
   return (
-    <UserHasAccess privilege="coreapps.systemAdministration">
+    <>
       <BillingHeader title={t('billManager', 'Bill Manager')} />
       <div className={styles.billManagerContainer}>
         <ExtensionSlot
@@ -61,7 +61,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
         )}
       </div>
       <WorkspaceContainer overlay contextKey="bill-manager" />
-    </UserHasAccess>
+    </>
   );
 };
 
