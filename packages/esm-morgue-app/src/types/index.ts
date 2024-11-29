@@ -257,3 +257,46 @@ export interface Queue {
 export type UpdateVisitPayload = {
   stopDatetime?: Date;
 };
+
+export interface PaginatedResponse {
+  uuid: string;
+  display: string;
+  identifiers: Identifier[];
+  person: Person;
+}
+
+export interface Identifier {
+  identifier: string;
+  uuid: string;
+  preferred: boolean;
+  location: Location;
+}
+
+export interface Location {
+  uuid: string;
+  name: string;
+}
+
+export interface Person {
+  uuid: string;
+  display: string;
+  gender: string;
+  birthdate: string;
+  dead: boolean;
+  age: number;
+  deathDate: string;
+  causeOfDeath: CauseOfDeath;
+  preferredAddress: PreferredAddress;
+}
+
+export interface CauseOfDeath {
+  uuid: string;
+  display: string;
+}
+
+export interface PreferredAddress {
+  uuid: string;
+  stateProvince: any;
+  countyDistrict: any;
+  address4: any;
+}
