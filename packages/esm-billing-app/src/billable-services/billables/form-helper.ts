@@ -40,7 +40,7 @@ export const formatBillableServicePayloadForSubmission = (
 };
 
 export function mapInputToPayloadSchema(service): BillableFormSchema {
-  const servicePrices: ServicePriceSchema[] = service.servicePrices.map((price: any) => ({
+  const servicePrices: Array<ServicePriceSchema> = service.servicePrices.map((price: any) => ({
     price: price.price,
     paymentMode: {
       uuid: price.paymentMode?.uuid,
