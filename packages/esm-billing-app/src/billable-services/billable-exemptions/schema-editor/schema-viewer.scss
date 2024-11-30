@@ -1,0 +1,32 @@
+@use '@carbon/colors';
+@use '@carbon/type';
+
+.ischemaViewerContainerde {
+  @include type.type-style('body-compact-02');
+  padding: 0;
+  margin: 0;
+}
+.closeDir {
+  vertical-align: middle;
+  margin-right: 5px;
+  color: colors.$red-60;
+}
+.openDir {
+  vertical-align: middle;
+  margin-right: 5px;
+  color: colors.$yellow-60;
+}
+.fileIcon {
+  vertical-align: middle;
+  margin-right: 5px;
+  color: colors.$green-60;
+}
+.treeNode {
+  padding: 5px 10px;
+  margin: 5px 0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.treeNodeSelected {
+  background-color: colors.$green-10;
+}

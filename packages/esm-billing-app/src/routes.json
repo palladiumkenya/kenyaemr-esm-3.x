@@ -146,11 +146,6 @@
       "slot": "billing-dashboard-link-slot"
     },
     {
-      "component": "billableExemptionsLink",
-      "name": "billable-exemptions-link",
-      "slot": "billing-dashboard-link-slot"
-    },
-    {
       "component": "paymentHistoryLink",
       "name": "payment-history-link",
       "slot": "billing-dashboard-link-slot"
@@ -173,6 +168,11 @@
     {
       "component": "chargeableItemsLink",
       "name": "chargeable-items-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
+      "component": "billableExemptionsLink",
+      "name": "billable-exemptions-link",
       "slot": "billing-dashboard-link-slot"
     },
     {
