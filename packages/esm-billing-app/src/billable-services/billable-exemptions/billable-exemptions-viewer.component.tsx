@@ -128,7 +128,7 @@ export const BillableExemptionsViewer = () => {
             <div className={styles.topBtns}>
               {!schema && selectedIndex === 1 && (
                 <Button kind="ghost" onClick={inputDummySchema}>
-                  {t('inputDummySchema', 'Input Dummy Schema')}
+                  {t('inputSampleSchema', 'Input sample schema')}
                 </Button>
               )}
               {schema && selectedIndex === 1 && <ActionButtons schema={schema} />}
