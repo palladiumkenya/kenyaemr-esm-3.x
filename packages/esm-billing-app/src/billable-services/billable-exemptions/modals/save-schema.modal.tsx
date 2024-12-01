@@ -2,9 +2,9 @@ import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ComposedModal, Form, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
-import { saveExemptionSchema, useSystemBillableSetting } from '../hook/useSystemBillableSetting';
+import { saveExemptionSchema, useSystemBillableSetting } from '../../../hooks/useSystemBillableSetting';
 
-import type { Schema } from '../types';
+import type { Schema } from '../../../types';
 import styles from './save-schema-modal.scss';
 
 interface SaveSchemaModalProps {

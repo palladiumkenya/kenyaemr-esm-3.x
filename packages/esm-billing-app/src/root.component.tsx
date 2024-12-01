@@ -13,7 +13,7 @@ import { PaymentPoints } from './payment-points/payment-points.component';
 import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 import PaymentModeHome from './payment-modes/payment-mode-home.component';
-import { BillableExemptions } from './billable-services/billable-exemptions/billable-exemptions.component';
+import { BillableExemptions } from './billable-exemption/billable-exemptions.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';

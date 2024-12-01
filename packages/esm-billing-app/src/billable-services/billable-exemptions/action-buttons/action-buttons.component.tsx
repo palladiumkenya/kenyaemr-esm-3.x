@@ -1,6 +1,6 @@
 import React from 'react';
 import SaveSchemamModal from '../modals/save-schema.modal';
-import type { Schema } from '../types';
+import type { Schema } from '../../../types';
 import styles from './action-buttons.scss';
 
 interface ActionButtonsProps {

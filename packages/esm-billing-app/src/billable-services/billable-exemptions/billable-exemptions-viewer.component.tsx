@@ -16,12 +16,12 @@ import {
 } from '@carbon/react';
 import SchemaEditor from '../billable-exemptions/schema-editor/schema-editor.component';
 import SchemaViewer from '../billable-exemptions/schema-editor/schema-viewer-component';
-import { useSystemBillableSetting } from '../billable-exemptions/hook/useSystemBillableSetting';
+import { useSystemBillableSetting } from '../../hooks/useSystemBillableSetting';
 import ActionButtons from '../billable-exemptions/action-buttons/action-buttons.component';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import type { Schema } from '../billable-exemptions/types';
+import type { Schema } from '../../types';
 import styles from './billable-exemptions.scss';
 
 interface MarkerProps extends IMarker {

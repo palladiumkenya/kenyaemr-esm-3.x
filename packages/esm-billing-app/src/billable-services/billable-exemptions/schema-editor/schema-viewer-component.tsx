@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { Schema } from '../types';
-import AceEditor from 'react-ace';
+import type { Schema } from '../../../types';
 import TreeView from 'react-accessible-treeview';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-github';
