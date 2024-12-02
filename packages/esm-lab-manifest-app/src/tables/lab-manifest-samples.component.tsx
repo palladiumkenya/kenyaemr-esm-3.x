@@ -15,7 +15,15 @@ import {
   TableSelectRow,
 } from '@carbon/react';
 import { ArrowRight, Printer, TrashCan } from '@carbon/react/icons';
-import { ErrorState, formatDate, parseDate, showModal, showSnackbar, usePagination } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  ErrorState,
+  formatDate,
+  parseDate,
+  showModal,
+  showSnackbar,
+  usePagination,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +36,8 @@ import {
 } from '../lab-manifest.resources';
 import { LabManifestSample } from '../types';
 import styles from './lab-manifest-table.scss';
+import PatientNameCell from './patient-name-cell.component';
+import PatientCCCNumbercell from './patient-ccc-no-cell.component';
 
 interface LabManifestSamplesProps {
   manifestUuid: string;
@@ -45,6 +55,10 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
   const headers = [
     {
       header: t('patient', 'Patient'),
+      key: 'patientName',
+    },
+    {
+      header: t('ccc', 'CCC Number'),
       key: 'cccKDODNumber',
     },
     {
@@ -130,7 +144,8 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         sampleType: sample.sampleType ?? '--',
         status: sample.status,
         batchNumber: sample.batchNumber ?? '--',
-        cccKDODNumber: sample?.order?.patient?.identifiers[0]?.identifier ?? '--',
+        patientName: sample?.order?.patient ? <PatientNameCell patient={sample?.order?.patient} /> : '--',
+        cccKDODNumber: sample?.order?.patient ? <PatientCCCNumbercell patient={sample?.order?.patient} /> : '--',
         dateRequested: sample.dateSent ? formatDate(parseDate(sample.dateSent)) : '--',
         resultDate: sample.resultDate ? formatDate(parseDate(sample.resultDate)) : '--',
         result: sample.result ?? '--',

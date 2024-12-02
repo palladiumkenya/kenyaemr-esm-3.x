@@ -28,8 +28,14 @@ export const configSchema = {
       { sampleType: 'DBS', labManifestType: ['1'] },
     ],
   },
+  cccNumberIdentifierType: {
+    _type: Type.UUID,
+    _description: 'List of sample types and list of manifest type id it applies',
+    _default: '05ee9cf4-7242-4a17-b4d4-00f707265c8a',
+  },
 };
 export interface LabManifestConfig {
   labmanifestTypes: Array<{ id: number; type: string }>;
   sampleTypes: Array<{ sampleType: string; labManifestType: Array<string> }>;
+  cccNumberIdentifierType: string;
 }
