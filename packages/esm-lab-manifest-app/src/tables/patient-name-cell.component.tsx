@@ -5,11 +5,11 @@ import usePatient from '../hooks/usePatient';
 import { InlineLoading } from '@carbon/react';
 
 type Props = {
-  patient: Order['patient'];
+  patientUuid: string;
 };
 
-const PatientNameCell: React.FC<Props> = ({ patient: { uuid, identifiers } }) => {
-  const { isLoading, patient } = usePatient(uuid);
+const PatientNameCell: React.FC<Props> = ({ patientUuid }) => {
+  const { isLoading, patient } = usePatient(patientUuid);
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient Summary';
 
   if (isLoading) {
@@ -17,7 +17,10 @@ const PatientNameCell: React.FC<Props> = ({ patient: { uuid, identifiers } }) =>
   }
 
   return (
-    <ConfigurableLink to={patientChartUrl} templateParams={{ patientUuid: uuid }} style={{ textDecoration: 'none' }}>
+    <ConfigurableLink
+      to={patientChartUrl}
+      templateParams={{ patientUuid: patientUuid }}
+      style={{ textDecoration: 'none' }}>
       {patient?.person?.display}
     </ConfigurableLink>
   );

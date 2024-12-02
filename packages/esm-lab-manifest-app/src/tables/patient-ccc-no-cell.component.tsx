@@ -6,11 +6,11 @@ import { useConfig } from '@openmrs/esm-framework';
 import { LabManifestConfig } from '../config-schema';
 
 type Props = {
-  patient: Order['patient'];
+  patientUuid: string;
 };
 
-const PatientCCCNumbercell: React.FC<Props> = ({ patient: { uuid, identifiers } }) => {
-  const { isLoading, patient } = usePatient(uuid);
+const PatientCCCNumbercell: React.FC<Props> = ({ patientUuid }) => {
+  const { isLoading, patient } = usePatient(patientUuid);
   const { cccNumberIdentifierType } = useConfig<LabManifestConfig>();
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient Summary';
 

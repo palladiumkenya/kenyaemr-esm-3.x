@@ -76,6 +76,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
                 dateFormat="d/m/Y"
                 id="startDate"
                 datePickerType="single"
+                className={styles.datePickerInput}
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
@@ -97,6 +98,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
               <DatePicker
                 value={field.value}
                 onChange={field.onChange}
+                className={styles.datePickerInput}
                 dateFormat="d/m/Y"
                 id="endDate"
                 datePickerType="single"
@@ -146,6 +148,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
                 dateFormat="d/m/Y"
                 id="dispatchDate"
                 datePickerType="single"
+                className={styles.datePickerInput}
                 {...field}
                 invalid={form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>

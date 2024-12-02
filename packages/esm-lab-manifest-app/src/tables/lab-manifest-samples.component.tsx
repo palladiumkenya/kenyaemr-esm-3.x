@@ -58,7 +58,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
       key: 'patientName',
     },
     {
-      header: t('ccc', 'CCC Number'),
+      header: t('cccKDODNumber', 'CCC/KDOD Number'),
       key: 'cccKDODNumber',
     },
     {
@@ -144,8 +144,16 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         sampleType: sample.sampleType ?? '--',
         status: sample.status,
         batchNumber: sample.batchNumber ?? '--',
-        patientName: sample?.order?.patient ? <PatientNameCell patient={sample?.order?.patient} /> : '--',
-        cccKDODNumber: sample?.order?.patient ? <PatientCCCNumbercell patient={sample?.order?.patient} /> : '--',
+        patientName: sample?.order?.patient?.uuid ? (
+          <PatientNameCell patientUuid={sample?.order?.patient?.uuid} />
+        ) : (
+          '--'
+        ),
+        cccKDODNumber: sample?.order?.patient ? (
+          <PatientCCCNumbercell patientUuid={sample?.order?.patient?.uuid} />
+        ) : (
+          '--'
+        ),
         dateRequested: sample.dateSent ? formatDate(parseDate(sample.dateSent)) : '--',
         resultDate: sample.resultDate ? formatDate(parseDate(sample.resultDate)) : '--',
         result: sample.result ?? '--',

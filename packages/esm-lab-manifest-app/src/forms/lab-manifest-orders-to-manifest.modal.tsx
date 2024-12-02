@@ -17,8 +17,8 @@ import { showSnackbar, useConfig } from '@openmrs/esm-framework';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
 import { z } from 'zod';
+import { LabManifestConfig } from '../config-schema';
 import { useLabManifest } from '../hooks';
 import {
   addOrderToManifest,
@@ -28,7 +28,6 @@ import {
 import { ActiveRequestOrder } from '../types';
 import ActiveOrdersSelectionPreview from './active-order-selection-preview';
 import styles from './lab-manifest-form.scss';
-import { LabManifestConfig } from '../config-schema';
 
 interface LabManifestOrdersToManifestFormProps {
   onClose: () => void;
@@ -54,7 +53,6 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
 }) => {
   const { t } = useTranslation();
   const form = useForm<OrderToManifestFormType>({
-    defaultValues: {},
     resolver: zodResolver(labManifestOrderToManifestFormSchema),
   });
   const { sampleTypes } = useConfig<LabManifestConfig>();
@@ -67,15 +65,27 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
       );
       results.forEach((res) => {
         if (res.status === 'fulfilled') {
-          showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Order added succesfully' });
+          showSnackbar({
+            title: 'Success',
+            kind: 'success',
+            subtitle: t('manifestorderAddSuccess', 'Order added succesfully'),
+          });
         } else {
-          showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding order to the manifest' });
+          showSnackbar({
+            title: 'Failure',
+            kind: 'error',
+            subtitle: t('manifestOrderError', 'Error adding order to the manifest') + ` ${res.reason}`,
+          });
         }
       });
       mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
       onClose();
     } catch (error) {
-      showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error adding orders to the manifest' });
+      showSnackbar({
+        title: 'Failure',
+        kind: 'error',
+        subtitle: t('manifestOrderError', 'Error adding order to the manifest') + ` ${error?.message}`,
+      });
     }
   };
 
@@ -112,12 +122,13 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
               />
             </Column>
             <Row className={styles.datePickersRow}>
-              <Column className={styles.datePickerInput}>
+              <Column className={styles.inputRow}>
                 <Controller
                   control={form.control}
                   name="sampleCollectionDate"
                   render={({ field }) => (
                     <DatePicker
+                      className={styles.datePickerInput}
                       dateFormat="d/m/Y"
                       id="sampleCollectionDate"
                       datePickerType="single"
@@ -129,17 +140,19 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
                         invalidText={form.formState.errors[field.name]?.message}
                         placeholder="mm/dd/yyyy"
                         labelText={t('sampleCollectionDate', 'Sample collection date')}
+                        size="xl"
                       />
                     </DatePicker>
                   )}
                 />
               </Column>
-              <Column className={styles.datePickerInput}>
+              <Column className={styles.inputRow}>
                 <Controller
                   control={form.control}
                   name="sampleSeparationDate"
                   render={({ field }) => (
                     <DatePicker
+                      className={styles.datePickerInput}
                       dateFormat="d/m/Y"
                       id="sampleSeparationDate"
                       datePickerType="single"
@@ -151,6 +164,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
                         invalidText={form.formState.errors[field.name]?.message}
                         placeholder="mm/dd/yyyy"
                         labelText={t('sampleSeparationDate', 'Sample seperation date')}
+                        size="xl"
                       />
                     </DatePicker>
                   )}
