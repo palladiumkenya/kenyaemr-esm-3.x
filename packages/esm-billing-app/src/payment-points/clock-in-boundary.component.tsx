@@ -4,7 +4,8 @@ import { useClockInStatus } from './use-clock-in-status';
 
 // Wrap this component around each place where a user should be clocked in to access
 export const ClockInBoundary = ({ children }: { children: React.ReactNode }) => {
-  const { isClockedInSomewhere, isLoading } = useClockInStatus();
+  const { isClockedInSomewhere, isLoading, error } = useClockInStatus();
+
   const openClockInModal = () => {
     const dispose = showModal('clock-in-modal', {
       closeModal: () => dispose(),
@@ -15,10 +16,19 @@ export const ClockInBoundary = ({ children }: { children: React.ReactNode }) => 
     if (isLoading) {
       return;
     }
+
+    if (error) {
+      return;
+    }
+
     if (!isClockedInSomewhere) {
       openClockInModal();
     }
-  }, [isClockedInSomewhere, isLoading]);
+  }, [error, isClockedInSomewhere, isLoading]);
+
+  if (error) {
+    return null;
+  }
 
   return <>{children}</>;
 };
