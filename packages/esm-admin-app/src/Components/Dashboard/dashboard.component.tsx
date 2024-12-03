@@ -2,8 +2,8 @@ import React from 'react';
 import Header from '../Header/header.component';
 import { useTranslation } from 'react-i18next';
 import { Layer, ComboButton, MenuItem } from '@carbon/react';
-import { Add, WatsonHealthScalpelSelect } from '@carbon/react/icons';
 import styles from './dashboard.scss';
+import LogTable from '../table/operation-log-table.component';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -18,6 +18,9 @@ const Dashboard: React.FC = () => {
           <MenuItem label={t('recreateDatatools', 'Recreate datatools')} />
           <MenuItem label={t('refreshDwapi', 'Refresh DWAPI tables')} />
         </ComboButton>
+      </Layer>
+      <Layer className={styles.tableLayer}>
+        <LogTable />
       </Layer>
     </div>
   );

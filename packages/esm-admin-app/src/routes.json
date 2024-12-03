@@ -9,7 +9,7 @@
   "pages": [
     {
       "component": "root",
-      "route": "etl-administration",
+      "route": "admin",
       "online": true,
       "offline": true
     }
