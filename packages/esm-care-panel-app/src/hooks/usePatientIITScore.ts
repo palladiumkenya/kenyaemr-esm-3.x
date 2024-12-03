@@ -8,7 +8,7 @@ const usePatientIITScore = (patientUuid: string) => {
   const url = `${restBaseUrl}/keml/patientiitscore?patientUuid=${patientUuid}`;
   const { data, error, isLoading } = useSWR<FetchResponse<IITRiskScore>>(url, openmrsFetch);
 
-  const riskScore = useMemo(() => data?.data, [patientUuid, data]);
+  const riskScore = useMemo(() => data?.data, [data]);
   return {
     isLoading,
     error,
