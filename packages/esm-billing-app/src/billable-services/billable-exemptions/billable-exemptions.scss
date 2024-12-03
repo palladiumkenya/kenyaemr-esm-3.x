@@ -1,0 +1,75 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  padding: layout.$spacing-05 layout.$spacing-10;
+  display: flex;
+  flex-direction: column;
+}
+
+.grid {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+  max-width: 100%;
+
+  :global(.cds--tabs__nav-item--selected) {
+    border-bottom: 2px solid var(--cds-border-interactive, colors.$teal-70);
+    outline: none !important;
+  }
+}
+
+.column {
+  margin-left: 0;
+  margin-right: 0;
+}
+.errorNotification {
+  min-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  button {
+    margin-left: layout.$spacing-05;
+  }
+}
+
+.schemaName {
+  @include type.type-style('heading-03');
+}
+
+.editorContainer {
+  padding: layout.$spacing-05;
+
+  :global(.ace_editor .ace_content .ace_layer .error) {
+    position: absolute;
+    background-color: colors.$red-60;
+    border-radius: 0;
+  }
+}
+
+.heading {
+  display: flex;
+  margin-right: 1rem;
+  align-items: center;
+}
+.tabHeading {
+  display: flex;
+  align-items: center;
+  @include type.type-style('heading-compact-01');
+  min-height: 2.5rem;
+  width: 100%;
+  padding: 0.75rem;
+}
+
+.topBtns {
+  display: flex;
+  align-items: center;
+}
