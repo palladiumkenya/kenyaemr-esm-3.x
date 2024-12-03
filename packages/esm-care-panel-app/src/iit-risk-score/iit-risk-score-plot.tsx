@@ -55,10 +55,18 @@ const CarePanelRiskScorePlot: React.FC<CarePanelRiskScorePlotProps> = ({ patient
       </center>
       <div style={{ padding: '1rem' }}>
         <LineChart
-          data={patientRiskScore.map((risk) => ({
-            ...risk,
-            evaluationDate: formatDate(parseDate(risk.evaluationDate)),
-          }))}
+          data={
+            riskScore?.riskScore && !riskScore?.riskScore.includes('-')
+              ? [
+                  {
+                    evaluationDate: riskScore.evaluationDate,
+                    riskScore: Number(riskScore?.riskScore?.split('%')[0]?.trim()),
+                    description: riskScore?.description,
+                    riskFactors: riskScore?.riskFactors,
+                  },
+                ]
+              : []
+          }
           options={options}
         />
       </div>

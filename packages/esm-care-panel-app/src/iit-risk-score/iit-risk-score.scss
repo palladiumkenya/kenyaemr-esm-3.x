@@ -32,7 +32,7 @@
     left: 0;
   }
 
-  &>span {
+  & > span {
     @include type.type-style('body-01');
   }
 }
