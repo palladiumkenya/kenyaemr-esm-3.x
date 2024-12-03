@@ -16,7 +16,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PaymentPoint } from '../../types';
-import { clockIn, clockOut, usePaymentPoints, useProviderUUID, useTimeSheets } from '../payment-points.resource';
+import { clockIn, clockOut, useActiveSheet, usePaymentPoints, useProviderUUID } from '../payment-points.resource';
 import { useClockInStatus } from '../use-clock-in-status';
 
 const schema = z.object({
@@ -26,7 +26,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint?: PaymentPoint }) => {
-  const { mutate } = useTimeSheets();
+  const { mutate } = useActiveSheet();
   const { providerUUID, isLoading, error } = useProviderUUID();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);

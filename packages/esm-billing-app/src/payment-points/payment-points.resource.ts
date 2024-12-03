@@ -57,6 +57,26 @@ export const useTimeSheets = () => {
   };
 };
 
+export const useActiveSheet = () => {
+  const { providerUUID, isLoading: isLoadingProviderUUID, error: providerUUIDError } = useProviderUUID();
+
+  const url = `/ws/rest/v1/cashier/timesheet?v=full&getProviderOpenTimesheet=true&cashier=${providerUUID}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{
+    data: { results: Timesheet[] };
+  }>(providerUUID ? url : undefined, openmrsFetch, {
+    errorRetryCount: 3,
+  });
+
+  return {
+    timesheets: data?.data.results.filter((r) => Boolean(r)) ?? [],
+    error: error || providerUUIDError,
+    isLoading: isLoading || isLoadingProviderUUID,
+    isValidating,
+    mutate,
+  };
+};
+
 export const clockIn = (payload: { cashier: string; cashPoint: string; clockIn: string }) => {
   const url = `/ws/rest/v1/cashier/timesheet`;
   return openmrsFetch(url, {
