@@ -4,6 +4,7 @@ import usePatient from '../hooks/usePatient';
 import { InlineLoading } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { LabManifestConfig } from '../config-schema';
+import useIsKDoDSite from '../hooks/useIsKDoDSite';
 
 type Props = {
   patientUuid: string;
@@ -11,13 +12,17 @@ type Props = {
 
 const PatientCCCNumbercell: React.FC<Props> = ({ patientUuid }) => {
   const { isLoading, patient } = usePatient(patientUuid);
-  const { cccNumberIdentifierType } = useConfig<LabManifestConfig>();
-  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient Summary';
+  const {
+    patientIdentifierTypes: { cccNumberIdentifierType, kdodIdentifierType },
+  } = useConfig<LabManifestConfig>();
+  const { isKDoDSite, error, isLoading: siteLoading } = useIsKDoDSite();
 
-  if (isLoading) {
+  if (isLoading || siteLoading) {
     return <InlineLoading status="active" iconDescription="Loading" />;
   }
-  return <>{patient?.identifiers?.find((id) => id.identifierType.uuid === cccNumberIdentifierType)?.identifier}</>;
+
+  const identifierType = isKDoDSite ? kdodIdentifierType : cccNumberIdentifierType;
+  return <>{patient?.identifiers?.find((id) => id.identifierType.uuid === identifierType)?.identifier ?? '--'}</>;
 };
 
 export default PatientCCCNumbercell;
