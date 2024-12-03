@@ -1,3 +1,14 @@
 {
-
+  "completionStatus": "Completion status",
+  "endTime": "End time",
+  "etlAdministration": "ETL Administration",
+  "etlOperation": "ETL operations",
+  "etlOperationLog": "ETL Operations Log",
+  "home": "Home",
+  "procedure": "Procedure",
+  "recreateDatatools": "Recreate datatools",
+  "recreateTables": "Recreate tables",
+  "refreshDwapi": "Refresh DWAPI tables",
+  "refreshTables": "Refresh tables",
+  "startTime": "Start time"
 }
