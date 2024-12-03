@@ -5,6 +5,7 @@ import React from 'react';
 import usePatientIITScore from '../hooks/usePatientIITScore';
 import styles from './iit-risk-score.scss';
 import { patientRiskScore } from './risk-score.mock';
+import { useTranslation } from 'react-i18next';
 
 interface CarePanelRiskScorePlotProps {
   patientUuid: string;
@@ -12,6 +13,7 @@ interface CarePanelRiskScorePlotProps {
 
 const CarePanelRiskScorePlot: React.FC<CarePanelRiskScorePlotProps> = ({ patientUuid }) => {
   const { isLoading, error, riskScore } = usePatientIITScore(patientUuid);
+  const { t } = useTranslation();
   const options: LineChartOptions = {
     title: 'KenyaHMIS ML Model',
     legend: { enabled: false },
@@ -46,9 +48,9 @@ const CarePanelRiskScorePlot: React.FC<CarePanelRiskScorePlotProps> = ({ patient
 
   return (
     <div className={styles.riskScoreCard}>
-      <span className={styles.sectionHeader}>IIT Risk Score Trend</span>
+      <span className={styles.sectionHeader}>{t('iitRiskScoreTrend', 'IIT Risk Score Trend')}</span>
       <center>
-        <strong>Latest risk score: </strong>
+        <strong>{t('latestRiskScore', 'Latest risk score')}: </strong>
         {`${riskScore?.riskScore} (${riskScore?.description})`}
       </center>
       <div style={{ padding: '1rem' }}>

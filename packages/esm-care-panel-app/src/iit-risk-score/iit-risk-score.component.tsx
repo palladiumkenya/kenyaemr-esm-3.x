@@ -45,24 +45,24 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
   }
   return (
     <div className={styles.riskScoreCard}>
-      <span className={styles.sectionHeader}>IIT Risk Score</span>
+      <span className={styles.sectionHeader}>{t('iitRiskscore', 'IIT Risk Score')}</span>
       <Row style={{ display: 'flex' }}>
         <Column lg={4} md={4} sm={4} className={styles.riskScoreCardItem}>
-          <strong>Risk Score:</strong>
+          <strong>{t('riskScore', 'Risk Score')}:</strong>
           <p>{`${riskScore?.riskScore ?? 0}`}</p>
         </Column>
         <Column lg={4} md={4} sm={4} className={styles.riskScoreCardItem}>
-          <strong>Evaluation Date:</strong>
+          <strong>{t('evaluationDate', 'Evaluation Date')}:</strong>
           <p>{formatDate(parseDate(riskScore?.evaluationDate))}</p>
         </Column>
       </Row>
       <Row style={{ display: 'flex' }}>
         <Column lg={4} md={4} sm={4} className={styles.riskScoreCardItem}>
-          <strong>Description:</strong>
+          <strong>{t('description', 'Description')}:</strong>
           <p>{riskScore?.description}</p>
         </Column>
         <Column lg={12} md={12} sm={12} className={styles.riskScoreCardItem}>
-          <strong>Risk Factors:</strong>
+          <strong>{t('riskFactors', 'Risk Factors')}:</strong>
           <p>{riskScore?.riskFactors}</p>
         </Column>
       </Row>
