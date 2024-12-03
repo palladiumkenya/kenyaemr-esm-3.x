@@ -1,4 +1,4 @@
-import { Type } from '@openmrs/esm-framework';
+import { ConfigSchema, Type } from '@openmrs/esm-framework';
 
 export interface BillingConfig {
   visitAttributeTypes: {
@@ -9,20 +9,43 @@ export interface BillingConfig {
     exemptionCategory: string;
     billPaymentStatus: string;
   };
+  insurancePaymentMethod: string;
   inPatientVisitTypeUuid: string;
   patientExemptionCategories: Array<{ value: string; label: string }>;
   excludedPaymentMode: Array<{ uuid: string; label: string }>;
   enforceBillPayment: boolean;
-  mpesaCallbackUrl: string;
-  shortCode: string;
-  passKey: string;
-  authorizationUrl: string;
-  initiateUrl: string;
   billingStatusQueryUrl: string;
   mpesaAPIBaseUrl: string;
+  hieBaseUrl: string;
+  insuranceSchemes: Array<string>;
+  shaIdentificationNumberUUID: string;
+  cashPointUuid: string;
+  cashierUuid: string;
+  patientBillsUrl: string;
+  nationalIdUUID: string;
+  isPDSLFacility: boolean;
+  concepts: {
+    emergencyPriorityConceptUuid: string;
+  };
+  paymentMethodsUuidsThatShouldNotShowPrompt: Array<string>;
 }
 
-export const configSchema = {
+export const configSchema: ConfigSchema = {
+  isPDSLFacility: {
+    _type: Type.Boolean,
+    _description: 'A flag for PDSL facilities',
+    _default: false,
+  },
+  shaIdentificationNumberUUID: {
+    _type: Type.String,
+    _description: 'Social Health Authority Identification Number',
+    _default: '24aedd37-b5be-4e08-8311-3721b8d5100d',
+  },
+  nationalIdUUID: {
+    _type: Type.String,
+    _description: 'National Identification Number',
+    _default: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
+  },
   inPatientVisitTypeUuid: {
     _type: Type.String,
     _description: 'The visit type uuid for in-patient',
@@ -32,6 +55,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'The base url that will be used to make any backend calls related to mpesa.',
     _default: 'https://billing.kenyahmis.org',
+  },
+  hieBaseUrl: {
+    _type: Type.String,
+    _description: 'HIE Base URL for getting intervensions and benefit packages',
+    _default: 'https://payers.apeiro-digital.com/api/v1',
   },
   visitAttributeTypes: {
     isPatientExempted: {
@@ -65,11 +93,16 @@ export const configSchema = {
       _default: '919b51c9-8e2e-468f-8354-181bf3e55786',
     },
   },
+  insurancePaymentMethod: {
+    _type: Type.String,
+    _description: 'Insurance Payment method UUID',
+    _default: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
+  },
   patientExemptionCategories: {
     _type: Type.Array,
     _elements: {
       value: {
-        _type: Type.UUID,
+        _type: Type.String,
         _description: 'The value of the exemption category',
       },
       label: {
@@ -93,41 +126,60 @@ export const configSchema = {
         _description: 'The label of the payment mode to be excluded',
       },
     },
-    _default: [],
+    _default: [
+      {
+        uuid: 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4',
+        label: 'Waiver',
+      },
+    ],
   },
   enforceBillPayment: {
     _type: Type.Boolean,
     _default: true,
     _description: 'Whether to enforce bill payment or not for patient to receive service',
   },
-  mpesaCallbackUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'MPESA callback Url to receive confirmation payload from MPESA Daraja API',
-  },
-  shortCode: {
-    _type: Type.String,
-    _default: '',
-    _description: 'shortcode used to identify an organization and receive the transaction',
-  },
-  passKey: {
-    _type: Type.String,
-    _default: '',
-    _description: 'Passkey used for generating password for generation of access token to auth APIs',
-  },
-  authorizationUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'MPESA Authenciation url gives you a time bound access token to call allowed APIs.',
-  },
-  initiateUrl: {
-    _type: Type.String,
-    _default: '',
-    _description: 'MPESA Initiator url which Initiates online payment on behalf of a customer.',
-  },
   billingStatusQueryUrl: {
     _type: Type.String,
     _default: '${restBaseUrl}/cashier/billLineItem?orderUuid=${orderUuid}&v=full',
     _description: 'URL to query billing status',
+  },
+  insuranceSchemes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['SHA', 'Jubilee Insurance', 'AAR Insurance', 'Old Mutual Insurance'],
+    _description: 'List of insurance schemes',
+  },
+  cashPointUuid: {
+    _type: Type.String,
+    _description: 'Where bill is generated from',
+    _default: '54065383-b4d4-42d2-af4d-d250a1fd2590',
+  },
+  cashierUuid: {
+    _type: Type.String,
+    _description: 'Who Generated the bill',
+    _default: '54065383-b4d4-42d2-af4d-d250a1fd2590',
+  },
+  patientBillsUrl: {
+    _type: Type.String,
+    _description: 'The url to fetch patient bills',
+    _default:
+      '${restBaseUrl}/cashier/bill?v=custom:(uuid,display,voided,voidReason,adjustedBy,cashPoint:(uuid,name),cashier:(uuid,display),dateCreated,lineItems,patient:(uuid,display))',
+  },
+  concepts: {
+    emergencyPriorityConceptUuid: {
+      _type: Type.String,
+      _description: 'The concept uuid for emergency priority',
+      _default: '037446f4-adfc-40b3-928c-a39a4826b1bf',
+    },
+  },
+  paymentMethodsUuidsThatShouldNotShowPrompt: {
+    _type: Type.Array,
+    _description: 'The payment methods that should not show the billing prompt',
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['beac329b-f1dc-4a33-9e7c-d95821a137a6'],
   },
 };

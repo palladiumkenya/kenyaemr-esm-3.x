@@ -14,15 +14,14 @@ interface CaseManagerResponse {
   results: CaseManager[];
 }
 
-interface RelationshipType {
+export interface RelationshipType {
   uuid: string;
   display: string;
+  displayAIsToB: string;
+  displayBIsToA: string;
 }
 
-interface RelationshipTypeResponse {
-  results: RelationshipType[];
-}
-interface RelationshipTypeResponse {
+export interface RelationshipTypeResponse {
   results: RelationshipType[];
 }
 
@@ -48,14 +47,6 @@ export const useCaseManagers = () => {
   const customRepresentation = 'custom:(uuid,display,person:(uuid))';
   const url = `/ws/rest/v1/provider?v=${customRepresentation}`;
   const { data, error } = useSWRImmutable<{ data: CaseManagerResponse }>(url, openmrsFetch);
-
-  return { data, error };
-};
-
-export const useRelationshipType = () => {
-  const customRepresentation = 'custom:(uuid,display)&q=Case manager';
-  const url = `/ws/rest/v1/relationshiptype?v=${customRepresentation}`;
-  const { data, error } = useSWRImmutable<{ data: RelationshipTypeResponse }>(url, openmrsFetch);
 
   return { data, error };
 };

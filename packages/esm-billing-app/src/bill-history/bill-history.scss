@@ -1,11 +1,14 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   margin: 2rem 0;
 }
-
+.widgetCard {
+  // height: layout.$spacing-10;
+  background-color: $ui-02;
+}
 .billHistoryContainer {
   background-color: $ui-02;
   border: 1px solid $ui-03;

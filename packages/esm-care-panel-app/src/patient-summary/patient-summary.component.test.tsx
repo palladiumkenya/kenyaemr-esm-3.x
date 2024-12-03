@@ -14,13 +14,6 @@ const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatientSummary = usePatientSummary as jest.Mock;
 const mockedUseReactToPrint = jest.mocked(useReactToPrint);
 
-jest.mock('@openmrs/esm-framework', () => {
-  return {
-    ...jest.requireActual('@openmrs/esm-framework'),
-    formatDate: jest.fn().mockImplementation((mockDate) => `${dayjs(mockDate).format('DD-MMM-YYYY')}`),
-  };
-});
-
 jest.mock('react-to-print', () => {
   const originalModule = jest.requireActual('react-to-print');
 
@@ -86,7 +79,7 @@ describe('PatientSummary', () => {
     expect(screen.getByText(mockPatient.weight)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.height)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.bmi)).toBeInTheDocument();
-    expect(screen.getByText(mockPatient.bloodPressure)).toBeInTheDocument();
+    expect(screen.getByText(`${mockPatient.bloodPressure}/${mockPatient.bpDiastolic}`)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.oxygenSaturation)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.pulseRate)).toBeInTheDocument();
     expect(screen.getByText(mockPatient.familyProtection)).toBeInTheDocument();

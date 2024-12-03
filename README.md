@@ -16,7 +16,7 @@ This repository contains frontend modules for the KenyaEMR 3.x. These modules re
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+This monorepo uses [yarn](https://yarnpkg.com).
 
 To install the dependancies, run:
 ```bash

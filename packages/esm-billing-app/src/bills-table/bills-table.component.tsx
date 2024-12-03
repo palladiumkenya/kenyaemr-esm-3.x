@@ -70,6 +70,10 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
       header: t('billedItems', 'Billed Items'),
       key: 'billedItems',
     },
+    {
+      header: t('status', 'Status'),
+      key: 'status',
+    },
   ];
 
   const searchResults = useMemo(() => {
@@ -94,7 +98,7 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
 
   const setBilledItems = (bill) =>
     bill?.lineItems?.reduce(
-      (acc, item) => acc + (acc ? ' & ' : '') + (item.billableService.split(':')[1] || item.item.split(':')[1] || ''),
+      (acc, item) => acc + (acc ? ' & ' : '') + (item?.billableService.split(':')[1] || item?.item.split(':')[1] || ''),
       '',
     );
 
@@ -116,6 +120,7 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
     department: '--',
     billedItems: setBilledItems(bill),
     billingPrice: '--',
+    status: bill.status,
   }));
 
   const handleSearch = useCallback(

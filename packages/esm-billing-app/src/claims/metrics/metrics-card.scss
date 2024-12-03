@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
   flex-grow: 1;
@@ -16,7 +16,6 @@
   border: 0.0625rem solid $ui-03;
   height: 7.875rem;
   padding: spacing.$spacing-05;
-  margin: spacing.$spacing-03 spacing.$spacing-03;
 }
 
 .tileHeader {

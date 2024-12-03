@@ -1,0 +1,32 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.metricsContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 layout.$spacing-05;
+  height: 4rem;
+  margin-bottom: 0 layout.$spacing-05;
+}
+
+.searchInput {
+  flex-grow: 1;
+  margin-right: layout.$spacing-03;
+}
+
+.actionBtn {
+  display: flex;
+  align-items: center;
+  column-gap: layout.$spacing-03;
+  min-width: 200px;
+}
+.comboBox input[type='text'] {
+  background-color: colors.$white;
+  cursor: default;
+}
+.searchInput input[type='text'] {
+  background-color: colors.$white;
+  cursor: default;
+}

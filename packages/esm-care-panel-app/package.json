@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-care-panel-app",
-  "version": "5.2.0",
+  "version": "5.3.7",
   "description": "Patient care panels microfrontend for the OpenMRS SPA",
   "browser": "dist/kenyaemr-esm-care-panel-app.js",
   "main": "src/index.ts",

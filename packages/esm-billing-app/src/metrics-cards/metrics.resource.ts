@@ -1,5 +1,5 @@
-import { calculateTotalAmount, convertToCurrency } from '../helpers';
-import { MappedBill } from '../types';
+import { convertToCurrency } from '../helpers';
+import { MappedBill, PaymentStatus } from '../types';
 
 /**
  * A custom hook for calculating bill metrics.
@@ -9,19 +9,22 @@ import { MappedBill } from '../types';
  *
  * @param {Array<Object>} bills - An array of bill objects. Each bill object should have a `status` and `lineItems` properties.
  *
- * @returns {{
- *   cumulativeBills: string,
- *   pendingBills: string,
- *   paidBills: string
- * }}
  */
 
-export const useBillMetrics = (bills: Array<MappedBill>) => {
-  const { paidTotal, pendingTotal, cumulativeTotal } = calculateBillTotals(bills);
+export const useBillMetrics = (
+  bills: Array<MappedBill>,
+): {
+  totalBills: string;
+  pendingBills: string;
+  paidBills: string;
+  exemptedBills: string;
+} => {
+  const { paidTotal, pendingTotal, cumulativeTotal, exemptedTotal } = calculateBillTotals(bills);
   return {
-    cumulativeBills: convertToCurrency(cumulativeTotal),
+    totalBills: convertToCurrency(cumulativeTotal),
     pendingBills: convertToCurrency(pendingTotal),
     paidBills: convertToCurrency(paidTotal),
+    exemptedBills: convertToCurrency(exemptedTotal),
   };
 };
 
@@ -29,17 +32,21 @@ const calculateBillTotals = (bills: Array<MappedBill>) => {
   let paidTotal = 0;
   let pendingTotal = 0;
   let cumulativeTotal = 0;
+  let exemptedTotal = 0;
 
   bills.forEach((bill) => {
-    if (bill.status === 'PAID') {
-      paidTotal += bill.totalAmount;
-    } else if (bill.status === 'PENDING') {
-      pendingTotal += bill.totalAmount;
+    const amount = bill.totalAmount || 0; // Ensure totalAmount is a valid number
+    if (bill.status === PaymentStatus.PAID) {
+      paidTotal += amount;
+    } else if (bill.status === PaymentStatus.PENDING) {
+      pendingTotal += amount;
+    } else if (bill.status === PaymentStatus.EXEMPTED) {
+      exemptedTotal += amount;
     }
-    cumulativeTotal += bill.totalAmount; // Add to cumulative total regardless of status
+    cumulativeTotal += amount; // Add to cumulative total regardless of status
   });
 
-  return { paidTotal, pendingTotal, cumulativeTotal };
+  return { paidTotal, pendingTotal, cumulativeTotal, exemptedTotal };
 };
 
 export default calculateBillTotals;

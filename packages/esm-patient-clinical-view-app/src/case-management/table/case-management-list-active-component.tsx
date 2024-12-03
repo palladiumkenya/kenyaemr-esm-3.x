@@ -37,14 +37,12 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
 
   const { data: activeCasesData, error: activeCasesError } = useActivecases(caseManagerPersonUuid);
 
-  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient%20Summary';
+  const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/case-management-encounters';
 
   const headers = [
-    { key: 'sno', header: t('s/No', 'S/No') },
     { key: 'names', header: t('names', 'Names') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
-    { key: 'action', header: t('action', 'Action') },
   ];
 
   const filteredCases = activeCasesData?.data.results.filter(
@@ -58,7 +56,6 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
     ?.slice((currentPage - 1) * pageSize, currentPage * pageSize)
     .map((caseData, index) => ({
       id: caseData.uuid,
-      sno: (currentPage - 1) * pageSize + index + 1,
       names: (
         <ConfigurableLink
           style={{ textDecoration: 'none', maxWidth: '50%' }}
@@ -69,12 +66,6 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
       ),
       dateofstart: new Date(caseData.startDate).toLocaleDateString(),
       dateofend: caseData.endDate ? new Date(caseData.endDate).toLocaleDateString() : '-',
-      action: (
-        <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
-          {/* <OverflowMenuItem itemText="Transfer Case" />
-          <OverflowMenuItem hasDivider isDelete itemText="End Relationship" /> */}
-        </OverflowMenu>
-      ),
     }));
 
   useEffect(() => {

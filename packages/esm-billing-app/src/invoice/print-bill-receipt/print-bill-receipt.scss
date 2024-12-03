@@ -1,0 +1,21 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.title {
+  @include type.type-style('heading-02');
+}
+
+.previewFrame {
+  width: 100%;
+  height: 60vh;
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+.btn {
+  min-width: 100%;
+  @include type.type-style('heading-02');
+}

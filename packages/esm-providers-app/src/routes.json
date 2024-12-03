@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "extensions": [
+    {
+      "component": "providersDashboardLink",
+      "name": "providers-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "providers",
+        "title": "providers",
+        "slot": "providers-dashboard-slot"
+      },
+      "featureFlag": "healthInformationExchange"
+    },
+    {
+      "component": "root",
+      "name": "providers-dashboard-root",
+      "slot": "providers-dashboard-slot"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "provider-register-form",
+      "component": "providerDetailsWorkspace",
+      "title": "provider Register Form",
+      "type": "other-form"
+    }
+  ],
+  "modals": [
+    {
+      "component": "hwrConfirmationModal",
+      "name": "hwr-confirmation-modal"
+    },
+    {
+      "component": "hwrEmptymodel",
+      "name": "hwr-empty-modal"
+    },
+   {
+      "component": "hwrSyncmodal",
+      "name": "hwr-sync-modal"
+    }
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "providers"
+    },
+    {
+      "component": "providerMessageAlert",
+      "route": true
+    }
+  ]
+}

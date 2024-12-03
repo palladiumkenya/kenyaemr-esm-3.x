@@ -1,0 +1,19 @@
+@use '@carbon/layout';
+
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+
+  & > section {
+    position: relative;
+    margin-bottom: layout.$spacing-01;
+  }
+}
+
+.iconMarginLeft {
+  margin-left: layout.$spacing-05;
+}
+
+.bulkUploadButton {
+  margin-right: layout.$spacing-05;
+}

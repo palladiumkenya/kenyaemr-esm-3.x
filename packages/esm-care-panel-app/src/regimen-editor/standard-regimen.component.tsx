@@ -4,13 +4,15 @@ import { Select, SelectItem } from '@carbon/react';
 import { useStandardRegimen } from '../hooks/useStandardRegimen';
 import styles from './standard-regimen.scss';
 import { usePatient } from '@openmrs/esm-framework';
-import { filterRegimenData, calculateAge } from './utils';
+import { calculateAge, filterRegimenData } from './utils';
 
 interface StandardRegimenProps {
   category: string;
-  setStandardRegimen: (value: any) => void;
-  setStandardRegimenLine: (value: any) => void;
+  setStandardRegimen: (value: string) => void;
+  setStandardRegimenLine: (value: string) => void;
   selectedRegimenType: string;
+  visitDate: Date;
+  errors: { [key: string]: string };
 }
 
 const StandardRegimen: React.FC<StandardRegimenProps> = ({
@@ -18,6 +20,8 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
   setStandardRegimen,
   setStandardRegimenLine,
   selectedRegimenType,
+  visitDate,
+  errors,
 }) => {
   const { t } = useTranslation();
   const { standardRegimen, isLoading, error } = useStandardRegimen();
@@ -27,7 +31,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
   const [selectedRegimens, setSelectedRegimens] = useState([]);
   const matchingCategory = standardRegimen.find((item) => item.categoryCode === category);
   const { patient } = usePatient();
-  const patientAge = calculateAge(patient?.birthDate);
+  const patientAge = calculateAge(patient?.birthDate, visitDate);
   const filteredRegimenLineByAge = filterRegimenData(matchingCategory?.category, patientAge);
 
   useEffect(() => {
@@ -58,7 +62,8 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
         {selectedRegimenType === 'standardUuid' ? (
           <Select
             id="regimenLine"
-            invalidText="Required"
+            invalid={!!errors?.standardRegimenLine}
+            invalidText={errors?.standardRegimenLine}
             labelText={t('selectRegimenLine', 'Select Regimen Line')}
             className={styles.inputContainer}
             value={selectedRegimenLine}
@@ -66,7 +71,7 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
             {!selectedRegimenLine || selectedRegimenLine == '--' ? (
               <SelectItem text={t('selectRegimenLine', 'Select Regimen Line')} value="" />
             ) : null}
-            {filteredRegimenLineByAge.map((line) => (
+            {filteredRegimenLineByAge?.map((line) => (
               <SelectItem key={line.regimenline} text={line.regimenline} value={line.regimenLineValue}>
                 {line.regimenline}
               </SelectItem>
@@ -77,7 +82,8 @@ const StandardRegimen: React.FC<StandardRegimenProps> = ({
         {selectedRegimenLine && (
           <Select
             id="regimen"
-            invalidText="Required"
+            invalid={!!errors?.standardRegimen}
+            invalidText={errors?.standardRegimen}
             labelText={t('selectRegimen', 'Select Regimen')}
             className={styles.inputContainer}
             value={selectedRegimen}

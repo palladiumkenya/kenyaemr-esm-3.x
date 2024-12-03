@@ -13,12 +13,13 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   ErrorState,
   isDesktop,
   launchWorkspace,
+  useConfig,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
@@ -28,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import useContacts from '../hooks/useContacts';
 import styles from './contact-list.scss';
 import HIVStatus from './hiv-status.component';
+import { deleteRelationship } from '../relationships/relationship.resources';
 
 interface ContactListProps {
   patientUuid: string;
@@ -38,6 +40,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('contactList', 'Contact list');
   const layout = useLayoutType();
+
   const { contacts, error, isLoading } = useContacts(patientUuid);
   const { results, totalPages, currentPage, goTo } = usePagination(contacts, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
@@ -87,11 +90,23 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       header: t('pnsAproach', 'PNS Aproach'),
       key: 'pnsAproach',
     },
+    {
+      header: t('ipvOutcome', 'IPV Outcome'),
+      key: 'ipvOutcome',
+    },
+    { header: t('actions', 'Actions'), key: 'actions' },
   ];
 
   const handleAddContact = () => {
     launchWorkspace('contact-list-form', {
       workspaceTitle: 'Contact Form',
+      patientUuid,
+    });
+  };
+
+  const handleEditRelationship = (relationShipUuid: string) => {
+    launchWorkspace('relationship-update-form', {
+      relationShipUuid,
     });
   };
 
@@ -119,6 +134,25 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         baseLineivStatus: relation.baselineHIVStatus ?? '--',
         livingWithClient: relation.livingWithClient ?? '--',
         pnsAproach: relation.pnsAproach ?? '--',
+        ipvOutcome: relation.ipvOutcome ?? '--',
+        actions: (
+          <>
+            <Button
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Edit"
+              onClick={() => handleEditRelationship(relation.uuid)}
+            />
+            <Button
+              renderIcon={TrashCan}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Delete"
+              onClick={() => deleteRelationship(relation.uuid)}
+            />
+          </>
+        ),
       };
     }) ?? [];
 
@@ -141,7 +175,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
             {t('noContactToDisplay', 'There is no contact data to display for this patient.')}
           </p>
           <Button onClick={handleAddContact} renderIcon={Add} kind="ghost">
-            {t('recordContact', 'Record Contact')}
+            {t('addPNSContact', 'Add PNS Contact')}
           </Button>
         </Tile>
       </Layer>
@@ -155,8 +189,6 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         </Button>
       </CardHeader>
       <DataTable
-        useZebraStyles
-        size="sm"
         rows={tableRows ?? []}
         headers={headers}
         render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (

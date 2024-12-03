@@ -1,24 +1,40 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { Session } from '@openmrs/esm-framework';
+import omit from 'lodash/omit';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
-import { Enrollment, HTSEncounter, Patient } from '../types';
+import { relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
+import { Enrollment, HTSEncounter } from '../types';
 import { replaceAll } from '../utils/expression-helper';
+export const BOOLEAN_YES = '1065';
+export const BOOLEAN_NO = '1066';
 
-export const ContactListFormSchema = z.object({
-  listingDate: z.date({ coerce: true }),
-  givenName: z.string().min(1, 'Required'),
-  middleName: z.string().min(1, 'Required'),
-  familyName: z.string().min(1, 'Required'),
-  gender: z.enum(['M', 'F']),
-  dateOfBirth: z.date({ coerce: true }).max(new Date(), 'Must not be a future date'),
-  maritalStatus: z.string().optional(),
-  address: z.string().optional(),
-  phoneNumber: z.string().optional(),
-  relationshipToPatient: z.string().uuid('Invalid relationship type').min(1, 'Required'),
-  livingWithClient: z.string().optional(),
-  baselineStatus: z.string().optional(),
-  preferedPNSAproach: z.string().optional(),
-});
+export const ContactListFormSchema = relationshipFormSchema
+  .extend({
+    physicalAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+    threatened: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+    sexualAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+    livingWithClient: z.string().optional(),
+    baselineStatus: z.string().optional(),
+    preferedPNSAproach: z.string().optional(),
+    ipvOutCome: z.enum(['True', 'False']).optional(),
+  })
+  .refine(
+    (data) => {
+      return !(data.mode === 'search' && !data.personB);
+    },
+    { message: 'Required', path: ['personB'] },
+  )
+  .refine(
+    (data) => {
+      return !(data.mode === 'create' && !data.personBInfo);
+    },
+    { path: ['personBInfo'], message: 'Please provide patient information' },
+  );
+
+export const contactIPVOutcomeOptions = [
+  { label: 'True', value: 'True' },
+  { label: 'False', value: 'False' },
+];
 
 export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
   encounters: HTSEncounter[],
@@ -47,54 +63,27 @@ export const getHivStatusBasedOnEnrollmentAndHTSEncounters = (
   return 'Negative';
 };
 
-const fetcher = async <T = any,>(url: string, payload: T) => {
-  const response = await openmrsFetch(url, {
-    method: 'POST',
-    body: JSON.stringify(payload),
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-  if (response.ok) {
-    return await response.json();
-  }
-  throw new Error(`Fetch failed with status ${response.status}`);
-};
-
 export const saveContact = async (
-  {
-    givenName,
-    middleName,
-    familyName,
-    gender,
-    address,
-    baselineStatus,
-    dateOfBirth,
-    listingDate,
-    livingWithClient,
-    maritalStatus,
-    phoneNumber,
-    preferedPNSAproach,
-    relationshipToPatient,
-  }: z.infer<typeof ContactListFormSchema>,
-  patientUuid: string,
-  encounter: Record<string, any>,
+  data: z.infer<typeof ContactListFormSchema>,
   config: ConfigObject,
+  session: Session,
 ) => {
-  const results: {
-    step: 'person' | 'relationship' | 'obs' | 'patient';
-    status: 'fulfilled' | 'rejected';
-    message: string;
-  }[] = [];
-  // Create person payload
-  const personPayload = {
-    names: [{ givenName, middleName, familyName }],
-    gender,
-    birthdate: dateOfBirth,
-    addresses: address ? [{ preferred: true, address1: address }] : undefined,
-    dead: false,
-    attributes: [
+  const { baselineStatus, ipvOutCome, preferedPNSAproach, livingWithClient } = data;
+
+  // Save contact
+  await saveRelationship(
+    omit(data, [
+      'baselineStatus',
+      'ipvOutCome',
+      'physicalAssault',
+      'preferedPNSAproach',
+      'livingWithClient',
+      'sexualAssault',
+      'threatened',
+    ]),
+    config,
+    session,
+    [
       // Add optional baseline HIV Status attrobute
       ...(baselineStatus
         ? [
@@ -105,18 +94,14 @@ export const saveContact = async (
           ]
         : []),
       // Add Optional Telephone contact attribute
-      ...(phoneNumber
+      ...(data.mode === 'create'
         ? [
             {
-              attributeType: config.contactPersonAttributesUuid.telephone,
-              value: phoneNumber,
+              attributeType: config.contactPersonAttributesUuid.contactCreated,
+              value: BOOLEAN_YES,
             },
           ]
         : []),
-      {
-        attributeType: config.contactPersonAttributesUuid.contactCreated,
-        value: '1065',
-      },
       // Add Optional Prefered PNS Aproach attribute
       ...(preferedPNSAproach
         ? [
@@ -135,82 +120,14 @@ export const saveContact = async (
             },
           ]
         : []),
+      ...(ipvOutCome
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.contactIPVOutcome,
+              value: ipvOutCome,
+            },
+          ]
+        : []),
     ],
-  };
-  try {
-    // Generate Openmrs Id for the patient
-    const identifier = await generateOpenmrsIdentifier(config.openmrsIdentifierSourceUuid);
-    // Create patient
-    const patient: Patient = await fetcher(`/ws/rest/v1/patient`, {
-      person: personPayload,
-      identifiers: [
-        {
-          identifier: identifier.data.identifier,
-          identifierType: config.openmrsIDUuid,
-          location: encounter.location,
-        },
-      ],
-    });
-    // patient creation success
-    results.push({
-      step: 'person',
-      message: 'Patient created successfully',
-      status: 'fulfilled',
-    });
-    // Create relationship payload
-    const relationshipPayload = {
-      personA: patient.person.uuid,
-      relationshipType: relationshipToPatient,
-      personB: patientUuid,
-      startDate: listingDate.toISOString(),
-    };
-    // Create optional encounter with marital/civil status obs
-    let demographicsPayload;
-    if (maritalStatus) {
-      demographicsPayload = {
-        ...encounter,
-        encounterType: config.registrationEncounterUuid,
-        patient: patient.uuid,
-        obs: [{ concept: config.maritalStatusUuid, value: maritalStatus }],
-      };
-    }
-    // excecute patient relationship and obs creation tasks in parallell
-    const asyncTask = await Promise.allSettled([
-      fetcher(`/ws/rest/v1/relationship`, relationshipPayload),
-      ...(maritalStatus ? [fetcher(`/ws/rest/v1/encounter`, demographicsPayload)] : []),
-    ]);
-    // Track excection status on finish
-    asyncTask.forEach(({ status }, index) => {
-      let message: string;
-      let step: any;
-      if (index === 0) {
-        message = status === 'fulfilled' ? 'Relationship created successfully' : 'Error creating Relationship';
-        step = 'relationship';
-      } else if (index === 1) {
-        message =
-          status === 'fulfilled' ? 'Contact demographics saved succesfully!' : 'Error saving contact demographics';
-        step = 'obs';
-      }
-      results.push({
-        status,
-        message,
-        step,
-      });
-    });
-  } catch (error) {
-    results.push({ message: 'Error creating patient', step: 'person', status: 'rejected' });
-  }
-  return results;
+  );
 };
-
-export function generateOpenmrsIdentifier(source: string) {
-  const abortController = new AbortController();
-  return openmrsFetch(`${restBaseUrl}/idgen/identifiersource/${source}/identifier`, {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    method: 'POST',
-    body: {},
-    signal: abortController.signal,
-  });
-}

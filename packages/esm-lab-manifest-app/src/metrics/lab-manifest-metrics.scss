@@ -1,0 +1,80 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/colors';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.cardContainer {
+  display: flex;
+  flex-flow: row wrap;
+  margin-top: spacing.$spacing-03;
+  gap: spacing.$spacing-05;
+}
+
+.metricContainer {
+  padding: spacing.$spacing-03;
+}
+
+.labManifestStatusMetricValue {
+  max-width: spacing.$spacing-13;
+}
+
+.btnLayer {
+  display: flex;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-05;
+  padding-right: spacing.$spacing-05;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+
+  & > button {
+    border-color: colors.$blue-60;
+  }
+}
+
+.metricCardContainer {
+  border: colors.$gray-20 solid 1px;
+  padding: spacing.$spacing-03;
+  flex-grow: 1;
+  & > p {
+    @include type.type-style('heading-02');
+    margin-bottom: spacing.$spacing-03;
+  }
+}
+
+.metricCardStatusRow {
+  display: flex;
+  flex-flow: row wrap;
+  gap: spacing.$spacing-05;
+}
+
+.metricCardRow {
+  display: flex;
+  flex-flow: row wrap;
+  gap: spacing.$spacing-05;
+  justify-content: space-between;
+  padding-top: spacing.$spacing-05;
+  align-items: center;
+}
+
+.metricCardAgregateValue {
+  @include type.type-style('heading-05');
+  font-weight: var(--cds-heading-05-font-weight, 100);
+}
+
+.metricDanger {
+  font-size: 0.625rem !important;
+  color: $danger;
+}
+
+.metricWarning {
+  font-size: 0.625rem !important;
+
+  color: colors.$orange-40;
+}
+
+.metricSuccess {
+  font-size: 0.625rem !important;
+
+  color: colors.$green-40;
+}

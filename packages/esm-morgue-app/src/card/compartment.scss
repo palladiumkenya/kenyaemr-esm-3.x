@@ -1,0 +1,123 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.allPatientCardWrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: layout.$spacing-01;
+  width: 100%;
+  padding: 0;
+  justify-items: center;
+  align-items: start;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+.cardView {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: layout.$spacing-04;
+  background-color: colors.$gray-20;
+  margin-bottom: layout.$spacing-05;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    padding: layout.$spacing-03;
+    gap: layout.$spacing-02;
+  }
+}
+
+.cardRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: layout.$spacing-03;
+
+  &.centeredContent {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+.cardLabelWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: layout.$spacing-07;
+  height: layout.$spacing-07;
+  border-radius: 50%;
+  background-color: colors.$blue-60;
+}
+
+.cardLabel {
+  font-size: layout.$spacing-05;
+  line-height: 1.29;
+  border-radius: 50%;
+  letter-spacing: 0.16px;
+  color: colors.$white;
+}
+
+.deceasedName,
+.noCompartment {
+  font-size: type.type-scale(2);
+  font-weight: 600;
+  color: colors.$black;
+  margin-left: layout.$spacing-05;
+  width: 100%;
+}
+
+.deceasedReason,
+.deceasedNoDays,
+.noDays {
+  color: colors.$gray-90;
+  font-size: type.type-scale(2);
+}
+
+.assignButton {
+  width: 100%;
+  margin-top: layout.$spacing-05;
+}
+
+.viewDetailsLink {
+  margin: 0;
+  padding: 0;
+  color: colors.$gray-60;
+}
+
+.middot {
+  margin: 0 layout.$spacing-03;
+  font-weight: normal;
+  color: colors.$gray-60;
+  font-size: type.type-scale(2);
+}
+
+.age {
+  font-weight: normal;
+  color: colors.$gray-60;
+  font-size: type.type-scale(2);
+}
+.causeDisplay {
+  font-size: type.type-scale(2);
+  color: colors.$gray-60;
+  text-align: justify;
+}
+.emptyStateContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.borderLine {
+  width: 100%;
+  height: 1px;
+  background-color: colors.$gray-30;
+  margin: layout.$spacing-03 0;
+}

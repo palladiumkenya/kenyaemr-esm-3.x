@@ -1,0 +1,29 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+
+.modalHeaderLabel {
+  @include type.type-style('label-02');
+}
+
+.modalHeaderHeading {
+  @include type.type-style('heading-compact-02');
+}
+
+.button_spinner {
+  padding: 0;
+  margin-right: layout.$spacing-03;
+}
+
+.loading_wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.contentcontainer {
+  padding-left: layout.$spacing-05;
+}
+
+.contentvalue {
+  @include type.type-style('heading-compact-02');
+  margin-bottom: layout.$spacing-03;
+}

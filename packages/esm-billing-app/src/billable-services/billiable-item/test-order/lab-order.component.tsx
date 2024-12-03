@@ -11,9 +11,10 @@ type LabOrderProps = {
       conceptUuid: string;
     };
   };
+  setHasPrice: (hasPrice: boolean) => void;
 };
 
-const LabOrder: React.FC<LabOrderProps> = ({ order }) => {
+const LabOrder: React.FC<LabOrderProps> = ({ order, setHasPrice }) => {
   const { t } = useTranslation();
   const { billableItem, isLoading, error } = useBillableItem(order?.testType?.conceptUuid);
 

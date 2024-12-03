@@ -1,9 +1,9 @@
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .container {
-  margin: 2rem 0;
+  margin-top: layout.$spacing-05;
 }
 
 .emptyStateContainer,
@@ -178,4 +178,12 @@
 .filterEmptyStateHelper {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+.expendableRow {
+  padding-left: 1rem;
+}
+
+.scalpel {
+  cursor: pointer;
 }

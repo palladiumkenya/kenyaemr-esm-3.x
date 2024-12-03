@@ -1,0 +1,86 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.table {
+  padding: layout.$spacing-05;
+}
+
+.errorStateSkeleton,
+.dataTableSkeleton,
+.emptyStateWrapper {
+  padding-top: layout.$spacing-05;
+}
+
+.checkBoxWrapper {
+  padding: layout.$spacing-05;
+}
+
+.dateRangePicker {
+  flex-grow: unset;
+}
+
+.tableToolBar {
+  position: relative;
+
+  > section {
+    position: relative;
+    top: 0;
+
+    > div {
+      height: auto;
+      align-items: center;
+    }
+  }
+}
+
+.skeletonIcon {
+  width: layout.$spacing-09;
+  height: layout.$spacing-09;
+  margin-right: layout.$spacing-05;
+}
+
+.loadingPaymentTotals,
+.paymentTotals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  gap: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+}
+
+.paymentTotal {
+  color: colors.$blue-60;
+  margin-top: layout.$spacing-05;
+}
+
+.tile {
+  border: 1px solid $ui-03;
+}
+
+.tagWrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid $ui-03;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  flex-wrap: wrap;
+}
+
+.loadingPaymentTotal {
+  width: 50% !important;
+}
+
+.clockIn {
+  margin-left: layout.$spacing-05;
+  align-self: flex-end;
+}
+
+.noServiceTypes,
+.noCashiersInRange {
+  font-size: small;
+}
+
+.timesheetsFilter {
+  flex-grow: unset;
+  margin-right: layout.$spacing-01;
+}

@@ -1,0 +1,73 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+
+.formContainer {
+  border: 1px solid colors.$cool-gray-20;
+  padding: layout.$spacing-03;
+}
+
+.hieCard {
+  height: layout.$layout-03;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-row: auto;
+  align-items: center;
+  column-gap: layout.$spacing-03;
+  border-bottom: 1px solid colors.$cool-gray-20;
+
+  &:hover {
+    cursor: pointer;
+    background-color: colors.$cool-gray-10;
+  }
+}
+
+.hieCardItemActive {
+  display: flex;
+  align-items: center;
+  column-gap: layout.$spacing-03;
+
+  & > svg {
+    fill: colors.$green-60;
+    font-size: layout.$spacing-03;
+  }
+}
+
+.hieCardItemInActive {
+  display: flex;
+  align-items: center;
+  column-gap: layout.$spacing-03;
+
+  & > svg {
+    fill: colors.$red-60;
+    font-size: layout.$spacing-03;
+  }
+}
+
+.hieInsurerTitle {
+  @include type.type-style('heading-compact-01');
+}
+
+.hieInsurerValue {
+  color: colors.$cool-gray-70;
+  @include type.type-style('label-02');
+}
+
+.activeSubscription {
+  color: colors.$green-80;
+  @include type.type-style('label-02');
+}
+
+.inActiveSubscription {
+  color: colors.$red-80;
+  @include type.type-style('label-02');
+}
+
+:global(.sb-tooltip-trigger) {
+  border: none;
+  background-color: transparent;
+}
+
+.missingSHANumber {
+  max-width: unset;
+}

@@ -1,11 +1,20 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { referralDashboardMeta } from './dashboard.meta';
+import { referralDashboardMeta, shrSummaryDashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
 import { createHomeDashboardLink } from './create-dashboard-link';
-import ReferralReasonsDialogPopup from './community-referrals/referral-reasons/referral-reasons.component';
-import ReferralChartView from './community-referrals/patient-chart/referral-chart-view.component';
+import ReferralChartView from './referrals/patient-chart/referral-chart-view.component';
+import ReferralReasonsDialogPopup from './referrals/referral-reasons/referral-reasons.component';
+import SHRAuthorizationForm from './shr-summary/shr-authorization-form.workspace';
+import SHRSummaryPanel from './shr-summary/shr-summary.component';
+import shrPatientSummaryComponent from './shrpatient-summary/shrpatient-summary.component';
+import FacilityRefferalForm from './workspace/referrals.workspace.component';
 
 const moduleName = '@kenyaemr/esm-shr-app';
 
@@ -18,19 +27,22 @@ export const importTranslation = require.context('../translations', false, /.jso
 
 export const shrPatientSummary = getSyncLifecycle(shrPatientSummaryComponent, options);
 
-// t('sharedhealthrecords', 'Shared Health Records')
-///export const shrSummaryDashboardLink = getSyncLifecycle(createDashboardLink({ ...dashboardMeta, moduleName }), options);
-
 export function startupApp() {
   registerBreadcrumbs([]);
+  registerFeatureFlag('shr-summary', 'SHR Summary', 'Adds authorization to pull a patient SHR information');
   defineConfigSchema(moduleName, configSchema);
 }
 
-export const communityReferralsDashboardLink = getSyncLifecycle(
+export const ReferralsDashboardLink = getSyncLifecycle(
   createHomeDashboardLink({
-    name: 'community-referrals',
-    title: 'Community referrals',
+    name: 'referrals',
+    title: 'Referrals',
   }),
+  options,
+);
+
+export const shrSummaryDashboardLink = getSyncLifecycle(
+  createDashboardLink({ ...shrSummaryDashboardMeta, moduleName }),
   options,
 );
 
@@ -44,3 +56,8 @@ export const referralReasonsDialogPopup = getSyncLifecycle(ReferralReasonsDialog
 // Dashboard links for referrals and the corresponding view in the patient chart
 export const referralWidget = getSyncLifecycle(ReferralChartView, options);
 export const referralLink = getSyncLifecycle(createDashboardLink(referralDashboardMeta), options);
+export const facilityRefferalForm = getSyncLifecycle(FacilityRefferalForm, options);
+
+// SHR Summary
+export const patientSHRSummary = getSyncLifecycle(SHRSummaryPanel, options);
+export const shrAuthorizationForm = getSyncLifecycle(SHRAuthorizationForm, options);

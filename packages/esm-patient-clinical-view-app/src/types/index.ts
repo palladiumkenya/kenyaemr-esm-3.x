@@ -74,6 +74,7 @@ export interface Relationship {
     bIsToA: string;
   };
   startDate: string;
+  endDate: string | null;
 }
 
 export interface Contact {
@@ -89,10 +90,30 @@ export interface Contact {
   gender: string;
   contact: string | null;
   startDate: string | null;
+  endDate: string | null;
   baselineHIVStatus: string | null;
   personContactCreated: string | null;
   livingWithClient: string | null;
   pnsAproach: string | null;
+  ipvOutcome: string | null;
+  age: number | null;
+}
+
+export interface Peer {
+  uuid: string;
+  name: string;
+  display: string;
+  relativeAge: number;
+  dead: boolean;
+  causeOfDeath: string;
+  relativeUuid: string;
+  relationshipType: string;
+  patientUuid: string;
+  gender: string;
+  contact: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  age: number | null;
 }
 
 export interface Person {
@@ -102,6 +123,7 @@ export interface Person {
   display: string;
   causeOfDeath: string;
   gender: string;
+  deathDate: string;
   attributes: {
     uuid: string;
     display: string;
@@ -124,6 +146,7 @@ export interface Patient {
 export interface RelationShipType {
   uuid: string;
   displayAIsToB: string;
+  displayBIsToA: String;
 }
 
 export interface Enrollment {
@@ -146,4 +169,76 @@ export interface HTSEncounter {
       display: string;
     };
   }[];
+}
+
+export interface BedDetails extends Bed {
+  patient: null | {
+    uuid: string;
+    person: {
+      gender: string;
+      age: number;
+      preferredName: {
+        givenName: string;
+        familyName: string;
+      };
+    };
+    identifiers: Array<{ identifier: string }>;
+  };
+}
+
+export type AdmissionLocation = {
+  ward: {
+    uuid: string;
+    display: string;
+    name: string;
+    description: string;
+  };
+  totalBeds: number;
+  occupiedBeds: number;
+  bedLayouts: Array<BedDetails>;
+};
+
+export interface Bed {
+  id: number;
+  bedId: number;
+  uuid: string;
+  bedNumber: string;
+  bedType: {
+    uuid: string;
+    name: string;
+    displayName: string;
+    description: string;
+    resourceVersion: string;
+  };
+  row: number;
+  column: number;
+  status: 'AVAILABLE' | string;
+  location: string;
+}
+
+export type MappedBedData = Array<{
+  id: number;
+  number: string;
+  name: string;
+  description: string;
+  status: string;
+  uuid: string;
+}>;
+
+export type ReportingPeriod = {
+  year: number;
+  month: number;
+};
+
+export interface Encounter {
+  uuid: string;
+  display: string;
+  encounterDatetime: string;
+}
+
+export interface Visit {
+  uuid: string;
+  display?: string;
+  startDatetime: string;
+  stopDatetime?: string;
 }

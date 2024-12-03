@@ -15,6 +15,7 @@ import {
 } from '@carbon/react';
 import { Add, TrashCan } from '@carbon/react/icons';
 import {
+  ConfigurableLink,
   ErrorState,
   UserHasAccess,
   isDesktop,
@@ -92,7 +93,13 @@ export const PharmacyPatients: React.FC = () => {
       return {
         id: `${patient.uuid}`,
         openmrsId: patient.openmrsId,
-        name: patient.name,
+        name: (
+          <ConfigurableLink
+            style={{ textDecoration: 'none' }}
+            to={window.getOpenmrsSpaBase() + `patient/${patient.uuid}/chart/Patient Summary`}>
+            {patient.name}
+          </ConfigurableLink>
+        ),
         age: patient.age ?? '--',
         sex: patient.gender ?? '--',
         contact: patient.telephoneContact ?? '--',

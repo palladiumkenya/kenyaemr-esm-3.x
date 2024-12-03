@@ -15,29 +15,39 @@ import {
   Tile,
   Button,
 } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
+import { Add, Edit, TrashCan } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import { ConfigurableLink, isDesktop, navigate, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { useRelationships } from './relationships.resource';
+import {
+  ConfigurableLink,
+  isDesktop,
+  launchWorkspace,
+  useConfig,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
+import { usePatientRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
+import { deleteRelationship } from '../relationships/relationship.resources';
 
 interface FamilyHistoryProps {
-  encounterTypeUuid?: string;
-  formEntrySub?: any;
   patientUuid: string;
 }
 
 const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
+  const { concepts, familyRelationshipsTypeList } = config;
   const layout = useLayoutType();
-  const { concepts } = config;
   const [pageSize, setPageSize] = useState(10);
-  const { relationships, error, isLoading, isValidating } = useRelationships(patientUuid);
-  const headerTitle = t('familyHistory', 'Family history');
-  const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
+  const { relationships, error, isLoading, isValidating } = usePatientRelationships(patientUuid);
+
+  const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
+  const familyRelationships = relationships.filter((r) => familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
+
+  const headerTitle = t('familyContacts', 'Family contacts');
+  const { results, totalPages, currentPage, goTo } = usePagination(familyRelationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const headers = [
@@ -65,10 +75,19 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
       header: t('chronicDisease', 'Chronic Disease'),
       key: 'chronicDisease',
     },
+    { header: t('actions', 'Actions'), key: 'actions' },
   ];
 
   const handleAddHistory = () => {
-    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
+    launchWorkspace('family-relationship-form', {
+      workspaceTitle: 'Family Relationship Form',
+      patientUuid,
+    });
+  };
+  const handleEditRelationship = (relationShipUuid: string) => {
+    launchWorkspace('relationship-update-form', {
+      relationShipUuid,
+    });
   };
 
   const tableRows =
@@ -92,18 +111,47 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
         ),
         patientUuid: relation,
         chronicDisease: <ConceptObservations patientUuid={patientUuid} conceptUuid={concepts.problemListConceptUuid} />,
+        actions: (
+          <>
+            <Button
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Edit"
+              onClick={() => handleEditRelationship(relation.uuid)}
+            />
+            <Button
+              renderIcon={TrashCan}
+              hasIconOnly
+              kind="ghost"
+              iconDescription="Delete"
+              onClick={() => deleteRelationship(relation.uuid)}
+            />
+          </>
+        ),
       };
     }) ?? [];
 
-  if (isLoading) {
-    return <DataTableSkeleton rowCount={5} />;
+  if (isLoading || isValidating) {
+    return (
+      <DataTableSkeleton
+        headers={headers}
+        aria-label="patient family table"
+        showToolbar={false}
+        showHeader={false}
+        rowCount={3}
+        zebra
+        columnCount={3}
+        className={styles.dataTableSkeleton}
+      />
+    );
   }
 
   if (error) {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (relationships.length === 0) {
+  if (familyRelationships.length === 0) {
     return (
       <Layer>
         <Tile className={styles.tile}>
@@ -113,7 +161,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
           <EmptyDataIllustration />
           <p className={styles.content}>There is no family history data to display for this patient.</p>
           <Button onClick={handleAddHistory} renderIcon={Add} kind="ghost">
-            {t('recordHistory', 'Record History')}
+            {t('addRelationship', 'Add relationship')}
           </Button>
         </Tile>
       </Layer>
