@@ -103,7 +103,7 @@ export const useModuleLinks = () => {
       label: 'ETL Administration',
       url: `${openmrsSpaBase}etl-administration`,
       icon: <IbmCloudant size={24} />,
-      privilege: 'o3: View Bed Management Dashboard',
+      privilege: 'o3: View ETL Administration Dashboard',
     },
   ];
 };

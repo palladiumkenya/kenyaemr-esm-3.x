@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.btnLayer {
+  display: flex;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
+}
