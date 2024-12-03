@@ -1,11 +1,11 @@
-import React from 'react';
-import styles from './machine-learning.scss';
-import CarePanellIITRiskScore from '../iit-risk-score/iit-risk-score.component';
-import CarePanelRiskScorePlot from '../iit-risk-score/iit-risk-score-plot';
-import usePatientHIVStatus from '../hooks/usePatientHIVStatus';
 import { ErrorState } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import usePatientHIVStatus from '../hooks/usePatientHIVStatus';
+import CarePanelRiskScorePlot from '../iit-risk-score/iit-risk-score-plot';
+import CarePanellIITRiskScore from '../iit-risk-score/iit-risk-score.component';
+import styles from './machine-learning.scss';
 
 interface CarePanelMachineLearningProps {
   patientUuid: string;
@@ -19,8 +19,10 @@ const CarePanelMachineLearning: React.FC<CarePanelMachineLearningProps> = ({ pat
     return <ErrorState error={error} headerTitle={header} />;
   }
   return (
-    <div className={styles['machine-learning']}>
-      {!isPositive && <EmptyState headerTitle={header} displayText="machine learning predictions" />}
+    <div className={styles.machineLearning}>
+      {!isPositive && (
+        <EmptyState headerTitle={header} displayText={t('mlPredictions', 'machine learning predictions')} />
+      )}
       {isPositive && <CarePanellIITRiskScore patientUuid={patientUuid} />}
       {isPositive && <CarePanelRiskScorePlot patientUuid={patientUuid} />}
     </div>
