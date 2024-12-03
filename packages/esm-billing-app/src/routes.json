@@ -171,6 +171,11 @@
       "slot": "billing-dashboard-link-slot"
     },
     {
+      "component": "billableExemptionsLink",
+      "name": "billable-exemptions-link",
+      "slot": "billing-dashboard-link-slot"
+    },
+    {
       "component": "claimsManagementSideNavGroup",
       "name": "claims-management-dashboard-link",
       "slot": "homepage-dashboard-slot",
