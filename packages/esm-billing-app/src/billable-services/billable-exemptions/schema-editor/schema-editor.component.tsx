@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
 import AceEditor, { type IMarker } from 'react-ace';
-import Ajv from 'ajv';
 import 'ace-builds/webpack-resolver';
 import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { ActionableNotification, Link } from '@carbon/react';
 import { ChevronRight, ChevronLeft } from '@carbon/react/icons';
 import styles from './schema-editor.scss';
-import { useStandardSchema } from '../../../hooks/useStandardSchema';
 
 interface MarkerProps extends IMarker {
   text: string;
@@ -34,10 +32,9 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({
   const { t } = useTranslation();
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const { schema, schemaProperties } = useStandardSchema('kenyaemr.billing.exemptions');
 
   // Validate JSON schema
-  const validateSchema = (content: string, schema) => {
+  const validateSchema = (content: string) => {
     try {
       const trimmedContent = content.replace(/\s/g, '');
       // Check if the content is an empty object
@@ -46,71 +43,18 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({
         setErrors([]);
         return;
       }
-      const ajv = new Ajv({ allErrors: true, jsPropertySyntax: true, strict: false });
-      const validate = ajv.compile(schema);
-      const parsedContent = JSON.parse(content);
-      const isValid = validate(parsedContent);
-      const jsonLines = content.split('\n');
-
-      const traverse = (schemaPath) => {
-        const pathSegments = schemaPath.split('/').filter((segment) => segment !== '' || segment !== 'type');
-        let lineNumber = -1;
-
-        for (const segment of pathSegments) {
-          if (segment === 'properties' || segment === 'items') {
-            continue;
-          } // Skip 'properties' and 'items'
-          const match = segment.match(/^([^[\]]+)/); // Extract property key
-          if (match) {
-            const propertyName: string = pathSegments[pathSegments.length - 2]; // Get property key
-            lineNumber = jsonLines.findIndex((line) => line.includes(propertyName));
-          }
-          if (lineNumber !== -1) {
-            break;
-          }
-        }
-
-        return lineNumber;
-      };
-
-      if (!isValid) {
-        const errorMarkers = validate.errors.map((error) => {
-          const schemaPath = error.schemaPath.replace(/^#\//, ''); // Remove leading '#/'
-          const lineNumber = traverse(schemaPath);
-          const pathSegments = error.instancePath.split('.'); // Split the path into segments
-          const errorPropertyName = pathSegments[pathSegments.length - 1];
-          const message =
-            error.keyword === 'type' || error.keyword === 'enum'
-              ? `${errorPropertyName.charAt(0).toUpperCase() + errorPropertyName.slice(1)} ${error.message}`
-              : `${error.message.charAt(0).toUpperCase() + error.message.slice(1)}`;
-
-          return {
-            startRow: lineNumber,
-            startCol: 0,
-            endRow: lineNumber,
-            endCol: 1,
-            className: 'error',
-            text: message,
-            type: 'text' as const,
-          };
-        });
-
-        setErrors(errorMarkers);
-      } else {
-        setErrors([]);
-      }
     } catch (error) {
       console.error('Error parsing or validating JSON:', error);
     }
   };
 
-  const debouncedValidateSchema = debounce(validateSchema, 200);
+  const debouncedValidateSchema = debounce(validateSchema);
 
   const handleChange = (newValue: string) => {
     setValidationOn(false);
     onSchemaChange(newValue);
     setCurrentIndex(0);
-    debouncedValidateSchema(newValue, schema);
+    debouncedValidateSchema(newValue);
   };
 
   const ErrorNotification = ({ text, line }) => (
