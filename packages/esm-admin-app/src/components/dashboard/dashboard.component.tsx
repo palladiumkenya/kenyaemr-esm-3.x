@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from '../Header/header.component';
+import Header from '../header/header.component';
 import { useTranslation } from 'react-i18next';
 import { Layer, ComboButton, MenuItem } from '@carbon/react';
 import styles from './dashboard.scss';
