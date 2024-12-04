@@ -1,11 +1,11 @@
 import { LineChart, LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
-import React from 'react';
-import styles from './iit-risk-score.scss';
-import usePatientIITScore from '../hooks/usePatientIITScore';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { patientRiskScore } from './risk-score.mock';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
+import React from 'react';
+import usePatientIITScore from '../hooks/usePatientIITScore';
+import styles from './iit-risk-score.scss';
+import { patientRiskScore } from './risk-score.mock';
+import { useTranslation } from 'react-i18next';
 
 interface CarePanelRiskScorePlotProps {
   patientUuid: string;
@@ -13,6 +13,7 @@ interface CarePanelRiskScorePlotProps {
 
 const CarePanelRiskScorePlot: React.FC<CarePanelRiskScorePlotProps> = ({ patientUuid }) => {
   const { isLoading, error, riskScore } = usePatientIITScore(patientUuid);
+  const { t } = useTranslation();
   const options: LineChartOptions = {
     title: 'KenyaHMIS ML Model',
     legend: { enabled: false },
@@ -46,18 +47,26 @@ const CarePanelRiskScorePlot: React.FC<CarePanelRiskScorePlotProps> = ({ patient
   };
 
   return (
-    <div className={styles['risk-score-card']}>
-      <span className={styles.sectionHeader}>IIT Risk Score Trend</span>
+    <div className={styles.riskScoreCard}>
+      <span className={styles.sectionHeader}>{t('iitRiskScoreTrend', 'IIT Risk Score Trend')}</span>
       <center>
-        <strong>Latest risk score: </strong>
-        {`${riskScore.riskScore}%`}
+        <strong>{t('latestRiskScore', 'Latest risk score')}: </strong>
+        {`${riskScore?.riskScore} (${riskScore?.description})`}
       </center>
       <div style={{ padding: '1rem' }}>
         <LineChart
-          data={patientRiskScore.map((risk) => ({
-            ...risk,
-            evaluationDate: formatDate(parseDate(risk.evaluationDate)),
-          }))}
+          data={
+            riskScore?.riskScore && !riskScore?.riskScore.includes('-')
+              ? [
+                  {
+                    evaluationDate: riskScore.evaluationDate,
+                    riskScore: Number(riskScore?.riskScore?.split('%')[0]?.trim()),
+                    description: riskScore?.description,
+                    riskFactors: riskScore?.riskFactors,
+                  },
+                ]
+              : []
+          }
           options={options}
         />
       </div>
