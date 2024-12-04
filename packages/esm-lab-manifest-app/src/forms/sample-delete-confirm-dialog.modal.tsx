@@ -19,6 +19,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from '../tables/lab-manifest-table.scss';
 import { LabManifestSample } from '../types';
+import PatientNameCell from '../tables/patient-name-cell.component';
+import PatientCCCNumbercell from '../tables/patient-ccc-no-cell.component';
 
 interface SampleDeleteConfirmDialogProps {
   onClose: () => void;
@@ -30,7 +32,11 @@ const SampleDeleteConfirmDialog: React.FC<SampleDeleteConfirmDialogProps> = ({ o
 
   const headers = [
     {
-      header: t('patientIdentifier', 'Patient Identifier'),
+      header: t('patient', 'Patient'),
+      key: 'patient',
+    },
+    {
+      header: t('cccKDODNumber', 'CCC/KDOD Number'),
       key: 'cccKDODNumber',
     },
     {
@@ -62,7 +68,12 @@ const SampleDeleteConfirmDialog: React.FC<SampleDeleteConfirmDialogProps> = ({ o
         sampleType: sample.sampleType ?? '--',
         status: sample.status,
         batchNumber: sample.batchNumber ?? '--',
-        cccKDODNumber: sample?.order?.patient?.identifiers[0]?.identifier ?? '--',
+        patient: sample?.order?.patient?.uuid ? <PatientNameCell patientUuid={sample?.order?.patient?.uuid} /> : '--',
+        cccKDODNumber: sample?.order?.patient?.uuid ? (
+          <PatientCCCNumbercell patientUuid={sample?.order?.patient?.uuid} />
+        ) : (
+          '--'
+        ),
         dateRequested: sample.dateSent ? formatDate(parseDate(sample.dateSent)) : '--',
         resultDate: sample.resultDate ? formatDate(parseDate(sample.resultDate)) : '--',
         result: sample.result ?? '--',

@@ -1,11 +1,9 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
 
-.machine-learning {
+.machineLearning {
   padding: 8px;
-  gap: spacing.$spacing-08;
+  gap: layout.$spacing-08;
 }
 
 .sectionHeader {
@@ -17,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   row-gap: 1.5rem;
   position: relative;
 
