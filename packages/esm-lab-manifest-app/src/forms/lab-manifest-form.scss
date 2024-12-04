@@ -40,7 +40,6 @@
   margin-top: layout.$spacing-05;
   display: flex;
   flex: 1;
-
 }
 
 .datePickersRow {
@@ -50,7 +49,6 @@
   align-items: center;
   width: 100%;
 }
-
 
 .button {
   height: layout.$spacing-10;
@@ -101,7 +99,7 @@
     left: 0;
   }
 
-  &>span {
+  & > span {
     @include type.type-style('body-01');
   }
 }
