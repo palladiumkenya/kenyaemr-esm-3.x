@@ -4,7 +4,7 @@
 
 This is a frontend module that provides Admin functionality.
 
-#### Morgue App features
+#### Admin App features
 - Management of the ETL management
 
 #### Admin App design 

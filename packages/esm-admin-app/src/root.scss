@@ -1,15 +1,7 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
 
 .container {
-  padding: spacing.$spacing-07;
-}
-
-.welcome {
-  @include type.type-style('heading-04');
-  margin: spacing.$spacing-05 0;
-}
-
-.explainer {
-  margin-bottom: 2rem;
+  padding: layout.$spacing-07;
 }

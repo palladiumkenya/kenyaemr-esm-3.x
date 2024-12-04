@@ -3,7 +3,7 @@ import Header from '../Header/header.component';
 import { useTranslation } from 'react-i18next';
 import { Layer, ComboButton, MenuItem } from '@carbon/react';
 import styles from './dashboard.scss';
-import LogTable from '../table/operation-log-table.component';
+import LogTable from '../logs/operation-log-table.component';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
