@@ -31,7 +31,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
-  const { globalActiveSheet, isClockedInSomewhere } = useClockInStatus(paymentPoint?.uuid);
+  const { globalActiveSheet, isClockedIn } = useClockInStatus(paymentPoint?.uuid);
 
   const shouldPromptUser = !paymentPoint;
 
@@ -75,7 +75,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     setIsSubmitting(true);
-    if (isClockedInSomewhere) {
+    if (isClockedIn) {
       clockOut(globalActiveSheet.uuid, {
         clockOut: new Date().toISOString(),
       })
@@ -158,7 +158,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
     <Form onSubmit={handleSubmit(onSubmit)}>
       <ModalHeader closeModal={closeModal}>Clock In</ModalHeader>
       <ModalBody>
-        {isClockedInSomewhere
+        {isClockedIn
           ? `You will be clocked in on ${paymentPoint.name} right now but you will be automatically be clocked out of ${globalActiveSheet.cashPoint.name} first. Do you want to proceed.`
           : `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`}
       </ModalBody>

@@ -42,7 +42,7 @@ describe('Payment', () => {
     mockedUseClockInStatus.mockReturnValue({
       globalActiveSheet: mockedActiveSheet,
       localActiveSheet: undefined,
-      isClockedInSomewhere: true,
+      isClockedIn: true,
       error: null,
       isLoading: false,
       isClockedInCurrentPaymentPoint: false,

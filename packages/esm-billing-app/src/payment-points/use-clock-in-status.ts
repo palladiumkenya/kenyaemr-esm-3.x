@@ -12,7 +12,7 @@ export const useClockInStatus = (paymentPointUUID?: string) => {
   return {
     globalActiveSheet,
     localActiveSheet,
-    isClockedInSomewhere: Boolean(globalActiveSheet),
+    isClockedIn: Boolean(globalActiveSheet),
     error: error,
     isLoading: isLoading,
     isClockedInCurrentPaymentPoint: Boolean(localActiveSheet),
