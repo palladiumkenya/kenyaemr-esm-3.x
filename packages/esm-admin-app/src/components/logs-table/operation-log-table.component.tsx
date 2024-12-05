@@ -30,7 +30,7 @@ const LogTable: React.FC = () => {
   const pageSize = 10;
   const isTablet = useLayoutType() === 'tablet';
 
-  const logData: LogData[] = useLogData().map((item, index) => ({
+  const logData: Array<LogData> = useLogData().map((item, index) => ({
     ...item,
     id: `row-${index}`,
   }));
