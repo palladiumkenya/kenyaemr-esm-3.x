@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "kenyaemrCharts": "^1.6.7"
+  },
+  "extensions": [
+  ],
+  "pages": [
+    {
+      "component": "root",
+      "route": "admin",
+      "online": true,
+      "offline": true
+    }
+  ]
+}
