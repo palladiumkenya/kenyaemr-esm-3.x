@@ -1,0 +1,19 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.header {
+  @include type.type-style('body-compact-02');
+  height: layout.$spacing-12;
+  display: flex;
+  justify-content: space-between;
+  padding: layout.$spacing-05;
+  background: white;
+  border: 1px solid colors.$gray-20;
+}
+.svgContainer svg {
+  width: layout.$spacing-10;
+  height: layout.$spacing-10;
+  margin-right: layout.$spacing-06;
+  fill: var(--brand-03);
+}

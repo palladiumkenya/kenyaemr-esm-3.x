@@ -1,0 +1,7 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.container {
+  padding: layout.$spacing-07;
+}
