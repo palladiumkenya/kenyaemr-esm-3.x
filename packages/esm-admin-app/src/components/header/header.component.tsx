@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, IbmCloudant, Location, UserFollow } from '@carbon/react/icons';
-import { formatDate, useSession } from '@openmrs/esm-framework';
+import { Calendar, Location } from '@carbon/react/icons';
+import { formatDate, useSession, PageHeader } from '@openmrs/esm-framework';
 import styles from './header.scss';
 import ETLIllustration from './header-illustration.component';
 
@@ -16,22 +16,11 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
 
   return (
     <div className={styles.header}>
-      <div className={styles['left-justified-items']}>
-        <ETLIllustration />
-        <div className={styles['page-labels']}>
-          <p>{t('etlAdministration', 'ETL Administration')}</p>
-          <p className={styles['page-name']}>{title}</p>
-        </div>
-      </div>
-      <div className={styles['right-justified-items']}>
-        <div className={styles['date-and-location']}>
-          <Location size={16} />
-          <span className={styles.value}>{location}</span>
-          <span className={styles.middot}>&middot;</span>
-          <Calendar size={16} />
-          <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
-        </div>
-      </div>
+      <PageHeader
+        title={t('etlAdministration', 'ETL Administration')}
+        illustration={<ETLIllustration />}
+        className={styles.header}
+      />
     </div>
   );
 };
