@@ -43,59 +43,53 @@ svg.iconOverrides {
   fill: var(--brand-03);
 }
 
-.metrics {
+.left-justified-items {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  cursor: pointer;
+  align-items: center;
+}
+
+.right-justified-items {
+  @include type.type-style('body-compact-02');
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.page-name {
+  @include type.type-style('heading-04');
+}
+
+.page-labels {
+  margin: layout.$spacing-05;
+
+  p:first-of-type {
+    margin-bottom: layout.$spacing-02;
+  }
+}
+
+.date-and-location {
+  display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: layout.$spacing-06;
-  flex-wrap: wrap;
-  padding: layout.$spacing-04 layout.$spacing-05 0 0;
-  width: auto;
-  height: auto;
 }
 
-.wrapMetrics {
-  width: auto;
-  height: auto;
-  flex-grow: 1;
+.userContainer {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: layout.$spacing-03;
-  padding: 0;
-  min-width: layout.$spacing-12;
-}
-
-.metricLabel {
-  flex-grow: 0;
-  font-size: layout.$spacing-04;
-  line-height: 1.33;
-  letter-spacing: 0.32px;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.metricValue {
-  flex-grow: 0;
-  font-family: IBMPlexSans;
-  font-size: layout.$spacing-06;
-  line-height: 1.4;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.metricLocationDate {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  justify-content: flex-end;
   gap: layout.$spacing-05;
-  width: auto;
-  max-width: 120px;
+}
+
+.value {
+  margin-left: layout.$spacing-02;
+}
+
+.middot {
+  margin: 0 layout.$spacing-03;
+}
+
+.view {
+  @include type.type-style('label-01');
 }

@@ -52,3 +52,16 @@
 .dateTimePickerContainer {
   margin-left: layout.$spacing-04;
 }
+
+.sectionField {
+  min-width: 25rem;
+}
+.columnField {
+  padding: layout.$spacing-02;
+}
+.fieldColumn {
+  padding: layout.$spacing-04;
+}
+.fieldSection {
+  min-width: 22rem;
+}

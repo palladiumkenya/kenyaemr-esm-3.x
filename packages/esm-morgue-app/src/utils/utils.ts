@@ -34,3 +34,26 @@ export function convertDateToDays(startDate: string | Date): number {
   const start = dayjs(startDate);
   return today.diff(start, 'day');
 }
+
+/**
+ * Formats a given date string into "DD-MMM-YYYY, hh:mm A" format.
+ *
+ * @param {string | Date | undefined} date - The date to format.
+ * @returns {string} - The formatted date or an empty string if no date is provided.
+ */
+export const formatDateTime = (date) => {
+  if (!date) {
+    return '--';
+  }
+  return dayjs(date).format('DD-MMM-YYYY, hh:mm A');
+};
+
+// Utility functions to get the current date and time
+
+export const getCurrentTime = () => {
+  const now = new Date();
+  const hours = now.getHours() % 12 || 12;
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const period = now.getHours() >= 12 ? 'PM' : 'AM';
+  return { time: `${hours}:${minutes}`, period };
+};
