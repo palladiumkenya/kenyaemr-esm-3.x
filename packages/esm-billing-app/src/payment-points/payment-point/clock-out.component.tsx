@@ -3,13 +3,13 @@ import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PaymentPoint } from '../../types';
-import { clockOut, useTimeSheets } from '../payment-points.resource';
+import { clockOut, useActiveSheet } from '../payment-points.resource';
 import { useClockInStatus } from '../use-clock-in-status';
 
 export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint: PaymentPoint }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { mutate } = useTimeSheets();
+  const { mutate } = useActiveSheet();
   const { t } = useTranslation();
 
   const { localActiveSheet, isLoading, error } = useClockInStatus(paymentPoint.uuid);
