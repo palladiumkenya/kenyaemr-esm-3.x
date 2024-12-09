@@ -12,3 +12,31 @@ export const useActiveMorgueVisit = (uuid: string) => {
 
   return { activeVisit: data?.data?.results[0], error, isLoading };
 };
+
+export const usePatientDischargedStatus = (uuid: string) => {
+  const customRepresentation = 'custom:(visitType:(uuid),startDatetime,stopDatetime,encounters:(encounterType:(uuid)))';
+  const url = `${restBaseUrl}/visit?v=${customRepresentation}&patient=${uuid}&limit=1`;
+
+  const { data, error, isLoading } = useSWR<
+    FetchResponse<{
+      results: Array<{
+        visitType: { uuid: string };
+        startDatetime: string;
+        stopDatetime: string;
+        encounters: Array<{
+          encounterType: {
+            uuid: string;
+          };
+        }>;
+      }>;
+    }>
+  >(url, openmrsFetch);
+
+  const status = data?.data?.results[0];
+
+  return {
+    status,
+    error,
+    isLoading,
+  };
+};

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './compartment.scss';
 import EmptyCompartment from './empty-compartment.component';
 import AvailableCompartment from './avail-compartment.compartment';
-import EmptyDeceasedSearch from '../empty-state/empty-search-deceased.component';
+import EmptyDeceasedSearch from '../empty-state/empty-morgue-admission.component';
 import { useTranslation } from 'react-i18next';
 import { DeceasedInfo } from '../types';
 

@@ -6,6 +6,7 @@ import CompartmentView from '../card/compartment-view.compartment';
 import { useDeceasedPatient } from '../hook/useMorgue.resource';
 import { InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
+import EmptyMorgueAdmission from '../empty-state/empty-morgue-admission.component';
 
 export const AdmittedQueue: React.FC = () => {
   const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
@@ -17,7 +18,6 @@ export const AdmittedQueue: React.FC = () => {
   };
 
   const admittedPatients = deceasedPatients?.filter((patient) => patient.status === 'admitted') || [];
-
   if (isLoading) {
     return (
       <InlineLoading
@@ -32,14 +32,21 @@ export const AdmittedQueue: React.FC = () => {
     return <ErrorState error={error} headerTitle={t('allocation', 'Allocation')} />;
   }
 
+  if (admittedPatients?.length === 0) {
+    return (
+      <EmptyMorgueAdmission
+        title={t('allocations', 'Allocation')}
+        subTitle={t('noAdmittedBodies', 'There are no admitted bodies')}
+      />
+    );
+  }
+
   return (
     <div className={styles.layoutWrapper}>
       <CardHeader title={t('allocation', 'Allocation')} children={''} />
       <DeceasedFilter onSearchChange={handleSearchChange} />
       <div className={styles.patientCardContainer}>
-        <div className={styles.patientCardContainer}>
-          <CompartmentView patientVisit={{ results: admittedPatients }} searchQuery={searchQuery} />
-        </div>
+        <CompartmentView patientVisit={{ results: admittedPatients }} searchQuery={searchQuery} />
       </div>
     </div>
   );
