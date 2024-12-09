@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useTestOrderBillStatus } from './test-order-action.resource';
 import { showModal } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
+import styles from './test-order-action.scss';
 
 type TestOrderProps = {
   order: Order;
@@ -88,13 +89,13 @@ const TestOrderAction: React.FC<TestOrderProps> = React.memo((props) => {
   }
 
   const buttonText = hasPendingPayment
-    ? t('unsettledBill', 'Unsettled bill.')
+    ? t('unsettledBill', 'Unsettled bill')
     : Object.hasOwn(props, 'medicationRequestBundle')
     ? actionText ?? t('dispense', 'Dispense')
     : actionText ?? t('pickLabRequest', 'Pick Lab Request');
 
   return (
-    <Button kind="primary" disabled={hasPendingPayment} key={`${orderUuid}`} onClick={launchModal}>
+    <Button kind="primary" className={styles.actionButton} disabled={hasPendingPayment} onClick={launchModal}>
       {buttonText}
     </Button>
   );
