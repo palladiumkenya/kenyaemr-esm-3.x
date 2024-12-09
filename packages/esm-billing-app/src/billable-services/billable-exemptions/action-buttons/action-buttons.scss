@@ -1,0 +1,12 @@
+@use '@carbon/layout';
+
+.actionButtons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin: layout.$spacing-05 0;
+
+  > button {
+    margin-left: layout.$spacing-05;
+  }
+}
