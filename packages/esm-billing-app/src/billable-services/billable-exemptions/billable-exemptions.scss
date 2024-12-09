@@ -64,7 +64,7 @@
   display: flex;
   align-items: center;
   @include type.type-style('heading-compact-01');
-  min-height: layout.$spacing-13;
+  min-height: layout.$spacing-05;
   width: 100%;
   padding: layout.$spacing-04;
 }

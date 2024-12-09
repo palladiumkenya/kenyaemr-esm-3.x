@@ -115,11 +115,7 @@ export const BillableExemptionsViewer = () => {
       <Grid className={classNames(styles.grid)}>
         <Column lg={16} md={16} className={styles.column}>
           <div className={styles.actionButtons}>
-            {isLoading ? (
-              <InlineLoading description={`${t('loadingSchema', 'Loading schema')}...`} />
-            ) : (
-              <h1 className={styles.schemaName}>{t('exemptionSchema', 'Exemption Schema')}</h1>
-            )}
+            {isLoading ? <InlineLoading description={`${t('loadingSchema', 'Loading schema')}...`} /> : ''}
           </div>
           <div className={styles.heading}>
             <span className={styles.tabHeading}>{t('schemaEditor', 'Exemptions Schema Editor')}</span>
