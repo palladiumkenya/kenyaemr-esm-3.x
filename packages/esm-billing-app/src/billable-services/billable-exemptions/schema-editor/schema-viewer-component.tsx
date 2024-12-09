@@ -10,11 +10,10 @@ interface SchemaViewerProps {
 interface TreeNode {
   id: string;
   label: string;
-  children?: TreeNode[];
-  icon: React.ReactNode;
+  children?: Array<TreeNode>;
 }
 
-const transformDataToTree = (data: Record<string, any>, parentKey = 'root'): TreeNode[] => {
+const transformDataToTree = (data: Record<string, any>, parentKey = 'root'): Array<TreeNode> => {
   return Object.entries(data).map(([key, value]) => {
     const nodeId = `${parentKey}-${key}`;
     const isObject = typeof value === 'object' && !Array.isArray(value);
@@ -22,17 +21,10 @@ const transformDataToTree = (data: Record<string, any>, parentKey = 'root'): Tre
     return {
       id: nodeId,
       label: isObject || Array.isArray(value) ? key : `${key}: ${value}`,
-      icon:
-        isObject || Array.isArray(value) ? (
-          <Folder className={styles.folderIcon} />
-        ) : (
-          <DocumentTasks className={styles.dirIcon} />
-        ),
       children: Array.isArray(value)
         ? value.map((item, index) => ({
             id: `${nodeId}-${index}`,
             label: `${item.description} (${item.concept})`,
-            icon: <DocumentTasks className={styles.dirIcon} />,
           }))
         : isObject
         ? transformDataToTree(value, nodeId)
@@ -53,7 +45,7 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
     }
   }, [data]);
 
-  const handleSelect = useCallback((selectedNodeIds: string[]) => {
+  const handleSelect = useCallback((selectedNodeIds: Array<string>) => {
     setSelectedNodes(selectedNodeIds);
   }, []);
 
@@ -69,7 +61,7 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
     });
   }, []);
 
-  const renderTreeNodes = (nodes: TreeNode[]) =>
+  const renderTreeNodes = (nodes: Array<TreeNode>) =>
     nodes.map((node) => {
       const isExpanded = expandedNodes.has(node.id);
       return (
@@ -77,7 +69,6 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
           key={node.id}
           id={node.id}
           label={node.label}
-          renderIcon={() => node.icon}
           isExpanded={isExpanded}
           onToggle={() => handleToggle(node.id)}
           multiselect={true}

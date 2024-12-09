@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import AceEditor, { type IMarker } from 'react-ace';
+import 'ace-builds/webpack-resolver';
 import debounce from 'lodash-es/debounce';
 import Ajv from 'ajv';
 import { useTranslation } from 'react-i18next';
 import { ActionableNotification, Link } from '@carbon/react';
 import { ChevronRight, ChevronLeft } from '@carbon/react/icons';
 import styles from './schema-editor.scss';
-import { useStandardSchema } from '../../../hooks/useStandardSchema';
+import { useStandardSchema } from '../../../hooks/useExemptionSchema';
 
 interface MarkerProps extends IMarker {
   text: string;
@@ -149,7 +150,9 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({
     <div>
       {errors.length && validationOn ? <ErrorMessages /> : null}
       <AceEditor
-        style={{ height: '100vh', width: '100%', border: errors.length ? '3px solid #DA1E28' : 'none' }}
+        className={errors.length ? styles.hasErrors : ''}
+        width="100%"
+        height="100vh"
         mode="json"
         theme="textmate"
         name="schemaEditor"
