@@ -16,7 +16,7 @@ import {
 } from '@carbon/react';
 import SchemaEditor from '../billable-exemptions/schema-editor/schema-editor.component';
 import SchemaViewer from '../billable-exemptions/schema-editor/schema-viewer-component';
-import { useSystemBillableSetting } from '../../hooks/useSystemBillableSetting';
+import { useSystemBillableSetting } from '../../hooks/useExemptionSchema';
 import ActionButtons from '../billable-exemptions/action-buttons/action-buttons.component';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import type { Schema } from '../../types';
