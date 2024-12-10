@@ -1,13 +1,9 @@
 import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { ServiceConcept } from '../types';
+import { ServiceConcept, ServiceTypesResponse } from '../types';
 
 type ResponseObject = {
   results: Array<OpenmrsResource>;
-};
-
-type ServiceTypesResponse = {
-  setMembers: { uuid: string; display: string }[];
 };
 
 export const useBillableServices = () => {
@@ -17,7 +13,7 @@ export const useBillableServices = () => {
 };
 
 export function useServiceTypes() {
-  const url = `/ws/rest/v1/concept/d7bd4cc0-90b1-4f22-90f2-ab7fde936727?v=custom:(setMembers:(uuid,display))`;
+  const url = `/ws/rest/v1/concept/d7bd4cc0-90b1-4f22-90f2-ab7fde936727?v=custom:(setMembers:(uuid,display,id))`;
   const { data, error, isLoading } = useSWR<{ data: ServiceTypesResponse }>(url, openmrsFetch, {});
   return { serviceTypes: data?.data.setMembers ?? [], error, isLoading };
 }
