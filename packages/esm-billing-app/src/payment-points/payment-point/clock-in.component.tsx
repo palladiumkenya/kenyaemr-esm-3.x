@@ -25,7 +25,15 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint?: PaymentPoint }) => {
+export const ClockIn = ({
+  closeModal,
+  paymentPoint,
+  enableCancelling,
+}: {
+  closeModal: () => void;
+  paymentPoint?: PaymentPoint;
+  enableCancelling?: boolean;
+}) => {
   const { mutate } = useActiveSheet();
   const { providerUUID, isLoading, error } = useProviderUUID();
   const { t } = useTranslation();
@@ -112,7 +120,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
   if (shouldPromptUser) {
     return (
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <ModalHeader closeModal={undefined}>Clock In</ModalHeader>
+        <ModalHeader closeModal={enableCancelling ? closeModal : undefined}>Clock In</ModalHeader>
         <ModalBody>
           {isLoadingPaymentPoints ? (
             <SelectSkeleton />
@@ -134,9 +142,9 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
         <ModalFooter>
           <Button
             kind="secondary"
-            onClick={shouldPromptUser ? undefined : closeModal}
+            onClick={enableCancelling ? closeModal : undefined}
             type="button"
-            disabled={shouldPromptUser}>
+            disabled={enableCancelling ? false : true}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button type="submit" disabled={isLoading || error || !providerUUID || !isValid}>

@@ -1,5 +1,4 @@
 import {
-  Button,
   DataTable,
   Pagination,
   TableContainer,
@@ -7,7 +6,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { isDesktop, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -15,8 +14,6 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useBills } from '../../billing.resource';
 import { useRenderedRows } from '../../hooks/use-rendered-rows';
-import { usePaymentPoints } from '../../payment-points/payment-points.resource';
-import { useClockInStatus } from '../../payment-points/use-clock-in-status';
 import { PaymentStatus, Timesheet } from '../../types';
 import { AppliedFilterTags } from './applied-filter-tages.component';
 import { Filter } from './filter.component';
@@ -30,10 +27,6 @@ export const PaymentHistoryViewer = () => {
   const [dateRange, setDateRange] = useState<Array<Date>>([dayjs().startOf('day').toDate(), new Date()]);
   const { paymentPointUUID } = useParams();
   const isOnPaymentPointPage = Boolean(paymentPointUUID);
-
-  const { isClockedInCurrentPaymentPoint } = useClockInStatus(paymentPointUUID);
-  const { paymentPoints } = usePaymentPoints();
-
   const paidBillsResponse = useBills('', isOnPaymentPointPage ? '' : PaymentStatus.PAID, dateRange[0], dateRange[1]);
   const { bills } = paidBillsResponse;
 
@@ -60,20 +53,6 @@ export const PaymentHistoryViewer = () => {
 
   const handleFilterByDateRange = (dates: Array<Date>) => {
     setDateRange(dates);
-  };
-
-  const openClockInModal = () => {
-    const dispose = showModal('clock-in-modal', {
-      closeModal: () => dispose(),
-      paymentPoint: paymentPoints.find((paymentPoint) => paymentPoint.uuid === paymentPointUUID),
-    });
-  };
-
-  const openClockOutModal = () => {
-    const dispose = showModal('clock-out-modal', {
-      closeModal: () => dispose(),
-      paymentPoint: paymentPoints.find((paymentPoint) => paymentPoint.uuid === paymentPointUUID),
-    });
   };
 
   const resetFilters = () => {
@@ -116,16 +95,6 @@ export const PaymentHistoryViewer = () => {
                     dateRange={dateRange}
                   />
                   <TableToolBarDateRangePicker onChange={handleFilterByDateRange} currentValues={dateRange} />
-                  {isOnPaymentPointPage && !isClockedInCurrentPaymentPoint && (
-                    <Button className={styles.clockIn} onClick={openClockInModal}>
-                      Clock In
-                    </Button>
-                  )}
-                  {isOnPaymentPointPage && isClockedInCurrentPaymentPoint && (
-                    <Button className={styles.clockIn} onClick={openClockOutModal} kind="danger">
-                      Clock Out
-                    </Button>
-                  )}
                 </TableToolbarContent>
               </TableToolbar>
             </div>

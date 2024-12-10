@@ -5,7 +5,7 @@
 
 .container {
   display: flex;
-  margin: layout.$spacing-05;
+  margin: 0 layout.$spacing-05 layout.$spacing-05 layout.$spacing-05;
   gap: layout.$spacing-05;
 }
 
