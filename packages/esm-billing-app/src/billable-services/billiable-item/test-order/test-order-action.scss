@@ -1,0 +1,12 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0 layout.$spacing-04;
+  font-size: type.type-scale(2);
+}

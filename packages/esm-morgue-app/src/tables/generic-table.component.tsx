@@ -15,7 +15,7 @@ import {
 import { CardHeader, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './generic-table.scss';
-import EmptyDeceasedSearch from '../empty-state/empty-search-deceased.component';
+import EmptyDeceasedSearch from '../empty-state/empty-morgue-admission.component';
 
 interface GenericTableProps {
   rows: any[];

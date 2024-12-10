@@ -2720,6 +2720,7 @@ __metadata:
     prettier: "npm:^2.2.1"
     pretty-quick: "npm:^2.0.2"
     react: "npm:^18.2.0"
+    react-ace: "npm:^13.0.0"
     react-dom: "npm:^18.2.0"
     react-hook-form: "npm:^7.45.1"
     react-i18next: "npm:^11.18.6"
@@ -6787,6 +6788,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ace-builds@npm:^1.36.3":
+  version: 1.36.5
+  resolution: "ace-builds@npm:1.36.5"
+  checksum: b9e29c9ef2ed380f7eb3ff94777e82de9482344707ec348f241989d0377822c06d59ab18d881970e23983773de5c0ca1e5f9c710a7f18fb60ca9939df0cf97da
+  languageName: node
+  linkType: hard
+
 "acorn-globals@npm:^7.0.0":
   version: 7.0.1
   resolution: "acorn-globals@npm:7.0.1"
@@ -9751,6 +9759,13 @@ __metadata:
   version: 3.2.7
   resolution: "dexie@npm:3.2.7"
   checksum: e70dae162b1589ff02b98810d1cdc157be0e0f66710be28ab2477db4ccd5cc7364f8c681e3f21883c3835ea800f8100ec975b015fa3ac6cdcb5686d187b31043
+  languageName: node
+  linkType: hard
+
+"diff-match-patch@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "diff-match-patch@npm:1.0.5"
+  checksum: fd1ab417eba9559bda752a4dfc9a8ac73fa2ca8b146d29d153964b437168e301c09d8a688fae0cd81d32dc6508a4918a94614213c85df760793f44e245173bb6
   languageName: node
   linkType: hard
 
@@ -13936,6 +13951,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.get@npm:^4.4.2":
+  version: 4.4.2
+  resolution: "lodash.get@npm:4.4.2"
+  checksum: 2a4925f6e89bc2c010a77a802d1ba357e17ed1ea03c2ddf6a146429f2856a216663e694a6aa3549a318cbbba3fd8b7decb392db457e6ac0b83dc745ed0a17380
+  languageName: node
+  linkType: hard
+
 "lodash.isequal@npm:^4.5.0":
   version: 4.5.0
   resolution: "lodash.isequal@npm:4.5.0"
@@ -16285,6 +16307,22 @@ __metadata:
     iconv-lite: "npm:0.4.24"
     unpipe: "npm:1.0.0"
   checksum: 863b5171e140546a4d99f349b720abac4410338e23df5e409cfcc3752538c9caf947ce382c89129ba976f71894bd38b5806c774edac35ebf168d02aa1ac11a95
+  languageName: node
+  linkType: hard
+
+"react-ace@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "react-ace@npm:13.0.0"
+  dependencies:
+    ace-builds: "npm:^1.36.3"
+    diff-match-patch: "npm:^1.0.5"
+    lodash.get: "npm:^4.4.2"
+    lodash.isequal: "npm:^4.5.0"
+    prop-types: "npm:^15.8.1"
+  peerDependencies:
+    react: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 93bf67725641d6533d25e930c309e86ea13f91299c6f3fa7ae90c35d647a8309beca2f031c31bf7fe2f3bc9d88831430befa3340eb6c1ed8d651529613363240
   languageName: node
   linkType: hard
 

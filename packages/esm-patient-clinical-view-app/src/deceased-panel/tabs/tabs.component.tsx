@@ -1,17 +1,39 @@
 import React from 'react';
 import styles from './tabs.scss';
-import { navigate } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, useConfig, useVisit } from '@openmrs/esm-framework';
 import { Tile, Button, Layer } from '@carbon/react';
-import { Movement, Return, Delete, TrashCan } from '@carbon/react/icons';
+import { Movement, Return } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import MortuarySummary from '../mortuary-summary/mortuary-summary.component';
+import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { ConfigObject } from '../../config-schema';
+import { usePatientDischargedStatus } from '../hook/useMorgueVisit';
 
 const DeceasedDetailsView: React.FC = () => {
   const { t } = useTranslation();
+  const patientUuid = getPatientUuidFromUrl();
+  const { morgueDischargeEncounterUuid, morgueVisitTypeUuid } = useConfig<ConfigObject>();
+  const { status, isLoading, error } = usePatientDischargedStatus(patientUuid);
+
+  const isVisitActive = !(typeof status?.stopDatetime === 'string');
+  const hasDischargeEncounter = status?.encounters?.some(
+    (encounter) => encounter.encounterType.uuid === morgueDischargeEncounterUuid,
+  );
+
   const handleNavigateToAllocationPage = () =>
     navigate({
       to: window.getOpenmrsSpaBase() + `home/morgue/allocation`,
     });
+
+  const handleDischargeForm = (uuid: string) => {
+    launchWorkspace('discharge-body-form', {
+      workspaceTitle: t('dischargeForm', 'Discharge form'),
+      patientUuid: uuid,
+    });
+  };
+
+  const isDischargeDisabled = hasDischargeEncounter && !isVisitActive;
+
   return (
     <div className={styles.deceasedDetailsContainer}>
       <Layer className={styles.container}>
@@ -30,15 +52,12 @@ const DeceasedDetailsView: React.FC = () => {
                 {t('allocation', 'Allocation View')}
               </Button>
               <Button
-                className={styles.ghostButton}
-                kind="ghost"
+                className={styles.rightButton}
+                kind="danger"
                 size="sm"
-                renderIcon={TrashCan}
-                onClick={handleNavigateToAllocationPage}>
-                {t('disposeBody', 'Dispose body')}
-              </Button>
-
-              <Button className={styles.rightButton} kind="danger" size="sm" renderIcon={Movement}>
+                renderIcon={Movement}
+                onClick={() => handleDischargeForm(patientUuid)}
+                disabled={isDischargeDisabled}>
                 {t('releaseBody', 'Release Body')}
               </Button>
             </div>
