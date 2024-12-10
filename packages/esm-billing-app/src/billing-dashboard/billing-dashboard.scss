@@ -29,7 +29,7 @@
 .clockOutStrip {
   display: flex;
   justify-content: space-between;
-  padding: layout.$spacing-05;
+  padding: layout.$spacing-05 layout.$spacing-05 0 layout.$spacing-05;
 }
 
 .clockOutInfo {

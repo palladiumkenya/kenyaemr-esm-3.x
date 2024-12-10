@@ -9,6 +9,7 @@ export const ClockInBoundary = ({ children }: { children: React.ReactNode }) => 
   const openClockInModal = () => {
     const dispose = showModal('clock-in-modal', {
       closeModal: () => dispose(),
+      disableCancelling: true,
     });
   };
 
