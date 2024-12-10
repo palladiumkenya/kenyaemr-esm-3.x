@@ -46,7 +46,7 @@ export const configSchema = {
   morgueDischargeEncounterTypeUuid: {
     type: Type.String,
     _description: 'Encounter type for morgue discharge',
-    _default: ' d618f40b-b5a3-4f17-81c8-2f04e2aad58e',
+    _default: 'd618f40b-b5a3-4f17-81c8-2f04e2aad58e',
   },
   visitPaymentMethodAttributeUuid: {
     _type: Type.String,
@@ -82,6 +82,11 @@ export const configSchema = {
     _type: Type.String,
     _description: 'UUID for discharge area concept',
     _default: 'a458fd00-199e-4d08-ad5c-1be322a6ccbe',
+  },
+  adminUuid: {
+    _type: Type.String,
+    _description: 'UUID for admin user',
+    _default: 'e02c40e5-04e7-11e5-ae3c-a0b3cc4f922f',
   },
 };
 
@@ -127,4 +132,5 @@ export type ConfigObject = {
   policeIDNumber: string;
   dischargeAreaUuid: string;
   morgueDischargeEncounterTypeUuid: string;
+  adminUuid: string;
 };

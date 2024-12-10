@@ -44,7 +44,7 @@ export const configSchema = {
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
       clinicalEncounterFormUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
-      autopsyFormUuid: '',
+      autopsyFormUuid: '62d2c083-70af-4403-a5c4-6147507e1528',
     },
   },
   defaulterTracingEncounterUuid: {
@@ -52,10 +52,10 @@ export const configSchema = {
     _description: 'Encounter UUID for defaulter tracing',
     _default: '1495edf8-2df2-11e9-b210-d663bd873d93',
   },
-  autopsyEncounterUuid: {
+  autopsyEncounterFormUuid: {
     _type: Type.String,
     _description: 'Encounter UUID for autopsy',
-    _default: '',
+    _default: '465a92f2-baf8-42e9-9612-53064be868e8',
   },
   clinicalEncounterUuid: {
     _type: Type.String,
@@ -255,6 +255,11 @@ export const configSchema = {
     _description: ' UUID for morgue visit',
     _default: '6307dbe2-f336-4c11-a393-50c2769f455a',
   },
+  morgueDischargeEncounterUuid: {
+    _type: Type.String,
+    _description: ' UUID for morgue discharge encounter uuid',
+    _default: 'd618f40b-b5a3-4f17-81c8-2f04e2aad58e',
+  },
   inPatientForms: {
     _type: Type.Array,
     _description: 'List of forms that can be filled out for in-patients',
@@ -282,6 +287,7 @@ export const configSchema = {
 export interface ConfigObject {
   peerEducatorRelationship: string;
   morgueVisitTypeUuid: string;
+  morgueDischargeEncounterUuid: string;
   caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
   peerCalendarOutreactForm: string;
   encounterTypes: { mchMotherConsultation: string; hivTestingServices: string; kpPeerCalender: string };
@@ -298,6 +304,7 @@ export interface ConfigObject {
     autopsyFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
+  autopsyEncounterFormUuid: string;
   clinicalEncounterUuid: string;
   registrationEncounterUuid: string;
   registrationObs: {

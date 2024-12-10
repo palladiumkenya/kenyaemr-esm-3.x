@@ -1,17 +1,33 @@
 import {
   FetchResponse,
   openmrsFetch,
+  openmrsObservableFetch,
   OpenmrsResource,
   restBaseUrl,
+  toDateObjectStrict,
+  toOmrsIsoString,
   useConfig,
   useOpenmrsPagination,
 } from '@openmrs/esm-framework';
-import { DeceasedPatientResponse, PaymentMethod, VisitTypeResponse, Location, Patient, Visit } from '../types';
+import {
+  DeceasedPatientResponse,
+  PaymentMethod,
+  VisitTypeResponse,
+  Location,
+  Patient,
+  Visit,
+  UseVisitQueueEntries,
+  VisitQueueEntry,
+  MappedVisitQueueEntry,
+  UpdateVisitPayload,
+  PaginatedResponse,
+} from '../types';
 import useSWR from 'swr';
 import { BillingConfig, ConfigObject } from '../config-schema';
 import { useEffect, useState } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { makeUrlUrl } from '../utils/utils';
+import type { Observable } from 'rxjs';
 
 const getMorguePatientStatus = async (
   patientUuid: string,
@@ -19,7 +35,7 @@ const getMorguePatientStatus = async (
   morgueDischargeEncounter: string,
 ): Promise<'discharged' | 'admitted' | 'awaiting'> => {
   const customRepresentation = 'custom:(visitType:(uuid),startDatetime,stopDatetime,encounters:(encounterType:(uuid)))';
-  const url = `${restBaseUrl}/visit?v=${customRepresentation}&includeInactive=false&patient=${patientUuid}&limit=1`;
+  const url = `${restBaseUrl}/visit?v=${customRepresentation}&patient=${patientUuid}&limit=1`;
   const response = await openmrsFetch<{
     results: Array<{
       visitType: { uuid: string };
@@ -38,6 +54,7 @@ const getMorguePatientStatus = async (
   );
   const isMorgueVisit = visit?.visitType?.uuid === morgueVisitTypeUuid;
   const isVisitActive = !(typeof visit?.stopDatetime === 'string');
+
   if (!isMorgueVisit) {
     return 'awaiting';
   }
@@ -46,28 +63,33 @@ const getMorguePatientStatus = async (
   }
   return 'admitted';
 };
-export const useDeceasedPatient = () => {
+export const useDeceasedPatient = (searchTerm?: string) => {
   const { morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid } = useConfig<ConfigObject>();
   const [deceasedPatient, setDeceasedPatient] = useState([]);
   const [isLoadingStatus, setIsLoadingStatus] = useState(false);
   const [statusError, setStatusError] = useState();
   const customRepresentation =
     'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name)),person:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),preferredAddress:(uuid,stateProvince,countyDistrict,address4)))';
-  const url = `${restBaseUrl}/morgue/patient?v=${customRepresentation}&dead=true`;
+  const uril = makeUrlUrl(`${restBaseUrl}/morgue/patient?v=${customRepresentation}&dead=true&q=${searchTerm}`);
+  const pageSize = 10;
+  const {
+    data: paginatedData,
+    error: paginatedError,
+    isLoading: isPaginatedLoading,
+  } = useOpenmrsPagination<PaginatedResponse>(uril, pageSize);
 
-  const { data, error, isLoading } = useSWRImmutable<{ data: DeceasedPatientResponse }>(url, openmrsFetch);
   useEffect(() => {
-    if (data?.data?.results?.length) {
+    if (paginatedData?.length) {
       (async () => {
         try {
           setIsLoadingStatus(true);
           const status = await Promise.all(
-            data.data.results.map((data) => {
+            paginatedData?.map((data) => {
               return getMorguePatientStatus(data?.uuid, morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid);
             }),
           );
 
-          setDeceasedPatient(data.data.results.map((patient, index) => ({ ...patient, status: status[index] })));
+          setDeceasedPatient(paginatedData?.map((patient, index) => ({ ...patient, status: status[index] })));
         } catch (error) {
           setStatusError(error);
         } finally {
@@ -75,18 +97,13 @@ export const useDeceasedPatient = () => {
         }
       })();
     }
-  }, [morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid, data]);
+  }, [morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid, paginatedData]);
 
-  return { data: deceasedPatient, error: error ?? statusError, isLoading: isLoading || isLoadingStatus };
-};
-
-export const usePatientPaginatedEncounters = (patientUuid: string) => {
-  const customRepresentation =
-    'custom:(visitType:(uuid,name,display),uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display),display),value,obsDatetime),encounterType:(uuid,display,viewPrivilege,editPrivilege),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient,attributes:(attributeType:ref,display,uuid,value)';
-  const url = makeUrlUrl(`${restBaseUrl}/encounter?patient=${patientUuid}&v=full`);
-
-  const paginatedEncounter = useOpenmrsPagination(url, 10);
-  return paginatedEncounter;
+  return {
+    data: deceasedPatient,
+    error: paginatedError ?? statusError,
+    isLoading: isPaginatedLoading || isLoadingStatus,
+  };
 };
 
 export const useVisitType = () => {
@@ -177,3 +194,74 @@ const usePerson = (uuid: string) => {
 };
 
 export default usePerson;
+
+export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
+  const apiUrl = `${restBaseUrl}/visit-queue-entry?v=full&patient=${patientUuid}`;
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
+  const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
+    id: visitQueueEntry.uuid,
+    name: visitQueueEntry.queueEntry.queue.display,
+    patientUuid: visitQueueEntry.queueEntry.patient.uuid,
+    priority:
+      visitQueueEntry.queueEntry.priority.display === 'Urgent'
+        ? 'Priority'
+        : visitQueueEntry.queueEntry.priority.display,
+    priorityUuid: visitQueueEntry.queueEntry.priority.uuid,
+    service: visitQueueEntry.queueEntry.queue?.display,
+    status: visitQueueEntry.queueEntry.status.display,
+    statusUuid: visitQueueEntry.queueEntry.status.uuid,
+    visitUuid: visitQueueEntry.visit?.uuid,
+    visitType: visitQueueEntry.visit?.visitType?.display,
+    queue: visitQueueEntry.queueEntry.queue,
+    queueEntryUuid: visitQueueEntry.queueEntry.uuid,
+  });
+
+  const mappedVisitQueueEntry =
+    data?.data?.results
+      ?.map(mapVisitQueueEntryProperties)
+      .filter((visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid)
+      .shift() ?? null;
+  return {
+    queueEntry: mappedVisitQueueEntry,
+    isLoading,
+    error: error,
+    isValidating,
+    mutate,
+  };
+}
+
+export function removeQueuedPatient(
+  queueUuid: string,
+  queueEntryUuid: string,
+  abortController: AbortController,
+  endedAt?: Date,
+) {
+  return openmrsFetch(`${restBaseUrl}/queue/${queueUuid}/entry/${queueEntryUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: {
+      endedAt: toDateObjectStrict(toOmrsIsoString(endedAt) ?? toOmrsIsoString(new Date())),
+    },
+    signal: abortController.signal,
+  });
+}
+
+export function updateVisit(
+  uuid: string,
+  payload: UpdateVisitPayload,
+  abortController: AbortController,
+): Observable<any> {
+  return openmrsObservableFetch(`${restBaseUrl}/visit/${uuid}`, {
+    signal: abortController.signal,
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json',
+    },
+    body: payload,
+  });
+}
