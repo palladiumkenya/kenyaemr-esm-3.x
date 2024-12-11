@@ -2692,6 +2692,7 @@ __metadata:
     "@types/webpack-env": "npm:^1.16.0"
     "@typescript-eslint/eslint-plugin": "npm:^4.15.1"
     "@typescript-eslint/parser": "npm:^5.18.0"
+    ace-builds: "npm:^1.36.5"
     axios: "npm:^1.6.8"
     babel-preset-minify: "npm:^0.5.1"
     classnames: "npm:^2.3.2"
@@ -6788,7 +6789,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ace-builds@npm:^1.36.3":
+"ace-builds@npm:^1.36.3, ace-builds@npm:^1.36.5":
   version: 1.36.5
   resolution: "ace-builds@npm:1.36.5"
   checksum: b9e29c9ef2ed380f7eb3ff94777e82de9482344707ec348f241989d0377822c06d59ab18d881970e23983773de5c0ca1e5f9c710a7f18fb60ca9939df0cf97da
