@@ -564,3 +564,9 @@ export interface Service {
   concept: string;
   description: string;
 }
+
+export type ServiceType = { uuid: string; display: string; id: number };
+
+export type ServiceTypesResponse = {
+  setMembers: Array<ServiceType>;
+};
