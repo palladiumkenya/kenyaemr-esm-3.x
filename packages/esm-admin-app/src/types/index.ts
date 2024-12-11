@@ -1,6 +1,6 @@
-export interface ETLLogs {
-  procedure: string;
-  startTime: string;
-  endTime: string;
-  completionStatus: string;
+export interface ETLResponse {
+  script_name: string;
+  start_time: string;
+  stop_time: string;
+  status: string;
 }
