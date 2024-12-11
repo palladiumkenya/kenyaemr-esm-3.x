@@ -16,7 +16,7 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PaymentPoint } from '../../types';
-import { clockIn, clockOut, usePaymentPoints, useProviderUUID, useTimeSheets } from '../payment-points.resource';
+import { clockIn, clockOut, useActiveSheet, usePaymentPoints, useProviderUUID } from '../payment-points.resource';
 import { useClockInStatus } from '../use-clock-in-status';
 
 const schema = z.object({
@@ -26,12 +26,12 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint?: PaymentPoint }) => {
-  const { mutate } = useTimeSheets();
+  const { mutate } = useActiveSheet();
   const { providerUUID, isLoading, error } = useProviderUUID();
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
-  const { globalActiveSheet, isClockedInSomewhere } = useClockInStatus(paymentPoint?.uuid);
+  const { globalActiveSheet, isClockedIn } = useClockInStatus(paymentPoint?.uuid);
 
   const shouldPromptUser = !paymentPoint;
 
@@ -75,7 +75,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     setIsSubmitting(true);
-    if (isClockedInSomewhere) {
+    if (isClockedIn) {
       clockOut(globalActiveSheet.uuid, {
         clockOut: new Date().toISOString(),
       })
@@ -158,7 +158,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
     <Form onSubmit={handleSubmit(onSubmit)}>
       <ModalHeader closeModal={closeModal}>Clock In</ModalHeader>
       <ModalBody>
-        {isClockedInSomewhere
+        {isClockedIn
           ? `You will be clocked in on ${paymentPoint.name} right now but you will be automatically be clocked out of ${globalActiveSheet.cashPoint.name} first. Do you want to proceed.`
           : `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`}
       </ModalBody>
