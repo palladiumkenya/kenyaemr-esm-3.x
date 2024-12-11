@@ -1,7 +1,6 @@
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import first from 'lodash-es/first';
 
 type BillableItemResponse = {
   uuid: string;
