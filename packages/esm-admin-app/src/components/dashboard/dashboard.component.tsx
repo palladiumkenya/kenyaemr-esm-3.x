@@ -77,7 +77,7 @@ const Dashboard: React.FC = () => {
       <Layer className={styles.btnLayer}>
         {isLoading ? (
           <InlineLoading
-            description={t('etlsOperationsLoading', `Please wait, ${currentOperation} is in progress...`)}
+            description={t('etlsOperationsLoading', 'Please wait, {{currentOperation}} is in progress...')}
             size="md"
             className={styles.loading}
             withOverlay
@@ -86,27 +86,27 @@ const Dashboard: React.FC = () => {
           <ComboButton tooltipAlignment="left" label={t('etlOperation', 'ETL operations')} size="md">
             <MenuItem
               label={t('refreshTables', 'Refresh tables')}
-              onClick={() => openConfirmationModal(refreshTables, t('refreshTables', 'Refresh tables'), false)} // Preserve existing rows during refresh
+              onClick={() => openConfirmationModal(refreshTables, t('refreshTables', 'Refresh tables'), false)}
             />
             <MenuItem
               label={t('recreateTables', 'Recreate tables')}
-              onClick={() => openConfirmationModal(recreateTables, t('recreateTables', 'Recreate tables'), true)} // Clear data for recreate operation
+              onClick={() => openConfirmationModal(recreateTables, t('recreateTables', 'Recreate tables'), true)}
             />
             <MenuItem
               label={t('recreateDatatools', 'Recreate datatools')}
               onClick={() =>
                 openConfirmationModal(recreateDatatools, t('recreateDatatools', 'Recreate datatools'), true)
-              } // Clear data for recreate operation
+              }
             />
             <MenuItem
               label={t('refreshDwapi', 'Refresh DWAPI tables')}
-              onClick={() => openConfirmationModal(refreshDwapi, t('refreshDwapi', 'Refresh DWAPI tables'), false)} // Preserve existing rows during refresh
+              onClick={() => openConfirmationModal(refreshDwapi, t('refreshDwapi', 'Refresh DWAPI tables'), false)}
             />
           </ComboButton>
         )}
       </Layer>
       <Layer className={styles.tableLayer}>
-        <LogTable logData={logData} isLoading={isRefreshing} /> {/* Pass refresh state for conditional loading */}
+        <LogTable logData={logData} isLoading={isRefreshing} />
       </Layer>
     </div>
   );

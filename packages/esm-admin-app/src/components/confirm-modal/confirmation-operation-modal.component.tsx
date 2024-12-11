@@ -16,7 +16,7 @@ const OperationConfirmation: React.FC<OperationConfirmationModalProps> = ({
   operationType,
 }) => {
   const { t } = useTranslation();
-  const message = t('operationsConfirmationMessages', `Do you want to ${operationType || operationName}?`);
+  const message = t('operationsConfirmationMessages', `Do you want to {{operationType || operationName}}?`);
 
   return (
     <>
