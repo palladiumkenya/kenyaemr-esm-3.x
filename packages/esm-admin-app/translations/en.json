@@ -8,7 +8,7 @@
   "etlsOperationsLoading": "Please wait {{currentOperation}} is in progress...",
   "home": "Home",
   "noRecordsFound": "No ETL Operation logs found",
-  "noRespond": "No",
+  "no": "No",
   "operationError": "{{operationName}} failed",
   "operationErrorSubtitle": "An error occurred during the operation.",
   "operationsConfirmationMessages": "Do you want to {{operationTypeOrName}}?",
