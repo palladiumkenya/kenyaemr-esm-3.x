@@ -11,7 +11,8 @@ jest.mock('react-i18next', () => ({
 describe('OperationConfirmation', () => {
   beforeEach(() => {
     (useTranslation as jest.Mock).mockReturnValue({
-      t: (key, defaultValue) => defaultValue || key,
+      t: (key, defaultValue, options) =>
+        options?.operationTypeOrName ? `Do you want to ${options.operationTypeOrName}?` : defaultValue || key,
     });
   });
 
@@ -31,7 +32,7 @@ describe('OperationConfirmation', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Confirmation' })).toBeInTheDocument();
-    expect(screen.getByText(`Do you want to ${operationType || operationName}?`)).toBeInTheDocument();
+    expect(screen.getByText('Do you want to refreshed?')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
     expect(screen.getByText('Yes')).toBeInTheDocument();
   });
