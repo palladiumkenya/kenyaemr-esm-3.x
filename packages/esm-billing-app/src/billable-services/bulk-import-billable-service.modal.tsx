@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { usePaymentModes } from '../billing.resource';
 import { MAX_ALLOWED_FILE_SIZE } from '../constants';
 import { ExcelFileRow } from '../types';
-import { createBillableService } from './billable-service.resource';
+import { createBillableService, useServiceTypes } from './billable-service.resource';
 import { useChargeSummaries } from './billables/charge-summary.resource';
 import { BillableServicePayload, getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
 import styles from './clinical-charges.scss';
@@ -19,7 +19,7 @@ export const BulkImportBillableServices = ({ closeModal }) => {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
 
   const { chargeSummaryItems, mutate } = useChargeSummaries();
-
+  const { serviceTypes } = useServiceTypes();
   const { paymentModes } = usePaymentModes();
 
   const attachFiles = () => {
@@ -48,7 +48,18 @@ export const BulkImportBillableServices = ({ closeModal }) => {
     reader.onload = async (e) => {
       setIsImporting(true);
       const data = new Uint8Array(e.target.result as ArrayBuffer);
-      const fileReadResponse = getBulkUploadPayloadFromExcelFile(data, chargeSummaryItems, paymentModes);
+      let fileReadResponse: ReturnType<typeof getBulkUploadPayloadFromExcelFile> = [];
+
+      try {
+        fileReadResponse = getBulkUploadPayloadFromExcelFile(data, chargeSummaryItems, paymentModes, serviceTypes);
+      } catch (error) {
+        setIsImporting(false);
+        closeModal();
+        showSnackbar({
+          title: t('errorOccurred', 'an error occurred'),
+          subtitle: t('uploadError', 'an unknown error occurred. Please try reuploading the file'),
+        });
+      }
 
       if (fileReadResponse === 'INVALID_TEMPLATE') {
         closeModal();
@@ -59,6 +70,7 @@ export const BulkImportBillableServices = ({ closeModal }) => {
           ),
           kind: 'error',
         });
+        setIsImporting(false);
         return;
       }
 
@@ -93,20 +105,22 @@ export const BulkImportBillableServices = ({ closeModal }) => {
         await Promise.all(promises);
       }
 
-      mutate();
       setIsImporting(false);
       closeModal();
 
-      if (erroredPayloads.length === 0 && correctRowsPayload.length > 1) {
+      if (erroredPayloads.length === 0 && correctRowsPayload.length >= 1) {
         showSnackbar({
           title: t('success', 'successfully'),
           subtitle: t(
             'successFullyUploadedItems',
-            `Successfully uploaded ${correctRowsPayload.length} billable services.`,
+            `Successfully uploaded ${correctRowsPayload.length} billable service${
+              correctRowsPayload.length > 1 ? 's' : ''
+            }.`,
           ),
           kind: 'success',
         });
 
+        mutate();
         return;
       }
 
