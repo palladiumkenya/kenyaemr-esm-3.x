@@ -77,7 +77,9 @@ const Dashboard: React.FC = () => {
       <Layer className={styles.btnLayer}>
         {isLoading ? (
           <InlineLoading
-            description={t('etlsOperationsLoading', 'Please wait, {{currentOperation}} is in progress...')}
+            description={t('etlsOperationsLoading', 'Please wait {{currentOperation}} is in progress...', {
+              currentOperation,
+            })}
             size="md"
             className={styles.loading}
             withOverlay
