@@ -1,7 +1,7 @@
 import { Filter, MappedBill } from '../../../types';
 
 const createPaymentMethodFilter =
-  (paymentMethods: string[]) =>
+  (paymentMethods: Array<string>) =>
   (bill: MappedBill): MappedBill => {
     // If no payment methods specified, return original bill
     if (!paymentMethods || paymentMethods.length === 0) {
@@ -18,7 +18,7 @@ const createPaymentMethodFilter =
   };
 
 const createServiceTypesFilter =
-  (serviceUuids: string[]) =>
+  (serviceUuids: Array<string>) =>
   (bill: MappedBill): boolean => {
     if (!serviceUuids || serviceUuids.length === 0) {
       return true;
@@ -27,7 +27,7 @@ const createServiceTypesFilter =
   };
 
 // Main filtering function
-export const filterBills = (bills: MappedBill[], filters: Filter): MappedBill[] => {
+export const filterBills = (bills: Array<MappedBill>, filters: Filter): Array<MappedBill> => {
   const { paymentMethods = [], serviceTypes = [], cashiers = [], status } = filters;
   const billsWithFilteredPayments = bills.map(createPaymentMethodFilter(paymentMethods));
 

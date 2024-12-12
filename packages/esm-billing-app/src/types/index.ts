@@ -571,9 +571,9 @@ export type ServiceTypesResponse = {
   setMembers: Array<ServiceType>;
 };
 export interface Filter {
-  paymentMethods?: string[];
+  paymentMethods?: Array<string>;
   amountRange?: { min: number; max: number };
-  serviceTypes?: string[];
-  cashiers?: string[];
+  serviceTypes?: Array<string>;
+  cashiers?: Array<string>;
   status?: string;
 }

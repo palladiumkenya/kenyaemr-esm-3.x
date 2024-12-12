@@ -10,12 +10,16 @@ import {
   Pagination,
   Search,
   TableContainer,
+  Button,
 } from '@carbon/react';
+import { Download } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useDebounce, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { convertToCurrency } from '../../helpers/functions';
 import { MappedBill } from '../../types';
+import { exportToExcel } from '../../helpers/excelExport';
+import dayjs from 'dayjs';
 
 export const PaymentHistoryTable = ({
   headers,
@@ -58,6 +62,36 @@ export const PaymentHistoryTable = ({
     };
   });
 
+  const handleExport = () => {
+    const dataForExport = rows.map((row) => {
+      return {
+        ...row,
+        totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
+      };
+    });
+    const data = dataForExport.map((row: (typeof transformedRows)[0]) => {
+      return {
+        'Patient ID': row.identifier,
+        'Patient Name': row.patientName,
+        'Receipt Number': row.receiptNumber,
+        'Total Amount': row.lineItems.reduce((acc, item) => acc + item.price, 0),
+        'Payment Mode': row.payments.map((payment: (typeof row.payments)[0]) => payment.instanceType.name).join(', '),
+        'Payment Date': dayjs(row.payments[0].dateCreated).format('DD-MM-YYYY'),
+        'Payment Amount': row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0),
+        'Reason/Reference': row.payments
+          .map((payment: (typeof row.payments)[0]) =>
+            payment.attributes.map((attribute: (typeof payment.attributes)[0]) => attribute.attributeType.name),
+          )
+          .join(' '),
+      };
+    });
+
+    exportToExcel(data, {
+      fileName: `Transaction History - ${dayjs().format('DDD-MMM-YYYY:HH-mm-ss')}`,
+      sheetName: t('paymentHistory', 'Payment History'),
+    });
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -69,6 +103,10 @@ export const PaymentHistoryTable = ({
           id="search-transactions"
           onChange={(event) => setSearchString(event.target.value)}
         />
+
+        <Button size={responsiveSize} renderIcon={Download} iconDescription="Download" onClick={handleExport}>
+          {t('download', 'Download')}
+        </Button>
       </div>
       <DataTable useZebraStyles size="sm" rows={transformedRows} headers={headers}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
