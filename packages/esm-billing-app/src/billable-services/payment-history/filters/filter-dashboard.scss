@@ -1,0 +1,15 @@
+@use '@carbon/layout';
+
+.filterContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-05;
+  align-items: center;
+}
+
+.filterDashboard {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05 layout.$spacing-05 0 layout.$spacing-05;
+}

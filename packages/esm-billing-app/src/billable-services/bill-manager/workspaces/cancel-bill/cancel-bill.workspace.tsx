@@ -23,12 +23,14 @@ type CancelBillWorkspaceProps = DefaultWorkspaceProps & {
   patientUuid: string;
   bill: MappedBill;
   lineItem: LineItem;
+  mutateSomeEndpoint: () => void;
 };
 
 const CancelBillWorkspace: React.FC<CancelBillWorkspaceProps> = ({
   patientUuid,
   bill,
   lineItem,
+  mutateSomeEndpoint,
   closeWorkspace,
   closeWorkspaceWithSavedChanges,
 }) => {
@@ -67,7 +69,7 @@ const CancelBillWorkspace: React.FC<CancelBillWorkspaceProps> = ({
       mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/cashier/bill`), undefined, {
         revalidate: true,
       });
-      closeWorkspaceWithSavedChanges();
+      closeWorkspaceWithSavedChanges({ onWorkspaceClose: mutateSomeEndpoint });
     } catch (error) {
       showSnackbar({
         title: t('billUpdate', 'Bill update'),

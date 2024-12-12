@@ -570,3 +570,10 @@ export type ServiceType = { uuid: string; display: string; id: number };
 export type ServiceTypesResponse = {
   setMembers: Array<ServiceType>;
 };
+export interface Filter {
+  paymentMethods?: string[];
+  amountRange?: { min: number; max: number };
+  serviceTypes?: string[];
+  cashiers?: string[];
+  status?: string;
+}
