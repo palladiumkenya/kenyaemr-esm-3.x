@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@carbon/pictograms-react": "^11.66.0",
-    "@openmrs/esm-framework": "next",
+    "@openmrs/esm-framework": "^6.0.1-pre.2553",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "^1.30.0",
     "@swc/cli": "^0.1.57",
@@ -77,7 +77,7 @@
     "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lodash": "^4.17.21",
-    "openmrs": "next",
+    "openmrs": "^6.0.1-pre.2553",
     "pinst": "^3.0.0",
     "prettier": "^2.2.1",
     "pretty-quick": "^2.0.2",

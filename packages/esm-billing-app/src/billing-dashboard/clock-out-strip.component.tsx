@@ -1,6 +1,7 @@
 import { Button } from '@carbon/react';
 import { Alarm, IbmCloudSysdigSecure, Shuffle } from '@carbon/react/icons';
 import { showModal } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,8 +26,7 @@ export const ClockOutStrip = () => {
   };
 
   const openClockInModal = () => {
-    const dispose = showModal('clock-in-modal', {
-      closeModal: () => dispose(),
+    launchPatientWorkspace('clock-in-workspace', {
       enableCancelling: true,
     });
   };

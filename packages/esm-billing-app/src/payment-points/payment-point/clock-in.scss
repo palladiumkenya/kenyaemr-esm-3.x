@@ -1,0 +1,11 @@
+@use '@carbon/layout';
+
+.form {
+  width: 100%;
+  padding: layout.$spacing-05;
+}
+
+.buttonSet {
+  width: 100%;
+  margin-top: layout.$spacing-05;
+}
