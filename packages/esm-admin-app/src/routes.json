@@ -5,6 +5,12 @@
   },
   "extensions": [
   ],
+  "modals": [
+    {
+      "component": "operationConfirmationModal",
+      "name": "operation-confirmation-modal"
+    }
+  ],
   "pages": [
     {
       "component": "root",

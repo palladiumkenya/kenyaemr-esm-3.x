@@ -51,7 +51,7 @@ const LogTable: React.FC<LogTableProps> = ({ logData, isLoading }) => {
     <div className={styles.table}>
       <CardHeader title={t('etlOperationLog', 'ETL Operations Log')} children={''} />
       <div className={styles.logTable}>
-        {isLoading ? (
+        {isLoading && logData.length === 0 ? (
           <DataTableSkeleton
             headers={headers}
             aria-label="etl table"

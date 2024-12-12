@@ -1,14 +1,17 @@
 {
   "completionStatus": "Completion status",
+  "confirmation": "Confirmation",
   "endTime": "End time",
   "etlAdministration": "ETL Administration",
   "etlOperation": "ETL operations",
-  "etlOperationLoading": "",
   "etlOperationLog": "ETL Operations Log",
+  "etlsOperationsLoading": "Please wait {{currentOperation}} is in progress...",
   "home": "Home",
   "noRecordsFound": "No ETL Operation logs found",
+  "no": "No",
   "operationError": "{{operationName}} failed",
   "operationErrorSubtitle": "An error occurred during the operation.",
+  "operationsConfirmationMessages": "Do you want to {{operationTypeOrName}}?",
   "operationSuccess": "{{operationName}} successfully {{operationType}}",
   "operationSuccessSubtitle": "The operation completed successfully.",
   "procedure": "Procedure",
@@ -18,5 +21,6 @@
   "refreshDwapi": "Refresh DWAPI tables",
   "refreshed": "refreshed",
   "refreshTables": "Refresh tables",
-  "startTime": "Start time"
+  "startTime": "Start time",
+  "yes": "Yes"
 }
