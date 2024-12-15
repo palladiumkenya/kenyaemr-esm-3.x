@@ -1,6 +1,6 @@
 import { OverflowMenuItem } from '@carbon/react';
 import React from 'react';
-import { LineItem, MappedBill } from '../../../types';
+import { LineItem, MappedBill, PaymentStatus } from '../../../types';
 import { showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
@@ -20,8 +20,13 @@ const RefundLineItem: React.FC<RefundLineItemProps> = ({ lineItem, bill, isRefun
     });
   };
 
+
   if (isRefundedBillableService) {
     return null;
+  }
+
+  if(lineItem.paymentStatus !== PaymentStatus.PAID){
+ return null;
   }
 
   return <OverflowMenuItem itemText={t('refundItem', 'Refund item')} onClick={() => handleOpenRefundLineItemModal()} />;
