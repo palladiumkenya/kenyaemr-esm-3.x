@@ -22,7 +22,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
   const { t } = useTranslation();
   const { patientBills: bills, isLoading } = usePatientBills(patientUuid);
   const filteredBills =
-    bills.filter((bill) => !Boolean(bill.totalAmount === bill.tenderedAmount) && patientUuid === bill.patientUuid) ??
+    bills.filter((bill) => patientUuid === bill.patientUuid) ??
     [];
 
   return (
