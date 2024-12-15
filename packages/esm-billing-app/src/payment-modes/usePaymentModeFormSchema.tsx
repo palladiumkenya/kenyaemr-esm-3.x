@@ -42,7 +42,7 @@ const usePaymentModeFormSchema = () => {
         invalid_type_error: 'Retired must be a boolean',
       })
       .optional()
-      .default(false), // Provides a default value if retired is not specified
+      .default(false),
     attributeTypes: z.array(attributeTypeSchema).optional(),
   });
 
