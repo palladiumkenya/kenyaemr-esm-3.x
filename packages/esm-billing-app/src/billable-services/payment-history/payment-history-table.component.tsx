@@ -1,98 +1,164 @@
-import { DataTableSkeleton, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@carbon/react';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import React from 'react';
+import React, { useMemo, useState } from 'react';
+import {
+  DataTable,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Pagination,
+  Search,
+  TableContainer,
+  Button,
+} from '@carbon/react';
+import { Download } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useBills } from '../../billing.resource';
+import { useDebounce, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { convertToCurrency } from '../../helpers/functions';
 import { MappedBill } from '../../types';
-// import { headers } from './payment-history-viewer.component';
-import styles from './payment-history.scss';
+import { exportToExcel } from '../../helpers/excelExport';
+import dayjs from 'dayjs';
 
 export const PaymentHistoryTable = ({
-  tableData,
-  paidBillsResponse,
-  renderedRows,
+  headers,
+  rows = [],
 }: {
-  tableData: any;
-  paidBillsResponse: ReturnType<typeof useBills>;
-  renderedRows: MappedBill[];
+  headers: Array<Record<string, any>>;
+  rows: Array<MappedBill>;
 }) => {
   const { t } = useTranslation();
-  const { bills, error, isLoading } = paidBillsResponse;
-  const { rows, getHeaderProps, getRowProps, getTableProps } = tableData;
+  const [pageSize, setPageSize] = useState(10);
+  const responsiveSize = useLayoutType() !== 'tablet' ? 'sm' : 'md';
+  const [searchString, setSearchString] = useState('');
+  const debouncedSearchString = useDebounce(searchString, 1000);
 
-  const headers = [
-    { header: t('billDate', 'Date'), key: 'dateCreated' },
-    { header: t('patientName', 'Patient Name'), key: 'patientName' },
-    { header: t('identifier', 'Identifier'), key: 'identifier' },
-    { header: t('totalAmount', 'Total Amount'), key: 'totalAmount' },
-    { header: t('billingService', 'Service'), key: 'billingService' },
-    { header: t('referenceCodes', ' Reference Codes'), key: 'referenceCodes' },
-    { header: t('status', 'Status'), key: 'status' },
-  ];
+  const searchResults = useMemo(() => {
+    if (rows !== undefined && rows.length > 0) {
+      if (debouncedSearchString && debouncedSearchString.trim() !== '') {
+        const search = debouncedSearchString.toLowerCase();
+        return rows?.filter((activeBillRow) =>
+          Object.entries(activeBillRow).some(([header, value]) => {
+            if (header === 'patientUuid') {
+              return false;
+            }
+            return `${value}`.toLowerCase().includes(search);
+          }),
+        );
+      }
+    }
 
-  if (isLoading) {
-    return (
-      <div className={styles.dataTableSkeleton}>
-        <DataTableSkeleton
-          headers={headers}
-          aria-label="patient bills table"
-          showToolbar={false}
-          showHeader={false}
-          columnCount={Object.keys(headers).length}
-          zebra
-          rowCount={3}
-        />
-      </div>
-    );
-  }
+    return rows;
+  }, [debouncedSearchString, rows]);
 
-  if (error) {
-    return (
-      <div className={styles.errorStateSkeleton}>
-        <ErrorState error={error} headerTitle={t('paidBillsErrorState', 'An error occurred fetching bills')} />
-      </div>
-    );
-  }
+  const { currentPage, goTo, results } = usePagination(searchResults, pageSize);
+  const { pageSizes } = usePaginationInfo(pageSize, rows.length, currentPage, results.length);
 
-  if (bills.length === 0 || renderedRows.length === 0) {
-    return (
-      <div className={styles.emptyStateWrapper}>
-        <EmptyState
-          displayText={t('noBillsFilter', 'No bills match that filter please adjust your filters')}
-          headerTitle={t('noBillsHeader', 'No bills match the provided filters')}
-        />
-      </div>
-    );
-  }
+  const transformedRows = results.map((row) => {
+    return {
+      ...row,
+      totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
+    };
+  });
+
+  const handleExport = () => {
+    const dataForExport = rows.map((row) => {
+      return {
+        ...row,
+        totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
+      };
+    });
+    const data = dataForExport.map((row: (typeof transformedRows)[0]) => {
+      return {
+        'Patient ID': row.identifier,
+        'Patient Name': row.patientName,
+        'Receipt Number': row.receiptNumber,
+        'Total Amount': row.lineItems.reduce((acc, item) => acc + item.price, 0),
+        'Payment Mode': row.payments.map((payment: (typeof row.payments)[0]) => payment.instanceType.name).join(', '),
+        'Payment Date': dayjs(row.payments[0].dateCreated).format('DD-MM-YYYY'),
+        'Payment Amount': row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0),
+        'Reason/Reference': row.payments
+          .map((payment: (typeof row.payments)[0]) =>
+            payment.attributes.map((attribute: (typeof payment.attributes)[0]) => attribute.attributeType.name),
+          )
+          .join(' '),
+      };
+    });
+
+    exportToExcel(data, {
+      fileName: `Transaction History - ${dayjs().format('DDD-MMM-YYYY:HH-mm-ss')}`,
+      sheetName: t('paymentHistory', 'Payment History'),
+    });
+  };
 
   return (
-    <Table {...getTableProps()} aria-label="sample table">
-      <TableHead>
-        <TableRow>
-          {headers.map((header) => (
-            <TableHeader
-              key={header.key}
-              {...getHeaderProps({
-                header,
-              })}>
-              {header.header}
-            </TableHeader>
-          ))}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {rows.map((row) => (
-          <TableRow
-            key={row.id}
-            {...getRowProps({
-              row,
-            })}>
-            {row.cells.map((cell) => (
-              <TableCell key={cell.id}>{cell.value}</TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+        <Search
+          size="sm"
+          placeholder={t('searchTransactions', 'Search transactions table')}
+          labelText={t('searchTransactions', 'Search transactions table')}
+          closeButtonLabelText={t('clearSearch', 'Clear search input')}
+          id="search-transactions"
+          onChange={(event) => setSearchString(event.target.value)}
+        />
+
+        <Button size={responsiveSize} renderIcon={Download} iconDescription="Download" onClick={handleExport}>
+          {t('download', 'Download')}
+        </Button>
+      </div>
+      <DataTable useZebraStyles size="sm" rows={transformedRows} headers={headers}>
+        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+          <TableContainer {...getTableContainerProps()}>
+            <Table {...getTableProps()} size="sm" aria-label="sample table">
+              <TableHead>
+                <TableRow>
+                  {headers.map((header) => (
+                    <TableHeader
+                      key={header.key}
+                      {...getHeaderProps({
+                        header,
+                      })}>
+                      {header.header}
+                    </TableHeader>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    {...getRowProps({
+                      row,
+                    })}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </DataTable>
+      {pageSizes.length > 1 && (
+        <Pagination
+          forwardText={t('nextPage', 'Next page')}
+          backwardText={t('previousPage', 'Previous page')}
+          page={currentPage ?? 1}
+          pageSize={pageSize ?? 10}
+          pageSizes={pageSizes}
+          totalItems={searchResults.length ?? 0}
+          size={responsiveSize}
+          onChange={({ page: newPage, pageSize }) => {
+            if (newPage !== currentPage) {
+              goTo(newPage);
+            }
+            setPageSize(pageSize);
+          }}
+        />
+      )}
+    </div>
   );
 };

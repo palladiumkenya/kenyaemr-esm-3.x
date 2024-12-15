@@ -1,6 +1,6 @@
 import flatMapDeep from 'lodash-es/flatMapDeep';
 import { useLocation, useParams } from 'react-router-dom';
-import { useBillsServiceTypes } from '../billable-services/payment-history/use-bills-service-types';
+import { useBillsServiceTypes } from '../billable-services/payment-history/useBillServiceTypes';
 import { usePaymentModes } from '../billing.resource';
 import { MappedBill, Timesheet } from '../types';
 
@@ -71,14 +71,15 @@ export const useRenderedRows = (bills: MappedBill[], filters: Array<string>, tim
         return true;
       }
       const rowValues = getAllValues(row);
-      return paymentModeFilters.some((paymentType) =>
-        rowValues.some((value) => String(value).toLowerCase().includes(paymentType.toLowerCase())),
-      );
+      return paymentModeFilters.some((paymentType) => {
+        return rowValues.some((value) => String(value).toLowerCase() === paymentType.toLowerCase());
+      });
     })
     .filter((row) => {
       if (serviceTypeFilters.length === 0) {
         return true;
       }
+
       const rowValues = getAllValues(row);
       return serviceTypeFilters.some((serviceType) =>
         rowValues.some((value) => String(value).toLowerCase().includes(serviceType.toLowerCase())),

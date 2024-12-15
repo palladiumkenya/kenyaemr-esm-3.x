@@ -12,7 +12,7 @@ export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void;
   const { mutate } = useTimeSheets();
   const { t } = useTranslation();
 
-  const { localActiveSheet, isLoading, error } = useClockInStatus(paymentPoint.uuid);
+  const { localActiveSheet, isLoading, error } = useClockInStatus(paymentPoint?.uuid);
 
   const onContinue = () => {
     setIsSubmitting(true);
