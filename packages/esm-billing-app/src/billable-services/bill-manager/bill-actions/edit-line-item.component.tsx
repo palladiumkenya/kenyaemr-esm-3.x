@@ -12,10 +12,10 @@ type EditLineItemProps = {
 const EditLineItem: React.FC<EditLineItemProps> = ({ lineItem, bill }) => {
   const { t } = useTranslation();
 
-  if(lineItem.paymentStatus == PaymentStatus.PAID){
+  if (lineItem.paymentStatus == PaymentStatus.PAID) {
     return null;
-     }
-        
+  }
+
   const handleOpenEditLineItemWorkspace = (lineItem: LineItem) => {
     launchWorkspace('edit-bill-form', {
       workspaceTitle: t('editBillForm', 'Edit Bill Form'),

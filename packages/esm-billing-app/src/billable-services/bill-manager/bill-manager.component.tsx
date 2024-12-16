@@ -21,9 +21,7 @@ const BillManager: React.FC<BillManagerProps> = () => {
   const [patientUuid, setPatientUuid] = React.useState<string>(undefined);
   const { t } = useTranslation();
   const { patientBills: bills, isLoading } = usePatientBills(patientUuid);
-  const filteredBills =
-    bills.filter((bill) => patientUuid === bill.patientUuid) ??
-    [];
+  const filteredBills = bills.filter((bill) => patientUuid === bill.patientUuid) ?? [];
 
   return (
     <>
