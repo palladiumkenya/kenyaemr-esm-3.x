@@ -52,7 +52,7 @@ const DrugOrder: React.FC<DrugOrderProps> = ({ order }) => {
         {billableItem &&
           billableItem?.servicePrices.map((item) => (
             <div key={item.uuid} className={styles.itemContainer}>
-              <span className={styles.bold}>{t('unitPrice', 'Unit price ')}</span>
+              <span className={styles.bold}>{item.paymentMode.name}</span>
               <span>{convertToCurrency(item.price)}</span>
             </div>
           ))}

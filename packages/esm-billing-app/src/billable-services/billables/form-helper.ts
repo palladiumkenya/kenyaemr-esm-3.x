@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { ExcelFileRow, PaymentMethod } from '../../types';
+import { ExcelFileRow, PaymentMethod, ServiceType } from '../../types';
 import { ChargeAble } from './charge-summary.resource';
 import { BillableFormSchema, ServicePriceSchema } from './form-schemas';
 
@@ -119,6 +119,7 @@ export const getBulkUploadPayloadFromExcelFile = (
   fileData: Uint8Array,
   currentlyExistingBillableServices: Array<ChargeAble>,
   paymentModes: Array<PaymentMethod>,
+  serviceTypes: Array<ServiceType>,
 ) => {
   const workbook = XLSX.read(fileData, { type: 'array' });
 
@@ -167,7 +168,7 @@ export const getBulkUploadPayloadFromExcelFile = (
       return {
         name: row.name,
         shortName: row.short_name ?? row.name,
-        serviceType: row.service_type_id,
+        serviceType: serviceTypes.find((type) => type.id === row.service_type_id).uuid,
         servicePrices: [
           {
             paymentMode: paymentModes.find((mode) => mode.name === 'Cash').uuid,
@@ -177,7 +178,6 @@ export const getBulkUploadPayloadFromExcelFile = (
         ],
         serviceStatus: row.disable === 'false' ? 'DISABLED' : 'ENABLED',
         concept: row.concept_id,
-        stockItem: '',
       };
     });
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { Scalpel } from '@carbon/react/icons';
-import { MappedBill } from '../../../types';
+import { MappedBill, PaymentStatus } from '../../../types';
 import { launchWorkspace } from '@openmrs/esm-framework';
 
 type WaiveBillActionButtonProps = {
@@ -12,6 +12,9 @@ type WaiveBillActionButtonProps = {
 const WaiveBillActionButton: React.FC<WaiveBillActionButtonProps> = ({ bill }) => {
   const { t } = useTranslation();
 
+  if (bill.status == PaymentStatus.PAID) {
+    return null;
+  }
   const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {
     launchWorkspace('waive-bill-form', {
       workspaceTitle: 'Waive Bill Form',

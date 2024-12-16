@@ -1,5 +1,4 @@
 import {
-  Button,
   ComboButton,
   DataTable,
   DataTableSkeleton,
@@ -19,7 +18,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { Add, CategoryAdd, Download, Upload, WatsonHealthScalpelSelect } from '@carbon/react/icons';
+import { CategoryAdd, Download, Upload, WatsonHealthScalpelSelect } from '@carbon/react/icons';
 import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';

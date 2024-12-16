@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BillableExemptions } from './billable-exemption/billable-exemptions.component';
 import BillManager from './billable-services/bill-manager/bill-manager.component';
 import { ChargeItemsDashboard } from './billable-services/dashboard/dashboard.component';
 import { PaymentHistory } from './billable-services/payment-history/payment-history.component';
@@ -46,6 +47,7 @@ const RootComponent: React.FC = () => {
         <Route path="/bill-manager" element={<BillManager />} />
         <Route path="/charge-items" element={<ChargeItemsDashboard />} />
         <Route path="/payment-modes" element={<PaymentModeHome />} />
+        <Route path="/billable-exemptions" element={<BillableExemptions />} />
       </Routes>
     </BrowserRouter>
   );

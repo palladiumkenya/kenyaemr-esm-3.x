@@ -1,7 +1,10 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
 export interface OpenmrsEncounter extends OpenmrsResource {
   encounterDatetime: string;
-  encounterType: string;
+  encounterType: {
+    uuid: string;
+    display: string;
+  };
   patient: string;
   location: string;
   encounterProviders?: Array<{
@@ -13,7 +16,12 @@ export interface OpenmrsEncounter extends OpenmrsResource {
 
   form?: { name: string; uuid: string };
 
-  visit?: string;
+  visit?: {
+    visitType: {
+      uuid: string;
+      display: string;
+    };
+  };
   diagnoses?: Array<{
     uuid: string;
     diagnosis: { coded: { display: string } };

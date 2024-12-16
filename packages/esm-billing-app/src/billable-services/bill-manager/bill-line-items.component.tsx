@@ -10,7 +10,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
-import { LineItem, MappedBill } from '../../types';
+import { LineItem, MappedBill, PaymentStatus } from '../../types';
 import styles from './bill-manager.scss';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 
@@ -26,6 +26,7 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
             <StructuredListCell head>{t('quantity', 'Quantity')}</StructuredListCell>
             <StructuredListCell head>{t('unitPrice', 'Unit Price')}</StructuredListCell>
             <StructuredListCell head>{t('total', 'Total')}</StructuredListCell>
+            <StructuredListCell head>{t('status', 'Status')}</StructuredListCell>
             <StructuredListCell head>{t('actions', 'Actions')}</StructuredListCell>
           </StructuredListRow>
         </StructuredListHead>
@@ -52,18 +53,22 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
     lineItem.billableService.split(':').at(0),
   );
 
+  const extensionHeight = lineItem.paymentStatus === PaymentStatus.PAID ? '3em' : '5em';
+
   return (
     <StructuredListRow className={isRefundedLineItem && styles.refundedItem}>
       <StructuredListCell>
-        {lineItem.item === '' ? extractString(lineItem.billableService) : extractString(lineItem.item)}
+        {lineItem.item === '' ? lineItem.billableService.split(':')[1] : extractString(lineItem.item)}
       </StructuredListCell>
       <StructuredListCell>{lineItem.quantity}</StructuredListCell>
       <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
       <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
+      <StructuredListCell>{lineItem.paymentStatus}</StructuredListCell>
+
       <StructuredListCell>
         <OverflowMenu aria-label="overflow-menu">
           <ExtensionSlot
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: '7.5rem' }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: extensionHeight }}
             className="cds--overflow-menu-options__option"
             name="bill-actions-overflow-menu-slot"
             state={{ lineItem, bill, isRefundedBillableService }}

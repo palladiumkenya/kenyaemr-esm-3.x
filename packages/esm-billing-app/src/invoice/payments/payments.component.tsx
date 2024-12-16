@@ -11,7 +11,7 @@ import { processBillPayment } from '../../billing.resource';
 import { convertToCurrency } from '../../helpers';
 import { useClockInStatus } from '../../payment-points/use-clock-in-status';
 import { LineItem, PaymentFormValue, PaymentStatus, type MappedBill } from '../../types';
-import { computeTotalPrice, computeWaivedAmount, extractErrorMessagesFromResponse } from '../../utils';
+import { computeWaivedAmount, extractErrorMessagesFromResponse } from '../../utils';
 import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
 import PaymentForm from './payment-form/payment-form.component';
 import PaymentHistory from './payment-history/payment-history.component';
@@ -56,7 +56,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const selectedLineItemsAmountDue =
     selectedLineItems
       .filter((item) => item.paymentStatus !== PaymentStatus.PAID)
-      .reduce((curr: number, prev) => curr + Number(prev.price), 0) - totalWaivedAmount;
+      .reduce((curr: number, prev) => curr + Number(prev.price * prev.quantity), 0) - totalWaivedAmount;
 
   const handleNavigateToBillingDashboard = () =>
     navigate({

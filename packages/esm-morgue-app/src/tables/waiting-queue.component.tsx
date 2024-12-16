@@ -6,9 +6,15 @@ import { Tag, Button, DataTableSkeleton, OverflowMenu, OverflowMenuItem } from '
 import styles from './generic-table.scss';
 import { useTranslation } from 'react-i18next';
 import { useDeceasedPatient } from '../hook/useMorgue.resource';
+import { formatDateTime } from '../utils/utils';
 
-export const WaitingQueue: React.FC = () => {
-  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
+interface WaitingQueueProps {
+  isLoading: boolean;
+  deceasedPatients: any;
+  error: any;
+}
+
+export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedPatients, error }) => {
   const { t } = useTranslation();
   const waitingInLine = t('waitingInLine', 'Waiting In Line');
 
@@ -46,11 +52,11 @@ export const WaitingQueue: React.FC = () => {
 
   const rows = awaitingPatients.map((patient) => ({
     id: patient.uuid,
-    name: toUpperCase(patient.person.display),
+    name: patient.person.display?.toUpperCase(),
     gender: patient.person.gender,
     age: patient?.person?.age,
     identifier: patient?.identifiers[0]?.identifier,
-    deathDate: formatDate(new Date(patient.person.deathDate)),
+    deathDate: patient.person.deathDate ? new Date(patient.person.deathDate).toLocaleString() : t('nullDate', '--'),
     causeOfDeath: patient.person.causeOfDeath?.display,
     status: <Tag type="magenta">{patient.status}</Tag>,
   }));
@@ -62,17 +68,9 @@ export const WaitingQueue: React.FC = () => {
     });
   };
 
-  const handleDischargeForm = (patientUuid: string) => {
-    launchWorkspace('discharge-body-form', {
-      workspaceTitle: t('dischargeForm', 'Discharge form'),
-      patientUuid,
-    });
-  };
-
   const actionColumn = (row) => (
     <OverflowMenu size="sm" flipped>
       <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
-      <OverflowMenuItem isDelete itemText={t('release', 'Release')} onClick={() => handleDischargeForm(row.id)} />
     </OverflowMenu>
   );
 

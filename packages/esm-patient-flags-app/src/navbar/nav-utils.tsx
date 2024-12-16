@@ -12,6 +12,7 @@ import {
   InventoryManagement,
   HospitalBed,
   ChemistryReference,
+  IbmCloudant,
 } from '@carbon/react/icons';
 import { useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
@@ -97,6 +98,12 @@ export const useModuleLinks = () => {
       url: `${openmrsSpaBase}bed-management`,
       icon: <HospitalBed size={24} />,
       privilege: 'o3: View Bed Management Dashboard',
+    },
+    {
+      label: 'ETL Administration',
+      url: `${openmrsSpaBase}admin`,
+      icon: <IbmCloudant size={24} />,
+      privilege: 'o3: View ETL Administration Dashboard',
     },
   ];
 };

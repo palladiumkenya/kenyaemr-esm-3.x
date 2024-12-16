@@ -1,3 +1,10 @@
+import { OpenmrsResource } from '@openmrs/esm-framework';
+
+export interface Concept extends OpenmrsResource {}
+export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
+export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
+export type QueueService = 'Clinical consultation' | 'Triage';
+export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
 export interface Patient {
   uuid: string;
   display: string;
@@ -179,4 +186,117 @@ export interface EncounterList {
     display: string;
     name: string;
   };
+}
+
+export interface VisitQueueEntry {
+  queueEntry: VisitQueueEntry;
+  uuid: string;
+  visit: Visit;
+}
+
+export interface VisitQueueEntry {
+  display: string;
+  endedAt: null;
+  locationWaitingFor: string | null;
+  patient: {
+    uuid: string;
+    person: {
+      age: string;
+      gender: string;
+    };
+    phoneNumber: string;
+  };
+  priority: {
+    display: QueuePriority;
+    uuid: string;
+  };
+  providerWaitingFor: null;
+  queue: Queue;
+  startedAt: string;
+  status: {
+    display: QueueStatus;
+    uuid: string;
+  };
+  uuid: string;
+  visit: Visit;
+}
+
+export interface MappedVisitQueueEntry {
+  id: string;
+  name: string;
+  patientUuid: string;
+  priority: MappedQueuePriority;
+  priorityUuid: string;
+  service: string;
+  status: QueueStatus;
+  statusUuid: string;
+  visitUuid: string;
+  visitType: string;
+  queue: Queue;
+  queueEntryUuid: string;
+}
+
+export interface UseVisitQueueEntries {
+  queueEntry: MappedVisitQueueEntry | null;
+  isLoading: boolean;
+  error: Error;
+  isValidating?: boolean;
+  mutate: () => void;
+}
+export interface Queue {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+  location: Location;
+  service: string;
+  allowedPriorities: Array<Concept>;
+  allowedStatuses: Array<Concept>;
+}
+
+export type UpdateVisitPayload = {
+  stopDatetime?: Date;
+};
+
+export interface PaginatedResponse {
+  uuid: string;
+  display: string;
+  identifiers: Identifier[];
+  person: Person;
+}
+
+export interface Identifier {
+  identifier: string;
+  uuid: string;
+  preferred: boolean;
+  location: Location;
+}
+
+export interface Location {
+  uuid: string;
+  name: string;
+}
+
+export interface Person {
+  uuid: string;
+  display: string;
+  gender: string;
+  birthdate: string;
+  dead: boolean;
+  age: number;
+  deathDate: string;
+  causeOfDeath: CauseOfDeath;
+  preferredAddress: PreferredAddress;
+}
+
+export interface CauseOfDeath {
+  uuid: string;
+  display: string;
+}
+
+export interface PreferredAddress {
+  uuid: string;
+  stateProvince: any;
+  countyDistrict: any;
+  address4: any;
 }
