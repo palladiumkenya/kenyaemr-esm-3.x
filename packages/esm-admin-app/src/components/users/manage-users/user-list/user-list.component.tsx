@@ -115,7 +115,7 @@ const UserList: React.FC = () => {
             onClick={() =>
               launchWorkspace('manage-user-workspace', {
                 workspaceTitle: t('editUser', 'Edit User'),
-                initialUserValue: users[1],
+                initialUserValue: users[2],
               })
             }
           />

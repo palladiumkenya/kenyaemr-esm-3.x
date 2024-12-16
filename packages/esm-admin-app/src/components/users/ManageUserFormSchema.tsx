@@ -28,7 +28,7 @@ const useManageUserFormSchema = () => {
     //     message: t('passwordMismatch', 'Passwords must match'),
     //   }),
     forcePasswordChange: z.boolean().optional(),
-    adminRoles: z.array(z.string()).optional(),
+    roles: z.array(z.string()).optional(),
     billingRoles: z.array(z.string()).optional(),
     clinicalRoles: z.array(z.string()).optional(),
     inventoryRoles: z.array(z.string()).optional(),

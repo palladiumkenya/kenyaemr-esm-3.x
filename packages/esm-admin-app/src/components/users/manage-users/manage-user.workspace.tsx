@@ -29,8 +29,9 @@ import {
   ClickableTile,
 } from '@carbon/react';
 import { z } from 'zod';
-import { User, UserSchema } from '../../../types';
+import { UserSchema, User } from '../../../types';
 import { zodResolver } from '@hookform/resolvers/zod';
+import classNames from 'classnames';
 import { createUser, handleMutation, useRoles, useUser } from '../../../user-management.resources';
 import useManageUserFormSchema from '../ManageUserFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
@@ -54,7 +55,22 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { manageUserFormSchema } = useManageUserFormSchema();
 
   type UserFormSchema = z.infer<typeof manageUserFormSchema>;
-  const formDefaultValues = Object.keys(initialUserValue).length > 0 ? initialUserValue : {};
+  const formDefaultValues =
+    Object.keys(initialUserValue).length > 0
+      ? {
+          ...initialUserValue,
+          givenName: initialUserValue.person?.display.split(' ')[0] || '',
+          middleName: initialUserValue.person?.display.split(' ')[1] || '',
+          familyName: initialUserValue.person?.display.split(' ')[2] || '',
+          phoneNumber:
+            initialUserValue.person?.attributes?.find((attr) => attr.uuid === 'b2c38640-2603-4629-aebd-3b54f33f1e3a')
+              ?.display || '',
+          email:
+            initialUserValue.person?.attributes?.find((attr) => attr.uuid === 'b8d0b331-1d2d-4a9a-b741-1816f498bdb6')
+              ?.display || '',
+          roles: initialUserValue.roles.map((role) => role.display).join(', ') || [],
+        }
+      : {};
 
   const formMethods = useForm<UserFormSchema>({
     resolver: zodResolver(manageUserFormSchema),
@@ -76,17 +92,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const onSubmit = async (data: UserFormSchema) => {
     const emaiAttribute = 'b8d0b331-1d2d-4a9a-b741-1816f498bdb6';
     const telephoneAttribute = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
-    // Combine all roles into a single array
-    const allRoles = [
-      ...(data.adminRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-      ...(data.billingRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-      ...(data.clinicalRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-      ...(data.recordRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-      ...(data.pharmacistRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-      ...(data.inventoryRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-      ...(data.investigationRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-      ...(data.recordRoles || []).map((role) => (typeof role === 'string' ? { name: role } : role)),
-    ];
+    const allRoles = [...(data.roles || []).map((role) => (typeof role === 'string' ? { name: role } : role))];
     const payload: Partial<UserSchema> = {
       username: data.username,
       password: data.password,
@@ -167,10 +173,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const toggleSection = (section) => {
     setActiveSection((prev) => (prev === section ? null : section));
   };
-
-  // const handleTabClick = (selectedSection) => {
-  //   toggleSection(selectedSection);
-  // };
 
   return (
     <FormProvider {...formMethods}>
@@ -447,7 +449,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   />
                                 ) : (
                                   <Controller
-                                    name="adminRoles"
+                                    name="roles"
                                     control={formMethods.control}
                                     render={({ field }) => (
                                       <>
@@ -457,7 +459,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                             const isSelected = field.value?.includes(role.display);
                                             return (
                                               <label
-                                                key={role.uuid}
+                                                key={role.display}
                                                 className={
                                                   isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
                                                 }>
@@ -494,7 +496,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             </Column>
           </Grid>
         </div>
-        <ButtonSet>
+        <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
           <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
             {t('cancel', 'Cancel')}
           </Button>

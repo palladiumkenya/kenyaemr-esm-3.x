@@ -23,6 +23,10 @@ export interface User {
   person: {
     uuid: string;
     display: string;
+    attributes?: Array<{
+      uuid: string;
+      display: string;
+    }>;
   };
   privileges: Array<string>;
   roles: Array<{
