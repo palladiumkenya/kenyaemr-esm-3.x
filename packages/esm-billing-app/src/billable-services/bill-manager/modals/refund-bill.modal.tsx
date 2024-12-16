@@ -32,11 +32,18 @@ export const RefundBillModal: React.FC<RefundBillModalProps> = ({ onClose, bill,
       ...(billableServiceUuid && { billableService: billableServiceUuid }),
     };
 
+    const billPayments = bill.payments.map((payment) => ({
+      instanceType: payment.instanceType.uuid,
+      attributes: [],
+      amount: payment.amount,
+      amountTendered: payment.amountTendered,
+    }));
+
     const billWithRefund = {
       cashPoint: bill.cashPointUuid,
       cashier: bill.cashier.uuid,
       lineItems: [lineItemToBeRefunded],
-      payments: bill.payments,
+      payments: billPayments,
       patient: bill.patientUuid,
       status: bill.status,
     };
@@ -72,22 +79,26 @@ export const RefundBillModal: React.FC<RefundBillModalProps> = ({ onClose, bill,
         {t('refundBill', 'Refund Bill')}
       </ModalHeader>
       <ModalBody className={styles.modalHeaderHeading}>
-        {t('refundBillDescription', 'Are you sure you want to refund this bill? Proceed cautiously.')}
+        {lineItem.paymentStatus === PaymentStatus.PAID
+          ? t('refundBillDescription', 'Are you sure you want to refund this bill? Proceed cautiously.')
+          : t('refundBillDescription', 'Refund is only allowed for paid bills')}
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={onClose}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={refundBillItems} disabled={isLoading}>
-          {isLoading ? (
-            <div className={styles.loading_wrapper}>
-              <Loading className={styles.button_spinner} withOverlay={false} small />
-              {t('processingPayment', 'Processing Payment')}
-            </div>
-          ) : (
-            t('refund', 'Refund')
-          )}
-        </Button>
+        {lineItem.paymentStatus === PaymentStatus.PAID && (
+          <Button kind="danger" onClick={refundBillItems} disabled={isLoading}>
+            {isLoading ? (
+              <div className={styles.loading_wrapper}>
+                <Loading className={styles.button_spinner} withOverlay={false} small />
+                {t('processingPayment', 'Processing Payment')}
+              </div>
+            ) : (
+              t('refund', 'Refund')
+            )}
+          </Button>
+        )}
       </ModalFooter>
     </>
   );

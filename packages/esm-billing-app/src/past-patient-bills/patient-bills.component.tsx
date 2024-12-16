@@ -63,7 +63,7 @@ export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, pat
         style={{ textDecoration: 'none', maxWidth: '50%' }}
         to={billingUrl}
         templateParams={{ patientUuid: bill.patientUuid, uuid: bill.uuid }}>
-        {bill.lineItems.map((item) => extractString(item.billableService)).join(', ')}
+        {bill.lineItems.map((item) => item.billableService.split(':')[1]).join(', ')}
       </ConfigurableLink>
     ),
     totalAmount: convertToCurrency(bill.totalAmount),
