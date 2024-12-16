@@ -42,7 +42,7 @@ export const ClockIn = ({
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
-  const { globalActiveSheet, isClockedIn } = useClockInStatus(paymentPoint?.uuid);
+  const { globalActiveSheet, isClockedIn } = useClockInStatus();
 
   const {
     register,
