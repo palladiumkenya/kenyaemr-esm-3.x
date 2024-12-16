@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@carbon/pictograms-react": "^11.66.0",
-    "@openmrs/esm-framework": "^6.0.1-pre.2553",
+    "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "^1.30.0",
     "@swc/cli": "^0.1.57",
