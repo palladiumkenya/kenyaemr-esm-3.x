@@ -59,6 +59,7 @@ export const PaymentHistoryTable = ({
     return {
       ...row,
       totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
+      referenceCodes: row.payments.map(({ attributes }) => attributes.map(({ value }) => value).join(' ')).join(', '),
     };
   });
 
@@ -71,18 +72,18 @@ export const PaymentHistoryTable = ({
     });
     const data = dataForExport.map((row: (typeof transformedRows)[0]) => {
       return {
+        'Receipt Number': row.receiptNumber,
         'Patient ID': row.identifier,
         'Patient Name': row.patientName,
-        'Receipt Number': row.receiptNumber,
-        'Total Amount': row.lineItems.reduce((acc, item) => acc + item.price, 0),
-        'Payment Mode': row.payments.map((payment: (typeof row.payments)[0]) => payment.instanceType.name).join(', '),
-        'Payment Date': dayjs(row.payments[0].dateCreated).format('DD-MM-YYYY'),
-        'Payment Amount': row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0),
+        'Mode of Payment': row.payments
+          .map((payment: (typeof row.payments)[0]) => payment.instanceType.name)
+          .join(', '),
+        'Total Amount Due': row.lineItems.reduce((acc, item) => acc + item.price, 0),
+        'Date of Payment': dayjs(row.payments[0].dateCreated).format('DD-MM-YYYY'),
+        'Total Amount Paid': row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0),
         'Reason/Reference': row.payments
-          .map((payment: (typeof row.payments)[0]) =>
-            payment.attributes.map((attribute: (typeof payment.attributes)[0]) => attribute.attributeType.name),
-          )
-          .join(' '),
+          .map(({ attributes }) => attributes.map(({ value }) => value).join(' '))
+          .join(', '),
       };
     });
 
