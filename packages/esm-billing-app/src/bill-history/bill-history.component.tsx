@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTableSkeleton,
-  Layer,
   DataTable,
   TableContainer,
   Table,
@@ -11,7 +10,6 @@ import {
   TableRow,
   TableBody,
   TableCell,
-  Tile,
   Pagination,
   TableExpandHeader,
   TableExpandRow,
@@ -21,7 +19,6 @@ import {
 import { Add } from '@carbon/react/icons';
 import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
-  EmptyDataIllustration,
   ErrorState,
   usePaginationInfo,
   CardHeader,
