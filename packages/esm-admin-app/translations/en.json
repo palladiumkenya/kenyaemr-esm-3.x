@@ -2,7 +2,7 @@
   "completionStatus": "Completion status",
   "confirmation": "Confirmation",
   "endTime": "End time",
-  "etlAdministration": "ETL Administration",
+  "etlAdministration": "ETL Admin",
   "etlOperation": "ETL operations",
   "etlOperationLog": "ETL Operations Log",
   "etlsOperationsLoading": "Please wait {{currentOperation}} is in progress...",
@@ -22,5 +22,15 @@
   "refreshed": "refreshed",
   "refreshTables": "Refresh tables",
   "startTime": "Start time",
-  "yesRespond": "Yes"
+  "yesRespond": "Yes",
+  "users": "Users",
+  "userManagement": "User Management",
+  "currentUsers": "Current Users",
+  "systemId": "System ID",
+  "username": "Username",
+  "given": "Given",
+  "familyName": "Family Name",
+  "roles": "Roles",
+  "searchUser": "Search user table",
+  "addUser": "Add User"
 }

@@ -4,6 +4,70 @@
     "kenyaemrCharts": "^1.6.7"
   },
   "extensions": [
+    {
+      "name": "admin-nav-menu",
+      "slot": "admin-sidebar-slot",
+      "component": "adminNavMenu",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "admin-management-app-menu-item",
+      "component": "adminManagementAppMenuItem",
+      "slot": "app-menu-item-slot",
+      "meta": {
+        "name": " User Management"
+      }
+    },
+    {
+      "name": "management-link",
+      "slot": "admin-page-dashboard-slot",
+      "component": "userManagementLink",
+      "meta": {
+        "name": "management",
+        "slot": "user-management-slot",
+        "title": "management"
+      },
+      "order": 0,
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "etl-link",
+      "slot": "admin-page-dashboard-slot",
+      "component": "etlAdministrationDashboardLink",
+      "meta": {
+        "name": "etl",
+        "slot": "elt-administration-slot",
+        "title": "etl"
+      },
+      "order": 1,
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "user-management",
+      "slot": "user-management-slot",
+      "component": "userManagement"
+    },
+    {
+      "name": "etl-administration",
+      "slot": "elt-administration-slot",
+      "component": "etlAdministration"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "manage-user-workspace",
+      "component": "manageUserWorkspace",
+      "title": "Manage User Workspace",
+      "type": "other-form",
+      "canHide": true,
+      "canMaximize": true,
+      "width": "extra-wide",
+      "hasOwnSidebar": true
+      
+    }
   ],
   "modals": [
     {

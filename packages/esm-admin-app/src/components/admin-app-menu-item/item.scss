@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.customTile {
+  background-color: colors.$gray-10;
+  border-radius: layout.$spacing-02;
+  padding: layout.$spacing-05;
+  width: layout.$spacing-09;
+  height: layout.$spacing-12;
+  text-align: center;
+  margin: layout.$spacing-01;
+}
+
+.customTileTitle {
+  font-size: layout.$spacing-02;
+  color: colors.$gray-90;
+}

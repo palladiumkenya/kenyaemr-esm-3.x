@@ -1,0 +1,95 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.formContainer {
+  margin-right: layout.$spacing-05;
+  margin-left: 0;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+}
+
+.tablet {
+  padding: layout.$spacing-06 layout.$spacing-05;
+  background-color: colors.$white;
+}
+
+.desktop {
+  padding: 0;
+  width: 100%;
+}
+
+.formStackControl {
+  row-gap: layout.$layout-01;
+}
+.checkBoxColumn {
+  background-color: colors.$gray-10;
+  margin: layout.$spacing-05;
+}
+
+.listItem {
+  list-style: none;
+  padding: 10px;
+  cursor: pointer;
+  background-color: colors.$gray-30;
+  font-size: small;
+}
+
+.listItem.active {
+  background-color: colors.$green-30;
+}
+
+.checkboxLabelSingleLine {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  font-size: medium;
+}
+
+.checkboxGroupGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 1rem;
+  column-gap: 0.5rem;
+  font-size: 14px;
+  :global(.cds--fieldset-legend) {
+    font-size: 18px;
+  }
+}
+
+.CheckboxGroup .bx--fieldset-legend {
+  font-size: 18px;
+}
+
+.btn {
+  min-width: 50%;
+}
+
+.checkboxLabelSelected {
+  background-color: colors.$green-10;
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  font-size: medium;
+  transition: background-color 0.3s ease;
+  font-size: 13px;
+}
+
+.checkboxLabel {
+  background-color: transparent;
+  border-radius: 4px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  font-size: 13px;
+}
