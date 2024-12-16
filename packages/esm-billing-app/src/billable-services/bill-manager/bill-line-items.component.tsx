@@ -54,13 +54,11 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
   );
 
   const extensionHeight = lineItem.paymentStatus === PaymentStatus.PAID ? '3em' : '5em';
-  
-
 
   return (
     <StructuredListRow className={isRefundedLineItem && styles.refundedItem}>
       <StructuredListCell>
-        {lineItem.item === '' ? lineItem.billableService.split(":")[1] : extractString(lineItem.item)}
+        {lineItem.item === '' ? lineItem.billableService.split(':')[1] : extractString(lineItem.item)}
       </StructuredListCell>
       <StructuredListCell>{lineItem.quantity}</StructuredListCell>
       <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
@@ -70,7 +68,7 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
       <StructuredListCell>
         <OverflowMenu aria-label="overflow-menu">
           <ExtensionSlot
-           style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: extensionHeight }}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', height: extensionHeight }}
             className="cds--overflow-menu-options__option"
             name="bill-actions-overflow-menu-slot"
             state={{ lineItem, bill, isRefundedBillableService }}

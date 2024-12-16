@@ -12,9 +12,9 @@ type DeleteBillActionButtonProps = {
 const DeleteBillActionButton: React.FC<DeleteBillActionButtonProps> = ({ bill }) => {
   const { t } = useTranslation();
 
-  if(bill.status == PaymentStatus.PAID){
+  if (bill.status == PaymentStatus.PAID) {
     return null;
-     }
+  }
   const handleOpenDeleteBillModal = (bill: MappedBill) => {
     const dispose = showModal('delete-bill-modal', {
       bill,

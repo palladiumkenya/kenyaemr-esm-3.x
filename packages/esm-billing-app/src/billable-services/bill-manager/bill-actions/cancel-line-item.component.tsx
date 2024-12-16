@@ -13,9 +13,9 @@ type CancelLineItemProps = {
 const CancelLineItem: React.FC<CancelLineItemProps> = ({ lineItem, bill }) => {
   const { t } = useTranslation();
 
-  if(lineItem.paymentStatus == PaymentStatus.PAID){
+  if (lineItem.paymentStatus == PaymentStatus.PAID) {
     return null;
-     }
+  }
   const handleCancelLineItemWorkspace = () => {
     launchWorkspace('cancel-bill-workspace', {
       workspaceTitle: t('cancelBillForm', 'Cancel Bill Form'),

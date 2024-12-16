@@ -12,8 +12,7 @@ type WaiveBillActionButtonProps = {
 const WaiveBillActionButton: React.FC<WaiveBillActionButtonProps> = ({ bill }) => {
   const { t } = useTranslation();
 
-  
-  if(bill.status == PaymentStatus.PAID){
+  if (bill.status == PaymentStatus.PAID) {
     return null;
   }
   const handleOpenWaiveBillWorkspace = (bill: MappedBill) => {

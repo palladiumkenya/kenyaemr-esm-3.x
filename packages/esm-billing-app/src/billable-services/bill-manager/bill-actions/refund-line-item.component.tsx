@@ -20,13 +20,12 @@ const RefundLineItem: React.FC<RefundLineItemProps> = ({ lineItem, bill, isRefun
     });
   };
 
-
   if (isRefundedBillableService) {
     return null;
   }
 
-  if(lineItem.paymentStatus !== PaymentStatus.PAID){
- return null;
+  if (lineItem.paymentStatus !== PaymentStatus.PAID) {
+    return null;
   }
 
   return <OverflowMenuItem itemText={t('refundItem', 'Refund item')} onClick={() => handleOpenRefundLineItemModal()} />;
