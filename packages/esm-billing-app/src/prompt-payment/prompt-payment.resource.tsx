@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { mapBillProperties } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
 import { BillingPromptType, MappedBill, PatientInvoice } from '../types';
+import dayjs from 'dayjs';
 
 interface BillingPromptResult {
   shouldShowBillingPrompt: boolean;
@@ -11,6 +12,12 @@ interface BillingPromptResult {
   error: Error | null;
   currentVisit: Visit | null;
   bills: Array<MappedBill>;
+  billingDuration?: {
+    isWithinPromptDuration: boolean;
+    hoursSinceLastBill: number;
+    lastDateBilled: Date;
+    mostRecentBill: MappedBill;
+  };
 }
 
 // Constants
@@ -80,7 +87,7 @@ const hasOnlyOrderBills = (bills: Array<MappedBill>): boolean => {
  * 1. The current visit is not an inpatient visit
  * 2. The patient has a positive bill balance
  * 3. The payment method is not in the excluded payment methods list
- * 4. For patient-chart, prompt is not shown if the line items in the bill are only orders
+ * 4. For patient-chart, prompt is not shown if the line items in the bill are only orders and the billing duration is within the prompt duration
  *
  * @param patientUuid - The UUID of the patient to check billing status for
  * @returns {BillingPromptResult} An object containing:
@@ -89,6 +96,7 @@ const hasOnlyOrderBills = (bills: Array<MappedBill>): boolean => {
  *  - error: any error that occurred during data fetching
  *  - currentVisit: the current visit object or null
  *  - bills: array of the patient's bills
+ *  - billingDuration: an object containing billing duration information
  */
 export const useBillingPrompt = (
   patientUuid: string,
@@ -100,28 +108,42 @@ export const useBillingPrompt = (
 
   const { paymentMethodsUuidsThatShouldNotShowPrompt, inPatientVisitTypeUuid } = config;
 
+  const hasLoaded = isLoadingBills && isLoadingVisit;
   const isExcludedPaymentMethod = checkPaymentMethodExclusion(currentVisit, paymentMethodsUuidsThatShouldNotShowPrompt);
-
   const patientBillBalance = calculateBillBalance(bills);
   const hasOnlyOrders = hasOnlyOrderBills(bills);
+  const billingDuration = checkBillingDuration(bills, config);
 
   if (promptType === 'patient-chart' && hasOnlyOrders) {
     return {
       shouldShowBillingPrompt: false,
-      isLoading: isLoadingBills || isLoadingVisit,
+      isLoading: hasLoaded,
       error,
       currentVisit,
       bills,
+      billingDuration,
+    };
+  }
+
+  if (promptType === 'patient-chart' && config.promptDuration.enable && !billingDuration.isWithinPromptDuration) {
+    return {
+      shouldShowBillingPrompt: false,
+      isLoading: hasLoaded,
+      error,
+      currentVisit,
+      bills,
+      billingDuration,
     };
   }
 
   return {
     shouldShowBillingPrompt:
       !isExcludedPaymentMethod && shouldShowPrompt(currentVisit, patientBillBalance, inPatientVisitTypeUuid),
-    isLoading: isLoadingBills || isLoadingVisit,
+    isLoading: hasLoaded,
     error,
     currentVisit,
     bills,
+    billingDuration,
   };
 };
 
@@ -158,5 +180,58 @@ export const usePatientBills = (patientUuid: string) => {
     error,
     isValidating,
     mutate,
+  };
+};
+
+/**
+ * Checks if bills are within the configured prompt duration and provides billing timing information
+ *
+ * @param {Array<MappedBill>} bills - Array of patient bills containing dateCreated timestamps
+ * @param {Object} config - Configuration object containing prompt duration settings
+ * @param {number} config.promptDuration - Maximum number of hours to show prompt after bill creation
+ *
+ * @returns {Object} Billing duration information
+ * @returns {boolean} returns.isWithinPromptDuration - Whether the most recent bill is within prompt duration
+ * @returns {number} returns.hoursSinceLastBill - Hours elapsed since most recent bill
+ * @returns {string} returns.lastDateBilled - ISO timestamp of most recent bill
+ * @returns {MappedBill} returns.mostRecentBill - The most recent bill object
+ *
+ * @throws {Error} When bills array is empty or promptDuration is not configured
+ *
+ * @example
+ * const bills = [{ dateCreated: '2023-01-01T10:00:00Z' }];
+ * const config = { promptDuration: 24 };
+ * const result = checkBillingDuration(bills, config);
+ * // Returns: {
+ * //   isWithinPromptDuration: true,
+ * //   hoursSinceLastBill: 5,
+ * //   lastDateBilled: '2023-01-01T10:00:00Z',
+ * //   mostRecentBill: { dateCreated: '2023-01-01T10:00:00Z' }
+ * // }
+ */
+const checkBillingDuration = (bills: Array<MappedBill> = [], config: BillingConfig) => {
+  if (!config?.promptDuration?.enable) {
+    return {
+      isWithinPromptDuration: false,
+      hoursSinceLastBill: 0,
+      lastDateBilled: new Date(),
+      mostRecentBill: null,
+    };
+  }
+
+  const sortedBills = [...bills].sort((a, b) => dayjs(b.dateCreated).diff(dayjs(a.dateCreated)));
+
+  const mostRecentBill = sortedBills[0];
+  const lastDateBilled = new Date(mostRecentBill?.dateCreatedUnformatted);
+  const currentDate = new Date();
+
+  // Calculate hours since last bill
+  const hoursSinceLastBill = dayjs(currentDate).diff(dayjs(lastDateBilled), 'hour');
+
+  return {
+    isWithinPromptDuration: hoursSinceLastBill <= config.promptDuration.duration,
+    hoursSinceLastBill,
+    lastDateBilled,
+    mostRecentBill,
   };
 };

@@ -77,7 +77,7 @@ const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
             <StructuredListBody>
               {lineItems.map((lineItem) => {
                 return (
-                  <StructuredListRow>
+                  <StructuredListRow key={lineItem.uuid}>
                     <StructuredListCell>{extractString(lineItem.billableService || lineItem.item)}</StructuredListCell>
                     <StructuredListCell>{lineItem.quantity}</StructuredListCell>
                     <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>

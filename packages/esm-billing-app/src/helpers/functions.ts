@@ -65,24 +65,19 @@ export const getGender = (gender: string, t) => {
 
 /**
  * Extracts and returns the substring after the first colon (:) in the input string.
- * The input string is expected to be in the format "uuid:string".
+ * If there's no colon or the input is invalid, returns the original string.
+ * The input string is typically in the format "uuid:string".
  *
  * @param {string} input - The input string from which the substring is to be extracted.
- * @returns {string} The substring found after the first colon in the input string.
+ * @returns {string} The substring found after the first colon, or the original string if no colon is present.
  */
 export function extractString(input: string): string {
-  const parts = input
-    .split(' ')
-    .map((s) => s.split(':')[1])
-    .filter((s) => Boolean(s));
-
-  const firstTwoBillableServices = parts.slice(0, 2);
-
-  if (parts.length <= 2) {
-    return firstTwoBillableServices.join(', ');
+  if (!input || typeof input !== 'string') {
+    return '';
   }
 
-  return `${firstTwoBillableServices.join(', ')} & ${parts.length - 2} other services`;
+  const parts = input.split(':');
+  return parts.length > 1 ? parts[1] : input;
 }
 
 // cleans the provider display name
