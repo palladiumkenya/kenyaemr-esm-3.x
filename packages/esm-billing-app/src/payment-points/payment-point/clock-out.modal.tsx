@@ -2,21 +2,20 @@ import { Button, Loading, ModalBody, ModalFooter, ModalHeader } from '@carbon/re
 import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PaymentPoint } from '../../types';
 import { clockOut, useActiveSheet } from '../payment-points.resource';
 import { useClockInStatus } from '../use-clock-in-status';
 
-export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint: PaymentPoint }) => {
+export const ClockOut = ({ closeModal }: { closeModal: () => void }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mutate } = useActiveSheet();
   const { t } = useTranslation();
 
-  const { localActiveSheet, isLoading, error } = useClockInStatus(paymentPoint.uuid);
+  const { globalActiveSheet, isLoading, error } = useClockInStatus();
 
   const onContinue = () => {
     setIsSubmitting(true);
-    clockOut(localActiveSheet.uuid, {
+    clockOut(globalActiveSheet.uuid, {
       clockOut: new Date().toISOString(),
     })
       .then(() => {
@@ -43,7 +42,9 @@ export const ClockOut = ({ closeModal, paymentPoint }: { closeModal: () => void;
   return (
     <React.Fragment>
       <ModalHeader closeModal={closeModal}>Clock Out</ModalHeader>
-      <ModalBody>You will be clocked out of {paymentPoint.name} right now. Do you want to proceed.</ModalBody>
+      <ModalBody>
+        You will be clocked out of {globalActiveSheet.cashPoint.name} right now. Do you want to proceed.
+      </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeModal} type="button">
           {t('cancel', 'Cancel')}

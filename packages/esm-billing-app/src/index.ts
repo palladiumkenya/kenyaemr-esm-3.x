@@ -38,7 +38,7 @@ import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
 import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
 import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
 import { ClockIn } from './payment-points/payment-point/clock-in.modal';
-import { ClockOut } from './payment-points/payment-point/clock-out.component';
+import { ClockOut } from './payment-points/payment-point/clock-out.modal';
 import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
 import rootComponent from './root.component';
 

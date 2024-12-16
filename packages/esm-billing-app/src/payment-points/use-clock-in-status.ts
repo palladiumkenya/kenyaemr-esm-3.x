@@ -1,20 +1,14 @@
 import { useActiveSheet } from './payment-points.resource';
 
-export const useClockInStatus = (paymentPointUUID?: string) => {
+export const useClockInStatus = () => {
   const { timesheets, error, isLoading } = useActiveSheet();
 
   const globalActiveSheet = timesheets.find((sheet) => sheet.clockIn && !sheet.clockOut);
 
-  const localActiveSheet = timesheets.find(
-    (sheet) => sheet.clockIn && !sheet.clockOut && paymentPointUUID && sheet.cashPoint.uuid === paymentPointUUID,
-  );
-
   return {
     globalActiveSheet,
-    localActiveSheet,
     isClockedIn: Boolean(globalActiveSheet),
     error: error,
     isLoading: isLoading,
-    isClockedInCurrentPaymentPoint: Boolean(localActiveSheet),
   };
 };

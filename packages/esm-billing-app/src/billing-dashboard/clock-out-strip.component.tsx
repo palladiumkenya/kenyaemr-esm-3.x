@@ -4,14 +4,12 @@ import { showModal } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePaymentPoints } from '../payment-points/payment-points.resource';
 import { useClockInStatus } from '../payment-points/use-clock-in-status';
 import styles from './billing-dashboard.scss';
 
 export const ClockOutStrip = () => {
   const { isClockedIn, globalActiveSheet } = useClockInStatus();
   const { t } = useTranslation();
-  const { paymentPoints } = usePaymentPoints();
 
   if (!isClockedIn) {
     return null;
@@ -20,7 +18,6 @@ export const ClockOutStrip = () => {
   const openClockOutModal = () => {
     const dispose = showModal('clock-out-modal', {
       closeModal: () => dispose(),
-      paymentPoint: paymentPoints.find((paymentPoint) => paymentPoint.uuid === globalActiveSheet.cashPoint.uuid),
     });
   };
 
