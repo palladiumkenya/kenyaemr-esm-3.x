@@ -79,7 +79,7 @@
     "jest-cli": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "lodash": "^4.17.21",
-    "openmrs": "^6.0.1-pre.2553",
+    "openmrs": "next",
     "pinst": "^3.0.0",
     "prettier": "^2.2.1",
     "pretty-quick": "^2.0.2",
