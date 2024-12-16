@@ -1,4 +1,4 @@
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { showModal } from '@openmrs/esm-framework';
 import React, { useEffect } from 'react';
 import { useClockInStatus } from './use-clock-in-status';
 
@@ -7,7 +7,8 @@ export const ClockInBoundary = ({ children }: { children: React.ReactNode }) => 
   const { isClockedIn, isLoading, error } = useClockInStatus();
 
   const openClockInModal = () => {
-    launchPatientWorkspace('clock-in-workspace', {
+    const dispose = showModal('clock-in-modal', {
+      closeModal: () => dispose(),
       disableCancelling: true,
     });
   };

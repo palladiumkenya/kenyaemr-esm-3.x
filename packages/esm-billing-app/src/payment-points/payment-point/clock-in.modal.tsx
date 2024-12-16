@@ -1,7 +1,17 @@
-import { Button, ButtonSet, Form, Loading, Select, SelectItem, SelectSkeleton } from '@carbon/react';
+import {
+  Button,
+  Form,
+  Loading,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  SelectSkeleton,
+} from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, showSnackbar, useSession } from '@openmrs/esm-framework';
-import React, { useEffect, useState } from 'react';
+import { showSnackbar, useSession } from '@openmrs/esm-framework';
+import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -17,14 +27,14 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export const ClockIn = ({
-  closeWorkspace,
+  closeModal,
   paymentPoint,
   disableCancelling,
-  promptBeforeClosing,
 }: {
+  closeModal?: () => void;
   paymentPoint?: PaymentPoint;
   disableCancelling?: boolean;
-} & DefaultWorkspaceProps) => {
+}) => {
   const { mutate } = useActiveSheet();
   const { currentProvider } = useSession();
   const providerUUID = currentProvider?.uuid;
@@ -54,7 +64,7 @@ export const ClockIn = ({
           kind: 'success',
         });
         mutate();
-        closeWorkspace();
+        closeModal();
       })
       .catch(() => {
         showSnackbar({
@@ -64,7 +74,7 @@ export const ClockIn = ({
         });
 
         if (disableCancelling !== true) {
-          closeWorkspace();
+          closeModal();
         }
       })
       .finally(() => {
@@ -99,7 +109,7 @@ export const ClockIn = ({
         )
         .finally(() => {
           setIsSubmitting(false);
-          closeWorkspace();
+          closeModal();
         });
 
       return;
@@ -108,32 +118,31 @@ export const ClockIn = ({
     clockInWrapper(data.paymentPointUUID);
   };
 
-  useEffect(() => {
-    promptBeforeClosing(() => !isClockedIn);
-  }, [isClockedIn, promptBeforeClosing]);
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-      {isLoadingPaymentPoints ? (
-        <SelectSkeleton />
-      ) : (
-        <Select
-          {...register('paymentPointUUID')}
-          labelText={t('selectPaymentPoint', 'Select payment point')}
-          helperText={t('selectPaymentPointMessage', 'Select the payment point on which you will be clocked in.')}
-          label={t('paymentPoint', 'Payment point')}
-          placeholder={t('pleaseSelectPaymentPoint', 'Please select a payment point')}
-          invalid={!!errors.paymentPointUUID}
-          invalidText={errors.paymentPointUUID?.message}>
-          {paymentPoints.map((point) => (
-            <SelectItem value={point.uuid} text={point.name} />
-          ))}
-        </Select>
-      )}
-      <ButtonSet className={styles.buttonSet}>
+      <ModalHeader closeModal={disableCancelling ? undefined : closeModal}>Clock In</ModalHeader>
+      <ModalBody>
+        {isLoadingPaymentPoints ? (
+          <SelectSkeleton />
+        ) : (
+          <Select
+            {...register('paymentPointUUID')}
+            labelText={t('selectPaymentPoint', 'Select payment point')}
+            helperText={t('selectPaymentPointMessage', 'Select the payment point on which you will be clocked in.')}
+            label={t('paymentPoint', 'Payment point')}
+            placeholder={t('pleaseSelectPaymentPoint', 'Please select a payment point')}
+            invalid={!!errors.paymentPointUUID}
+            invalidText={errors.paymentPointUUID?.message}>
+            {paymentPoints.map((point) => (
+              <SelectItem value={point.uuid} text={point.name} />
+            ))}
+          </Select>
+        )}
+      </ModalBody>
+      <ModalFooter>
         <Button
           kind="secondary"
-          onClick={disableCancelling ? undefined : closeWorkspace}
+          onClick={disableCancelling ? undefined : closeModal}
           type="button"
           disabled={Boolean(disableCancelling)}>
           {t('cancel', 'Cancel')}
@@ -148,7 +157,7 @@ export const ClockIn = ({
             t('clockIn', 'Clock In')
           )}
         </Button>
-      </ButtonSet>
+      </ModalFooter>
     </Form>
   );
 };

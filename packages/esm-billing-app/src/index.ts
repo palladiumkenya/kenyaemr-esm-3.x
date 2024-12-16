@@ -37,7 +37,7 @@ import { createLeftPanelLink } from './left-panel-link.component';
 import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
 import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
 import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
-import { ClockIn } from './payment-points/payment-point/clock-in.workspace';
+import { ClockIn } from './payment-points/payment-point/clock-in.modal';
 import { ClockOut } from './payment-points/payment-point/clock-out.component';
 import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
 import rootComponent from './root.component';

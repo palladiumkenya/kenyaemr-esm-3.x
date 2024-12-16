@@ -265,12 +265,6 @@
       "component": "cancelBillWorkspace",
       "title": "Cancel Bill Workspace",
       "type": "other-form"
-    },
-    {
-      "name": "clock-in-workspace",
-      "component": "clockIn",
-      "title": "Clock In",
-      "type": "other-form"
     }
   ],
   "modals": [
@@ -297,6 +291,10 @@
     {
       "name": "paid-bill-receipt-print-preview-modal",
       "component": "paidBillReceiptPrintPreviewModal"
+    },
+    {
+      "name": "clock-in-modal",
+      "component": "clockIn"
     }
   ]
 }

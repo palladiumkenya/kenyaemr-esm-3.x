@@ -1,6 +1,6 @@
 import { Button, ButtonSkeleton, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { IbmCloudLogging } from '@carbon/react/icons';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { showModal } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import BillsTable from '../bills-table/bills-table.component';
@@ -19,7 +19,9 @@ const BillingTabs = () => {
   const { isClockedIn, isLoading } = useClockInStatus();
 
   const openClockInModal = () => {
-    launchWorkspace('clock-in-workspace');
+    const dispose = showModal('clock-in-modal', {
+      closeModal: () => dispose(),
+    });
   };
 
   return (
