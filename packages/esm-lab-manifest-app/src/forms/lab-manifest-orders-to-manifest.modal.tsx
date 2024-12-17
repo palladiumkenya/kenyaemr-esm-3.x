@@ -63,7 +63,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
       const results = await Promise.allSettled(
         selectedOrders.map((order) => addOrderToManifest({ ...order, ...values })),
       );
-      results.forEach((res) => {
+      results.forEach((res, index) => {
         if (res.status === 'fulfilled') {
           showSnackbar({
             title: 'Success',
@@ -72,9 +72,12 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
           });
         } else {
           showSnackbar({
-            title: 'Failure',
+            title: t('manifestOrderError', 'Error adding order {{orderUuid}} for {{patient}} to the manifest', {
+              orderUuid: selectedOrders[index]?.order?.uuid,
+              patient: orders.find((order) => selectedOrders[index]?.order?.uuid === order.orderUuid)?.patientName,
+            }),
             kind: 'error',
-            subtitle: t('manifestOrderError', 'Error adding order to the manifest') + ` ${res.reason}`,
+            subtitle: ` ${res.reason?.responseBody?.error?.message ?? res?.reason?.message}`,
           });
         }
       });
@@ -82,9 +85,9 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
       onClose();
     } catch (error) {
       showSnackbar({
-        title: 'Failure',
+        title: t('manifestOrderError', 'Error adding order to the manifest'),
         kind: 'error',
-        subtitle: t('manifestOrderError', 'Error adding order to the manifest') + ` ${error?.message}`,
+        subtitle: ` ${error.reason?.responseBody?.error?.message ?? error?.reason?.message}`,
       });
     }
   };
