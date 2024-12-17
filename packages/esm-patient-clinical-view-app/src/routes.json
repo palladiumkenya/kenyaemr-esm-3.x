@@ -305,6 +305,10 @@
     {
       "name": "relationship-delete-confirm-dialog",
       "component": "relationshipDeleteConfirmialog"
+    },
+    {
+      "name": "end-relationship-dialog",
+      "component": "endRelationshipModal"
     }
   ],
   "workspaces": [

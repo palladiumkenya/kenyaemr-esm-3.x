@@ -8,116 +8,75 @@ import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 import { createMedicationDispenseProps } from './dispense.resource';
 
 jest.mock('./test-order-action.resource');
-
-const mockTestProps = {
-  order: { uuid: '123', patient: { uuid: '456' } } as Order,
-  patientUuid: 'patient-uuid-123',
-  encounterUuid: 'encounter-uuid-456',
-  medicationRequestBundle: {
-    request: {
-      id: 'med-request-789',
-      medicationReference: { reference: 'Medication/med-123' },
-      medicationCodeableConcept: { coding: [{ code: 'med-code-123' }] },
-      subject: { reference: 'Patient/patient-uuid-123' },
-      dispenseRequest: {
-        quantity: {
-          value: 30,
-          code: 'TAB',
-          unit: 'tablets',
-          system: 'http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm',
+jest.mock('./dispense.resource', () => ({
+  createMedicationDispenseProps: jest.fn(() => ({
+    whenHandedOver: '2024-12-17T11:52:35+00:00',
+    medicationRequestBundle: {
+      request: {
+        dispenseRequest: {
+          quantity: { value: 30, code: 'TAB', unit: 'tablets' },
         },
       },
-      dosageInstruction: [
-        {
-          text: 'Take 1 tablet daily',
-          timing: { code: 'daily' },
-          route: { coding: [{ code: 'PO' }] },
-          doseAndRate: [
-            {
-              doseQuantity: {
-                value: 1,
-                code: 'TAB',
-                unit: 'tablet',
-              },
-            },
-          ],
-          additionalInstruction: [{ text: 'with food' }],
-        },
-      ],
     },
-  },
-  quantityRemaining: 30,
-  session: {
-    currentProvider: {
-      uuid: 'provider-uuid-123',
-    },
-    sessionLocation: {
-      uuid: 'location-uuid-456',
-    },
-  },
-  providers: [
-    {
-      uuid: 'provider-uuid-123',
-      display: 'Dr. Test Provider',
-    },
-  ],
-  closeable: true,
-} as Record<string, unknown>;
+    otherProp: 'test-value',
+  })),
+}));
+
+jest.mock('@openmrs/esm-framework', () => ({
+  launchWorkspace: jest.fn(),
+  showModal: jest.fn(),
+}));
 
 const testProps = {
   order: { uuid: '123', patient: { uuid: '456' } } as Order,
+  modalName: 'test-modal',
+  actionText: 'Test Action',
 };
 
 describe('TestOrderAction', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     jest.clearAllMocks();
+    jest.useFakeTimers().setSystemTime(new Date('2024-12-17T11:52:35Z'));
   });
 
-  test('should render loading when isLoading is true', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  test('should render loading state when isLoading is true', () => {
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: true, hasPendingPayment: false });
     render(<TestOrderAction {...testProps} />);
+
     expect(screen.getByText('Verifying bill status...')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 
-  test("should display `Unsettled bill for test` when there's a pending payment", () => {
+  test('should display "Unsettled bill" when hasPendingPayment is true', () => {
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: true });
     render(<TestOrderAction {...testProps} />);
+
     expect(screen.getByText('Unsettled bill')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeDisabled();
   });
 
-  test("should display `Pick Lab Request` when there's no pending payment", async () => {
-    const user = userEvent.setup();
+  test('should render the button with correct action text', () => {
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: false });
     render(<TestOrderAction {...testProps} />);
-    const pickLabRequestMenuItem = screen.getByText('Pick Lab Request');
-    await user.click(pickLabRequestMenuItem);
 
-    expect(screen.queryByText('Unsettled bill.')).not.toBeInTheDocument();
-    expect(showModal).toBeCalledWith('pickup-lab-request-modal', {
-      closeModal: expect.any(Function),
-      order: { patient: { uuid: '456' }, uuid: '123' },
-    });
+    expect(screen.getByText('Test Action')).toBeInTheDocument();
+    expect(screen.getByRole('button')).toBeEnabled();
   });
 
-  test('should not render the dispense form if closeable is false', () => {
+  test('should not render button if order is in progress', () => {
+    const inProgressProps = {
+      ...testProps,
+      order: { ...testProps.order, fulfillerStatus: 'IN_PROGRESS' } as Order,
+    };
+
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: false });
-    render(<TestOrderAction {...testProps} closeable={false} />);
-    expect(screen.queryByText('Dispense')).not.toBeInTheDocument();
-  });
+    render(<TestOrderAction {...inProgressProps} />);
 
-  test('should launch the dispense form when dispense order is part of props', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: false });
-    render(<TestOrderAction {...mockTestProps} />);
-    const dispenseButton = screen.getByRole('button', { name: 'Dispense' });
-    expect(dispenseButton).toBeInTheDocument();
-
-    await user.click(dispenseButton);
-    const dispenseFormProps = createMedicationDispenseProps(mockTestProps);
-
-    expect(launchWorkspace).toHaveBeenCalledWith('dispense-workspace', {
-      ...dispenseFormProps,
-    });
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

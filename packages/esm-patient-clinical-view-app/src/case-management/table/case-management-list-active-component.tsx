@@ -22,6 +22,7 @@ import {
   ConfigurableLink,
   isDesktop,
   launchWorkspace,
+  showModal,
   showSnackbar,
   useLayoutType,
   useSession,
@@ -64,26 +65,10 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
         caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
   );
   const handleDiscontinueACase = async (relationshipUuid: string) => {
-    try {
-      await updateRelationship(relationshipUuid, { endDate: new Date() });
-      await fetchCases();
-
-      showSnackbar({
-        kind: 'success',
-        title: t('endRlship', 'End relationship'),
-        subtitle: t('savedRlship', 'Relationship ended successfully'),
-        timeoutInMs: 3000,
-        isLowContrast: true,
-      });
-    } catch (error) {
-      showSnackbar({
-        kind: 'error',
-        title: t('RlshipError', 'Relationship Error'),
-        subtitle: t('RlshipError', 'Request Failed.......'),
-        timeoutInMs: 2500,
-        isLowContrast: true,
-      });
-    }
+    const dispose = showModal('end-relationship-dialog', {
+      relationshipUuid,
+      closeModal: () => dispose(),
+    });
   };
 
   const tableRows = filteredCases
