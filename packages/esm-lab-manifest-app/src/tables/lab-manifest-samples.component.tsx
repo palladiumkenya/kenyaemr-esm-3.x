@@ -102,9 +102,19 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
           await removeSampleFromTheManifest(sampleUUid);
           mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
           dispose();
-          showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Sample removed from manifest successfully!' });
-        } catch (e) {
-          showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error removing sample from the manifest' });
+          showSnackbar({
+            title: 'Success',
+            kind: 'success',
+            subtitle: t('sampleRemoveSuccess', 'Sample removed from manifest successfully!'),
+          });
+        } catch (e: any) {
+          showSnackbar({
+            title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
+              sample: sampleUUid,
+            }),
+            kind: 'error',
+            subtitle: `${e?.responseBody?.error?.message ?? e?.message} `,
+          });
         }
       },
     });
@@ -120,7 +130,23 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
             const deleteMany = await Promise.allSettled(selected.map(({ uuid }) => removeSampleFromTheManifest(uuid)));
             mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
             dispose();
-            showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Sample removed from manifest successfully!' });
+            deleteMany.forEach((deleteCall, index) => {
+              if (deleteCall.status === 'rejected') {
+                showSnackbar({
+                  title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
+                    sample: selected[index]?.uuid,
+                  }),
+                  kind: 'error',
+                  subtitle: `${deleteCall.reason?.responseBody?.error?.message ?? deleteCall.reason?.message} `,
+                });
+              } else {
+                showSnackbar({
+                  title: 'Success',
+                  kind: 'success',
+                  subtitle: 'Sample removed from manifest successfully!',
+                });
+              }
+            });
           } catch (e) {
             showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error removing sample from the manifest' });
           }

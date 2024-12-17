@@ -77,7 +77,7 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
               patient: orders.find((order) => selectedOrders[index]?.order?.uuid === order.orderUuid)?.patientName,
             }),
             kind: 'error',
-            subtitle: ` ${res.reason?.responseBody?.error?.message ?? res?.reason?.message}`,
+            subtitle: `${res.reason?.responseBody?.error?.message ?? res?.reason?.message}`,
           });
         }
       });
