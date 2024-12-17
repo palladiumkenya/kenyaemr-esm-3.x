@@ -72,8 +72,8 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
           });
         } else {
           showSnackbar({
-            title: t('manifestOrderError', 'Error adding order {{orderUuid}} for {{patient}} to the manifest', {
-              orderUuid: selectedOrders[index]?.order?.uuid,
+            title: t('manifestOrderError', 'Error adding order {{order}} for {{patient}} to the manifest', {
+              order: orders.find((order) => selectedOrders[index]?.order?.uuid === order.orderUuid)?.orderId,
               patient: orders.find((order) => selectedOrders[index]?.order?.uuid === order.orderUuid)?.patientName,
             }),
             kind: 'error',

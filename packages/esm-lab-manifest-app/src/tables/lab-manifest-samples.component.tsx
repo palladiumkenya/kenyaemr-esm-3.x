@@ -108,9 +108,10 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
             subtitle: t('sampleRemoveSuccess', 'Sample removed from manifest successfully!'),
           });
         } catch (e: any) {
+          const _sample = samples.find((sample) => sample.uuid === sampleUUid);
           showSnackbar({
             title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
-              sample: sampleUUid,
+              sample: _sample.id ?? _sample?.uuid,
             }),
             kind: 'error',
             subtitle: `${e?.responseBody?.error?.message ?? e?.message} `,
@@ -131,10 +132,12 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
             mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
             dispose();
             deleteMany.forEach((deleteCall, index) => {
+              const _sample = selected[index];
+
               if (deleteCall.status === 'rejected') {
                 showSnackbar({
                   title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
-                    sample: selected[index]?.uuid,
+                    sample: _sample.id ?? _sample.uuid,
                   }),
                   kind: 'error',
                   subtitle: `${deleteCall.reason?.responseBody?.error?.message ?? deleteCall.reason?.message} `,
