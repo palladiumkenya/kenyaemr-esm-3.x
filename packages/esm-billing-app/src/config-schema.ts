@@ -28,6 +28,10 @@ export interface BillingConfig {
     emergencyPriorityConceptUuid: string;
   };
   paymentMethodsUuidsThatShouldNotShowPrompt: Array<string>;
+  promptDuration: {
+    enable: boolean;
+    duration: number;
+  };
 }
 
 export const configSchema: ConfigSchema = {
@@ -181,5 +185,14 @@ export const configSchema: ConfigSchema = {
       _type: Type.String,
     },
     _default: ['beac329b-f1dc-4a33-9e7c-d95821a137a6'],
+  },
+  promptDuration: {
+    _type: Type.Object,
+    _description:
+      'The duration in hours for the prompt to be shown, if the duration is less than this, the prompt will be shown',
+    _default: {
+      enable: true,
+      duration: 24,
+    },
   },
 };

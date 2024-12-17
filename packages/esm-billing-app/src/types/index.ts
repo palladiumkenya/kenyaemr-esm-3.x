@@ -97,6 +97,7 @@ interface AttributeType {
   foreignKey?: string | null;
   regExp?: string | null;
   required: boolean;
+  value?: string;
 }
 
 interface Attribute {
