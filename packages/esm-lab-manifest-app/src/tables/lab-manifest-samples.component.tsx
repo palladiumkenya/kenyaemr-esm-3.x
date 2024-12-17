@@ -128,19 +128,21 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         samples: selected,
         onDelete: async () => {
           try {
-            const deleteMany = await Promise.allSettled(selected.map(({ uuid }) => removeSampleFromTheManifest(uuid)));
+            const samplesDeletionAsyncTasks = await Promise.allSettled(
+              selected.map(({ uuid }) => removeSampleFromTheManifest(uuid)),
+            );
             mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
             dispose();
-            deleteMany.forEach((deleteCall, index) => {
+            samplesDeletionAsyncTasks.forEach((task, index) => {
               const _sample = selected[index];
 
-              if (deleteCall.status === 'rejected') {
+              if (task.status === 'rejected') {
                 showSnackbar({
                   title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
                     sample: _sample.id ?? _sample.uuid,
                   }),
                   kind: 'error',
-                  subtitle: `${deleteCall.reason?.responseBody?.error?.message ?? deleteCall.reason?.message} `,
+                  subtitle: `${task.reason?.responseBody?.error?.message ?? task.reason?.message} `,
                 });
               } else {
                 showSnackbar({
