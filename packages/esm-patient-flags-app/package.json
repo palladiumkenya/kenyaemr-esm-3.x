@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-patient-flags-app",
-  "version": "5.3.7",
+  "version": "5.3.8",
   "description": "Patient flags microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-flags-app.js",
   "main": "src/index.ts",
