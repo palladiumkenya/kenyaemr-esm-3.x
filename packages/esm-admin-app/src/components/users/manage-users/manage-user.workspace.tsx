@@ -7,7 +7,7 @@ import {
   showSnackbar,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import styles from './manage-user.workspace.scss';
 import {
   TextInput,
@@ -23,16 +23,13 @@ import {
   Select,
   PasswordInput,
   Column,
-  Grid,
-  Tabs,
-  Tab,
   ClickableTile,
 } from '@carbon/react';
 import { z } from 'zod';
 import { UserSchema, User } from '../../../types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
-import { createUser, handleMutation, useRoles, useUser } from '../../../user-management.resources';
+import { createUser, handleMutation, useRoles, usePersonAttribute } from '../../../user-management.resources';
 import useManageUserFormSchema from '../ManageUserFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp } from '@carbon/react/icons';
@@ -54,23 +51,32 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
   const { manageUserFormSchema } = useManageUserFormSchema();
 
+  const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
   type UserFormSchema = z.infer<typeof manageUserFormSchema>;
   const formDefaultValues =
     Object.keys(initialUserValue).length > 0
       ? {
           ...initialUserValue,
-          givenName: initialUserValue.person?.display.split(' ')[0] || '',
-          middleName: initialUserValue.person?.display.split(' ')[1] || '',
-          familyName: initialUserValue.person?.display.split(' ')[2] || '',
-          phoneNumber:
-            initialUserValue.person?.attributes?.find((attr) => attr.uuid === 'b2c38640-2603-4629-aebd-3b54f33f1e3a')
-              ?.display || '',
-          email:
-            initialUserValue.person?.attributes?.find((attr) => attr.uuid === 'b8d0b331-1d2d-4a9a-b741-1816f498bdb6')
-              ?.display || '',
-          roles: initialUserValue.roles.map((role) => role.display).join(', ') || [],
+          ...extractNameParts(initialUserValue.person?.display || ''),
+          phoneNumber: extractAttributeValue(initialUserValue.person?.attributes, 'Telephone'),
+          email: extractAttributeValue(initialUserValue.person?.attributes, 'Email'),
+          roles: initialUserValue.roles?.map((role) => role.display) || [],
+          gender: initialUserValue.person?.gender || 'M',
         }
       : {};
+
+  function extractNameParts(display = '') {
+    const nameParts = display.split(' ');
+
+    const [givenName = '', middleName = '', familyName = ''] =
+      nameParts.length === 3 ? nameParts : [nameParts[0], '', nameParts[1] || ''];
+
+    return { givenName, middleName, familyName };
+  }
+
+  function extractAttributeValue(attributes, prefix) {
+    return attributes?.find((attr) => attr.display.startsWith(prefix))?.display?.split(' ')[3] || '';
+  }
 
   const formMethods = useForm<UserFormSchema>({
     resolver: zodResolver(manageUserFormSchema),
@@ -82,6 +88,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
   const { roles = [], isLoading } = useRoles();
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
+  const { attributeTypes = [] } = usePersonAttribute();
 
   useEffect(() => {
     if (isDirty) {
@@ -90,13 +97,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = async (data: UserFormSchema) => {
-    const emaiAttribute = 'b8d0b331-1d2d-4a9a-b741-1816f498bdb6';
-    const telephoneAttribute = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
+    const emailAttribute = attributeTypes.find((attr) => attr.name === 'email')?.uuid || '';
+    const telephoneAttribute = attributeTypes.find((attr) => attr.name === 'Telephone contact')?.uuid || '';
     const allRoles = [...(data.roles || []).map((role) => (typeof role === 'string' ? { name: role } : role))];
     const payload: Partial<UserSchema> = {
       username: data.username,
       password: data.password,
-      systemId: data.systemId,
       person: {
         names: [
           {
@@ -108,11 +114,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         gender: data.gender,
         attributes: [
           {
-            attributeType: emaiAttribute,
+            attributeType: telephoneAttribute,
             value: data.phoneNumber,
           },
           {
-            attributeType: telephoneAttribute,
+            attributeType: emailAttribute,
             value: data.email,
           },
         ],
@@ -175,269 +181,306 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   };
 
   return (
-    <FormProvider {...formMethods}>
-      <form onSubmit={formMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
-        <div className={styles.formContainer}>
-          <Grid className={styles.grid}>
-            <Column xsm={0} md={4} lg={4} className={styles.columnGridLeft} condensed>
-              <ul className={styles.list}>
-                <ClickableTile
-                  className={`${styles.listItem} ${activeSection === 'demographic' ? styles.active : ''}`}
-                  onClick={() => toggleSection('demographic')}>
-                  {t('demographicInformation', 'Demographic Info')}
-                </ClickableTile>
-                <ClickableTile
-                  className={`${styles.listItem} ${activeSection === 'provider' ? styles.active : ''}`}
-                  onClick={() => toggleSection('provider')}>
-                  {t('providerAccount', 'Provider Account')}
-                </ClickableTile>
-                <ClickableTile
-                  className={`${styles.listItem} ${activeSection === 'login' ? styles.active : ''}`}
-                  onClick={() => toggleSection('login')}>
-                  {t('loginInformation', 'Login Info')}
-                </ClickableTile>
-                <ClickableTile
-                  className={`${styles.listItem} ${activeSection === 'roles' ? styles.active : ''}`}
-                  onClick={() => toggleSection('roles')}>
-                  {t('roles', 'Roles Info')}
-                </ClickableTile>
-              </ul>
-            </Column>
-            <Column xsm={12} md={12} lg={12} className={styles.columnGridRight}>
-              <Stack className={styles.formStackControl} gap={7}>
-                {activeSection == 'demographic' && (
-                  <ResponsiveWrapper>
-                    <CardHeader title="Dempgraphic Info">
-                      <ChevronSortUp />
-                    </CardHeader>
-                    <Controller
-                      name="givenName"
-                      control={formMethods.control}
-                      render={({ field }) => (
-                        <TextInput
-                          {...field}
-                          id="givenName"
-                          type="text"
-                          labelText={t('givenName', 'Given Name')}
-                          placeholder={t('userGivenName', 'Enter Given name')}
-                          invalid={!!errors.givenName}
-                          invalidText={errors.givenName?.message}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="middleName"
-                      control={formMethods.control}
-                      render={({ field }) => (
-                        <TextInput
-                          {...field}
-                          id="middleName"
-                          labelText={t('middleName', 'Middle Name')}
-                          placeholder={t('middleName', 'Middle Name')}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="familyName"
-                      control={formMethods.control}
-                      render={({ field }) => (
-                        <TextInput
-                          {...field}
-                          id="familyName"
-                          labelText={t('familyName', 'Family Name')}
-                          placeholder={t('familyName', 'Family Name')}
-                          invalid={!!errors.familyName}
-                          invalidText={errors.familyName?.message}
-                        />
-                      )}
-                    />
-                    <Controller
-                      name="phoneNumber"
-                      control={formMethods.control}
-                      render={({ field }) => (
-                        <TextInput
-                          {...field}
-                          id="phoneNumber"
-                          type="text"
-                          labelText={t('phoneNumber', 'Phone Number')}
-                          placeholder={t('phoneNumber', 'Phone Number')}
-                          invalid={!!errors.givenName}
-                          invalidText={errors.givenName?.message}
-                        />
-                      )}
-                    />
-
-                    <Controller
-                      name="email"
-                      control={formMethods.control}
-                      render={({ field }) => (
-                        <TextInput
-                          {...field}
-                          id="email"
-                          type="email"
-                          labelText={t('email', 'Email')}
-                          placeholder={t('phoneNumber', 'Email')}
-                          invalid={!!errors.givenName}
-                          className={styles.checkboxLabelSingleLine}
-                          invalidText={errors.givenName?.message}
-                        />
-                      )}
-                    />
-
-                    <Controller
-                      name="gender"
-                      control={formMethods.control}
-                      render={({ field }) => (
-                        <RadioButtonGroup
-                          {...field}
-                          legendText={t('gender', 'Gender')}
-                          orientation="vertical"
-                          invalid={!!errors.gender}
-                          invalidText={errors.gender?.message}>
-                          <RadioButton value="Male" labelText={t('male', 'Male')} />
-                          <RadioButton value="Female" labelText={t('female', 'Female')} />
-                        </RadioButtonGroup>
-                      )}
-                    />
-                  </ResponsiveWrapper>
-                )}
-                <ResponsiveWrapper>
-                  {activeSection === 'provider' && (
-                    <ResponsiveWrapper>
-                      <CardHeader title="Provider Details">
-                        <ChevronSortUp />
-                      </CardHeader>
-                      <Controller
-                        name="providerIdentifiers"
-                        control={formMethods.control}
-                        render={({ field }) => (
-                          <CheckboxGroup
-                            legendText={t('providerIdentifiers', 'Provider Details')}
-                            className={styles.checkboxGroupGrid}>
-                            <Checkbox
-                              className={styles.checkboxLabelSingleLine}
-                              {...field}
-                              id="providerIdentifiers"
-                              labelText={t('providerIdentifiers', 'Create a Provider account for this user')}
-                              checked={field.value || false}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                          </CheckboxGroup>
-                        )}
-                      />
-                    </ResponsiveWrapper>
-                  )}
-                </ResponsiveWrapper>
-                <ResponsiveWrapper>
-                  {activeSection === 'login' && (
-                    <ResponsiveWrapper>
-                      <CardHeader title="Login Info">
-                        <ChevronSortUp />
-                      </CardHeader>
-                      <Controller
-                        name="systemId"
-                        control={formMethods.control}
-                        render={({ field }) => (
-                          <TextInput
-                            {...field}
-                            id="systemId"
-                            labelText={t('systemId', 'System ID')}
-                            invalid={!!errors.systemId}
-                            invalidText={errors.systemId?.message}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="username"
-                        control={formMethods.control}
-                        render={({ field }) => (
-                          <TextInput
-                            {...field}
-                            id="username"
-                            labelText={t('username', 'Username')}
-                            invalid={!!errors.username}
-                            invalidText={errors.username?.message}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="password"
-                        control={formMethods.control}
-                        render={({ field }) => (
-                          <PasswordInput
-                            {...field}
-                            id="password"
-                            type="password"
-                            labelText={t('password', 'Password')}
-                            helperText={t(
-                              'passwordHelper',
-                              'Password must be 8 characters long, include upper and lower characters, at least one digit, one non digit',
-                            )}
-                            invalid={!!errors.password}
-                            invalidText={errors.password?.message}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="confirmPassword"
-                        control={formMethods.control}
-                        render={({ field }) => (
-                          <PasswordInput
-                            {...field}
-                            id="confirmPassword"
-                            type="password"
-                            labelText={t('confirmPassword', 'Confirm Password')}
-                            helperText={t('confirmPasswordHelper', 'Retype the password (for accuracy)')}
-                            invalid={!!errors.confirmPassword}
-                            invalidText={errors.confirmPassword?.message}
-                          />
-                        )}
-                      />
-                      <Controller
-                        name="forcePasswordChange"
-                        control={formMethods.control}
-                        render={({ field }) => (
-                          <CheckboxGroup
-                            legendText={t('forcePasswordChange', 'Force Password Change')}
-                            className={styles.checkboxGroupGrid}>
-                            <Checkbox
-                              className={styles.checkboxLabelSingleLine}
-                              {...field}
-                              id="forcePasswordChange"
-                              labelText={t(
-                                'forcePasswordChangeHelper',
-                                'Optionally require this user to change their password on next login',
-                              )}
-                              checked={field.value || false}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                          </CheckboxGroup>
-                        )}
-                      />
-                    </ResponsiveWrapper>
-                  )}
-                </ResponsiveWrapper>
-
-                <ResponsiveWrapper>
-                  {activeSection === 'roles' && (
-                    <ResponsiveWrapper>
-                      <CardHeader title="Roles Info">
-                        <ChevronSortUp />
-                      </CardHeader>
-                      <Controller
-                        name="primaryRole"
-                        control={formMethods.control}
-                        render={({ field }) => (
-                          <Select id="carder-select" labelText={t('primaryRole', 'Primary Role')} {...field}>
-                            <SelectItem value="" text={t('selectOption', 'Choose an option')} />
-                            <SelectItem value="admin" text={t('admin', 'Admin')} />
-                            <SelectItem value="provider" text={t('provider', 'Provider')} />
-                            <SelectItem value="nurse" text={t('nurse', 'Nurse')} />
-                          </Select>
-                        )}
-                      />
+    <div className={styles.leftTabsContainer}>
+      <div>
+        <div className={styles.leftTabsLayout}>
+          <ul className={styles.tabList}>
+            <ClickableTile
+              className={`${styles.listItem} ${activeSection === 'demographic' ? styles.active : ''}`}
+              onClick={() => toggleSection('demographic')}>
+              {t('demographicInformation', 'Demographic Info')}
+            </ClickableTile>
+            <ClickableTile
+              className={`${styles.listItem} ${activeSection === 'provider' ? styles.active : ''}`}
+              onClick={() => toggleSection('provider')}>
+              {t('providerAccount', 'Provider Account')}
+            </ClickableTile>
+            <ClickableTile
+              className={`${styles.listItem} ${activeSection === 'login' ? styles.active : ''}`}
+              onClick={() => toggleSection('login')}>
+              {t('loginInformation', 'Login Info')}
+            </ClickableTile>
+            <ClickableTile
+              className={`${styles.listItem} ${activeSection === 'roles' ? styles.active : ''}`}
+              onClick={() => toggleSection('roles')}>
+              {t('roles', 'Roles Info')}
+            </ClickableTile>
+          </ul>
+          <div className={styles.tabPanels}>
+            <FormProvider {...formMethods}>
+              <form onSubmit={formMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
+                <div className={styles.formContainer}>
+                  <Stack className={styles.formStackControl} gap={7}>
+                    {activeSection === 'demographic' && (
                       <ResponsiveWrapper>
-                        <Grid>
+                        <CardHeader title="Demographic Info">
+                          <ChevronSortUp />
+                        </CardHeader>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="givenName"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="givenName"
+                                type="text"
+                                labelText={t('givenName', 'Given Name')}
+                                placeholder={t('userGivenName', 'Enter Given Name')}
+                                invalid={!!errors.givenName}
+                                invalidText={errors.givenName?.message}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="middleName"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="middleName"
+                                labelText={t('middleName', 'Middle Name')}
+                                placeholder={t('middleName', 'Middle Name')}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="familyName"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="familyName"
+                                labelText={t('familyName', 'Family Name')}
+                                placeholder={t('familyName', 'Family Name')}
+                                invalid={!!errors.familyName}
+                                invalidText={errors.familyName?.message}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="phoneNumber"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="phoneNumber"
+                                type="text"
+                                labelText={t('phoneNumber', 'Phone Number')}
+                                placeholder={t('phoneNumber', 'Enter Phone Number')}
+                                invalid={!!errors.phoneNumber}
+                                invalidText={errors.phoneNumber?.message}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="email"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="email"
+                                type="email"
+                                labelText={t('email', 'Email')}
+                                placeholder={t('email', 'Enter Email')}
+                                invalid={!!errors.email}
+                                invalidText={errors.email?.message}
+                                className={styles.checkboxLabelSingleLine}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="gender"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <RadioButtonGroup
+                                {...field}
+                                legendText={t('gender', 'Gender')}
+                                orientation="vertical"
+                                invalid={!!errors.gender}
+                                invalidText={errors.gender?.message}>
+                                <RadioButton
+                                  value="M"
+                                  id="M"
+                                  labelText={t('male', 'Male')}
+                                  checked={field.value === 'M'}
+                                />
+                                <RadioButton
+                                  value="F"
+                                  id="F"
+                                  labelText={t('female', 'Female')}
+                                  checked={field.value === 'F'}
+                                />
+                              </RadioButtonGroup>
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                      </ResponsiveWrapper>
+                    )}
+
+                    {activeSection === 'provider' && (
+                      <ResponsiveWrapper>
+                        <CardHeader title="Provider Details">
+                          <ChevronSortUp />
+                        </CardHeader>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="providerIdentifiers"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <CheckboxGroup
+                                legendText={t('providerIdentifiers', 'Provider Details')}
+                                className={styles.multilineCheckboxLabel}>
+                                <Checkbox
+                                  className={styles.checkboxLabelSingleLine}
+                                  {...field}
+                                  id="providerIdentifiers"
+                                  labelText={t('providerIdentifiers', 'Create a Provider account for this user')}
+                                  checked={field.value || false}
+                                  onChange={(e) => field.onChange(e.target.checked)}
+                                />
+                              </CheckboxGroup>
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                      </ResponsiveWrapper>
+                    )}
+
+                    {activeSection === 'login' && (
+                      <ResponsiveWrapper>
+                        <CardHeader title="Login Info">
+                          <ChevronSortUp />
+                        </CardHeader>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="username"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="username"
+                                labelText={t('username', 'Username')}
+                                invalid={!!errors.username}
+                                invalidText={errors.username?.message}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="password"
+                            control={formMethods.control}
+                            rules={
+                              isInitialValuesEmpty
+                                ? {
+                                    required: 'Password is required',
+                                    minLength: { value: 8, message: 'Password must be at least 8 characters long' },
+                                    pattern: {
+                                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/,
+                                      message: 'Password must include uppercase, lowercase, and a number',
+                                    },
+                                  }
+                                : {}
+                            }
+                            render={({ field }) => (
+                              <PasswordInput
+                                {...field}
+                                id="password"
+                                labelText="Password"
+                                invalid={!!errors.password}
+                                invalidText={errors.password?.message}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="confirmPassword"
+                            control={formMethods.control}
+                            rules={
+                              isInitialValuesEmpty
+                                ? {
+                                    required: 'Please confirm your password',
+                                    validate: (value) =>
+                                      value === formMethods.watch('password') || 'Passwords do not match',
+                                  }
+                                : {}
+                            }
+                            render={({ field }) => (
+                              <PasswordInput
+                                {...field}
+                                id="confirmPassword"
+                                labelText="Confirm Password"
+                                invalid={!!errors.confirmPassword}
+                                invalidText={errors.confirmPassword?.message}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="forcePasswordChange"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <CheckboxGroup
+                                legendText={t('forcePasswordChange', 'Force Password Change')}
+                                className={styles.checkboxGroupGrid}>
+                                <Checkbox
+                                  className={styles.multilineCheckboxLabel}
+                                  {...field}
+                                  id="forcePasswordChange"
+                                  labelText={t(
+                                    'forcePasswordChangeHelper',
+                                    'Optionally require this user to change their password on next login',
+                                  )}
+                                  checked={field.value || false}
+                                  onChange={(e) => field.onChange(e.target.checked)}
+                                />
+                              </CheckboxGroup>
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                      </ResponsiveWrapper>
+                    )}
+
+                    {activeSection === 'roles' && (
+                      <ResponsiveWrapper>
+                        <CardHeader title="Roles Info">
+                          <ChevronSortUp />
+                        </CardHeader>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="primaryRole"
+                            control={formMethods.control}
+                            render={({ field }) => (
+                              <Select id="carder-select" labelText={t('primaryRole', 'Primary Role')} {...field}>
+                                <SelectItem value="" text={t('selectOption', 'Choose an option')} />
+                                <SelectItem value="admin" text={t('admin', 'Admin')} />
+                                <SelectItem value="provider" text={t('provider', 'Provider')} />
+                                <SelectItem value="nurse" text={t('nurse', 'Nurse')} />
+                              </Select>
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
                           {rolesConfig.map((category) => (
                             <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
                               <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
@@ -469,10 +512,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                                   checked={isSelected}
                                                   onChange={(e) => {
                                                     const value = e.target.checked
-                                                      ? [...(field.value || []), role.display]
+                                                      ? [...(field.value || []), role.display] // Add selected role
                                                       : (field.value || []).filter(
                                                           (selectedRole) => selectedRole !== role.display,
-                                                        );
+                                                        ); // Remove unselected role
                                                     field.onChange(value);
                                                   }}
                                                 />
@@ -487,35 +530,35 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                               </CheckboxGroup>
                             </Column>
                           ))}
-                        </Grid>
+                        </ResponsiveWrapper>
                       </ResponsiveWrapper>
-                    </ResponsiveWrapper>
-                  )}
-                </ResponsiveWrapper>
-              </Stack>
-            </Column>
-          </Grid>
+                    )}
+                  </Stack>
+                </div>
+                <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
+                  <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
+                    {t('cancel', 'Cancel')}
+                  </Button>
+                  <Button
+                    kind="primary"
+                    type="submit"
+                    disabled={isSubmitting || Object.keys(errors).length > 0}
+                    className={styles.btn}>
+                    {isSubmitting ? (
+                      <span style={{ display: 'flex', alignItems: 'center' }}>
+                        {t('submitting', 'Submitting...')} <InlineLoading status="active" />
+                      </span>
+                    ) : (
+                      t('saveAndClose', 'Save & close')
+                    )}
+                  </Button>
+                </ButtonSet>
+              </form>
+            </FormProvider>
+          </div>
         </div>
-        <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-          <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button
-            kind="primary"
-            type="submit"
-            disabled={isSubmitting || Object.keys(errors).length > 0}
-            className={styles.btn}>
-            {isSubmitting ? (
-              <span style={{ display: 'flex', alignItems: 'center' }}>
-                {t('submitting', 'Submitting...')} <InlineLoading status="active" />
-              </span>
-            ) : (
-              t('saveAndClose', 'Save & close')
-            )}
-          </Button>
-        </ButtonSet>
-      </form>
-    </FormProvider>
+      </div>
+    </div>
   );
 };
 

@@ -12,7 +12,7 @@ const useManageUserFormSchema = () => {
     givenName: z.string().nonempty(t('givenNameRequired', 'Given name is required')),
     middleName: z.string().optional(),
     familyName: z.string().nonempty(t('familyNameRequired', 'Family name is required')),
-    gender: z.enum(['Male', 'Female'], {
+    gender: z.enum(['M', 'F'], {
       errorMap: () => ({
         message: t('genderRequired', 'Gender is required'),
       }),
@@ -20,13 +20,9 @@ const useManageUserFormSchema = () => {
     phoneNumber: z.string().optional(),
     email: z.string().optional(),
     providerIdentifiers: z.boolean().optional(),
-    systemId: z.string().nonempty(t('systemIdRequired', 'System ID is required')),
     username: z.string().nonempty(t('usernameRequired', 'Username is required')),
-    password: z.string().min(8, t('passwordRequirements', 'Password must meet complexity requirements')),
-    confirmPassword: z.string(),
-    //   .refine((val, ctx) => val === ctx?.parent.password, {
-    //     message: t('passwordMismatch', 'Passwords must match'),
-    //   }),
+    password: z.string().optional(),
+    confirmPassword: z.string().optional(),
     forcePasswordChange: z.boolean().optional(),
     roles: z.array(z.string()).optional(),
     billingRoles: z.array(z.string()).optional(),

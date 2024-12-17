@@ -23,6 +23,7 @@ export interface User {
   person: {
     uuid: string;
     display: string;
+    gender: string;
     attributes?: Array<{
       uuid: string;
       display: string;
@@ -87,4 +88,9 @@ export interface UserRoleSchema {
   name: string;
   description: string;
   category: string;
+}
+
+export interface PersonAttributeType {
+  uuid: string;
+  name: string;
 }

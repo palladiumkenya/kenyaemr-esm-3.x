@@ -19,7 +19,6 @@ import {
 import { Edit } from '@carbon/react/icons';
 import styles from './user-list.scss';
 import { launchWorkspace, useDebounce } from '@openmrs/esm-framework';
-import { User } from '../../../../types';
 import { useUser } from '../../../../user-management.resources';
 
 const UserList: React.FC = () => {
@@ -33,7 +32,21 @@ const UserList: React.FC = () => {
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const filteredUserList = useMemo(() => {
-    return users.filter((user) => user.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase())) ?? [];
+    return (
+      users.filter((user) => {
+        const rolesDisplay = user.roles
+          .map((role) => role.display)
+          .join(', ')
+          .toLowerCase();
+        const fullName = user.person.display.toLowerCase();
+        return (
+          user.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          user.systemId.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          fullName.includes(debouncedSearchTerm.toLowerCase()) ||
+          rolesDisplay.includes(debouncedSearchTerm.toLowerCase())
+        );
+      }) ?? []
+    );
   }, [users, debouncedSearchTerm]);
 
   const paginatedUsers = useMemo(() => {
@@ -88,7 +101,7 @@ const UserList: React.FC = () => {
     },
   ];
 
-  const rows = paginatedUsers.map((user) => {
+  const rows = paginatedUsers.map((user, index) => {
     const rolesDisplay =
       user.roles.length > 2
         ? `${user.roles[0].display}, ${user.roles[1].display}, ...`
@@ -112,12 +125,17 @@ const UserList: React.FC = () => {
             hasIconOnly
             kind="ghost"
             iconDescription={t('edit', 'Edit')}
-            onClick={() =>
-              launchWorkspace('manage-user-workspace', {
-                workspaceTitle: t('editUser', 'Edit User'),
-                initialUserValue: users[2],
-              })
-            }
+            onClick={() => {
+              const selectedUser = users.find((u) => u.uuid === user.uuid);
+              if (selectedUser) {
+                launchWorkspace('manage-user-workspace', {
+                  workspaceTitle: t('editUser', 'Edit User'),
+                  initialUserValue: selectedUser,
+                });
+              } else {
+                console.error('User not found:', user.uuid);
+              }
+            }}
           />
         </ButtonSet>
       ),

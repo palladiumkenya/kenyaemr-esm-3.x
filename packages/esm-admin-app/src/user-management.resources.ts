@@ -43,3 +43,15 @@ export const useRoles = () => {
     error,
   };
 };
+
+export const usePersonAttribute = () => {
+  const url = `${restBaseUrl}/personattributetype?v=full`;
+  const { data, isLoading, error } = useSWR<{ data: { results: Array<Roles> } }>(url, openmrsFetch, {
+    errorRetryCount: 2,
+  });
+  return {
+    attributeTypes: data?.data?.results,
+    isLoading,
+    error,
+  };
+};

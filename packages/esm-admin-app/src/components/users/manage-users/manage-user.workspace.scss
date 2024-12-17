@@ -38,12 +38,12 @@
   list-style: none;
   padding: 10px;
   cursor: pointer;
-  background-color: colors.$gray-30;
-  font-size: small;
+  background-color: colors.$gray-10;
+  font-size: 14px;
 }
 
 .listItem.active {
-  background-color: colors.$green-30;
+  background-color: colors.$gray-20;
 }
 
 .checkboxLabelSingleLine {
@@ -93,3 +93,63 @@
   transition: background-color 0.3s ease;
   font-size: 13px;
 }
+
+.leftTabsContainer {
+  display: flex;
+  flex-direction: column;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.leftTabsLayout {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.tabList {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  background-color: white;
+  padding: 0;
+}
+
+.tabPanels {
+  flex: 1;
+  padding: 16px;
+  // background-color: red;
+}
+
+@media (max-width: 768px) {
+  .leftTabsLayout {
+    flex-direction: column;
+  }
+
+  .tabList {
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+    min-width: unset;
+    justify-content: space-between;
+  }
+
+  .tabList {
+    padding: 8px;
+    flex: 1;
+    text-align: center;
+  }
+
+  .tabList {
+    border-left: red;
+    border-bottom: 8px solid #0f62fe;
+  }
+}
+
+.multilineCheckboxLabel .cds--checkbox-label {
+  display: block;
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
