@@ -21,7 +21,7 @@ import {
   type DataTableRow,
 } from '@carbon/react';
 import { isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
-import { LineItem, MappedBill } from '../types';
+import { LineItem, MappedBill, PaymentStatus } from '../types';
 import styles from './invoice-table.scss';
 
 type InvoiceTableProps = {
@@ -155,10 +155,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
                         <TableSelectRow
                           aria-label="Select row"
                           {...getSelectionProps({ row })}
-                          disabled={tableRows[index].status === 'PAID'}
+                          disabled={
+                            tableRows[index].status === PaymentStatus.PAID ||
+                            tableRows[index].status === PaymentStatus.EXEMPTED
+                          }
                           onChange={(checked: boolean) => handleRowSelection(row, checked)}
                           checked={
-                            tableRows[index].status === 'PAID' ||
+                            tableRows[index].status === PaymentStatus.PAID ||
+                            tableRows[index].status === PaymentStatus.EXEMPTED ||
                             Boolean(selectedLineItems?.find((item) => item?.uuid === row?.id))
                           }
                         />

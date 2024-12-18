@@ -70,6 +70,10 @@ export const determineBillableItemPaymentStatus = (
     return fallbackPaymentStatus;
   }
 
+  if (billableItem.paymentStatus === PaymentStatus.EXEMPTED) {
+    return PaymentStatus.EXEMPTED;
+  }
+
   const itemTotalCost = billableItem.price * billableItem.quantity;
   return totalPaidAmount >= itemTotalCost ? PaymentStatus.PAID : PaymentStatus.PENDING;
 };
@@ -133,15 +137,39 @@ export const createPaymentPayload = (
   const consolidatedPayments = [...currentPayments, ...existingPayments];
   const totalPaidAmount = consolidatedPayments.reduce((sum, payment) => sum + payment.amountTendered, 0);
 
-  // Process billable items
-  const processedLineItems = lineItems.map((lineItem) => ({
-    ...lineItem,
-    billableService: extractServiceIdentifier(lineItem),
-    item: extractServiceIdentifier(lineItem),
-    paymentStatus: isBillableItemInCollection(selectedBillableItems, lineItem)
-      ? determineBillableItemPaymentStatus(lineItems.length, lineItem, totalPaidAmount, initialPaymentStatus)
-      : isBillableItemFullyPaid(totalPaidAmount, lineItem),
+  // Process selected items and update their payment status
+  const processedSelectedBillableItems = selectedBillableItems.map((billableItem) => ({
+    ...billableItem,
+    billableService: extractServiceIdentifier(billableItem),
+    item: extractServiceIdentifier(billableItem),
+    paymentStatus: determineBillableItemPaymentStatus(
+      lineItems.length,
+      billableItem,
+      totalPaidAmount,
+      initialPaymentStatus,
+    ),
   }));
+
+  // Handle remaining line items based on whether there are selected items
+  const remainingLineItems =
+    selectedBillableItems.length > 0
+      ? // If items were selected, exclude them from the original line items
+        lineItems.filter((lineItem) => {
+          const isItemSelected = processedSelectedBillableItems.some(
+            (selectedItem) => selectedItem.uuid === lineItem.uuid,
+          );
+          return !isItemSelected;
+        })
+      : // If no items were selected, update payment status for all line items
+        lineItems.map((lineItem) => ({
+          ...lineItem,
+          billableService: extractServiceIdentifier(lineItem),
+          item: extractServiceIdentifier(lineItem),
+          paymentStatus: isBillableItemFullyPaid(totalPaidAmount, lineItem),
+        }));
+
+  // Combine selected and remaining items into final processed list
+  const processedLineItems = [...processedSelectedBillableItems, ...remainingLineItems];
 
   // Determine final bill status
   const hasUnpaidItems = processedLineItems.some((item) => item.paymentStatus === PaymentStatus.PENDING);
