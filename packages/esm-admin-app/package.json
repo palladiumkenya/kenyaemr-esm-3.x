@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-admin-app",
-  "version": "5.3.7",
+  "version": "5.3.8",
   "description": "Facilitates the management of ETL tables",
   "browser": "dist/kenyaemr-esm-admin-app.js",
   "main": "src/index.ts",
