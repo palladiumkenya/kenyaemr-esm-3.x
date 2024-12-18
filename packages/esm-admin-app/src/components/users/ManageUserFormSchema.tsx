@@ -24,13 +24,15 @@ const useManageUserFormSchema = () => {
     password: z.string().optional(),
     confirmPassword: z.string().optional(),
     forcePasswordChange: z.boolean().optional(),
-    roles: z.array(z.string()).optional(),
-    billingRoles: z.array(z.string()).optional(),
-    clinicalRoles: z.array(z.string()).optional(),
-    inventoryRoles: z.array(z.string()).optional(),
-    investigationRoles: z.array(z.string()).optional(),
-    pharmacistRoles: z.array(z.string()).optional(),
-    recordRoles: z.array(z.string()).optional(),
+    roles: z
+      .array(
+        z.object({
+          uuid: z.string().min(1, 'UUI is required'),
+          display: z.string().min(1, 'Role name is required'),
+          description: z.string().nullable().optional(),
+        }),
+      )
+      .optional(),
     primaryRole: z.string().optional(),
   });
 

@@ -32,6 +32,7 @@ export interface User {
   privileges: Array<string>;
   roles: Array<{
     uuid: string;
+    description: string;
     display: string;
   }>;
   retired: boolean;
@@ -43,9 +44,6 @@ export interface Roles {
   display: string;
   name: string;
   description: string;
-  retired: boolean;
-  privileges: Array<string>;
-  inheritedRoles: Array<string>;
 }
 
 export interface UserSchema {

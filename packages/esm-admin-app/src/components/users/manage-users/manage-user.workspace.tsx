@@ -60,7 +60,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           ...extractNameParts(initialUserValue.person?.display || ''),
           phoneNumber: extractAttributeValue(initialUserValue.person?.attributes, 'Telephone'),
           email: extractAttributeValue(initialUserValue.person?.attributes, 'Email'),
-          roles: initialUserValue.roles?.map((role) => role.display) || [],
+          roles:
+            initialUserValue.roles?.map((role) => ({
+              uuid: role.uuid,
+              display: role.display,
+              description: role.description,
+            })) || [],
           gender: initialUserValue.person?.gender || 'M',
         }
       : {};
@@ -123,12 +128,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           },
         ],
       },
-      roles: allRoles
-        .filter((role): role is { name: string; description?: string } => typeof role === 'object' && 'name' in role)
-        .map((role) => ({
-          name: role.name,
-          description: role.description ?? null,
-        })),
+      roles: data.roles.map((role) => ({
+        uuid: role.uuid,
+        name: role.display,
+        description: role.description || '',
+      })),
     };
 
     try {
@@ -141,8 +145,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           isLowContrast: true,
         });
 
+        handleMutation(`${restBaseUrl}/user?v=full`);
         closeWorkspaceWithSavedChanges();
-        handleMutation(`${restBaseUrl}/user?includeAll=true&v=default`);
       }
     } catch (error) {
       const errorObject = error?.responseBody?.error;
@@ -494,37 +498,56 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   <Controller
                                     name="roles"
                                     control={formMethods.control}
-                                    render={({ field }) => (
-                                      <>
-                                        {roles
-                                          .filter((role) => category.roles.includes(role.name))
-                                          .map((role) => {
-                                            const isSelected = field.value?.includes(role.display);
-                                            return (
-                                              <label
-                                                key={role.display}
-                                                className={
-                                                  isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
-                                                }>
-                                                <input
-                                                  type="checkbox"
-                                                  id={role.name}
-                                                  checked={isSelected}
-                                                  onChange={(e) => {
-                                                    const value = e.target.checked
-                                                      ? [...(field.value || []), role.display] // Add selected role
-                                                      : (field.value || []).filter(
-                                                          (selectedRole) => selectedRole !== role.display,
-                                                        ); // Remove unselected role
-                                                    field.onChange(value);
-                                                  }}
-                                                />
-                                                {role.display}
-                                              </label>
-                                            );
-                                          })}
-                                      </>
-                                    )}
+                                    render={({ field }) => {
+                                      const selectedRoles = field.value || [];
+
+                                      return (
+                                        <>
+                                          {roles
+                                            .filter((role) => category.roles.includes(role.name))
+                                            .map((role) => {
+                                              // Check if the role is selected based on display, description, and uuid
+                                              const isSelected = selectedRoles.some(
+                                                (r) =>
+                                                  r.display === role.display &&
+                                                  r.description === role.description &&
+                                                  r.uuid === role.uuid,
+                                              );
+
+                                              return (
+                                                <label
+                                                  key={role.display}
+                                                  className={
+                                                    isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
+                                                  }>
+                                                  <input
+                                                    type="checkbox"
+                                                    id={role.display}
+                                                    checked={isSelected}
+                                                    onChange={(e) => {
+                                                      const updatedValue = e.target.checked
+                                                        ? [
+                                                            ...selectedRoles,
+                                                            {
+                                                              uuid: role.uuid,
+                                                              display: role.display,
+                                                              description: role.description ?? null, // Allow null description
+                                                            },
+                                                          ]
+                                                        : selectedRoles.filter(
+                                                            (selectedRole) => selectedRole.display !== role.display,
+                                                          ); // Remove role based on display
+
+                                                      field.onChange(updatedValue); // Update form state
+                                                    }}
+                                                  />
+                                                  {role.display}
+                                                </label>
+                                              );
+                                            })}
+                                        </>
+                                      );
+                                    }}
                                   />
                                 )}
                               </CheckboxGroup>

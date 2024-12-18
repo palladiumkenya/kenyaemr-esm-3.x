@@ -1,13 +1,11 @@
 import { FetchResponse, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 
-// Define interfaces
 export interface RoleCategory {
-  category: string; // Name of the category (e.g., Admin Roles)
-  roles: Array<string>; // List of role names
+  category: string;
+  roles: Array<string>;
 }
 
-// Fetch and configure roles
 export function useSystemUserRoleConfigSetting() {
   const { data, error, isLoading, mutate } = useSWRImmutable<{ data: { results: Array<OpenmrsResource> } }, Error>(
     `/ws/rest/v1/systemsetting?q=kenyaemr.userRole.config&v=full`,
@@ -18,12 +16,10 @@ export function useSystemUserRoleConfigSetting() {
     },
   );
 
-  // Extract user role config resource from the response
   const userRolesConfigResource = data?.data?.results?.find(
     (resource) => resource.property === 'kenyaemr.userRole.config',
   );
 
-  // Parse roles into RoleCategory format
   let rolesConfig: RoleCategory[] = [];
   if (userRolesConfigResource?.value) {
     try {
