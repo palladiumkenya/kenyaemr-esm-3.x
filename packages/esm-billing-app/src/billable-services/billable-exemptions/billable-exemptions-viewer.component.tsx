@@ -16,7 +16,7 @@ import {
 } from '@carbon/react';
 import SchemaEditor from '../billable-exemptions/schema-editor/schema-editor.component';
 import SchemaViewer from '../billable-exemptions/schema-editor/schema-viewer-component';
-import { useSystemBillableSetting } from '../../hooks/useSystemBillableSetting';
+import { useSystemBillableSetting } from '../../hooks/useExemptionSchema';
 import ActionButtons from '../billable-exemptions/action-buttons/action-buttons.component';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import type { Schema } from '../../types';
@@ -115,11 +115,7 @@ export const BillableExemptionsViewer = () => {
       <Grid className={classNames(styles.grid)}>
         <Column lg={16} md={16} className={styles.column}>
           <div className={styles.actionButtons}>
-            {isLoading ? (
-              <InlineLoading description={`${t('loadingSchema', 'Loading schema')}...`} />
-            ) : (
-              <h1 className={styles.schemaName}>{t('exemptionSchema', 'Exemption Schema')}</h1>
-            )}
+            {isLoading ? <InlineLoading description={`${t('loadingSchema', 'Loading schema')}...`} /> : ''}
           </div>
           <div className={styles.heading}>
             <span className={styles.tabHeading}>{t('schemaEditor', 'Exemptions Schema Editor')}</span>
