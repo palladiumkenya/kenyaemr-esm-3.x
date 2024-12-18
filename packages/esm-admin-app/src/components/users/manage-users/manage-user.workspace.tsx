@@ -24,6 +24,7 @@ import {
   PasswordInput,
   Column,
   ClickableTile,
+  Tile,
 } from '@carbon/react';
 import { z } from 'zod';
 import { UserSchema, User } from '../../../types';
@@ -102,9 +103,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = async (data: UserFormSchema) => {
-    const emailAttribute = attributeTypes.find((attr) => attr.name === 'email')?.uuid || '';
+    const emailAttribute = attributeTypes.find((attr) => attr.name === 'Email address')?.uuid || '';
     const telephoneAttribute = attributeTypes.find((attr) => attr.name === 'Telephone contact')?.uuid || '';
-    const allRoles = [...(data.roles || []).map((role) => (typeof role === 'string' ? { name: role } : role))];
     const payload: Partial<UserSchema> = {
       username: data.username,
       password: data.password,
@@ -188,7 +188,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     <div className={styles.leftTabsContainer}>
       <div>
         <div className={styles.leftTabsLayout}>
-          <ul className={styles.tabList}>
+          <Tile className={styles.tabList}>
             <ClickableTile
               className={`${styles.listItem} ${activeSection === 'demographic' ? styles.active : ''}`}
               onClick={() => toggleSection('demographic')}>
@@ -209,7 +209,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
               onClick={() => toggleSection('roles')}>
               {t('roles', 'Roles Info')}
             </ClickableTile>
-          </ul>
+          </Tile>
           <div className={styles.tabPanels}>
             <FormProvider {...formMethods}>
               <form onSubmit={formMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
@@ -506,7 +506,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                           {roles
                                             .filter((role) => category.roles.includes(role.name))
                                             .map((role) => {
-                                              // Check if the role is selected based on display, description, and uuid
                                               const isSelected = selectedRoles.some(
                                                 (r) =>
                                                   r.display === role.display &&
@@ -531,14 +530,14 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                                             {
                                                               uuid: role.uuid,
                                                               display: role.display,
-                                                              description: role.description ?? null, // Allow null description
+                                                              description: role.description ?? null,
                                                             },
                                                           ]
                                                         : selectedRoles.filter(
                                                             (selectedRole) => selectedRole.display !== role.display,
-                                                          ); // Remove role based on display
+                                                          );
 
-                                                      field.onChange(updatedValue); // Update form state
+                                                      field.onChange(updatedValue);
                                                     }}
                                                   />
                                                   {role.display}

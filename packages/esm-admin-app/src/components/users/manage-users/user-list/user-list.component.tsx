@@ -16,7 +16,7 @@ import {
   Pagination,
   ButtonSet,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
+import { Edit, User } from '@carbon/react/icons';
 import styles from './user-list.scss';
 import { launchWorkspace, useDebounce } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
@@ -148,8 +148,9 @@ const UserList: React.FC = () => {
         <Button
           onClick={() => launchWorkspace('manage-user-workspace', { workspaceTitle: t('addUser', 'Add User') })}
           className={styles.addPaymentModeButton}
+          renderIcon={User}
           size={size}
-          kind="ghost">
+          kind="primary">
           {t('addUser', 'Add User')}
         </Button>
       </CardHeader>
