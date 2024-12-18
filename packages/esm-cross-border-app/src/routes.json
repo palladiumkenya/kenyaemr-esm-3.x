@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "kenyaemr": "^19.0.0"
+  },
+  "pages": [
+    {
+      "component": "crossBorderApp",
+      "route": "cross-border"
+    }
+  ],
+  "extensions": []
+}
