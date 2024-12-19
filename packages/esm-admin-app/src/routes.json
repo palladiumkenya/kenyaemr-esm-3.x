@@ -26,8 +26,11 @@
       "component": "manageUserWorkspace",
       "title": "Manage User Workspace",
       "type": "other-form",
+      "canHide": true,
       "canMaximize": true,
-      "width": "extra-wide"
+      "width": "extra-wide",
+      "hasOwnSidebar": true
+      
     }
   ],
   "modals": [

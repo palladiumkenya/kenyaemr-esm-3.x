@@ -13,12 +13,14 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
+export const root = getSyncLifecycle(Root, options);
+
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
 
 export const operationConfirmationModal = getSyncLifecycle(OperationConfirmation, options);
-export const root = getSyncLifecycle(Root, options);
+export const manageUserWorkspace = getSyncLifecycle(ManageUserWorkspace, options);
 
 export const userManagementLeftPannelLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'Manage Users', name: 'user-management' }),
@@ -29,5 +31,3 @@ export const etlAdministrationLeftPannelLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'ETL Administration', name: 'etl-administration' }),
   options,
 );
-
-export const manageUserWorkspace = getSyncLifecycle(ManageUserWorkspace, options);

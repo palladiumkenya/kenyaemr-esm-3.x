@@ -147,7 +147,7 @@ const UserList: React.FC = () => {
       <CardHeader title="Current Users">
         <Button
           onClick={() => launchWorkspace('manage-user-workspace', { workspaceTitle: t('addUser', 'Add User') })}
-          className={styles.addPaymentModeButton}
+          className={styles.userManagementModeButton}
           renderIcon={UserFollow}
           size={size}
           kind="primary">
