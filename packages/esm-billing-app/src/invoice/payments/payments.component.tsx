@@ -121,9 +121,9 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
             {bill && <PaymentHistory bill={bill} />}
             {isPaymentInvalid && (
               <InlineNotification
-                title={t('incompletePayment', 'Incomplete payment')}
+                title={t('underpaymentWarning', 'Payment warning (Underpayment)')}
                 subtitle={t(
-                  'paymentErrorSubtitle',
+                  'underpaymentWarningMessage',
                   'Please ensure all selected line items are fully paid, Total amount expected is {{selectedLineItemsAmountDue}}',
                   {
                     selectedLineItemsAmountDue: convertToCurrency(selectedLineItemsAmountDue),
@@ -136,10 +136,10 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
             )}
             {hasAmountPaidExceeded && (
               <InlineNotification
-                title={t('paymentError', 'Payment error')}
+                title={t('overpaymentWarning', 'Payment warning (Overpayment)')}
                 subtitle={t(
-                  'paymentErrorSubtitle',
-                  'Amount paid {{totalAmountTendered}} should not be greater than amount due {{selectedLineItemsAmountDue}} for selected line items',
+                  'overpaymentWarningMessage',
+                  'Amount paid {{ totalAmountTendered }} should not be greater than amount due {{ selectedLineItemsAmountDue }} for selected line items',
                   {
                     totalAmountTendered: convertToCurrency(totalAmountTendered),
                     selectedLineItemsAmountDue: convertToCurrency(selectedLineItemsAmountDue),
