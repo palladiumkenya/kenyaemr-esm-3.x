@@ -47,7 +47,7 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
   const { user } = useSession();
   const caseManagerPersonUuid = user?.person.uuid;
 
-  const { data: activeCasesData, error: activeCasesError, mutate: fetchCases } = useActivecases(caseManagerPersonUuid);
+  const { data: activeCasesData, error: activeCasesError } = useActivecases(caseManagerPersonUuid);
 
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/case-management-encounters';
 
@@ -87,12 +87,12 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
       dateofend: caseData.endDate ? (
         new Date(caseData.endDate).toLocaleDateString()
       ) : (
-        <Tag type="green" size="lg">
+        <Tag type="green" size={responsiveSize}>
           {t('enrolled', 'Enrolled')}
         </Tag>
       ),
       actions: (
-        <OverflowMenu size="md">
+        <OverflowMenu size={responsiveSize}>
           <OverflowMenuItem
             isDelete
             itemText={t('discontinue', 'Discontinue')}
