@@ -15,7 +15,6 @@ const schema = z.object({
   caseManager: z.string().nonempty({ message: 'Case Manager is required' }),
   relationship: z.string().nonempty({ message: 'Relationship is required' }),
   startDate: z.date({ required_error: 'Start Date is required' }),
-  endDate: z.date().optional(),
   notes: z.string().optional(),
 });
 
@@ -65,7 +64,6 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
       relationshipType: data.relationship,
       personB: patientUuid,
       startDate: data.startDate.toISOString(),
-      endDate: data.endDate ? data.endDate.toISOString() : null,
     };
 
     try {
@@ -167,13 +165,16 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
             name="startDate"
             control={control}
             render={({ field, fieldState }) => (
-              <DatePicker datePickerType="single" onChange={(e) => field.onChange(e[0])}>
+              <DatePicker
+                datePickerType="single"
+                onChange={(e) => field.onChange(e[0])}
+                className={styles.formDatePicker}>
                 <DatePickerInput
                   placeholder="mm/dd/yyyy"
                   labelText="Start Date"
                   id="case-start-date-picker"
                   size="md"
-                  className={styles.datePickerInput}
+                  className={styles.formDatePicker}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
                 />
@@ -181,25 +182,6 @@ const CaseManagementForm: React.FC<CaseManagementProp> = ({ closeWorkspace }) =>
             )}
           />
         </Column>
-
-        <Column>
-          <Controller
-            name="endDate"
-            control={control}
-            render={({ field }) => (
-              <DatePicker datePickerType="single" onChange={(e) => field.onChange(e[0])}>
-                <DatePickerInput
-                  placeholder="mm/dd/yyyy"
-                  labelText="End Date"
-                  id="case-end-date-picker"
-                  size="md"
-                  className={styles.component}
-                />
-              </DatePicker>
-            )}
-          />
-        </Column>
-
         <Column className={styles.textbox}>
           <Controller
             name="notes"
