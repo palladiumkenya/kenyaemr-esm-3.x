@@ -1,6 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR, { mutate } from 'swr';
-import { Roles, User, UserSchema } from './types';
+import { Role, User } from './config-schema';
 
 export const useUser = () => {
   const url = `${restBaseUrl}/user?v=full`;
@@ -15,7 +15,7 @@ export const useUser = () => {
   };
 };
 
-export const createUser = (user: Partial<UserSchema>, uuid?: string) => {
+export const createUser = (user: Partial<User>, uuid?: string) => {
   const url = uuid ? `${restBaseUrl}/user/${uuid}` : `${restBaseUrl}/user`;
 
   return openmrsFetch(url, {
@@ -33,7 +33,7 @@ export const handleMutation = (url: string) => {
 
 export const useRoles = () => {
   const url = `${restBaseUrl}/role?v=full`;
-  const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<Roles> } }>(url, openmrsFetch, {
+  const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<Role> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
   return {
@@ -46,7 +46,7 @@ export const useRoles = () => {
 
 export const usePersonAttribute = () => {
   const url = `${restBaseUrl}/personattributetype?v=full`;
-  const { data, isLoading, error } = useSWR<{ data: { results: Array<Roles> } }>(url, openmrsFetch, {
+  const { data, isLoading, error } = useSWR<{ data: { results: Array<Role> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
   return {

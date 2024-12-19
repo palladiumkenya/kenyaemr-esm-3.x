@@ -4,38 +4,89 @@ export const configSchema = {};
 
 export interface ConfigObject {}
 
-export interface UserConfig {
-  users: Array<{
-    uuid: string;
-    display: string;
-    username: string;
-    systemId: string;
-    userProperties: {
-      loginAttempts: string;
-      lastViewedPatientIds: string;
-    };
-    person: {
-      uuid: string;
-      display: string;
-      links: Array<{
-        rel: string;
-        uri: string;
-      }>;
-    };
-    privileges: Array<string>;
-    roles: Array<{
-      uuid: string;
-      display: string;
-      links: Array<{
-        rel: string;
-        uri: string;
-      }>;
-    }>;
-    retired: boolean;
-    links: Array<{
-      rel: string;
-      uri: string;
-    }>;
-    resourceVersion: string;
-  }>;
+// export interface UserProperties {
+//   loginAttempts: string;
+//   lastViewedPatientIds: string;
+// }
+
+// export interface Person {
+//   uuid: string;
+//   display: string;
+// }
+
+// export interface Role {
+//   uuid: string;
+//   display: string;
+// }
+
+// export interface User {
+//   uuid: string;
+//   display: string;
+//   username: string;
+//   systemId: string;
+//   userProperties: UserProperties;
+//   person: Person;
+//   privileges: Array<string>;
+//   roles: Array<Role>;
+//   retired: boolean;
+// }
+
+// export interface UserConfig {
+//   users: Array<User>;
+// }
+
+export interface UserProperties {
+  loginAttempts: string;
+  lastViewedPatientIds: string;
+}
+
+export interface Person {
+  uuid?: string;
+  display?: string;
+  gender: string;
+  names?: Array<Name>;
+  attributes?: Array<Attribute>;
+}
+
+export interface Role {
+  uuid: string;
+  description?: string;
+  display?: string;
+  name?: string;
+}
+
+export interface User {
+  uuid: string;
+  display: string;
+  username: string;
+  password?: string;
+  systemId: string;
+  userProperties: UserProperties;
+  person: Person;
+  privileges?: Array<string>;
+  roles: Array<Role>;
+  retired: boolean;
+  resourceVersion: string;
+}
+
+export interface Name {
+  givenName: string;
+  familyName: string;
+  middleName: string;
+}
+
+export interface Attribute {
+  attributeType?: string;
+  value?: string;
+}
+
+export interface UserProperties {
+  loginAttempts: string;
+  lastViewedPatientIds: string;
+}
+
+export interface UserRoleSchema {
+  name: string;
+  description: string;
+  category: string;
 }

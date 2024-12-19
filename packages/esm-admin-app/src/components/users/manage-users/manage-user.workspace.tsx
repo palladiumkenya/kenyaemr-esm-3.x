@@ -27,7 +27,6 @@ import {
   Tile,
 } from '@carbon/react';
 import { z } from 'zod';
-import { UserSchema, User } from '../../../types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
 import { createUser, handleMutation, useRoles, usePersonAttribute } from '../../../user-management.resources';
@@ -35,6 +34,7 @@ import useManageUserFormSchema from '../ManageUserFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
+import { User } from '../../../config-schema';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -105,7 +105,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const onSubmit = async (data: UserFormSchema) => {
     const emailAttribute = attributeTypes.find((attr) => attr.name === 'Email address')?.uuid || '';
     const telephoneAttribute = attributeTypes.find((attr) => attr.name === 'Telephone contact')?.uuid || '';
-    const payload: Partial<UserSchema> = {
+    const payload: Partial<User> = {
       username: data.username,
       password: data.password,
       person: {

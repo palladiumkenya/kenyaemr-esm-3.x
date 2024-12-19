@@ -15,7 +15,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   const location = session?.sessionLocation?.display;
 
   return (
-    <div className={styles.header} data-testid="billing-header">
+    <div className={styles.header} data-testid="admin-header">
       <div className={styles['left-justified-items']}>
         <UserManagementIllustration />
         <div className={styles['page-labels']}>

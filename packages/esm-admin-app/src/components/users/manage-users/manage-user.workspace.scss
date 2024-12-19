@@ -29,17 +29,21 @@
 .formStackControl {
   row-gap: layout.$layout-01;
 }
+
 .checkBoxColumn {
   background-color: colors.$gray-10;
   margin: layout.$spacing-05;
+  padding: layout.$spacing-03;
+  border-radius: layout.$spacing-05;
 }
 
 .listItem {
   list-style: none;
-  padding: 10px;
+  padding: layout.$spacing-03;
   cursor: pointer;
   background-color: colors.$gray-10;
   font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .listItem.active {
@@ -51,22 +55,23 @@
   overflow: hidden;
   text-overflow: ellipsis;
   display: inline-block;
-  font-size: medium;
+  font-size: 14px;
 }
 
 .checkboxGroupGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  row-gap: 1rem;
-  column-gap: 0.5rem;
+  row-gap: layout.$spacing-03;
+  column-gap: layout.$spacing-02;
   font-size: 14px;
+
   :global(.cds--fieldset-legend) {
-    font-size: 18px;
+    font-size: 14px;
   }
 }
 
 .CheckboxGroup .bx--fieldset-legend {
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .btn {
@@ -75,29 +80,28 @@
 
 .checkboxLabelSelected {
   background-color: colors.$green-10;
-  border-radius: 4px;
-  padding: 4px;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-02;
   display: flex;
   align-items: center;
-  font-size: medium;
+  font-size: 14px;
   transition: background-color 0.3s ease;
-  font-size: 13px;
 }
 
 .checkboxLabel {
   background-color: transparent;
-  border-radius: 4px;
-  padding: 4px;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-02;
   display: flex;
   align-items: center;
   transition: background-color 0.3s ease;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .leftTabsContainer {
   display: flex;
   flex-direction: column;
-  border-radius: 4px;
+  border-radius: layout.$spacing-05;
   overflow: hidden;
 }
 
@@ -111,14 +115,14 @@
   display: flex;
   flex-direction: column;
   min-width: 200px;
-  background-color: white;
-  padding: 0;
+  background-color: colors.$white;
+  padding: layout.$spacing-03;
+  border-right: 1px solid colors.$gray-30;
 }
 
 .tabPanels {
   flex: 1;
-  padding: 16px;
-  // background-color: red;
+  padding: layout.$spacing-04;
 }
 
 @media (max-width: 768px) {
@@ -129,20 +133,14 @@
   .tabList {
     flex-direction: row;
     border-right: none;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid colors.$gray-30;
     min-width: unset;
     justify-content: space-between;
+    padding: layout.$spacing-02;
   }
 
-  .tabList {
-    padding: 8px;
-    flex: 1;
-    text-align: center;
-  }
-
-  .tabList {
-    border-left: red;
-    border-bottom: 8px solid #0f62fe;
+  .tabPanels {
+    padding: layout.$spacing-03;
   }
 }
 

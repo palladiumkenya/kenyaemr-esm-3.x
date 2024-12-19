@@ -1,4 +1,4 @@
-import { FetchResponse, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
+import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 
 export interface RoleCategory {

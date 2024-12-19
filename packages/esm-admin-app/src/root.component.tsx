@@ -1,25 +1,34 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
-import { etlBasePath } from './constants';
-import Dashboard from './components/dashboard/home-dashboard.component';
+import styles from './root.scss';
+import LeftPanel from './components/side-menu/left-pannel.component';
+import UserManagentLandingPage from './components/users/manage-users/manage-user.component';
+import EtlAdminDashboard from './components/dashboard/etl-dashboard.component';
 
 const Root: React.FC = () => {
-  const spaBasePath = `${window.spaBase}/admin`;
+  const spaBasePath = window.spaBase;
+  const adminBasename = window.getOpenmrsSpaBase() + 'admin';
 
   useEffect(() => {
-    setLeftNav({ name: 'admin-page-dashboard-slot', basePath: spaBasePath });
-    return () => unsetLeftNav('admin-page-dashboard-slot');
+    setLeftNav({
+      name: 'admin-left-panel-slot',
+      basePath: spaBasePath,
+    });
+    return () => unsetLeftNav('admin-left-panel-slot');
   }, [spaBasePath]);
+
   return (
-    <main className="omrs-main-content">
-      <BrowserRouter basename={etlBasePath}>
+    <BrowserRouter basename={adminBasename}>
+      <LeftPanel />
+      <main className={styles.container}>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/:user-management" element={<Dashboard />} />
+          <Route path="/" element={<UserManagentLandingPage />} />
+          <Route path="/user-management" element={<UserManagentLandingPage />} />
+          <Route path="/etl-administration" element={<EtlAdminDashboard />} />
         </Routes>
-      </BrowserRouter>
-    </main>
+      </main>
+    </BrowserRouter>
   );
 };
 
