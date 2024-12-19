@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-providers-app",
-  "version": "5.3.8",
+  "version": "5.3.9",
   "description": " It offers seamless workflows integrated with the Health Information Exchange (HEI) system, ensuring efficient and effective communication and collaboration among healthcare providers. ",
   "browser": "dist/kenyaemr-esm-providers-app.js",
   "main": "src/index.ts",
