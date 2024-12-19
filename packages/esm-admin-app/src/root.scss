@@ -3,5 +3,10 @@
 @use '@carbon/colors';
 
 .container {
-  padding: layout.$spacing-07;
+  background-color: colors.$white-0;
+  height: calc(100vh - layout.$spacing-09);
+}
+
+:global(.omrs-breakpoint-gt-tablet) .container {
+  margin-left: var(--omrs-sidenav-width);
 }

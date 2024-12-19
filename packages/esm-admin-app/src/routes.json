@@ -4,6 +4,34 @@
     "kenyaemrCharts": "^1.6.7"
   },
   "extensions": [
+    {
+      "component": "adminLeftPanelLink",
+      "name": "admin-left-panel-link",
+      "slot": "admin-left-panel-slot"
+    },
+    {
+      "component": "userManagementLeftPannelLink",
+      "name": "user-management-left-panel-link",
+      "slot": "admin-left-panel-slot"
+    },
+    {
+      "component": "etlAdministrationLeftPannelLink",
+      "name": "etl-administration-left-panel-link",
+      "slot": "admin-left-panel-slot"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "manage-user-workspace",
+      "component": "manageUserWorkspace",
+      "title": "Manage User Workspace",
+      "type": "other-form",
+      "canHide": true,
+      "canMaximize": true,
+      "width": "extra-wide",
+      "hasOwnSidebar": true
+      
+    }
   ],
   "modals": [
     {
@@ -14,9 +42,7 @@
   "pages": [
     {
       "component": "root",
-      "route": "admin",
-      "online": true,
-      "offline": true
+      "route": "admin"
     }
   ]
 }

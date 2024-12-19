@@ -4,3 +4,9 @@ export interface ETLResponse {
   stop_time: string;
   status: string;
 }
+
+export interface DashboardConfig {
+  name: string;
+  slot: string;
+  title: string;
+}
