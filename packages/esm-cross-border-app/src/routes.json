@@ -9,5 +9,26 @@
       "route": "cross-border"
     }
   ],
-  "extensions": []
+  "extensions": [
+    {
+      "name": "cross-border-side-nav",
+      "slot": "cross-border-side-nav-slot",
+      "component": "crossBorderSideNav"
+    },
+    {
+      "name": "cross-border-search-dashboard-db-link",
+      "slot": "cross-border-page-dashboard-slot",
+      "component": "crossBorderSearchDashboardLink",
+      "meta": {
+        "name": "cross-border-search",
+        "title": "Search",
+        "slot": "cross-border-search-dashboard-slot"
+      }
+    },
+    {
+      "name": "cross-border-search",
+      "slot": "cross-border-search-dashboard-slot",
+      "component": "crossBorderSearch"
+    }
+  ]
 }
