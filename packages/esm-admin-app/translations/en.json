@@ -1,6 +1,7 @@
 {
   "actions": "Actions",
   "addUser": "Add User",
+  "adminLeftPannel": "Admin left panel",
   "clearSearch": "Clear search input",
   "completionStatus": "Completion status",
   "confirmation": "Confirmation",
@@ -21,7 +22,6 @@
   "familyName": "Family Name",
   "given": "Given",
   "home": "Home",
-  "manageUsers": "Manage Users",
   "noUsers": "No User Available",
   "procedure": "Procedure",
   "recreated": "recreated",
