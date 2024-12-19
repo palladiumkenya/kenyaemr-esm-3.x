@@ -89,7 +89,6 @@ const EndRelationshipModal: React.FC<EndRelationshipModalProps> = ({ closeModal,
               </DatePicker>
             )}
           />
-          {errors.endDate && <div className={styles.errorText}>{errors.endDate.message}</div>}
         </div>
       </div>
       <ModalFooter>
