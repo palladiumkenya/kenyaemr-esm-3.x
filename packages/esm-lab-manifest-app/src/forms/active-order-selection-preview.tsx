@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import styles from '../tables/lab-manifest-table.scss';
 import { ActiveRequestOrder } from '../types';
+import PatientCCCNumbercell from '../tables/patient-ccc-no-cell.component';
 
 interface ActiveOrdersSelectionPreviewProps {
   orders?: Array<ActiveRequestOrder>;
@@ -41,7 +42,13 @@ const ActiveOrdersSelectionPreview: React.FC<ActiveOrdersSelectionPreviewProps> 
       return {
         id: `${activeRequest.orderUuid}`,
         patientName: activeRequest.patientName,
-        cccKdod: activeRequest.cccKdod,
+        cccKdod: activeRequest.cccKdod?.trim()?.replaceAll(' ', '') ? (
+          activeRequest.cccKdod
+        ) : activeRequest?.patientUuid ? (
+          <PatientCCCNumbercell patientUuid={activeRequest?.patientUuid} />
+        ) : (
+          '--'
+        ),
         dateRequested: activeRequest.dateRequested,
       };
     }) ?? [];

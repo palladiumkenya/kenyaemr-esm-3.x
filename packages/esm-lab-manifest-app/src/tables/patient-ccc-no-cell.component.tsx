@@ -1,10 +1,9 @@
-import React from 'react';
-import { Order } from '../types';
-import usePatient from '../hooks/usePatient';
 import { InlineLoading } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
+import React from 'react';
 import { LabManifestConfig } from '../config-schema';
 import useIsKDoDSite from '../hooks/useIsKDoDSite';
+import usePatient from '../hooks/usePatient';
 
 type Props = {
   patientUuid: string;
