@@ -1,10 +1,3 @@
-// import React from 'react';
-// import { LeftNavMenu } from '@openmrs/esm-framework';
-
-// const SideMenu = () => <LeftNavMenu />;
-
-// export default SideMenu;
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SideNav } from '@carbon/react';

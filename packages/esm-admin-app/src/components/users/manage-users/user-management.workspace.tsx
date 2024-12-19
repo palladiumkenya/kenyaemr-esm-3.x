@@ -8,7 +8,7 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import styles from './manage-user.workspace.scss';
+import styles from './user-management.workspace.scss';
 import {
   TextInput,
   ButtonSet,
@@ -30,7 +30,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
 import { createUser, handleMutation, useRoles, usePersonAttribute } from '../../../user-management.resources';
-import useManageUserFormSchema from '../ManageUserFormSchema';
+import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
@@ -50,10 +50,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const [activeSection, setActiveSection] = useState('demographic');
 
-  const { manageUserFormSchema } = useManageUserFormSchema();
+  const { userManagementFormSchema } = UserManagementFormSchema();
 
   const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
-  type UserFormSchema = z.infer<typeof manageUserFormSchema>;
+  type UserFormSchema = z.infer<typeof userManagementFormSchema>;
   const formDefaultValues =
     Object.keys(initialUserValue).length > 0
       ? {
@@ -85,7 +85,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   }
 
   const formMethods = useForm<UserFormSchema>({
-    resolver: zodResolver(manageUserFormSchema),
+    resolver: zodResolver(userManagementFormSchema),
     mode: 'all',
     defaultValues: formDefaultValues,
   });

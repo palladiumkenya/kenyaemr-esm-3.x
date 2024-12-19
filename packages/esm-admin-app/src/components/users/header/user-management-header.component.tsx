@@ -1,9 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location, UserFollow } from '@carbon/react/icons';
-import { formatDate, useSession, PageHeader } from '@openmrs/esm-framework';
+import { formatDate, useSession, ServiceQueuesPictogram } from '@openmrs/esm-framework';
 import styles from './header.scss';
-import UserManagementIllustration from './header-illustration.component';
 
 interface HeaderProps {
   title: string;
@@ -17,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
   return (
     <div className={styles.header} data-testid="admin-header">
       <div className={styles['left-justified-items']}>
-        <UserManagementIllustration />
+        <ServiceQueuesPictogram />
         <div className={styles['page-labels']}>
           <p>{t('users', 'Users')}</p>
           <p className={styles['page-name']}>{title}</p>

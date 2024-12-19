@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { Edit, UserFollow } from '@carbon/react/icons';
 import styles from './user-list.scss';
-import { launchWorkspace, useDebounce } from '@openmrs/esm-framework';
+import { launchWorkspace, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
 
 const UserList: React.FC = () => {
@@ -143,67 +143,70 @@ const UserList: React.FC = () => {
   });
 
   return (
-    <div>
-      <CardHeader title="Current Users">
-        <Button
-          onClick={() => launchWorkspace('manage-user-workspace', { workspaceTitle: t('addUser', 'Add User') })}
-          className={styles.userManagementModeButton}
-          renderIcon={UserFollow}
-          size={size}
-          kind="primary">
-          {t('addUser', 'Add User')}
-        </Button>
-      </CardHeader>
-      <div className={styles.dataTable}>
-        <Search
-          size={size}
-          placeholder={t('searchUser', 'Search user table')}
-          labelText={t('searchLabel', 'Search')}
-          closeButtonLabelText={t('clearSearch', 'Clear search input')}
-          id="search-1"
-          onChange={(event) => handleSearch(event.target.value)}
-        />
-        <DataTable useZebraStyles size={size} rows={rows} headers={headers}>
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-            <TableContainer>
-              <Table {...getTableProps()} aria-label="user table">
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header, i) => (
-                      <TableHeader
-                        key={i}
-                        {...getHeaderProps({
-                          header,
-                        })}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+    <>
+      <div>
+        <CardHeader title="Current Users">
+          <Button
+            onClick={() => launchWorkspace('manage-user-workspace', { workspaceTitle: t('addUser', 'Add User') })}
+            className={styles.userManagementModeButton}
+            renderIcon={UserFollow}
+            size={size}
+            kind="primary">
+            {t('addUser', 'Add User')}
+          </Button>
+        </CardHeader>
+        <div className={styles.dataTable}>
+          <Search
+            size={size}
+            placeholder={t('searchUser', 'Search user table')}
+            labelText={t('searchLabel', 'Search')}
+            closeButtonLabelText={t('clearSearch', 'Clear search input')}
+            id="search-1"
+            onChange={(event) => handleSearch(event.target.value)}
+          />
+          <DataTable useZebraStyles size={size} rows={rows} headers={headers}>
+            {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()} aria-label="user table">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header, i) => (
+                        <TableHeader
+                          key={i}
+                          {...getHeaderProps({
+                            header,
+                          })}>
+                          {header.header}
+                        </TableHeader>
                       ))}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
-        <Pagination
-          totalItems={filteredUserList.length}
-          pageSize={pageSize}
-          pageSizes={[5, 10, 20]}
-          onChange={({ page, pageSize }) => {
-            setCurrentPage(page);
-            setPageSize(pageSize);
-          }}
-        />
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow key={row.id} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+          <Pagination
+            totalItems={filteredUserList.length}
+            pageSize={pageSize}
+            pageSizes={[5, 10, 20]}
+            onChange={({ page, pageSize }) => {
+              setCurrentPage(page);
+              setPageSize(pageSize);
+            }}
+          />
+        </div>
       </div>
-    </div>
+      <WorkspaceContainer overlay contextKey="admin" />
+    </>
   );
 };
 

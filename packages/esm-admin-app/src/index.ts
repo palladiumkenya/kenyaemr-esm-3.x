@@ -3,7 +3,7 @@ import { configSchema } from './config-schema';
 import { moduleName } from './constants';
 import OperationConfirmation from './components/confirm-modal/confirmation-operation-modal.component';
 import Root from './root.component';
-import ManageUserWorkspace from './components/users/manage-users/manage-user.workspace';
+import ManageUserWorkspace from './components/users/manage-users/user-management.workspace';
 import { createLeftPanelLink } from './left-pannel-link.component';
 
 const options = {

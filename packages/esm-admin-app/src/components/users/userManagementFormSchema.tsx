@@ -1,14 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-const useManageUserFormSchema = () => {
+const UserManagementFormSchema = () => {
   const { t } = useTranslation();
-  const userFormSchema = z.object({
-    name: z.string().min(1, 'Role name is required'),
-    description: z.string().optional(),
-  });
 
-  const manageUserFormSchema = z.object({
+  const userManagementFormSchema = z.object({
     givenName: z.string().nonempty(t('givenNameRequired', 'Given name is required')),
     middleName: z.string().optional(),
     familyName: z.string().nonempty(t('familyNameRequired', 'Family name is required')),
@@ -36,7 +32,7 @@ const useManageUserFormSchema = () => {
     primaryRole: z.string().optional(),
   });
 
-  return { manageUserFormSchema };
+  return { userManagementFormSchema };
 };
 
-export default useManageUserFormSchema;
+export default UserManagementFormSchema;
