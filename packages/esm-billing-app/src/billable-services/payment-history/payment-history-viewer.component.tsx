@@ -1,10 +1,10 @@
+import { DataTableSkeleton } from '@carbon/react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePaymentFilterContext } from './usePaymentFilterContext';
-import { PaymentHistoryTable } from './payment-history-table.component';
 import EmptyPatientBill from '../../past-patient-bills/patient-bills-dashboard/empty-patient-bill.component';
+import { PaymentHistoryTable } from './payment-history-table.component';
+import { usePaymentFilterContext } from './usePaymentFilterContext';
 import { usePaymentTransactionHistory } from './usePaymentTransactionHistory';
-import { DataTableSkeleton } from '@carbon/react';
 
 export const PaymentHistoryViewer = () => {
   const { t } = useTranslation();
