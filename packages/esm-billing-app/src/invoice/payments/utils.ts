@@ -121,16 +121,27 @@ export const createPaymentPayload = (
   const existingPayments = payments.map((payment) => ({
     amount: payment.amount,
     amountTendered: payment.amountTendered,
-    attributes: [],
+    attributes: payment.attributes.map((attribute) => ({
+      attributeType: attribute.attributeType.uuid,
+      value: attribute.value,
+    })),
     instanceType: payment.instanceType.uuid,
   }));
+
+  const createPaymentAttribute = (formValue) => {
+    const paymentMethodAttributeTypes = formValue?.method?.attributeTypes;
+    return paymentMethodAttributeTypes.map((attributeType) => ({
+      attributeType: attributeType.uuid,
+      value: formValue.referenceCode,
+    }));
+  };
 
   // Transform new payments
   const currentPayments = paymentFormValues.map((formValue) => ({
     amount: parseFloat(totalAmount.toFixed(2)),
     amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
-    attributes: [],
-    instanceType: formValue.method,
+    attributes: createPaymentAttribute(formValue),
+    instanceType: formValue.method.uuid,
   }));
 
   // Combine and calculate payments
@@ -154,17 +165,21 @@ export const createPaymentPayload = (
   const remainingLineItems =
     selectedBillableItems.length > 0
       ? // If items were selected, exclude them from the original line items
-        lineItems.filter((lineItem) => {
-          const isItemSelected = processedSelectedBillableItems.some(
-            (selectedItem) => selectedItem.uuid === lineItem.uuid,
-          );
-          return !isItemSelected;
-        })
+        lineItems
+          .filter((lineItem) => {
+            const isItemSelected = processedSelectedBillableItems.some(
+              (selectedItem) => selectedItem.uuid === lineItem.uuid,
+            );
+            return !isItemSelected;
+          })
+          .map((lineItem) => ({
+            ...lineItem,
+            billableService: extractServiceIdentifier(lineItem),
+            item: extractServiceIdentifier(lineItem),
+          }))
       : // If no items were selected, update payment status for all line items
         lineItems.map((lineItem) => ({
           ...lineItem,
-          billableService: extractServiceIdentifier(lineItem),
-          item: extractServiceIdentifier(lineItem),
           paymentStatus: isBillableItemFullyPaid(totalPaidAmount, lineItem),
         }));
 

@@ -26,7 +26,18 @@ type PaymentProps = {
 const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const paymentSchema = z.object({
-    method: z.string().refine((value) => !!value, 'Payment method is required'),
+    method: z
+      .object({
+        uuid: z.string(),
+        name: z.string(),
+        attributeTypes: z.array(
+          z.object({
+            uuid: z.string(),
+            description: z.string(),
+          }),
+        ),
+      })
+      .required({}),
     amount: z.number().refine((value) => {
       const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + Number(value));
       return amountDue >= 0;
