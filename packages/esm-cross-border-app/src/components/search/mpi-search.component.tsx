@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
-import { Tabs, TabList, Tab, TabPanels, TabPanel, Layer, Button, Checkbox, TextInput, Search } from '@carbon/react';
-import { Dashboard, CloudMonitoring, Activity, Settings, Search as MPISearchIcon } from '@carbon/react/icons';
+import {
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  Layer,
+  Button,
+  Checkbox,
+  TextInput,
+  Search,
+  SkeletonText,
+} from '@carbon/react';
+import { CloudMonitoring, Activity, Settings, Search as MPISearchIcon } from '@carbon/react/icons';
 import styles from './mpi-search.scss';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from '@openmrs/esm-framework';
 import { useMPISearch } from './mpi-search.resource';
-import { SkeletonText } from '@carbon/react';
 
 const MPISearch: React.FC = () => {
   const { t } = useTranslation();
@@ -36,11 +47,13 @@ const MPISearch: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={() => {}}
             />
-            {isLoading && (
+            {isLoading ? (
               <>
                 <SkeletonText />
                 <SkeletonText />
               </>
+            ) : (
+              <>{JSON.stringify(patients, null, 2)}</>
             )}
           </TabPanel>
           <TabPanel>

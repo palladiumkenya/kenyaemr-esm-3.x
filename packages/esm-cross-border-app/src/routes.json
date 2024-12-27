@@ -9,6 +9,24 @@
       "route": "cross-border"
     }
   ],
+  "workspaces": [
+    {
+      "name": "cross-border-form-entry",
+      "component": "crossBorderFormEntry",
+      "title": "Cross Border Form Entry",
+      "type": "form",
+      "width": "wider",
+      "canMaximize": true,
+      "canHide": true
+    },
+    {
+      "name": "cross-border-patient-search",
+      "component": "crossBorderPatientSearch",
+      "title": "Patient Search",
+      "type": "form",
+      "width": "wider"
+    }
+  ],
   "extensions": [
     {
       "name": "cross-border-side-nav",
@@ -18,17 +36,21 @@
     {
       "name": "cross-border-search-dashboard-db-link",
       "slot": "cross-border-page-dashboard-slot",
-      "component": "crossBorderSearchDashboardLink",
+      "component": "overviewDashboardLink",
       "meta": {
-        "name": "cross-border-search",
-        "title": "Search",
-        "slot": "cross-border-search-dashboard-slot"
+        "name": "cross-border-overview",
+        "title": "Overview",
+        "slot": "cross-border-overview-dashboard-slot"
       }
     },
     {
       "name": "cross-border-search",
-      "slot": "cross-border-search-dashboard-slot",
       "component": "crossBorderSearch"
+    },
+    {
+      "name": "cross-border-summary",
+      "component": "crossBorderSummary",
+      "slot": "cross-border-overview-dashboard-slot"
     }
   ]
 }

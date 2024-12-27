@@ -1,12 +1,6 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  ExtensionSlot,
-  WorkspaceContainer,
-  isDesktop,
-  useExtensionStore,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import { ExtensionSlot, WorkspaceContainer, isDesktop, useExtensionStore, useLayoutType } from '@openmrs/esm-framework';
 import DashboardView from './dashboard-view.component';
 import styles from './home-dashboard.scss';
 import { DashboardConfig } from '../../types';
@@ -21,7 +15,7 @@ export default function Dashboard() {
       .filter((e) => Object.keys(e).length) || [];
   const dashboards = ungroupedDashboards as Array<DashboardConfig>;
   const activeDashboard = dashboards.find((dashboard) => dashboard.name === params?.dashboard) || dashboards[0];
-  
+
   return (
     <>
       <div className={styles.homePageWrapper}>

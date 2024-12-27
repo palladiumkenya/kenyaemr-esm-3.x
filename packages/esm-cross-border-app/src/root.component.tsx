@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, BrowserRouter, Route } from 'react-router-dom';
-import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
+import { setLeftNav, unsetLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import Dashboard from './components/dashboard/home-dashboard.component';
 
 const CrossBorderApp = () => {
@@ -18,6 +18,7 @@ const CrossBorderApp = () => {
           <Route path="/cross-border" element={<Dashboard />} />
           <Route path="/cross-border/:dashboard/*" element={<Dashboard />} />
         </Routes>
+        <WorkspaceContainer key="cross-border" contextKey="cross-border"></WorkspaceContainer>
       </BrowserRouter>
     </main>
   );
