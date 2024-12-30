@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "kenyaemr": "^19.0.0"
+  },
+  "pages": [
+    {
+      "component": "crossBorderApp",
+      "route": "cross-border"
+    }
+  ],
+  "workspaces": [
+    {
+      "name": "cross-border-form-entry",
+      "component": "crossBorderFormEntry",
+      "title": "Cross Border Form Entry",
+      "type": "form",
+      "width": "wider",
+      "canMaximize": true,
+      "canHide": true
+    },
+    {
+      "name": "cross-border-patient-search",
+      "component": "crossBorderPatientSearch",
+      "title": "Patient Search",
+      "type": "form",
+      "width": "wider"
+    }
+  ],
+  "extensions": [
+    {
+      "name": "cross-border-side-nav",
+      "slot": "cross-border-side-nav-slot",
+      "component": "crossBorderSideNav"
+    },
+    {
+      "name": "cross-border-search-dashboard-db-link",
+      "slot": "cross-border-page-dashboard-slot",
+      "component": "overviewDashboardLink",
+      "meta": {
+        "name": "cross-border-overview",
+        "title": "Overview",
+        "slot": "cross-border-overview-dashboard-slot"
+      }
+    },
+    {
+      "name": "cross-border-search",
+      "component": "crossBorderSearch"
+    },
+    {
+      "name": "cross-border-summary",
+      "component": "crossBorderSummary",
+      "slot": "cross-border-overview-dashboard-slot"
+    }
+  ]
+}

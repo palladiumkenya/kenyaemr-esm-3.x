@@ -1,0 +1,7 @@
+@use '@carbon/layout';
+
+.mpiSearchContainer {
+  padding: layout.$spacing-05;
+  height: calc(100vh - 9rem);
+  background-color: white;
+}
