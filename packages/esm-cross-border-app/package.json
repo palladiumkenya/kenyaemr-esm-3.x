@@ -2,7 +2,7 @@
   "name": "@kenyaemr/esm-cross-border-app",
   "version": "5.3.8",
   "description": "Cross border microfrontend for the OpenMRS SPA",
-  "browser": "dist/openmrs-esm-cross-border-app.js",
+  "browser": "dist/kenyaemr-esm-cross-border-app.js",
   "main": "src/index.ts",
   "source": true,
   "license": "MPL-2.0",
