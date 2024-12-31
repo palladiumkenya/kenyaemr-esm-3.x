@@ -57,6 +57,27 @@ export const useTimeSheets = () => {
   };
 };
 
+export const useActiveSheet = () => {
+  const { currentProvider } = useSession();
+  const providerUUID = currentProvider?.uuid;
+
+  const url = `/ws/rest/v1/cashier/timesheet?v=full&getProviderOpenTimesheet=true&cashier=${providerUUID}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{
+    data: { results: Timesheet[] };
+  }>(providerUUID ? url : undefined, openmrsFetch, {
+    errorRetryCount: 3,
+  });
+
+  return {
+    timesheets: data?.data.results.filter((r) => Boolean(r)) ?? [],
+    error: error,
+    isLoading: isLoading,
+    isValidating,
+    mutate,
+  };
+};
+
 export const clockIn = (payload: { cashier: string; cashPoint: string; clockIn: string }) => {
   const url = `/ws/rest/v1/cashier/timesheet`;
   return openmrsFetch(url, {
@@ -108,15 +129,3 @@ export function useUsers() {
 
   return { users, error, isLoading };
 }
-
-// this hook gives you the providerUUID of the current signed in user.
-export const useProviderUUID = () => {
-  const { user } = useSession();
-  const { providers, error, isLoading } = useProviders();
-  const { users, error: fetchingUsersError, isLoading: isLoadingUsers } = useUsers();
-
-  const userPerson = users?.find((u) => u.uuid === user.uuid)?.person;
-  const providerUUID = providers?.find((p) => p.person.uuid === userPerson?.uuid)?.uuid;
-
-  return { providerUUID, isLoading: isLoading || isLoadingUsers, error: error || fetchingUsersError };
-};

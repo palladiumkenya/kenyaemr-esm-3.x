@@ -10,14 +10,15 @@ import {
   SelectSkeleton,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { showSnackbar, useSession } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { PaymentPoint } from '../../types';
-import { clockIn, clockOut, usePaymentPoints, useProviderUUID, useTimeSheets } from '../payment-points.resource';
+import { clockIn, clockOut, useActiveSheet, usePaymentPoints } from '../payment-points.resource';
 import { useClockInStatus } from '../use-clock-in-status';
+import styles from './clock-in.scss';
 
 const schema = z.object({
   paymentPointUUID: z.string({ required_error: 'Payment point is required.' }),
@@ -25,15 +26,23 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>;
 
-export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; paymentPoint?: PaymentPoint }) => {
-  const { mutate } = useTimeSheets();
-  const { providerUUID, isLoading, error } = useProviderUUID();
+export const ClockIn = ({
+  closeModal,
+  paymentPoint,
+  disableCancelling,
+}: {
+  closeModal?: () => void;
+  paymentPoint?: PaymentPoint;
+  disableCancelling?: boolean;
+}) => {
+  const { mutate } = useActiveSheet();
+  const { currentProvider } = useSession();
+  const providerUUID = currentProvider?.uuid;
+
   const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { paymentPoints, isLoading: isLoadingPaymentPoints } = usePaymentPoints();
-  const { globalActiveSheet, isClockedInSomewhere } = useClockInStatus(paymentPoint?.uuid);
-
-  const shouldPromptUser = !paymentPoint;
+  const { globalActiveSheet, isClockedIn } = useClockInStatus();
 
   const {
     register,
@@ -64,7 +73,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
           kind: 'error',
         });
 
-        if (!shouldPromptUser) {
+        if (disableCancelling !== true) {
           closeModal();
         }
       })
@@ -75,7 +84,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
 
   const onSubmit: SubmitHandler<FormData> = (data) => {
     setIsSubmitting(true);
-    if (isClockedInSomewhere) {
+    if (isClockedIn) {
       clockOut(globalActiveSheet.uuid, {
         clockOut: new Date().toISOString(),
       })
@@ -88,7 +97,7 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
           mutate();
           clockInWrapper(data.paymentPointUUID);
         })
-        .catch(() => {
+        .catch(() =>
           showSnackbar({
             title: t('anErrorOccurred', 'An Error Occurred'),
             subtitle: t(
@@ -96,8 +105,8 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
               `An error occurred clocking out of ${globalActiveSheet.cashPoint.name}`,
             ),
             kind: 'error',
-          });
-        })
+          }),
+        )
         .finally(() => {
           setIsSubmitting(false);
           closeModal();
@@ -109,68 +118,36 @@ export const ClockIn = ({ closeModal, paymentPoint }: { closeModal: () => void; 
     clockInWrapper(data.paymentPointUUID);
   };
 
-  if (shouldPromptUser) {
-    return (
-      <Form onSubmit={handleSubmit(onSubmit)}>
-        <ModalHeader closeModal={undefined}>Clock In</ModalHeader>
-        <ModalBody>
-          {isLoadingPaymentPoints ? (
-            <SelectSkeleton />
-          ) : (
-            <Select
-              {...register('paymentPointUUID')}
-              labelText={t('selectPaymentPoint', 'Select payment point')}
-              helperText={t('selectPaymentPointMessage', 'Select the payment point on which you will be clocked in.')}
-              label={t('paymentPoint', 'Payment point')}
-              placeholder={t('pleaseSelectPaymentPoint', 'Please select a payment point')}
-              invalid={!!errors.paymentPointUUID}
-              invalidText={errors.paymentPointUUID?.message}>
-              {paymentPoints.map((point) => (
-                <SelectItem value={point.uuid} text={point.name} />
-              ))}
-            </Select>
-          )}
-        </ModalBody>
-        <ModalFooter>
-          <Button
-            kind="secondary"
-            onClick={shouldPromptUser ? undefined : closeModal}
-            type="button"
-            disabled={shouldPromptUser}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button type="submit" disabled={isLoading || error || !providerUUID || !isValid}>
-            {isSubmitting ? (
-              <>
-                <Loading withOverlay={false} small />
-                {t('clockingIn', 'Clocking in')}
-              </>
-            ) : (
-              t('clockIn', 'Clock In')
-            )}
-          </Button>
-        </ModalFooter>
-      </Form>
-    );
-  }
-
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
-      <ModalHeader closeModal={closeModal}>Clock In</ModalHeader>
+    <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+      <ModalHeader closeModal={disableCancelling ? undefined : closeModal}>Clock In</ModalHeader>
       <ModalBody>
-        {isClockedInSomewhere
-          ? `You will be clocked in on ${paymentPoint.name} right now but you will be automatically be clocked out of ${globalActiveSheet.cashPoint.name} first. Do you want to proceed.`
-          : `You will be clocked in on ${paymentPoint.name} right now. Do you want to proceed.`}
+        {isLoadingPaymentPoints ? (
+          <SelectSkeleton />
+        ) : (
+          <Select
+            {...register('paymentPointUUID')}
+            labelText={t('selectPaymentPoint', 'Select payment point')}
+            helperText={t('selectPaymentPointMessage', 'Select the payment point on which you will be clocked in.')}
+            label={t('paymentPoint', 'Payment point')}
+            placeholder={t('pleaseSelectPaymentPoint', 'Please select a payment point')}
+            invalid={!!errors.paymentPointUUID}
+            invalidText={errors.paymentPointUUID?.message}>
+            {paymentPoints.map((point) => (
+              <SelectItem value={point.uuid} text={point.name} />
+            ))}
+          </Select>
+        )}
       </ModalBody>
       <ModalFooter>
         <Button
           kind="secondary"
-          onClick={shouldPromptUser ? undefined : closeModal}
+          onClick={disableCancelling ? undefined : closeModal}
           type="button"
-          disabled={shouldPromptUser}>
+          disabled={Boolean(disableCancelling)}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button type="submit" disabled={isLoading || error || !providerUUID || !isValid}>
+        <Button type="submit" disabled={!isValid || !providerUUID}>
           {isSubmitting ? (
             <>
               <Loading withOverlay={false} small />
