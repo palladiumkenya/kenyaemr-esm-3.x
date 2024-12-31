@@ -22,6 +22,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
     control,
     formState: { errors },
     setFocus,
+    getValues,
   } = useFormContext<PaymentFormValue>();
   const { paymentModes, isLoading, error } = usePaymentModes();
 
@@ -59,7 +60,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
                 id="paymentMethod"
                 onChange={({ selectedItem }) => {
                   setFocus(`payment.${index}.amount`);
-                  field.onChange(selectedItem?.uuid);
+                  field.onChange(selectedItem);
                 }}
                 titleText={t('paymentMethod', 'Payment method')}
                 label={t('selectPaymentMethod', 'Select payment method')}
@@ -85,19 +86,22 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
               />
             )}
           />
-          <Controller
-            name={`payment.${index}.referenceCode`}
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                id="paymentReferenceCode"
-                labelText={t('referenceNumber', 'Reference number')}
-                placeholder={t('enterReferenceNumber', 'Enter ref. number')}
-                type="text"
-              />
-            )}
-          />
+          {getValues(`payment.${index}.method`)?.['attributeTypes']?.length > 0 && (
+            <Controller
+              name={`payment.${index}.referenceCode`}
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  id="paymentReferenceCode"
+                  labelText={t('referenceNumber', 'Reference number')}
+                  placeholder={t('enterReferenceNumber', 'Enter ref. number')}
+                  type="text"
+                />
+              )}
+            />
+          )}
+
           <div className={styles.removeButtonContainer}>
             <TrashCan onClick={() => handleRemovePaymentMode(index)} className={styles.removeButton} size={20} />
           </div>

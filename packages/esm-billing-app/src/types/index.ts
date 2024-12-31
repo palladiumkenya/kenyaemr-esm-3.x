@@ -282,7 +282,7 @@ export interface PaymentMethod {
 export interface Payment {
   uuid: string;
   instanceType: PaymentInstanceType;
-  attributes: Attribute[];
+  attributes: Array<Attribute>;
   amount: number;
   amountTendered: number;
   dateCreated: number;
