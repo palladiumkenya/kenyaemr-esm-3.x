@@ -552,11 +552,11 @@ export type BillingPromptType = 'patient-chart' | 'billing-orders';
 
 export interface Schema {
   services: {
-    all: Service[];
-    'program:HIV'?: Service[];
-    'program:TB'?: Service[];
-    'age<5'?: Service[];
-    'visitAttribute:prisoner'?: Service[];
+    all: Array<Service>;
+    'program:HIV'?: Array<Service>;
+    'program:TB'?: Array<Service>;
+    'age<5'?: Array<Service>;
+    'visitAttribute:prisoner'?: Array<Service>;
   };
   commodities: Record<string, unknown>;
 }
