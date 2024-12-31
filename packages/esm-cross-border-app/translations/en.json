@@ -1,1 +1,17 @@
-{}
+{
+  "clearSearch": "Clear search input",
+  "crossBorder": "Cross Border",
+  "crossBorderEncounters": "Cross Border Encounters",
+  "encounters": "Encounters",
+  "forms": "Forms",
+  "mpiSearch": "MPI Search",
+  "referral": "Referral",
+  "referralForm": "Referral Form",
+  "screening": "Screening",
+  "screeningForm": "Screening Form",
+  "searchLabel": "Search",
+  "searchPlaceholder": "Search using patient name or ID",
+  "summaryOfCrossBorderEncounters": "Summary of cross border encounters",
+  "totalCrossBorderReferral": "Total cross border referral",
+  "totalCrossBorderScreening": "Total cross border screening"
+}
