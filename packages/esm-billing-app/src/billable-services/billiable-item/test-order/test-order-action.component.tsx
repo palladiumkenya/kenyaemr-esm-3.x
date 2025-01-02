@@ -56,7 +56,7 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
       order,
       ...(additionalProps && { additionalProps }),
     });
-  }, [order, additionalProps, modalName, handleModalClose]);
+  }, [isDispenseOrder, modalName, order, additionalProps, dispenseFormProps, handleModalClose]);
 
   if (isLoading) {
     return (
