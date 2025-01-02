@@ -11,8 +11,6 @@ import {
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  ComboButton,
-  MenuItem,
 } from '@carbon/react';
 import styles from './encounter.scss';
 import { useTranslation } from 'react-i18next';
@@ -57,20 +55,6 @@ const Encounter: React.FC = () => {
               <TableToolbarContent>
                 <TableToolbarSearch persistent onChange={onInputChange} />
               </TableToolbarContent>
-              <ComboButton size="sm" label={t('forms', 'Forms')}>
-                <MenuItem
-                  onClick={() =>
-                    handleFormEntry('37f6bd8d-586a-4169-95fa-5781f987fe62', t('screeningForm', 'Screening Form'))
-                  }
-                  label={t('screeningForm', 'Screening Form')}
-                />
-                <MenuItem
-                  onClick={() =>
-                    handleFormEntry('37f6bd8d-586a-4169-95fa-5781f987fe62', t('referralForm', 'Referral Form'))
-                  }
-                  label={t('referralForm', 'Referral Form')}
-                />
-              </ComboButton>
             </TableToolbar>
             <Table {...getTableProps()} aria-label={t('encounters', 'Encounters')}>
               <TableHead>
