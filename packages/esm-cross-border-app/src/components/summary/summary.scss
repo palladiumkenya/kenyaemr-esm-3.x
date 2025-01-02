@@ -20,3 +20,16 @@
   height: 7.875rem;
   background-color: colors.$white;
 }
+
+.dateRangePicker {
+  flex-grow: unset;
+}
+.filterContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-05;
+  text-align: end;
+  align-items: center;
+  justify-content: flex-end;
+  padding: layout.$spacing-05;
+}
