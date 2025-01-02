@@ -14,18 +14,29 @@ import {
   Layer,
   Tile,
   OverflowMenu,
+  Tag,
+  OverflowMenuItem,
 } from '@carbon/react';
 import { CardHeader, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
-import { ConfigurableLink, isDesktop, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  ConfigurableLink,
+  isDesktop,
+  launchWorkspace,
+  showSnackbar,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import styles from './case-management-list.scss';
 import { useActivecases } from '../workspace/case-management.resource';
 import { extractNameString, uppercaseText } from '../../utils/expression-helper';
+import { updateRelationship } from '../../relationships/relationship.resources';
 
 interface CaseManagementListActiveProps {
   setActiveCasesCount: (count: number) => void;
+  activeTabIndex: number;
 }
 
-const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ setActiveCasesCount }) => {
+const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ setActiveCasesCount, activeTabIndex }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
@@ -35,7 +46,7 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
   const { user } = useSession();
   const caseManagerPersonUuid = user?.person.uuid;
 
-  const { data: activeCasesData, error: activeCasesError } = useActivecases(caseManagerPersonUuid);
+  const { data: activeCasesData, error: activeCasesError, mutate: fetchCases } = useActivecases(caseManagerPersonUuid);
 
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/case-management-encounters';
 
@@ -43,6 +54,7 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
     { key: 'names', header: t('names', 'Names') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
+    { key: 'actions', header: t('actions', 'Actions') },
   ];
 
   const filteredCases = activeCasesData?.data.results.filter(
@@ -51,6 +63,28 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
       (extractNameString(caseData.personB.display).toLowerCase().includes(searchTerm.toLowerCase()) ||
         caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
   );
+  const handleDiscontinueACase = async (relationshipUuid: string) => {
+    try {
+      await updateRelationship(relationshipUuid, { endDate: new Date() });
+      await fetchCases();
+
+      showSnackbar({
+        kind: 'success',
+        title: t('endRlship', 'End relationship'),
+        subtitle: t('savedRlship', 'Relationship ended successfully'),
+        timeoutInMs: 3000,
+        isLowContrast: true,
+      });
+    } catch (error) {
+      showSnackbar({
+        kind: 'error',
+        title: t('RlshipError', 'Relationship Error'),
+        subtitle: t('RlshipError', 'Request Failed.......'),
+        timeoutInMs: 2500,
+        isLowContrast: true,
+      });
+    }
+  };
 
   const tableRows = filteredCases
     ?.slice((currentPage - 1) * pageSize, currentPage * pageSize)
@@ -65,7 +99,23 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
         </ConfigurableLink>
       ),
       dateofstart: new Date(caseData.startDate).toLocaleDateString(),
-      dateofend: caseData.endDate ? new Date(caseData.endDate).toLocaleDateString() : '-',
+      dateofend: caseData.endDate ? (
+        new Date(caseData.endDate).toLocaleDateString()
+      ) : (
+        <Tag type="green" size="lg">
+          {t('enrolled', 'Enrolled')}
+        </Tag>
+      ),
+      actions: (
+        <OverflowMenu size="md">
+          <OverflowMenuItem
+            isDelete
+            itemText={t('discontinue', 'Discontinue')}
+            disabled={activeTabIndex === 1}
+            onClick={() => handleDiscontinueACase(caseData.uuid)}
+          />
+        </OverflowMenu>
+      ),
     }));
 
   useEffect(() => {
