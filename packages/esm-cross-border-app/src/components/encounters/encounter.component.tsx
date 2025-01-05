@@ -14,28 +14,49 @@ import {
 } from '@carbon/react';
 import styles from './encounter.scss';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace, usePatient } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { MappedCbEncounter } from '../../types';
+type CbEncounterProps = {
+  encounters: Array<MappedCbEncounter>;
+};
 
-const Encounter: React.FC = () => {
+const Encounter: React.FC<CbEncounterProps> = ({ encounters }) => {
   const { t } = useTranslation();
-  const headers = [];
-  const rows = [];
-  const patientUuid = 'd1369934-99f8-4dd5-8891-f54d39447a09';
-  const { patient, isLoading } = usePatient(patientUuid);
-  if (isLoading) {
-    return <div>Loading...</div>;
+  const headers = [
+    { header: 'Date & time', key: 'encounterDatetime' },
+    { header: 'Name', key: 'patientName' },
+    { header: 'Visit type', key: 'visit' },
+    { header: 'Form name', key: 'form' },
+  ];
+  const sortedEncounters = encounters.sort((a, b) => {
+    const dateA = new Date(a.encounterDatetime || 0).getTime();
+    const dateB = new Date(b.encounterDatetime || 0).getTime();
+    return dateB - dateA;
+  });
+  const tableRows = sortedEncounters.map((encounter) => ({
+    encounterDatetime: encounter?.encounterDatetime
+      ? formatDatetime(parseDate(encounter?.encounterDatetime), { mode: 'wide' })
+      : '--',
+    patientName: encounter?.patientName,
+    visit: encounter?.visit,
+    form: encounter?.form,
+    id: encounter?.encounterUuid,
+  }));
+  if (encounters.length === 0) {
+    return (
+      <div className={styles.encounterContainer}>
+        <EmptyState
+          displayText={t('noEncountersFound', 'cross border encounters')}
+          headerTitle={t('noEncountersFoundTitle', 'No encounters found')}
+        />
+      </div>
+    );
   }
-
-  const handleFormEntry = (formUuid: string, formName: string) => {
-    launchWorkspace('cross-border-patient-search', {
-      formUuid,
-      encounterUuid: '',
-    });
-  };
 
   return (
     <div className={styles.encounterContainer}>
-      <DataTable size="sm" rows={rows} headers={headers}>
+      <DataTable size="sm" rows={tableRows} headers={headers}>
         {({
           rows,
           headers,
