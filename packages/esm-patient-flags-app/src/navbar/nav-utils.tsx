@@ -13,6 +13,7 @@ import {
   HospitalBed,
   ChemistryReference,
   IbmCloudant,
+  WatsonHealthCrossReference,
 } from '@carbon/react/icons';
 import { useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
@@ -104,6 +105,12 @@ export const useModuleLinks = () => {
       url: `${openmrsSpaBase}admin`,
       icon: <IbmCloudant size={24} />,
       privilege: 'o3: View ETL Administration Dashboard',
+    },
+    {
+      label: 'Cross Border',
+      url: `${openmrsSpaBase}cross-border`,
+      icon: <WatsonHealthCrossReference size={24} />,
+      privilege: 'o3: View Cross Border Dashboard',
     },
   ];
 };
