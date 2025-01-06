@@ -8,7 +8,7 @@ export interface RoleCategory {
 
 export function useSystemUserRoleConfigSetting() {
   const { data, error, isLoading, mutate } = useSWRImmutable<{ data: { results: Array<OpenmrsResource> } }, Error>(
-    `/ws/rest/v1/systemsetting?q=kenyaemr.userRole.config&v=full`,
+    `/ws/rest/v1/systemsetting?q=kenyaemr.userRole.config&v=custom:(uuid,value,property)`,
     openmrsFetch,
     {
       revalidateOnFocus: false,
