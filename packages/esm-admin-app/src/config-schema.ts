@@ -4,37 +4,6 @@ export const configSchema = {};
 
 export interface ConfigObject {}
 
-// export interface UserProperties {
-//   loginAttempts: string;
-//   lastViewedPatientIds: string;
-// }
-
-// export interface Person {
-//   uuid: string;
-//   display: string;
-// }
-
-// export interface Role {
-//   uuid: string;
-//   display: string;
-// }
-
-// export interface User {
-//   uuid: string;
-//   display: string;
-//   username: string;
-//   systemId: string;
-//   userProperties: UserProperties;
-//   person: Person;
-//   privileges: Array<string>;
-//   roles: Array<Role>;
-//   retired: boolean;
-// }
-
-// export interface UserConfig {
-//   users: Array<User>;
-// }
-
 export interface UserProperties {
   loginAttempts: string;
   lastViewedPatientIds: string;
