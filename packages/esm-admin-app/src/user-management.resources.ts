@@ -3,7 +3,7 @@ import useSWR, { mutate } from 'swr';
 import { Role, User } from './config-schema';
 
 export const useUser = () => {
-  const url = `${restBaseUrl}/user?v=full`;
+  const url = `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`;
   const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<User> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
@@ -32,7 +32,7 @@ export const handleMutation = (url: string) => {
 };
 
 export const useRoles = () => {
-  const url = `${restBaseUrl}/role?v=full`;
+  const url = `${restBaseUrl}/role?v=custom:(uuid,description,display,name)`;
   const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<Role> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
@@ -45,7 +45,7 @@ export const useRoles = () => {
 };
 
 export const usePersonAttribute = () => {
-  const url = `${restBaseUrl}/personattributetype?v=full`;
+  const url = `${restBaseUrl}/personattributetype?v=custom:(name,uuid)`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<Role> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });

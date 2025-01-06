@@ -84,13 +84,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     return attributes?.find((attr) => attr.display.startsWith(prefix))?.display?.split(' ')[3] || '';
   }
 
-  const formMethods = useForm<UserFormSchema>({
+  const userFormMethods = useForm<UserFormSchema>({
     resolver: zodResolver(userManagementFormSchema),
     mode: 'all',
     defaultValues: formDefaultValues,
   });
 
-  const { errors, isSubmitting, isDirty } = formMethods.formState;
+  const { errors, isSubmitting, isDirty } = userFormMethods.formState;
 
   const { roles = [], isLoading } = useRoles();
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
@@ -145,7 +145,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           isLowContrast: true,
         });
 
-        handleMutation(`${restBaseUrl}/user?v=full`);
+        handleMutation(
+          `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`,
+        );
         closeWorkspaceWithSavedChanges();
       }
     } catch (error) {
@@ -211,8 +213,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             </ClickableTile>
           </Tile>
           <div className={styles.tabPanels}>
-            <FormProvider {...formMethods}>
-              <form onSubmit={formMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
+            <FormProvider {...userFormMethods}>
+              <form onSubmit={userFormMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
                 <div className={styles.formContainer}>
                   <Stack className={styles.formStackControl} gap={7}>
                     {activeSection === 'demographic' && (
@@ -224,7 +226,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="givenName"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
@@ -242,7 +244,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="middleName"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
@@ -257,7 +259,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="familyName"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
@@ -274,7 +276,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="phoneNumber"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
@@ -292,7 +294,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="email"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
@@ -311,7 +313,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="gender"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <RadioButtonGroup
                                 {...field}
@@ -346,7 +348,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="providerIdentifiers"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <CheckboxGroup
                                 legendText={t('providerIdentifiers', 'Provider Details')}
@@ -374,7 +376,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="username"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
@@ -390,7 +392,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="password"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             rules={
                               isInitialValuesEmpty
                                 ? {
@@ -417,13 +419,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="confirmPassword"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             rules={
                               isInitialValuesEmpty
                                 ? {
                                     required: 'Please confirm your password',
                                     validate: (value) =>
-                                      value === formMethods.watch('password') || 'Passwords do not match',
+                                      value === userFormMethods.watch('password') || 'Passwords do not match',
                                   }
                                 : {}
                             }
@@ -441,7 +443,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="forcePasswordChange"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <CheckboxGroup
                                 legendText={t('forcePasswordChange', 'Force Password Change')}
@@ -472,7 +474,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           <Controller
                             name="primaryRole"
-                            control={formMethods.control}
+                            control={userFormMethods.control}
                             render={({ field }) => (
                               <Select id="carder-select" labelText={t('primaryRole', 'Primary Role')} {...field}>
                                 <SelectItem value="" text={t('selectOption', 'Choose an option')} />
@@ -497,7 +499,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 ) : (
                                   <Controller
                                     name="roles"
-                                    control={formMethods.control}
+                                    control={userFormMethods.control}
                                     render={({ field }) => {
                                       const selectedRoles = field.value || [];
 
