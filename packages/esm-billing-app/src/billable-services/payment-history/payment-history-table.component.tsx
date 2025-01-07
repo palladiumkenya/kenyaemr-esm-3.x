@@ -59,7 +59,10 @@ export const PaymentHistoryTable = ({
     return {
       ...row,
       totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
-      referenceCodes: row.payments.map(({ attributes }) => attributes.map(({ value }) => value).join(' ')).join(', '),
+      referenceCodes: row.payments
+        .map(({ attributes }) => attributes.map(({ value }) => value).join(', '))
+        .filter((code) => code !== '')
+        .join(', '),
     };
   });
 
@@ -83,6 +86,7 @@ export const PaymentHistoryTable = ({
         'Total Amount Paid': row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0),
         'Reason/Reference': row.payments
           .map(({ attributes }) => attributes.map(({ value }) => value).join(' '))
+          .filter((code) => code !== '')
           .join(', '),
       };
     });

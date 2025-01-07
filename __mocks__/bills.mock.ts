@@ -641,26 +641,41 @@ export const mockLineItems = [
 ];
 
 export const mockPaymentModes = [
-  { uuid: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74', name: 'Cash', description: 'Cash Payment', retired: false },
+  {
+    uuid: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74',
+    name: 'Cash',
+    description: 'Cash Payment',
+    retired: false,
+    attributeTypes: [],
+  },
   {
     uuid: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
     name: 'Insurance',
     description: 'Insurance method of payment',
     retired: false,
+    attributeTypes: [],
   },
   {
     uuid: '28989582-e8c3-46b0-96d0-c249cb06d5c6',
     name: 'Mobile Money',
     description: 'Mobile money method of payment',
     retired: false,
+    attributeTypes: [],
   },
   {
     uuid: 'd1d6e7da-2717-49c4-a855-28fc5df3b3b7',
     name: 'Social Health Insurance Fund (SHA)',
     description: 'Social Health Insurance Fund (SHA)',
     retired: false,
+    attributeTypes: [],
   },
-  { uuid: 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4', name: 'Waiver', description: 'Waiver payment', retired: false },
+  {
+    uuid: 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4',
+    name: 'Waiver',
+    description: 'Waiver payment',
+    retired: false,
+    attributeTypes: [],
+  },
 ];
 
 export const mockedActiveSheet = {
