@@ -86,11 +86,11 @@ describe('PaymentModeWorkspace', () => {
     // key in name, description and retired
     const nameInput = screen.getByRole('textbox', { name: /Payment mode name/i });
     const descriptionInput = screen.getByRole('textbox', { name: /Payment mode description/i });
-    const retiredToggle = screen.getByRole('switch', { name: /Retired/i });
+    const enablePaymentToggle = screen.getByRole('switch', { name: /Enable payment mode/i });
 
     await user.type(nameInput, 'Test Name');
     await user.type(descriptionInput, 'Test Description');
-    await user.click(retiredToggle);
+    await user.click(enablePaymentToggle);
 
     // Click to add attribute type
     const addAttributeTypeButton = screen.getByRole('button', { name: /Add attribute type/i });
@@ -102,7 +102,6 @@ describe('PaymentModeWorkspace', () => {
     const attributeRegExpInput = screen.getByRole('textbox', { name: /Enter regular expression/i });
     const attributeRetiredToggle = screen.getByRole('switch', { name: /Attribute retired/i });
     const attributeRequiredToggle = screen.getByRole('switch', { name: /Attribute required/i });
-    const attributeFormatDropdown = screen.getByRole('combobox', { name: /Attribute format/i });
 
     // Key in attribute type details
     await user.type(attributeTypeNameInput, 'Test Attribute Name');

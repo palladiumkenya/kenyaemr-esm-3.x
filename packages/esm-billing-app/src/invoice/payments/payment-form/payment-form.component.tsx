@@ -6,12 +6,12 @@ import { Button, Dropdown, NumberInputSkeleton, TextInput, NumberInput } from '@
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import styles from './payment-form.scss';
 import { usePaymentModes } from '../../../billing.resource';
-import { PaymentFormValue } from '../../../types';
+import { PaymentFormValue, PaymentMethod } from '../../../types';
 
 type PaymentFormProps = {
   disablePayment: boolean;
   amountDue: number;
-  append: (obj: { method: string; amount: number; referenceCode: string }) => void;
+  append: (obj: { method: PaymentMethod; amount: number; referenceCode: string }) => void;
   fields: FieldArrayWithId<PaymentFormValue, 'payment', 'id'>[];
   remove: UseFieldArrayRemove;
 };
@@ -22,12 +22,18 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
     control,
     formState: { errors },
     setFocus,
+    getValues,
   } = useFormContext<PaymentFormValue>();
   const { paymentModes, isLoading, error } = usePaymentModes();
 
+  const shouldShowReferenceCode = (index: number) => {
+    const formValues = getValues();
+    return formValues?.payment?.[index]?.method?.attributeTypes?.some((attribute) => attribute.required);
+  };
+
   const handleAppendPaymentMode = useCallback(() => {
     {
-      append({ method: '', amount: 0, referenceCode: '' });
+      append({ method: null, amount: 0, referenceCode: '' });
       setFocus(`payment.${fields.length}.method`);
     }
   }, [append]);
@@ -59,7 +65,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
                 id="paymentMethod"
                 onChange={({ selectedItem }) => {
                   setFocus(`payment.${index}.amount`);
-                  field.onChange(selectedItem?.uuid);
+                  field.onChange(selectedItem);
                 }}
                 titleText={t('paymentMethod', 'Payment method')}
                 label={t('selectPaymentMethod', 'Select payment method')}
@@ -85,19 +91,23 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
               />
             )}
           />
-          <Controller
-            name={`payment.${index}.referenceCode`}
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                id="paymentReferenceCode"
-                labelText={t('referenceNumber', 'Reference number')}
-                placeholder={t('enterReferenceNumber', 'Enter ref. number')}
-                type="text"
-              />
-            )}
-          />
+          {shouldShowReferenceCode(index) && (
+            <Controller
+              name={`payment.${index}.referenceCode`}
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  id="paymentReferenceCode"
+                  labelText={t('referenceNumber', 'Reference number')}
+                  placeholder={t('enterReferenceNumber', 'Enter ref. number')}
+                  type="text"
+                  invalid={!!errors?.payment?.[index]?.referenceCode}
+                  invalidText={errors?.payment?.[index]?.referenceCode?.message}
+                />
+              )}
+            />
+          )}
           <div className={styles.removeButtonContainer}>
             <TrashCan onClick={() => handleRemovePaymentMode(index)} className={styles.removeButton} size={20} />
           </div>
