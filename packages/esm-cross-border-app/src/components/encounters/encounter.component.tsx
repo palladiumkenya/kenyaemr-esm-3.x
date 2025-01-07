@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
+  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -14,7 +15,7 @@ import {
 } from '@carbon/react';
 import styles from './encounter.scss';
 import { useTranslation } from 'react-i18next';
-import { formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { formatDatetime, isDesktop, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedCbEncounter } from '../../types';
 type CbEncounterProps = {
@@ -23,6 +24,10 @@ type CbEncounterProps = {
 
 const Encounter: React.FC<CbEncounterProps> = ({ encounters }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
+  const pageSizes = [10, 20, 30, 40, 50];
+  const [pageSize, setPageSize] = useState(10);
   const headers = [
     { header: 'Date & time', key: 'encounterDatetime' },
     { header: 'Name', key: 'patientName' },
@@ -34,6 +39,8 @@ const Encounter: React.FC<CbEncounterProps> = ({ encounters }) => {
     const dateB = new Date(b.encounterDatetime || 0).getTime();
     return dateB - dateA;
   });
+  const { paginated, goTo, results, currentPage } = usePagination(encounters, pageSize);
+
   const tableRows = sortedEncounters.map((encounter) => ({
     encounterDatetime: encounter?.encounterDatetime
       ? formatDatetime(parseDate(encounter?.encounterDatetime), { mode: 'wide' })
@@ -56,7 +63,7 @@ const Encounter: React.FC<CbEncounterProps> = ({ encounters }) => {
 
   return (
     <div className={styles.encounterContainer}>
-      <DataTable size="sm" rows={tableRows} headers={headers}>
+      <DataTable size={responsiveSize} rows={tableRows} headers={headers}>
         {({
           rows,
           headers,
@@ -108,6 +115,26 @@ const Encounter: React.FC<CbEncounterProps> = ({ encounters }) => {
           </TableContainer>
         )}
       </DataTable>
+      {paginated && (
+        <Pagination
+          forwardText="Next page"
+          backwardText="Previous page"
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={pageSizes}
+          totalItems={encounters?.length}
+          className={styles.pagination}
+          size={responsiveSize}
+          onChange={({ pageSize: newPageSize, page: newPage }) => {
+            if (newPageSize !== pageSize) {
+              setPageSize(newPageSize);
+            }
+            if (newPage !== currentPage) {
+              goTo(newPage);
+            }
+          }}
+        />
+      )}
     </div>
   );
 };

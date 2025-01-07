@@ -16,3 +16,11 @@
     top: 0;
   }
 }
+
+.pagination {
+  overflow: hidden;
+
+  &:global(.cds--pagination) {
+    border-top: none;
+  }
+}
