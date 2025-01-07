@@ -116,7 +116,7 @@ describe('Payment', () => {
             voided: false,
           },
           {
-            billableService: null,
+            billableService: 'Hemoglobin',
             display: 'BillLineItem',
             item: 'Hemoglobin',
             lineItemOrder: 0,

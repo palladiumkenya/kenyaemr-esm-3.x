@@ -121,7 +121,10 @@ export const createPaymentPayload = (
   const existingPayments = payments.map((payment) => ({
     amount: payment.amount,
     amountTendered: payment.amountTendered,
-    attributes: [],
+    attributes: payment.attributes.map((attribute) => ({
+      attributeType: attribute.attributeType?.uuid,
+      value: attribute.value,
+    })),
     instanceType: payment.instanceType.uuid,
   }));
 
@@ -129,8 +132,11 @@ export const createPaymentPayload = (
   const currentPayments = paymentFormValues.map((formValue) => ({
     amount: parseFloat(totalAmount.toFixed(2)),
     amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
-    attributes: [],
-    instanceType: formValue.method,
+    attributes: formValue.method?.attributeTypes?.map((attribute) => ({
+      attributeType: attribute.uuid,
+      value: formValue.referenceCode,
+    })),
+    instanceType: formValue.method?.uuid,
   }));
 
   // Combine and calculate payments
@@ -163,13 +169,20 @@ export const createPaymentPayload = (
       : // If no items were selected, update payment status for all line items
         lineItems.map((lineItem) => ({
           ...lineItem,
-          billableService: extractServiceIdentifier(lineItem),
           item: extractServiceIdentifier(lineItem),
+          billableService: extractServiceIdentifier(lineItem),
           paymentStatus: isBillableItemFullyPaid(totalPaidAmount, lineItem),
         }));
 
   // Combine selected and remaining items into final processed list
-  const processedLineItems = [...processedSelectedBillableItems, ...remainingLineItems];
+  const processedLineItems = [
+    ...processedSelectedBillableItems,
+    ...remainingLineItems.map((item) => ({
+      ...item,
+      item: extractServiceIdentifier(item),
+      billableService: extractServiceIdentifier(item),
+    })),
+  ];
 
   // Determine final bill status
   const hasUnpaidItems = processedLineItems.some((item) => item.paymentStatus === PaymentStatus.PENDING);

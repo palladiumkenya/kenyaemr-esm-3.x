@@ -1,8 +1,8 @@
+import React from 'react';
 import { Button, InlineNotification } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { navigate, showSnackbar } from '@openmrs/esm-framework';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import React, { useState } from 'react';
 import { FormProvider, useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
@@ -17,6 +17,7 @@ import PaymentForm from './payment-form/payment-form.component';
 import PaymentHistory from './payment-history/payment-history.component';
 import styles from './payments.scss';
 import { createPaymentPayload } from './utils';
+import { usePaymentSchema } from '../../hooks/usePaymentSchema';
 
 type PaymentProps = {
   bill: MappedBill;
@@ -25,18 +26,11 @@ type PaymentProps = {
 
 const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
-  const paymentSchema = z.object({
-    method: z.string().refine((value) => !!value, 'Payment method is required'),
-    amount: z.number().refine((value) => {
-      const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + Number(value));
-      return amountDue >= 0;
-    }, 'Amount paid should not be greater than amount due'),
-    referenceCode: z.union([z.number(), z.string()]).optional(),
-  });
+  const paymentSchema = usePaymentSchema(bill);
   const { globalActiveSheet } = useClockInStatus();
 
   const methods = useForm<PaymentFormValue>({
-    mode: 'all',
+    mode: 'onSubmit',
     defaultValues: { payment: [] },
     resolver: zodResolver(z.object({ payment: z.array(paymentSchema) })),
   });
@@ -46,7 +40,6 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     name: 'payment',
     control: methods.control,
   });
-  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
 
   const totalWaivedAmount = computeWaivedAmount(bill);
   const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount), 0) ?? 0;
@@ -85,7 +78,6 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
         });
         const url = `/ws/rest/v1/cashier/bill/${bill.uuid}`;
         mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, { revalidate: true });
-        setPaymentSuccessful(true);
       },
       (error) => {
         showSnackbar({
@@ -123,7 +115,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
               <InlineNotification
                 title={t('incompletePayment', 'Incomplete payment')}
                 subtitle={t(
-                  'paymentErrorSubtitle',
+                  'incompletePaymentSubtitle',
                   'Please ensure all selected line items are fully paid, Total amount expected is {{selectedLineItemsAmountDue}}',
                   {
                     selectedLineItemsAmountDue: convertToCurrency(selectedLineItemsAmountDue),
@@ -136,9 +128,9 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
             )}
             {hasAmountPaidExceeded && (
               <InlineNotification
-                title={t('paymentError', 'Payment error')}
+                title={t('overPayment', 'Over payment')}
                 subtitle={t(
-                  'paymentErrorSubtitle',
+                  'overPaymentSubtitle',
                   'Amount paid {{totalAmountTendered}} should not be greater than amount due {{selectedLineItemsAmountDue}} for selected line items',
                   {
                     totalAmountTendered: convertToCurrency(totalAmountTendered),
