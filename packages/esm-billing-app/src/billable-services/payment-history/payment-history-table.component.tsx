@@ -58,6 +58,7 @@ export const PaymentHistoryTable = ({
   const transformedRows = results.map((row) => {
     return {
       ...row,
+      billingService: row.lineItems.map((item) => item.billableService).join(', '),
       totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
       referenceCodes: row.payments
         .map(({ attributes }) => attributes.map(({ value }) => value).join(', '))
