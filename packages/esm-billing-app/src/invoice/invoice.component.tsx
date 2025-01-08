@@ -23,7 +23,7 @@ import { LineItem } from '../types';
 import InvoiceTable from './invoice-table.component';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
-import PrintPaidBillReceiptAction from './print-bill-receipt/print-receipt-action.component';
+import ReceiptPrintButton from './print-bill-receipt/receipt-print-button.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 
 interface InvoiceDetailsProps {
@@ -130,7 +130,7 @@ const Invoice: React.FC = () => {
         </section>
       </div>
       <div className={styles.actionArea}>
-        <PrintPaidBillReceiptAction bill={bill} />
+        <ReceiptPrintButton bill={bill} />
         <Button
           onClick={handlePrint}
           kind="tertiary"
