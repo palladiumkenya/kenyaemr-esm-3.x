@@ -16,12 +16,12 @@ export const configSchema = {
   morgueVisitTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue visit',
-    _default: '6307dbe2-f336-4c11-a393-50c2769f455a',
+    _default: '02b67c47-6071-4091-953d-ad21452e830c',
   },
   morgueDepartmentServiceTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue department service type',
-    _default: '4a4a5b10-5740-48ff-929d-9f29c77125e9',
+    _default: 'd7bd4cc0-90b1-4f22-90f2-ab7fde936727',
   },
   insurancepaymentModeUuid: {
     _type: Type.String,
@@ -31,12 +31,12 @@ export const configSchema = {
   morgueCompartmentTagUuid: {
     _type: Type.String,
     _description: 'UUID for morgue compartment tag',
-    _default: '53a3a11b-c731-48bb-b8e0-efaf3207a34c',
+    _default: 'a69f6810-fa6a-4423-a3e4-f88e8ac032dd',
   },
   tagNumberUuid: {
     _type: Type.String,
     _description: 'UUID for tag number concept',
-    _default: '4e4456fc-314a-4729-aa24-62e2b0637544',
+    _default: '13ba9c45-c540-4f10-b915-fa3d7baeb3d1',
   },
   morgueAdmissionEncounterType: {
     _type: Type.String,
@@ -46,7 +46,7 @@ export const configSchema = {
   morgueDischargeEncounterTypeUuid: {
     type: Type.String,
     _description: 'Encounter type for morgue discharge',
-    _default: 'd618f40b-b5a3-4f17-81c8-2f04e2aad58e',
+    _default: '3d618f40b-b5a3-4f17-81c8-2f04e2aad58e',
   },
   visitPaymentMethodAttributeUuid: {
     _type: Type.String,
@@ -56,22 +56,22 @@ export const configSchema = {
   obNumberUuid: {
     _type: Type.String,
     _description: 'UUID for ob number concept',
-    _default: '188ffac9-af2f-4a83-be58-f914f8bae08a',
+    _default: 'c756d06a-22a5-4b66-933e-3d44667b72a0',
   },
   policeNameUuid: {
     _type: Type.String,
     _description: 'UUID for police name concept',
-    _default: '8c9922b3-37a8-4473-b81b-221a82c1c3cf',
+    _default: '6d58d9b5-6f84-4e77-941e-f5cc86d18a60',
   },
   burialPermitNumberUuid: {
     _type: Type.String,
     _description: 'UUID for burial permit number concept',
-    _default: '63f961a7-1614-45ce-8cd1-7d5e98aa23c4',
+    _default: '29ef3df3-9845-49b0-96f2-5fb6d6240039',
   },
   policeIDNumber: {
     _type: Type.String,
     _description: 'UUID for police id number concept',
-    _default: '8a960c91-fc0e-4143-a9db-6c9fa57b51e2',
+    _default: '8d488d02-d1d8-41a5-8219-61f4fc5dbeb0',
   },
   encounterProviderRoleUuid: {
     _type: Type.UUID,
@@ -81,7 +81,7 @@ export const configSchema = {
   dischargeAreaUuid: {
     _type: Type.String,
     _description: 'UUID for discharge area concept',
-    _default: 'a458fd00-199e-4d08-ad5c-1be322a6ccbe',
+    _default: '89ebccf1-4cca-4195-aeff-3e75fdf976b4',
   },
   adminUuid: {
     _type: Type.String,
