@@ -3534,7 +3534,7 @@ __metadata:
     "@openmrs/esm-framework": 6.x
     react: 18.x
     single-spa: 6.x
-  checksum: 10/e9eb4db1927d1f3c2e64cc93392ef68e3a3d54fdb741a801b2267ae3d8a938943296b599d73c5c82dfad70df1c797cbef6f2a6fba2e0d55a25d722d22a95ad8f
+  checksum: 10/a5a2e01d6e1b92995abb7435f601bc616733a5a090849d23b590571e666a0c4bf8c850416a75d2ffcdb5a23603500dcd649d89da6dff00a5a8033d9ff367b234
   languageName: node
   linkType: hard
 
@@ -7022,13 +7022,6 @@ __metadata:
     mime-types: "npm:~2.1.34"
     negotiator: "npm:0.6.3"
   checksum: 10/67eaaa90e2917c58418e7a9b89392002d2b1ccd69bcca4799135d0c632f3b082f23f4ae4ddeedbced5aa59bcc7bdf4699c69ebed4593696c922462b7bc5744d6
-  languageName: node
-  linkType: hard
-
-"ace-builds@npm:^1.36.3":
-  version: 1.36.5
-  resolution: "ace-builds@npm:1.36.5"
-  checksum: 10/b9e29c9ef2ed380f7eb3ff94777e82de9482344707ec348f241989d0377822c06d59ab18d881970e23983773de5c0ca1e5f9c710a7f18fb60ca9939df0cf97da
   languageName: node
   linkType: hard
 
