@@ -242,6 +242,10 @@ export interface Encounter {
   uuid: string;
   display: string;
   encounterDatetime: string;
+  location: {
+    uuid: string;
+    display: string;
+  };
 }
 
 export interface Visit {
@@ -249,4 +253,5 @@ export interface Visit {
   display?: string;
   startDatetime: string;
   stopDatetime?: string;
+  encounters;
 }

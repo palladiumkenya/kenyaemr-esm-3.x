@@ -50,16 +50,24 @@ export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedP
 
   const awaitingPatients = deceasedPatients?.filter((patient) => patient?.status === 'awaiting') || [];
 
-  const rows = awaitingPatients.map((patient) => ({
-    id: patient.uuid,
-    name: patient.person.display?.toUpperCase(),
-    gender: patient.person.gender,
-    age: patient?.person?.age,
-    identifier: patient?.identifiers[0]?.identifier,
-    deathDate: patient.person.deathDate ? new Date(patient.person.deathDate).toLocaleString() : t('nullDate', '--'),
-    causeOfDeath: patient.person.causeOfDeath?.display,
-    status: <Tag type="magenta">{patient.status}</Tag>,
-  }));
+  const rows = awaitingPatients.map((patient, index) => {
+    const openMrsId =
+      patient?.patient?.identifiers
+        ?.find((id) => id.display.startsWith('OpenMRS ID'))
+        ?.display.split('=')[1]
+        ?.trim() || t('missingIdentifier', '--');
+
+    return {
+      id: `${patient?.patient?.uuid}`,
+      name: toUpperCase(patient?.person?.person?.display || t('unknownName', '--')),
+      gender: patient?.person?.person?.gender || t('unknownGender', '--'),
+      age: patient?.person?.person?.age || t('unknownAge', '--'),
+      identifier: openMrsId,
+      deathDate: formatDateTime(patient?.person?.person?.deathDate) || t('nullDate', '--'),
+      causeOfDeath: patient?.person?.person?.causeOfDeath?.display || t('unknownCause', '--'),
+      status: <Tag type="magenta">{patient?.status || t('unknownStatus', '--')}</Tag>,
+    };
+  });
 
   const handleAdmissionForm = (patientUuid: string) => {
     launchWorkspace('patient-additional-info-form', {
@@ -68,11 +76,13 @@ export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedP
     });
   };
 
-  const actionColumn = (row) => (
-    <OverflowMenu size="sm" flipped>
-      <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
-    </OverflowMenu>
-  );
+  const actionColumn = (row) => {
+    return (
+      <OverflowMenu size="sm" flipped>
+        <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
+      </OverflowMenu>
+    );
+  };
 
   return <GenericTable rows={rows} headers={genericTableHeader} actionColumn={actionColumn} title={waitingInLine} />;
 };

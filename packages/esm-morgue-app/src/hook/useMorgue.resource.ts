@@ -84,12 +84,17 @@ export const useDeceasedPatient = (searchTerm?: string) => {
         try {
           setIsLoadingStatus(true);
           const status = await Promise.all(
-            paginatedData?.map((data) => {
-              return getMorguePatientStatus(data?.uuid, morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid);
-            }),
+            paginatedData.map((data) =>
+              getMorguePatientStatus(data.person?.uuid, morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid),
+            ),
           );
 
-          setDeceasedPatient(paginatedData?.map((patient, index) => ({ ...patient, status: status[index] })));
+          setDeceasedPatient(
+            paginatedData.map((patient, index) => ({
+              ...patient,
+              status: status[index],
+            })),
+          );
         } catch (error) {
           setStatusError(error);
         } finally {
