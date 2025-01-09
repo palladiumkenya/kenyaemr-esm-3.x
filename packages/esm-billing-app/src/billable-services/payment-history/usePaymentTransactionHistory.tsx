@@ -3,7 +3,6 @@ import { useBills } from '../../billing.resource';
 import { PaymentStatus, Filter } from '../../types';
 import { filterBills } from './filters/bill-filter';
 import { usePaymentFilterContext } from './usePaymentFilterContext';
-import capitalize from 'lodash/capitalize';
 
 function extractServiceName(billableService: string): string {
   const parts = billableService.split(':');
@@ -11,7 +10,7 @@ function extractServiceName(billableService: string): string {
     return billableService.trim();
   }
   const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  return capitalize(parts[0].trim().match(uuidPattern) ? parts[1].trim() : parts[0].trim());
+  return parts[0].trim().match(uuidPattern) ? parts[1].trim() : parts[0].trim();
 }
 
 export const usePaymentTransactionHistory = (filters: Filter) => {
