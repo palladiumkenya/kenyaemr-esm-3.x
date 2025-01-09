@@ -37,19 +37,6 @@
   border-radius: layout.$spacing-05;
 }
 
-.listItem {
-  list-style: none;
-  padding: layout.$spacing-03;
-  cursor: pointer;
-  background-color: colors.$gray-10;
-  font-size: 14px;
-  transition: background-color 0.3s ease;
-}
-
-.listItem.active {
-  background-color: colors.$gray-20;
-}
-
 .checkboxLabelSingleLine {
   white-space: nowrap;
   overflow: hidden;
@@ -98,39 +85,38 @@
   font-size: 14px;
 }
 
-.leftTabsContainer {
+.leftContainer {
   display: flex;
   flex-direction: column;
   border-radius: layout.$spacing-05;
   overflow: hidden;
 }
 
-.leftTabsLayout {
+.leftLayout {
   display: flex;
   flex-direction: row;
   height: 100%;
 }
 
-.tabList {
+.progressIndicator {
   display: flex;
   flex-direction: column;
   min-width: 200px;
-  background-color: colors.$white;
-  padding: layout.$spacing-03;
+  padding-top: layout.$spacing-03;
   border-right: 1px solid colors.$gray-30;
 }
 
-.tabPanels {
+.sections {
   flex: 1;
   padding: layout.$spacing-04;
 }
 
 @media (max-width: 768px) {
-  .leftTabsLayout {
+  .leftLayout {
     flex-direction: column;
   }
 
-  .tabList {
+  .progressIndicator {
     flex-direction: row;
     border-right: none;
     border-bottom: 1px solid colors.$gray-30;
@@ -139,7 +125,7 @@
     padding: layout.$spacing-02;
   }
 
-  .tabPanels {
+  .sections {
     padding: layout.$spacing-03;
   }
 }

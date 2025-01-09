@@ -23,18 +23,27 @@ import {
   Select,
   PasswordInput,
   Column,
-  ClickableTile,
-  Tile,
+  ProgressIndicator,
+  ProgressStep,
+  ComboBox,
 } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
-import { createUser, handleMutation, useRoles, usePersonAttribute } from '../../../user-management.resources';
+import {
+  createUser,
+  handleMutation,
+  useRoles,
+  usePersonAttribute,
+  useProvider,
+  useProviderAttributeType,
+  useLocation,
+} from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
-import { User } from '../../../config-schema';
+import { Provider, User } from '../../../config-schema';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -49,27 +58,84 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [activeSection, setActiveSection] = useState('demographic');
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const { userManagementFormSchema } = UserManagementFormSchema();
 
+  const { providerAttributeType = [] } = useProviderAttributeType();
+  const providerLicenseAttributeType =
+    providerAttributeType.find((type) => type.name === 'Practising License Number')?.uuid || '';
+  const licenseExpiryDateAttributeType =
+    providerAttributeType.find((type) => type.name === 'License Expiry Date')?.uuid || '';
+  const primaryFacilityAttributeType =
+    providerAttributeType.find((type) => type.name === 'Primary Facility')?.uuid || '';
+
+  const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
+  const { location, loadingLocation } = useLocation();
+
+  function getProviderAttributes() {
+    if (!Array.isArray(provider)) {
+      return [];
+    }
+    return provider.flatMap((item) => item.attributes || []);
+  }
+
+  function getProviderLicenseNumber() {
+    const providerAttributes = getProviderAttributes();
+    const providerLicense = providerAttributes.find(
+      (attr) => attr.attributeType?.uuid === providerLicenseAttributeType && attr.value,
+    );
+    return providerLicense?.value;
+  }
+
+  function getPrimaryFacility() {
+    const providerAttributes = getProviderAttributes();
+    const primaryFacility = providerAttributes.find(
+      (attr) => attr.attributeType?.uuid === primaryFacilityAttributeType && attr.value,
+    );
+    if (primaryFacility && primaryFacility.value) {
+      if (typeof primaryFacility.value === 'object' && primaryFacility.value !== null) {
+        return primaryFacility.value?.name;
+      }
+    }
+  }
+
+  function getProviderLicenseExpiryDate() {
+    const providerAttributes = getProviderAttributes();
+    const licenseExpiryDate = providerAttributes.find(
+      (attr) => attr.attributeType?.uuid === licenseExpiryDateAttributeType && attr.value,
+    );
+
+    if (licenseExpiryDate?.value) {
+      const date = new Date(licenseExpiryDate.value);
+      return [
+        date.getFullYear(),
+        String(date.getMonth() + 1).padStart(2, '0'),
+        String(date.getDate()).padStart(2, '0'),
+      ].join('-');
+    }
+  }
+
   const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
   type UserFormSchema = z.infer<typeof userManagementFormSchema>;
-  const formDefaultValues =
-    Object.keys(initialUserValue).length > 0
-      ? {
-          ...initialUserValue,
-          ...extractNameParts(initialUserValue.person?.display || ''),
-          phoneNumber: extractAttributeValue(initialUserValue.person?.attributes, 'Telephone'),
-          email: extractAttributeValue(initialUserValue.person?.attributes, 'Email'),
-          roles:
-            initialUserValue.roles?.map((role) => ({
-              uuid: role.uuid,
-              display: role.display,
-              description: role.description,
-            })) || [],
-          gender: initialUserValue.person?.gender || 'M',
-        }
-      : {};
+  const formDefaultValues = !isInitialValuesEmpty
+    ? {
+        ...initialUserValue,
+        ...extractNameParts(initialUserValue.person?.display || ''),
+        phoneNumber: extractAttributeValue(initialUserValue.person?.attributes, 'Telephone'),
+        email: extractAttributeValue(initialUserValue.person?.attributes, 'Email'),
+        roles:
+          initialUserValue.roles?.map((role) => ({
+            uuid: role.uuid,
+            display: role.display,
+            description: role.description,
+          })) || [],
+        gender: initialUserValue.person?.gender || 'M',
+        providerLicense: getProviderLicenseNumber(),
+        licenseExpiryDate: getProviderLicenseExpiryDate(),
+        primaryFacility: getPrimaryFacility(),
+      }
+    : {};
 
   function extractNameParts(display = '') {
     const nameParts = display.split(' ');
@@ -105,6 +171,26 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const onSubmit = async (data: UserFormSchema) => {
     const emailAttribute = attributeTypes.find((attr) => attr.name === 'Email address')?.uuid || '';
     const telephoneAttribute = attributeTypes.find((attr) => attr.name === 'Telephone contact')?.uuid || '';
+    const setProvider = data.providerIdentifiers;
+    const facility = data.primaryFacility.split(' ');
+    const mflCode = facility[facility.length - 1];
+    const providerPayload: Partial<Provider> = {
+      attributes: [
+        {
+          attributeType: primaryFacilityAttributeType,
+          value: mflCode,
+        },
+        {
+          attributeType: providerLicenseAttributeType,
+          value: data.providerLicense,
+        },
+        {
+          attributeType: licenseExpiryDateAttributeType,
+          value: data.licenseExpiryDate,
+        },
+      ],
+    };
+
     const payload: Partial<User> = {
       username: data.username,
       password: data.password,
@@ -136,7 +222,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     };
 
     try {
-      const response = await createUser(payload, initialUserValue?.uuid ?? '');
+      const response = await createUser(payload, setProvider, providerPayload, initialUserValue?.uuid ?? '');
 
       if (response.ok) {
         showSnackbar({
@@ -183,36 +269,34 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   }, [isDirty, promptBeforeClosing]);
 
   const toggleSection = (section) => {
-    setActiveSection((prev) => (prev === section ? null : section));
+    setActiveSection((prev) => (prev !== section ? section : prev));
   };
 
+  const steps = [
+    { id: 'demographic', label: t('demographicInformation', 'Demographic Info') },
+    { id: 'provider', label: t('providerAccount', 'Provider Account') },
+    { id: 'login', label: t('loginInformation', 'Login Info') },
+    { id: 'roles', label: t('roles', 'Roles Info') },
+  ];
+
   return (
-    <div className={styles.leftTabsContainer}>
+    <div className={styles.leftContainer}>
       <div>
-        <div className={styles.leftTabsLayout}>
-          <Tile className={styles.tabList}>
-            <ClickableTile
-              className={`${styles.listItem} ${activeSection === 'demographic' ? styles.active : ''}`}
-              onClick={() => toggleSection('demographic')}>
-              {t('demographicInformation', 'Demographic Info')}
-            </ClickableTile>
-            <ClickableTile
-              className={`${styles.listItem} ${activeSection === 'provider' ? styles.active : ''}`}
-              onClick={() => toggleSection('provider')}>
-              {t('providerAccount', 'Provider Account')}
-            </ClickableTile>
-            <ClickableTile
-              className={`${styles.listItem} ${activeSection === 'login' ? styles.active : ''}`}
-              onClick={() => toggleSection('login')}>
-              {t('loginInformation', 'Login Info')}
-            </ClickableTile>
-            <ClickableTile
-              className={`${styles.listItem} ${activeSection === 'roles' ? styles.active : ''}`}
-              onClick={() => toggleSection('roles')}>
-              {t('roles', 'Roles Info')}
-            </ClickableTile>
-          </Tile>
-          <div className={styles.tabPanels}>
+        <div className={styles.leftLayout}>
+          <ProgressIndicator
+            currentIndex={currentIndex}
+            spaceEquality={true}
+            vertical={true}
+            className={styles.progressIndicator}
+            onChange={(newIndex) => {
+              toggleSection(steps[newIndex].id);
+              setCurrentIndex(newIndex);
+            }}>
+            {steps.map((step, index) => (
+              <ProgressStep key={step.id} label={step.label} className={styles.ProgresStep} />
+            ))}
+          </ProgressIndicator>
+          <div className={styles.sections}>
             <FormProvider {...userFormMethods}>
               <form onSubmit={userFormMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
                 <div className={styles.formContainer}>
@@ -339,32 +423,213 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
-
                     {activeSection === 'provider' && (
                       <ResponsiveWrapper>
                         <CardHeader title="Provider Details">
                           <ChevronSortUp />
                         </CardHeader>
-                        <ResponsiveWrapper>
-                          <Controller
-                            name="providerIdentifiers"
-                            control={userFormMethods.control}
-                            render={({ field }) => (
-                              <CheckboxGroup
-                                legendText={t('providerIdentifiers', 'Provider Details')}
-                                className={styles.multilineCheckboxLabel}>
-                                <Checkbox
-                                  className={styles.checkboxLabelSingleLine}
-                                  {...field}
-                                  id="providerIdentifiers"
-                                  labelText={t('providerIdentifiers', 'Create a Provider account for this user')}
-                                  checked={field.value || false}
-                                  onChange={(e) => field.onChange(e.target.checked)}
+
+                        {loadingProvider || providerError ? (
+                          <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
+                        ) : provider.length > 0 ? (
+                          <>
+                            <ResponsiveWrapper>
+                              <Controller
+                                name="systemId"
+                                control={userFormMethods.control}
+                                render={({ field }) => (
+                                  <TextInput
+                                    {...field}
+                                    id="systemeId"
+                                    type="text"
+                                    labelText={t('providerId', 'Provider Id')}
+                                    placeholder={t('providerId', 'Provider Id')}
+                                    invalid={!!errors.email}
+                                    invalidText={errors.email?.message}
+                                    className={styles.checkboxLabelSingleLine}
+                                  />
+                                )}
+                              />
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              {loadingLocation ? (
+                                <InlineLoading
+                                  status="active"
+                                  iconDescription="Loading"
+                                  description="Loading data..."
                                 />
-                              </CheckboxGroup>
+                              ) : (
+                                <Controller
+                                  name="primaryFacility"
+                                  control={userFormMethods.control}
+                                  render={({ field }) => (
+                                    <ComboBox
+                                      {...field}
+                                      id="primaryFacility"
+                                      items={location}
+                                      itemToString={(item) => {
+                                        if (!item) {
+                                          return '';
+                                        }
+                                        const attributeValue = item.attributes?.[0]?.value || '';
+                                        return `${item.name || ''} ${attributeValue}`.trim();
+                                      }}
+                                      titleText={t('primaryFacility', 'Primary Facility')}
+                                      selectedItem={
+                                        (location || []).find((item) => `${item.name || ''}`.trim() === field.value) ||
+                                        null
+                                      }
+                                      onChange={({ selectedItem }) => {
+                                        if (selectedItem) {
+                                          const attributeValue = selectedItem.attributes?.[0]?.value || '';
+                                          const formattedString = `${selectedItem.name || ''} ${attributeValue}`.trim();
+                                          field.onChange(formattedString);
+                                        } else {
+                                          field.onChange('');
+                                        }
+                                      }}
+                                    />
+                                  )}
+                                />
+                              )}
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Controller
+                                name="providerLicense"
+                                control={userFormMethods.control}
+                                render={({ field }) => (
+                                  <TextInput
+                                    {...field}
+                                    id="providerLicense"
+                                    type="text"
+                                    labelText={t('providerLicense', 'Provider License Number')}
+                                    placeholder={t('providerLicense', 'Provider License Number')}
+                                    className={styles.checkboxLabelSingleLine}
+                                  />
+                                )}
+                              />
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Controller
+                                name="licenseExpiryDate"
+                                control={userFormMethods.control}
+                                render={({ field }) => (
+                                  <TextInput
+                                    {...field}
+                                    id="licenseExpiryDate"
+                                    type="date"
+                                    labelText={t('licenseExpiryDate', 'License Expiry Date')}
+                                    placeholder={t('licenseExpiryDate', 'License Expiry Date')}
+                                    className={styles.checkboxLabelSingleLine}
+                                  />
+                                )}
+                              />
+                            </ResponsiveWrapper>
+                          </>
+                        ) : (
+                          <>
+                            <Controller
+                              name="providerIdentifiers"
+                              control={userFormMethods.control}
+                              render={({ field }) => (
+                                <CheckboxGroup
+                                  legendText={t('providerIdentifiers', 'Provider Details')}
+                                  className={styles.multilineCheckboxLabel}>
+                                  <Checkbox
+                                    className={styles.checkboxLabelSingleLine}
+                                    {...field}
+                                    id="providerIdentifiers"
+                                    labelText={t('providerIdentifiers', 'Create a Provider account for this user')}
+                                    checked={field.value || false}
+                                    onChange={(e) => field.onChange(e.target.checked)}
+                                  />
+                                </CheckboxGroup>
+                              )}
+                            />
+
+                            {userFormMethods.watch('providerIdentifiers') && (
+                              <>
+                                <ResponsiveWrapper>
+                                  {loadingLocation ? (
+                                    <InlineLoading
+                                      status="active"
+                                      iconDescription="Loading"
+                                      description="Loading location data..."
+                                    />
+                                  ) : (
+                                    <Controller
+                                      name="primaryFacility"
+                                      control={userFormMethods.control}
+                                      render={({ field }) => (
+                                        <ComboBox
+                                          {...field}
+                                          id="primaryFacility"
+                                          items={location}
+                                          itemToString={(item) => {
+                                            if (!item) {
+                                              return '';
+                                            }
+                                            const attributeValue = item.attributes?.[0]?.value || '';
+                                            return `${item.name || ''} ${attributeValue}`.trim();
+                                          }}
+                                          titleText={t('primaryFacility', 'Primary Facility')}
+                                          selectedItem={
+                                            (location || []).find(
+                                              (item) => `${item.name || ''}`.trim() === field.value,
+                                            ) || null
+                                          }
+                                          onChange={({ selectedItem }) => {
+                                            if (selectedItem) {
+                                              const attributeValue = selectedItem.attributes?.[0]?.value || '';
+                                              const formattedString = `${
+                                                selectedItem.name || ''
+                                              } ${attributeValue}`.trim();
+                                              field.onChange(formattedString);
+                                            } else {
+                                              field.onChange('');
+                                            }
+                                          }}
+                                        />
+                                      )}
+                                    />
+                                  )}
+                                </ResponsiveWrapper>
+                                <ResponsiveWrapper>
+                                  <Controller
+                                    name="providerLicense"
+                                    control={userFormMethods.control}
+                                    render={({ field }) => (
+                                      <TextInput
+                                        {...field}
+                                        id="providerLicense"
+                                        type="text"
+                                        labelText={t('providerLicense', 'Provider License Number')}
+                                        placeholder={t('providerLicense', 'Provider License Number')}
+                                        className={styles.checkboxLabelSingleLine}
+                                      />
+                                    )}
+                                  />
+                                </ResponsiveWrapper>
+                                <ResponsiveWrapper>
+                                  <Controller
+                                    name="licenseExpiryDate"
+                                    control={userFormMethods.control}
+                                    render={({ field }) => (
+                                      <TextInput
+                                        {...field}
+                                        id="licenseExpiryDate"
+                                        type="date"
+                                        labelText={t('licenseExpiryDate', 'License Expiry Date')}
+                                        placeholder={t('licenseExpiryDate', 'License Expiry Date')}
+                                        className={styles.checkboxLabelSingleLine}
+                                      />
+                                    )}
+                                  />
+                                </ResponsiveWrapper>
+                              </>
                             )}
-                          />
-                        </ResponsiveWrapper>
+                          </>
+                        )}
                       </ResponsiveWrapper>
                     )}
 
