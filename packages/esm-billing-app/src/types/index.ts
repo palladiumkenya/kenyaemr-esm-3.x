@@ -551,13 +551,7 @@ export type FacilityClaim = {
 export type BillingPromptType = 'patient-chart' | 'billing-orders';
 
 export interface Schema {
-  services: {
-    all: Array<Service>;
-    'program:HIV'?: Array<Service>;
-    'program:TB'?: Array<Service>;
-    'age<5'?: Array<Service>;
-    'visitAttribute:prisoner'?: Array<Service>;
-  };
+  services: Record<string, unknown>;
   commodities: Record<string, unknown>;
 }
 
