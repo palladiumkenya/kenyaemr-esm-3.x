@@ -1,0 +1,20 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+.dataTable {
+  margin: layout.$spacing-05;
+}
+
+.userManagementModeButton {
+  margin-right: layout.$spacing-05;
+}
+
+.btnSet {
+  flex-flow: row wrap;
+  gap: layout.$spacing-03;
+}
+
+.btn {
+  padding-left: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+}
