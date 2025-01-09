@@ -3012,6 +3012,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kenyaemr/esm-cross-border-app@workspace:packages/esm-cross-border-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-cross-border-app@workspace:packages/esm-cross-border-app"
+  dependencies:
+    "@carbon/react": "npm:^1.72.0"
+    lodash-es: "npm:^4.17.15"
+    webpack: "npm:^5.74.0"
+  peerDependencies:
+    "@openmrs/esm-framework": 5.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@kenyaemr/esm-lab-manifest-app@workspace:packages/esm-lab-manifest-app":
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-lab-manifest-app@workspace:packages/esm-lab-manifest-app"

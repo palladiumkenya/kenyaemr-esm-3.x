@@ -41,7 +41,7 @@ export const usePaymentsReconciler = (billUUID: string) => {
   const mobileMoneyPaymentMethodInstanceTypeUUID = paymentModes.find((method) => method.name === 'Mobile Money')?.uuid;
   const paymentReferenceUUID = paymentModes
     .find((mode) => mode.name === 'Mobile Money')
-    ?.attributeTypes.find((type) => type.description === 'Reference Number').uuid;
+    ?.attributeTypes.find((type) => type.description === 'Reference Number')?.uuid;
 
   const { data: billPayments } = useSWR(url + bill.uuid, () => fetchPaymentStatus({ url: url, billUUID: bill.uuid }));
   const aggregatorReferenceNumbers = billPayments?.map((pd) => pd.referenceNumber) ?? [];

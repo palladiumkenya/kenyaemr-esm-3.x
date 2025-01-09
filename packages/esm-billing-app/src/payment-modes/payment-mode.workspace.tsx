@@ -167,7 +167,7 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
                 render={({ field }) => (
                   <Toggle
                     {...field}
-                    labelText={t('paymentModeRetired', 'Retired')}
+                    labelText={t('enablePaymentMode', 'Enable payment mode')}
                     labelA="Off"
                     labelB="On"
                     toggled={field.value}

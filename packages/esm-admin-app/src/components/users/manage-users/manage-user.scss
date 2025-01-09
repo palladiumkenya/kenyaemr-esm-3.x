@@ -1,0 +1,31 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  height: calc(100vh - 3rem);
+}
+
+.servicesTableContainer {
+  margin: layout.$spacing-05;
+}
+
+.illo {
+  margin-top: layout.$spacing-05;
+}
+
+.content {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-05;
+}
+
+.tile {
+  border: 1px solid colors.$gray-20;
+  padding: layout.$spacing-05 0;
+  text-align: center;
+}
+
+.section {
+  border-right: 1px solid colors.$gray-20;
+}
