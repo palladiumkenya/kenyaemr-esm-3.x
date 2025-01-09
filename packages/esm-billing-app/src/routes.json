@@ -278,10 +278,6 @@
       "component": "createPaymentPoint"
     },
     {
-      "name": "clock-in-modal",
-      "component": "clockIn"
-    },
-    {
       "name": "clock-out-modal",
       "component": "clockOut"
     },
@@ -300,6 +296,10 @@
     {
       "name": "paid-bill-receipt-print-preview-modal",
       "component": "paidBillReceiptPrintPreviewModal"
+    },
+    {
+      "name": "clock-in-modal",
+      "component": "clockIn"
     }
   ]
 }

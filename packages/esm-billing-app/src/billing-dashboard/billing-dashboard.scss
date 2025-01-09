@@ -25,3 +25,30 @@
   padding: 1.5rem 0;
   text-align: center;
 }
+
+.clockOutStrip {
+  display: flex;
+  justify-content: space-between;
+  padding: layout.$spacing-05 layout.$spacing-05 0 layout.$spacing-05;
+}
+
+.clockOutInfo {
+  display: flex;
+  align-items: center;
+
+  svg {
+    height: layout.$spacing-06;
+    width: layout.$spacing-06;
+    margin-right: layout.$spacing-02;
+  }
+
+  span {
+    margin: 0 layout.$spacing-02;
+    color: colors.$gray-60;
+  }
+
+  .cashPointName {
+    font-size: smaller;
+    color: colors.$gray-60;
+  }
+}
