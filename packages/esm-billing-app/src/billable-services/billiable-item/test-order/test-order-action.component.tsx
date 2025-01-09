@@ -56,7 +56,7 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
       order,
       ...(additionalProps && { additionalProps }),
     });
-  }, [order, additionalProps, modalName, handleModalClose]);
+  }, [isDispenseOrder, modalName, order, additionalProps, dispenseFormProps, handleModalClose]);
 
   if (isLoading) {
     return (
@@ -80,6 +80,7 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
     <Button
       kind="primary"
       className={!isDispenseOrder ? styles.actionButton : ''}
+      size={!isDispenseOrder ? 'md' : ''}
       disabled={hasPendingPayment}
       onClick={launchModal}>
       {buttonText}
