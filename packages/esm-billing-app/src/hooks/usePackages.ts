@@ -1,35 +1,27 @@
-import { FetchResponse, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { BillingConfig } from '../config-schema';
 import { Package } from '../types';
-import { category } from './benefits.mock';
 
 /**
  * Hook that return a list of sha benefits category/packages
  * @returns
  */
 const usePackages = () => {
-  const { hieBaseUrl } = useConfig<BillingConfig>();
-  const url = `${hieBaseUrl}/master/category/all-`;
+  const url = `${restBaseUrl}/insuranceclaims/claims/benefit-package`;
 
-  const { data, isLoading, error } = useSWR<Array<{ id: number; code: string; categoryName: string }>>(
+  const { data, isLoading, error } = useSWR<FetchResponse<Array<{ code: string; name: string; description: string }>>>(
     url,
-    async () => {
-      await new Promise((resolve, reject) => {
-        setTimeout(resolve, 2000);
-      });
-      return category;
-    },
+    openmrsFetch,
   );
 
   return {
     isLoading,
-    packages: (data ?? []).map(
+    packages: (data?.data ?? []).map(
       (category) =>
         ({
-          uuid: `${category.id}`,
+          uuid: `${category.code}`,
           packageCode: category.code,
-          packageName: category.categoryName,
+          packageName: category.name,
         } as Package),
     ),
     error,
