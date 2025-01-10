@@ -65,7 +65,7 @@ export const DischargedBodies: React.FC<DischargedProps> = ({ isLoading, decease
           style={{ textDecoration: 'none', maxWidth: '50%' }}
           to={patientChartUrl}
           templateParams={{ patientUuid: patient?.person?.uuid }}>
-          {patient.person.display?.toUpperCase()}
+          {patient?.person?.person?.display?.toUpperCase()}
         </ConfigurableLink>
       ),
       gender: patient?.person?.person?.gender || t('unknownGender', '--'),
