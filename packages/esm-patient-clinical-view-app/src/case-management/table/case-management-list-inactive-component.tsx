@@ -13,7 +13,7 @@ import {
   Search,
   Layer,
   Tile,
-  OverflowMenu,
+  Tag,
 } from '@carbon/react';
 import { CardHeader, EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableLink, isDesktop, useLayoutType, useSession } from '@openmrs/esm-framework';
@@ -43,6 +43,7 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
     { key: 'names', header: t('names', 'Names') },
     { key: 'dateofstart', header: t('dateofstart', 'Start Date') },
     { key: 'dateofend', header: t('dateofend', 'End Date') },
+    { key: 'status', header: t('status', 'Status') },
   ];
 
   const filteredCases = inactiveCasesData?.data.results.filter(
@@ -52,21 +53,24 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
         caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
-  const tableRows = filteredCases
-    ?.slice((currentPage - 1) * pageSize, currentPage * pageSize)
-    .map((caseData, index) => ({
-      id: caseData.uuid,
-      names: (
-        <ConfigurableLink
-          style={{ textDecoration: 'none', maxWidth: '50%' }}
-          to={patientChartUrl}
-          templateParams={{ patientUuid: caseData.personB.uuid }}>
-          {uppercaseText(extractNameString(caseData.personB.display))}
-        </ConfigurableLink>
-      ),
-      dateofstart: new Date(caseData.startDate).toLocaleDateString(),
-      dateofend: new Date(caseData.endDate).toLocaleDateString(),
-    }));
+  const tableRows = filteredCases?.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((caseData) => ({
+    id: caseData.uuid,
+    names: (
+      <ConfigurableLink
+        style={{ textDecoration: 'none', maxWidth: '50%' }}
+        to={patientChartUrl}
+        templateParams={{ patientUuid: caseData.personB.uuid }}>
+        {uppercaseText(extractNameString(caseData.personB.display))}
+      </ConfigurableLink>
+    ),
+    dateofstart: new Date(caseData.startDate).toLocaleDateString(),
+    dateofend: new Date(caseData.endDate).toLocaleDateString(),
+    status: caseData.endDate ? (
+      <Tag type="red" size="lg">
+        {t('discontinued', 'Discontinued')}
+      </Tag>
+    ) : null,
+  }));
 
   useEffect(() => {
     const count = filteredCases?.length || 0;
