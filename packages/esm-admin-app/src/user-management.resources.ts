@@ -26,8 +26,12 @@ export const postUser = async (user: Partial<User>, url: string) => {
   return response.json();
 };
 
-export const createProvider = async (uuid: string, identifier: string, attributes: Partial<Provider>) => {
-  const providerUrl = `${restBaseUrl}/provider`;
+export const createProvider = async (
+  uuid: string,
+  identifier: string,
+  attributes: Partial<Provider>,
+  providerUrl?: string,
+) => {
   const providerBody = {
     person: uuid,
     identifier: identifier,
@@ -49,6 +53,7 @@ export const createUser = async (
   setProvider: boolean,
   attributes: Partial<Provider>,
   uuid?: string,
+  providerUUID?: string,
 ) => {
   const url = uuid ? `${restBaseUrl}/user/${uuid}` : `${restBaseUrl}/user`;
 
@@ -57,7 +62,8 @@ export const createUser = async (
   if (setProvider || (response.person && response.person.uuid)) {
     const personUUID = response.person.uuid;
     const identifier = response.systemId;
-    return await createProvider(personUUID, identifier, attributes);
+    const providerUrl = providerUUID ? `${restBaseUrl}/provider/${providerUUID}` : `${restBaseUrl}/provider`;
+    return await createProvider(personUUID, identifier, attributes, providerUrl);
   }
 
   return response;

@@ -174,6 +174,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const setProvider = data.providerIdentifiers;
     const facility = data.primaryFacility.split(' ');
     const mflCode = facility[facility.length - 1];
+    const providerUUID = provider[0].uuid;
     const providerPayload: Partial<Provider> = {
       attributes: [
         {
@@ -222,7 +223,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     };
 
     try {
-      const response = await createUser(payload, setProvider, providerPayload, initialUserValue?.uuid ?? '');
+      const response = await createUser(
+        payload,
+        setProvider,
+        providerPayload,
+        initialUserValue?.uuid ?? '',
+        providerUUID ?? '',
+      );
 
       if (response.ok) {
         showSnackbar({
