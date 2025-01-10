@@ -1,0 +1,20 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.formDatePicker input {
+  min-width: 50rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid colors.$gray-50;
+  padding: layout.$spacing-04 layout.$spacing-05;
+  background-color: colors.$white;
+}
+
+.centeredContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: layout.$spacing-06 layout.$spacing-07;
+}

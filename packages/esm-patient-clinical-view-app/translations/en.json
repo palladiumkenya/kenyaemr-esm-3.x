@@ -77,6 +77,8 @@
   "encountersDescription": "List of encounters during the current visit",
   "encountersList": "Encounters list",
   "encounterType": "Encounter Type",
+  "endDate": "End Date",
+  "endRelationship": "End Relationship",
   "enterForm": "Enter form",
   "error": "Error",
   "errorFetchingbedInformation": "Error fetching bed information",
@@ -128,6 +130,7 @@
   "neonatalSummary": "Neonatal Summary",
   "nextPage": "Next page",
   "nextVisitDate": "Next visit date",
+  "no": "No",
   "noContactToDisplay": "There is no contact data to display for this patient.",
   "noEncounters": "No encounters found",
   "noEncounterToDisplay": "There are no encounters to display for this patient.",
@@ -156,9 +159,13 @@
   "recordLabourDetails": "Record labour details",
   "referrals": "Referrals",
   "relation": "Relation",
+  "relationshipError": "Relationship Error",
   "releaseBody": "Release Body",
   "reportingMonth": "Month",
   "reportingYear": "Year",
+  "rlshipConfirmationText": "This will end the relationship. Are you sure you want to proceed?",
+  "RlshipErrorMessage": "Request Failed",
+  "savedRlship": "Relationship ended successfully",
   "sex": "Sex",
   "smoking": "Smoking",
   "smokingDuration": "Smoking Duration",
@@ -187,5 +194,6 @@
   "viewBeds": "View beds",
   "viewEncounter": "View",
   "visitDate": "Screening Date",
-  "visitType": "Visit type"
+  "visitType": "Visit type",
+  "yes": "Yes"
 }
