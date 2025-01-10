@@ -22,7 +22,6 @@ import {
   ConfigurableLink,
   isDesktop,
   launchWorkspace,
-  showModal,
   showSnackbar,
   useLayoutType,
   useSession,
@@ -47,7 +46,7 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
   const { user } = useSession();
   const caseManagerPersonUuid = user?.person.uuid;
 
-  const { data: activeCasesData, error: activeCasesError } = useActivecases(caseManagerPersonUuid);
+  const { data: activeCasesData, error: activeCasesError, mutate: fetchCases } = useActivecases(caseManagerPersonUuid);
 
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/case-management-encounters';
 
@@ -65,10 +64,26 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
         caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
   );
   const handleDiscontinueACase = async (relationshipUuid: string) => {
-    const dispose = showModal('end-relationship-dialog', {
-      relationshipUuid,
-      closeModal: () => dispose(),
-    });
+    try {
+      await updateRelationship(relationshipUuid, { endDate: new Date() });
+      await fetchCases();
+
+      showSnackbar({
+        kind: 'success',
+        title: t('endRlship', 'End relationship'),
+        subtitle: t('savedRlship', 'Relationship ended successfully'),
+        timeoutInMs: 3000,
+        isLowContrast: true,
+      });
+    } catch (error) {
+      showSnackbar({
+        kind: 'error',
+        title: t('RlshipError', 'Relationship Error'),
+        subtitle: t('RlshipError', 'Request Failed.......'),
+        timeoutInMs: 2500,
+        isLowContrast: true,
+      });
+    }
   };
 
   const tableRows = filteredCases
@@ -87,12 +102,12 @@ const CaseManagementListActive: React.FC<CaseManagementListActiveProps> = ({ set
       dateofend: caseData.endDate ? (
         new Date(caseData.endDate).toLocaleDateString()
       ) : (
-        <Tag type="green" size={responsiveSize}>
+        <Tag type="green" size="lg">
           {t('enrolled', 'Enrolled')}
         </Tag>
       ),
       actions: (
-        <OverflowMenu size={responsiveSize}>
+        <OverflowMenu size="md">
           <OverflowMenuItem
             isDelete
             itemText={t('discontinue', 'Discontinue')}
