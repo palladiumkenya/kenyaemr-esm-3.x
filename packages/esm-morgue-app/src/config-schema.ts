@@ -5,7 +5,6 @@ export const configSchema = {
     _type: Type.String,
     _description: ' UUID for morgue visit',
     _default: '02b67c47-6071-4091-953d-ad21452e830c',
-    _default: '02b67c47-6071-4091-953d-ad21452e830c',
   },
   morgueDepartmentServiceTypeUuid: {
     _type: Type.String,
@@ -70,7 +69,6 @@ export const configSchema = {
   dischargeAreaUuid: {
     _type: Type.String,
     _description: 'UUID for discharge area concept',
-    _default: '89ebccf1-4cca-4195-aeff-3e75fdf976b4',
     _default: '89ebccf1-4cca-4195-aeff-3e75fdf976b4',
   },
   adminUuid: {
