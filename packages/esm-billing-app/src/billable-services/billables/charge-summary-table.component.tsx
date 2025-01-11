@@ -24,6 +24,7 @@ import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../../helpers';
+import { downloadChargeItems } from '../utils';
 import styles from './charge-summary-table.scss';
 import { useChargeSummaries } from './charge-summary.resource';
 import { downloadExcelTemplateFile, searchTableData } from './form-helper';
@@ -103,6 +104,10 @@ const ChargeSummaryTable: React.FC = () => {
     });
   };
 
+  const handleDownloadChargeItems = () => {
+    downloadChargeItems(chargeSummaryItems);
+  };
+
   if (isLoading) {
     return <DataTableSkeleton headers={headers} aria-label="sample table" showHeader={false} showToolbar={false} />;
   }
@@ -151,7 +156,12 @@ const ChargeSummaryTable: React.FC = () => {
                   <MenuItem onClick={openBulkUploadModal} label={t('bulkUpload', 'Bulk Upload')} renderIcon={Upload} />
                   <MenuItem
                     onClick={downloadExcelTemplateFile}
-                    label={t('downloadTemplate', 'Download template')}
+                    label={t('downloadTemplate', 'Download upload template')}
+                    renderIcon={Download}
+                  />
+                  <MenuItem
+                    onClick={handleDownloadChargeItems}
+                    label={t('downloadChargeItems', 'Download charge items')}
                     renderIcon={Download}
                   />
                 </ComboButton>
