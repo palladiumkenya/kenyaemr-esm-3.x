@@ -185,7 +185,7 @@ export const getBulkUploadPayloadFromExcelFile = (
 };
 
 export function createExcelTemplateFile(): Uint8Array {
-  const headers = ['concept_id', 'name', 'short_name', 'price', 'disable', 'service_type_id'];
+  const headers = ['name', 'short_name', 'service_status', 'service_type_id', 'concept_id', 'Cash'];
 
   const worksheet = XLSX.utils.aoa_to_sheet([headers]);
   const workbook = XLSX.utils.book_new();
@@ -193,12 +193,12 @@ export function createExcelTemplateFile(): Uint8Array {
 
   // Set column widths for better readability
   const colWidths = [
-    { wch: 15 }, // concept_id
     { wch: 30 }, // name
     { wch: 20 }, // short_name
-    { wch: 10 }, // price
-    { wch: 10 }, // disable
+    { wch: 10 }, // service_status
     { wch: 20 }, // service_type_id
+    { wch: 15 }, // concept_id
+    { wch: 10 }, // Cash
   ];
   worksheet['!cols'] = colWidths;
 

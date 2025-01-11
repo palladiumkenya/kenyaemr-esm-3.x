@@ -18,7 +18,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
 } from '@carbon/react';
-import { CategoryAdd, Download, Upload, WatsonHealthScalpelSelect } from '@carbon/react/icons';
+import { CategoryAdd, DocumentDownload, Download, Upload, WatsonHealthScalpelSelect } from '@carbon/react/icons';
 import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
@@ -156,8 +156,8 @@ const ChargeSummaryTable: React.FC = () => {
                   <MenuItem onClick={openBulkUploadModal} label={t('bulkUpload', 'Bulk Upload')} renderIcon={Upload} />
                   <MenuItem
                     onClick={downloadExcelTemplateFile}
-                    label={t('downloadTemplate', 'Download upload template')}
-                    renderIcon={Download}
+                    label={t('downloadUploadTemplate', 'Download upload template')}
+                    renderIcon={DocumentDownload}
                   />
                   <MenuItem
                     onClick={handleDownloadChargeItems}
