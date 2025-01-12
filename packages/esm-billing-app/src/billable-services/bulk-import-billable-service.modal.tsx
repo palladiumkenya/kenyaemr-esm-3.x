@@ -5,12 +5,11 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePaymentModes } from '../billing.resource';
 import { MAX_ALLOWED_FILE_SIZE } from '../constants';
-import { ExcelFileRow } from '../types';
 import { createBillableService, useServiceTypes } from './billable-service.resource';
 import { useChargeSummaries } from './billables/charge-summary.resource';
-import { BillableServicePayload, getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
+import { getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
 import styles from './clinical-charges.scss';
-import { createAndDownloadFailedUploadsExcelFile, createAndDownloadFilteredRowsFile } from './utils';
+import { createAndDownloadFailedUploadsExcelFile } from './utils';
 
 export const BulkImportBillableServices = ({ closeModal }) => {
   const [isImporting, setIsImporting] = useState(false);
@@ -53,20 +52,24 @@ export const BulkImportBillableServices = ({ closeModal }) => {
       try {
         fileReadResponse = getBulkUploadPayloadFromExcelFile(data, chargeSummaryItems, paymentModes, serviceTypes);
       } catch (error) {
+        console.error('error', error);
         setIsImporting(false);
         closeModal();
         showSnackbar({
           title: t('errorOccurred', 'an error occurred'),
           subtitle: t('uploadError', 'an unknown error occurred. Please try reuploading the file'),
+          kind: 'error',
         });
+
+        return;
       }
 
       if (fileReadResponse === 'INVALID_TEMPLATE') {
         closeModal();
         showSnackbar({
           title: t(
-            'invalidFile',
-            'The file you uploaded is invalid. A valid template should include [concept_id, name, short_name, price, disable, category]',
+            'invalidFileError',
+            'The file you uploaded is invalid. A valid template should include the following columns [name, short_name, service_status, service_type_id, concept_id, your payment modes]',
           ),
           kind: 'error',
         });
@@ -74,55 +77,48 @@ export const BulkImportBillableServices = ({ closeModal }) => {
         return;
       }
 
-      const correctRowsPayload = fileReadResponse.at(0) ?? [];
-      const filteredOutRows = fileReadResponse.at(1) ?? [];
+      const erroredPayloads = [];
 
-      if (filteredOutRows?.length > 0) {
-        createAndDownloadFilteredRowsFile(filteredOutRows as ExcelFileRow[]);
-        showSnackbar({
-          title: t(
-            'filteredOutRows',
-            'Some rows were missing categories and were filtered out. An excel file of the rows has been downloaded',
-          ),
-          kind: 'error',
-        });
-      }
+      const newItems = fileReadResponse.at(0);
+      const updatedItems = fileReadResponse.at(1);
 
-      const erroredPayloads: BillableServicePayload[] = [];
+      let successfulNewItems = 0;
+      let successfulUpdatedItems = 0;
 
       const chunkSize = 50;
-      for (let i = 0; i < correctRowsPayload.length; i += chunkSize) {
-        const chunk = correctRowsPayload.slice(i, i + chunkSize);
+      for (let i = 0; i < newItems.length; i += chunkSize) {
+        const chunk = newItems.slice(i, i + chunkSize);
 
         const promises = chunk.map(async (formPayload) => {
           try {
             await createBillableService(formPayload);
+            successfulNewItems++;
           } catch (error) {
             erroredPayloads.push(formPayload);
           }
         });
 
-        await Promise.all(promises);
+        await Promise.allSettled(promises);
+      }
+
+      for (let i = 0; i < updatedItems.length; i += chunkSize) {
+        const chunk = updatedItems.slice(i, i + chunkSize);
+
+        const promises = chunk.map(async (formPayload) => {
+          const uuid = chargeSummaryItems.find((i) => i.name === formPayload.name).uuid;
+          try {
+            await createBillableService({ uuid, ...formPayload });
+            successfulUpdatedItems++;
+          } catch (error) {
+            erroredPayloads.push(formPayload);
+          }
+        });
+
+        await Promise.allSettled(promises);
       }
 
       setIsImporting(false);
       closeModal();
-
-      if (erroredPayloads.length === 0 && correctRowsPayload.length >= 1) {
-        showSnackbar({
-          title: t('success', 'successfully'),
-          subtitle: t(
-            'successFullyUploadedItems',
-            `Successfully uploaded ${correctRowsPayload.length} billable service${
-              correctRowsPayload.length > 1 ? 's' : ''
-            }.`,
-          ),
-          kind: 'success',
-        });
-
-        mutate();
-        return;
-      }
 
       if (erroredPayloads.length) {
         createAndDownloadFailedUploadsExcelFile(erroredPayloads);
@@ -130,11 +126,34 @@ export const BulkImportBillableServices = ({ closeModal }) => {
           title: t('anErrorOccurred', 'anErrorOccurred'),
           subtitle: t(
             'anErrorOccurred',
-            `An error occurred uploading some items. A file has been downloaded with the failed services`,
+            `An error occurred uploading ${erroredPayloads.length} items. A file has been downloaded with the failed services`,
           ),
           kind: 'error',
         });
       }
+
+      if (successfulNewItems >= 1) {
+        showSnackbar({
+          title: t('success', 'successfully'),
+          subtitle: t(
+            'successFullyCreatedNewItems',
+            `Successfully uploaded ${successfulNewItems} new chargeitem${successfulNewItems > 1 ? 's' : ''}.`,
+          ),
+          kind: 'success',
+        });
+      }
+
+      if (successfulUpdatedItems >= 1) {
+        showSnackbar({
+          title: t('success', 'successfully'),
+          subtitle: t(
+            'successFullyUpdatedNewItems',
+            `Successfully updated ${successfulUpdatedItems} chargeitem${successfulUpdatedItems > 1 ? 's' : ''}.`,
+          ),
+          kind: 'success',
+        });
+      }
+      mutate();
     };
 
     reader.onerror = () => {

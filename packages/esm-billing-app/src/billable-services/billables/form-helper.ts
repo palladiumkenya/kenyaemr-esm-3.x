@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx';
-import { ExcelFileRow, PaymentMethod, ServiceType } from '../../types';
+import { ExcelFileRow, PaymentMethod, PaymentMode, ServiceType } from '../../types';
 import { ChargeAble } from './charge-summary.resource';
 import { BillableFormSchema, ServicePriceSchema } from './form-schemas';
 
@@ -140,52 +140,70 @@ export const getBulkUploadPayloadFromExcelFile = (
   const firstRowKeys = Object.keys(jsonData.at(0));
 
   if (
-    !firstRowKeys.includes('concept_id') ||
     !firstRowKeys.includes('name') ||
-    !firstRowKeys.includes('price') ||
-    !firstRowKeys.includes('disable') ||
+    !firstRowKeys.includes('short_name') ||
+    !firstRowKeys.includes('service_status') ||
     !firstRowKeys.includes('service_type_id') ||
-    !firstRowKeys.includes('short_name')
+    !firstRowKeys.includes('concept_id')
   ) {
     return 'INVALID_TEMPLATE';
   }
 
-  const rowsWithMissingCategories: Array<ExcelFileRow> = [];
+  const newChargeItems = [];
+  const updatedChargeItems = [];
 
-  const payload = jsonData
-    .filter((row) => {
-      if (row.service_type_id.toString().length > 1) {
-        return true;
-      } else {
-        rowsWithMissingCategories.push(row);
-        return false;
-      }
-    })
-    .filter(
-      (row) => !currentlyExistingBillableServices.some((item) => item.name.toLowerCase() === row.name.toLowerCase()),
-    )
-    .map((row) => {
+  for (const chargeItem of jsonData) {
+    const alreadyExists = !currentlyExistingBillableServices.some(
+      (item) => item.name.toLowerCase() === chargeItem.name.toLowerCase(),
+    );
+
+    if (alreadyExists) {
+      newChargeItems.push(chargeItem);
+    } else {
+      updatedChargeItems.push(chargeItem);
+    }
+  }
+
+  const constructPayload = (chargeItems: ExcelFileRow[]) => {
+    return chargeItems.map((row) => {
+      const servicePrices = paymentModes
+        .map((mode) => {
+          if (row[mode.name].toString().length > 1) {
+            return {
+              paymentMode: mode.uuid,
+              price: row[mode.name],
+              name: mode.name,
+            };
+          }
+        })
+        .filter((priceObj) => Boolean(priceObj));
+
       return {
         name: row.name,
         shortName: row.short_name ?? row.name,
-        serviceType: serviceTypes.find((type) => type.id === row.service_type_id).uuid,
-        servicePrices: [
-          {
-            paymentMode: paymentModes.find((mode) => mode.name === 'Cash').uuid,
-            price: row.price ?? 0,
-            name: 'Cash',
-          },
-        ],
-        serviceStatus: row.disable === 'false' ? 'DISABLED' : 'ENABLED',
+        serviceType: serviceTypes.find((type) => type.id === row.service_type_id)?.uuid ?? null,
+        servicePrices,
+        serviceStatus: row.service_status,
         concept: row.concept_id,
       };
     });
+  };
 
-  return [payload, rowsWithMissingCategories];
+  const newChargeItemsPayload = constructPayload(newChargeItems);
+  const updatedChargeItemsPayload = constructPayload(updatedChargeItems);
+
+  return [newChargeItemsPayload, updatedChargeItemsPayload];
 };
 
-export function createExcelTemplateFile(): Uint8Array {
-  const headers = ['name', 'short_name', 'service_status', 'service_type_id', 'concept_id', 'Cash'];
+export function createExcelTemplateFile(paymentModes: PaymentMode[]): Uint8Array {
+  const headers = [
+    'name',
+    'short_name',
+    'service_status',
+    'service_type_id',
+    'concept_id',
+    ...paymentModes.map((mode) => mode.name),
+  ];
 
   const worksheet = XLSX.utils.aoa_to_sheet([headers]);
   const workbook = XLSX.utils.book_new();
@@ -198,7 +216,11 @@ export function createExcelTemplateFile(): Uint8Array {
     { wch: 10 }, // service_status
     { wch: 20 }, // service_type_id
     { wch: 15 }, // concept_id
-    { wch: 10 }, // Cash
+    ...paymentModes.map(() => {
+      return {
+        wch: 10,
+      };
+    }),
   ];
   worksheet['!cols'] = colWidths;
 
@@ -207,8 +229,8 @@ export function createExcelTemplateFile(): Uint8Array {
   return new Uint8Array(excelBuffer);
 }
 
-export const downloadExcelTemplateFile = () => {
-  const excelBuffer = createExcelTemplateFile();
+export const downloadExcelTemplateFile = (paymentModes: PaymentMode[]) => {
+  const excelBuffer = createExcelTemplateFile(paymentModes);
   const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');

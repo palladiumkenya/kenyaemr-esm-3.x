@@ -23,6 +23,7 @@ import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } 
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePaymentModes } from '../../billing.resource';
 import { convertToCurrency } from '../../helpers';
 import { downloadChargeItems } from '../utils';
 import styles from './charge-summary-table.scss';
@@ -36,6 +37,7 @@ const ChargeSummaryTable: React.FC = () => {
   const layout = useLayoutType();
   const size = layout === 'tablet' ? 'lg' : 'md';
   const { isLoading, isValidating, error, mutate, chargeSummaryItems } = useChargeSummaries();
+  const { paymentModes } = usePaymentModes();
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [searchString, setSearchString] = useState('');
 
@@ -105,7 +107,7 @@ const ChargeSummaryTable: React.FC = () => {
   };
 
   const handleDownloadChargeItems = () => {
-    downloadChargeItems(chargeSummaryItems);
+    downloadChargeItems(chargeSummaryItems, paymentModes);
   };
 
   if (isLoading) {
@@ -155,7 +157,7 @@ const ChargeSummaryTable: React.FC = () => {
                   />
                   <MenuItem onClick={openBulkUploadModal} label={t('bulkUpload', 'Bulk Upload')} renderIcon={Upload} />
                   <MenuItem
-                    onClick={downloadExcelTemplateFile}
+                    onClick={() => downloadExcelTemplateFile(paymentModes)}
                     label={t('downloadUploadTemplate', 'Download upload template')}
                     renderIcon={DocumentDownload}
                   />

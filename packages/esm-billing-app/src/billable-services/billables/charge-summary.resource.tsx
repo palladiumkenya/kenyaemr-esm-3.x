@@ -1,5 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { PaymentMode } from '../../types';
 
 export type ChargeAble = {
   uuid: string;
@@ -16,6 +17,7 @@ export type ChargeAble = {
     uuid: string;
     name: string;
     price: number;
+    paymentMode: PaymentMode;
   }>;
   concept: {
     uuid: string;

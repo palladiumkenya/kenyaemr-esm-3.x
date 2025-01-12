@@ -471,12 +471,12 @@ export interface Link {
 }
 
 export type ExcelFileRow = {
-  concept_id: number;
   name: string;
-  price: number;
-  disable: 'false' | 'true';
-  service_type_id: number;
   short_name: string;
+  service_status: 'false' | 'true';
+  service_type_id: number;
+  concept_id: number;
+  [key: string]: string | number;
 };
 
 export type PaymentMode = {
