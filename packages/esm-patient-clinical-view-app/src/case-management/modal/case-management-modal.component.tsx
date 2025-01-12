@@ -44,7 +44,7 @@ const EndRelationshipModal: React.FC<EndRelationshipModalProps> = ({ closeModal,
       showSnackbar({
         kind: 'success',
         title: t('endRelationship', 'End relationship'),
-        subtitle: t('savedRlship', 'Relationship ended successfully'),
+        subtitle: t('savedRelationship', 'Relationship ended successfully'),
         timeoutInMs: 3000,
         isLowContrast: true,
       });
@@ -53,7 +53,7 @@ const EndRelationshipModal: React.FC<EndRelationshipModalProps> = ({ closeModal,
       showSnackbar({
         kind: 'error',
         title: t('relationshipError', 'Relationship Error'),
-        subtitle: t('RlshipErrorMessage', 'Request Failed'),
+        subtitle: t('relationshipErrorMessage', 'Request Failed'),
         timeoutInMs: 2500,
         isLowContrast: true,
       });
@@ -63,10 +63,10 @@ const EndRelationshipModal: React.FC<EndRelationshipModalProps> = ({ closeModal,
   return (
     <form onSubmit={handleSubmit(handleEndRelationship)}>
       <div className="cds--modal-header">
-        <h3 className="cds--modal-header__heading">{t('endRelationship', 'End Relationship')}</h3>
+        <h3 className="cds--modal-header__heading">{t('endRelationship', 'End relationship')}</h3>
       </div>
       <div className="cds--modal-content">
-        <p>{t('rlshipConfirmationText', 'This will end the relationship. Are you sure you want to proceed?')}</p>
+        <p>{t('relationshipConfirmationText', 'This will end the relationship. Are you sure you want to proceed?')}</p>
 
         <div className={styles.centeredContainer}>
           <Controller
