@@ -62,6 +62,7 @@
   "department": "Department",
   "descentOfHead": "Descent of Head",
   "disabilities": "Disabilities",
+  "discard": "Discard",
   "dischargeDate": "Discharge Date",
   "dischargeForm": "Discharge form",
   "dischargingDoctor": "Discharging Doctor",
@@ -130,7 +131,6 @@
   "neonatalSummary": "Neonatal Summary",
   "nextPage": "Next page",
   "nextVisitDate": "Next visit date",
-  "no": "No",
   "noContactToDisplay": "There is no contact data to display for this patient.",
   "noEncounters": "No encounters found",
   "noEncounterToDisplay": "There are no encounters to display for this patient.",
@@ -165,6 +165,7 @@
   "releaseBody": "Release Body",
   "reportingMonth": "Month",
   "reportingYear": "Year",
+  "save": "Save",
   "savedRelationship": "Relationship ended successfully",
   "sex": "Sex",
   "smoking": "Smoking",
@@ -194,6 +195,5 @@
   "viewBeds": "View beds",
   "viewEncounter": "View",
   "visitDate": "Screening Date",
-  "visitType": "Visit type",
-  "yes": "Yes"
+  "visitType": "Visit type"
 }
