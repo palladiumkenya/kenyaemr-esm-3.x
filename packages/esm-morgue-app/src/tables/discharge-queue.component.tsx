@@ -51,23 +51,31 @@ export const DischargedBodies: React.FC<DischargedProps> = ({ isLoading, decease
 
   const dischargedDeceased = deceasedPatients?.filter((patient) => patient?.status === 'discharged') || [];
 
-  const rows = dischargedDeceased.map((patient) => ({
-    id: patient.uuid,
-    name: (
-      <ConfigurableLink
-        style={{ textDecoration: 'none', maxWidth: '50%' }}
-        to={patientChartUrl}
-        templateParams={{ patientUuid: patient?.person?.uuid }}>
-        {patient.person.display?.toUpperCase()}
-      </ConfigurableLink>
-    ),
-    gender: patient.person.gender,
-    age: patient?.person?.age,
-    identifier: patient?.identifiers[0]?.identifier,
-    deathDate: new Date(patient.person.deathDate).toLocaleString(),
-    causeOfDeath: patient.person.causeOfDeath?.display,
-    status: <Tag type="magenta">{patient.status}</Tag>,
-  }));
+  const rows = dischargedDeceased.map((patient, index) => {
+    const openMrsId =
+      patient?.patient?.identifiers
+        ?.find((id) => id.display.startsWith('OpenMRS ID'))
+        ?.display.split('=')[1]
+        ?.trim() || '--';
+
+    return {
+      id: `${patient?.patient?.uuid}`,
+      name: (
+        <ConfigurableLink
+          style={{ textDecoration: 'none', maxWidth: '50%' }}
+          to={patientChartUrl}
+          templateParams={{ patientUuid: patient?.person?.uuid }}>
+          {patient?.person?.person?.display?.toUpperCase()}
+        </ConfigurableLink>
+      ),
+      gender: patient?.person?.person?.gender || '--',
+      age: patient?.person?.person?.age || '--',
+      identifier: openMrsId,
+      deathDate: formatDateTime(patient?.person?.person?.deathDate) || '--',
+      causeOfDeath: patient?.person?.person?.causeOfDeath?.display || '--',
+      status: <Tag type="magenta">{patient?.status || '--'}</Tag>,
+    };
+  });
 
   return <GenericTable rows={rows} headers={genericTableHeader} title={dischargedInLine} />;
 };

@@ -41,6 +41,10 @@ export interface DeceasedInfo {
   uuid: string;
   status?: string;
   display: string;
+  patient: {
+    uuid: string;
+    display: string;
+  };
   identifiers: Array<{
     identifier: string;
     uuid: string;

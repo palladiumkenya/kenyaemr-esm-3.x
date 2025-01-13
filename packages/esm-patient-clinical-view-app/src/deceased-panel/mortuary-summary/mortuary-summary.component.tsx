@@ -22,6 +22,8 @@ const MortuarySummary: React.FC = () => {
   const { person, isLoading } = usePerson(patientUuid);
   const { activeVisit, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
   const startDate = activeVisit?.startDatetime;
+  const compartment = activeVisit?.encounters[0]?.location?.display;
+
   if (isLoading || isActiveLoading) {
     return (
       <InlineLoading
@@ -55,7 +57,7 @@ const MortuarySummary: React.FC = () => {
           </div>
           <div className={styles.wrapMetrics}>
             <span className={styles.metricLabel}>{t('compartment', 'Compartment')}</span>
-            <span className={styles.metricValue}>C1</span>
+            <span className={styles.metricValue}>{compartment}</span>
           </div>
         </div>
       </div>

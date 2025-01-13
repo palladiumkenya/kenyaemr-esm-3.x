@@ -5,8 +5,7 @@ import { Visit } from '../../types';
 
 export const useActiveMorgueVisit = (uuid: string) => {
   const { morgueVisitTypeUuid } = useConfig<ConfigObject>();
-  const customRepresentation = `custom:(uuid,display,startDatetime,stopDatetime)`;
-  const url = `${restBaseUrl}/visit?v=${customRepresentation}&includeInactive=false&totalCount=true&visitType=${morgueVisitTypeUuid}&q=${uuid}`;
+  const url = `${restBaseUrl}/visit?v=full&includeInactive=false&totalCount=true&visitType=${morgueVisitTypeUuid}&q=${uuid}`;
 
   const { data, error, isLoading } = useSWR<FetchResponse<{ results: Visit[] }>>(url, openmrsFetch);
 

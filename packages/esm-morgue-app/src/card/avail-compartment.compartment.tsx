@@ -16,13 +16,10 @@ interface AvailableCompartmentProps {
 }
 
 const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
+  const patientUuid = patientInfo?.patient?.uuid;
   const { t } = useTranslation();
-  const { isLoading, error, person } = usePerson(patientInfo.uuid);
-  const {
-    data: activeDeceased,
-    error: isActiveError,
-    isLoading: isActiveLoading,
-  } = useActiveMorgueVisit(patientInfo?.uuid);
+  const { isLoading, error, person } = usePerson(patientInfo?.person?.uuid);
+  const { data: activeDeceased, error: isActiveError, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
 
   const startVisitDate = activeDeceased?.[0]?.startDatetime;
 
@@ -72,7 +69,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
         <span className={styles.viewDetails}>
           <ConfigurableLink
             className={styles.viewDetailsLink}
-            to={`\${openmrsSpaBase}/patient/${patientInfo.uuid}/chart/deceased-panel`}>
+            to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/deceased-panel`}>
             <View size={20} />
           </ConfigurableLink>
         </span>
