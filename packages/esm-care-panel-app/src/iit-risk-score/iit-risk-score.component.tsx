@@ -4,6 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePatientIITScore from '../hooks/usePatientIITScore';
 import styles from './iit-risk-score.scss';
+import dayjs from 'dayjs';
 
 interface CarePanellIITRiskScoreProps {
   patientUuid: string;
@@ -40,6 +41,10 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
     );
   }
 
+  const evaluationDate = dayjs(riskScore?.evaluationDate).isValid()
+    ? formatDate(parseDate(riskScore.evaluationDate))
+    : '--';
+
   if (error) {
     return <ErrorState error={error} headerTitle={t('iitRiscScore', 'IIT Risk Score')} />;
   }
@@ -53,7 +58,7 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
         </Column>
         <Column lg={4} md={4} sm={4} className={styles.riskScoreCardItem}>
           <strong>{t('evaluationDate', 'Evaluation Date')}:</strong>
-          <p>{formatDate(parseDate(riskScore?.evaluationDate))}</p>
+          <p>{evaluationDate}</p>
         </Column>
       </Row>
       <Row style={{ display: 'flex' }}>
