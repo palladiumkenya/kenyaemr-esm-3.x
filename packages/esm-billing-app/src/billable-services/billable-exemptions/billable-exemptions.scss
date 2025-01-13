@@ -16,7 +16,7 @@
   max-width: 100%;
 
   :global(.cds--tabs__nav-item--selected) {
-    border-bottom: 2px solid var(--cds-border-interactive, colors.$teal-70);
+    border-bottom: layout.$spacing-01 solid var(--cds-border-interactive, colors.$teal-70);
     outline: none !important;
   }
 }
@@ -57,16 +57,16 @@
 
 .heading {
   display: flex;
-  margin-right: 1rem;
+  margin-right: layout.$spacing-05;
   align-items: center;
 }
 .tabHeading {
   display: flex;
   align-items: center;
   @include type.type-style('heading-compact-01');
-  min-height: 2.5rem;
+  min-height: layout.$spacing-05;
   width: 100%;
-  padding: 0.75rem;
+  padding: layout.$spacing-04;
 }
 
 .topBtns {

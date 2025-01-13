@@ -551,19 +551,8 @@ export type FacilityClaim = {
 export type BillingPromptType = 'patient-chart' | 'billing-orders';
 
 export interface Schema {
-  services: {
-    all: Service[];
-    'program:HIV'?: Service[];
-    'program:TB'?: Service[];
-    'age<5'?: Service[];
-    'visitAttribute:prisoner'?: Service[];
-  };
+  services: Record<string, unknown>;
   commodities: Record<string, unknown>;
-}
-
-export interface Service {
-  concept: string;
-  description: string;
 }
 
 export type ServiceType = { uuid: string; display: string; id: number };
