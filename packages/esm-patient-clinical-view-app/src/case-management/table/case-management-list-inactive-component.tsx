@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -46,18 +46,27 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
     { key: 'status', header: t('status', 'Status') },
   ];
 
-  const filteredCases = inactiveCasesData?.data.results.filter(
-    (caseData) =>
-      caseData.endDate !== null &&
-      (extractNameString(caseData.personB.display).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
+  const filteredCases = useMemo(
+    () =>
+      inactiveCasesData?.data.results.filter(
+        (caseData) =>
+          caseData.endDate !== null &&
+          (extractNameString(caseData.personB.display).toLowerCase().includes(searchTerm.toLowerCase()) ||
+            caseData.personB.display.toLowerCase().includes(searchTerm.toLowerCase())),
+      ) || [],
+    [inactiveCasesData, searchTerm],
   );
 
-  const tableRows = filteredCases?.slice((currentPage - 1) * pageSize, currentPage * pageSize).map((caseData) => ({
+  const paginatedCases = useMemo(
+    () => filteredCases.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [filteredCases, currentPage, pageSize],
+  );
+
+  const tableRows = paginatedCases.map((caseData) => ({
     id: caseData.uuid,
     names: (
       <ConfigurableLink
-        style={{ textDecoration: 'none', maxWidth: '50%' }}
+        className={styles.configurableLink}
         to={patientChartUrl}
         templateParams={{ patientUuid: caseData.personB.uuid }}>
         {uppercaseText(extractNameString(caseData.personB.display))}
@@ -69,17 +78,18 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
       <Tag type="red" size="lg">
         {t('discontinued', 'Discontinued')}
       </Tag>
-    ) : null,
+    ) : (
+      '--'
+    ),
   }));
 
   useEffect(() => {
-    const count = filteredCases?.length || 0;
-    setInactiveCasesCount(count);
+    setInactiveCasesCount(filteredCases.length);
   }, [filteredCases, setInactiveCasesCount]);
 
   const headerTitle = `${t('inactiveCases', 'Inactive Cases')}`;
 
-  if (filteredCases?.length === 0) {
+  if (!filteredCases.length) {
     return (
       <Layer>
         <Tile className={styles.tile}>
@@ -97,7 +107,7 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
 
   return (
     <div className={styles.widgetContainer}>
-      <CardHeader title={headerTitle} children={''}></CardHeader>
+      <CardHeader title={headerTitle} children={''} />
       <Search
         labelText=""
         placeholder={t('filterTable', 'Filter table')}
@@ -107,7 +117,7 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
       <DataTable
         useZebraStyles
         size="sm"
-        rows={tableRows || []}
+        rows={tableRows}
         headers={headers}
         render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()}>
@@ -138,7 +148,7 @@ const CaseManagementListInActive: React.FC<CaseManagementListInActiveProps> = ({
         page={currentPage}
         pageSize={pageSize}
         pageSizes={[5, 10, 15]}
-        totalItems={filteredCases?.length || 0}
+        totalItems={filteredCases.length}
         onChange={({ page, pageSize }) => {
           setCurrentPage(page);
           setPageSize(pageSize);

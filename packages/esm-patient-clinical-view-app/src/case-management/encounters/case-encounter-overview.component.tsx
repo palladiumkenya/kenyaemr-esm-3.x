@@ -68,7 +68,7 @@ const CaseEncounterHeader = ({ patientUuid, mutate, onFilterChange }: CaseEncoun
             id="serviceFilter"
             initialSelectedItem={{ text: t('all', 'All'), filterUuid: '' }}
             label=""
-            titleText={t('filterByForm', 'Filter by formz') + ':'}
+            titleText={t('filterByForm', 'Filter by form') + ':'}
             type="inline"
             items={[{ text: t('all', 'All'), filterUuid: '' }, ...items]}
             itemToString={(item) => (item ? item.text : '')}

@@ -1,0 +1,54 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.formContainer {
+  width: 100%;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.formButton {
+  height: layout.$spacing-09;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: layout.$spacing-11;
+  margin-bottom: layout.$spacing-05;
+}
+
+.buttonSet {
+  position: absolute;
+  bottom: layout.$spacing-05;
+  left: 4%;
+  width: 80%;
+  display: flex;
+  gap: layout.$spacing-02;
+
+  & > button {
+    max-width: 40%;
+    width: 40%;
+  }
+}
+.formAdmissionDatepicker input {
+  min-width: 25rem;
+}
+.formAdmissionTimepicker input {
+  min-width: 12rem;
+}
+.dateTimeSection {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-02;
+  align-items: center;
+  margin-top: layout.$spacing-04;
+}
+.confirmationText {
+  margin-bottom: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
+}
+.dateTimePickerContainer {
+  margin-left: layout.$spacing-04;
+}

@@ -55,7 +55,7 @@ import RelationshipUpdateForm from './relationships/forms/relationships-update-f
 import DeleteRelationshipConfirmDialog from './relationships/modals/delete-relationship-dialog.modal';
 import DeceasedDetailsView from './deceased-panel/tabs/tabs.component';
 import DeceasedPanelDashboardLink from './deceased-panel/dashboard-link/dashboard-link.component';
-import EndRelationshipModal from './case-management/modal/case-management-modal.component';
+import EndRelationshipWorkspace from './case-management/workspace/case-management-workspace.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -156,7 +156,7 @@ export const inPatientChartDashboard = getSyncLifecycle(InPatient, options);
 export const peerCalendarFormEntry = getSyncLifecycle(FormEntryWorkspace, options);
 
 // Case management modal
-export const endRelationshipModal = getSyncLifecycle(EndRelationshipModal, options);
+export const endRelationshipWorkspace = getSyncLifecycle(EndRelationshipWorkspace, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
