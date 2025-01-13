@@ -59,13 +59,13 @@ export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedP
 
     return {
       id: `${patient?.patient?.uuid}`,
-      name: toUpperCase(patient?.person?.person?.display || t('unknownName', '--')),
-      gender: patient?.person?.person?.gender || t('unknownGender', '--'),
-      age: patient?.person?.person?.age || t('unknownAge', '--'),
+      name: toUpperCase(patient?.person?.person?.display || '--'),
+      gender: patient?.person?.person?.gender || '--',
+      age: patient?.person?.person?.age || '--',
       identifier: openMrsId,
-      deathDate: formatDateTime(patient?.person?.person?.deathDate) || t('nullDate', '--'),
-      causeOfDeath: patient?.person?.person?.causeOfDeath?.display || t('unknownCause', '--'),
-      status: <Tag type="magenta">{patient?.status || t('unknownStatus', '--')}</Tag>,
+      deathDate: formatDateTime(patient?.person?.person?.deathDate) || '--',
+      causeOfDeath: patient?.person?.person?.causeOfDeath?.display || '--',
+      status: <Tag type="magenta">{patient?.status || '--'}</Tag>,
     };
   });
 
@@ -79,7 +79,10 @@ export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedP
   const actionColumn = (row) => {
     return (
       <OverflowMenu size="sm" flipped>
-        <OverflowMenuItem itemText={t('admit', 'Admit')} onClick={() => handleAdmissionForm(row.id)} />
+        <OverflowMenuItem
+          itemText={t('admitToMorgue', 'Admit to morgue')}
+          onClick={() => handleAdmissionForm(row.id)}
+        />
       </OverflowMenu>
     );
   };

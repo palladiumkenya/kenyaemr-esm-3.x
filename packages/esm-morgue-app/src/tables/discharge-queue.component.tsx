@@ -56,7 +56,7 @@ export const DischargedBodies: React.FC<DischargedProps> = ({ isLoading, decease
       patient?.patient?.identifiers
         ?.find((id) => id.display.startsWith('OpenMRS ID'))
         ?.display.split('=')[1]
-        ?.trim() || t('missingIdentifier', '--');
+        ?.trim() || '--';
 
     return {
       id: `${patient?.patient?.uuid}`,
@@ -68,12 +68,12 @@ export const DischargedBodies: React.FC<DischargedProps> = ({ isLoading, decease
           {patient?.person?.person?.display?.toUpperCase()}
         </ConfigurableLink>
       ),
-      gender: patient?.person?.person?.gender || t('unknownGender', '--'),
-      age: patient?.person?.person?.age || t('unknownAge', '--'),
+      gender: patient?.person?.person?.gender || '--',
+      age: patient?.person?.person?.age || '--',
       identifier: openMrsId,
-      deathDate: formatDateTime(patient?.person?.person?.deathDate) || t('nullDate', '--'),
-      causeOfDeath: patient?.person?.person?.causeOfDeath?.display || t('unknownCause', '--'),
-      status: <Tag type="magenta">{patient?.status || t('unknownStatus', '--')}</Tag>,
+      deathDate: formatDateTime(patient?.person?.person?.deathDate) || '--',
+      causeOfDeath: patient?.person?.person?.causeOfDeath?.display || '--',
+      status: <Tag type="magenta">{patient?.status || '--'}</Tag>,
     };
   });
 
