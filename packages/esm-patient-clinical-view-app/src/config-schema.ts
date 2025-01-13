@@ -44,7 +44,7 @@ export const configSchema = {
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
       clinicalEncounterFormUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
-      autopsyFormUuid: '62d2c083-70af-4403-a5c4-6147507e1528',
+      autopsyFormUuid: '523c711f-f3ef-4723-b4dc-89efa572153f',
     },
   },
   defaulterTracingEncounterUuid: {
@@ -253,12 +253,12 @@ export const configSchema = {
   morgueVisitTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue visit',
-    _default: '6307dbe2-f336-4c11-a393-50c2769f455a',
+    _default: '02b67c47-6071-4091-953d-ad21452e830c',
   },
   morgueDischargeEncounterUuid: {
     _type: Type.String,
     _description: ' UUID for morgue discharge encounter uuid',
-    _default: 'd618f40b-b5a3-4f17-81c8-2f04e2aad58e',
+    _default: '3d618f40b-b5a3-4f17-81c8-2f04e2aad58e',
   },
   inPatientForms: {
     _type: Type.Array,

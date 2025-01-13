@@ -26,6 +26,7 @@
   "procedure": "Procedure",
   "recreated": "recreated",
   "recreateDatatools": "Recreate datatools",
+  "recreateFacilityWideTables": "Recreate facility wide tables",
   "recreateTables": "Recreate tables",
   "refreshDwapi": "Refresh DWAPI tables",
   "refreshed": "refreshed",
