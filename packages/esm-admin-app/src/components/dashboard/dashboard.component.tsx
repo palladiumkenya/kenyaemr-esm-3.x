@@ -3,7 +3,13 @@ import Header from '../header/header.component';
 import { useTranslation } from 'react-i18next';
 import { Layer, ComboButton, MenuItem, InlineLoading } from '@carbon/react';
 import styles from './dashboard.scss';
-import { recreateTables, refreshTables, recreateDatatools, refreshDwapi } from '../logs-table/operation-log-resource';
+import {
+  recreateTables,
+  refreshTables,
+  recreateDatatools,
+  refreshDwapi,
+  recreateFacilityWideTables,
+} from '../logs-table/operation-log-resource';
 import LogTable from '../logs-table/operation-log-table.component';
 import { showModal, showSnackbar } from '@openmrs/esm-framework';
 
@@ -91,6 +97,10 @@ const Dashboard: React.FC = () => {
               onClick={() => openConfirmationModal(refreshTables, t('refreshTables', 'Refresh tables'), false)}
             />
             <MenuItem
+              label={t('refreshDwapi', 'Refresh DWAPI tables')}
+              onClick={() => openConfirmationModal(refreshDwapi, t('refreshDwapi', 'Refresh DWAPI tables'), false)}
+            />
+            <MenuItem
               label={t('recreateTables', 'Recreate tables')}
               onClick={() => openConfirmationModal(recreateTables, t('recreateTables', 'Recreate tables'), true)}
             />
@@ -99,10 +109,16 @@ const Dashboard: React.FC = () => {
               onClick={() =>
                 openConfirmationModal(recreateDatatools, t('recreateDatatools', 'Recreate datatools'), true)
               }
-            />
+            />{' '}
             <MenuItem
-              label={t('refreshDwapi', 'Refresh DWAPI tables')}
-              onClick={() => openConfirmationModal(refreshDwapi, t('refreshDwapi', 'Refresh DWAPI tables'), false)}
+              label={t('recreateFacilityWideTables', 'Recreate facility wide tables')}
+              onClick={() =>
+                openConfirmationModal(
+                  recreateFacilityWideTables,
+                  t('recreateFacilityWideTables', 'Recreate facility wide tables'),
+                  true,
+                )
+              }
             />
           </ComboButton>
         )}

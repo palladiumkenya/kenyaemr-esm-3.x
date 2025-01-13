@@ -40,8 +40,8 @@ const LogTable: React.FC<LogTableProps> = ({ logData, isLoading }) => {
   const rows = logData?.map((item, index) => ({
     id: index.toString(),
     script_name: item.script_name,
-    start_time: formatDate(new Date(item.start_time)),
-    stop_time: formatDate(new Date(item.stop_time)),
+    start_time: item?.start_time ? formatDate(new Date(item?.start_time)) : '--',
+    stop_time: item?.stop_time ? formatDate(new Date(item?.stop_time)) : '--',
     status: item.status,
   }));
 
