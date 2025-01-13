@@ -101,10 +101,10 @@ export const useModuleLinks = () => {
       privilege: 'o3: View Bed Management Dashboard',
     },
     {
-      label: 'ETL Administration',
+      label: 'Administration',
       url: `${openmrsSpaBase}admin`,
-      icon: <IbmCloudant size={24} />,
-      privilege: 'o3: View ETL Administration Dashboard',
+      icon: <User size={24} />,
+      privilage: 'o3: View Administration Dashboard',
     },
     {
       label: 'Cross Border',
