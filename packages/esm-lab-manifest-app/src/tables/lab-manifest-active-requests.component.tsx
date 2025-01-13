@@ -20,6 +20,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useActiveRequests from '../hooks/useActiveRequests';
 import styles from './lab-manifest-table.scss';
+import PatientCCCNumbercell from './patient-ccc-no-cell.component';
 
 interface LabManifestActiveRequestsProps {
   manifestUuid: string;
@@ -66,22 +67,14 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
   ) => {
     if (selected.length > 0) {
       const orders = request.Orders.filter((order) => selected.some((o) => o.order.uuid === order.orderUuid));
-      if (orders.every((order) => order.cccKdod)) {
-        const dispose = showModal('lab-manifest-order-modal-form', {
-          onClose: () => dispose(),
-          props: {
-            title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
-            selectedOrders: selected,
-            orders,
-          },
-        });
-      } else {
-        showNotification({
-          title: 'Failed to add samples to manifest',
-          kind: 'error',
-          description: 'All patients must have CCC/KDOD Number',
-        });
-      }
+      const dispose = showModal('lab-manifest-order-modal-form', {
+        onClose: () => dispose(),
+        props: {
+          title: selected.length > 1 ? 'Add Multiple Orders To Manifest' : undefined,
+          selectedOrders: selected,
+          orders,
+        },
+      });
     }
   };
 
@@ -100,7 +93,13 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
         ) : (
           '--'
         ),
-        cccKdod: activeRequest.cccKdod ?? '--',
+        cccKdod: activeRequest.cccKdod?.trim()?.replaceAll(' ', '') ? (
+          activeRequest.cccKdod
+        ) : activeRequest?.patientUuid ? (
+          <PatientCCCNumbercell patientUuid={activeRequest?.patientUuid} />
+        ) : (
+          '--'
+        ),
         dateRequested: activeRequest.dateRequested,
         actions: (
           <Button

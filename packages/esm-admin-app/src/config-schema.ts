@@ -59,3 +59,42 @@ export interface UserRoleSchema {
   description: string;
   category: string;
 }
+
+export interface Provider {
+  uuid?: string;
+  identifier?: string;
+  retired: boolean;
+  attributes?: Array<Attribute>;
+}
+
+export interface ProviderAttributes {
+  uuid?: string;
+  identifier?: string;
+  retired: boolean;
+  attributes?: Array<AttributeItems>;
+}
+
+export interface AttributeItems {
+  attributeType?: AttributeType;
+  value?: any;
+}
+
+export interface AttributeType {
+  uuid?: string;
+  description?: string;
+  display?: string;
+  name?: string;
+}
+
+export interface AttributeValue {
+  name?: string;
+  uuid?: string;
+}
+
+export interface ProviderLocation {
+  uuid: string;
+  name?: string;
+  description?: string;
+  retired: boolean;
+  attributes?: Array<AttributeItems>;
+}

@@ -102,9 +102,20 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
           await removeSampleFromTheManifest(sampleUUid);
           mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
           dispose();
-          showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Sample removed from manifest successfully!' });
-        } catch (e) {
-          showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error removing sample from the manifest' });
+          showSnackbar({
+            title: 'Success',
+            kind: 'success',
+            subtitle: t('sampleRemoveSuccess', 'Sample removed from manifest successfully!'),
+          });
+        } catch (e: any) {
+          const _sample = samples.find((sample) => sample.uuid === sampleUUid);
+          showSnackbar({
+            title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
+              sample: _sample.id ?? _sample?.uuid,
+            }),
+            kind: 'error',
+            subtitle: `${e?.responseBody?.error?.message ?? e?.message} `,
+          });
         }
       },
     });
@@ -117,10 +128,30 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         samples: selected,
         onDelete: async () => {
           try {
-            const deleteMany = await Promise.allSettled(selected.map(({ uuid }) => removeSampleFromTheManifest(uuid)));
+            const samplesDeletionAsyncTasks = await Promise.allSettled(
+              selected.map(({ uuid }) => removeSampleFromTheManifest(uuid)),
+            );
             mutateManifestLinks(manifest?.uuid, manifest?.manifestStatus);
             dispose();
-            showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Sample removed from manifest successfully!' });
+            samplesDeletionAsyncTasks.forEach((task, index) => {
+              const _sample = selected[index];
+
+              if (task.status === 'rejected') {
+                showSnackbar({
+                  title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
+                    sample: _sample.id ?? _sample.uuid,
+                  }),
+                  kind: 'error',
+                  subtitle: `${task.reason?.responseBody?.error?.message ?? task.reason?.message} `,
+                });
+              } else {
+                showSnackbar({
+                  title: 'Success',
+                  kind: 'success',
+                  subtitle: 'Sample removed from manifest successfully!',
+                });
+              }
+            });
           } catch (e) {
             showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error removing sample from the manifest' });
           }
