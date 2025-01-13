@@ -32,3 +32,10 @@ export const refreshDwapi = async () => {
   }>(url);
   return response.data.data;
 };
+export const recreateFacilityWideTables = async () => {
+  const url = `${restBaseUrl}/kemrchart/recreateFacilitywideTables`;
+  const response = await openmrsFetch<{
+    data: Array<ETLResponse>;
+  }>(url);
+  return response.data.data;
+};
