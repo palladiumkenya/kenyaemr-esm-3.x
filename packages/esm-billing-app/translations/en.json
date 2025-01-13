@@ -70,7 +70,7 @@
   "claimSummary": "Claim Summary",
   "clear": "Clear",
   "clearSearch": "Clear search input",
-  "clockInTime": "Clocked in on {{clockInDateTime}}",
+  "clockInTime": "Clocked in on {{clockInDate}}",
   "close": "Close",
   "create": "Create",
   "createClaimError": "Create Claim error",

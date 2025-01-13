@@ -32,8 +32,8 @@ export const ClockOutStrip = () => {
       <div className={styles.clockOutInfo}>
         <Alarm />
         <p className={styles.clockInTime}>
-          {t('clockInTime', `Clocked in on {{clockInDateTime}}`, {
-            clockInDateTime: dayjs(globalActiveSheet.clockIn).format('D MMM YYYY, HH:mm A'),
+          {t('clockInTime', 'Clocked in on {{clockInDate}}', {
+            clockInDate: dayjs(globalActiveSheet.clockIn).format('D MMM YYYY, HH:mm A'),
           })}
         </p>
         <span className={styles.middot}>&middot;</span>

@@ -5,13 +5,18 @@ import styles from './case-management-tabs.scss';
 import CaseManagementListActive from '../table/case-management-list-active-component';
 import CaseManagementListInActive from '../table/case-management-list-inactive-component';
 
-const CaseManagementTabs: React.FC = () => {
+interface CaseManagementTabsProps {
+  setActiveTabIndex: (index: number) => void;
+}
+
+const CaseManagementTabs: React.FC<CaseManagementTabsProps> = ({ setActiveTabIndex }) => {
   const { t } = useTranslation();
-  const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
+  const [activeTabIndex, setLocalActiveTabIndex] = useState<number>(0);
   const [activeCasesCount, setActiveCasesCount] = useState<number>(0);
   const [inactiveCasesCount, setInactiveCasesCount] = useState<number>(0);
 
   const handleTabChange = ({ selectedIndex }: { selectedIndex: number }) => {
+    setLocalActiveTabIndex(selectedIndex);
     setActiveTabIndex(selectedIndex);
   };
 
@@ -30,7 +35,7 @@ const CaseManagementTabs: React.FC = () => {
         </div>
         <TabPanels>
           <TabPanel className={styles.tabPanel}>
-            <CaseManagementListActive setActiveCasesCount={setActiveCasesCount} />
+            <CaseManagementListActive setActiveCasesCount={setActiveCasesCount} activeTabIndex={activeTabIndex} />
           </TabPanel>
           <TabPanel className={styles.tabPanel}>
             <CaseManagementListInActive setInactiveCasesCount={setInactiveCasesCount} />
