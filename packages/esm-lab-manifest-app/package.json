@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-lab-manifest-app",
-  "version": "5.3.9",
+  "version": "5.4.0",
   "description": "lab-manifest app for KenyaEMR",
   "browser": "dist/kenyaemr-esm-lab-manifest-app.js",
   "main": "src/index.ts",

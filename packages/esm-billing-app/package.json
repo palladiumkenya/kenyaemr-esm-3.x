@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-billing-app",
-  "version": "5.3.9",
+  "version": "5.4.0",
   "description": "Billing app for KenyaEMR",
   "browser": "dist/kenyaemr-esm-billing-app.js",
   "main": "src/index.ts",
