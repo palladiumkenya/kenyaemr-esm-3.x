@@ -317,6 +317,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               <Layer className={styles.input}>
                 <PackageInterventions
                   category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
+                  patientUuid={patientUuid}
                 />
               </Layer>
             </Column>
