@@ -200,7 +200,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       </Layer>
     );
   }
-
   return (
     <FormProvider {...form}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -333,7 +332,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                     invalid={form.formState.errors[field.name]?.message}
                     invalidText={form.formState.errors[field.name]?.message}
                     id="diagnoses"
-                    titleText={t('diagnosis', 'Diagnosis')}
+                    titleText={t('finalDiagnosis', 'Final Diagnosis')}
                     selectedItems={field.value}
                     label="Choose option"
                     items={diagnoses.map((r) => r.id)}
