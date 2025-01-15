@@ -1,6 +1,6 @@
 import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { SHAIntervension } from '../types';
+import { SHAIntervention } from '../types';
 
 export const useInterventions = (code: string) => {
   const fetcher = (url: string) => {
@@ -35,7 +35,7 @@ export const useInterventions = (code: string) => {
           interventionCode,
           subCategoryBenefitsPackage: interventionSubPackage,
           interventionName,
-        } as SHAIntervension),
+        } as SHAIntervention),
     ),
     error,
   };

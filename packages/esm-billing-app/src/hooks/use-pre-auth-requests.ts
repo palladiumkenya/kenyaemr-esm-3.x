@@ -195,7 +195,19 @@ export const usePreAuthRequests = () => {
   const { hieBaseUrl } = useConfig<BillingConfig>();
   const url = `${hieBaseUrl}/claim/byFacility?facilityCode=Organization/${mflCodeValue}&type=preauthorization&claimResponseId=`;
 
-  const { data, error, isLoading, mutate } = useSWR<{ data: Array<PreAuthRequest> }>(url, openmrsFetch);
+  const { data, error, isLoading, mutate } = useSWR<{ data: Array<PreAuthRequest> }>(
+    url,
+    () =>
+      new Promise<{ data: Array<PreAuthRequest> }>((resolve) =>
+        setTimeout(
+          () =>
+            resolve({
+              data: preAuthRequests as any,
+            }),
+          3000,
+        ),
+      ),
+  );
 
   return {
     preAuthRequests: (data?.data?.length ? data?.data : preAuthRequests).map((r) => {

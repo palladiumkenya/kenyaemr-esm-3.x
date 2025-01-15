@@ -8,10 +8,10 @@ import { eligibilityRequestShema } from '../benefits-package.resources';
 
 type EligibilityRequest = z.infer<typeof eligibilityRequestShema>;
 
-type PackageIntervensionsProps = {
+type PackageInterventionsProps = {
   category: string;
 };
-const PackageIntervensions: React.FC<PackageIntervensionsProps> = ({ category }) => {
+const PackageInterventions: React.FC<PackageInterventionsProps> = ({ category }) => {
   const { error, interventions, isLoading } = useInterventions(category);
   const form = useFormContext<EligibilityRequest>();
   const { t } = useTranslation();
@@ -21,7 +21,13 @@ const PackageIntervensions: React.FC<PackageIntervensionsProps> = ({ category })
   }, [category]);
 
   if (isLoading) {
-    return <InlineLoading status="active" iconDescription="Loading" description="Loading intervensions..." />;
+    return (
+      <InlineLoading
+        status="active"
+        iconDescription="Loading"
+        description={t('loadingInterventions', 'Loading interventions') + '...'}
+      />
+    );
   }
 
   if (error) {
@@ -31,7 +37,7 @@ const PackageIntervensions: React.FC<PackageIntervensionsProps> = ({ category })
         kind="error"
         lowContrast={true}
         statusIconDescription="notification"
-        title={t('failure', 'Error loading intervensions')}
+        title={t('failure', 'Error loading interventions')}
       />
     );
   }
@@ -60,4 +66,4 @@ const PackageIntervensions: React.FC<PackageIntervensionsProps> = ({ category })
   );
 };
 
-export default PackageIntervensions;
+export default PackageInterventions;

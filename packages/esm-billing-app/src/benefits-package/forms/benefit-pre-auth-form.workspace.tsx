@@ -28,7 +28,7 @@ import useProvider from '../../hooks/useProvider';
 import { PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-pre-auth-form.scss';
-import PackageIntervensions from './package-intervensions.component';
+import PackageInterventions from './package-interventions.component';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
@@ -240,7 +240,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
           </Column>
           {selectedPackageObservable && (
             <Column>
-              <PackageIntervensions
+              <PackageInterventions
                 category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
               />
             </Column>
@@ -255,7 +255,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
                   invalid={form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   id="diagnoses"
-                  titleText={t('diagnosis', 'Diagnosis')}
+                  titleText={t('finalDiagnosis', 'Final Diagnosis')}
                   selectedItems={field.value}
                   label="Choose option"
                   items={diagnoses.map((r) => r.id)}
@@ -279,7 +279,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button className={styles.button} kind="primary" type="submit">
+          <Button className={styles.button} kind="primary" type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loading className={styles.button_spinner} withOverlay={false} small /> {t('submitting', 'Submitting')}
