@@ -57,15 +57,11 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
     resolver: zodResolver(schema),
   });
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isValid },
-  } = form;
+  const { control, handleSubmit } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      await saveRelationship(data, config, session, []);
+      await saveRelationship({ ...data, ...({ notes: undefined } as any) }, config, session, []);
       closeWorkspace();
     } catch (error) {}
   };
@@ -87,6 +83,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
                   id="startDate"
                   datePickerType="single"
                   {...field}
+                  ref={undefined}
                   invalid={form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}>
                   <DatePickerInput
@@ -111,6 +108,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
                   id="endDate"
                   datePickerType="single"
                   {...field}
+                  ref={undefined}
                   invalid={form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}>
                   <DatePickerInput
@@ -162,11 +160,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button
-            className={styles.button}
-            kind="primary"
-            type="submit"
-            disabled={!isValid || form.formState.isSubmitting}>
+          <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>
             {t('save', 'Save')}
           </Button>
         </ButtonSet>
