@@ -165,8 +165,7 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
                     legendText={t('sex', 'Sex')}
                     {...field}
                     invalid={error?.message}
-                    invalidText={error?.message}
-                    className={styles.billingItem}>
+                    invalidText={error?.message}>
                     <RadioButton labelText={t('male', 'Male')} value="M" id="M" />
                     <RadioButton labelText={t('female', 'Female')} value="F" id="F" />
                   </RadioButtonGroup>

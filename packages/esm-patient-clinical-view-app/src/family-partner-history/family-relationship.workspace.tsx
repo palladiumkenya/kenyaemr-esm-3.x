@@ -62,7 +62,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      await saveRelationship({ ...data, ...({ notes: undefined } as any) }, config, session, []); /// Remove notes from payload since endpoint doesnt espect it avoid 400 error
+      await saveRelationship({ ...data, ...({ notes: undefined } as any) }, config, session, []); /// Remove notes from payload since endpoint doesn't expect it to avoid 400 error
       closeWorkspace();
     } catch (error) {}
   };

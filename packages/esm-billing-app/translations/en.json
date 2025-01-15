@@ -120,7 +120,6 @@
   "errorOnLine": "Error on line",
   "errorRetrievingHIESubscription": "Error retrieving HIE subscription",
   "exemptionCategory": "Exemption category",
-  "exemptionSchema": "Exemption Schema",
   "facility": "Facility",
   "failedBillPayment": "Bill payment failed",
   "failure": "Error loading intervensions",
