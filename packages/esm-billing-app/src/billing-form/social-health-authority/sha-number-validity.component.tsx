@@ -20,33 +20,16 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
   const { patient, isLoading } = usePatient(patientUuid);
   const { watch } = useFormContext();
   const isSHA = watch('insuranceScheme')?.includes('SHA');
-  const { data, isLoading: isLoadingHIEEligibility, error } = useHIEEligibility(patientUuid);
-
   const shaIdentificationNumber = patient?.identifier
     ?.filter((identifier) => identifier)
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === shaIdentificationNumberUUID));
+
+  const { data, isLoading: isLoadingHIEEligibility, error } = useHIEEligibility(patientUuid, shaIdentificationNumber);
 
   const isHIEEligible = true;
 
   if (!isSHA) {
     return null;
-  }
-
-  if (isLoadingHIEEligibility || isLoading) {
-    return <InlineLoading status="active" description={t('loading', 'Loading ...')} />;
-  }
-
-  if (error) {
-    return (
-      <InlineNotification
-        aria-label="closes notification"
-        kind="error"
-        lowContrast={true}
-        statusIconDescription="notification"
-        title={t('error', 'Error')}
-        subtitle={t('errorRetrievingHIESubscription', 'Error retrieving HIE subscription')}
-      />
-    );
   }
 
   if (shaIdentificationNumber?.length === 0) {
@@ -64,6 +47,23 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
         onActionButtonClick={() => {
           navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
         }}
+      />
+    );
+  }
+
+  if (isLoadingHIEEligibility || isLoading) {
+    return <InlineLoading status="active" description={t('loading', 'Loading ...')} />;
+  }
+
+  if (error) {
+    return (
+      <InlineNotification
+        aria-label="closes notification"
+        kind="error"
+        lowContrast={true}
+        statusIconDescription="notification"
+        title={t('error', 'Error')}
+        subtitle={t('errorRetrievingHIESubscription', 'Error retrieving HIE subscription')}
       />
     );
   }

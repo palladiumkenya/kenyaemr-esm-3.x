@@ -11,7 +11,7 @@ type HIEEligibilityResponse = {
   eligibility_response: EligibilityResponse;
 };
 
-export const useHIEEligibility = (patientUuid: string) => {
+export const useHIEEligibility = (patientUuid: string, shaIdentificationNumber?: fhir.Identifier[]) => {
   const { patient } = usePatient(patientUuid);
   const { nationalIdUUID } = useConfig<BillingConfig>();
 
@@ -20,7 +20,9 @@ export const useHIEEligibility = (patientUuid: string) => {
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === nationalIdUUID))
     ?.at(0)?.value;
 
-  const url = `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?patientUuid=${patientUuid}&nationalId=${nationalId}`;
+  const url = shaIdentificationNumber
+    ? `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?patientUuid=${patientUuid}&nationalId=${nationalId}`
+    : undefined; // this is to avoid making the request if the patient does not have a SHA Id.
   const { data, error, isLoading, mutate } = useSWR<{ data: Array<HIEEligibilityResponse> }>(url, openmrsFetch, {
     errorRetryCount: 0,
   });
