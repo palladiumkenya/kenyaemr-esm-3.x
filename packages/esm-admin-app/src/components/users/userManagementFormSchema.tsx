@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
+import { optional, z } from 'zod';
 
 const UserManagementFormSchema = () => {
   const { t } = useTranslation();
@@ -34,6 +34,27 @@ const UserManagementFormSchema = () => {
     primaryFacility: z.string().optional(),
     providerLicense: z.string().optional(),
     licenseExpiryDate: z.string().optional(),
+    permanent: z.boolean().optional(),
+    enabled: z.boolean().optional(),
+    stockOperation: z
+      .array(
+        z.object({
+          operationTypeName: z.string().optional(),
+          operationTypeUuid: z.string().optional(),
+        }),
+      )
+      .optional(),
+    operationLocation: z
+      .array(
+        z.object({
+          locationName: z.string().optional(),
+          locationUuid: z.string().optional(),
+        }),
+      )
+      .optional(),
+
+    activeTo: z.string().optional(),
+    activeFrom: z.string().optional(),
   });
 
   return { userManagementFormSchema };
