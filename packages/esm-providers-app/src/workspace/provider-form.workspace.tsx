@@ -230,14 +230,14 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             attributeType: licenseBodyUuid,
             value: data.registrationNumber,
           },
-          ...(healthWorker
-            ? [
-                {
-                  attributeType: providerHieFhirReference,
-                  value: JSON.stringify(healthWorker),
-                },
-              ]
-            : []), // Include the healthWorker attribute only if it exists
+          // ...(healthWorker
+          //   ? [
+          //       {
+          //         attributeType: providerHieFhirReference,
+          //         value: JSON.stringify(healthWorker),
+          //       },
+          //     ]
+          //   : []),
         ],
         retired: false,
       };
