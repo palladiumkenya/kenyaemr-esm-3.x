@@ -55,6 +55,7 @@ import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatForDatePicker, to
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
+  model?: UserRoleScope;
 };
 
 const MinDate: Date = today();
