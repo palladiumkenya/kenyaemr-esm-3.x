@@ -3,7 +3,7 @@ import { Tile, Grid, Column, Layer, InlineLoading, Button } from '@carbon/react'
 import { useFacilityInfo } from '../hook/useFacilityInfo';
 import styles from './facility-info.scss';
 import { useTranslation } from 'react-i18next';
-import { showSnackbar } from '@openmrs/esm-framework';
+import { showNotification, showSnackbar } from '@openmrs/esm-framework';
 import { FacilityData } from '../../types';
 const FacilityInfo: React.FC = () => {
   const { t } = useTranslation();
@@ -12,6 +12,9 @@ const FacilityInfo: React.FC = () => {
   const [facilityData, setFacilityData] = useState<FacilityData>(defaultFacility);
   useEffect(() => {
     setFacilityData(defaultFacility);
+    if (defaultFacility?.operationalStatus !== 'Operational') {
+      showNotification({ kind: 'error', title: 'Error', description: 'The facility SHA status is is not operational' });
+    }
   }, [defaultFacility]);
 
   const synchronizeFacilityData = async () => {
