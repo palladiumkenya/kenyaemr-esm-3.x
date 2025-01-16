@@ -2,7 +2,41 @@ import { openmrsFetch, restBaseUrl, useConfig, usePatient } from '@openmrs/esm-f
 import useSWR from 'swr';
 import { BillingConfig } from '../config-schema';
 
-type EligibilityResponse = { message: { eligible: 0 | 1; possible_solution: string; reason: string } };
+export interface EligibilityResponse {
+  requestIdType: number;
+  requestIdNumber: string;
+  memberCrNumber: string;
+  fullName: string;
+  memberType: string;
+  coverageStartDate: Date;
+  coverageEndDate: Date;
+  status: number;
+  message: string;
+  reason: string;
+  possibleSolution: null;
+  coverageType: string;
+  primaryContributor: null;
+  employerDetails: EmployerDetails;
+  dependants: any[];
+  active: boolean;
+}
+
+export interface EmployerDetails {
+  employerName: string;
+  jobGroup: string;
+  scheme: Scheme;
+}
+
+export interface Scheme {
+  schemeCode: string;
+  schemeName: string;
+  schemeCategoryCode: string;
+  schemeCategoryName: string;
+  memberPolicyStartDate: string;
+  memberPolicyEndDate: string;
+  joinDate: string;
+  leaveDate: string;
+}
 
 type HIEEligibilityResponse = {
   insurer: string;

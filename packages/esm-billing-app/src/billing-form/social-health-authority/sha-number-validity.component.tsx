@@ -1,7 +1,6 @@
 import { ActionableNotification, Form, InlineLoading, InlineNotification, Tooltip } from '@carbon/react';
 import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
 import { formatDate, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
-import capitalize from 'lodash/capitalize';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -25,8 +24,8 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === shaIdentificationNumberUUID));
 
   const { data, isLoading: isLoadingHIEEligibility, error } = useHIEEligibility(patientUuid, shaIdentificationNumber);
-
-  const isHIEEligible = true;
+  const isHIEEligible = data.at(0)?.eligibility_response.status === 1;
+  const isNotHIEEligible = data.at(0)?.eligibility_response.active === false;
 
   if (!isSHA) {
     return null;
@@ -68,49 +67,48 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (!isHIEEligible) {
+  if (isNotHIEEligible) {
     return (
-      <ActionableNotification
+      <InlineNotification
         title={t('pendingHIEVerification', 'Pending HIE verification')}
-        subtitle={t('pendingVerificationReason', data[0].eligibility_response.message.reason)}
-        closeOnEscape
-        inline={false}
-        actionButtonLabel={t('verify', 'Verify')}
+        subtitle={data[0].eligibility_response.message}
         className={styles.missingSHANumber}
-        onActionButtonClick={() => {
-          navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/edit` });
-        }}
       />
     );
   }
 
-  return (
-    <Form className={styles.formContainer}>
-      {data?.map(({ inforce, insurer, start }, index) => {
-        return (
-          <div key={`${index}${insurer}`} className={styles.hieCard}>
-            <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
-              <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
-              <span className={styles.hieInsurerValue}>{capitalize(insurer)}</span>
-              {start && (
-                <Tooltip className={styles.tooltip} align="bottom" label={`Active from ${formatDate(new Date(start))}`}>
-                  <button className="sb-tooltip-trigger" type="button">
-                    <Information />
-                  </button>
-                </Tooltip>
-              )}
+  if (isHIEEligible) {
+    return (
+      <Form className={styles.formContainer}>
+        {data?.map(({ inforce, insurer, start, eligibility_response }, index) => {
+          return (
+            <div key={`${index}${insurer}`} className={styles.hieCard}>
+              <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+                <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
+                <span className={styles.hieInsurerValue}>SHA</span>
+                {start && (
+                  <Tooltip
+                    className={styles.tooltip}
+                    align="bottom"
+                    label={`Active from ${formatDate(new Date(eligibility_response.coverageStartDate))}`}>
+                    <button className="sb-tooltip-trigger" type="button">
+                      <Information />
+                    </button>
+                  </Tooltip>
+                )}
+              </div>
+              <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+                <CheckboxCheckedFilled />
+                <span className={Boolean(inforce) ? styles.activeSubscription : styles.inActiveSubscription}>
+                  {inforce ? t('active', 'Active') : t('inactive', 'Inactive')}
+                </span>
+              </div>
             </div>
-            <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
-              <CheckboxCheckedFilled />
-              <span className={Boolean(inforce) ? styles.activeSubscription : styles.inActiveSubscription}>
-                {inforce ? t('active', 'Active') : t('inactive', 'Inactive')}
-              </span>
-            </div>
-          </div>
-        );
-      })}
-    </Form>
-  );
+          );
+        })}
+      </Form>
+    );
+  }
 };
 
 export default SHANumberValidity;
