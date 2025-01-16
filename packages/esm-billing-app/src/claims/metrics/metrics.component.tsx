@@ -35,9 +35,9 @@ const MainMetrics: React.FC<MainMetricsProps> = ({ selectedLineItems, bill }) =>
           headerLabel={t('claimsItems', 'Claims Items')}
         />
         <MetricsCard
-          label={t('date', 'Date of Claimed')}
+          label={t('date', 'Date of Claim')}
           value={formatDate(bill.dateCreated)}
-          headerLabel={t('date', 'Date of Claimed')}
+          headerLabel={t('date', 'Date of Claim')}
         />
       </div>
     </>
