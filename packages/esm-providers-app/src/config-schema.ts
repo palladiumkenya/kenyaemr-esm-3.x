@@ -32,6 +32,11 @@ export const configSchema = {
     _description: 'UUID for provider licensing body',
     _default: 'bcaaa67b-cc72-4662-90c2-e1e992ceda66',
   },
+  providerHieFhirReference: {
+    _type: Type.String,
+    _description: 'UUID for provider hie fhir reference',
+    _default: '67b94e8e-4d61-4810-b0f1-d86497f6e553',
+  },
   defaultPrimaryFacility: {
     _type: Type.String,
     _description: 'Default facility for a provider',
@@ -64,6 +69,7 @@ export interface ConfigObject {
   nationalIDUuid: string;
   passportNumberUuid: string;
   licenseExpiryDateUuid: string;
+  providerHieFhirReference: string;
   licenseBodyUuid: string;
   providerNationalIdUuid: string;
   licenseNumberUuid: string;

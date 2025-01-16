@@ -81,6 +81,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     licenseNumberUuid,
     licenseBodyUuid,
     identifierTypes,
+    providerHieFhirReference,
   } = useConfig<ConfigObject>();
 
   const [searchHWR, setSearchHWR] = useState({
@@ -88,6 +89,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     identifier: '',
     isHWRLoading: false,
   });
+  const [healthWorker, setHealthWorker] = useState(null);
   const definedRoles = roles.map((role) => role.uuid) || [];
   const licenseDate = provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid)?.value;
 
@@ -118,39 +120,48 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
   const handleSearch = async () => {
     try {
       setSearchHWR({ ...searchHWR, isHWRLoading: true });
-      const healthWorker: Practitioner = await searchHealthCareWork(searchHWR.identifierType, searchHWR.identifier);
-      const nationalId = healthWorker?.entry[0]?.resource.identifier?.find((id) =>
-        id.type?.coding?.some((code) => code.code === 'national-id'),
-      )?.value;
-      const licenseNumber = healthWorker?.entry[0]?.resource.identifier?.find((id) =>
-        id.type?.coding?.some((code) => code.code === 'license-number'),
-      )?.value;
-      const registrationNumber = healthWorker?.entry[0]?.resource.identifier?.find((id) =>
-        id.type?.coding?.some((code) => code.code === 'board-registration-number'),
-      )?.value;
-
-      const licenseDate = formatDate(
-        new Date(
-          healthWorker?.entry[0]?.resource.identifier?.find((id) =>
-            id.type?.coding?.some((code) => code.code === 'license-number'),
-          )?.period?.end || t('unknown', 'Unknown'),
-        ),
+      const fetchedHealthWorker: Practitioner = await searchHealthCareWork(
+        searchHWR.identifierType,
+        searchHWR.identifier,
       );
-      const Names = healthWorker?.entry[0].resource?.name[0].text;
-      const nameParts = Names.split(' ');
-      const surname = nameParts.pop();
-      const firstName = nameParts.join(' ');
 
       const dispose = showModal('hwr-confirmation-modal', {
-        healthWorker,
+        healthWorker: fetchedHealthWorker,
         onConfirm: () => {
           dispose();
-          setValue('surname', surname);
-          setValue('firstname', firstName);
-          setValue('nationalid', nationalId);
-          setValue('licenseNumber', licenseNumber);
-          setValue('registrationNumber', registrationNumber);
-          setValue('licenseExpiryDate', parseDate(licenseDate));
+          setValue('surname', fetchedHealthWorker?.entry[0]?.resource?.name[0]?.text.split(' ').pop());
+          setValue(
+            'firstname',
+            fetchedHealthWorker?.entry[0]?.resource?.name[0]?.text.split(' ').slice(0, -1).join(' '),
+          );
+          setValue(
+            'nationalid',
+            fetchedHealthWorker?.entry[0]?.resource?.identifier?.find((id) =>
+              id.type?.coding?.some((code) => code.code === 'national-id'),
+            )?.value,
+          );
+          setValue(
+            'licenseNumber',
+            fetchedHealthWorker?.entry[0]?.resource?.identifier?.find((id) =>
+              id.type?.coding?.some((code) => code.code === 'license-number'),
+            )?.value,
+          );
+          setValue(
+            'registrationNumber',
+            fetchedHealthWorker?.entry[0]?.resource?.identifier?.find((id) =>
+              id.type?.coding?.some((code) => code.code === 'board-registration-number'),
+            )?.value,
+          );
+          setValue(
+            'licenseExpiryDate',
+            parseDate(
+              fetchedHealthWorker?.entry[0]?.resource?.identifier?.find((id) =>
+                id.type?.coding?.some((code) => code.code === 'license-number'),
+              )?.period?.end || t('unknown', 'Unknown'),
+            ),
+          );
+          // Save fetched healthWorker to state
+          setHealthWorker(fetchedHealthWorker);
         },
       });
     } catch (error) {
@@ -159,6 +170,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       setSearchHWR({ ...searchHWR, isHWRLoading: false });
     }
   };
+
   const onSubmit = async (data) => {
     let response;
     try {
@@ -218,6 +230,14 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             attributeType: licenseBodyUuid,
             value: data.registrationNumber,
           },
+          ...(healthWorker
+            ? [
+                {
+                  attributeType: providerHieFhirReference,
+                  value: JSON.stringify(healthWorker),
+                },
+              ]
+            : []), // Include the healthWorker attribute only if it exists
         ],
         retired: false,
       };
@@ -366,6 +386,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               id="form__national__id"
               placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
               labelText={t('nationalID', 'National ID*')}
+              disabled
               invalid={!!errors.nationalid}
               invalidText={errors.nationalid?.message}
             />
@@ -409,7 +430,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                placeholder="license number"
+                placeholder="License number"
+                disabled
                 id="form__license_number"
                 labelText={t('licenseNumber', 'License number*')}
                 invalid={!!errors.licenseNumber}
@@ -418,6 +440,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             )}
           />
         </Column>
+
         <Column>
           <Controller
             name="registrationNumber"
@@ -426,6 +449,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <TextInput
                 {...field}
                 placeholder="Registration number"
+                disabled
                 id="form__license_number"
                 labelText={t('registrationNumber', 'Registration number*')}
                 invalid={!!errors.registrationNumber}
@@ -454,6 +478,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                   labelText="License expiry date*"
                   id="form__license_date_picker"
                   size="md"
+                  disabled
                   invalid={!!errors.licenseExpiryDate}
                   invalidText={errors.licenseExpiryDate?.message}
                 />

@@ -59,6 +59,7 @@ interface Person {
     familyName: string;
   };
   gender: string;
+  birthdate: string;
   attributes: PersonAttribute[];
 }
 
