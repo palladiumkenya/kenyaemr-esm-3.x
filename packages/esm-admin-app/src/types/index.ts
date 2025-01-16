@@ -22,3 +22,13 @@ export interface DefaultFacility {
   shaContracted: string;
   shaFacilityExpiryDate: string;
 }
+
+export interface FacilityData {
+  shaKephLevel?: string;
+  mflCode?: string;
+  display?: string;
+  operationalStatus?: string;
+  shaStatus?: string;
+  shaContracted?: string;
+  shaFacilityExpiryDate?: string;
+}
