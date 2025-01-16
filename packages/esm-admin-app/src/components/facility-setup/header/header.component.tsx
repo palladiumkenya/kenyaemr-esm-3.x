@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Development } from '@carbon/react/icons';
-import { formatDate, useSession, PageHeader } from '@openmrs/esm-framework';
+import { useSession, PageHeader } from '@openmrs/esm-framework';
 import styles from './header.scss';
 
 interface HeaderProps {

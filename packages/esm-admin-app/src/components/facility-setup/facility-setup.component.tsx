@@ -8,15 +8,6 @@ import { showSnackbar } from '@openmrs/esm-framework';
 
 const FacilitySetup: React.FC = () => {
   const { t } = useTranslation();
-  const [isLoading, setIsLoading] = useState(false);
-  const [logData, setLogData] = useState<Array<any>>([]);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const synchronize = async () => {
-    try {
-    } catch (e) {
-      showSnackbar({ title: 'Synchronizing Error', kind: 'error', subtitle: e });
-    }
-  };
   return (
     <div className="omrs-main-content">
       <Header title="Facility Setup" />
@@ -29,19 +20,3 @@ const FacilitySetup: React.FC = () => {
 };
 
 export default FacilitySetup;
-
-//  const syncResponse = useDefaultFacility();
-//       if (syncResponse?.defaultFacility) {
-//         showSnackbar({
-//           title: t('syncedWithHie', 'Synced with HIE Successfully'),
-//           kind: 'success',
-//           isLowContrast: true,
-//         });
-//       } else {
-//         showSnackbar({
-//           title: t('syncingWithHieFailed', 'Syncing with HIE Failed'),
-//           subtitle: hieresponse.error,
-//           kind: 'error',
-//           isLowContrast: true,
-//         });
-//       }
