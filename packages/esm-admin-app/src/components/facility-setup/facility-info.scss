@@ -3,7 +3,7 @@
 @use '@carbon/colors';
 
 .omrs-main-content {
-  background-color: white;
+  background-color: colors.$white;
 }
 
 .bottomBorder {
@@ -47,7 +47,7 @@
 
 .card {
   padding: 1rem;
-  background-color: #f5f4f4;
+  background-color: colors.$gray-10;
   border: 1px solid #e0e0e0;
   border-radius: 2px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
