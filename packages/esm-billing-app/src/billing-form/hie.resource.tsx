@@ -54,9 +54,10 @@ export const useSHAEligibility = (patientUuid: string, shaIdentificationNumber?:
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === nationalIdUUID))
     ?.at(0)?.value;
 
-  const url = shaIdentificationNumber
-    ? `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?patientUuid=${patientUuid}&nationalId=${nationalId}`
-    : undefined; // this is to avoid making the request if the patient does not have a SHA Id.
+  const url =
+    shaIdentificationNumber?.length > 0
+      ? `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?patientUuid=${patientUuid}&nationalId=${nationalId}`
+      : undefined; // this is to avoid making the request if the patient does not have a SHA Id.
   const { data, error, isLoading, mutate } = useSWR<{ data: Array<HIEEligibilityResponse> }>(url, openmrsFetch, {
     errorRetryCount: 0,
   });
