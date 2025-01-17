@@ -53,7 +53,9 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, patientUuid })
       header: 'Actions',
     },
   ];
-  const rows = dependents?.map((dependent) => ({
+
+  const rows = dependents?.map((dependent, index) => ({
+    id: `${index}-${dependent.name}`,
     name: capitalize(dependent.name),
     relationship: capitalize(dependent.relationship),
     phoneNumber: dependent.phoneNumber,
