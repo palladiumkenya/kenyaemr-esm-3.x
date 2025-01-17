@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTableSkeleton,
@@ -15,7 +15,7 @@ import {
   TableExpandRow,
   TableExpandedRow,
   Search,
-  Tag,
+  Dropdown,
 } from '@carbon/react';
 import { isDesktop, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
@@ -26,19 +26,74 @@ import { ConfigObject } from '../config-schema';
 import dayjs from 'dayjs';
 import CustomActionMenu from '../overflow/overflow-component';
 import EmptyProviderState from './empty-state.component';
-import { Report, SearchLocate } from '@carbon/react/icons';
+import { Report } from '@carbon/react/icons';
 
-const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ filter }) => {
+type FilterType = 'All Providers' | 'Active Licensed' | 'Expired Licensed' | 'Licensed expiring soon' | 'Unlicensed';
+
+const getCardTitle = (filterName: FilterType): string => {
+  const filterMap: Record<FilterType, string> = {
+    'All Providers': 'List of all providers',
+    'Active Licensed': 'List of active licensed providers',
+    'Expired Licensed': 'List of expired licensed providers',
+    'Licensed expiring soon': 'List of licensed expiring soon providers',
+    Unlicensed: 'List of unlicensed providers',
+  };
+  return filterMap[filterName] || 'List of providers';
+};
+
+const ProviderListTable: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const { provider, error, isLoading } = useProviders();
   const { licenseNumberUuid, licenseExpiryDateUuid, providerNationalIdUuid } = useConfig<ConfigObject>();
-  const [pageSize, setPageSize] = React.useState(10);
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const [pageSize, setPageSize] = useState(10);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('All Providers');
+
+  const isActiveLicensed = (provider) => {
+    const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
+    const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+    const licenseExpiryDate = expiryAttr ? dayjs(expiryAttr.value) : null;
+    return licenseAttr && licenseExpiryDate && licenseExpiryDate.isAfter(dayjs());
+  };
+
+  const isExpiredLicensed = (provider) => {
+    const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+    const licenseExpiryDate = expiryAttr ? dayjs(expiryAttr.value) : null;
+    return licenseExpiryDate && licenseExpiryDate.isBefore(dayjs());
+  };
+
+  const isExpiringSoon = (provider) => {
+    const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
+    const licenseExpiryDate = expiryAttr ? dayjs(expiryAttr.value) : null;
+    const today = dayjs();
+    return (
+      licenseExpiryDate &&
+      licenseExpiryDate.isAfter(today) &&
+      licenseExpiryDate.diff(today, 'day') > 0 &&
+      licenseExpiryDate.diff(today, 'day') <= 3
+    );
+  };
+
+  const isUnlicensed = (provider) => {
+    const nationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
+    return !nationalId;
+  };
 
   const filteredProviders = Array.isArray(provider)
-    ? provider.filter((p) => filter(p) && p.person.display.toLowerCase().includes(searchQuery.toLowerCase()))
+    ? provider.filter((p) => {
+        const matchesSearch = p.person.display.toLowerCase().includes(searchQuery.toLowerCase());
+
+        const matchesFilter =
+          selectedFilter === 'All Providers' ||
+          (selectedFilter === 'Active Licensed' && isActiveLicensed(p)) ||
+          (selectedFilter === 'Expired Licensed' && isExpiredLicensed(p)) ||
+          (selectedFilter === 'Licensed expiring soon' && isExpiringSoon(p)) ||
+          (selectedFilter === 'Unlicensed' && isUnlicensed(p));
+
+        return matchesSearch && matchesFilter;
+      })
     : [];
 
   const { paginated, goTo, results, currentPage } = usePagination(filteredProviders, pageSize);
@@ -50,16 +105,7 @@ const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ f
     { header: t('action', 'Action'), key: 'action' },
   ];
 
-  const maskNationalId = (id) => {
-    if (id && id.length > 5) {
-      const start = id.slice(0, 3);
-      const end = id.slice(-3);
-      return `${start}***${end}`;
-    }
-    return id;
-  };
-
-  const rowData = results.map((provider, index) => {
+  const rowData = results.map((provider) => {
     const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
     return {
       id: provider.uuid,
@@ -85,9 +131,25 @@ const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ f
   return (
     <div className={styles.Container}>
       <div className={styles.providerContainer}>
-        <CardHeader title={t('providersAll', 'List of provider')}>
-          <></>
+        <CardHeader
+          title={`${t(getCardTitle(selectedFilter), { count: filteredProviders.length })} (${
+            filteredProviders.length
+          })`}>
+          <Dropdown
+            className={styles.dropDown}
+            initialSelectedItem={{ text: 'All Providers' }}
+            itemToString={(item) => item.text}
+            items={[
+              { text: 'All Providers' },
+              { text: 'Active Licensed' },
+              { text: 'Expired Licensed' },
+              { text: 'Licensed expiring soon' },
+              { text: 'Unlicensed' },
+            ]}
+            onChange={({ selectedItem }) => setSelectedFilter((selectedItem?.text as FilterType) || 'All Providers')}
+          />
         </CardHeader>
+
         <Search
           labelText=""
           placeholder={t('searchProvider', 'Search for provider')}
@@ -150,6 +212,7 @@ const ProviderListTable: React.FC<{ filter: (provider: any) => boolean }> = ({ f
             )}
           </DataTable>
         )}
+
         {paginated && (
           <Pagination
             forwardText={t('nextPage', 'Next page')}

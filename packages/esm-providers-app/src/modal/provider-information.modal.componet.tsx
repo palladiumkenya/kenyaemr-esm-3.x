@@ -95,6 +95,16 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
                 )?.valueCodeableConcept?.coding?.[0]?.display || t('unknown', 'Unknown')
               }
             />
+            <HealthWorkerInfo
+              label={t('qualification', 'Qualification')}
+              value={
+                healthWorker?.entry[0]?.resource?.qualification?.[0]?.code?.coding?.[0]?.display ||
+                healthWorker?.entry[0]?.resource?.extension?.find(
+                  (ext) => ext.url === 'https://ts.kenya-hie.health/Codesystem/specialty',
+                )?.valueCodeableConcept?.coding?.[0]?.display ||
+                t('unknown', 'Unknown')
+              }
+            />
 
             <HealthWorkerInfo
               label={t('licenseValid', 'License Validity')}

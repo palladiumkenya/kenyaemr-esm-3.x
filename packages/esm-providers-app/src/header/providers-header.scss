@@ -2,117 +2,18 @@
 @use '@carbon/type';
 @use '@carbon/colors';
 
-.header__section__container {
+.header {
   @include type.type-style('body-compact-02');
-  color: colors.$gray-70;
   height: layout.$spacing-12;
-  background-color: white;
-  border: 1px solid colors.$gray-20;
-  border-left: 0;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: layout.$spacing-01;
-  margin-right: 0;
-  overflow-x: hidden;
-  padding: 0 layout.$spacing-05;
+  background: white;
+  border: 1px solid colors.$gray-20;
 }
-
-.left__justified__items {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin-left: layout.$spacing-04;
-}
-
-.page__name {
-  @include type.type-style('heading-04');
-}
-
-.page__labels {
-  margin-left: 1rem;
-
-  p:first-of-type {
-    margin-bottom: layout.$spacing-02;
-  }
-}
-
-.svg__container svg {
+.svgContainer svg {
   width: layout.$spacing-10;
   height: layout.$spacing-10;
+  margin-right: layout.$spacing-03;
+  margin-left: layout.$spacing-06;
   fill: var(--brand-03);
-}
-
-.metrics__header {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  align-items: center;
-  gap: layout.$spacing-06;
-  flex-wrap: wrap;
-  padding: layout.$spacing-04 layout.$spacing-05 0 0;
-  margin-right: layout.$spacing-09;
-  width: auto;
-  height: auto;
-}
-
-.warp__metrics {
-  width: auto;
-  height: auto;
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  gap: layout.$spacing-03;
-  padding: 0;
-  min-width: layout.$spacing-12;
-}
-
-.metric__label {
-  flex-grow: 0;
-  font-family: IBMPlexSans;
-  font-size: layout.$spacing-04;
-  line-height: layout.$spacing-06;
-  letter-spacing: layout.$spacing-01;
-  color: colors.$gray-70;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.metric__value {
-  flex-grow: 0;
-  font-size: layout.$spacing-06;
-  line-height: layout.$spacing-06;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.metricLocationDate {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: layout.$spacing-05;
-  width: auto;
-}
-
-.location,
-.date {
-  display: flex;
-  align-items: center;
-  font-size: layout.$spacing-05;
-  line-height: layout.$spacing-06;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.location {
-  margin-bottom: layout.$spacing-02;
 }
