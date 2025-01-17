@@ -1,20 +1,42 @@
 import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { SHAIntervension } from '../types';
+import { SHAIntervention } from '../types';
 
-export const useInterventions = (code: string) => {
+export type InterventionsFilter = {
+  package_code?: string;
+  scheme_code?: string;
+  applicable_gender?: 'MALE' | 'FEMALE';
+};
+
+export const toQueryParams = (q: Record<string, any>) => {
+  return (
+    '?' +
+    Object.entries(q)
+      .reduce((prev, [key, val]) => {
+        if (val !== undefined && val !== null) {
+          return [...prev, `${key}=${val}`];
+        }
+        return prev;
+      }, [])
+      .join('&')
+  );
+};
+
+export const useInterventions = (filters: InterventionsFilter) => {
   const fetcher = (url: string) => {
     return openmrsFetch(url, {
       method: 'POST',
       body: {
         searchKeyAndValues: {
+          ...filters,
           // scheme_code: 'UHC',
-          package_code: code,
+          applicable_gender: filters.applicable_gender ? `ALL,${filters.applicable_gender}` : undefined,
         },
       },
     });
   };
-  const url = `${restBaseUrl}/insuranceclaims/claims/interventions/query?code=${code}`;
+
+  const url = `${restBaseUrl}/insuranceclaims/claims/interventions/query${toQueryParams(filters)}`;
   const { isLoading, error, data } = useSWR<
     FetchResponse<{
       status: string;
@@ -35,7 +57,7 @@ export const useInterventions = (code: string) => {
           interventionCode,
           subCategoryBenefitsPackage: interventionSubPackage,
           interventionName,
-        } as SHAIntervension),
+        } as SHAIntervention),
     ),
     error,
   };
