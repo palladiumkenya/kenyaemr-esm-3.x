@@ -49,7 +49,7 @@ const LogTable: React.FC<LogTableProps> = ({ logData, isLoading }) => {
 
   return (
     <div className={styles.table}>
-      <CardHeader title={t('etlOperationLog', 'ETL Operations Log')} children={''} />
+      <CardHeader title={t('facilityInfo', 'Facility Info')} children={''} />
       <div className={styles.logTable}>
         {isLoading && logData.length === 0 ? (
           <DataTableSkeleton
