@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DefaultWorkspaceProps,
@@ -44,6 +44,7 @@ import {
   useStockOperationTypes,
   useStockTagLocations,
   createOrUpdateUserRoleScope,
+  createProvider,
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
@@ -54,7 +55,6 @@ import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatForDatePicker, to
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
-  model?: UserRoleScope;
 };
 
 const MinDate: Date = today();
@@ -69,10 +69,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const [activeSection, setActiveSection] = useState('demographic');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
+  const { location, loadingLocation } = useLocation();
 
   const { userManagementFormSchema } = UserManagementFormSchema();
-
-  // operation types
   const {
     types: { results: stockOperations },
     loadingStock,
@@ -80,61 +80,37 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
   const { stockLocations } = useStockTagLocations();
 
-  // ========================================
-
   const { providerAttributeType = [] } = useProviderAttributeType();
-  const providerLicenseAttributeType =
-    providerAttributeType.find((type) => type.name === 'Practising License Number')?.uuid || '';
-  const licenseExpiryDateAttributeType =
-    providerAttributeType.find((type) => type.name === 'License Expiry Date')?.uuid || '';
-  const primaryFacilityAttributeType =
-    providerAttributeType.find((type) => type.name === 'Primary Facility')?.uuid || '';
+  // Memoize provider attribute mappings
+  const attributeTypeMapping = useMemo(() => {
+    return {
+      licenseNumber: providerAttributeType.find((type) => type.name === 'Practising License Number')?.uuid || '',
+      licenseExpiry: providerAttributeType.find((type) => type.name === 'License Expiry Date')?.uuid || '',
+      primaryFacility: providerAttributeType.find((type) => type.name === 'Primary Facility')?.uuid || '',
+    };
+  }, [providerAttributeType]);
 
-  const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
-  const { location, loadingLocation } = useLocation();
+  const providerAttributes = useMemo(() => provider.flatMap((item) => item.attributes || []), [provider]);
 
-  function getProviderAttributes() {
-    if (!Array.isArray(provider)) {
-      return [];
-    }
-    return provider.flatMap((item) => item.attributes || []);
-  }
+  const getProviderAttributeValue = useCallback(
+    (uuid: string, key = 'value') => providerAttributes.find((attr) => attr.attributeType?.uuid === uuid)?.[key],
+    [providerAttributes],
+  );
 
-  function getProviderLicenseNumber() {
-    const providerAttributes = getProviderAttributes();
-    const providerLicense = providerAttributes.find(
-      (attr) => attr.attributeType?.uuid === providerLicenseAttributeType && attr.value,
-    );
-    return providerLicense?.value;
-  }
+  const providerLicenseNumber = useMemo(
+    () => getProviderAttributeValue(attributeTypeMapping.licenseNumber),
+    [attributeTypeMapping, getProviderAttributeValue],
+  );
 
-  function getPrimaryFacility() {
-    const providerAttributes = getProviderAttributes();
-    const primaryFacility = providerAttributes.find(
-      (attr) => attr.attributeType?.uuid === primaryFacilityAttributeType && attr.value,
-    );
-    if (primaryFacility && primaryFacility.value) {
-      if (typeof primaryFacility.value === 'object' && primaryFacility.value !== null) {
-        return primaryFacility.value?.name;
-      }
-    }
-  }
+  const primaryFacility = useMemo(() => {
+    const value = getProviderAttributeValue(attributeTypeMapping.primaryFacility);
+    return typeof value === 'object' ? value?.name : value;
+  }, [attributeTypeMapping, getProviderAttributeValue]);
 
-  function getProviderLicenseExpiryDate() {
-    const providerAttributes = getProviderAttributes();
-    const licenseExpiryDate = providerAttributes.find(
-      (attr) => attr.attributeType?.uuid === licenseExpiryDateAttributeType && attr.value,
-    );
-
-    if (licenseExpiryDate?.value) {
-      const date = new Date(licenseExpiryDate.value);
-      return [
-        date.getFullYear(),
-        String(date.getMonth() + 1).padStart(2, '0'),
-        String(date.getDate()).padStart(2, '0'),
-      ].join('-');
-    }
-  }
+  const licenseExpiryDate = useMemo(() => {
+    const value = getProviderAttributeValue(attributeTypeMapping.licenseExpiry);
+    return value ? new Date(value).toISOString().split('T')[0] : undefined;
+  }, [attributeTypeMapping, getProviderAttributeValue]);
 
   const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
   type UserFormSchema = z.infer<typeof userManagementFormSchema>;
@@ -151,9 +127,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             description: role.description,
           })) || [],
         gender: initialUserValue.person?.gender || 'M',
-        providerLicense: getProviderLicenseNumber(),
-        licenseExpiryDate: getProviderLicenseExpiryDate(),
-        primaryFacility: getPrimaryFacility(),
+        providerLicense: providerLicenseNumber,
+        licenseExpiryDate: licenseExpiryDate,
+        primaryFacility: primaryFacility,
       }
     : {};
 
@@ -166,7 +142,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     return { givenName, middleName, familyName };
   }
 
-  function extractAttributeValue(attributes, prefix) {
+  function extractAttributeValue(attributes, prefix: string) {
     return attributes?.find((attr) => attr.display.startsWith(prefix))?.display?.split(' ')[3] || '';
   }
 
@@ -192,7 +168,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const emailAttribute = attributeTypes.find((attr) => attr.name === 'Email address')?.uuid || '';
     const telephoneAttribute = attributeTypes.find((attr) => attr.name === 'Telephone contact')?.uuid || '';
     const setProvider = data.providerIdentifiers;
-    const mflCode = data.primaryFacility?.split(' ').pop() || '';
     const providerUUID = provider[0]?.uuid || '';
     const roleName = data.roles?.[0]?.display || '';
 
@@ -230,9 +205,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
     const providerPayload: Partial<Provider> = {
       attributes: [
-        { attributeType: primaryFacilityAttributeType, value: mflCode },
-        { attributeType: providerLicenseAttributeType, value: data.providerLicense },
-        { attributeType: licenseExpiryDateAttributeType, value: data.licenseExpiryDate },
+        { attributeType: attributeTypeMapping.primaryFacility, value: data.primaryFacility?.split(' ').pop() || '' },
+        { attributeType: attributeTypeMapping.licenseNumber, value: data.providerLicense },
+        { attributeType: attributeTypeMapping.licenseExpiry, value: data.licenseExpiryDate },
       ].filter((attr) => attr.value),
     };
 
@@ -290,6 +265,24 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             );
           }
         }
+        if (setProvider) {
+          try {
+            const providerUrl = providerUUID ? `${restBaseUrl}/provider/${providerUUID}` : `${restBaseUrl}/provider`;
+            const personUUID = response.person.uuid;
+            const identifier = response.systemId;
+            const providerResponse = await createProvider(personUUID, identifier, providerPayload, providerUrl);
+
+            if (providerResponse.ok) {
+              showSnackbarMessage(t('providerSaved', 'Provider saved successfully'), '', 'success');
+            }
+          } catch (error) {
+            showSnackbarMessage(
+              t('providerFail', 'Failed to save provider'),
+              t('providerFailedSubtitle', 'An error occurred while creating provider'),
+              'error',
+            );
+          }
+        }
       } else {
         throw new Error('User creation failed');
       }
@@ -323,13 +316,16 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     setActiveSection((prev) => (prev !== section ? section : prev));
   };
 
-  const steps = [
-    { id: 'demographic', label: t('demographicInformation', 'Demographic Info') },
-    { id: 'provider', label: t('providerAccount', 'Provider Account') },
-    { id: 'login', label: t('loginInformation', 'Login Info') },
-    { id: 'roles', label: t('roles', 'Roles Info') },
-    { id: 'additionalRoles', label: t('additionalRoles', 'Additional Roles') },
-  ];
+  const steps = useMemo(
+    () => [
+      { id: 'demographic', label: t('demographicInformation', 'Demographic Info') },
+      { id: 'provider', label: t('providerAccount', 'Provider Account') },
+      { id: 'login', label: t('loginInformation', 'Login Info') },
+      { id: 'roles', label: t('roles', 'Roles Info') },
+      { id: 'additionalRoles', label: t('additionalRoles', 'Additional Roles') },
+    ],
+    [t],
+  );
 
   return (
     <div className={styles.leftContainer}>
@@ -805,7 +801,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
                         <ResponsiveWrapper>
                           {rolesConfig
-                            .filter((category) => category.category !== 'Inventory Roles') // Exclude inventory category
+                            .filter((category) => category.category !== 'Inventory Roles')
                             .map((category) => (
                               <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
                                 <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
@@ -886,7 +882,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
                         <ResponsiveWrapper>
                           {rolesConfig
-                            .filter((category) => category.category === 'Inventory Roles') // Exclude inventory category
+                            .filter((category) => category.category === 'Inventory Roles')
                             .map((category) => (
                               <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
                                 <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
@@ -966,7 +962,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             <CheckboxGroup
                               legendText={t('stockOperation', 'Stock Operation')}
                               className={styles.checkboxGroupGrid}>
-                              {isLoading ? (
+                              {loadingStock ? (
                                 <InlineLoading
                                   status="active"
                                   iconDescription="Loading"
@@ -1036,7 +1032,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             lg={12}
                             className={styles.checkBoxColumn}>
                             <CheckboxGroup legendText={t('location', 'Location')} className={styles.checkboxGroupGrid}>
-                              {isLoading ? (
+                              {loadingStock ? (
                                 <InlineLoading
                                   status="active"
                                   iconDescription="Loading"
