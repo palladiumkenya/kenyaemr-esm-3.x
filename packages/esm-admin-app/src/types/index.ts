@@ -28,7 +28,8 @@ export interface FacilityData {
   mflCode?: string;
   display?: string;
   operationalStatus?: string;
-  shaStatus?: string;
   shaContracted?: string;
+  shaFacilityId?: string;
+  shaFacilityLicenseNumber?: string;
   shaFacilityExpiryDate?: string;
 }

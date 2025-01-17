@@ -72,9 +72,8 @@ const FacilityInfo: React.FC = () => {
               <p>
                 <strong>Keph Level:</strong> {facilityData?.shaKephLevel}
               </p>
-              <p>
-                <strong>Operational Status:</strong> {facilityData?.operationalStatus}
-              </p>
+              <br />
+              <br />
             </div>
           </Tile>
         </Column>
@@ -87,7 +86,13 @@ const FacilityInfo: React.FC = () => {
               <hr className={styles.cardDivider} />
               <div className={styles.cardContent}>
                 <p>
-                  <strong>SHA Status:</strong> {facilityData?.shaStatus}
+                  <strong>Facility Registry Code:</strong> {facilityData?.shaFacilityId}
+                </p>
+                <p>
+                  <strong>SHA License Number:</strong> {facilityData?.shaFacilityLicenseNumber}
+                </p>
+                <p>
+                  <strong>SHA Status:</strong> {facilityData?.operationalStatus}
                 </p>
                 <p>
                   <strong>SHA Contracted:</strong> {facilityData?.shaContracted}
@@ -95,7 +100,6 @@ const FacilityInfo: React.FC = () => {
                 <p>
                   <strong>SHA Expiry Date:</strong> {facilityData?.shaFacilityExpiryDate}
                 </p>
-                <br />
               </div>
             </Tile>
           </Layer>
