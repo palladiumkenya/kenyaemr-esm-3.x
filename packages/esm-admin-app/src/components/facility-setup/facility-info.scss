@@ -74,6 +74,11 @@
   justify-content: space-between;
   margin-bottom: 0.5rem;
 }
+.cardContent br {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
 
 .cardContent strong {
   min-width: 150px;
