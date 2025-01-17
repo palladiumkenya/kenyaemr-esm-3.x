@@ -5,9 +5,11 @@ import styles from './facility-info.scss';
 import { useTranslation } from 'react-i18next';
 import { showNotification, showSnackbar } from '@openmrs/esm-framework';
 import { FacilityData } from '../../types';
+
 const FacilityInfo: React.FC = () => {
   const { t } = useTranslation();
-  const { defaultFacility, isLoading: defaultFacilityLoading, error, refetch } = useFacilityInfo();
+  const [shouldSynchronize, setshouldSynchronize] = useState<boolean>(false);
+  const { defaultFacility, isLoading: defaultFacilityLoading, error, refetch } = useFacilityInfo(shouldSynchronize);
 
   const [facilityData, setFacilityData] = useState<FacilityData>(defaultFacility);
   useEffect(() => {
@@ -19,7 +21,7 @@ const FacilityInfo: React.FC = () => {
 
   const synchronizeFacilityData = async () => {
     try {
-      // Trigger manual refetch
+      setshouldSynchronize(true);
       await refetch();
       showSnackbar({
         title: t('syncingHieSuccess', 'Synchronization Complete'),
