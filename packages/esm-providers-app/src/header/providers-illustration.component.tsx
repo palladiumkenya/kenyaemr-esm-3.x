@@ -4,8 +4,8 @@ import { MedicalStaff } from '@carbon/pictograms-react';
 
 const ProvidersIllustration: React.FC = () => {
   return (
-    <div className={styles.svg__container}>
-      <MedicalStaff className={styles.icon__overiders} />
+    <div className={styles.svgContainer}>
+      <MedicalStaff className={styles.iconOveriders} />
     </div>
   );
 };
