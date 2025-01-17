@@ -55,6 +55,7 @@ const UserManagementFormSchema = () => {
 
     activeTo: z.string().optional(),
     activeFrom: z.string().optional(),
+    isEditProvider: z.boolean().optional(),
   });
 
   return { userManagementFormSchema };

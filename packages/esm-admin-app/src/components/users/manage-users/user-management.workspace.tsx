@@ -81,6 +81,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { stockLocations } = useStockTagLocations();
 
   const { providerAttributeType = [] } = useProviderAttributeType();
+
+  const { roles = [], isLoading } = useRoles();
+  const { rolesConfig, error } = useSystemUserRoleConfigSetting();
+  const { attributeTypes = [] } = usePersonAttribute();
   // Memoize provider attribute mappings
   const attributeTypeMapping = useMemo(() => {
     return {
@@ -114,24 +118,27 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
   const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
   type UserFormSchema = z.infer<typeof userManagementFormSchema>;
-  const formDefaultValues = !isInitialValuesEmpty
-    ? {
-        ...initialUserValue,
-        ...extractNameParts(initialUserValue.person?.display || ''),
-        phoneNumber: extractAttributeValue(initialUserValue.person?.attributes, 'Telephone'),
-        email: extractAttributeValue(initialUserValue.person?.attributes, 'Email'),
-        roles:
-          initialUserValue.roles?.map((role) => ({
-            uuid: role.uuid,
-            display: role.display,
-            description: role.description,
-          })) || [],
-        gender: initialUserValue.person?.gender || 'M',
-        providerLicense: providerLicenseNumber,
-        licenseExpiryDate: licenseExpiryDate,
-        primaryFacility: primaryFacility,
-      }
-    : {};
+  const formDefaultValues = useMemo(() => {
+    if (isInitialValuesEmpty) {
+      return {};
+    }
+    return {
+      ...initialUserValue,
+      ...extractNameParts(initialUserValue.person?.display || ''),
+      phoneNumber: extractAttributeValue(initialUserValue.person?.attributes, 'Telephone'),
+      email: extractAttributeValue(initialUserValue.person?.attributes, 'Email'),
+      roles:
+        initialUserValue.roles?.map((role) => ({
+          uuid: role.uuid,
+          display: role.display,
+          description: role.description,
+        })) || [],
+      gender: initialUserValue.person?.gender || 'M',
+      providerLicense: providerLicenseNumber,
+      licenseExpiryDate: licenseExpiryDate,
+      primaryFacility: primaryFacility,
+    };
+  }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
 
   function extractNameParts(display = '') {
     const nameParts = display.split(' ');
@@ -152,11 +159,15 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     defaultValues: formDefaultValues,
   });
 
+  const { reset } = userFormMethods;
+
   const { errors, isSubmitting, isDirty } = userFormMethods.formState;
 
-  const { roles = [], isLoading } = useRoles();
-  const { rolesConfig, error } = useSystemUserRoleConfigSetting();
-  const { attributeTypes = [] } = usePersonAttribute();
+  useEffect(() => {
+    if (!loadingProvider && !loadingLocation) {
+      reset(formDefaultValues);
+    }
+  }, [loadingProvider, loadingLocation, formDefaultValues, reset]);
 
   useEffect(() => {
     if (isDirty) {
@@ -168,6 +179,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const emailAttribute = attributeTypes.find((attr) => attr.name === 'Email address')?.uuid || '';
     const telephoneAttribute = attributeTypes.find((attr) => attr.name === 'Telephone contact')?.uuid || '';
     const setProvider = data.providerIdentifiers;
+    const editProvider = data.isEditProvider;
     const providerUUID = provider[0]?.uuid || '';
     const roleName = data.roles?.[0]?.display || '';
 
@@ -265,7 +277,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             );
           }
         }
-        if (setProvider) {
+        if (setProvider || editProvider) {
           try {
             const providerUrl = providerUUID ? `${restBaseUrl}/provider/${providerUUID}` : `${restBaseUrl}/provider`;
             const personUUID = response.person.uuid;
@@ -570,6 +582,26 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     placeholder={t('licenseExpiryDate', 'License Expiry Date')}
                                     className={styles.checkboxLabelSingleLine}
                                   />
+                                )}
+                              />
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Controller
+                                name="isEditProvider"
+                                control={userFormMethods.control}
+                                render={({ field }) => (
+                                  <CheckboxGroup
+                                    legendText={t('editProvider', 'Edit Provider Details')}
+                                    className={styles.multilineCheckboxLabel}>
+                                    <Checkbox
+                                      className={styles.checkboxLabelSingleLine}
+                                      {...field}
+                                      id="isEditProvider"
+                                      labelText={t('EditProviderDetails', 'Edit provider details?')}
+                                      checked={field.value || false}
+                                      onChange={(e) => field.onChange(e.target.checked)}
+                                    />
+                                  </CheckboxGroup>
                                 )}
                               />
                             </ResponsiveWrapper>
