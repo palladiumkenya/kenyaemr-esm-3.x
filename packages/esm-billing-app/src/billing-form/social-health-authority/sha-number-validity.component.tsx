@@ -1,11 +1,12 @@
 import { ActionableNotification, Form, InlineLoading, InlineNotification, Tooltip } from '@carbon/react';
 import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
 import { formatDate, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
+import { isWithinInterval } from 'date-fns';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BillingConfig } from '../../config-schema';
-import { useHIEEligibility } from '../hie.resource';
+import { useSHAEligibility } from '../hie.resource';
 import styles from './sha-number-validity.scss';
 
 type SHANumberValidityProps = {
@@ -16,16 +17,24 @@ type SHANumberValidityProps = {
 const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, patientUuid }) => {
   const { t } = useTranslation();
   const { shaIdentificationNumberUUID } = useConfig<BillingConfig>();
-  const { patient, isLoading } = usePatient(patientUuid);
+  const { patient, isLoading: isLoadingPatientUuid } = usePatient(patientUuid);
   const { watch } = useFormContext();
   const isSHA = watch('insuranceScheme')?.includes('SHA');
   const shaIdentificationNumber = patient?.identifier
     ?.filter((identifier) => identifier)
     .filter((identifier) => identifier.type.coding.some((coding) => coding.code === shaIdentificationNumberUUID));
 
-  const { data, isLoading: isLoadingHIEEligibility, error } = useHIEEligibility(patientUuid, shaIdentificationNumber);
-  const isHIEEligible = data.at(0)?.eligibility_response.status === 1;
-  const isNotHIEEligible = data.at(0)?.eligibility_response.active === false;
+  const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
+
+  const isRegisteredOnSHA = Boolean(data?.coverageEndDate) && Boolean(data?.coverageStartDate);
+  const isNotRegisteredOnSHA = data?.active === false;
+
+  const isActive = isRegisteredOnSHA
+    ? isWithinInterval(new Date(), {
+        start: new Date(data?.coverageStartDate),
+        end: new Date(data?.coverageEndDate),
+      })
+    : false;
 
   if (!isSHA) {
     return null;
@@ -50,7 +59,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (isLoadingHIEEligibility || isLoading) {
+  if (isLoadingHIEEligibility || isLoadingPatientUuid) {
     return <InlineLoading status="active" description={t('loading', 'Loading ...')} />;
   }
 
@@ -67,45 +76,41 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (isNotHIEEligible) {
+  if (isNotRegisteredOnSHA) {
     return (
       <InlineNotification
         title={t('pendingHIEVerification', 'Pending HIE verification')}
-        subtitle={data[0].eligibility_response.message}
+        subtitle={data?.message}
         className={styles.missingSHANumber}
       />
     );
   }
 
-  if (isHIEEligible) {
+  if (isRegisteredOnSHA) {
     return (
       <Form className={styles.formContainer}>
-        {data?.map(({ inforce, insurer, start, eligibility_response }, index) => {
-          return (
-            <div key={`${index}${insurer}`} className={styles.hieCard}>
-              <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
-                <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
-                <span className={styles.hieInsurerValue}>SHA</span>
-                {start && (
-                  <Tooltip
-                    className={styles.tooltip}
-                    align="bottom"
-                    label={`Active from ${formatDate(new Date(eligibility_response.coverageStartDate))}`}>
-                    <button className="sb-tooltip-trigger" type="button">
-                      <Information />
-                    </button>
-                  </Tooltip>
-                )}
-              </div>
-              <div className={Boolean(inforce) ? styles.hieCardItemActive : styles.hieCardItemInActive}>
-                <CheckboxCheckedFilled />
-                <span className={Boolean(inforce) ? styles.activeSubscription : styles.inActiveSubscription}>
-                  {inforce ? t('active', 'Active') : t('inactive', 'Inactive')}
-                </span>
-              </div>
-            </div>
-          );
-        })}
+        <div className={styles.hieCard}>
+          <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+            <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
+            <span className={styles.hieInsurerValue}>SHA</span>
+            {isActive && (
+              <Tooltip
+                className={styles.tooltip}
+                align="bottom"
+                label={`Active from ${formatDate(new Date(data?.coverageStartDate))}`}>
+                <button className="sb-tooltip-trigger" type="button">
+                  <Information />
+                </button>
+              </Tooltip>
+            )}
+          </div>
+          <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+            <CheckboxCheckedFilled />
+            <span className={isActive ? styles.activeSubscription : styles.inActiveSubscription}>
+              {isActive ? t('active', 'Active') : t('inactive', 'Inactive')}
+            </span>
+          </div>
+        </div>
       </Form>
     );
   }

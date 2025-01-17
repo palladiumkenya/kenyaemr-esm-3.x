@@ -45,7 +45,7 @@ type HIEEligibilityResponse = {
   eligibility_response: EligibilityResponse;
 };
 
-export const useHIEEligibility = (patientUuid: string, shaIdentificationNumber?: fhir.Identifier[]) => {
+export const useSHAEligibility = (patientUuid: string, shaIdentificationNumber?: fhir.Identifier[]) => {
   const { patient } = usePatient(patientUuid);
   const { nationalIdUUID } = useConfig<BillingConfig>();
 
@@ -62,13 +62,9 @@ export const useHIEEligibility = (patientUuid: string, shaIdentificationNumber?:
   });
 
   return {
-    data:
-      data?.data.map((d) => {
-        return {
-          ...d,
-          eligibility_response: JSON.parse(d.eligibility_response as unknown as string) as EligibilityResponse,
-        };
-      }) ?? [],
+    data: data
+      ? { ...(JSON.parse(data?.data.at(0)?.eligibility_response as unknown as string) as EligibilityResponse) }
+      : undefined,
     isLoading,
     error,
     mutate,
