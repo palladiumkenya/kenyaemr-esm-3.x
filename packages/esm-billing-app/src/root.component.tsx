@@ -8,7 +8,6 @@ import { BillingDashboard } from './billing-dashboard/billing-dashboard.componen
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
 import ClaimScreen from './claims/dashboard/claims-dashboard.component';
-import PreAuthRequestDashboard from './claims/pre-auth/pre-auth-dashboard.component';
 import Invoice from './invoice/invoice.component';
 import PaymentModeHome from './payment-modes/payment-mode-home.component';
 import { ClockInBoundary } from './payment-points/clock-in-boundary.component';
@@ -24,7 +23,6 @@ const RootComponent: React.FC = () => {
         <Route path="/" element={<BillingDashboard />} />
         <Route path="/claims-overview" element={<ClaimsManagementOverview />} />
         <Route path="/preauth-requests" element={<ClaimsManagementPreAuthRequest />} />
-        <Route path="/patient/:patientUuid/:billUuid/pre-auth-request" element={<PreAuthRequestDashboard />} />
         <Route
           path="/patient/:patientUuid/:billUuid"
           element={
