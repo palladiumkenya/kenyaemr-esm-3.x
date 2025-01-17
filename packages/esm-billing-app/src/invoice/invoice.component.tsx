@@ -5,7 +5,10 @@ import {
   formatDatetime,
   navigate,
   parseDate,
+  setCurrentVisit,
   showModal,
+  showSnackbar,
+  updateVisit,
   useFeatureFlag,
   usePatient,
   useVisit,
@@ -21,6 +24,7 @@ import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
 import { LineItem } from '../types';
 import InvoiceTable from './invoice-table.component';
+import { removeQueuedPatient, useVisitQueueEntry } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import ReceiptPrintButton from './print-bill-receipt/receipt-print-button.component';
@@ -39,7 +43,14 @@ const Invoice: React.FC = () => {
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
   usePaymentsReconciler(billUuid);
-  const { currentVisit, isLoading: isVisitLoading, error: visitError } = useVisit(patientUuid);
+  const {
+    currentVisit,
+    isLoading: isVisitLoading,
+    error: visitError,
+    currentVisitIsRetrospective,
+    mutate: mutateVisit,
+  } = useVisit(patientUuid);
+  const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
@@ -108,12 +119,49 @@ const Invoice: React.FC = () => {
     );
   }
 
-  const handleViewClaims = () => {
+  const handleEndVisit = async () => {
+    if (currentVisitIsRetrospective) {
+      setCurrentVisit(null, null);
+    } else {
+      const endVisitPayload = {
+        stopDatetime: new Date(),
+      };
+
+      const abortController = new AbortController();
+
+      updateVisit(currentVisit.uuid, endVisitPayload, abortController)
+        .then((response) => {
+          if (queueEntry) {
+            removeQueuedPatient(
+              queueEntry.queue.uuid,
+              queueEntry.queueEntryUuid,
+              abortController,
+              response?.data.stopDatetime,
+            );
+          }
+          mutateVisit();
+          showSnackbar({
+            isLowContrast: true,
+            kind: 'success',
+            subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+            title: t('visitEnded', 'Visit ended'),
+          });
+        })
+        .catch((error) => {
+          showSnackbar({
+            title: t('errorEndingVisit', 'Error ending visit'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: error?.message,
+          });
+        });
+    }
+  };
+
+  const handleViewClaims = async () => {
     if (currentVisit) {
-      const dispose = showModal('end-visit-dialog', {
-        closeModal: () => dispose(),
-        patientUuid,
-      });
+      await handleEndVisit();
+      navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
     } else {
       navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
     }
@@ -153,6 +201,7 @@ const Invoice: React.FC = () => {
         {isProcessClaimsFormEnabled && (
           <Button
             onClick={handleViewClaims}
+            disabled={bill?.status !== 'PAID'}
             kind="danger"
             size="sm"
             renderIcon={BaggageClaim}

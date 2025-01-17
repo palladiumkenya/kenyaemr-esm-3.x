@@ -4,7 +4,7 @@ import {
   Diagnosis,
   Package,
   PatientBenefit,
-  SHAIntervension,
+  SHAIntervention,
   shifIdentifiersResponse,
 } from '../types';
 
@@ -52,10 +52,10 @@ export const packages = [
   },
 ] as Array<Package>;
 
-export const intervensions = patientBenefits.map(({ interventionCode, interventionName }) => ({
+export const interventions = patientBenefits.map(({ interventionCode, interventionName }) => ({
   interventionCode,
   interventionName,
-})) as Array<SHAIntervension>;
+})) as Array<SHAIntervention>;
 
 export const coverageEligibilityResponse = [
   {
