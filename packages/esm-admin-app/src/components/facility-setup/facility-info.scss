@@ -1,0 +1,87 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.omrs-main-content {
+  background-color: colors.$white;
+}
+
+.bottomBorder {
+  margin-bottom: layout.$spacing-05;
+}
+
+.btnLayer {
+  display: flex;
+  padding-top: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+  padding-bottom: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
+  flex-direction: row;
+  justify-content: flex-end;
+  background-color: white;
+  width: 100%;
+}
+
+.tableLayer {
+  padding-left: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+  background: white;
+  padding-top: layout.$spacing-01;
+}
+
+.loading {
+  display: flex;
+  padding-top: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+  padding-bottom: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
+  flex-direction: row;
+  justify-content: flex-end;
+  background-color: white;
+  width: 100%;
+}
+
+.facilityInfoContainer {
+  margin: layout.$spacing-05;
+}
+
+.card {
+  padding: 1rem;
+  background-color: colors.$gray-10;
+  border: 1px solid #e0e0e0;
+  border-radius: 2px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cardTitle {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.cardDivider {
+  border: none;
+  border-top: 1px solid #e0e0e0;
+  margin: 0.5rem 0;
+}
+.cardContent {
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.cardContent p {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.cardContent br {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.cardContent strong {
+  min-width: 150px;
+  display: inline-block;
+  color: #393939;
+}
