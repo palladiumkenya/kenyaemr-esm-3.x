@@ -26,10 +26,12 @@ const ClaimsSummaryChart = () => {
   }
 
   const transformClaimSummaryChartData = (data) => {
-    return data.map((item) => [
-      { group: item.month, value: item.claimsA },
-      { group: item.month, value: item.claimsB },
-    ]).flat();
+    return data
+      .map((item) => [
+        { group: item.month, value: item.claimsA },
+        { group: item.month, value: item.claimsB },
+      ])
+      .flat();
   };
 
   const options: BarChartOptions = {
@@ -54,15 +56,11 @@ const ClaimsSummaryChart = () => {
     height: '400px',
   };
 
- 
   const transformedData = transformClaimSummaryChartData(metrics.summaryGraph);
 
   return (
     <div style={{ padding: '2rem' }}>
-      <GroupedBarChart
-        data={transformedData}
-        options={options}
-      />
+      <GroupedBarChart data={transformedData} options={options} />
     </div>
   );
 };

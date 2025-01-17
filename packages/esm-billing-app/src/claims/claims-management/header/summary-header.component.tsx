@@ -3,27 +3,21 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './summary-header.scss';
 
-
 interface ClaimsSummaryHeaderProps {
   filters: {
-    fromDate: Date | null; 
+    fromDate: Date | null;
     toDate: Date | null;
   };
   onFilterChanged: (updateFn: (currentFilters: any) => any) => void;
   statusOptions?: string[];
 }
 
-const ClaimSummaryHeader: React.FC<ClaimsSummaryHeaderProps> = ({
-  filters,
-  onFilterChanged,
-}) => {
+const ClaimSummaryHeader: React.FC<ClaimsSummaryHeaderProps> = ({ filters, onFilterChanged }) => {
   const { t } = useTranslation();
 
- 
   const today = new Date();
   const oneMonthAgo = new Date(today);
   oneMonthAgo.setMonth(today.getMonth() - 1);
-
 
   useEffect(() => {
     if (!filters.fromDate && !filters.toDate) {
@@ -42,8 +36,7 @@ const ClaimSummaryHeader: React.FC<ClaimsSummaryHeaderProps> = ({
         onChange={([fromDate, toDate]) =>
           onFilterChanged((currentFilters) => ({ ...currentFilters, fromDate, toDate }))
         }
-        aria-label={t('datePicker.rangeLabel', 'Select date range')}
-      >
+        aria-label={t('datePicker.rangeLabel', 'Select date range')}>
         <DatePickerInput
           id="date-picker-input-id-start"
           placeholder={t('datePicker.startPlaceholder', 'mm/dd/yyyy')}
