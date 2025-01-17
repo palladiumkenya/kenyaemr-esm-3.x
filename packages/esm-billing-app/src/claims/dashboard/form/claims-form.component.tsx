@@ -21,7 +21,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
-import PackageIntervensions from '../../../benefits-package/forms/package-intervensions.component';
+import PackageInterventions from '../../../benefits-package/forms/package-interventions.component';
 import { formatDate } from '../../../helpers/functions';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import usePackages from '../../../hooks/usePackages';
@@ -314,8 +314,9 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           {selectedPackageObservable && (
             <Column>
               <Layer className={styles.input}>
-                <PackageIntervensions
+                <PackageInterventions
                   category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
+                  patientUuid={patientUuid}
                 />
               </Layer>
             </Column>
