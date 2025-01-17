@@ -17,7 +17,7 @@ export interface EligibilityResponse {
   coverageType: string;
   primaryContributor: null;
   employerDetails: EmployerDetails;
-  dependants: any[];
+  dependants: Array<unknown>;
   active: boolean;
 }
 
