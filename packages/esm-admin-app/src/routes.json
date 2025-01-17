@@ -18,6 +18,11 @@
       "component": "etlAdministrationLeftPannelLink",
       "name": "etl-administration-left-panel-link",
       "slot": "admin-left-panel-slot"
+    },
+    {
+      "component": "facilitySetupLeftPanelLink",
+      "name": "facility-setup-left-panel-link",
+      "slot": "admin-left-panel-slot"
     }
   ],
   "workspaces": [
