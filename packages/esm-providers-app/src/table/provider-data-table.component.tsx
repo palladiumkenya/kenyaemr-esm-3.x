@@ -28,6 +28,19 @@ import CustomActionMenu from '../overflow/overflow-component';
 import EmptyProviderState from './empty-state.component';
 import { Report } from '@carbon/react/icons';
 
+type FilterType = 'All Providers' | 'Active Licensed' | 'Expired Licensed' | 'Licensed expiring soon' | 'Unlicensed';
+
+const getCardTitle = (filterName: FilterType): string => {
+  const filterMap: Record<FilterType, string> = {
+    'All Providers': 'List of all providers',
+    'Active Licensed': 'List of active licensed providers',
+    'Expired Licensed': 'List of expired licensed providers',
+    'Licensed expiring soon': 'List of licensed expiring soon providers',
+    Unlicensed: 'List of unlicensed providers',
+  };
+  return filterMap[filterName] || 'List of providers';
+};
+
 const ProviderListTable: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -36,9 +49,8 @@ const ProviderListTable: React.FC = () => {
   const { licenseNumberUuid, licenseExpiryDateUuid, providerNationalIdUuid } = useConfig<ConfigObject>();
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('All Providers'); // Default filter to "All Providers"
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('All Providers');
 
-  // Helper functions for filtering
   const isActiveLicensed = (provider) => {
     const licenseAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseNumberUuid);
     const expiryAttr = provider.attributes.find((attr) => attr.attributeType.uuid === licenseExpiryDateUuid);
@@ -120,20 +132,9 @@ const ProviderListTable: React.FC = () => {
     <div className={styles.Container}>
       <div className={styles.providerContainer}>
         <CardHeader
-          title={`${t(
-            selectedFilter === 'All Providers'
-              ? 'List of all providers'
-              : selectedFilter === 'Active Licensed'
-              ? 'List of active licensed providers'
-              : selectedFilter === 'Expired Licensed'
-              ? 'List of expired licensed providers'
-              : selectedFilter === 'Licensed expiring soon'
-              ? 'List of licensed expiring soon providers'
-              : 'List of unlicensed providers',
-            {
-              count: filteredProviders.length,
-            },
-          )} (${filteredProviders.length})`}>
+          title={`${t(getCardTitle(selectedFilter), { count: filteredProviders.length })} (${
+            filteredProviders.length
+          })`}>
           <Dropdown
             className={styles.dropDown}
             initialSelectedItem={{ text: 'All Providers' }}
@@ -145,7 +146,7 @@ const ProviderListTable: React.FC = () => {
               { text: 'Licensed expiring soon' },
               { text: 'Unlicensed' },
             ]}
-            onChange={({ selectedItem }) => setSelectedFilter(selectedItem?.text || 'All Providers')}
+            onChange={({ selectedItem }) => setSelectedFilter((selectedItem?.text as FilterType) || 'All Providers')}
           />
         </CardHeader>
 

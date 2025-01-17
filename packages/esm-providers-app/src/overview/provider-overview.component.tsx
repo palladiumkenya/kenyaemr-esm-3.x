@@ -4,8 +4,8 @@ import { launchWorkspace } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ProviderListTable from '../table/provider-data-table.component';
-import styles from './overview.scss';
-export const Overview: React.FC = () => {
+import styles from './provider-overview.scss';
+export const ProviderOverview: React.FC = () => {
   const { t } = useTranslation();
 
   const handleRegisterProvider = () => {

@@ -50,6 +50,9 @@ const providerFormSchema = z
     gender: z.enum(['M', 'F'], { required_error: 'Gender is required' }),
     licenseNumber: z.string().nonempty('License number is required'),
     registrationNumber: z.string().nonempty('License number is required'),
+    phoneNumber: z.string().optional(),
+    qualification: z.string().optional(),
+    providerAddress: z.string().optional(),
     passportNumber: z.string().optional(),
     licenseExpiryDate: z.date(),
     username: z.string().nonempty('Username is required'),
@@ -82,6 +85,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     licenseBodyUuid,
     identifierTypes,
     providerHieFhirReference,
+    phoneNumberUuid,
+    qualificationUuid,
+    providerAddressUuid,
   } = useConfig<ConfigObject>();
 
   const [searchHWR, setSearchHWR] = useState({
@@ -107,6 +113,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
       gender: provider?.person?.gender ?? 'M',
       licenseNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseNumberUuid)?.value,
       registrationNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === licenseBodyUuid)?.value,
+      phoneNumber: provider?.attributes?.find((attr) => attr.attributeType.uuid === phoneNumberUuid)?.value,
+      qualification: provider?.attributes?.find((attr) => attr.attributeType.uuid === qualificationUuid)?.value,
+      providerAddress: provider?.attributes?.find((attr) => attr.attributeType.uuid === providerAddressUuid)?.value,
       licenseExpiryDate: licenseDate ? parseDate(licenseDate) : undefined,
       username: user?.username,
       password: provider ? '*****' : '',
@@ -153,6 +162,26 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             )?.value,
           );
           setValue(
+            'phoneNumber',
+            fetchedHealthWorker?.entry[0]?.resource?.telecom?.find((contact) => contact.system === 'phone')?.value ||
+              '',
+          );
+
+          setValue(
+            'qualification',
+            fetchedHealthWorker?.entry[0]?.resource?.qualification?.[0]?.code?.coding?.[0]?.display ||
+              fetchedHealthWorker?.entry[0]?.resource?.extension?.find(
+                (ext) => ext.url === 'https://ts.kenya-hie.health/Codesystem/specialty',
+              )?.valueCodeableConcept?.coding?.[0]?.display ||
+              '',
+          );
+          setValue(
+            'providerAddress',
+            fetchedHealthWorker?.entry[0]?.resource?.telecom?.find((contact) => contact.system === 'email')?.value ||
+              '',
+          );
+
+          setValue(
             'licenseExpiryDate',
             parseDate(
               fetchedHealthWorker?.entry[0]?.resource?.identifier?.find((id) =>
@@ -160,7 +189,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               )?.period?.end || t('unknown', 'Unknown'),
             ),
           );
-          // Save fetched healthWorker to state
           setHealthWorker(fetchedHealthWorker);
         },
       });
@@ -230,14 +258,27 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             attributeType: licenseBodyUuid,
             value: data.registrationNumber,
           },
-          // ...(healthWorker
-          //   ? [
-          //       {
-          //         attributeType: providerHieFhirReference,
-          //         value: JSON.stringify(healthWorker),
-          //       },
-          //     ]
-          //   : []),
+          {
+            attributeType: phoneNumberUuid,
+            value: data.phoneNumber,
+          },
+          {
+            attributeType: qualificationUuid,
+            value: data.qualification,
+          },
+          {
+            attributeType: providerAddressUuid,
+            value: data.providerAddress,
+          },
+
+          ...(healthWorker
+            ? [
+                {
+                  attributeType: providerHieFhirReference,
+                  value: JSON.stringify(healthWorker),
+                },
+              ]
+            : []),
         ],
         retired: false,
       };
@@ -483,6 +524,57 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                   invalidText={errors.licenseExpiryDate?.message}
                 />
               </DatePicker>
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            name="phoneNumber"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                placeholder="Phone number"
+                disabled
+                id="phoneNumber"
+                labelText={t('phoneNumber', 'Phone number')}
+                invalid={!!errors.phoneNumber}
+                invalidText={errors.phoneNumber?.message}
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            name="providerAddress"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                placeholder="Email address"
+                disabled
+                id="phoneNumber"
+                labelText={t('emailAddress', 'Email address')}
+                invalid={!!errors?.providerAddress}
+                invalidText={errors?.providerAddress?.message}
+              />
+            )}
+          />
+        </Column>
+        <Column>
+          <Controller
+            name="qualification"
+            control={control}
+            render={({ field }) => (
+              <TextInput
+                {...field}
+                placeholder="Qualification"
+                disabled
+                id="qualification"
+                labelText={t('qualification', 'Qualification')}
+                invalid={!!errors.qualification}
+                invalidText={errors.qualification?.message}
+              />
             )}
           />
         </Column>

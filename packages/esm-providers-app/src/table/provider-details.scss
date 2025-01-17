@@ -11,10 +11,9 @@
   margin-right: layout.$spacing-01;
 }
 .middot {
-  margin: 0 0.25rem;
+  margin: 0 layout.$spacing-01;
 }
-.nationalId {
-  margin-top: layout.$spacing-04;
+.spanField {
   margin-left: layout.$spacing-04;
   margin-right: layout.$spacing-01;
 }
@@ -55,4 +54,8 @@
   display: flex;
   flex-flow: row wrap;
   align-items: center;
+  margin-top: layout.$spacing-04;
+}
+.patientAvatar {
+  margin-top: layout.$spacing-06;
 }

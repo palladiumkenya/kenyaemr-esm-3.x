@@ -6,6 +6,7 @@ import { useProviderDetails, useProviderUser } from '../workspace/hook/provider-
 import { PatientPhoto } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import classNames from 'classnames';
+import capitalize from 'lodash/capitalize';
 
 interface ProviderDetailsProps {
   providerUuid: string;
@@ -20,6 +21,10 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
   const licenseAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'Practising License Number');
   const nationalID = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider National Id Number');
   const dateAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Expiry Date');
+  const phoneNumber = provider?.attributes?.find((attr) => attr.attributeType.display === 'Phone number');
+  const qualification = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider qualification');
+  const registrationNumber = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Body');
+  const emailAddress = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider address');
 
   const formattedExpiryDate = dateAttr?.value ? dayjs(dateAttr.value).format('YYYY-MM-DD') : null;
   const today = dayjs();
@@ -60,7 +65,6 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
             <PatientPhoto patientUuid={user?.uuid} patientName={user?.person?.display} />
           </div>
           <div className={styles.patientInfo}>
-            {/* Patient Name, Gender, and License Status */}
             <div className={classNames(styles.row, styles.patientNameRow)}>
               <div className={styles.flexRow}>
                 <span className={styles.patientName}>{user?.person?.display} </span> &middot;
@@ -68,19 +72,38 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
                   {user?.person?.gender === 'M' ? 'Male' : user?.person?.gender === 'F' ? 'Female' : ''} &middot;{' '}
                 </span>
                 <span className={styles.statusTag}>{getLicenseStatusTag()}</span>
+                <span className={styles.statusTag}>
+                  {qualification?.value && <Tag type="cyan">{capitalize(qualification.value)}</Tag>}
+                </span>
               </div>
             </div>
 
-            {/* National ID and License Number */}
             <div className={classNames(styles.row, styles.patientNameRow)}>
               <div className={styles.flexRow}>
-                <span className={styles.nationalId}>
+                <span className={styles.spanField}>
+                  {t('phoneNumber', 'Phone number')}: {phoneNumber?.value ? phoneNumber.value : '--'}
+                </span>
+                <span className={styles.middot}>&middot; </span>
+
+                <span className={styles.spanField}>
+                  {t('emailAddress', 'Email address')}: {emailAddress?.value ? emailAddress.value : '--'}
+                </span>
+              </div>
+            </div>
+            <div className={classNames(styles.row, styles.patientNameRow)}>
+              <div className={styles.flexRow}>
+                <span className={styles.spanField}>
                   {t('nationalId', 'National ID')}: {nationalID?.value ? nationalID.value : '--'}
                 </span>
                 <span className={styles.middot}>&middot; </span>
 
-                <span className={styles.nationalId}>
+                <span className={styles.spanField}>
                   {t('licenseNumber', 'License number')}: {licenseAttr?.value ? licenseAttr.value : '--'}
+                </span>
+                <span className={styles.middot}>&middot; </span>
+                <span className={styles.spanField}>
+                  {t('registrationNumber', 'Registration number')}:{' '}
+                  {registrationNumber?.value ? registrationNumber.value : '--'}
                 </span>
               </div>
             </div>

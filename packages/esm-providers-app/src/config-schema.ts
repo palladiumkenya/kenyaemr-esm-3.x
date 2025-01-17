@@ -37,6 +37,21 @@ export const configSchema = {
     _description: 'UUID for provider hie fhir reference',
     _default: '67b94e8e-4d61-4810-b0f1-d86497f6e553',
   },
+  phoneNumberUuid: {
+    _type: Type.String,
+    _description: 'UUID for provider hie phone number',
+    _default: '37daed7f-1f4e-4e62-8e83-6048ade18a87',
+  },
+  qualificationUuid: {
+    _type: Type.String,
+    _description: 'UUID for provider hie qualification',
+    _default: '43f99413-6e7f-4812-bc60-066bb1d43f94',
+  },
+  providerAddressUuid: {
+    _type: Type.String,
+    _description: 'UUID for provider hie address',
+    _default: '033ff604-ecf7-464f-b623-5b77c733667f',
+  },
   defaultPrimaryFacility: {
     _type: Type.String,
     _description: 'Default facility for a provider',
@@ -70,6 +85,9 @@ export interface ConfigObject {
   passportNumberUuid: string;
   licenseExpiryDateUuid: string;
   providerHieFhirReference: string;
+  phoneNumberUuid: string;
+  qualificationUuid: string;
+  providerAddressUuid: string;
   licenseBodyUuid: string;
   providerNationalIdUuid: string;
   licenseNumberUuid: string;
