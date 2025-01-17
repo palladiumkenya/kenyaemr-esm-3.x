@@ -521,6 +521,12 @@ export interface ClaimsPreAuthFilter {
   search?: string;
 }
 
+export interface ClaimsSummaryFilter {
+  fromDate: Date;
+  toDate: Date;
+  status: string;
+}
+
 export interface BenefitDataResponse {
   title?: string;
   allocation?: string;

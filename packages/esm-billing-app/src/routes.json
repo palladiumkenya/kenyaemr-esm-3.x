@@ -186,11 +186,18 @@
       },
       "featureFlag": "healthInformationExchange"
     },
+    
+    {
+      "component": "claimsSummaryOverviewDashboardLink",
+      "name": "claims-management-summary-link",
+      "slot": "claims-management-dashboard-link-slot"
+    },
     {
       "component": "claimsManagementOverviewDashboardLink",
       "name": "claims-management-overview-link",
       "slot": "claims-management-dashboard-link-slot"
     },
+
     {
       "component": "preAuthRequestsDashboardLink",
       "name": "preauthrequest-overview-link",

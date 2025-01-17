@@ -128,6 +128,13 @@ export const claimsManagementSideNavGroup = getSyncLifecycle(
   }),
   options,
 );
+export const claimsSummaryOverviewDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'claims-summary',
+    title: 'Claims Summary',
+  }),
+  options,
+);
 export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'claims-overview',
