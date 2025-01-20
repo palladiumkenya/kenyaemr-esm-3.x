@@ -32,4 +32,5 @@ export interface FacilityData {
   shaFacilityId?: string;
   shaFacilityLicenseNumber?: string;
   shaFacilityExpiryDate?: string;
+  source?: string;
 }
