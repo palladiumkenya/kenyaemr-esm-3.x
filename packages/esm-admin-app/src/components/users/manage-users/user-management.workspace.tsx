@@ -49,10 +49,11 @@ import {
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
-import { ChevronSortUp } from '@carbon/react/icons';
+import { ChevronSortUp, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { Provider, User, UserRoleScope } from '../../../config-schema';
 import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatForDatePicker, today } from '../../../constants';
+import { ResourceRepresentation } from '../../../api';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -73,7 +74,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
   const { location, loadingLocation } = useLocation();
 
-  const { items, loadingRoleScope, userRoleScopeError } = useUserRoleScopes();
+  const { items, loadingRoleScope, userRoleScopeError } = useUserRoleScopes({
+    v: ResourceRepresentation.Default,
+    totalCount: true,
+  });
 
   const { userManagementFormSchema } = UserManagementFormSchema();
   const {
@@ -88,6 +92,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { roles = [], isLoading } = useRoles();
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
   const { attributeTypes = [] } = usePersonAttribute();
+
+  const userRoleScope = items.results.find((user) => user.userUuid === initialUserValue.uuid);
+
   // Memoize provider attribute mappings
   const attributeTypeMapping = useMemo(() => {
     return {
@@ -143,6 +150,20 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate,
       primaryFacility: primaryFacility,
+      stockOperations:
+        userRoleScope.operationTypes?.map((op) => ({
+          operationTypeName: op.operationTypeName,
+          operationTypeUuid: op.operationTypeUuid,
+        })) || [],
+      operationLocation:
+        userRoleScope.locations?.map((loc) => ({
+          locationName: loc.locationName,
+          locationUuid: loc.locationUuid,
+        })) || [],
+      permanent: userRoleScope.permanent,
+      enabled: userRoleScope.enabled,
+      activeTo: userRoleScope.activeTo,
+      activeFrom: userRoleScope.activeFrom,
     };
   }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
 
@@ -263,7 +284,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
         if (userRoleScopePayload && Object.keys(userRoleScopePayload).length > 0) {
           try {
-            const userRoleScopeUrl = `${restBaseUrl}/stockmanagement/userrolescope`;
+            const userRoleScopeUrl = data.isEditUseRoleScope
+              ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
+              : `${restBaseUrl}/stockmanagement/userrolescope`;
             const userUuid = response.uuid;
 
             const userRoleScopeResponse = await createOrUpdateUserRoleScope(
@@ -273,6 +296,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             );
 
             if (userRoleScopeResponse.ok) {
+              handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
               showSnackbarMessage(t('userRoleScopeSaved', 'User role scope saved successfully'), '', 'success');
             }
           } catch (error) {
@@ -486,6 +510,20 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                               </RadioButtonGroup>
                             )}
                           />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <ButtonSet className={styles.btnSet}>
+                            <Button
+                              className={styles.btn}
+                              renderIcon={ChevronRight}
+                              hasIconOnly
+                              kind="ghost"
+                              iconDescription={t('next', 'Next')}
+                              onClick={() => {
+                                toggleSection(currentIndex + 1);
+                              }}
+                            />
+                          </ButtonSet>
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
@@ -716,6 +754,20 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             )}
                           </>
                         )}
+                        <ResponsiveWrapper>
+                          <ButtonSet className={styles.btnSet}>
+                            <Button
+                              className={styles.btn}
+                              renderIcon={ChevronRight}
+                              hasIconOnly
+                              kind="ghost"
+                              iconDescription={t('next', 'Next')}
+                              onClick={() => {
+                                toggleSection(currentIndex + 1);
+                              }}
+                            />
+                          </ButtonSet>
+                        </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
 
@@ -813,6 +865,20 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                               </CheckboxGroup>
                             )}
                           />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <ButtonSet className={styles.btnSet}>
+                            <Button
+                              className={styles.btn}
+                              renderIcon={ChevronRight}
+                              hasIconOnly
+                              kind="ghost"
+                              iconDescription={t('next', 'Next')}
+                              onClick={() => {
+                                toggleSection(currentIndex + 1);
+                              }}
+                            />
+                          </ButtonSet>
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
@@ -1208,6 +1274,28 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             </Tile>
                           )}
                         </ResponsiveWrapper>
+                        {items.results.length > 0 && (
+                          <ResponsiveWrapper>
+                            <Controller
+                              name="isEditUseRoleScope"
+                              control={userFormMethods.control}
+                              render={({ field }) => (
+                                <CheckboxGroup
+                                  legendText={t('editUserRoleScope', 'Edit User Role Scope')}
+                                  className={styles.multilineCheckboxLabel}>
+                                  <Checkbox
+                                    className={styles.checkboxLabelSingleLine}
+                                    {...field}
+                                    id="isEditUseRoleScope"
+                                    labelText={t('editUserRoleScope', 'Edit User Role Scope?')}
+                                    checked={field.value || false}
+                                    onChange={(e) => field.onChange(e.target.checked)}
+                                  />
+                                </CheckboxGroup>
+                              )}
+                            />
+                          </ResponsiveWrapper>
+                        )}
                       </ResponsiveWrapper>
                     )}
                   </Stack>
