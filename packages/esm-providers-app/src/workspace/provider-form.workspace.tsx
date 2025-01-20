@@ -538,7 +538,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <TextInput
                 {...field}
                 placeholder="Phone number"
-                // disabled
+                disabled
                 id="phoneNumber"
                 labelText={t('phoneNumber', 'Phone number')}
                 invalid={!!errors.phoneNumber}
@@ -555,7 +555,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <TextInput
                 {...field}
                 placeholder="Email address"
-                // disabled
+                disabled
                 id="phoneNumber"
                 labelText={t('emailAddress', 'Email address')}
                 invalid={!!errors?.providerAddress}
@@ -572,7 +572,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <TextInput
                 {...field}
                 placeholder="Qualification"
-                // disabled
+                disabled
                 id="qualification"
                 labelText={t('qualification', 'Qualification')}
                 invalid={!!errors.qualification}
