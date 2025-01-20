@@ -88,9 +88,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   // Memoize provider attribute mappings
   const attributeTypeMapping = useMemo(() => {
     return {
-      licenseNumber: providerAttributeType.find((type) => type.name === 'Practising License Number')?.uuid || '',
-      licenseExpiry: providerAttributeType.find((type) => type.name === 'License Expiry Date')?.uuid || '',
-      primaryFacility: providerAttributeType.find((type) => type.name === 'Primary Facility')?.uuid || '',
+      licenseNumber:
+        providerAttributeType.find((type) => type.uuid === 'bcaaa67b-cc72-4662-90c2-e1e992ceda66')?.uuid || '',
+      licenseExpiry:
+        providerAttributeType.find((type) => type.uuid === '00539959-a1c7-4848-a5ed-8941e9d5e835')?.uuid || '',
+      primaryFacility:
+        providerAttributeType.find((type) => type.uuid === '5a53dddd-b382-4245-9bf1-03bce973f24b')?.uuid || '',
     };
   }, [providerAttributeType]);
 
@@ -133,7 +136,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           display: role.display,
           description: role.description,
         })) || [],
-      gender: initialUserValue.person?.gender || 'M',
+      gender: initialUserValue.person?.gender,
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate,
       primaryFacility: primaryFacility,
@@ -176,8 +179,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   }, [isDirty, promptBeforeClosing]);
 
   const onSubmit = async (data: UserFormSchema) => {
-    const emailAttribute = attributeTypes.find((attr) => attr.name === 'Email address')?.uuid || '';
-    const telephoneAttribute = attributeTypes.find((attr) => attr.name === 'Telephone contact')?.uuid || '';
+    const emailAttribute = 'b8d0b331-1d2d-4a9a-b741-1816f498bdb6';
+    const telephoneAttribute = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
     const setProvider = data.providerIdentifiers;
     const editProvider = data.isEditProvider;
     const providerUUID = provider[0]?.uuid || '';
