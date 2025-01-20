@@ -14,6 +14,7 @@ import {
 } from './config-schema';
 import uniqBy from 'lodash-es/uniqBy';
 import { useMemo } from 'react';
+import { ResourceFilterCriteria, toQueryParams } from './api';
 
 export const useUser = () => {
   const url = `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`;
@@ -178,5 +179,17 @@ export function useStockTagLocations() {
     stockLocations: uniqBy(stockLocations, 'id') ?? [],
     isLoading,
     error,
+  };
+}
+
+export type UserRoleScopeFilter = ResourceFilterCriteria;
+// getUserRoleScopes
+export function useUserRoleScopes(filter: UserRoleScopeFilter) {
+  const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope${toQueryParams(filter)}`;
+  const { data, error, isLoading } = useSWR<{ data: PageableResult<UserRoleScope> }, Error>(apiUrl, openmrsFetch);
+  return {
+    items: data?.data || <PageableResult<UserRoleScope>>{},
+    loadingRoleScope: isLoading,
+    userRoleScopeError: error,
   };
 }
