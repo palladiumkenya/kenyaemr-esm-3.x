@@ -12,6 +12,9 @@ const FacilityInfo: React.FC = () => {
   const { defaultFacility, isLoading: defaultFacilityLoading, error, refetch } = useFacilityInfo(shouldSynchronize);
 
   const [facilityData, setFacilityData] = useState<FacilityData>(defaultFacility);
+  useEffect(() => {
+    setFacilityData(defaultFacility);
+  }, [defaultFacility]);
 
   const synchronizeFacilityData = async () => {
     try {
@@ -23,10 +26,10 @@ const FacilityInfo: React.FC = () => {
         isLowContrast: true,
       });
       if (defaultFacility?.source != 'HIE') {
-        showNotification({
-          kind: 'error',
-          title: 'Error',
-          description: 'HIE Sync Failed. Pulling local info.',
+        showSnackbar({
+          kind: 'warning',
+          title: 'HIE Sync Failed. Pulling local info.',
+          isLowContrast: true,
         });
       }
     } catch (error) {
@@ -67,7 +70,7 @@ const FacilityInfo: React.FC = () => {
             <hr className={styles.cardDivider} />
             <div className={styles.cardContent}>
               <p>
-                <strong>Facility Name:</strong> {facilityData?.display || 'N/A'}
+                <strong>Facility Name:</strong> {facilityData?.display}
               </p>
               <p>
                 <strong>Facility KMHFR Code:</strong> {facilityData?.mflCode}
