@@ -21,10 +21,10 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
   const licenseAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'Practising License Number');
   const nationalID = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider National Id Number');
   const dateAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Expiry Date');
-  const phoneNumber = provider?.attributes?.find((attr) => attr.attributeType.display === 'Phone number');
-  const qualification = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider qualification');
+  const phoneNumber = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider Telephone');
+  const qualification = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider Qualification');
   const registrationNumber = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Body');
-  const emailAddress = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider address');
+  const emailAddress = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider Address');
 
   const formattedExpiryDate = dateAttr?.value ? dayjs(dateAttr.value).format('YYYY-MM-DD') : null;
   const today = dayjs();
@@ -73,7 +73,7 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
                 </span>
                 <span className={styles.statusTag}>{getLicenseStatusTag()}</span>
                 <span className={styles.statusTag}>
-                  {qualification?.value && <Tag type="cyan">{capitalize(qualification.value)}</Tag>}
+                  {qualification?.value && <Tag type="cyan">{capitalize(qualification?.value)}</Tag>}
                 </span>
               </div>
             </div>

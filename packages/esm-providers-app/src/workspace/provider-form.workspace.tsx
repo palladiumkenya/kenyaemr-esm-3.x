@@ -50,7 +50,10 @@ const providerFormSchema = z
     gender: z.enum(['M', 'F'], { required_error: 'Gender is required' }),
     licenseNumber: z.string().nonempty('License number is required'),
     registrationNumber: z.string().nonempty('License number is required'),
-    phoneNumber: z.string().optional(),
+    phoneNumber: z
+      .string()
+      .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+      .optional(),
     qualification: z.string().optional(),
     providerAddress: z.string().optional(),
     passportNumber: z.string().optional(),
@@ -535,7 +538,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <TextInput
                 {...field}
                 placeholder="Phone number"
-                disabled
+                // disabled
                 id="phoneNumber"
                 labelText={t('phoneNumber', 'Phone number')}
                 invalid={!!errors.phoneNumber}
@@ -552,7 +555,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <TextInput
                 {...field}
                 placeholder="Email address"
-                disabled
+                // disabled
                 id="phoneNumber"
                 labelText={t('emailAddress', 'Email address')}
                 invalid={!!errors?.providerAddress}
@@ -569,7 +572,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <TextInput
                 {...field}
                 placeholder="Qualification"
-                disabled
+                // disabled
                 id="qualification"
                 labelText={t('qualification', 'Qualification')}
                 invalid={!!errors.qualification}

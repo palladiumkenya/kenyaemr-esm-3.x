@@ -28,6 +28,10 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
     passportNumberUuid,
     licenseNumberUuid,
     identifierTypes,
+    phoneNumberUuid,
+    qualificationUuid,
+    providerAddressUuid,
+    providerHieFhirReference,
   } = useConfig<ConfigObject>();
 
   const providerNationalId = provider.attributes.find((attr) => attr.attributeType.uuid === providerNationalIdUuid);
@@ -84,6 +88,19 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
           )?.period?.end,
         ),
       );
+      const phoneNumber = healthWorker?.entry[0]?.resource?.telecom?.find(
+        (contact) => contact.system === 'phone',
+      )?.value;
+      const email = healthWorker?.entry[0]?.resource?.telecom?.find((contact) => contact.system === 'email')?.value;
+
+      const qualification =
+        healthWorker?.entry[0]?.resource?.qualification?.[0]?.code?.coding?.[0]?.display ||
+        healthWorker?.entry[0]?.resource?.extension?.find(
+          (ext) => ext.url === 'https://ts.kenya-hie.health/Codesystem/specialty',
+        )?.valueCodeableConcept?.coding?.[0]?.display;
+
+      const fhirBundle = JSON.stringify(healthWorker);
+
       const updatableAttributes = [
         {
           attributeType: licenseNumberUuid,
@@ -96,6 +113,22 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
         {
           attributeType: licenseExpiryDateUuid,
           value: parseDate(licenseDate),
+        },
+        {
+          attributeType: phoneNumberUuid,
+          value: phoneNumber,
+        },
+        {
+          attributeType: qualificationUuid,
+          value: qualification,
+        },
+        {
+          attributeType: providerHieFhirReference,
+          value: fhirBundle,
+        },
+        {
+          attributeType: providerAddressUuid,
+          value: email,
         },
       ];
 
