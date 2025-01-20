@@ -45,6 +45,7 @@ import {
   useStockTagLocations,
   createOrUpdateUserRoleScope,
   createProvider,
+  useUserRoleScopes,
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
@@ -71,6 +72,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
   const { location, loadingLocation } = useLocation();
+
+  const { items, loadingRoleScope, userRoleScopeError } = useUserRoleScopes();
 
   const { userManagementFormSchema } = UserManagementFormSchema();
   const {
