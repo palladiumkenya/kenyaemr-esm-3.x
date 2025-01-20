@@ -12,12 +12,6 @@ const FacilityInfo: React.FC = () => {
   const { defaultFacility, isLoading: defaultFacilityLoading, error, refetch } = useFacilityInfo(shouldSynchronize);
 
   const [facilityData, setFacilityData] = useState<FacilityData>(defaultFacility);
-  useEffect(() => {
-    setFacilityData(defaultFacility);
-    if (defaultFacility?.operationalStatus !== 'Operational') {
-      showNotification({ kind: 'error', title: 'Error', description: 'The facility SHA status is is not operational' });
-    }
-  }, [defaultFacility]);
 
   const synchronizeFacilityData = async () => {
     try {
@@ -28,6 +22,13 @@ const FacilityInfo: React.FC = () => {
         kind: 'success',
         isLowContrast: true,
       });
+      if (defaultFacility?.source != 'HIE') {
+        showNotification({
+          kind: 'error',
+          title: 'Error',
+          description: 'HIE Sync Failed. Pulling local info.',
+        });
+      }
     } catch (error) {
       const errorMessage = error?.responseBody?.error?.message ?? 'An error occurred while synchronizing with HIE';
       showSnackbar({
