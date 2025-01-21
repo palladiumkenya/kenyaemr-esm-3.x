@@ -26,7 +26,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
 
   const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
 
-  const isRegisteredOnSHA = Boolean(data?.coverageEndDate) && Boolean(data?.coverageStartDate);
+  const isRegisteredOnSHA = data?.status === 1;
   const isNotRegisteredOnSHA = data?.status === 0;
 
   const isActive = isRegisteredOnSHA
