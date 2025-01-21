@@ -27,7 +27,6 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
   const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
 
   const isRegisteredOnSHA = data?.status === 1;
-  const isNotRegisteredOnSHA = data?.status === 0;
 
   const isActive = isRegisteredOnSHA
     ? isWithinInterval(new Date(), {
@@ -76,7 +75,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (isNotRegisteredOnSHA) {
+  if (!isRegisteredOnSHA) {
     return (
       <InlineNotification
         title={t('HIEVerificationFailure', 'HIE verification failure')}
