@@ -50,7 +50,10 @@ const providerFormSchema = z
     gender: z.enum(['M', 'F'], { required_error: 'Gender is required' }),
     licenseNumber: z.string().nonempty('License number is required'),
     registrationNumber: z.string().nonempty('License number is required'),
-    phoneNumber: z.string().optional(),
+    phoneNumber: z
+      .string()
+      .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+      .optional(),
     qualification: z.string().optional(),
     providerAddress: z.string().optional(),
     passportNumber: z.string().optional(),
