@@ -78,7 +78,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
   if (!isRegisteredOnSHA) {
     return (
       <InlineNotification
-        title={t('HIEVerificationFailure', 'HIE verification failure')}
+        title={t('hieVerificationFailure', 'HIE verification failure')}
         subtitle={`${data?.message ?? ''}.${data?.possibleSolution ?? ''}`}
         className={styles.missingSHANumber}
       />
