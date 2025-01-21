@@ -59,6 +59,7 @@ interface Person {
     familyName: string;
   };
   gender: string;
+  birthdate: string;
   attributes: PersonAttribute[];
 }
 
@@ -87,9 +88,24 @@ interface Entry {
     active: boolean;
     name: Name[];
     telecom: ContactList[];
+    extension: Extension[];
     gender: string;
     qualification: Qualification[];
   };
+}
+export interface Extension {
+  url: string;
+  valueCodeableConcept: ValueCodeableConcept;
+}
+
+export interface ValueCodeableConcept {
+  coding: Coding[];
+}
+
+export interface Coding {
+  system: string;
+  code: string;
+  display: string;
 }
 
 interface IdentifierType {

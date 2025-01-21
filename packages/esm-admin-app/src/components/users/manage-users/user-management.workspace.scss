@@ -136,3 +136,9 @@
   word-wrap: break-word;
   line-height: 1.4;
 }
+
+.datePicker {
+  margin: layout.$spacing-05;
+  padding: layout.$spacing-03;
+  border-radius: layout.$spacing-05;
+}

@@ -24,7 +24,6 @@
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
   "dependencies": {
-    "@carbon/charts-react": "^1.13.33",
     "@hookform/resolvers": "^3.1.1",
     "ace-builds": "^1.36.5",
     "classnames": "^2.3.2",

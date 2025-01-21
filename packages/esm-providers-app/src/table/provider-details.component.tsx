@@ -1,50 +1,80 @@
-import React from 'react';
-import styles from './generic-data-table.scss';
+import React, { useRef } from 'react';
+import styles from './provider-details.scss';
 import { useTranslation } from 'react-i18next';
-import {
-  StructuredListWrapper,
-  StructuredListRow,
-  StructuredListCell,
-  StructuredListBody,
-  Tile,
-  Tag,
-  Button,
-} from '@carbon/react';
-import { usePersonDetails, useProviderDetails, useProviderUser } from '../workspace/hook/provider-form.resource';
-import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { Edit } from '@carbon/react/icons';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { Tag } from '@carbon/react';
+import { useProviderDetails, useProviderUser } from '../workspace/hook/provider-form.resource';
+import { PatientPhoto } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
+import classNames from 'classnames';
+import capitalize from 'lodash/capitalize';
 
 interface ProviderDetailsProps {
   providerUuid: string;
 }
 
+interface ProviderAttribute {
+  value: string;
+}
+
+interface ProviderAttributes {
+  licenseAttr?: ProviderAttribute;
+  nationalID?: ProviderAttribute;
+  dateAttr?: ProviderAttribute;
+  phoneNumber?: ProviderAttribute;
+  qualification?: ProviderAttribute;
+  registrationNumber?: ProviderAttribute;
+  emailAddress?: ProviderAttribute;
+}
+
 const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
   const { t } = useTranslation();
+  const patientBannerRef = useRef(null);
   const { provider } = useProviderDetails(providerUuid);
   const { user, isLoading, error } = useProviderUser(providerUuid);
 
-  const licenseAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'Practising License Number');
-  const nationalID = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider National Id Number');
-  const dateAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Expiry Date');
+  const attributeMap = {
+    licenseAttr: 'Practising License Number',
+    nationalID: 'Provider National Id Number',
+    dateAttr: 'License Expiry Date',
+    phoneNumber: 'Provider Telephone',
+    qualification: 'Provider Qualification',
+    registrationNumber: 'License Body',
+    emailAddress: 'Provider Address',
+  };
+
+  const attributes: ProviderAttributes = Object.entries(attributeMap).reduce((acc, [key, display]) => {
+    const attr = provider?.attributes?.find((attr) => attr.attributeType.display === display);
+    if (attr) {
+      acc[key as keyof ProviderAttributes] = { value: attr.value };
+    }
+    return acc;
+  }, {} as ProviderAttributes);
+
+  const { licenseAttr, nationalID, dateAttr, phoneNumber, qualification, registrationNumber, emailAddress } =
+    attributes;
 
   const formattedExpiryDate = dateAttr?.value ? dayjs(dateAttr.value).format('YYYY-MM-DD') : null;
   const today = dayjs();
   const expiryDate = dateAttr?.value ? dayjs(dateAttr.value) : null;
   const daysUntilExpiry = expiryDate ? expiryDate.diff(today, 'day') : null;
 
-  let licenseStatus;
+  const getLicenseStatusTag = () => {
+    if (!licenseAttr?.value) {
+      return <Tag type="red">{t('unlicensed', 'Unlicensed')}</Tag>;
+    }
 
-  if (!expiryDate) {
-    licenseStatus = <Tag type="red">{t('missingExpiryDate', 'Missing expiry date')}</Tag>;
-  } else if (daysUntilExpiry < 0) {
-    licenseStatus = <Tag type="red">{t('licenseExpired', 'License has expired')}</Tag>;
-  } else if (daysUntilExpiry <= 3) {
-    licenseStatus = <Tag type="cyan">{t('licenseExpiringSoon', 'License is expiring soon')}</Tag>;
-  } else {
-    licenseStatus = <Tag type="green">{t('activeLicensed', 'Active License')}</Tag>;
-  }
+    if (daysUntilExpiry < 0) {
+      return <Tag type="red">{t('licenseExpired', 'License has expired')}</Tag>;
+    } else if (daysUntilExpiry <= 3) {
+      return (
+        <>
+          <Tag type="cyan">{t('licenseExpiringSoon', 'License is expiring soon')}</Tag>
+        </>
+      );
+    } else {
+      return <Tag type="green">{t('active', 'Active')}</Tag>;
+    }
+  };
 
   if (isLoading) {
     return <div>{t('loading', 'Loading...')}</div>;
@@ -56,80 +86,58 @@ const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
 
   return (
     <div className={styles.providerDetailsContainer}>
-      <div>
-        <div style={{ backgroundColor: 'white', width: '80%' }}>
-          <CardHeader title={t('profileOverview', 'Profile overview')}>
-            <></>
-          </CardHeader>
+      <header aria-label="patient banner" role="banner" ref={patientBannerRef}>
+        <div className={styles.patientBanner}>
+          <div className={styles.patientAvatar} role="img">
+            <PatientPhoto patientUuid={user?.uuid} patientName={user?.person?.display} />
+          </div>
+          <div className={styles.patientInfo}>
+            <div className={classNames(styles.row, styles.patientNameRow)}>
+              <div className={styles.flexRow}>
+                <span className={styles.patientName}>{user?.person?.display} </span> &middot;
+                <span className={styles.gender}>
+                  {user?.person?.gender === 'M' ? 'Male' : user?.person?.gender === 'F' ? 'Female' : ''} &middot;{' '}
+                </span>
+                <span className={styles.statusTag}>{getLicenseStatusTag()}</span>
+                <span className={styles.statusTag}>
+                  {qualification?.value && <Tag type="cyan">{capitalize(qualification?.value)}</Tag>}
+                </span>
+              </div>
+            </div>
+
+            <div className={classNames(styles.row, styles.patientNameRow)}>
+              <div className={styles.flexRow}>
+                <span className={styles.spanField}>
+                  {t('phoneNumber', 'Phone number')}: {phoneNumber?.value ? phoneNumber.value : '--'}
+                </span>
+                <span className={styles.middot}>&middot; </span>
+
+                <span className={styles.spanField}>
+                  {t('emailAddress', 'Email address')}: {emailAddress?.value ? emailAddress.value : '--'}
+                </span>
+              </div>
+            </div>
+            <div className={classNames(styles.row, styles.patientNameRow)}>
+              <div className={styles.flexRow}>
+                <span className={styles.spanField}>
+                  {t('nationalId', 'National ID')}: {nationalID?.value ? nationalID.value : '--'}
+                </span>
+                <span className={styles.middot}>&middot; </span>
+
+                <span className={styles.spanField}>
+                  {t('licenseNumber', 'License number')}: {licenseAttr?.value ? licenseAttr.value : '--'}
+                </span>
+                <span className={styles.middot}>&middot; </span>
+                <span className={styles.spanField}>
+                  {t('registrationNumber', 'Registration number')}:{' '}
+                  {registrationNumber?.value ? registrationNumber.value : '--'}
+                </span>
+              </div>
+            </div>
+            <br />
+          </div>
         </div>
-        <Tile style={{ backgroundColor: 'white', width: '80%' }}>
-          <StructuredListWrapper>
-            <StructuredListBody>
-              <StructuredListRow>
-                <StructuredListCell noWrap>
-                  <br />
-                  <ExtensionSlot
-                    style={{
-                      marginRight: '1rem',
-                      marginTop: '2rem',
-                    }}
-                    name="patient-photo-slot"
-                    state={{ patientName: user?.person?.display || t('unknown', 'Unknown') }}
-                  />
-                </StructuredListCell>
-                <StructuredListCell>
-                  {' '}
-                  <div className={styles.providerDetails}>
-                    <div className={styles.providerName}>{user?.person?.display}</div>
-                    <div className={styles.demographics}>
-                      {t('Gender', 'Gender')}: {user?.person?.gender}
-                    </div>
-                    <div className={styles.identifiers}>
-                      <div>
-                        <span>{t('nationalID', 'National ID')}: </span>
-                        <span>
-                          {nationalID?.value ? (
-                            <Tag type="green">{nationalID.value}</Tag>
-                          ) : (
-                            <Tag type="red">{t('missingIDno', 'Missing National ID')}</Tag>
-                          )}
-                        </span>
-                      </div>
-                      <div>
-                        <span>{t('licenseNumber', 'License Number')}: </span>
-                        <span>
-                          {licenseAttr?.value ? (
-                            <Tag type="green">{licenseAttr.value}</Tag>
-                          ) : (
-                            <Tag type="red">{t('unlicensed', 'Unlicensed')}</Tag>
-                          )}
-                        </span>
-                      </div>
-                      <div>
-                        <span>{t('expiryDate', 'Expiry Date')}: </span>
-                        <span>
-                          {formattedExpiryDate ? (
-                            <>
-                              <Tag type="blue">{formattedExpiryDate}</Tag>
-                              {licenseStatus}
-                            </>
-                          ) : (
-                            <Tag type="red">{t('missingExpiryDate', 'Missing Expiry Date')}</Tag>
-                          )}
-                        </span>
-                      </div>
-                      <div>
-                        <span>{t('roles', 'Roles')}: </span>
-                        <span>{user?.allRoles.map((role) => role.display).join(', ')}</span>
-                      </div>
-                    </div>
-                  </div>
-                </StructuredListCell>
-              </StructuredListRow>
-            </StructuredListBody>
-          </StructuredListWrapper>
-        </Tile>
-      </div>
+      </header>
     </div>
   );
 };
