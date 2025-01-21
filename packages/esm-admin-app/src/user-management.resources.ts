@@ -162,7 +162,7 @@ export function useStockOperationTypes() {
     Error
   >(apiUrl, openmrsFetch);
   return {
-    types: data?.data || <PageableResult<StockOperationType>>{},
+    stockOperations: data?.data.results,
     loadingStock: isLoading,
     error,
   };

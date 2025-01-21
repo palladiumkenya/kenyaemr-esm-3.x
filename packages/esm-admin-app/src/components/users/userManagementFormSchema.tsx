@@ -53,10 +53,13 @@ const UserManagementFormSchema = () => {
       )
       .optional(),
 
-    activeTo: z.string().optional(),
-    activeFrom: z.string().optional(),
     isEditProvider: z.boolean().optional(),
-    isEditUseRoleScope: z.boolean().optional(),
+    dateRange: z
+      .object({
+        activeTo: z.date().optional(),
+        activeFrom: z.date().optional(),
+      })
+      .optional(),
   });
 
   return { userManagementFormSchema };

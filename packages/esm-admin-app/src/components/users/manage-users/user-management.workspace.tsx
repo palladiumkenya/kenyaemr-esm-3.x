@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
 import {
   DefaultWorkspaceProps,
   ResponsiveWrapper,
@@ -74,16 +75,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
   const { location, loadingLocation } = useLocation();
 
-  const { items, loadingRoleScope, userRoleScopeError } = useUserRoleScopes({
+  const { items, loadingRoleScope } = useUserRoleScopes({
     v: ResourceRepresentation.Default,
     totalCount: true,
   });
 
   const { userManagementFormSchema } = UserManagementFormSchema();
-  const {
-    types: { results: stockOperations },
-    loadingStock,
-  } = useStockOperationTypes();
+  const { stockOperations, loadingStock } = useStockOperationTypes();
 
   const { stockLocations } = useStockTagLocations();
 
@@ -93,9 +91,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
   const { attributeTypes = [] } = usePersonAttribute();
 
-  const userRoleScope = items.results.find((user) => user.userUuid === initialUserValue.uuid);
-
-  // Memoize provider attribute mappings
+  const userRoleScope = useMemo(
+    () => items?.results?.find((user) => user.userUuid === initialUserValue.uuid) || null,
+    [items, initialUserValue.uuid],
+  );
   const attributeTypeMapping = useMemo(() => {
     return {
       licenseNumber:
@@ -150,20 +149,22 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate,
       primaryFacility: primaryFacility,
-      stockOperations:
-        userRoleScope.operationTypes?.map((op) => ({
-          operationTypeName: op.operationTypeName,
-          operationTypeUuid: op.operationTypeUuid,
+      stockOperation:
+        userRoleScope?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
+          operationTypeName,
+          operationTypeUuid,
         })) || [],
       operationLocation:
-        userRoleScope.locations?.map((loc) => ({
-          locationName: loc.locationName,
-          locationUuid: loc.locationUuid,
+        userRoleScope?.locations?.map(({ locationName, locationUuid }) => ({
+          locationName,
+          locationUuid,
         })) || [],
-      permanent: userRoleScope.permanent,
-      enabled: userRoleScope.enabled,
-      activeTo: userRoleScope.activeTo,
-      activeFrom: userRoleScope.activeFrom,
+      permanent: userRoleScope?.permanent,
+      enabled: userRoleScope?.enabled,
+      dateRange: {
+        activeTo: userRoleScope?.activeTo ? new Date(userRoleScope.activeTo) : undefined,
+        activeFrom: userRoleScope?.activeFrom ? new Date(userRoleScope.activeFrom) : undefined,
+      },
     };
   }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
 
@@ -191,10 +192,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { errors, isSubmitting, isDirty } = userFormMethods.formState;
 
   useEffect(() => {
-    if (!loadingProvider && !loadingLocation) {
+    if (!loadingProvider && !loadingLocation && !loadingRoleScope && !isInitialValuesEmpty) {
       reset(formDefaultValues);
     }
-  }, [loadingProvider, loadingLocation, formDefaultValues, reset]);
+  }, [loadingProvider, loadingLocation, loadingRoleScope, formDefaultValues, isInitialValuesEmpty, reset]);
 
   useEffect(() => {
     if (isDirty) {
@@ -213,7 +214,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const hasValidLocations = Array.isArray(data.operationLocation) && data.operationLocation.length > 0;
     const hasEnabledFlag = data.enabled !== undefined && data.enabled !== null;
     const hasOperationTypes = Array.isArray(data.stockOperation) && data.stockOperation.length > 0;
-    const hasDateRange = data.activeFrom && data.activeTo;
+    const hasDateRange = data.dateRange.activeFrom && data.dateRange.activeTo;
     const hasValidRoleConditions =
       hasValidLocations && hasEnabledFlag && hasOperationTypes && (data.permanent || hasDateRange);
 
@@ -228,8 +229,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         : [],
       permanent: data.permanent,
       enabled: data.enabled,
-      activeFrom: data.activeFrom,
-      activeTo: data.activeTo,
+      activeFrom: data.dateRange.activeFrom,
+      activeTo: data.dateRange.activeTo,
       operationTypes: hasOperationTypes
         ? data.stockOperation.map((op) => ({
             operationTypeUuid: op.operationTypeUuid,
@@ -282,9 +283,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         );
         closeWorkspaceWithSavedChanges();
 
-        if (userRoleScopePayload && Object.keys(userRoleScopePayload).length > 0) {
+        if (userRoleScopePayload !== null) {
           try {
-            const userRoleScopeUrl = data.isEditUseRoleScope
+            const userRoleScopeUrl = userRoleScope?.uuid
               ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
               : `${restBaseUrl}/stockmanagement/userrolescope`;
             const userUuid = response.uuid;
@@ -302,7 +303,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           } catch (error) {
             showSnackbarMessage(
               t('userRoleScopeFail', 'Failed to save user role scope'),
-              t('userRoleScopeFailedSubtitle', 'An error occurred while creating user role scope'),
+              t('userRoleScopeFailedSubtitle', 'An error occurred while creating user role scope{{errorMessage}}', {
+                errorMessage: JSON.stringify(error, null, 2),
+              }),
               'error',
             );
           }
@@ -510,20 +513,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                               </RadioButtonGroup>
                             )}
                           />
-                        </ResponsiveWrapper>
-                        <ResponsiveWrapper>
-                          <ButtonSet className={styles.btnSet}>
-                            <Button
-                              className={styles.btn}
-                              renderIcon={ChevronRight}
-                              hasIconOnly
-                              kind="ghost"
-                              iconDescription={t('next', 'Next')}
-                              onClick={() => {
-                                toggleSection(currentIndex + 1);
-                              }}
-                            />
-                          </ButtonSet>
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
@@ -754,20 +743,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             )}
                           </>
                         )}
-                        <ResponsiveWrapper>
-                          <ButtonSet className={styles.btnSet}>
-                            <Button
-                              className={styles.btn}
-                              renderIcon={ChevronRight}
-                              hasIconOnly
-                              kind="ghost"
-                              iconDescription={t('next', 'Next')}
-                              onClick={() => {
-                                toggleSection(currentIndex + 1);
-                              }}
-                            />
-                          </ButtonSet>
-                        </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
 
@@ -865,20 +840,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                               </CheckboxGroup>
                             )}
                           />
-                        </ResponsiveWrapper>
-                        <ResponsiveWrapper>
-                          <ButtonSet className={styles.btnSet}>
-                            <Button
-                              className={styles.btn}
-                              renderIcon={ChevronRight}
-                              hasIconOnly
-                              kind="ghost"
-                              iconDescription={t('next', 'Next')}
-                              onClick={() => {
-                                toggleSection(currentIndex + 1);
-                              }}
-                            />
-                          </ButtonSet>
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
@@ -1078,6 +1039,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   control={userFormMethods.control}
                                   render={({ field }) => {
                                     const selectedStockOperation = field.value || [];
+
                                     const isSelected = (operationUuid: string) =>
                                       selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
                                     const toggleOperation = (operation) => {
@@ -1148,6 +1110,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   control={userFormMethods.control}
                                   render={({ field }) => {
                                     const selectedLocations = field.value || [];
+
                                     const isSelected = (locationUuid: string) =>
                                       selectedLocations.some((loc) => loc.locationUuid === locationUuid);
                                     const toggleLocation = (location) => {
@@ -1237,86 +1200,102 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <ResponsiveWrapper>
                           {!userFormMethods?.watch('permanent') && (
                             <Tile className={styles.datePicker}>
-                              <DatePicker
-                                datePickerType="range"
-                                light
-                                minDate={formatForDatePicker(MinDate)}
-                                locale="en"
-                                dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                                onChange={(dates) => {
-                                  if (Array.isArray(dates) && dates.length === 2) {
-                                    userFormMethods.setValue('activeFrom', dates[0]);
-                                    userFormMethods.setValue('activeTo', dates[1]);
-                                  }
-                                }}>
-                                <DatePickerInput
-                                  id="date-picker-input-id-start"
-                                  placeholder={DATE_PICKER_FORMAT}
-                                  labelText={t('activeFrom', 'Active From')}
-                                />
-                                <DatePickerInput
-                                  id="date-picker-input-id-finish"
-                                  placeholder={DATE_PICKER_FORMAT}
-                                  labelText={t('activeTo', 'Active To')}
-                                />
-                              </DatePicker>
+                              <Controller
+                                name="dateRange"
+                                control={userFormMethods.control}
+                                render={({ field }) => {
+                                  const { value, onChange } = field;
 
-                              <Controller
-                                name="activeFrom"
-                                control={userFormMethods.control}
-                                render={({ field }) => <input type="hidden" {...field} value={field.value || ''} />}
-                              />
-                              <Controller
-                                name="activeTo"
-                                control={userFormMethods.control}
-                                render={({ field }) => <input type="hidden" {...field} value={field.value || ''} />}
+                                  const handleDateChange = (dates: Array<Date | null>) => {
+                                    if (dates && dates.length === 2) {
+                                      onChange({
+                                        activeFrom: dates[0] || null,
+                                        activeTo: dates[1] || null,
+                                      });
+                                    }
+                                  };
+
+                                  return (
+                                    <DatePicker
+                                      datePickerType="range"
+                                      light
+                                      minDate={formatForDatePicker(MinDate)}
+                                      locale="en"
+                                      dateFormat={DATE_PICKER_CONTROL_FORMAT}
+                                      onChange={handleDateChange}
+                                      value={[
+                                        value?.activeFrom ? new Date(value.activeFrom) : null,
+                                        value?.activeTo ? new Date(value.activeTo) : null,
+                                      ]}>
+                                      <DatePickerInput
+                                        id="date-picker-input-id-start"
+                                        name="activeFrom"
+                                        placeholder={DATE_PICKER_FORMAT}
+                                        labelText={t('activeFrom', 'Active From')}
+                                        value={formatForDatePicker(value?.activeFrom)}
+                                      />
+                                      <DatePickerInput
+                                        id="date-picker-input-id-finish"
+                                        name="activeTo"
+                                        placeholder={DATE_PICKER_FORMAT}
+                                        labelText={t('activeTo', 'Active To')}
+                                        value={formatForDatePicker(value?.activeTo)}
+                                      />
+                                    </DatePicker>
+                                  );
+                                }}
                               />
                             </Tile>
                           )}
                         </ResponsiveWrapper>
-                        {items.results.length > 0 && (
-                          <ResponsiveWrapper>
-                            <Controller
-                              name="isEditUseRoleScope"
-                              control={userFormMethods.control}
-                              render={({ field }) => (
-                                <CheckboxGroup
-                                  legendText={t('editUserRoleScope', 'Edit User Role Scope')}
-                                  className={styles.multilineCheckboxLabel}>
-                                  <Checkbox
-                                    className={styles.checkboxLabelSingleLine}
-                                    {...field}
-                                    id="isEditUseRoleScope"
-                                    labelText={t('editUserRoleScope', 'Edit User Role Scope?')}
-                                    checked={field.value || false}
-                                    onChange={(e) => field.onChange(e.target.checked)}
-                                  />
-                                </CheckboxGroup>
-                              )}
-                            />
-                          </ResponsiveWrapper>
-                        )}
                       </ResponsiveWrapper>
                     )}
                   </Stack>
                 </div>
                 <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-                  <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
-                    {t('cancel', 'Cancel')}
-                  </Button>
-                  <Button
-                    kind="primary"
-                    type="submit"
-                    disabled={isSubmitting || Object.keys(errors).length > 0}
-                    className={styles.btn}>
-                    {isSubmitting ? (
-                      <span style={{ display: 'flex', alignItems: 'center' }}>
-                        {t('submitting', 'Submitting...')} <InlineLoading status="active" />
-                      </span>
-                    ) : (
-                      t('saveAndClose', 'Save & close')
-                    )}
-                  </Button>
+                  {activeSection === 'demographic' || activeSection === 'additionalRoles' ? (
+                    <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
+                      {t('cancel', 'Cancel')}
+                    </Button>
+                  ) : (
+                    <Button
+                      kind="secondary"
+                      onClick={() => {
+                        toggleSection(steps[currentIndex - 1].id);
+                        setCurrentIndex(currentIndex - 1);
+                      }}
+                      className={styles.btn}>
+                      {t('back', 'Back')}
+                    </Button>
+                  )}
+                  {activeSection === 'additionalRoles' ? (
+                    <Button
+                      kind="primary"
+                      type="submit"
+                      disabled={isSubmitting || Object.keys(errors).length > 0}
+                      className={styles.btn}>
+                      {isSubmitting ? (
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                          {t('submitting', 'Submitting...')} <InlineLoading status="active" />
+                        </span>
+                      ) : (
+                        t('saveAndClose', 'Save & close')
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      kind="primary"
+                      renderIcon={ChevronRight}
+                      className={styles.btn}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toggleSection(steps[currentIndex + 1].id);
+
+                        setCurrentIndex(currentIndex + 1);
+                      }}>
+                      {t('next', 'Next')}
+                    </Button>
+                  )}
                 </ButtonSet>
               </form>
             </FormProvider>
