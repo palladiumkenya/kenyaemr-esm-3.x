@@ -1,4 +1,5 @@
-import { Type } from '@openmrs/esm-framework';
+import { fhirBaseUrl, Type } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 
 export const configSchema = {};
 
@@ -97,4 +98,73 @@ export interface ProviderLocation {
   description?: string;
   retired: boolean;
   attributes?: Array<AttributeItems>;
+}
+
+// Stock roles
+export interface OpenmrsData extends OpenmrsObject {}
+export interface OpenmrsObject {
+  uuid?: string;
+}
+export type BaseOpenmrsObject = OpenmrsObject;
+export interface BaseOpenmrsData extends BaseOpenmrsObject, OpenmrsData {}
+export interface StockOperationType extends BaseOpenmrsData {
+  uuid: string;
+  name: string;
+  description: string;
+  operationType: string;
+  hasSource: boolean;
+  hasDestination: boolean;
+  stockOperationTypeLocationScopes: Array<StockOperationTypeLocationScope>;
+}
+
+export interface StockOperationTypeLocationScope {
+  uuid: string;
+  locationTag: string;
+  isSource: string;
+  isDestination: string;
+}
+
+// Pagging
+export interface PageableResult<ResultType> {
+  results: ResultType[];
+  totalCount: number | null;
+}
+
+export interface PagingCriteria {
+  startIndex?: number | null;
+  limit?: number | null;
+}
+
+// stock location
+
+export interface FHIRResponse {
+  entry: Array<{ resource: fhir.Location }>;
+  total: number;
+  type: string;
+  resourceType: string;
+}
+
+export interface UserRoleScopeLocation extends BaseOpenmrsData {
+  locationUuid?: string;
+  locationName?: string;
+  enableDescendants?: boolean;
+}
+
+export interface UserRoleScopeOperationType extends BaseOpenmrsData {
+  operationTypeUuid?: string;
+  operationTypeName?: string;
+}
+
+export interface UserRoleScope extends BaseOpenmrsData {
+  userUuid?: string;
+  role?: string;
+  userName?: string;
+  userGivenName?: string;
+  userFamilyName?: string;
+  permanent: boolean;
+  activeFrom?: string;
+  activeTo?: string;
+  enabled: boolean;
+  locations?: Array<UserRoleScopeLocation>;
+  operationTypes?: Array<UserRoleScopeOperationType>;
 }
