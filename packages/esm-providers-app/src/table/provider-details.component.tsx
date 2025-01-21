@@ -12,19 +12,46 @@ interface ProviderDetailsProps {
   providerUuid: string;
 }
 
+interface ProviderAttribute {
+  value: string;
+}
+
+interface ProviderAttributes {
+  licenseAttr?: ProviderAttribute;
+  nationalID?: ProviderAttribute;
+  dateAttr?: ProviderAttribute;
+  phoneNumber?: ProviderAttribute;
+  qualification?: ProviderAttribute;
+  registrationNumber?: ProviderAttribute;
+  emailAddress?: ProviderAttribute;
+}
+
 const ProviderDetails: React.FC<ProviderDetailsProps> = ({ providerUuid }) => {
   const { t } = useTranslation();
   const patientBannerRef = useRef(null);
   const { provider } = useProviderDetails(providerUuid);
   const { user, isLoading, error } = useProviderUser(providerUuid);
 
-  const licenseAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'Practising License Number');
-  const nationalID = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider National Id Number');
-  const dateAttr = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Expiry Date');
-  const phoneNumber = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider Telephone');
-  const qualification = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider Qualification');
-  const registrationNumber = provider?.attributes?.find((attr) => attr.attributeType.display === 'License Body');
-  const emailAddress = provider?.attributes?.find((attr) => attr.attributeType.display === 'Provider Address');
+  const attributeMap = {
+    licenseAttr: 'Practising License Number',
+    nationalID: 'Provider National Id Number',
+    dateAttr: 'License Expiry Date',
+    phoneNumber: 'Provider Telephone',
+    qualification: 'Provider Qualification',
+    registrationNumber: 'License Body',
+    emailAddress: 'Provider Address',
+  };
+
+  const attributes: ProviderAttributes = Object.entries(attributeMap).reduce((acc, [key, display]) => {
+    const attr = provider?.attributes?.find((attr) => attr.attributeType.display === display);
+    if (attr) {
+      acc[key as keyof ProviderAttributes] = { value: attr.value };
+    }
+    return acc;
+  }, {} as ProviderAttributes);
+
+  const { licenseAttr, nationalID, dateAttr, phoneNumber, qualification, registrationNumber, emailAddress } =
+    attributes;
 
   const formattedExpiryDate = dateAttr?.value ? dayjs(dateAttr.value).format('YYYY-MM-DD') : null;
   const today = dayjs();
