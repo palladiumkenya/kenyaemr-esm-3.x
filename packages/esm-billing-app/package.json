@@ -37,11 +37,11 @@
     "url": "https://github.com/palladiumkenya/kenyaemr-esm-core/issues"
   },
   "dependencies": {
-    "@carbon/react": "^1.72.0",
     "lodash-es": "^4.17.15",
     "react-to-print": "^2.14.13"
   },
   "peerDependencies": {
+    "@carbon/react": "1.x",
     "@openmrs/esm-framework": "5.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",

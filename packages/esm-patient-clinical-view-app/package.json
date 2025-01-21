@@ -38,11 +38,11 @@
   },
   "dependencies": {
     "@carbon/charts-react": "^1.5.2",
-    "@carbon/react": "^1.72.0",
     "d3": "^7.6.1",
     "lodash-es": "^4.17.21"
   },
   "peerDependencies": {
+    "@carbon/react": "1.x",
     "@openmrs/esm-framework": "5.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",
