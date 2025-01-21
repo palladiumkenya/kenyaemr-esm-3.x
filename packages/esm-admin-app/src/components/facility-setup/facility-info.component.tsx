@@ -14,9 +14,6 @@ const FacilityInfo: React.FC = () => {
   const [facilityData, setFacilityData] = useState<FacilityData>(defaultFacility);
   useEffect(() => {
     setFacilityData(defaultFacility);
-    if (defaultFacility?.operationalStatus !== 'Operational') {
-      showNotification({ kind: 'error', title: 'Error', description: 'The facility SHA status is is not operational' });
-    }
   }, [defaultFacility]);
 
   const synchronizeFacilityData = async () => {
@@ -28,6 +25,13 @@ const FacilityInfo: React.FC = () => {
         kind: 'success',
         isLowContrast: true,
       });
+      if (defaultFacility?.source != 'HIE') {
+        showSnackbar({
+          kind: 'warning',
+          title: 'HIE Sync Failed. Pulling local info.',
+          isLowContrast: true,
+        });
+      }
     } catch (error) {
       const errorMessage = error?.responseBody?.error?.message ?? 'An error occurred while synchronizing with HIE';
       showSnackbar({
@@ -66,7 +70,7 @@ const FacilityInfo: React.FC = () => {
             <hr className={styles.cardDivider} />
             <div className={styles.cardContent}>
               <p>
-                <strong>Facility Name:</strong> {facilityData?.display || 'N/A'}
+                <strong>Facility Name:</strong> {facilityData?.display}
               </p>
               <p>
                 <strong>Facility KMHFR Code:</strong> {facilityData?.mflCode}
