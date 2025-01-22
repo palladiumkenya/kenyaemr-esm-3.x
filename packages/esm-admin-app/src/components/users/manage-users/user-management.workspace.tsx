@@ -360,8 +360,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const steps = useMemo(
     () => [
       { id: 'demographic', label: t('demographicInformation', 'Demographic Info') },
-      { id: 'provider', label: t('providerAccount', 'Provider Account') },
       { id: 'login', label: t('loginInformation', 'Login Info') },
+      { id: 'provider', label: t('providerAccount', 'Provider Account') },
       { id: 'roles', label: t('roles', 'Roles Info') },
       { id: 'additionalRoles', label: t('additionalRoles', 'Additional Roles') },
     ],
@@ -741,7 +741,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         )}
                       </ResponsiveWrapper>
                     )}
-
                     {activeSection === 'login' && (
                       <ResponsiveWrapper>
                         <CardHeader title="Login Info">
@@ -1073,7 +1072,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                         <ResponsiveWrapper>
                           <Column
-                            key={t('location', 'Location')}
+                            key={t('location', 'Stock Location')}
                             xsm={8}
                             md={12}
                             lg={12}
