@@ -1,54 +1,45 @@
 import React, { useEffect, useState } from 'react';
 import { BarChartOptions, GroupedBarChart, ScaleTypes } from '@carbon/charts-react';
+import useClaimsAggregate from '../../../hooks/useClaimsAggregate';
 
 const ClaimsSummaryChart = () => {
   const [metrics, setMetrics] = useState({ summaryGraph: [] });
 
-  useEffect(() => {
-    setTimeout(() => {
-      // Simulating API data fetch
-      const data = {
-        summaryGraph: [
-          { month: 'January', claimsA: 1200, claimsB: 1000 },
-          { month: 'February', claimsA: 1000, claimsB: 1100 },
-          { month: 'March', claimsA: 1400, claimsB: 1300 },
-          { month: 'April', claimsA: 800, claimsB: 700 },
-          { month: 'May', claimsA: 1100, claimsB: 1200 },
-        ],
-      };
+  const { isLoading, summarizedData, error } = useClaimsAggregate();
 
-      setMetrics(data);
-    }, 1000); // Simulating async fetch
-  }, []);
-
-  if (!metrics.summaryGraph.length) {
+  if (isLoading) {
     return <div>Loading data...</div>;
   }
 
-  const transformClaimSummaryChartData = (data) => {
-    return data
-      .map((item) => [
-        { group: item.month, value: item.claimsA },
-        { group: item.month, value: item.claimsB },
-      ])
-      .flat();
-  };
+  if (error) {
+    return <div>Error loading claims data</div>;
+  }
+
+  useEffect(() => {
+    if (summarizedData.length) {
+      const transformedData = summarizedData.flatMap((item) => [
+        { group: 'Claimed', month: item.month, value: item.claimedTotal },
+        { group: 'Approved', month: item.month, value: item.approvedTotal },
+      ]);
+
+      setMetrics({ summaryGraph: transformedData });
+    }
+  }, [summarizedData]);
 
   const options: BarChartOptions = {
-    title: 'Claims Comparative Analysis',
+    title: 'Analysis of Claimed vs Approved Amount by Month',
     legend: {
       enabled: true,
     },
     axes: {
       left: {
+        mapsTo: 'month',
         title: 'Month',
-        mapsTo: 'group',
         scaleType: ScaleTypes.LABELS,
       },
       bottom: {
-        title: 'Amount (Ksh)',
         mapsTo: 'value',
-
+        title: 'Amount (Ksh)',
         scaleType: ScaleTypes.LINEAR,
         includeZero: true,
       },
@@ -56,11 +47,9 @@ const ClaimsSummaryChart = () => {
     height: '400px',
   };
 
-  const transformedData = transformClaimSummaryChartData(metrics.summaryGraph);
-
   return (
     <div style={{ padding: '2rem' }}>
-      <GroupedBarChart data={transformedData} options={options} />
+      <GroupedBarChart data={metrics.summaryGraph} options={options} />
     </div>
   );
 };

@@ -16,26 +16,31 @@ const ClaimSummaryHeader: React.FC<ClaimsSummaryHeaderProps> = ({ filters, onFil
   const { t } = useTranslation();
 
   const today = new Date();
-  const oneMonthAgo = new Date(today);
-  oneMonthAgo.setMonth(today.getMonth() - 1);
+  const sixMonthsAgo = new Date(today);
+  sixMonthsAgo.setMonth(today.getMonth() - 6);
 
   useEffect(() => {
     if (!filters.fromDate && !filters.toDate) {
       onFilterChanged(() => ({
-        fromDate: oneMonthAgo,
+        fromDate: sixMonthsAgo,
         toDate: today,
       }));
     }
-  }, [filters, onFilterChanged, oneMonthAgo, today]);
+  }, [filters, onFilterChanged, sixMonthsAgo, today]);
+
+  const handleDateChange = ([fromDate, toDate]: [Date, Date]) => {
+    onFilterChanged(() => ({
+      fromDate,
+      toDate,
+    }));
+  };
 
   return (
     <div className={styles.summaryContainer}>
       <DatePicker
         datePickerType="range"
         value={[filters.fromDate, filters.toDate]}
-        onChange={([fromDate, toDate]) =>
-          onFilterChanged((currentFilters) => ({ ...currentFilters, fromDate, toDate }))
-        }
+        onChange={handleDateChange}
         aria-label={t('datePicker.rangeLabel', 'Select date range')}>
         <DatePickerInput
           id="date-picker-input-id-start"
