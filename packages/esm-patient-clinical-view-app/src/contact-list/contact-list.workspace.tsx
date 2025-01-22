@@ -13,7 +13,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo } from 'react';
-import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
@@ -119,7 +119,14 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
     if (!showIPVRelatedFields) {
       form.setValue('ipvOutCome', undefined);
     }
-  }, [observablePhysicalAssault, observableThreatened, observableSexualAssault, observableRelationship]);
+  }, [
+    observablePhysicalAssault,
+    observableThreatened,
+    observableSexualAssault,
+    observableRelationship,
+    form,
+    showIPVRelatedFields,
+  ]);
 
   return (
     <FormProvider {...form}>
