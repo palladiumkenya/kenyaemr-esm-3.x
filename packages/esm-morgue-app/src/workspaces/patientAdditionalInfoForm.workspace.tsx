@@ -6,7 +6,7 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
-  TextArea,
+  Tag,
   Stack,
   TextInput,
   TimePicker,
@@ -15,10 +15,12 @@ import {
   RadioButtonGroup,
   RadioButton,
   Layer,
+  InlineLoading,
   Tile,
   Search,
   FilterableMultiSelect,
   Dropdown,
+  InlineNotification,
 } from '@carbon/react';
 import {
   ResponsiveWrapper,
@@ -53,6 +55,7 @@ import { PENDING_PAYMENT_STATUS } from '../constants';
 import { mutate } from 'swr';
 import dayjs from 'dayjs';
 import DeceasedHeader from '../component/deceasedInfo/deceased-header.component';
+import { getCurrentTime } from '../utils/utils';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -62,11 +65,15 @@ interface PatientAdditionalInfoFormProps {
 const MAX_RESULTS = 5;
 
 const patientInfoSchema = z.object({
-  dateOfAdmission: z.date({ coerce: true }).refine((date) => !!date, 'Date of admission is required'),
-  timeOfDeath: z
+  dateOfAdmission: z
+    .date({ coerce: true })
+    .refine((date) => !!date, 'Date of admission is required')
+    .refine((date) => date <= new Date(), 'Date of admission cannot be in the future'),
+  timeOfDeath: z.string().nonempty('Time of death is required'),
+  period: z
     .string()
-    .nonempty('Time of death is required')
-    .regex(/^(0[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i, 'Time of death must be in the format hh:mm AM/PM'),
+    .nonempty('AM/PM is required')
+    .regex(/^(AM|PM)$/i, 'Invalid period'),
   tagNumber: z.string().nonempty('Tag number is required'),
   obNumber: z.string().optional(),
   policeName: z.string().optional(),
@@ -85,6 +92,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { data: visitTypes, isLoading: isLoadingVisitTypes } = useVisitType();
+  const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
   const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
@@ -92,7 +100,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
-  const { morgueCompartments } = useMorgueCompartment();
+  const { compartments, isLoading: isLoadingCompartments } = useMorgueCompartment();
   const {
     sessionLocation: { uuid: locationUuid },
     currentProvider: { uuid: currentProviderUuid },
@@ -127,7 +135,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     resolver: zodResolver(patientInfoSchema),
     defaultValues: {
       dateOfAdmission: new Date(),
-      timeOfDeath: '',
+      timeOfDeath: defaultTime,
+      period: defaultPeriod,
       tagNumber: '',
       obNumber: '',
       policeName: '',
@@ -280,6 +289,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const handlePoliceCaseChange = (selectedItem: string | null) => {
     setIsPoliceCase(selectedItem);
   };
+
   return (
     <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.formGrid}>
@@ -298,7 +308,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                     field.onChange(event[0]);
                   }
                 }}
-                value={field.value ? new Date(field.value) : null}>
+                value={field.value ? new Date(field.value) : null}
+                maxDate={new Date()}>
                 <DatePickerInput
                   id="date-of-admission"
                   placeholder="mm/dd/yyyy"
@@ -312,44 +323,42 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
         </Column>
 
         <Column>
-          <Controller
-            name="timeOfDeath"
-            control={control}
-            render={({ field }) => {
-              const [timeValue, periodValue] = field.value ? field.value.split(' ') : ['', 'AM'];
-
-              return (
-                <div className={styles.dateTimeSection}>
-                  <ResponsiveWrapper>
+          <div className={styles.dateTimeSection}>
+            <ResponsiveWrapper>
+              <Controller
+                name="timeOfDeath"
+                control={control}
+                render={({ field }) => {
+                  return (
                     <TimePicker
+                      {...field}
                       id="time-of-death-picker"
                       labelText={t('timeAdmission', 'Time of admission*')}
                       className={styles.formAdmissionTimepicker}
-                      value={timeValue}
-                      onChange={(e) => {
-                        field.onChange(`${e.target.value} ${periodValue}`);
-                      }}
                       invalid={!!errors.timeOfDeath}
                       invalidText={errors.timeOfDeath?.message}
                     />
-                    <TimePickerSelect
-                      className={styles.formDeathTimepickerSelector}
-                      id="time-picker-select"
-                      labelText={t('selectPeriod', 'AM/PM')}
-                      value={periodValue}
-                      onChange={(e) => {
-                        field.onChange(`${timeValue} ${e.target.value}`);
-                      }}
-                      invalid={!!errors.timeOfDeath}
-                      invalidText={errors.timeOfDeath?.message}>
-                      <SelectItem value="AM" text="AM" />
-                      <SelectItem value="PM" text="PM" />
-                    </TimePickerSelect>
-                  </ResponsiveWrapper>
-                </div>
-              );
-            }}
-          />
+                  );
+                }}
+              />
+              <Controller
+                name="period"
+                control={control}
+                render={({ field }) => (
+                  <TimePickerSelect
+                    {...field}
+                    className={styles.formDeathTimepickerSelector}
+                    id="time-picker-select"
+                    labelText={t('selectPeriod', 'AM/PM')}
+                    invalid={!!errors.period}
+                    invalidText={errors.period?.message}>
+                    <SelectItem value="AM" text="AM" />
+                    <SelectItem value="PM" text="PM" />
+                  </TimePickerSelect>
+                )}
+              />
+            </ResponsiveWrapper>
+          </div>
         </Column>
 
         <Column>
@@ -465,27 +474,46 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
             <Controller
               control={control}
               name="services"
-              render={({ field }) => (
-                <FilterableMultiSelect
-                  id="billing-service"
-                  className={styles.formAdmissionDatepicker}
-                  titleText={t('searchServices', 'Search services')}
-                  items={lineItems
-                    .filter((service) => service?.serviceType?.uuid === morgueDepartmentServiceTypeUuid)
-                    .map((service) => service.uuid)}
-                  itemToString={(item) => lineItems.find((i) => i.uuid === item)?.name ?? ''}
-                  onChange={({ selectedItems }) => {
-                    field.onChange(selectedItems);
-                  }}
-                  placeholder={t('Service', 'Service')}
-                  initialSelectedItems={field.value}
-                  invalid={!!errors.services}
-                  invalidText={errors.services?.message}
-                />
-              )}
+              render={({ field }) => {
+                const availableServices = lineItems.filter(
+                  (service) => service?.serviceType?.uuid === morgueDepartmentServiceTypeUuid,
+                );
+                return (
+                  <>
+                    {availableServices.length > 0 ? (
+                      <>
+                        <FilterableMultiSelect
+                          id="billing-service"
+                          className={styles.formAdmissionDatepicker}
+                          titleText={t('searchServices', 'Search services')}
+                          items={availableServices.map((service) => service.uuid)}
+                          itemToString={(item) => availableServices.find((i) => i.uuid === item)?.name ?? ''}
+                          onChange={({ selectedItems }) => {
+                            field.onChange(selectedItems);
+                          }}
+                          placeholder={t('Service', 'Service')}
+                          initialSelectedItems={field.value}
+                          invalid={!!errors.services}
+                          invalidText={errors.services?.message}
+                        />
+                      </>
+                    ) : (
+                      <InlineNotification
+                        kind="warning"
+                        title={t(
+                          'noServicesAvailable',
+                          'No service price has been configured for the mortuary department.',
+                        )}
+                        lowContrast
+                      />
+                    )}
+                  </>
+                );
+              }}
             />
           </Column>
         )}
+
         <Column>
           <Controller
             name="tagNumber"
@@ -602,13 +630,25 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 {...field}
                 id="avail-compartment"
                 className={styles.sectionField}
-                items={morgueCompartments.map((compartment) => compartment.uuid)}
+                items={compartments.map((compartment) => ({
+                  uuid: compartment.uuid,
+                  display: compartment.display,
+                  status: compartment.status,
+                }))}
                 itemToString={(item) =>
-                  morgueCompartments.find((compartment) => compartment.uuid === item)?.display ?? ''
+                  item
+                    ? `${item.display} - ${
+                        item.status === 'occupied'
+                          ? t('occupied', 'Occupied')
+                          : item.status === 'unoccupied'
+                          ? t('unoccupied', 'Unoccupied')
+                          : t('sharing', 'Sharing')
+                      }`
+                    : ''
                 }
                 titleText={t('availableCompartment', 'Available Compartment')}
                 label={t('ChooseOptions', 'Choose option')}
-                onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}
                 initialSelectedItems={field.value}
                 invalid={!!errors.availableCompartment}
                 invalidText={errors.availableCompartment?.message}
@@ -616,6 +656,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
             )}
           />
         </Column>
+
         <Column>
           <Controller
             name="burialPermitNo"
@@ -634,10 +675,10 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           />
         </Column>
         <ButtonSet className={styles.buttonSet}>
-          <Button style={{ maxWidth: '65%' }} size="lg" kind="secondary" onClick={closeWorkspace}>
+          <Button size="lg" kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button style={{ maxWidth: '60%' }} kind="primary" size="lg" type="submit">
+          <Button kind="primary" size="lg" type="submit">
             {t('admit', 'Admit')}
           </Button>
         </ButtonSet>

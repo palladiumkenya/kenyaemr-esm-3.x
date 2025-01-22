@@ -25,7 +25,6 @@ export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedP
     { header: 'Age', key: 'age' },
     { header: 'Date of Death', key: 'deathDate' },
     { header: 'Cause of Death', key: 'causeOfDeath' },
-    { header: 'Status', key: 'status' },
   ];
 
   if (isLoading) {
@@ -65,7 +64,6 @@ export const WaitingQueue: React.FC<WaitingQueueProps> = ({ isLoading, deceasedP
       identifier: openMrsId,
       deathDate: formatDateTime(patient?.person?.person?.deathDate) || '--',
       causeOfDeath: patient?.person?.person?.causeOfDeath?.display || '--',
-      status: <Tag type="magenta">{patient?.status || '--'}</Tag>,
     };
   });
 

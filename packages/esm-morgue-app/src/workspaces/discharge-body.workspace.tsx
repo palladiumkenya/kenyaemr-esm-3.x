@@ -265,7 +265,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
             {t('discard', 'Discard')}
           </Button>
           <Button kind="primary" size="lg" type="submit">
-            {t('admit', 'Admit')}
+            {t('submit', 'Submit')}
           </Button>
         </ButtonSet>
       </Stack>

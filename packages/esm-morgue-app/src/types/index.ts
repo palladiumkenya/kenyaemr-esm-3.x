@@ -128,6 +128,7 @@ export interface Location {
   name: string;
   uuid: string;
   display: string;
+  status?: string;
 }
 
 export interface Visit {

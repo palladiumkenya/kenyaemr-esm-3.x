@@ -153,16 +153,97 @@ export const useBillableItems = () => {
   };
 };
 
+const getMorgueCompartmentStatus = async (
+  locationUuid: string,
+  morgueVisitTypeUuid: string,
+  morgueDischargeEncounter: string,
+): Promise<'occupied' | 'unoccupied' | 'sharing'> => {
+  const customRepresentation =
+    'custom:(visitType:(uuid),startDatetime,stopDatetime,encounters:(location:(uuid),encounterType:(uuid)))';
+  const url = `${restBaseUrl}/visit?includeInactive=true&v=${customRepresentation}&visitType=${morgueVisitTypeUuid}&limit=1`;
+
+  const response = await openmrsFetch<{
+    results: Array<{
+      visitType: { uuid: string };
+      startDatetime: string;
+      stopDatetime: string | null;
+      encounters: Array<{
+        location: { uuid: string };
+        encounterType: { uuid: string };
+      }>;
+    }>;
+  }>(url);
+
+  const visits = response?.data?.results ?? [];
+
+  const locationVisits = visits.filter((visit) =>
+    visit.encounters.some((encounter) => encounter.location.uuid === locationUuid),
+  );
+
+  const hasActiveVisit = locationVisits.some((visit) => visit.startDatetime && !visit.stopDatetime);
+
+  const hasDischargedEncounter = locationVisits.some(
+    (visit) =>
+      visit.stopDatetime &&
+      visit.encounters.some((encounter) => encounter.encounterType.uuid === morgueDischargeEncounter),
+  );
+
+  if (hasActiveVisit) {
+    return 'occupied';
+  }
+  if (hasDischargedEncounter) {
+    return 'unoccupied';
+  }
+  return 'unoccupied';
+};
+
 export const useMorgueCompartment = () => {
-  const { morgueCompartmentTagUuid } = useConfig<ConfigObject>();
+  const { morgueCompartmentTagUuid, morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid } = useConfig<ConfigObject>();
+
   const customRepresentation = 'custom:(uuid,display,name)';
   const url = `${restBaseUrl}/location?v=${customRepresentation}&tag=${morgueCompartmentTagUuid}`;
-  const { data, isLoading, error } = useSWR<FetchResponse<{ results: Array<Location> }>>(url, openmrsFetch);
+
+  const {
+    data: locationsData,
+    isLoading: isLocationsLoading,
+    error: locationsError,
+  } = useSWR<FetchResponse<{ results: Array<Location> }>>(url, openmrsFetch);
+
+  const [compartmentStatuses, setCompartmentStatuses] = useState([]);
+  const [statusError, setStatusError] = useState();
+  const [isStatusLoading, setIsStatusLoading] = useState(false);
+
+  useEffect(() => {
+    if (locationsData?.data?.results?.length) {
+      (async () => {
+        try {
+          setIsStatusLoading(true);
+
+          const statuses = await Promise.all(
+            locationsData.data.results.map((location) =>
+              getMorgueCompartmentStatus(location.uuid, morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid),
+            ),
+          );
+
+          setCompartmentStatuses(
+            locationsData.data.results.map((location, index) => ({
+              ...location,
+              status: statuses[index],
+            })),
+          );
+        } catch (error) {
+          setStatusError(error);
+        } finally {
+          setIsStatusLoading(false);
+        }
+      })();
+    }
+  }, [locationsData, morgueVisitTypeUuid, morgueDischargeEncounterTypeUuid]);
 
   return {
-    morgueCompartments: data?.data?.results ?? [],
-    isLoading,
-    error,
+    compartments: compartmentStatuses,
+    isLoading: isLocationsLoading || isStatusLoading,
+    error: locationsError ?? statusError,
   };
 };
 
