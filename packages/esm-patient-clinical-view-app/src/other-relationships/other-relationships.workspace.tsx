@@ -13,9 +13,6 @@ import { uppercaseText } from '../utils/expression-helper';
 import styles from './other-relationships.scss';
 
 const schema = relationshipFormSchema
-  .extend({
-    notes: z.string().optional(),
-  })
   .refine(
     (data) => {
       return !(data.mode === 'search' && !data.personB);
@@ -61,7 +58,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      await saveRelationship({ ...data, ...({ notes: undefined } as any) }, config, session, []);
+      await saveRelationship(data, config, session, []);
       closeWorkspace();
     } catch (error) {}
   };
@@ -136,21 +133,6 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
                   onChange={(e) => field.onChange(e.selectedItem?.id)}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
-                />
-              )}
-            />
-          </Column>
-
-          <Column className={styles.textbox}>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  labelText={t('additionalNotes', 'Any additional notes')}
-                  rows={4}
-                  id="relationship-notes"
-                  {...field}
                 />
               )}
             />

@@ -146,7 +146,7 @@ export const saveRelationship = async (
       patient = response.data?.uuid;
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Patient created succesfully' });
     } catch (error) {
-      showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating patient' });
+      showSnackbar({ title: 'Error creating patient', kind: 'error', subtitle: error?.message });
       throw error; // Don't contunue if an erro ocuures
     }
   }
@@ -197,7 +197,7 @@ export const saveRelationship = async (
       });
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Patient Demographics saved succesfuly' });
     } catch (error) {
-      showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error saving patient demographics' });
+      showSnackbar({ title: 'Error saving patient demographics', kind: 'error', subtitle: error?.message });
     }
   }
 
@@ -216,7 +216,7 @@ export const saveRelationship = async (
     showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Relationship saved succesfully' });
     mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/relationship'));
   } catch (error) {
-    showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error saving relationship' });
+    showSnackbar({ title: 'Error saving relationship', kind: 'error', subtitle: error?.message });
     throw error;
   }
 };

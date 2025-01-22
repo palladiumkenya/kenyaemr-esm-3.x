@@ -13,9 +13,6 @@ import styles from './family-relationship.scss';
 import { useMappedRelationshipTypes } from './relationships.resource';
 
 const schema = relationshipFormSchema
-  .extend({
-    notes: z.string().optional(),
-  })
   .refine(
     (data) => {
       return !(data.mode === 'search' && !data.personB);
@@ -62,7 +59,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      await saveRelationship({ ...data, ...({ notes: undefined } as any) }, config, session, []); /// Remove notes from payload since endpoint doesn't expect it to avoid 400 error
+      await saveRelationship(data, config, session, []); /// Remove notes from payload since endpoint doesn't expect it to avoid 400 error
       closeWorkspace();
     } catch (error) {}
   };
@@ -139,20 +136,6 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
                     size="xl"
                   />
                 </DatePicker>
-              )}
-            />
-          </Column>
-          <Column className={styles.textbox}>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  labelText={t('additionalNotes', 'Any additional notes')}
-                  rows={4}
-                  id="relationship-notes"
-                  {...field}
-                />
               )}
             />
           </Column>
