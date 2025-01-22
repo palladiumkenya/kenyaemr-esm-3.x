@@ -1083,7 +1083,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             lg={12}
                             className={styles.checkBoxColumn}>
                             <CheckboxGroup
-                              legendText={t('inventoryLocation', 'Inventory Location')}
+                              legendText={t('stockLocation', 'Stock Location')}
                               className={styles.checkboxGroupGrid}>
                               {loadingStock ? (
                                 <InlineLoading
@@ -1164,78 +1164,79 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   </div>
                                 )}
                               />
-                              <Controller
-                                name="permanent"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <div>
-                                    <label htmlFor="permanent">
-                                      <input
-                                        type="checkbox"
-                                        id="permanent"
-                                        name="permanent"
-                                        checked={field.value || false}
-                                        onChange={(e) => field.onChange(e.target.checked)}
-                                      />
-                                      {t('permanent', 'Permanent?')}
-                                    </label>
-                                  </div>
-                                )}
-                              />
+                              {userFormMethods?.watch('enabled') && (
+                                <Controller
+                                  name="permanent"
+                                  control={userFormMethods.control}
+                                  render={({ field }) => (
+                                    <div>
+                                      <label htmlFor="permanent">
+                                        <input
+                                          type="checkbox"
+                                          id="permanent"
+                                          name="permanent"
+                                          checked={field.value || false}
+                                          onChange={(e) => field.onChange(e.target.checked)}
+                                        />
+                                        {t('permanent', 'Permanent?')}
+                                      </label>
+                                    </div>
+                                  )}
+                                />
+                              )}
                             </CheckboxGroup>
+                            {!userFormMethods?.watch('permanent') && userFormMethods?.watch('enabled') && (
+                              <ResponsiveWrapper>
+                                <Tile>
+                                  <Controller
+                                    name="dateRange"
+                                    control={userFormMethods.control}
+                                    render={({ field }) => {
+                                      const { value, onChange } = field;
+
+                                      const handleDateChange = (dates: Array<Date | null>) => {
+                                        if (dates && dates.length === 2) {
+                                          onChange({
+                                            activeFrom: dates[0] || null,
+                                            activeTo: dates[1] || null,
+                                          });
+                                        }
+                                      };
+
+                                      return (
+                                        <DatePicker
+                                          datePickerType="range"
+                                          light
+                                          minDate={formatForDatePicker(MinDate)}
+                                          locale="en"
+                                          dateFormat={DATE_PICKER_CONTROL_FORMAT}
+                                          onChange={handleDateChange}
+                                          value={[
+                                            value?.activeFrom ? new Date(value.activeFrom) : null,
+                                            value?.activeTo ? new Date(value.activeTo) : null,
+                                          ]}>
+                                          <DatePickerInput
+                                            id="date-picker-input-id-start"
+                                            name="activeFrom"
+                                            placeholder={DATE_PICKER_FORMAT}
+                                            labelText={t('activeFrom', 'Active From')}
+                                            value={formatForDatePicker(value?.activeFrom)}
+                                          />
+                                          <DatePickerInput
+                                            id="date-picker-input-id-finish"
+                                            name="activeTo"
+                                            placeholder={DATE_PICKER_FORMAT}
+                                            labelText={t('activeTo', 'Active To')}
+                                            value={formatForDatePicker(value?.activeTo)}
+                                          />
+                                        </DatePicker>
+                                      );
+                                    }}
+                                  />
+                                </Tile>
+                              </ResponsiveWrapper>
+                            )}
                           </Column>
-                        </ResponsiveWrapper>
-
-                        <ResponsiveWrapper>
-                          {!userFormMethods?.watch('permanent') && (
-                            <Tile className={styles.datePicker}>
-                              <Controller
-                                name="dateRange"
-                                control={userFormMethods.control}
-                                render={({ field }) => {
-                                  const { value, onChange } = field;
-
-                                  const handleDateChange = (dates: Array<Date | null>) => {
-                                    if (dates && dates.length === 2) {
-                                      onChange({
-                                        activeFrom: dates[0] || null,
-                                        activeTo: dates[1] || null,
-                                      });
-                                    }
-                                  };
-
-                                  return (
-                                    <DatePicker
-                                      datePickerType="range"
-                                      light
-                                      minDate={formatForDatePicker(MinDate)}
-                                      locale="en"
-                                      dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                                      onChange={handleDateChange}
-                                      value={[
-                                        value?.activeFrom ? new Date(value.activeFrom) : null,
-                                        value?.activeTo ? new Date(value.activeTo) : null,
-                                      ]}>
-                                      <DatePickerInput
-                                        id="date-picker-input-id-start"
-                                        name="activeFrom"
-                                        placeholder={DATE_PICKER_FORMAT}
-                                        labelText={t('activeFrom', 'Active From')}
-                                        value={formatForDatePicker(value?.activeFrom)}
-                                      />
-                                      <DatePickerInput
-                                        id="date-picker-input-id-finish"
-                                        name="activeTo"
-                                        placeholder={DATE_PICKER_FORMAT}
-                                        labelText={t('activeTo', 'Active To')}
-                                        value={formatForDatePicker(value?.activeTo)}
-                                      />
-                                    </DatePicker>
-                                  );
-                                }}
-                              />
-                            </Tile>
-                          )}
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
