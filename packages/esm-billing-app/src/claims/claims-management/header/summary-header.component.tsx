@@ -1,5 +1,5 @@
 import { DatePicker, DatePickerInput } from '@carbon/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './summary-header.scss';
 
@@ -15,9 +15,12 @@ interface ClaimsSummaryHeaderProps {
 const ClaimSummaryHeader: React.FC<ClaimsSummaryHeaderProps> = ({ filters, onFilterChanged }) => {
   const { t } = useTranslation();
 
-  const today = new Date();
-  const sixMonthsAgo = new Date(today);
-  sixMonthsAgo.setMonth(today.getMonth() - 6);
+  const today = useMemo(() => new Date(), []);
+  const sixMonthsAgo = useMemo(() => {
+    const date = new Date(today);
+    date.setMonth(today.getMonth() - 6);
+    return date;
+  }, [today]);
 
   useEffect(() => {
     if (!filters.fromDate && !filters.toDate) {
