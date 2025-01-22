@@ -211,35 +211,31 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const providerUUID = provider[0]?.uuid || '';
     const roleName = data.roles?.[0]?.display || '';
 
-    const hasValidLocations = Array.isArray(data.operationLocation) && data.operationLocation.length > 0;
+    const hasValidLocations = data.operationLocation?.length > 0;
     const hasEnabledFlag = data.enabled !== undefined && data.enabled !== null;
-    const hasOperationTypes = Array.isArray(data.stockOperation) && data.stockOperation.length > 0;
-    const hasDateRange = data.dateRange.activeFrom && data.dateRange.activeTo;
+    const hasOperationTypes = data.stockOperation?.length > 0;
+    const hasDateRange = data.dateRange?.activeFrom && data.dateRange?.activeTo;
     const hasValidRoleConditions =
       hasValidLocations && hasEnabledFlag && hasOperationTypes && (data.permanent || hasDateRange);
 
     const userRoleScopePayload: Partial<UserRoleScope> = {
       ...(hasValidRoleConditions && { role: roleName }),
-      locations: hasValidLocations
-        ? data.operationLocation.map((loc) => ({
-            locationUuid: loc.locationUuid,
-            locationName: loc.locationName,
-            enableDescendants: false,
-          }))
-        : [],
+      locations: data.operationLocation?.map((loc) => ({
+        locationUuid: loc.locationUuid,
+        locationName: loc.locationName,
+        enableDescendants: false,
+      })),
       permanent: data.permanent,
       enabled: data.enabled,
-      activeFrom: data.dateRange.activeFrom,
-      activeTo: data.dateRange.activeTo,
-      operationTypes: hasOperationTypes
-        ? data.stockOperation.map((op) => ({
-            operationTypeUuid: op.operationTypeUuid,
-            operationTypeName: op.operationTypeName,
-          }))
-        : [],
+      activeFrom: data.dateRange?.activeFrom,
+      activeTo: data.dateRange?.activeTo,
+      operationTypes: data.stockOperation?.map((op) => ({
+        operationTypeUuid: op.operationTypeUuid,
+        operationTypeName: op.operationTypeName,
+      })),
     };
 
-    if (!hasValidRoleConditions && userRoleScopePayload.locations.length === 0) {
+    if (!hasValidRoleConditions && userRoleScopePayload.locations?.length === 0) {
       return null;
     }
 
