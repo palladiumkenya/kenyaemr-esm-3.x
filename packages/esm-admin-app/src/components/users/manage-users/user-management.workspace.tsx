@@ -162,8 +162,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       permanent: userRoleScope?.permanent,
       enabled: userRoleScope?.enabled,
       dateRange: {
-        activeTo: userRoleScope?.activeTo ? new Date(userRoleScope.activeTo) : undefined,
-        activeFrom: userRoleScope?.activeFrom ? new Date(userRoleScope.activeFrom) : undefined,
+        activeTo: userRoleScope?.activeTo,
+        activeFrom: userRoleScope?.activeFrom,
       },
     };
   }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
