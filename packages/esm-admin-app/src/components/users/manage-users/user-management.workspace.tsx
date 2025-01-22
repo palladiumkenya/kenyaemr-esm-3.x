@@ -1097,7 +1097,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             md={12}
                             lg={12}
                             className={styles.checkBoxColumn}>
-                            <CheckboxGroup legendText={t('location', 'Location')} className={styles.checkboxGroupGrid}>
+                            <CheckboxGroup
+                              legendText={t('inventoryLocation', 'Inventory Location')}
+                              className={styles.checkboxGroupGrid}>
                               {loadingStock ? (
                                 <InlineLoading
                                   status="active"
@@ -1156,7 +1158,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                         <ResponsiveWrapper>
                           <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                            <CheckboxGroup className={styles.checkboxGroupGrid}>
+                            <CheckboxGroup
+                              legendText={t('inventoryUser', 'Inventory User')}
+                              className={styles.checkboxGroupGrid}>
                               <Controller
                                 name="enabled"
                                 control={userFormMethods.control}
