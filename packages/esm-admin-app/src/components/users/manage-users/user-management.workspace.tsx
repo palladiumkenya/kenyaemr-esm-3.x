@@ -850,21 +850,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                           <ChevronSortUp />
                         </CardHeader>
                         <ResponsiveWrapper>
-                          <Controller
-                            name="primaryRole"
-                            control={userFormMethods.control}
-                            render={({ field }) => (
-                              <Select id="carder-select" labelText={t('primaryRole', 'Primary Role')} {...field}>
-                                <SelectItem value="" text={t('selectOption', 'Choose an option')} />
-                                <SelectItem value="admin" text={t('admin', 'Admin')} />
-                                <SelectItem value="provider" text={t('provider', 'Provider')} />
-                                <SelectItem value="nurse" text={t('nurse', 'Nurse')} />
-                              </Select>
-                            )}
-                          />
-                        </ResponsiveWrapper>
-
-                        <ResponsiveWrapper>
                           {rolesConfig
                             .filter((category) => category.category !== 'Inventory Roles')
                             .map((category) => (
