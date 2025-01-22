@@ -491,7 +491,7 @@ export type PaymentMode = {
   resourceVersion?: string;
 };
 
-export type SHAIntervension = {
+export type SHAIntervention = {
   interventionCode: string;
   shaCategory: string;
   accessCode: string;

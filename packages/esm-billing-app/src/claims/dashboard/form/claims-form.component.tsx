@@ -21,7 +21,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
-import PackageIntervensions from '../../../benefits-package/forms/package-intervensions.component';
+import PackageInterventions from '../../../benefits-package/forms/package-interventions.component';
 import { formatDate } from '../../../helpers/functions';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import usePackages from '../../../hooks/usePackages';
@@ -200,7 +200,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       </Layer>
     );
   }
-
   return (
     <FormProvider {...form}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
@@ -315,8 +314,9 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           {selectedPackageObservable && (
             <Column>
               <Layer className={styles.input}>
-                <PackageIntervensions
+                <PackageInterventions
                   category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
+                  patientUuid={patientUuid}
                 />
               </Layer>
             </Column>
@@ -333,7 +333,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                     invalid={form.formState.errors[field.name]?.message}
                     invalidText={form.formState.errors[field.name]?.message}
                     id="diagnoses"
-                    titleText={t('diagnosis', 'Diagnosis')}
+                    titleText={t('finalDiagnosis', 'Final Diagnosis')}
                     selectedItems={field.value}
                     label="Choose option"
                     items={diagnoses.map((r) => r.id)}

@@ -1,0 +1,38 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.omrs-main-content {
+  background-color: white;
+}
+
+.btnLayer {
+  display: flex;
+  padding-top: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+  padding-bottom: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
+  flex-direction: row;
+  justify-content: flex-end;
+  background-color: white;
+  width: 100%;
+}
+
+.tableLayer {
+  padding-left: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+  background: white;
+  padding-top: layout.$spacing-01;
+}
+
+.loading {
+  display: flex;
+  padding-top: layout.$spacing-05;
+  padding-right: layout.$spacing-05;
+  padding-bottom: layout.$spacing-05;
+  margin-top: layout.$spacing-05;
+  flex-direction: row;
+  justify-content: flex-end;
+  background-color: white;
+  width: 100%;
+}

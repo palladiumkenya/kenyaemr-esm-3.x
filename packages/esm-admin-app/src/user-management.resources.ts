@@ -1,6 +1,19 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR, { mutate } from 'swr';
-import { AttributeType, Provider, ProviderAttributes, ProviderLocation, Role, User } from './config-schema';
+import {
+  AttributeType,
+  FHIRResponse,
+  PageableResult,
+  Provider,
+  ProviderAttributes,
+  ProviderLocation,
+  Role,
+  StockOperationType,
+  User,
+  UserRoleScope,
+} from './config-schema';
+import uniqBy from 'lodash-es/uniqBy';
+import { useMemo } from 'react';
 
 export const useUser = () => {
   const url = `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`;
@@ -48,25 +61,29 @@ export const createProvider = async (
   });
 };
 
-export const createUser = async (
-  user: Partial<User>,
-  setProvider: boolean,
-  attributes: Partial<Provider>,
-  uuid?: string,
-  providerUUID?: string,
+export const createUser = async (user: Partial<User>, uuid?: string) => {
+  const userUrl = uuid ? `${restBaseUrl}/user/${uuid}` : `${restBaseUrl}/user`;
+
+  return await postUser(user, userUrl);
+};
+
+export const createOrUpdateUserRoleScope = async (
+  userRoleScopeUrl?: string,
+  userRoleScopePayload?: Partial<UserRoleScope>,
+  userUuid?: string,
 ) => {
-  const url = uuid ? `${restBaseUrl}/user/${uuid}` : `${restBaseUrl}/user`;
+  const userRoleScopeBody = {
+    userUuid: userUuid,
+    ...userRoleScopePayload,
+  };
 
-  const response = await postUser(user, url);
-
-  if (setProvider || (response.person && response.person.uuid)) {
-    const personUUID = response.person.uuid;
-    const identifier = response.systemId;
-    const providerUrl = providerUUID ? `${restBaseUrl}/provider/${providerUUID}` : `${restBaseUrl}/provider`;
-    return await createProvider(personUUID, identifier, attributes, providerUrl);
-  }
-
-  return response;
+  return await openmrsFetch(userRoleScopeUrl, {
+    method: 'POST',
+    body: JSON.stringify(userRoleScopeBody),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };
 
 export const handleMutation = (url: string) => {
@@ -133,3 +150,33 @@ export const useLocation = () => {
     locationError: error,
   };
 };
+
+// getStockOperationTypes
+export function useStockOperationTypes() {
+  const apiUrl = `${restBaseUrl}/stockmanagement/stockoperationtype?v=default`;
+  const { data, isLoading, error } = useSWR<
+    {
+      data: PageableResult<StockOperationType>;
+    },
+    Error
+  >(apiUrl, openmrsFetch);
+  return {
+    types: data?.data || <PageableResult<StockOperationType>>{},
+    loadingStock: isLoading,
+    error,
+  };
+}
+
+export function useStockTagLocations() {
+  const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=main store,main pharmacy,dispensary `;
+  const { data, error, isLoading } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
+  const stockLocations = useMemo(
+    () => data?.data?.entry?.map((response) => response.resource) ?? [],
+    [data?.data?.entry],
+  );
+  return {
+    stockLocations: uniqBy(stockLocations, 'id') ?? [],
+    isLoading,
+    error,
+  };
+}
