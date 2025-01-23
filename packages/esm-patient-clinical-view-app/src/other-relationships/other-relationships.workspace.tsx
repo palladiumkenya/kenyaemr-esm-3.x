@@ -13,9 +13,6 @@ import { uppercaseText } from '../utils/expression-helper';
 import styles from './other-relationships.scss';
 
 const schema = relationshipFormSchema
-  .extend({
-    notes: z.string().optional(),
-  })
   .refine(
     (data) => {
       return !(data.mode === 'search' && !data.personB);
@@ -57,11 +54,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
     resolver: zodResolver(schema),
   });
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isValid },
-  } = form;
+  const { control, handleSubmit } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
@@ -87,6 +80,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
                   id="startDate"
                   datePickerType="single"
                   {...field}
+                  ref={undefined}
                   invalid={form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}>
                   <DatePickerInput
@@ -111,6 +105,7 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
                   id="endDate"
                   datePickerType="single"
                   {...field}
+                  ref={undefined}
                   invalid={form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}>
                   <DatePickerInput
@@ -142,31 +137,12 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
               )}
             />
           </Column>
-
-          <Column className={styles.textbox}>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  labelText={t('additionalNotes', 'Any additional notes')}
-                  rows={4}
-                  id="relationship-notes"
-                  {...field}
-                />
-              )}
-            />
-          </Column>
         </Stack>
         <ButtonSet className={styles.buttonSet}>
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button
-            className={styles.button}
-            kind="primary"
-            type="submit"
-            disabled={!isValid || form.formState.isSubmitting}>
+          <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>
             {t('save', 'Save')}
           </Button>
         </ButtonSet>
