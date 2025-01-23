@@ -11,5 +11,94 @@
       "offline": true
     }
   ],
-  "extensions": []
+  "extensions": [
+    {
+      "component": "homeDashboardLink",
+      "name": "kenyaemr-home-page-link",
+      "order": 0,
+      "meta": {
+        "name": "",
+        "title": "KenyaEMR Home page",
+        "slot": "kenyaemr-home-page-slot"
+      }
+    },
+    {
+      "component": "homeRoot",
+      "name": "kenya-emr-home-root",
+      "slot": "kenyaemr-home-page-slot"
+    },
+    {
+      "component": "diagnosticsDashboardNavGroup",
+      "name": "diagnostics-dashboard-nav-group",
+      "meta": {
+        "name": "diagnostics",
+        "title": "Diagnostics",
+        "slot": "diagnostics-slot"
+      }
+    },
+    {
+      "component": "diagnosticsRoot",
+      "name": "diagnostics-root",
+      "slot": "diagnostics-slot"
+    },
+    {
+      "component": "billingDashboardNavGroup",
+      "name": "billing-dashboard-nav-group",
+      "meta": {
+        "name": "billing",
+        "title": "Billing",
+        "slot": "billing-dashboard-slot"
+      }
+    },
+    {
+      "component": "claimsManagementSideNavGroup",
+      "name": "claims-management-dashboard-nav-group",
+      "meta": {
+        "name": "claims-management",
+        "title": "Claims management Overview",
+        "slot": "case-management-slot"
+      },
+      "featureFlag": "healthInformationExchange"
+    },
+    {
+      "component": "linkageServicesDashboardNavGroup",
+      "name": "linkage-services-dashboard-nav-group",
+      "meta": {
+        "name": "linkage-services",
+        "title": "Linkage Services",
+        "slot": "linkage-services-slot"
+      }
+    },
+    {
+      "component": "linkageServicesRoot",
+      "name": "linkage-services-root",
+      "slot": "linkage-services-slot"
+    },
+    {
+      "component": "inpatientDashboardLink",
+      "name": "kenya-emr-inpatient-dashboard-link"
+    },
+    {
+      "component": "referralsDashboardLink",
+      "name": "kenyaemr-referrals-dashboard-link"
+    },
+    {
+      "component": "providersDashboardLink",
+      "name": "kenyaemr-providers-dashboard-link"
+    },
+    {
+      "component": "patientServicesDashboardNavGroup",
+      "name": "patient-services-dashboard-nav-group",
+      "order": 1
+    },
+    {
+      "component": "patientChartClinicalConsultationNavGroup",
+      "name": "patient-chart-clinical-consultation-nav-group",
+      "meta": {
+        "name": "clinical-consultation",
+        "title": "Clinical consultation",
+        "slot": "clinical-consultation-slot"
+      }
+    }
+  ]
 }
