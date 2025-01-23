@@ -77,13 +77,13 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
           <Controller
             control={form.control}
             name="personB"
-            render={({ field }) => (
+            render={({ field, fieldState: { error } }) => (
               <Autosuggest
                 className={styles.input}
                 labelText={t('patient', 'Patient')}
                 placeholder={t('patientPlaceHolder', 'Search patient')}
-                invalid={Boolean(form.formState.errors[field.name]?.message)}
-                invalidText={form.formState.errors[field.name]?.message}
+                invalid={Boolean(error?.message)}
+                invalidText={error?.message}
                 getDisplayValue={(item) => item.person.display}
                 renderSuggestionItem={(item) => <PatientSearchInfo patient={item} />}
                 getFieldValue={(item) => item.uuid}
@@ -113,10 +113,10 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.givenName"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
+                  invalid={error?.message}
+                  invalidText={error?.message}
                   {...field}
                   placeholder="First name"
                   labelText={t('firstName', 'First name')}
@@ -128,10 +128,10 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.middleName"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
+                  invalid={error?.message}
+                  invalidText={error?.message}
                   {...field}
                   placeholder="Middle name"
                   labelText={t('middleName', 'Middle name')}
@@ -143,10 +143,10 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.familyName"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
+                  invalid={error?.message}
+                  invalidText={error?.message}
                   {...field}
                   placeholder="Last name"
                   labelText={t('lastName', 'Last name')}
@@ -158,16 +158,18 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.gender"
-              render={({ field }) => (
-                <RadioButtonGroup
-                  legendText={t('sex', 'Sex')}
-                  {...field}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
-                  className={styles.billingItem}>
-                  <RadioButton labelText={t('male', 'Male')} value="M" id="M" />
-                  <RadioButton labelText={t('female', 'Female')} value="F" id="F" />
-                </RadioButtonGroup>
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <RadioButtonGroup
+                    name="personBInfo.gender"
+                    legendText={t('sex', 'Sex')}
+                    {...field}
+                    invalid={error?.message}
+                    invalidText={error?.message}>
+                    <RadioButton labelText={t('male', 'Male')} value="M" id="M" />
+                    <RadioButton labelText={t('female', 'Female')} value="F" id="F" />
+                  </RadioButtonGroup>
+                </>
               )}
             />
           </Column>
@@ -175,11 +177,16 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.birthdate"
-              render={({ field }) => (
-                <DatePicker datePickerType="single" {...field} className={styles.datePickerInput}>
+              render={({ field, fieldState: { error } }) => (
+                <DatePicker
+                  datePickerType="single"
+                  {...field}
+                  invalid={error?.message}
+                  invalidText={error?.message}
+                  className={styles.datePickerInput}>
                   <DatePickerInput
-                    invalid={form.formState.errors[field.name]?.message}
-                    invalidText={form.formState.errors[field.name]?.message}
+                    invalid={error?.message}
+                    invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('dateOfBirth', 'Date of birth')}
                     size="xl"
@@ -195,11 +202,11 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.maritalStatus"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <Dropdown
                   ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
+                  invalid={error?.message}
+                  invalidText={error?.message}
                   id="maritalStatus"
                   titleText={t('maritalStatus', 'Marital status')}
                   onChange={(e) => {
@@ -218,10 +225,10 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.address"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
+                  invalid={error?.message}
+                  invalidText={error?.message}
                   {...field}
                   placeholder="Physical Address/Landmark"
                   labelText={t('address', 'Address')}
@@ -233,11 +240,11 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
             <Controller
               control={form.control}
               name="personBInfo.phoneNumber"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <TextInput
                   {...field}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}
+                  invalid={error?.message}
+                  invalidText={error?.message}
                   placeholder="Phone number"
                   labelText={t('phoneNumber', 'Phone number')}
                 />

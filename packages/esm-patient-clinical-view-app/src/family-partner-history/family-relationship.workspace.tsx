@@ -13,9 +13,6 @@ import styles from './family-relationship.scss';
 import { useMappedRelationshipTypes } from './relationships.resource';
 
 const schema = relationshipFormSchema
-  .extend({
-    notes: z.string().optional(),
-  })
   .refine(
     (data) => {
       return !(data.mode === 'search' && !data.personB);
@@ -58,15 +55,11 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
     resolver: zodResolver(schema),
   });
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isValid },
-  } = form;
+  const { control, handleSubmit } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      await saveRelationship(data, config, session, []);
+      await saveRelationship(data, config, session, []); /// Remove notes from payload since endpoint doesn't expect it to avoid 400 error
       closeWorkspace();
     } catch (error) {}
   };
@@ -100,18 +93,19 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
             <Controller
               control={form.control}
               name="startDate"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
                   id="startDate"
                   datePickerType="single"
                   {...field}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}>
+                  ref={undefined}
+                  invalid={error?.message}
+                  invalidText={error?.message}>
                   <DatePickerInput
-                    invalid={form.formState.errors[field.name]?.message}
-                    invalidText={form.formState.errors[field.name]?.message}
+                    invalid={error?.message}
+                    invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('startDate', 'Start Date')}
                     size="xl"
@@ -124,37 +118,24 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
             <Controller
               control={form.control}
               name="endDate"
-              render={({ field }) => (
+              render={({ field, fieldState: { error } }) => (
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
                   id="endDate"
                   datePickerType="single"
                   {...field}
-                  invalid={form.formState.errors[field.name]?.message}
-                  invalidText={form.formState.errors[field.name]?.message}>
+                  ref={undefined}
+                  invalid={error?.message}
+                  invalidText={error?.message}>
                   <DatePickerInput
-                    invalid={form.formState.errors[field.name]?.message}
-                    invalidText={form.formState.errors[field.name]?.message}
+                    invalid={error?.message}
+                    invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('endDate', 'End Date')}
                     size="xl"
                   />
                 </DatePicker>
-              )}
-            />
-          </Column>
-          <Column className={styles.textbox}>
-            <Controller
-              name="notes"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  labelText={t('additionalNotes', 'Any additional notes')}
-                  rows={4}
-                  id="relationship-notes"
-                  {...field}
-                />
               )}
             />
           </Column>
@@ -164,11 +145,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
           <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
             {t('discard', 'Discard')}
           </Button>
-          <Button
-            className={styles.button}
-            kind="primary"
-            type="submit"
-            disabled={!isValid || form.formState.isLoading}>
+          <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>
             {t('save', 'Save')}
           </Button>
         </ButtonSet>
