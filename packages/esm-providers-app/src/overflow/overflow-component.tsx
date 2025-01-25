@@ -28,6 +28,9 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
   const registrationNumber = provider.attributes.find((attr) => attr.attributeType.uuid === licenseBodyUuid);
   const passPortNumber = provider.attributes.find((attr) => attr.attributeType.uuid === passportNumberUuid);
 
+  // Check if any of the attributes has a value
+  const canSync = !!(providerNationalId?.value || registrationNumber?.value || passPortNumber?.value);
+
   if (isLoading) {
     return null;
   }
@@ -39,6 +42,7 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
       user,
     });
   };
+
   const handleOpenModal = () => {
     setSyncLoading(true);
     showModal('hwr-sync-modal', { provider });
@@ -53,7 +57,7 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
     <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
       <OverflowMenuItem itemText="Edit" onClick={() => handleUpdateProvider(provider)} />
       <MenuItemDivider />
-      <OverflowMenuItem itemText="Sync" onClick={handleOpenModal} disabled={!providerNationalId} />
+      <OverflowMenuItem itemText="Sync" onClick={handleOpenModal} disabled={!canSync} />
     </OverflowMenu>
   );
 }
