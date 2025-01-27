@@ -243,10 +243,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       })),
     };
 
-    if (!hasValidRoleConditions && userRoleScopePayload.locations?.length === 0) {
-      return null;
-    }
-
     const providerPayload: Partial<Provider> = {
       attributes: [
         { attributeType: attributeTypeMapping.primaryFacility, value: data.primaryFacility?.split(' ').pop() || '' },
@@ -287,7 +283,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         );
         closeWorkspaceWithSavedChanges();
 
-        if (userRoleScopePayload !== null) {
+        if (userRoleScopePayload !== null && hasValidRoleConditions) {
           try {
             const userRoleScopeUrl = userRoleScope?.uuid
               ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
