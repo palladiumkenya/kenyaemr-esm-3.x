@@ -7,16 +7,13 @@ import { Package } from '../types';
  * @returns
  */
 const usePackages = () => {
-  const url = `${restBaseUrl}/insuranceclaims/claims/benefit-package`;
+  const url = `${restBaseUrl}/kenyaemr/sha-benefits-package?synchronize=false`;
 
-  const { data, isLoading, error } = useSWR<FetchResponse<Array<{ code: string; name: string; description: string }>>>(
-    url,
-    openmrsFetch,
-  );
+  const { data, isLoading, error } = useSWR<FetchResponse<{ shaBenefitsPackage: string }>>(url, openmrsFetch);
 
   return {
     isLoading,
-    packages: (data?.data ?? []).map(
+    packages: (data?.data.shaBenefitsPackage ? JSON.parse(data?.data.shaBenefitsPackage) : []).map(
       (category) =>
         ({
           uuid: `${category.code}`,
