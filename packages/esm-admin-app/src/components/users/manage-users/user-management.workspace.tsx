@@ -53,8 +53,13 @@ import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { Provider, User, UserRoleScope } from '../../../config-schema';
-import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatForDatePicker, today } from '../../../constants';
-import { ResourceRepresentation } from '../../../api';
+import {
+  DATE_PICKER_CONTROL_FORMAT,
+  DATE_PICKER_FORMAT,
+  formatForDatePicker,
+  formatNewDate,
+  today,
+} from '../../../constants';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -75,10 +80,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
   const { location, loadingLocation } = useLocation();
 
-  const { items, loadingRoleScope } = useUserRoleScopes({
-    v: ResourceRepresentation.Default,
-    totalCount: true,
-  });
+  const { items, loadingRoleScope } = useUserRoleScopes();
 
   const { userManagementFormSchema } = UserManagementFormSchema();
   const { stockOperations, loadingStock } = useStockOperationTypes();
@@ -89,7 +91,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
   const { roles = [], isLoading } = useRoles();
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
-  const { attributeTypes = [] } = usePersonAttribute();
 
   const userRoleScope = useMemo(
     () => items?.results?.find((user) => user.userUuid === initialUserValue.uuid) || null,
@@ -162,8 +163,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       permanent: userRoleScope?.permanent,
       enabled: userRoleScope?.enabled,
       dateRange: {
-        activeTo: userRoleScope?.activeTo,
-        activeFrom: userRoleScope?.activeFrom,
+        activeTo: formatNewDate(userRoleScope?.activeTo),
+        activeFrom: formatNewDate(userRoleScope?.activeFrom),
       },
     };
   }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
@@ -353,7 +354,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     }
   }, [isDirty, promptBeforeClosing]);
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: string) => {
     setActiveSection((prev) => (prev !== section ? section : prev));
   };
 
@@ -1189,13 +1190,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     render={({ field }) => {
                                       const { value, onChange } = field;
 
-                                      const handleDateChange = (dates: Array<Date | null>) => {
-                                        if (dates && dates.length === 2) {
-                                          onChange({
-                                            activeFrom: dates[0] || null,
-                                            activeTo: dates[1] || null,
-                                          });
-                                        }
+                                      const handleDateChange = (dates: Array<Date>) => {
+                                        onChange({
+                                          activeFrom: dates[0],
+                                          activeTo: dates[1],
+                                        });
                                       };
 
                                       return (
@@ -1206,23 +1205,20 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                           locale="en"
                                           dateFormat={DATE_PICKER_CONTROL_FORMAT}
                                           onChange={handleDateChange}
-                                          value={[
-                                            value?.activeFrom ? new Date(value.activeFrom) : null,
-                                            value?.activeTo ? new Date(value.activeTo) : null,
-                                          ]}>
+                                          value={[value?.activeFrom, value?.activeTo]}>
                                           <DatePickerInput
                                             id="date-picker-input-id-start"
                                             name="activeFrom"
                                             placeholder={DATE_PICKER_FORMAT}
                                             labelText={t('activeFrom', 'Active From')}
-                                            value={formatForDatePicker(value?.activeFrom)}
+                                            value={value?.activeFrom}
                                           />
                                           <DatePickerInput
                                             id="date-picker-input-id-finish"
                                             name="activeTo"
                                             placeholder={DATE_PICKER_FORMAT}
                                             labelText={t('activeTo', 'Active To')}
-                                            value={formatForDatePicker(value?.activeTo)}
+                                            value={value?.activeTo}
                                           />
                                         </DatePicker>
                                       );

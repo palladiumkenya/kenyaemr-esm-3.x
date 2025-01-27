@@ -10,8 +10,6 @@ export const today = () => {
 
 export const DATE_PICKER_CONTROL_FORMAT = 'd/m/Y';
 
-// to move to a location
-
 export const DATE_PICKER_FORMAT = 'DD/MM/YYYY';
 
 export const formatForDatePicker = (date: Date | null | undefined) => {
@@ -20,4 +18,8 @@ export const formatForDatePicker = (date: Date | null | undefined) => {
 
 export const formatDisplayDate = (date: Date | null | undefined, format?: string) => {
   return date ? dayjs(date).format(format ?? 'DD-MMM-YYYY') : '';
+};
+
+export const formatNewDate = (date: Date | null | undefined) => {
+  return date ? new Date(date) : undefined;
 };
