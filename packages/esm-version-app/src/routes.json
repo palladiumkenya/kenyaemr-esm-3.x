@@ -93,6 +93,7 @@
     },
     {
       "component": "patientChartClinicalConsultationNavGroup",
+      "order": 3,
       "name": "patient-chart-clinical-consultation-nav-group",
       "meta": {
         "name": "clinical-consultation",
