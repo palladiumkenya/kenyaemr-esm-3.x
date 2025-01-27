@@ -167,7 +167,14 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         activeFrom: formatNewDate(userRoleScope?.activeFrom),
       },
     };
-  }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
+  }, [
+    isInitialValuesEmpty,
+    initialUserValue,
+    providerLicenseNumber,
+    licenseExpiryDate,
+    primaryFacility,
+    userRoleScope,
+  ]);
 
   function extractNameParts(display = '') {
     const nameParts = display.split(' ');
@@ -1172,7 +1179,15 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                           id="permanent"
                                           name="permanent"
                                           checked={field.value || false}
-                                          onChange={(e) => field.onChange(e.target.checked)}
+                                          onChange={(e) => {
+                                            field.onChange(e.target.checked);
+                                            if (e.target.checked) {
+                                              userFormMethods.setValue('dateRange', {
+                                                activeFrom: undefined,
+                                                activeTo: undefined,
+                                              });
+                                            }
+                                          }}
                                         />
                                         {t('permanent', 'Permanent?')}
                                       </label>
