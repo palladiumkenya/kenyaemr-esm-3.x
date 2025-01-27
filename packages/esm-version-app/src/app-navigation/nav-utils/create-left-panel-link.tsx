@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { LinkExtension } from './link-extension.component';
-import { CarbonIconType } from '@carbon/react/icons';
+import { type CarbonIconType } from '@carbon/react/icons';
 
 type LinkConfig = {
   route: string;
