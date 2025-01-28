@@ -10,7 +10,7 @@ on:
       - created
 
 env:
-  TURBO_TOKEN: 'turbo-token'
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ github.repository_owner }}
   FORCE_COLOR: true
 
@@ -21,6 +21,8 @@ jobs:
     permissions:
       actions: read
       contents: read
+      packages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -33,9 +35,18 @@ jobs:
           node-version: "18"
           cache: 'yarn'
 
-      # Use Turborepo Remote Caching
-      - name: Setup Turborepo Remote Cache
-        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Configure Vercel Remote Cache
+        run: npx turbo login --sso-team $TURBO_TEAM
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+
+      - name: Setup Turborepo cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -43,24 +54,28 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Run lint, type checks and tests
-        run: yarn verify --cache-dir=".turbo"
+        run: yarn verify
         env:
-          TURBO_CACHE_KEY: ${{ github.sha }}
+          TURBO_CACHE: remote:rw
+          TURBO_CACHE_DIR: .turbo
 
       - name: Build packages
         run: |
           yarn turbo run build \
             --cache-dir=".turbo" \
-            --concurrency=5 \
+            --concurrency=8 \
             --no-daemon
         env:
-          TURBO_CACHE_KEY: ${{ github.sha }}
+          TURBO_CACHE: remote:rw
+          TURBO_CACHE_DIR: .turbo
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: packages
-          path: packages/**/dist
+          path: |
+            packages/**/dist
+            !packages/**/node_modules
           compression-level: 9
           retention-days: 7
 
@@ -68,6 +83,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push'
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -80,6 +99,11 @@ jobs:
           node-version: "18"
           registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
+
+      - name: Configure Vercel Remote Cache
+        run: npx turbo login --sso-team $TURBO_TEAM
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -90,14 +114,21 @@ jobs:
         run: yarn workspaces foreach --worktree --topological --exclude @kenyaemr/esm-3.x-apps version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
 
       - name: Build
-        run: yarn turbo run build --cache-dir=".turbo" --concurrency=5 --no-daemon
+        run: yarn turbo run build --cache-dir=".turbo" --concurrency=8 --no-daemon
         env:
           TURBO_CACHE_KEY: ${{ github.sha }}
+          TURBO_TEAM: ${{ github.repository_owner }}
 
       - name: Configure Git
         run: |
           git config user.email "info@thepalladiumgroup.com"
           git config user.name "KenyaEMR CI"
+
+      - name: Commit version changes
+        run: |
+          git add package.json packages/*/package.json
+          git commit -m "ci: version bump [skip ci]"
+          git push origin HEAD:main
 
       - name: Publish pre-release
         run: |
@@ -106,26 +137,27 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
-  # dev server build dispatch
+
   Trigger_server_build:
-      runs-on: ubuntu-latest
-      needs: pre_release
-      steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v2
-  
-        - name: Invoke workflow without inputs. Don't wait for result
-          uses: aurelien-baudet/workflow-dispatch@v2
-          with:
-            workflow: KenyaEMR CI
-            repo: palladiumkenya/openmrs-config-kenyaemr
-            token: ${{ secrets.PERSONAL_TOKENS }}
-            wait-for-completion: false 
+    runs-on: ubuntu-latest
+    needs: pre_release
+    steps:
+      - name: Invoke workflow
+        uses: aurelien-baudet/workflow-dispatch@v2
+        with:
+          workflow: KenyaEMR CI
+          repo: palladiumkenya/openmrs-config-kenyaemr
+          token: ${{ secrets.PERSONAL_TOKENS }}
+          wait-for-completion: false
 
   release:
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'release'
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -138,6 +170,11 @@ jobs:
           node-version: "18"
           registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
+
+      - name: Configure Vercel Remote Cache
+        run: npx turbo login --sso-team $TURBO_TEAM
+        env:
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -159,3 +196,4 @@ jobs:
           yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
