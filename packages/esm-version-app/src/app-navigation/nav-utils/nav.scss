@@ -1,0 +1,9 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.itemTitle {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-05;
+  align-items: center;
+}

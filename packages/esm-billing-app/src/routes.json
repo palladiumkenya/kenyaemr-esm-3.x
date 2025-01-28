@@ -143,6 +143,7 @@
     {
       "component": "billingOverviewLink",
       "name": "billing-overview-link",
+      "order": 0,
       "slot": "billing-dashboard-link-slot"
     },
     {
@@ -189,6 +190,7 @@
     {
       "component": "claimsManagementOverviewDashboardLink",
       "name": "claims-management-overview-link",
+      "order": 0,
       "slot": "claims-management-dashboard-link-slot"
     },
     {
