@@ -26,8 +26,9 @@ export const usePaymentModes = () => {
   return { paymentModes: data?.data.results ?? [], error, isLoading };
 };
 
-export const createBillableService = (payload: any, uuid?: string) => {
+export const createBillableService = (payload: any) => {
   const url = `/ws/rest/v1/cashier/api/billable-service`;
+
   return openmrsFetch(url, {
     method: 'POST',
     body: payload,
@@ -36,6 +37,7 @@ export const createBillableService = (payload: any, uuid?: string) => {
     },
   });
 };
+
 export const deleteBillableService = (payload: any) => {
   const url = `/ws/rest/v1/cashier/api/deletebillable-service`;
   return openmrsFetch(url, {
