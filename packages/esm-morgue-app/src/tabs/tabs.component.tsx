@@ -37,7 +37,7 @@ export const MorgueTabs: React.FC = () => {
     },
   ];
   const handleAdmitBodyWorkspace = () => {
-    // launchWorkspace('admit-body-form');
+    launchWorkspace('admit-body-form');
   };
   return (
     <div className={styles.referralsList} data-testid="">

@@ -16,17 +16,6 @@
       }
     },
     {
-      "component": "peerCalendarDashboardLink",
-      "name": "peer-calendar-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "peer-calendar",
-        "title": "Peer Calendar",
-        "slot": "peer-calendar-dashboard-slot",
-        "path": "peer-management"
-      }
-    },
-    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot"
@@ -43,6 +32,12 @@
       "name": "discharge-body-form",
       "component": "dischargeBodyForm",
       "title": "discharge body form",
+      "type": "other-form"
+    },
+    {
+      "name": "admit-body-form",
+      "component": "admitBodyForm",
+      "title": "Admission form",
       "type": "other-form"
     }
   ],
