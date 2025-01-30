@@ -158,14 +158,6 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     onSuggestionSelected(name, undefined);
   };
 
-  const handleClick = (index: number) => {
-    const display = getDisplayValue(suggestions[index]);
-    const value = getFieldValue(suggestions[index]);
-    searchBox.current.value = display;
-    onSuggestionSelected(name, value);
-    setSuggestions([]);
-  };
-
   return (
     <div className={styles.autocomplete} ref={wrapper}>
       <label className="cds--label">{labelText}</label>
@@ -184,7 +176,6 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
-              onClick={(e) => handleClick(index)}
               role="presentation"
               className={typeof renderSuggestionItem !== 'function' && styles.displayText}>
               {typeof renderSuggestionItem === 'function'

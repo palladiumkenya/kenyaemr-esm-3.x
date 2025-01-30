@@ -1,8 +1,8 @@
-import { Tag, Tile, Button, Row } from '@carbon/react';
-import { ArrowRightIcon, type Patient, PatientPhoto, useLayoutType } from '@openmrs/esm-framework';
+import { Button, Row, Tag, Tile } from '@carbon/react';
+import { launchWorkspace, type Patient, PatientPhoto, useLayoutType } from '@openmrs/esm-framework';
 import React from 'react';
-import styles from './patient-search-info.scss';
 import { useTranslation } from 'react-i18next';
+import styles from './patient-search-info.scss';
 
 type PatientSearchInfoProps = {
   patient: Patient;
@@ -11,9 +11,17 @@ type PatientSearchInfoProps = {
 const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient }) => {
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
   const { t } = useTranslation();
+  const patientUuid = patient.uuid;
+
+  const handleAdmissionForm = (patientUuid: string) => {
+    launchWorkspace('patient-additional-info-form', {
+      workspaceTitle: t('admissionForm', 'Admission form'),
+      patientUuid,
+    });
+  };
 
   return (
-    <div>
+    <div className={styles.patientInfoContainer}>
       <Tile className={styles.patientInfo}>
         <div className={styles.patientAvatar} role="img">
           <PatientPhoto patientUuid={patient.uuid} patientName={patient?.person?.display} />
@@ -37,7 +45,11 @@ const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient }) => {
       </Tile>
       <div className={styles.admissionRequestActionBar}>
         <Row className={styles.buttonRow}>
-          <Button kind="primary" size={responsiveSize} className={styles.actionButton}>
+          <Button
+            kind="primary"
+            size={responsiveSize}
+            className={styles.actionButton}
+            onClick={() => handleAdmissionForm(patientUuid)}>
             {t('admitBody', 'Admit body')}
           </Button>
           <Button kind="danger" size={responsiveSize} className={styles.actionButton}>
