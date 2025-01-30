@@ -1,5 +1,6 @@
 {
   "admissionForm": "Admission form",
+  "admitBodies": "Admit bodies",
   "admitted": "Admitted",
   "admitToMorgue": "Admit to morgue",
   "allocation": "Allocation",
@@ -19,6 +20,5 @@
   "pullingCompartment": "Pulling compartments data.....",
   "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
   "waitingInLine": "Waiting In Line",
-  "waitingQueue": "Waiting queue",
-  "waitQueue": "Waiting queue"
+  "waitingQueue": "Waiting queue"
 }
