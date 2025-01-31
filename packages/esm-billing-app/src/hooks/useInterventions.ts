@@ -61,12 +61,13 @@ export const useInterventions = (filters: InterventionsFilter) => {
     ...filters,
     synchronize: false,
   })}`;
-  const { isLoading, error, data } = useSWR<{ data: Data }>(url, async (url: string) => {
-    const payload = require('./payload.json');
-    return { data: payload };
-  });
+  const { isLoading, error, data } = useSWR<FetchResponse<{ shaInterventions: string }>>(url, openmrsFetch);
   const interventions = useMemo(() => {
-    return (data?.data as Data | undefined)?.data
+    return (
+      (data?.data?.shaInterventions
+        ? JSON.parse(data.data.shaInterventions.replace("',uuid(),1,now(),0);", ''))
+        : undefined) as Data | undefined
+    )?.data
       ?.filter((d) => {
         // 1. Filter by package code (only if defined)
         if (filters.package_code && d.interventionPackage !== filters.package_code) {
