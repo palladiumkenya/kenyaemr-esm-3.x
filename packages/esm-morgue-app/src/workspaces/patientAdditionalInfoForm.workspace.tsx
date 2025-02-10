@@ -54,6 +54,7 @@ import { mutate } from 'swr';
 import dayjs from 'dayjs';
 import DeceasedHeader from '../component/deceasedInfo/deceased-header.component';
 import { useAssignedCompartmentByPatient } from '../hook/useAssignedCompartmentByPatient';
+import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -95,12 +96,19 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const { data: compartmentAssignedToPatient, isLoading: isLoadingCompartmentAssignedToPatient } =
     useAssignedCompartmentByPatient(patientUuid);
+  const { admissionLocation, isLoading: isLoadingAdmissionLocation } = useAdmissionLocation();
+
   const {
     sessionLocation: { uuid: locationUuid },
     currentProvider: { uuid: currentProviderUuid },
     user: { roles },
   } = useSession();
 
+  const locationName = locationUuid
+    ? admissionLocation?.bedLayouts?.[0]?.patients?.[0]?.person?.display || 'No Compartment'
+    : 'No Compartment';
+  const displayText =
+    locationName === 'No Compartment' ? `No Compartment (Location UUID: ${locationUuid})` : locationName;
   const {
     morgueVisitTypeUuid,
     morgueDepartmentServiceTypeUuid,
@@ -595,7 +603,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           </>
         )}
 
-        {/* <Column>
+        <Column>
           <Controller
             name="availableCompartment"
             control={control}
@@ -604,9 +612,9 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 {...field}
                 id="avail-compartment"
                 className={styles.sectionField}
-                items={morgueCompartments.map((compartment) => compartment.uuid)}
+                items={admissionLocation?.bedLayouts?.map((bed) => bed.bedUuid) || []} // Use bed UUIDs as items
                 itemToString={(item) =>
-                  morgueCompartments.find((compartment) => compartment.uuid === item)?.display ?? ''
+                  admissionLocation?.bedLayouts?.find((bed) => bed.bedUuid === item)?.bedNumber || ''
                 }
                 titleText={t('availableCompartment', 'Available Compartment')}
                 label={t('ChooseOptions', 'Choose option')}
@@ -617,7 +625,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
               />
             )}
           />
-        </Column> */}
+        </Column>
         <Column>
           <Controller
             name="burialPermitNo"
