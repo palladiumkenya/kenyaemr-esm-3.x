@@ -1,12 +1,14 @@
 import { InlineLoading, Button } from '@carbon/react';
-import { Order } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTestOrderBillStatus } from './test-order-action.resource';
-import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
-import styles from './test-order-action.scss';
+import { useOrderBill, useTestOrderBillStatus } from './test-order-action.resource';
+import { launchWorkspace, showModal } from '@openmrs/esm-framework';
+import { Order } from '@openmrs/esm-patient-common-lib';
 import { createMedicationDispenseProps } from './dispense.resource';
+import { useStockItemQuantity } from '../useBillableItem';
+import { useBillableServices } from '../../billable-service.resource';
+import styles from './test-order-action.scss';
 
 type TestOrderProps = {
   order?: Order;
@@ -32,9 +34,16 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
   const dispenseFormProps = isDispenseOrder ? createMedicationDispenseProps(props) : null;
   const orderUuid = order?.uuid ?? medicationRequestBundle?.request?.id;
   const patientUuid = order?.patient?.uuid ?? medicationRequestBundle?.request?.subject?.reference?.split('/')[1];
-
   const { isLoading, hasPendingPayment } = useTestOrderBillStatus(orderUuid, patientUuid);
-
+  const drugUuid = medicationRequestBundle?.request?.medicationReference?.reference?.split('/')[1];
+  const { billableServices } = useBillableServices();
+  const { stockItemQuantity, stockItemUuid } = useStockItemQuantity(drugUuid);
+  const billableItem =
+    billableServices?.filter((service) => {
+      const stockItem = service?.stockItem.split(':')[0];
+      return stockItem === stockItemUuid;
+    }) || [];
+  const { itemHasBill } = useOrderBill(patientUuid, orderUuid);
   // Handle modal close and revalidation
   const handleModalClose = useCallback(() => {
     mutate((key) => typeof key === 'string' && key.startsWith(additionalProps?.mutateUrl as string), undefined, {
@@ -43,6 +52,17 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
   }, [additionalProps?.mutateUrl]);
 
   const launchModal = useCallback(() => {
+    if (stockItemQuantity > 0 && itemHasBill.length < 1 && billableItem.length > 0) {
+      const disposeBill = showModal(modalName ?? 'create-bill-item-modal', {
+        closeModal: () => {
+          handleModalClose();
+          disposeBill();
+        },
+        medicationRequestBundle,
+      });
+      return;
+    }
+
     if (isDispenseOrder) {
       launchWorkspace('dispense-workspace', dispenseFormProps);
       return;
@@ -56,7 +76,18 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
       order,
       ...(additionalProps && { additionalProps }),
     });
-  }, [isDispenseOrder, modalName, order, additionalProps, dispenseFormProps, handleModalClose]);
+  }, [
+    isDispenseOrder,
+    modalName,
+    order,
+    additionalProps,
+    dispenseFormProps,
+    handleModalClose,
+    medicationRequestBundle,
+    stockItemQuantity,
+    billableItem.length,
+    itemHasBill.length,
+  ]);
 
   if (isLoading) {
     return (
@@ -70,18 +101,30 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
     return null;
   }
 
-  const buttonText = hasPendingPayment
-    ? t('unsettledBill', 'Unsettled bill')
-    : isDispenseOrder
-    ? actionText ?? t('dispense', 'Dispense')
-    : actionText ?? t('pickLabRequest', 'Pick Lab Request');
+  const buttonText = (() => {
+    if (hasPendingPayment) {
+      return t('unsettledBill', 'Unsettled bill');
+    }
+
+    if (stockItemQuantity < 1) {
+      return t('outOfStock', 'Out of Stock');
+    }
+
+    if (stockItemQuantity > 0 && itemHasBill.length === 0 && billableItem.length > 0) {
+      return t('bill', 'Bill');
+    }
+
+    return isDispenseOrder
+      ? actionText ?? t('dispense', 'Dispense')
+      : actionText ?? t('pickLabRequest', 'Pick Lab Request');
+  })();
 
   return (
     <Button
       kind="primary"
       className={!isDispenseOrder ? styles.actionButton : ''}
       size={!isDispenseOrder ? 'md' : ''}
-      disabled={hasPendingPayment}
+      disabled={hasPendingPayment || stockItemQuantity < 1}
       onClick={launchModal}>
       {buttonText}
     </Button>

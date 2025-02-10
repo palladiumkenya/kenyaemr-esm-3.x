@@ -28,7 +28,6 @@ const DrugOrder: React.FC<DrugOrderProps> = ({ order }) => {
   if (isLoading || isLoadingInventory) {
     return null;
   }
-
   return (
     <div className={styles.drugOrderContainer}>
       {stockItem && stockItem.length > 0 ? (

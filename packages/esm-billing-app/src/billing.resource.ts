@@ -275,6 +275,7 @@ export const billingFormSchema = z.object({
         priceName: z.string().optional().default('Default'),
         priceUuid: z.string().uuid(),
         lineItemOrder: z.number().optional().default(0),
+        order: z.string().optional().default(''),
         paymentStatus: z.enum(['PENDING']),
       }),
     )
