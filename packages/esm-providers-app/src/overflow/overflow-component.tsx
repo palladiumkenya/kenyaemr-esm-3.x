@@ -1,18 +1,10 @@
-import { launchWorkspace, showModal, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal, useConfig } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
-import { Practitioner, ProviderResponse } from '../types';
-import { OverflowMenuItem, OverflowMenu, MenuItemDivider, InlineLoading } from '@carbon/react';
-import {
-  createProviderAttribute,
-  searchHealthCareWork,
-  updateProviderAttributes,
-  useIdentifierTypes,
-  useProviderUser,
-} from '../workspace/hook/provider-form.resource';
-import { disableLogin } from './overflow.resource';
+import { ProviderResponse } from '../types';
+import { OverflowMenuItem, OverflowMenu, MenuItemDivider } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
-import { mutate } from 'swr';
+import { useProviderUser } from '../workspace/hook/provider-form.resource';
 
 type CustomActionMenuProps = {
   provider: ProviderResponse;
@@ -28,22 +20,17 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
   const registrationNumber = provider.attributes.find((attr) => attr.attributeType.uuid === licenseBodyUuid);
   const passPortNumber = provider.attributes.find((attr) => attr.attributeType.uuid === passportNumberUuid);
 
-  // Check if any of the attributes has a value
-  const canSync = !!(providerNationalId?.value || registrationNumber?.value || passPortNumber?.value);
+  const isSyncEnabled = !!(providerNationalId?.value || registrationNumber?.value || passPortNumber?.value);
 
-  if (isLoading) {
-    return null;
-  }
-
-  const handleUpdateProvider = (provider: ProviderResponse) => {
+  const handleUpdateProvider = () => {
     launchWorkspace('provider-register-form', {
-      workspaceTitle: 'Update account form',
+      workspaceTitle: t('updateAccountForm', 'Update account form'),
       provider,
       user,
     });
   };
 
-  const handleOpenModal = () => {
+  const handleOpenSyncModal = () => {
     setSyncLoading(true);
     showModal('hwr-sync-modal', { provider });
     setSyncLoading(false);
@@ -54,10 +41,14 @@ function CustomActionMenu({ provider }: CustomActionMenuProps) {
   }
 
   return (
-    <OverflowMenu flipped={document?.dir === 'rtl'} aria-label="overflow-menu">
-      <OverflowMenuItem itemText="Edit" onClick={() => handleUpdateProvider(provider)} />
+    <OverflowMenu flipped={document?.dir === 'rtl'} aria-label={t('overflowMenu', 'Overflow menu')}>
+      <OverflowMenuItem itemText={t('edit', 'Edit')} onClick={handleUpdateProvider} />
       <MenuItemDivider />
-      <OverflowMenuItem itemText="Sync" onClick={handleOpenModal} disabled={!canSync} />
+      <OverflowMenuItem
+        itemText={t('sync', 'Sync')}
+        onClick={handleOpenSyncModal}
+        disabled={!isSyncEnabled || syncLoading}
+      />
     </OverflowMenu>
   );
 }

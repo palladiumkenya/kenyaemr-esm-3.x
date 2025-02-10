@@ -3,7 +3,7 @@
 @use '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-.form__button {
+.formButton {
   height: layout.$spacing-09;
   display: flex;
   align-content: flex-start;
@@ -11,20 +11,20 @@
   min-width: layout.$spacing-09;
   margin-bottom: layout.$spacing-05;
 }
-.error_message {
+.errorMessage {
   color: colors.$red-60;
   font-size: layout.$spacing-04;
   line-height: layout.$spacing-05;
 }
 
-.form__button_set {
+.formButtonSet {
   margin-top: layout.$spacing-11;
   display: flex;
   justify-content: center;
   margin-left: layout.$spacing-05;
 }
 
-.form__header__section {
+.formHeaderSection {
   @include type.type-style('heading-02');
   display: flex;
   align-items: center;
@@ -46,18 +46,18 @@
     @include type.type-style('body-01');
   }
 }
-.form__subheader__section {
+.formSubheaderSection {
   @include type.type-style('heading-02');
   margin-top: layout.$spacing-05;
 }
-.form__container {
+.formContainer {
   width: 100%;
 }
-.form__grid {
+.formGrid {
   margin: 0 layout.$spacing-05;
   padding: 0rem;
 }
-.form__gender {
+.formGender {
   color: colors.$gray-70;
   display: inline-block;
   font-size: layout.$spacing-04;
@@ -66,15 +66,15 @@
   margin-bottom: layout.$spacing-03;
   vertical-align: baseline;
 }
-.form__header__section {
+.formHeaderSection {
   @include type.type-style('heading-02');
   margin-top: layout.$spacing-04;
   margin-bottom: layout.$spacing-02;
 }
-.form__role_label {
+.formRoleLabel {
   color: colors.$gray-40;
 }
-.form__license_label {
+.formLicenseLabel {
   color: colors.$gray-70;
   display: inline-block;
   font-size: layout.$spacing-04;
@@ -82,23 +82,23 @@
   margin-bottom: layout.$spacing-02;
   vertical-align: baseline;
 }
-.form__license__tag {
+.formLicenseTag {
   width: layout.$spacing-13;
   font-weight: 600;
   padding: layout.$spacing-03;
 }
-.form__date__picker input {
+.formDatePicker input {
   min-width: 24rem;
 }
-.form__row {
+.formRow {
   display: flex;
   align-items: center;
 }
 
-.form__search-button {
+.formSearchButton {
   margin-left: layout.$spacing-03;
 }
-.form__combox_box {
+.formComboxBox {
   align-items: center;
   display: flex;
 }

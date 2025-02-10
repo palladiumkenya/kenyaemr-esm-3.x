@@ -19,7 +19,15 @@ import {
 } from '@carbon/react';
 import { GenderFemale, GenderMale, Query } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formatDate, parseDate, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import {
+  formatDate,
+  parseDate,
+  restBaseUrl,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -202,7 +210,6 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
     }
   };
   const onSubmit = async (data) => {
-    let response;
     try {
       const personPayload = {
         names: [
@@ -221,76 +228,61 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         roles: data.roles,
       };
 
-      let _user;
+      let updatedOrCreatedUser;
 
       if (provider) {
-        const userResponse = await updateProviderUser({ roles: userPayload.roles }, user!.uuid);
-        response = await updateProviderPerson(personPayload, user!.person.uuid);
-        _user = await userResponse.json();
+        const userUpdateResponse = await updateProviderUser({ roles: userPayload.roles }, user.uuid);
+        const personUpdateResponse = await updateProviderPerson(personPayload, user.person.uuid);
+        updatedOrCreatedUser = await userUpdateResponse.json();
+        mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
+
         showSnackbar({
-          title: 'Success',
+          title: t('success', 'Success'),
           kind: 'success',
-          subtitle: t('accountUpatedMsgs', 'Account updated successfully!'),
+          subtitle: t('accountUpdatedMsg', 'Account updated successfully!'),
         });
       } else {
-        response = await createUser(userPayload);
-        _user = await response.json();
+        const userCreationResponse = await createUser(userPayload);
+        updatedOrCreatedUser = await userCreationResponse.json();
+        mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
+
         showSnackbar({
-          title: 'Success',
+          title: t('success', 'Success'),
           kind: 'success',
-          subtitle: t('personMsg', 'Person created successfully!'),
+          subtitle: t('personCreatedMsg', 'Person created successfully!'),
         });
       }
 
       const providerPayload = {
-        person: _user.person.uuid,
+        person: updatedOrCreatedUser.person.uuid,
         identifier: data.providerId,
         attributes: [],
         retired: false,
       };
 
-      if (data.nationalid) {
-        providerPayload.attributes.push({
-          attributeType: providerNationalIdUuid,
-          value: data.nationalid,
-        });
-      }
-      if (data.licenseExpiryDate) {
-        providerPayload.attributes.push({
-          attributeType: licenseExpiryDateUuid,
-          value: new Date(data.licenseExpiryDate).toISOString(),
-        });
-      }
-      if (data.licenseNumber) {
-        providerPayload.attributes.push({
-          attributeType: licenseNumberUuid,
-          value: data.licenseNumber,
-        });
-      }
-      if (data.registrationNumber) {
-        providerPayload.attributes.push({
-          attributeType: licenseBodyUuid,
-          value: data.registrationNumber,
-        });
-      }
-      if (data.phoneNumber) {
-        providerPayload.attributes.push({
-          attributeType: phoneNumberUuid,
-          value: data.phoneNumber,
-        });
-      }
-      if (data.qualification) {
-        providerPayload.attributes.push({
-          attributeType: qualificationUuid,
-          value: data.qualification,
-        });
-      }
-      if (data.providerAddress) {
-        providerPayload.attributes.push({
-          attributeType: providerAddressUuid,
-          value: data.providerAddress,
-        });
-      }
+      const attributeMappings = [
+        { field: 'nationalid', uuid: providerNationalIdUuid },
+        {
+          field: 'licenseExpiryDate',
+          uuid: licenseExpiryDateUuid,
+          transform: (value) => new Date(value).toISOString(),
+        },
+        { field: 'licenseNumber', uuid: licenseNumberUuid },
+        { field: 'registrationNumber', uuid: licenseBodyUuid },
+        { field: 'phoneNumber', uuid: phoneNumberUuid },
+        { field: 'qualification', uuid: qualificationUuid },
+        { field: 'providerAddress', uuid: providerAddressUuid },
+      ];
+
+      attributeMappings.forEach(({ field, uuid, transform }) => {
+        if (data[field]) {
+          providerPayload.attributes.push({
+            attributeType: uuid,
+            value: transform ? transform(data[field]) : data[field],
+          });
+        }
+      });
+
       if (healthWorker) {
         providerPayload.attributes.push({
           attributeType: providerHieFhirReference,
@@ -313,57 +305,54 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
           providerPayload.attributes
             .filter((attr) => updatableAttributes.includes(attr.attributeType))
             .map((attr) => {
-              const _attribute = provider.attributes.find((at) => at.attributeType.uuid === attr.attributeType)?.uuid;
+              const existingAttribute = provider.attributes.find(
+                (at) => at.attributeType.uuid === attr.attributeType,
+              )?.uuid;
 
-              if (_attribute) {
-                return updateProviderAttributes({ value: attr.value }, provider.uuid, _attribute);
-              }
-              if (attr.value !== null && attr.value !== undefined) {
+              if (existingAttribute) {
+                return updateProviderAttributes({ value: attr.value }, provider.uuid, existingAttribute);
+              } else if (attr.value !== null && attr.value !== undefined) {
                 return createProviderAttribute(attr, provider.uuid);
               }
               return Promise.resolve();
             }),
         );
 
-        mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/provider'));
+        mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
         showSnackbar({
-          title: 'Success',
+          title: t('success', 'Success'),
           kind: 'success',
-          subtitle: t('accountUpatedMsg', 'Account updated successfully!'),
+          subtitle: t('accountUpdatedMsg', 'Account updated successfully!'),
         });
       } else {
-        response = await createProvider(providerPayload);
-        mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/provider'));
+        const providerCreationResponse = await createProvider(providerPayload);
+        mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
         showSnackbar({
-          title: 'Success',
+          title: t('success', 'Success'),
           kind: 'success',
-          subtitle: t('accountMsg', 'Account created successfully!'),
+          subtitle: t('accountCreatedMsg', 'Account created successfully!'),
         });
       }
 
       closeWorkspace();
     } catch (error) {
-      console.error(error);
+      console.error('Error submitting form:', error);
       showSnackbar({
-        title: 'Failure',
+        title: t('failure', 'Failure'),
         kind: 'error',
-        subtitle: t(
-          'errorMsg',
-          `Error ${provider ? 'updating' : 'creating'} provider! ${error?.responseBody?.error?.message}`,
-        ),
+        subtitle: t('errorMsg', `Error ${provider ? 'updating' : 'creating'} provider! {{message}}`, {
+          message: error?.responseBody?.error?.message,
+        }),
       });
     }
   };
-
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} className={styles.form__container}>
-      <Stack gap={4} className={styles.form__grid}>
-        <span className={styles.form__header__section}>
-          {t('healthWorkVerify', 'Health worker registry verification')}
-        </span>
+    <Form onSubmit={handleSubmit(onSubmit)} className={styles.formContainer}>
+      <Stack gap={4} className={styles.formGrid}>
+        <span className={styles.formHeaderSection}>{t('healthWorkVerify', 'Health worker registry verification')}</span>
         {searchHWR.isHWRLoading ? (
           <InlineLoading
-            className={styles.form__loading}
+            className={styles.formLoading}
             active={searchHWR.isHWRLoading}
             description={t('pullDetailsfromHWR', 'Pulling health worker details........')}
           />
@@ -374,7 +363,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 onChange={({ selectedItem }) => {
                   setSearchHWR({ ...searchHWR, identifierType: selectedItem?.key ?? '' });
                 }}
-                id="form__identifier__type"
+                id="formIdentifierType"
                 titleText={t('identificationType', 'Identification Type')}
                 placeholder={t('chooseIdentifierType', 'Choose identifier type')}
                 initialSelectedItem={defaultIdentifierType}
@@ -383,13 +372,13 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               />
             </Column>
             <Column>
-              <span className={styles.form__gender}>{t('identifierNumber', 'Identifier number*')}</span>
-              <Row className={styles.form__row}>
+              <span className={styles.formGender}>{t('identifierNumber', 'Identifier number*')}</span>
+              <Row className={styles.formRow}>
                 <Search
-                  className={styles.form__search}
+                  className={styles.formSearch}
                   defaultValue={searchHWR.identifier}
                   placeholder={t('enterIdentifierNumber', 'Enter identifier number')}
-                  id="form__search__health__workers"
+                  id="formSearchHealthWorkers"
                   onChange={(value) => {
                     setSearchHWR({ ...searchHWR, identifier: value.target.value });
                   }}
@@ -399,14 +388,14 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                   size="md"
                   renderIcon={Query}
                   hasIconOnly
-                  className={styles.form__search_button}
+                  className={styles.formSearchButton}
                   onClick={handleSearch}
                 />
               </Row>
             </Column>
           </>
         )}
-        <span className={styles.form__subheader__section}>{t('personinfo', 'Person info')}</span>
+        <span className={styles.formSubheaderSection}>{t('personinfo', 'Person info')}</span>
         <Column>
           <Controller
             name="surname"
@@ -414,8 +403,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                placeholder="surname"
-                id="form__surname"
+                placeholder={t('surnamePlaceholder', 'surname')}
+                id="formSurname"
                 labelText={t('surname', 'Surname*')}
                 invalid={!!errors.surname}
                 invalidText={errors.surname?.message}
@@ -430,8 +419,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                id="form__firstname"
-                placeholder="firstname"
+                id="formFirstname"
+                placeholder={t('firstnamePlaceholder', 'First name')}
                 labelText={t('firstname', 'First name*')}
                 invalid={!!errors.firstname}
                 invalidText={errors.firstname?.message}
@@ -446,7 +435,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                id="form__national__id"
+                id="formNationalId"
                 placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
                 labelText={t('nationalID', 'National ID*')}
                 disabled={!provider}
@@ -458,7 +447,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         )}
 
         <Column>
-          <span className={styles.form__gender}>{t('gender', 'Gender*')}</span>
+          <span className={styles.formGender}>{t('gender', 'Gender*')}</span>
           <Controller
             control={control}
             name="gender"
@@ -470,7 +459,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                   name="M"
                   text={
                     <>
-                      <GenderMale /> Male
+                      <GenderMale /> {t('male', 'Male')}
                     </>
                   }
                 />
@@ -478,14 +467,14 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                   name="F"
                   text={
                     <>
-                      <GenderFemale /> Female
+                      <GenderFemale /> {t('female', 'Female')}
                     </>
                   }
                 />
               </ContentSwitcher>
             )}
           />
-          {errors.gender && <div className={styles.error_message}>{String(errors.gender?.message)}</div>}
+          {errors.gender && <div className={styles.errorMessage}>{String(errors.gender?.message)}</div>}
         </Column>
         {provider && (
           <>
@@ -496,9 +485,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    placeholder="License number"
+                    placeholder={t('licenseNumberPlaceholder', 'License number')}
                     disabled={!provider}
-                    id="form__license_number"
+                    id="formLicenseNumber"
                     labelText={t('licenseNumber', 'License number*')}
                     invalid={!!errors.licenseNumber}
                     invalidText={errors.licenseNumber?.message}
@@ -513,8 +502,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    placeholder="Registration number"
-                    id="form__license_number"
+                    placeholder={t('registrationNumberPlaceholder', 'Registration number')}
+                    id="formRegistrationNumber"
                     labelText={t('registrationNumber', 'Registration number*')}
                     disabled={!provider}
                     invalid={!!errors.registrationNumber}
@@ -532,7 +521,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <DatePicker
                 datePickerType="single"
-                className={styles.form__date__picker}
+                className={styles.formDatePicker}
                 onChange={(event) => {
                   if (event.length) {
                     field.onChange(event[0]);
@@ -540,10 +529,10 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 }}
                 value={field.value}>
                 <DatePickerInput
-                  className={styles.form__date__picker}
+                  className={styles.formDatePicker}
                   placeholder="mm/dd/yyyy"
                   labelText="License expiry date*"
-                  id="form__license_date_picker"
+                  id="formLicenseDatePicker"
                   size="md"
                   disabled
                   invalid={!!errors.licenseExpiryDate}
@@ -560,7 +549,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                placeholder="Phone number"
+                placeholder={t('phoneNumber', 'Phone number')}
                 disabled
                 id="phoneNumber"
                 labelText={t('phoneNumber', 'Phone number')}
@@ -577,9 +566,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                placeholder="Email address"
+                placeholder={t('emailAddress', 'Email address')}
                 disabled
-                id="phoneNumber"
+                id="emailAddress"
                 labelText={t('emailAddress', 'Email address')}
                 invalid={!!errors?.providerAddress}
                 invalidText={errors?.providerAddress?.message}
@@ -594,7 +583,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                placeholder="Qualification"
+                placeholder={t('qualification', 'Qualification')}
                 disabled
                 id="qualification"
                 labelText={t('qualification', 'Qualification')}
@@ -605,9 +594,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
           />
         </Column>
         {!provider ? (
-          <span className={styles.form__subheader__section}>{t('loginIn', 'Login info')}</span>
+          <span className={styles.formSubheaderSection}>{t('loginIn', 'Login info')}</span>
         ) : (
-          <span className={styles.form__subheader__section}>{t('rolesHeader', 'Roles info')}</span>
+          <span className={styles.formSubheaderSection}>{t('rolesHeader', 'Roles info')}</span>
         )}
 
         <Column>
@@ -617,8 +606,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             render={({ field }) => (
               <TextInput
                 {...field}
-                placeholder="Username"
-                id="form__username"
+                placeholder={t('username', 'Username')}
+                id="formUsername"
                 labelText={t('username', 'Username*')}
                 invalid={!!errors.username}
                 invalidText={errors.username?.message}
@@ -635,8 +624,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 render={({ field }) => (
                   <PasswordInput
                     {...field}
-                    id="form__password"
-                    placeholder="Password"
+                    id="formPassword"
+                    placeholder={t('password', 'Password')}
                     labelText={t('password', 'Password*')}
                     invalid={!!errors.password}
                     invalidText={errors.password?.message}
@@ -651,9 +640,9 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 render={({ field }) => (
                   <PasswordInput
                     {...field}
-                    id="form__confirm__password"
-                    placeholder="Confirm password"
-                    labelText={t('confirmPasword', 'Confirm password*')}
+                    id="formConfirmPassword"
+                    placeholder={t('confirmPassword', 'Confirm password')}
+                    labelText={t('confirmPasword', 'Confirm password')}
                     invalid={!!errors.confirmPassword}
                     invalidText={errors.confirmPassword?.message}
                   />
@@ -670,12 +659,11 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               <>
                 <MultiSelect
                   ref={field.ref}
-                  label={<span className={styles.form__role_label}>Roles</span>}
-                  id="form__roles"
-                  titleText="Roles*"
+                  label={<span className={styles.formRoleLabel}>{t('roles', 'Roles')}</span>}
+                  id="formRoles"
+                  titleText={t('roles', 'Roles*')}
                   initialSelectedItems={field.value}
                   items={definedRoles}
-                  placeholder="Confirm password"
                   itemToString={(item) => roles.find((r) => r.uuid === item)?.display ?? ''}
                   onChange={({ selectedItems }) => {
                     field.onChange(selectedItems);
@@ -697,8 +685,8 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    placeholder="Provider ID"
-                    id="form__provide__id"
+                    placeholder={t('providerId', 'Provider ID')}
+                    id="formProvideId"
                     labelText={t('providerId', 'Provider ID*')}
                     invalid={!!errors.providerId}
                     invalidText={errors.providerId?.message}
@@ -709,11 +697,11 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
           </>
         )}
       </Stack>
-      <ButtonSet className={styles.form__button_set}>
-        <Button className={styles.form__button} size="sm" kind="secondary" onClick={closeWorkspace}>
+      <ButtonSet className={styles.formButtonSet}>
+        <Button className={styles.formButton} size="sm" kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.form__button} kind="primary" size="sm" type="submit">
+        <Button className={styles.formButton} kind="primary" size="sm" type="submit">
           {t('submit', 'Submit')}
         </Button>
       </ButtonSet>
