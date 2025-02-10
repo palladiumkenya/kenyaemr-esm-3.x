@@ -83,6 +83,14 @@
       "name": "kenyaemr-referrals-dashboard-link"
     },
     {
+      "component": "wardsDashboardLink",
+      "name": "kenyaemr-wards-dashboard-link"
+    },
+    {
+      "component": "mortuaryDashboardLink",
+      "name": "kenyaemr-morgue-dashboard-link"
+    },
+    {
       "component": "providersDashboardLink",
       "name": "kenyaemr-providers-dashboard-link"
     },
