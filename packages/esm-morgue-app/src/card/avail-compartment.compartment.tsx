@@ -7,47 +7,43 @@ import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { convertDateToDays } from '../utils/utils';
 import capitalize from 'lodash-es/capitalize';
-import { DeceasedInfo } from '../types';
+import { DeceasedInfo, mortuaryLocationFetchResponse } from '../types';
 import usePerson, { useActiveMorgueVisit } from '../hook/useMorgue.resource';
 
 interface AvailableCompartmentProps {
-  patientInfo: DeceasedInfo;
-  index: number;
+  patientInfo: any; // Update this type to match the patient object structure
+  bedNumber: string;
 }
 
-const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
-  const patientUuid = patientInfo?.patient?.uuid;
+const getUuids = (patientInfo) => ({
+  personUuid: patientInfo?.person?.uuid || null,
+  patientUuid: patientInfo?.uuid || null,
+});
+
+const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, bedNumber }) => {
+  const { personUuid, patientUuid } = getUuids(patientInfo);
   const { t } = useTranslation();
-  const { isLoading, error, person } = usePerson(patientInfo?.person?.uuid);
-  const { data: activeDeceased, error: isActiveError, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
-
-  const startVisitDate = activeDeceased?.[0]?.startDatetime;
-
-  if (isLoading || isActiveLoading) {
-    return (
-      <InlineLoading
-        status="active"
-        iconDescription="Loading"
-        description={t('pullingCompartment', 'Pulling compartments data.....')}
-      />
-    );
-  }
-
-  if (error || isActiveError) {
-    return <ErrorState error={error} headerTitle={t('allocation', 'Allocation')} />;
-  }
-
-  const daysSpent = convertDateToDays(startVisitDate);
-  const timeSpentTagType = daysSpent > 17 ? 'red' : 'blue';
+  const { isLoading, error, person } = usePerson(personUuid);
 
   const causeOfDeathDisplay = person?.causeOfDeath?.display;
-  const causeOfDeathTagType = causeOfDeathDisplay?.toLowerCase() === 'unknown' ? 'red' : 'undefined';
+
+  const causeOfDeathMessage = causeOfDeathDisplay
+    ? causeOfDeathDisplay.toLowerCase() === 'unknown'
+      ? causeOfDeathDisplay
+      : capitalize(causeOfDeathDisplay)
+    : '--';
+
+  const causeOfDeathTagType = causeOfDeathDisplay
+    ? causeOfDeathDisplay.toLowerCase() === 'unknown'
+      ? 'red'
+      : 'undefined'
+    : 'undefined';
 
   return (
     <div className={styles.cardView}>
       <div className={styles.cardRow}>
         <div className={styles.cardLabelWrapper}>
-          <div className={styles.cardLabel}>{index + 1}</div>
+          <div className={styles.cardLabel}>{bedNumber}</div>
         </div>
         <span className={styles.deceasedName}>
           {toUpperCase(person?.display)}
@@ -60,10 +56,10 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
           {t('Reason', 'Reason ')}
           {causeOfDeathTagType === 'red' ? (
             <Tag size="md" type={causeOfDeathTagType}>
-              {causeOfDeathDisplay}
+              {causeOfDeathMessage}
             </Tag>
           ) : (
-            <span className={styles.causeDisplay}>{capitalize(causeOfDeathDisplay)}</span>
+            <span className={styles.causeDisplay}>{causeOfDeathMessage}</span>
           )}
         </span>
         <span className={styles.viewDetails}>
@@ -75,17 +71,6 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
         </span>
       </div>
       <div className={styles.borderLine}></div>
-      <div className={styles.cardRow}>
-        <span className={styles.deceasedReason}>
-          {t('timeSpent', 'Time spent ')}
-          <Tag size="md" type={timeSpentTagType}>
-            {daysSpent} {t('days', 'days')}
-          </Tag>
-        </span>
-        <Tag size="md" type="green">
-          {patientInfo?.status}
-        </Tag>
-      </div>
     </div>
   );
 };

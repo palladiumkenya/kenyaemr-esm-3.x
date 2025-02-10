@@ -3,6 +3,7 @@ import { launchWorkspace, type Patient, PatientPhoto, useLayoutType } from '@ope
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './patient-search-info.scss';
+import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 
 type PatientSearchInfoProps = {
   patient: Patient;

@@ -10,6 +10,7 @@ import DeceasedInfo from '../component/deceasedInfo/deceased-info.component';
 import { fetchDeceasedPatient } from '../hook/useDeceasedPatients';
 import styles from './admit-body.scss';
 import PatientSearchInfo from '../autosuggest/patient-search-info.component';
+import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 
 const schema = z.object({
   deceasedPatient: z.string().nonempty('Patient selection is required').uuid('Invalid patient selection'),
@@ -33,12 +34,6 @@ const AdmitBodyForm: React.FC = () => {
   });
 
   const { handleSubmit, control, formState } = form;
-
-  // const launchLabOrderWorkspace = (patientUuid: string) => {
-  //   launchWorkspace('order-basket', {
-  //     patientUuid,
-  //   });
-  // };
 
   const onSuggestionSelected = (value: string) => {
     if (value) {

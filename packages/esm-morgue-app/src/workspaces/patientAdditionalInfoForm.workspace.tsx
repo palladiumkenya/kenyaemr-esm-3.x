@@ -53,6 +53,7 @@ import { PENDING_PAYMENT_STATUS } from '../constants';
 import { mutate } from 'swr';
 import dayjs from 'dayjs';
 import DeceasedHeader from '../component/deceasedInfo/deceased-header.component';
+import { useAssignedCompartmentByPatient } from '../hook/useAssignedCompartmentByPatient';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -92,7 +93,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
-  const { morgueCompartments } = useMorgueCompartment();
+  const { data: compartmentAssignedToPatient, isLoading: isLoadingCompartmentAssignedToPatient } =
+    useAssignedCompartmentByPatient(patientUuid);
   const {
     sessionLocation: { uuid: locationUuid },
     currentProvider: { uuid: currentProviderUuid },
@@ -593,7 +595,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
           </>
         )}
 
-        <Column>
+        {/* <Column>
           <Controller
             name="availableCompartment"
             control={control}
@@ -615,7 +617,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
               />
             )}
           />
-        </Column>
+        </Column> */}
         <Column>
           <Controller
             name="burialPermitNo"

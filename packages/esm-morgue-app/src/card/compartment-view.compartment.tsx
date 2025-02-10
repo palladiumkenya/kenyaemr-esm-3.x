@@ -4,29 +4,56 @@ import EmptyCompartment from './empty-compartment.component';
 import AvailableCompartment from './avail-compartment.compartment';
 import EmptyDeceasedSearch from '../empty-state/empty-morgue-admission.component';
 import { useTranslation } from 'react-i18next';
-import { DeceasedInfo } from '../types';
+import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
+import { InlineLoading } from '@carbon/react';
+import CompartmentShareDivider from './compartmentSharing.component';
 
-interface CompartmentViewProps {
-  patientVisit: { results: DeceasedInfo[] };
-  searchQuery: string;
-}
-
-const CompartmentView: React.FC<CompartmentViewProps> = ({ patientVisit, searchQuery }) => {
+const CompartmentView: React.FC = () => {
   const { t } = useTranslation();
+  const { admissionLocation, isLoading } = useAdmissionLocation();
 
-  const filteredPatients = patientVisit.results?.filter((patient) =>
-    patient.person.display.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  if (isLoading) {
+    return (
+      <InlineLoading
+        status="active"
+        iconDescription="Loading"
+        description={t('pullingCompartment', 'Pulling compartments data.....')}
+      />
+    );
+  }
 
-  return filteredPatients.length > 0 ? (
+  return admissionLocation?.bedLayouts?.length > 0 ? (
     <div className={styles.allPatientCardWrapper}>
-      {filteredPatients.map((patient, index) => (
-        <div key={patient.uuid} className={styles.cardRow}>
-          <AvailableCompartment patientInfo={patient} index={index} />
+      {admissionLocation?.bedLayouts?.map((bed, index) => (
+        <div key={bed.bedUuid} className={styles.cardRow}>
+          {bed.status === 'OCCUPIED' ? (
+            <>
+              {bed.patients.length > 1 ? (
+                // Vertical layout for more than one patient
+                <div className={styles.verticalLayout}>
+                  {bed.patients.map((patient, patientIndex) => (
+                    <React.Fragment key={patient.uuid}>
+                      <AvailableCompartment patientInfo={patient} bedNumber={bed?.bedNumber} />
+                      {patientIndex < bed.patients.length - 1 && <CompartmentShareDivider />}
+                    </React.Fragment>
+                  ))}
+                </div>
+              ) : (
+                // Horizontal layout for one patient
+                <div className={styles.horizontalLayout}>
+                  <AvailableCompartment patientInfo={bed.patients[0]} bedNumber={bed?.bedNumber} />
+                </div>
+              )}
+            </>
+          ) : (
+            // Empty compartment if bed is not occupied
+            <EmptyCompartment bedNumber={bed?.bedNumber} />
+          )}
         </div>
       ))}
     </div>
   ) : (
+    // Empty state if no beds are found
     <div className={styles.emptyStateContainer}>
       <EmptyDeceasedSearch
         title={t('noResultNotFound', 'No result found')}

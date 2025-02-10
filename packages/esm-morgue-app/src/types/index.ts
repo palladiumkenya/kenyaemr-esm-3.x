@@ -304,3 +304,47 @@ export interface PreferredAddress {
   countyDistrict: any;
   address4: any;
 }
+
+export interface mortuaryLocationFetchResponse {
+  totalBeds: number;
+  occupiedBeds: number;
+  ward: Location;
+  bedLayouts: Array<BedLayout>;
+}
+export interface BedLayout {
+  rowNumber: number;
+  columnNumber: number;
+  bedNumber: string;
+  bedId: number;
+  bedUuid: string;
+  status: BedStatus;
+  bedType: BedType;
+  location: string;
+  patients: Patient[];
+  bedTagMaps: BedTagMap[];
+}
+export interface BedType {
+  uuid: string;
+  name: string;
+  displayName: string;
+  description: string;
+  resourceVersion: string;
+}
+interface BedTagMap {
+  uuid: string;
+  bedTag: {
+    id: number;
+    name: string;
+    uuid: string;
+    resourceVersion: string;
+  };
+}
+export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+
+export interface BedDetail {
+  bedId: number;
+  bedNumber: string;
+  bedType: BedType;
+  physicalLocation: Location;
+  patients: Array<Patient>;
+}
