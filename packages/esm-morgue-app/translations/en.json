@@ -5,7 +5,6 @@
   "admitted": "Admitted",
   "admitToMorgue": "Admit to morgue",
   "allocation": "Allocation",
-  "allocations": "Allocation",
   "causeOfDeath": "Cause of death: ",
   "deceased": "Deceased",
   "dischargeBodies": "Discharged bodies",
@@ -16,12 +15,11 @@
   "missingIdentifier": "--",
   "mortuary": "Mortuary",
   "mortuaryManagement": "Mortuary management",
-  "noAdmittedBodies": "There are no admitted bodies",
   "noDeceasedPersons": "There are no deceased persons on the waiting list",
   "noResultFound": "Sorry, no results found",
   "noWaitingList": "Waiting List",
-  "pullingCompartment": "Pulling compartments data.....",
   "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
+  "sharing": "Sharing",
   "waitingInLine": "Waiting In Line",
   "waitingQueue": "Waiting queue"
 }
