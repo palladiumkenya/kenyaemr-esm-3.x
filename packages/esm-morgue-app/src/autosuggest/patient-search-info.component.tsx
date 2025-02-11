@@ -12,11 +12,23 @@ type PatientSearchInfoProps = {
 const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient }) => {
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
   const { t } = useTranslation();
+  const { admissionLocation } = useAdmissionLocation();
+  const isAdmitted = admissionLocation?.bedLayouts
+    .map((patient) => patient.patients)
+    .flat()
+    .some((p) => p.uuid === patient.uuid);
   const patientUuid = patient.uuid;
 
   const handleAdmissionForm = (patientUuid: string) => {
     launchWorkspace('patient-additional-info-form', {
       workspaceTitle: t('admissionForm', 'Admission form'),
+      patientUuid,
+    });
+  };
+
+  const handleTransferForm = (patientUuid: string) => {
+    launchWorkspace('swap-unit-form', {
+      workspaceTitle: t('transferForm', 'Transfer form'),
       patientUuid,
     });
   };
@@ -46,13 +58,23 @@ const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient }) => {
       </Tile>
       <div className={styles.admissionRequestActionBar}>
         <Row className={styles.buttonRow}>
-          <Button
-            kind="primary"
-            size={responsiveSize}
-            className={styles.actionButton}
-            onClick={() => handleAdmissionForm(patientUuid)}>
-            {t('admitBody', 'Admit body')}
-          </Button>
+          {isAdmitted ? (
+            <Button
+              kind="secondary"
+              size={responsiveSize}
+              className={styles.actionButton}
+              onClick={() => handleTransferForm(patientUuid)}>
+              {t('transferBody', 'Transfer body')}
+            </Button>
+          ) : (
+            <Button
+              kind="primary"
+              size={responsiveSize}
+              className={styles.actionButton}
+              onClick={() => handleAdmissionForm(patientUuid)}>
+              {t('admitBody', 'Admit body')}
+            </Button>
+          )}
           <Button kind="danger" size={responsiveSize} className={styles.actionButton}>
             {t('disposeBody', 'Dispose body')}
           </Button>

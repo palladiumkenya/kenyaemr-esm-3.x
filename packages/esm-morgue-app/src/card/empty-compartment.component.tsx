@@ -14,17 +14,17 @@ const EmptyCompartment: React.FC<EmptyCompartmentProps> = ({ bedNumber }) => {
     launchWorkspace('admit-body-form');
   };
   return (
-    <Tile onClick={handleSearchAdmitWorkspace} className={styles.cardView}>
+    <div className={styles.cardView}>
       <div className={`${styles.cardRow} ${styles.centeredContent}`}>
         <div className={styles.cardLabelWrapper}>
           <div className={styles.cardLabel}>{bedNumber}</div>
         </div>
         <span className={styles.noCompartment}>{t('empty', 'Empty')}</span>
       </div>
-      {/* <div className={`${styles.cardRow} ${styles.centeredContent}`}> */}
-
-      {/* </div> */}
-    </Tile>
+      {/* <Button kind="ghost" renderIcon={Movement}>
+        Assign
+      </Button> */}
+    </div>
   );
 };
 

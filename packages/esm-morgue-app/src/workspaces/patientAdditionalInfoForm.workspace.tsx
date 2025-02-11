@@ -1,60 +1,50 @@
 import {
   Button,
   ButtonSet,
-  ComboBox,
   Column,
+  ComboBox,
   DatePicker,
   DatePickerInput,
+  Dropdown,
+  FilterableMultiSelect,
   Form,
-  TextArea,
+  Layer,
+  RadioButton,
+  RadioButtonGroup,
+  Search,
+  SelectItem,
+  InlineNotification,
   Stack,
   TextInput,
-  TimePicker,
-  TimePickerSelect,
-  SelectItem,
-  RadioButtonGroup,
-  RadioButton,
-  Layer,
   Tile,
-  Search,
-  FilterableMultiSelect,
-  Dropdown,
+  TimePicker,
+  InlineLoading,
+  TimePickerSelect,
 } from '@carbon/react';
-import {
-  ResponsiveWrapper,
-  useLayoutType,
-  useConfig,
-  useSession,
-  showSnackbar,
-  formatTime,
-  parseDate,
-} from '@openmrs/esm-framework';
-import React, { useMemo, useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ResponsiveWrapper, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
-import styles from './patientAdditionalInfoForm.scss';
+import fuzzy from 'fuzzy';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
+import { z } from 'zod';
+import DeceasedHeader from '../component/deceasedInfo/deceased-header.component';
+import { ConfigObject } from '../config-schema';
+import { PENDING_PAYMENT_STATUS } from '../constants';
 import {
   createPatientBill,
-  startVisitWithEncounter,
   useBillableItems,
   useCashPoint,
-  useMorgueCompartment,
   usePaymentModes,
   useVisitType,
 } from '../hook/useMorgue.resource';
-import fuzzy from 'fuzzy';
-import { Controller, useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
-import isEmpty from 'lodash-es/isEmpty';
-import { ConfigObject } from '../config-schema';
-import { PENDING_PAYMENT_STATUS } from '../constants';
-import { mutate } from 'swr';
-import dayjs from 'dayjs';
-import DeceasedHeader from '../component/deceasedInfo/deceased-header.component';
-import { useAssignedCompartmentByPatient } from '../hook/useAssignedCompartmentByPatient';
 import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
+import { getCurrentTime, patientInfoSchema } from '../utils/utils';
+import styles from './patientAdditionalInfoForm.scss';
+import { useMortuaryOperation } from '../hook/useAdmitPatient';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -63,66 +53,21 @@ interface PatientAdditionalInfoFormProps {
 
 const MAX_RESULTS = 5;
 
-const patientInfoSchema = z.object({
-  dateOfAdmission: z.date({ coerce: true }).refine((date) => !!date, 'Date of admission is required'),
-  timeOfDeath: z
-    .string()
-    .nonempty('Time of death is required')
-    .regex(/^(0[1-9]|1[0-2]):[0-5][0-9]\s?(AM|PM)$/i, 'Time of death must be in the format hh:mm AM/PM'),
-  tagNumber: z.string().nonempty('Tag number is required'),
-  obNumber: z.string().optional(),
-  policeName: z.string().optional(),
-  policeIDNo: z.string().optional(),
-  dischargeArea: z.string().optional(),
-  burialPermitNo: z.string().nonempty('Burial Permit is required'),
-  visitType: z.string().uuid('invalid visit type'),
-  availableCompartment: z.string(),
-  services: z.array(z.string().uuid('invalid service')).nonempty('Must select one service'),
-  paymentMethod: z.string().uuid('invalid payment method'),
-  insuranceScheme: z.string().optional(),
-  policyNumber: z.string().optional(),
-});
-
 const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
-  const layout = useLayoutType();
   const { data: visitTypes, isLoading: isLoadingVisitTypes } = useVisitType();
   const { lineItems, isLoading: isLoadingLineItems, error: lineError } = useBillableItems();
+  const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
   const { cashPoints, isLoading: isLoadingCashPoints, error: cashError } = useCashPoint();
   const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
 
   const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
-  const { data: compartmentAssignedToPatient, isLoading: isLoadingCompartmentAssignedToPatient } =
-    useAssignedCompartmentByPatient(patientUuid);
   const { admissionLocation, isLoading: isLoadingAdmissionLocation } = useAdmissionLocation();
 
-  const {
-    sessionLocation: { uuid: locationUuid },
-    currentProvider: { uuid: currentProviderUuid },
-    user: { roles },
-  } = useSession();
-
-  const locationName = locationUuid
-    ? admissionLocation?.bedLayouts?.[0]?.patients?.[0]?.person?.display || 'No Compartment'
-    : 'No Compartment';
-  const displayText =
-    locationName === 'No Compartment' ? `No Compartment (Location UUID: ${locationUuid})` : locationName;
-  const {
-    morgueVisitTypeUuid,
-    morgueDepartmentServiceTypeUuid,
-    insurancepaymentModeUuid,
-    visitPaymentMethodAttributeUuid,
-    morgueAdmissionEncounterType,
-    tagNumberUuid,
-    policeIDNumber,
-    policeNameUuid,
-    burialPermitNumberUuid,
-    obNumberUuid,
-    encounterProviderRoleUuid,
-    dischargeAreaUuid,
-  } = useConfig<ConfigObject>();
+  const { morgueVisitTypeUuid, morgueDepartmentServiceTypeUuid, insurancepaymentModeUuid } = useConfig<ConfigObject>();
+  const { admitBody, errorFetchingEmrConfiguration, isLoadingEmrConfiguration } = useMortuaryOperation();
 
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [isPoliceCase, setIsPoliceCase] = useState<string | null>(null);
@@ -137,14 +82,13 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     resolver: zodResolver(patientInfoSchema),
     defaultValues: {
       dateOfAdmission: new Date(),
-      timeOfDeath: '',
+      timeOfDeath: defaultTime,
+      period: defaultPeriod,
       tagNumber: '',
       obNumber: '',
       policeName: '',
       policeIDNo: '',
-      burialPermitNo: '',
       visitType: morgueVisitTypeUuid,
-      availableCompartment: '',
       paymentMethod: '',
       insuranceScheme: '',
       dischargeArea: '',
@@ -190,67 +134,25 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
         };
       });
 
-    const encounterDateTime = dayjs(data.dateOfAdmission).toISOString();
+    const { admissionEncounter, compartment } = await admitBody(patientUuid, data);
 
-    const obs = [];
-    if (data.tagNumber) {
-      obs.push({ concept: tagNumberUuid, value: data.tagNumber });
+    if (admissionEncounter && compartment) {
+      showSnackbar({
+        title: t('admissionSuccess', 'Deceased Admission'),
+        subtitle: t('admissionSuccessMessage', 'Patient has been admitted to the mortuary successfully'),
+        kind: 'success',
+      });
+    } else {
+      showSnackbar({
+        title: t('admissionError', 'Deceased Admission Error'),
+        subtitle: t(
+          'admissionError',
+          'An error has occurred while admitting deceased patient to the mortuary, Contact system administrator',
+        ),
+        kind: 'error',
+        isLowContrast: true,
+      });
     }
-    if (data.obNumber) {
-      obs.push({ concept: obNumberUuid, value: data.obNumber });
-    }
-    if (data.policeName) {
-      obs.push({ concept: policeNameUuid, value: data.policeName });
-    }
-    if (data.policeIDNo) {
-      obs.push({ concept: policeIDNumber, value: data.policeIDNo });
-    }
-    if (data.burialPermitNo) {
-      obs.push({ concept: burialPermitNumberUuid, value: data.burialPermitNo });
-    }
-    if (data.dischargeArea) {
-      obs.push({ concept: dischargeAreaUuid, value: data.dischargeArea });
-    }
-
-    const encounterPayload = {
-      visit: {
-        patient: patientUuid,
-        startDatetime: encounterDateTime,
-        visitType: data.visitType,
-        location: locationUuid,
-        attributes: [
-          {
-            attributeType: visitPaymentMethodAttributeUuid,
-            value: data.paymentMethod,
-          },
-        ],
-      },
-      encounterDatetime: new Date().toISOString(),
-      patient: patientUuid,
-      encounterType: morgueAdmissionEncounterType,
-      location: data.availableCompartment,
-      encounterProviders: [
-        {
-          provider: currentProviderUuid,
-          encounterRole: encounterProviderRoleUuid,
-        },
-      ],
-      obs: obs.length > 0 ? obs : undefined,
-    };
-    await startVisitWithEncounter(encounterPayload).then(
-      () => {
-        showSnackbar({ title: 'Start visit', subtitle: ' visit has been started successfully', kind: 'success' });
-      },
-      (error) => {
-        const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
-        showSnackbar({
-          title: 'Visit Error',
-          subtitle: `An error has occurred while starting visit, Contact system administrator quoting this error ${errorMessage}`,
-          kind: 'error',
-          isLowContrast: true,
-        });
-      },
-    );
 
     const billPayload = {
       lineItems: linesItems,
@@ -262,7 +164,11 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
 
     await createPatientBill(billPayload).then(
       () => {
-        showSnackbar({ title: 'Patient Bill', subtitle: 'Patient has been billed successfully', kind: 'success' });
+        showSnackbar({
+          title: t('patientBill', 'Patient Bill'),
+          subtitle: t('patientBillSuccess', 'Patient has been billed successfully'),
+          kind: 'success',
+        });
       },
       (error) => {
         const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
@@ -290,6 +196,12 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const handlePoliceCaseChange = (selectedItem: string | null) => {
     setIsPoliceCase(selectedItem);
   };
+  if (isLoadingEmrConfiguration) {
+    return <InlineLoading status="active" description="Loading....." />;
+  }
+  if (errorFetchingEmrConfiguration) {
+    return <InlineNotification kind="error" title={errorFetchingEmrConfiguration} />;
+  }
   return (
     <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.formGrid}>
@@ -320,48 +232,44 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
             )}
           />
         </Column>
-
         <Column>
-          <Controller
-            name="timeOfDeath"
-            control={control}
-            render={({ field }) => {
-              const [timeValue, periodValue] = field.value ? field.value.split(' ') : ['', 'AM'];
-
-              return (
-                <div className={styles.dateTimeSection}>
-                  <ResponsiveWrapper>
+          <div className={styles.dateTimeSection}>
+            <ResponsiveWrapper>
+              <Controller
+                name="timeOfDeath"
+                control={control}
+                render={({ field }) => {
+                  return (
                     <TimePicker
+                      {...field}
                       id="time-of-death-picker"
                       labelText={t('timeAdmission', 'Time of admission*')}
                       className={styles.formAdmissionTimepicker}
-                      value={timeValue}
-                      onChange={(e) => {
-                        field.onChange(`${e.target.value} ${periodValue}`);
-                      }}
                       invalid={!!errors.timeOfDeath}
                       invalidText={errors.timeOfDeath?.message}
                     />
-                    <TimePickerSelect
-                      className={styles.formDeathTimepickerSelector}
-                      id="time-picker-select"
-                      labelText={t('selectPeriod', 'AM/PM')}
-                      value={periodValue}
-                      onChange={(e) => {
-                        field.onChange(`${timeValue} ${e.target.value}`);
-                      }}
-                      invalid={!!errors.timeOfDeath}
-                      invalidText={errors.timeOfDeath?.message}>
-                      <SelectItem value="AM" text="AM" />
-                      <SelectItem value="PM" text="PM" />
-                    </TimePickerSelect>
-                  </ResponsiveWrapper>
-                </div>
-              );
-            }}
-          />
+                  );
+                }}
+              />
+              <Controller
+                name="period"
+                control={control}
+                render={({ field }) => (
+                  <TimePickerSelect
+                    {...field}
+                    className={styles.formDeathTimepickerSelector}
+                    id="time-picker-select"
+                    labelText={t('selectPeriod', 'AM/PM')}
+                    invalid={!!errors.period}
+                    invalidText={errors.period?.message}>
+                    <SelectItem value="AM" text="AM" />
+                    <SelectItem value="PM" text="PM" />
+                  </TimePickerSelect>
+                )}
+              />
+            </ResponsiveWrapper>
+          </div>
         </Column>
-
         <Column>
           <span className={styles.visitTypeHeader}>{t('visitTypes', 'Visit type')}</span>
 
@@ -475,24 +383,42 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
             <Controller
               control={control}
               name="services"
-              render={({ field }) => (
-                <FilterableMultiSelect
-                  id="billing-service"
-                  className={styles.formAdmissionDatepicker}
-                  titleText={t('searchServices', 'Search services')}
-                  items={lineItems
-                    .filter((service) => service?.serviceType?.uuid === morgueDepartmentServiceTypeUuid)
-                    .map((service) => service.uuid)}
-                  itemToString={(item) => lineItems.find((i) => i.uuid === item)?.name ?? ''}
-                  onChange={({ selectedItems }) => {
-                    field.onChange(selectedItems);
-                  }}
-                  placeholder={t('Service', 'Service')}
-                  initialSelectedItems={field.value}
-                  invalid={!!errors.services}
-                  invalidText={errors.services?.message}
-                />
-              )}
+              render={({ field }) => {
+                const availableServices = lineItems.filter(
+                  (service) => service?.serviceType?.uuid === morgueDepartmentServiceTypeUuid,
+                );
+                return (
+                  <>
+                    {availableServices.length > 0 ? (
+                      <>
+                        <FilterableMultiSelect
+                          id="billing-service"
+                          className={styles.formAdmissionDatepicker}
+                          titleText={t('searchServices', 'Search services')}
+                          items={availableServices.map((service) => service.uuid)}
+                          itemToString={(item) => availableServices.find((i) => i.uuid === item)?.name ?? ''}
+                          onChange={({ selectedItems }) => {
+                            field.onChange(selectedItems);
+                          }}
+                          placeholder={t('Service', 'Service')}
+                          initialSelectedItems={field.value}
+                          invalid={!!errors.services}
+                          invalidText={errors.services?.message}
+                        />
+                      </>
+                    ) : (
+                      <InlineNotification
+                        kind="warning"
+                        title={t(
+                          'noServicesAvailable',
+                          'No service price has been configured for the mortuary department.',
+                        )}
+                        lowContrast
+                      />
+                    )}
+                  </>
+                );
+              }}
             />
           </Column>
         )}
@@ -530,7 +456,6 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
             )}
           />
         </Column>
-
         <Column>
           <Dropdown
             onChange={(e) => handlePoliceCaseChange(e.selectedItem)}
@@ -545,7 +470,6 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
             )}
           />
         </Column>
-
         {isPoliceCase === 'Yes' && (
           <>
             <Column>
@@ -602,7 +526,6 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
             </Column>
           </>
         )}
-
         <Column>
           <Controller
             name="availableCompartment"
@@ -612,33 +535,22 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 {...field}
                 id="avail-compartment"
                 className={styles.sectionField}
-                items={admissionLocation?.bedLayouts?.map((bed) => bed.bedUuid) || []} // Use bed UUIDs as items
-                itemToString={(item) =>
-                  admissionLocation?.bedLayouts?.find((bed) => bed.bedUuid === item)?.bedNumber || ''
+                items={
+                  admissionLocation?.bedLayouts?.map((bed) => ({
+                    bedId: bed.bedId,
+                    display:
+                      bed.status === 'OCCUPIED'
+                        ? `${bed.bedNumber} . ${bed.patients.map((patient) => patient?.person?.display).join(' . ')}`
+                        : `${bed.bedNumber} . ${bed.status}`,
+                  })) || []
                 }
+                itemToString={(item) => item?.display || ''}
                 titleText={t('availableCompartment', 'Available Compartment')}
                 label={t('ChooseOptions', 'Choose option')}
-                onChange={({ selectedItem }) => field.onChange(selectedItem)}
+                onChange={({ selectedItem }) => field.onChange(selectedItem?.bedId)}
                 initialSelectedItems={field.value}
                 invalid={!!errors.availableCompartment}
                 invalidText={errors.availableCompartment?.message}
-              />
-            )}
-          />
-        </Column>
-        <Column>
-          <Controller
-            name="burialPermitNo"
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                id="burialPermitNo"
-                className={styles.formAdmissionDatepicker}
-                placeholder={t('burialPermitNo', 'Burial permit number')}
-                labelText={t('burialPermitNumber', 'Burial permit number')}
-                invalid={!!errors.burialPermitNo}
-                invalidText={errors.burialPermitNo?.message}
               />
             )}
           />

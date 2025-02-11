@@ -39,6 +39,12 @@
       "component": "admitBodyForm",
       "title": "Admission form",
       "type": "other-form"
+    },
+    {
+      "name": "swap-unit-form",
+      "component": "swapForm",
+      "title": "Swap form",
+      "type": "other-form"
     }
   ],
   "pages": [

@@ -1,17 +1,15 @@
-import React from 'react';
-import styles from './compartment.scss';
-import { Button, Tag, InlineLoading } from '@carbon/react';
+import { Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { toUpperCase } from '../helpers/expression-helper';
-import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { convertDateToDays } from '../utils/utils';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
-import { DeceasedInfo, mortuaryLocationFetchResponse } from '../types';
-import usePerson, { useActiveMorgueVisit } from '../hook/useMorgue.resource';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { toUpperCase } from '../helpers/expression-helper';
+import usePerson from '../hook/useMorgue.resource';
+import styles from './compartment.scss';
 
 interface AvailableCompartmentProps {
-  patientInfo: any; // Update this type to match the patient object structure
+  patientInfo: any;
   bedNumber: string;
 }
 

@@ -36,11 +36,11 @@
 
 .buttonRow {
   display: flex;
-  width: 100%; /* Ensure the Row takes up the full width */
-  gap: 8px; /* Optional: space between buttons */
+  width: 100%;
+  gap: 8px;
 }
 
 .actionButton {
-  flex-grow: 1; /* Make the buttons fill the available space */
-  width: 100%; /* Ensure buttons take up full width of their container */
+  flex-grow: 1;
+  width: 100%;
 }

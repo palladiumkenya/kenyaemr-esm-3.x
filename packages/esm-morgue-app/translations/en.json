@@ -20,6 +20,8 @@
   "noWaitingList": "Waiting List",
   "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
   "sharing": "Sharing",
+  "transferBody": "Transfer body",
+  "transferForm": "Transfer form",
   "waitingInLine": "Waiting In Line",
   "waitingQueue": "Waiting queue"
 }

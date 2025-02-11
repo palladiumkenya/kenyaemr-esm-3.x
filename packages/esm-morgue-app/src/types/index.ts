@@ -303,7 +303,7 @@ export interface PreferredAddress {
   address4: any;
 }
 
-export interface mortuaryLocationFetchResponse {
+export interface MortuaryLocationFetchResponse {
   totalBeds: number;
   occupiedBeds: number;
   ward: Location;
@@ -491,11 +491,37 @@ export interface Observation extends OpenmrsResourceStrict {
   accessionNumber: string;
   obsGroup: Observation;
   value: number | string | boolean | OpenmrsResource;
-  valueCodedName: OpenmrsResource; // ConceptName
+  valueCodedName: OpenmrsResource;
   groupMembers: Array<Observation>;
   comment: string;
   location: Location;
-  order: OpenmrsResource; // Order
+  order: OpenmrsResource;
   encounter: Encounter;
   voided: boolean;
+}
+
+export interface CurrentLocationEncounterResponse {
+  results: {
+    visit: {
+      patient: {
+        uuid: string;
+        display: string;
+      };
+    };
+    encounterAssigningToCurrentInpatientLocation: {
+      encounterDatetime: string;
+    };
+  };
+}
+
+export interface PatientInfo {
+  person?: {
+    uuid: string;
+    display: string;
+    age: number;
+    causeOfDeath?: {
+      display: string;
+    };
+  };
+  uuid: string;
 }

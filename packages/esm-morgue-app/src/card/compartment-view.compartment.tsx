@@ -29,7 +29,6 @@ const CompartmentView: React.FC = () => {
           {bed.status === 'OCCUPIED' ? (
             <>
               {bed.patients.length > 1 ? (
-                // Vertical layout for more than one patient
                 <div className={styles.verticalLayout}>
                   {bed.patients.map((patient, patientIndex) => (
                     <React.Fragment key={patient.uuid}>
@@ -39,21 +38,18 @@ const CompartmentView: React.FC = () => {
                   ))}
                 </div>
               ) : (
-                // Horizontal layout for one patient
                 <div className={styles.horizontalLayout}>
                   <AvailableCompartment patientInfo={bed.patients[0]} bedNumber={bed?.bedNumber} />
                 </div>
               )}
             </>
           ) : (
-            // Empty compartment if bed is not occupied
             <EmptyCompartment bedNumber={bed?.bedNumber} />
           )}
         </div>
       ))}
     </div>
   ) : (
-    // Empty state if no beds are found
     <div className={styles.emptyStateContainer}>
       <EmptyDeceasedSearch
         title={t('noResultNotFound', 'No result found')}
