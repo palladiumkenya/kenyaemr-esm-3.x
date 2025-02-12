@@ -12,6 +12,8 @@ const HomeRoot = () => {
         <Route path="/providers/*" element={<ExtensionSlot name="providers-dashboard-slot" />} />
         <Route path="/referrals/*" element={<ExtensionSlot name="referrals-slot" />} />
         <Route path="/bed-admission/*" element={<ExtensionSlot name="bed-admission-dashboard-slot" />} />
+        <Route path="/morgue/*" element={<ExtensionSlot name="morgue-dashboard-slot" />} />
+        <Route path="/ward/*" element={<ExtensionSlot name="ward-dashboard-slot" />} />
         {/* Patient services Routes */}
         <Route path="/appointments/*" element={<ExtensionSlot name="clinical-appointments-dashboard-slot" />} />
         <Route path="/service-queues/*" element={<ExtensionSlot name="service-queues-dashboard-slot" />} />

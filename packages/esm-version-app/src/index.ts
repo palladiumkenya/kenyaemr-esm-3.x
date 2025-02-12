@@ -1,13 +1,14 @@
 import {
   HealthCross,
   Home,
+  Movement,
   HospitalBed,
-  IbmCloudBackupAndRecovery,
   Money,
   Stethoscope,
   TcpIpService,
   UserAdmin,
   UserMultiple,
+  Hotel,
 } from '@carbon/react/icons';
 import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardGroup, createLeftPanelLink } from './app-navigation/nav-utils';
@@ -68,7 +69,7 @@ export const claimsManagementSideNavGroup = getSyncLifecycle(
     title: 'Claims Management',
     slotName: 'claims-management-dashboard-link-slot',
     isExpanded: false,
-    icon: IbmCloudBackupAndRecovery,
+    icon: Movement,
   }),
   options,
 );
@@ -97,6 +98,14 @@ export const referralsDashboardLink = getSyncLifecycle(
 );
 export const providersDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/providers', title: 'Providers', icon: UserAdmin }),
+  options,
+);
+export const wardsDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({ route: '/home/ward', title: 'Wards', icon: HospitalBed }),
+  options,
+);
+export const mortuaryDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({ route: '/home/morgue', title: 'Mortuary', icon: Hotel }),
   options,
 );
 
