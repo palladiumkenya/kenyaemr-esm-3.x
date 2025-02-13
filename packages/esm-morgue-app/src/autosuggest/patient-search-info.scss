@@ -46,8 +46,17 @@
 }
 .admissionRequestActionBar {
   width: 100%;
+  text-align: center;
+  background-color: colors.$gray-30;
 }
 .patientInfoContainer {
   padding: layout.$spacing-03;
   margin-top: layout.$spacing-02;
+}
+.pointer {
+  cursor: pointer;
+}
+
+.notAllowed {
+  cursor: not-allowed;
 }

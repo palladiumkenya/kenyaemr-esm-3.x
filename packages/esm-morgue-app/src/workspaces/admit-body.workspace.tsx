@@ -1,16 +1,14 @@
 import { Column, Form, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useState } from 'react';
+import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { Autosuggest } from '../autosuggest/autosuggest.component';
 import SearchEmptyState from '../autosuggest/search-empty-state.component';
-import DeceasedInfo from '../component/deceasedInfo/deceased-info.component';
-import { fetchDeceasedPatient } from '../hook/useDeceasedPatients';
 import styles from './admit-body.scss';
 import PatientSearchInfo from '../autosuggest/patient-search-info.component';
-import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
+import { fetchDeceasedPatient } from '../hook/useDeceasedPatients';
 
 const schema = z.object({
   deceasedPatient: z.string().nonempty('Patient selection is required').uuid('Invalid patient selection'),
@@ -37,6 +35,7 @@ const AdmitBodyForm: React.FC = () => {
 
   const onSuggestionSelected = (value: string) => {
     if (value) {
+      // Handle suggestion selection logic here
     }
   };
 

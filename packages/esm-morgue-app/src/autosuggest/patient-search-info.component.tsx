@@ -1,5 +1,5 @@
 import { Button, Row, Tag, Tile } from '@carbon/react';
-import { launchWorkspace, type Patient, PatientPhoto, useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace, type Patient, PatientPhoto, useLayoutType, showSnackbar } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './patient-search-info.scss';
@@ -7,34 +7,39 @@ import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 
 type PatientSearchInfoProps = {
   patient: Patient;
+  onClick?: () => void;
+  disabled?: boolean;
 };
 
-const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient }) => {
+const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient, onClick, disabled }) => {
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
   const { t } = useTranslation();
   const { admissionLocation } = useAdmissionLocation();
   const isAdmitted = admissionLocation?.bedLayouts
-    .map((patient) => patient.patients)
+    .map((bed) => bed.patients)
     .flat()
     .some((p) => p.uuid === patient.uuid);
-  const patientUuid = patient.uuid;
 
-  const handleAdmissionForm = (patientUuid: string) => {
-    launchWorkspace('patient-additional-info-form', {
-      workspaceTitle: t('admissionForm', 'Admission form'),
-      patientUuid,
-    });
-  };
-
-  const handleTransferForm = (patientUuid: string) => {
-    launchWorkspace('swap-unit-form', {
-      workspaceTitle: t('transferForm', 'Transfer form'),
-      patientUuid,
-    });
+  const handleClick = () => {
+    if (isAdmitted) {
+      showSnackbar({
+        title: t('deceasedAlreadyAdmitted', 'Deceased patient Already Admitted'),
+        subtitle: t('patientAlreadyAdmittedMessage', 'This deceased patient has already been admitted.'),
+        kind: 'error',
+        isLowContrast: true,
+      });
+    } else {
+      launchWorkspace('patient-additional-info-form', {
+        workspaceTitle: t('admissionForm', 'Admission form'),
+        patientUuid: patient.uuid,
+      });
+    }
   };
 
   return (
-    <div className={styles.patientInfoContainer}>
+    <div
+      className={`${styles.patientInfoContainer} ${!disabled && !isAdmitted ? styles.pointer : styles.notAllowed}`}
+      onClick={!disabled ? handleClick : undefined}>
       <Tile className={styles.patientInfo}>
         <div className={styles.patientAvatar} role="img">
           <PatientPhoto patientUuid={patient.uuid} patientName={patient?.person?.display} />
@@ -53,33 +58,16 @@ const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient }) => {
               </Tag>
             )}
           </div>
-          <div className={styles.causeDisplay}>{patient?.person?.causeOfDeath?.display}</div>{' '}
+          <div className={styles.causeDisplay}>{patient?.person?.causeOfDeath?.display}</div>
         </div>
       </Tile>
-      <div className={styles.admissionRequestActionBar}>
-        <Row className={styles.buttonRow}>
-          {isAdmitted ? (
-            <Button
-              kind="secondary"
-              size={responsiveSize}
-              className={styles.actionButton}
-              onClick={() => handleTransferForm(patientUuid)}>
-              {t('transferBody', 'Transfer body')}
-            </Button>
-          ) : (
-            <Button
-              kind="primary"
-              size={responsiveSize}
-              className={styles.actionButton}
-              onClick={() => handleAdmissionForm(patientUuid)}>
-              {t('admitBody', 'Admit body')}
-            </Button>
-          )}
-          <Button kind="danger" size={responsiveSize} className={styles.actionButton}>
-            {t('disposeBody', 'Dispose body')}
-          </Button>
-        </Row>
-      </div>
+      {isAdmitted && (
+        <div className={styles.admissionRequestActionBar}>
+          <Row className={styles.buttonRow}>
+            <p>{t('deceasedHasAlreadyBeenAdmitted', 'Deceased has already been admitted')}</p>
+          </Row>
+        </div>
+      )}
     </div>
   );
 };
