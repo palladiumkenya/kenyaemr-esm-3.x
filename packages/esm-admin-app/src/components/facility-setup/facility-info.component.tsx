@@ -115,7 +115,7 @@ const FacilityInfo: React.FC = () => {
                   {shaFacility?.operationalStatus
                     ? `${shaFacility.operationalStatus.at(0).toUpperCase()}${shaFacility.operationalStatus
                         .slice(1)
-                        .toLocaleLowerCase()}`
+                        ?.toLocaleLowerCase()}`
                     : '--'}
                 </p>
                 <p>
