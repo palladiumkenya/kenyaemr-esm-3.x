@@ -1,21 +1,39 @@
 import { FetchResponse, openmrsFetch, restBaseUrl, useSession } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { FacilityData } from '../../types';
+import { DefaultFacility, SHAFacility } from '../../types';
 
-export function useFacilityInfo(shouldSynchronize: boolean = false) {
+export function useShaFacility(shouldSynchronize: boolean = false) {
   const { authenticated } = useSession();
-  const url = `${restBaseUrl}/kenyaemr/default-facility?synchronize=${shouldSynchronize}`;
+  const url = `${restBaseUrl}/kenyaemr/sha-facility-status?synchronize=${shouldSynchronize}`;
 
-  const { data, isLoading, error, mutate } = useSWR<FetchResponse<FacilityData>>(
+  const { data, isLoading, error, mutate } = useSWR<FetchResponse<SHAFacility>>(
     authenticated ? url : null,
     openmrsFetch,
-    {},
+  );
+
+  return {
+    isLoading,
+    shaFacility: data?.data,
+    error,
+    mutate,
+  };
+}
+
+export const useDefaultFacility = () => {
+  const url = `${restBaseUrl}/kenyaemr/default-facility`;
+  const { authenticated } = useSession();
+
+  const { data, isLoading, error, mutate } = useSWR<FetchResponse<DefaultFacility>>(
+    authenticated ? url : null,
+    openmrsFetch,
   );
 
   return {
     isLoading,
     defaultFacility: data?.data,
     error,
-    refetch: mutate, // Expose mutate as refetch
+    mutate,
   };
-}
+};
+
+export default useDefaultFacility;

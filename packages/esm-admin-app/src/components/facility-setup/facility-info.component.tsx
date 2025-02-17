@@ -1,31 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import { Tile, Grid, Column, Layer, InlineLoading, Button } from '@carbon/react';
-import { useFacilityInfo } from '../hook/useFacilityInfo';
-import styles from './facility-info.scss';
+import { Button, Column, Grid, InlineLoading, Layer, Tile } from '@carbon/react';
+import { showSnackbar } from '@openmrs/esm-framework';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showNotification, showSnackbar } from '@openmrs/esm-framework';
-import { FacilityData } from '../../types';
+import { useDefaultFacility, useShaFacility } from '../hook/useFacilityInfo';
+import styles from './facility-info.scss';
 
 const FacilityInfo: React.FC = () => {
   const { t } = useTranslation();
   const [shouldSynchronize, setshouldSynchronize] = useState<boolean>(false);
-  const { defaultFacility, isLoading: defaultFacilityLoading, error, refetch } = useFacilityInfo(shouldSynchronize);
-
-  const [facilityData, setFacilityData] = useState<FacilityData>(defaultFacility);
-  useEffect(() => {
-    setFacilityData(defaultFacility);
-  }, [defaultFacility]);
+  const {
+    shaFacility,
+    isLoading: isShaFacilityLoading,
+    error: shaFacilityError,
+    mutate: mutateShafacility,
+  } = useShaFacility(shouldSynchronize);
+  const {
+    defaultFacility,
+    isLoading: isDefaultFacilityLoading,
+    mutate: mutateDefaultFacility,
+    error: defaultFacilityError,
+  } = useDefaultFacility();
+  const mutateFacility = useCallback(async () => {
+    const defaultFacility = await mutateDefaultFacility();
+    const shaFacility = await mutateShafacility();
+    return {
+      shaFacility,
+      defaultFacility,
+    };
+  }, [mutateDefaultFacility, mutateShafacility]);
 
   const synchronizeFacilityData = async () => {
     try {
       setshouldSynchronize(true);
-      await refetch();
+      const { shaFacility } = await mutateFacility();
       showSnackbar({
         title: t('syncingHieSuccess', 'Synchronization Complete'),
         kind: 'success',
         isLowContrast: true,
       });
-      if (defaultFacility?.source != 'HIE') {
+      if (shaFacility.data?.source != 'HIE') {
         showSnackbar({
           kind: 'warning',
           title: 'HIE Sync Failed. Pulling local info.',
@@ -47,7 +60,7 @@ const FacilityInfo: React.FC = () => {
     <div className={styles.facilityInfoContainer}>
       <div>
         <Layer className={styles.btnLayer}>
-          {defaultFacilityLoading ? (
+          {isShaFacilityLoading || isDefaultFacilityLoading ? (
             <InlineLoading
               description={t('synchronizingFacilityData', 'Please wait, Synchronizing Info.')}
               size="md"
@@ -70,13 +83,13 @@ const FacilityInfo: React.FC = () => {
             <hr className={styles.cardDivider} />
             <div className={styles.cardContent}>
               <p>
-                <strong>Facility Name:</strong> {facilityData?.display}
+                <strong>Facility Name:</strong> {defaultFacility?.display}
               </p>
               <p>
-                <strong>Facility KMHFR Code:</strong> {facilityData?.mflCode}
+                <strong>Facility KMHFR Code:</strong> {shaFacility?.mflCode}
               </p>
               <p>
-                <strong>Keph Level:</strong> {facilityData?.shaKephLevel}
+                <strong>Keph Level:</strong> {shaFacility?.kephLevel}
               </p>
               <br />
               <br />
@@ -92,19 +105,19 @@ const FacilityInfo: React.FC = () => {
               <hr className={styles.cardDivider} />
               <div className={styles.cardContent}>
                 <p>
-                  <strong>Facility Registry Code:</strong> {facilityData?.shaFacilityId}
+                  <strong>Facility Registry Code:</strong> {shaFacility?.shaFacilityId}
                 </p>
                 <p>
-                  <strong>SHA License Number:</strong> {facilityData?.shaFacilityLicenseNumber}
+                  <strong>SHA License Number:</strong> {shaFacility?.shaFacilityLicenseNumber}
                 </p>
                 <p>
-                  <strong>SHA Status:</strong> {facilityData?.operationalStatus}
+                  <strong>SHA Status:</strong> {shaFacility?.operationalStatus}
                 </p>
                 <p>
-                  <strong>SHA Contracted:</strong> {facilityData?.shaContracted}
+                  <strong>SHA Contracted:</strong> {shaFacility?.approved}
                 </p>
                 <p>
-                  <strong>SHA Expiry Date:</strong> {facilityData?.shaFacilityExpiryDate}
+                  <strong>SHA Expiry Date:</strong> {shaFacility?.shaFacilityExpiryDate}
                 </p>
               </div>
             </Tile>
