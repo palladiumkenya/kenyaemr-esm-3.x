@@ -10,7 +10,7 @@ const FacilitySetup: React.FC = () => {
   const { t } = useTranslation();
   return (
     <div className="omrs-main-content">
-      <Header title="Facility Setup" />
+      <Header title="Facility Details" />
 
       <Layer className={styles.tableLayer}>
         <FacilityInfo />

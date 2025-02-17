@@ -1,6 +1,6 @@
 import { Button, Column, Grid, InlineLoading, Layer, Tile } from '@carbon/react';
-import { showSnackbar } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useState } from 'react';
+import { formatDate, parseDate, showSnackbar } from '@openmrs/esm-framework';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDefaultFacility, useShaFacility } from '../hook/useFacilityInfo';
 import styles from './facility-info.scss';
@@ -111,13 +111,19 @@ const FacilityInfo: React.FC = () => {
                   <strong>SHA License Number:</strong> {shaFacility?.shaFacilityLicenseNumber}
                 </p>
                 <p>
-                  <strong>SHA Status:</strong> {shaFacility?.operationalStatus}
+                  <strong>SHA Status:</strong>{' '}
+                  {shaFacility?.operationalStatus
+                    ? `${shaFacility.operationalStatus.at(0).toUpperCase()}${shaFacility.operationalStatus
+                        .slice(1)
+                        .toLocaleLowerCase()}`
+                    : '--'}
                 </p>
                 <p>
                   <strong>SHA Contracted:</strong> {shaFacility?.approved}
                 </p>
                 <p>
-                  <strong>SHA Expiry Date:</strong> {shaFacility?.shaFacilityExpiryDate}
+                  <strong>SHA Expiry Date:</strong>{' '}
+                  {shaFacility?.shaFacilityExpiryDate ? formatDate(parseDate(shaFacility.shaFacilityExpiryDate)) : '--'}
                 </p>
               </div>
             </Tile>
