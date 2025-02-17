@@ -8,8 +8,10 @@
   "deceased": "Deceased",
   "deceasedAlreadyAdmitted": "Deceased patient Already Admitted",
   "deceasedHasAlreadyBeenAdmitted": "Deceased has already been admitted",
+  "discharge": "Discharge body",
   "dischargeBodies": "Discharged bodies",
   "discharged": "Discharged",
+  "dischargeForm": "Discharge form",
   "empty": "Empty",
   "errorMessage": "Error",
   "missingIdentifier": "--",
@@ -21,6 +23,7 @@
   "patientAlreadyAdmittedMessage": "This deceased patient has already been admitted.",
   "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
   "sharing": "Sharing",
+  "swapCompartment": "Swap compartment",
   "waitingInLine": "Waiting In Line",
   "waitingQueue": "Waiting queue"
 }
