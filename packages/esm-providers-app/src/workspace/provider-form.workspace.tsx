@@ -145,6 +145,11 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         searchHWR.identifier,
       );
 
+      if (!fetchedHealthWorker?.entry || fetchedHealthWorker.entry.length === 0) {
+        showModal('hwr-empty-modal', { errorCode: t('noResults', 'No results found') });
+        return;
+      }
+
       const dispose = showModal('hwr-confirmation-modal', {
         healthWorker: fetchedHealthWorker,
         onConfirm: () => {
@@ -428,23 +433,21 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             )}
           />
         </Column>
-        {provider && (
-          <Controller
-            name="nationalid"
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                id="formNationalId"
-                placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
-                labelText={t('nationalID', 'National ID*')}
-                disabled={!provider}
-                invalid={!!errors.nationalid}
-                invalidText={errors.nationalid?.message}
-              />
-            )}
-          />
-        )}
+        <Controller
+          name="nationalid"
+          control={control}
+          render={({ field }) => (
+            <TextInput
+              {...field}
+              id="formNationalId"
+              placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
+              labelText={t('nationalID', 'National ID*')}
+              disabled={!provider}
+              invalid={!!errors.nationalid}
+              invalidText={errors.nationalid?.message}
+            />
+          )}
+        />
 
         <Column>
           <span className={styles.formGender}>{t('gender', 'Gender*')}</span>
