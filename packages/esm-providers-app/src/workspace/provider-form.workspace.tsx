@@ -242,7 +242,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
 
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('accountUpdated', 'Account Updated'),
           kind: 'success',
           subtitle: t('accountUpdatedMsg', 'Account updated successfully!'),
         });
@@ -252,7 +252,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
 
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('personCreated', 'Person Created'),
           kind: 'success',
           subtitle: t('personCreatedMsg', 'Person created successfully!'),
         });
@@ -325,7 +325,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
 
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('accountUpdated', 'Account Updated'),
           kind: 'success',
           subtitle: t('accountUpdatedMsg', 'Account updated successfully!'),
         });
@@ -333,7 +333,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         const providerCreationResponse = await createProvider(providerPayload);
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('accountCreated', 'Account Created'),
           kind: 'success',
           subtitle: t('accountCreatedMsg', 'Account created successfully!'),
         });
