@@ -81,3 +81,20 @@ export const patientInfoSchema = z.object({
   insuranceScheme: z.string().optional(),
   policyNumber: z.string().optional(),
 });
+
+export const dischargeSchema = z.object({
+  dateOfDischarge: z.date({ coerce: true }).refine((date) => !!date, 'Date of discharge is required'),
+  timeOfDischarge: z.string().nonempty('Time of discharge is required'),
+  period: z
+    .string()
+    .nonempty('AM/PM is required')
+    .regex(/^(AM|PM)$/i, 'Invalid period'),
+  burialPermitNumber: z.string().nonempty('Burial Permit Number is required'),
+  nextOfKinNames: z.string().nonempty('Next of kin names is required'),
+  relationshipType: z.string().nonempty('Next of kin relationship is required'),
+  nextOfKinAddress: z.string().nonempty('Next of kin address is required'),
+  nextOfKinContact: z
+    .string()
+    .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+    .nonempty('Next of kin phone number is required'),
+});

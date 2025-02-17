@@ -40,3 +40,4 @@ export const patientAdditionalInfoForm = getAsyncLifecycle(
 export const dischargeBodyForm = getAsyncLifecycle(() => import('./workspaces/discharge-body.workspace'), options);
 export const admitBodyForm = getAsyncLifecycle(() => import('./workspaces/admit-body.workspace'), options);
 export const swapForm = getAsyncLifecycle(() => import('./workspaces/swap-unit.workspace'), options);
+export const actionBarButtons = getAsyncLifecycle(() => import('./extension/actionButton.component'), options);

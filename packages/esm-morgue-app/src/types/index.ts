@@ -524,4 +524,8 @@ export interface PatientInfo {
     };
   };
   uuid: string;
+  attributes: {
+    uuid: string;
+    display: string;
+  }[];
 }

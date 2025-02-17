@@ -31,7 +31,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
-import DeceasedHeader from '../component/deceasedInfo/deceased-header.component';
 import { ConfigObject } from '../config-schema';
 import { PENDING_PAYMENT_STATUS } from '../constants';
 import {
@@ -45,6 +44,7 @@ import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 import { getCurrentTime, patientInfoSchema } from '../utils/utils';
 import styles from './patientAdditionalInfoForm.scss';
 import { useMortuaryOperation } from '../hook/useAdmitPatient';
+import DeceasedInfo from '../component/deceasedInfo/deceased-info.component';
 
 interface PatientAdditionalInfoFormProps {
   closeWorkspace: () => void;
@@ -206,7 +206,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
     <Form className={styles.formContainer} onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.formGrid}>
         <br />
-        <DeceasedHeader patientUuid={patientUuid} />
+        <DeceasedInfo patientUuid={patientUuid} />
         <Column>
           <Controller
             name="dateOfAdmission"

@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch, restBaseUrl, useConfig, useSession } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, restBaseUrl, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
@@ -6,7 +6,7 @@ import useSWRImmutable from 'swr/immutable';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
 import { CurrentLocationEncounterResponse, customRepProps, EmrApiConfigurationResponse, Encounter } from '../types';
-import { patientInfoSchema } from '../utils/utils';
+import { dischargeSchema, patientInfoSchema } from '../utils/utils';
 import { useMortuaryLocation } from './useMortuaryAdmissionLocation';
 const customRep = `custom:${customRepProps.map((prop) => prop.join(':')).join(',')}`;
 
@@ -36,6 +36,7 @@ export const useMortuaryOperation = () => {
     visitPaymentMethodAttributeUuid,
     tagNumberUuid,
     obNumberUuid,
+    burialPermitNumberUuid,
     policeNameUuid,
     policeIDNumber,
     dischargeAreaUuid,
@@ -148,8 +149,62 @@ export const useMortuaryOperation = () => {
     [assignDeceasedToCompartment, createMortuaryAdmissionEncounter],
   );
 
+  const createDischargeMortuaryEncounter = useCallback(
+    async (visit: Visit, data: z.infer<typeof dischargeSchema>) => {
+      const obs = [];
+      if (data.burialPermitNumber) {
+        obs.push({ concept: burialPermitNumberUuid, value: data.burialPermitNumber });
+      }
+
+      const encounterPayload = {
+        encounterDatetime: data?.dateOfDischarge,
+        patient: visit?.patient?.uuid,
+        encounterType: emrConfiguration?.exitFromInpatientEncounterType,
+        location: visit?.location?.uuid,
+        encounterProviders: [
+          {
+            provider: currentProvider?.uuid,
+            encounterRole: emrConfiguration?.clinicianEncounterRole?.uuid,
+          },
+        ],
+        visit: visit?.uuid,
+        obs: obs.length > 0 ? obs : undefined,
+      };
+      return openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: encounterPayload,
+      });
+    },
+    [
+      burialPermitNumberUuid,
+      currentProvider?.uuid,
+      emrConfiguration?.clinicianEncounterRole?.uuid,
+      emrConfiguration?.exitFromInpatientEncounterType,
+    ],
+  );
+  const removeDeceasedFromCompartment = useCallback(
+    async (patientUuid: string, bedId: number) =>
+      openmrsFetch(`${restBaseUrl}/beds/${bedId}?patientUuid=${patientUuid}`, {
+        method: 'DELETE',
+      }),
+    [],
+  );
+
+  const dischargeBody = useCallback(
+    async (visit: Visit, bedId: number, data: z.infer<typeof dischargeSchema>) => {
+      const dischargeEncounter = await createDischargeMortuaryEncounter(visit, data);
+      const compartment = await removeDeceasedFromCompartment(visit?.patient?.uuid, bedId);
+      return { dischargeEncounter, compartment };
+    },
+    [createDischargeMortuaryEncounter, removeDeceasedFromCompartment],
+  );
+
   return {
     admitBody,
+    dischargeBody,
     isLoadingEmrConfiguration,
     errorFetchingEmrConfiguration,
   };

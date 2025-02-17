@@ -5,8 +5,8 @@ import capitalize from 'lodash-es/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { toUpperCase } from '../helpers/expression-helper';
-import usePerson from '../hook/useMorgue.resource';
 import styles from './compartment.scss';
+import { usePerson } from '../hook/useMorgue.resource';
 
 interface AvailableCompartmentProps {
   patientInfo: any;

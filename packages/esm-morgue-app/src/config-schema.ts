@@ -48,6 +48,26 @@ export const configSchema = {
     _description: 'Encounter type for morgue discharge',
     _default: '3d618f40b-b5a3-4f17-81c8-2f04e2aad58e',
   },
+  nextOfKinNameUuid: {
+    _type: Type.String,
+    _description: 'UUID for next of kin name concept',
+    _default: '830bef6d-b01f-449d-9f8d-ac0fede8dbd3',
+  },
+  nextOfKinRelationshipUuid: {
+    _type: Type.String,
+    _description: 'UUID for next of kin relationship concept',
+    _default: 'd0aa9fd1-2ac5-45d8-9c5e-4317c622c8f5',
+  },
+  nextOfKinAddressUuid: {
+    _type: Type.String,
+    _description: 'UUID for next of kin address concept',
+    _default: '7cf22bec-d90a-46ad-9f48-035952261294',
+  },
+  nextOfKinPhoneUuid: {
+    _type: Type.String,
+    _description: 'UUID for next of kin phone concept',
+    _default: '342a1d39-c541-4b29-8818-930916f4c2dc',
+  },
   visitPaymentMethodAttributeUuid: {
     _type: Type.String,
     _description: 'UUID for visit payment method attribute',

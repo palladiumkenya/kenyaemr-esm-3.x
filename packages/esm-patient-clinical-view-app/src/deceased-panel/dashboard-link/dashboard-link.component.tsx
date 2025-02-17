@@ -3,7 +3,7 @@ import { ConfigurableLink } from '@openmrs/esm-framework';
 import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
-import usePerson from '../../../../esm-morgue-app/src/hook/useMorgue.resource';
+import { usePerson } from '../../../../esm-morgue-app/src/hook/useMorgue.resource';
 
 const DeceasedPanelDashboardLink = () => {
   const { t } = useTranslation();
@@ -15,13 +15,13 @@ const DeceasedPanelDashboardLink = () => {
     return null;
   }
 
-  if (person?.dead) {
-    return (
-      <ConfigurableLink className={classNames('cds--side-nav__link', 'active-left-nav-link')} to={url}>
-        {t('mortuaryDetails', 'Mortuary details')}
-      </ConfigurableLink>
-    );
-  }
+  // if (person?.person?.dead) {
+  //   return (
+  //     <ConfigurableLink className={classNames('cds--side-nav__link', 'active-left-nav-link')} to={url}>
+  //       {t('mortuaryDetails', 'Mortuary details')}
+  //     </ConfigurableLink>
+  //   );
+  // }
 
   return null;
 };

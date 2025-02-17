@@ -16,6 +16,14 @@
       }
     },
     {
+      "name": "action-buttons",
+      "component": "actionBarButtons",
+      "slot": "mortuary-action-buttons-slot",
+      "meta": {
+        "fullWidth": false
+      }
+    },
+    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot"

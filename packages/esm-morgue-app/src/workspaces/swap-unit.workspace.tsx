@@ -32,6 +32,22 @@ const SwapForm: React.FC<SwapFormProps> = ({ closeWorkspace, patientUuid }) => {
     },
   });
 
+  const currentBed = admissionLocation?.bedLayouts?.find((bed) =>
+    bed.patients.some((patient) => patient.uuid === patientUuid),
+  );
+
+  const currentBedNumber = currentBed?.bedNumber;
+
+  const dropdownItems =
+    admissionLocation?.bedLayouts?.map((bed) => ({
+      bedId: bed.bedId,
+      display:
+        bed.status === 'OCCUPIED'
+          ? `${bed.bedNumber} . ${bed.patients.map((patient) => patient?.person?.display).join(' . ')}`
+          : `${bed.bedNumber} . ${bed.status}`,
+      disabled: bed.bedId === currentBed?.bedId,
+    })) || [];
+
   const onSubmit = async (data: any) => {
     closeWorkspace();
   };
@@ -45,6 +61,14 @@ const SwapForm: React.FC<SwapFormProps> = ({ closeWorkspace, patientUuid }) => {
       <Stack gap={4} className={styles.formGrid}>
         <DeceasedInfo patientUuid={patientUuid} />
 
+        {currentBedNumber && (
+          <Column className={styles.searchContainer}>
+            <p>
+              {t('currentCompartment', 'Current Compartment')}: {currentBedNumber}
+            </p>
+          </Column>
+        )}
+
         <Column className={styles.searchContainer}>
           <Controller
             name="availableCompartment"
@@ -54,15 +78,7 @@ const SwapForm: React.FC<SwapFormProps> = ({ closeWorkspace, patientUuid }) => {
                 {...field}
                 id="avail-compartment"
                 className={styles.sectionField}
-                items={
-                  admissionLocation?.bedLayouts?.map((bed) => ({
-                    bedId: bed.bedId,
-                    display:
-                      bed.status === 'OCCUPIED'
-                        ? `${bed.bedNumber} . ${bed.patients.map((patient) => patient?.person?.display).join(' . ')}`
-                        : `${bed.bedNumber} . ${bed.status}`,
-                  })) || []
-                }
+                items={dropdownItems}
                 itemToString={(item) => item?.display || ''}
                 titleText={t('availableCompartment', 'Available Compartment')}
                 label={t('ChooseOptions', 'Choose option')}
