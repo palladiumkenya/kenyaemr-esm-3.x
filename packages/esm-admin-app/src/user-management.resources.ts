@@ -14,7 +14,6 @@ import {
 } from './config-schema';
 import uniqBy from 'lodash-es/uniqBy';
 import { useMemo } from 'react';
-// import { ResourceFilterCriteria, toQueryParams } from './api';
 
 export const useUser = () => {
   const url = `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`;

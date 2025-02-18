@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { format } from 'date-fns';
 import {
   DefaultWorkspaceProps,
   ResponsiveWrapper,
   restBaseUrl,
   showSnackbar,
   useLayoutType,
+  formatDatetime,
 } from '@openmrs/esm-framework';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import styles from './user-management.workspace.scss';
@@ -20,8 +20,6 @@ import {
   RadioButton,
   CheckboxGroup,
   Checkbox,
-  SelectItem,
-  Select,
   PasswordInput,
   Column,
   ProgressIndicator,
@@ -53,13 +51,7 @@ import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { Provider, User, UserRoleScope } from '../../../config-schema';
-import {
-  DATE_PICKER_CONTROL_FORMAT,
-  DATE_PICKER_FORMAT,
-  formatForDatePicker,
-  formatNewDate,
-  today,
-} from '../../../constants';
+import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatNewDate, today } from '../../../constants';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -1212,7 +1204,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                         <DatePicker
                                           datePickerType="range"
                                           light
-                                          minDate={formatForDatePicker(MinDate)}
+                                          minDate={formatDatetime(MinDate)}
                                           locale="en"
                                           dateFormat={DATE_PICKER_CONTROL_FORMAT}
                                           onChange={handleDateChange}
