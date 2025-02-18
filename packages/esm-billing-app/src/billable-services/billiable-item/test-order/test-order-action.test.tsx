@@ -3,7 +3,6 @@ import { screen, render } from '@testing-library/react';
 import TestOrderAction from './test-order-action.component';
 import { Order } from '@openmrs/esm-patient-common-lib';
 import * as resource from './test-order-action.resource';
-//import * as billItemResource from '../useBillableItem';
 import userEvent from '@testing-library/user-event';
 import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 import { createMedicationDispenseProps } from './dispense.resource';
