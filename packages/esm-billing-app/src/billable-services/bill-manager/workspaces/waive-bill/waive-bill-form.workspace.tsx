@@ -89,7 +89,7 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   if (lineItems?.length === 0) {
     return null;

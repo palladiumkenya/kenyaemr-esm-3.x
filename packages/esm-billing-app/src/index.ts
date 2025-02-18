@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import BenefitsPackage from './benefits-package/benefits-package.component';
 import Benefits from './benefits-package/benefits/benefits.component';
@@ -12,6 +12,7 @@ import WaiveBillActionButton from './billable-services/bill-manager/bill-actions
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
 import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/serviceItemCard.component';
+import CreateBillItemModal from './billable-services/bill-manager/modals/create-bill-item-modal.component';
 import CancelBillWorkspace from './billable-services/bill-manager/workspaces/cancel-bill/cancel-bill.workspace';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill/edit-bill-form.workspace';
 import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill/waive-bill-form.workspace';
@@ -156,6 +157,7 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
+export const createBillItemModal = getSyncLifecycle(CreateBillItemModal, options);
 
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);

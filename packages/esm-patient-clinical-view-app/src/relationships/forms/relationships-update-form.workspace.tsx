@@ -48,7 +48,7 @@ const RelationshipUpdateForm: React.FC<RelationshipUpdateFormProps> = ({ closeWo
       relationship.startDate && form.setValue('startDate', new Date(relationship.startDate));
       relationship.relationshipType && form.setValue('relationshipType', relationship.relationshipType.uuid);
     }
-  }, [relationship]);
+  }, [relationship, form]);
 
   const onSubmit = async (values: RelationshipUpdateFormType) => {
     try {

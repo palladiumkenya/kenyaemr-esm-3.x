@@ -71,7 +71,7 @@ export const RefundBillModal: React.FC<RefundBillModalProps> = ({ onClose, bill,
     } finally {
       setIsLoading(false);
     }
-  }, [bill, lineItem, onClose, t]);
+  }, [bill, lineItem, onClose, t, billableServiceUuid, itemUuid]);
 
   return (
     <>

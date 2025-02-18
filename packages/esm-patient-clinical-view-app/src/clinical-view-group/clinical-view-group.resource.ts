@@ -21,7 +21,7 @@ export const usePatientEnrollment = (patientUuid: string) => {
 
   const patientEnrollments = useMemo(
     () => data?.data.results.sort((a, b) => (b.dateEnrolled > a.dateEnrolled ? 1 : -1)) ?? [],
-    [data?.data.results, isValidating],
+    [data?.data.results],
   );
 
   return {

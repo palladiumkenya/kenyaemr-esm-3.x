@@ -20,7 +20,7 @@ const ClaimsManagementPreAuthRequest = () => {
       { value: 'cancelled', label: t('cancelled', 'Cancelled') },
       { value: 'entered-in-error', label: t('enteredInError', 'Entered in error') },
     ],
-    [],
+    [t],
   );
 
   return (
