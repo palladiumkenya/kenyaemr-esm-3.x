@@ -441,7 +441,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
               {...field}
               id="formNationalId"
               placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
-              labelText={t('nationalID', 'National ID*')}
+              labelText={t('nationalID', 'National ID')}
               disabled={!provider}
               invalid={!!errors.nationalid}
               invalidText={errors.nationalid?.message}
