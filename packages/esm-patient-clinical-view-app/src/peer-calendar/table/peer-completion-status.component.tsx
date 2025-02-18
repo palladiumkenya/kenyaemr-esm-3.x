@@ -36,7 +36,7 @@ const PeerCompletionStatus: React.FC<PeerCompletionStatusProps> = ({
 
   useEffect(() => {
     mutate();
-  }, [reportingPeriod]);
+  }, [reportingPeriod, mutate]);
 
   useEffect(() => {
     if (isLoading) {
@@ -47,7 +47,7 @@ const PeerCompletionStatus: React.FC<PeerCompletionStatusProps> = ({
     } else if (completePeers.includes(peer.patientUuid) && encounters.length < 1) {
       setCompletePeers(completePeers.filter((c) => c !== peer.patientUuid));
     }
-  }, [encounters]);
+  }, [encounters, completePeers, peer.patientUuid, setCompletePeers, isLoading]);
 
   if (isLoading) {
     return <TagSkeleton />;
