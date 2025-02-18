@@ -1,20 +1,19 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/type';
 @use '@carbon/layout';
 @use '@carbon/colors';
 
 .heading {
   @include type.type-style('heading-compact-01');
-  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+  margin: layout.$spacing-05 0 layout.$spacing-05;
 }
 
 .grid {
-  margin: spacing.$spacing-05 spacing.$spacing-05;
-  padding: spacing.$spacing-05 0rem 0rem orem;
+  margin: layout.$spacing-05 layout.$spacing-05;
+  padding-top: layout.$spacing-05;
 }
 
 .billingItem {
-  margin-top: spacing.$spacing-10;
+  margin-top: layout.$spacing-10;
   overflow-x: auto;
 }
 
