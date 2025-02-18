@@ -1,0 +1,26 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.heading {
+  @include type.type-style('heading-compact-01');
+  margin: layout.$spacing-05 0 layout.$spacing-05;
+}
+
+.grid {
+  margin: layout.$spacing-05 layout.$spacing-05;
+  padding-top: layout.$spacing-05;
+}
+
+.billingItem {
+  margin-top: layout.$spacing-10;
+  overflow-x: auto;
+}
+
+.button {
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
