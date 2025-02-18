@@ -62,17 +62,20 @@ export const BillableExemptionsViewer = () => {
         setInvalidJsonErrorMessage(t('invalidJsonError', 'Invalid JSON input.'));
       }
     },
-    [resetErrorMessage],
+    [resetErrorMessage, t],
   );
 
-  const updateSchema = useCallback((updatedSchema: Schema) => {
-    try {
-      setSchema(updatedSchema);
-      setStringifiedSchema(JSON.stringify(updatedSchema, null, 2));
-    } catch (error) {
-      setInvalidJsonErrorMessage(t('saveError', 'Failed to save schema.'));
-    }
-  }, []);
+  const updateSchema = useCallback(
+    (updatedSchema: Schema) => {
+      try {
+        setSchema(updatedSchema);
+        setStringifiedSchema(JSON.stringify(updatedSchema, null, 2));
+      } catch (error) {
+        setInvalidJsonErrorMessage(t('saveError', 'Failed to save schema.'));
+      }
+    },
+    [t],
+  );
 
   useEffect(() => {
     if (billableExceptionSchema) {

@@ -37,7 +37,7 @@ const ClaimsManagementTable: React.FC = () => {
       { value: 'CHECKED', label: t('checked', 'Checked') },
       { value: 'VALUATED', label: t('valuated', 'Valuated') },
     ],
-    [],
+    [t],
   );
   const [pageSize, setPageSize] = useState(5);
   const filterClaims = (claim) => {

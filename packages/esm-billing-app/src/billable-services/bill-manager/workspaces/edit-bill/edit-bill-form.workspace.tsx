@@ -60,7 +60,7 @@ export const EditBillForm: React.FC<EditBillFormProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   const onSubmit: SubmitHandler<EditBillFormData> = async (formData) => {
     const updateBill = createEditBillPayload(lineItem, formData, bill, formData.adjustmentReason);

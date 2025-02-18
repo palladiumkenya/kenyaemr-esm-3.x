@@ -1,9 +1,9 @@
+import React from 'react';
 import { InlineLoading, InlineNotification, MultiSelect } from '@carbon/react';
-import React, { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { InterventionsFilter, toQueryParams, useInterventions } from '../../hooks/useInterventions';
+import { InterventionsFilter, useInterventions } from '../../hooks/useInterventions';
 import { eligibilityRequestShema } from '../benefits-package.resources';
 import { usePatient } from '@openmrs/esm-framework';
 
@@ -14,24 +14,15 @@ type PackageInterventionsProps = {
   patientUuid: string;
 };
 const PackageInterventions: React.FC<PackageInterventionsProps> = ({ category, patientUuid }) => {
-  const [filters, setFilters] = useState<InterventionsFilter>({ package_code: category });
   const { error: patientError, isLoading: isPatientLoading, patient } = usePatient(patientUuid);
+  const filters: InterventionsFilter = {
+    package_code: category,
+    applicable_gender: patient?.gender === 'male' ? 'MALE' : 'FEMALE',
+  };
   const { error, interventions, isLoading } = useInterventions(filters);
 
   const form = useFormContext<EligibilityRequest>();
   const { t } = useTranslation();
-
-  useEffect(() => {
-    setFilters((state) => ({
-      ...state,
-      package_code: category,
-      applicable_gender: patient?.gender === 'male' ? 'MALE' : patient?.gender === 'female' ? 'FEMALE' : undefined,
-    }));
-  }, [category, patient]);
-
-  useEffect(() => {
-    form.setValue('interventions', []);
-  }, [category]);
 
   if (isLoading || isPatientLoading) {
     return (
@@ -56,6 +47,10 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ category, p
     );
   }
 
+  if (interventions.length === 0) {
+    return null;
+  }
+
   return (
     <Controller
       control={form.control}
@@ -71,7 +66,7 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ category, p
             field.onChange(e.selectedItems);
           }}
           initialSelectedItems={field.value}
-          label="Choose option"
+          label={t('chooseInterventions', 'Choose interventions')}
           items={interventions.map((r) => r.interventionCode)}
           itemToString={(item) => interventions.find((r) => r.interventionCode === item)?.interventionName ?? ''}
         />

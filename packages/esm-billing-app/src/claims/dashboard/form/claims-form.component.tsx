@@ -45,7 +45,9 @@ const ClaimsFormSchema = z.object({
   treatmentStart: z.string().nonempty({ message: 'Treatment start date is required' }),
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
   package: z.string().min(1, 'Package Required'),
-  interventions: z.array(z.string()).nonempty({ message: 'At least one intervention is required' }),
+  interventions: z.array(z.string()).min(1, {
+    message: 'At least one intervention is required',
+  }),
   provider: z.string().nonempty({ message: 'provider is provider' }),
 });
 
@@ -96,6 +98,11 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     setValue,
     reset,
   } = form;
+
+  const handleInterventionsChange = (e: { selectedItem: string }) => {
+    form.setValue('interventions', []);
+    setValue('package', e.selectedItem);
+  };
 
   const onSubmit = async (data: z.infer<typeof ClaimsFormSchema>) => {
     setLoading(true);
@@ -163,7 +170,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       setLoading(false);
     }
   };
-  const selectedPackageObservable = form.watch('package');
+  const selectedPackage = packages.find((package_) => package_.uuid === form.watch('package'))?.packageCode ?? '';
 
   useEffect(() => {
     setValue('diagnoses', diagnoses?.map((d) => d.id) ?? ([] as any));
@@ -297,9 +304,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                         invalidText={form.formState.errors[field.name]?.message}
                         id="package"
                         titleText={t('package', 'Package')}
-                        onChange={(e) => {
-                          field.onChange(e.selectedItem);
-                        }}
+                        onChange={handleInterventionsChange}
                         initialSelectedItem={field.value}
                         label="Choose package"
                         items={packages.map((r) => r.uuid)}
@@ -311,16 +316,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               />
             </Layer>
           </Column>
-          {selectedPackageObservable && (
-            <Column>
-              <Layer className={styles.input}>
-                <PackageInterventions
-                  category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
-                  patientUuid={patientUuid}
-                />
-              </Layer>
-            </Column>
-          )}
+
+          <Column>
+            <Layer className={styles.input}>
+              <PackageInterventions key={selectedPackage} category={selectedPackage} patientUuid={patientUuid} />
+            </Layer>
+          </Column>
 
           <Column>
             <Layer className={styles.input}>
