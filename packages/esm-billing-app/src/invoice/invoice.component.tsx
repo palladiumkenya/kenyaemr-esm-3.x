@@ -85,7 +85,7 @@ const Invoice: React.FC = () => {
   useEffect(() => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems(paidLineItems);
-  }, [bill?.lineItems?.length]);
+  }, [bill?.lineItems, bill?.lineItems?.length]);
 
   const invoiceDetails = {
     'Total Amount': convertToCurrency(bill?.totalAmount),
@@ -129,32 +129,33 @@ const Invoice: React.FC = () => {
 
       const abortController = new AbortController();
 
-      updateVisit(currentVisit.uuid, endVisitPayload, abortController)
-        .then((response) => {
-          if (queueEntry) {
-            removeQueuedPatient(
-              queueEntry.queue.uuid,
-              queueEntry.queueEntryUuid,
-              abortController,
-              response?.data.stopDatetime,
-            );
-          }
-          mutateVisit();
-          showSnackbar({
-            isLowContrast: true,
-            kind: 'success',
-            subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
-            title: t('visitEnded', 'Visit ended'),
-          });
-        })
-        .catch((error) => {
-          showSnackbar({
-            title: t('errorEndingVisit', 'Error ending visit'),
-            kind: 'error',
-            isLowContrast: false,
-            subtitle: error?.message,
-          });
+      try {
+        const response = await updateVisit(currentVisit.uuid, endVisitPayload, abortController);
+
+        if (queueEntry) {
+          removeQueuedPatient(
+            queueEntry.queue.uuid,
+            queueEntry.queueEntryUuid,
+            abortController,
+            response?.data?.stopDatetime,
+          );
+        }
+
+        mutateVisit();
+        showSnackbar({
+          isLowContrast: true,
+          kind: 'success',
+          subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+          title: t('visitEnded', 'Visit ended'),
         });
+      } catch (error) {
+        showSnackbar({
+          title: t('errorEndingVisit', 'Error ending visit'),
+          kind: 'error',
+          isLowContrast: false,
+          subtitle: error?.message || 'An error occurred',
+        });
+      }
     }
   };
 
