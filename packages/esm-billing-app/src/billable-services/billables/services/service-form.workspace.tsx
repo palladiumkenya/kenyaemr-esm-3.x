@@ -66,7 +66,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
       setConceptToLookup(initialValues.concept?.concept?.display);
       trigger();
     }
-  }, [initialValues]);
+  }, [initialValues, trigger]);
 
   const {
     fields: servicePriceFields,
