@@ -48,6 +48,12 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     }));
   }, [visitAttributeTypes, getValues]);
 
+  const [policyNumber, exemptionCategory, insuranceScheme] = watch([
+    'policyNumber',
+    'exemptionCategory',
+    'insuranceScheme',
+  ]);
+
   useEffect(() => {
     setAttributes(createVisitAttributesPayload());
   }, [
@@ -55,9 +61,9 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     paymentMethods,
     setAttributes,
     createVisitAttributesPayload,
-    watch('policyNumber'),
-    watch('exemptionCategory'),
-    watch('insuranceScheme'),
+    policyNumber,
+    exemptionCategory,
+    insuranceScheme,
   ]);
 
   if (isLoadingPaymentModes) {

@@ -145,6 +145,11 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         searchHWR.identifier,
       );
 
+      if (!fetchedHealthWorker?.entry || fetchedHealthWorker.entry.length === 0) {
+        showModal('hwr-empty-modal', { errorCode: t('noResults', 'No results found') });
+        return;
+      }
+
       const dispose = showModal('hwr-confirmation-modal', {
         healthWorker: fetchedHealthWorker,
         onConfirm: () => {
@@ -237,7 +242,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
 
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('accountUpdated', 'Account Updated'),
           kind: 'success',
           subtitle: t('accountUpdatedMsg', 'Account updated successfully!'),
         });
@@ -247,7 +252,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
 
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('personCreated', 'Person Created'),
           kind: 'success',
           subtitle: t('personCreatedMsg', 'Person created successfully!'),
         });
@@ -320,7 +325,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
 
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('accountUpdated', 'Account Updated'),
           kind: 'success',
           subtitle: t('accountUpdatedMsg', 'Account updated successfully!'),
         });
@@ -328,7 +333,7 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
         const providerCreationResponse = await createProvider(providerPayload);
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
         showSnackbar({
-          title: t('success', 'Success'),
+          title: t('accountCreated', 'Account Created'),
           kind: 'success',
           subtitle: t('accountCreatedMsg', 'Account created successfully!'),
         });
@@ -428,23 +433,21 @@ const ProviderForm: React.FC<ProvideModalProps> = ({ closeWorkspace, provider, u
             )}
           />
         </Column>
-        {provider && (
-          <Controller
-            name="nationalid"
-            control={control}
-            render={({ field }) => (
-              <TextInput
-                {...field}
-                id="formNationalId"
-                placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
-                labelText={t('nationalID', 'National ID*')}
-                disabled={!provider}
-                invalid={!!errors.nationalid}
-                invalidText={errors.nationalid?.message}
-              />
-            )}
-          />
-        )}
+        <Controller
+          name="nationalid"
+          control={control}
+          render={({ field }) => (
+            <TextInput
+              {...field}
+              id="formNationalId"
+              placeholder={t('nationalIdPlaceholder', 'Enter National ID')}
+              labelText={t('nationalID', 'National ID')}
+              disabled={!provider}
+              invalid={!!errors.nationalid}
+              invalidText={errors.nationalid?.message}
+            />
+          )}
+        />
 
         <Column>
           <span className={styles.formGender}>{t('gender', 'Gender*')}</span>

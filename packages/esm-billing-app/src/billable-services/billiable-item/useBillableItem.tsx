@@ -39,9 +39,24 @@ export const useSockItemInventory = (stockItemId: string) => {
   const { data, error, isLoading } = useSWR<{
     data: { results: Array<{ quantityUoM: string; quantity: number; partyName: string }> };
   }>(url, openmrsFetch);
-
   return {
     stockItem: (data?.data?.results as Array<any>) ?? [],
+    isLoading: isLoading,
+    error,
+  };
+};
+
+export const useStockItemQuantity = (drugUuid: string) => {
+  const url = `/ws/rest/v1/stockmanagement/stockiteminventory?v=default&limit=10&totalCount=true&drugUuid=${drugUuid}`;
+  const { data, error, isLoading } = useSWR<{
+    data: {
+      results: Array<{ quantityUoM: string; quantity: number; partyName: string; stockItemUuid: string }>;
+      total: number;
+    };
+  }>(url, openmrsFetch);
+  return {
+    stockItemQuantity: data?.data?.total ?? 0,
+    stockItemUuid: data?.data?.results[0]?.stockItemUuid ?? '',
     isLoading: isLoading,
     error,
   };

@@ -52,7 +52,7 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
     if (initialValues) {
       trigger();
     }
-  }, [initialValues]);
+  }, [initialValues, trigger]);
 
   const onSubmit = async (formValues: BillableFormSchema) => {
     const payload = formatBillableServicePayloadForSubmission(formValues, initialValues?.['uuid']);

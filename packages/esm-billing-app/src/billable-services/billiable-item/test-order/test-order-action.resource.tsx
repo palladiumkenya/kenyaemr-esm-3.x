@@ -9,7 +9,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
   const config = useConfig<BillingConfig>();
   const { currentVisit } = useVisit(patientUuid);
   const { isEmergencyPatient, isLoading: isLoadingQueue } = usePatientQueue(patientUuid);
-  const { isLoading: isLoadingBill, hasPendingPayment } = useOrderPendingPaymentStatus(patientUuid, orderUuid);
+  const { isLoading, hasPendingPayment } = useOrderPendingPaymentStatus(patientUuid, orderUuid);
 
   // We want to check if the payment method is in the excluded list this includes insurances, where patient do not need to pay immediately
   const isExcludedPaymentMethod = checkPaymentMethodExclusion(
@@ -18,7 +18,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
   );
 
   return useMemo(() => {
-    if (isLoadingBill || isLoadingQueue) {
+    if (isLoading || isLoadingQueue) {
       return { hasPendingPayment: false, isLoading: true };
     }
 
@@ -33,7 +33,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
     return { hasPendingPayment, isLoading: false };
   }, [
     isLoadingQueue,
-    isLoadingBill,
+    isLoading,
     currentVisit?.visitType?.uuid,
     config?.inPatientVisitTypeUuid,
     isExcludedPaymentMethod,
@@ -73,4 +73,15 @@ export const useOrderPendingPaymentStatus = (patientUuid: string, orderUuid: str
   }, [flattenedLineItems]);
 
   return useMemo(() => ({ hasPendingPayment, isLoading, error }), [hasPendingPayment, isLoading, error]);
+};
+
+export const useOrderBill = (patientUuid: string, orderUuid: string) => {
+  const { patientBills, isLoading, error } = usePatientBills(patientUuid);
+  const itemHasBill = useMemo(() => {
+    return patientBills
+      ?.map((bill) => bill.lineItems)
+      .flat()
+      .filter((lineItem) => lineItem.order && lineItem.order.uuid === orderUuid);
+  }, [patientBills, orderUuid]);
+  return { itemHasBill };
 };

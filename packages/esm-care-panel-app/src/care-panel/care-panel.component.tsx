@@ -30,7 +30,7 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   const [switchItem, setSwitcherItem] = useState<SwitcherItem>({ index: 0 });
   const patientEnrollments = useMemo(
     () => (isLoading ? [] : enrollments[switchItem?.name || first(switcherHeaders)]),
-    [enrollments, isLoading, switchItem?.name, switcherHeaders, isValidating],
+    [enrollments, isLoading, switchItem?.name, switcherHeaders],
   );
 
   if (isLoading) {
