@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.summaryContainer {
+  display: flex;
+  margin-top: layout.$spacing-05;
+  gap: layout.$spacing-01;
+}
+
+.input {
+  min-width: 300px;
+}
