@@ -162,8 +162,8 @@ export interface UserRoleScope extends BaseOpenmrsData {
   userGivenName?: string;
   userFamilyName?: string;
   permanent: boolean;
-  activeFrom?: string;
-  activeTo?: string;
+  activeFrom?: Date;
+  activeTo?: Date;
   enabled: boolean;
   locations?: Array<UserRoleScopeLocation>;
   operationTypes?: Array<UserRoleScopeOperationType>;
