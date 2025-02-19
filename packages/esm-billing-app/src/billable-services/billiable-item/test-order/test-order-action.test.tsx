@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen, render, act } from '@testing-library/react';
 import TestOrderAction from './test-order-action.component';
 import { Order } from '@openmrs/esm-patient-common-lib';
 import * as resource from './test-order-action.resource';
@@ -11,6 +11,11 @@ import { useStockItemQuantity } from '../useBillableItem';
 jest.mock('./test-order-action.resource');
 jest.mock('../useBillableItem', () => ({
   useStockItemQuantity: jest.fn(),
+}));
+jest.mock('./dispense.resource', () => ({
+  createMedicationDispenseProps: jest.fn(() => ({
+    whenHandedOver: '2025-02-19T12:35:53+00:00',
+  })),
 }));
 
 const mockTestProps = {
@@ -122,7 +127,9 @@ describe('TestOrderAction', () => {
     });
     render(<TestOrderAction {...testProps} />);
     const pickLabRequestMenuItem = screen.getByText('Pick Lab Request');
-    await user.click(pickLabRequestMenuItem);
+    await act(async () => {
+      await user.click(pickLabRequestMenuItem);
+    });
 
     expect(screen.queryByText('Unsettled bill.')).not.toBeInTheDocument();
     expect(showModal).toBeCalledWith('pickup-lab-request-modal', {
@@ -162,11 +169,10 @@ describe('TestOrderAction', () => {
     const dispenseButton = screen.getByRole('button', { name: 'Dispense' });
     expect(dispenseButton).toBeInTheDocument();
 
-    await user.click(dispenseButton);
-    const dispenseFormProps = createMedicationDispenseProps(mockTestProps);
-
-    expect(launchWorkspace).toHaveBeenCalledWith('dispense-workspace', {
-      ...dispenseFormProps,
+    await act(async () => {
+      await user.click(dispenseButton);
     });
+    const dispenseFormProps = createMedicationDispenseProps(mockTestProps);
+    expect(launchWorkspace).toHaveBeenCalledWith('dispense-workspace', dispenseFormProps);
   });
 });
