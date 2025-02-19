@@ -4,7 +4,7 @@ import React from 'react';
 import styles from './deceased-info.scss';
 import { formatDeceasedName } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
-import usePerson from '../../hook/useMorgue.resource';
+import { usePerson } from '../../hook/useMorgue.resource';
 
 const DeceasedInfo: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { isLoading, patient, error } = usePatient(patientUuid);

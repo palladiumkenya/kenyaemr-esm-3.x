@@ -1,0 +1,62 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.patientInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  background-color: colors.$white;
+}
+
+.patientInfo:hover {
+  background-color: colors.$gray-10;
+}
+
+.patientDetails {
+  flex: 1;
+}
+
+.patientName {
+  @include type.type-style('heading-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-02;
+}
+
+.demographics {
+  display: flex;
+  align-items: center;
+  margin-bottom: layout.$spacing-02;
+  color: colors.$gray-70;
+  text-transform: uppercase;
+}
+.deceased {
+  text-transform: none;
+}
+
+.middot {
+  margin: 0 0.25rem;
+}
+.actionButton {
+  width: 50%;
+}
+.buttonRow {
+  width: 100%;
+}
+.admissionRequestActionBar {
+  width: 100%;
+  text-align: center;
+  background-color: colors.$gray-30;
+}
+.patientInfoContainer {
+  padding: layout.$spacing-03;
+  margin-top: layout.$spacing-02;
+}
+.pointer {
+  cursor: pointer;
+}
+
+.notAllowed {
+  cursor: not-allowed;
+}

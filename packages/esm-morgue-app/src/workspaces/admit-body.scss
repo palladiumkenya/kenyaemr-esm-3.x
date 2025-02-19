@@ -1,0 +1,46 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.formButton {
+  height: layout.$spacing-09;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: layout.$spacing-11;
+  margin-bottom: layout.$spacing-05;
+}
+
+.buttonSet {
+  position: absolute;
+  bottom: layout.$spacing-05;
+  left: 4%;
+  width: 80%;
+  display: flex;
+  gap: layout.$spacing-02;
+
+  & > button {
+    max-width: 40%;
+    width: 40%;
+  }
+}
+.searchContainer {
+  padding: layout.$spacing-04;
+}
+
+.admissionRequestActionBar {
+  width: 100%;
+  padding: layout.$spacing-05;
+  margin-left: layout.$spacing-10;
+}
+
+.buttonRow {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.actionButton {
+  flex-grow: 1;
+  width: 100%;
+}

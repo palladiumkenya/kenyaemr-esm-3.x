@@ -110,7 +110,7 @@ export const useDeceasedPatient = (searchTerm?: string) => {
     isLoading: isPaginatedLoading || isLoadingStatus,
   };
 };
-
+// Used
 export const useVisitType = () => {
   const customRepresentation = 'custom:(uuid,display,name)';
   const url = `${restBaseUrl}/visittype?v=${customRepresentation}`;
@@ -137,7 +137,7 @@ export const usePaymentModes = (excludeWaiver: boolean = true) => {
     error,
   };
 };
-
+// // Used
 export const useBillableItems = () => {
   const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(uuid,display),servicePrices:(uuid,name,price,paymentMode))`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
@@ -165,12 +165,12 @@ export const useMorgueCompartment = () => {
     error,
   };
 };
-
+// // Used
 export const createPatientBill = (payload) => {
   const postUrl = `${restBaseUrl}/cashier/bill`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
-
+// Used
 export const useCashPoint = () => {
   const url = `/ws/rest/v1/cashier/cashPoint`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
@@ -182,6 +182,7 @@ export const startVisitWithEncounter = (payload) => {
   const postUrl = `${restBaseUrl}/encounter`;
   return openmrsFetch(postUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
 };
+// Retired
 export const useActiveMorgueVisit = (patientUuid: string) => {
   const customRepresentation = 'custom:(visitType:(uuid),startDatetime,stopDatetime,encounters:(encounterType:(uuid)))';
   const url = `${restBaseUrl}/visit?v=${customRepresentation}&includeInactive=false&patient=${patientUuid}&limit=1`;
@@ -190,16 +191,16 @@ export const useActiveMorgueVisit = (patientUuid: string) => {
 
   return { data: activeDeceased, error, isLoading };
 };
-const usePerson = (uuid: string) => {
-  const customRepresentation = `custom:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display))`;
+// // Used
+
+export const usePerson = (uuid: string) => {
+  const customRepresentation = `custom:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),attributes:(uuid,display))`;
   const url = `${restBaseUrl}/person/${uuid}?v=${customRepresentation}`;
   const { isLoading, error, data } = useSWR<FetchResponse<Patient['person']>>(url, openmrsFetch);
   const person = data?.data;
   return { isLoading, error, person };
 };
-
-export default usePerson;
-
+// Used
 export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
   const apiUrl = `${restBaseUrl}/visit-queue-entry?v=full&patient=${patientUuid}`;
   const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
@@ -237,7 +238,7 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
     mutate,
   };
 }
-
+// Used
 export function removeQueuedPatient(
   queueUuid: string,
   queueEntryUuid: string,
