@@ -151,7 +151,6 @@ export const useLocation = () => {
   };
 };
 
-// getStockOperationTypes
 export function useStockOperationTypes() {
   const apiUrl = `${restBaseUrl}/stockmanagement/stockoperationtype?v=default`;
   const { data, isLoading, error } = useSWR<
@@ -181,8 +180,6 @@ export function useStockTagLocations() {
   };
 }
 
-// export type UserRoleScopeFilter = ResourceFilterCriteria;
-// getUserRoleScopes
 export const useUserRoleScopes = () => {
   const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope?v=full`;
   const { data, error, isLoading } = useSWR<{ data: PageableResult<UserRoleScope> }, Error>(apiUrl, openmrsFetch);
