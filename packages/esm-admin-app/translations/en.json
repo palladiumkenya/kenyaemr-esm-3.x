@@ -12,6 +12,7 @@
   "etlOperation": "ETL operations",
   "etlsOperationsLoading": "Please wait {{currentOperation}} is in progress...",
   "facilityCode": "Facility KMHFR Code",
+  "facilityDetails": "Facility Details",
   "facilityInfo": "Facility Info",
   "facilityName": "Facility Name",
   "facilityRegistryCode": "Facility Registry Code",
