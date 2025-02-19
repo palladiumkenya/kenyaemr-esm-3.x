@@ -85,7 +85,7 @@ const Invoice: React.FC = () => {
   useEffect(() => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems(paidLineItems);
-  }, [bill?.lineItems?.length]);
+  }, [bill?.lineItems]);
 
   const invoiceDetails = {
     'Total Amount': convertToCurrency(bill?.totalAmount),

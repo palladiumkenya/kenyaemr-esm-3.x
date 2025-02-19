@@ -13,14 +13,7 @@ interface ReferralReasonData {
 
 const CommunityReferralActions: React.FC<ReferralReasonData> = ({ status, referralData }) => {
   const { t } = useTranslation();
-  const refearralReasonsHandleClick = useCallback(() => {
-    const dispose = showModal('referral-reasons-dialog', {
-      closeModal: () => dispose(),
-      referralReasons: referralData,
-      status: status,
-      handleProcessReferral,
-    });
-  }, [referralData]);
+
   const handleProcessReferral = useCallback(() => {
     processCommunityReferral(referralData.messageId)
       .then((res) => {
@@ -44,7 +37,16 @@ const CommunityReferralActions: React.FC<ReferralReasonData> = ({ status, referr
           isLowContrast: true,
         });
       });
-  }, []);
+  }, [referralData, t]);
+
+  const refearralReasonsHandleClick = useCallback(() => {
+    const dispose = showModal('referral-reasons-dialog', {
+      closeModal: () => dispose(),
+      referralReasons: referralData,
+      status: status,
+      handleProcessReferral,
+    });
+  }, [referralData, handleProcessReferral, status]);
 
   return (
     <>

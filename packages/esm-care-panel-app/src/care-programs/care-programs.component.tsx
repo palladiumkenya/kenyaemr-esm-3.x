@@ -72,12 +72,12 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
             formInfo: {
               encounterUuid: '',
               formUuid,
-              additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails } ?? {},
+              additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails ?? {} },
             },
           })
         : launchStartVisitPrompt();
     },
-    [currentVisit],
+    [currentVisit, handleMutations],
   );
 
   const rows = useMemo(
@@ -110,7 +110,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
           ),
         };
       }),
-    [carePrograms, isValidating],
+    [carePrograms, isValidating, handleCareProgramClick],
   );
 
   const headers = [

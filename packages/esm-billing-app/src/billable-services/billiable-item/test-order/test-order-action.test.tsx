@@ -6,8 +6,12 @@ import * as resource from './test-order-action.resource';
 import userEvent from '@testing-library/user-event';
 import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 import { createMedicationDispenseProps } from './dispense.resource';
+import { useStockItemQuantity } from '../useBillableItem';
 
 jest.mock('./test-order-action.resource');
+jest.mock('../useBillableItem', () => ({
+  useStockItemQuantity: jest.fn(),
+}));
 
 const mockTestProps = {
   order: { uuid: '123', patient: { uuid: '456' } } as Order,
@@ -75,13 +79,31 @@ describe('TestOrderAction', () => {
   });
 
   test('should render loading when isLoading is true', () => {
-    jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: true, hasPendingPayment: false });
+    jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValue({ isLoading: true, hasPendingPayment: false });
+    jest.spyOn(resource, 'useOrderBill').mockReturnValue({
+      itemHasBill: [],
+    });
+    (useStockItemQuantity as jest.Mock).mockReturnValue({
+      stockItemQuantity: 5,
+      stockItemUuid: 'some-uuid',
+      isLoading: false,
+      error: undefined,
+    });
     render(<TestOrderAction {...testProps} />);
     expect(screen.getByText('Verifying bill status...')).toBeInTheDocument();
   });
 
   test("should display `Unsettled bill for test` when there's a pending payment", () => {
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: true });
+    jest.spyOn(resource, 'useOrderBill').mockReturnValueOnce({
+      itemHasBill: [],
+    });
+    (useStockItemQuantity as jest.Mock).mockReturnValueOnce({
+      stockItemQuantity: 5,
+      stockItemUuid: 'some-uuid',
+      isLoading: false,
+      error: undefined,
+    });
     render(<TestOrderAction {...testProps} />);
     expect(screen.getByText('Unsettled bill')).toBeInTheDocument();
   });
@@ -89,6 +111,15 @@ describe('TestOrderAction', () => {
   test("should display `Pick Lab Request` when there's no pending payment", async () => {
     const user = userEvent.setup();
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: false });
+    jest.spyOn(resource, 'useOrderBill').mockReturnValueOnce({
+      itemHasBill: [],
+    });
+    (useStockItemQuantity as jest.Mock).mockReturnValueOnce({
+      stockItemQuantity: 5,
+      stockItemUuid: 'some-uuid',
+      isLoading: false,
+      error: undefined,
+    });
     render(<TestOrderAction {...testProps} />);
     const pickLabRequestMenuItem = screen.getByText('Pick Lab Request');
     await user.click(pickLabRequestMenuItem);
@@ -101,7 +132,16 @@ describe('TestOrderAction', () => {
   });
 
   test('should not render the dispense form if closeable is false', () => {
-    jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: false });
+    jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValue({ isLoading: false, hasPendingPayment: false });
+    jest.spyOn(resource, 'useOrderBill').mockReturnValue({
+      itemHasBill: [],
+    });
+    (useStockItemQuantity as jest.Mock).mockReturnValue({
+      stockItemQuantity: 5,
+      stockItemUuid: 'some-uuid',
+      isLoading: false,
+      error: undefined,
+    });
     render(<TestOrderAction {...testProps} closeable={false} />);
     expect(screen.queryByText('Dispense')).not.toBeInTheDocument();
   });
@@ -109,6 +149,15 @@ describe('TestOrderAction', () => {
   test('should launch the dispense form when dispense order is part of props', async () => {
     const user = userEvent.setup();
     jest.spyOn(resource, 'useTestOrderBillStatus').mockReturnValueOnce({ isLoading: false, hasPendingPayment: false });
+    jest.spyOn(resource, 'useOrderBill').mockReturnValueOnce({
+      itemHasBill: [],
+    });
+    (useStockItemQuantity as jest.Mock).mockReturnValueOnce({
+      stockItemQuantity: 5,
+      stockItemUuid: 'some-uuid',
+      isLoading: false,
+      error: undefined,
+    });
     render(<TestOrderAction {...mockTestProps} />);
     const dispenseButton = screen.getByRole('button', { name: 'Dispense' });
     expect(dispenseButton).toBeInTheDocument();

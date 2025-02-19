@@ -97,7 +97,7 @@ describe('CarePrograms', () => {
     await user.click(enrollButton);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
-        additionalProps: { enrollmenrDetails: undefined },
+        additionalProps: { enrollmenrDetails: expect.anything() },
         encounterUuid: '',
         formUuid: '89994550-9939-40f3-afa6-173bce445c79',
       },

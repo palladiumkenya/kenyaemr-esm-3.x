@@ -24,7 +24,7 @@ const AlertMessageBanner: React.FC<AlertMessageBannerProps> = ({ expiryDate }) =
         onActionButtonClick: () => {},
       });
     }
-  }, [expiryDate]);
+  }, [expiryDate, messageText]);
 
   return null;
 };

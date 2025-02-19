@@ -302,6 +302,10 @@
     {
       "name": "clock-in-modal",
       "component": "clockIn"
+    },
+    {
+      "name": "create-bill-item-modal",
+      "component": "createBillItemModal"
     }
   ]
 }

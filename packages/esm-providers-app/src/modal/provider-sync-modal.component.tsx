@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, Column, Search, ComboBox, InlineLoading } from '@carbon/react';
 import styles from './provider-sync-modal.scss';
 import { Practitioner, ProviderResponse } from '../types';
-import { useConfig, showSnackbar, formatDate, parseDate, showToast } from '@openmrs/esm-framework';
+import { useConfig, showSnackbar, formatDate, parseDate, showToast, restBaseUrl } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import {
   searchHealthCareWork,
@@ -111,7 +111,7 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
         }),
       );
 
-      mutate((key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/provider'));
+      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
       showSnackbar({
         title: 'Success',
         kind: 'success',
