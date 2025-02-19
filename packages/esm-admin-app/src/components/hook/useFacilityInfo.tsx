@@ -2,7 +2,7 @@ import { FetchResponse, openmrsFetch, restBaseUrl, useSession } from '@openmrs/e
 import useSWR from 'swr';
 import { DefaultFacility, SHAFacility } from '../../types';
 
-export function useShaFacility(shouldSynchronize: boolean = false) {
+export function useShaFacilityInfo(shouldSynchronize: boolean = false) {
   const { authenticated } = useSession();
   const url = `${restBaseUrl}/kenyaemr/sha-facility-status?synchronize=${shouldSynchronize}`;
 
@@ -19,7 +19,7 @@ export function useShaFacility(shouldSynchronize: boolean = false) {
   };
 }
 
-export const useDefaultFacility = () => {
+export const useLocalFacilityInfo = () => {
   const url = `${restBaseUrl}/kenyaemr/default-facility`;
   const { authenticated } = useSession();
 
@@ -30,10 +30,8 @@ export const useDefaultFacility = () => {
 
   return {
     isLoading,
-    defaultFacility: data?.data,
+    localFacility: data?.data,
     error,
     mutate,
   };
 };
-
-export default useDefaultFacility;
