@@ -14,23 +14,21 @@ export interface FrontendModule {
   name: string;
   version?: string;
 }
+export interface SHAFacility {
+  operationalStatus: string;
+  approved: string;
+  kephLevel: string;
+  shaFacilityId: string;
+  shaFacilityExpiryDate: string;
+  registrationNumber: string;
+  mflCode: string;
+  shaFacilityLicenseNumber: string;
+  facilityRegistryCode: string;
+  source: string;
+}
+
 export interface DefaultFacility {
   locationId: number;
   uuid: string;
   display: string;
-  operationalStatus: string;
-  shaContracted: string;
-  shaFacilityExpiryDate: string;
-}
-
-export interface FacilityData {
-  shaKephLevel?: string;
-  mflCode?: string;
-  display?: string;
-  operationalStatus?: string;
-  shaContracted?: string;
-  shaFacilityId?: string;
-  shaFacilityLicenseNumber?: string;
-  shaFacilityExpiryDate?: string;
-  source?: string;
 }
