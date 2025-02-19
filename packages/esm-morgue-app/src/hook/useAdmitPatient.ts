@@ -1,13 +1,31 @@
-import { FetchResponse, openmrsFetch, restBaseUrl, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
+import {
+  closeWorkspace,
+  FetchResponse,
+  openmrsFetch,
+  restBaseUrl,
+  showSnackbar,
+  updateVisit,
+  useConfig,
+  useSession,
+  type Visit,
+} from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { useCallback, useMemo } from 'react';
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
-import { CurrentLocationEncounterResponse, customRepProps, EmrApiConfigurationResponse, Encounter } from '../types';
+import {
+  CurrentLocationEncounterResponse,
+  customRepProps,
+  EmrApiConfigurationResponse,
+  Encounter,
+  MappedVisitQueueEntry,
+  VisitQueueEntry,
+} from '../types';
 import { dischargeSchema, patientInfoSchema } from '../utils/utils';
 import { useMortuaryLocation } from './useMortuaryAdmissionLocation';
+import { removeQueuedPatient } from './useMorgue.resource';
 const customRep = `custom:${customRepProps.map((prop) => prop.join(':')).join(',')}`;
 
 export default function useEmrConfiguration() {
@@ -193,13 +211,37 @@ export const useMortuaryOperation = () => {
     [],
   );
 
+  const endCurrentVisit = useCallback(
+    async (currentVisit: Visit, queueEntry: MappedVisitQueueEntry, data: z.infer<typeof dischargeSchema>) => {
+      const abortController = new AbortController();
+      const response = await updateVisit(
+        currentVisit.uuid,
+        {
+          stopDatetime: data.dateOfDischarge,
+        },
+        abortController,
+      );
+
+      if (queueEntry) {
+        removeQueuedPatient(
+          queueEntry.queue.uuid,
+          queueEntry.queueEntryUuid,
+          abortController,
+          response?.data?.stopDatetime,
+        );
+      }
+    },
+    [],
+  );
+
   const dischargeBody = useCallback(
-    async (visit: Visit, bedId: number, data: z.infer<typeof dischargeSchema>) => {
+    async (visit: Visit, queueEntry: MappedVisitQueueEntry, bedId: number, data: z.infer<typeof dischargeSchema>) => {
       const dischargeEncounter = await createDischargeMortuaryEncounter(visit, data);
       const compartment = await removeDeceasedFromCompartment(visit?.patient?.uuid, bedId);
+      await endCurrentVisit(visit, queueEntry, data);
       return { dischargeEncounter, compartment };
     },
-    [createDischargeMortuaryEncounter, removeDeceasedFromCompartment],
+    [createDischargeMortuaryEncounter, endCurrentVisit, removeDeceasedFromCompartment],
   );
 
   return {

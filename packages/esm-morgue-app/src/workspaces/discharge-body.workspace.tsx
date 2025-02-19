@@ -78,47 +78,14 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
       setCurrentVisit(null, null);
       closeWorkspace();
     } else {
-      const endVisitPayload = {
-        stopDatetime: data.dateOfDischarge,
-      };
-
-      const abortController = new AbortController();
-
       try {
         // Then, end the visit
-        updateVisit(currentVisit.uuid, endVisitPayload, abortController).subscribe({
-          next: async (response) => {
-            if (queueEntry) {
-              removeQueuedPatient(
-                queueEntry.queue.uuid,
-                queueEntry.queueEntryUuid,
-                abortController,
-                response?.data.stopDatetime,
-              );
-            }
-            await dischargeBody(currentVisit, bedId, data);
-            showSnackbar({
-              title: 'Discharge',
-              subtitle: 'The deceased has been discharged successfully',
-              kind: 'success',
-            });
-            closeWorkspace();
-            showSnackbar({
-              isLowContrast: true,
-              kind: 'success',
-              subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
-              title: t('visitEnded', 'Visit ended'),
-            });
-            mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/visit`));
-          },
-          error: (error) => {
-            showSnackbar({
-              title: t('errorEndingVisit', 'Error ending visit'),
-              kind: 'error',
-              isLowContrast: false,
-              subtitle: error?.message,
-            });
-          },
+        await dischargeBody(currentVisit, queueEntry, bedId, data);
+        showSnackbar({
+          title: 'Visit Discharged',
+          subtitle: 'Visit Discharged successfully',
+          kind: 'success',
+          isLowContrast: true,
         });
       } catch (error) {
         const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
