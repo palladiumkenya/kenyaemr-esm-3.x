@@ -9,7 +9,7 @@ import {
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
 import { useParams } from 'react-router-dom';
-import { type MortuaryLocationFetchResponse } from '../types';
+import { type MortuaryLocationFetchResponse, type FHIREncounter } from '../types';
 
 export function useLocation(locationUuid: string, rep: string = 'custom:(display,uuid)') {
   return useSWRImmutable<FetchResponse<Location>>(

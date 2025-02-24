@@ -217,7 +217,7 @@ export const useMortuaryOperation = () => {
       const response = await updateVisit(
         currentVisit.uuid,
         {
-          stopDatetime: data.dateOfDischarge,
+          stopDatetime: new Date(),
         },
         abortController,
       );
@@ -243,23 +243,43 @@ export const useMortuaryOperation = () => {
     },
     [createDischargeMortuaryEncounter, endCurrentVisit, removeDeceasedFromCompartment],
   );
+  const createEncounterForCompartmentSwap = useCallback(
+    async (patientUuid: string, visitUuid: string) =>
+      openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: {
+          encounterDatetime: new Date(),
+          patient: patientUuid,
+          encounterType: emrConfiguration?.bedAssignmentEncounterType,
+          location: location?.uuid,
+          encounterProviders: [
+            {
+              provider: currentProvider?.uuid,
+              encounterRole: emrConfiguration?.clinicianEncounterRole?.uuid,
+            },
+          ],
+          visit: visitUuid,
+          obs: [],
+        },
+      }),
+    [
+      currentProvider?.uuid,
+      emrConfiguration?.bedAssignmentEncounterType,
+      emrConfiguration?.clinicianEncounterRole?.uuid,
+      location?.uuid,
+    ],
+  );
 
   return {
     admitBody,
+    createEncounterForCompartmentSwap,
+    assignDeceasedToCompartment,
+    removeDeceasedFromCompartment,
     dischargeBody,
     isLoadingEmrConfiguration,
     errorFetchingEmrConfiguration,
-  };
-};
-
-export const useTimeOnUnit = () => {
-  const { location } = useMortuaryLocation();
-  const customRepresentation = `custom:(visit:(patient:(uuid,display),),encounterAssigningToCurrentInpatientLocation:(encounterDatetime),)`;
-  const url = `${restBaseUrl}/emrapi/inpatient/admission?currentInpatientLocation=${location?.uuid}&v=${customRepresentation}`;
-  const { data, ...rest } = useSWR<FetchResponse<CurrentLocationEncounterResponse>, Error>(url, openmrsFetch);
-
-  return {
-    timeOnUnit: data?.data,
-    ...rest,
   };
 };
