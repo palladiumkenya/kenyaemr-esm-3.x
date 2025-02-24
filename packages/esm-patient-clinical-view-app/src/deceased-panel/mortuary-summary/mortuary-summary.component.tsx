@@ -11,7 +11,6 @@ import AttachmentView from '../panels/attachement.component';
 import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
 import usePerson from '../hook/usePerson';
 import { useActiveMorgueVisit } from '../hook/useMorgueVisit';
-import { name } from '../../../../esm-billing-app/dist/main';
 
 const MortuarySummary: React.FC = () => {
   const config = useConfig();
