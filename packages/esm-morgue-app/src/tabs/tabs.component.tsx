@@ -1,39 +1,46 @@
 import { Button, Layer, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { SearchAdvanced } from '@carbon/react/icons';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDeceasedPatient } from '../hook/useMorgue.resource';
+import useEmrConfiguration from '../hook/useAdmitPatient';
+import { useDischargedPatient } from '../hook/useDischargedPatient';
+import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 import { AdmittedQueue } from '../tables/admitted-queue.component';
 import { DischargedBodies } from '../tables/discharge-queue.component';
 import styles from './tabs.scss';
-import { launchWorkspace, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 
 export const MorgueTabs: React.FC = () => {
   const { t } = useTranslation();
-  const { data: deceasedPatients, error, isLoading } = useDeceasedPatient();
+  const { admissionLocation } = useAdmissionLocation();
+  const admittedCount = admissionLocation?.bedLayouts?.filter((bed) => bed.status === 'OCCUPIED').length || 0;
+  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
 
-  // const awaitingCount = deceasedPatients?.filter((p) => p.status === 'awaiting').length || 0;
-  const admittedCount = deceasedPatients?.filter((p) => p.status === 'admitted').length || 0;
-  const dischargedCount = deceasedPatients?.filter((p) => p.status === 'discharged').length || 0;
+  const dischargeEncounterTypeUuid = emrConfiguration?.exitFromInpatientEncounterType?.uuid;
+  const { dischargedPatientUuids, isLoading: isLoadingDischargedPatient } =
+    useDischargedPatient(dischargeEncounterTypeUuid);
+  const dischargedCount = dischargedPatientUuids?.length || 0;
 
   const getTabLabel = (baseLabel: string, count: number | null) => (
     <span className={styles.tabLabel}>
-      {baseLabel} {isLoading ? '' : `(${count})`}
+      {baseLabel} {count ? `(${count})` : ''}
     </span>
   );
 
   const tabPanels = [
-    // {
-    //   name: getTabLabel(t('waitQueue', 'Waiting queue'), awaitingCount),
-    //   component: <WaitingQueue isLoading={isLoading} deceasedPatients={deceasedPatients} error={error} />,
-    // },
     {
       name: getTabLabel(t('admitted', 'Admitted'), admittedCount),
       component: <AdmittedQueue />,
     },
     {
       name: getTabLabel(t('discharged', 'Discharged'), dischargedCount),
-      component: <DischargedBodies isLoading={isLoading} deceasedPatients={deceasedPatients} error={error} />,
+      component: (
+        <DischargedBodies
+          isLoading={isLoadingDischargedPatient || isLoadingEmrConfiguration}
+          error={errorFetchingEmrConfiguration}
+          dischargedPatientUuids={dischargedPatientUuids}
+        />
+      ),
     },
   ];
   const handleAdmitBodyWorkspace = () => {
@@ -54,7 +61,7 @@ export const MorgueTabs: React.FC = () => {
               renderIcon={(props) => <SearchAdvanced size={40} {...props} />}
               onClick={() => handleAdmitBodyWorkspace()}
               className={styles.actionBtn}
-              disabled={isLoading}>
+              disabled={isLoadingDischargedPatient}>
               {t('admitBodies', 'Admit bodies')}
             </Button>
           </div>
