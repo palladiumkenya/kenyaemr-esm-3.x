@@ -5,10 +5,9 @@ import capitalize from 'lodash-es/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { toUpperCase } from '../helpers/expression-helper';
-import styles from './compartment.scss';
-import { usePerson } from '../hook/useMorgue.resource';
-import { MortuaryLocationFetchResponse, Patient, PatientInfo } from '../types';
+import { Patient } from '../types';
 import { convertDateToDays } from '../utils/utils';
+import styles from './compartment.scss';
 
 interface AvailableCompartmentProps {
   patientInfo: Patient;
