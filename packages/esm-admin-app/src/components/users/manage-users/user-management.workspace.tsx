@@ -6,6 +6,7 @@ import {
   restBaseUrl,
   showSnackbar,
   useLayoutType,
+  formatDatetime,
 } from '@openmrs/esm-framework';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import styles from './user-management.workspace.scss';
@@ -19,8 +20,6 @@ import {
   RadioButton,
   CheckboxGroup,
   Checkbox,
-  SelectItem,
-  Select,
   PasswordInput,
   Column,
   ProgressIndicator,
@@ -45,13 +44,14 @@ import {
   useStockTagLocations,
   createOrUpdateUserRoleScope,
   createProvider,
+  useUserRoleScopes,
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
-import { ChevronSortUp } from '@carbon/react/icons';
+import { ChevronSortUp, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { Provider, User, UserRoleScope } from '../../../config-schema';
-import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatForDatePicker, today } from '../../../constants';
+import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatNewDate, today } from '../../../constants';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -72,11 +72,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
   const { location, loadingLocation } = useLocation();
 
+  const { items, loadingRoleScope } = useUserRoleScopes();
+
   const { userManagementFormSchema } = UserManagementFormSchema();
-  const {
-    types: { results: stockOperations },
-    loadingStock,
-  } = useStockOperationTypes();
+  const { stockOperations, loadingStock } = useStockOperationTypes();
 
   const { stockLocations } = useStockTagLocations();
 
@@ -84,8 +83,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
   const { roles = [], isLoading } = useRoles();
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
-  const { attributeTypes = [] } = usePersonAttribute();
-  // Memoize provider attribute mappings
+
+  const userRoleScope = useMemo(
+    () => items?.results?.find((user) => user.userUuid === initialUserValue.uuid) || null,
+    [items, initialUserValue.uuid],
+  );
   const attributeTypeMapping = useMemo(() => {
     return {
       licenseNumber:
@@ -140,8 +142,31 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate,
       primaryFacility: primaryFacility,
+      stockOperation:
+        userRoleScope?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
+          operationTypeName,
+          operationTypeUuid,
+        })) || [],
+      operationLocation:
+        userRoleScope?.locations?.map(({ locationName, locationUuid }) => ({
+          locationName,
+          locationUuid,
+        })) || [],
+      permanent: userRoleScope?.permanent,
+      enabled: userRoleScope?.enabled,
+      dateRange: {
+        activeTo: formatNewDate(userRoleScope?.activeTo),
+        activeFrom: formatNewDate(userRoleScope?.activeFrom),
+      },
     };
-  }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
+  }, [
+    isInitialValuesEmpty,
+    initialUserValue,
+    providerLicenseNumber,
+    licenseExpiryDate,
+    primaryFacility,
+    userRoleScope,
+  ]);
 
   function extractNameParts(display = '') {
     const nameParts = display.split(' ');
@@ -167,10 +192,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { errors, isSubmitting, isDirty } = userFormMethods.formState;
 
   useEffect(() => {
-    if (!loadingProvider && !loadingLocation) {
+    if (!loadingProvider && !loadingLocation && !loadingRoleScope && !isInitialValuesEmpty) {
       reset(formDefaultValues);
     }
-  }, [loadingProvider, loadingLocation, formDefaultValues, reset]);
+  }, [loadingProvider, loadingLocation, loadingRoleScope, formDefaultValues, isInitialValuesEmpty, reset]);
 
   useEffect(() => {
     if (isDirty) {
@@ -186,37 +211,29 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const providerUUID = provider[0]?.uuid || '';
     const roleName = data.roles?.[0]?.display || '';
 
-    const hasValidLocations = Array.isArray(data.operationLocation) && data.operationLocation.length > 0;
+    const hasValidLocations = data.operationLocation?.length > 0;
     const hasEnabledFlag = data.enabled !== undefined && data.enabled !== null;
-    const hasOperationTypes = Array.isArray(data.stockOperation) && data.stockOperation.length > 0;
-    const hasDateRange = data.activeFrom && data.activeTo;
+    const hasOperationTypes = data.stockOperation?.length > 0;
+    const hasDateRange = data.dateRange?.activeFrom && data.dateRange?.activeTo;
     const hasValidRoleConditions =
       hasValidLocations && hasEnabledFlag && hasOperationTypes && (data.permanent || hasDateRange);
 
     const userRoleScopePayload: Partial<UserRoleScope> = {
       ...(hasValidRoleConditions && { role: roleName }),
-      locations: hasValidLocations
-        ? data.operationLocation.map((loc) => ({
-            locationUuid: loc.locationUuid,
-            locationName: loc.locationName,
-            enableDescendants: false,
-          }))
-        : [],
+      locations: data.operationLocation?.map((loc) => ({
+        locationUuid: loc.locationUuid,
+        locationName: loc.locationName,
+        enableDescendants: false,
+      })),
       permanent: data.permanent,
       enabled: data.enabled,
-      activeFrom: data.activeFrom,
-      activeTo: data.activeTo,
-      operationTypes: hasOperationTypes
-        ? data.stockOperation.map((op) => ({
-            operationTypeUuid: op.operationTypeUuid,
-            operationTypeName: op.operationTypeName,
-          }))
-        : [],
+      activeFrom: data.dateRange?.activeFrom,
+      activeTo: data.dateRange?.activeTo,
+      operationTypes: data.stockOperation?.map((op) => ({
+        operationTypeUuid: op.operationTypeUuid,
+        operationTypeName: op.operationTypeName,
+      })),
     };
-
-    if (!hasValidRoleConditions && userRoleScopePayload.locations.length === 0) {
-      return null;
-    }
 
     const providerPayload: Partial<Provider> = {
       attributes: [
@@ -258,9 +275,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         );
         closeWorkspaceWithSavedChanges();
 
-        if (userRoleScopePayload && Object.keys(userRoleScopePayload).length > 0) {
+        if (userRoleScopePayload !== null && hasValidRoleConditions) {
           try {
-            const userRoleScopeUrl = `${restBaseUrl}/stockmanagement/userrolescope`;
+            const userRoleScopeUrl = userRoleScope?.uuid
+              ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
+              : `${restBaseUrl}/stockmanagement/userrolescope`;
             const userUuid = response.uuid;
 
             const userRoleScopeResponse = await createOrUpdateUserRoleScope(
@@ -270,12 +289,15 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             );
 
             if (userRoleScopeResponse.ok) {
+              handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
               showSnackbarMessage(t('userRoleScopeSaved', 'User role scope saved successfully'), '', 'success');
             }
           } catch (error) {
             showSnackbarMessage(
               t('userRoleScopeFail', 'Failed to save user role scope'),
-              t('userRoleScopeFailedSubtitle', 'An error occurred while creating user role scope'),
+              t('userRoleScopeFailedSubtitle', 'An error occurred while creating user role scope{{errorMessage}}', {
+                errorMessage: JSON.stringify(error, null, 2),
+              }),
               'error',
             );
           }
@@ -327,15 +349,15 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     }
   }, [isDirty, promptBeforeClosing]);
 
-  const toggleSection = (section) => {
+  const toggleSection = (section: string) => {
     setActiveSection((prev) => (prev !== section ? section : prev));
   };
 
   const steps = useMemo(
     () => [
       { id: 'demographic', label: t('demographicInformation', 'Demographic Info') },
-      { id: 'provider', label: t('providerAccount', 'Provider Account') },
       { id: 'login', label: t('loginInformation', 'Login Info') },
+      { id: 'provider', label: t('providerAccount', 'Provider Account') },
       { id: 'roles', label: t('roles', 'Roles Info') },
       { id: 'additionalRoles', label: t('additionalRoles', 'Additional Roles') },
     ],
@@ -715,7 +737,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         )}
                       </ResponsiveWrapper>
                     )}
-
                     {activeSection === 'login' && (
                       <ResponsiveWrapper>
                         <CardHeader title="Login Info">
@@ -819,21 +840,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <CardHeader title="Roles Info">
                           <ChevronSortUp />
                         </CardHeader>
-                        <ResponsiveWrapper>
-                          <Controller
-                            name="primaryRole"
-                            control={userFormMethods.control}
-                            render={({ field }) => (
-                              <Select id="carder-select" labelText={t('primaryRole', 'Primary Role')} {...field}>
-                                <SelectItem value="" text={t('selectOption', 'Choose an option')} />
-                                <SelectItem value="admin" text={t('admin', 'Admin')} />
-                                <SelectItem value="provider" text={t('provider', 'Provider')} />
-                                <SelectItem value="nurse" text={t('nurse', 'Nurse')} />
-                              </Select>
-                            )}
-                          />
-                        </ResponsiveWrapper>
-
                         <ResponsiveWrapper>
                           {rolesConfig
                             .filter((category) => category.category !== 'Inventory Roles')
@@ -1009,6 +1015,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   control={userFormMethods.control}
                                   render={({ field }) => {
                                     const selectedStockOperation = field.value || [];
+
                                     const isSelected = (operationUuid: string) =>
                                       selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
                                     const toggleOperation = (operation) => {
@@ -1061,12 +1068,14 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                         <ResponsiveWrapper>
                           <Column
-                            key={t('location', 'Location')}
+                            key={t('location', 'Stock Location')}
                             xsm={8}
                             md={12}
                             lg={12}
                             className={styles.checkBoxColumn}>
-                            <CheckboxGroup legendText={t('location', 'Location')} className={styles.checkboxGroupGrid}>
+                            <CheckboxGroup
+                              legendText={t('stockLocation', 'Stock Location')}
+                              className={styles.checkboxGroupGrid}>
                               {loadingStock ? (
                                 <InlineLoading
                                   status="active"
@@ -1079,6 +1088,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   control={userFormMethods.control}
                                   render={({ field }) => {
                                     const selectedLocations = field.value || [];
+
                                     const isSelected = (locationUuid: string) =>
                                       selectedLocations.some((loc) => loc.locationUuid === locationUuid);
                                     const toggleLocation = (location) => {
@@ -1124,7 +1134,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                         <ResponsiveWrapper>
                           <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                            <CheckboxGroup className={styles.checkboxGroupGrid}>
+                            <CheckboxGroup
+                              legendText={t('inventoryUser', 'Inventory User')}
+                              className={styles.checkboxGroupGrid}>
                               <Controller
                                 name="enabled"
                                 control={userFormMethods.control}
@@ -1143,89 +1155,131 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   </div>
                                 )}
                               />
-                              <Controller
-                                name="permanent"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <div>
-                                    <label htmlFor="permanent">
-                                      <input
-                                        type="checkbox"
-                                        id="permanent"
-                                        name="permanent"
-                                        checked={field.value || false}
-                                        onChange={(e) => field.onChange(e.target.checked)}
-                                      />
-                                      {t('permanent', 'Permanent?')}
-                                    </label>
-                                  </div>
-                                )}
-                              />
+                              {userFormMethods?.watch('enabled') && (
+                                <Controller
+                                  name="permanent"
+                                  control={userFormMethods.control}
+                                  render={({ field }) => (
+                                    <div>
+                                      <label htmlFor="permanent">
+                                        <input
+                                          type="checkbox"
+                                          id="permanent"
+                                          name="permanent"
+                                          checked={field.value || false}
+                                          onChange={(e) => {
+                                            field.onChange(e.target.checked);
+                                            if (e.target.checked) {
+                                              userFormMethods.setValue('dateRange', {
+                                                activeFrom: undefined,
+                                                activeTo: undefined,
+                                              });
+                                            }
+                                          }}
+                                        />
+                                        {t('permanent', 'Permanent?')}
+                                      </label>
+                                    </div>
+                                  )}
+                                />
+                              )}
                             </CheckboxGroup>
+                            {!userFormMethods?.watch('permanent') && userFormMethods?.watch('enabled') && (
+                              <ResponsiveWrapper>
+                                <Tile>
+                                  <Controller
+                                    name="dateRange"
+                                    control={userFormMethods.control}
+                                    render={({ field }) => {
+                                      const { value, onChange } = field;
+
+                                      const handleDateChange = (dates: Array<Date>) => {
+                                        onChange({
+                                          activeFrom: dates[0],
+                                          activeTo: dates[1],
+                                        });
+                                      };
+
+                                      return (
+                                        <DatePicker
+                                          datePickerType="range"
+                                          light
+                                          minDate={formatDatetime(MinDate)}
+                                          locale="en"
+                                          dateFormat={DATE_PICKER_CONTROL_FORMAT}
+                                          onChange={handleDateChange}
+                                          value={[value?.activeFrom, value?.activeTo]}>
+                                          <DatePickerInput
+                                            id="date-picker-input-id-start"
+                                            name="activeFrom"
+                                            placeholder={DATE_PICKER_FORMAT}
+                                            labelText={t('activeFrom', 'Active From')}
+                                            value={value?.activeFrom}
+                                          />
+                                          <DatePickerInput
+                                            id="date-picker-input-id-finish"
+                                            name="activeTo"
+                                            placeholder={DATE_PICKER_FORMAT}
+                                            labelText={t('activeTo', 'Active To')}
+                                            value={value?.activeTo}
+                                          />
+                                        </DatePicker>
+                                      );
+                                    }}
+                                  />
+                                </Tile>
+                              </ResponsiveWrapper>
+                            )}
                           </Column>
-                        </ResponsiveWrapper>
-
-                        <ResponsiveWrapper>
-                          {!userFormMethods?.watch('permanent') && (
-                            <Tile className={styles.datePicker}>
-                              <DatePicker
-                                datePickerType="range"
-                                light
-                                minDate={formatForDatePicker(MinDate)}
-                                locale="en"
-                                dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                                onChange={(dates) => {
-                                  if (Array.isArray(dates) && dates.length === 2) {
-                                    userFormMethods.setValue('activeFrom', dates[0]);
-                                    userFormMethods.setValue('activeTo', dates[1]);
-                                  }
-                                }}>
-                                <DatePickerInput
-                                  id="date-picker-input-id-start"
-                                  placeholder={DATE_PICKER_FORMAT}
-                                  labelText={t('activeFrom', 'Active From')}
-                                />
-                                <DatePickerInput
-                                  id="date-picker-input-id-finish"
-                                  placeholder={DATE_PICKER_FORMAT}
-                                  labelText={t('activeTo', 'Active To')}
-                                />
-                              </DatePicker>
-
-                              <Controller
-                                name="activeFrom"
-                                control={userFormMethods.control}
-                                render={({ field }) => <input type="hidden" {...field} value={field.value || ''} />}
-                              />
-                              <Controller
-                                name="activeTo"
-                                control={userFormMethods.control}
-                                render={({ field }) => <input type="hidden" {...field} value={field.value || ''} />}
-                              />
-                            </Tile>
-                          )}
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
                   </Stack>
                 </div>
                 <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-                  <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
-                    {t('cancel', 'Cancel')}
-                  </Button>
-                  <Button
-                    kind="primary"
-                    type="submit"
-                    disabled={isSubmitting || Object.keys(errors).length > 0}
-                    className={styles.btn}>
-                    {isSubmitting ? (
-                      <span style={{ display: 'flex', alignItems: 'center' }}>
-                        {t('submitting', 'Submitting...')} <InlineLoading status="active" />
-                      </span>
-                    ) : (
-                      t('saveAndClose', 'Save & close')
-                    )}
-                  </Button>
+                  {activeSection === 'demographic' || activeSection === 'additionalRoles' ? (
+                    <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
+                      {t('cancel', 'Cancel')}
+                    </Button>
+                  ) : (
+                    <Button
+                      kind="secondary"
+                      onClick={() => {
+                        toggleSection(steps[currentIndex - 1].id);
+                        setCurrentIndex(currentIndex - 1);
+                      }}
+                      className={styles.btn}>
+                      {t('back', 'Back')}
+                    </Button>
+                  )}
+                  {activeSection === 'additionalRoles' ? (
+                    <Button
+                      kind="primary"
+                      type="submit"
+                      disabled={isSubmitting || Object.keys(errors).length > 0}
+                      className={styles.btn}>
+                      {isSubmitting ? (
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                          {t('submitting', 'Submitting...')} <InlineLoading status="active" />
+                        </span>
+                      ) : (
+                        t('saveAndClose', 'Save & close')
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      kind="primary"
+                      renderIcon={ChevronRight}
+                      className={styles.btn}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        toggleSection(steps[currentIndex + 1].id);
+
+                        setCurrentIndex(currentIndex + 1);
+                      }}>
+                      {t('next', 'Next')}
+                    </Button>
+                  )}
                 </ButtonSet>
               </form>
             </FormProvider>

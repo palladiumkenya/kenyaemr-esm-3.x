@@ -151,7 +151,6 @@ export const useLocation = () => {
   };
 };
 
-// getStockOperationTypes
 export function useStockOperationTypes() {
   const apiUrl = `${restBaseUrl}/stockmanagement/stockoperationtype?v=default`;
   const { data, isLoading, error } = useSWR<
@@ -161,7 +160,7 @@ export function useStockOperationTypes() {
     Error
   >(apiUrl, openmrsFetch);
   return {
-    types: data?.data || <PageableResult<StockOperationType>>{},
+    stockOperations: data?.data.results,
     loadingStock: isLoading,
     error,
   };
@@ -180,3 +179,13 @@ export function useStockTagLocations() {
     error,
   };
 }
+
+export const useUserRoleScopes = () => {
+  const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope?v=full`;
+  const { data, error, isLoading } = useSWR<{ data: PageableResult<UserRoleScope> }, Error>(apiUrl, openmrsFetch);
+  return {
+    items: data?.data,
+    loadingRoleScope: isLoading,
+    userRoleScopeError: error,
+  };
+};
