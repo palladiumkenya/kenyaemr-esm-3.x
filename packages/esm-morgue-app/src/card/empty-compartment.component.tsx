@@ -21,9 +21,6 @@ const EmptyCompartment: React.FC<EmptyCompartmentProps> = ({ bedNumber }) => {
         </div>
         <span className={styles.noCompartment}>{t('empty', 'Empty')}</span>
       </div>
-      {/* <Button kind="ghost" renderIcon={Movement}>
-        Assign
-      </Button> */}
     </div>
   );
 };

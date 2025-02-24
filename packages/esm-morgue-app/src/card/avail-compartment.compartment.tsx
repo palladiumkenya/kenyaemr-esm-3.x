@@ -1,29 +1,31 @@
 import { Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, useVisit } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { toUpperCase } from '../helpers/expression-helper';
 import styles from './compartment.scss';
 import { usePerson } from '../hook/useMorgue.resource';
+import { MortuaryLocationFetchResponse, Patient, PatientInfo } from '../types';
+import { convertDateToDays } from '../utils/utils';
 
 interface AvailableCompartmentProps {
-  patientInfo: any;
+  patientInfo: Patient;
   bedNumber: string;
 }
 
-const getUuids = (patientInfo) => ({
+const getPatientAndPersionUuid = (patientInfo) => ({
   personUuid: patientInfo?.person?.uuid || null,
   patientUuid: patientInfo?.uuid || null,
 });
 
 const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, bedNumber }) => {
-  const { personUuid, patientUuid } = getUuids(patientInfo);
+  const { personUuid, patientUuid } = getPatientAndPersionUuid(patientInfo);
   const { t } = useTranslation();
-  const { isLoading, error, person } = usePerson(personUuid);
+  const { currentVisit } = useVisit(patientUuid);
 
-  const causeOfDeathDisplay = person?.causeOfDeath?.display;
+  const causeOfDeathDisplay = patientInfo?.person?.causeOfDeath?.display;
 
   const causeOfDeathMessage = causeOfDeathDisplay
     ? causeOfDeathDisplay.toLowerCase() === 'unknown'
@@ -37,6 +39,13 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
       : 'undefined'
     : 'undefined';
 
+  const startDate = currentVisit?.startDatetime;
+
+  const lengthOfStay = `${convertDateToDays(startDate)} ${
+    convertDateToDays(startDate) === 1 ? t('day', 'Day') : t('days', 'Days')
+  }`;
+  const lengthOfStayDays = parseInt(lengthOfStay.match(/\d+/)?.[0] || '0', 10);
+  const timeSpentTagType = lengthOfStayDays > 17 ? 'red' : 'blue';
   return (
     <div className={styles.cardView}>
       <div className={styles.cardRow}>
@@ -44,9 +53,9 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
           <div className={styles.cardLabel}>{bedNumber}</div>
         </div>
         <span className={styles.deceasedName}>
-          {toUpperCase(person?.display)}
+          {toUpperCase(patientInfo?.person?.display)}
           <span className={styles.middot}>&middot;</span>
-          <span className={styles.age}>{person?.age} Yrs</span>
+          <span className={styles.age}>{patientInfo?.person?.age} Yrs</span>
         </span>
       </div>
       <div className={styles.cardRow}>
@@ -69,6 +78,14 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
         </span>
       </div>
       <div className={styles.borderLine}></div>
+      <div className={styles.cardRow}>
+        <span className={styles.deceasedReason}>
+          {t('timeSpent', 'Time spent ')}
+          <Tag size="md" type={timeSpentTagType}>
+            {lengthOfStay}
+          </Tag>
+        </span>
+      </div>
     </div>
   );
 };

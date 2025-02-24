@@ -17,7 +17,7 @@ const CompartmentView: React.FC = () => {
       <InlineLoading
         status="active"
         iconDescription="Loading"
-        description={t('pullingCompartment', 'Pulling compartments data.....')}
+        description={t('pullingCompartment', 'Pulling compartments data...')}
       />
     );
   }
