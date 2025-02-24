@@ -22,6 +22,10 @@ const ActionButton: React.FC<ActionButtonProps> = ({ patientUuid }) => {
     bed.patients.some((patient) => patient.uuid === patientUuid),
   )?.bedId;
 
+  const personUuid = admissionLocation?.bedLayouts
+    ?.find((bed) => bed.patients.some((patient) => patient.uuid === patientUuid))
+    ?.patients.find((patient) => patient.uuid === patientUuid)?.person?.uuid;
+
   const handleNavigateToAllocationPage = () =>
     navigate({
       to: window.getOpenmrsSpaBase() + `home/morgue/allocation`,
@@ -32,6 +36,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ patientUuid }) => {
       workspaceTitle: t('dischargeForm', 'Discharge form'),
       patientUuid: uuid,
       bedId,
+      personUuid,
     });
   };
 

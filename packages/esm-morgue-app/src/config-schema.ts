@@ -1,18 +1,6 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
-  autopsyEncounterUuid: {
-    _type: Type.String,
-    _description: 'Encounter UUID for autopsy',
-    _default: '',
-  },
-  formsList: {
-    _type: Type.Object,
-    _description: 'List of form UUIDs',
-    _default: {
-      autopsyFormUuid: '',
-    },
-  },
   morgueVisitTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue visit',
@@ -133,16 +121,16 @@ export interface BillingConfig {
 }
 
 export type ConfigObject = {
-  formsList: {
-    autopsyFormUuid: string;
-  };
-  autopsyEncounterUuid: string;
   morgueVisitTypeUuid: string;
   morgueDepartmentServiceTypeUuid: string;
   insurancepaymentModeUuid: string;
   morgueCompartmentTagUuid: string;
   tagNumberUuid: string;
   morgueAdmissionEncounterType: string;
+  nextOfKinNameUuid: string;
+  nextOfKinRelationshipUuid: string;
+  nextOfKinAddressUuid: string;
+  nextOfKinPhoneUuid: string;
   visitPaymentMethodAttributeUuid: string;
   policeStatementUuid: string;
   obNumberUuid: string;
