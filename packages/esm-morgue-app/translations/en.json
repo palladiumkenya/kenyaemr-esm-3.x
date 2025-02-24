@@ -3,7 +3,6 @@
   "admissionForm": "Admission form",
   "admitBodies": "Admit bodies",
   "admitted": "Admitted",
-  "admitToMorgue": "Admit to morgue",
   "allocation": "Allocation",
   "allocations": "Allocation",
   "causeOfDeath": "Cause of death: ",
@@ -24,7 +23,6 @@
   "errorMessage": "Error",
   "lengthofStay": "Length of stay",
   "loading": "Loading...",
-  "missingIdentifier": "--",
   "mortuary": "Mortuary",
   "mortuaryManagement": "Mortuary management",
   "nextOfKin": "Next of Kin",
@@ -37,7 +35,5 @@
   "phone": "Phone",
   "searchForADeceased": "Try to search again using the deceased patient's unique ID number",
   "sharing": "Sharing",
-  "swapCompartment": "Swap compartment",
-  "waitingInLine": "Waiting In Line",
-  "waitingQueue": "Waiting queue"
+  "swapCompartment": "Swap compartment"
 }
