@@ -1,0 +1,37 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.nextOfKinDetailsContainer {
+  background-color: colors.$white;
+  width: 50%;
+  padding: layout.$spacing-04;
+}
+
+.nextOfKinTitle {
+  @include type.type-style('label-02');
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: colors.$gray-70;
+  gap: layout.$spacing-01;
+  margin-left: layout.$spacing-02;
+  margin-right: layout.$spacing-02;
+  margin-bottom: layout.$spacing-02;
+  font-weight: 600;
+}
+.nextOfKinName {
+  margin-left: layout.$spacing-02;
+  margin-right: layout.$spacing-02;
+}
+.nextOfKinInfo {
+  margin-left: layout.$spacing-02;
+  margin-right: layout.$spacing-02;
+}
+
+.middot {
+  margin: 0 layout.$spacing-01;
+}
+.nextOfKinPhone {
+  margin-right: layout.$spacing-05;
+}
