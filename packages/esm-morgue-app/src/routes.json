@@ -24,6 +24,14 @@
       }
     },
     {
+      "name": "deceased-banner-info",
+      "component": "bannerInfo",
+      "slot": "deceased-banner-info-slot",
+      "meta": {
+        "fullWidth": false
+      }
+    },
+    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot"

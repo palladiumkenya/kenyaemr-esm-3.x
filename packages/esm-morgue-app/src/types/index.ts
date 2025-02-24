@@ -7,13 +7,8 @@ export interface Patient {
   uuid: string;
   display: string;
   identifiers: Array<{
-    identifier: string;
     uuid: string;
-    preferred: boolean;
-    location: {
-      uuid: string;
-      name: string;
-    };
+    display: string;
   }>;
   person: {
     uuid: string;
@@ -33,6 +28,14 @@ export interface Patient {
       countyDistrict: string | null;
       address4: string | null;
     } | null;
+    attributes: {
+      uuid: string;
+      display: string;
+      value: string;
+      attributeType: {
+        uuid: string;
+      };
+    }[];
   };
 }
 export interface DeceasedInfo {
@@ -528,4 +531,58 @@ export interface PatientInfo {
     uuid: string;
     display: string;
   }[];
+}
+export interface FHIREncounter {
+  resourceType: string;
+  id: string;
+  meta?: {
+    versionId: string;
+    lastUpdated: string;
+    tag: {
+      system: string;
+      code: string;
+      display: string;
+    }[];
+  };
+  status: string;
+  class: {
+    system: string;
+    code: string;
+  };
+  type: {
+    coding: {
+      system: string;
+      code: string;
+      display: string;
+    }[];
+  }[];
+  subject: {
+    reference: string;
+    type?: string;
+    display?: string;
+  };
+  participant?: {
+    individual: {
+      reference: string;
+      type?: string;
+      identifier?: {
+        value: string;
+      };
+      display?: string;
+    };
+  }[];
+  period: {
+    start: string;
+  };
+  location: {
+    location: {
+      reference: string;
+      type?: string;
+      display?: string;
+    };
+  }[];
+  partOf?: {
+    reference: string;
+    type: string;
+  };
 }

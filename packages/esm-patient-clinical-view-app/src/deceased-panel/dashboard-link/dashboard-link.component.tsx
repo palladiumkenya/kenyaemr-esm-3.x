@@ -15,13 +15,13 @@ const DeceasedPanelDashboardLink = () => {
     return null;
   }
 
-  // if (person?.person?.dead) {
-  //   return (
-  //     <ConfigurableLink className={classNames('cds--side-nav__link', 'active-left-nav-link')} to={url}>
-  //       {t('mortuaryDetails', 'Mortuary details')}
-  //     </ConfigurableLink>
-  //   );
-  // }
+  if (person?.dead) {
+    return (
+      <ConfigurableLink className={classNames('cds--side-nav__link', 'active-left-nav-link')} to={url}>
+        {t('mortuaryDetails', 'Mortuary details')}
+      </ConfigurableLink>
+    );
+  }
 
   return null;
 };
