@@ -40,8 +40,8 @@ const UserList: React.FC = () => {
           .toLowerCase();
         const fullName = user.person.display.toLowerCase();
         return (
-          user.username.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-          user.systemId.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          user.username?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+          user.systemId?.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
           fullName.includes(debouncedSearchTerm.toLowerCase()) ||
           rolesDisplay.includes(debouncedSearchTerm.toLowerCase())
         );
