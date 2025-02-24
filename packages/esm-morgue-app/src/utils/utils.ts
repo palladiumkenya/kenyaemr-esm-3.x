@@ -30,12 +30,22 @@ export const formatDeceasedName = (patient) => {
  * @param startDate - The starting date in string or Date format.
  * @returns The number of days from the start date to today.
  */
-export function convertDateToDays(startDate: string | Date): number {
-  const today = dayjs();
-  const start = dayjs(startDate);
-  return today.diff(start, 'day');
-}
+export function convertDateToDays(startDate?: string | Date): number {
+  if (!startDate) {
+    return 0;
+  }
 
+  const start = dayjs(startDate);
+  const today = dayjs();
+
+  const diff = today.diff(start, 'day', true);
+
+  if (Math.abs(diff) < 1 && diff !== 0) {
+    return 1;
+  }
+
+  return Math.abs(Math.round(diff));
+}
 /**
  * Formats a given date string into "DD-MMM-YYYY, hh:mm A" format.
  *
