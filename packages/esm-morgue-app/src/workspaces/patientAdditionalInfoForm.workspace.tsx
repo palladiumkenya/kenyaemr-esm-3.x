@@ -22,7 +22,7 @@ import {
   TimePickerSelect,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ResponsiveWrapper, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { ResponsiveWrapper, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import fuzzy from 'fuzzy';
@@ -64,7 +64,11 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
   const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
 
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
-  const { admissionLocation, isLoading: isLoadingAdmissionLocation } = useAdmissionLocation();
+  const {
+    admissionLocation,
+    isLoading: isLoadingAdmissionLocation,
+    mutate: mutateAdmissionLocation,
+  } = useAdmissionLocation();
 
   const { morgueVisitTypeUuid, morgueDepartmentServiceTypeUuid, insurancepaymentModeUuid } = useConfig<ConfigObject>();
   const { admitBody, errorFetchingEmrConfiguration, isLoadingEmrConfiguration } = useMortuaryOperation();
@@ -180,10 +184,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
         });
       },
     );
-
-    mutate((key) => {
-      return typeof key === 'string' && key.startsWith('/ws/rest/v1/morgue');
-    });
+    mutateAdmissionLocation();
     closeWorkspace();
   };
 
