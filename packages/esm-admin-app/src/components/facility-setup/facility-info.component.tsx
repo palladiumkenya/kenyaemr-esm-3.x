@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocalFacilityInfo, useShaFacilityInfo } from '../hook/useFacilityInfo';
 import styles from './facility-info.scss';
 import Card from './card.component';
+import dayjs from 'dayjs';
 
 const FacilityInfo: React.FC = () => {
   const { t } = useTranslation();
@@ -39,7 +40,10 @@ const FacilityInfo: React.FC = () => {
     [shaFacility],
   );
   const shaExpiry = useMemo(
-    () => (shaFacility?.shaFacilityExpiryDate ? formatDate(parseDate(shaFacility.shaFacilityExpiryDate)) : undefined),
+    () =>
+      shaFacility?.shaFacilityExpiryDate && dayjs(shaFacility.shaFacilityExpiryDate).isValid()
+        ? formatDate(parseDate(shaFacility.shaFacilityExpiryDate))
+        : undefined,
     [shaFacility],
   );
 
