@@ -17,6 +17,7 @@ import {
 } from '@carbon/react/icons';
 import { useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
+import { useTranslation } from 'react-i18next';
 const openmrsSpaBase = window['getOpenmrsSpaBase']();
 
 const handleClearCache = async () => {
@@ -29,6 +30,7 @@ const handleClearCache = async () => {
 };
 
 export const useModuleLinks = () => {
+  const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   return [
     {
@@ -111,6 +113,11 @@ export const useModuleLinks = () => {
       url: `${openmrsSpaBase}cross-border`,
       icon: <WatsonHealthCrossReference size={24} />,
       privilege: 'o3: View Cross Border Dashboard',
+    },
+    {
+      label: t('reports', 'Reports'),
+      url: `${openmrsSpaBase}reports`,
+      icon: <Report size={24} />,
     },
   ];
 };
