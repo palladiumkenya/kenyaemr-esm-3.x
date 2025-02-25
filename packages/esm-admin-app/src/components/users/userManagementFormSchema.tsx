@@ -64,6 +64,7 @@ const UserManagementFormSchema = () => {
         activeFrom: z.date().optional(),
       })
       .optional(),
+    stockRole: z.string().optional(),
   });
 
   return { userManagementFormSchema };
