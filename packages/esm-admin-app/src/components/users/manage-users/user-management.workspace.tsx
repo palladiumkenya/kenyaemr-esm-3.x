@@ -364,6 +364,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     [t],
   );
 
+  const selectedRoles = userFormMethods.watch('roles') || [];
+  const inventoryRoles = rolesConfig
+    .filter((category) => category.category === 'Core Inventory Roles')
+    .flatMap((category) => category.roles || []);
+  const hasInventoryRole = selectedRoles.some((role) => inventoryRoles.includes(role.display));
+
   return (
     <div className={styles.leftContainer}>
       <div>
@@ -841,75 +847,73 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                           <ChevronSortUp />
                         </CardHeader>
                         <ResponsiveWrapper>
-                          {rolesConfig
-                            .filter((category) => category.category !== 'Inventory Roles')
-                            .map((category) => (
-                              <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                                <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
-                                  {isLoading ? (
-                                    <InlineLoading
-                                      status="active"
-                                      iconDescription="Loading"
-                                      description="Loading data..."
-                                    />
-                                  ) : (
-                                    <Controller
-                                      name="roles"
-                                      control={userFormMethods.control}
-                                      render={({ field }) => {
-                                        const selectedRoles = field.value || [];
+                          {rolesConfig.map((category) => (
+                            <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+                              <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
+                                {isLoading ? (
+                                  <InlineLoading
+                                    status="active"
+                                    iconDescription="Loading"
+                                    description="Loading data..."
+                                  />
+                                ) : (
+                                  <Controller
+                                    name="roles"
+                                    control={userFormMethods.control}
+                                    render={({ field }) => {
+                                      const selectedRoles = field.value || [];
 
-                                        return (
-                                          <>
-                                            {roles
-                                              .filter((role) => category.roles.includes(role.name))
-                                              .map((role) => {
-                                                const isSelected = selectedRoles.some(
-                                                  (r) =>
-                                                    r.display === role.display &&
-                                                    r.description === role.description &&
-                                                    r.uuid === role.uuid,
-                                                );
+                                      return (
+                                        <>
+                                          {roles
+                                            .filter((role) => category.roles.includes(role.name))
+                                            .map((role) => {
+                                              const isSelected = selectedRoles.some(
+                                                (r) =>
+                                                  r.display === role.display &&
+                                                  r.description === role.description &&
+                                                  r.uuid === role.uuid,
+                                              );
 
-                                                return (
-                                                  <label
-                                                    key={role.display}
-                                                    className={
-                                                      isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
-                                                    }>
-                                                    <input
-                                                      type="checkbox"
-                                                      id={role.display}
-                                                      checked={isSelected}
-                                                      onChange={(e) => {
-                                                        const updatedValue = e.target.checked
-                                                          ? [
-                                                              ...selectedRoles,
-                                                              {
-                                                                uuid: role.uuid,
-                                                                display: role.display,
-                                                                description: role.description ?? null,
-                                                              },
-                                                            ]
-                                                          : selectedRoles.filter(
-                                                              (selectedRole) => selectedRole.display !== role.display,
-                                                            );
+                                              return (
+                                                <label
+                                                  key={role.display}
+                                                  className={
+                                                    isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
+                                                  }>
+                                                  <input
+                                                    type="checkbox"
+                                                    id={role.display}
+                                                    checked={isSelected}
+                                                    onChange={(e) => {
+                                                      const updatedValue = e.target.checked
+                                                        ? [
+                                                            ...selectedRoles,
+                                                            {
+                                                              uuid: role.uuid,
+                                                              display: role.display,
+                                                              description: role.description ?? null,
+                                                            },
+                                                          ]
+                                                        : selectedRoles.filter(
+                                                            (selectedRole) => selectedRole.display !== role.display,
+                                                          );
 
-                                                        field.onChange(updatedValue);
-                                                      }}
-                                                    />
-                                                    {role.display}
-                                                  </label>
-                                                );
-                                              })}
-                                          </>
-                                        );
-                                      }}
-                                    />
-                                  )}
-                                </CheckboxGroup>
-                              </Column>
-                            ))}
+                                                      field.onChange(updatedValue);
+                                                    }}
+                                                  />
+                                                  {role.display}
+                                                </label>
+                                              );
+                                            })}
+                                        </>
+                                      );
+                                    }}
+                                  />
+                                )}
+                              </CheckboxGroup>
+                            </Column>
+                          ))}
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
@@ -920,14 +924,51 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <CardHeader title={t('additionalRoles', 'Additional Roles')}>
                           <ChevronSortUp />
                         </CardHeader>
+                        {hasInventoryRole && (
+                          <>
+                            <ResponsiveWrapper>
+                              <Controller
+                                name="stockRole"
+                                control={userFormMethods.control}
+                                render={({ field }) => {
+                                  const selectedRoles = userFormMethods.watch('roles') || [];
 
-                        <ResponsiveWrapper>
-                          {rolesConfig
-                            .filter((category) => category.category === 'Inventory Roles')
-                            .map((category) => (
-                              <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                                <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
-                                  {isLoading ? (
+                                  const inventoryRoles = rolesConfig
+                                    .filter((category) => category.category === 'Core Inventory Roles')
+                                    .flatMap((category) => category.roles || [])
+                                    .filter((roleName) => selectedRoles.some((role) => role.display === roleName))
+                                    .map((roleName) => selectedRoles.find((role) => role.display === roleName))
+                                    .filter(Boolean);
+
+                                  return (
+                                    <ComboBox
+                                      {...field}
+                                      id="stockRole"
+                                      items={inventoryRoles}
+                                      itemToString={(item) => item?.display?.trim() || ''}
+                                      titleText={t('userRoleScope', 'Role')}
+                                      selectedItem={
+                                        inventoryRoles.find((item) => item?.display === field.value) || null
+                                      }
+                                      onChange={({ selectedItem }) => {
+                                        field.onChange(selectedItem ? selectedItem.display.trim() : '');
+                                      }}
+                                    />
+                                  );
+                                }}
+                              />
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Column
+                                key={t('stockOperation', 'Stock Operation')}
+                                xsm={8}
+                                md={12}
+                                lg={12}
+                                className={styles.checkBoxColumn}>
+                                <CheckboxGroup
+                                  legendText={t('stockOperation', 'Stock Operation')}
+                                  className={styles.checkboxGroupGrid}>
+                                  {loadingStock ? (
                                     <InlineLoading
                                       status="active"
                                       iconDescription="Loading"
@@ -935,51 +976,50 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     />
                                   ) : (
                                     <Controller
-                                      name="roles"
+                                      name="stockOperation"
                                       control={userFormMethods.control}
                                       render={({ field }) => {
-                                        const selectedRoles = field.value || [];
+                                        const selectedStockOperation = field.value || [];
+
+                                        const isSelected = (operationUuid: string) =>
+                                          selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
+                                        const toggleOperation = (operation) => {
+                                          if (isSelected(operation.uuid)) {
+                                            field.onChange(
+                                              selectedStockOperation.filter(
+                                                (op) => op.operationTypeUuid !== operation.uuid,
+                                              ),
+                                            );
+                                          } else {
+                                            field.onChange([
+                                              ...selectedStockOperation,
+                                              {
+                                                operationTypeUuid: operation.uuid,
+                                                operationTypeName: operation.name,
+                                              },
+                                            ]);
+                                          }
+                                        };
 
                                         return (
                                           <>
-                                            {roles
-                                              .filter((role) => category.roles.includes(role.name))
-                                              .map((role) => {
-                                                const isSelected = selectedRoles.some(
-                                                  (r) =>
-                                                    r.display === role.display &&
-                                                    r.description === role.description &&
-                                                    r.uuid === role.uuid,
-                                                );
-
+                                            {stockOperations?.length > 0 &&
+                                              stockOperations.map((operation) => {
                                                 return (
                                                   <label
-                                                    key={role.display}
+                                                    key={operation.uuid}
                                                     className={
-                                                      isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
+                                                      isSelected(operation.uuid)
+                                                        ? styles.checkboxLabelSelected
+                                                        : styles.checkboxLabel
                                                     }>
                                                     <input
                                                       type="checkbox"
-                                                      id={role.display}
-                                                      checked={isSelected}
-                                                      onChange={(e) => {
-                                                        const updatedValue = e.target.checked
-                                                          ? [
-                                                              ...selectedRoles,
-                                                              {
-                                                                uuid: role.uuid,
-                                                                display: role.display,
-                                                                description: role.description ?? null,
-                                                              },
-                                                            ]
-                                                          : selectedRoles.filter(
-                                                              (selectedRole) => selectedRole.display !== role.display,
-                                                            );
-
-                                                        field.onChange(updatedValue);
-                                                      }}
+                                                      id={operation.uuid}
+                                                      checked={isSelected(operation.uuid)}
+                                                      onChange={() => toggleOperation(operation)}
                                                     />
-                                                    {role.display}
+                                                    {operation.name}
                                                   </label>
                                                 );
                                               })}
@@ -990,248 +1030,175 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   )}
                                 </CheckboxGroup>
                               </Column>
-                            ))}
-                        </ResponsiveWrapper>
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Column
+                                key={t('location', 'Stock Location')}
+                                xsm={8}
+                                md={12}
+                                lg={12}
+                                className={styles.checkBoxColumn}>
+                                <CheckboxGroup
+                                  legendText={t('stockLocation', 'Stock Location')}
+                                  className={styles.checkboxGroupGrid}>
+                                  {loadingStock ? (
+                                    <InlineLoading
+                                      status="active"
+                                      iconDescription="Loading"
+                                      description="Loading data..."
+                                    />
+                                  ) : (
+                                    <Controller
+                                      name="operationLocation"
+                                      control={userFormMethods.control}
+                                      render={({ field }) => {
+                                        const selectedLocations = field.value || [];
 
-                        <ResponsiveWrapper>
-                          <Column
-                            key={t('stockOperation', 'Stock Operation')}
-                            xsm={8}
-                            md={12}
-                            lg={12}
-                            className={styles.checkBoxColumn}>
-                            <CheckboxGroup
-                              legendText={t('stockOperation', 'Stock Operation')}
-                              className={styles.checkboxGroupGrid}>
-                              {loadingStock ? (
-                                <InlineLoading
-                                  status="active"
-                                  iconDescription="Loading"
-                                  description="Loading data..."
-                                />
-                              ) : (
-                                <Controller
-                                  name="stockOperation"
-                                  control={userFormMethods.control}
-                                  render={({ field }) => {
-                                    const selectedStockOperation = field.value || [];
-
-                                    const isSelected = (operationUuid: string) =>
-                                      selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
-                                    const toggleOperation = (operation) => {
-                                      if (isSelected(operation.uuid)) {
-                                        field.onChange(
-                                          selectedStockOperation.filter(
-                                            (op) => op.operationTypeUuid !== operation.uuid,
-                                          ),
-                                        );
-                                      } else {
-                                        field.onChange([
-                                          ...selectedStockOperation,
-                                          {
-                                            operationTypeUuid: operation.uuid,
-                                            operationTypeName: operation.name,
-                                          },
-                                        ]);
-                                      }
-                                    };
-
-                                    return (
-                                      <>
-                                        {stockOperations?.length > 0 &&
-                                          stockOperations.map((operation) => {
-                                            return (
-                                              <label
-                                                key={operation.uuid}
-                                                className={
-                                                  isSelected(operation.uuid)
-                                                    ? styles.checkboxLabelSelected
-                                                    : styles.checkboxLabel
-                                                }>
-                                                <input
-                                                  type="checkbox"
-                                                  id={operation.uuid}
-                                                  checked={isSelected(operation.uuid)}
-                                                  onChange={() => toggleOperation(operation)}
-                                                />
-                                                {operation.name}
-                                              </label>
+                                        const isSelected = (locationUuid: string) =>
+                                          selectedLocations.some((loc) => loc.locationUuid === locationUuid);
+                                        const toggleLocation = (location) => {
+                                          if (isSelected(location.id)) {
+                                            field.onChange(
+                                              selectedLocations.filter((loc) => loc.locationUuid !== location.id),
                                             );
-                                          })}
-                                      </>
-                                    );
-                                  }}
-                                />
-                              )}
-                            </CheckboxGroup>
-                          </Column>
-                        </ResponsiveWrapper>
-                        <ResponsiveWrapper>
-                          <Column
-                            key={t('location', 'Stock Location')}
-                            xsm={8}
-                            md={12}
-                            lg={12}
-                            className={styles.checkBoxColumn}>
-                            <CheckboxGroup
-                              legendText={t('stockLocation', 'Stock Location')}
-                              className={styles.checkboxGroupGrid}>
-                              {loadingStock ? (
-                                <InlineLoading
-                                  status="active"
-                                  iconDescription="Loading"
-                                  description="Loading data..."
-                                />
-                              ) : (
-                                <Controller
-                                  name="operationLocation"
-                                  control={userFormMethods.control}
-                                  render={({ field }) => {
-                                    const selectedLocations = field.value || [];
+                                          } else {
+                                            field.onChange([
+                                              ...selectedLocations,
+                                              { locationName: location.name, locationUuid: location.id },
+                                            ]);
+                                          }
+                                        };
 
-                                    const isSelected = (locationUuid: string) =>
-                                      selectedLocations.some((loc) => loc.locationUuid === locationUuid);
-                                    const toggleLocation = (location) => {
-                                      if (isSelected(location.id)) {
-                                        field.onChange(
-                                          selectedLocations.filter((loc) => loc.locationUuid !== location.id),
+                                        return (
+                                          <>
+                                            {stockLocations?.length > 0 &&
+                                              stockLocations.map((location) => (
+                                                <label
+                                                  key={location.id}
+                                                  className={
+                                                    isSelected(location.id)
+                                                      ? styles.checkboxLabelSelected
+                                                      : styles.checkboxLabel
+                                                  }>
+                                                  <input
+                                                    type="checkbox"
+                                                    id={location.id}
+                                                    checked={isSelected(location.id)}
+                                                    onChange={() => toggleLocation(location)}
+                                                  />
+                                                  {location.name}
+                                                </label>
+                                              ))}
+                                          </>
                                         );
-                                      } else {
-                                        field.onChange([
-                                          ...selectedLocations,
-                                          { locationName: location.name, locationUuid: location.id },
-                                        ]);
-                                      }
-                                    };
-
-                                    return (
-                                      <>
-                                        {stockLocations?.length > 0 &&
-                                          stockLocations.map((location) => (
-                                            <label
-                                              key={location.id}
-                                              className={
-                                                isSelected(location.id)
-                                                  ? styles.checkboxLabelSelected
-                                                  : styles.checkboxLabel
-                                              }>
-                                              <input
-                                                type="checkbox"
-                                                id={location.id}
-                                                checked={isSelected(location.id)}
-                                                onChange={() => toggleLocation(location)}
-                                              />
-                                              {location.name}
-                                            </label>
-                                          ))}
-                                      </>
-                                    );
-                                  }}
-                                />
-                              )}
-                            </CheckboxGroup>
-                          </Column>
-                        </ResponsiveWrapper>
-                        <ResponsiveWrapper>
-                          <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                            <CheckboxGroup
-                              legendText={t('inventoryUser', 'Inventory User')}
-                              className={styles.checkboxGroupGrid}>
-                              <Controller
-                                name="enabled"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <div>
-                                    <label htmlFor="enable">
-                                      <input
-                                        type="checkbox"
-                                        id="enable"
-                                        name="enabled"
-                                        checked={field.value || false}
-                                        onChange={(e) => field.onChange(e.target.checked)}
-                                      />
-                                      {t('enable', 'Enable?')}
-                                    </label>
-                                  </div>
-                                )}
-                              />
-                              {userFormMethods?.watch('enabled') && (
-                                <Controller
-                                  name="permanent"
-                                  control={userFormMethods.control}
-                                  render={({ field }) => (
-                                    <div>
-                                      <label htmlFor="permanent">
-                                        <input
-                                          type="checkbox"
-                                          id="permanent"
-                                          name="permanent"
-                                          checked={field.value || false}
-                                          onChange={(e) => {
-                                            field.onChange(e.target.checked);
-                                            if (e.target.checked) {
-                                              userFormMethods.setValue('dateRange', {
-                                                activeFrom: undefined,
-                                                activeTo: undefined,
-                                              });
-                                            }
-                                          }}
-                                        />
-                                        {t('permanent', 'Permanent?')}
-                                      </label>
-                                    </div>
+                                      }}
+                                    />
                                   )}
-                                />
-                              )}
-                            </CheckboxGroup>
-                            {!userFormMethods?.watch('permanent') && userFormMethods?.watch('enabled') && (
-                              <ResponsiveWrapper>
-                                <Tile>
+                                </CheckboxGroup>
+                              </Column>
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+                                <CheckboxGroup
+                                  legendText={t('inventoryUser', 'Inventory User')}
+                                  className={styles.checkboxGroupGrid}>
                                   <Controller
-                                    name="dateRange"
+                                    name="enabled"
                                     control={userFormMethods.control}
-                                    render={({ field }) => {
-                                      const { value, onChange } = field;
-
-                                      const handleDateChange = (dates: Array<Date>) => {
-                                        onChange({
-                                          activeFrom: dates[0],
-                                          activeTo: dates[1],
-                                        });
-                                      };
-
-                                      return (
-                                        <DatePicker
-                                          datePickerType="range"
-                                          light
-                                          minDate={formatDatetime(MinDate)}
-                                          locale="en"
-                                          dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                                          onChange={handleDateChange}
-                                          value={[value?.activeFrom, value?.activeTo]}>
-                                          <DatePickerInput
-                                            id="date-picker-input-id-start"
-                                            name="activeFrom"
-                                            placeholder={DATE_PICKER_FORMAT}
-                                            labelText={t('activeFrom', 'Active From')}
-                                            value={value?.activeFrom}
+                                    render={({ field }) => (
+                                      <div>
+                                        <label htmlFor="enable">
+                                          <input
+                                            type="checkbox"
+                                            id="enable"
+                                            name="enabled"
+                                            checked={field.value || false}
+                                            onChange={(e) => field.onChange(e.target.checked)}
                                           />
-                                          <DatePickerInput
-                                            id="date-picker-input-id-finish"
-                                            name="activeTo"
-                                            placeholder={DATE_PICKER_FORMAT}
-                                            labelText={t('activeTo', 'Active To')}
-                                            value={value?.activeTo}
-                                          />
-                                        </DatePicker>
-                                      );
-                                    }}
+                                          {t('enable', 'Enable?')}
+                                        </label>
+                                      </div>
+                                    )}
                                   />
-                                </Tile>
-                              </ResponsiveWrapper>
-                            )}
-                          </Column>
-                        </ResponsiveWrapper>
+                                  {userFormMethods?.watch('enabled') && (
+                                    <Controller
+                                      name="permanent"
+                                      control={userFormMethods.control}
+                                      render={({ field }) => (
+                                        <div>
+                                          <label htmlFor="permanent">
+                                            <input
+                                              type="checkbox"
+                                              id="permanent"
+                                              name="permanent"
+                                              checked={field.value || false}
+                                              onChange={(e) => {
+                                                field.onChange(e.target.checked);
+                                                if (e.target.checked) {
+                                                  userFormMethods.setValue('dateRange', {
+                                                    activeFrom: undefined,
+                                                    activeTo: undefined,
+                                                  });
+                                                }
+                                              }}
+                                            />
+                                            {t('permanent', 'Permanent?')}
+                                          </label>
+                                        </div>
+                                      )}
+                                    />
+                                  )}
+                                </CheckboxGroup>
+                                {!userFormMethods?.watch('permanent') && userFormMethods?.watch('enabled') && (
+                                  <ResponsiveWrapper>
+                                    <Tile>
+                                      <Controller
+                                        name="dateRange"
+                                        control={userFormMethods.control}
+                                        render={({ field }) => {
+                                          const { value, onChange } = field;
+
+                                          const handleDateChange = (dates: Array<Date>) => {
+                                            onChange({
+                                              activeFrom: dates[0],
+                                              activeTo: dates[1],
+                                            });
+                                          };
+
+                                          return (
+                                            <DatePicker
+                                              datePickerType="range"
+                                              light
+                                              minDate={formatDatetime(MinDate)}
+                                              locale="en"
+                                              dateFormat={DATE_PICKER_CONTROL_FORMAT}
+                                              onChange={handleDateChange}
+                                              value={[value?.activeFrom, value?.activeTo]}>
+                                              <DatePickerInput
+                                                id="date-picker-input-id-start"
+                                                name="activeFrom"
+                                                placeholder={DATE_PICKER_FORMAT}
+                                                labelText={t('activeFrom', 'Active From')}
+                                                value={value?.activeFrom}
+                                              />
+                                              <DatePickerInput
+                                                id="date-picker-input-id-finish"
+                                                name="activeTo"
+                                                placeholder={DATE_PICKER_FORMAT}
+                                                labelText={t('activeTo', 'Active To')}
+                                                value={value?.activeTo}
+                                              />
+                                            </DatePicker>
+                                          );
+                                        }}
+                                      />
+                                    </Tile>
+                                  </ResponsiveWrapper>
+                                )}
+                              </Column>
+                            </ResponsiveWrapper>
+                          </>
+                        )}
                       </ResponsiveWrapper>
                     )}
                   </Stack>
@@ -1252,7 +1219,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                       {t('back', 'Back')}
                     </Button>
                   )}
-                  {activeSection === 'additionalRoles' ? (
+                  {activeSection === 'additionalRoles' || !hasInventoryRole ? (
                     <Button
                       kind="primary"
                       type="submit"
