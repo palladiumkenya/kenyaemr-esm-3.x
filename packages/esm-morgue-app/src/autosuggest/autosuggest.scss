@@ -1,0 +1,61 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.label01 {
+  @include type.type-style('label-01');
+}
+
+.suggestions {
+  position: relative;
+  border-top-width: 0;
+  list-style: none;
+  margin-top: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-left: 0;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  background-color: colors.$white;
+  margin-bottom: 20px;
+  z-index: 99;
+  box-shadow: layout.$spacing-03 layout.$spacing-03 layout.$spacing-03 layout.$spacing-03 colors.$gray-30;
+}
+
+.suggestions li {
+  color: colors.$gray-70;
+  border-bottom: 1px solid colors.$gray-50;
+}
+
+.displayText {
+  padding: layout.$spacing-05;
+}
+
+.suggestions li:not(:last-of-type) {
+  border-bottom: 1px solid colors.$gray-40-hover;
+}
+
+.autocomplete {
+  position: relative;
+}
+
+.autocompleteSearch {
+  width: 100%;
+}
+
+.suggestions a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.invalid input {
+  outline: 2px solid var(--cds-support-error, colors.$red-60);
+  outline-offset: -2px;
+  margin-bottom: layout.$spacing-02;
+}
+
+.invalidMsg {
+  color: var(--cds-text-error, colors.$red-60);
+  font-size: small;
+}

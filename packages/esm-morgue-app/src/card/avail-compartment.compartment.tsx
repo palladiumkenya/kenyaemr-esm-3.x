@@ -1,58 +1,60 @@
-import React from 'react';
-import styles from './compartment.scss';
-import { Button, Tag, InlineLoading } from '@carbon/react';
+import { Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { toUpperCase } from '../helpers/expression-helper';
-import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { convertDateToDays } from '../utils/utils';
+import { ConfigurableLink, useVisit } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
-import { DeceasedInfo } from '../types';
-import usePerson, { useActiveMorgueVisit } from '../hook/useMorgue.resource';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { toUpperCase } from '../helpers/expression-helper';
+import { Patient } from '../types';
+import { convertDateToDays } from '../utils/utils';
+import styles from './compartment.scss';
 
 interface AvailableCompartmentProps {
-  patientInfo: DeceasedInfo;
-  index: number;
+  patientInfo: Patient;
+  bedNumber: string;
 }
 
-const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, index }) => {
-  const patientUuid = patientInfo?.patient?.uuid;
+const getPatientAndPersionUuid = (patientInfo) => ({
+  personUuid: patientInfo?.person?.uuid || null,
+  patientUuid: patientInfo?.uuid || null,
+});
+
+const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo, bedNumber }) => {
+  const { personUuid, patientUuid } = getPatientAndPersionUuid(patientInfo);
   const { t } = useTranslation();
-  const { isLoading, error, person } = usePerson(patientInfo?.person?.uuid);
-  const { data: activeDeceased, error: isActiveError, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
+  const { currentVisit } = useVisit(patientUuid);
 
-  const startVisitDate = activeDeceased?.[0]?.startDatetime;
+  const causeOfDeathDisplay = patientInfo?.person?.causeOfDeath?.display;
 
-  if (isLoading || isActiveLoading) {
-    return (
-      <InlineLoading
-        status="active"
-        iconDescription="Loading"
-        description={t('pullingCompartment', 'Pulling compartments data.....')}
-      />
-    );
-  }
+  const causeOfDeathMessage = causeOfDeathDisplay
+    ? causeOfDeathDisplay.toLowerCase() === 'unknown'
+      ? causeOfDeathDisplay
+      : capitalize(causeOfDeathDisplay)
+    : '--';
 
-  if (error || isActiveError) {
-    return <ErrorState error={error} headerTitle={t('allocation', 'Allocation')} />;
-  }
+  const causeOfDeathTagType = causeOfDeathDisplay
+    ? causeOfDeathDisplay.toLowerCase() === 'unknown'
+      ? 'red'
+      : 'undefined'
+    : 'undefined';
 
-  const daysSpent = convertDateToDays(startVisitDate);
-  const timeSpentTagType = daysSpent > 17 ? 'red' : 'blue';
+  const startDate = currentVisit?.startDatetime;
 
-  const causeOfDeathDisplay = person?.causeOfDeath?.display;
-  const causeOfDeathTagType = causeOfDeathDisplay?.toLowerCase() === 'unknown' ? 'red' : 'undefined';
-
+  const lengthOfStay = `${convertDateToDays(startDate)} ${
+    convertDateToDays(startDate) === 1 ? t('day', 'Day') : t('days', 'Days')
+  }`;
+  const lengthOfStayDays = parseInt(lengthOfStay.match(/\d+/)?.[0] || '0', 10);
+  const timeSpentTagType = lengthOfStayDays > 17 ? 'red' : 'blue';
   return (
     <div className={styles.cardView}>
       <div className={styles.cardRow}>
         <div className={styles.cardLabelWrapper}>
-          <div className={styles.cardLabel}>{index + 1}</div>
+          <div className={styles.cardLabel}>{bedNumber}</div>
         </div>
         <span className={styles.deceasedName}>
-          {toUpperCase(person?.display)}
+          {toUpperCase(patientInfo?.person?.display)}
           <span className={styles.middot}>&middot;</span>
-          <span className={styles.age}>{person?.age} Yrs</span>
+          <span className={styles.age}>{patientInfo?.person?.age} Yrs</span>
         </span>
       </div>
       <div className={styles.cardRow}>
@@ -60,10 +62,10 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
           {t('Reason', 'Reason ')}
           {causeOfDeathTagType === 'red' ? (
             <Tag size="md" type={causeOfDeathTagType}>
-              {causeOfDeathDisplay}
+              {causeOfDeathMessage}
             </Tag>
           ) : (
-            <span className={styles.causeDisplay}>{capitalize(causeOfDeathDisplay)}</span>
+            <span className={styles.causeDisplay}>{causeOfDeathMessage}</span>
           )}
         </span>
         <span className={styles.viewDetails}>
@@ -79,12 +81,9 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
         <span className={styles.deceasedReason}>
           {t('timeSpent', 'Time spent ')}
           <Tag size="md" type={timeSpentTagType}>
-            {daysSpent} {t('days', 'days')}
+            {lengthOfStay}
           </Tag>
         </span>
-        <Tag size="md" type="green">
-          {patientInfo?.status}
-        </Tag>
       </div>
     </div>
   );
