@@ -47,7 +47,7 @@ import {
   useUserRoleScopes,
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
-import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { Provider, User, UserRoleScope } from '../../../config-schema';
@@ -847,84 +847,85 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                           <ChevronSortUp />
                         </CardHeader>
                         <ResponsiveWrapper>
-                          {rolesConfig.map((category) => (
-                            <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                              <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
-                                {isLoading ? (
-                                  <InlineLoading
-                                    status="active"
-                                    iconDescription="Loading"
-                                    description="Loading data..."
-                                  />
-                                ) : (
-                                  <Controller
-                                    name="roles"
-                                    control={userFormMethods.control}
-                                    render={({ field }) => {
-                                      const selectedRoles = field.value || [];
+                          {rolesConfig
+                            .filter((category) => category.category !== 'Core Inventory Roles')
+                            .map((category) => (
+                              <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+                                <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
+                                  {isLoading ? (
+                                    <InlineLoading
+                                      status="active"
+                                      iconDescription="Loading"
+                                      description="Loading data..."
+                                    />
+                                  ) : (
+                                    <Controller
+                                      name="roles"
+                                      control={userFormMethods.control}
+                                      render={({ field }) => {
+                                        const selectedRoles = field.value || [];
 
-                                      return (
-                                        <>
-                                          {roles
-                                            .filter((role) => category.roles.includes(role.name))
-                                            .map((role) => {
-                                              const isSelected = selectedRoles.some(
-                                                (r) =>
-                                                  r.display === role.display &&
-                                                  r.description === role.description &&
-                                                  r.uuid === role.uuid,
-                                              );
+                                        return (
+                                          <>
+                                            {roles
+                                              .filter((role) => category.roles.includes(role.name))
+                                              .map((role) => {
+                                                const isSelected = selectedRoles.some(
+                                                  (r) =>
+                                                    r.display === role.display &&
+                                                    r.description === role.description &&
+                                                    r.uuid === role.uuid,
+                                                );
 
-                                              return (
-                                                <label
-                                                  key={role.display}
-                                                  className={
-                                                    isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
-                                                  }>
-                                                  <input
-                                                    type="checkbox"
-                                                    id={role.display}
-                                                    checked={isSelected}
-                                                    onChange={(e) => {
-                                                      const updatedValue = e.target.checked
-                                                        ? [
-                                                            ...selectedRoles,
-                                                            {
-                                                              uuid: role.uuid,
-                                                              display: role.display,
-                                                              description: role.description ?? null,
-                                                            },
-                                                          ]
-                                                        : selectedRoles.filter(
-                                                            (selectedRole) => selectedRole.display !== role.display,
-                                                          );
+                                                return (
+                                                  <label
+                                                    key={role.display}
+                                                    className={
+                                                      isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
+                                                    }>
+                                                    <input
+                                                      type="checkbox"
+                                                      id={role.display}
+                                                      checked={isSelected}
+                                                      onChange={(e) => {
+                                                        const updatedValue = e.target.checked
+                                                          ? [
+                                                              ...selectedRoles,
+                                                              {
+                                                                uuid: role.uuid,
+                                                                display: role.display,
+                                                                description: role.description ?? null,
+                                                              },
+                                                            ]
+                                                          : selectedRoles.filter(
+                                                              (selectedRole) => selectedRole.display !== role.display,
+                                                            );
 
-                                                      field.onChange(updatedValue);
-                                                    }}
-                                                  />
-                                                  {role.display}
-                                                </label>
-                                              );
-                                            })}
-                                        </>
-                                      );
-                                    }}
-                                  />
-                                )}
-                              </CheckboxGroup>
-                            </Column>
-                          ))}
+                                                        field.onChange(updatedValue);
+                                                      }}
+                                                    />
+                                                    {role.display}
+                                                  </label>
+                                                );
+                                              })}
+                                          </>
+                                        );
+                                      }}
+                                    />
+                                  )}
+                                </CheckboxGroup>
+                              </Column>
+                            ))}
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
-
                     {/* Additional roles */}
                     {activeSection === 'additionalRoles' && (
                       <ResponsiveWrapper>
                         <CardHeader title={t('additionalRoles', 'Additional Roles')}>
                           <ChevronSortUp />
                         </CardHeader>
-                        {hasInventoryRole && (
+                        {hasInventoryRole ? (
                           <>
                             <ResponsiveWrapper>
                               <Controller
@@ -1198,6 +1199,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                               </Column>
                             </ResponsiveWrapper>
                           </>
+                        ) : (
+                          <EmptyState displayText={t('noAdditionalRoles', 'No Additional Roles')} headerTitle={''} />
                         )}
                       </ResponsiveWrapper>
                     )}
