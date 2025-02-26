@@ -142,22 +142,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate,
       primaryFacility: primaryFacility,
-      stockOperation:
-        userRoleScope?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
-          operationTypeName,
-          operationTypeUuid,
-        })) || [],
-      operationLocation:
-        userRoleScope?.locations?.map(({ locationName, locationUuid }) => ({
-          locationName,
-          locationUuid,
-        })) || [],
-      permanent: userRoleScope?.permanent,
-      enabled: userRoleScope?.enabled,
-      dateRange: {
-        activeTo: formatNewDate(userRoleScope?.activeTo),
-        activeFrom: formatNewDate(userRoleScope?.activeFrom),
-      },
     };
   }, [
     isInitialValuesEmpty,
@@ -209,7 +193,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const setProvider = data.providerIdentifiers;
     const editProvider = data.isEditProvider;
     const providerUUID = provider[0]?.uuid || '';
-    const roleName = data.roles?.[0]?.display || '';
+    const roleName = data.stockRole || '';
 
     const hasValidLocations = data.operationLocation?.length > 0;
     const hasEnabledFlag = data.enabled !== undefined && data.enabled !== null;
@@ -275,7 +259,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         );
         closeWorkspaceWithSavedChanges();
 
-        if (userRoleScopePayload !== null && hasValidRoleConditions) {
+        if (userRoleScopePayload !== null && hasValidRoleConditions && !userRoleScope?.uuid) {
           try {
             const userRoleScopeUrl = userRoleScope?.uuid
               ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
@@ -925,7 +909,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <CardHeader title={t('additionalRoles', 'Additional Roles')}>
                           <ChevronSortUp />
                         </CardHeader>
-                        {hasInventoryRole ? (
+                        {!initialUserValue.uuid && hasInventoryRole ? (
                           <>
                             <ResponsiveWrapper>
                               <Controller
@@ -1207,49 +1191,68 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                   </Stack>
                 </div>
                 <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-                  {activeSection === 'demographic' || activeSection === 'additionalRoles' ? (
-                    <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
-                      {t('cancel', 'Cancel')}
-                    </Button>
-                  ) : (
-                    <Button
-                      kind="secondary"
-                      onClick={() => {
-                        toggleSection(steps[currentIndex - 1].id);
-                        setCurrentIndex(currentIndex - 1);
-                      }}
-                      className={styles.btn}>
-                      {t('back', 'Back')}
-                    </Button>
-                  )}
-                  {activeSection === 'additionalRoles' || !hasInventoryRole ? (
-                    <Button
-                      kind="primary"
-                      type="submit"
-                      disabled={isSubmitting || Object.keys(errors).length > 0}
-                      className={styles.btn}>
-                      {isSubmitting ? (
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
-                          {t('submitting', 'Submitting...')} <InlineLoading status="active" />
-                        </span>
-                      ) : (
-                        t('saveAndClose', 'Save & close')
-                      )}
-                    </Button>
-                  ) : (
-                    <Button
-                      kind="primary"
-                      renderIcon={ChevronRight}
-                      className={styles.btn}
-                      onClick={(e) => {
+                  <Button
+                    kind="secondary"
+                    onClick={
+                      activeSection === 'demographic' || activeSection === 'additionalRoles'
+                        ? closeWorkspace
+                        : () => {
+                            toggleSection(steps[currentIndex - 1].id);
+                            setCurrentIndex(currentIndex - 1);
+                          }
+                    }
+                    className={styles.btn}>
+                    {t(
+                      activeSection === 'demographic' || activeSection === 'additionalRoles' ? 'cancel' : 'back',
+                      activeSection === 'demographic' || activeSection === 'additionalRoles' ? 'Cancel' : 'Back',
+                    )}
+                  </Button>
+
+                  <Button
+                    kind="primary"
+                    type={
+                      activeSection === 'additionalRoles' ||
+                      (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
+                        ? 'submit'
+                        : undefined
+                    }
+                    disabled={isSubmitting || Object.keys(errors).length > 0}
+                    renderIcon={
+                      activeSection === 'additionalRoles' ||
+                      (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
+                        ? undefined
+                        : ChevronRight
+                    }
+                    className={styles.btn}
+                    onClick={(e) => {
+                      if (
+                        !(
+                          activeSection === 'additionalRoles' ||
+                          (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
+                        )
+                      ) {
                         e.preventDefault();
                         toggleSection(steps[currentIndex + 1].id);
-
                         setCurrentIndex(currentIndex + 1);
-                      }}>
-                      {t('next', 'Next')}
-                    </Button>
-                  )}
+                      }
+                    }}>
+                    {isSubmitting ? (
+                      <span style={{ display: 'flex', alignItems: 'center' }}>
+                        {t('submitting', 'Submitting...')} <InlineLoading status="active" />
+                      </span>
+                    ) : (
+                      t(
+                        activeSection === 'additionalRoles' ||
+                          (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
+                          ? 'saveAndClose'
+                          : 'next',
+                        activeSection === 'additionalRoles' ||
+                          (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
+                          ? 'Save & close'
+                          : 'Next',
+                      )
+                    )}
+                  </Button>
                 </ButtonSet>
               </form>
             </FormProvider>
