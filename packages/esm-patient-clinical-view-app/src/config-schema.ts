@@ -74,6 +74,16 @@ export const configSchema = {
       _description: 'List of given problems for a given patient',
       _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    motherMedicalHistoryConcepts: {
+      _type: Type.Array,
+      _description: 'List of latest mothers medical history of interest for CWC',
+      _default: [
+        {
+          uuid: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          display: 'Viral Load',
+        },
+      ],
+    },
   },
   specialClinics: {
     _type: Type.Array,
@@ -317,7 +327,11 @@ export interface ConfigObject {
   maritalStatusUuid: string;
   hivProgramUuid: string;
   kvpProgramUuid: string;
-  concepts: Record<string, string>;
+  concepts: {
+    probableCauseOfDeathConceptUuid: string;
+    problemListConceptUuid: string;
+    motherMedicalHistoryConcepts: Array<{ display: string; uuid: string }>;
+  };
   specialClinics: Array<{ id: string; formUuid: string; encounterTypeUuid: string; title: string }>;
   contactPersonAttributesUuid: {
     telephone: string;
