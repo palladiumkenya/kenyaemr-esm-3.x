@@ -375,16 +375,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       if (response.uuid) {
         showSnackbarMessage(t('userSaved', 'User saved successfully'), '', 'success');
 
-<<<<<<< HEAD
         if (userRoleScopePayload !== null && hasValidRoleConditions) {
-=======
-        handleMutation(
-          `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`,
-        );
-        closeWorkspaceWithSavedChanges();
-
-        if (userRoleScopePayload !== null && hasValidRoleConditions && !userRoleScope?.uuid) {
->>>>>>> 130ef20 (disable editing of user role scope)
           try {
             const userRoleScopeUrl = userRoleScope?.uuid
               ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
@@ -873,7 +864,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   <Checkbox
                                     className={styles.checkboxLabelSingleLine}
                                     {...field}
-                                    id="providerIdentifiers"
+                                    id="providerIdentifiersa"
                                     labelText={t('providerIdentifiers', 'Create a Provider account for this user')}
                                     checked={field.value || false}
                                     onChange={(e) => field.onChange(e.target.checked)}
