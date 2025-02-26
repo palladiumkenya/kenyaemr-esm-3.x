@@ -15,7 +15,11 @@ const MotherInfoExpandedRow: React.FC<MotherInfoExpandedRowProps> = ({ patientUu
 
   useEffect(() => {
     if (error) {
-      showSnackbar({ title: t('errorLoadingMothersObs', 'Error loading mothers obs'), subtitle: error?.message });
+      showSnackbar({
+        kind: 'error',
+        title: t('errorLoadingMothersObs', 'Error loading mothers obs'),
+        subtitle: error?.message,
+      });
     }
   }, [error, t]);
 
