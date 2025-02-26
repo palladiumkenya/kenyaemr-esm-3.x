@@ -36,7 +36,6 @@ import {
   createUser,
   handleMutation,
   useRoles,
-  usePersonAttribute,
   useProvider,
   useProviderAttributeType,
   useLocation,
@@ -259,11 +258,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         );
         closeWorkspaceWithSavedChanges();
 
-        if (userRoleScopePayload !== null && hasValidRoleConditions && !userRoleScope?.uuid) {
+        if (userRoleScopePayload !== null && hasValidRoleConditions) {
           try {
-            const userRoleScopeUrl = userRoleScope?.uuid
-              ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
-              : `${restBaseUrl}/stockmanagement/userrolescope`;
+            const userRoleScopeUrl = `${restBaseUrl}/stockmanagement/userrolescope`;
             const userUuid = response.uuid;
 
             const userRoleScopeResponse = await createOrUpdateUserRoleScope(
@@ -347,12 +344,19 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     ],
     [t],
   );
-
   const selectedRoles = userFormMethods.watch('roles') || [];
+
   const inventoryRoles = rolesConfig
     .filter((category) => category.category === 'Core Inventory Roles')
     .flatMap((category) => category.roles || []);
-  const hasInventoryRole = selectedRoles.some((role) => inventoryRoles.includes(role.display));
+
+  const scopeRoles =
+    items?.results?.filter((role) => role.userUuid === initialUserValue.uuid).map((role) => role.role) || [];
+  const filteredInventoryRoles = initialUserValue.uuid
+    ? inventoryRoles.filter((role) => !scopeRoles.includes(role))
+    : inventoryRoles;
+
+  const hasInventoryRole = selectedRoles.some((role) => filteredInventoryRoles.includes(role.display));
 
   return (
     <div className={styles.leftContainer}>
@@ -909,7 +913,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <CardHeader title={t('additionalRoles', 'Additional Roles')}>
                           <ChevronSortUp />
                         </CardHeader>
-                        {!initialUserValue.uuid && hasInventoryRole ? (
+                        {hasInventoryRole ? (
                           <>
                             <ResponsiveWrapper>
                               <Controller
@@ -918,22 +922,29 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 render={({ field }) => {
                                   const selectedRoles = userFormMethods.watch('roles') || [];
 
+                                  const scopeRoles = items?.results
+                                    ?.filter((role) => role.userUuid === initialUserValue.uuid)
+                                    .map((role) => role.role);
+
                                   const inventoryRoles = rolesConfig
                                     .filter((category) => category.category === 'Core Inventory Roles')
                                     .flatMap((category) => category.roles || [])
                                     .filter((roleName) => selectedRoles.some((role) => role.display === roleName))
                                     .map((roleName) => selectedRoles.find((role) => role.display === roleName))
                                     .filter(Boolean);
+                                  const filteredInventoryRoles = initialUserValue.uuid
+                                    ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display))
+                                    : inventoryRoles;
 
                                   return (
                                     <ComboBox
                                       {...field}
                                       id="stockRole"
-                                      items={inventoryRoles}
+                                      items={filteredInventoryRoles}
                                       itemToString={(item) => item?.display?.trim() || ''}
                                       titleText={t('userRoleScope', 'Role')}
                                       selectedItem={
-                                        inventoryRoles.find((item) => item?.display === field.value) || null
+                                        filteredInventoryRoles.find((item) => item?.display === field.value) || null
                                       }
                                       onChange={({ selectedItem }) => {
                                         field.onChange(selectedItem ? selectedItem.display.trim() : '');
@@ -943,6 +954,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 }}
                               />
                             </ResponsiveWrapper>
+
                             <ResponsiveWrapper>
                               <Column
                                 key={t('stockOperation', 'Stock Operation')}
