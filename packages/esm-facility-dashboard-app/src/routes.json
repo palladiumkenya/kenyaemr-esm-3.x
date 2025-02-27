@@ -5,8 +5,8 @@
   },
   "extensions": [
     {
-      "component": "surveylanceDashboardLink",
-      "name": "surveylance -dashboard-link",
+      "component": "surveillanceDashboardLink",
+      "name": "surveillance-dashboard-link",
       "slot": "facility-dashboard-left-panel-slot"
     }
   ],

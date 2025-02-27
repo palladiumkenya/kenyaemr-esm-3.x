@@ -1,18 +1,18 @@
+import { Calendar, Location } from '@carbon/react/icons';
+import { formatDate, useSession } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Calendar, Location } from '@carbon/react/icons';
-import { formatDate, useSession, PageHeader } from '@openmrs/esm-framework';
+import SurveillanceIllustration from './header-illustration.component';
 import styles from './header.scss';
-import SurveylanceIllustration from './header-illustration.component';
 
-const SurveylanceHeader: React.FC<{ title: string }> = ({ title }) => {
+const SurveillanceHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   return (
     <div className={styles.header}>
       <div className={styles.leftJustifiedItems}>
-        <SurveylanceIllustration />
+        <SurveillanceIllustration />
         <div className={styles.pageLabels}>
           <p>{t('facilitydashboard', 'Facility Dashboard')}</p>
           <p className={styles.pageName}>{title}</p>
@@ -31,4 +31,4 @@ const SurveylanceHeader: React.FC<{ title: string }> = ({ title }) => {
   );
 };
 
-export default SurveylanceHeader;
+export default SurveillanceHeader;

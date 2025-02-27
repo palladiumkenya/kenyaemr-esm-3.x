@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './header.scss';
 import { ChartColumn } from '@carbon/react/icons';
 
-const SurveylanceIllustration: React.FC = () => {
+const SurveillanceIllustration: React.FC = () => {
   return (
     <div className={styles.svgContainer}>
       <ChartColumn className={styles.iconOveriders} />
@@ -10,4 +10,4 @@ const SurveylanceIllustration: React.FC = () => {
   );
 };
 
-export default SurveylanceIllustration;
+export default SurveillanceIllustration;
