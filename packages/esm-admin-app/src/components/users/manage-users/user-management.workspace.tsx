@@ -346,17 +346,32 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   );
   const selectedRoles = userFormMethods.watch('roles') || [];
 
-  const inventoryRoles = rolesConfig
-    .filter((category) => category.category === 'Core Inventory Roles')
-    .flatMap((category) => category.roles || []);
+  const inventoryRoles = useMemo(
+    () =>
+      rolesConfig
+        .filter((category) => category.category === 'Core Inventory Roles')
+        .flatMap((category) => category.roles || [])
+        .filter((roleName) => selectedRoles.some((role) => role.display === roleName))
+        .map((roleName) => selectedRoles.find((role) => role.display === roleName))
+        .filter(Boolean),
+    [rolesConfig, selectedRoles],
+  );
 
-  const scopeRoles =
-    items?.results?.filter((role) => role.userUuid === initialUserValue.uuid).map((role) => role.role) || [];
-  const filteredInventoryRoles = initialUserValue.uuid
-    ? inventoryRoles.filter((role) => !scopeRoles.includes(role))
-    : inventoryRoles;
+  const scopeRoles = useMemo(
+    () => items?.results?.filter((role) => role.userUuid === initialUserValue.uuid).map((role) => role.role) || [],
+    [items, initialUserValue.uuid],
+  );
 
-  const hasInventoryRole = selectedRoles.some((role) => filteredInventoryRoles.includes(role.display));
+  const filteredInventoryRoles = useMemo(
+    () =>
+      initialUserValue.uuid ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display)) : inventoryRoles,
+    [initialUserValue.uuid, inventoryRoles, scopeRoles],
+  );
+
+  const hasInventoryRole = useMemo(
+    () => selectedRoles.some((role) => filteredInventoryRoles.includes(role)),
+    [selectedRoles, filteredInventoryRoles],
+  );
 
   return (
     <div className={styles.leftContainer}>
@@ -919,39 +934,22 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                               <Controller
                                 name="stockRole"
                                 control={userFormMethods.control}
-                                render={({ field }) => {
-                                  const selectedRoles = userFormMethods.watch('roles') || [];
-
-                                  const scopeRoles = items?.results
-                                    ?.filter((role) => role.userUuid === initialUserValue.uuid)
-                                    .map((role) => role.role);
-
-                                  const inventoryRoles = rolesConfig
-                                    .filter((category) => category.category === 'Core Inventory Roles')
-                                    .flatMap((category) => category.roles || [])
-                                    .filter((roleName) => selectedRoles.some((role) => role.display === roleName))
-                                    .map((roleName) => selectedRoles.find((role) => role.display === roleName))
-                                    .filter(Boolean);
-                                  const filteredInventoryRoles = initialUserValue.uuid
-                                    ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display))
-                                    : inventoryRoles;
-
-                                  return (
-                                    <ComboBox
-                                      {...field}
-                                      id="stockRole"
-                                      items={filteredInventoryRoles}
-                                      itemToString={(item) => item?.display?.trim() || ''}
-                                      titleText={t('userRoleScope', 'Role')}
-                                      selectedItem={
-                                        filteredInventoryRoles.find((item) => item?.display === field.value) || null
-                                      }
-                                      onChange={({ selectedItem }) => {
-                                        field.onChange(selectedItem ? selectedItem.display.trim() : '');
-                                      }}
-                                    />
-                                  );
-                                }}
+                                render={({ field }) => (
+                                  <ComboBox
+                                    {...field}
+                                    id="stockRole"
+                                    items={filteredInventoryRoles}
+                                    itemToString={(item) => item?.display?.trim() || ''}
+                                    titleText={t('userRoleScope', 'Role')}
+                                    selectedItem={
+                                      filteredInventoryRoles.find((item) => item?.display === field.value) || null
+                                    }
+                                    onChange={({ selectedItem }) => {
+                                      field.onChange(selectedItem ? selectedItem.display.trim() : '');
+                                    }}
+                                    disabled={!hasInventoryRole}
+                                  />
+                                )}
                               />
                             </ResponsiveWrapper>
 
@@ -1196,7 +1194,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             </ResponsiveWrapper>
                           </>
                         ) : (
-                          <EmptyState displayText={t('noAdditionalRoles', 'No Additional Roles')} headerTitle={''} />
+                          <EmptyState displayText={t('noAdditionalRoles', 'No additional roles')} headerTitle={''} />
                         )}
                       </ResponsiveWrapper>
                     )}
@@ -1226,13 +1224,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                       activeSection === 'additionalRoles' ||
                       (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
                         ? 'submit'
-                        : undefined
+                        : ''
                     }
                     disabled={isSubmitting || Object.keys(errors).length > 0}
                     renderIcon={
                       activeSection === 'additionalRoles' ||
                       (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
-                        ? undefined
+                        ? ''
                         : ChevronRight
                     }
                     className={styles.btn}
