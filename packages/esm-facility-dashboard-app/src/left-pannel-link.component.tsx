@@ -20,13 +20,20 @@ function LinkExtension({ config }: { config: LinkConfig }) {
   };
 
   if (isUUID(urlSegment)) {
-    urlSegment = '';
+    urlSegment = 'facility-dashboard';
   }
+
+  const getName = (name: string) => {
+    if (!name) {
+      return 'facility-dashboard';
+    }
+    return name;
+  };
 
   return (
     <ConfigurableLink
       to={`${window.getOpenmrsSpaBase()}facility-dashboard${name && name !== 'facility-dashboard' ? `/${name}` : ''}`}
-      className={`cds--side-nav__link ${name === urlSegment && 'active-left-nav-link'}`}>
+      className={`cds--side-nav__link ${getName(name) === urlSegment && 'active-left-nav-link'}`}>
       {title}
     </ConfigurableLink>
   );

@@ -16,3 +16,8 @@ export const root = getSyncLifecycle(Root, options);
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }
+
+export const surveylanceDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({ title: 'Surveylance', name: '' }),
+  options,
+);
