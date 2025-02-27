@@ -1,5 +1,17 @@
 {
+  "delayedVLTesting": "Delayed Viral Load (VL) testing",
+  "dnapcrPending": "DNA-PCR Pending",
+  "eacPending": "EAC Pending",
   "facilitydashboard": "Facility Dashboard",
   "facilitydashboardLeftPannel": "facility Dashboard Left Panel",
-  "surveylance": "Surveylance"
+  "heiIncomplete": "HEI Incomplete",
+  "HEIWithoutDNAPCR": "HEI (6-8 WEEKS) without DNA PCR Results",
+  "HEIWithoutFinalDocumentedOutcome": "HEI (24 months) without final documented outcomes",
+  "hivPositiveClientsnotLinkedToArt": "HIV Positive Clients not linked to ART",
+  "hivUnlinked": "HIV Unlinked",
+  "pregnantPostPartumWomenNotLinkedToPREP": "Pregnant / postpartum women at high risk not linked to PREP",
+  "prepUnlinked": "PREP Unlinked",
+  "surveillance": "Surveillance",
+  "virallyUnSupressedWithoutAdherancecancelingFor2Weeks": "Virally Unsupressed clients without enhanced addherance counceling (EAC) within 2 weeks",
+  "vlDelayed": "VL Delayed"
 }
