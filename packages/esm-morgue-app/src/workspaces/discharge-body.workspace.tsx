@@ -14,6 +14,7 @@ import {
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  navigate,
   ResponsiveWrapper,
   restBaseUrl,
   setCurrentVisit,
@@ -138,6 +139,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
         );
         mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/visit`));
         closeWorkspace();
+        navigate({ to: window.getOpenmrsSpaBase() + `home/morgue` });
       } catch (error) {
         const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
         showSnackbar({
