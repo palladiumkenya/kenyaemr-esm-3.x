@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "kenyaemrCharts": "^1.6.7"
+  },
+  "extensions": [
+    {
+      "component": "facilityDashboardLeftPanelLink",
+      "name": "facility-dashboard-left-panel-link",
+      "slot": "facility-dashboard-left-panel-slot"
+    }
+  ],
+  "workspaces": [],
+  "modals": [],
+  "pages": [
+    {
+      "component": "root",
+      "route": "facility-dashboard"
+    }
+  ]
+}
