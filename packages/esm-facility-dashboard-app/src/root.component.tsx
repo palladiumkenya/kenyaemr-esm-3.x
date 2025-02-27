@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LeftPanel from './components/side-menu/left-pannel.component';
 import styles from './root.scss';
+import SurveylanceDashboard from './surveylance/surveylance-dashboard.component';
 
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
@@ -21,7 +22,7 @@ const Root: React.FC = () => {
       <LeftPanel />
       <main className={styles.container}>
         <Routes>
-          <Route path="/" element={<div>landing...</div>} />
+          <Route path="/" element={<SurveylanceDashboard />} />
         </Routes>
       </main>
     </BrowserRouter>
