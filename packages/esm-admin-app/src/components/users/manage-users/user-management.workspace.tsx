@@ -50,7 +50,13 @@ import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { Provider, User, UserRoleScope } from '../../../config-schema';
-import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatNewDate, today } from '../../../constants';
+import {
+  DATE_PICKER_CONTROL_FORMAT,
+  DATE_PICKER_FORMAT,
+  formatNewDate,
+  ROLE_CATEGORIES,
+  today,
+} from '../../../constants';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -346,19 +352,25 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   );
   const selectedRoles = userFormMethods.watch('roles') || [];
 
+  function extractInventoryRoleNames(rolesConfig) {
+    return rolesConfig.find((category) => category.category === ROLE_CATEGORIES.CORE_INVENTORY)?.roles || [];
+  }
+
+  const inventoryRoleNames = useMemo(() => extractInventoryRoleNames(rolesConfig), [rolesConfig]);
+
   const inventoryRoles = useMemo(
-    () =>
-      rolesConfig
-        .filter((category) => category.category === 'Core Inventory Roles')
-        .flatMap((category) => category.roles || [])
-        .filter((roleName) => selectedRoles.some((role) => role.display === roleName))
-        .map((roleName) => selectedRoles.find((role) => role.display === roleName))
-        .filter(Boolean),
-    [rolesConfig, selectedRoles],
+    () => selectedRoles.filter((role) => inventoryRoleNames.includes(role.display)),
+    [selectedRoles, inventoryRoleNames],
   );
 
   const scopeRoles = useMemo(
-    () => items?.results?.filter((role) => role.userUuid === initialUserValue.uuid).map((role) => role.role) || [],
+    () =>
+      items?.results?.reduce((acc, role) => {
+        if (role.userUuid === initialUserValue.uuid) {
+          acc.push(role.role);
+        }
+        return acc;
+      }, []) || [],
     [items, initialUserValue.uuid],
   );
 
@@ -369,9 +381,55 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   );
 
   const hasInventoryRole = useMemo(
-    () => selectedRoles.some((role) => filteredInventoryRoles.includes(role)),
+    () => filteredInventoryRoles.length > 0 && selectedRoles.some((role) => filteredInventoryRoles.includes(role)),
     [selectedRoles, filteredInventoryRoles],
   );
+
+  function filterRolesConfig(rolesConfig) {
+    return rolesConfig.filter((category) => category.category !== ROLE_CATEGORIES.CORE_INVENTORY);
+  }
+
+  const hasAdditionalRoles = activeSection === 'additionalRoles';
+  const hasLoginInfo = activeSection === 'login';
+  const hasRoles = activeSection === 'roles';
+  const hasDemographicInfo = activeSection === 'demographic';
+  const hasProviderAccount = activeSection === 'provider';
+
+  const isSaveAndClose = () =>
+    hasAdditionalRoles || (!hasInventoryRole && !(hasDemographicInfo || hasLoginInfo || hasProviderAccount));
+
+  const getSubmitButtonText = () =>
+    t(isSaveAndClose() ? 'saveAndClose' : 'next', isSaveAndClose() ? 'Save & close' : 'Next');
+
+  const getSubmitButtonType = () => (isSaveAndClose() ? 'submit' : '');
+
+  const getSubmitButtonIcon = () => (isSaveAndClose() ? '' : ChevronRight);
+
+  const handleBackClick = () => {
+    if (hasDemographicInfo || hasAdditionalRoles) {
+      closeWorkspace();
+    } else {
+      toggleSection(steps[currentIndex - 1].id);
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleNextClick = (e) => {
+    if (!isSaveAndClose()) {
+      e.preventDefault();
+      toggleSection(steps[currentIndex + 1].id);
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const handlePermissionDurationChange = (e, field, setValue) => {
+    const isChecked = e.target.checked;
+    field.onChange(isChecked);
+
+    if (isChecked) {
+      setValue('dateRange', { activeFrom: undefined, activeTo: undefined });
+    }
+  };
 
   return (
     <div className={styles.leftContainer}>
@@ -395,7 +453,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
               <form onSubmit={userFormMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
                 <div className={styles.formContainer}>
                   <Stack className={styles.formStackControl} gap={7}>
-                    {activeSection === 'demographic' && (
+                    {hasDemographicInfo && (
                       <ResponsiveWrapper>
                         <CardHeader title="Demographic Info">
                           <ChevronSortUp />
@@ -517,7 +575,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
-                    {activeSection === 'provider' && (
+                    {hasProviderAccount && (
                       <ResponsiveWrapper>
                         <CardHeader title="Provider Details">
                           <ChevronSortUp />
@@ -746,7 +804,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         )}
                       </ResponsiveWrapper>
                     )}
-                    {activeSection === 'login' && (
+                    {hasLoginInfo && (
                       <ResponsiveWrapper>
                         <CardHeader title="Login Info">
                           <ChevronSortUp />
@@ -844,86 +902,84 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                       </ResponsiveWrapper>
                     )}
 
-                    {activeSection === 'roles' && (
+                    {hasRoles && (
                       <ResponsiveWrapper>
                         <CardHeader title="Roles Info">
                           <ChevronSortUp />
                         </CardHeader>
                         <ResponsiveWrapper>
-                          {rolesConfig
-                            .filter((category) => category.category !== 'Core Inventory Roles')
-                            .map((category) => (
-                              <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                                <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
-                                  {isLoading ? (
-                                    <InlineLoading
-                                      status="active"
-                                      iconDescription="Loading"
-                                      description="Loading data..."
-                                    />
-                                  ) : (
-                                    <Controller
-                                      name="roles"
-                                      control={userFormMethods.control}
-                                      render={({ field }) => {
-                                        const selectedRoles = field.value || [];
+                          {filterRolesConfig(rolesConfig).map((category) => (
+                            <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+                              <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
+                                {isLoading ? (
+                                  <InlineLoading
+                                    status="active"
+                                    iconDescription="Loading"
+                                    description="Loading data..."
+                                  />
+                                ) : (
+                                  <Controller
+                                    name="roles"
+                                    control={userFormMethods.control}
+                                    render={({ field }) => {
+                                      const selectedRoles = field.value || [];
 
-                                        return (
-                                          <>
-                                            {roles
-                                              .filter((role) => category.roles.includes(role.name))
-                                              .map((role) => {
-                                                const isSelected = selectedRoles.some(
-                                                  (r) =>
-                                                    r.display === role.display &&
-                                                    r.description === role.description &&
-                                                    r.uuid === role.uuid,
-                                                );
+                                      return (
+                                        <>
+                                          {roles
+                                            .filter((role) => category.roles.includes(role.name))
+                                            .map((role) => {
+                                              const isSelected = selectedRoles.some(
+                                                (r) =>
+                                                  r.display === role.display &&
+                                                  r.description === role.description &&
+                                                  r.uuid === role.uuid,
+                                              );
 
-                                                return (
-                                                  <label
-                                                    key={role.display}
-                                                    className={
-                                                      isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
-                                                    }>
-                                                    <input
-                                                      type="checkbox"
-                                                      id={role.display}
-                                                      checked={isSelected}
-                                                      onChange={(e) => {
-                                                        const updatedValue = e.target.checked
-                                                          ? [
-                                                              ...selectedRoles,
-                                                              {
-                                                                uuid: role.uuid,
-                                                                display: role.display,
-                                                                description: role.description ?? null,
-                                                              },
-                                                            ]
-                                                          : selectedRoles.filter(
-                                                              (selectedRole) => selectedRole.display !== role.display,
-                                                            );
+                                              return (
+                                                <label
+                                                  key={role.display}
+                                                  className={
+                                                    isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
+                                                  }>
+                                                  <input
+                                                    type="checkbox"
+                                                    id={role.display}
+                                                    checked={isSelected}
+                                                    onChange={(e) => {
+                                                      const updatedValue = e.target.checked
+                                                        ? [
+                                                            ...selectedRoles,
+                                                            {
+                                                              uuid: role.uuid,
+                                                              display: role.display,
+                                                              description: role.description ?? null,
+                                                            },
+                                                          ]
+                                                        : selectedRoles.filter(
+                                                            (selectedRole) => selectedRole.display !== role.display,
+                                                          );
 
-                                                        field.onChange(updatedValue);
-                                                      }}
-                                                    />
-                                                    {role.display}
-                                                  </label>
-                                                );
-                                              })}
-                                          </>
-                                        );
-                                      }}
-                                    />
-                                  )}
-                                </CheckboxGroup>
-                              </Column>
-                            ))}
+                                                      field.onChange(updatedValue);
+                                                    }}
+                                                  />
+                                                  {role.display}
+                                                </label>
+                                              );
+                                            })}
+                                        </>
+                                      );
+                                    }}
+                                  />
+                                )}
+                              </CheckboxGroup>
+                            </Column>
+                          ))}
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
                     {/* Additional roles */}
-                    {activeSection === 'additionalRoles' && (
+                    {hasAdditionalRoles && (
                       <ResponsiveWrapper>
                         <CardHeader title={t('additionalRoles', 'Additional Roles')}>
                           <ChevronSortUp />
@@ -940,7 +996,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     id="stockRole"
                                     items={filteredInventoryRoles}
                                     itemToString={(item) => item?.display?.trim() || ''}
-                                    titleText={t('userRoleScope', 'Role')}
+                                    titleText={t('stockRole', 'Stock Role')}
                                     selectedItem={
                                       filteredInventoryRoles.find((item) => item?.display === field.value) || null
                                     }
@@ -1095,7 +1151,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             <ResponsiveWrapper>
                               <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
                                 <CheckboxGroup
-                                  legendText={t('inventoryUser', 'Inventory User')}
+                                  legendText={t('stockRoleAccess', 'Stock Role Access')}
                                   className={styles.checkboxGroupGrid}>
                                   <Controller
                                     name="enabled"
@@ -1127,15 +1183,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                               id="permanent"
                                               name="permanent"
                                               checked={field.value || false}
-                                              onChange={(e) => {
-                                                field.onChange(e.target.checked);
-                                                if (e.target.checked) {
-                                                  userFormMethods.setValue('dateRange', {
-                                                    activeFrom: undefined,
-                                                    activeTo: undefined,
-                                                  });
-                                                }
-                                              }}
+                                              onChange={(e) =>
+                                                handlePermissionDurationChange(e, field, userFormMethods.setValue)
+                                              }
                                             />
                                             {t('permanent', 'Permanent?')}
                                           </label>
@@ -1201,69 +1251,30 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                   </Stack>
                 </div>
                 <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-                  <Button
-                    kind="secondary"
-                    onClick={
-                      activeSection === 'demographic' || activeSection === 'additionalRoles'
-                        ? closeWorkspace
-                        : () => {
-                            toggleSection(steps[currentIndex - 1].id);
-                            setCurrentIndex(currentIndex - 1);
-                          }
-                    }
-                    className={styles.btn}>
+                  <Button kind="secondary" onClick={handleBackClick} className={styles.btn}>
                     {t(
-                      activeSection === 'demographic' || activeSection === 'additionalRoles' ? 'cancel' : 'back',
-                      activeSection === 'demographic' || activeSection === 'additionalRoles' ? 'Cancel' : 'Back',
+                      hasDemographicInfo || hasAdditionalRoles ? 'cancel' : 'back',
+                      hasDemographicInfo || hasAdditionalRoles ? 'Cancel' : 'Back',
                     )}
                   </Button>
 
                   <Button
                     kind="primary"
-                    type={
-                      activeSection === 'additionalRoles' ||
-                      (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
-                        ? 'submit'
-                        : ''
-                    }
+                    type={getSubmitButtonType()}
                     disabled={isSubmitting || Object.keys(errors).length > 0}
-                    renderIcon={
-                      activeSection === 'additionalRoles' ||
-                      (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
-                        ? ''
-                        : ChevronRight
-                    }
+                    renderIcon={getSubmitButtonIcon()}
                     className={styles.btn}
-                    onClick={(e) => {
-                      if (
-                        !(
-                          activeSection === 'additionalRoles' ||
-                          (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
-                        )
-                      ) {
-                        e.preventDefault();
-                        toggleSection(steps[currentIndex + 1].id);
-                        setCurrentIndex(currentIndex + 1);
-                      }
-                    }}>
+                    onClick={handleNextClick}>
                     {isSubmitting ? (
                       <span style={{ display: 'flex', alignItems: 'center' }}>
                         {t('submitting', 'Submitting...')} <InlineLoading status="active" />
                       </span>
                     ) : (
-                      t(
-                        activeSection === 'additionalRoles' ||
-                          (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
-                          ? 'saveAndClose'
-                          : 'next',
-                        activeSection === 'additionalRoles' ||
-                          (!hasInventoryRole && !['demographic', 'login', 'provider'].includes(activeSection))
-                          ? 'Save & close'
-                          : 'Next',
-                      )
+                      getSubmitButtonText()
                     )}
                   </Button>
                 </ButtonSet>
+                ;
               </form>
             </FormProvider>
           </div>
