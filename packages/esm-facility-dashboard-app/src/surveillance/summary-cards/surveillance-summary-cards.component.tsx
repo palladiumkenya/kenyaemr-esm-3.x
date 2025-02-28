@@ -1,10 +1,28 @@
+import { Layer, SkeletonPlaceholder } from '@carbon/react';
+import { ErrorState } from '@openmrs/esm-framework/src';
 import React from 'react';
-import { Layer } from '@carbon/react';
-import styles from './summary-card.scss';
-import SummaryCard from './summary-card.component';
 import { useTranslation } from 'react-i18next';
+import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
+import SummaryCard from './summary-card.component';
+import styles from './summary-card.scss';
 const SurveillanceSummaryCards = () => {
   const { t } = useTranslation();
+  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance();
+
+  if (isLoading) {
+    return (
+      <Layer className={styles.cardcontainer}>
+        {Array.from({ length: 6 }).map((_, index) => (
+          <SkeletonPlaceholder className={styles.summaryCard} key={index} />
+        ))}
+      </Layer>
+    );
+  }
+
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('surveillanceSummary', 'Surveillance Summary')} />;
+  }
+
   return (
     <Layer className={styles.cardcontainer}>
       <SummaryCard
