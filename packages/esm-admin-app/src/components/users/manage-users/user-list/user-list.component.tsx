@@ -14,12 +14,14 @@ import {
   DataTableSkeleton,
   Button,
   Pagination,
-  ButtonSet,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
 import { Edit, UserFollow } from '@carbon/react/icons';
 import styles from './user-list.scss';
 import { launchWorkspace, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
+import StockUserRoleListActionsMenu from '../manage-user-role-scope/user-role-scope-list/user-role-scope-list-action-menu.component';
 
 const UserList: React.FC = () => {
   const { t } = useTranslation();
@@ -118,26 +120,24 @@ const UserList: React.FC = () => {
       familyName: familyName,
       roles: rolesDisplay,
       actions: (
-        <ButtonSet className={styles.btnSet}>
-          <Button
+        <OverflowMenu className={styles.btnSet}>
+          <OverflowMenuItem
             className={styles.btn}
-            renderIcon={Edit}
-            hasIconOnly
-            kind="ghost"
-            iconDescription={t('edit', 'Edit')}
             onClick={() => {
               const selectedUser = users.find((u) => u.uuid === user.uuid);
               if (selectedUser) {
                 launchWorkspace('manage-user-workspace', {
                   workspaceTitle: t('editUser', 'Edit User'),
-                  initialUserValue: selectedUser,
+                  initialUserValue: user,
                 });
               } else {
                 console.error('User not found:', user.uuid);
               }
             }}
+            itemText={t('editUser', 'Edit user')}
           />
-        </ButtonSet>
+          <StockUserRoleListActionsMenu />
+        </OverflowMenu>
       ),
     };
   });
