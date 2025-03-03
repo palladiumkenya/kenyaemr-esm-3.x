@@ -132,7 +132,7 @@ const UserList: React.FC = () => {
       familyName: familyName,
       roles: rolesDisplay,
       actions: (
-        <OverflowMenu className={styles.btnSet}>
+        <OverflowMenu className={styles.btnSet} flipped={true} aria-label="user-management-menu">
           <OverflowMenuItem
             className={styles.btn}
             onClick={() => {
