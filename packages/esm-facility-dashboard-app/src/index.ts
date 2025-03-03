@@ -21,3 +21,8 @@ export const surveillanceDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'Surveillance', name: '' }),
   options,
 );
+
+export const aboveSiteDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({ title: 'Above site Dashboard', name: 'above-site' }),
+  options,
+);

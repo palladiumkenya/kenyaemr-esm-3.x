@@ -13,7 +13,7 @@ const SurveillanceFilters = () => {
         id="filters"
         itemToString={(item) => item?.label ?? ''}
         items={[{ label: 'Last day view' }, { label: 'Last 1 week view' }]}
-        label={t('toggleView', 'Toggle View')}
+        label={t('reportingPeriod', 'Reporting Period')}
       />
     </div>
   );

@@ -1,8 +1,13 @@
 export type SurveillanceSummary = {
-  getHivPositiveNotLinked: 52;
-  getPregnantPostpartumNotInPrep: 36;
-  getEligibleForVlSampleNotTaken: 36;
-  getVirallySuppressedWithoutEAC: 13;
-  getHeiSixToEightWeeksWithoutPCRResults: 3;
-  getHei24MonthsWithoutDocumentedOutcome: 52;
+  getHivPositiveNotLinked: number;
+  getHivTestedPositive: number;
+  getPregnantPostpartumNotInPrep: number;
+  getEligibleForVlSampleNotTaken: number;
+  getVirallySuppressedWithoutEAC: number;
+  getHeiSixToEightWeeksWithoutPCRResults: number;
+  getHei24MonthsWithoutDocumentedOutcome: number;
+  fivePercentThreshhold: number;
+  onePercentThreshhold: number;
 };
+
+export type IndicationMode = 'decreasing' | 'increasing';

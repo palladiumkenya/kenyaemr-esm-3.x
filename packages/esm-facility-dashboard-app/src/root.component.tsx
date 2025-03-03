@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import LeftPanel from './components/side-menu/left-pannel.component';
 import styles from './root.scss';
 import SurveillanceDashboard from './surveillance/surveillance-dashboard.component';
+import AboveSiteDashboard from './above-site/above-site-dashboard.component';
 
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
@@ -23,6 +24,7 @@ const Root: React.FC = () => {
       <main className={styles.container}>
         <Routes>
           <Route path="/" element={<SurveillanceDashboard />} />
+          <Route path="/above-site" element={<AboveSiteDashboard />} />
         </Routes>
       </main>
     </BrowserRouter>

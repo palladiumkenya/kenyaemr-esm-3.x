@@ -2,12 +2,13 @@ import { Tile } from '@carbon/react';
 import { ArrowUp, ArrowDown } from '@carbon/react/icons';
 import React from 'react';
 import styles from './summary-card.scss';
+import { type IndicationMode } from '../../types';
 
 type Props = {
   title: string;
   value?: string;
   header?: string;
-  mode?: 'increasing' | 'decreasing';
+  mode?: IndicationMode;
 };
 
 const SummaryCard: React.FC<Props> = ({ title, value, header, mode }) => {

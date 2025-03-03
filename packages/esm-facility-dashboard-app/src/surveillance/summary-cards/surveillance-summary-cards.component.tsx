@@ -1,5 +1,5 @@
 import { Layer, SkeletonPlaceholder } from '@carbon/react';
-import { ErrorState } from '@openmrs/esm-framework/src';
+import { ErrorState } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
@@ -7,7 +7,7 @@ import SummaryCard from './summary-card.component';
 import styles from './summary-card.scss';
 const SurveillanceSummaryCards = () => {
   const { t } = useTranslation();
-  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance();
+  const { error, isLoading, surveillanceSummary, getIndication } = useFacilityDashboardSurveillance();
 
   if (isLoading) {
     return (
@@ -26,46 +26,50 @@ const SurveillanceSummaryCards = () => {
   return (
     <Layer className={styles.cardcontainer}>
       <SummaryCard
-        header={t('hivUnlinked', 'HIV Unlinked')}
+        header={t('hivNotlinked', 'HIV Not linked')}
         title={t('hivPositiveClientsnotLinkedToArt', 'HIV Positive Clients not linked to ART')}
-        value="100"
-        mode="decreasing"
+        value={`${surveillanceSummary?.getHivPositiveNotLinked}`}
+        mode={getIndication(
+          surveillanceSummary?.getHivPositiveNotLinked,
+          surveillanceSummary?.getHivTestedPositive,
+          surveillanceSummary?.fivePercentThreshhold,
+        )}
       />
       <SummaryCard
-        header={t('prepUnlinked', 'PREP Unlinked')}
+        header={t('prepNotlinked', 'PREP Not linked')}
         title={t(
           'pregnantPostPartumWomenNotLinkedToPREP',
           'Pregnant / postpartum women at high risk not linked to PREP',
         )}
-        value="300"
-        mode="increasing"
+        value={`${surveillanceSummary?.getPregnantPostpartumNotInPrep}`}
+        mode={'decreasing'}
       />
       <SummaryCard
         header={t('eacPending', 'EAC Pending')}
         title={t(
-          'virallyUnSupressedWithoutAdherancecancelingFor2Weeks',
-          'Virally Unsupressed clients without enhanced addherance counceling (EAC) within 2 weeks',
+          'virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks',
+          'Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks',
         )}
-        value="1200"
-        mode="increasing"
+        value={`${surveillanceSummary?.getVirallySuppressedWithoutEAC}`}
+        mode="decreasing"
       />
       <SummaryCard
         header={t('vlDelayed', 'VL Delayed')}
         title={t('delayedVLTesting', 'Delayed Viral Load (VL) testing')}
-        value="1800"
+        value={`${surveillanceSummary?.getEligibleForVlSampleNotTaken}`}
         mode="decreasing"
       />
       <SummaryCard
         header={t('dnapcrPending', 'DNA-PCR Pending')}
         title={t('HEIWithoutDNAPCR', 'HEI (6-8 WEEKS) without DNA PCR Results')}
-        value="72"
+        value={`${surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults}`}
         mode="decreasing"
       />
       <SummaryCard
         header={t('heiIncomplete', 'HEI Incomplete')}
         title={t('HEIWithoutFinalDocumentedOutcome', 'HEI (24 months) without final documented outcomes')}
-        value="36000"
-        mode="decreasing"
+        value={`${surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome}`}
+        mode="increasing"
       />
     </Layer>
   );
