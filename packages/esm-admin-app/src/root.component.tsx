@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
+import { setLeftNav, unsetLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import styles from './root.scss';
 import LeftPanel from './components/side-menu/left-pannel.component';
 import UserManagentLandingPage from './components/users/manage-users/manage-user.component';
 import EtlAdminDashboard from './components/dashboard/etl-dashboard.component';
 import FacilitySetup from './components/facility-setup/facility-setup.component';
+import Overlay from './components/overlay/overlay.component';
 
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
@@ -21,6 +22,7 @@ const Root: React.FC = () => {
 
   return (
     <BrowserRouter basename={adminBasename}>
+      <Overlay />
       <LeftPanel />
       <main className={styles.container}>
         <Routes>
