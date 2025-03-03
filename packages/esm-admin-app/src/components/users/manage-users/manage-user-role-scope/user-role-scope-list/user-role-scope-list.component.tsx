@@ -21,7 +21,7 @@ import {
 import { ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
 import styles from '../../manage-user.scss';
 import { isDesktop, restBaseUrl, showModal, showSnackbar } from '@openmrs/esm-framework';
-import { useUserRoleScopes } from '../../../../../user-management.resources';
+import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../../../../user-management.resources';
 import { UserRoleScope } from '../../../../../config-schema';
 
 interface StockUserRoleScopesListProps {
@@ -48,40 +48,40 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
     [t],
   );
 
-  //   const showDeleteUserRoleScopeModal = (uuid: string) => {
-  //     const close = showModal('delete-stock-user-scope-modal', {
-  //       close: () => close(),
-  //       uuid: uuid,
-  //       onConfirmation: () => {
-  //         const ids = [];
-  //         ids.push(uuid);
-  //         deleteUserRoleScopes(ids)
-  //           .then(
-  //             () => {
-  //               handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
-  //               setDeletingUserScope(false);
-  //               showSnackbar({
-  //                 isLowContrast: true,
-  //                 title: t('deletingstockUserScope', 'Delete Stock User Scope'),
-  //                 kind: 'success',
-  //                 subtitle: t('stockUserScopeDeletedSuccessfully', 'Stock User Scope Deleted Successfully'),
-  //               });
-  //             },
-  //             (error) => {
-  //               setDeletingUserScope(false);
-  //               showSnackbar({
-  //                 title: t('errorDeletingUserScope', 'Error deleting a user scope'),
-  //                 kind: 'error',
-  //                 isLowContrast: true,
-  //                 subtitle: error?.message,
-  //               });
-  //             },
-  //           )
-  //           .catch();
-  //         close();
-  //       },
-  //     });
-  //   };
+  const showDeleteUserRoleScopeModal = (uuid: string) => {
+    const close = showModal('delete-stock-user-scope-modal', {
+      close: () => close(),
+      uuid: uuid,
+      onConfirmation: () => {
+        const ids = [];
+        ids.push(uuid);
+        deleteUserRoleScopes(ids)
+          .then(
+            () => {
+              handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
+              setDeletingUserScope(false);
+              showSnackbar({
+                isLowContrast: true,
+                title: t('deletingstockUserScope', 'Delete Stock User Scope'),
+                kind: 'success',
+                subtitle: t('stockUserScopeDeletedSuccessfully', 'Stock User Scope Deleted Successfully'),
+              });
+            },
+            (error) => {
+              setDeletingUserScope(false);
+              showSnackbar({
+                title: t('errorDeletingUserScope', 'Error deleting a user scope'),
+                kind: 'error',
+                isLowContrast: true,
+                subtitle: error?.message,
+              });
+            },
+          )
+          .catch();
+        close();
+      },
+    });
+  };
 
   const tableRows = useMemo(() => {
     return (
@@ -122,7 +122,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
                 hasDivider
                 isDelete
                 onClick={() => {
-                  //   showDeleteUserRoleScopeModal(userRoleScope.uuid);
+                  showDeleteUserRoleScopeModal(userRoleScope.uuid);
                 }}
                 itemText={t('delete', 'Delete')}
               />
