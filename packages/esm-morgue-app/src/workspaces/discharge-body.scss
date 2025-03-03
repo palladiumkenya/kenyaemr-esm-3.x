@@ -20,8 +20,8 @@
 }
 
 .buttonSet {
-  position: absolute;
-  bottom: layout.$spacing-05;
+  position: relative;
+  padding-top: layout.$spacing-05;
   left: 4%;
   width: 80%;
   display: flex;

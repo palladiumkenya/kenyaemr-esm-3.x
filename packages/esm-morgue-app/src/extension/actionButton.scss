@@ -1,0 +1,69 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.actionButton {
+  display: flex;
+  gap: layout.$spacing-03;
+}
+
+.metrics {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  gap: layout.$spacing-06;
+  flex-wrap: wrap;
+  padding: layout.$spacing-04 layout.$spacing-05 0 0;
+  width: auto;
+  height: auto;
+}
+
+.wrapMetrics {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+  padding: 0;
+  min-width: layout.$spacing-12;
+}
+
+.metricLabel {
+  flex-grow: 0;
+  font-size: layout.$spacing-04;
+  line-height: 1.33;
+  letter-spacing: 0.32px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metricValue {
+  flex-grow: 0;
+  font-size: type.type-scale(2);
+  color: colors.$gray-60;
+  line-height: 1.4;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metricLocationDate {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: layout.$spacing-05;
+  width: auto;
+  max-width: 120px;
+}
+
+.metricList {
+  display: flex;
+  flex-flow: row wrap;
+  padding-bottom: layout.$spacing-03;
+  margin: 0 layout.$spacing-05;
+}

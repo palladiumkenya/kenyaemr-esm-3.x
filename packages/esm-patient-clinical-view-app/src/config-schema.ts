@@ -44,7 +44,7 @@ export const configSchema = {
       htsReferral: '9284828e-ce55-11e9-a32f-2a2ae2dbcce4',
       clinicalEncounterFormUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
-      autopsyFormUuid: '523c711f-f3ef-4723-b4dc-89efa572153f',
+      autopsyFormUuid: '2b61a73-4971-4fc0-b20b-9a30176317e2',
     },
   },
   defaulterTracingEncounterUuid: {
@@ -55,7 +55,7 @@ export const configSchema = {
   autopsyEncounterFormUuid: {
     _type: Type.String,
     _description: 'Encounter UUID for autopsy',
-    _default: '465a92f2-baf8-42e9-9612-53064be868e8',
+    _default: '32b61a73-4971-4fc0-b20b-9a30176317e2',
   },
   clinicalEncounterUuid: {
     _type: Type.String,

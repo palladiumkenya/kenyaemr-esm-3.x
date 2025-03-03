@@ -16,14 +16,19 @@
       }
     },
     {
-      "component": "peerCalendarDashboardLink",
-      "name": "peer-calendar-dashboard-link",
-      "slot": "homepage-dashboard-slot",
+      "name": "action-buttons",
+      "component": "actionBarButtons",
+      "slot": "mortuary-action-buttons-slot",
       "meta": {
-        "name": "peer-calendar",
-        "title": "Peer Calendar",
-        "slot": "peer-calendar-dashboard-slot",
-        "path": "peer-management"
+        "fullWidth": false
+      }
+    },
+    {
+      "name": "deceased-banner-info",
+      "component": "bannerInfo",
+      "slot": "deceased-banner-info-slot",
+      "meta": {
+        "fullWidth": false
       }
     },
     {
@@ -43,6 +48,18 @@
       "name": "discharge-body-form",
       "component": "dischargeBodyForm",
       "title": "discharge body form",
+      "type": "other-form"
+    },
+    {
+      "name": "admit-body-form",
+      "component": "admitBodyForm",
+      "title": "Admission form",
+      "type": "other-form"
+    },
+    {
+      "name": "swap-unit-form",
+      "component": "swapForm",
+      "title": "Swap form",
       "type": "other-form"
     }
   ],

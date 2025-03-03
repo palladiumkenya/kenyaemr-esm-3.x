@@ -1,0 +1,61 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.cardView {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: layout.$spacing-04;
+  background-color: colors.$gray-20;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    padding: layout.$spacing-03;
+    gap: layout.$spacing-02;
+  }
+}
+
+.cardRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: layout.$spacing-03;
+
+  &.centeredContent {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+.cardLabelWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: layout.$spacing-10;
+}
+
+.cardLabel {
+  font-size: layout.$spacing-05;
+  line-height: 1.29;
+  color: colors.$blue-60;
+  width: layout.$spacing-13;
+}
+
+.deceasedName,
+.noCompartment {
+  font-size: type.type-scale(2);
+  font-weight: 600;
+  color: colors.$black;
+  width: 100%;
+  margin-right: layout.$spacing-09;
+}
+
+.assignButton {
+  width: 100%;
+  margin-top: layout.$spacing-05;
+}
