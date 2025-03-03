@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   DataTableSkeleton,
@@ -11,16 +11,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
-  Pagination,
+  Button,
   OverflowMenu,
   OverflowMenuItem,
 } from '@carbon/react';
-import { ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
+import { AddAlt, ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
 import styles from '../../manage-user.scss';
-import { isDesktop, restBaseUrl, showModal, showSnackbar } from '@openmrs/esm-framework';
+import { isDesktop, restBaseUrl, showModal, showSnackbar, WorkspaceContainer } from '@openmrs/esm-framework';
 import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../../../../user-management.resources';
 import { UserRoleScope } from '../../../../../config-schema';
 
@@ -35,6 +32,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
   // Fetch user role scopes
   const { items: userRoleScopes, loadingRoleScope } = useUserRoleScopes();
   const [deletingUserScope, setDeletingUserScope] = useState(false);
+  const size = 'mid';
 
   const tableHeaders = useMemo(
     () => [
@@ -133,60 +131,60 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
   }, [userRoleScopes, t, userUuid, onEditUserRoleScope]);
 
   return (
-    <TableContainer title={t('userRoleScopes', 'User Role Scopes')}>
-      <TableToolbar>
-        <TableToolbarContent>
-          <TableToolbarSearch onChange={(e) => {}} />
-        </TableToolbarContent>
-      </TableToolbar>
-
-      {loadingRoleScope ? (
-        <DataTableSkeleton rowCount={5} headers={tableHeaders} />
-      ) : (
-        <DataTable rows={tableRows} headers={tableHeaders}>
-          {({ rows, headers, getHeaderProps }) => (
-            <Table>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })} key={header.key}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.length > 0 ? (
-                  rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+    <>
+      <div>
+        <CardHeader title="User Role Scope">
+          <Button
+            onClick={() => {}}
+            className={styles.userManagementModeButton}
+            renderIcon={AddAlt}
+            size={size}
+            kind="primary">
+            {t('addUserRoleScope', 'Add User Role Scope')}
+          </Button>
+        </CardHeader>
+        <div className={styles.dataTable}>
+          <DataTable useZebraStyle size={size} rows={tableRows} headers={tableHeaders}>
+            {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()} aria-label="user role scope table">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                          {header.header}
+                        </TableHeader>
                       ))}
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={headers.length} className={styles.emptyTable}>
-                      <EmptyState
-                        displayText={t('noUserRoleScope', 'No user role scope')}
-                        headerTitle={t('userRoleScope', 'User Role Scope')}
-                      />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          )}
-        </DataTable>
-      )}
-
-      <Pagination
-        totalItems={tableRows.length}
-        pageSize={5}
-        pageSizes={[5, 10, 20]}
-        onChange={({ page, pageSize }) => {}}
-      />
-    </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {rows.length > 0 ? (
+                      rows.map((row) => (
+                        <TableRow key={row.id} {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={headers.length} className={styles.emptyTable}>
+                          <EmptyState
+                            displayText={t('noUserRoleScope', 'No user role scope')}
+                            headerTitle={t('userRoleScope', 'User Role Scope')}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+        </div>
+      </div>
+      <WorkspaceContainer overlay contextKey="admin" />
+    </>
   );
 };
 

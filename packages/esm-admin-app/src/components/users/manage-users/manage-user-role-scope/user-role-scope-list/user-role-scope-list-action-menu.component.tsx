@@ -21,7 +21,7 @@ const StockUserRoleListActionsMenu: React.FC<StockUserRoleListActionsMenuProps> 
       onClick={() => {
         handleClick();
       }}
-      itemText={t('manageRoleScope', 'Manage stock user role scope')}
+      itemText={t('manageUserRoleScope', 'Manage user role scope')}
     />
   );
 };
