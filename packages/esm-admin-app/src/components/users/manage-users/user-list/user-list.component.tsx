@@ -136,7 +136,7 @@ const UserList: React.FC = () => {
             }}
             itemText={t('editUser', 'Edit user')}
           />
-          <StockUserRoleListActionsMenu />
+          <StockUserRoleListActionsMenu userUuid={user.uuid} />
         </OverflowMenu>
       ),
     };
