@@ -1,0 +1,12 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.container {
+  background-color: colors.$white-0;
+  height: calc(100vh - layout.$spacing-09);
+}
+
+:global(.omrs-breakpoint-gt-tablet) .container {
+  margin-left: var(--omrs-sidenav-width);
+}

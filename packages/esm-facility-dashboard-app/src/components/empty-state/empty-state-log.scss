@@ -1,0 +1,28 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.emptyStateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  background-color: colors.$gray-10;
+  row-gap: layout.$spacing-02;
+
+  & form {
+    border: none;
+  }
+  .subTitle {
+    @include type.type-style('body-compact-01');
+    color: colors.$cool-gray-70;
+    margin-top: layout.$spacing-04;
+  }
+}
+
+svg.iconOverrides {
+  width: layout.$spacing-11;
+  height: layout.$spacing-11;
+  fill: var(--brand-03);
+}

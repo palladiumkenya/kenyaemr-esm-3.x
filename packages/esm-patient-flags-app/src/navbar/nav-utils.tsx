@@ -45,7 +45,7 @@ export const useModuleLinks = () => {
     },
     {
       label: 'Facility Dashboard ',
-      url: config.facilityDashboardUrl,
+      url: `${openmrsSpaBase}facility-dashboard`,
       icon: <ChartColumn size={24} />,
       privilege: 'o3: View Facility Dashboard',
     },

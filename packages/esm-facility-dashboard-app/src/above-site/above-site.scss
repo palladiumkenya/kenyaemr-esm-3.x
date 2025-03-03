@@ -1,0 +1,13 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.dashboard {
+  width: 100%;
+  height: 85vh;
+  padding: 0 layout.$spacing-05 0 layout.$spacing-05;
+}
+
+.supersetBtn {
+  margin-left: layout.$spacing-05;
+}
