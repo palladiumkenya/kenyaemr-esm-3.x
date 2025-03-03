@@ -1,5 +1,6 @@
 {
   "aboveSiteDashboard": "Above site facility Dashboard",
+  "aboveSiteFacilityDashboard": "Above site facility Dashboard",
   "delayedVLTesting": "Delayed Viral Load (VL) testing",
   "dnapcrPending": "DNA-PCR Pending",
   "eacPending": "EAC Pending",
@@ -15,6 +16,7 @@
   "reportingPeriod": "Reporting Period",
   "surveillance": "Surveillance",
   "surveillanceSummary": "Surveillance Summary",
+  "viewOnSuperset": "View on Superset",
   "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks",
   "vlDelayed": "VL Delayed"
 }
