@@ -24,6 +24,9 @@ import styles from './user-list.scss';
 import { launchWorkspace, showModal, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
 import StockUserRoleListActionsMenu from '../manage-user-role-scope/user-role-scope-list/user-role-scope-list-action-menu.component';
+import { useSystemUserRoleConfigSetting } from '../../../hook/useSystemRoleSetting';
+import { ROLE_CATEGORIES } from '../../../../constants';
+import { User } from '@carbon/pictograms-react';
 
 const UserList: React.FC = () => {
   const { t } = useTranslation();
@@ -35,6 +38,8 @@ const UserList: React.FC = () => {
   const [syncLoading, setSyncLoading] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { rolesConfig, error } = useSystemUserRoleConfigSetting();
 
   const filteredUserList = useMemo(() => {
     return (
@@ -105,6 +110,12 @@ const UserList: React.FC = () => {
     },
   ];
 
+  function extractInventoryRoleNames(rolesConfig) {
+    return rolesConfig.find((category) => category.category === ROLE_CATEGORIES.CORE_INVENTORY)?.roles || [];
+  }
+
+  const inventoryRoleNames = extractInventoryRoleNames(rolesConfig);
+
   const rows = paginatedUsers.map((user, index) => {
     const rolesDisplay =
       user.roles.length > 2
@@ -113,6 +124,7 @@ const UserList: React.FC = () => {
 
     const [given, ...familyNameParts] = user.person.display.split(' ');
     const familyName = familyNameParts.join(' ');
+    const userHasInventoryRole = user.roles.some((role) => inventoryRoleNames.includes(role.display));
 
     return {
       id: user.uuid,
@@ -138,7 +150,9 @@ const UserList: React.FC = () => {
             }}
             itemText={t('editUser', 'Edit user')}
           />
-          <StockUserRoleListActionsMenu userUuid={user.uuid} />
+          {userHasInventoryRole && StockUserRoleListActionsMenu ? (
+            <StockUserRoleListActionsMenu userUuid={user?.uuid} />
+          ) : null}
         </OverflowMenu>
       ),
     };
