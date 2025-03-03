@@ -2,17 +2,17 @@ import { Calendar, Location } from '@carbon/react/icons';
 import { formatDate, useSession } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import SurveillanceIllustration from './header-illustration.component';
+import FacilityDashboardIllustration from './header-illustration.component';
 import styles from './header.scss';
 
-const SurveillanceHeader: React.FC<{ title: string }> = ({ title }) => {
+const FacilityDashboardHeader: React.FC<{ title: string }> = ({ title }) => {
   const { t } = useTranslation();
   const userSession = useSession();
   const userLocation = userSession?.sessionLocation?.display;
   return (
     <div className={styles.header}>
       <div className={styles.leftJustifiedItems}>
-        <SurveillanceIllustration />
+        <FacilityDashboardIllustration />
         <div className={styles.pageLabels}>
           <p>{t('facilitydashboard', 'Facility Dashboard')}</p>
           <p className={styles.pageName}>{title}</p>
@@ -31,4 +31,4 @@ const SurveillanceHeader: React.FC<{ title: string }> = ({ title }) => {
   );
 };
 
-export default SurveillanceHeader;
+export default FacilityDashboardHeader;

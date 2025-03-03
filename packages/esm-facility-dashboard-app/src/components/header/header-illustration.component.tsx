@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './header.scss';
 import { ChartColumn } from '@carbon/react/icons';
 
-const SurveillanceIllustration: React.FC = () => {
+const FacilityDashboardIllustration: React.FC = () => {
   return (
     <div className={styles.svgContainer}>
       <ChartColumn className={styles.iconOveriders} />
@@ -10,4 +10,4 @@ const SurveillanceIllustration: React.FC = () => {
   );
 };
 
-export default SurveillanceIllustration;
+export default FacilityDashboardIllustration;

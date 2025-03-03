@@ -7,13 +7,13 @@
   "heiIncomplete": "HEI Incomplete",
   "HEIWithoutDNAPCR": "HEI (6-8 WEEKS) without DNA PCR Results",
   "HEIWithoutFinalDocumentedOutcome": "HEI (24 months) without final documented outcomes",
+  "hivNotlinked": "HIV Not linked",
   "hivPositiveClientsnotLinkedToArt": "HIV Positive Clients not linked to ART",
-  "hivUnlinked": "HIV Unlinked",
   "pregnantPostPartumWomenNotLinkedToPREP": "Pregnant / postpartum women at high risk not linked to PREP",
-  "prepUnlinked": "PREP Unlinked",
+  "prepNotlinked": "PREP Not linked",
+  "reportingPeriod": "Reporting Period",
   "surveillance": "Surveillance",
   "surveillanceSummary": "Surveillance Summary",
-  "toggleView": "Toggle View",
-  "virallyUnSupressedWithoutAdherancecancelingFor2Weeks": "Virally Unsupressed clients without enhanced addherance counceling (EAC) within 2 weeks",
+  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks",
   "vlDelayed": "VL Delayed"
 }
