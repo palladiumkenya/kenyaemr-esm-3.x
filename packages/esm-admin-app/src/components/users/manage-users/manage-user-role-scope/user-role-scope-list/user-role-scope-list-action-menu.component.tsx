@@ -1,16 +1,19 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UserRoleScope } from '../../../../../config-schema';
 import { OverflowMenuItem } from '@carbon/react';
 import { launchOverlay } from '../../../../hook/overlay';
-import SimpleOverlayContent from '../../user-list/sample.component';
+import StockUserRoleScopesList from './user-role-scope-list.component';
 
-const StockUserRoleListActionsMenu: React.FC = () => {
+interface StockUserRoleListActionsMenuProps {
+  userUuid?: string;
+}
+
+const StockUserRoleListActionsMenu: React.FC<StockUserRoleListActionsMenuProps> = ({ userUuid }) => {
   const { t } = useTranslation();
 
   const handleClick = useCallback(() => {
-    launchOverlay('Manage Stock User Role Scope', <SimpleOverlayContent />);
-  }, []);
+    launchOverlay('Manage Stock User Role Scope', <StockUserRoleScopesList userUuid={userUuid} />);
+  }, [userUuid]);
 
   return (
     <OverflowMenuItem
