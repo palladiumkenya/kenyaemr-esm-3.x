@@ -9,6 +9,7 @@ import SearchEmptyState from '../autosuggest/search-empty-state.component';
 import styles from './admit-body.scss';
 import PatientSearchInfo from '../autosuggest/patient-search-info.component';
 import { fetchDeceasedPatient } from '../hook/useDeceasedPatients';
+import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 
 const schema = z.object({
   deceasedPatient: z.string().nonempty('Patient selection is required').uuid('Invalid patient selection'),
@@ -18,10 +19,11 @@ type AdmitBodyFormInputs = z.infer<typeof schema>;
 
 const AdmitBodyForm: React.FC = () => {
   const { t } = useTranslation();
+  const { admissionLocation } = useAdmissionLocation();
 
   const searchPatient = async (query: string) => {
     const abortController = new AbortController();
-    return await fetchDeceasedPatient(query, abortController);
+    return await fetchDeceasedPatient(query, abortController, admissionLocation);
   };
 
   const form = useForm<AdmitBodyFormInputs>({
@@ -67,6 +69,7 @@ const AdmitBodyForm: React.FC = () => {
                   onSuggestionSelected(value);
                   field.onChange(value);
                 }}
+                admissionLocation={admissionLocation}
               />
             )}
           />
