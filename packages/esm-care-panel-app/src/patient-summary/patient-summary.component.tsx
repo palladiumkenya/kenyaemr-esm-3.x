@@ -73,7 +73,9 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
             <div className={styles.content}>
               <p className={styles.label}>{t('reportDate', 'Report date')}</p>
               <p>
-                <span className={styles.value}>{data?.reportDate ? formatDate(new Date(data?.reportDate)) : '--'}</span>
+                <span className={styles.value}>
+                  {data?.reportDate ? formatDate(new Date(data?.reportDate), { noToday: true }) : '--'}
+                </span>
               </p>
             </div>
             <div className={styles.content}>
