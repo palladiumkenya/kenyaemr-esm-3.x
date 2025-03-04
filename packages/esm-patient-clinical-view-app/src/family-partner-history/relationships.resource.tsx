@@ -9,10 +9,11 @@ interface RelationshipsResponse {
   results: Array<Relationship>;
 }
 
-interface ExtractedRelationship {
+export interface ExtractedRelationship {
   uuid: string;
   display: string;
   relativeAge: number;
+  relativeGender: string;
   name: string;
   dead: boolean;
   causeOfDeath: string;
@@ -42,6 +43,7 @@ interface Person {
   dead: boolean;
   display: string;
   causeOfDeath: string;
+  gender: string;
 }
 
 type FHIRResourceResponse = {
@@ -125,7 +127,7 @@ export const useMappedRelationshipTypes = () => {
 
 export function usePatientRelationships(patientUuid: string) {
   const customRepresentation =
-    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath),personB:(uuid,age,display,dead,causeOfDeath),relationshipType:(uuid,display,description,aIsToB,bIsToA))';
+    'custom:(display,uuid,personA:(uuid,age,display,dead,causeOfDeath,gender),personB:(uuid,age,display,dead,causeOfDeath,gender),relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
   const relationshipsUrl = patientUuid
     ? `/ws/rest/v1/relationship?person=${patientUuid}&v=${customRepresentation}`
@@ -171,6 +173,7 @@ function extractRelationshipData(
         relationshipTypeDisplay: r.relationshipType.display,
         relationshipTypeUUID: r.relationshipType.uuid,
         patientUuid: r.personB.uuid,
+        relativeGender: r.personB.gender,
       });
     } else {
       relationshipsData.push({
@@ -185,6 +188,7 @@ function extractRelationshipData(
         relationshipTypeDisplay: r.relationshipType.display,
         relationshipTypeUUID: r.relationshipType.uuid,
         patientUuid: r.personA.uuid,
+        relativeGender: r.personA.gender,
       });
     }
   }
