@@ -36,7 +36,6 @@ import {
   createUser,
   handleMutation,
   useRoles,
-  usePersonAttribute,
   useProvider,
   useProviderAttributeType,
   useLocation,
@@ -47,11 +46,17 @@ import {
   useUserRoleScopes,
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
-import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { Provider, User, UserRoleScope } from '../../../config-schema';
-import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, formatNewDate, today } from '../../../constants';
+import {
+  DATE_PICKER_CONTROL_FORMAT,
+  DATE_PICKER_FORMAT,
+  formatNewDate,
+  ROLE_CATEGORIES,
+  today,
+} from '../../../constants';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -142,22 +147,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate,
       primaryFacility: primaryFacility,
-      stockOperation:
-        userRoleScope?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
-          operationTypeName,
-          operationTypeUuid,
-        })) || [],
-      operationLocation:
-        userRoleScope?.locations?.map(({ locationName, locationUuid }) => ({
-          locationName,
-          locationUuid,
-        })) || [],
-      permanent: userRoleScope?.permanent,
-      enabled: userRoleScope?.enabled,
-      dateRange: {
-        activeTo: formatNewDate(userRoleScope?.activeTo),
-        activeFrom: formatNewDate(userRoleScope?.activeFrom),
-      },
     };
   }, [
     isInitialValuesEmpty,
@@ -209,7 +198,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const setProvider = data.providerIdentifiers;
     const editProvider = data.isEditProvider;
     const providerUUID = provider[0]?.uuid || '';
-    const roleName = data.roles?.[0]?.display || '';
+    const roleName = data.stockRole || '';
 
     const hasValidLocations = data.operationLocation?.length > 0;
     const hasEnabledFlag = data.enabled !== undefined && data.enabled !== null;
@@ -277,9 +266,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
         if (userRoleScopePayload !== null && hasValidRoleConditions) {
           try {
-            const userRoleScopeUrl = userRoleScope?.uuid
-              ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
-              : `${restBaseUrl}/stockmanagement/userrolescope`;
+            const userRoleScopeUrl = `${restBaseUrl}/stockmanagement/userrolescope`;
             const userUuid = response.uuid;
 
             const userRoleScopeResponse = await createOrUpdateUserRoleScope(
@@ -363,6 +350,86 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     ],
     [t],
   );
+  const selectedRoles = userFormMethods.watch('roles') || [];
+
+  function extractInventoryRoleNames(rolesConfig) {
+    return rolesConfig.find((category) => category.category === ROLE_CATEGORIES.CORE_INVENTORY)?.roles || [];
+  }
+
+  const inventoryRoleNames = useMemo(() => extractInventoryRoleNames(rolesConfig), [rolesConfig]);
+
+  const inventoryRoles = useMemo(
+    () => selectedRoles.filter((role) => inventoryRoleNames.includes(role.display)),
+    [selectedRoles, inventoryRoleNames],
+  );
+
+  const scopeRoles = useMemo(
+    () =>
+      items?.results?.reduce((acc, role) => {
+        if (role.userUuid === initialUserValue.uuid) {
+          acc.push(role.role);
+        }
+        return acc;
+      }, []) || [],
+    [items, initialUserValue.uuid],
+  );
+
+  const filteredInventoryRoles = useMemo(
+    () =>
+      initialUserValue.uuid ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display)) : inventoryRoles,
+    [initialUserValue.uuid, inventoryRoles, scopeRoles],
+  );
+
+  const hasInventoryRole = useMemo(
+    () => filteredInventoryRoles.length > 0 && selectedRoles.some((role) => filteredInventoryRoles.includes(role)),
+    [selectedRoles, filteredInventoryRoles],
+  );
+
+  function filterRolesConfig(rolesConfig) {
+    return rolesConfig.filter((category) => category.category !== ROLE_CATEGORIES.CORE_INVENTORY);
+  }
+
+  const hasAdditionalRoles = activeSection === 'additionalRoles';
+  const hasLoginInfo = activeSection === 'login';
+  const hasRoles = activeSection === 'roles';
+  const hasDemographicInfo = activeSection === 'demographic';
+  const hasProviderAccount = activeSection === 'provider';
+
+  const isSaveAndClose = () =>
+    hasAdditionalRoles || (!hasInventoryRole && !(hasDemographicInfo || hasLoginInfo || hasProviderAccount));
+
+  const getSubmitButtonText = () =>
+    t(isSaveAndClose() ? 'saveAndClose' : 'next', isSaveAndClose() ? 'Save & close' : 'Next');
+
+  const getSubmitButtonType = () => (isSaveAndClose() ? 'submit' : '');
+
+  const getSubmitButtonIcon = () => (isSaveAndClose() ? '' : ChevronRight);
+
+  const handleBackClick = () => {
+    if (hasDemographicInfo || hasAdditionalRoles) {
+      closeWorkspace();
+    } else {
+      toggleSection(steps[currentIndex - 1].id);
+      setCurrentIndex(currentIndex - 1);
+    }
+  };
+
+  const handleNextClick = (e) => {
+    if (!isSaveAndClose()) {
+      e.preventDefault();
+      toggleSection(steps[currentIndex + 1].id);
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const handlePermissionDurationChange = (e, field, setValue) => {
+    const isChecked = e.target.checked;
+    field.onChange(isChecked);
+
+    if (isChecked) {
+      setValue('dateRange', { activeFrom: undefined, activeTo: undefined });
+    }
+  };
 
   return (
     <div className={styles.leftContainer}>
@@ -386,7 +453,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
               <form onSubmit={userFormMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
                 <div className={styles.formContainer}>
                   <Stack className={styles.formStackControl} gap={7}>
-                    {activeSection === 'demographic' && (
+                    {hasDemographicInfo && (
                       <ResponsiveWrapper>
                         <CardHeader title="Demographic Info">
                           <ChevronSortUp />
@@ -508,7 +575,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
-                    {activeSection === 'provider' && (
+                    {hasProviderAccount && (
                       <ResponsiveWrapper>
                         <CardHeader title="Provider Details">
                           <ChevronSortUp />
@@ -737,7 +804,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         )}
                       </ResponsiveWrapper>
                     )}
-                    {activeSection === 'login' && (
+                    {hasLoginInfo && (
                       <ResponsiveWrapper>
                         <CardHeader title="Login Info">
                           <ChevronSortUp />
@@ -835,99 +902,124 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                       </ResponsiveWrapper>
                     )}
 
-                    {activeSection === 'roles' && (
+                    {hasRoles && (
                       <ResponsiveWrapper>
                         <CardHeader title="Roles Info">
                           <ChevronSortUp />
                         </CardHeader>
                         <ResponsiveWrapper>
-                          {rolesConfig
-                            .filter((category) => category.category !== 'Inventory Roles')
-                            .map((category) => (
-                              <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                                <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
-                                  {isLoading ? (
-                                    <InlineLoading
-                                      status="active"
-                                      iconDescription="Loading"
-                                      description="Loading data..."
-                                    />
-                                  ) : (
-                                    <Controller
-                                      name="roles"
-                                      control={userFormMethods.control}
-                                      render={({ field }) => {
-                                        const selectedRoles = field.value || [];
+                          {filterRolesConfig(rolesConfig).map((category) => (
+                            <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+                              <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
+                                {isLoading ? (
+                                  <InlineLoading
+                                    status="active"
+                                    iconDescription="Loading"
+                                    description="Loading data..."
+                                  />
+                                ) : (
+                                  <Controller
+                                    name="roles"
+                                    control={userFormMethods.control}
+                                    render={({ field }) => {
+                                      const selectedRoles = field.value || [];
 
-                                        return (
-                                          <>
-                                            {roles
-                                              .filter((role) => category.roles.includes(role.name))
-                                              .map((role) => {
-                                                const isSelected = selectedRoles.some(
-                                                  (r) =>
-                                                    r.display === role.display &&
-                                                    r.description === role.description &&
-                                                    r.uuid === role.uuid,
-                                                );
+                                      return (
+                                        <>
+                                          {roles
+                                            .filter((role) => category.roles.includes(role.name))
+                                            .map((role) => {
+                                              const isSelected = selectedRoles.some(
+                                                (r) =>
+                                                  r.display === role.display &&
+                                                  r.description === role.description &&
+                                                  r.uuid === role.uuid,
+                                              );
 
-                                                return (
-                                                  <label
-                                                    key={role.display}
-                                                    className={
-                                                      isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
-                                                    }>
-                                                    <input
-                                                      type="checkbox"
-                                                      id={role.display}
-                                                      checked={isSelected}
-                                                      onChange={(e) => {
-                                                        const updatedValue = e.target.checked
-                                                          ? [
-                                                              ...selectedRoles,
-                                                              {
-                                                                uuid: role.uuid,
-                                                                display: role.display,
-                                                                description: role.description ?? null,
-                                                              },
-                                                            ]
-                                                          : selectedRoles.filter(
-                                                              (selectedRole) => selectedRole.display !== role.display,
-                                                            );
+                                              return (
+                                                <label
+                                                  key={role.display}
+                                                  className={
+                                                    isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
+                                                  }>
+                                                  <input
+                                                    type="checkbox"
+                                                    id={role.display}
+                                                    checked={isSelected}
+                                                    onChange={(e) => {
+                                                      const updatedValue = e.target.checked
+                                                        ? [
+                                                            ...selectedRoles,
+                                                            {
+                                                              uuid: role.uuid,
+                                                              display: role.display,
+                                                              description: role.description ?? null,
+                                                            },
+                                                          ]
+                                                        : selectedRoles.filter(
+                                                            (selectedRole) => selectedRole.display !== role.display,
+                                                          );
 
-                                                        field.onChange(updatedValue);
-                                                      }}
-                                                    />
-                                                    {role.display}
-                                                  </label>
-                                                );
-                                              })}
-                                          </>
-                                        );
-                                      }}
-                                    />
-                                  )}
-                                </CheckboxGroup>
-                              </Column>
-                            ))}
+                                                      field.onChange(updatedValue);
+                                                    }}
+                                                  />
+                                                  {role.display}
+                                                </label>
+                                              );
+                                            })}
+                                        </>
+                                      );
+                                    }}
+                                  />
+                                )}
+                              </CheckboxGroup>
+                            </Column>
+                          ))}
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
-
                     {/* Additional roles */}
-                    {activeSection === 'additionalRoles' && (
+                    {hasAdditionalRoles && (
                       <ResponsiveWrapper>
                         <CardHeader title={t('additionalRoles', 'Additional Roles')}>
                           <ChevronSortUp />
                         </CardHeader>
+                        {hasInventoryRole ? (
+                          <>
+                            <ResponsiveWrapper>
+                              <Controller
+                                name="stockRole"
+                                control={userFormMethods.control}
+                                render={({ field }) => (
+                                  <ComboBox
+                                    {...field}
+                                    id="stockRole"
+                                    items={filteredInventoryRoles}
+                                    itemToString={(item) => item?.display?.trim() || ''}
+                                    titleText={t('stockRole', 'Stock Role')}
+                                    selectedItem={
+                                      filteredInventoryRoles.find((item) => item?.display === field.value) || null
+                                    }
+                                    onChange={({ selectedItem }) => {
+                                      field.onChange(selectedItem ? selectedItem.display.trim() : '');
+                                    }}
+                                    disabled={!hasInventoryRole}
+                                  />
+                                )}
+                              />
+                            </ResponsiveWrapper>
 
-                        <ResponsiveWrapper>
-                          {rolesConfig
-                            .filter((category) => category.category === 'Inventory Roles')
-                            .map((category) => (
-                              <Column key={category.category} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                                <CheckboxGroup legendText={category.category} className={styles.checkboxGroupGrid}>
-                                  {isLoading ? (
+                            <ResponsiveWrapper>
+                              <Column
+                                key={t('stockOperation', 'Stock Operation')}
+                                xsm={8}
+                                md={12}
+                                lg={12}
+                                className={styles.checkBoxColumn}>
+                                <CheckboxGroup
+                                  legendText={t('stockOperation', 'Stock Operation')}
+                                  className={styles.checkboxGroupGrid}>
+                                  {loadingStock ? (
                                     <InlineLoading
                                       status="active"
                                       iconDescription="Loading"
@@ -935,51 +1027,50 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     />
                                   ) : (
                                     <Controller
-                                      name="roles"
+                                      name="stockOperation"
                                       control={userFormMethods.control}
                                       render={({ field }) => {
-                                        const selectedRoles = field.value || [];
+                                        const selectedStockOperation = field.value || [];
+
+                                        const isSelected = (operationUuid: string) =>
+                                          selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
+                                        const toggleOperation = (operation) => {
+                                          if (isSelected(operation.uuid)) {
+                                            field.onChange(
+                                              selectedStockOperation.filter(
+                                                (op) => op.operationTypeUuid !== operation.uuid,
+                                              ),
+                                            );
+                                          } else {
+                                            field.onChange([
+                                              ...selectedStockOperation,
+                                              {
+                                                operationTypeUuid: operation.uuid,
+                                                operationTypeName: operation.name,
+                                              },
+                                            ]);
+                                          }
+                                        };
 
                                         return (
                                           <>
-                                            {roles
-                                              .filter((role) => category.roles.includes(role.name))
-                                              .map((role) => {
-                                                const isSelected = selectedRoles.some(
-                                                  (r) =>
-                                                    r.display === role.display &&
-                                                    r.description === role.description &&
-                                                    r.uuid === role.uuid,
-                                                );
-
+                                            {stockOperations?.length > 0 &&
+                                              stockOperations.map((operation) => {
                                                 return (
                                                   <label
-                                                    key={role.display}
+                                                    key={operation.uuid}
                                                     className={
-                                                      isSelected ? styles.checkboxLabelSelected : styles.checkboxLabel
+                                                      isSelected(operation.uuid)
+                                                        ? styles.checkboxLabelSelected
+                                                        : styles.checkboxLabel
                                                     }>
                                                     <input
                                                       type="checkbox"
-                                                      id={role.display}
-                                                      checked={isSelected}
-                                                      onChange={(e) => {
-                                                        const updatedValue = e.target.checked
-                                                          ? [
-                                                              ...selectedRoles,
-                                                              {
-                                                                uuid: role.uuid,
-                                                                display: role.display,
-                                                                description: role.description ?? null,
-                                                              },
-                                                            ]
-                                                          : selectedRoles.filter(
-                                                              (selectedRole) => selectedRole.display !== role.display,
-                                                            );
-
-                                                        field.onChange(updatedValue);
-                                                      }}
+                                                      id={operation.uuid}
+                                                      checked={isSelected(operation.uuid)}
+                                                      onChange={() => toggleOperation(operation)}
                                                     />
-                                                    {role.display}
+                                                    {operation.name}
                                                   </label>
                                                 );
                                               })}
@@ -990,297 +1081,200 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   )}
                                 </CheckboxGroup>
                               </Column>
-                            ))}
-                        </ResponsiveWrapper>
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Column
+                                key={t('location', 'Stock Location')}
+                                xsm={8}
+                                md={12}
+                                lg={12}
+                                className={styles.checkBoxColumn}>
+                                <CheckboxGroup
+                                  legendText={t('stockLocation', 'Stock Location')}
+                                  className={styles.checkboxGroupGrid}>
+                                  {loadingStock ? (
+                                    <InlineLoading
+                                      status="active"
+                                      iconDescription="Loading"
+                                      description="Loading data..."
+                                    />
+                                  ) : (
+                                    <Controller
+                                      name="operationLocation"
+                                      control={userFormMethods.control}
+                                      render={({ field }) => {
+                                        const selectedLocations = field.value || [];
 
-                        <ResponsiveWrapper>
-                          <Column
-                            key={t('stockOperation', 'Stock Operation')}
-                            xsm={8}
-                            md={12}
-                            lg={12}
-                            className={styles.checkBoxColumn}>
-                            <CheckboxGroup
-                              legendText={t('stockOperation', 'Stock Operation')}
-                              className={styles.checkboxGroupGrid}>
-                              {loadingStock ? (
-                                <InlineLoading
-                                  status="active"
-                                  iconDescription="Loading"
-                                  description="Loading data..."
-                                />
-                              ) : (
-                                <Controller
-                                  name="stockOperation"
-                                  control={userFormMethods.control}
-                                  render={({ field }) => {
-                                    const selectedStockOperation = field.value || [];
-
-                                    const isSelected = (operationUuid: string) =>
-                                      selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
-                                    const toggleOperation = (operation) => {
-                                      if (isSelected(operation.uuid)) {
-                                        field.onChange(
-                                          selectedStockOperation.filter(
-                                            (op) => op.operationTypeUuid !== operation.uuid,
-                                          ),
-                                        );
-                                      } else {
-                                        field.onChange([
-                                          ...selectedStockOperation,
-                                          {
-                                            operationTypeUuid: operation.uuid,
-                                            operationTypeName: operation.name,
-                                          },
-                                        ]);
-                                      }
-                                    };
-
-                                    return (
-                                      <>
-                                        {stockOperations?.length > 0 &&
-                                          stockOperations.map((operation) => {
-                                            return (
-                                              <label
-                                                key={operation.uuid}
-                                                className={
-                                                  isSelected(operation.uuid)
-                                                    ? styles.checkboxLabelSelected
-                                                    : styles.checkboxLabel
-                                                }>
-                                                <input
-                                                  type="checkbox"
-                                                  id={operation.uuid}
-                                                  checked={isSelected(operation.uuid)}
-                                                  onChange={() => toggleOperation(operation)}
-                                                />
-                                                {operation.name}
-                                              </label>
+                                        const isSelected = (locationUuid: string) =>
+                                          selectedLocations.some((loc) => loc.locationUuid === locationUuid);
+                                        const toggleLocation = (location) => {
+                                          if (isSelected(location.id)) {
+                                            field.onChange(
+                                              selectedLocations.filter((loc) => loc.locationUuid !== location.id),
                                             );
-                                          })}
-                                      </>
-                                    );
-                                  }}
-                                />
-                              )}
-                            </CheckboxGroup>
-                          </Column>
-                        </ResponsiveWrapper>
-                        <ResponsiveWrapper>
-                          <Column
-                            key={t('location', 'Stock Location')}
-                            xsm={8}
-                            md={12}
-                            lg={12}
-                            className={styles.checkBoxColumn}>
-                            <CheckboxGroup
-                              legendText={t('stockLocation', 'Stock Location')}
-                              className={styles.checkboxGroupGrid}>
-                              {loadingStock ? (
-                                <InlineLoading
-                                  status="active"
-                                  iconDescription="Loading"
-                                  description="Loading data..."
-                                />
-                              ) : (
-                                <Controller
-                                  name="operationLocation"
-                                  control={userFormMethods.control}
-                                  render={({ field }) => {
-                                    const selectedLocations = field.value || [];
+                                          } else {
+                                            field.onChange([
+                                              ...selectedLocations,
+                                              { locationName: location.name, locationUuid: location.id },
+                                            ]);
+                                          }
+                                        };
 
-                                    const isSelected = (locationUuid: string) =>
-                                      selectedLocations.some((loc) => loc.locationUuid === locationUuid);
-                                    const toggleLocation = (location) => {
-                                      if (isSelected(location.id)) {
-                                        field.onChange(
-                                          selectedLocations.filter((loc) => loc.locationUuid !== location.id),
+                                        return (
+                                          <>
+                                            {stockLocations?.length > 0 &&
+                                              stockLocations.map((location) => (
+                                                <label
+                                                  key={location.id}
+                                                  className={
+                                                    isSelected(location.id)
+                                                      ? styles.checkboxLabelSelected
+                                                      : styles.checkboxLabel
+                                                  }>
+                                                  <input
+                                                    type="checkbox"
+                                                    id={location.id}
+                                                    checked={isSelected(location.id)}
+                                                    onChange={() => toggleLocation(location)}
+                                                  />
+                                                  {location.name}
+                                                </label>
+                                              ))}
+                                          </>
                                         );
-                                      } else {
-                                        field.onChange([
-                                          ...selectedLocations,
-                                          { locationName: location.name, locationUuid: location.id },
-                                        ]);
-                                      }
-                                    };
-
-                                    return (
-                                      <>
-                                        {stockLocations?.length > 0 &&
-                                          stockLocations.map((location) => (
-                                            <label
-                                              key={location.id}
-                                              className={
-                                                isSelected(location.id)
-                                                  ? styles.checkboxLabelSelected
-                                                  : styles.checkboxLabel
-                                              }>
-                                              <input
-                                                type="checkbox"
-                                                id={location.id}
-                                                checked={isSelected(location.id)}
-                                                onChange={() => toggleLocation(location)}
-                                              />
-                                              {location.name}
-                                            </label>
-                                          ))}
-                                      </>
-                                    );
-                                  }}
-                                />
-                              )}
-                            </CheckboxGroup>
-                          </Column>
-                        </ResponsiveWrapper>
-                        <ResponsiveWrapper>
-                          <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                            <CheckboxGroup
-                              legendText={t('inventoryUser', 'Inventory User')}
-                              className={styles.checkboxGroupGrid}>
-                              <Controller
-                                name="enabled"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <div>
-                                    <label htmlFor="enable">
-                                      <input
-                                        type="checkbox"
-                                        id="enable"
-                                        name="enabled"
-                                        checked={field.value || false}
-                                        onChange={(e) => field.onChange(e.target.checked)}
-                                      />
-                                      {t('enable', 'Enable?')}
-                                    </label>
-                                  </div>
-                                )}
-                              />
-                              {userFormMethods?.watch('enabled') && (
-                                <Controller
-                                  name="permanent"
-                                  control={userFormMethods.control}
-                                  render={({ field }) => (
-                                    <div>
-                                      <label htmlFor="permanent">
-                                        <input
-                                          type="checkbox"
-                                          id="permanent"
-                                          name="permanent"
-                                          checked={field.value || false}
-                                          onChange={(e) => {
-                                            field.onChange(e.target.checked);
-                                            if (e.target.checked) {
-                                              userFormMethods.setValue('dateRange', {
-                                                activeFrom: undefined,
-                                                activeTo: undefined,
-                                              });
-                                            }
-                                          }}
-                                        />
-                                        {t('permanent', 'Permanent?')}
-                                      </label>
-                                    </div>
+                                      }}
+                                    />
                                   )}
-                                />
-                              )}
-                            </CheckboxGroup>
-                            {!userFormMethods?.watch('permanent') && userFormMethods?.watch('enabled') && (
-                              <ResponsiveWrapper>
-                                <Tile>
+                                </CheckboxGroup>
+                              </Column>
+                            </ResponsiveWrapper>
+                            <ResponsiveWrapper>
+                              <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+                                <CheckboxGroup
+                                  legendText={t('stockRoleAccess', 'Stock Role Access')}
+                                  className={styles.checkboxGroupGrid}>
                                   <Controller
-                                    name="dateRange"
+                                    name="enabled"
                                     control={userFormMethods.control}
-                                    render={({ field }) => {
-                                      const { value, onChange } = field;
-
-                                      const handleDateChange = (dates: Array<Date>) => {
-                                        onChange({
-                                          activeFrom: dates[0],
-                                          activeTo: dates[1],
-                                        });
-                                      };
-
-                                      return (
-                                        <DatePicker
-                                          datePickerType="range"
-                                          light
-                                          minDate={formatDatetime(MinDate)}
-                                          locale="en"
-                                          dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                                          onChange={handleDateChange}
-                                          value={[value?.activeFrom, value?.activeTo]}>
-                                          <DatePickerInput
-                                            id="date-picker-input-id-start"
-                                            name="activeFrom"
-                                            placeholder={DATE_PICKER_FORMAT}
-                                            labelText={t('activeFrom', 'Active From')}
-                                            value={value?.activeFrom}
+                                    render={({ field }) => (
+                                      <div>
+                                        <label htmlFor="enable">
+                                          <input
+                                            type="checkbox"
+                                            id="enable"
+                                            name="enabled"
+                                            checked={field.value || false}
+                                            onChange={(e) => field.onChange(e.target.checked)}
                                           />
-                                          <DatePickerInput
-                                            id="date-picker-input-id-finish"
-                                            name="activeTo"
-                                            placeholder={DATE_PICKER_FORMAT}
-                                            labelText={t('activeTo', 'Active To')}
-                                            value={value?.activeTo}
-                                          />
-                                        </DatePicker>
-                                      );
-                                    }}
+                                          {t('enable', 'Enable?')}
+                                        </label>
+                                      </div>
+                                    )}
                                   />
-                                </Tile>
-                              </ResponsiveWrapper>
-                            )}
-                          </Column>
-                        </ResponsiveWrapper>
+                                  {userFormMethods?.watch('enabled') && (
+                                    <Controller
+                                      name="permanent"
+                                      control={userFormMethods.control}
+                                      render={({ field }) => (
+                                        <div>
+                                          <label htmlFor="permanent">
+                                            <input
+                                              type="checkbox"
+                                              id="permanent"
+                                              name="permanent"
+                                              checked={field.value || false}
+                                              onChange={(e) =>
+                                                handlePermissionDurationChange(e, field, userFormMethods.setValue)
+                                              }
+                                            />
+                                            {t('permanent', 'Permanent?')}
+                                          </label>
+                                        </div>
+                                      )}
+                                    />
+                                  )}
+                                </CheckboxGroup>
+                                {!userFormMethods?.watch('permanent') && userFormMethods?.watch('enabled') && (
+                                  <ResponsiveWrapper>
+                                    <Tile>
+                                      <Controller
+                                        name="dateRange"
+                                        control={userFormMethods.control}
+                                        render={({ field }) => {
+                                          const { value, onChange } = field;
+
+                                          const handleDateChange = (dates: Array<Date>) => {
+                                            onChange({
+                                              activeFrom: dates[0],
+                                              activeTo: dates[1],
+                                            });
+                                          };
+
+                                          return (
+                                            <DatePicker
+                                              datePickerType="range"
+                                              light
+                                              minDate={formatDatetime(MinDate)}
+                                              locale="en"
+                                              dateFormat={DATE_PICKER_CONTROL_FORMAT}
+                                              onChange={handleDateChange}
+                                              value={[value?.activeFrom, value?.activeTo]}>
+                                              <DatePickerInput
+                                                id="date-picker-input-id-start"
+                                                name="activeFrom"
+                                                placeholder={DATE_PICKER_FORMAT}
+                                                labelText={t('activeFrom', 'Active From')}
+                                                value={value?.activeFrom}
+                                              />
+                                              <DatePickerInput
+                                                id="date-picker-input-id-finish"
+                                                name="activeTo"
+                                                placeholder={DATE_PICKER_FORMAT}
+                                                labelText={t('activeTo', 'Active To')}
+                                                value={value?.activeTo}
+                                              />
+                                            </DatePicker>
+                                          );
+                                        }}
+                                      />
+                                    </Tile>
+                                  </ResponsiveWrapper>
+                                )}
+                              </Column>
+                            </ResponsiveWrapper>
+                          </>
+                        ) : (
+                          <EmptyState displayText={t('noAdditionalRoles', 'No additional roles')} headerTitle={''} />
+                        )}
                       </ResponsiveWrapper>
                     )}
                   </Stack>
                 </div>
                 <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-                  {activeSection === 'demographic' || activeSection === 'additionalRoles' ? (
-                    <Button kind="secondary" onClick={closeWorkspace} className={styles.btn}>
-                      {t('cancel', 'Cancel')}
-                    </Button>
-                  ) : (
-                    <Button
-                      kind="secondary"
-                      onClick={() => {
-                        toggleSection(steps[currentIndex - 1].id);
-                        setCurrentIndex(currentIndex - 1);
-                      }}
-                      className={styles.btn}>
-                      {t('back', 'Back')}
-                    </Button>
-                  )}
-                  {activeSection === 'additionalRoles' ? (
-                    <Button
-                      kind="primary"
-                      type="submit"
-                      disabled={isSubmitting || Object.keys(errors).length > 0}
-                      className={styles.btn}>
-                      {isSubmitting ? (
-                        <span style={{ display: 'flex', alignItems: 'center' }}>
-                          {t('submitting', 'Submitting...')} <InlineLoading status="active" />
-                        </span>
-                      ) : (
-                        t('saveAndClose', 'Save & close')
-                      )}
-                    </Button>
-                  ) : (
-                    <Button
-                      kind="primary"
-                      renderIcon={ChevronRight}
-                      className={styles.btn}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        toggleSection(steps[currentIndex + 1].id);
+                  <Button kind="secondary" onClick={handleBackClick} className={styles.btn}>
+                    {t(
+                      hasDemographicInfo || hasAdditionalRoles ? 'cancel' : 'back',
+                      hasDemographicInfo || hasAdditionalRoles ? 'Cancel' : 'Back',
+                    )}
+                  </Button>
 
-                        setCurrentIndex(currentIndex + 1);
-                      }}>
-                      {t('next', 'Next')}
-                    </Button>
-                  )}
+                  <Button
+                    kind="primary"
+                    type={getSubmitButtonType()}
+                    disabled={isSubmitting || Object.keys(errors).length > 0}
+                    renderIcon={getSubmitButtonIcon()}
+                    className={styles.btn}
+                    onClick={handleNextClick}>
+                    {isSubmitting ? (
+                      <span style={{ display: 'flex', alignItems: 'center' }}>
+                        {t('submitting', 'Submitting...')} <InlineLoading status="active" />
+                      </span>
+                    ) : (
+                      getSubmitButtonText()
+                    )}
+                  </Button>
                 </ButtonSet>
+                ;
               </form>
             </FormProvider>
           </div>
