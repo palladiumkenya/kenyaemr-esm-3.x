@@ -1,0 +1,22 @@
+{
+  "aboveSiteDashboard": "Above site facility Dashboard",
+  "aboveSiteFacilityDashboard": "Above site facility Dashboard",
+  "delayedVLTesting": "Delayed Viral Load (VL) testing",
+  "dnapcrPending": "DNA-PCR Pending",
+  "eacPending": "EAC Pending",
+  "facilitydashboard": "Facility Dashboard",
+  "facilitydashboardLeftPannel": "facility Dashboard Left Panel",
+  "heiIncomplete": "HEI Incomplete",
+  "HEIWithoutDNAPCR": "HEI (6-8 WEEKS) without DNA PCR Results",
+  "HEIWithoutFinalDocumentedOutcome": "HEI (24 months) without final documented outcomes",
+  "hivNotlinked": "HIV Not linked",
+  "hivPositiveClientsnotLinkedToArt": "HIV Positive Clients not linked to ART",
+  "pregnantPostPartumWomenNotLinkedToPREP": "Pregnant / postpartum women at high risk not linked to PREP",
+  "prepNotlinked": "PREP Not linked",
+  "reportingPeriod": "Reporting Period",
+  "surveillance": "Surveillance",
+  "surveillanceSummary": "Surveillance Summary",
+  "viewOnSuperset": "View on Superset",
+  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks",
+  "vlDelayed": "VL Delayed"
+}
