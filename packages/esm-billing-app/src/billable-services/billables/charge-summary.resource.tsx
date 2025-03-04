@@ -1,5 +1,6 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { PaymentMode } from '../../types';
 
 export type ChargeAble = {
   uuid: string;
@@ -10,15 +11,18 @@ export type ChargeAble = {
   serviceType: {
     uuid: string;
     display: string;
+    id: string;
   };
   servicePrices: Array<{
     uuid: string;
     name: string;
     price: number;
+    paymentMode: PaymentMode;
   }>;
   concept: {
     uuid: string;
     display: string;
+    id: string;
   };
 };
 
@@ -27,7 +31,7 @@ type ChargeAblesResponse = {
 };
 
 export const useChargeSummaries = () => {
-  const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(uuid,display),servicePrices:(uuid,name,paymentMode,price),concept:(uuid,display))`;
+  const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(uuid,id,display),servicePrices:(uuid,name,paymentMode,price),concept:(uuid,id,display))`;
   const { data, isLoading, isValidating, error, mutate } = useSWR<{ data: ChargeAblesResponse }>(url, openmrsFetch, {
     errorRetryCount: 0,
   });
