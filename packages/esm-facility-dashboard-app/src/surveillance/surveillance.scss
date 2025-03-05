@@ -1,0 +1,16 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.filtersContainer {
+  margin: 0 layout.$spacing-05 layout.$spacing-05 layout.$spacing-05;
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-05;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.viewToggler {
+  width: 330px;
+}

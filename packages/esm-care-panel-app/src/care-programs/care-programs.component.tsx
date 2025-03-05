@@ -39,7 +39,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const { carePrograms, isLoading, isValidating, error, mutateEligiblePrograms } = useCarePrograms(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
 
-  const handleMutations = () => {
+  const handleMutations = useCallback(() => {
     mutateEligiblePrograms();
     mutate(
       (key) =>
@@ -52,7 +52,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       undefined,
       { revalidate: true },
     );
-  };
+  }, [mutateEligiblePrograms, patientUuid]);
 
   const handleCareProgramClick = useCallback(
     (careProgram: PatientCarePrograms) => {
@@ -110,7 +110,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
           ),
         };
       }),
-    [carePrograms, isValidating, handleCareProgramClick],
+    [carePrograms, handleCareProgramClick],
   );
 
   const headers = [
