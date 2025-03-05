@@ -203,3 +203,5 @@ function extractName(display: string) {
   }
   return display.trim();
 }
+
+export const PARENT_CHILD_RELATIONSHIP = 'Parent/Child';

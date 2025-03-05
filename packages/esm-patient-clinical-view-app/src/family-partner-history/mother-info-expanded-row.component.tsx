@@ -4,7 +4,7 @@ import { Tile, InlineLoading } from '@carbon/react';
 import useLatestMotherMedicalDetails from '../hooks/useLatestMotherMedicalDetails';
 import { useTranslation } from 'react-i18next';
 import { formatDate, parseDate, showSnackbar } from '@openmrs/esm-framework';
-import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 type MotherInfoExpandedRowProps = {
   patientUuid: string;
 };
@@ -12,7 +12,7 @@ type MotherInfoExpandedRowProps = {
 const MotherInfoExpandedRow: React.FC<MotherInfoExpandedRowProps> = ({ patientUuid }) => {
   const { data, error, isLoading } = useLatestMotherMedicalDetails(patientUuid);
   const { t } = useTranslation();
-
+  const title = t('mothersInfo', 'Mother Program info');
   useEffect(() => {
     if (error) {
       showSnackbar({
@@ -35,18 +35,22 @@ const MotherInfoExpandedRow: React.FC<MotherInfoExpandedRowProps> = ({ patientUu
   if (error) {
     return null;
   }
+
+  if (!data?.length) {
+    return <EmptyState displayText={t('programInfo', 'Program Info')} headerTitle={title} />;
+  }
+
   return (
     <div className={styles.motherInfoExpandedRow}>
-      <CardHeader title={t('mothersInfo', 'Mother Program info')} children={<></>} />
+      <CardHeader title={title} children={<></>} />
       <Tile className={styles.obsValues}>
         {data.map((obs) => (
           <div key={obs.uuid}>
             <p>
-              <strong>{obs.concept.display}</strong>: <span>{(obs.value as any)?.display ?? obs.value}</span>
+              <strong>{obs.display}</strong>: <span>{`${obs.value} ${obs.unit}`}</span>
             </p>
             <p>
-              <strong>{t('dateRecorded', 'Date recorded')}</strong>:{' '}
-              <span>{formatDate(parseDate(obs.obsDatetime))}</span>
+              <strong>{t('dateRecorded', 'Date recorded')}</strong>: <span>{formatDate(parseDate(obs.obsDate))}</span>
             </p>
           </div>
         ))}

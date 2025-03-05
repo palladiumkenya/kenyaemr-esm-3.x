@@ -28,7 +28,7 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { ExtractedRelationship, usePatientRelationships } from './relationships.resource';
+import { ExtractedRelationship, PARENT_CHILD_RELATIONSHIP, usePatientRelationships } from './relationships.resource';
 import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
@@ -53,7 +53,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     (relation: ExtractedRelationship) => {
       return (
         relation?.relationshipTypeUUID ===
-          familyRelationshipsTypeList?.find((r) => r.display === 'Parent/Child')?.uuid &&
+          familyRelationshipsTypeList?.find((r) => r.display === PARENT_CHILD_RELATIONSHIP)?.uuid &&
         relation?.relativeGender === 'F'
       );
     },
