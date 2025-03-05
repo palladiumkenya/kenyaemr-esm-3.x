@@ -26,14 +26,13 @@ import {
   WorkspaceContainer,
 } from '@openmrs/esm-framework';
 import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../../../../user-management.resources';
-import { UserRoleScope } from '../../../../../config-schema';
+import { User } from '../../../../../config-schema';
 
 interface StockUserRoleScopesListProps {
-  userUuid?: string;
-  onEditUserRoleScope?: (userRoleScope: UserRoleScope) => void;
+  user?: User;
 }
 
-const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userUuid, onEditUserRoleScope }) => {
+const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user }) => {
   const { t } = useTranslation();
 
   // Fetch user role scopes
@@ -91,7 +90,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
   const tableRows = useMemo(() => {
     return (
       userRoleScopes?.results
-        ?.filter((scope) => scope.userUuid === userUuid)
+        ?.filter((scope) => scope.userUuid === user.uuid)
         .map((userRoleScope, index) => ({
           id: index.toString(),
           role: userRoleScope.role || 'N/A',
@@ -138,7 +137,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
           ),
         })) || []
     );
-  }, [userRoleScopes, t, userUuid, onEditUserRoleScope]);
+  }, [userRoleScopes, t, user.uuid]);
 
   return (
     <>
@@ -148,6 +147,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
             onClick={() => {
               launchWorkspace('user-role-scope-workspace', {
                 workspaceTitle: t('addRoleScope', 'Add a new user role scope'),
+                user: user,
               });
             }}
             className={styles.userManagementModeButton}
