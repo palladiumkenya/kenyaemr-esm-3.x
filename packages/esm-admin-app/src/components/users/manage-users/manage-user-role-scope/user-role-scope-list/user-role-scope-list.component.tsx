@@ -17,7 +17,14 @@ import {
 } from '@carbon/react';
 import { AddAlt, ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
 import styles from '../../manage-user.scss';
-import { isDesktop, restBaseUrl, showModal, showSnackbar, WorkspaceContainer } from '@openmrs/esm-framework';
+import {
+  isDesktop,
+  launchWorkspace,
+  restBaseUrl,
+  showModal,
+  showSnackbar,
+  WorkspaceContainer,
+} from '@openmrs/esm-framework';
 import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../../../../user-management.resources';
 import { UserRoleScope } from '../../../../../config-schema';
 
@@ -112,7 +119,10 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
             <OverflowMenu className={styles.btnSet}>
               <OverflowMenuItem
                 onClick={() => {
-                  onEditUserRoleScope(userRoleScope);
+                  launchWorkspace('user-role-scope-workspace', {
+                    workspaceTitle: t('editRoleScope', 'Edit User Role Scope'),
+                    userRoleScopeInitialValues: userRoleScope,
+                  });
                 }}
                 itemText={t('edit', 'Edit')}
               />
@@ -135,7 +145,11 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
       <div>
         <CardHeader title="User Role Scope">
           <Button
-            onClick={() => {}}
+            onClick={() => {
+              launchWorkspace('user-role-scope-workspace', {
+                workspaceTitle: t('addRoleScope', 'Add a new user role scope'),
+              });
+            }}
             className={styles.userManagementModeButton}
             renderIcon={AddAlt}
             size={size}

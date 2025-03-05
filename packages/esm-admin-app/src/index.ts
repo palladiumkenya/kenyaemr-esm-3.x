@@ -5,6 +5,7 @@ import OperationConfirmation from './components/confirm-modal/confirmation-opera
 import Root from './root.component';
 import ManageUserWorkspace from './components/users/manage-users/user-management.workspace';
 import { createLeftPanelLink } from './left-pannel-link.component';
+import UserRoleScopeWorkspace from './components/users/manage-users/manage-user-role-scope/user-role-scope-workspace/user-role-scope.workspace';
 
 const options = {
   featureName: 'esm-admin-app',
@@ -21,6 +22,7 @@ export function startupApp() {
 
 export const operationConfirmationModal = getSyncLifecycle(OperationConfirmation, options);
 export const manageUserWorkspace = getSyncLifecycle(ManageUserWorkspace, options);
+export const userRoleScopeWorkspace = getSyncLifecycle(UserRoleScopeWorkspace, options);
 
 export const userManagementLeftPannelLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'Manage Users', name: 'user-management' }),
