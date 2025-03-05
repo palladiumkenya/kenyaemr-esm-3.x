@@ -32,7 +32,7 @@ const SurveillanceSummaryCards = () => {
         mode={getIndication(
           surveillanceSummary?.getHivPositiveNotLinked,
           surveillanceSummary?.getHivTestedPositive,
-          surveillanceSummary?.fivePercentThreshhold,
+          surveillanceSummary?.clinicalActionThreshold,
         )}
       />
       <SummaryCard
@@ -42,7 +42,11 @@ const SurveillanceSummaryCards = () => {
           'Pregnant / postpartum women at high risk not linked to PREP',
         )}
         value={`${surveillanceSummary?.getPregnantPostpartumNotInPrep}`}
-        mode={'decreasing'}
+        mode={getIndication(
+          surveillanceSummary?.getPregnantPostpartumNotInPrep,
+          surveillanceSummary?.getPregnantOrPostpartumClients,
+          surveillanceSummary?.clinicalActionThreshold,
+        )}
       />
       <SummaryCard
         header={t('eacPending', 'EAC Pending')}
@@ -50,26 +54,42 @@ const SurveillanceSummaryCards = () => {
           'virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks',
           'Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks',
         )}
-        value={`${surveillanceSummary?.getVirallySuppressedWithoutEAC}`}
-        mode="decreasing"
+        value={`${surveillanceSummary?.getVirallyUnsuppressedWithoutEAC}`}
+        mode={getIndication(
+          surveillanceSummary?.getVirallyUnsuppressedWithoutEAC,
+          surveillanceSummary?.getVirallyUnsuppressed,
+          surveillanceSummary?.clinicalActionThreshold,
+        )}
       />
       <SummaryCard
         header={t('vlDelayed', 'VL Delayed')}
         title={t('delayedVLTesting', 'Delayed Viral Load (VL) testing')}
         value={`${surveillanceSummary?.getEligibleForVlSampleNotTaken}`}
-        mode="decreasing"
+        mode={getIndication(
+          surveillanceSummary?.getEligibleForVlSampleNotTaken,
+          surveillanceSummary?.getEligibleForVl,
+          surveillanceSummary?.clinicalActionThreshold,
+        )}
       />
       <SummaryCard
         header={t('dnapcrPending', 'DNA-PCR Pending')}
         title={t('HEIWithoutDNAPCR', 'HEI (6-8 WEEKS) without DNA PCR Results')}
         value={`${surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults}`}
-        mode="decreasing"
+        mode={getIndication(
+          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults,
+          surveillanceSummary?.getHeiSixToEightWeeksOld,
+          surveillanceSummary?.heiClinicalActionThreshold,
+        )}
       />
       <SummaryCard
         header={t('heiIncomplete', 'HEI Incomplete')}
         title={t('HEIWithoutFinalDocumentedOutcome', 'HEI (24 months) without final documented outcomes')}
         value={`${surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome}`}
-        mode="increasing"
+        mode={getIndication(
+          surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome,
+          surveillanceSummary?.getHei24MonthsOld,
+          surveillanceSummary?.heiClinicalActionThreshold,
+        )}
       />
     </Layer>
   );

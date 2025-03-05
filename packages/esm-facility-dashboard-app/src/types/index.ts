@@ -1,13 +1,18 @@
 export type SurveillanceSummary = {
   getHivPositiveNotLinked: number;
   getHivTestedPositive: number;
+  getPregnantOrPostpartumClients: number;
   getPregnantPostpartumNotInPrep: number;
+  getEligibleForVl: number;
   getEligibleForVlSampleNotTaken: number;
-  getVirallySuppressedWithoutEAC: number;
+  getVirallyUnsuppressed: number;
+  getVirallyUnsuppressedWithoutEAC: number;
+  getHeiSixToEightWeeksOld: number;
   getHeiSixToEightWeeksWithoutPCRResults: number;
+  getHei24MonthsOld: number;
   getHei24MonthsWithoutDocumentedOutcome: number;
-  fivePercentThreshhold: number;
-  onePercentThreshhold: number;
+  clinicalActionThreshold: number;
+  heiClinicalActionThreshold: number;
 };
 
 export type IndicationMode = 'decreasing' | 'increasing';
