@@ -149,9 +149,7 @@ const UserList: React.FC = () => {
             }}
             itemText={t('editUser', 'Edit user')}
           />
-          {userHasInventoryRole && StockUserRoleListActionsMenu ? (
-            <StockUserRoleListActionsMenu userUuid={user?.uuid} />
-          ) : null}
+          {userHasInventoryRole && StockUserRoleListActionsMenu ? <StockUserRoleListActionsMenu user={user} /> : null}
         </OverflowMenu>
       ),
     };
