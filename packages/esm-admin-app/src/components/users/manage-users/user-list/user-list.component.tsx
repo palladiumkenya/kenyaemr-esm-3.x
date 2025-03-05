@@ -26,7 +26,6 @@ import { useUser } from '../../../../user-management.resources';
 import StockUserRoleListActionsMenu from '../manage-user-role-scope/user-role-scope-list/user-role-scope-list-action-menu.component';
 import { useSystemUserRoleConfigSetting } from '../../../hook/useSystemRoleSetting';
 import { ROLE_CATEGORIES } from '../../../../constants';
-import { User } from '@carbon/pictograms-react';
 
 const UserList: React.FC = () => {
   const { t } = useTranslation();
