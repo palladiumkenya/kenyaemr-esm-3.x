@@ -631,32 +631,14 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
               <p className={styles.label}>{t('cd4Trends', 'CD4 Trends')}</p>
               {data?.allCd4CountResults?.length > 0
                 ? data?.allCd4CountResults?.map((cd4, index) => {
-                    let formattedDate: Date | null = null;
-
-                    if (dayjs(cd4.cd4CountDate, 'DD/MM/YYYY', true).isValid()) {
-                      const parts = cd4.cd4CountDate?.split('/');
-                      if (parts && parts.length === 3) {
-                        const day = parseInt(parts[0], 10);
-                        const month = parseInt(parts[1], 10) - 1; // Subtract 1 since months are zero-based
-                        const year = parseInt(parts[2], 10);
-
-                        if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-                          formattedDate = new Date(year, month, day);
-
-                          // Check if the date is valid
-                          if (isNaN(formattedDate.getTime())) {
-                            formattedDate = null;
-                          }
-                        }
-                      }
-                    }
-
                     return (
-                      <div key={`cd4Trend-${cd4}-${index}`}>
-                        <span className={styles.value}> {cd4.cd4Count} </span>
-                        <span className={styles.label}>
-                          {formattedDate ? formatDate(formattedDate) : 'Invalid date'}
-                        </span>
+                      <div key={`cd4Trend-${cd4?.cd4Count}-${index}`}>
+                        <span className={styles.value}>{cd4?.cd4Count}</span>
+                        {cd4?.cd4Count === 'N/A' || cd4?.cd4Count === '' ? (
+                          <span>None</span>
+                        ) : (
+                          <span>( {cd4?.cd4CountDate ? cd4?.cd4CountDate : '--'})</span>
+                        )}
                         <br />
                       </div>
                     );
