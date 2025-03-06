@@ -41,9 +41,10 @@ const CarePanellIITRiskScore: React.FC<CarePanellIITRiskScoreProps> = ({ patient
     );
   }
 
-  const evaluationDate = dayjs(riskScore?.evaluationDate).isValid()
-    ? formatDate(parseDate(riskScore.evaluationDate))
-    : '--';
+  const evaluationDate =
+    riskScore?.evaluationDate && dayjs(riskScore.evaluationDate).isValid()
+      ? formatDate(parseDate(riskScore?.evaluationDate))
+      : '--';
 
   if (error) {
     return <ErrorState error={error} headerTitle={t('iitRiscScore', 'IIT Risk Score')} />;
