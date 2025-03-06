@@ -28,7 +28,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
 
   const shouldShowReferenceCode = (index: number) => {
     const formValues = getValues();
-    return formValues?.payment?.[index]?.method?.attributeTypes?.some((attribute) => attribute.required);
+    const attributes = formValues?.payment?.[index]?.method?.attributeTypes ?? [];
+    return attributes.some((attribute) => attribute.required) || attributes?.length > 0;
   };
 
   const handleAppendPaymentMode = useCallback(() => {
