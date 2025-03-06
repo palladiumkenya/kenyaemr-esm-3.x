@@ -15,10 +15,13 @@ import {
   Button,
   Pagination,
   ButtonSet,
+  OverflowMenuItem,
+  MenuItemDivider,
+  OverflowMenu,
 } from '@carbon/react';
 import { Edit, UserFollow } from '@carbon/react/icons';
 import styles from './user-list.scss';
-import { launchWorkspace, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
 
 const UserList: React.FC = () => {
@@ -28,6 +31,7 @@ const UserList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [syncLoading, setSyncLoading] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -58,6 +62,11 @@ const UserList: React.FC = () => {
   const handleSearch = (searchTerm: string) => {
     setSearchTerm(searchTerm);
     setCurrentPage(1);
+  };
+  const handleOpenSyncModal = () => {
+    setSyncLoading(true);
+    // showModal('hwr-sync-modal', { provider });
+    setSyncLoading(false);
   };
 
   if (isLoading) {
@@ -118,26 +127,64 @@ const UserList: React.FC = () => {
       familyName: familyName,
       roles: rolesDisplay,
       actions: (
-        <ButtonSet className={styles.btnSet}>
-          <Button
-            className={styles.btn}
-            renderIcon={Edit}
-            hasIconOnly
-            kind="ghost"
-            iconDescription={t('edit', 'Edit')}
-            onClick={() => {
-              const selectedUser = users.find((u) => u.uuid === user.uuid);
-              if (selectedUser) {
-                launchWorkspace('manage-user-workspace', {
-                  workspaceTitle: t('editUser', 'Edit User'),
-                  initialUserValue: selectedUser,
-                });
-              } else {
-                console.error('User not found:', user.uuid);
-              }
-            }}
-          />
-        </ButtonSet>
+        <>
+          <OverflowMenu flipped={document?.dir === 'rtl'} aria-label={t('overflowMenu', 'Overflow menu')}>
+            <OverflowMenuItem
+              itemText={t('edit', 'Edit')}
+              onClick={() => {
+                const selectedUser = users.find((u) => u.uuid === user.uuid);
+                if (selectedUser) {
+                  launchWorkspace('manage-user-workspace', {
+                    workspaceTitle: t('editUser', 'Edit User'),
+                    initialUserValue: selectedUser,
+                  });
+                } else {
+                  console.error('User not found:', user.uuid);
+                }
+              }}
+            />
+            <MenuItemDivider />
+            <OverflowMenuItem itemText={t('sync', 'Sync')} onClick={handleOpenSyncModal} />
+          </OverflowMenu>
+          {/* <ButtonSet className={styles.btnSet}>
+            <Button
+              className={styles.btn}
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('edit', 'Edit')}
+              onClick={() => {
+                const selectedUser = users.find((u) => u.uuid === user.uuid);
+                if (selectedUser) {
+                  launchWorkspace('manage-user-workspace', {
+                    workspaceTitle: t('editUser', 'Edit User'),
+                    initialUserValue: selectedUser,
+                  });
+                } else {
+                  console.error('User not found:', user.uuid);
+                }
+              }}
+            />
+            <Button
+              className={styles.btn}
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('sync', 'Sync')}
+              onClick={() => {
+                const selectedUser = users.find((u) => u.uuid === user.uuid);
+                if (selectedUser) {
+                  launchWorkspace('manage-user-workspace', {
+                    workspaceTitle: t('editUser', 'Edit User'),
+                    initialUserValue: selectedUser,
+                  });
+                } else {
+                  console.error('User not found:', user.uuid);
+                }
+              }}
+            />
+          </ButtonSet> */}
+        </>
       ),
     };
   });
