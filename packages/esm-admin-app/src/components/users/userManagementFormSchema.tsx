@@ -33,7 +33,11 @@ const UserManagementFormSchema = () => {
     systemId: z.string().optional(),
     primaryFacility: z.string().optional(),
     providerLicense: z.string().optional(),
-    licenseExpiryDate: z.string().optional(),
+    licenseExpiryDate: z.date().optional(),
+    registrationNumber: z.string().optional(),
+    qualification: z.string().optional(),
+    nationalId: z.string().optional(),
+    passportNumber: z.string().optional(),
     permanent: z.boolean().optional(),
     enabled: z.boolean().optional(),
     stockOperation: z
