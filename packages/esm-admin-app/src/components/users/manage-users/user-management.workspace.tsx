@@ -45,11 +45,7 @@ import {
   useProvider,
   useProviderAttributeType,
   useLocation,
-  useStockOperationTypes,
-  useStockTagLocations,
-  createOrUpdateUserRoleScope,
   createProvider,
-  useUserRoleScopes,
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
@@ -58,13 +54,7 @@ import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting'
 import { ConfigObject, Provider, User, UserRoleScope } from '../../../config-schema';
 import { type PractitionerResponse } from '../../../types';
 import { searchHealthCareWork } from '../../hook/useHWR';
-import {
-  DATE_PICKER_CONTROL_FORMAT,
-  DATE_PICKER_FORMAT,
-  formatNewDate,
-  ROLE_CATEGORIES,
-  today,
-} from '../../../constants';
+import { ROLE_CATEGORIES, today } from '../../../constants';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -86,12 +76,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
   const { location, loadingLocation } = useLocation();
 
-  const { items, loadingRoleScope } = useUserRoleScopes();
-
   const { userManagementFormSchema } = UserManagementFormSchema();
-  const { stockOperations, loadingStock } = useStockOperationTypes();
-
-  const { stockLocations } = useStockTagLocations();
 
   const { providerAttributeType = [] } = useProviderAttributeType();
 
@@ -112,10 +97,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   });
   const defaultIdentifierType = identifierTypes.find((item) => item.key === searchHWR.identifierType);
 
-  const userRoleScope = useMemo(
-    () => items?.results?.find((user) => user.userUuid === initialUserValue.uuid) || null,
-    [items, initialUserValue.uuid],
-  );
   const attributeTypeMapping = useMemo(() => {
     return {
       licenseNumber:
@@ -176,14 +157,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       licenseExpiryDate: licenseExpiryDate,
       primaryFacility: primaryFacility,
     };
-  }, [
-    isInitialValuesEmpty,
-    initialUserValue,
-    providerLicenseNumber,
-    licenseExpiryDate,
-    primaryFacility,
-    userRoleScope,
-  ]);
+  }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
 
   function extractNameParts(display = '') {
     const nameParts = display.split(' ');
@@ -209,10 +183,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { errors, isSubmitting, isDirty } = userFormMethods.formState;
 
   useEffect(() => {
-    if (!loadingProvider && !loadingLocation && !loadingRoleScope && !isInitialValuesEmpty) {
+    if (!loadingProvider && !isInitialValuesEmpty) {
       reset(formDefaultValues);
     }
-  }, [loadingProvider, loadingLocation, loadingRoleScope, formDefaultValues, isInitialValuesEmpty, reset]);
+  }, [loadingProvider, formDefaultValues, isInitialValuesEmpty, reset]);
 
   useEffect(() => {
     if (isDirty) {
@@ -310,31 +284,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     const setProvider = data.providerIdentifiers;
     const editProvider = data.isEditProvider;
     const providerUUID = provider[0]?.uuid || '';
-    const roleName = data.stockRole || '';
-
-    const hasValidLocations = data.operationLocation?.length > 0;
-    const hasEnabledFlag = data.enabled !== undefined && data.enabled !== null;
-    const hasOperationTypes = data.stockOperation?.length > 0;
-    const hasDateRange = data.dateRange?.activeFrom && data.dateRange?.activeTo;
-    const hasValidRoleConditions =
-      hasValidLocations && hasEnabledFlag && hasOperationTypes && (data.permanent || hasDateRange);
-
-    const userRoleScopePayload: Partial<UserRoleScope> = {
-      ...(hasValidRoleConditions && { role: roleName }),
-      locations: data.operationLocation?.map((loc) => ({
-        locationUuid: loc.locationUuid,
-        locationName: loc.locationName,
-        enableDescendants: false,
-      })),
-      permanent: data.permanent,
-      enabled: data.enabled,
-      activeFrom: data.dateRange?.activeFrom,
-      activeTo: data.dateRange?.activeTo,
-      operationTypes: data.stockOperation?.map((op) => ({
-        operationTypeUuid: op.operationTypeUuid,
-        operationTypeName: op.operationTypeName,
-      })),
-    };
 
     const providerPayload: Partial<Provider> = {
       attributes: [
@@ -381,33 +330,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       if (response.uuid) {
         showSnackbarMessage(t('userSaved', 'User saved successfully'), '', 'success');
 
-        if (userRoleScopePayload !== null && hasValidRoleConditions) {
-          try {
-            const userRoleScopeUrl = userRoleScope?.uuid
-              ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScope.uuid}`
-              : `${restBaseUrl}/stockmanagement/userrolescope`;
-            const userUuid = response.uuid;
+        handleMutation(
+          `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`,
+        );
+        closeWorkspaceWithSavedChanges();
 
-            const userRoleScopeResponse = await createOrUpdateUserRoleScope(
-              userRoleScopeUrl,
-              userRoleScopePayload,
-              userUuid,
-            );
-
-            if (userRoleScopeResponse.ok) {
-              handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
-              showSnackbarMessage(t('userRoleScopeSaved', 'User role scope saved successfully'), '', 'success');
-            }
-          } catch (error) {
-            showSnackbarMessage(
-              t('userRoleScopeFail', 'Failed to save user role scope'),
-              t('userRoleScopeFailedSubtitle', 'An error occurred while creating user role scope{{errorMessage}}', {
-                errorMessage: JSON.stringify(error, null, 2),
-              }),
-              'error',
-            );
-          }
-        }
         if (setProvider || editProvider) {
           try {
             const providerUrl = providerUUID ? `${restBaseUrl}/provider/${providerUUID}` : `${restBaseUrl}/provider`;
@@ -467,57 +394,20 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       { id: 'login', label: t('loginInformation', 'Login Info') },
       { id: 'provider', label: t('providerAccount', 'Provider Account') },
       { id: 'roles', label: t('roles', 'Roles Info') },
-      { id: 'additionalRoles', label: t('additionalRoles', 'Additional Roles') },
     ],
     [t],
-  );
-
-  const selectedRoles = userFormMethods.watch('roles') || [];
-  function extractInventoryRoleNames(rolesConfig) {
-    return rolesConfig.find((category) => category.category === ROLE_CATEGORIES.CORE_INVENTORY)?.roles || [];
-  }
-
-  const inventoryRoleNames = useMemo(() => extractInventoryRoleNames(rolesConfig), [rolesConfig]);
-
-  const inventoryRoles = useMemo(
-    () => selectedRoles.filter((role) => inventoryRoleNames.includes(role.display)),
-    [selectedRoles, inventoryRoleNames],
-  );
-
-  const scopeRoles = useMemo(
-    () =>
-      items?.results?.reduce((acc, role) => {
-        if (role.userUuid === initialUserValue.uuid) {
-          acc.push(role.role);
-        }
-        return acc;
-      }, []) || [],
-    [items, initialUserValue.uuid],
-  );
-
-  const filteredInventoryRoles = useMemo(
-    () =>
-      initialUserValue.uuid ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display)) : inventoryRoles,
-    [initialUserValue.uuid, inventoryRoles, scopeRoles],
-  );
-
-  const hasInventoryRole = useMemo(
-    () => filteredInventoryRoles.length > 0 && selectedRoles.some((role) => filteredInventoryRoles.includes(role)),
-    [selectedRoles, filteredInventoryRoles],
   );
 
   function filterRolesConfig(rolesConfig) {
     return rolesConfig.filter((category) => category.category !== ROLE_CATEGORIES.CORE_INVENTORY);
   }
 
-  const hasAdditionalRoles = activeSection === 'additionalRoles';
   const hasLoginInfo = activeSection === 'login';
   const hasRoles = activeSection === 'roles';
   const hasDemographicInfo = activeSection === 'demographic';
   const hasProviderAccount = activeSection === 'provider';
 
-  const isSaveAndClose = () =>
-    hasAdditionalRoles || (!hasInventoryRole && !(hasDemographicInfo || hasLoginInfo || hasProviderAccount));
+  const isSaveAndClose = () => !(hasDemographicInfo || hasLoginInfo || hasProviderAccount);
 
   const getSubmitButtonText = () =>
     t(isSaveAndClose() ? 'saveAndClose' : 'next', isSaveAndClose() ? 'Save & close' : 'Next');
@@ -527,7 +417,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const getSubmitButtonIcon = () => (isSaveAndClose() ? '' : ChevronRight);
 
   const handleBackClick = () => {
-    if (hasDemographicInfo || hasAdditionalRoles) {
+    if (hasDemographicInfo) {
       closeWorkspace();
     } else {
       toggleSection(steps[currentIndex - 1].id);
@@ -540,15 +430,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       e.preventDefault();
       toggleSection(steps[currentIndex + 1].id);
       setCurrentIndex(currentIndex + 1);
-    }
-  };
-
-  const handlePermissionDurationChange = (e, field, setValue) => {
-    const isChecked = e.target.checked;
-    field.onChange(isChecked);
-
-    if (isChecked) {
-      setValue('dateRange', { activeFrom: undefined, activeTo: undefined });
     }
   };
 
@@ -1176,283 +1057,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         </ResponsiveWrapper>
                       </ResponsiveWrapper>
                     )}
-                    {/* Additional roles */}
-                    {hasAdditionalRoles && (
-                      <ResponsiveWrapper>
-                        <CardHeader title={t('additionalRoles', 'Additional Roles')}>
-                          <ChevronSortUp />
-                        </CardHeader>
-                        {!initialUserValue.uuid && hasInventoryRole ? (
-                          <>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="stockRole"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <ComboBox
-                                    {...field}
-                                    id="stockRole"
-                                    items={filteredInventoryRoles}
-                                    itemToString={(item) => item?.display?.trim() || ''}
-                                    titleText={t('stockRole', 'Stock Role')}
-                                    selectedItem={
-                                      filteredInventoryRoles.find((item) => item?.display === field.value) || null
-                                    }
-                                    onChange={({ selectedItem }) => {
-                                      field.onChange(selectedItem ? selectedItem.display.trim() : '');
-                                    }}
-                                    disabled={!hasInventoryRole}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Column
-                                key={t('stockOperation', 'Stock Operation')}
-                                xsm={8}
-                                md={12}
-                                lg={12}
-                                className={styles.checkBoxColumn}>
-                                <CheckboxGroup
-                                  legendText={t('stockOperation', 'Stock Operation')}
-                                  className={styles.checkboxGroupGrid}>
-                                  {loadingStock ? (
-                                    <InlineLoading
-                                      status="active"
-                                      iconDescription="Loading"
-                                      description="Loading data..."
-                                    />
-                                  ) : (
-                                    <Controller
-                                      name="stockOperation"
-                                      control={userFormMethods.control}
-                                      render={({ field }) => {
-                                        const selectedStockOperation = field.value || [];
-
-                                        const isSelected = (operationUuid: string) =>
-                                          selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
-                                        const toggleOperation = (operation) => {
-                                          if (isSelected(operation.uuid)) {
-                                            field.onChange(
-                                              selectedStockOperation.filter(
-                                                (op) => op.operationTypeUuid !== operation.uuid,
-                                              ),
-                                            );
-                                          } else {
-                                            field.onChange([
-                                              ...selectedStockOperation,
-                                              {
-                                                operationTypeUuid: operation.uuid,
-                                                operationTypeName: operation.name,
-                                              },
-                                            ]);
-                                          }
-                                        };
-
-                                        return (
-                                          <>
-                                            {stockOperations?.length > 0 &&
-                                              stockOperations.map((operation) => {
-                                                return (
-                                                  <label
-                                                    key={operation.uuid}
-                                                    className={
-                                                      isSelected(operation.uuid)
-                                                        ? styles.checkboxLabelSelected
-                                                        : styles.checkboxLabel
-                                                    }>
-                                                    <input
-                                                      type="checkbox"
-                                                      id={operation.uuid}
-                                                      checked={isSelected(operation.uuid)}
-                                                      onChange={() => toggleOperation(operation)}
-                                                    />
-                                                    {operation.name}
-                                                  </label>
-                                                );
-                                              })}
-                                          </>
-                                        );
-                                      }}
-                                    />
-                                  )}
-                                </CheckboxGroup>
-                              </Column>
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Column
-                                key={t('location', 'Stock Location')}
-                                xsm={8}
-                                md={12}
-                                lg={12}
-                                className={styles.checkBoxColumn}>
-                                <CheckboxGroup
-                                  legendText={t('stockLocation', 'Stock Location')}
-                                  className={styles.checkboxGroupGrid}>
-                                  {loadingStock ? (
-                                    <InlineLoading
-                                      status="active"
-                                      iconDescription="Loading"
-                                      description="Loading data..."
-                                    />
-                                  ) : (
-                                    <Controller
-                                      name="operationLocation"
-                                      control={userFormMethods.control}
-                                      render={({ field }) => {
-                                        const selectedLocations = field.value || [];
-
-                                        const isSelected = (locationUuid: string) =>
-                                          selectedLocations.some((loc) => loc.locationUuid === locationUuid);
-                                        const toggleLocation = (location) => {
-                                          if (isSelected(location.id)) {
-                                            field.onChange(
-                                              selectedLocations.filter((loc) => loc.locationUuid !== location.id),
-                                            );
-                                          } else {
-                                            field.onChange([
-                                              ...selectedLocations,
-                                              { locationName: location.name, locationUuid: location.id },
-                                            ]);
-                                          }
-                                        };
-
-                                        return (
-                                          <>
-                                            {stockLocations?.length > 0 &&
-                                              stockLocations.map((location) => (
-                                                <label
-                                                  key={location.id}
-                                                  className={
-                                                    isSelected(location.id)
-                                                      ? styles.checkboxLabelSelected
-                                                      : styles.checkboxLabel
-                                                  }>
-                                                  <input
-                                                    type="checkbox"
-                                                    id={location.id}
-                                                    checked={isSelected(location.id)}
-                                                    onChange={() => toggleLocation(location)}
-                                                  />
-                                                  {location.name}
-                                                </label>
-                                              ))}
-                                          </>
-                                        );
-                                      }}
-                                    />
-                                  )}
-                                </CheckboxGroup>
-                              </Column>
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                                <CheckboxGroup
-                                  legendText={t('stockRoleAccess', 'Stock Role Access')}
-                                  className={styles.checkboxGroupGrid}>
-                                  <Controller
-                                    name="enabled"
-                                    control={userFormMethods.control}
-                                    render={({ field }) => (
-                                      <div>
-                                        <label htmlFor="enable">
-                                          <input
-                                            type="checkbox"
-                                            id="enable"
-                                            name="enabled"
-                                            checked={field.value || false}
-                                            onChange={(e) => field.onChange(e.target.checked)}
-                                          />
-                                          {t('enable', 'Enable?')}
-                                        </label>
-                                      </div>
-                                    )}
-                                  />
-                                  {userFormMethods?.watch('enabled') && (
-                                    <Controller
-                                      name="permanent"
-                                      control={userFormMethods.control}
-                                      render={({ field }) => (
-                                        <div>
-                                          <label htmlFor="permanent">
-                                            <input
-                                              type="checkbox"
-                                              id="permanent"
-                                              name="permanent"
-                                              checked={field.value || false}
-                                              onChange={(e) =>
-                                                handlePermissionDurationChange(e, field, userFormMethods.setValue)
-                                              }
-                                            />
-                                            {t('permanent', 'Permanent?')}
-                                          </label>
-                                        </div>
-                                      )}
-                                    />
-                                  )}
-                                </CheckboxGroup>
-                                {!userFormMethods?.watch('permanent') && userFormMethods?.watch('enabled') && (
-                                  <ResponsiveWrapper>
-                                    <Tile>
-                                      <Controller
-                                        name="dateRange"
-                                        control={userFormMethods.control}
-                                        render={({ field }) => {
-                                          const { value, onChange } = field;
-
-                                          const handleDateChange = (dates: Array<Date>) => {
-                                            onChange({
-                                              activeFrom: dates[0],
-                                              activeTo: dates[1],
-                                            });
-                                          };
-
-                                          return (
-                                            <DatePicker
-                                              datePickerType="range"
-                                              light
-                                              minDate={formatDatetime(MinDate)}
-                                              locale="en"
-                                              dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                                              onChange={handleDateChange}
-                                              value={[value?.activeFrom, value?.activeTo]}>
-                                              <DatePickerInput
-                                                id="date-picker-input-id-start"
-                                                name="activeFrom"
-                                                placeholder={DATE_PICKER_FORMAT}
-                                                labelText={t('activeFrom', 'Active From')}
-                                                value={value?.activeFrom}
-                                              />
-                                              <DatePickerInput
-                                                id="date-picker-input-id-finish"
-                                                name="activeTo"
-                                                placeholder={DATE_PICKER_FORMAT}
-                                                labelText={t('activeTo', 'Active To')}
-                                                value={value?.activeTo}
-                                              />
-                                            </DatePicker>
-                                          );
-                                        }}
-                                      />
-                                    </Tile>
-                                  </ResponsiveWrapper>
-                                )}
-                              </Column>
-                            </ResponsiveWrapper>
-                          </>
-                        ) : (
-                          <EmptyState displayText={t('noAdditionalRoles', 'No additional roles')} headerTitle={''} />
-                        )}
-                      </ResponsiveWrapper>
-                    )}
                   </Stack>
                 </div>
                 <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
                   <Button kind="secondary" onClick={handleBackClick} className={styles.btn}>
-                    {t(
-                      hasDemographicInfo || hasAdditionalRoles ? 'cancel' : 'back',
-                      hasDemographicInfo || hasAdditionalRoles ? 'Cancel' : 'Back',
-                    )}
+                    {t(hasDemographicInfo ? 'cancel' : 'back', hasDemographicInfo ? 'Cancel' : 'Back')}
                   </Button>
 
                   <Button
@@ -1471,7 +1080,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                     )}
                   </Button>
                 </ButtonSet>
-                ;
               </form>
             </FormProvider>
           </div>
