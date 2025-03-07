@@ -8,7 +8,7 @@ import {
   showSnackbar,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styles from '../../../manage-users/user-management.workspace.scss';
 import {
   TextInput,
@@ -43,8 +43,9 @@ import {
   today,
 } from '../../../../../constants';
 import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
-import { ChevronSortUp } from '@carbon/react/icons';
+import { Add, ChevronSortUp } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../../../hook/useSystemRoleSetting';
+import UserRoleScopeFormFields from './user-role-scope-fields.component';
 
 type UserRoleScopeWorkspaceProps = DefaultWorkspaceProps & {
   userRoleScopeInitialValues?: UserRoleScope;
@@ -70,54 +71,37 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   const isInitialValuesEmpty = Object.keys(userRoleScopeInitialValues).length === 0;
   const emptyUser = Object.keys(user).length === 0;
   type UserRoleScopeFormSchema = z.infer<typeof userRoleScopeFormSchema>;
-  const formDefaultValues = useMemo(() => {
-    if (isInitialValuesEmpty) {
-      return {};
-    }
-    return {
-      ...userRoleScopeInitialValues,
-      dateRange: {
-        activeTo: formatNewDate(userRoleScopeInitialValues?.activeTo),
-        activeFrom: formatNewDate(userRoleScopeInitialValues?.activeFrom),
-      },
-      operationLocation:
-        userRoleScopeInitialValues?.locations?.map(({ locationName, locationUuid }) => ({
-          locationName,
-          locationUuid,
-        })) || [],
-      stockOperation:
-        userRoleScopeInitialValues?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
-          operationTypeName,
-          operationTypeUuid,
-        })) || [],
-    };
-  }, [userRoleScopeInitialValues, isInitialValuesEmpty]);
+  const useFormDefaults = (userRoleScopeInitialValues, isInitialValuesEmpty, emptyUser, user) => {
+    return useMemo(() => {
+      if (isInitialValuesEmpty || emptyUser) {
+        return {};
+      }
 
-  const userFormDefaultValues = useMemo(() => {
-    if (emptyUser) {
-      return {};
-    }
-    return {
-      ...userRoleScopeInitialValues,
-      userName: user.username,
-      dateRange: {
-        activeTo: formatNewDate(userRoleScopeInitialValues?.activeTo),
-        activeFrom: formatNewDate(userRoleScopeInitialValues?.activeFrom),
-      },
-      operationLocation:
-        userRoleScopeInitialValues?.locations?.map(({ locationName, locationUuid }) => ({
-          locationName,
-          locationUuid,
-        })) || [],
-      stockOperation:
-        userRoleScopeInitialValues?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
-          operationTypeName,
-          operationTypeUuid,
-        })) || [],
-    };
-  }, [userRoleScopeInitialValues, emptyUser]);
+      return {
+        ...userRoleScopeInitialValues,
+        userName: user?.username || userRoleScopeInitialValues?.userName,
+        dateRange: {
+          activeTo: formatNewDate(userRoleScopeInitialValues?.activeTo),
+          activeFrom: formatNewDate(userRoleScopeInitialValues?.activeFrom),
+        },
+        locations:
+          userRoleScopeInitialValues?.locations?.map(({ locationName, locationUuid }) => ({
+            locationName,
+            locationUuid,
+          })) || [],
+        operationTypes:
+          userRoleScopeInitialValues?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
+            operationTypeName,
+            operationTypeUuid,
+          })) || [],
+      };
+    }, [userRoleScopeInitialValues, isInitialValuesEmpty, emptyUser, user]);
+  };
 
-  const defaultValues = Object.keys(formDefaultValues).length > 0 ? formDefaultValues : userFormDefaultValues;
+  const editFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, isInitialValuesEmpty, null, null);
+  const addFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, null, emptyUser, user);
+
+  const defaultValues = Object.keys(editFormDefaultValues).length > 0 ? editFormDefaultValues : addFormDefaultValues;
 
   const roleScopeformMethods = useForm<UserRoleScopeFormSchema>({
     resolver: zodResolver(userRoleScopeFormSchema),
@@ -135,70 +119,72 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   }, [isDirty, promptBeforeClosing]);
 
   useEffect(() => {
-    if ((userRoleScopeInitialValues && !loadingStock) || (user && !loadingStock)) {
+    if (!userRoleScopeInitialValues && !loadingStock) {
       reset(defaultValues);
     }
   }, [defaultValues, loadingStock, userRoleScopeInitialValues, user]);
 
+  // field array
+  const {
+    fields: forms,
+    append: appendForm,
+    remove: removeForm,
+  } = useFieldArray({
+    control: roleScopeformMethods.control,
+    name: 'forms',
+  });
+
+  const mappedRoleScopeForms = (forms) => ({
+    uuid: userRoleScopeInitialValues?.uuid,
+    userUuid: userRoleScopeInitialValues?.userUuid || user?.uuid,
+    userName: userRoleScopeInitialValues?.userName,
+    userGivenName: userRoleScopeInitialValues?.userGivenName,
+    userFamilyName: userRoleScopeInitialValues?.userFamilyName,
+    permanent: forms.permanent,
+    enabled: forms.enabled,
+    operationTypes: forms.operationTypes?.map(({ operationTypeUuid, operationTypeName }) => ({
+      operationTypeUuid,
+      operationTypeName,
+    })),
+    locations: forms.locations?.map(({ locationUuid, locationName }) => ({
+      locationUuid,
+      locationName,
+      enableDescendants: false,
+    })),
+    role: forms.role,
+    activeFrom: forms.dateRange?.activeFrom || null,
+    activeTo: forms.dateRange?.activeTo || null,
+  });
+
+  const showNotification = (titleKey, subtitleKey, kind, params = {}) => {
+    showSnackbar({
+      title: t(titleKey),
+      subtitle: t(subtitleKey, params),
+      kind,
+      isLowContrast: true,
+    });
+  };
+
   const onSubmit = async (data: UserRoleScopeFormSchema) => {
-    if (!userRoleScopeInitialValues) {
-      console.error('Initial user role scope mode is not set.');
-      return;
-    }
-
-    const payload: Partial<UserRoleScope> = {
-      uuid: userRoleScopeInitialValues.uuid,
-      userName: data.userName,
-      userGivenName: userRoleScopeInitialValues.userGivenName,
-      userFamilyName: userRoleScopeInitialValues.userFamilyName,
-      role: data.role,
-      permanent: data.permanent,
-      activeFrom: data.dateRange.activeFrom,
-      activeTo: data.dateRange.activeTo,
-      enabled: data.enabled,
-      locations: data.operationLocation?.map((loc) => ({
-        locationUuid: loc.locationUuid,
-        locationName: loc.locationName,
-        enableDescendants: false,
-      })),
-      operationTypes: data.stockOperation?.map((op) => ({
-        operationTypeUuid: op.operationTypeUuid,
-        operationTypeName: op.operationTypeName,
-      })),
-    };
-
     try {
       const userRoleScopeUrl = userRoleScopeInitialValues?.uuid
         ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScopeInitialValues.uuid}`
         : `${restBaseUrl}/stockmanagement/userrolescope`;
-      const response = await createOrUpdateUserRoleScope(
-        userRoleScopeUrl,
-        payload,
-        userRoleScopeInitialValues?.userUuid ?? '',
-      );
-      if (response.ok) {
-        showSnackbar({
-          title: t('userRoleScopeSaved', 'User role scope saved successfully'),
-          subtitle: t('userRoleScopeCreatedSubtitle', 'User role scope has been created successfully'),
-          kind: 'success',
-          isLowContrast: true,
-        });
-        closeWorkspaceWithSavedChanges();
-        handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
+
+      for (const roleScope of data.forms.map(mappedRoleScopeForms)) {
+        const payload: Partial<UserRoleScope> = { ...roleScope };
+
+        const response = await createOrUpdateUserRoleScope(userRoleScopeUrl, payload, user?.uuid ?? '');
+        if (response.ok) {
+          showNotification('userRoleScopeSaved', 'userRoleScopeCreatedSubtitle', 'success');
+          closeWorkspaceWithSavedChanges();
+          handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
+        }
       }
     } catch (error) {
-      const errorObject = error?.responseBody?.error;
-      const errorMessage = errorObject?.message ?? 'An error occurred while creating the User role scope';
-      showSnackbar({
-        title: t('userRoleScopeCreationFailed', 'User role scope creation failed'),
-        subtitle: t(
-          'userRoleScopeCreationFailedSubtitle',
-          'An error occurred while creating the user role scope {{errorMessage}}',
-          { errorMessage },
-        ),
-        kind: 'error',
-        isLowContrast: true,
-      });
+      const errorMessage =
+        error?.responseBody?.error?.message ?? 'An error occurred while creating the User role scope';
+      showNotification('userRoleScopeCreationFailed', 'userRoleScopeCreationFailedSubtitle', 'error', { errorMessage });
     }
   };
 
@@ -221,25 +207,18 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
     }
   }, [isDirty, promptBeforeClosing]);
 
-  const handlePermissionDurationChange = (e, field, setValue) => {
-    const isChecked = e.target.checked;
-    field.onChange(isChecked);
-
-    if (isChecked) {
-      setValue('dateRange', { activeFrom: undefined, activeTo: undefined });
-    }
-  };
-
   function extractInventoryRoleNames(rolesConfig) {
     return rolesConfig.find((category) => category.category === ROLE_CATEGORIES.CORE_INVENTORY)?.roles || [];
   }
 
   const inventoryRoleNames = useMemo(() => extractInventoryRoleNames(rolesConfig), [rolesConfig]);
 
-  const inventoryRoles = useMemo(
-    () => user.roles.filter((role) => inventoryRoleNames.includes(role.display)),
-    [user.roles, inventoryRoleNames],
-  );
+  const inventoryRoles = useMemo(() => {
+    if (!user?.roles || inventoryRoleNames.length === 0) {
+      return [];
+    }
+    return user.roles.filter((role) => inventoryRoleNames.includes(role.display));
+  }, [user?.roles, inventoryRoleNames]);
 
   const scopeRoles = useMemo(
     () =>
@@ -274,251 +253,37 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
               <CardHeader title={t('stockUserRoleScope', 'Stock User Roles Scope')}>
                 <ChevronSortUp />
               </CardHeader>
-              <ResponsiveWrapper>
-                <Controller
-                  name="userName"
-                  control={roleScopeformMethods.control}
-                  render={({ field }) => (
-                    <TextInput {...field} readOnly={true} id="userName" labelText={t('username', 'Username')} />
-                  )}
-                />
-              </ResponsiveWrapper>
-              <ResponsiveWrapper>
-                <Controller
-                  name="role"
-                  control={roleScopeformMethods.control}
-                  render={({ field }) => (
-                    <ComboBox
-                      {...field}
-                      id="role"
-                      items={filteredInventoryRoles}
-                      itemToString={(item) => item?.display?.trim() || ''}
-                      titleText={t('stockRole', 'Stock Role')}
-                      selectedItem={filteredInventoryRoles.find((item) => item?.display === field.value) || null}
-                      onChange={({ selectedItem }) => {
-                        field.onChange(selectedItem ? selectedItem.display.trim() : '');
-                      }}
-                      disabled={!hasInventoryRole}
-                    />
-                  )}
-                />
-              </ResponsiveWrapper>
-              <ResponsiveWrapper>
-                <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
-                  <CheckboxGroup
-                    legendText={t('stockRoleAccess', 'Stock Role Access')}
-                    className={styles.checkboxGroupGrid}>
-                    <Controller
-                      name="enabled"
-                      control={roleScopeformMethods.control}
-                      render={({ field }) => (
-                        <div>
-                          <label htmlFor="enable">
-                            <input
-                              type="checkbox"
-                              id="enable"
-                              name="enabled"
-                              checked={field.value || false}
-                              onChange={(e) => field.onChange(e.target.checked)}
-                            />
-                            {t('enable', 'Enable?')}
-                          </label>
-                        </div>
-                      )}
-                    />
-                    {roleScopeformMethods?.watch('enabled') && (
-                      <Controller
-                        name="permanent"
-                        control={roleScopeformMethods.control}
-                        render={({ field }) => (
-                          <div>
-                            <label htmlFor="permanent">
-                              <input
-                                type="checkbox"
-                                id="permanent"
-                                name="permanent"
-                                checked={field.value || false}
-                                onChange={(e) =>
-                                  handlePermissionDurationChange(e, field, roleScopeformMethods.setValue)
-                                }
-                              />
-                              {t('permanent', 'Permanent?')}
-                            </label>
-                          </div>
-                        )}
-                      />
-                    )}
-                  </CheckboxGroup>
-                  {!roleScopeformMethods?.watch('permanent') && roleScopeformMethods?.watch('enabled') && (
-                    <ResponsiveWrapper>
-                      <Tile>
-                        <Controller
-                          name="dateRange"
-                          control={roleScopeformMethods.control}
-                          render={({ field }) => {
-                            const { value, onChange } = field;
-
-                            const handleDateChange = (dates: Array<Date>) => {
-                              onChange({
-                                activeFrom: dates[0],
-                                activeTo: dates[1],
-                              });
-                            };
-
-                            return (
-                              <DatePicker
-                                datePickerType="range"
-                                light
-                                minDate={formatDatetime(MinDate)}
-                                locale="en"
-                                dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                                onChange={handleDateChange}
-                                value={[value?.activeFrom, value?.activeTo]}>
-                                <DatePickerInput
-                                  id="date-picker-input-id-start"
-                                  name="activeFrom"
-                                  placeholder={DATE_PICKER_FORMAT}
-                                  labelText={t('activeFrom', 'Active From')}
-                                  value={value?.activeFrom}
-                                />
-                                <DatePickerInput
-                                  id="date-picker-input-id-finish"
-                                  name="activeTo"
-                                  placeholder={DATE_PICKER_FORMAT}
-                                  labelText={t('activeTo', 'Active To')}
-                                  value={value?.activeTo}
-                                />
-                              </DatePicker>
-                            );
-                          }}
-                        />
-                      </Tile>
-                    </ResponsiveWrapper>
-                  )}
-                </Column>
-              </ResponsiveWrapper>
-              <ResponsiveWrapper>
-                <Column
-                  key={t('stockOperation', 'Stock Operation')}
-                  xsm={8}
-                  md={12}
-                  lg={12}
-                  className={styles.checkBoxColumn}>
-                  <CheckboxGroup
-                    legendText={t('stockOperation', 'Stock Operation')}
-                    className={styles.checkboxGroupGrid}>
-                    {loadingStock ? (
-                      <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
-                    ) : (
-                      <Controller
-                        name="stockOperation"
-                        control={roleScopeformMethods.control}
-                        render={({ field }) => {
-                          const selectedStockOperation = field.value || [];
-
-                          const isSelected = (operationUuid: string) =>
-                            selectedStockOperation.some((op) => op.operationTypeUuid === operationUuid);
-                          const toggleOperation = (operation) => {
-                            if (isSelected(operation.uuid)) {
-                              field.onChange(
-                                selectedStockOperation.filter((op) => op.operationTypeUuid !== operation.uuid),
-                              );
-                            } else {
-                              field.onChange([
-                                ...selectedStockOperation,
-                                {
-                                  operationTypeUuid: operation.uuid,
-                                  operationTypeName: operation.name,
-                                },
-                              ]);
-                            }
-                          };
-
-                          return (
-                            <>
-                              {stockOperations?.length > 0 &&
-                                stockOperations.map((operation) => {
-                                  return (
-                                    <label
-                                      key={operation.uuid}
-                                      className={
-                                        isSelected(operation.uuid) ? styles.checkboxLabelSelected : styles.checkboxLabel
-                                      }>
-                                      <input
-                                        type="checkbox"
-                                        id={operation.uuid}
-                                        checked={isSelected(operation.uuid)}
-                                        onChange={() => toggleOperation(operation)}
-                                      />
-                                      {operation.name}
-                                    </label>
-                                  );
-                                })}
-                            </>
-                          );
-                        }}
-                      />
-                    )}
-                  </CheckboxGroup>
-                </Column>
-              </ResponsiveWrapper>
-              <ResponsiveWrapper>
-                <Column
-                  key={t('stockLocation', 'Stock Location')}
-                  xsm={8}
-                  md={12}
-                  lg={12}
-                  className={styles.checkBoxColumn}>
-                  <CheckboxGroup legendText={t('stockLocation', 'Stock Location')} className={styles.checkboxGroupGrid}>
-                    {loadingStock ? (
-                      <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
-                    ) : (
-                      <Controller
-                        name="operationLocation"
-                        control={roleScopeformMethods.control}
-                        render={({ field }) => {
-                          const selectedLocations = field.value || [];
-
-                          const isSelected = (locationUuid: string) =>
-                            selectedLocations.some((loc) => loc.locationUuid === locationUuid);
-                          const toggleLocation = (location) => {
-                            if (isSelected(location.id)) {
-                              field.onChange(selectedLocations.filter((loc) => loc.locationUuid !== location.id));
-                            } else {
-                              field.onChange([
-                                ...selectedLocations,
-                                { locationName: location.name, locationUuid: location.id },
-                              ]);
-                            }
-                          };
-
-                          return (
-                            <>
-                              {stockLocations?.length > 0 &&
-                                stockLocations.map((location) => (
-                                  <label
-                                    key={location.id}
-                                    className={
-                                      isSelected(location.id) ? styles.checkboxLabelSelected : styles.checkboxLabel
-                                    }>
-                                    <input
-                                      type="checkbox"
-                                      id={location.id}
-                                      checked={isSelected(location.id)}
-                                      onChange={() => toggleLocation(location)}
-                                    />
-                                    {location.name}
-                                  </label>
-                                ))}
-                            </>
-                          );
-                        }}
-                      />
-                    )}
-                  </CheckboxGroup>
-                </Column>
-              </ResponsiveWrapper>
             </ResponsiveWrapper>
+            <div className={styles.roleStockFields}>
+              <ResponsiveWrapper>
+                <TextInput
+                  readOnly={true}
+                  id="userName"
+                  labelText={t('username', 'Username')}
+                  value={user?.username || userRoleScopeInitialValues?.userName}
+                />
+              </ResponsiveWrapper>
+            </div>
+            {forms.map((field, index) => (
+              <UserRoleScopeFormFields
+                key={field.id}
+                field={field}
+                index={index}
+                control={roleScopeformMethods.control}
+                removeForm={removeForm}
+                filteredInventoryRoles={filteredInventoryRoles}
+                hasInventoryRole={hasInventoryRole}
+                stockOperations={stockOperations}
+                stockLocations={stockLocations}
+                loadingStock={loadingStock}
+                roleScopeformMethods={roleScopeformMethods}
+              />
+            ))}
+            <div className={styles.roleStockFields}>
+              <Button size="sm" kind="tertiary" renderIcon={Add} onClick={() => appendForm({})}>
+                {t('addAnotherRoleScope', 'Add user role scope')}
+              </Button>
+            </div>
           </Stack>
         </div>
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
