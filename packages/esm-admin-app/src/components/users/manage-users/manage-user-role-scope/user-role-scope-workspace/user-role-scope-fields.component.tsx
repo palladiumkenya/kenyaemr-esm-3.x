@@ -26,6 +26,7 @@ type UserRoleScopeFields = {
   loadingStock: any;
   stockLocations: any;
   roleScopeformMethods: any;
+  isInitialValuesEmpty: boolean;
 };
 const MinDate: Date = today();
 
@@ -40,6 +41,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
   loadingStock,
   stockLocations,
   roleScopeformMethods,
+  isInitialValuesEmpty,
 }) => {
   const { t } = useTranslation();
   const { watch } = useFormContext();
@@ -272,9 +274,11 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
           </CheckboxGroup>
         </Column>
       </ResponsiveWrapper>
-      <Button size="sm" kind="danger--tertiary" onClick={() => removeForm(index)}>
-        {t('remove', 'Remove')}
-      </Button>
+      {isInitialValuesEmpty && (
+        <Button size="sm" kind="danger--tertiary" onClick={() => removeForm(index)}>
+          {t('remove', 'Remove')}
+        </Button>
+      )}
     </div>
   );
 };
