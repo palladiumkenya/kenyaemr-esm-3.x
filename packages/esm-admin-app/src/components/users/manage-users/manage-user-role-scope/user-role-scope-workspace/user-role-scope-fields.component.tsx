@@ -1,5 +1,5 @@
-import React from 'react';
-import { Control, Controller, useFormContext } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { Control, Controller, useFormContext, UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './user-role-fields.scss';
 import { formatDatetime, ResponsiveWrapper } from '@openmrs/esm-framework';
@@ -14,17 +14,18 @@ import {
   DatePicker,
 } from '@carbon/react';
 import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, today } from '../../../../../constants';
+import { Role, StockOperationType } from '../../../../../config-schema';
 
 type UserRoleScopeFields = {
   field: Record<string, any>;
   index: number;
   control: Control<Record<string, any>>;
   removeForm: (index: number) => void;
-  filteredInventoryRoles: any;
+  filteredInventoryRoles: Array<Role>;
   hasInventoryRole: boolean;
-  stockOperations: any;
-  loadingStock: any;
-  stockLocations: any;
+  stockOperations: Array<StockOperationType>;
+  loadingStock: boolean;
+  stockLocations: Array<fhir.Location>;
   roleScopeformMethods: any;
   isInitialValuesEmpty: boolean;
 };
@@ -44,7 +45,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
   isInitialValuesEmpty,
 }) => {
   const { t } = useTranslation();
-  const { watch } = useFormContext();
+  const { watch, setValue } = useFormContext();
   const enabled = watch(`forms.${index}.enabled`);
   const permanent = watch(`forms.${index}.permanent`);
 
@@ -56,6 +57,12 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
       setValue(`forms.${index}.dateRange`, { activeFrom: undefined, activeTo: undefined });
     }
   };
+
+  useEffect(() => {
+    if (permanent) {
+      setValue(`forms.${index}.dateRange`, { activeFrom: undefined, activeTo: undefined });
+    }
+  }, [permanent, setValue, index]);
 
   return (
     <div className={styles.roleStockFields}>
