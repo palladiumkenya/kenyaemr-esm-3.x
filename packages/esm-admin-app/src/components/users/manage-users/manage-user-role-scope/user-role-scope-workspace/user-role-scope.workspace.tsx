@@ -42,7 +42,7 @@ import {
   ROLE_CATEGORIES,
   today,
 } from '../../../../../constants';
-import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { Add, ChevronSortUp } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../../../hook/useSystemRoleSetting';
 import UserRoleScopeFormFields from './user-role-scope-fields.component';
@@ -78,22 +78,26 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
       }
 
       return {
-        ...userRoleScopeInitialValues,
-        userName: user?.username || userRoleScopeInitialValues?.userName,
-        dateRange: {
-          activeTo: formatNewDate(userRoleScopeInitialValues?.activeTo),
-          activeFrom: formatNewDate(userRoleScopeInitialValues?.activeFrom),
-        },
-        locations:
-          userRoleScopeInitialValues?.locations?.map(({ locationName, locationUuid }) => ({
-            locationName,
-            locationUuid,
-          })) || [],
-        operationTypes:
-          userRoleScopeInitialValues?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
-            operationTypeName,
-            operationTypeUuid,
-          })) || [],
+        forms: [
+          {
+            ...userRoleScopeInitialValues,
+            userName: user?.username || userRoleScopeInitialValues?.userName,
+            dateRange: {
+              activeTo: formatNewDate(userRoleScopeInitialValues?.activeTo),
+              activeFrom: formatNewDate(userRoleScopeInitialValues?.activeFrom),
+            },
+            locations:
+              userRoleScopeInitialValues?.locations?.map(({ locationName, locationUuid }) => ({
+                locationName,
+                locationUuid,
+              })) || [],
+            operationTypes:
+              userRoleScopeInitialValues?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
+                operationTypeName,
+                operationTypeUuid,
+              })) || [],
+          },
+        ],
       };
     }, [userRoleScopeInitialValues, isInitialValuesEmpty, emptyUser, user]);
   };
@@ -101,12 +105,13 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   const editFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, isInitialValuesEmpty, null, null);
   const addFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, null, emptyUser, user);
 
-  const defaultValues = Object.keys(editFormDefaultValues).length > 0 ? editFormDefaultValues : addFormDefaultValues;
+  const userRoleScopedefaultValues =
+    Object.keys(editFormDefaultValues).length > 0 ? editFormDefaultValues : addFormDefaultValues;
 
   const roleScopeformMethods = useForm<UserRoleScopeFormSchema>({
     resolver: zodResolver(userRoleScopeFormSchema),
     mode: 'all',
-    defaultValues: defaultValues,
+    defaultValues: userRoleScopedefaultValues,
   });
 
   const { reset } = roleScopeformMethods;
@@ -120,9 +125,9 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
 
   useEffect(() => {
     if (!userRoleScopeInitialValues && !loadingStock) {
-      reset(defaultValues);
+      reset(userRoleScopedefaultValues);
     }
-  }, [defaultValues, loadingStock, userRoleScopeInitialValues, user]);
+  }, [userRoleScopedefaultValues, loadingStock, userRoleScopeInitialValues, user]);
 
   // field array
   const {
@@ -223,20 +228,17 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   const scopeRoles = useMemo(
     () =>
       items?.results?.reduce((acc, role) => {
-        if (role.userUuid === userRoleScopeInitialValues.uuid) {
+        if (role.userUuid === user.uuid) {
           acc.push(role.role);
         }
         return acc;
       }, []) || [],
-    [items, userRoleScopeInitialValues.uuid],
+    [items, user.uuid],
   );
 
   const filteredInventoryRoles = useMemo(
-    () =>
-      userRoleScopeInitialValues.uuid
-        ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display))
-        : inventoryRoles,
-    [userRoleScopeInitialValues.uuid, inventoryRoles, scopeRoles],
+    () => (user.uuid ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display)) : inventoryRoles),
+    [user.uuid, inventoryRoles, scopeRoles],
   );
 
   const hasInventoryRole = useMemo(
@@ -264,6 +266,7 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
                 />
               </ResponsiveWrapper>
             </div>
+
             {forms.map((field, index) => (
               <UserRoleScopeFormFields
                 key={field.id}
@@ -277,13 +280,24 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
                 stockLocations={stockLocations}
                 loadingStock={loadingStock}
                 roleScopeformMethods={roleScopeformMethods}
+                isInitialValuesEmpty={isInitialValuesEmpty}
               />
             ))}
-            <div className={styles.roleStockFields}>
-              <Button size="sm" kind="tertiary" renderIcon={Add} onClick={() => appendForm({})}>
-                {t('addAnotherRoleScope', 'Add user role scope')}
-              </Button>
-            </div>
+            {isInitialValuesEmpty && (
+              <div>
+                <div className={styles.roleStockFields}>
+                  {!hasInventoryRole && <EmptyState displayText={t('noUserRole', 'No user role')} headerTitle="" />}
+                  <Button
+                    size="sm"
+                    kind="tertiary"
+                    renderIcon={Add}
+                    onClick={() => appendForm({})}
+                    disabled={!hasInventoryRole}>
+                    {t('addAnotherRoleScope', 'Add user role scope')}
+                  </Button>
+                </div>
+              </div>
+            )}
           </Stack>
         </div>
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
