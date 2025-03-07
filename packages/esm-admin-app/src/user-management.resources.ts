@@ -86,20 +86,6 @@ export const createOrUpdateUserRoleScope = async (
   });
 };
 
-// export function createOrUpdateUserRoleScope(item: UserRoleScope) {
-//   const abortController = new AbortController();
-//   const isNew = item.uuid != null;
-//   const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope${isNew ? '/' + item.uuid : ''}`;
-//   return openmrsFetch(apiUrl, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//     },
-//     signal: abortController.signal,
-//     body: item,
-//   });
-// }
-
 export const handleMutation = (url: string) => {
   mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, { revalidate: true });
 };

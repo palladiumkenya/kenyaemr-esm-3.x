@@ -117,28 +117,6 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
     name: 'forms',
   });
 
-  // const mappedRoleScopeForms = (forms) => ({
-  //   uuid: userRoleScopeInitialValues?.uuid,
-  //   userUuid: userRoleScopeInitialValues?.userUuid || user?.uuid,
-  //   userName: userRoleScopeInitialValues?.userName,
-  //   userGivenName: userRoleScopeInitialValues?.userGivenName,
-  //   userFamilyName: userRoleScopeInitialValues?.userFamilyName,
-  //   permanent: forms.permanent,
-  //   enabled: forms.enabled,
-  //   operationTypes: forms.operationTypes?.map(({ operationTypeUuid, operationTypeName }) => ({
-  //     operationTypeUuid,
-  //     operationTypeName,
-  //   })),
-  //   locations: forms.locations?.map(({ locationUuid, locationName }) => ({
-  //     locationUuid,
-  //     locationName,
-  //     enableDescendants: false,
-  //   })),
-  //   role: forms.role,
-  //   activeFrom: forms.dateRange?.activeFrom || null,
-  //   activeTo: forms.dateRange?.activeTo || null,
-  // });
-
   const mappedRoleScopeForms = (form) => ({
     uuid: userRoleScopeInitialValues?.uuid,
     userUuid: userRoleScopeInitialValues?.userUuid || user?.uuid,
