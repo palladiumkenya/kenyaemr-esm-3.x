@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import {
@@ -52,66 +52,57 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user 
     [t],
   );
 
-  const showDeleteUserRoleScopeModal = (uuid: string) => {
-    const close = showModal('delete-stock-user-scope-modal', {
-      close: () => close(),
-      uuid: uuid,
-      onConfirmation: () => {
-        const ids = [];
-        ids.push(uuid);
-        deleteUserRoleScopes(ids)
-          .then(
-            () => {
-              handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
-              setDeletingUserScope(false);
-              showSnackbar({
-                isLowContrast: true,
-                title: t('deletingstockUserScope', 'Delete Stock User Scope'),
-                kind: 'success',
-                subtitle: t('stockUserScopeDeletedSuccessfully', 'Stock User Scope Deleted Successfully'),
-              });
-            },
-            (error) => {
-              setDeletingUserScope(false);
-              showSnackbar({
-                title: t('errorDeletingUserScope', 'Error deleting a user scope'),
-                kind: 'error',
-                isLowContrast: true,
-                subtitle: error?.message,
-              });
-            },
-          )
-          .catch();
-        close();
-      },
-    });
-  };
+  const showDeleteUserRoleScopeModal = useCallback(
+    (uuid: string) => {
+      const close = showModal('delete-stock-user-scope-modal', {
+        close: () => close(),
+        uuid,
+        onConfirmation: () => {
+          deleteUserRoleScopes([uuid])
+            .then(
+              () => {
+                handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
+                setDeletingUserScope(false);
+                showSnackbar({
+                  isLowContrast: true,
+                  title: t('deletingstockUserScope', 'Delete Stock User Scope'),
+                  kind: 'success',
+                  subtitle: t('stockUserScopeDeletedSuccessfully', 'Stock User Scope Deleted Successfully'),
+                });
+              },
+              (error) => {
+                setDeletingUserScope(false);
+                showSnackbar({
+                  title: t('errorDeletingUserScope', 'Error deleting a user scope'),
+                  kind: 'error',
+                  isLowContrast: true,
+                  subtitle: error?.message,
+                });
+              },
+            )
+            .catch();
+          close();
+        },
+      });
+    },
+    [t],
+  );
+
+  const renderLocationIcon = (enableDescendants) => (enableDescendants ? <ArrowDownLeft /> : <ArrowLeft />);
 
   const tableRows = useMemo(() => {
     return (
-      userRoleScopes?.results
-        ?.filter((scope) => scope.userUuid === user.uuid)
+      (userRoleScopes?.results ?? [])
+        .filter((scope) => scope.userUuid === user?.uuid)
         .map((userRoleScope, index) => ({
           id: index.toString(),
           role: userRoleScope.role || 'N/A',
-          location: userRoleScope?.locations?.map((location) => {
-            const key = `loc-${userRoleScope?.uuid}-${location.locationUuid}`;
-            return (
-              <span key={key}>
-                {location?.locationName}
-                {location?.enableDescendants ? (
-                  <ArrowDownLeft key={`${key}-${index}-0`} />
-                ) : (
-                  <ArrowLeft key={`${key}-${index}-1`} />
-                )}{' '}
-              </span>
-            );
-          }),
-          stockOperation: userRoleScope?.operationTypes
-            ?.map((operation) => {
-              return operation?.operationTypeName;
-            })
-            ?.join(', '),
+          location: userRoleScope?.locations?.map((location) => (
+            <span key={`loc-${userRoleScope?.uuid}-${location.locationUuid}`}>
+              {location?.locationName} {renderLocationIcon(location?.enableDescendants)}
+            </span>
+          )),
+          stockOperation: userRoleScope?.operationTypes?.map((operation) => operation?.operationTypeName).join(', '),
           permanent: userRoleScope.permanent ? t('yes', 'Yes') : t('no', 'No'),
           enabled: userRoleScope.enabled ? t('yes', 'Yes') : t('no', 'No'),
           actions: (
@@ -137,7 +128,11 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user 
           ),
         })) || []
     );
-  }, [userRoleScopes, t, user.uuid]);
+  }, [userRoleScopes, t, user?.uuid]);
+
+  if (loadingRoleScope) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
 
   return (
     <>

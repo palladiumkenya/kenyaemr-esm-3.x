@@ -1,28 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DefaultWorkspaceProps,
-  formatDatetime,
   ResponsiveWrapper,
   restBaseUrl,
   showSnackbar,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { Controller, FormProvider, useFieldArray, useForm } from 'react-hook-form';
+import { FormProvider, useFieldArray, useForm } from 'react-hook-form';
 import styles from '../../../manage-users/user-management.workspace.scss';
-import {
-  TextInput,
-  ButtonSet,
-  Button,
-  InlineLoading,
-  Stack,
-  Column,
-  Tile,
-  ComboBox,
-  DatePickerInput,
-  DatePicker,
-  CheckboxGroup,
-} from '@carbon/react';
+import { TextInput, ButtonSet, Button, InlineLoading, Stack } from '@carbon/react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
@@ -35,13 +22,7 @@ import {
   useStockTagLocations,
   useUserRoleScopes,
 } from '../../../../../user-management.resources';
-import {
-  DATE_PICKER_CONTROL_FORMAT,
-  DATE_PICKER_FORMAT,
-  formatNewDate,
-  ROLE_CATEGORIES,
-  today,
-} from '../../../../../constants';
+import { formatNewDate, ROLE_CATEGORIES, today } from '../../../../../constants';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { Add, ChevronSortUp } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../../../hook/useSystemRoleSetting';
@@ -51,7 +32,6 @@ type UserRoleScopeWorkspaceProps = DefaultWorkspaceProps & {
   userRoleScopeInitialValues?: UserRoleScope;
   user?: User;
 };
-const MinDate: Date = today();
 
 const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   closeWorkspace,
@@ -127,9 +107,7 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
     if (!userRoleScopeInitialValues && !loadingStock) {
       reset(userRoleScopedefaultValues);
     }
-  }, [userRoleScopedefaultValues, loadingStock, userRoleScopeInitialValues, user]);
-
-  // field array
+  }, [userRoleScopedefaultValues, loadingStock, userRoleScopeInitialValues, user, reset]);
   const {
     fields: forms,
     append: appendForm,
@@ -139,26 +117,48 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
     name: 'forms',
   });
 
-  const mappedRoleScopeForms = (forms) => ({
+  // const mappedRoleScopeForms = (forms) => ({
+  //   uuid: userRoleScopeInitialValues?.uuid,
+  //   userUuid: userRoleScopeInitialValues?.userUuid || user?.uuid,
+  //   userName: userRoleScopeInitialValues?.userName,
+  //   userGivenName: userRoleScopeInitialValues?.userGivenName,
+  //   userFamilyName: userRoleScopeInitialValues?.userFamilyName,
+  //   permanent: forms.permanent,
+  //   enabled: forms.enabled,
+  //   operationTypes: forms.operationTypes?.map(({ operationTypeUuid, operationTypeName }) => ({
+  //     operationTypeUuid,
+  //     operationTypeName,
+  //   })),
+  //   locations: forms.locations?.map(({ locationUuid, locationName }) => ({
+  //     locationUuid,
+  //     locationName,
+  //     enableDescendants: false,
+  //   })),
+  //   role: forms.role,
+  //   activeFrom: forms.dateRange?.activeFrom || null,
+  //   activeTo: forms.dateRange?.activeTo || null,
+  // });
+
+  const mappedRoleScopeForms = (form) => ({
     uuid: userRoleScopeInitialValues?.uuid,
     userUuid: userRoleScopeInitialValues?.userUuid || user?.uuid,
     userName: userRoleScopeInitialValues?.userName,
     userGivenName: userRoleScopeInitialValues?.userGivenName,
     userFamilyName: userRoleScopeInitialValues?.userFamilyName,
-    permanent: forms.permanent,
-    enabled: forms.enabled,
-    operationTypes: forms.operationTypes?.map(({ operationTypeUuid, operationTypeName }) => ({
+    permanent: form?.permanent,
+    enabled: form?.enabled,
+    operationTypes: form?.operationTypes?.map(({ operationTypeUuid, operationTypeName }) => ({
       operationTypeUuid,
       operationTypeName,
     })),
-    locations: forms.locations?.map(({ locationUuid, locationName }) => ({
+    locations: form?.locations?.map(({ locationUuid, locationName }) => ({
       locationUuid,
       locationName,
       enableDescendants: false,
     })),
-    role: forms.role,
-    activeFrom: forms.dateRange?.activeFrom || null,
-    activeTo: forms.dateRange?.activeTo || null,
+    role: form?.role,
+    activeFrom: form?.dateRange?.activeFrom || null,
+    activeTo: form?.dateRange?.activeTo || null,
   });
 
   const showNotification = (titleKey, subtitleKey, kind, params = {}) => {
@@ -176,20 +176,24 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
         ? `${restBaseUrl}/stockmanagement/userrolescope/${userRoleScopeInitialValues.uuid}`
         : `${restBaseUrl}/stockmanagement/userrolescope`;
 
-      for (const roleScope of data.forms.map(mappedRoleScopeForms)) {
-        const payload: Partial<UserRoleScope> = { ...roleScope };
+      await Promise.all(
+        data.forms.map(async (form) => {
+          const roleScope = mappedRoleScopeForms(form);
+          const response = await createOrUpdateUserRoleScope(userRoleScopeUrl, roleScope, user?.uuid ?? '');
+          if (response.ok) {
+            showNotification('userRoleScopeSaved', 'User role scope saved successfully', 'success');
+            closeWorkspaceWithSavedChanges();
+          }
+        }),
+      );
 
-        const response = await createOrUpdateUserRoleScope(userRoleScopeUrl, payload, user?.uuid ?? '');
-        if (response.ok) {
-          showNotification('userRoleScopeSaved', 'userRoleScopeCreatedSubtitle', 'success');
-          closeWorkspaceWithSavedChanges();
-          handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
-        }
-      }
+      handleMutation(`${restBaseUrl}/stockmanagement/userrolescope`);
     } catch (error) {
       const errorMessage =
         error?.responseBody?.error?.message ?? 'An error occurred while creating the User role scope';
-      showNotification('userRoleScopeCreationFailed', 'userRoleScopeCreationFailedSubtitle', 'error', { errorMessage });
+      showNotification('userRoleScopeCreationFailed', 'User role scope failed to save successfully', 'error', {
+        errorMessage,
+      });
     }
   };
 
@@ -216,7 +220,7 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
     return rolesConfig.find((category) => category.category === ROLE_CATEGORIES.CORE_INVENTORY)?.roles || [];
   }
 
-  const inventoryRoleNames = useMemo(() => extractInventoryRoleNames(rolesConfig), [rolesConfig]);
+  const inventoryRoleNames = useMemo(() => extractInventoryRoleNames(rolesConfig || []), [rolesConfig]);
 
   const inventoryRoles = useMemo(() => {
     if (!user?.roles || inventoryRoleNames.length === 0) {
@@ -236,10 +240,12 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
     [items, user.uuid],
   );
 
-  const filteredInventoryRoles = useMemo(
-    () => (user.uuid ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display)) : inventoryRoles),
-    [user.uuid, inventoryRoles, scopeRoles],
-  );
+  const filteredInventoryRoles = useMemo(() => {
+    if (!user?.roles) {
+      return [];
+    }
+    return user.uuid ? inventoryRoles.filter((role) => !scopeRoles.includes(role.display)) : inventoryRoles;
+  }, [user?.roles, user.uuid, inventoryRoles, scopeRoles]);
 
   const hasInventoryRole = useMemo(
     () => filteredInventoryRoles.length > 0 && user.roles.some((role) => filteredInventoryRoles.includes(role)),
