@@ -189,3 +189,26 @@ export const useUserRoleScopes = () => {
     userRoleScopeError: error,
   };
 };
+
+export function deleteUserRoleScopes(ids: string[]) {
+  let otherIds = ids.reduce((p, c, i) => {
+    if (i === 0) {
+      return p;
+    }
+    p += (p.length > 0 ? ',' : '') + encodeURIComponent(c);
+    return p;
+  }, '');
+  if (otherIds.length > 0) {
+    otherIds = '?ids=' + otherIds;
+  }
+  const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope/${ids[0]}${otherIds}`;
+  const abortController = new AbortController();
+
+  return openmrsFetch(apiUrl, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+  });
+}

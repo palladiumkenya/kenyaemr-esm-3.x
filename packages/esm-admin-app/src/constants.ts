@@ -13,3 +13,7 @@ export const DATE_PICKER_FORMAT = 'DD/MM/YYYY';
 export const formatNewDate = (date: Date | null | undefined) => {
   return date ? new Date(date) : '';
 };
+
+export const ROLE_CATEGORIES = {
+  CORE_INVENTORY: 'Core Inventory Roles',
+};
