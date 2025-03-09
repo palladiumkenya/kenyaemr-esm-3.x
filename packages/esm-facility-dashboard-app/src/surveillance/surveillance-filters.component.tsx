@@ -1,11 +1,11 @@
 import { Dropdown } from '@carbon/react';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './surveillance.scss';
 
 const SurveillanceFilters = () => {
   const { t } = useTranslation();
-  const reportingPeriods = useMemo(() => [{ label: 'Last 1 week view' }], []);
+  const reportingPeriods = [{ label: 'Last 1 week view' }];
   return (
     <div className={styles.filtersContainer}>
       <Dropdown
