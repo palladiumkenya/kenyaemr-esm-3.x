@@ -44,6 +44,7 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
       return stockItem === stockItemUuid;
     }) || [];
   const { itemHasBill } = useOrderBill(patientUuid, orderUuid);
+  const drugOrderTypeUuid = '131168f4-15f5-102d-96e4-000c29c2a5d7';
   // Handle modal close and revalidation
   const handleModalClose = useCallback(() => {
     mutate((key) => typeof key === 'string' && key.startsWith(additionalProps?.mutateUrl as string), undefined, {
@@ -106,11 +107,16 @@ const TestOrderAction: React.FC<TestOrderProps> = (props) => {
       return t('unsettledBill', 'Unsettled bill');
     }
 
-    if (stockItemQuantity < 1) {
+    if (stockItemQuantity < 1 && order?.orderType?.uuid === drugOrderTypeUuid) {
       return t('outOfStock', 'Out of Stock');
     }
 
-    if (stockItemQuantity > 0 && itemHasBill.length === 0 && billableItem.length > 0) {
+    if (
+      stockItemQuantity > 0 &&
+      itemHasBill.length === 0 &&
+      billableItem.length > 0 &&
+      order?.orderType?.uuid === drugOrderTypeUuid
+    ) {
       return t('bill', 'Bill');
     }
 
