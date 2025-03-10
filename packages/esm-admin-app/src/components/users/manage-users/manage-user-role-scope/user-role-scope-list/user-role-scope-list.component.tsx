@@ -128,7 +128,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user 
           ),
         })) || []
     );
-  }, [userRoleScopes, t, user?.uuid]);
+  }, [userRoleScopes, t, user?.uuid, showDeleteUserRoleScopeModal]);
 
   if (loadingRoleScope) {
     return <DataTableSkeleton role="progressbar" />;

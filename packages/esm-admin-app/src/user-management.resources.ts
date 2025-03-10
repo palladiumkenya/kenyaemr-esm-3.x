@@ -190,18 +190,20 @@ export const useUserRoleScopes = () => {
   };
 };
 
-export function deleteUserRoleScopes(ids: string[]) {
-  let otherIds = ids.reduce((p, c, i) => {
-    if (i === 0) {
-      return p;
+export function deleteUserRoleScopes(roleScopeIds: string[]) {
+  let encodedRoleScopeIds = roleScopeIds.reduce((queryString, currentId, index) => {
+    if (index === 0) {
+      return queryString;
     }
-    p += (p.length > 0 ? ',' : '') + encodeURIComponent(c);
-    return p;
+    queryString += (queryString.length > 0 ? ',' : '') + encodeURIComponent(currentId);
+    return queryString;
   }, '');
-  if (otherIds.length > 0) {
-    otherIds = '?ids=' + otherIds;
+
+  if (encodedRoleScopeIds.length > 0) {
+    encodedRoleScopeIds = '?ids=' + encodedRoleScopeIds;
   }
-  const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope/${ids[0]}${otherIds}`;
+
+  const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope/${roleScopeIds[0]}${encodedRoleScopeIds}`;
   const abortController = new AbortController();
 
   return openmrsFetch(apiUrl, {
