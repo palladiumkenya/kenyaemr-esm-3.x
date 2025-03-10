@@ -39,6 +39,14 @@
     {
       "component": "operationConfirmationModal",
       "name": "operation-confirmation-modal"
+    },
+    {
+      "component": "hwrConfirmationModal",
+      "name": "hwr-confirmation-modal"
+    },
+    {
+      "component": "hwrEmptyModal",
+      "name": "hwr-empty-modal"
     }
   ],
   "pages": [
