@@ -5,6 +5,7 @@ import styles from './surveillance.scss';
 
 const SurveillanceFilters = () => {
   const { t } = useTranslation();
+  const reportingPeriods = [{ label: 'Last 1 week view' }];
   return (
     <div className={styles.filtersContainer}>
       <Dropdown
@@ -12,7 +13,8 @@ const SurveillanceFilters = () => {
         autoAlign
         id="filters"
         itemToString={(item) => item?.label ?? ''}
-        items={[{ label: 'Last day view' }, { label: 'Last 1 week view' }]}
+        items={reportingPeriods}
+        selectedItem={reportingPeriods[0]}
         label={t('reportingPeriod', 'Reporting Period')}
       />
     </div>

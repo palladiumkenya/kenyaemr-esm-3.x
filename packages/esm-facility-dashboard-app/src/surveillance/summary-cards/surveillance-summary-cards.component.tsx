@@ -75,21 +75,21 @@ const SurveillanceSummaryCards = () => {
         header={t('dnapcrPending', 'DNA-PCR Pending')}
         title={t('HEIWithoutDNAPCR', 'HEI (6-8 WEEKS) without DNA PCR Results')}
         value={`${surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults}`}
-        mode={getIndication(
-          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults,
-          surveillanceSummary?.getHeiSixToEightWeeksOld,
-          surveillanceSummary?.heiClinicalActionThreshold,
-        )}
+        mode={
+          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults >= surveillanceSummary?.heiClinicalActionThreshold
+            ? 'increasing'
+            : 'decreasing'
+        }
       />
       <SummaryCard
         header={t('heiIncomplete', 'HEI Incomplete')}
         title={t('HEIWithoutFinalDocumentedOutcome', 'HEI (24 months) without final documented outcomes')}
         value={`${surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome}`}
-        mode={getIndication(
-          surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome,
-          surveillanceSummary?.getHei24MonthsOld,
-          surveillanceSummary?.heiClinicalActionThreshold,
-        )}
+        mode={
+          surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome >= surveillanceSummary?.heiClinicalActionThreshold
+            ? 'increasing'
+            : 'decreasing'
+        }
       />
     </Layer>
   );
