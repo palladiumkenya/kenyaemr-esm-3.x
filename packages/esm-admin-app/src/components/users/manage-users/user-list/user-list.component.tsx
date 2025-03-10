@@ -14,12 +14,16 @@ import {
   DataTableSkeleton,
   Button,
   Pagination,
-  ButtonSet,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
 import { Edit, UserFollow } from '@carbon/react/icons';
 import styles from './user-list.scss';
 import { launchWorkspace, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
+import StockUserRoleListActionsMenu from '../manage-user-role-scope/user-role-scope-list/user-role-scope-list-action-menu.component';
+import { useSystemUserRoleConfigSetting } from '../../../hook/useSystemRoleSetting';
+import { ROLE_CATEGORIES } from '../../../../constants';
 
 const UserList: React.FC = () => {
   const { t } = useTranslation();
@@ -30,6 +34,8 @@ const UserList: React.FC = () => {
   const [pageSize, setPageSize] = useState(10);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { rolesConfig, error } = useSystemUserRoleConfigSetting();
 
   const filteredUserList = useMemo(() => {
     return (
@@ -101,6 +107,12 @@ const UserList: React.FC = () => {
     },
   ];
 
+  function extractInventoryRoleNames(rolesConfig) {
+    return rolesConfig.find((category) => category.category === ROLE_CATEGORIES.CORE_INVENTORY)?.roles || [];
+  }
+
+  const inventoryRoleNames = extractInventoryRoleNames(rolesConfig);
+
   const rows = paginatedUsers.map((user, index) => {
     const rolesDisplay =
       user.roles.length > 2
@@ -109,6 +121,7 @@ const UserList: React.FC = () => {
 
     const [given, ...familyNameParts] = user.person.display.split(' ');
     const familyName = familyNameParts.join(' ');
+    const userHasInventoryRole = user.roles.some((role) => inventoryRoleNames.includes(role.display));
 
     return {
       id: user.uuid,
@@ -118,26 +131,24 @@ const UserList: React.FC = () => {
       familyName: familyName,
       roles: rolesDisplay,
       actions: (
-        <ButtonSet className={styles.btnSet}>
-          <Button
+        <OverflowMenu className={styles.btnSet} flipped={true} aria-label="user-management-menu">
+          <OverflowMenuItem
             className={styles.btn}
-            renderIcon={Edit}
-            hasIconOnly
-            kind="ghost"
-            iconDescription={t('edit', 'Edit')}
             onClick={() => {
               const selectedUser = users.find((u) => u.uuid === user.uuid);
               if (selectedUser) {
                 launchWorkspace('manage-user-workspace', {
                   workspaceTitle: t('editUser', 'Edit User'),
-                  initialUserValue: selectedUser,
+                  initialUserValue: user,
                 });
               } else {
                 console.error('User not found:', user.uuid);
               }
             }}
+            itemText={t('editUser', 'Edit user')}
           />
-        </ButtonSet>
+          {userHasInventoryRole && StockUserRoleListActionsMenu ? <StockUserRoleListActionsMenu user={user} /> : null}
+        </OverflowMenu>
       ),
     };
   });
