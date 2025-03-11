@@ -7,7 +7,7 @@ import SummaryCard from './summary-card.component';
 import styles from './summary-card.scss';
 const SurveillanceSummaryCards = () => {
   const { t } = useTranslation();
-  const { error, isLoading, surveillanceSummary, getIndication } = useFacilityDashboardSurveillance();
+  const { error, isLoading, surveillanceSummary, getIndication, getPercentage } = useFacilityDashboardSurveillance();
 
   if (isLoading) {
     return (
@@ -26,9 +26,13 @@ const SurveillanceSummaryCards = () => {
   return (
     <Layer className={styles.cardcontainer}>
       <SummaryCard
-        header={t('hivNotlinked', 'HIV Not linked')}
-        title={t('hivPositiveClientsnotLinkedToArt', 'HIV Positive Clients not linked to ART')}
-        value={`${surveillanceSummary?.getHivPositiveNotLinked}`}
+        header={t('hivNotlinked', 'HIV +ve not linked')}
+        title={t('hivPositiveClientsnotLinkedToArt', 'Number of HIV +ve Clients not linked to ART')}
+        value={`${surveillanceSummary?.getHivPositiveNotLinked}/${surveillanceSummary?.getHivTestedPositive}`}
+        percentage={getPercentage(
+          surveillanceSummary?.getHivPositiveNotLinked,
+          surveillanceSummary?.getHivTestedPositive,
+        )}
         mode={getIndication(
           surveillanceSummary?.getHivPositiveNotLinked,
           surveillanceSummary?.getHivTestedPositive,
@@ -36,12 +40,13 @@ const SurveillanceSummaryCards = () => {
         )}
       />
       <SummaryCard
-        header={t('prepNotlinked', 'PREP Not linked')}
-        title={t(
-          'pregnantPostPartumWomenNotLinkedToPREP',
-          'Pregnant / postpartum women at high risk not linked to PREP',
+        header={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
+        title={t('pbfwNotLinked', 'High risk -ve PBFW Not linked to PrEP')}
+        value={`${surveillanceSummary?.getPregnantPostpartumNotInPrep}/${surveillanceSummary?.getPregnantOrPostpartumClients}`}
+        percentage={getPercentage(
+          surveillanceSummary?.getPregnantPostpartumNotInPrep,
+          surveillanceSummary?.getPregnantOrPostpartumClients,
         )}
-        value={`${surveillanceSummary?.getPregnantPostpartumNotInPrep}`}
         mode={getIndication(
           surveillanceSummary?.getPregnantPostpartumNotInPrep,
           surveillanceSummary?.getPregnantOrPostpartumClients,
@@ -49,22 +54,33 @@ const SurveillanceSummaryCards = () => {
         )}
       />
       <SummaryCard
-        header={t('eacPending', 'EAC Pending')}
+        header={t('delayedEAC', 'Delayed EAC')}
         title={t(
           'virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks',
           'Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks',
         )}
-        value={`${surveillanceSummary?.getVirallyUnsuppressedWithoutEAC}`}
+        value={`${surveillanceSummary?.getVirallyUnsuppressedWithoutEAC}/${surveillanceSummary?.getVirallyUnsuppressed}`}
         mode={getIndication(
           surveillanceSummary?.getVirallyUnsuppressedWithoutEAC,
           surveillanceSummary?.getVirallyUnsuppressed,
           surveillanceSummary?.clinicalActionThreshold,
         )}
+        percentage={getPercentage(
+          surveillanceSummary?.getVirallyUnsuppressedWithoutEAC,
+          surveillanceSummary?.getVirallyUnsuppressed,
+        )}
       />
       <SummaryCard
-        header={t('vlDelayed', 'VL Delayed')}
-        title={t('delayedVLTesting', 'Delayed Viral Load (VL) testing')}
-        value={`${surveillanceSummary?.getEligibleForVlSampleNotTaken}`}
+        header={t('missedoppotunityVL', 'Missed opportunity VL')}
+        title={t(
+          'delayedVLTesting',
+          'Number of client on ART that visited, were eligible for VL sampling and no VL was done',
+        )}
+        value={`${surveillanceSummary?.getEligibleForVlSampleNotTaken}/${surveillanceSummary?.getEligibleForVl}`}
+        percentage={getPercentage(
+          surveillanceSummary?.getEligibleForVlSampleNotTaken,
+          surveillanceSummary?.getEligibleForVl,
+        )}
         mode={getIndication(
           surveillanceSummary?.getEligibleForVlSampleNotTaken,
           surveillanceSummary?.getEligibleForVl,
@@ -72,9 +88,13 @@ const SurveillanceSummaryCards = () => {
         )}
       />
       <SummaryCard
-        header={t('dnapcrPending', 'DNA-PCR Pending')}
-        title={t('HEIWithoutDNAPCR', 'HEI (6-8 WEEKS) without DNA PCR Results')}
-        value={`${surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults}`}
+        header={t('dnapcrPending', 'Pending DNA-PCR Results')}
+        title={t('heiWithoutDNAPCR', 'HEI (6-8 WEEKS) without DNA PCR Results')}
+        value={`${surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults}/${surveillanceSummary.getHeiSixToEightWeeksOld}`}
+        percentage={getPercentage(
+          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults,
+          surveillanceSummary.getHeiSixToEightWeeksOld,
+        )}
         mode={
           surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults >= surveillanceSummary?.heiClinicalActionThreshold
             ? 'increasing'
@@ -82,9 +102,13 @@ const SurveillanceSummaryCards = () => {
         }
       />
       <SummaryCard
-        header={t('heiIncomplete', 'HEI Incomplete')}
-        title={t('HEIWithoutFinalDocumentedOutcome', 'HEI (24 months) without final documented outcomes')}
-        value={`${surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome}`}
+        header={t('heiFinalOutcomes', 'HEI Final Outcomes')}
+        title={t('heiWithoutFinalDocumentedOutcome', '24 months old HEI without documented outcome')}
+        value={`${surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome}/${surveillanceSummary.getHei24MonthsOld}`}
+        percentage={getPercentage(
+          surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome,
+          surveillanceSummary?.getHei24MonthsOld,
+        )}
         mode={
           surveillanceSummary?.getHei24MonthsWithoutDocumentedOutcome >= surveillanceSummary?.heiClinicalActionThreshold
             ? 'increasing'
