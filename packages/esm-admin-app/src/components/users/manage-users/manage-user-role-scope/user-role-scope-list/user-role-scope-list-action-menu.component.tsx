@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
+import { launchWorkspace, navigate } from '@openmrs/esm-framework';
 import { launchOverlay } from '../../../../hook/overlay';
 import StockUserRoleScopesList from './user-role-scope-list.component';
 import { User } from '../../../../../config-schema';
@@ -13,7 +14,10 @@ const StockUserRoleListActionsMenu: React.FC<StockUserRoleListActionsMenuProps> 
   const { t } = useTranslation();
 
   const handleClick = useCallback(() => {
-    launchOverlay('Manage Stock User Role Scope', <StockUserRoleScopesList user={user} />);
+    launchWorkspace('user-role-scope-workspace', {
+      workspaceTitle: t('editRoleScope', 'Edit User Role Scope'),
+      userUuid: user.uuid,
+    });
   }, [user]);
 
   return (

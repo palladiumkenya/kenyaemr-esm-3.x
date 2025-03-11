@@ -14,6 +14,7 @@ import {
   Button,
   OverflowMenu,
   OverflowMenuItem,
+  Header,
 } from '@carbon/react';
 import { AddAlt, ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
 import styles from '../../manage-user.scss';
@@ -26,13 +27,14 @@ import {
   WorkspaceContainer,
 } from '@openmrs/esm-framework';
 import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../../../../user-management.resources';
-import { User } from '../../../../../config-schema';
+import { User, UserRoleScope } from '../../../../../config-schema';
 
 interface StockUserRoleScopesListProps {
-  user?: User;
+  userUuid: string;
+  onEditUserRoleScope: (userRoleScope: UserRoleScope) => void;
 }
 
-const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user }) => {
+const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userUuid, onEditUserRoleScope }) => {
   const { t } = useTranslation();
 
   // Fetch user role scopes
@@ -93,7 +95,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user 
   const tableRows = useMemo(() => {
     return (
       (userRoleScopes?.results ?? [])
-        .filter((scope) => scope.userUuid === user?.uuid)
+        .filter((scope) => scope.userUuid === userUuid)
         .map((userRoleScope, index) => ({
           id: index.toString(),
           role: userRoleScope.role || 'N/A',
@@ -109,10 +111,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user 
             <OverflowMenu className={styles.btnSet}>
               <OverflowMenuItem
                 onClick={() => {
-                  launchWorkspace('user-role-scope-workspace', {
-                    workspaceTitle: t('editRoleScope', 'Edit User Role Scope'),
-                    userRoleScopeInitialValues: userRoleScope,
-                  });
+                  onEditUserRoleScope(userRoleScope);
                 }}
                 itemText={t('edit', 'Edit')}
               />
@@ -128,7 +127,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user 
           ),
         })) || []
     );
-  }, [userRoleScopes, t, user?.uuid, showDeleteUserRoleScopeModal]);
+  }, [userRoleScopes, t, userUuid, showDeleteUserRoleScopeModal, onEditUserRoleScope]);
 
   if (loadingRoleScope) {
     return <DataTableSkeleton role="progressbar" />;
@@ -142,7 +141,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user 
             onClick={() => {
               launchWorkspace('user-role-scope-workspace', {
                 workspaceTitle: t('addRoleScope', 'Add a new user role scope'),
-                user: user,
+                user: userUuid,
               });
             }}
             className={styles.userManagementModeButton}

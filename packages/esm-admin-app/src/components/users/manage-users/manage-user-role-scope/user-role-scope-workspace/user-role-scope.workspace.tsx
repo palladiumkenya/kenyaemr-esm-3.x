@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DefaultWorkspaceProps,
@@ -27,6 +27,7 @@ import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { Add, ChevronSortUp } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../../../hook/useSystemRoleSetting';
 import UserRoleScopeFormFields from './user-role-scope-fields.component';
+import StockUserRoleScopesList from '../user-role-scope-list/user-role-scope-list.component';
 
 type UserRoleScopeWorkspaceProps = DefaultWorkspaceProps & {
   userRoleScopeInitialValues?: UserRoleScope;
@@ -37,7 +38,6 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   closeWorkspace,
   promptBeforeClosing,
   closeWorkspaceWithSavedChanges,
-  userRoleScopeInitialValues = {} as UserRoleScope,
   user = {} as User,
 }) => {
   const { t } = useTranslation();
@@ -48,12 +48,16 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
   const { items, loadingRoleScope } = useUserRoleScopes();
 
-  const isInitialValuesEmpty = Object.keys(userRoleScopeInitialValues).length === 0;
+  const [userRoleScopeInitialValues, setuserRoleScopeInitialValues] = useState<UserRoleScope | null>(null);
+  const handleEditUserRoleScope = useCallback((userRoleScope: UserRoleScope) => {
+    setuserRoleScopeInitialValues(userRoleScope);
+  }, []);
+  // const isInitialValuesEmpty = Object.keys(userRoleScopeInitialValues).length === 0;
   const emptyUser = Object.keys(user).length === 0;
   type UserRoleScopeFormSchema = z.infer<typeof userRoleScopeFormSchema>;
   const useFormDefaults = (userRoleScopeInitialValues, isInitialValuesEmpty, emptyUser, user) => {
     return useMemo(() => {
-      if (isInitialValuesEmpty || emptyUser) {
+      if (userRoleScopeInitialValues) {
         return {};
       }
 
@@ -82,7 +86,7 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
     }, [userRoleScopeInitialValues, isInitialValuesEmpty, emptyUser, user]);
   };
 
-  const editFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, isInitialValuesEmpty, null, null);
+  const editFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, !userRoleScopeInitialValues, null, null);
   const addFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, null, emptyUser, user);
 
   const userRoleScopedefaultValues =
@@ -231,79 +235,86 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   );
 
   return (
-    <FormProvider {...roleScopeformMethods}>
-      <form onSubmit={roleScopeformMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
-        <div className={styles.formContainer}>
-          <Stack className={styles.formStackControl} gap={7}>
-            <ResponsiveWrapper>
-              <CardHeader title={t('stockUserRoleScope', 'Stock User Roles Scope')}>
-                <ChevronSortUp />
-              </CardHeader>
-            </ResponsiveWrapper>
-            <div className={styles.roleStockFields}>
-              <ResponsiveWrapper>
-                <TextInput
-                  readOnly={true}
-                  id="userName"
-                  labelText={t('username', 'Username')}
-                  value={user?.username || userRoleScopeInitialValues?.userName}
-                />
-              </ResponsiveWrapper>
-            </div>
-
-            {forms.map((field, index) => (
-              <UserRoleScopeFormFields
-                key={field.id}
-                field={field}
-                index={index}
-                control={roleScopeformMethods.control}
-                removeForm={removeForm}
-                filteredInventoryRoles={filteredInventoryRoles}
-                hasInventoryRole={hasInventoryRole}
-                stockOperations={stockOperations}
-                stockLocations={stockLocations}
-                loadingStock={loadingStock}
-                roleScopeformMethods={roleScopeformMethods}
-                isInitialValuesEmpty={isInitialValuesEmpty}
-              />
-            ))}
-            {isInitialValuesEmpty && (
-              <div>
+    <>
+      <div>
+        <StockUserRoleScopesList onEditUserRoleScope={handleEditUserRoleScope} userUuid={user.uuid} />
+      </div>
+      {userRoleScopeInitialValues && (
+        <FormProvider {...roleScopeformMethods}>
+          <form onSubmit={roleScopeformMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
+            <div className={styles.formContainer}>
+              <Stack className={styles.formStackControl} gap={7}>
+                <ResponsiveWrapper>
+                  <CardHeader title={t('stockUserRoleScope', 'Stock User Roles Scope')}>
+                    <ChevronSortUp />
+                  </CardHeader>
+                </ResponsiveWrapper>
                 <div className={styles.roleStockFields}>
-                  {!hasInventoryRole && <EmptyState displayText={t('noUserRole', 'No user role')} headerTitle="" />}
-                  <Button
-                    size="sm"
-                    kind="tertiary"
-                    renderIcon={Add}
-                    onClick={() => appendForm({})}
-                    disabled={!hasInventoryRole}>
-                    {t('addAnotherRoleScope', 'Add user role scope')}
-                  </Button>
+                  <ResponsiveWrapper>
+                    <TextInput
+                      readOnly={true}
+                      id="userName"
+                      labelText={t('username', 'Username')}
+                      value={user?.username || userRoleScopeInitialValues?.userName}
+                    />
+                  </ResponsiveWrapper>
                 </div>
-              </div>
-            )}
-          </Stack>
-        </div>
-        <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button
-            disabled={isSubmitting || Object.keys(errors).length > 0}
-            style={{ maxWidth: '50%' }}
-            kind="primary"
-            type="submit">
-            {isSubmitting ? (
-              <span style={{ display: 'flex', justifyItems: 'center' }}>
-                {t('submitting', 'Submitting...')} <InlineLoading status="active" iconDescription="Loading" />
-              </span>
-            ) : (
-              t('saveAndClose', 'Save & close')
-            )}
-          </Button>
-        </ButtonSet>
-      </form>
-    </FormProvider>
+
+                {forms.map((field, index) => (
+                  <UserRoleScopeFormFields
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    control={roleScopeformMethods.control}
+                    removeForm={removeForm}
+                    filteredInventoryRoles={filteredInventoryRoles}
+                    hasInventoryRole={hasInventoryRole}
+                    stockOperations={stockOperations}
+                    stockLocations={stockLocations}
+                    loadingStock={loadingStock}
+                    roleScopeformMethods={roleScopeformMethods}
+                    isInitialValuesEmpty={!userRoleScopeInitialValues}
+                  />
+                ))}
+                {!userRoleScopeInitialValues && (
+                  <div>
+                    <div className={styles.roleStockFields}>
+                      {!hasInventoryRole && <EmptyState displayText={t('noUserRole', 'No user role')} headerTitle="" />}
+                      <Button
+                        size="sm"
+                        kind="tertiary"
+                        renderIcon={Add}
+                        onClick={() => appendForm({})}
+                        disabled={!hasInventoryRole}>
+                        {t('addAnotherRoleScope', 'Add user role scope')}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </Stack>
+            </div>
+            <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
+              <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
+                {t('cancel', 'Cancel')}
+              </Button>
+              <Button
+                disabled={isSubmitting || Object.keys(errors).length > 0}
+                style={{ maxWidth: '50%' }}
+                kind="primary"
+                type="submit">
+                {isSubmitting ? (
+                  <span style={{ display: 'flex', justifyItems: 'center' }}>
+                    {t('submitting', 'Submitting...')} <InlineLoading status="active" iconDescription="Loading" />
+                  </span>
+                ) : (
+                  t('saveAndClose', 'Save & close')
+                )}
+              </Button>
+            </ButtonSet>
+          </form>
+        </FormProvider>
+      )}
+    </>
   );
 };
 
