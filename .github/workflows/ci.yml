@@ -3,16 +3,23 @@ name: KenyaEMR CI
 on:
   push:
     branches: [main]
+    paths:
+      - 'packages/**'
+      - 'yarn.lock'
+      - '.github/workflows/**'
   pull_request:
     branches: [main]
+  workflow_dispatch:
   release:
     types:
       - created
 
 env:
-  TURBO_TOKEN: 'turbo-token'
-  TURBO_TEAM: ${{ github.repository_owner }}
   FORCE_COLOR: true
+  env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+  TURBO_REMOTE_ONLY: true
 
 jobs:
   build:
@@ -33,9 +40,14 @@ jobs:
           node-version: "18"
           cache: 'yarn'
 
-      # Use Turborepo Remote Caching
-      - name: Setup Turborepo Remote Cache
-        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Setup Turbo Cache
+        id: turbo-cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -43,24 +55,22 @@ jobs:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       - name: Run lint, type checks and tests
-        run: yarn verify --cache-dir=".turbo"
-        env:
-          TURBO_CACHE_KEY: ${{ github.sha }}
+        run: yarn verify
 
       - name: Build packages
         run: |
           yarn turbo run build \
+            --concurrency=10 \
             --cache-dir=".turbo" \
-            --concurrency=5 \
             --no-daemon
-        env:
-          TURBO_CACHE_KEY: ${{ github.sha }}
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: packages
-          path: packages/**/dist
+          path: |
+            packages/**/dist
+            .turbo
           compression-level: 9
           retention-days: 7
 
@@ -80,6 +90,20 @@ jobs:
           node-version: "18"
           registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
+
+      - name: Download artifacts and turbo cache
+        uses: actions/download-artifact@v4
+        with:
+          name: packages
+          path: .
+
+      - name: Restore Turbo Cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -106,6 +130,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
+
   # dev server build dispatch
   Trigger_server_build:
       runs-on: ubuntu-latest
@@ -139,11 +164,19 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: 'yarn'
 
-      - name: Download build artifacts
+      - name: Download build artifacts and turbo cache
         uses: actions/download-artifact@v4
         with:
           name: packages
-          path: packages
+          path: .
+
+      - name: Restore Turbo Cache
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
