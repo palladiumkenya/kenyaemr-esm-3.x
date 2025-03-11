@@ -14,7 +14,6 @@ import {
   Button,
   OverflowMenu,
   OverflowMenuItem,
-  Header,
 } from '@carbon/react';
 import { AddAlt, ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
 import styles from '../../manage-user.scss';
@@ -30,11 +29,16 @@ import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../.
 import { User, UserRoleScope } from '../../../../../config-schema';
 
 interface StockUserRoleScopesListProps {
-  userUuid: string;
-  onEditUserRoleScope: (userRoleScope: UserRoleScope) => void;
+  user?: User;
+  onEditUserRoleScope?: (userRoleScope: UserRoleScope) => void;
+  onAddUserRoleScope?: (isAddRoleScope: boolean) => void;
 }
 
-const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userUuid, onEditUserRoleScope }) => {
+const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({
+  user,
+  onEditUserRoleScope,
+  onAddUserRoleScope,
+}) => {
   const { t } = useTranslation();
 
   // Fetch user role scopes
@@ -95,7 +99,7 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
   const tableRows = useMemo(() => {
     return (
       (userRoleScopes?.results ?? [])
-        .filter((scope) => scope.userUuid === userUuid)
+        .filter((scope) => scope.userUuid === user.uuid)
         .map((userRoleScope, index) => ({
           id: index.toString(),
           role: userRoleScope.role || 'N/A',
@@ -127,72 +131,55 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ userU
           ),
         })) || []
     );
-  }, [userRoleScopes, t, userUuid, showDeleteUserRoleScopeModal, onEditUserRoleScope]);
+  }, [userRoleScopes, t, user.uuid, showDeleteUserRoleScopeModal, onEditUserRoleScope]);
 
   if (loadingRoleScope) {
     return <DataTableSkeleton role="progressbar" />;
   }
 
   return (
-    <>
-      <div>
-        <CardHeader title="User Role Scope">
-          <Button
-            onClick={() => {
-              launchWorkspace('user-role-scope-workspace', {
-                workspaceTitle: t('addRoleScope', 'Add a new user role scope'),
-                user: userUuid,
-              });
-            }}
-            className={styles.userManagementModeButton}
-            renderIcon={AddAlt}
-            size={size}
-            kind="primary">
-            {t('addUserRoleScope', 'Add User Role Scope')}
-          </Button>
-        </CardHeader>
-        <div className={styles.dataTable}>
-          <DataTable useZebraStyle size={size} rows={tableRows} headers={tableHeaders}>
-            {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()} aria-label="user role scope table">
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader {...getHeaderProps({ header })} key={header.key}>
-                          {header.header}
-                        </TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.length > 0 ? (
-                      rows.map((row) => (
-                        <TableRow key={row.id} {...getRowProps({ row })}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value}</TableCell>
-                          ))}
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={headers.length} className={styles.emptyTable}>
-                          <EmptyState
-                            displayText={t('noUserRoleScope', 'No user role scope')}
-                            headerTitle={t('userRoleScope', 'User Role Scope')}
-                          />
-                        </TableCell>
+    <div>
+      <CardHeader title="Manage User Role Scope" children={''}></CardHeader>
+      <div className={styles.dataTable}>
+        <DataTable useZebraStyle size={size} rows={tableRows} headers={tableHeaders}>
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()} aria-label="user role scope table">
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.length > 0 ? (
+                    rows.map((row) => (
+                      <TableRow key={row.id} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        ))}
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DataTable>
-        </div>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={headers.length} className={styles.emptyTable}>
+                        <EmptyState
+                          displayText={t('noUserRoleScope', 'No user role scope')}
+                          headerTitle={t('userRoleScope', 'User Role Scope')}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
-      <WorkspaceContainer overlay contextKey="admin" />
-    </>
+    </div>
   );
 };
 

@@ -23,7 +23,6 @@ import { Edit, UserFollow } from '@carbon/react/icons';
 import styles from './user-list.scss';
 import { launchWorkspace, showModal, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
-import StockUserRoleListActionsMenu from '../manage-user-role-scope/user-role-scope-list/user-role-scope-list-action-menu.component';
 import { useSystemUserRoleConfigSetting } from '../../../hook/useSystemRoleSetting';
 import { ROLE_CATEGORIES } from '../../../../constants';
 
@@ -149,7 +148,18 @@ const UserList: React.FC = () => {
             }}
             itemText={t('editUser', 'Edit user')}
           />
-          {userHasInventoryRole && StockUserRoleListActionsMenu ? <StockUserRoleListActionsMenu user={user} /> : null}
+          {userHasInventoryRole ? (
+            <OverflowMenuItem
+              hasDivider
+              onClick={() => {
+                launchWorkspace('user-role-scope-workspace', {
+                  workspaceTitle: t('manageUserRoleScope', 'Manage user role scope'),
+                  user: user,
+                });
+              }}
+              itemText={t('manageUserRoleScope', 'Manage user role scope')}
+            />
+          ) : null}
         </OverflowMenu>
       ),
     };

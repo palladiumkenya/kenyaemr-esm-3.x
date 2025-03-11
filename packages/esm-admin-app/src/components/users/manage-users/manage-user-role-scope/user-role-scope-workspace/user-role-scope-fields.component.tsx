@@ -14,7 +14,7 @@ import {
   DatePicker,
 } from '@carbon/react';
 import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, today } from '../../../../../constants';
-import { Role, StockOperationType } from '../../../../../config-schema';
+import { Role, StockOperationType, UserRoleScope } from '../../../../../config-schema';
 
 type UserRoleScopeFields = {
   field: Record<string, any>;
@@ -27,7 +27,7 @@ type UserRoleScopeFields = {
   loadingStock: boolean;
   stockLocations: Array<fhir.Location>;
   roleScopeformMethods: any;
-  isInitialValuesEmpty: boolean;
+  userRoleScopeInitialValues: UserRoleScope;
 };
 const MinDate: Date = today();
 
@@ -42,7 +42,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
   loadingStock,
   stockLocations,
   roleScopeformMethods,
-  isInitialValuesEmpty,
+  userRoleScopeInitialValues,
 }) => {
   const { t } = useTranslation();
   const { watch, setValue } = useFormContext();
@@ -81,7 +81,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
               onChange={({ selectedItem }) => {
                 field.onChange(selectedItem ? selectedItem.display.trim() : '');
               }}
-              disabled={!hasInventoryRole}
+              disabled={userRoleScopeInitialValues}
             />
           )}
         />
@@ -281,7 +281,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
           </CheckboxGroup>
         </Column>
       </ResponsiveWrapper>
-      {isInitialValuesEmpty && (
+      {!userRoleScopeInitialValues && (
         <Button size="sm" kind="danger--tertiary" onClick={() => removeForm(index)}>
           {t('remove', 'Remove')}
         </Button>

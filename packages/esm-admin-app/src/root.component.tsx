@@ -6,7 +6,6 @@ import LeftPanel from './components/side-menu/left-pannel.component';
 import UserManagentLandingPage from './components/users/manage-users/manage-user.component';
 import EtlAdminDashboard from './components/dashboard/etl-dashboard.component';
 import FacilitySetup from './components/facility-setup/facility-setup.component';
-import Overlay from './components/overlay/overlay.component';
 
 const Root: React.FC = () => {
   const spaBasePath = window.spaBase;
@@ -22,7 +21,6 @@ const Root: React.FC = () => {
 
   return (
     <BrowserRouter basename={adminBasename}>
-      <Overlay />
       <LeftPanel />
       <main className={styles.container}>
         <Routes>

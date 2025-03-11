@@ -30,7 +30,6 @@ import UserRoleScopeFormFields from './user-role-scope-fields.component';
 import StockUserRoleScopesList from '../user-role-scope-list/user-role-scope-list.component';
 
 type UserRoleScopeWorkspaceProps = DefaultWorkspaceProps & {
-  userRoleScopeInitialValues?: UserRoleScope;
   user?: User;
 };
 
@@ -48,54 +47,45 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
   const { items, loadingRoleScope } = useUserRoleScopes();
 
-  const [userRoleScopeInitialValues, setuserRoleScopeInitialValues] = useState<UserRoleScope | null>(null);
+  const [userRoleScopeInitialValues, setUserRoleScopeInitialValues] = useState<UserRoleScope | null>(null);
   const handleEditUserRoleScope = useCallback((userRoleScope: UserRoleScope) => {
-    setuserRoleScopeInitialValues(userRoleScope);
+    setUserRoleScopeInitialValues(userRoleScope);
   }, []);
-  // const isInitialValuesEmpty = Object.keys(userRoleScopeInitialValues).length === 0;
-  const emptyUser = Object.keys(user).length === 0;
+
   type UserRoleScopeFormSchema = z.infer<typeof userRoleScopeFormSchema>;
-  const useFormDefaults = (userRoleScopeInitialValues, isInitialValuesEmpty, emptyUser, user) => {
-    return useMemo(() => {
-      if (userRoleScopeInitialValues) {
-        return {};
-      }
 
-      return {
-        forms: [
-          {
-            ...userRoleScopeInitialValues,
-            userName: user?.username || userRoleScopeInitialValues?.userName,
-            dateRange: {
-              activeTo: formatNewDate(userRoleScopeInitialValues?.activeTo),
-              activeFrom: formatNewDate(userRoleScopeInitialValues?.activeFrom),
+  const userRoleScopedefaultValues = useMemo(
+    () => ({
+      forms: userRoleScopeInitialValues
+        ? [
+            {
+              ...userRoleScopeInitialValues,
+              userName: user?.username || userRoleScopeInitialValues?.userName,
+              dateRange: {
+                activeTo: formatNewDate(userRoleScopeInitialValues?.activeTo),
+                activeFrom: formatNewDate(userRoleScopeInitialValues?.activeFrom),
+              },
+              locations:
+                userRoleScopeInitialValues?.locations?.map(({ locationName, locationUuid }) => ({
+                  locationName,
+                  locationUuid,
+                })) || [],
+              operationTypes:
+                userRoleScopeInitialValues?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
+                  operationTypeName,
+                  operationTypeUuid,
+                })) || [],
             },
-            locations:
-              userRoleScopeInitialValues?.locations?.map(({ locationName, locationUuid }) => ({
-                locationName,
-                locationUuid,
-              })) || [],
-            operationTypes:
-              userRoleScopeInitialValues?.operationTypes?.map(({ operationTypeName, operationTypeUuid }) => ({
-                operationTypeName,
-                operationTypeUuid,
-              })) || [],
-          },
-        ],
-      };
-    }, [userRoleScopeInitialValues, isInitialValuesEmpty, emptyUser, user]);
-  };
-
-  const editFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, !userRoleScopeInitialValues, null, null);
-  const addFormDefaultValues = useFormDefaults(userRoleScopeInitialValues, null, emptyUser, user);
-
-  const userRoleScopedefaultValues =
-    Object.keys(editFormDefaultValues).length > 0 ? editFormDefaultValues : addFormDefaultValues;
+          ]
+        : [],
+    }),
+    [userRoleScopeInitialValues, user],
+  );
 
   const roleScopeformMethods = useForm<UserRoleScopeFormSchema>({
     resolver: zodResolver(userRoleScopeFormSchema),
     mode: 'all',
-    defaultValues: userRoleScopedefaultValues,
+    defaultValues: userRoleScopedefaultValues as UserRoleScopeFormSchema,
   });
 
   const { reset } = roleScopeformMethods;
@@ -108,8 +98,8 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   }, [isDirty, promptBeforeClosing]);
 
   useEffect(() => {
-    if (!userRoleScopeInitialValues && !loadingStock) {
-      reset(userRoleScopedefaultValues);
+    if (userRoleScopeInitialValues && !loadingStock) {
+      reset(userRoleScopedefaultValues as UserRoleScopeFormSchema);
     }
   }, [userRoleScopedefaultValues, loadingStock, userRoleScopeInitialValues, user, reset]);
   const {
@@ -237,15 +227,20 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   return (
     <>
       <div>
-        <StockUserRoleScopesList onEditUserRoleScope={handleEditUserRoleScope} userUuid={user.uuid} />
+        <StockUserRoleScopesList onEditUserRoleScope={handleEditUserRoleScope} user={user} />
       </div>
-      {userRoleScopeInitialValues && (
+      {userRoleScopedefaultValues && (
         <FormProvider {...roleScopeformMethods}>
           <form onSubmit={roleScopeformMethods.handleSubmit(onSubmit, handleError)} className={styles.form}>
             <div className={styles.formContainer}>
               <Stack className={styles.formStackControl} gap={7}>
                 <ResponsiveWrapper>
-                  <CardHeader title={t('stockUserRoleScope', 'Stock User Roles Scope')}>
+                  <CardHeader
+                    title={
+                      userRoleScopeInitialValues
+                        ? t('editRoleScope', 'Edit User Role Scope')
+                        : t('addRoleScope', 'Add a new user role scope')
+                    }>
                     <ChevronSortUp />
                   </CardHeader>
                 </ResponsiveWrapper>
@@ -273,7 +268,7 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
                     stockLocations={stockLocations}
                     loadingStock={loadingStock}
                     roleScopeformMethods={roleScopeformMethods}
-                    isInitialValuesEmpty={!userRoleScopeInitialValues}
+                    userRoleScopeInitialValues={userRoleScopeInitialValues}
                   />
                 ))}
                 {!userRoleScopeInitialValues && (
