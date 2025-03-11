@@ -9,19 +9,23 @@ type Props = {
   value?: string;
   header?: string;
   mode?: IndicationMode;
+  percentage?: string;
 };
 
-const SummaryCard: React.FC<Props> = ({ title, value, header, mode }) => {
+const SummaryCard: React.FC<Props> = ({ title, value, header, mode, percentage }) => {
   return (
     <Tile className={styles.summaryCard}>
-      <span>
+      <span className={styles.indications}>
         {mode === 'increasing' && <ArrowUp className={styles.upIcon} />}
         {mode === 'decreasing' && <ArrowDown className={styles.downIcon} />}
         {mode === 'increasing' && <ArrowUp className={styles.upIcon} />}
         {mode === 'decreasing' && <ArrowDown className={styles.downIcon} />}
       </span>
       {header && <strong>{header}</strong>}
-      <h4>{value ?? '--'}</h4>
+      <span className={styles.valueAndPercentageRow}>
+        <h4 className={styles.summaryValue}>{value ?? '--'}</h4>
+        {percentage && <span className={styles.percentage}>{`(${percentage})`}</span>}
+      </span>
       <p>{title}</p>
     </Tile>
   );
