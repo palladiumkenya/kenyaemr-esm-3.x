@@ -1,5 +1,5 @@
 import { Tile } from '@carbon/react';
-import { ArrowUp, ArrowDown } from '@carbon/react/icons';
+import { StopFilledAlt } from '@carbon/react/icons';
 import React from 'react';
 import styles from './summary-card.scss';
 import { type IndicationMode } from '../../types';
@@ -16,10 +16,10 @@ const SummaryCard: React.FC<Props> = ({ title, value, header, mode, percentage }
   return (
     <Tile className={styles.summaryCard}>
       <span className={styles.indications}>
-        {mode === 'increasing' && <ArrowUp className={styles.upIcon} />}
-        {mode === 'decreasing' && <ArrowDown className={styles.downIcon} />}
-        {mode === 'increasing' && <ArrowUp className={styles.upIcon} />}
-        {mode === 'decreasing' && <ArrowDown className={styles.downIcon} />}
+        <StopFilledAlt
+          className={mode === 'increasing' ? styles.upIcon : mode === 'decreasing' ? styles.downIcon : undefined}
+          size={30}
+        />
       </span>
       {header && <strong>{header}</strong>}
       <span className={styles.valueAndPercentageRow}>

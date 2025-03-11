@@ -17,12 +17,12 @@
   flex-direction: column;
   gap: layout.$spacing-05;
 
-  & > p {
+  &>p {
     color: colors.$gray-60;
     font-size: small;
   }
 
-  & > strong {
+  &>strong {
     color: colors.$gray-60;
   }
 }
@@ -53,8 +53,10 @@
 
 .upIcon {
   color: colors.$red-50;
+
 }
 
 .downIcon {
   color: colors.$green-50;
+
 }
