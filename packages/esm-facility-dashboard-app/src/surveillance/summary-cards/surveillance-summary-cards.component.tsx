@@ -71,10 +71,10 @@ const SurveillanceSummaryCards = () => {
         )}
       />
       <SummaryCard
-        header={t('missedoppotunityVL', 'Missed oppotunity VL')}
+        header={t('missedoppotunityVL', 'Missed opportunity VL')}
         title={t(
           'delayedVLTesting',
-          'Number of client on ART that visited,were eligible for VL sampling and no VL was done',
+          'Number of client on ART that visited, were eligible for VL sampling and no VL was done',
         )}
         value={`${surveillanceSummary?.getEligibleForVlSampleNotTaken}/${surveillanceSummary?.getEligibleForVl}`}
         percentage={getPercentage(
