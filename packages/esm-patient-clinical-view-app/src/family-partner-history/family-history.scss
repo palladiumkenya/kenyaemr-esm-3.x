@@ -43,3 +43,17 @@
     }
   }
 }
+
+.motherInfoExpandedRow {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+  background-color: colors.$white;
+}
+
+.obsValues {
+  display: grid;
+  gap: layout.$spacing-05;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  background-color: white;
+}
