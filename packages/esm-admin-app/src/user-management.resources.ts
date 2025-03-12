@@ -11,7 +11,7 @@ import {
   StockOperationType,
   User,
   UserRoleScope,
-} from './config-schema';
+} from './types';
 import uniqBy from 'lodash-es/uniqBy';
 import { useMemo } from 'react';
 

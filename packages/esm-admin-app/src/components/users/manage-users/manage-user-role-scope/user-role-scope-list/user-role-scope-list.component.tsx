@@ -26,7 +26,7 @@ import {
   WorkspaceContainer,
 } from '@openmrs/esm-framework';
 import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../../../../user-management.resources';
-import { User, UserRoleScope } from '../../../../../config-schema';
+import { User, UserRoleScope } from '../../../../../types';
 
 interface StockUserRoleScopesListProps {
   user?: User;

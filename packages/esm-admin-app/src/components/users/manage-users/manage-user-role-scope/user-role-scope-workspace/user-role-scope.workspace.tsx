@@ -13,7 +13,7 @@ import { TextInput, ButtonSet, Button, InlineLoading, Stack } from '@carbon/reac
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
-import { User, UserRoleScope } from '../../../../../config-schema';
+import { User, UserRoleScope } from '../../../../../types';
 import UserRoleScopeFormSchema from './userRoleScopeFormSchema';
 import {
   createOrUpdateUserRoleScope,

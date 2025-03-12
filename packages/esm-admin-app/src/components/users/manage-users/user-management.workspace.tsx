@@ -51,10 +51,11 @@ import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, Query, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
-import { ConfigObject, Provider, User, UserRoleScope } from '../../../config-schema';
+import { Provider, User } from '../../../types';
 import { type PractitionerResponse } from '../../../types';
 import { searchHealthCareWork } from '../../hook/useHWR';
 import { ROLE_CATEGORIES, today } from '../../../constants';
+import { ConfigObject } from '../../../config-schema';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;

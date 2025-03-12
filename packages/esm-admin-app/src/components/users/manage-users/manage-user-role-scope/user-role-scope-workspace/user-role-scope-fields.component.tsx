@@ -14,7 +14,7 @@ import {
   DatePicker,
 } from '@carbon/react';
 import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, today } from '../../../../../constants';
-import { Role, StockOperationType, UserRoleScope } from '../../../../../config-schema';
+import { Role, StockOperationType, UserRoleScope } from '../../../../../types';
 
 type UserRoleScopeFields = {
   field: Record<string, any>;
