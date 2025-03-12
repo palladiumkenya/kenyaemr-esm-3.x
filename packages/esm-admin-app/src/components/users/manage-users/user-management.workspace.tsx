@@ -307,6 +307,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       username: data.username,
       password: data.password,
       person: {
+        uuid: initialUserValue?.person?.uuid,
         names: [{ givenName: data.givenName, familyName: data.familyName, middleName: data.middleName }],
         gender: data.gender,
         attributes: [
@@ -333,7 +334,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         handleMutation(
           `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`,
         );
-        closeWorkspaceWithSavedChanges();
 
         if (setProvider || editProvider) {
           try {
