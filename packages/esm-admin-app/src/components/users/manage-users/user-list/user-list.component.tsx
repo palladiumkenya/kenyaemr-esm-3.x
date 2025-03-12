@@ -63,12 +63,6 @@ const UserList: React.FC = () => {
     setSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-  const handleOpenSyncModal = () => {
-    setSyncLoading(true);
-    // showModal('hwr-sync-modal', { provider });
-    setSyncLoading(false);
-  };
-
   if (isLoading) {
     return <DataTableSkeleton />;
   }
@@ -128,25 +122,7 @@ const UserList: React.FC = () => {
       roles: rolesDisplay,
       actions: (
         <>
-          <OverflowMenu flipped={document?.dir === 'rtl'} aria-label={t('overflowMenu', 'Overflow menu')}>
-            <OverflowMenuItem
-              itemText={t('edit', 'Edit')}
-              onClick={() => {
-                const selectedUser = users.find((u) => u.uuid === user.uuid);
-                if (selectedUser) {
-                  launchWorkspace('manage-user-workspace', {
-                    workspaceTitle: t('editUser', 'Edit User'),
-                    initialUserValue: selectedUser,
-                  });
-                } else {
-                  console.error('User not found:', user.uuid);
-                }
-              }}
-            />
-            <MenuItemDivider />
-            <OverflowMenuItem itemText={t('sync', 'Sync')} onClick={handleOpenSyncModal} />
-          </OverflowMenu>
-          {/* <ButtonSet className={styles.btnSet}>
+          <ButtonSet className={styles.btnSet}>
             <Button
               className={styles.btn}
               renderIcon={Edit}
@@ -165,25 +141,7 @@ const UserList: React.FC = () => {
                 }
               }}
             />
-            <Button
-              className={styles.btn}
-              renderIcon={Edit}
-              hasIconOnly
-              kind="ghost"
-              iconDescription={t('sync', 'Sync')}
-              onClick={() => {
-                const selectedUser = users.find((u) => u.uuid === user.uuid);
-                if (selectedUser) {
-                  launchWorkspace('manage-user-workspace', {
-                    workspaceTitle: t('editUser', 'Edit User'),
-                    initialUserValue: selectedUser,
-                  });
-                } else {
-                  console.error('User not found:', user.uuid);
-                }
-              }}
-            />
-          </ButtonSet> */}
+          </ButtonSet>
         </>
       ),
     };
