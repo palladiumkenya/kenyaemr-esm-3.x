@@ -15,10 +15,13 @@ import {
   Button,
   Pagination,
   ButtonSet,
+  OverflowMenuItem,
+  MenuItemDivider,
+  OverflowMenu,
 } from '@carbon/react';
 import { Edit, UserFollow } from '@carbon/react/icons';
 import styles from './user-list.scss';
-import { launchWorkspace, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal, useDebounce, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useUser } from '../../../../user-management.resources';
 
 const UserList: React.FC = () => {
@@ -28,6 +31,7 @@ const UserList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [syncLoading, setSyncLoading] = useState(false);
 
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -59,7 +63,6 @@ const UserList: React.FC = () => {
     setSearchTerm(searchTerm);
     setCurrentPage(1);
   };
-
   if (isLoading) {
     return <DataTableSkeleton />;
   }
@@ -118,26 +121,28 @@ const UserList: React.FC = () => {
       familyName: familyName,
       roles: rolesDisplay,
       actions: (
-        <ButtonSet className={styles.btnSet}>
-          <Button
-            className={styles.btn}
-            renderIcon={Edit}
-            hasIconOnly
-            kind="ghost"
-            iconDescription={t('edit', 'Edit')}
-            onClick={() => {
-              const selectedUser = users.find((u) => u.uuid === user.uuid);
-              if (selectedUser) {
-                launchWorkspace('manage-user-workspace', {
-                  workspaceTitle: t('editUser', 'Edit User'),
-                  initialUserValue: selectedUser,
-                });
-              } else {
-                console.error('User not found:', user.uuid);
-              }
-            }}
-          />
-        </ButtonSet>
+        <>
+          <ButtonSet className={styles.btnSet}>
+            <Button
+              className={styles.btn}
+              renderIcon={Edit}
+              hasIconOnly
+              kind="ghost"
+              iconDescription={t('edit', 'Edit')}
+              onClick={() => {
+                const selectedUser = users.find((u) => u.uuid === user.uuid);
+                if (selectedUser) {
+                  launchWorkspace('manage-user-workspace', {
+                    workspaceTitle: t('editUser', 'Edit User'),
+                    initialUserValue: selectedUser,
+                  });
+                } else {
+                  console.error('User not found:', user.uuid);
+                }
+              }}
+            />
+          </ButtonSet>
+        </>
       ),
     };
   });

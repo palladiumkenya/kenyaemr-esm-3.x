@@ -1,0 +1,21 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.healthWorkerInfoContainer {
+  display: grid;
+  grid-template-columns: 0.25fr 0.75fr;
+  margin: layout.$spacing-02;
+}
+.healthWorkerInfoLabel {
+  min-width: layout.$spacing-11;
+  font-weight: bold;
+}
+.healthWorkerOverview {
+  display: flex;
+  margin: layout.$spacing-05;
+}
+.healthWorkerPhoto {
+  display: flex;
+  align-items: center;
+}

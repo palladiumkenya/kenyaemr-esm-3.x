@@ -5,6 +5,8 @@ import OperationConfirmation from './components/confirm-modal/confirmation-opera
 import Root from './root.component';
 import ManageUserWorkspace from './components/users/manage-users/user-management.workspace';
 import { createLeftPanelLink } from './left-pannel-link.component';
+import HWRConfirmModal from './components/modal/hwr-confirmation.modal';
+import HWREmptyModal from './components/modal/hwr-empty.modal.component';
 
 const options = {
   featureName: 'esm-admin-app',
@@ -35,3 +37,6 @@ export const facilitySetupLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'Facility Details', name: 'facility-setup' }),
   options,
 );
+
+export const hwrConfirmationModal = getSyncLifecycle(HWRConfirmModal, options);
+export const hwrEmptyModal = getSyncLifecycle(HWREmptyModal, options);
