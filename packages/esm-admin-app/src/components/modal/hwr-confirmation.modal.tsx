@@ -1,9 +1,10 @@
+import { Button, Tag } from '@carbon/react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
+import capitalize from 'lodash-es/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Tag } from '@carbon/react';
-import { displayName, ExtensionSlot, formatDate } from '@openmrs/esm-framework';
-import capitalize from 'lodash/capitalize';
 import { type PractitionerResponse } from '../../types';
+import styles from './hwr-confirmation.modal.scss';
 
 interface HealthWorkerInfoProps {
   label: string;
@@ -12,8 +13,8 @@ interface HealthWorkerInfoProps {
 
 const HealthWorkerInfo: React.FC<HealthWorkerInfoProps> = ({ label, value }) => {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '0.25fr 0.75fr', margin: '0.25rem' }}>
-      <span style={{ minWidth: '5rem', fontWeight: 'bold' }}>{label}</span>
+    <div className={styles.healthWorkerInfoContainer}>
+      <span className={styles.healthWorkerInfoLabel}>{label}</span>
       <span>{value}</span>
     </div>
   );
@@ -49,9 +50,9 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
             'Health worker information found in the registry, do you want to use the information to continue with registration?',
           )}
         </p>
-        <div style={{ display: 'flex', margin: '1rem' }}>
+        <div className={styles.healthWorkerOverview}>
           <ExtensionSlot
-            style={{ display: 'flex', alignItems: 'center' }}
+            className={styles.healthWorkerPhoto}
             name="patient-photo-slot"
             state={{
               patientName: practitioner?.name?.[0]?.text || '',
@@ -64,14 +65,14 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
             />
 
             {practitioner?.telecom?.map((telecom, index) => (
-              <HealthWorkerInfo key={index} label={capitalize(telecom?.system)} value={telecom?.value || ''} />
+              <HealthWorkerInfo key={index} label={capitalize(telecom?.system)} value={telecom?.value || '--'} />
             ))}
 
             {practitioner?.identifier?.map((identifier, index) => (
               <HealthWorkerInfo
                 key={index}
-                label={identifier.type?.coding?.map((code) => code.display).join(' ') || t('unknown', 'Unknown')}
-                value={identifier.value || t('unknown', 'Unknown')}
+                label={identifier.type?.coding?.map((code) => code.display).join(' ') || '--'}
+                value={identifier.value || '--'}
               />
             ))}
 
@@ -83,7 +84,7 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
               label={t('renewalDate', 'Renewal Date')}
               value={
                 practitioner?.identifier?.find((id) => id.type?.coding?.some((code) => code.code === 'license-number'))
-                  ?.period?.end || t('unknown', 'Unknown')
+                  ?.period?.end || '--'
               }
             />
 
@@ -92,18 +93,18 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
               value={
                 practitioner?.qualification?.[0]?.extension?.find(
                   (ext) => ext.url === 'https://hwr-kenyahie/StructureDefinition/licensing-body',
-                )?.valueCodeableConcept?.coding?.[0]?.display || t('unknown', 'Unknown')
+                )?.valueCodeableConcept?.coding?.[0]?.display || '--'
               }
             />
-            {/* <HealthWorkerInfo
+            <HealthWorkerInfo
               label={t('qualification', 'Qualification')}
               value={
                 practitioner?.qualification?.[0]?.code?.coding?.[0]?.display ||
                 practitioner?.extension?.find((ext) => ext.url === 'https://ts.kenya-hie.health/Codesystem/specialty')
                   ?.valueCodeableConcept?.coding?.[0]?.display ||
-                t('unknown', 'Unknown')
+                '--'
               }
-            /> */}
+            />
 
             <HealthWorkerInfo
               label={t('licenseValid', 'License Validity')}

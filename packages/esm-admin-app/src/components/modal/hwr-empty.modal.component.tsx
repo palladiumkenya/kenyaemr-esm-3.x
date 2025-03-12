@@ -10,26 +10,29 @@ interface HWREmptyModalProps {
 
 const HWREmptyModal: React.FC<HWREmptyModalProps> = ({ close, errorCode }) => {
   const { t } = useTranslation();
-  let message = t(
+
+  const errorMessages = {
+    [RESOURCE_NOT_FOUND]: t(
+      'ResourceNotFound',
+      'The Health Work Registry is not reachable, kindly confirm your internet connectivity and try again. Do you want to continue to create an account',
+    ),
+    [HWR_API_NO_CREDENTIALS]: t(
+      'noHwrApi',
+      'Health Care Worker Registry API credentials not configured, Kindly contact system admin. Do you want to continue to create an account',
+    ),
+    [UNKNOWN]: t(
+      'unknownError',
+      'An error occurred while searching Health Worker Registry, kindly contact system admin. Do you want to continue to create an account',
+    ),
+  };
+
+  const defaultMessage = t(
     'HealthworkerNotFound',
     'The health worker records could not be found in Health Worker registry, do you want to continue to create an account',
   );
-  if (errorCode === RESOURCE_NOT_FOUND) {
-    message = t(
-      'ResourceNotFound',
-      'The Health Work Registry is not reachable, kindly confirm your internet connectivity and try again. Do you want to continue to create an account',
-    );
-  } else if (errorCode === HWR_API_NO_CREDENTIALS) {
-    message = t(
-      'noHwrApi',
-      'Health Care Worker Registry API credentials not configured,Kindly contact system admin. Do you want to continue to create an account',
-    );
-  } else if (errorCode === UNKNOWN) {
-    message = t(
-      'unknownError',
-      'An error occured while searching Health Worker Registry, kindly contact system admin. Do you want to continue to create an account ',
-    );
-  }
+
+  const message = errorMessages[errorCode] || defaultMessage;
+
   return (
     <>
       <div className="cds--modal-header">

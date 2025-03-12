@@ -5,7 +5,7 @@ import OperationConfirmation from './components/confirm-modal/confirmation-opera
 import Root from './root.component';
 import ManageUserWorkspace from './components/users/manage-users/user-management.workspace';
 import { createLeftPanelLink } from './left-pannel-link.component';
-import HWRConfirmModal from './components/modal/hwr-confirmation.modal.component';
+import HWRConfirmModal from './components/modal/hwr-confirmation.modal';
 import HWREmptyModal from './components/modal/hwr-empty.modal.component';
 
 const options = {
