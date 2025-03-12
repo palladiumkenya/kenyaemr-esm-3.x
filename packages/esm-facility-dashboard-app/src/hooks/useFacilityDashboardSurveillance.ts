@@ -16,10 +16,21 @@ const useFacilityDashboardSurveillance = () => {
       return 'decreasing';
     }
   }, []);
+  const getPercentage = useCallback((indicator: number, denominator: number): string => {
+    if (indicator === null || indicator === undefined || denominator === null || denominator === undefined) {
+      return `- %`;
+    }
+    if (denominator === 0) {
+      return '0 %';
+    }
+    const percent = (indicator / denominator) * 100;
+    return `${percent} %`;
+  }, []);
 
   return {
     surveillanceSummary: data?.data,
     getIndication,
+    getPercentage,
     isLoading,
     mutate,
     error,

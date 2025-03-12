@@ -17,12 +17,6 @@
   flex-direction: column;
   gap: layout.$spacing-05;
 
-  & > h4 {
-    font-weight: bold;
-    color: colors.$gray-80;
-    margin-bottom: layout.$spacing-03;
-  }
-
   & > p {
     color: colors.$gray-60;
     font-size: small;
@@ -30,14 +24,31 @@
 
   & > strong {
     color: colors.$gray-60;
-    text-transform: uppercase;
   }
+}
 
-  & > span {
-    position: absolute;
-    right: layout.$spacing-05;
-    top: layout.$spacing-05;
-  }
+.summaryValue {
+  font-weight: bold;
+  color: colors.$gray-80;
+  margin-bottom: layout.$spacing-03;
+}
+
+.valueAndPercentageRow {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  gap: layout.$spacing-01;
+}
+
+.indications {
+  position: absolute;
+  right: layout.$spacing-05;
+  top: layout.$spacing-05;
+}
+
+.percentage {
+  color: colors.$gray-60;
+  font-size: small;
 }
 
 .upIcon {
