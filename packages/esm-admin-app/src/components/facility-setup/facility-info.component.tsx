@@ -6,6 +6,7 @@ import { useLocalFacilityInfo, useShaFacilityInfo } from '../hook/useFacilityInf
 import styles from './facility-info.scss';
 import Card from './card.component';
 import dayjs from 'dayjs';
+import { syncPackagesAndInterventions } from './facility-setup.resource';
 
 const FacilityInfo: React.FC = () => {
   const { t } = useTranslation();
@@ -63,6 +64,8 @@ const FacilityInfo: React.FC = () => {
           isLowContrast: true,
         });
       }
+      // sync packages and intervensions
+      await syncPackagesAndInterventions();
     } catch (error) {
       const errorMessage =
         error?.responseBody?.error?.message ??
