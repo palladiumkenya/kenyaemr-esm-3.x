@@ -31,40 +31,13 @@ const UserManagementFormSchema = () => {
       .optional(),
     primaryRole: z.string().optional(),
     systemId: z.string().optional(),
-    primaryFacility: z.string().optional(),
     providerLicense: z.string().optional(),
     licenseExpiryDate: z.date().optional(),
     registrationNumber: z.string().optional(),
     qualification: z.string().optional(),
     nationalId: z.string().optional(),
     passportNumber: z.string().optional(),
-    permanent: z.boolean().optional(),
-    enabled: z.boolean().optional(),
-    stockOperation: z
-      .array(
-        z.object({
-          operationTypeName: z.string().optional(),
-          operationTypeUuid: z.string().optional(),
-        }),
-      )
-      .optional(),
-    operationLocation: z
-      .array(
-        z.object({
-          locationName: z.string().optional(),
-          locationUuid: z.string().optional(),
-        }),
-      )
-      .optional(),
-
     isEditProvider: z.boolean().optional(),
-    dateRange: z
-      .object({
-        activeTo: z.date().optional(),
-        activeFrom: z.date().optional(),
-      })
-      .optional(),
-    stockRole: z.string().optional(),
   });
 
   return { userManagementFormSchema };

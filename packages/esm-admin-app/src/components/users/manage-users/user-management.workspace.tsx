@@ -51,8 +51,7 @@ import UserManagementFormSchema from '../userManagementFormSchema';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, Query, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
-import { Provider, User } from '../../../types';
-import { type PractitionerResponse } from '../../../types';
+import { type PractitionerResponse, Provider, User } from '../../../types';
 import { searchHealthCareWork } from '../../hook/useHWR';
 import { ROLE_CATEGORIES, today } from '../../../constants';
 import { ConfigObject } from '../../../config-schema';
@@ -104,8 +103,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         providerAttributeType.find((type) => type.uuid === 'bcaaa67b-cc72-4662-90c2-e1e992ceda66')?.uuid || '',
       licenseExpiry:
         providerAttributeType.find((type) => type.uuid === '00539959-a1c7-4848-a5ed-8941e9d5e835')?.uuid || '',
-      primaryFacility:
-        providerAttributeType.find((type) => type.uuid === '5a53dddd-b382-4245-9bf1-03bce973f24b')?.uuid || '',
       providerNationalId: providerAttributeType.find((type) => type.uuid === providerNationalIdUuid)?.uuid || '',
       providerHieFhirReference:
         providerAttributeType.find((type) => type.uuid === providerHieFhirReference)?.uuid || '',
@@ -125,11 +122,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     () => getProviderAttributeValue(attributeTypeMapping.licenseNumber),
     [attributeTypeMapping, getProviderAttributeValue],
   );
-
-  const primaryFacility = useMemo(() => {
-    const value = getProviderAttributeValue(attributeTypeMapping.primaryFacility);
-    return typeof value === 'object' ? value?.name : value;
-  }, [attributeTypeMapping, getProviderAttributeValue]);
 
   const licenseExpiryDate = useMemo(() => {
     const value = getProviderAttributeValue(attributeTypeMapping.licenseExpiry);
@@ -156,9 +148,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       gender: initialUserValue.person?.gender,
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate,
-      primaryFacility: primaryFacility,
     };
-  }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate, primaryFacility]);
+  }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate]);
 
   function extractNameParts(display = '') {
     const nameParts = display.split(' ');
@@ -288,9 +279,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
     const providerPayload: Partial<Provider> = {
       attributes: [
-        { attributeType: attributeTypeMapping.primaryFacility, value: data.primaryFacility?.split(' ').pop() || '' },
         { attributeType: attributeTypeMapping.licenseNumber, value: data.providerLicense },
-        { attributeType: attributeTypeMapping.licenseExpiry, value: data.licenseExpiryDate.toISOString() },
+        {
+          attributeType: attributeTypeMapping.licenseExpiry,
+          value: data.licenseExpiryDate ? data.licenseExpiryDate.toISOString() : '',
+        },
         { attributeType: attributeTypeMapping.licenseBodyUuid, value: data.registrationNumber },
         { attributeType: attributeTypeMapping.providerHieFhirReference, value: JSON.stringify(healthWorker) },
         {
@@ -565,7 +558,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     {...field}
                                     id="phoneNumber"
                                     type="text"
-                                    disabled
                                     labelText={t('phoneNumber', 'Phone Number')}
                                     placeholder={t('phoneNumber', 'Enter Phone Number')}
                                     invalid={!!errors.phoneNumber}
@@ -582,7 +574,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   <TextInput
                                     {...field}
                                     id="email"
-                                    disabled
                                     type="email"
                                     labelText={t('email', 'Email')}
                                     placeholder={t('email', 'Enter Email')}
@@ -667,48 +658,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   />
                                 )}
                               />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              {loadingLocation ? (
-                                <InlineLoading
-                                  status="active"
-                                  iconDescription="Loading"
-                                  description="Loading data..."
-                                />
-                              ) : (
-                                <Controller
-                                  name="primaryFacility"
-                                  control={userFormMethods.control}
-                                  render={({ field }) => (
-                                    <ComboBox
-                                      {...field}
-                                      id="primaryFacility"
-                                      items={location}
-                                      itemToString={(item) => {
-                                        if (!item) {
-                                          return '';
-                                        }
-                                        const attributeValue = item.attributes?.[0]?.value || '';
-                                        return `${item.name || ''} ${attributeValue}`.trim();
-                                      }}
-                                      titleText={t('primaryFacility', 'Primary Facility')}
-                                      selectedItem={
-                                        (location || []).find((item) => `${item.name || ''}`.trim() === field.value) ||
-                                        null
-                                      }
-                                      onChange={({ selectedItem }) => {
-                                        if (selectedItem) {
-                                          const attributeValue = selectedItem.attributes?.[0]?.value || '';
-                                          const formattedString = `${selectedItem.name || ''} ${attributeValue}`.trim();
-                                          field.onChange(formattedString);
-                                        } else {
-                                          field.onChange('');
-                                        }
-                                      }}
-                                    />
-                                  )}
-                                />
-                              )}
                             </ResponsiveWrapper>
                             <ResponsiveWrapper>
                               <Controller
@@ -834,56 +783,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 </CheckboxGroup>
                               )}
                             />
-
-                            {userFormMethods.watch('providerIdentifiers') && (
-                              <>
-                                <ResponsiveWrapper>
-                                  {loadingLocation ? (
-                                    <InlineLoading
-                                      status="active"
-                                      iconDescription="Loading"
-                                      description="Loading location data..."
-                                    />
-                                  ) : (
-                                    <Controller
-                                      name="primaryFacility"
-                                      control={userFormMethods.control}
-                                      render={({ field }) => (
-                                        <ComboBox
-                                          {...field}
-                                          id="primaryFacility"
-                                          items={location}
-                                          itemToString={(item) => {
-                                            if (!item) {
-                                              return '';
-                                            }
-                                            const attributeValue = item.attributes?.[0]?.value || '';
-                                            return `${item.name || ''} ${attributeValue}`.trim();
-                                          }}
-                                          titleText={t('primaryFacility', 'Primary Facility')}
-                                          selectedItem={
-                                            (location || []).find(
-                                              (item) => `${item.name || ''}`.trim() === field.value,
-                                            ) || null
-                                          }
-                                          onChange={({ selectedItem }) => {
-                                            if (selectedItem) {
-                                              const attributeValue = selectedItem.attributes?.[0]?.value || '';
-                                              const formattedString = `${
-                                                selectedItem.name || ''
-                                              } ${attributeValue}`.trim();
-                                              field.onChange(formattedString);
-                                            } else {
-                                              field.onChange('');
-                                            }
-                                          }}
-                                        />
-                                      )}
-                                    />
-                                  )}
-                                </ResponsiveWrapper>
-                              </>
-                            )}
                           </>
                         )}
                       </ResponsiveWrapper>
