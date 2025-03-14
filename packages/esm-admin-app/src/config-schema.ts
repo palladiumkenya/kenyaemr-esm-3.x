@@ -27,6 +27,16 @@ export const configSchema = {
     _description: 'UUID for license body',
     _default: 'ba18bb97-d17c-4640-80d2-58e7df90ca4c',
   },
+  licenseNumberUuid: {
+    _type: Type.String,
+    _description: 'UUID for license number',
+    _default: 'bcaaa67b-cc72-4662-90c2-e1e992ceda66',
+  },
+  licenseExpiryDateUuid: {
+    _type: Type.String,
+    _description: 'UUID for license expiry date',
+    _default: '00539959-a1c7-4848-a5ed-8941e9d5e835',
+  },
   identifierTypes: {
     _type: Type.Array,
     _elements: {
@@ -56,6 +66,9 @@ export interface ConfigObject {
   providerHieFhirReference: string;
   qualificationUuid: string;
   licenseBodyUuid: string;
+  registrationNumberUuid: string;
+  licenseNumberUuid: string;
+  licenseExpiryDateUuid: string;
   identifierTypes: Array<{
     key: string;
     name: string;
