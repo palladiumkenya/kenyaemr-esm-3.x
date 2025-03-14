@@ -11,7 +11,7 @@ import {
   StockOperationType,
   User,
   UserRoleScope,
-} from './config-schema';
+} from './types';
 import uniqBy from 'lodash-es/uniqBy';
 import { useMemo } from 'react';
 
@@ -189,3 +189,28 @@ export const useUserRoleScopes = () => {
     userRoleScopeError: error,
   };
 };
+
+export function deleteUserRoleScopes(roleScopeIds: string[]) {
+  let encodedRoleScopeIds = roleScopeIds.reduce((queryString, currentId, index) => {
+    if (index === 0) {
+      return queryString;
+    }
+    queryString += (queryString.length > 0 ? ',' : '') + encodeURIComponent(currentId);
+    return queryString;
+  }, '');
+
+  if (encodedRoleScopeIds.length > 0) {
+    encodedRoleScopeIds = '?ids=' + encodedRoleScopeIds;
+  }
+
+  const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope/${roleScopeIds[0]}${encodedRoleScopeIds}`;
+  const abortController = new AbortController();
+
+  return openmrsFetch(apiUrl, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+  });
+}

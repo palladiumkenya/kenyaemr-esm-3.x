@@ -39,3 +39,6 @@ export const UNKNOWN = 'UNKNOWN';
  * @constant {string}
  */
 export const PROVIDER_NOT_FOUND = 'PROVIDER_NOT_FOUND';
+export const ROLE_CATEGORIES = {
+  CORE_INVENTORY: 'Core Inventory Roles',
+};

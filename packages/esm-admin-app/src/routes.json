@@ -33,6 +33,14 @@
       "type": "other-form",
       "canMaximize": true,
       "width": "extra-wide"
+    },
+    {
+      "name": "user-role-scope-workspace",
+      "component": "userRoleScopeWorkspace",
+      "title": "User Rple Scope Workspace",
+      "type": "other-form",
+       "canMaximize": true,
+      "width": "extra-wide"
     }
   ],
   "modals": [
