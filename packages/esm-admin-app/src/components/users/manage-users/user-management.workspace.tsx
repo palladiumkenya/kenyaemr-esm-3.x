@@ -52,7 +52,7 @@ import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, Query, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { type PractitionerResponse, Provider, User } from '../../../types';
-import { searchHealthCareWork } from '../../hook/useHWR';
+import { searchHealthCareWork } from '../../hook/searchHealthCareWork';
 import { ROLE_CATEGORIES, today } from '../../../constants';
 import { ConfigObject } from '../../../config-schema';
 
