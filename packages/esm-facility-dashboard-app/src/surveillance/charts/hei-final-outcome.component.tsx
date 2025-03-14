@@ -3,7 +3,8 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-const HIVPositiveNotLinkedToART = () => {
+
+const HEIFinalOutcomesChart = () => {
   const { t } = useTranslation();
   const generateRandomData = (numRecords: number) => {
     return Array.from({ length: numRecords }, (_, i) => ({
@@ -36,12 +37,12 @@ const HIVPositiveNotLinkedToART = () => {
     <>
       <BaseIndicatorTrendChart
         data={values}
-        title={t('hivPositiveNotLinkedToART', 'HIV +VE Not linked to ART')}
-        yAxisTitle={t('percentageTestedPositiveNotLinked', '% tested positive not linked')}
+        title={t('heiFinalOutcomes', 'HEI Final Outcomes')}
+        yAxisTitle={t('percentageHEIOutcome', '% 24 month old HEI without documented outcomes')}
       />
       <BaseProgressTrackingChart data={data} />;
     </>
   );
 };
 
-export default HIVPositiveNotLinkedToART;
+export default HEIFinalOutcomesChart;

@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-const HIVPositiveNotLinkedToART = () => {
+const PBFWNotInPrep = () => {
   const { t } = useTranslation();
   const generateRandomData = (numRecords: number) => {
     return Array.from({ length: numRecords }, (_, i) => ({
@@ -12,7 +12,7 @@ const HIVPositiveNotLinkedToART = () => {
     }));
   };
 
-  const generateRandomDataProgress = (numRecords: number) => {
+  const generateRandomDataForProgress = (numRecords: number) => {
     const data = [];
     for (let i = 1; i <= numRecords; i++) {
       data.push({
@@ -29,19 +29,19 @@ const HIVPositiveNotLinkedToART = () => {
     return data;
   };
 
-  const data = useMemo(() => generateRandomDataProgress(40), []);
+  const data = useMemo(() => generateRandomDataForProgress(40), []);
 
   const values = useMemo(() => generateRandomData(40), []);
   return (
     <>
       <BaseIndicatorTrendChart
         data={values}
-        title={t('hivPositiveNotLinkedToART', 'HIV +VE Not linked to ART')}
-        yAxisTitle={t('percentageTestedPositiveNotLinked', '% tested positive not linked')}
+        title={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
+        yAxisTitle={t('percentageHightRiskPBFW', '% High risk PBFW Not in PrEP')}
       />
       <BaseProgressTrackingChart data={data} />;
     </>
   );
 };
 
-export default HIVPositiveNotLinkedToART;
+export default PBFWNotInPrep;
