@@ -10,6 +10,7 @@ import CarePanelDashboard from './care-panel-dashboard/care-panel-dashboard.comp
 import PatientSummary from './patient-summary/patient-summary.component';
 import PatientDiagnoses from './dispensing-patient-details/diagnoses.component';
 import PatientConditions from './dispensing-patient-details/conditions.component';
+import DispensingPatientVitals from './dispensing-patient-details/patient-vitals.component';
 
 const moduleName = '@kenyaemr/esm-care-panel-app';
 
@@ -51,3 +52,4 @@ export const regimenFormWorkspace = getSyncLifecycle(regimenFormComponent, optio
 // TODO Clean when community version gets merged
 export const patientDiagnoses = getSyncLifecycle(PatientDiagnoses, options);
 export const patientConditions = getSyncLifecycle(PatientConditions, options);
+export const dispensingPaentientVitals = getSyncLifecycle(DispensingPatientVitals, options);

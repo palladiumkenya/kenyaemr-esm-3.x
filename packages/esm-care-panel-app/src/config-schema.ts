@@ -5,6 +5,10 @@ export interface CarePanelConfig {
     encounterProviderRoleUuid: string;
   };
   hivProgramUuid: string;
+  dispensingVitalsConcepts: Array<{
+    uuid: string;
+    display: string;
+  }>;
 }
 
 export const configSchema = {
@@ -19,5 +23,15 @@ export const configSchema = {
     _type: Type.String,
     _description: 'HIV Program UUID',
     _default: 'dfdc6d40-2f2f-463d-ba90-cc97350441a8',
+  },
+  dispensingVitalsConcepts: {
+    _type: Type.Array,
+    _description: 'Uuids of patient vitals concept required for dispensing',
+    _default: [
+      {
+        display: 'Weight (Kg)',
+        uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
+    ],
   },
 };

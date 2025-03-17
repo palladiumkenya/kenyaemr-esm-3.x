@@ -62,6 +62,12 @@
       "component": "patientConditions",
       "online": true,
       "offline": true
+    },
+    {
+      "name": "dispensing-patient-vitals",
+      "component": "dispensingPaentientVitals",
+      "online": true,
+      "offline": true
     }
   ],
   "workspaces": [
