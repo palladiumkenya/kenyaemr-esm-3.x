@@ -384,8 +384,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         names: [{ givenName: data.givenName, familyName: data.familyName, middleName: data.middleName }],
         gender: data.gender,
         attributes: [
-          { attributeType: personPhonenumberAttributeUuid, value: data.phoneNumber ?? undefined },
-          { attributeType: personEmailAttributeUuid, value: data.email ?? undefined },
+          { attributeType: personPhonenumberAttributeUuid, value: data.phoneNumber },
+          { attributeType: personEmailAttributeUuid, value: data.email },
         ],
       },
       roles: data.roles?.map((role) => ({

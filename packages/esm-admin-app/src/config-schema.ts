@@ -39,12 +39,12 @@ export const configSchema = {
   },
   phoneNumberUuid: {
     _type: Type.String,
-    _description: 'UUID for provider hie phone number',
+    _description: 'UUID for provider phone number',
     _default: '37daed7f-1f4e-4e62-8e83-6048ade18a87',
   },
   providerAddressUuid: {
     _type: Type.String,
-    _description: 'UUID for provider hie address',
+    _description: 'UUID for provider address',
     _default: '033ff604-ecf7-464f-b623-5b77c733667f',
   },
   personEmailAttributeUuid: {

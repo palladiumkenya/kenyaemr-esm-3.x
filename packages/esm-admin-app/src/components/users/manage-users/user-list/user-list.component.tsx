@@ -43,15 +43,15 @@ import { ConfigObject } from '../../../../config-schema';
 import { formatDateTime } from '../../../../utils/utils';
 import UserDetails from '../user-details/user-details.component';
 
-type FilterType = 'All users' | 'Active Licensed' | 'Expired Licensed' | 'Licensed expiring soon' | 'Unlicensed';
+type FilterType = 'allUsers' | 'activeLicensed' | 'expiredLicensed' | 'licensedExpiringSoon' | 'unlicensed';
 
 const getCardTitle = (filterName: FilterType): string => {
   const filterMap: Record<FilterType, string> = {
-    'All users': 'List of all users',
-    'Active Licensed': 'List of active licensed users',
-    'Expired Licensed': 'List of expired licensed users',
-    'Licensed expiring soon': 'List of licensed expiring soon users',
-    Unlicensed: 'List of unlicensed users',
+    allUsers: 'List of all users',
+    activeLicensed: 'List of active licensed users',
+    expiredLicensed: 'List of expired licensed users',
+    licensedExpiringSoon: 'List of licensed expiring soon users',
+    unlicensed: 'List of unlicensed users',
   };
   return filterMap[filterName] || 'List of users';
 };
@@ -68,7 +68,7 @@ const UserList: React.FC = () => {
 
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState<FilterType>('All users');
+  const [selectedFilter, setSelectedFilter] = useState<FilterType>('allUsers');
 
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
 
@@ -135,25 +135,25 @@ const UserList: React.FC = () => {
     }
 
     switch (selectedFilter) {
-      case 'Active Licensed':
+      case 'activeLicensed':
         filtered = filtered.filter((user) => {
           const userProvider = provider.find((p) => p.person?.uuid === user.person.uuid);
           return userProvider && isActiveLicensed(userProvider);
         });
         break;
-      case 'Expired Licensed':
+      case 'expiredLicensed':
         filtered = filtered.filter((user) => {
           const userProvider = provider.find((p) => p.person?.uuid === user.person.uuid);
           return userProvider && isExpiredLicensed(userProvider);
         });
         break;
-      case 'Licensed expiring soon':
+      case 'licensedExpiringSoon':
         filtered = filtered.filter((user) => {
           const userProvider = provider.find((p) => p.person?.uuid === user.person.uuid);
           return userProvider && isExpiringSoon(userProvider);
         });
         break;
-      case 'Unlicensed':
+      case 'unlicensed':
         filtered = filtered.filter((user) => {
           const userProvider = provider.find((p) => p.person?.uuid === user.person.uuid);
           return userProvider && isUnlicensed(userProvider);
@@ -230,9 +230,9 @@ const UserList: React.FC = () => {
     const isSyncEnabled = !!(providerNationalId?.value || registrationNumber?.value || passPortNumber?.value);
 
     return {
-      id: user?.uuid,
-      systemId: user?.systemId,
-      names: capitalize(user?.person?.display),
+      id: user.uuid,
+      systemId: user.systemId,
+      names: capitalize(user.person.display),
       licenseNumber: licenseNumber,
       licenseExpiryDate: formatDateTime(new Date(licenseExpiryDate)),
       userProvider,
@@ -286,11 +286,11 @@ const UserList: React.FC = () => {
               label={t('filter', 'Filter')}
               className={styles.dropDownFilter}
               items={[
-                { id: 'All users', label: t('All users', 'All users') },
-                { id: 'Active Licensed', label: t('Active Licensed', 'Active Licensed') },
-                { id: 'Expired Licensed', label: t('Expired Licensed', 'Expired Licensed') },
-                { id: 'Licensed expiring soon', label: t('Licensed expiring soon', 'Licensed expiring soon') },
-                { id: 'Unlicensed', label: t('Unlicensed', 'Unlicensed') },
+                { id: 'allUsers', label: t('All users', 'All users') },
+                { id: 'activeLicensed', label: t('Active Licensed', 'Active Licensed') },
+                { id: 'expiredLicensed', label: t('Expired Licensed', 'Expired Licensed') },
+                { id: 'licensedExpiringSoon', label: t('Licensed expiring soon', 'Licensed expiring soon') },
+                { id: 'unlicensed', label: t('Unlicensed', 'Unlicensed') },
               ]}
               itemToString={(item) => (item ? item.label : '')}
               onChange={({ selectedItem }) => setSelectedFilter(selectedItem.id)}
