@@ -7,6 +7,7 @@ import {
   Provider,
   ProviderAttributes,
   ProviderLocation,
+  ProviderResponse,
   Role,
   StockOperationType,
   User,
@@ -116,8 +117,8 @@ export const usePersonAttribute = () => {
 };
 
 export const useProvider = (systemId: string) => {
-  const url = `${restBaseUrl}/provider?q=${systemId}&v=custom:(uuid,identifier,retired,attributes:(value:(name),attributeType:(uuid,name)))`;
-  const { data, isLoading, error } = useSWR<{ data: { results: Array<ProviderAttributes> } }>(url, openmrsFetch, {
+  const url = `${restBaseUrl}/provider?q=${systemId}&v=custom:(uuid,identifier,retired,attributes:(uuid,display,value:(name),attributeType:(uuid,name)))`;
+  const { data, isLoading, error } = useSWR<{ data: { results: Array<ProviderResponse> } }>(url, openmrsFetch, {
     errorRetryCount: 2,
   });
   return {
