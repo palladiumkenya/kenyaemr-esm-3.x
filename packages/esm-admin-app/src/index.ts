@@ -8,6 +8,7 @@ import { createLeftPanelLink } from './left-pannel-link.component';
 import HWRConfirmModal from './components/modal/hwr-confirmation.modal';
 import HWREmptyModal from './components/modal/hwr-empty.modal.component';
 import UserRoleScopeWorkspace from './components/users/manage-users/manage-user-role-scope/user-role-scope-workspace/user-role-scope.workspace';
+import HWRSyncModal from './components/modal/hwr-sync.modal';
 
 const options = {
   featureName: 'esm-admin-app',
@@ -42,3 +43,4 @@ export const facilitySetupLeftPanelLink = getSyncLifecycle(
 
 export const hwrConfirmationModal = getSyncLifecycle(HWRConfirmModal, options);
 export const hwrEmptyModal = getSyncLifecycle(HWREmptyModal, options);
+export const hwrSyncModal = getSyncLifecycle(HWRSyncModal, options);
