@@ -8,7 +8,7 @@ const UserManagementFormSchema = () => {
     givenName: z.string().nonempty(t('givenNameRequired', 'Given name is required')),
     middleName: z.string().optional(),
     familyName: z.string().nonempty(t('familyNameRequired', 'Family name is required')),
-    gender: z.enum(['M', 'F'], {
+    sex: z.enum(['M', 'F'], {
       errorMap: () => ({
         message: t('genderRequired', 'Gender is required'),
       }),

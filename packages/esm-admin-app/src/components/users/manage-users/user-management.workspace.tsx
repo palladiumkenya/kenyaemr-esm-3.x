@@ -198,7 +198,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           display: role.display,
           description: role.description,
         })) || [],
-      gender: initialUserValue.person?.gender,
+      sex: initialUserValue.person?.gender,
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate ? new Date(licenseExpiryDate) : undefined,
       qualification: qualification,
@@ -382,7 +382,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       person: {
         uuid: initialUserValue?.person?.uuid,
         names: [{ givenName: data.givenName, familyName: data.familyName, middleName: data.middleName }],
-        gender: data.gender,
+        gender: data.sex,
         attributes: [
           { attributeType: personPhonenumberAttributeUuid, value: data.phoneNumber },
           { attributeType: personEmailAttributeUuid, value: data.email },
@@ -712,15 +712,15 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             </ResponsiveWrapper>
                             <ResponsiveWrapper>
                               <Controller
-                                name="gender"
+                                name="sex"
                                 control={userFormMethods.control}
                                 render={({ field }) => (
                                   <RadioButtonGroup
                                     {...field}
-                                    legendText={t('gender', 'Gender')}
+                                    legendText={t('sex', 'Sex')}
                                     orientation="vertical"
-                                    invalid={!!errors.gender}
-                                    invalidText={errors.gender?.message}>
+                                    invalid={!!errors.sex}
+                                    invalidText={errors.sex?.message}>
                                     <RadioButton
                                       value="M"
                                       id="M"
