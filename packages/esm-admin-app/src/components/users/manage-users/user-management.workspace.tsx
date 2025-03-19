@@ -717,7 +717,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 render={({ field }) => (
                                   <RadioButtonGroup
                                     {...field}
-                                    legendText={t('gender', 'Gender')}
+                                    legendText={t('sex', 'Sex')}
                                     orientation="vertical"
                                     invalid={!!errors.gender}
                                     invalidText={errors.gender?.message}>
