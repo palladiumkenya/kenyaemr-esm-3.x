@@ -198,7 +198,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           display: role.display,
           description: role.description,
         })) || [],
-      sex: initialUserValue.person?.gender,
+      gender: initialUserValue.person?.gender,
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate ? new Date(licenseExpiryDate) : undefined,
       qualification: qualification,
@@ -382,7 +382,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       person: {
         uuid: initialUserValue?.person?.uuid,
         names: [{ givenName: data.givenName, familyName: data.familyName, middleName: data.middleName }],
-        gender: data.sex,
+        gender: data.gender,
         attributes: [
           { attributeType: personPhonenumberAttributeUuid, value: data.phoneNumber },
           { attributeType: personEmailAttributeUuid, value: data.email },
@@ -712,15 +712,15 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                             </ResponsiveWrapper>
                             <ResponsiveWrapper>
                               <Controller
-                                name="sex"
+                                name="gender"
                                 control={userFormMethods.control}
                                 render={({ field }) => (
                                   <RadioButtonGroup
                                     {...field}
                                     legendText={t('sex', 'Sex')}
                                     orientation="vertical"
-                                    invalid={!!errors.sex}
-                                    invalidText={errors.sex?.message}>
+                                    invalid={!!errors.gender}
+                                    invalidText={errors.gender?.message}>
                                     <RadioButton
                                       value="M"
                                       id="M"
