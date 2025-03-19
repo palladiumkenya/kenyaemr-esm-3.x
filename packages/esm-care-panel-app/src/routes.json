@@ -50,14 +50,32 @@
       "order": 3,
       "online": true,
       "offline": false
+    },
+    {
+      "name": "patient-diagnoses",
+      "component": "patientDiagnoses",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "patient-conditions",
+      "component": "patientConditions",
+      "online": true,
+      "offline": true
+    },
+    {
+      "name": "dispensing-patient-vitals",
+      "component": "dispensingPaentientVitals",
+      "online": true,
+      "offline": true
     }
   ],
   "workspaces": [
     {
       "name": "patient-regimen-workspace",
       "title": "Patient Regimen",
-      "component":"regimenFormWorkspace",
-      "type":"form",
+      "component": "regimenFormWorkspace",
+      "type": "form",
       "canMaximize": true,
       "canHide": true,
       "width": "wider"

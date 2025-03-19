@@ -16,3 +16,8 @@ export type SurveillanceSummary = {
 };
 
 export type IndicationMode = 'decreasing' | 'increasing';
+export type SurveillanceindicatorsFilter = {
+  indicator?: string;
+  startdate?: Date;
+  endDate?: Date;
+};

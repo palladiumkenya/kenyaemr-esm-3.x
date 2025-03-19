@@ -24,7 +24,7 @@ const useFacilityDashboardSurveillance = () => {
       return '0 %';
     }
     const percent = (indicator / denominator) * 100;
-    return `${percent} %`;
+    return `${percent.toFixed(2)} %`;
   }, []);
 
   return {
