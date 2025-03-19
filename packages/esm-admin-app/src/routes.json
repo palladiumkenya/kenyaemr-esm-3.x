@@ -55,6 +55,10 @@
     {
       "component": "hwrEmptyModal",
       "name": "hwr-empty-modal"
+    },
+     {
+      "component": "hwrSyncModal",
+      "name": "hwr-syncing-modal"
     }
   ],
   "pages": [

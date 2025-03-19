@@ -76,6 +76,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
               id="role"
               items={filteredInventoryRoles}
               itemToString={(item) => item?.display?.trim() || ''}
+              placeholder={t('chooseAStockRole', 'Choose a stock role')}
               titleText={t('stockRole', 'Stock Role')}
               selectedItem={filteredInventoryRoles.find((item) => item?.display === field.value) || null}
               onChange={({ selectedItem }) => {
