@@ -50,7 +50,6 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
           size="md"
         />
       </DatePicker>
-
       <Dropdown
         className={styles.filterInput}
         autoAlign
