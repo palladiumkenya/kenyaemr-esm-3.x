@@ -3,6 +3,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SurveillanceindicatorsFilter } from '../types';
 import styles from './surveillance.scss';
+import { today } from '../constants';
+import { formatDatetime } from '@openmrs/esm-framework';
 
 type Props = {
   filters: SurveillanceindicatorsFilter;
@@ -25,7 +27,7 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
         <DatePickerInput id="date-picker-input-id-start" placeholder="mm/dd/yyyy" labelText="Start date" size="md" />
         <DatePickerInput id="date-picker-input-id-finish" placeholder="mm/dd/yyyy" labelText="End date" size="md" />
       </DatePicker>
-      <Dropdown
+      {/* <Dropdown
         className={styles.filterInput}
         autoAlign
         id="filters"
@@ -33,7 +35,7 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
         items={reportingPeriods}
         selectedItem={reportingPeriods[0]}
         label={t('reportingPeriod', 'Reporting Period')}
-      />
+      /> */}
       <Dropdown
         className={styles.filterInput}
         autoAlign

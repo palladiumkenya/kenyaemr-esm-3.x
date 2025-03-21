@@ -12,7 +12,9 @@ import HEIFinalOutcomesChart from './charts/hei-final-outcome.component';
 import { SurveillanceindicatorsFilter } from '../types';
 const SurveillancelanceDashboard = () => {
   const { t } = useTranslation();
-  const [currFilters, setCurrFilters] = useState<SurveillanceindicatorsFilter>({});
+  const [currFilters, setCurrFilters] = useState<SurveillanceindicatorsFilter>({
+    indicator: 'getHivPositiveNotLinked',
+  });
   return (
     <div>
       <FacilityDashboardHeader title={t('surveillance', 'Surveillance')} />

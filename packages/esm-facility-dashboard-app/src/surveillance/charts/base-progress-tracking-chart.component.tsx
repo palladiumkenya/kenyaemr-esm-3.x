@@ -18,7 +18,7 @@ const BaseProgressTrackingChart: React.FC<Props> = ({ data }) => {
     },
     axes: {
       bottom: {
-        title: t('weeks', 'Weeks'),
+        title: t('days', 'Days'),
         mapsTo: 'key',
         scaleType: ScaleTypes.LABELS,
       },
@@ -31,8 +31,10 @@ const BaseProgressTrackingChart: React.FC<Props> = ({ data }) => {
     },
     color: {
       scale: {
-        Pending: '#ff0000', // Red color for Pending
-        Completed: '#0000ff', // Blue color for Completed
+        // Pending: '#ff0000', // Red color for Pending
+        // Completed: '#0000ff', // Blue color for Completed
+        Pending: '#0000ff', // Red color for Pending
+        Completed: '#ff0000', // Blue color for Completed
       },
     },
     height: '400px',
