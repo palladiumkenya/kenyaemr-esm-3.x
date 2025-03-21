@@ -7,14 +7,14 @@
 }
 
 .chartGroupContainer {
-  display: flex;
-  flex-flow: row wrap;
+  display: flex !important;
+  flex-flow: row wrap !important;
 }
-.tendChart{
+.tendChart {
   flex: 50%;
 }
 
-.trackingChart{
+.trackingChart {
   flex: 50;
 }
 

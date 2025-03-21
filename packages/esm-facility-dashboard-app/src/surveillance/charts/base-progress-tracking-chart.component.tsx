@@ -31,10 +31,8 @@ const BaseProgressTrackingChart: React.FC<Props> = ({ data }) => {
     },
     color: {
       scale: {
-        // Pending: '#ff0000', // Red color for Pending
-        // Completed: '#0000ff', // Blue color for Completed
-        Pending: '#0000ff', // Red color for Pending
-        Completed: '#ff0000', // Blue color for Completed
+        Pending: '#0000ff',
+        Completed: '#ff0000',
       },
     },
     height: '400px',
