@@ -15,11 +15,12 @@ const SurveillancelanceDashboard = () => {
   const [currFilters, setCurrFilters] = useState<SurveillanceindicatorsFilter>({
     indicator: 'getHivPositiveNotLinked',
   });
+
   return (
     <div>
       <FacilityDashboardHeader title={t('surveillance', 'Surveillance')} />
       <SurveillanceFilters filters={currFilters} onFiltersChange={setCurrFilters} />
-      <SurveillanceSummaryCards />
+      <SurveillanceSummaryCards startDate={currFilters.startdate} endDate={currFilters.endDate} />
       {currFilters.indicator === 'getHivPositiveNotLinked' && <HIVPositiveNotLinkedToART />}
       {currFilters.indicator === 'getPregnantPostpartumNotInPrep' && <PBFWNotInPrep />}
       {currFilters.indicator === 'getEligibleForVlSampleNotTaken' && <DelayedEACCharts />}
