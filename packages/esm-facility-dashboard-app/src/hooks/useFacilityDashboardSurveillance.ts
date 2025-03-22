@@ -1,20 +1,21 @@
-import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { FetchResponse, formatDatetime, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { IndicationMode, type SurveillanceSummary } from '../types';
 import { useCallback } from 'react';
 
-const useFacilityDashboardSurveillance = () => {
-  const url = `${restBaseUrl}/kenyaemr/facility-dashboard`;
+const useFacilityDashboardSurveillance = (startDate?: Date, endDate?: Date) => {
+  const url =
+    startDate && endDate
+      ? `${restBaseUrl}/kenyaemr/facility-dashboard?startDate=${formatDatetime(startDate)}&endDate=${formatDatetime(
+          endDate,
+        )}`
+      : `${restBaseUrl}/kenyaemr/facility-dashboard`;
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<SurveillanceSummary>>(url, openmrsFetch);
   const getIndication = useCallback((indicator: number, denominator: number, threshold: number): IndicationMode => {
-    if (denominator === 0) {
+    if (denominator === 0 || indicator <= denominator * threshold) {
       return 'decreasing';
     }
-    if (indicator > denominator * threshold) {
-      return 'increasing';
-    } else {
-      return 'decreasing';
-    }
+    return 'increasing';
   }, []);
   const getPercentage = useCallback((indicator: number, denominator: number): string => {
     if (indicator === null || indicator === undefined || denominator === null || denominator === undefined) {
@@ -28,7 +29,7 @@ const useFacilityDashboardSurveillance = () => {
   }, []);
 
   return {
-    surveillanceSummary: data?.data,
+    surveillanceSummary: error ? null : data?.data,
     getIndication,
     getPercentage,
     isLoading,

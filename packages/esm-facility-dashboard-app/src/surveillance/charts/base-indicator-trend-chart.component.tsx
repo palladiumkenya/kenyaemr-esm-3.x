@@ -29,7 +29,7 @@ const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle }) =
         mapsTo: 'abnomallPercentage',
       },
       bottom: {
-        title: t('durationInWeeks', 'Duration in weeks'),
+        title: t('durationInDays', 'Duration in days'),
         scaleType: ScaleTypes.LABELS,
         mapsTo: 'week',
       },

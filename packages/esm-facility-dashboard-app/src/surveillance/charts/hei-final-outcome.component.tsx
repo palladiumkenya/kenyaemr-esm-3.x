@@ -3,12 +3,14 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
+import { sevenDaysRunningDates } from '../../constants';
+import styles from './charts.scss';
 
 const HEIFinalOutcomesChart = () => {
   const { t } = useTranslation();
   const generateRandomData = (numRecords: number) => {
     return Array.from({ length: numRecords }, (_, i) => ({
-      week: `Week ${i + 1}`,
+      week: sevenDaysRunningDates(i),
       abnomallPercentage: Math.floor(Math.random() * 50),
     }));
   };
@@ -18,29 +20,35 @@ const HEIFinalOutcomesChart = () => {
     for (let i = 1; i <= numRecords; i++) {
       data.push({
         group: 'Pending',
-        key: `Week ${i}`,
+        key: sevenDaysRunningDates(i),
         value: Math.floor(Math.random() * 50),
       });
       data.push({
         group: 'Completed',
-        key: `Week ${i}`,
+        key: sevenDaysRunningDates(i),
         value: Math.floor(Math.random() * 50),
       });
     }
     return data;
   };
 
-  const data = useMemo(() => generateRandomDataProgress(40), []);
+  const data = useMemo(() => generateRandomDataProgress(7), []);
 
-  const values = useMemo(() => generateRandomData(40), []);
+  const values = useMemo(() => generateRandomData(7), []);
   return (
     <>
-      <BaseIndicatorTrendChart
-        data={values}
-        title={t('heiFinalOutcomes', 'HEI Final Outcomes')}
-        yAxisTitle={t('percentageHEIOutcome', '% 24 month old HEI without documented outcomes')}
-      />
-      <BaseProgressTrackingChart data={data} />;
+      <div className={styles.chartGroupContainer}>
+        <div className={styles.tendChart}>
+          <BaseIndicatorTrendChart
+            data={values}
+            title={t('heiFinalOutcomes', 'HEI Final Outcomes')}
+            yAxisTitle={t('percentageHEIOutcome', '% 24 month old HEI without documented outcomes')}
+          />
+        </div>
+        <div className={styles.trackingChart}>
+          <BaseProgressTrackingChart data={data} />
+        </div>
+      </div>
     </>
   );
 };
