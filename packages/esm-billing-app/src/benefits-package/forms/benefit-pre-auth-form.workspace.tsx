@@ -5,16 +5,15 @@ import {
   DropdownSkeleton,
   Form,
   FormLabel,
-  InlineNotification,
   Layer,
   Loading,
   MultiSelect,
   Stack,
-  Tile,
 } from '@carbon/react';
 import { DocumentAttachment } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, showSnackbar, useSession } from '@openmrs/esm-framework';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import React, { useEffect, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -22,14 +21,12 @@ import { z } from 'zod';
 import { useVisit } from '../../claims/dashboard/form/claims-form.resource';
 import { MAX_ALLOWED_FILE_SIZE } from '../../constants';
 import { useSystemSetting } from '../../hooks/getMflCode';
-import usePackages from '../../hooks/usePackages';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
 import { PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-pre-auth-form.scss';
-import PackageInterventions from './package-interventions.component';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import SHABenefitPackangesAndInterventions from './packages-and-interventions-form.commponent';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
 
@@ -41,7 +38,7 @@ interface BenefitPreAuthFormProps extends DefaultWorkspaceProps {
 
 const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
-  const { visits: recentVisit, isLoading } = useVisit(patientUuid);
+  const { visits: recentVisit, isLoading, error: visitError } = useVisit(patientUuid);
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
   const inputFileRef = useRef<HTMLInputElement>();
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -53,7 +50,6 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
     sessionLocation: { uuid: facilityUuid, display: facilityName },
   } = useSession();
   const { providerLoading: providerLoading, provider } = useProvider(providerUuid);
-  const { isLoading: packagesLoading, error: packageError, packages } = usePackages();
 
   const form = useForm<BenefitsPreAuth>({
     defaultValues: {
@@ -62,6 +58,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
       facilityUuid,
       diagnosisUuids: [],
       interventions: [],
+      packages: [],
     },
     resolver: zodResolver(preauthSchema),
   });
@@ -104,9 +101,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
     }
   };
 
-  const selectedPackageObservable = form.watch('packageUUid');
-
-  if (packagesLoading || diagnosesLoading || isLoading || providerLoading) {
+  if (diagnosesLoading || isLoading || providerLoading) {
     return (
       <Layer className={styles.loading}>
         <Loading withOverlay={false} small />
@@ -114,10 +109,10 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
     );
   }
 
-  if (packageError) {
+  if (visitError) {
     return (
       <Layer className={styles.error}>
-        <ErrorState error={packageError} headerTitle={t('errorMessage', 'Error')} />
+        <ErrorState error={visitError} headerTitle={t('errorMessage', 'Error')} />
       </Layer>
     );
   }
@@ -206,46 +201,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
               )}
             />
           </Column>
-          <Column>
-            <Controller
-              control={form.control}
-              name="packageUUid"
-              render={({ field }) => (
-                <>
-                  {packageError ? (
-                    <InlineNotification
-                      kind="error"
-                      subtitle={t('errorFetchingPackages', 'Error fetching packeges')}
-                      lowContrast
-                    />
-                  ) : (
-                    <Dropdown
-                      ref={field.ref}
-                      invalid={form.formState.errors[field.name]?.message}
-                      invalidText={form.formState.errors[field.name]?.message}
-                      id="package"
-                      titleText={t('package', 'Package')}
-                      onChange={(e) => {
-                        field.onChange(e.selectedItem);
-                      }}
-                      initialSelectedItem={field.value}
-                      label="Choose package"
-                      items={packages.map((r) => r.uuid)}
-                      itemToString={(item) => packages.find((r) => r.uuid === item)?.packageName ?? ''}
-                    />
-                  )}
-                </>
-              )}
-            />
-          </Column>
-          {selectedPackageObservable && (
-            <Column>
-              <PackageInterventions
-                category={packages.find((package_) => package_.uuid === selectedPackageObservable)?.packageCode ?? ''}
-                patientUuid={patientUuid}
-              />
-            </Column>
-          )}
+          <SHABenefitPackangesAndInterventions patientUuid={patientUuid} />
           <Column>
             <Controller
               control={form.control}

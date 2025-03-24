@@ -8,6 +8,7 @@ export interface BillingConfig {
     policyNumber: string;
     exemptionCategory: string;
     billPaymentStatus: string;
+    shaBenefitPackagesAndInterventions: string;
   };
   insurancePaymentMethod: string;
   inPatientVisitTypeUuid: string;
@@ -95,6 +96,11 @@ export const configSchema: ConfigSchema = {
       _type: Type.String,
       _description: 'The bill payment status visit attribute uuid',
       _default: '919b51c9-8e2e-468f-8354-181bf3e55786',
+    },
+    shaBenefitPackagesAndInterventions: {
+      _type: Type.String,
+      _description: 'JSON String of SHA Benefit Packages and Interventions for this visit',
+      _default: '338725fa-3790-4679-98b9-be623214ee29',
     },
   },
   insurancePaymentMethod: {
