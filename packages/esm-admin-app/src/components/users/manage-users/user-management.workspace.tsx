@@ -52,9 +52,11 @@ import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import { ChevronSortUp, Query, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { type PractitionerResponse, Provider, User } from '../../../types';
-import { searchHealthCareWork } from '../../hook/useHWR';
+import { searchHealthCareWork } from '../../hook/searchHealthCareWork';
 import { ROLE_CATEGORIES, today } from '../../../constants';
 import { ConfigObject } from '../../../config-schema';
+import { mutate } from 'swr';
+import { createProviderAttribute, updateProviderAttributes } from '../../modal/hwr-sync.resource';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -86,10 +88,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     identifierTypes,
     licenseBodyUuid,
     passportNumberUuid,
+    personEmailAttributeUuid,
+    personPhonenumberAttributeUuid,
+    phoneNumberUuid,
+    providerAddressUuid,
     providerHieFhirReference,
     qualificationUuid,
     providerNationalIdUuid,
-    registrationNumberUuid,
     licenseNumberUuid,
     licenseExpiryDateUuid,
   } = useConfig<ConfigObject>();
@@ -108,10 +113,23 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       providerHieFhirReference:
         providerAttributeType.find((type) => type.uuid === providerHieFhirReference)?.uuid || '',
       qualification: providerAttributeType.find((type) => type.uuid === qualificationUuid)?.uuid || '',
-      licenseBodyUuid: providerAttributeType.find((type) => type.uuid === licenseBodyUuid)?.uuid || '',
-      registrationNumberUuid: providerAttributeType.find((type) => type.uuid === registrationNumberUuid)?.uuid || '',
+      licenseBody: providerAttributeType.find((type) => type.uuid === licenseBodyUuid)?.uuid || '',
+      phoneNumber: providerAttributeType.find((type) => type.uuid === phoneNumberUuid)?.uuid || '',
+      providerAddress: providerAttributeType.find((type) => type.uuid === providerAddressUuid)?.uuid || '',
+      passportNumber: providerAttributeType.find((type) => type.uuid === passportNumberUuid)?.uuid || '',
     };
-  }, [licenseBodyUuid, providerAttributeType, providerHieFhirReference, providerNationalIdUuid, qualificationUuid]);
+  }, [
+    licenseBodyUuid,
+    licenseExpiryDateUuid,
+    licenseNumberUuid,
+    passportNumberUuid,
+    phoneNumberUuid,
+    providerAddressUuid,
+    providerAttributeType,
+    providerHieFhirReference,
+    providerNationalIdUuid,
+    qualificationUuid,
+  ]);
 
   const providerAttributes = useMemo(() => provider.flatMap((item) => item.attributes || []), [provider]);
 
@@ -127,7 +145,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
 
   const licenseExpiryDate = useMemo(() => {
     const value = getProviderAttributeValue(attributeTypeMapping.licenseExpiry);
-    return value ? new Date(value).toISOString().split('T')[0] : undefined;
+    return value ? new Date(value) : '';
   }, [attributeTypeMapping, getProviderAttributeValue]);
 
   const qualification = useMemo(
@@ -138,22 +156,42 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     () => getProviderAttributeValue(attributeTypeMapping.providerNationalId),
     [attributeTypeMapping, getProviderAttributeValue],
   );
-  const registrationNumber = useMemo(
-    () => getProviderAttributeValue(attributeTypeMapping.registrationNumberUuid),
+  const passportNumber = useMemo(
+    () => getProviderAttributeValue(attributeTypeMapping.passportNumber),
     [attributeTypeMapping, getProviderAttributeValue],
   );
-
+  const registrationNumber = useMemo(
+    () => getProviderAttributeValue(attributeTypeMapping.licenseBody),
+    [attributeTypeMapping, getProviderAttributeValue],
+  );
+  const phoneNumber = useMemo(
+    () => getProviderAttributeValue(attributeTypeMapping.phoneNumber),
+    [attributeTypeMapping, getProviderAttributeValue],
+  );
+  const email = useMemo(
+    () => getProviderAttributeValue(attributeTypeMapping.providerAddress),
+    [attributeTypeMapping, getProviderAttributeValue],
+  );
   const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
   type UserFormSchema = z.infer<typeof userManagementFormSchema>;
   const formDefaultValues = useMemo(() => {
     if (isInitialValuesEmpty) {
       return {};
     }
+    const extractNameParts = (display = '') => {
+      const nameParts = display.split(' ');
+
+      const [givenName = '', middleName = '', familyName = ''] =
+        nameParts.length === 3 ? nameParts : [nameParts[0], '', nameParts[1] || ''];
+
+      return { givenName, middleName, familyName };
+    };
+
     return {
       ...initialUserValue,
       ...extractNameParts(initialUserValue.person?.display || ''),
-      phoneNumber: extractAttributeValue(initialUserValue.person?.attributes, 'Telephone'),
-      email: extractAttributeValue(initialUserValue.person?.attributes, 'Email'),
+      phoneNumber: phoneNumber,
+      email: email,
       roles:
         initialUserValue.roles?.map((role) => ({
           uuid: role.uuid,
@@ -162,21 +200,24 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         })) || [],
       gender: initialUserValue.person?.gender,
       providerLicense: providerLicenseNumber,
-      licenseExpiryDate: licenseExpiryDate,
+      licenseExpiryDate: licenseExpiryDate ? new Date(licenseExpiryDate) : undefined,
       qualification: qualification,
       nationalId: nationalId,
+      passportNumber: passportNumber,
       registrationNumber: registrationNumber,
     };
-  }, [isInitialValuesEmpty, initialUserValue, providerLicenseNumber, licenseExpiryDate]);
-
-  function extractNameParts(display = '') {
-    const nameParts = display.split(' ');
-
-    const [givenName = '', middleName = '', familyName = ''] =
-      nameParts.length === 3 ? nameParts : [nameParts[0], '', nameParts[1] || ''];
-    licenseBodyUuid;
-    return { givenName, middleName, familyName };
-  }
+  }, [
+    isInitialValuesEmpty,
+    initialUserValue,
+    phoneNumber,
+    email,
+    providerLicenseNumber,
+    licenseExpiryDate,
+    qualification,
+    nationalId,
+    passportNumber,
+    registrationNumber,
+  ]);
 
   function extractAttributeValue(attributes, prefix: string) {
     return attributes?.find((attr) => attr.display.startsWith(prefix))?.display?.split(' ')[3] || '';
@@ -230,6 +271,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           const givenName = nameWithoutTitle[0];
           const middleName = nameWithoutTitle.slice(1, -1).join(' ');
           const familyName = nameWithoutTitle[nameWithoutTitle.length - 1];
+          const healthWorkerPassPortNumber = fetchedHealthWorker?.link
+            ?.find(
+              (link: { relation: string; url: string }) =>
+                link.relation === 'self' && link.url.includes('identifierType=Passport'),
+            )
+            ?.url.split('identifierNumber=')[1]
+            ?.split('&')[0];
 
           setValue('givenName', givenName);
           setValue('middleName', middleName);
@@ -278,6 +326,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
               )?.period?.end || t('unknown', 'Unknown'),
             ),
           );
+          setValue('passportNumber', healthWorkerPassPortNumber);
           setHealthWorker(fetchedHealthWorker);
         },
       });
@@ -287,10 +336,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       setSearchHWR({ ...searchHWR, isHWRLoading: false });
     }
   };
-
   const onSubmit = async (data: UserFormSchema) => {
-    const emailAttribute = 'b8d0b331-1d2d-4a9a-b741-1816f498bdb6';
-    const telephoneAttribute = 'b2c38640-2603-4629-aebd-3b54f33f1e3a';
     const setProvider = data.providerIdentifiers;
     const editProvider = data.isEditProvider;
     const providerUUID = provider[0]?.uuid || '';
@@ -302,8 +348,11 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           attributeType: attributeTypeMapping.licenseExpiry,
           value: data.licenseExpiryDate ? data.licenseExpiryDate.toISOString() : '',
         },
-        { attributeType: attributeTypeMapping.licenseBodyUuid, value: data.registrationNumber },
-        { attributeType: attributeTypeMapping.providerHieFhirReference, value: JSON.stringify(healthWorker) },
+        { attributeType: attributeTypeMapping.licenseBody, value: data.registrationNumber },
+        {
+          attributeType: attributeTypeMapping?.providerHieFhirReference,
+          value: JSON.stringify(healthWorker),
+        },
         {
           attributeType: attributeTypeMapping.providerNationalId,
           value: data.nationalId,
@@ -311,6 +360,18 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         {
           attributeType: attributeTypeMapping.qualification,
           value: data.qualification,
+        },
+        {
+          attributeType: attributeTypeMapping.passportNumber,
+          value: data.passportNumber,
+        },
+        {
+          attributeType: attributeTypeMapping.phoneNumber,
+          value: data.phoneNumber,
+        },
+        {
+          attributeType: attributeTypeMapping.providerAddress,
+          value: data.email,
         },
       ].filter((attr) => attr.value),
     };
@@ -323,8 +384,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         names: [{ givenName: data.givenName, familyName: data.familyName, middleName: data.middleName }],
         gender: data.gender,
         attributes: [
-          { attributeType: telephoneAttribute, value: data.phoneNumber },
-          { attributeType: emailAttribute, value: data.email },
+          { attributeType: personPhonenumberAttributeUuid, value: data.phoneNumber },
+          { attributeType: personEmailAttributeUuid, value: data.email },
         ],
       },
       roles: data.roles?.map((role) => ({
@@ -347,13 +408,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`,
         );
 
-        if (setProvider || editProvider) {
+        if (setProvider) {
           try {
             const providerUrl = providerUUID ? `${restBaseUrl}/provider/${providerUUID}` : `${restBaseUrl}/provider`;
             const personUUID = response.person.uuid;
             const identifier = response.systemId;
             const providerResponse = await createProvider(personUUID, identifier, providerPayload, providerUrl);
-
             if (providerResponse.ok) {
               showSnackbarMessage(t('providerSaved', 'Provider saved successfully'), '', 'success');
             }
@@ -365,10 +425,54 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             );
           }
         }
+        if (editProvider) {
+          const updatableAttributes = [
+            {
+              attributeType: licenseBodyUuid,
+              value: data?.registrationNumber,
+            },
+            {
+              attributeType: providerNationalIdUuid,
+              value: data?.nationalId,
+            },
+            {
+              attributeType: licenseNumberUuid,
+              value: data?.providerLicense,
+            },
+            {
+              attributeType: passportNumberUuid,
+              value: data?.passportNumber,
+            },
+          ].filter((attr) => attr?.value !== undefined && attr?.value !== null && attr?.value !== '');
+
+          await Promise.all(
+            updatableAttributes?.map((attr) => {
+              const existingAttributes = provider[0]?.attributes?.find(
+                (at) => at?.attributeType?.uuid === attr?.attributeType,
+              )?.uuid;
+
+              const payload = {
+                attributeType: attr?.attributeType,
+                value: attr?.value,
+              };
+
+              if (!existingAttributes) {
+                return createProviderAttribute(payload, providerUUID);
+              }
+              return updateProviderAttributes(payload, providerUUID, existingAttributes);
+            }),
+          );
+          showSnackbar({
+            title: 'Success',
+            kind: 'success',
+            subtitle: t('updateMessage', 'Provider updated successfully'),
+          });
+        }
       } else {
         throw new Error('User creation failed');
       }
       handleMutation(`${restBaseUrl}/user`);
+      mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/provider`));
       closeWorkspaceWithSavedChanges();
     } catch (error) {
       showSnackbarMessage(
@@ -455,8 +559,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             vertical={true}
             className={styles.progressIndicator}
             onChange={(newIndex) => {
-              toggleSection(steps[newIndex].id);
-              setCurrentIndex(newIndex);
+              if (!searchHWR.isHWRLoading) {
+                toggleSection(steps[newIndex].id);
+                setCurrentIndex(newIndex);
+              }
             }}>
             {steps.map((step, index) => (
               <ProgressStep key={step.id} label={step.label} className={styles.ProgresStep} />
@@ -576,6 +682,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     {...field}
                                     id="phoneNumber"
                                     type="text"
+                                    disabled={isInitialValuesEmpty}
                                     labelText={t('phoneNumber', 'Phone Number')}
                                     placeholder={t('phoneNumber', 'Enter Phone Number')}
                                     invalid={!!errors.phoneNumber}
@@ -593,6 +700,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     {...field}
                                     id="email"
                                     type="email"
+                                    disabled={isInitialValuesEmpty}
                                     labelText={t('email', 'Email')}
                                     placeholder={t('email', 'Enter Email')}
                                     invalid={!!errors.email}
@@ -609,7 +717,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 render={({ field }) => (
                                   <RadioButtonGroup
                                     {...field}
-                                    legendText={t('gender', 'Gender')}
+                                    legendText={t('sex', 'Sex')}
                                     orientation="vertical"
                                     invalid={!!errors.gender}
                                     invalidText={errors.gender?.message}>
@@ -636,29 +744,130 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                     {hasProviderAccount && (
                       <ResponsiveWrapper>
                         <span className={styles.formHeaderSection}>{t('providerDetails', 'Provider details')}</span>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="nationalId"
+                            control={userFormMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="nationalId"
+                                disabled={isInitialValuesEmpty}
+                                type="text"
+                                labelText={t('nationalID', 'National id')}
+                                placeholder={t('nationalID', 'National id')}
+                                invalid={!!errors.nationalId}
+                                invalidText={errors.nationalId?.message}
+                                className={styles.checkboxLabelSingleLine}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="passportNumber"
+                            control={userFormMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="passportNumber"
+                                disabled={isInitialValuesEmpty}
+                                type="text"
+                                labelText={t('passportNumber', 'Passport number')}
+                                placeholder={t('passportNumber', 'Passport number')}
+                                invalid={!!errors.nationalId}
+                                invalidText={errors.nationalId?.message}
+                                className={styles.checkboxLabelSingleLine}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="providerLicense"
+                            control={userFormMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="providerLicense"
+                                type="text"
+                                disabled={isInitialValuesEmpty}
+                                labelText={t('providerLicense', 'License Number')}
+                                placeholder={t('providerLicense', 'License Number')}
+                                className={styles.checkboxLabelSingleLine}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="registrationNumber"
+                            control={userFormMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="registrationNumber"
+                                type="text"
+                                disabled={isInitialValuesEmpty}
+                                labelText={t('registrationNumber', 'Registration Number')}
+                                placeholder={t('registrationNumber', 'Registration Number')}
+                                className={styles.checkboxLabelSingleLine}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="qualification"
+                            control={userFormMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="qualification"
+                                type="qualification"
+                                disabled
+                                labelText={t('qualification', 'Qualification')}
+                                placeholder={t('qualification', 'Qualification')}
+                                invalid={!!errors.qualification}
+                                invalidText={errors.qualification?.message}
+                                className={styles.checkboxLabelSingleLine}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
+
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="licenseExpiryDate"
+                            control={userFormMethods.control}
+                            render={({ field }) => (
+                              <DatePicker
+                                datePickerType="single"
+                                className={styles.formDatePicker}
+                                onChange={(event) => {
+                                  if (event.length) {
+                                    field.onChange(event[0]);
+                                  }
+                                }}
+                                value={field.value ? new Date(field.value) : ''}>
+                                <DatePickerInput
+                                  className={styles.formDatePicker}
+                                  placeholder="mm/dd/yyyy"
+                                  labelText={t('licenseExpiryDate', 'License Expiry Date')}
+                                  id="formLicenseDatePicker"
+                                  size="md"
+                                  disabled
+                                  invalid={!!errors.licenseExpiryDate}
+                                  invalidText={errors.licenseExpiryDate?.message}
+                                />
+                              </DatePicker>
+                            )}
+                          />
+                        </ResponsiveWrapper>
                         {loadingProvider || providerError ? (
                           <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
                         ) : provider.length > 0 ? (
                           <>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="registrationNumber"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <TextInput
-                                    {...field}
-                                    id="registrationNumber"
-                                    type="registrationNumber"
-                                    disabled
-                                    labelText={t('registrationNumber', 'Registration number')}
-                                    placeholder={t('registrationNumber', 'Registration number')}
-                                    invalid={!!errors.registrationNumber}
-                                    invalidText={errors.registrationNumber?.message}
-                                    className={styles.checkboxLabelSingleLine}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
                             <ResponsiveWrapper>
                               <Controller
                                 name="systemId"
@@ -676,91 +885,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   />
                                 )}
                               />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="nationalId"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <TextInput
-                                    {...field}
-                                    id="email"
-                                    disabled
-                                    type="email"
-                                    labelText={t('nationalID', 'National id')}
-                                    placeholder={t('nationalID', 'National id')}
-                                    invalid={!!errors.nationalId}
-                                    invalidText={errors.nationalId?.message}
-                                    className={styles.checkboxLabelSingleLine}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="qualification"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <TextInput
-                                    {...field}
-                                    id="qualification"
-                                    type="qualification"
-                                    disabled
-                                    labelText={t('qualification', 'Qualification')}
-                                    placeholder={t('qualification', 'Qualification')}
-                                    invalid={!!errors.qualification}
-                                    invalidText={errors.qualification?.message}
-                                    className={styles.checkboxLabelSingleLine}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="providerLicense"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <TextInput
-                                    {...field}
-                                    id="providerLicense"
-                                    type="text"
-                                    disabled
-                                    labelText={t('providerLicense', 'License Number')}
-                                    placeholder={t('providerLicense', 'License Number')}
-                                    className={styles.checkboxLabelSingleLine}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="licenseExpiryDate"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <DatePicker
-                                    datePickerType="single"
-                                    className={styles.formDatePicker}
-                                    onChange={(event) => {
-                                      if (event.length) {
-                                        field.onChange(event[0]);
-                                      }
-                                    }}
-                                    value={field.value}>
-                                    <DatePickerInput
-                                      className={styles.formDatePicker}
-                                      placeholder="mm/dd/yyyy"
-                                      labelText={t('licenseExpiryDate', 'License Expiry Date')}
-                                      id="formLicenseDatePicker"
-                                      size="md"
-                                      disabled
-                                      invalid={!!errors.licenseExpiryDate}
-                                      invalidText={errors.licenseExpiryDate?.message}
-                                    />
-                                  </DatePicker>
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
                               <Controller
                                 name="isEditProvider"
                                 control={userFormMethods.control}
@@ -783,89 +907,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                           </>
                         ) : (
                           <>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="nationalId"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <TextInput
-                                    {...field}
-                                    id="email"
-                                    disabled
-                                    type="email"
-                                    labelText={t('nationalID', 'National id')}
-                                    placeholder={t('nationalID', 'National id')}
-                                    invalid={!!errors.nationalId}
-                                    invalidText={errors.nationalId?.message}
-                                    className={styles.checkboxLabelSingleLine}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="qualification"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <TextInput
-                                    {...field}
-                                    id="qualification"
-                                    type="qualification"
-                                    disabled
-                                    labelText={t('qualification', 'Qualification')}
-                                    placeholder={t('qualification', 'Qualification')}
-                                    invalid={!!errors.qualification}
-                                    invalidText={errors.qualification?.message}
-                                    className={styles.checkboxLabelSingleLine}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="providerLicense"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <TextInput
-                                    {...field}
-                                    id="providerLicense"
-                                    type="text"
-                                    disabled
-                                    labelText={t('providerLicense', 'License Number')}
-                                    placeholder={t('providerLicense', 'License Number')}
-                                    className={styles.checkboxLabelSingleLine}
-                                  />
-                                )}
-                              />
-                            </ResponsiveWrapper>
-                            <ResponsiveWrapper>
-                              <Controller
-                                name="licenseExpiryDate"
-                                control={userFormMethods.control}
-                                render={({ field }) => (
-                                  <DatePicker
-                                    datePickerType="single"
-                                    className={styles.formDatePicker}
-                                    onChange={(event) => {
-                                      if (event.length) {
-                                        field.onChange(event[0]);
-                                      }
-                                    }}
-                                    value={field.value}>
-                                    <DatePickerInput
-                                      className={styles.formDatePicker}
-                                      placeholder="mm/dd/yyyy"
-                                      labelText={t('licenseExpiryDate', 'License Expiry Date')}
-                                      id="formLicenseDatePicker"
-                                      size="md"
-                                      disabled
-                                      invalid={!!errors.licenseExpiryDate}
-                                      invalidText={errors.licenseExpiryDate?.message}
-                                    />
-                                  </DatePicker>
-                                )}
-                              />
-                            </ResponsiveWrapper>
                             <Controller
                               name="providerIdentifiers"
                               control={userFormMethods.control}
@@ -1068,7 +1109,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                   <Button
                     kind="primary"
                     type={getSubmitButtonType()}
-                    disabled={isSubmitting || Object.keys(errors).length > 0}
+                    disabled={isSubmitting || Object.keys(errors).length > 0 || searchHWR.isHWRLoading}
                     renderIcon={getSubmitButtonIcon()}
                     className={styles.btn}
                     onClick={handleNextClick}>

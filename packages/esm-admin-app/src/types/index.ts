@@ -289,3 +289,47 @@ export interface UserRoleScope extends BaseOpenmrsData {
   locations?: Array<UserRoleScopeLocation>;
   operationTypes?: Array<UserRoleScopeOperationType>;
 }
+
+export interface ProviderResponse {
+  uuid: string;
+  display: string;
+  person: PersonResponse;
+  identifier: string;
+  attributes: Array<{
+    uuid: string;
+    display: string;
+    attributeType: {
+      uuid: string;
+      display: string;
+    };
+    value: string;
+  }>;
+  retired: boolean;
+  voided: boolean;
+}
+interface PersonResponse {
+  uuid: string;
+  display: string;
+  names: {
+    givenName: string;
+    familyName: string;
+  };
+  gender: string;
+  birthdate: string;
+  attributes: Array<{
+    uuid: string;
+    display: string;
+  }>;
+}
+export interface UserResponse {
+  uuid: string;
+  display: string;
+  username: string;
+  systemId: string;
+  person: PersonResponse;
+  roles: Array<{
+    uuid: string;
+    display: string;
+    description: string;
+  }>;
+}
