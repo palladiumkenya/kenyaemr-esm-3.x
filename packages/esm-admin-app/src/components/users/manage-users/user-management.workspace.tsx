@@ -939,10 +939,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                           <Controller
                             name="username"
                             control={userFormMethods.control}
-                            rules={{
-                              validate: (value) =>
-                                usernames.includes(userFormMethods.watch('username')) ? 'Username already exits' : true,
-                            }}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
