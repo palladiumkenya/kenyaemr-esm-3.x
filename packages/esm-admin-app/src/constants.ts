@@ -42,3 +42,9 @@ export const PROVIDER_NOT_FOUND = 'PROVIDER_NOT_FOUND';
 export const ROLE_CATEGORIES = {
   CORE_INVENTORY: 'Core Inventory Roles',
 };
+export const SECTIONS = {
+  LOGIN: 'login',
+  ROLES: 'roles',
+  DEMOGRAPHIC: 'demographic',
+  PROVIDER: 'provider',
+};

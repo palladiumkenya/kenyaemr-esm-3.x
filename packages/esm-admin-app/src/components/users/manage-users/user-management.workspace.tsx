@@ -53,10 +53,11 @@ import { ChevronSortUp, Query, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { type PractitionerResponse, Provider, User } from '../../../types';
 import { searchHealthCareWork } from '../../hook/searchHealthCareWork';
-import { ROLE_CATEGORIES, today } from '../../../constants';
+import { ROLE_CATEGORIES, SECTIONS, today } from '../../../constants';
 import { ConfigObject } from '../../../config-schema';
 import { mutate } from 'swr';
 import { createProviderAttribute, updateProviderAttributes } from '../../modal/hwr-sync.resource';
+import { useUsers } from './user-list/user-list.resource';
 
 type ManageUserWorkspaceProps = DefaultWorkspaceProps & {
   initialUserValue?: User;
@@ -76,9 +77,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [healthWorker, setHealthWorker] = useState(null);
   const { provider = [], loadingProvider, providerError } = useProvider(initialUserValue.systemId);
-  const { location, loadingLocation } = useLocation();
+  const { users, isLoading: isLoadingUsers, error: usersError } = useUsers();
+  const usernames =
+    users?.map((user) => user.username).filter((username) => username !== initialUserValue?.username) || [];
+  const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
 
-  const { userManagementFormSchema } = UserManagementFormSchema();
+  const { userManagementFormSchema } = UserManagementFormSchema(usernames);
 
   const { providerAttributeType = [] } = useProviderAttributeType();
 
@@ -172,7 +176,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     () => getProviderAttributeValue(attributeTypeMapping.providerAddress),
     [attributeTypeMapping, getProviderAttributeValue],
   );
-  const isInitialValuesEmpty = Object.keys(initialUserValue).length === 0;
   type UserFormSchema = z.infer<typeof userManagementFormSchema>;
   const formDefaultValues = useMemo(() => {
     if (isInitialValuesEmpty) {
@@ -518,10 +521,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     return rolesConfig.filter((category) => category.category !== ROLE_CATEGORIES.CORE_INVENTORY);
   }
 
-  const hasLoginInfo = activeSection === 'login';
-  const hasRoles = activeSection === 'roles';
-  const hasDemographicInfo = activeSection === 'demographic';
-  const hasProviderAccount = activeSection === 'provider';
+  const hasLoginInfo = activeSection === SECTIONS.LOGIN;
+  const hasRoles = activeSection === SECTIONS.ROLES;
+  const hasDemographicInfo = activeSection === SECTIONS.DEMOGRAPHIC;
+  const hasProviderAccount = activeSection === SECTIONS.PROVIDER;
 
   const isSaveAndClose = () => !(hasDemographicInfo || hasLoginInfo || hasProviderAccount);
 
@@ -936,6 +939,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                           <Controller
                             name="username"
                             control={userFormMethods.control}
+                            rules={{
+                              validate: (value) =>
+                                usernames.includes(userFormMethods.watch('username')) ? 'Username already exits' : true,
+                            }}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
