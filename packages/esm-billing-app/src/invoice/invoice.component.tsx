@@ -42,6 +42,9 @@ const Invoice: React.FC = () => {
   const [isPrinting, setIsPrinting] = useState(false);
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
+  const isInsurancePayment = (payments) => {
+    return payments?.some((payment) => payment.instanceType.name === 'Insurance');
+  };
   usePaymentsReconciler(billUuid);
   const {
     currentVisit,
@@ -200,7 +203,7 @@ const Invoice: React.FC = () => {
           tooltipPosition="left">
           {t('mpesaPayment', 'MPESA Payment')}
         </Button>
-        {isProcessClaimsFormEnabled && (
+        {isProcessClaimsFormEnabled && isInsurancePayment(bill?.payments) && (
           <Button
             onClick={handleViewClaims}
             disabled={bill?.status !== 'PAID'}
