@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { optional, z } from 'zod';
 
-const UserManagementFormSchema = () => {
+const UserManagementFormSchema = (existingUsernames: Array<string>, isEdit?: boolean) => {
   const { t } = useTranslation();
 
   const userManagementFormSchema = z.object({
@@ -16,7 +16,12 @@ const UserManagementFormSchema = () => {
     phoneNumber: z.string().optional(),
     email: z.string().optional(),
     providerIdentifiers: z.boolean().optional(),
-    username: z.string().nonempty(t('usernameRequired', 'Username is required')),
+    username: z
+      .string()
+      .nonempty(t('usernameRequired', 'Username is required'))
+      .refine((value) => !existingUsernames.includes(value), {
+        message: t('usernameTaken', 'Username already exists'),
+      }),
     password: z.string().optional(),
     confirmPassword: z.string().optional(),
     forcePasswordChange: z.boolean().optional(),
