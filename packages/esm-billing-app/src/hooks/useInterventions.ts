@@ -10,20 +10,6 @@ export type InterventionsFilter = {
   applicable_gender?: 'MALE' | 'FEMALE';
 };
 
-export const toQueryParams = (q: Record<string, any>) => {
-  return (
-    '?' +
-    Object.entries(q)
-      .reduce((prev, [key, val]) => {
-        if (val !== undefined && val !== null) {
-          return [...prev, `${key}=${val}`];
-        }
-        return prev;
-      }, [])
-      .join('&')
-  );
-};
-
 type Data = {
   status: string;
   data: Array<{
@@ -56,17 +42,18 @@ export const useInterventions = (filters: InterventionsFilter) => {
   };
 
   const { error: facilityLevelError, isLoading: isLoadingFacilityLevel, level } = useFacilityLevel();
-
-  const url = `${restBaseUrl}/kenyaemr/sha-interventions${toQueryParams({
+  const urlParams = new URLSearchParams({
     ...filters,
-    synchronize: false,
-  })}`;
+    synchronize: 'false',
+  });
+  const url = `${restBaseUrl}/kenyaemr/sha-interventions?${urlParams.toString()}`;
   const { isLoading, error, data } = useSWR<FetchResponse<Data>>(url, openmrsFetch);
   const interventions = useMemo(() => {
+    const packageCodes = filters.package_code?.split(',') || [];
     return data?.data?.data
       ?.filter((d) => {
         // 1. Filter by package code (only if defined)
-        if (filters.package_code && d.interventionPackage !== filters.package_code) {
+        if (packageCodes.length > 0 && !packageCodes.includes(d.interventionPackage)) {
           return false;
         }
 
@@ -106,12 +93,23 @@ export const useInterventions = (filters: InterventionsFilter) => {
         interventionCode,
         subCategoryBenefitsPackage: interventionSubPackage,
         interventionName,
+        interventionPackage,
       })) as SHAIntervention[];
   }, [data, filters, level]); // Ensure proper memoization
-
+  const allInterventions = useMemo(() => {
+    return (data?.data?.data ?? []).map(
+      ({ interventionCode, interventionName, interventionPackage, interventionSubPackage }) => ({
+        interventionCode,
+        subCategoryBenefitsPackage: interventionSubPackage,
+        interventionName,
+        interventionPackage,
+      }),
+    ) as SHAIntervention[];
+  }, [data]);
   return {
     isLoading: isLoading || isLoadingFacilityLevel,
-    interventions,
+    interventions: interventions ?? [],
+    allInterventions,
     error: error || facilityLevelError,
   };
 };

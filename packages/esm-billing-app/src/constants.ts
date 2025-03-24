@@ -20,3 +20,4 @@ export const colorsArray = [
 // Size in MegaBits
 export const MAX_ALLOWED_FILE_SIZE = 2097152;
 export const PAYMENT_MODE_ATTRIBUTE_FORMATS = ['java.lang.String', 'java.lang.Integer', 'java.lang.Double'];
+export const SHA_INSURANCE_SCHEME = 'SHA';
