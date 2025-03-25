@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { InlineLoading, InlineNotification, MultiSelect } from '@carbon/react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -10,19 +10,35 @@ import { usePatient } from '@openmrs/esm-framework';
 type EligibilityRequest = z.infer<typeof eligibilityRequestShema>;
 
 type PackageInterventionsProps = {
-  category: string;
+  categories: Array<string>;
   patientUuid: string;
 };
-const PackageInterventions: React.FC<PackageInterventionsProps> = ({ category, patientUuid }) => {
+const PackageInterventions: React.FC<PackageInterventionsProps> = ({ categories, patientUuid }) => {
   const { error: patientError, isLoading: isPatientLoading, patient } = usePatient(patientUuid);
   const filters: InterventionsFilter = {
-    package_code: category,
+    package_code: categories.join(','),
     applicable_gender: patient?.gender === 'male' ? 'MALE' : 'FEMALE',
   };
-  const { error, interventions, isLoading } = useInterventions(filters);
+  const { error, interventions, isLoading, allInterventions } = useInterventions(filters);
 
-  const form = useFormContext<EligibilityRequest>();
+  const form = useFormContext<{ packages: Array<string>; interventions: Array<string> }>();
   const { t } = useTranslation();
+  const selectedInterventionsObservable = form.watch('interventions');
+
+  const interventions_ = useMemo(() => {
+    const additionalInterventions = selectedInterventionsObservable.reduce((prev, curr) => {
+      const interventionContainedInOptions = interventions.some((i) => i.interventionCode === curr);
+      if (!interventionContainedInOptions) {
+        const intervention = allInterventions.find((i) => i.interventionCode === curr);
+        if (intervention) {
+          prev.push(intervention);
+        }
+      }
+      return prev;
+    }, [] as typeof allInterventions);
+
+    return [...interventions, ...additionalInterventions];
+  }, [allInterventions, interventions, selectedInterventionsObservable]);
 
   if (isLoading || isPatientLoading) {
     return (
@@ -47,10 +63,6 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ category, p
     );
   }
 
-  if (interventions.length === 0) {
-    return null;
-  }
-
   return (
     <Controller
       control={form.control}
@@ -65,10 +77,10 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ category, p
           onChange={(e) => {
             field.onChange(e.selectedItems);
           }}
-          initialSelectedItems={field.value}
+          selectedItems={field.value}
           label={t('chooseInterventions', 'Choose interventions')}
-          items={interventions.map((r) => r.interventionCode)}
-          itemToString={(item) => interventions.find((r) => r.interventionCode === item)?.interventionName ?? ''}
+          items={interventions_.map((r) => r.interventionCode)}
+          itemToString={(item) => interventions_.find((r) => r.interventionCode === item)?.interventionName ?? ''}
         />
       )}
     />

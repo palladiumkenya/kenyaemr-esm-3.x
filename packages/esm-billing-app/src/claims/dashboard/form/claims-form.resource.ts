@@ -13,11 +13,27 @@ interface ProvidersResponse {
   results: Provider[];
 }
 
+interface ExtendedVisit extends Visit {
+  attributes: Array<{
+    uuid: string;
+    display: string;
+    attributeType: {
+      uuid: string;
+      display: string;
+    };
+    value: string;
+  }>;
+}
+export interface SHAPackagesAndInterventionVisitAttribute {
+  packages: Array<string>;
+  interventions: Array<string>;
+}
+
 export function useVisit(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,patient,encounters:(uuid,diagnoses:(uuid,display,certainty,diagnosis:(coded:(uuid,display))),encounterDatetime,encounterType:(uuid,display),encounterProviders:(uuid,display,provider:(uuid,person:(uuid,display)))),location:(uuid,name,display),visitType:(uuid,name,display),startDatetime,stopDatetime)&limit=1';
+    'custom:(uuid,patient,encounters:(uuid,diagnoses:(uuid,display,certainty,diagnosis:(coded:(uuid,display))),encounterDatetime,encounterType:(uuid,display),encounterProviders:(uuid,display,provider:(uuid,person:(uuid,display)))),location:(uuid,name,display),visitType:(uuid,name,display),startDatetime,stopDatetime,attributes)&limit=1';
 
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: { results: Array<ExtendedVisit> } }, Error>(
     `${restBaseUrl}/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );

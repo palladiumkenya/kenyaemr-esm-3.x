@@ -493,6 +493,7 @@ export type PaymentMode = {
 
 export type SHAIntervention = {
   interventionCode: string;
+  interventionPackage: string;
   shaCategory: string;
   accessCode: string;
   subCategoryBenefitsPackage: string;
