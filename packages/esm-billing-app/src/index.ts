@@ -23,7 +23,6 @@ import ImagingOrder from './billable-services/billiable-item/test-order/imaging-
 import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
 import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
 import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
-import TestOrderAction from './billable-services/billiable-item/test-order/test-order-action.component';
 import { BulkImportBillableServices } from './billable-services/bulk-import-billable-service.modal';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillingForm from './billing-form/billing-form.component';
@@ -42,6 +41,7 @@ import { ClockIn } from './payment-points/payment-point/clock-in.modal';
 import { ClockOut } from './payment-points/payment-point/clock-out.modal';
 import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
 import rootComponent from './root.component';
+import OrderActionButton from './billable-services/billiable-item/order-actions/components/order-action-button.component';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -169,7 +169,7 @@ export const priceInfoOrder = getSyncLifecycle(PriceInfoOrder, options);
 export const procedureOrder = getSyncLifecycle(ProcedureOrder, options);
 export const imagingOrder = getSyncLifecycle(ImagingOrder, options);
 export const drugOrder = getSyncLifecycle(DrugOrder, options);
-export const testOrderAction = getSyncLifecycle(TestOrderAction, options);
+export const orderActionButton = getSyncLifecycle(OrderActionButton, options);
 
 // bill manager modals
 export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
