@@ -47,7 +47,7 @@ const SurveillanceSummaryCards: React.FC<SurveillanceSummaryCardsProps> = ({ sta
         )}
       />
       <SummaryCard
-        header={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
+        header={t('prepNotlinked', 'High risk -ve PBFW not on PrEP')}
         title={t('pbfwNotLinked', 'High risk -ve PBFW Not linked to PrEP')}
         value={`${surveillanceSummary?.getPregnantPostpartumNotInPrep}/${surveillanceSummary?.getPregnantOrPostpartumClients}`}
         percentage={getPercentage(
