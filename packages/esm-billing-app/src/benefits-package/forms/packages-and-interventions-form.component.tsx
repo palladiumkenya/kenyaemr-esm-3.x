@@ -1,9 +1,9 @@
 import { Column, InlineLoading, InlineNotification, MultiSelect } from '@carbon/react';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import PackageInterventions from './interventions-form.component';
 import usePackages from '../../hooks/usePackages';
+import PackageInterventions from './interventions-form.component';
 
 type Props = {
   patientUuid: string;
@@ -18,6 +18,19 @@ const SHABenefitPackangesAndInterventions: React.FC<Props> = ({ patientUuid }) =
   if (packagesLoading) {
     return (
       <InlineLoading description={t('loading', 'Loading')} iconDescription={t('loading', 'Loading data') + '...'} />
+    );
+  }
+
+  if (packageError) {
+    return (
+      <InlineNotification
+        aria-label="closes notification"
+        kind="error"
+        lowContrast={true}
+        statusIconDescription="notification"
+        title={t('failureLoadingpackages', 'Error loading packages')}
+        subtitle={packageError?.message}
+      />
     );
   }
 
