@@ -5,9 +5,16 @@ import { useTranslation } from 'react-i18next';
 import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
 import SummaryCard from './summary-card.component';
 import styles from './summary-card.scss';
-const SurveillanceSummaryCards = () => {
+type SurveillanceSummaryCardsProps = {
+  startDate?: Date;
+  endDate?: Date;
+};
+const SurveillanceSummaryCards: React.FC<SurveillanceSummaryCardsProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const { error, isLoading, surveillanceSummary, getIndication, getPercentage } = useFacilityDashboardSurveillance();
+  const { error, isLoading, surveillanceSummary, getIndication, getPercentage } = useFacilityDashboardSurveillance(
+    startDate,
+    endDate,
+  );
 
   if (isLoading) {
     return (
@@ -40,7 +47,7 @@ const SurveillanceSummaryCards = () => {
         )}
       />
       <SummaryCard
-        header={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
+        header={t('prepNotlinked', 'High risk -ve PBFW not on PrEP')}
         title={t('pbfwNotLinked', 'High risk -ve PBFW Not linked to PrEP')}
         value={`${surveillanceSummary?.getPregnantPostpartumNotInPrep}/${surveillanceSummary?.getPregnantOrPostpartumClients}`}
         percentage={getPercentage(

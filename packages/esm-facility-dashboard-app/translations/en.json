@@ -1,10 +1,12 @@
 {
   "aboveSiteDashboard": "Above site facility Dashboard",
   "aboveSiteFacilityDashboard": "Above site facility Dashboard",
+  "days": "Days",
   "delayedEAC": "Delayed EAC",
   "delayedVLTesting": "Number of client on ART that visited, were eligible for VL sampling and no VL was done",
   "dnapcrPending": "DNA-PCR Pending",
-  "durationInWeeks": "Duration in weeks",
+  "durationInDays": "Duration in days",
+  "endDate": "End date",
   "facilitydashboard": "Facility Dashboard",
   "facilitydashboardLeftPannel": "facility Dashboard Left Panel",
   "heiFinalOutcomes": "HEI Final Outcomes",
@@ -13,6 +15,7 @@
   "hivNotlinked": "HIV +ve not linked",
   "hivPositiveClientsnotLinkedToArt": "HIV Positive Clients not linked to ART",
   "hivPositiveNotLinkedToART": "HIV +VE Not linked to ART",
+  "indicator": "Indicator",
   "missedoppotunityVL": "Missed opportunity VL",
   "pbfwNotLinked": "High risk -ve PBFW Not linked to PrEP",
   "percentage": "Percentage",
@@ -22,12 +25,11 @@
   "percentageMissedVL": "% of missed opportunity VL",
   "percentagePendingPCRDNAResults": "% of pending PCR-DNA Results",
   "percentageTestedPositiveNotLinked": "% tested positive not linked",
-  "prepNotlinked": "High risk +ve PBFW not on PrEP",
+  "prepNotlinked": "High risk -ve PBFW not on PrEP",
   "progresstracking": "Progress tracking",
-  "reportingPeriod": "Reporting Period",
+  "startDate": "Start date",
   "surveillance": "Surveillance",
   "surveillanceSummary": "Surveillance Summary",
   "viewOnSuperset": "View on Superset",
-  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks",
-  "weeks": "Weeks"
+  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks"
 }

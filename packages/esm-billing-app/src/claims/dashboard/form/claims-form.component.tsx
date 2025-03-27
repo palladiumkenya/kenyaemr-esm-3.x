@@ -10,7 +10,6 @@ import {
   MultiSelect,
   Row,
   Stack,
-  TextArea,
   TextInput,
   TextInputSkeleton,
 } from '@carbon/react';
@@ -21,15 +20,16 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import SHABenefitPackangesAndInterventions from '../../../benefits-package/forms/packages-and-interventions-form.component';
 import { BillingConfig } from '../../../config-schema';
 import { formatDate } from '../../../helpers/functions';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
 import useProvider from '../../../hooks/useProvider';
 import { LineItem, MappedBill } from '../../../types';
+import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
 import { processClaims, SHAPackagesAndInterventionVisitAttribute, useVisit } from './claims-form.resource';
 import styles from './claims-form.scss';
-import SHABenefitPackangesAndInterventions from '../../../benefits-package/forms/packages-and-interventions-form.component';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -345,44 +345,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               </Layer>
             </Column>
           </Row>
-          <Column>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="claimExplanation"
-                render={({ field }) => (
-                  <TextArea
-                    {...field}
-                    labelText={t('claimExplanation', 'Claim Explanation')}
-                    rows={3}
-                    placeholder="Claim Explanation"
-                    id="claimExplanation"
-                    invalid={!!errors.claimExplanation}
-                    invalidText={errors.claimExplanation?.message}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
-          <Column>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="claimJustification"
-                render={({ field }) => (
-                  <TextArea
-                    {...field}
-                    labelText={t('claimJustification', 'Claim Justification')}
-                    rows={3}
-                    placeholder="Claim Justification"
-                    id="claimJustification"
-                    invalid={!!errors.claimJustification}
-                    invalidText={errors.claimJustification?.message}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
+          <ClaimExplanationAndJusificationInput patientUuid={patientUuid} />
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
               {t('discardClaim', 'Discard Claim')}
