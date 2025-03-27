@@ -231,6 +231,12 @@
   ],
   "workspaces": [
     {
+      "name": "create-bill-workspace",
+      "component": "createBillWorkspace",
+      "title": "Create Bill Workspace",
+      "type": "other-form"
+    },
+    {
       "name": "waive-bill-form",
       "component": "waiveBillForm",
       "title": "Waive Bill Form",

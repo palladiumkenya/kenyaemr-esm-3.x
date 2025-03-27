@@ -16,7 +16,7 @@ const OrderActionButton: React.FC<Record<string, any>> = (props) => {
     );
   }
 
-  if (props.orderType === 'lab') {
+  if (props.order?.orderType?.name === 'Test Order') {
     const { order, modalName, additionalProps, actionText } = props;
     return (
       <LabOrderButton order={order} modalName={modalName} additionalProps={additionalProps} actionText={actionText} />
