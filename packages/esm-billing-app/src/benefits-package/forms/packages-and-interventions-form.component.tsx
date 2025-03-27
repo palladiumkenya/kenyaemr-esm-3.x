@@ -28,7 +28,7 @@ const SHABenefitPackangesAndInterventions: React.FC<Props> = ({ patientUuid }) =
         kind="error"
         lowContrast={true}
         statusIconDescription="notification"
-        title={t('failureLoadingpackages', 'Error loading packages')}
+        title={t('errorLoadingpackages', 'Error loading packages')}
         subtitle={packageError?.message}
       />
     );

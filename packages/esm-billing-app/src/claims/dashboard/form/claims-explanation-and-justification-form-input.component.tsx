@@ -7,10 +7,10 @@ import { InterventionsFilter, useInterventions } from '../../../hooks/useInterve
 import usePackages from '../../../hooks/usePackages';
 import styles from './claims-form.scss';
 
-type Props = {
+type ClaimExplanationAndJusificationInputProps = {
   patientUuid: string;
 };
-const ClaimExplanationAndJusificationInput: React.FC<Props> = ({ patientUuid }) => {
+const ClaimExplanationAndJusificationInput: React.FC<ClaimExplanationAndJusificationInputProps> = ({ patientUuid }) => {
   const { error: patientError, isLoading: isPatientLoading, patient } = usePatient(patientUuid);
 
   const form = useFormContext<{
@@ -67,7 +67,7 @@ const ClaimExplanationAndJusificationInput: React.FC<Props> = ({ patientUuid }) 
         kind="error"
         lowContrast={true}
         statusIconDescription="notification"
-        title={t('failureLoadingpackages', 'Error loading packages')}
+        title={t('errorLoadingpackages', 'Error loading packages')}
         subtitle={packageError?.message ?? packageError?.message ?? interventionsError?.message}
       />
     );
