@@ -26,11 +26,11 @@
   "percentagePendingPCRDNAResults": "% of HEI (6-8 weeks) without DNA-PCR Results",
   "percentageTestedPositiveNotLinked": "% tested positive not linked",
   "prepNotlinked": "High risk -ve PBFW not on PrEP",
+  "progressInAdressingLinkedToArt": "Progress in adressing Linkage to ART",
   "progresstracking": "Progress tracking",
   "startDate": "Start date",
   "surveillance": "Surveillance",
   "surveillanceSummary": "Surveillance Summary",
   "viewOnSuperset": "View on Superset",
-  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks",
-  "progressInAdressingLinkedToArt": "Progress in adressing Linkage to ART"
+  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks"
 }
