@@ -11,17 +11,29 @@ export function useLabOrderAction(order?: Order) {
   const orderUuid = order?.uuid;
   const patientUuid = order?.patient?.uuid;
 
-  const { isLoading, hasPendingPayment } = useBillStatus(orderUuid, patientUuid);
-
+  const { isLoading, hasPendingPayment, itemHasBill } = useBillStatus(orderUuid, patientUuid);
+  const shouldShowBillModal = itemHasBill.length < 1;
   const isInProgress = order?.fulfillerStatus === FulfillerStatus.IN_PROGRESS;
-  const buttonText = hasPendingPayment ? t('unsettledBill', 'Unsettled bill') : t('pickLabRequest', 'Pick Lab Request');
+
+  const getButtonText = () => {
+    if (hasPendingPayment) {
+      return t('unsettledBill', 'Unsettled bill');
+    }
+
+    if (shouldShowBillModal) {
+      return t('bill', 'Bill');
+    }
+
+    return t('pickLabRequest', 'Pick Lab Request');
+  };
 
   return {
     isLoading,
     isDisabled: hasPendingPayment,
-    buttonText,
+    buttonText: getButtonText(),
     isInProgress,
     orderUuid,
     patientUuid,
+    shouldShowBillModal,
   };
 }

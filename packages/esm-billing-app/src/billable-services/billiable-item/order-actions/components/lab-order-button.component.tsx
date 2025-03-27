@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { showModal } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 import { Order } from '@openmrs/esm-patient-common-lib';
 import { BaseOrderButton } from './base-order-button.component';
 import { useLabOrderAction } from '../hooks/useLabOrderAction';
@@ -19,21 +19,34 @@ export const LabOrderButton: React.FC<LabOrderButtonProps> = ({
   additionalProps,
   actionText,
 }) => {
-  const { isLoading, isDisabled, buttonText: defaultButtonText, isInProgress } = useLabOrderAction(order);
+  const {
+    isLoading,
+    isDisabled,
+    buttonText: defaultButtonText,
+    isInProgress,
+    shouldShowBillModal,
+  } = useLabOrderAction(order);
 
   const { handleModalClose } = useModalHandler(additionalProps?.mutateUrl as string);
   const buttonText = actionText ?? defaultButtonText;
 
   const launchModal = useCallback(() => {
-    const dispose = showModal(modalName, {
-      closeModal: () => {
-        handleModalClose();
-        dispose();
-      },
-      order,
-      ...(additionalProps && { additionalProps }),
-    });
-  }, [modalName, order, additionalProps, handleModalClose]);
+    if (shouldShowBillModal) {
+      launchWorkspace('create-bill-workspace', {
+        order,
+        patientUuid: order?.patient?.uuid,
+      });
+    } else {
+      const dispose = showModal(modalName, {
+        closeModal: () => {
+          handleModalClose();
+          dispose();
+        },
+        order,
+        ...(additionalProps && { additionalProps }),
+      });
+    }
+  }, [modalName, order, additionalProps, handleModalClose, shouldShowBillModal]);
 
   if (isInProgress) {
     return null;
