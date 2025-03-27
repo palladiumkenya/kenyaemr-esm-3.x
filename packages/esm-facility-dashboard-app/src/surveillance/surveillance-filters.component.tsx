@@ -3,6 +3,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SurveillanceindicatorsFilter } from '../types';
 import styles from './surveillance.scss';
+import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, today } from '../constants';
+import { formatDatetime } from '@openmrs/esm-framework';
 
 type Props = {
   filters: SurveillanceindicatorsFilter;
@@ -10,7 +12,7 @@ type Props = {
 };
 const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
   const { t } = useTranslation();
-  const reportingPeriods = [{ label: 'Last 1 week view' }];
+  const MaxDate: Date = today();
   const indicators = [
     { key: 'getHivPositiveNotLinked', label: 'HIV +ve not linked' },
     { key: 'getPregnantPostpartumNotInPrep', label: 'High risk +ve PBFW not on PrEP' },
@@ -21,19 +23,34 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
   ];
   return (
     <div className={styles.filtersContainer}>
-      <DatePicker datePickerType="range">
-        <DatePickerInput id="date-picker-input-id-start" placeholder="mm/dd/yyyy" labelText="Start date" size="md" />
-        <DatePickerInput id="date-picker-input-id-finish" placeholder="mm/dd/yyyy" labelText="End date" size="md" />
+      <DatePicker
+        datePickerType="range"
+        minDate={formatDatetime(MaxDate)}
+        locale="en"
+        dateFormat={DATE_PICKER_CONTROL_FORMAT}
+        onChange={(dates: Array<Date>) => {
+          if (onFiltersChange) {
+            onFiltersChange({
+              ...filters,
+              startdate: dates[0],
+              endDate: dates[1],
+            });
+          }
+        }}>
+        <DatePickerInput
+          id="date-picker-input-id-start"
+          placeholder={DATE_PICKER_FORMAT}
+          labelText={t('startDate', 'Start date')}
+          size="md"
+        />
+        <DatePickerInput
+          id="date-picker-input-id-finish"
+          placeholder={DATE_PICKER_FORMAT}
+          labelText={t('endDate', 'End date')}
+          size="md"
+        />
       </DatePicker>
-      <Dropdown
-        className={styles.filterInput}
-        autoAlign
-        id="filters"
-        itemToString={(item) => item?.label ?? ''}
-        items={reportingPeriods}
-        selectedItem={reportingPeriods[0]}
-        label={t('reportingPeriod', 'Reporting Period')}
-      />
+
       <Dropdown
         className={styles.filterInput}
         autoAlign
