@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SurveillanceindicatorsFilter } from '../types';
 import styles from './surveillance.scss';
-import { DATE_PICKER_FORMAT, today } from '../constants';
+import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, today } from '../constants';
 import { formatDatetime } from '@openmrs/esm-framework';
 
 type Props = {
@@ -27,7 +27,8 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
         datePickerType="range"
         minDate={formatDatetime(MaxDate)}
         locale="en"
-        onChange={(dates: [Date, Date]) => {
+        dateFormat={DATE_PICKER_CONTROL_FORMAT}
+        onChange={(dates: Array<Date>) => {
           if (onFiltersChange) {
             onFiltersChange({
               ...filters,

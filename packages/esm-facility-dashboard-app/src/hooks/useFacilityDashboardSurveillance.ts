@@ -2,14 +2,18 @@ import { FetchResponse, formatDatetime, openmrsFetch, restBaseUrl } from '@openm
 import useSWR from 'swr';
 import { IndicationMode, type SurveillanceSummary } from '../types';
 import { useCallback } from 'react';
+import { formattedDate, sevenDaysAgo, today } from '../constants';
 
 const useFacilityDashboardSurveillance = (startDate?: Date, endDate?: Date) => {
   const url =
     startDate && endDate
-      ? `${restBaseUrl}/kenyaemr/facility-dashboard?startDate=${formatDatetime(startDate)}&endDate=${formatDatetime(
+      ? `${restBaseUrl}/kenyaemr/facility-dashboard?startDate=${formattedDate(startDate)}&endDate=${formattedDate(
           endDate,
         )}`
-      : `${restBaseUrl}/kenyaemr/facility-dashboard`;
+      : `${restBaseUrl}/kenyaemr/facility-dashboard?startDate=${formattedDate(today())}&endDate=${formattedDate(
+          sevenDaysAgo(),
+        )}`;
+
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<SurveillanceSummary>>(url, openmrsFetch);
   const getIndication = useCallback((indicator: number, denominator: number, threshold: number): IndicationMode => {
     if (denominator === 0 || indicator <= denominator * threshold) {
