@@ -8,6 +8,9 @@ import deleteRegimenConfirmationDialogComponent from './regimen-editor/delete-re
 import regimenFormComponent from './regimen-editor/regimen-form.component';
 import CarePanelDashboard from './care-panel-dashboard/care-panel-dashboard.component';
 import PatientSummary from './patient-summary/patient-summary.component';
+import PatientDiagnoses from './dispensing-patient-details/diagnoses.component';
+import PatientConditions from './dispensing-patient-details/conditions.component';
+import DispensingPatientVitals from './dispensing-patient-details/patient-vitals.component';
 
 const moduleName = '@kenyaemr/esm-care-panel-app';
 
@@ -45,3 +48,8 @@ export const hivPatientSummaryDashboardLink = getSyncLifecycle(
 );
 export const hivPatientSummary = getSyncLifecycle(PatientSummary, options);
 export const regimenFormWorkspace = getSyncLifecycle(regimenFormComponent, options);
+
+// TODO Clean when community version gets merged
+export const patientDiagnoses = getSyncLifecycle(PatientDiagnoses, options);
+export const patientConditions = getSyncLifecycle(PatientConditions, options);
+export const dispensingPaentientVitals = getSyncLifecycle(DispensingPatientVitals, options);

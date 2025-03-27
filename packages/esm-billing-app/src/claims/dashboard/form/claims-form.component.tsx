@@ -10,26 +10,26 @@ import {
   MultiSelect,
   Row,
   Stack,
-  TextArea,
   TextInput,
   TextInputSkeleton,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useSession } from '@openmrs/esm-framework';
-import React, { useEffect, useState } from 'react';
+import { navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
-import PackageInterventions from '../../../benefits-package/forms/package-interventions.component';
+import SHABenefitPackangesAndInterventions from '../../../benefits-package/forms/packages-and-interventions-form.component';
+import { BillingConfig } from '../../../config-schema';
 import { formatDate } from '../../../helpers/functions';
 import { useSystemSetting } from '../../../hooks/getMflCode';
-import usePackages from '../../../hooks/usePackages';
 import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
-import { LineItem, MappedBill } from '../../../types';
-import { processClaims, useVisit } from './claims-form.resource';
-import styles from './claims-form.scss';
 import useProvider from '../../../hooks/useProvider';
+import { LineItem, MappedBill } from '../../../types';
+import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
+import { processClaims, SHAPackagesAndInterventionVisitAttribute, useVisit } from './claims-form.resource';
+import styles from './claims-form.scss';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -44,7 +44,7 @@ const ClaimsFormSchema = z.object({
   facility: z.string().nonempty({ message: 'Facility is required' }),
   treatmentStart: z.string().nonempty({ message: 'Treatment start date is required' }),
   treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
-  package: z.string().min(1, 'Package Required'),
+  packages: z.array(z.string()).nonempty({ message: 'At least one package is required' }),
   interventions: z.array(z.string()).min(1, {
     message: 'At least one intervention is required',
   }),
@@ -57,11 +57,23 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { patientUuid, billUuid } = useParams();
   const { visits: recentVisit, error: visitError, isLoading: visitLoading } = useVisit(patientUuid);
   const { diagnoses, error: diagnosisError, isLoading: diagnosisLoading } = usePatientDiagnosis(patientUuid);
-  const { error: packagesError, isLoading: packagesLoading, packages } = usePackages();
   const {
     currentProvider: { uuid: providerUuid },
   } = useSession();
   const { providerLoading: providerLoading, provider, error: providerError } = useProvider(providerUuid);
+  const { visitAttributeTypes } = useConfig<BillingConfig>();
+  const packagesAndinterventions = useMemo(() => {
+    if (recentVisit) {
+      const values = recentVisit.attributes?.find(
+        (attr) => attr.attributeType.uuid === visitAttributeTypes.shaBenefitPackagesAndInterventions,
+      )?.value;
+      if (values) {
+        const payload: SHAPackagesAndInterventionVisitAttribute = JSON.parse(values);
+        return payload;
+      }
+    }
+    return null;
+  }, [recentVisit, visitAttributeTypes]);
 
   const encounterUuid = recentVisit?.encounters[0]?.uuid;
   const visitTypeUuid = recentVisit?.visitType.uuid;
@@ -85,7 +97,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
       treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
       treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
-      package: '',
+      packages: [],
       interventions: [],
       provider: providerUuid,
     },
@@ -98,11 +110,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     setValue,
     reset,
   } = form;
-
-  const handleInterventionsChange = (e: { selectedItem: string }) => {
-    form.setValue('interventions', []);
-    setValue('package', e.selectedItem);
-  };
 
   const onSubmit = async (data: z.infer<typeof ClaimsFormSchema>) => {
     setLoading(true);
@@ -139,7 +146,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       use: 'claim',
       insurer: 'SHA',
       billNumber: billUuid,
-      packages: [data.package],
+      packages: data.packages,
       interventions: data.interventions,
     };
     try {
@@ -170,7 +177,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       setLoading(false);
     }
   };
-  const selectedPackage = packages.find((package_) => package_.uuid === form.watch('package'))?.packageCode ?? '';
 
   useEffect(() => {
     setValue('diagnoses', diagnoses?.map((d) => d.id) ?? ([] as any));
@@ -178,9 +184,11 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     setValue('facility', `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`);
     setValue('treatmentStart', recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '');
     setValue('treatmentEnd', recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '');
-  }, [diagnoses, recentVisit, mflCodeValue, setValue, provider]);
+    setValue('packages', (packagesAndinterventions?.packages ?? []) as any);
+    setValue('interventions', (packagesAndinterventions?.interventions ?? []) as any);
+  }, [diagnoses, recentVisit, mflCodeValue, setValue, provider, packagesAndinterventions]);
 
-  if (visitLoading || diagnosisLoading || packagesLoading || providerLoading) {
+  if (visitLoading || diagnosisLoading || providerLoading) {
     return (
       <Layer className={styles.loading}>
         {Array.from({ length: 6 }).map((_, index) => (
@@ -190,7 +198,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     );
   }
 
-  if (visitError || diagnosisError || packagesError || providerError) {
+  if (visitError || diagnosisError || providerError) {
     return (
       <Layer className={styles.loading}>
         <InlineNotification
@@ -198,7 +206,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           subtitle={
             visitError?.message ??
             diagnosisError?.message ??
-            packagesError?.message ??
             providerError?.message ??
             'Error occured while loading claims form'
           }
@@ -284,45 +291,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               </Layer>
             </Column>
           </Row>
-          <Column>
-            <Layer className={styles.input}>
-              <Controller
-                control={form.control}
-                name="package"
-                render={({ field }) => (
-                  <>
-                    {packagesError ? (
-                      <InlineNotification
-                        kind="error"
-                        subtitle={t('errorFetchingPackages', 'Error fetching packeges')}
-                        lowContrast
-                      />
-                    ) : (
-                      <Dropdown
-                        ref={field.ref}
-                        invalid={form.formState.errors[field.name]?.message}
-                        invalidText={form.formState.errors[field.name]?.message}
-                        id="package"
-                        titleText={t('package', 'Package')}
-                        onChange={handleInterventionsChange}
-                        initialSelectedItem={field.value}
-                        label="Choose package"
-                        items={packages.map((r) => r.uuid)}
-                        itemToString={(item) => packages.find((r) => r.uuid === item)?.packageName ?? ''}
-                      />
-                    )}
-                  </>
-                )}
-              />
-            </Layer>
-          </Column>
-
-          <Column>
-            <Layer className={styles.input}>
-              <PackageInterventions key={selectedPackage} category={selectedPackage} patientUuid={patientUuid} />
-            </Layer>
-          </Column>
-
+          <SHABenefitPackangesAndInterventions patientUuid={patientUuid} />
           <Column>
             <Layer className={styles.input}>
               <Controller
@@ -376,44 +345,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               </Layer>
             </Column>
           </Row>
-          <Column>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="claimExplanation"
-                render={({ field }) => (
-                  <TextArea
-                    {...field}
-                    labelText={t('claimExplanation', 'Claim Explanation')}
-                    rows={3}
-                    placeholder="Claim Explanation"
-                    id="claimExplanation"
-                    invalid={!!errors.claimExplanation}
-                    invalidText={errors.claimExplanation?.message}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
-          <Column>
-            <Layer className={styles.input}>
-              <Controller
-                control={control}
-                name="claimJustification"
-                render={({ field }) => (
-                  <TextArea
-                    {...field}
-                    labelText={t('claimJustification', 'Claim Justification')}
-                    rows={3}
-                    placeholder="Claim Justification"
-                    id="claimJustification"
-                    invalid={!!errors.claimJustification}
-                    invalidText={errors.claimJustification?.message}
-                  />
-                )}
-              />
-            </Layer>
-          </Column>
+          <ClaimExplanationAndJusificationInput patientUuid={patientUuid} />
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
               {t('discardClaim', 'Discard Claim')}

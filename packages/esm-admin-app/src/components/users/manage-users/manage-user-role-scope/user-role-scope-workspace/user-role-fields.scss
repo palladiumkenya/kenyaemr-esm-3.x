@@ -1,0 +1,117 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.roleStockFields {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+  outline: 1px solid colors.$gray-10;
+  padding: layout.$spacing-05;
+}
+
+.checkBoxColumn {
+  background-color: colors.$gray-10;
+  margin: layout.$spacing-05;
+  padding: layout.$spacing-03;
+  border-radius: layout.$spacing-05;
+}
+
+.checkboxLabelSingleLine {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  font-size: 14px;
+}
+
+.checkboxGroupGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: layout.$spacing-03;
+  column-gap: layout.$spacing-02;
+  font-size: 14px;
+
+  :global(.cds--fieldset-legend) {
+    font-size: 14px;
+  }
+}
+
+.CheckboxGroup .bx--fieldset-legend {
+  font-size: 14px;
+}
+
+.btn {
+  min-width: 50%;
+}
+
+.checkboxLabelSelected {
+  background-color: colors.$green-10;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-02;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.checkboxLabel {
+  background-color: transparent;
+  border-radius: layout.$spacing-05;
+  padding: layout.$spacing-02;
+  display: flex;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+}
+
+.leftContainer {
+  display: flex;
+  flex-direction: column;
+  border-radius: layout.$spacing-05;
+  overflow: hidden;
+}
+
+.leftLayout {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+
+.progressIndicator {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  padding-top: layout.$spacing-03;
+  border-right: 1px solid colors.$gray-30;
+}
+
+.sections {
+  flex: 1;
+  padding: layout.$spacing-04;
+}
+
+@media (max-width: 768px) {
+  .leftLayout {
+    flex-direction: column;
+  }
+
+  .progressIndicator {
+    flex-direction: row;
+    border-right: none;
+    border-bottom: 1px solid colors.$gray-30;
+    min-width: unset;
+    justify-content: space-between;
+    padding: layout.$spacing-02;
+  }
+
+  .sections {
+    padding: layout.$spacing-03;
+  }
+}
+
+.multilineCheckboxLabel .cds--checkbox-label {
+  display: block;
+  white-space: normal;
+  word-wrap: break-word;
+  line-height: 1.4;
+}

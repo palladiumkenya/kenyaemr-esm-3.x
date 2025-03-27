@@ -1,0 +1,25 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.chartContainer {
+  padding: layout.$spacing-05;
+}
+
+.chartGroupContainer {
+  display: flex !important;
+  flex-flow: row wrap !important;
+}
+.tendChart {
+  flex: 50%;
+}
+
+.trackingChart {
+  flex: 50;
+}
+
+@media (max-width: 800px) {
+  .chartGroupContainer {
+    flex-direction: column;
+  }
+}

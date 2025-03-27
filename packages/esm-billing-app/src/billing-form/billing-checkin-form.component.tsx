@@ -6,13 +6,14 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { createPatientBill, useBillableItems, useCashPoint } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
-import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS } from '../constants';
+import { EXEMPTED_PAYMENT_STATUS, PENDING_PAYMENT_STATUS, SHA_INSURANCE_SCHEME } from '../constants';
 import { BillingService } from '../types';
 import styles from './billing-checkin-form.scss';
 import { visitAttributesFormSchema, VisitAttributesFormValue } from './check-in-form.utils';
 import { hasPatientBeenExempted } from './helper';
 import SHANumberValidity from './social-health-authority/sha-number-validity.component';
 import VisitAttributesForm from './visit-attributes/visit-attributes-form.component';
+import SHABenefitPackangesAndInterventions from '../benefits-package/forms/packages-and-interventions-form.component';
 
 type BillingCheckInFormProps = {
   patientUuid: string;
@@ -36,11 +37,14 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
       insuranceScheme: '',
       policyNumber: '',
       exemptionCategory: '',
+      interventions: [],
+      packages: [],
     },
     resolver: zodResolver(visitAttributesFormSchema),
   });
   const isPatientExemptedValue = formMethods.watch('isPatientExempted');
   const paymentMethod = formMethods.watch('paymentMethods');
+  const isInsuranceSchemeSha = formMethods.watch('insuranceScheme') === SHA_INSURANCE_SCHEME;
 
   const handleCreateBill = useCallback((createBillPayload) => {
     createPatientBill(createBillPayload).then(
@@ -125,6 +129,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     <FormProvider {...formMethods}>
       <VisitAttributesForm setAttributes={setAttributes} />
       {hieFeatureFlags && <SHANumberValidity paymentMethod={attributes} patientUuid={patientUuid} />}
+      {hieFeatureFlags && isInsuranceSchemeSha && <SHABenefitPackangesAndInterventions patientUuid={patientUuid} />}
       {paymentMethod && (
         <section className={styles.sectionContainer}>
           <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>

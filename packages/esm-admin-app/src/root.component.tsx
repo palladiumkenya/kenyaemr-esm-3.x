@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
+import { setLeftNav, unsetLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import styles from './root.scss';
 import LeftPanel from './components/side-menu/left-pannel.component';
 import UserManagentLandingPage from './components/users/manage-users/manage-user.component';

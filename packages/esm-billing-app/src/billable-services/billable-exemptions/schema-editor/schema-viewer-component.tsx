@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { TreeView } from '@carbon/react';
-import { Folder, DocumentTasks } from '@carbon/react/icons';
+import { TreeView, TreeNode } from '@carbon/react';
 import styles from './schema-viewer.scss';
 
 interface SchemaViewerProps {
@@ -65,7 +64,7 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
     nodes.map((node) => {
       const isExpanded = expandedNodes.has(node.id);
       return (
-        <TreeView.TreeNode
+        <TreeNode
           key={node.id}
           id={node.id}
           label={node.label}
@@ -74,7 +73,7 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
           multiselect={true}
           className={styles.treeView}>
           {node.children && renderTreeNodes(node.children)}
-        </TreeView.TreeNode>
+        </TreeNode>
       );
     });
 

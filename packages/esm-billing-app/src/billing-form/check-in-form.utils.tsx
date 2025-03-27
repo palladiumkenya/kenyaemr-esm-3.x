@@ -6,6 +6,8 @@ export const visitAttributesFormSchema = z.object({
   insuranceScheme: z.string().optional(),
   policyNumber: z.string().optional(),
   exemptionCategory: z.string().optional(),
+  packages: z.array(z.string()).nonempty('Require atleast 1 package'),
+  interventions: z.array(z.string()).nonempty('Require atleast 1 intervention'),
 });
 
 export type VisitAttributesFormValue = z.infer<typeof visitAttributesFormSchema>;

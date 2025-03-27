@@ -16,7 +16,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
   const { t } = useTranslation();
   const { insuranceSchemes } = useConfig<BillingConfig>();
   const { visitAttributeTypes, patientExemptionCategories, insurancePaymentMethod } = useConfig<BillingConfig>();
-  const { setValue, watch, control, getValues } = useFormContext<VisitAttributesFormValue>();
+  const { setValue, watch, control, getValues, resetField } = useFormContext<VisitAttributesFormValue>();
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const [isPatientExempted, paymentMethods] = watch(['isPatientExempted', 'paymentMethods']);
   const resetFormFieldsForNonExemptedPatients = useCallback(() => {
@@ -24,7 +24,9 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     setValue('policyNumber', '');
     setValue('exemptionCategory', '');
     setValue('paymentMethods', '');
-  }, [setValue]);
+    resetField('packages');
+    resetField('interventions');
+  }, [setValue, resetField]);
 
   useEffect(() => {
     resetFormFieldsForNonExemptedPatients();
@@ -38,6 +40,10 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
       { uuid: visitAttributeTypes.policyNumber, value: values.policyNumber },
       { uuid: visitAttributeTypes.insuranceScheme, value: values.insuranceScheme },
       { uuid: visitAttributeTypes.exemptionCategory, value: values.exemptionCategory },
+      {
+        uuid: visitAttributeTypes.shaBenefitPackagesAndInterventions,
+        value: JSON.stringify({ packages: values.packages, interventions: values.interventions }),
+      },
     ];
     const visitAttributesPayload = formPayload.filter(
       (item) => item.value !== undefined && item.value !== null && item.value !== '',
@@ -48,10 +54,12 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     }));
   }, [visitAttributeTypes, getValues]);
 
-  const [policyNumber, exemptionCategory, insuranceScheme] = watch([
+  const [policyNumber, exemptionCategory, insuranceScheme, interventions, packages] = watch([
     'policyNumber',
     'exemptionCategory',
     'insuranceScheme',
+    'interventions',
+    'packages',
   ]);
 
   useEffect(() => {
@@ -64,6 +72,8 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
     policyNumber,
     exemptionCategory,
     insuranceScheme,
+    interventions,
+    packages,
   ]);
 
   if (isLoadingPaymentModes) {

@@ -1,0 +1,75 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.patientName {
+  @include type.type-style('label-02');
+  color: colors.$gray-100;
+  font-weight: 800;
+  margin-left: layout.$spacing-04;
+  margin-right: layout.$spacing-01;
+}
+.middot {
+  margin: 0 layout.$spacing-01;
+}
+.spanField {
+  margin-left: layout.$spacing-04;
+  margin-right: layout.$spacing-01;
+}
+
+.gender {
+  display: flex;
+  align-items: center;
+  color: colors.$gray-70;
+  gap: layout.$spacing-01;
+  margin-left: layout.$spacing-02;
+}
+.statusTag {
+  display: flex;
+  align-items: center;
+  color: colors.$gray-70;
+  gap: layout.$spacing-01;
+  margin-left: layout.$spacing-02;
+}
+.demographics {
+  display: flex;
+  align-items: center;
+  margin-bottom: layout.$spacing-02;
+  color: $text-02;
+  text-transform: uppercase;
+}
+
+.patientBanner {
+  display: flex;
+}
+
+.patientInfo {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.flexRow {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  margin-top: layout.$spacing-04;
+}
+.patientAvatar {
+  margin-top: layout.$spacing-06;
+}
+.viewRoles {
+  margin-top: layout.$spacing-06;
+}
+.roleContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.roleDescription {
+  margin: 0;
+  color: colors.$gray-70;
+  font-size: type.type-scale(1);
+}
