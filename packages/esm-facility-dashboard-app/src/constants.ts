@@ -22,9 +22,14 @@ export const formatNewDate = (date: Date | null | undefined) => {
   return date ? new Date(date) : '';
 };
 
+// Generate Dammy dates
 export const sevenDaysRunningDates = (index: number) => {
   const date = new Date(today());
   date.setDate(today().getDate() - index);
   const formattedDate = date.toISOString().split('T')[0];
   return formattedDate;
+};
+
+export const formattedDate = (date: Date) => {
+  return date ? dayjs(date).format(DATE_PICKER_FORMAT) : '';
 };
