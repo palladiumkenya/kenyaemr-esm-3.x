@@ -111,7 +111,7 @@ const LabManifestsTable = () => {
 
   const handlePrintManifest = async (manifest: MappedLabManifest) => {
     try {
-      await printManifest(manifest.uuid);
+      await printManifest(manifest.uuid, manifest.manifestStatus);
     } catch (error) {
       showSnackbar({ title: 'Failure', subtitle: 'Error printing manifest', kind: 'error' });
     }
