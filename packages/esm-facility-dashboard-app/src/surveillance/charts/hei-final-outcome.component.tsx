@@ -14,8 +14,8 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
   const { t } = useTranslation();
   const generateRandomData = (numRecords: number) => {
     return Array.from({ length: numRecords }, (_, i) => ({
-      week: sevenDaysRunningDates(i),
-      abnomallPercentage: Math.floor(Math.random() * 50),
+      day: sevenDaysRunningDates(i),
+      value: Math.floor(Math.random() * 50),
     }));
   };
 

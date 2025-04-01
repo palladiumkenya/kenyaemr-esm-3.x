@@ -24,7 +24,7 @@
   "percentageHightRiskPBFW": "% High risk PBFW Not in PrEP",
   "percentageMissedVL": "% of missed opportunity VL",
   "percentagePendingPCRDNAResults": "% of HEI (6-8 weeks) without DNA-PCR Results",
-  "percentageTestedPositiveNotLinked": "% tested positive not linked",
+  "numberTestedPositiveNotLinked": "no tested positive not linked",
   "prepNotlinked": "High risk -ve PBFW not on PrEP",
   "progressInAdressingLinkedToArt": "Progress in adressing Linkage to ART",
   "progresstracking": "Progress tracking",

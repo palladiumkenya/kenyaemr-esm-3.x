@@ -14,8 +14,8 @@ const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate 
   const { t } = useTranslation();
   const generateRandomData = (numRecords: number) => {
     return Array.from({ length: numRecords }, (_, i) => ({
-      week: sevenDaysRunningDates(i, endDate),
-      abnomallPercentage: Math.floor(Math.random() * 50),
+      day: sevenDaysRunningDates(i, endDate),
+      value: Math.floor(Math.random() * 50),
     }));
   };
 

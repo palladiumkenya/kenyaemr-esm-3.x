@@ -3,42 +3,44 @@ import { Layer } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './charts.scss';
+import { useChartDomain } from '../../hooks/useSurveillanceData';
 
 type Props = {
-  data: Array<{ group: string; key: string; value: number }>;
+  data: Array<{ group?: string; day: string; value: number }>;
+  height?: string;
 };
 
-const BaseArtProgressTrackingChart: React.FC<Props> = ({ data }) => {
+const BaseArtProgressTrackingChart: React.FC<Props> = ({ data, height = '400px' }) => {
   const { t } = useTranslation();
 
+  const [minValue, maxValue] = useChartDomain(data);
+
   const options: StackedBarChartOptions = {
-    title: t('progressInAdressingLinkedToArt', 'Progress in adressing Linkage to ART'),
+    title: t('progressInAddressingLinkedToArt', 'Progress in addressing Linkage to ART'),
     legend: {
       enabled: true,
     },
     axes: {
       bottom: {
-        title: t('days', 'Days'),
-        mapsTo: 'key',
+        title: t('day', 'Day'),
+        mapsTo: 'day',
         scaleType: ScaleTypes.LABELS,
       },
       left: {
-        title: t('percentage', 'Percentage'),
+        title: t('numberHivPositive', 'Number HIV positive'),
         mapsTo: 'value',
         scaleType: ScaleTypes.LINEAR,
-        percentage: true,
+        domain: [minValue, maxValue],
       },
     },
     color: {
       scale: {
-        LinkedElsewere: '#00416a', //Dark Imperial Blue
-        Dead: '#c46210', //Alloy Orange
-        Denial: '#195905', //Lincoln Green
-        Others: '#1e90ff', //Dodger Blue
-        NotFound: '#8601af', //Violet (Ryb)
+        ContactedAndLinked: '#00416a', // Dark Imperial Blue
+        ContactedButNotLinked: '#c46210', // Alloy Orange
+        NotContacted: '#195905', // Lincoln Green
       },
     },
-    height: '400px',
+    height,
     data: {
       groupMapsTo: 'group',
     },
