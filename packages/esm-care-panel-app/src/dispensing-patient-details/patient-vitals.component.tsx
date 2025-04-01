@@ -1,6 +1,7 @@
-import { Layer } from '@carbon/react';
+import { Tile } from '@carbon/react';
 import React from 'react';
 import { usePatientVitals } from './dispensing-patient-vitals.resources';
+import styles from './patient-info.scss';
 
 type PatientVitalsProps = {
   patientUuid: string;
@@ -9,18 +10,18 @@ type PatientVitalsProps = {
 const DispensingPatientVitals: React.FC<PatientVitalsProps> = ({ encounterUuid, patientUuid }) => {
   const { vitals, error, isLoading } = usePatientVitals(patientUuid, encounterUuid);
 
-  if (isLoading || error) {
+  if (isLoading || error || !vitals.length) {
     return null;
   }
   return (
-    <Layer>
+    <Tile className={styles.container}>
       {vitals.map((vital) => (
         <div>
           <strong>{vital?.display}: </strong>
           <span>{vital?.value}</span>
         </div>
       ))}
-    </Layer>
+    </Tile>
   );
 };
 

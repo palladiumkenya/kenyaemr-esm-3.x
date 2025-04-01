@@ -1,0 +1,9 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.container {
+  margin: layout.$spacing-03 0 layout.$spacing-03 0;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-20;
+}
