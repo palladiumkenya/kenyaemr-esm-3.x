@@ -1,5 +1,5 @@
 import { launchWorkspace } from '@openmrs/esm-framework';
-import { Order } from '@openmrs/esm-patient-common-lib';
+import { getPatientChartStore, Order } from '@openmrs/esm-patient-common-lib';
 import { useCallback } from 'react';
 import { mutate } from 'swr';
 
@@ -61,6 +61,11 @@ export const launchPrescriptionEditWorkspace = (order: Order, patientUuid: strin
       valueCoded: order.quantityUnits?.uuid,
     },
   };
+
+  const store = getPatientChartStore();
+  store.setState({
+    patientUuid,
+  });
 
   launchWorkspace('add-drug-order', { patientUuid, order: newItem });
 };

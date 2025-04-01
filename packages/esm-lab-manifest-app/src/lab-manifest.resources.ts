@@ -3,7 +3,7 @@ import { mutate } from 'swr';
 import { z } from 'zod';
 import { LabManifest, ManifestMetricYearSummary, MappedLabManifest, TransformedData } from './types';
 
-export const printableManifestStatus = ['Submitted', 'Complete results', 'Ready to send'];
+export const printableManifestStatus = ['Submitted', 'Complete results'];
 export const editableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
 export const sampleRemovableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
@@ -55,6 +55,7 @@ export const LabManifestFilters = [
     params: 'Complete results&withErrors=false',
   },
 ];
+
 const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
 
 export const labManifestFormSchema = z.object({
@@ -187,9 +188,11 @@ const printFile = async (url: string) => {
   window.open(_url, '_blank');
 };
 
-export const printManifest = async (manifestUid: string) => {
-  const url = `/openmrs${restBaseUrl}/kemrorder/printmanifest?manifestUuid=${manifestUid}`;
-  return await printFile(url);
+export const printManifest = async (manifestUid: string, status?: string) => {
+  if (status === 'Complete results') {
+    return await printFile(`/openmrs${restBaseUrl}/kemrorder/printmanifestlog?manifestUuid=${manifestUid}`);
+  }
+  return await printFile(`/openmrs${restBaseUrl}/kemrorder/printmanifest?manifestUuid=${manifestUid}`);
 };
 
 export const printSpecimentLabel = async (manifestOrderUuid: string) => {
