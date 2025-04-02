@@ -1,20 +1,23 @@
 import { LineChart, LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
 import { Layer } from '@carbon/react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './charts.scss';
+import { useChartDomain } from '../../hooks/useSurveillanceData';
 
 type Props = {
   data: Array<{
-    week: string;
-    abnomallPercentage: number;
+    day: string;
+    value: number;
   }>;
   title: string;
   yAxisTitle: string;
+  height?: string;
 };
-const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle }) => {
+const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle, height = '400px' }) => {
   const { t } = useTranslation();
+  const [minValue, maxValue] = useChartDomain(data);
   const options: LineChartOptions = {
     title: title,
     legend: {
@@ -23,18 +26,18 @@ const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle }) =
     axes: {
       left: {
         title: yAxisTitle,
-        percentage: true,
         scaleType: ScaleTypes.LINEAR,
+        domain: [minValue, maxValue],
         includeZero: true,
-        mapsTo: 'abnomallPercentage',
+        mapsTo: 'value',
       },
       bottom: {
-        title: t('durationInDays', 'Duration in days'),
+        title: t('day', 'Day'),
         scaleType: ScaleTypes.LABELS,
-        mapsTo: 'week',
+        mapsTo: 'day',
       },
     },
-    height: '400px',
+    height,
   };
 
   return (
