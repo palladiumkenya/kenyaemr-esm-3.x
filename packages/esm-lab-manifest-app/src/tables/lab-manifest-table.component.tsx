@@ -14,8 +14,10 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
-import { Edit, Printer, View } from '@carbon/react/icons';
+import { Edit, Printer, View, FetchUploadCloud } from '@carbon/react/icons';
 import {
   ErrorState,
   formatDate,
@@ -35,8 +37,11 @@ import { useLabManifests } from '../hooks';
 import {
   editableManifestStatus,
   LabManifestFilters,
+  mutateManifestLinks,
   printableManifestStatus,
   printManifest,
+  resubmittableManifestStatus,
+  saveLabManifest,
 } from '../lab-manifest.resources';
 import { MappedLabManifest } from '../types';
 import styles from './lab-manifest-table.scss';
@@ -51,6 +56,7 @@ const LabManifestsTable = () => {
   const { results, totalPages, currentPage, goTo } = usePagination(manifests, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
   const { labmanifestTypes } = useConfig<LabManifestConfig>();
+  const size = layout === 'tablet' ? 'lg' : 'md';
   const headers = [
     {
       header: t('startDate', 'Start date'),
@@ -117,6 +123,15 @@ const LabManifestsTable = () => {
     }
   };
 
+  const handleResubmitManifest = async (manifest: MappedLabManifest) => {
+    try {
+      await saveLabManifest({ manifestStatus: "'Submitted'" }, manifest.uuid);
+      mutateManifestLinks(manifest?.uuid, currFilter, manifest?.manifestStatus);
+    } catch (error) {
+      showSnackbar({ title: 'Failure', subtitle: 'Error resubmiting manifest', kind: 'error' });
+    }
+  };
+
   const tableRows =
     results?.map((manifest) => {
       return {
@@ -131,36 +146,30 @@ const LabManifestsTable = () => {
         manifestId: manifest.manifestId ?? '--',
         samples: `${manifest.samples.length}`,
         actions: (
-          <ButtonSet className={styles.btnSet}>
-            <Button
-              className={styles.btn}
-              renderIcon={View}
-              hasIconOnly
-              kind="ghost"
-              iconDescription={t('view', 'View')}
+          <OverflowMenu flipped size={size} aria-label="overflow-menu">
+            <OverflowMenuItem
+              itemText={t('viewManifest', 'View Manifest')}
               onClick={() => handleViewManifestSamples(manifest.uuid)}
             />
             {editableManifestStatus.includes(manifest.manifestStatus) && (
-              <Button
-                className={styles.btn}
-                renderIcon={Edit}
-                hasIconOnly
-                kind="ghost"
-                iconDescription={t('edit', 'Edit')}
+              <OverflowMenuItem
+                itemText={t('editmanifest', 'Edit Manifest')}
                 onClick={() => handleEditManifest(manifest)}
               />
             )}
             {printableManifestStatus.includes(manifest.manifestStatus) && (
-              <Button
-                className={styles.btn}
-                renderIcon={Printer}
-                hasIconOnly
-                kind="ghost"
-                iconDescription={t('printManifest', 'Print Manifest')}
+              <OverflowMenuItem
+                itemText={t('printManifest', 'Print Manifest')}
                 onClick={() => handlePrintManifest(manifest)}
               />
             )}
-          </ButtonSet>
+            {resubmittableManifestStatus.includes(manifest.manifestStatus) && (
+              <OverflowMenuItem
+                itemText={t('resubmitManifest', 'Resubmit Manifest')}
+                onClick={() => handleResubmitManifest(manifest)}
+              />
+            )}
+          </OverflowMenu>
         ),
       };
     }) ?? [];

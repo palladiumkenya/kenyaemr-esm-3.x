@@ -7,6 +7,7 @@ export const printableManifestStatus = ['Submitted', 'Complete results'];
 export const editableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
 export const sampleRemovableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
+export const resubmittableManifestStatus = ['Incomplete errors', 'Incomplete results', 'Complete errors'];
 
 export const LabManifestFilters = [
   {
