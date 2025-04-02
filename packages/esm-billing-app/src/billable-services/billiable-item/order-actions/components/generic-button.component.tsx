@@ -15,7 +15,7 @@ export interface GenericOrderButtonProps {
 
 export const GenericOrderButton: React.FC<GenericOrderButtonProps> = ({
   order,
-  modalName,
+  modalName = 'pickup-lab-request-modal',
   additionalProps,
   actionText,
 }) => {
