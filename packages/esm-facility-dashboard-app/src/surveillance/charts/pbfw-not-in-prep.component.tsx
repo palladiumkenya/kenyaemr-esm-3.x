@@ -6,6 +6,7 @@ import BaseProgressTrackingChart from './base-progress-tracking-chart.component'
 import { getNumberOfDays, sevenDaysRunningDates } from '../../constants';
 import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
 import { useSurveillanceData } from '../../hooks/useSurveillanceData';
+import EmptyState from '../empty-state/empty-state-log.components';
 
 type PBFWNotInPrepProps = {
   startDate?: Date;
@@ -16,36 +17,29 @@ const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => 
   const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
   const highRiskPBFWNotOnPrepValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHighRiskPBFWNotOnPrep');
 
-  const numberSequence = useMemo(() => Math.max(1, getNumberOfDays(startDate, endDate)), [startDate, endDate]);
+  const monthlyhighRiskPBFWNotOnPrepPatientData = useSurveillanceData(
+    surveillanceSummary,
+    'getMonthlyHighRiskPBFWNotOnPrepPatients',
+  );
 
-  const generateRandomDataForProgress = (numRecords: number) => {
-    const data = [];
-    for (let i = 1; i <= numRecords; i++) {
-      data.push({
-        group: 'Declined',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-      data.push({
-        group: 'StartedPrEP',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-    }
-    return data;
-  };
-
-  const data = useMemo(() => generateRandomDataForProgress(numberSequence), [numberSequence, startDate, endDate]);
   return (
     <>
-      {highRiskPBFWNotOnPrepValue.length > 0 && (
+      <br />
+      {highRiskPBFWNotOnPrepValue.length > 0 ? (
         <BaseIndicatorTrendChart
           data={highRiskPBFWNotOnPrepValue}
           title={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
-          yAxisTitle={t('percentageHightRiskPBFW', '% High risk PBFW Not in PrEP')}
+          yAxisTitle={t('percentageHightRiskPBFW', 'Number of High risk PBFW Not on PrEP')}
         />
+      ) : (
+        <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
       )}
-      {data.length > 0 && <BaseProgressTrackingChart data={data} />}
+      <br />
+      {monthlyhighRiskPBFWNotOnPrepPatientData.length > 0 ? (
+        <BaseProgressTrackingChart data={monthlyhighRiskPBFWNotOnPrepPatientData} />
+      ) : (
+        <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+      )}
     </>
   );
 };
