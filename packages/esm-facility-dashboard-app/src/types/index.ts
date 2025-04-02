@@ -15,6 +15,7 @@ export type SurveillanceSummary = {
   heiClinicalActionThreshold: number;
   getMonthlyHivPositiveNotLinked: HivPositiveNotLinkedData;
   getMonthlyHivPositiveNotLinkedPatients: HivPositiveNotLinkedData;
+  getMonthlyHighRiskPBFWNotOnPrep: HivPositiveNotLinkedData;
 };
 
 export type IndicationMode = 'decreasing' | 'increasing';
