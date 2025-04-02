@@ -10,6 +10,7 @@ export function useLabOrderAction(order?: Order) {
   const { t } = useTranslation();
   const orderUuid = order?.uuid;
   const patientUuid = order?.patient?.uuid;
+  const conceptClass = order?.concept?.conceptClass?.['display'];
 
   const { isLoading, hasPendingPayment, itemHasBill } = useBillStatus(orderUuid, patientUuid);
   const shouldShowBillModal = itemHasBill.length < 1;
@@ -24,7 +25,7 @@ export function useLabOrderAction(order?: Order) {
       return t('bill', 'Bill');
     }
 
-    return t('pickLabRequest', 'Pick Lab Request');
+    return t('pickLabRequest', 'Pick {{orderType}} Request', { orderType: conceptClass ?? 'Lab' });
   };
 
   return {

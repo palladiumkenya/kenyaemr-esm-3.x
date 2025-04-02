@@ -6,16 +6,16 @@ import { useLabOrderAction } from '../hooks/useLabOrderAction';
 import { useModalHandler } from '../hooks/useModalHandler';
 import styles from '../styles/order-action.scss';
 
-export interface LabOrderButtonProps {
+export interface GenericOrderButtonProps {
   order?: Order;
   modalName?: string;
   additionalProps?: Record<string, unknown>;
   actionText?: string;
 }
 
-export const LabOrderButton: React.FC<LabOrderButtonProps> = ({
+export const GenericOrderButton: React.FC<GenericOrderButtonProps> = ({
   order,
-  modalName = 'pickup-lab-request-modal',
+  modalName,
   additionalProps,
   actionText,
 }) => {
@@ -28,7 +28,7 @@ export const LabOrderButton: React.FC<LabOrderButtonProps> = ({
   } = useLabOrderAction(order);
 
   const { handleModalClose } = useModalHandler(additionalProps?.mutateUrl as string);
-  const buttonText = actionText ?? defaultButtonText;
+  const buttonText = defaultButtonText ?? actionText;
 
   const launchModal = useCallback(() => {
     if (shouldShowBillModal) {

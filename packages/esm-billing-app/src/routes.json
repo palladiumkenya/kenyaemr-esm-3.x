@@ -137,7 +137,12 @@
     {
       "name": "order-action-button",
       "component": "orderActionButton",
-      "slot": "prescription-action-button-slot",
+      "slots": [
+        "prescription-action-button-slot",
+        "imaging-orders-action",
+        "procedure-orders-action",
+        "tests-ordered-actions-slot"
+      ],
       "order": 0
     },
     {
