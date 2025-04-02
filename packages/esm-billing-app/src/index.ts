@@ -42,6 +42,7 @@ import { ClockOut } from './payment-points/payment-point/clock-out.modal';
 import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
 import rootComponent from './root.component';
 import OrderActionButton from './billable-services/billiable-item/order-actions/components/order-action-button.component';
+import CreateBillWorkspace from './billable-services/bill-manager/workspaces/create-bill/create-bill.workspace';
 
 const moduleName = '@kenyaemr/esm-billing-app';
 
@@ -158,6 +159,7 @@ export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 export const createBillItemModal = getSyncLifecycle(CreateBillItemModal, options);
+export const createBillWorkspace = getSyncLifecycle(CreateBillWorkspace, options);
 
 export const billingForm = getSyncLifecycle(BillingForm, options);
 export const requirePaymentModal = getSyncLifecycle(RequirePaymentModal, options);

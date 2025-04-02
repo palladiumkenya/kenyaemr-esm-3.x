@@ -1,39 +1,52 @@
 import React, { useCallback } from 'react';
-import { showModal } from '@openmrs/esm-framework';
+import { launchWorkspace, showModal } from '@openmrs/esm-framework';
 import { Order } from '@openmrs/esm-patient-common-lib';
 import { BaseOrderButton } from './base-order-button.component';
 import { useLabOrderAction } from '../hooks/useLabOrderAction';
 import { useModalHandler } from '../hooks/useModalHandler';
 import styles from '../styles/order-action.scss';
 
-export interface LabOrderButtonProps {
+export interface GenericOrderButtonProps {
   order?: Order;
   modalName?: string;
   additionalProps?: Record<string, unknown>;
   actionText?: string;
 }
 
-export const LabOrderButton: React.FC<LabOrderButtonProps> = ({
+export const GenericOrderButton: React.FC<GenericOrderButtonProps> = ({
   order,
-  modalName = 'pickup-lab-request-modal',
+  modalName,
   additionalProps,
   actionText,
 }) => {
-  const { isLoading, isDisabled, buttonText: defaultButtonText, isInProgress } = useLabOrderAction(order);
+  const {
+    isLoading,
+    isDisabled,
+    buttonText: defaultButtonText,
+    isInProgress,
+    shouldShowBillModal,
+  } = useLabOrderAction(order);
 
   const { handleModalClose } = useModalHandler(additionalProps?.mutateUrl as string);
-  const buttonText = actionText ?? defaultButtonText;
+  const buttonText = defaultButtonText ?? actionText;
 
   const launchModal = useCallback(() => {
-    const dispose = showModal(modalName, {
-      closeModal: () => {
-        handleModalClose();
-        dispose();
-      },
-      order,
-      ...(additionalProps && { additionalProps }),
-    });
-  }, [modalName, order, additionalProps, handleModalClose]);
+    if (shouldShowBillModal) {
+      launchWorkspace('create-bill-workspace', {
+        order,
+        patientUuid: order?.patient?.uuid,
+      });
+    } else {
+      const dispose = showModal(modalName, {
+        closeModal: () => {
+          handleModalClose();
+          dispose();
+        },
+        order,
+        ...(additionalProps && { additionalProps }),
+      });
+    }
+  }, [modalName, order, additionalProps, handleModalClose, shouldShowBillModal]);
 
   if (isInProgress) {
     return null;
