@@ -1,12 +1,12 @@
 import '@carbon/charts/styles.css';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-import { getNumberOfDays, sevenDaysRunningDates } from '../../constants';
 import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
 import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
+import styles from './charts.scss';
 
 type PBFWNotInPrepProps = {
   startDate?: Date;
@@ -24,22 +24,24 @@ const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => 
 
   return (
     <>
-      <br />
-      {highRiskPBFWNotOnPrepValue.length > 0 ? (
-        <BaseIndicatorTrendChart
-          data={highRiskPBFWNotOnPrepValue}
-          title={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
-          yAxisTitle={t('percentageHightRiskPBFW', 'Number of High risk PBFW Not on PrEP')}
-        />
-      ) : (
-        <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
-      )}
-      <br />
-      {monthlyhighRiskPBFWNotOnPrepPatientData.length > 0 ? (
-        <BaseProgressTrackingChart data={monthlyhighRiskPBFWNotOnPrepPatientData} />
-      ) : (
-        <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
-      )}
+      <div className={styles.chart}>
+        {highRiskPBFWNotOnPrepValue.length > 0 ? (
+          <BaseIndicatorTrendChart
+            data={highRiskPBFWNotOnPrepValue}
+            title={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
+            yAxisTitle={t('numberHightRiskPBFW', 'Number of High risk PBFW Not on PrEP')}
+          />
+        ) : (
+          <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+        )}
+      </div>
+      <div>
+        {monthlyhighRiskPBFWNotOnPrepPatientData.length > 0 ? (
+          <BaseProgressTrackingChart data={monthlyhighRiskPBFWNotOnPrepPatientData} />
+        ) : (
+          <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+        )}
+      </div>
     </>
   );
 };
