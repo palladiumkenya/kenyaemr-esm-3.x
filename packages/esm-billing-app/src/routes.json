@@ -283,6 +283,12 @@
       "component": "cancelBillWorkspace",
       "title": "Cancel Bill Workspace",
       "type": "other-form"
+    },
+    {
+      "name": "bill-deposit-workspace",
+      "component": "billDepositWorkspace",
+      "title": "Bill Deposit Workspace",
+      "type": "other-form"
     }
   ],
   "modals": [
