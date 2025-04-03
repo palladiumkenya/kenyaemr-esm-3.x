@@ -137,7 +137,12 @@
     {
       "name": "order-action-button",
       "component": "orderActionButton",
-      "slot": "prescription-action-button-slot",
+      "slots": [
+        "prescription-action-button-slot",
+        "imaging-orders-action",
+        "procedure-orders-action",
+        "tests-ordered-actions-slot"
+      ],
       "order": 0
     },
     {
@@ -230,6 +235,12 @@
     }
   ],
   "workspaces": [
+    {
+      "name": "create-bill-workspace",
+      "component": "createBillWorkspace",
+      "title": "Create Bill Workspace",
+      "type": "other-form"
+    },
     {
       "name": "waive-bill-form",
       "component": "waiveBillForm",

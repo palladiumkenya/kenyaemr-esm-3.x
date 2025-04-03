@@ -2,54 +2,33 @@ import '@carbon/charts/styles.css';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
-import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-import { sevenDaysRunningDates } from '../../constants';
-import styles from './charts.scss';
-const HIVPositiveNotLinkedToART = () => {
+import BaseArtProgressTrackingChart from './base-art-progress-tracking-chart.component';
+import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
+import { useSurveillanceData } from '../../hooks/useSurveillanceData';
+type HIVPositiveNotLinkedToARTProps = {
+  startDate?: Date;
+  endDate?: Date;
+};
+const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
 
-  const generateRandomData = (numRecords: number) => {
-    return Array.from({ length: numRecords }, (_, i) => ({
-      week: sevenDaysRunningDates(i),
-      abnomallPercentage: Math.floor(Math.random() * 50),
-    }));
-  };
+  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const generateRandomDataProgress = (numRecords: number) => {
-    const data = [];
-    for (let i = 1; i <= numRecords; i++) {
-      const formattedDate = sevenDaysRunningDates(i);
-      data.push({
-        group: 'Pending',
-        key: formattedDate,
-        value: Math.floor(Math.random() * 50),
-      });
-      data.push({
-        group: 'Completed',
-        key: formattedDate,
-        value: Math.floor(Math.random() * 50),
-      });
-    }
-    return data;
-  };
+  const hivPositivePatientValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHivPositiveNotLinked');
 
-  const data = useMemo(() => generateRandomDataProgress(7), []);
+  const monthlyHivPositivePatientData = useSurveillanceData(
+    surveillanceSummary,
+    'getMonthlyHivPositiveNotLinkedPatients',
+  );
 
-  const values = useMemo(() => generateRandomData(7), []);
   return (
     <>
-      <div className={styles.chartGroupContainer}>
-        <div className={styles.tendChart}>
-          <BaseIndicatorTrendChart
-            data={values}
-            title={t('hivPositiveNotLinkedToART', 'HIV +VE Not linked to ART')}
-            yAxisTitle={t('percentageTestedPositiveNotLinked', '% tested positive not linked')}
-          />
-        </div>
-        <div className={styles.trackingChart}>
-          <BaseProgressTrackingChart data={data} />
-        </div>
-      </div>
+      <BaseIndicatorTrendChart
+        data={hivPositivePatientValue}
+        title={t('hivPositiveNotLinkedToART', 'HIV +VE Not linked to ART')}
+        yAxisTitle={t('numberTestedPositiveNotLinked', 'no tested positive not linked')}
+      />
+      <BaseArtProgressTrackingChart data={monthlyHivPositivePatientData} />
     </>
   );
 };

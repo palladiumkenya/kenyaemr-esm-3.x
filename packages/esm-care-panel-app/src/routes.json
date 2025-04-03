@@ -52,20 +52,10 @@
       "offline": false
     },
     {
-      "name": "patient-diagnoses",
-      "component": "patientDiagnoses",
-      "online": true,
-      "offline": true
-    },
-    {
-      "name": "patient-conditions",
-      "component": "patientConditions",
-      "online": true,
-      "offline": true
-    },
-    {
       "name": "dispensing-patient-vitals",
       "component": "dispensingPaentientVitals",
+      "slot": "dispensing-condition-and-diagnoses",
+      "order": 1,
       "online": true,
       "offline": true
     }
