@@ -7,7 +7,12 @@ export const printableManifestStatus = ['Submitted', 'Complete results'];
 export const editableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
 export const activeOrdersSupportManifestStatus = ['Draft', 'On Hold'];
 export const sampleRemovableManifestStatus = ['Draft', 'On Hold', 'Ready to send'];
-export const resubmittableManifestStatus = ['Incomplete errors', 'Incomplete results', 'Complete errors'];
+export const resubmittableManifestStatus = [
+  'Incomplete errors',
+  'Incomplete results',
+  'Complete errors',
+  'Complete results',
+];
 
 export const LabManifestFilters = [
   {
@@ -81,6 +86,10 @@ export const labManifestOrderToManifestFormSchema = z.object({
   sampleCollectionDate: z.date({ coerce: true }),
   sampleSeparationDate: z.date({ coerce: true }),
 });
+
+export const requeueLabManifest = (labManifest: MappedLabManifest) => {
+  return openmrsFetch(`${restBaseUrl}/kemrorder/requeuemanifest?manifestUuid=${labManifest.uuid}`);
+};
 
 export const saveLabManifest = async (data: z.infer<typeof labManifestFormSchema>, manifestId: string | undefined) => {
   let url;

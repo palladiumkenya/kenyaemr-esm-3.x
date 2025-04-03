@@ -41,6 +41,10 @@ export const sampleDeleteConfirmDialog = getAsyncLifecycle(
   () => import('./forms/sample-delete-confirm-dialog.modal'),
   options,
 );
+export const requeueLabManifestConfirmModal = getAsyncLifecycle(
+  () => import('./forms/lab-manifest-requeue-confirm.modal'),
+  options,
+);
 export const labManifestSideNavGroup = getSyncLifecycle(
   createDashboardGroup({
     title: 'Lab Manifest',
