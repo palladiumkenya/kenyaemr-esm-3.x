@@ -11,7 +11,7 @@
   "dateRequested": "Date Requested",
   "deleteSelectedSamples": "Remove Selected Samples",
   "dispatch": "Dispatch",
-  "edit": "Edit",
+  "editmanifest": "Edit Manifest",
   "editManifest": "Edit Manifest",
   "endDate": "End Date",
   "errorRemovingSample": "Error removing sample {{sample}} from the manifest",
@@ -28,6 +28,7 @@
   "printManifest": "Print Manifest",
   "printSpecimenLabel": "Print Specimen Label",
   "removeFromManifest": "Remove from Manifest",
+  "resubmitManifest": "Resubmit Manifest",
   "result": "Result",
   "resultDate": "Result Date",
   "sampleRemoveSuccess": "Sample removed from manifest successfully!",
@@ -38,5 +39,5 @@
   "startDate": "Start date",
   "status": "Status",
   "type": "Type",
-  "view": "View"
+  "viewManifest": "View Manifest"
 }

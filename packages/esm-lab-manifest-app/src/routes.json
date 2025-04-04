@@ -11,7 +11,7 @@
       "meta": {
         "name": "lab-manifest",
         "title": "Lab manifest Overview",
-        "slot": "lab-manifest-slot"     
+        "slot": "lab-manifest-slot"
       }
     },
     {
@@ -45,6 +45,10 @@
     {
       "name": "sample-delete-confirm-dialog",
       "component": "sampleDeleteConfirmDialog"
+    },
+    {
+      "name": "lab-manifest-requeue-confirn-modal",
+      "component": "requeueLabManifestConfirmModal"
     }
   ],
   "pages": [
