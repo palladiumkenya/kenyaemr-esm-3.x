@@ -1,10 +1,12 @@
 import '@carbon/charts/styles.css';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
-import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-import { getNumberOfDays, sevenDaysRunningDates } from '../../constants';
 import styles from './charts.scss';
+import EmptyState from '../empty-state/empty-state-log.components';
+import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
+import { useSurveillanceData } from '../../hooks/useSurveillanceData';
+import { InlineLoading } from '@carbon/react';
 type DelayedEACChartsProps = {
   startDate?: Date;
   endDate?: Date;
@@ -12,40 +14,23 @@ type DelayedEACChartsProps = {
 
 const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const generateRandomData = (numRecords: number) => {
-    return Array.from({ length: numRecords }, (_, i) => ({
-      day: sevenDaysRunningDates(i, endDate),
-      value: Math.floor(Math.random() * 50),
-    }));
-  };
+  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const numberSequence = useMemo(() => Math.max(1, getNumberOfDays(startDate, endDate)), [startDate, endDate]);
-
-  const generateRandomDataProgress = (numRecords: number) => {
-    const data = [];
-    for (let i = 1; i <= numRecords; i++) {
-      data.push({
-        group: 'Pending',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-      data.push({
-        group: 'Completed',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-    }
-    return data;
-  };
-
-  const data = useMemo(() => generateRandomDataProgress(numberSequence), [numberSequence, startDate, endDate]);
-  const values = useMemo(() => generateRandomData(numberSequence), [numberSequence, startDate, endDate]);
+  const delayedEACValue = useSurveillanceData(surveillanceSummary, 'getMonthlyVirallyUnsuppressedWithoutEAC');
   return (
-    <BaseIndicatorTrendChart
-      data={values}
-      title={t('delayedEAC', 'Delayed enhanced adherence counselling')}
-      yAxisTitle={t('percentageDelatedEAC', '% Delayed EAC')}
-    />
+    <div className={styles.chart}>
+      {isLoading ? (
+        <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
+      ) : delayedEACValue.length > 0 ? (
+        <BaseIndicatorTrendChart
+          data={delayedEACValue}
+          title={t('delayedEAC', 'Delayed enhanced adherence counselling')}
+          yAxisTitle={t('numberDelayedEAC', 'Number of Delayed EAC')}
+        />
+      ) : (
+        <EmptyState subTitle={t('noDelayedEAC', 'No Delayed EAC data to display')} />
+      )}
+    </div>
   );
 };
 
