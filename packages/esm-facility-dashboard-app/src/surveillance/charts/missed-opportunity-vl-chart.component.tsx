@@ -1,50 +1,34 @@
-import '@carbon/charts/styles.css';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
-import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-import { getNumberOfDays, sevenDaysRunningDates } from '../../constants';
 import styles from './charts.scss';
+import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
+import { useSurveillanceData } from '../../hooks/useSurveillanceData';
+import EmptyState from '../empty-state/empty-state-log.components';
+import { InlineLoading } from '@carbon/react';
 type MissedOpportunityChartProps = {
   startDate?: Date;
   endDate?: Date;
 };
 const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const generateRandomData = (numRecords: number) => {
-    return Array.from({ length: numRecords }, (_, i) => ({
-      day: sevenDaysRunningDates(i, endDate),
-      value: Math.floor(Math.random() * 50),
-    }));
-  };
+  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const numberSequence = useMemo(() => Math.max(1, getNumberOfDays(startDate, endDate)), [startDate, endDate]);
-
-  const generateRandomDataProgress = (numRecords: number) => {
-    const data = [];
-    for (let i = 1; i <= numRecords; i++) {
-      data.push({
-        group: 'Pending',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-      data.push({
-        group: 'Completed',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-    }
-    return data;
-  };
-
-  const data = useMemo(() => generateRandomDataProgress(numberSequence), [numberSequence, startDate, endDate]);
-  const values = useMemo(() => generateRandomData(numberSequence), [numberSequence, startDate, endDate]);
+  const missedoppotunityVLValue = useSurveillanceData(surveillanceSummary, 'getMonthlyEligibleForVlSampleNotTaken');
   return (
-    <BaseIndicatorTrendChart
-      data={values}
-      title={t('missedoppotunityVL', 'Missed opportunity in viral load testing')}
-      yAxisTitle={t('percentageMissedVL', '% of missed opportunity VL')}
-    />
+    <div className={styles.chart}>
+      {isLoading ? (
+        <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
+      ) : missedoppotunityVLValue.length > 0 ? (
+        <BaseIndicatorTrendChart
+          data={missedoppotunityVLValue}
+          title={t('missedoppotunityVL', 'Missed opportunity in viral load testing')}
+          yAxisTitle={t('numberMissedVL', 'Number of missed opportunity VL')}
+        />
+      ) : (
+        <EmptyState subTitle={t('nomissedoppotunityVL', 'No missed opportunity VL data to display')} />
+      )}
+    </div>
   );
 };
 
