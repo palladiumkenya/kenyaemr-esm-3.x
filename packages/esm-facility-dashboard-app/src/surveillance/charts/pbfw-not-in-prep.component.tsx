@@ -1,9 +1,11 @@
 import '@carbon/charts/styles.css';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-import { getNumberOfDays, sevenDaysRunningDates } from '../../constants';
+import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
+import { useSurveillanceData } from '../../hooks/useSurveillanceData';
+import EmptyState from '../empty-state/empty-state-log.components';
 import styles from './charts.scss';
 
 type PBFWNotInPrepProps = {
@@ -12,42 +14,34 @@ type PBFWNotInPrepProps = {
 };
 const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const generateRandomData = (numRecords: number) => {
-    return Array.from({ length: numRecords }, (_, i) => ({
-      day: sevenDaysRunningDates(i, endDate),
-      value: Math.floor(Math.random() * 50),
-    }));
-  };
+  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
+  const highRiskPBFWNotOnPrepValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHighRiskPBFWNotOnPrep');
 
-  const numberSequence = useMemo(() => Math.max(1, getNumberOfDays(startDate, endDate)), [startDate, endDate]);
+  const monthlyhighRiskPBFWNotOnPrepPatientData = useSurveillanceData(
+    surveillanceSummary,
+    'getMonthlyHighRiskPBFWNotOnPrepPatients',
+  );
 
-  const generateRandomDataForProgress = (numRecords: number) => {
-    const data = [];
-    for (let i = 1; i <= numRecords; i++) {
-      data.push({
-        group: 'Declined',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-      data.push({
-        group: 'StartedPrEP',
-        key: sevenDaysRunningDates(i, endDate),
-        value: Math.floor(Math.random() * 50),
-      });
-    }
-    return data;
-  };
-
-  const data = useMemo(() => generateRandomDataForProgress(numberSequence), [numberSequence, startDate, endDate]);
-  const values = useMemo(() => generateRandomData(numberSequence), [numberSequence, startDate, endDate]);
   return (
     <>
-      <BaseIndicatorTrendChart
-        data={values}
-        title={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
-        yAxisTitle={t('percentageHightRiskPBFW', '% High risk PBFW Not in PrEP')}
-      />
-      <BaseProgressTrackingChart data={data} />
+      <div className={styles.chart}>
+        {highRiskPBFWNotOnPrepValue.length > 0 ? (
+          <BaseIndicatorTrendChart
+            data={highRiskPBFWNotOnPrepValue}
+            title={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
+            yAxisTitle={t('numberHightRiskPBFW', 'Number of High risk PBFW Not on PrEP')}
+          />
+        ) : (
+          <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+        )}
+      </div>
+      <div>
+        {monthlyhighRiskPBFWNotOnPrepPatientData.length > 0 ? (
+          <BaseProgressTrackingChart data={monthlyhighRiskPBFWNotOnPrepPatientData} />
+        ) : (
+          <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+        )}
+      </div>
     </>
   );
 };
