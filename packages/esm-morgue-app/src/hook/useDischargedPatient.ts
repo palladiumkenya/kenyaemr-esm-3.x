@@ -11,7 +11,7 @@ export const useDischargedPatient = (dischargeEncounterTypeUuid: string) => {
 
   const dischargedPatientUuids = data
     ?.map((encounter) => {
-      const reference = encounter.subject?.reference;
+      const reference = encounter?.subject?.reference;
       if (reference && reference.startsWith('Patient/')) {
         return reference.split('/')[1];
       }
