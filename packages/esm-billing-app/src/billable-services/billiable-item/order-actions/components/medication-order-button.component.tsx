@@ -39,9 +39,10 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
   const buttonText = actionText ?? defaultButtonText;
   const launchModal = useCallback(() => {
     if (shouldShowBillModal) {
-      launchWorkspace('create-bill-workspace', {
+      const dispose = showModal('create-bill-item-modal', {
         patientUuid,
         medicationRequestBundle,
+        closeModal: () => dispose(),
       });
       return;
     }
