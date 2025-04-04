@@ -33,7 +33,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
   };
 
   const handleAppendPaymentMode = useCallback(() => {
-    append({ method: null, amount: 0, referenceCode: '' });
+    append({ method: null, amount: null, referenceCode: '' });
     setFocus(`payment.${fields.length}.method`);
   }, [append, fields.length, setFocus]);
 
