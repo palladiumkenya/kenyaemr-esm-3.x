@@ -24,7 +24,7 @@ import { useSystemSetting } from '../../../hooks/getMflCode';
 import { usePatientAttributes } from '../../../hooks/usePatientAttributes';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
 import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
-import { MappedBill } from '../../../types';
+import { LineItem, MappedBill } from '../../../types';
 import PaymentStatusCheckerModal from '../payment-status-ckecker.modal';
 import { formatKenyanPhoneNumber } from '../utils';
 import styles from './initiate-payment.scss';
@@ -42,9 +42,10 @@ type FormData = z.infer<typeof initiatePaymentSchema>;
 export interface InitiatePaymentDialogProps {
   closeModal: () => void;
   bill: MappedBill;
+  selectedLineItems: Array<LineItem>;
 }
 
-const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
+const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const { phoneNumber, isLoading: isLoadingPhoneNumber } = usePatientAttributes(bill.patientUuid);
   const { mpesaAPIBaseUrl, isPDSLFacility } = useConfig<BillingConfig>();
@@ -103,6 +104,8 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
         onClose={closeModal}
         paymentMade={hasMadePayment}
         onPaymentMadestatusChange={setHasMadepayment}
+        bill={bill}
+        selectedLineItems={selectedLineItems}
       />
     );
   }
