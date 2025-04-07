@@ -142,6 +142,7 @@ const BillDepositWorkspace: React.FC<BillDepositWorkspaceProps> = ({
     if (isDirty) {
       promptBeforeClosing(() => true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDirty, promptBeforeClosing]);
 
   const billableService = Array.from(watch('billableService')?.servicePrices ?? []);

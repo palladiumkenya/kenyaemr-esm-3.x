@@ -1,13 +1,13 @@
 import React from 'react';
 import { ConfigurableLink } from '@openmrs/esm-framework';
-import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import classNames from 'classnames';
 import { useTranslation } from 'react-i18next';
 import { usePerson } from '../../../../esm-morgue-app/src/hook/useMorgue.resource';
 
 const DeceasedPanelDashboardLink = () => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
   const { person, isLoading } = usePerson(patientUuid);
   const url = `\${openmrsSpaBase}/patient/${patientUuid}/chart/deceased-panel`;
 

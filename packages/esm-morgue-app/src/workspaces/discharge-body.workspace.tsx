@@ -115,7 +115,10 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
         ];
         const patientInfo: PatientInfo = {
           uuid: currentVisit.patient.uuid,
-          attributes: currentVisit?.patient?.person?.attributes || [],
+          attributes: (currentVisit?.patient?.person?.attributes || []).map((attr) => ({
+            uuid: attr.uuid,
+            display: attr.display || '',
+          })),
         };
 
         for (const attribute of nextOfKinAttributes) {
