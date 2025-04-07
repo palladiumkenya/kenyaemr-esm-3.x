@@ -1,6 +1,6 @@
 import { Button, DataTableSkeleton } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { getPatientUuidFromUrl, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { getPatientUuidFromStore, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePreAuthRequests } from '../../hooks/use-pre-auth-requests';
@@ -36,7 +36,7 @@ const headers = [
 
 const BenefitsTable = () => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
   const { isLoading, preAuthRequests } = usePreAuthRequests();
 
   if (isLoading) {

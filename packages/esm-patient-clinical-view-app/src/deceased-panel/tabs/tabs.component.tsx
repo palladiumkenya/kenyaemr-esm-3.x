@@ -1,6 +1,6 @@
 import { Layer, Tile } from '@carbon/react';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
-import { getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../../config-schema';
@@ -10,7 +10,7 @@ import styles from './tabs.scss';
 
 const DeceasedDetailsView: React.FC = () => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
 
   return (
     <div className={styles.deceasedDetailsContainer}>

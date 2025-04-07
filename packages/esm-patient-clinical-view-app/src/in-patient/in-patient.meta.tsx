@@ -6,4 +6,5 @@ export const inPatientMeta = {
   name: 'In Patient',
   columns: 1,
   config: {},
+  icon: '',
 };

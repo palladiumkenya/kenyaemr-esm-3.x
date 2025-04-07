@@ -5,7 +5,7 @@ import {
   CardHeader,
   EmptyDataIllustration,
   ErrorState,
-  getPatientUuidFromUrl,
+  getPatientUuidFromStore,
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
@@ -22,7 +22,7 @@ const PatientSHRSummaryTable: React.FC<PatientSHRSummaryTableProps> = () => {
   const layout = useLayoutType();
   const headerTitle = t('shrRecords', 'SHR Records');
 
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
   const [accessGranted, setAccessGranted] = useState(false);
   const { error, isLoading, patientPhoneNumber, patientName } = usePatient(patientUuid);
 

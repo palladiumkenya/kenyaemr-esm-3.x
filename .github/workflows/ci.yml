@@ -6,55 +6,61 @@ on:
   pull_request:
     branches: [main]
   release:
-    types:
-      - created
+    types: [created]
 
 env:
-  TURBO_TOKEN: 'turbo-token'
-  TURBO_TEAM: ${{ github.repository_owner }}
   FORCE_COLOR: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
     permissions:
       actions: read
       contents: read
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
-      - name: Setup Node.js
+      - name: Setup Node.js & Yarn cache
         uses: actions/setup-node@v4
         with:
           node-version: "18"
           cache: 'yarn'
 
-      # Use Turborepo Remote Caching
-      - name: Setup Turborepo Remote Cache
-        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      # Cache Turborepo’s local cache folder
+      - name: Cache .turbo folder
+        uses: actions/cache@v3
+        with:
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-turbo-
+
+      # Cache Yarn’s global cache + workspace node_modules
+      - name: Cache Yarn & node_modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/yarn
+            **/node_modules
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
         env:
           YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
-      - name: Run lint, type checks and tests
+      - name: Run lint, type checks & tests
         run: yarn verify --cache-dir=".turbo"
-        env:
-          TURBO_CACHE_KEY: ${{ github.sha }}
 
       - name: Build packages
-        run: |
-          yarn turbo run build \
-            --cache-dir=".turbo" \
-            --concurrency=5 \
-            --no-daemon
-        env:
-          TURBO_CACHE_KEY: ${{ github.sha }}
+        run: yarn turbo run build --cache-dir=".turbo" --concurrency=5 
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
