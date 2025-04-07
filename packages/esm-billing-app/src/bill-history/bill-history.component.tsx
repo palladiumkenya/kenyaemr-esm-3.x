@@ -17,7 +17,7 @@ import {
   Button,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { isDesktop, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { isDesktop, launchWorkspace, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
   ErrorState,
   usePaginationInfo,
@@ -45,6 +45,10 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   const handleLaunchBillForm = () => {
     launchPatientWorkspace({ workspaceTitle: t('billingForm', 'Billing Form') });
+  };
+
+  const handleLaunchBillDepositForm = () => {
+    launchWorkspace('bill-deposit-workspace', { workspaceTitle: t('billDepositForm', 'Bill Deposit Form') });
   };
 
   const headerData = [
@@ -106,9 +110,14 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   return (
     <div>
       <CardHeader title={t('patientBilling', 'Patient billing')}>
-        <Button renderIcon={Add} onClick={handleLaunchBillForm} kind="ghost">
-          {t('addBill', 'Add bill item(s)')}
-        </Button>
+        <div>
+          <Button renderIcon={Add} onClick={handleLaunchBillForm} kind="ghost">
+            {t('addBill', 'Add bill item(s)')}
+          </Button>
+          <Button renderIcon={Add} onClick={handleLaunchBillDepositForm} kind="ghost">
+            {t('addDeposit', 'Add deposit')}
+          </Button>
+        </div>
       </CardHeader>
       <div className={styles.billHistoryContainer}>
         <DataTable isSortable rows={rowData} headers={headerData} size={responsiveSize} useZebraStyles>
