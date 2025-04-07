@@ -72,7 +72,6 @@ const PreauthTableTemporary: React.FC = () => {
   const size = layout === 'tablet' ? 'lg' : 'md';
 
   const headers = [
-    { key: 'claimCode', header: t('claimCode', 'Claim Code') },
     { key: 'status', header: t('status', 'Status') },
     { key: 'providerName', header: t('provider', 'Provider') },
     { key: 'patientName', header: t('patient', 'Patient') },
