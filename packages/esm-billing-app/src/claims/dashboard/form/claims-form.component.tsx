@@ -350,7 +350,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
               {t('discardClaim', 'Discard Claim')}
             </Button>
-            <Button className={styles.button} kind="primary" type="submit" disabled={!isValid || loading}>
+            <Button className={styles.button} kind="primary" type="submit" disabled={loading}>
               {loading ? (
                 <InlineLoading description={t('processing', 'Processing...')} />
               ) : (
