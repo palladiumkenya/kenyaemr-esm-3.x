@@ -37,15 +37,12 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
 
   const { handleModalClose } = useModalHandler(additionalProps?.mutateUrl as string);
   const buttonText = actionText ?? defaultButtonText;
-
   const launchModal = useCallback(() => {
     if (shouldShowBillModal) {
-      const disposeBill = showModal(modalName ?? 'create-bill-item-modal', {
-        closeModal: () => {
-          handleModalClose();
-          disposeBill();
-        },
+      const dispose = showModal('create-bill-item-modal', {
+        patientUuid,
         medicationRequestBundle,
+        closeModal: () => dispose(),
       });
       return;
     }
@@ -53,7 +50,7 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
     if (dispenseFormProps) {
       launchWorkspace('dispense-workspace', dispenseFormProps);
     }
-  }, [modalName, shouldShowBillModal, handleModalClose, medicationRequestBundle, dispenseFormProps]);
+  }, [modalName, shouldShowBillModal, handleModalClose, medicationRequestBundle, dispenseFormProps, patientUuid]);
 
   if (!closeable) {
     return null;

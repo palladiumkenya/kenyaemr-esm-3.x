@@ -33,7 +33,7 @@ const useFacilityDashboardSurveillance = (startDate?: Date, endDate?: Date) => {
   }, []);
 
   return {
-    surveillanceSummary: error ? null : data?.data,
+    surveillanceSummary: data?.data ?? null,
     getIndication,
     getPercentage,
     isLoading,

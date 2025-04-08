@@ -1,52 +1,46 @@
 import '@carbon/charts/styles.css';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-import { sevenDaysRunningDates } from '../../constants';
+import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
+import { useSurveillanceData } from '../../hooks/useSurveillanceData';
+import EmptyState from '../empty-state/empty-state-log.components';
 import styles from './charts.scss';
-const PBFWNotInPrep = () => {
+
+type PBFWNotInPrepProps = {
+  startDate?: Date;
+  endDate?: Date;
+};
+const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const generateRandomData = (numRecords: number) => {
-    return Array.from({ length: numRecords }, (_, i) => ({
-      week: sevenDaysRunningDates(i),
-      abnomallPercentage: Math.floor(Math.random() * 50),
-    }));
-  };
+  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
+  const highRiskPBFWNotOnPrepValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHighRiskPBFWNotOnPrep');
 
-  const generateRandomDataForProgress = (numRecords: number) => {
-    const data = [];
-    for (let i = 1; i <= numRecords; i++) {
-      data.push({
-        group: 'Pending',
-        key: sevenDaysRunningDates(i),
-        value: Math.floor(Math.random() * 50),
-      });
-      data.push({
-        group: 'Completed',
-        key: sevenDaysRunningDates(i),
-        value: Math.floor(Math.random() * 50),
-      });
-    }
-    return data;
-  };
+  const monthlyhighRiskPBFWNotOnPrepPatientData = useSurveillanceData(
+    surveillanceSummary,
+    'getMonthlyHighRiskPBFWNotOnPrepPatients',
+  );
 
-  const data = useMemo(() => generateRandomDataForProgress(7), []);
-
-  const values = useMemo(() => generateRandomData(7), []);
   return (
     <>
-      <div className={styles.chartGroupContainer}>
-        <div className={styles.tendChart}>
+      <div className={styles.chart}>
+        {highRiskPBFWNotOnPrepValue.length > 0 ? (
           <BaseIndicatorTrendChart
-            data={values}
+            data={highRiskPBFWNotOnPrepValue}
             title={t('prepNotlinked', 'High risk +ve PBFW not on PrEP')}
-            yAxisTitle={t('percentageHightRiskPBFW', '% High risk PBFW Not in PrEP')}
+            yAxisTitle={t('numberHightRiskPBFW', 'Number of High risk PBFW Not on PrEP')}
           />
-        </div>
-        <div className={styles.trackingChart}>
-          <BaseProgressTrackingChart data={data} />
-        </div>
+        ) : (
+          <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+        )}
+      </div>
+      <div>
+        {monthlyhighRiskPBFWNotOnPrepPatientData.length > 0 ? (
+          <BaseProgressTrackingChart data={monthlyhighRiskPBFWNotOnPrepPatientData} />
+        ) : (
+          <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+        )}
       </div>
     </>
   );

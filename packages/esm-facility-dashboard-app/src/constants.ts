@@ -9,9 +9,7 @@ export const today = () => {
 };
 
 export const sevenDaysAgo = () => {
-  const date = today(); // Get today's date
-  date.setDate(date.getDate() - 7); // Subtract 7 days
-  return date;
+  return dayjs().subtract(7, 'day').toDate();
 };
 
 export const DATE_PICKER_CONTROL_FORMAT = 'd/m/Y';
@@ -23,13 +21,21 @@ export const formatNewDate = (date: Date | null | undefined) => {
 };
 
 // Generate Dammy dates
-export const sevenDaysRunningDates = (index: number) => {
-  const date = new Date(today());
-  date.setDate(today().getDate() - index);
-  const formattedDate = date.toISOString().split('T')[0];
-  return formattedDate;
+export const sevenDaysRunningDates = (index: number, endDate: Date = new Date()): string => {
+  const date = new Date(endDate);
+  date.setDate(date.getDate() - index);
+  return date.toISOString().split('T')[0];
 };
 
 export const formattedDate = (date: Date) => {
   return date ? dayjs(date).format(DATE_PICKER_FORMAT) : '';
+};
+
+export const getNumberOfDays = (startDate?: Date, endDate?: Date) => {
+  if (!startDate || !endDate) {
+    return 7;
+  }
+  const start = dayjs(startDate);
+  const end = dayjs(endDate);
+  return end.diff(start, 'day');
 };

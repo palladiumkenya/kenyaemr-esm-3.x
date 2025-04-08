@@ -3,53 +3,49 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
-import { sevenDaysRunningDates } from '../../constants';
+import { getNumberOfDays, sevenDaysRunningDates } from '../../constants';
 import styles from './charts.scss';
+type DelayedEACChartsProps = {
+  startDate?: Date;
+  endDate?: Date;
+};
 
-const DelayedEACCharts = () => {
+const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
   const generateRandomData = (numRecords: number) => {
     return Array.from({ length: numRecords }, (_, i) => ({
-      week: sevenDaysRunningDates(i),
-      abnomallPercentage: Math.floor(Math.random() * 50),
+      day: sevenDaysRunningDates(i, endDate),
+      value: Math.floor(Math.random() * 50),
     }));
   };
+
+  const numberSequence = useMemo(() => Math.max(1, getNumberOfDays(startDate, endDate)), [startDate, endDate]);
 
   const generateRandomDataProgress = (numRecords: number) => {
     const data = [];
     for (let i = 1; i <= numRecords; i++) {
       data.push({
         group: 'Pending',
-        key: sevenDaysRunningDates(i),
+        key: sevenDaysRunningDates(i, endDate),
         value: Math.floor(Math.random() * 50),
       });
       data.push({
         group: 'Completed',
-        key: sevenDaysRunningDates(i),
+        key: sevenDaysRunningDates(i, endDate),
         value: Math.floor(Math.random() * 50),
       });
     }
     return data;
   };
 
-  const data = useMemo(() => generateRandomDataProgress(7), []);
-
-  const values = useMemo(() => generateRandomData(7), []);
+  const data = useMemo(() => generateRandomDataProgress(numberSequence), [numberSequence, startDate, endDate]);
+  const values = useMemo(() => generateRandomData(numberSequence), [numberSequence, startDate, endDate]);
   return (
-    <>
-      <div className={styles.chartGroupContainer}>
-        <div className={styles.tendChart}>
-          <BaseIndicatorTrendChart
-            data={values}
-            title={t('delayedEAC', 'Delayed EAC')}
-            yAxisTitle={t('percentageDelatedEAC', '% Delayed EAC')}
-          />
-        </div>
-        <div className={styles.trackingChart}>
-          <BaseProgressTrackingChart data={data} />
-        </div>
-      </div>
-    </>
+    <BaseIndicatorTrendChart
+      data={values}
+      title={t('delayedEAC', 'Delayed enhanced adherence counselling')}
+      yAxisTitle={t('percentageDelatedEAC', '% Delayed EAC')}
+    />
   );
 };
 

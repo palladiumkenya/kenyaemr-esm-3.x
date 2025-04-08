@@ -21,12 +21,24 @@ const SurveillancelanceDashboard = () => {
       <FacilityDashboardHeader title={t('surveillance', 'Surveillance')} />
       <SurveillanceFilters filters={currFilters} onFiltersChange={setCurrFilters} />
       <SurveillanceSummaryCards startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      {currFilters.indicator === 'getHivPositiveNotLinked' && <HIVPositiveNotLinkedToART />}
-      {currFilters.indicator === 'getPregnantPostpartumNotInPrep' && <PBFWNotInPrep />}
-      {currFilters.indicator === 'getEligibleForVlSampleNotTaken' && <DelayedEACCharts />}
-      {currFilters.indicator === 'getVirallyUnsuppressedWithoutEAC' && <MissedOpportunityChart />}
-      {currFilters.indicator === 'getHeiSixToEightWeeksWithoutPCRResults' && <DNAPCRPendingCharts />}
-      {currFilters.indicator === 'getHei24MonthsWithoutDocumentedOutcome' && <HEIFinalOutcomesChart />}
+      {currFilters.indicator === 'getHivPositiveNotLinked' && (
+        <HIVPositiveNotLinkedToART startDate={currFilters.startdate} endDate={currFilters.endDate} />
+      )}
+      {currFilters.indicator === 'getPregnantPostpartumNotInPrep' && (
+        <PBFWNotInPrep startDate={currFilters.startdate} endDate={currFilters.endDate} />
+      )}
+      {currFilters.indicator === 'getEligibleForVlSampleNotTaken' && (
+        <DelayedEACCharts startDate={currFilters.startdate} endDate={currFilters.endDate} />
+      )}
+      {currFilters.indicator === 'getVirallyUnsuppressedWithoutEAC' && (
+        <MissedOpportunityChart startDate={currFilters.startdate} endDate={currFilters.endDate} />
+      )}
+      {currFilters.indicator === 'getHeiSixToEightWeeksWithoutPCRResults' && (
+        <DNAPCRPendingCharts startDate={currFilters.startdate} endDate={currFilters.endDate} />
+      )}
+      {currFilters.indicator === 'getHei24MonthsWithoutDocumentedOutcome' && (
+        <HEIFinalOutcomesChart startDate={currFilters.startdate} endDate={currFilters.endDate} />
+      )}
     </div>
   );
 };
