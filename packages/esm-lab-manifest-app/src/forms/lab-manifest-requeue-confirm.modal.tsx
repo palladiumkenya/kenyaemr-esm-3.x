@@ -25,7 +25,7 @@ const LabManifestRequeueConfirmdialog: React.FC<LabManifestRequeueConfirmdialogP
       showSnackbar({
         title: t('success', 'Success'),
         kind: 'success',
-        subtitle: t('requeueSuccessMessage', 'Lab manifest resubmision successfully!'),
+        subtitle: t('requeueSuccessMessage', 'Lab manifest resubmission successful'),
       });
     } catch (error: any) {
       showSnackbar({
@@ -44,16 +44,19 @@ const LabManifestRequeueConfirmdialog: React.FC<LabManifestRequeueConfirmdialogP
       </ModalHeader>
       <ModalBody>
         <span className={styles.modalQuiz}>
-          {t('requeueLabManifestConfirmQuestion', 'Are you sure you want to requeue lab manifest back to submitted ?')}
+          {t(
+            'requeueLabManifestConfirmQuestion',
+            "Are you sure you want to requeue the lab manifest to the 'Submitted' status?",
+          )}
         </span>
       </ModalBody>
       <ModalFooter>
         <ButtonSet className={styles.buttonSet}>
           <Button kind="secondary" onClick={onClose} className={styles.button}>
-            Cancel
+            {t('cancel', 'Cancel')}
           </Button>
           <Button kind="primary" onClick={handleResubmitManifest} className={styles.button}>
-            Requeue
+            {t('requeue', 'Requeue')}
           </Button>
         </ButtonSet>
       </ModalFooter>

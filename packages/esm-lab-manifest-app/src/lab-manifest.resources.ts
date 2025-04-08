@@ -198,8 +198,8 @@ const printFile = async (url: string) => {
   window.open(_url, '_blank');
 };
 
-export const printManifest = async (manifestUid: string, status?: string) => {
-  if (status === 'Complete results') {
+export const printManifest = async (manifestUid: string, log?: boolean) => {
+  if (log) {
     return await printFile(`/openmrs${restBaseUrl}/kemrorder/printmanifestlog?manifestUuid=${manifestUid}`);
   }
   return await printFile(`/openmrs${restBaseUrl}/kemrorder/printmanifest?manifestUuid=${manifestUid}`);

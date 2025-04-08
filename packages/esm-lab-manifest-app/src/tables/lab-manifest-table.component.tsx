@@ -60,7 +60,7 @@ const LabManifestsTable = () => {
         isSortable: true,
       },
       {
-        header: t('endDate', 'End Date'),
+        header: t('endDate', 'End date'),
         key: 'endDate',
         isSortable: true,
       },
@@ -78,7 +78,7 @@ const LabManifestsTable = () => {
         key: 'manifestId',
       },
       {
-        header: t('labPersonContact', 'Lab person Contact'),
+        header: t('labPersonContact', 'Lab person contact'),
         key: 'labPersonContact',
       },
       {
@@ -113,9 +113,9 @@ const LabManifestsTable = () => {
     });
   };
 
-  const handlePrintManifest = async (manifest: MappedLabManifest) => {
+  const handlePrintManifest = async (manifest: MappedLabManifest, log: boolean = false) => {
     try {
-      await printManifest(manifest.uuid, manifest.manifestStatus);
+      await printManifest(manifest.uuid, log);
     } catch (error) {
       showSnackbar({ title: 'Failure', subtitle: 'Error printing manifest', kind: 'error' });
     }
@@ -156,11 +156,18 @@ const LabManifestsTable = () => {
                 />
               )}
               {printableManifestStatus.includes(manifest.manifestStatus) && (
-                <OverflowMenuItem
-                  itemText={t('printManifest', 'Print Manifest')}
-                  onClick={() => handlePrintManifest(manifest)}
-                />
+                <>
+                  <OverflowMenuItem
+                    itemText={t('printManifest', 'Print Manifest')}
+                    onClick={() => handlePrintManifest(manifest)}
+                  />
+                  <OverflowMenuItem
+                    itemText={t('printManifestLog', 'Print Manifest Log')}
+                    onClick={() => handlePrintManifest(manifest, true)}
+                  />
+                </>
               )}
+
               {resubmittableManifestStatus.includes(manifest.manifestStatus) && (
                 <OverflowMenuItem
                   itemText={t('requeueManifest', 'Requeue Manifest')}
