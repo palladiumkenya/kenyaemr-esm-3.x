@@ -568,3 +568,16 @@ export interface Filter {
   cashiers?: Array<string>;
   status?: string;
 }
+
+export interface StockItemResponse {
+  uuid: string;
+  drugUuid: string;
+  drugName: string;
+  conceptUuid: string;
+  conceptName: string;
+}
+export interface LineItemStockQuery {
+  drugName: string;
+  conceptUuid: string;
+  lineItemUuid?: string;
+}

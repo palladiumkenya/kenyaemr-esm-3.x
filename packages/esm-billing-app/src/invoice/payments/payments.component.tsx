@@ -11,13 +11,14 @@ import { processBillPayment } from '../../billing.resource';
 import { convertToCurrency } from '../../helpers';
 import { useClockInStatus } from '../../payment-points/use-clock-in-status';
 import { LineItem, PaymentFormValue, PaymentStatus, type MappedBill } from '../../types';
-import { computeWaivedAmount, extractErrorMessagesFromResponse } from '../../utils';
+import { computeWaivedAmount, extractDrugName, extractErrorMessagesFromResponse } from '../../utils';
 import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
 import PaymentForm from './payment-form/payment-form.component';
 import PaymentHistory from './payment-history/payment-history.component';
 import styles from './payments.scss';
 import { createPaymentPayload } from './utils';
 import { usePaymentSchema } from '../../hooks/usePaymentSchema';
+import { useStockItems } from './payments.resource';
 
 type PaymentProps = {
   bill: MappedBill;
@@ -28,6 +29,17 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const paymentSchema = usePaymentSchema(bill);
   const { globalActiveSheet } = useClockInStatus();
+  const lineItemStockQueries = selectedLineItems.map((item) => ({
+    drugName: extractDrugName(item.billableService),
+    conceptUuid: item.itemOrServiceConceptUuid,
+    lineItemUuid: item.uuid,
+  }));
+
+  const {
+    lineItemToStockMap,
+    isLoading: isLoadingStockItems,
+    error: stockItemsError,
+  } = useStockItems(lineItemStockQueries);
 
   const methods = useForm<PaymentFormValue>({
     mode: 'onSubmit',
@@ -56,15 +68,16 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
       to: window.getOpenmrsSpaBase() + 'home/billing',
     });
 
-  const handleProcessPayment = () => {
+  const handleProcessPayment = async () => {
     const { remove } = formArrayMethods;
-    const paymentPayload = createPaymentPayload(
+    const paymentPayload = await createPaymentPayload(
       bill,
       bill.patientUuid,
       formValues,
       amountDue,
       selectedLineItems,
       globalActiveSheet,
+      lineItemToStockMap,
     );
     remove();
 

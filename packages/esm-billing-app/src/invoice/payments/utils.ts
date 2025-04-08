@@ -113,31 +113,41 @@ export const createPaymentPayload = (
   remainingBalance,
   selectedBillableItems,
   timesheetDetails,
+  lineItemToStockMap?: Map<string, string>,
 ) => {
   const { totalAmount, payments = [], lineItems = [] } = billDetails;
   const initialPaymentStatus = remainingBalance <= 0 ? PaymentStatus.PAID : PaymentStatus.PENDING;
+  const lineItemUuids = selectedBillableItems.map((item) => item.uuid);
 
-  // Transform existing payments
-  const existingPayments = payments.map((payment) => ({
-    amount: payment.amount,
-    amountTendered: payment.amountTendered,
-    attributes: payment.attributes.map((attribute) => ({
-      attributeType: attribute.attributeType?.uuid,
-      value: attribute.value,
-    })),
-    instanceType: payment.instanceType.uuid,
-  }));
+  // Transform existing payments with stock UUID
+  const existingPayments = payments.map((payment) => {
+    return {
+      amount: payment.amount,
+      amountTendered: payment.amountTendered,
+      attributes: payment.attributes.map((attribute) => ({
+        attributeType: attribute.attributeType?.uuid,
+        value: attribute.value,
+      })),
+      instanceType: payment.instanceType.uuid,
+    };
+  });
 
-  // Transform new payments
-  const currentPayments = paymentFormValues.map((formValue) => ({
-    amount: parseFloat(totalAmount.toFixed(2)),
-    amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
-    attributes: formValue.method?.attributeTypes?.map((attribute) => ({
-      attributeType: attribute.uuid,
-      value: formValue.referenceCode,
-    })),
-    instanceType: formValue.method?.uuid,
-  }));
+  // Transform new payments with stock UUID
+  const currentPayments = paymentFormValues.map((formValue, index) => {
+    const lineItemUuid = lineItemUuids[index];
+    const stockUuid = lineItemUuid ? lineItemToStockMap?.get(lineItemUuid) : undefined;
+
+    return {
+      amount: parseFloat(totalAmount.toFixed(2)),
+      amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
+      attributes: formValue.method?.attributeTypes?.map((attribute) => ({
+        attributeType: attribute.uuid,
+        value: formValue.referenceCode,
+      })),
+      instanceType: formValue.method?.uuid,
+      item: stockUuid,
+    };
+  });
 
   // Combine and calculate payments
   const consolidatedPayments = [...currentPayments, ...existingPayments];
