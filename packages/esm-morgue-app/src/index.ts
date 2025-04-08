@@ -1,4 +1,10 @@
-import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  getAsyncLifecycle,
+  defineConfigSchema,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel/morgue-left-panel-link.component';
 const moduleName = '@kenyaemr/esm-morgue-app';
@@ -21,6 +27,11 @@ export function startupApp() {
       parent: `${window.spaBase}/home`,
     },
   ]);
+  registerFeatureFlag(
+    'mortuaryFeatureFlag',
+    'Mortuary App Service',
+    'Mortuary feature flag, this enables and disables the mortuary app feature',
+  );
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
