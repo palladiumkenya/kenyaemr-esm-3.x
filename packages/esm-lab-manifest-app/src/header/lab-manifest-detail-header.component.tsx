@@ -26,9 +26,9 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
     });
   };
 
-  const handlePrintManifest = async () => {
+  const handlePrintManifest = async (log: boolean = false) => {
     try {
-      await printManifest(manifest.uuid, manifest.manifestStatus);
+      await printManifest(manifest.uuid, log);
     } catch (error) {
       showSnackbar({ title: 'Failure', subtitle: 'Error printing manifest', kind: 'error' });
     }
@@ -83,9 +83,14 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
             </Button>
           )}
           {printableManifestStatus.includes(manifest.manifestStatus) && (
-            <Button kind="secondary" renderIcon={Printer} onClick={handlePrintManifest}>
-              {t('printManifest', 'Print Manifest')}
-            </Button>
+            <>
+              <Button kind="secondary" renderIcon={Printer} onClick={async () => await handlePrintManifest(false)}>
+                {t('printManifest', 'Print Manifest')}
+              </Button>
+              <Button kind="secondary" renderIcon={Printer} onClick={async () => await handlePrintManifest(true)}>
+                {t('printManifestLog', 'Print Manifest log')}
+              </Button>
+            </>
           )}
         </Row>
       </Row>
