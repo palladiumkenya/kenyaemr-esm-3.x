@@ -118,7 +118,6 @@ export const createPaymentPayload = (
   const { totalAmount, payments = [], lineItems = [] } = billDetails;
   const initialPaymentStatus = remainingBalance <= 0 ? PaymentStatus.PAID : PaymentStatus.PENDING;
   const lineItemUuids = selectedBillableItems.map((item) => item.uuid);
-
   // Transform existing payments with stock UUID
   const existingPayments = payments.map((payment) => {
     return {
