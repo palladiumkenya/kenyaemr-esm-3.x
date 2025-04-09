@@ -122,7 +122,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
             onChange={({ name }) => {
               setHasMadepayment(name === 'paymentMade');
             }}>
-            <Switch name="paymentNotMade" text={t('paymentNotMade', 'Payment Not made')} />
+            <Switch name="paymentNotMade" text={t('paymentNotMade', 'Payment not made')} />
             <Switch name="paymentMade" text={t('paymentMade', 'Payments already made')} />
           </ContentSwitcher>
         )}
@@ -192,7 +192,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                 {t('processingPayment', 'Processing Payment')}
               </>
             ) : (
-              t('initiatePay', 'Initiate Payment')
+              t('initiatePayment', 'Initiate Payment')
             )}
           </Button>
         </ButtonSet>

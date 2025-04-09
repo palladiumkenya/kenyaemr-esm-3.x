@@ -93,7 +93,7 @@ const PaymentStatusCheckerModal: React.FC<PaymentStatusCheckerModalProps> = ({
           onChange={({ name }) => {
             onPaymentMadestatusChange?.(name === 'paymentMade');
           }}>
-          <Switch name="paymentNotMade" text={t('paymentNotMade', 'Payment Not made')} />
+          <Switch name="paymentNotMade" text={t('paymentNotMade', 'Payment not made')} />
           <Switch name="paymentMade" text={t('paymentMade', 'Payments already made')} />
         </ContentSwitcher>
         <TextInput
@@ -120,7 +120,7 @@ const PaymentStatusCheckerModal: React.FC<PaymentStatusCheckerModalProps> = ({
             className={styles.button}>
             {isLoading || checking ? (
               <InlineLoading
-                description={t('checkingPaymentStatus', 'Check Payment status') + '...'}
+                description={t('checkingPaymentStatus', 'Check payment status') + '...'}
                 iconDescription={t('loading', 'Loading')}
               />
             ) : (

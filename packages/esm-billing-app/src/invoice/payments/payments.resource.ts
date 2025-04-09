@@ -27,13 +27,13 @@ export interface Data {
   TransAmount: string;
   BusinessShortCode: string;
   BillRefNumber: string;
-  InvoiceNumber: any;
+  InvoiceNumber?: string;
   OrgAccountBalance: string;
-  ThirdPartyTransID: any;
+  ThirdPartyTransID?: string;
   MSISDN: string;
   FirstName: string;
-  MiddleName: any;
-  LastName: any;
+  MiddleName?: string;
+  LastName?: string;
   status: string;
   created_at: string;
   updated_at: string;
