@@ -156,7 +156,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
             <PaymentForm
               selectedLineItems={selectedLineItems}
               {...formArrayMethods}
-              disablePayment={amountDue <= 0 || isFullyPaid}
+              disablePayment={amountDue <= 0}
               amountDue={amountDue}
             />
           </div>

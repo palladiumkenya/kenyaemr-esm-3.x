@@ -1,3 +1,5 @@
+import { PaymentStatus } from '../packages/esm-billing-app/src/types';
+
 export const billsSummary = [
   {
     uuid: '65f9f19a-f70e-44f4-9c6c-55b23dab4a3f',
@@ -333,7 +335,7 @@ export const mockBill = {
   patientName: 'James Bond',
   identifier: 'PJYM9 ',
   patientUuid: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
-  status: 'PENDING',
+  status: 'PENDING' as PaymentStatus,
   receiptNumber: '0035-6',
   cashier: {
     uuid: 'fe00dd43-4c39-4ce9-9832-bc3620c80c6c',
@@ -364,13 +366,17 @@ export const mockBill = {
       priceUuid: '',
       lineItemOrder: 0,
       paymentStatus: 'PENDING',
+      order: null,
       resourceVersion: '1.8',
+      itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+      serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
     },
   ],
   billingService: 'Hemoglobin',
   payments: [],
   totalAmount: 100,
   tenderedAmount: 0,
+  dateCreatedUnformatted: '2023-12-15',
 };
 
 export const mockPayments = [

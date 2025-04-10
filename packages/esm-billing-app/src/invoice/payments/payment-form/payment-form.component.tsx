@@ -54,11 +54,24 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   };
 
   const handleAppendPaymentMode = useCallback(() => {
-    append({ method: null, amount: null, referenceCode: '', itemUuid: '' });
+    const availableItems = getAvailableLineItems(fields.length);
+    const initialItemUuid = availableItems.length === 1 ? availableItems[0].uuid : '';
+
+    append({
+      method: null,
+      amount: null,
+      referenceCode: '',
+      itemUuid: initialItemUuid,
+    });
+
     setFocus(`payment.${fields.length}.method`);
-  }, [append, fields.length, setFocus]);
+  }, [append, fields.length, setFocus, selectedLineItems]);
 
   const handleRemovePaymentMode = useCallback((index) => remove(index), [remove]);
+
+  if (fields.length === 0 && selectedLineItems.length === 1) {
+    handleAppendPaymentMode();
+  }
 
   if (isLoading) {
     return <NumberInputSkeleton />;

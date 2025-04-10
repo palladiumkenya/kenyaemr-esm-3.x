@@ -49,15 +49,30 @@ describe('Payment', () => {
     });
 
     render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
+
+    // Add payment method
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
-    await user.click(screen.getByRole('combobox', { name: /Payment method/i }));
-    const cashOption = screen.getByRole('option', { name: /Cash/i });
+
+    // Wait for dropdown to be available
+    const lineItemDropdown = await screen.findByRole('combobox', { name: /Select line item to pay/i });
+    await user.click(lineItemDropdown);
+
+    // Find and select the first available line item
+    const lineItemOptions = await screen.findAllByRole('option');
+    await user.click(lineItemOptions[0]);
+
+    // Select payment method
+    const paymentMethodDropdown = await screen.findByRole('combobox', { name: /Payment method/i });
+    await user.click(paymentMethodDropdown);
+    const cashOption = await screen.findByRole('option', { name: /Cash/i });
     await user.click(cashOption);
 
+    // Enter amount
     const amountInput = screen.getByRole('spinbutton', { name: /Amount/i });
     await user.type(amountInput, '100');
 
+    // Submit
     const submitButton = screen.getByRole('button', { name: /Process Payment/i });
     await user.click(submitButton);
 
@@ -71,6 +86,8 @@ describe('Payment', () => {
             billableService: 'c15d25b9-12bb-441d-9241-cae541dd4575',
             display: 'BillLineItem',
             item: 'c15d25b9-12bb-441d-9241-cae541dd4575',
+            itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+            serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 0,
             order: null,
             paymentStatus: 'PAID',
@@ -87,6 +104,8 @@ describe('Payment', () => {
             billableService: '04be5832-5440-44d0-83d2-5c0dfd0ac7de',
             display: 'BillLineItem',
             item: '04be5832-5440-44d0-83d2-5c0dfd0ac7de',
+            itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+            serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 1,
             order: null,
             paymentStatus: 'PAID',
@@ -103,6 +122,8 @@ describe('Payment', () => {
             billableService: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
             display: 'BillLineItem',
             item: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
+            itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+            serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 2,
             order: null,
             paymentStatus: 'PAID',
@@ -119,7 +140,10 @@ describe('Payment', () => {
             billableService: 'Hemoglobin',
             display: 'BillLineItem',
             item: 'Hemoglobin',
+            itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+            serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 0,
+            order: null,
             paymentStatus: 'PENDING',
             price: 100,
             priceName: '',
@@ -133,7 +157,13 @@ describe('Payment', () => {
         ],
         patient: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
         payments: [
-          { amount: 100, amountTendered: 100, attributes: [], instanceType: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74' },
+          {
+            amount: 100,
+            amountTendered: 100,
+            attributes: [],
+            instanceType: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74',
+            item: undefined,
+          },
         ],
         status: 'PENDING',
       },
@@ -160,24 +190,24 @@ describe('Payment', () => {
 
     render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
 
-    // Click the "Add payment option" button
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
 
-    // Check if the payment method field is focused
-    const paymentMethodField = screen.getByRole('combobox', { name: /Payment method/i });
+    const lineItemDropdown = await screen.findByRole('combobox', { name: /Select line item to pay/i });
+    expect(lineItemDropdown).toHaveFocus();
+
+    await user.click(lineItemDropdown);
+    const lineItemOptions = await screen.findAllByRole('option');
+    await user.click(lineItemOptions[0]);
+
+    const paymentMethodField = await screen.findByRole('combobox', { name: /Payment method/i });
     expect(paymentMethodField).toHaveFocus();
 
-    // Simulate selecting a payment method
     await user.click(paymentMethodField);
-    const cashOption = screen.getByRole('option', { name: /Cash/i });
+    const cashOption = await screen.findByRole('option', { name: /Cash/i });
     await user.click(cashOption);
 
-    // Check if the amount field is focused
     const amountInput = screen.getByRole('spinbutton', { name: /Amount/i });
     expect(amountInput).toHaveFocus();
-
-    // Simulate entering an amount
-    await user.type(amountInput, '100');
   });
 });
