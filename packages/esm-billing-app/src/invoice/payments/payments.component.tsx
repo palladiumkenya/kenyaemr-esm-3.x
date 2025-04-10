@@ -41,11 +41,6 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     error: stockItemsError,
   } = useStockItems(lineItemStockQueries);
 
-  const mappedSelectedLineItems = selectedLineItems.map((item) => ({
-    ...item,
-    item: lineItemToStockMap.get(item.uuid),
-  }));
-
   const methods = useForm<PaymentFormValue>({
     mode: 'onSubmit',
     defaultValues: { payment: [] },
@@ -161,7 +156,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
             <PaymentForm
               selectedLineItems={selectedLineItems}
               {...formArrayMethods}
-              disablePayment={amountDue <= 0}
+              disablePayment={amountDue <= 0 || isFullyPaid}
               amountDue={amountDue}
             />
           </div>
