@@ -56,11 +56,13 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   const searchBox = useRef<HTMLInputElement>(null);
   const wrapper = useRef<HTMLDivElement>(null);
   const { id: name, labelText } = searchProps;
+  const [showEmptyState, setShowEmptyState] = useState(false);
 
   useEffect(() => {
     const handleClickOutsideComponent = (e: MouseEvent) => {
       if (wrapper.current && !wrapper.current.contains(e.target as Node)) {
         setSuggestions([]);
+        setShowEmptyState(false);
       }
     };
 
@@ -76,7 +78,13 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
 
     if (query) {
       getSearchResults(query).then((results) => {
-        setSuggestions(results);
+        const filteredResults = results.filter(
+          (result) =>
+            !admissionLocation?.bedLayouts
+              .flatMap((bed) => bed.patients)
+              .some((patient) => patient.uuid === result.patient.uuid),
+        );
+        setSuggestions(filteredResults);
       });
     } else {
       setSuggestions([]);
@@ -89,28 +97,11 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   };
 
   const handleClick = (index: number) => {
-    const suggestion = suggestions[index];
-    const isAdmitted = admissionLocation?.bedLayouts
-      .map((bed) => bed.patients)
-      .flat()
-      .some((p) => p.uuid === suggestion.patient.uuid);
-
-    if (isAdmitted) {
-      showSnackbar({
-        title: 'Patient Already Admitted',
-        subtitle: 'This patient has already been admitted.',
-        kind: 'error',
-        isLowContrast: true,
-      });
-    } else {
-      const display = getDisplayValue(suggestion);
-      const value = getFieldValue(suggestion);
-      if (searchBox.current) {
-        searchBox.current.value = display;
-      }
-      onSuggestionSelected(name, value);
-      setSuggestions([]);
-    }
+    const display = getDisplayValue(suggestions[index]);
+    const value = getFieldValue(suggestions[index]);
+    searchBox.current.value = display;
+    onSuggestionSelected(name, value);
+    setSuggestions([]);
   };
 
   return (
@@ -126,37 +117,24 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
           {...searchProps}
         />
       </Layer>
-      {suggestions.length > 0 ? (
-        <ul className={styles.suggestions}>
-          {suggestions.map((suggestion, index) => {
-            const isAdmitted = admissionLocation?.bedLayouts
-              .map((bed) => bed.patients)
-              .flat()
-              .some((p) => p.uuid === suggestion.patient.uuid);
 
-            return (
-              <li
-                key={index}
-                onClick={() => handleClick(index)}
-                role="presentation"
-                style={{ cursor: isAdmitted ? 'not-allowed' : 'pointer' }}>
-                {renderSuggestionItem ? (
-                  <PatientSearchInfo
-                    patient={suggestion.patient}
-                    onClick={() => handleClick(index)}
-                    disabled={isAdmitted}
-                  />
-                ) : (
-                  getDisplayValue(suggestion)
-                )}
-              </li>
-            );
-          })}
+      {suggestions.length > 0 && (
+        <ul className={styles.suggestions}>
+          {suggestions.map((suggestion, index) => (
+            <li key={index} onClick={() => handleClick(index)} role="presentation">
+              {renderSuggestionItem ? (
+                <PatientSearchInfo patient={suggestion.patient} disabled={false} />
+              ) : (
+                getDisplayValue(suggestion)
+              )}
+            </li>
+          ))}
         </ul>
-      ) : (
-        renderEmptyState && renderEmptyState(searchBox.current?.value || '')
       )}
-      {invalid && <label className={classNames(styles.invalidMsg)}>{invalidText}</label>}
+      {showEmptyState && searchBox.current?.value?.length >= 3 && typeof renderEmptyState === 'function' && (
+        <span className={styles.suggestions}>{renderEmptyState(searchBox.current?.value)}</span>
+      )}
+      {invalid ? <label className={classNames(styles.invalidMsg)}>{invalidText}</label> : <></>}
     </div>
   );
 };
