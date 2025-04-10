@@ -149,7 +149,6 @@ describe('Payment', () => {
       isLowContrast: true,
     });
   });
-
   test('should automatically focus on the payment method field when user clicks add payment options', async () => {
     const user = userEvent.setup();
     mockUsePaymentModes.mockReturnValue({
@@ -158,18 +157,27 @@ describe('Payment', () => {
       error: null,
       mutate: jest.fn(),
     });
+
     render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
+
+    // Click the "Add payment option" button
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
 
     // Check if the payment method field is focused
-    expect(screen.getByRole('combobox', { name: /Payment method/i })).toHaveFocus();
-    await user.click(screen.getByRole('combobox', { name: /Payment method/i }));
+    const paymentMethodField = screen.getByRole('combobox', { name: /Payment method/i });
+    expect(paymentMethodField).toHaveFocus();
+
+    // Simulate selecting a payment method
+    await user.click(paymentMethodField);
     const cashOption = screen.getByRole('option', { name: /Cash/i });
     await user.click(cashOption);
+
     // Check if the amount field is focused
-    expect(screen.getByRole('spinbutton', { name: /Amount/i })).toHaveFocus();
     const amountInput = screen.getByRole('spinbutton', { name: /Amount/i });
+    expect(amountInput).toHaveFocus();
+
+    // Simulate entering an amount
     await user.type(amountInput, '100');
   });
 });
