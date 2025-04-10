@@ -1,10 +1,10 @@
 import {
-  Button,
-  ButtonSet,
   DataTable,
   DataTableSkeleton,
   Dropdown,
   Layer,
+  OverflowMenu,
+  OverflowMenuItem,
   Pagination,
   Table,
   TableBody,
@@ -13,22 +13,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Tile,
 } from '@carbon/react';
-import { Edit, Printer, View } from '@carbon/react/icons';
 import {
   ErrorState,
   formatDate,
   launchWorkspace,
   navigate,
   parseDate,
+  showModal,
   showSnackbar,
   useConfig,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LabManifestConfig } from '../config-schema';
 import { useLabManifests } from '../hooks';
@@ -37,6 +36,7 @@ import {
   LabManifestFilters,
   printableManifestStatus,
   printManifest,
+  resubmittableManifestStatus,
 } from '../lab-manifest.resources';
 import { MappedLabManifest } from '../types';
 import styles from './lab-manifest-table.scss';
@@ -51,52 +51,56 @@ const LabManifestsTable = () => {
   const { results, totalPages, currentPage, goTo } = usePagination(manifests, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
   const { labmanifestTypes } = useConfig<LabManifestConfig>();
-  const headers = [
-    {
-      header: t('startDate', 'Start date'),
-      key: 'startDate',
-      isSortable: true,
-    },
-    {
-      header: t('endDate', 'End Date'),
-      key: 'endDate',
-      isSortable: true,
-    },
-    {
-      header: t('type', 'Type'),
-      key: 'type',
-      isSortable: true,
-    },
-    {
-      header: t('courrier', 'Courrier'),
-      key: 'courrier',
-    },
-    {
-      header: t('manifestId', 'Manifest Id'),
-      key: 'manifestId',
-    },
-    {
-      header: t('labPersonContact', 'Lab person Contact'),
-      key: 'labPersonContact',
-    },
-    {
-      header: t('status', 'Status'),
-      key: 'status',
-    },
-    {
-      header: t('dispatch', 'Dispatch'),
-      key: 'dispatch',
-      isSortable: true,
-    },
-    {
-      header: t('samples', 'Samples'),
-      key: 'samples',
-    },
-    {
-      header: t('actions', 'Actions'),
-      key: 'actions',
-    },
-  ];
+  const size = layout === 'tablet' ? 'lg' : 'md';
+  const headers = useMemo(
+    () => [
+      {
+        header: t('startDate', 'Start date'),
+        key: 'startDate',
+        isSortable: true,
+      },
+      {
+        header: t('endDate', 'End date'),
+        key: 'endDate',
+        isSortable: true,
+      },
+      {
+        header: t('type', 'Type'),
+        key: 'type',
+        isSortable: true,
+      },
+      {
+        header: t('courrier', 'Courrier'),
+        key: 'courrier',
+      },
+      {
+        header: t('manifestId', 'Manifest Id'),
+        key: 'manifestId',
+      },
+      {
+        header: t('labPersonContact', 'Lab person contact'),
+        key: 'labPersonContact',
+      },
+      {
+        header: t('status', 'Status'),
+        key: 'status',
+      },
+      {
+        header: t('dispatch', 'Dispatch'),
+        key: 'dispatch',
+        isSortable: true,
+      },
+      {
+        header: t('samples', 'Samples'),
+        key: 'samples',
+      },
+      {
+        header: t('actions', 'Actions'),
+        key: 'actions',
+      },
+    ],
+    [t],
+  );
 
   const handleViewManifestSamples = (manifestUuid: string) => {
     navigate({ to: window.getOpenmrsSpaBase() + `home/lab-manifest/${manifestUuid}` });
@@ -109,61 +113,73 @@ const LabManifestsTable = () => {
     });
   };
 
-  const handlePrintManifest = async (manifest: MappedLabManifest) => {
+  const handlePrintManifest = async (manifest: MappedLabManifest, log: boolean = false) => {
     try {
-      await printManifest(manifest.uuid, manifest.manifestStatus);
+      await printManifest(manifest.uuid, log);
     } catch (error) {
       showSnackbar({ title: 'Failure', subtitle: 'Error printing manifest', kind: 'error' });
     }
   };
 
-  const tableRows =
-    results?.map((manifest) => {
-      return {
-        id: `${manifest.uuid}`,
-        startDate: manifest.startDate ? formatDate(parseDate(manifest.startDate)) : '--',
-        endDate: manifest.endDate ? formatDate(parseDate(manifest.endDate)) : '--',
-        courrier: manifest.courierName ? manifest.courierName : '--',
-        labPersonContact: manifest.labPersonContact ?? '--',
-        type: labmanifestTypes.find((type) => `${type.id}` === manifest?.manifestType)?.type ?? '--',
-        status: manifest.manifestStatus ?? '--',
-        dispatch: manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--',
-        manifestId: manifest.manifestId ?? '--',
-        samples: `${manifest.samples.length}`,
-        actions: (
-          <ButtonSet className={styles.btnSet}>
-            <Button
-              className={styles.btn}
-              renderIcon={View}
-              hasIconOnly
-              kind="ghost"
-              iconDescription={t('view', 'View')}
-              onClick={() => handleViewManifestSamples(manifest.uuid)}
-            />
-            {editableManifestStatus.includes(manifest.manifestStatus) && (
-              <Button
-                className={styles.btn}
-                renderIcon={Edit}
-                hasIconOnly
-                kind="ghost"
-                iconDescription={t('edit', 'Edit')}
-                onClick={() => handleEditManifest(manifest)}
+  const handleLaunchRequeueConfirmModal = (labManifest: MappedLabManifest) => {
+    const dispose = showModal('lab-manifest-requeue-confirn-modal', {
+      labManifest,
+      onClose: () => dispose(),
+      filter: currFilter,
+    });
+  };
+
+  const tableRows = useMemo(
+    () =>
+      results?.map((manifest) => {
+        return {
+          id: `${manifest.uuid}`,
+          startDate: manifest.startDate ? formatDate(parseDate(manifest.startDate)) : '--',
+          endDate: manifest.endDate ? formatDate(parseDate(manifest.endDate)) : '--',
+          courrier: manifest.courierName ? manifest.courierName : '--',
+          labPersonContact: manifest.labPersonContact ?? '--',
+          type: labmanifestTypes.find((type) => `${type.id}` === manifest?.manifestType)?.type ?? '--',
+          status: manifest.manifestStatus ?? '--',
+          dispatch: manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--',
+          manifestId: manifest.manifestId ?? '--',
+          samples: `${manifest.samples.length}`,
+          actions: (
+            <OverflowMenu flipped size={size} aria-label="overflow-menu">
+              <OverflowMenuItem
+                itemText={t('viewManifest', 'View Manifest')}
+                onClick={() => handleViewManifestSamples(manifest.uuid)}
               />
-            )}
-            {printableManifestStatus.includes(manifest.manifestStatus) && (
-              <Button
-                className={styles.btn}
-                renderIcon={Printer}
-                hasIconOnly
-                kind="ghost"
-                iconDescription={t('printManifest', 'Print Manifest')}
-                onClick={() => handlePrintManifest(manifest)}
-              />
-            )}
-          </ButtonSet>
-        ),
-      };
-    }) ?? [];
+              {editableManifestStatus.includes(manifest.manifestStatus) && (
+                <OverflowMenuItem
+                  itemText={t('editmanifest', 'Edit Manifest')}
+                  onClick={() => handleEditManifest(manifest)}
+                />
+              )}
+              {printableManifestStatus.includes(manifest.manifestStatus) && (
+                <>
+                  <OverflowMenuItem
+                    itemText={t('printManifest', 'Print Manifest')}
+                    onClick={() => handlePrintManifest(manifest)}
+                  />
+                  <OverflowMenuItem
+                    itemText={t('printManifestLog', 'Print Manifest Log')}
+                    onClick={() => handlePrintManifest(manifest, true)}
+                  />
+                </>
+              )}
+
+              {resubmittableManifestStatus.includes(manifest.manifestStatus) && (
+                <OverflowMenuItem
+                  itemText={t('requeueManifest', 'Requeue Manifest')}
+                  onClick={() => handleLaunchRequeueConfirmModal(manifest)}
+                />
+              )}
+            </OverflowMenu>
+          ),
+        };
+      }) ?? [],
+    [results, t],
+  );
 
   if (isLoading) {
     return <DataTableSkeleton rowCount={5} />;
