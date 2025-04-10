@@ -605,6 +605,8 @@ export const mockLineItems = [
     paymentStatus: 'PENDING',
     order: null,
     resourceVersion: '1.8',
+    itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+    serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
   },
   {
     uuid: '60365e7e-d29e-4f13-b64b-9aecb5d36031',
@@ -621,6 +623,8 @@ export const mockLineItems = [
     paymentStatus: 'PENDING',
     order: null,
     resourceVersion: '1.8',
+    itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+    serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
   },
   {
     uuid: '006ee634-f1cf-4552-b751-f721679527af',
@@ -637,6 +641,8 @@ export const mockLineItems = [
     paymentStatus: 'PENDING',
     order: null,
     resourceVersion: '1.8',
+    itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+    serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
   },
 ];
 
@@ -647,6 +653,10 @@ export const mockPaymentModes = [
     description: 'Cash Payment',
     retired: false,
     attributeTypes: [],
+    retireReason: null,
+    auditInfo: null,
+    sortOrder: null,
+    resourceVersion: '1.0',
   },
   {
     uuid: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
@@ -654,6 +664,10 @@ export const mockPaymentModes = [
     description: 'Insurance method of payment',
     retired: false,
     attributeTypes: [],
+    retireReason: null,
+    auditInfo: null,
+    sortOrder: null,
+    resourceVersion: '1.0',
   },
   {
     uuid: '28989582-e8c3-46b0-96d0-c249cb06d5c6',
@@ -661,6 +675,10 @@ export const mockPaymentModes = [
     description: 'Mobile money method of payment',
     retired: false,
     attributeTypes: [],
+    retireReason: null,
+    auditInfo: null,
+    sortOrder: null,
+    resourceVersion: '1.0',
   },
   {
     uuid: 'd1d6e7da-2717-49c4-a855-28fc5df3b3b7',
@@ -668,6 +686,10 @@ export const mockPaymentModes = [
     description: 'Social Health Insurance Fund (SHA)',
     retired: false,
     attributeTypes: [],
+    retireReason: null,
+    auditInfo: null,
+    sortOrder: null,
+    resourceVersion: '1.0',
   },
   {
     uuid: 'eb6173cb-9678-4614-bbe1-0ccf7ed9d1d4',
@@ -675,6 +697,10 @@ export const mockPaymentModes = [
     description: 'Waiver payment',
     retired: false,
     attributeTypes: [],
+    retireReason: null,
+    auditInfo: null,
+    sortOrder: null,
+    resourceVersion: '1.0',
   },
 ];
 
