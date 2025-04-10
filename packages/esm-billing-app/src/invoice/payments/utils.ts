@@ -117,8 +117,8 @@ export const createPaymentPayload = (
 ) => {
   const { totalAmount, payments = [], lineItems = [] } = billDetails;
   const initialPaymentStatus = remainingBalance <= 0 ? PaymentStatus.PAID : PaymentStatus.PENDING;
-  const lineItemUuids = selectedBillableItems.map((item) => item.uuid);
-  // Transform existing payments with stock UUID
+
+  // Transform existing payments
   const existingPayments = payments.map((payment) => {
     return {
       amount: payment.amount,
@@ -128,14 +128,12 @@ export const createPaymentPayload = (
         value: attribute.value,
       })),
       instanceType: payment.instanceType.uuid,
+      item: lineItemToStockMap?.get(payment?.item),
     };
   });
 
-  // Transform new payments with stock UUID
+  // Transform new payments
   const currentPayments = paymentFormValues.map((formValue, index) => {
-    const lineItemUuid = lineItemUuids[index];
-    const stockUuid = lineItemUuid ? lineItemToStockMap?.get(lineItemUuid) : undefined;
-
     return {
       amount: parseFloat(totalAmount.toFixed(2)),
       amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
@@ -144,7 +142,7 @@ export const createPaymentPayload = (
         value: formValue.referenceCode,
       })),
       instanceType: formValue.method?.uuid,
-      item: stockUuid,
+      item: lineItemToStockMap?.get(formValue?.itemUuid),
     };
   });
 

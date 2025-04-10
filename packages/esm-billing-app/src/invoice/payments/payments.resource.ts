@@ -45,7 +45,6 @@ export const useStockItems = (queries: LineItemStockQuery[]) => {
     Promise.all(urls.map((url) => openmrsFetch(url))),
   );
 
-  // Create a map of line item UUID to stock UUID
   const lineItemToStockMap = React.useMemo(() => {
     const map = new Map<string, string>();
     data?.forEach((response, index) => {

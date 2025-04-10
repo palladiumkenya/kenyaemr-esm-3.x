@@ -167,7 +167,8 @@ export const computeWaivedAmount = (bill: MappedBill) => {
     .reduce((curr: number, prev) => curr + Number(prev.amountTendered), 0);
 };
 
-export const extractDrugName = (billableService: string) => {
-  const parts = billableService.split(':');
+export const extractBillableName = (billableService: string | { billableService: string }) => {
+  const parts =
+    typeof billableService === 'string' ? billableService.split(':') : billableService.billableService.split(':');
   return parts.length > 1 ? parts[1] : '';
 };
