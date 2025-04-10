@@ -1,12 +1,16 @@
 import {
   Button,
+  ButtonSet,
+  ContentSwitcher,
   Form,
   InlineNotification,
   Layer,
   Loading,
   ModalBody,
+  ModalFooter,
   ModalHeader,
   NumberInputSkeleton,
+  Switch,
   TextInput,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,7 +24,8 @@ import { useSystemSetting } from '../../../hooks/getMflCode';
 import { usePatientAttributes } from '../../../hooks/usePatientAttributes';
 import { useRequestStatus } from '../../../hooks/useRequestStatus';
 import { initiateStkPush } from '../../../m-pesa/mpesa-resource';
-import { MappedBill } from '../../../types';
+import { LineItem, MappedBill } from '../../../types';
+import PaymentStatusCheckerModal from '../payment-status-ckecker.modal';
 import { formatKenyanPhoneNumber } from '../utils';
 import styles from './initiate-payment.scss';
 
@@ -37,15 +42,17 @@ type FormData = z.infer<typeof initiatePaymentSchema>;
 export interface InitiatePaymentDialogProps {
   closeModal: () => void;
   bill: MappedBill;
+  selectedLineItems: Array<LineItem>;
 }
 
-const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill }) => {
+const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModal, bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const { phoneNumber, isLoading: isLoadingPhoneNumber } = usePatientAttributes(bill.patientUuid);
   const { mpesaAPIBaseUrl, isPDSLFacility } = useConfig<BillingConfig>();
   const { mflCodeValue } = useSystemSetting('facility.mflcode');
   const [notification, setNotification] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasMadePayment, setHasMadepayment] = useState(false);
   const [{ requestStatus }, pollingTrigger] = useRequestStatus(setNotification, closeModal, bill);
 
   const pendingAmount = bill.totalAmount - bill.tenderedAmount;
@@ -91,12 +98,35 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
     setIsLoading(false);
   };
 
+  if (isPDSLFacility && hasMadePayment) {
+    return (
+      <PaymentStatusCheckerModal
+        onClose={closeModal}
+        paymentMade={hasMadePayment}
+        onPaymentMadestatusChange={setHasMadepayment}
+        bill={bill}
+        selectedLineItems={selectedLineItems}
+      />
+    );
+  }
+
   return (
-    <div>
-      <ModalHeader closeModal={closeModal} />
+    <Form>
+      <ModalHeader className={styles.heading} closeModal={closeModal}>
+        {t('paymentPayment', 'Bill Payment')}
+      </ModalHeader>
       <ModalBody>
-        <Form className={styles.form}>
-          <h4>{t('paymentPayment', 'Bill Payment')}</h4>
+        {isPDSLFacility && (
+          <ContentSwitcher
+            selectedIndex={hasMadePayment ? 1 : 0}
+            onChange={({ name }) => {
+              setHasMadepayment(name === 'paymentMade');
+            }}>
+            <Switch name="paymentNotMade" text={t('paymentNotMade', 'Payment not made')} />
+            <Switch name="paymentMade" text={t('paymentMade', 'Payments already made')} />
+          </ContentSwitcher>
+        )}
+        <div className={styles.form}>
           {notification && (
             <InlineNotification
               kind={notification.type}
@@ -144,28 +174,30 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
               )}
             />
           </section>
-          <section>
-            <Button kind="secondary" className={styles.buttonLayout} onClick={closeModal}>
-              {t('cancel', 'Cancel')}
-            </Button>
-            <Button
-              type="submit"
-              className={styles.button}
-              onClick={handleSubmit(onSubmit)}
-              disabled={!isValid || isLoading || requestStatus === 'INITIATED'}>
-              {isLoading ? (
-                <>
-                  <Loading className={styles.button_spinner} withOverlay={false} small />{' '}
-                  {t('processingPayment', 'Processing Payment')}
-                </>
-              ) : (
-                t('initiatePay', 'Initiate Payment')
-              )}
-            </Button>
-          </section>
-        </Form>
+        </div>
       </ModalBody>
-    </div>
+      <ModalFooter>
+        <ButtonSet className={styles.buttonSet}>
+          <Button kind="secondary" onClick={closeModal} className={styles.button}>
+            {t('cancel', 'Cancel')}
+          </Button>
+          <Button
+            type="submit"
+            className={styles.button}
+            onClick={handleSubmit(onSubmit)}
+            disabled={!isValid || isLoading || requestStatus === 'INITIATED'}>
+            {isLoading ? (
+              <>
+                <Loading className={styles.button_spinner} withOverlay={false} small />{' '}
+                {t('processingPayment', 'Processing Payment')}
+              </>
+            ) : (
+              t('initiatePayment', 'Initiate Payment')
+            )}
+          </Button>
+        </ButtonSet>
+      </ModalFooter>
+    </Form>
   );
 };
 

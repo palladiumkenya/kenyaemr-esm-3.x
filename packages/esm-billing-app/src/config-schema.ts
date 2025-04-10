@@ -25,6 +25,7 @@ export interface BillingConfig {
   patientBillsUrl: string;
   nationalIdUUID: string;
   isPDSLFacility: boolean;
+  mobileMoneyPaymentModeUUID: string;
   concepts: {
     emergencyPriorityConceptUuid: string;
   };
@@ -40,6 +41,11 @@ export const configSchema: ConfigSchema = {
     _type: Type.Boolean,
     _description: 'A flag for PDSL facilities',
     _default: false,
+  },
+  mobileMoneyPaymentModeUUID: {
+    _type: Type.UUID,
+    _description: 'Mobile money payment method uuid',
+    _default: '28989582-e8c3-46b0-96d0-c249cb06d5c6',
   },
   shaIdentificationNumberUUID: {
     _type: Type.String,

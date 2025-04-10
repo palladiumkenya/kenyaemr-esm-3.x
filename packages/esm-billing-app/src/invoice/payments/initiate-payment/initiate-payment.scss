@@ -21,18 +21,28 @@
   margin-bottom: spacing.$spacing-04;
 }
 
-.buttonLayout {
-  margin-top: layout.$spacing-05;
-  margin-bottom: layout.$spacing-01;
+.button_spinner {
+  padding: 0;
+  margin-right: layout.$spacing-04;  
 }
 
 .button {
-  margin-left: layout.$spacing-04;
-  margin-top: layout.$spacing-05;
-  margin-bottom: layout.$spacing-01;
+  height: layout.$spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 20%;
 }
 
-.button_spinner {
-  padding: 0;
-  margin-right: 12px;
+.buttonSet {
+  padding: 0rem;
+  margin-top: layout.$spacing-05;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: layout.$spacing-05;
+}
+
+.heading {
+  @include type.type-style('heading-02');
 }

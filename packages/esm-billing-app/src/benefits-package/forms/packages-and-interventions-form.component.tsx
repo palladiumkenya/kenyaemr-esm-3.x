@@ -1,19 +1,33 @@
 import { Column, InlineLoading, InlineNotification, MultiSelect } from '@carbon/react';
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import usePackages from '../../hooks/usePackages';
 import PackageInterventions from './interventions-form.component';
+import { useConfig, usePatient } from '@openmrs/esm-framework';
+import { BillingConfig } from '../../config-schema';
 
 type Props = {
   patientUuid: string;
 };
 
 const SHABenefitPackangesAndInterventions: React.FC<Props> = ({ patientUuid }) => {
-  const form = useFormContext<{ packages: Array<string>; interventions: Array<string> }>();
+  const form = useFormContext<{ packages: Array<string>; interventions: Array<string>; policyNumber: string }>();
+  const { shaIdentificationNumberUUID } = useConfig<BillingConfig>();
   const { isLoading: packagesLoading, error: packageError, packages } = usePackages();
   const { t } = useTranslation();
+  const { error, isLoading, patient } = usePatient(patientUuid);
   const selectedPackageObservable = form.watch('packages');
+  const shaNumber = useMemo(
+    () => patient?.identifier?.find((id) => id?.type?.coding[0]?.code === shaIdentificationNumberUUID)?.value,
+    [patient, shaIdentificationNumberUUID],
+  );
+  const { setValue } = form;
+  useEffect(() => {
+    if (shaNumber) {
+      setValue('policyNumber', shaNumber);
+    }
+  }, [shaNumber, setValue]);
 
   if (packagesLoading) {
     return (
