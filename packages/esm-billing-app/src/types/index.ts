@@ -290,7 +290,12 @@ export interface Payment {
   resourceVersion: string;
 }
 
-export type FormPayment = { method: PaymentMethod; amount: string | number; referenceCode?: number | string };
+export type FormPayment = {
+  method: PaymentMethod;
+  amount: string | number;
+  referenceCode?: number | string;
+  itemUuid: string;
+};
 
 export type PaymentFormValue = {
   payment: Array<FormPayment>;
@@ -567,4 +572,17 @@ export interface Filter {
   serviceTypes?: Array<string>;
   cashiers?: Array<string>;
   status?: string;
+}
+
+export interface StockItemResponse {
+  uuid: string;
+  drugUuid: string;
+  drugName: string;
+  conceptUuid: string;
+  conceptName: string;
+}
+export interface LineItemStockQuery {
+  drugName: string;
+  conceptUuid: string;
+  lineItemUuid?: string;
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, InlineNotification } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { navigate, showSnackbar } from '@openmrs/esm-framework';
@@ -11,13 +11,14 @@ import { processBillPayment } from '../../billing.resource';
 import { convertToCurrency } from '../../helpers';
 import { useClockInStatus } from '../../payment-points/use-clock-in-status';
 import { LineItem, PaymentFormValue, PaymentStatus, type MappedBill } from '../../types';
-import { computeWaivedAmount, extractErrorMessagesFromResponse } from '../../utils';
+import { computeWaivedAmount, extractBillableName, extractErrorMessagesFromResponse } from '../../utils';
 import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
 import PaymentForm from './payment-form/payment-form.component';
 import PaymentHistory from './payment-history/payment-history.component';
 import styles from './payments.scss';
 import { createPaymentPayload } from './utils';
 import { usePaymentSchema } from '../../hooks/usePaymentSchema';
+import { useStockItems } from './payments.resource';
 
 type PaymentProps = {
   bill: MappedBill;
@@ -28,6 +29,17 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
   const paymentSchema = usePaymentSchema(bill);
   const { globalActiveSheet } = useClockInStatus();
+  const lineItemStockQueries = selectedLineItems.map((item) => ({
+    drugName: extractBillableName(item.billableService),
+    conceptUuid: item.itemOrServiceConceptUuid,
+    lineItemUuid: item.uuid,
+  }));
+
+  const {
+    lineItemToStockMap,
+    isLoading: isLoadingStockItems,
+    error: stockItemsError,
+  } = useStockItems(lineItemStockQueries);
 
   const methods = useForm<PaymentFormValue>({
     mode: 'onSubmit',
@@ -40,7 +52,6 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     name: 'payment',
     control: methods.control,
   });
-
   const totalWaivedAmount = computeWaivedAmount(bill);
   const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount), 0) ?? 0;
   const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + Number(totalAmountTendered));
@@ -56,15 +67,16 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
       to: window.getOpenmrsSpaBase() + 'home/billing',
     });
 
-  const handleProcessPayment = () => {
+  const handleProcessPayment = async () => {
     const { remove } = formArrayMethods;
-    const paymentPayload = createPaymentPayload(
+    const paymentPayload = await createPaymentPayload(
       bill,
       bill.patientUuid,
       formValues,
       amountDue,
       selectedLineItems,
       globalActiveSheet,
+      lineItemToStockMap,
     );
     remove();
 
@@ -101,7 +113,6 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
     totalAmountTendered > selectedLineItemsAmountDue &&
     bill.lineItems.length > 1;
   const isPaymentInvalid = !isFullyPaid && formValues.some((item) => item.amount !== 0) && bill.lineItems.length > 1;
-
   return (
     <FormProvider {...methods}>
       <div className={styles.wrapper}>
@@ -142,7 +153,12 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
                 className={styles.paymentError}
               />
             )}
-            <PaymentForm {...formArrayMethods} disablePayment={amountDue <= 0} amountDue={amountDue} />
+            <PaymentForm
+              selectedLineItems={selectedLineItems}
+              {...formArrayMethods}
+              disablePayment={amountDue <= 0}
+              amountDue={amountDue}
+            />
           </div>
         </div>
         <div className={styles.divider} />
