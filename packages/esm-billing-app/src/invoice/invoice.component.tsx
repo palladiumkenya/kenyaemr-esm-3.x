@@ -82,6 +82,7 @@ const Invoice: React.FC = () => {
     const dispose = showModal('initiate-payment-modal', {
       closeModal: () => dispose(),
       bill: bill,
+      selectedLineItems,
     });
   };
 
