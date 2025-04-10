@@ -91,6 +91,7 @@ export const useStockItems = (queries: LineItemStockQuery[]) => {
     error,
     lineItemToStockMap,
   };
+};
 export const checkPaymentStatus = (transactionId: string) => {
   const url = `${restBaseUrl}/rmsdataexchange/api/rmsmpesachecker?transactionId=${transactionId}`;
   return openmrsFetch<PaymentStatusResponse>(url);
