@@ -121,7 +121,10 @@ const FacilityInfo: React.FC = () => {
               <h3 className={styles.cardTitle}>{t('shaInformation', 'SHA Information')}</h3>
               <hr className={styles.cardDivider} />
               <div className={styles.cardContent}>
-                <Card label={t('facilityRegistryCode', 'Facility Registry Code')} value={shaFacility?.shaFacilityId} />
+                <Card
+                  label={t('facilityRegistryCode', 'Facility Registry Code')}
+                  value={shaFacility?.facilityRegistryCode}
+                />
                 <Card
                   label={t('shalicenceNumber', 'SHA License Number')}
                   value={shaFacility?.shaFacilityLicenseNumber}
