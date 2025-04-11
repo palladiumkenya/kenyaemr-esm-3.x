@@ -1,9 +1,13 @@
-import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
+import { Concept, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { ServiceConcept, ServiceTypesResponse } from '../types';
 
+type ExtendedResponseObject = OpenmrsResource & {
+  concept: Concept;
+};
+
 type ResponseObject = {
-  results: Array<OpenmrsResource>;
+  results: Array<ExtendedResponseObject>;
 };
 
 export const useBillableServices = () => {
