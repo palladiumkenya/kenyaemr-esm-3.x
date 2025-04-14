@@ -5,6 +5,7 @@ export const antenatalDashboardMeta = {
   path: 'antenatal-care-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
+  icon: '',
 };
 
 export const postnatalDashboardMeta = {
@@ -14,6 +15,7 @@ export const postnatalDashboardMeta = {
   path: 'postnatal-care-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
+  icon: '',
 };
 
 export const labourAndDeliveryDashboardMeta = {
@@ -23,6 +25,7 @@ export const labourAndDeliveryDashboardMeta = {
   path: 'labour-and-delivery-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
+  icon: '',
 };
 
 export const maternalAndChildHealthNavGroup = {

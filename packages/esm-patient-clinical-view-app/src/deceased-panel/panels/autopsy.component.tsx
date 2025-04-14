@@ -5,7 +5,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
-  getPatientUuidFromUrl,
+  getPatientUuidFromStore,
   launchPatientWorkspace,
   usePaginationInfo,
 } from '@openmrs/esm-patient-common-lib';
@@ -36,7 +36,7 @@ import { Observation } from '../../types';
 
 const AutopsyView: React.FC = () => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromUrl();
+  const patientUuid = getPatientUuidFromStore();
   const { formsList, autopsyEncounterFormUuid } = useConfig<ConfigObject>();
   const { encounters, isLoading, error, mutate, isValidating } = useAutospyEncounter(
     patientUuid,

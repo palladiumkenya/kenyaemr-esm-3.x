@@ -1,7 +1,7 @@
 {
   "name": "@kenyaemr/esm-cross-border-app",
   "version": "5.4.0",
-  "description": "Cross border microfrontend for the OpenMRS SPA",
+  "description": "Billing app for KenyaEMR",
   "browser": "dist/kenyaemr-esm-cross-border-app.js",
   "main": "src/index.ts",
   "source": true,
@@ -17,7 +17,7 @@
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js",
     "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
-    "test:watch": "cross-env TZ=UTC jest --watchAll --config jest.config.js",
+    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
     "coverage": "yarn test --coverage"
   },
   "browserslist": [
@@ -37,14 +37,16 @@
     "url": "https://github.com/palladiumkenya/kenyaemr-esm-core/issues"
   },
   "dependencies": {
-    "lodash-es": "^4.17.15"
+    "lodash-es": "^4.17.15",
+    "react-to-print": "^2.14.13"
   },
   "peerDependencies": {
     "@carbon/react": "1.x",
-    "@openmrs/esm-framework": "5.x",
+    "@openmrs/esm-framework": "6.x",
     "react": "^18.1.0",
     "react-i18next": "11.x",
-    "react-router-dom": "6.x"
+    "react-router-dom": "6.x",
+    "swr": "2.x"
   },
   "devDependencies": {
     "webpack": "^5.74.0"
