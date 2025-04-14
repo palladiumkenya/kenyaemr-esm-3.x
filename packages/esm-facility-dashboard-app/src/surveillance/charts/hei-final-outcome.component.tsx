@@ -28,10 +28,10 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
         <BaseIndicatorTrendChart
           data={heiFinalOutcomesValue}
           title={t('heiFinalOutcomes', 'Undocumented final outcome')}
-          yAxisTitle={t('numberHEIOutcome', 'Number of Undocumented final outcome')}
+          yAxisTitle={t('numberHEIOutcome', 'Number of undocumented final outcome')}
         />
       ) : (
-        <EmptyState subTitle={t('noheiFinalOutcomes', 'No Undocumented final outcome data to display')} />
+        <EmptyState subTitle={t('noheiFinalOutcomes', 'No undocumented final outcome data to display')} />
       )}
     </div>
   );

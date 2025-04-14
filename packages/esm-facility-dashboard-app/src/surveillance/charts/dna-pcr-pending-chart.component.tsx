@@ -23,11 +23,11 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
       ) : PendingPCRDNAResultsValue.length > 0 ? (
         <BaseIndicatorTrendChart
           data={PendingPCRDNAResultsValue}
-          title={t('dnapcrPending', 'HEI (6-8 weeks) without DNA-PCR Results')}
-          yAxisTitle={t('numberOfPendingPCRDNAResults', 'Number of HEI (6-8 weeks) without DNA-PCR Results')}
+          title={t('dnapcrPending', 'HEI (6-8 weeks) without DNA-PCR results')}
+          yAxisTitle={t('numberOfPendingPCRDNAResults', 'Number of HEI (6-8 weeks) without DNA-PCR results')}
         />
       ) : (
-        <EmptyState subTitle={t('noPendingPCRDNAResults', 'No PendingPCRDNAResults data to display')} />
+        <EmptyState subTitle={t('noPendingPCRDNAResults', 'No pending PCR DNA results data to display')} />
       )}
     </div>
   );
