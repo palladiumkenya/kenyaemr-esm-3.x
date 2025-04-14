@@ -27,6 +27,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
   const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
 
   const isRegisteredOnSHA = data?.status === 1;
+  const hasCrNumber = !!data?.memberCrNumber && data.memberCrNumber.length > 0;
 
   const isActive = isRegisteredOnSHA
     ? isWithinInterval(new Date(), {
@@ -75,7 +76,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (!isRegisteredOnSHA) {
+  if (!hasCrNumber) {
     return (
       <InlineNotification
         title={t('hieVerificationFailure', 'HIE verification failure')}
@@ -85,33 +86,39 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (isRegisteredOnSHA) {
-    return (
-      <Form className={styles.formContainer}>
-        <div className={styles.hieCard}>
-          <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
-            <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
-            <span className={styles.hieInsurerValue}>SHA</span>
-            {isActive && (
-              <Tooltip
-                className={styles.tooltip}
-                align="bottom"
-                label={`Active from ${formatDate(new Date(data?.coverageStartDate))}`}>
-                <button className="sb-tooltip-trigger" type="button">
-                  <Information />
-                </button>
-              </Tooltip>
-            )}
-          </div>
-          <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
-            <CheckboxCheckedFilled />
-            <span className={isActive ? styles.activeSubscription : styles.inActiveSubscription}>
-              {isActive ? t('active', 'Active') : t('inactive', 'Inactive')}
-            </span>
-          </div>
+  const renderInsurerCard = (insurerValue: string, cardClass: string) => (
+    <Form className={styles.formContainer}>
+      <div className={cardClass}>
+        <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+          <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
+          <span className={styles.hieInsurerValue}>{insurerValue}</span>
+          {isActive && (
+            <Tooltip
+              className={styles.tooltip}
+              align="bottom"
+              label={`Active from ${formatDate(new Date(data?.coverageStartDate))}`}>
+              <button className="sb-tooltip-trigger" type="button">
+                <Information />
+              </button>
+            </Tooltip>
+          )}
         </div>
-      </Form>
-    );
+        <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+          <CheckboxCheckedFilled />
+          <span className={isActive ? styles.activeSubscription : styles.inActiveSubscription}>
+            {isActive ? t('active', 'Active') : t('inactive', 'Inactive')}
+          </span>
+        </div>
+      </div>
+    </Form>
+  );
+
+  if (hasCrNumber) {
+    if (isRegisteredOnSHA) {
+      return renderInsurerCard('PHC | SHIF | ECCIF', styles.hieCard);
+    } else {
+      return renderInsurerCard('PHC', styles.hieCardPHC);
+    }
   }
 };
 
