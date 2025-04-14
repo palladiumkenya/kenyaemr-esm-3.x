@@ -9,12 +9,12 @@
       "component": "providersDashboardLink",
       "name": "providers-dashboard-link",
       "slot": "homepage-dashboard-slot",
+      "featureFlag": "providerManagementFeatureFlag",
       "meta": {
         "name": "providers",
         "title": "providers",
         "slot": "providers-dashboard-slot"
-      },
-      "featureFlag": "healthInformationExchange"
+      }
     },
     {
       "component": "root",

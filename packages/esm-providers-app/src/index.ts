@@ -1,4 +1,10 @@
-import { getAsyncLifecycle, defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  getAsyncLifecycle,
+  defineConfigSchema,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  registerFeatureFlag,
+} from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel/providers-left-panel-link.component';
 import { moduleName, providerBasePath } from './constants';
@@ -22,6 +28,11 @@ export function startupApp() {
       parent: `${window.spaBase}/home`,
     },
   ]);
+  registerFeatureFlag(
+    'providerManagementFeatureFlag',
+    'Provider Management App Service',
+    'This feature flag controls access to the deprecated Provider Management application. The entire Provider Management app is now deprecated and should not be used.',
+  );
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
