@@ -1,6 +1,6 @@
 import { Column, InlineLoading, InlineNotification, Layer, TextArea } from '@carbon/react';
 import { usePatient } from '@openmrs/esm-framework';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { InterventionsFilter, useInterventions } from '../../../hooks/useInterventions';
@@ -9,50 +9,110 @@ import styles from './claims-form.scss';
 
 type ClaimExplanationAndJusificationInputProps = {
   patientUuid: string;
+  disabled?: boolean;
+  validationEnabled?: boolean;
+  onInteraction?: () => void;
 };
-const ClaimExplanationAndJusificationInput: React.FC<ClaimExplanationAndJusificationInputProps> = ({ patientUuid }) => {
-  const { error: patientError, isLoading: isPatientLoading, patient } = usePatient(patientUuid);
 
-  const form = useFormContext<{
-    claimExplanation: string;
-    claimJustification: string;
-    packages: Array<string>;
-    interventions: Array<string>;
-  }>();
+const ClaimExplanationAndJusificationInput: React.FC<ClaimExplanationAndJusificationInputProps> = ({
+  patientUuid,
+  disabled = false,
+  validationEnabled = false,
+  onInteraction = () => {},
+}) => {
+  const { error: patientError, isLoading: isPatientLoading, patient } = usePatient(patientUuid);
   const { t } = useTranslation();
+  const form = useFormContext();
+  const { setValue, watch, trigger } = form;
+
+  const packages = watch('packages');
+  const interventions = watch('interventions');
+  const currentExplanation = watch('claimExplanation');
+  const currentJustification = watch('claimJustification');
+
   const { isLoading: packagesLoading, error: packageError, packages: shaPackages } = usePackages();
-  const { setValue } = form;
-  const packagesObservable = form.watch('packages');
-  const interventionsObservable = form.watch('interventions');
+
   const filters = useMemo<InterventionsFilter>(
     () => ({
-      package_code: packagesObservable.join(','),
+      package_code: packages?.join(','),
       applicable_gender: patient?.gender === 'male' ? 'MALE' : 'FEMALE',
     }),
-    [packagesObservable, patient],
-  );
-  const { error: interventionsError, isLoading: isLoadingInterventions, allInterventions } = useInterventions(filters);
-  const packagesSelected = useMemo(
-    () =>
-      packagesObservable
-        .map((packageCode) => shaPackages.find((pkg) => pkg.uuid === packageCode))
-        ?.map((p) => p?.packageName ?? '')
-        .filter(Boolean) ?? [],
-    [packagesObservable, shaPackages],
-  );
-  const interventionSelected = useMemo(
-    () =>
-      interventionsObservable.map(
-        (interventionCode) =>
-          allInterventions.find((intervention) => intervention.interventionCode === interventionCode)?.interventionName,
-      ) ?? [],
-    [interventionsObservable, allInterventions],
+    [packages, patient?.gender],
   );
 
+  const { error: interventionsError, isLoading: isLoadingInterventions, allInterventions } = useInterventions(filters);
+
+  const packagesSelected = useMemo(
+    () =>
+      packages
+        ?.map((packageCode) => shaPackages.find((pkg) => pkg.uuid === packageCode))
+        ?.map((p) => p?.packageName ?? '')
+        .filter(Boolean) ?? [],
+    [packages, shaPackages],
+  );
+
+  const interventionSelected = useMemo(
+    () =>
+      interventions
+        ?.map(
+          (interventionCode) =>
+            allInterventions.find((intervention) => intervention.interventionCode === interventionCode)
+              ?.interventionName,
+        )
+        .filter(Boolean) ?? [],
+    [interventions, allInterventions],
+  );
+
+  const hasPackagesAndInterventions = packagesSelected.length > 0 && interventionSelected.length > 0;
+
+  const updateFormFields = useCallback(() => {
+    if (!packagesLoading && !isLoadingInterventions && hasPackagesAndInterventions) {
+      const newExplanation = packagesSelected.join(', ');
+      const newJustification = interventionSelected.join(', ');
+
+      if (newExplanation !== currentExplanation) {
+        setValue('claimExplanation', newExplanation, {
+          shouldValidate: validationEnabled,
+          shouldDirty: true,
+          shouldTouch: false,
+        });
+      }
+
+      if (newJustification !== currentJustification) {
+        setValue('claimJustification', newJustification, {
+          shouldValidate: validationEnabled,
+          shouldDirty: true,
+          shouldTouch: false,
+        });
+      }
+
+      if (validationEnabled) {
+        trigger(['claimExplanation', 'claimJustification']);
+      }
+      onInteraction();
+    }
+  }, [
+    packagesLoading,
+    isLoadingInterventions,
+    hasPackagesAndInterventions,
+    packagesSelected,
+    interventionSelected,
+    currentExplanation,
+    currentJustification,
+    setValue,
+    validationEnabled,
+    trigger,
+    onInteraction,
+  ]);
+
   useEffect(() => {
-    setValue('claimExplanation', packagesSelected.join(', '));
-    setValue('claimJustification', interventionSelected.join(', '));
-  }, [packagesSelected, setValue, interventionSelected]);
+    const timer = setTimeout(updateFormFields, 300);
+    return () => clearTimeout(timer);
+  }, [updateFormFields]);
+
+  const shouldShowError = (fieldName: string) => {
+    return validationEnabled && form.formState.errors[fieldName] && form.formState.touchedFields[fieldName];
+  };
 
   if (packagesLoading || isPatientLoading || isLoadingInterventions) {
     return (
@@ -68,10 +128,12 @@ const ClaimExplanationAndJusificationInput: React.FC<ClaimExplanationAndJusifica
         lowContrast={true}
         statusIconDescription="notification"
         title={t('errorLoadingpackages', 'Error loading packages')}
-        subtitle={packageError?.message ?? packageError?.message ?? interventionsError?.message}
+        subtitle={packageError?.message ?? patientError?.message ?? interventionsError?.message}
       />
     );
   }
+
+  const textAreaDisabled = disabled && !hasPackagesAndInterventions;
 
   return (
     <>
@@ -87,8 +149,13 @@ const ClaimExplanationAndJusificationInput: React.FC<ClaimExplanationAndJusifica
                 rows={3}
                 placeholder="Claim Explanation"
                 id="claimExplanation"
-                invalid={!!error?.message}
+                invalid={shouldShowError('claimExplanation')}
                 invalidText={error?.message}
+                disabled={textAreaDisabled}
+                onChange={(e) => {
+                  field.onChange(e);
+                  onInteraction();
+                }}
               />
             )}
           />
@@ -106,8 +173,13 @@ const ClaimExplanationAndJusificationInput: React.FC<ClaimExplanationAndJusifica
                 rows={3}
                 placeholder="Claim Justification"
                 id="claimJustification"
-                invalid={!!error?.message}
+                invalid={shouldShowError('claimJustification')}
                 invalidText={error?.message}
+                disabled={textAreaDisabled}
+                onChange={(e) => {
+                  field.onChange(e);
+                  onInteraction();
+                }}
               />
             )}
           />
@@ -117,4 +189,4 @@ const ClaimExplanationAndJusificationInput: React.FC<ClaimExplanationAndJusifica
   );
 };
 
-export default ClaimExplanationAndJusificationInput;
+export default React.memo(ClaimExplanationAndJusificationInput);
