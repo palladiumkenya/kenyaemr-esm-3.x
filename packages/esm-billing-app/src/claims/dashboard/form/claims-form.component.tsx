@@ -15,7 +15,7 @@ import {
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -29,26 +29,39 @@ import useProvider from '../../../hooks/useProvider';
 import { LineItem, MappedBill } from '../../../types';
 import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
 import { processClaims, SHAPackagesAndInterventionVisitAttribute, useVisit } from './claims-form.resource';
+
 import styles from './claims-form.scss';
+import debounce from 'lodash-es/debounce';
 
 type ClaimsFormProps = {
   bill: MappedBill;
   selectedLineItems: LineItem[];
 };
 
+const ClaimsFormSchemaBase = z.object({
+  claimExplanation: z.string(),
+  claimJustification: z.string(),
+  diagnoses: z.array(z.string()),
+  visitType: z.string(),
+  facility: z.string(),
+  treatmentStart: z.string(),
+  treatmentEnd: z.string(),
+  packages: z.array(z.string()),
+  interventions: z.array(z.string()),
+  provider: z.string(),
+});
+
 const ClaimsFormSchema = z.object({
-  claimExplanation: z.string().nonempty({ message: 'Claim explanation is required' }),
-  claimJustification: z.string().nonempty({ message: 'Claim justification is required' }),
-  diagnoses: z.array(z.string()).nonempty({ message: 'At least one diagnosis is required' }),
-  visitType: z.string().nonempty({ message: 'Visit type is required' }),
-  facility: z.string().nonempty({ message: 'Facility is required' }),
-  treatmentStart: z.string().nonempty({ message: 'Treatment start date is required' }),
-  treatmentEnd: z.string().nonempty({ message: 'Treatment end date is required' }),
-  packages: z.array(z.string()).nonempty({ message: 'At least one package is required' }),
-  interventions: z.array(z.string()).min(1, {
-    message: 'At least one intervention is required',
-  }),
-  provider: z.string().nonempty({ message: 'provider is provider' }),
+  claimExplanation: z.string().min(1, { message: 'Claim explanation is required' }),
+  claimJustification: z.string().min(1, { message: 'Claim justification is required' }),
+  diagnoses: z.array(z.string()).min(1, { message: 'At least one diagnosis is required' }),
+  visitType: z.string().min(1, { message: 'Visit type is required' }),
+  facility: z.string().min(1, { message: 'Facility is required' }),
+  treatmentStart: z.string().min(1, { message: 'Treatment start date is required' }),
+  treatmentEnd: z.string().min(1, { message: 'Treatment end date is required' }),
+  packages: z.array(z.string()).min(1, { message: 'At least one package is required' }),
+  interventions: z.array(z.string()).min(1, { message: 'At least one intervention is required' }),
+  provider: z.string().min(1, { message: 'Provider is required' }),
 });
 
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
@@ -62,6 +75,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   } = useSession();
   const { providerLoading: providerLoading, provider, error: providerError } = useProvider(providerUuid);
   const { visitAttributeTypes } = useConfig<BillingConfig>();
+
   const packagesAndinterventions = useMemo(() => {
     if (recentVisit) {
       const values = recentVisit.attributes?.find(
@@ -77,9 +91,9 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
 
   const encounterUuid = recentVisit?.encounters[0]?.uuid;
   const visitTypeUuid = recentVisit?.visitType.uuid;
-
   const [loading, setLoading] = useState(false);
-  const { user } = useSession();
+  const [formInitialized, setFormInitialized] = useState(false);
+  const [validationEnabled, setValidationEnabled] = useState(false);
 
   const handleNavigateToBillingOptions = () =>
     navigate({
@@ -87,31 +101,92 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     });
 
   const form = useForm<z.infer<typeof ClaimsFormSchema>>({
-    mode: 'all',
-    resolver: zodResolver(ClaimsFormSchema),
+    mode: 'onTouched',
+    resolver: zodResolver(validationEnabled ? ClaimsFormSchema : ClaimsFormSchemaBase),
     defaultValues: {
       claimExplanation: '',
       claimJustification: '',
       diagnoses: [],
-      visitType: recentVisit?.visitType?.display || '',
-      facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
-      treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
-      treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
+      visitType: '',
+      facility: '',
+      treatmentStart: '',
+      treatmentEnd: '',
       packages: [],
       interventions: [],
-      provider: providerUuid,
+      provider: '',
     },
   });
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors, isValid, isDirty, touchedFields },
     setValue,
     reset,
+    trigger,
+    watch,
   } = form;
 
+  const packages = watch('packages');
+  const interventions = watch('interventions');
+  const claimExplanation = watch('claimExplanation');
+  const claimJustification = watch('claimJustification');
+
+  const debouncedValidation = useCallback(
+    debounce(() => {
+      if (formInitialized) {
+        trigger();
+      }
+    }, 500),
+    [formInitialized, trigger],
+  );
+
+  useEffect(() => {
+    debouncedValidation();
+    return () => debouncedValidation.cancel();
+  }, [packages, interventions, debouncedValidation]);
+
+  useEffect(() => {
+    if (!visitLoading && !diagnosisLoading && !providerLoading) {
+      const updates = {
+        diagnoses: diagnoses?.map((d) => d.id) ?? [],
+        visitType: recentVisit?.visitType?.display || '',
+        facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
+        treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
+        treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
+        packages: packagesAndinterventions?.packages ?? [],
+        interventions: packagesAndinterventions?.interventions ?? [],
+        provider: providerUuid,
+      };
+
+      Object.entries(updates).forEach(([field, value]) => {
+        setValue(field as any, value, { shouldValidate: false, shouldDirty: false, shouldTouch: false });
+      });
+
+      setTimeout(() => {
+        setFormInitialized(true);
+      }, 100);
+    }
+  }, [
+    diagnoses,
+    recentVisit,
+    mflCodeValue,
+    setValue,
+    provider,
+    packagesAndinterventions,
+    visitLoading,
+    diagnosisLoading,
+    providerLoading,
+    providerUuid,
+  ]);
+
   const onSubmit = async (data: z.infer<typeof ClaimsFormSchema>) => {
+    setValidationEnabled(true);
+    const isFormValid = await trigger();
+    if (!isFormValid) {
+      return;
+    }
+
     setLoading(true);
     const providedItems = selectedLineItems.reduce((acc, item) => {
       acc[item.uuid] = {
@@ -127,6 +202,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       };
       return acc;
     }, {});
+
     const payload = {
       providedItems,
       claimExplanation: data.claimExplanation,
@@ -149,6 +225,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       packages: data.packages,
       interventions: data.interventions,
     };
+
     try {
       await processClaims(payload);
       showSnackbar({
@@ -158,18 +235,17 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         timeoutInMs: 3000,
         isLowContrast: true,
       });
-      reset();
       setTimeout(() => {
         navigate({
-          to: window.getOpenmrsSpaBase() + `home/billing/`,
+          to: window.getOpenmrsSpaBase() + 'home/billing/',
         });
-      }, 2000);
+      }, 1000);
     } catch (err) {
       console.error(err);
       showSnackbar({
         kind: 'error',
         title: t('claimError', 'Claim Error'),
-        subtitle: t('sendClaimError', 'Request Failed, Please try later........'),
+        subtitle: t('sendClaimError', 'Request Failed, Please try later...'),
         timeoutInMs: 2500,
         isLowContrast: true,
       });
@@ -177,16 +253,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    setValue('diagnoses', diagnoses?.map((d) => d.id) ?? ([] as any));
-    setValue('visitType', recentVisit?.visitType?.display || '');
-    setValue('facility', `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`);
-    setValue('treatmentStart', recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '');
-    setValue('treatmentEnd', recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '');
-    setValue('packages', (packagesAndinterventions?.packages ?? []) as any);
-    setValue('interventions', (packagesAndinterventions?.interventions ?? []) as any);
-  }, [diagnoses, recentVisit, mflCodeValue, setValue, provider, packagesAndinterventions]);
 
   if (visitLoading || diagnosisLoading || providerLoading) {
     return (
@@ -207,16 +273,33 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             visitError?.message ??
             diagnosisError?.message ??
             providerError?.message ??
-            'Error occured while loading claims form'
+            'Error occurred while loading claims form'
           }
           lowContrast
         />
       </Layer>
     );
   }
+
+  const shouldShowError = (fieldName: string) => {
+    return validationEnabled && errors[fieldName] && (touchedFields[fieldName] || formInitialized);
+  };
+
   return (
     <FormProvider {...form}>
       <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+        {!selectedLineItems?.length && (
+          <div className={styles.notificationContainer}>
+            <InlineNotification
+              kind="info"
+              title={t('noItemsSelected', 'No items selected')}
+              subtitle={t('pleaseSelectItems', 'Please select line items to raise a claim')}
+              hideCloseButton={true}
+              lowContrast={true}
+              className={styles.notification}
+            />
+          </div>
+        )}
         <Stack gap={4} className={styles.grid}>
           <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
           <Row className={styles.formClaimRow}>
@@ -295,19 +378,23 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
           <Column>
             <Layer className={styles.input}>
               <Controller
-                control={form.control}
+                control={control}
                 name="diagnoses"
                 render={({ field }) => (
                   <MultiSelect
                     ref={field.ref}
-                    invalid={form.formState.errors[field.name]?.message}
-                    invalidText={form.formState.errors[field.name]?.message}
+                    invalid={shouldShowError('diagnoses')}
+                    invalidText={errors.diagnoses?.message}
                     id="diagnoses"
                     titleText={t('finalDiagnosis', 'Final Diagnosis')}
                     selectedItems={field.value}
                     label="Choose option"
                     items={diagnoses.map((r) => r.id)}
                     itemToString={(item) => diagnoses.find((r) => r.id === item)?.text ?? ''}
+                    onChange={(e) => {
+                      field.onChange(e.selectedItems);
+                      setValidationEnabled(true);
+                    }}
                   />
                 )}
               />
@@ -322,14 +409,15 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                   render={({ field }) => (
                     <Dropdown
                       ref={field.ref}
-                      invalid={form.formState.errors[field.name]?.message}
-                      invalidText={form.formState.errors[field.name]?.message}
+                      invalid={shouldShowError('provider')}
+                      invalidText={errors.provider?.message}
                       id="provider"
                       titleText={t('provider', 'Provider')}
                       onChange={(e) => {
                         field.onChange(e.selectedItem);
+                        setValidationEnabled(true);
                       }}
-                      initialSelectedItem={field.value}
+                      initialSelectedItem={provider.uuid}
                       label="Choose option"
                       items={[provider].map((r) => r.uuid)}
                       itemToString={(item) =>
@@ -345,16 +433,31 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
               </Layer>
             </Column>
           </Row>
-          <ClaimExplanationAndJusificationInput patientUuid={patientUuid} />
+          <ClaimExplanationAndJusificationInput
+            patientUuid={patientUuid}
+            disabled={!packages?.length || !interventions?.length}
+            validationEnabled={validationEnabled}
+            onInteraction={() => setValidationEnabled(true)}
+          />
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
               {t('discardClaim', 'Discard Claim')}
             </Button>
-            <Button className={styles.button} kind="primary" type="submit" disabled={loading}>
+            <Button
+              className={styles.button}
+              kind="primary"
+              type="submit"
+              onClick={() => setValidationEnabled(true)}
+              disabled={
+                loading || !isValid || !packages?.length || !interventions?.length || !selectedLineItems?.length
+              }
+              tooltipPosition="top"
+              tooltipAlignment="center"
+              renderIcon={loading ? InlineLoading : undefined}>
               {loading ? (
                 <InlineLoading description={t('processing', 'Processing...')} />
               ) : (
-                t('processClaim', 'Process Claim')
+                <>{t('processClaim', 'Process Claim')}</>
               )}
             </Button>
           </ButtonSet>
