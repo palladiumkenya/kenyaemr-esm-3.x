@@ -24,12 +24,13 @@ export const TracingOutcome_UUID = '160433AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const PatientTracingEncounterType_UUID = '1495edf8-2df2-11e9-b210-d663bd873d93';
 
 export const ClinicalEncounterFormUuid = 'e958f902-64df-4819-afd4-7fb061f59308';
-export const PartographEncounterFormUuid = 'd4c4dcfa-5c7b-4727-a7a6-f79a3b2c2735';
+export const PartographEncounterFormUuid = '3791e5b7-2cdc-44fc-982b-a81135367c96';
 export const AdmissionDate_UUID = '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const PriorityOfAdmission_UUID = '1655AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 // export const AdmittingDoctor_UUID= '';
 export const AdmissionWard_UUID = '5fc29316-0869-4b3b-ae2f-cc37c6014eb7';
 export const MchEncounterType_UUID = 'c6d09e05-1f25-4164-8860-9f32c5a02df0';
+export const mchPartoGraphEncounterTypeUuid = '022d62af-e2a5-4282-953b-52dd5cba3296';
 export const Alcohol_Use_UUID = '159449AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const Alcohol_Use_Duration_UUID = '1546AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 export const Smoking_UUID = '163201AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
