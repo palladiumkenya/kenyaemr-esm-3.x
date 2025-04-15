@@ -235,12 +235,11 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         timeoutInMs: 3000,
         isLowContrast: true,
       });
-      reset();
       setTimeout(() => {
         navigate({
           to: window.getOpenmrsSpaBase() + 'home/billing/',
         });
-      }, 2000);
+      }, 1000);
     } catch (err) {
       console.error(err);
       showSnackbar({
