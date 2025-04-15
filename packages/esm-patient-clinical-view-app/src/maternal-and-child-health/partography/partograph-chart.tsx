@@ -1,9 +1,26 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, TabList } from '@carbon/react';
-import styles from './partograph-chart.scss';
+import { Tab, TabsVertical, TabListVertical, TabPanels, TabPanel } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
-import { PartograpyComponents } from '../../config-schema';
+import styles from './partograph-chart.scss';
+
+interface PartographyComponent {
+  date: string;
+  fetalHeartRate?: number;
+  cervicalDilation?: number;
+  descentOfHead?: string | number;
+  [key: string]: any;
+}
+
+interface PartographChartProps {
+  partograpyComponents: PartographyComponent[];
+}
+
+interface PartographSignOption {
+  id: string;
+  title: string;
+  value: keyof PartographyComponent;
+}
 
 enum ScaleTypes {
   TIME = 'time',
@@ -12,108 +29,116 @@ enum ScaleTypes {
   LABELS = 'labels',
   LABELS_RATIO = 'labels-ratio',
 }
-interface PartographChartProps {
-  partograpyComponents: Array<PartograpyComponents>;
-}
-interface PartographyChartData {
-  title: string;
-  value: string;
-}
+
 const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents }) => {
   const { t } = useTranslation();
-  const convertedData = partograpyComponents.map((item) => {
-    const [numerator, denominator] = item.descentOfHead.split('/').map(Number);
-    const result = denominator !== 0 ? (numerator / denominator) * 10 : 10;
-    return { ...item, descentOfHead: result };
-  });
-  const [selectedPartographSign, setSelectedPartographSign] = React.useState<PartographyChartData>({
-    title: `Fetal Heart Rate (${convertedData[0]?.fetalHeartRate})`,
-    value: 'fetalHeartRate',
-  });
-  const partographSigns = [
-    {
-      id: 'fetalHeartRate',
-      title: `Heart Rate ${convertedData[0]?.fetalHeartRate?.toString() ?? '-'})`,
-      value: 'fetalHeartRate',
-    },
-    {
-      id: 'cervicalDilation',
-      title: `Cervical Dilation' ${convertedData[0]?.cervicalDilation?.toString() ?? '-'})`,
-      value: 'cervicalDilation',
-    },
-    {
-      id: 'descentOfHead',
-      title: `Descent of Head  ${convertedData[0]?.descentOfHead?.toString() ?? '-'})`,
-      value: 'descentOfHead',
-    },
-  ];
-  function parseTodayTime(dateString: string): string | null {
-    const dateTimeRegex = /(\d{2}:\d{2} [APMapm]{2})/;
-    const match = dateString.match(dateTimeRegex);
-    if (match) {
-      return match[0];
-    } else {
-      return null;
+
+  const processedPartographData = useMemo(() => {
+    return partograpyComponents.map((item) => {
+      const processedItem = { ...item };
+
+      if (typeof item.descentOfHead === 'string' && item.descentOfHead.includes('/')) {
+        const [numerator, denominator] = item.descentOfHead.split('/').map(Number);
+        processedItem.descentOfHead = denominator !== 0 ? (numerator / denominator) * 10 : 10;
+      }
+
+      return processedItem;
+    });
+  }, [partograpyComponents]);
+
+  const getFormattedValue = (value: any): string => {
+    if (value === undefined || value === null) {
+      return '-';
     }
-  }
-  const chartData = useMemo(() => {
-    return partograpyComponents
-      .filter((partography) => partography[selectedPartographSign.value])
-      .splice(0, 10)
-      .sort((partoDateA, partoDateB) => new Date(partoDateA.date).getTime() - new Date(partoDateB.date).getTime())
-      .map((partoData) => {
-        if (partoData[selectedPartographSign.value]) {
-          if ('fetalHeartRate'.includes(selectedPartographSign.value)) {
-            return [
-              {
-                group: 'Fetal Heart Rate',
-                key: parseTodayTime(partoData.date.toString()),
-                value: partoData.fetalHeartRate,
-                date: partoData.date,
-              },
-            ];
-          } else {
-            return {
-              group: selectedPartographSign.title,
-              key: parseTodayTime(partoData.date.toString()),
-              value: partoData[selectedPartographSign.value],
-              date: partoData.date,
-            };
-          }
-        }
-      });
-  }, [partograpyComponents, selectedPartographSign]);
-  const chartOptions = {
-    axes: {
-      bottom: {
-        title: 'Time',
-        mapsTo: 'key',
-        scaleType: ScaleTypes.LABELS,
-      },
-      left: {
-        mapsTo: 'value',
-        title: selectedPartographSign.title,
-        scaleType: ScaleTypes.LINEAR,
-        includeZero: false,
-      },
-    },
-    legend: {
-      enabled: false,
-    },
-    color: {
-      scale: {
-        [selectedPartographSign.title]: '#6929c4',
-      },
-    },
-    tooltip: {
-      customHTML: ([{ value, group, key }]) =>
-        `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${value} - ${String(
-          group,
-        ).toUpperCase()}
-        <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${key}</span></div>`,
-    },
-    height: '400px',
+    return value.toString();
   };
+
+  const partographSignOptions = useMemo<PartographSignOption[]>(() => {
+    const firstValidItem = processedPartographData.find(
+      (item) =>
+        item.fetalHeartRate !== undefined || item.cervicalDilation !== undefined || item.descentOfHead !== undefined,
+    );
+
+    const fetalHeartRate = firstValidItem?.fetalHeartRate;
+    const cervicalDilation = firstValidItem?.cervicalDilation;
+    const descentOfHead = firstValidItem?.descentOfHead;
+
+    return [
+      {
+        id: 'fetalHeartRate',
+        title: `Heart Rate (${getFormattedValue(fetalHeartRate)})`,
+        value: 'fetalHeartRate',
+      },
+      {
+        id: 'cervicalDilation',
+        title: `Cervical Dilation (${getFormattedValue(cervicalDilation)})`,
+        value: 'cervicalDilation',
+      },
+      {
+        id: 'descentOfHead',
+        title: `Descent of Head (${getFormattedValue(descentOfHead)})`,
+        value: 'descentOfHead',
+      },
+    ];
+  }, [processedPartographData]);
+
+  const [selectedPartographSign, setSelectedPartographSign] = useState<PartographSignOption>(partographSignOptions[0]);
+
+  const chartData = useMemo(() => {
+    if (!processedPartographData.length) {
+      return [];
+    }
+
+    return processedPartographData
+      .filter((item) => item[selectedPartographSign.value] !== undefined)
+      .slice(0, 10)
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .map((item) => ({
+        group: selectedPartographSign.title,
+        value: item[selectedPartographSign.value],
+        date: item.date,
+      }));
+  }, [processedPartographData, selectedPartographSign]);
+
+  const chartOptions = useMemo(
+    () => ({
+      title: t('partoGraphtChartTitle', 'PartoGraph Chart'),
+      axes: {
+        bottom: {
+          title: t('time', 'Time'),
+          mapsTo: 'date',
+          scaleType: ScaleTypes.TIME,
+        },
+        left: {
+          mapsTo: 'value',
+          title: selectedPartographSign.title,
+          scaleType: ScaleTypes.LINEAR,
+          includeZero: false,
+        },
+      },
+      curve: 'curveMonotoneX',
+      height: '400px',
+      tooltip: {
+        customHTML: ([{ value, group }]: any) => `
+        <div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">
+          ${value} - ${String(group).toUpperCase()}
+          <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${group}</span>
+        </div>
+      `,
+      },
+    }),
+    [t, selectedPartographSign.title],
+  );
+
+  const handleTabSelect = (option: PartographSignOption) => {
+    setSelectedPartographSign(option);
+  };
+
+  React.useEffect(() => {
+    const currentOption = partographSignOptions.find((option) => option.id === selectedPartographSign.id);
+    // Update to the new option or default to the first option
+    setSelectedPartographSign(currentOption || partographSignOptions[0]);
+  }, [partographSignOptions]);
 
   return (
     <div className={styles.vitalsChartContainer}>
@@ -121,30 +146,28 @@ const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents 
         <label className={styles.vitalsSignLabel} htmlFor="partography-chart-tab-group">
           {t('partographyDisplay', 'Partography Displayed')}
         </label>
-        <Tabs className={styles.verticalTabs}>
-          <TabList className={styles.tablist} aria-label="Partography  Data">
-            {partographSigns.map(({ id, title, value }) => {
-              return (
-                <Tab
-                  key={id}
-                  className={`${styles.tab} ${styles.bodyLong01} ${
-                    selectedPartographSign.title === title && styles.selectedTab
-                  }`}
-                  onClick={() =>
-                    setSelectedPartographSign({
-                      title: title,
-                      value: value,
-                    })
-                  }>
-                  {title}-
-                </Tab>
-              );
-            })}
-          </TabList>
-        </Tabs>
-      </div>
-      <div className={styles.vitalsChartArea}>
-        <LineChart data={chartData.flat()} options={chartOptions} />
+        <TabsVertical height="">
+          <TabListVertical>
+            {partographSignOptions.map((option) => (
+              <Tab
+                key={option.id}
+                className={`${styles.tab} ${styles.bodyLong01} ${
+                  selectedPartographSign.id === option.id ? styles.selectedTab : ''
+                }`}
+                onClick={() => handleTabSelect(option)}>
+                {option.title}
+              </Tab>
+            ))}
+          </TabListVertical>
+
+          <TabPanels>
+            {partographSignOptions.map(({ id, title, value }) => (
+              <TabPanel key={id}>
+                <LineChart data={chartData.flat()} options={chartOptions} />
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </TabsVertical>
       </div>
     </div>
   );

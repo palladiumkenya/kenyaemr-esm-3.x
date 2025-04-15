@@ -375,7 +375,7 @@ export interface ConfigObject {
 
 export interface PartograpyComponents {
   id: string;
-  date: string;
+  date: string | Date;
   fetalHeartRate: number;
   cervicalDilation: number;
   descentOfHead: string;

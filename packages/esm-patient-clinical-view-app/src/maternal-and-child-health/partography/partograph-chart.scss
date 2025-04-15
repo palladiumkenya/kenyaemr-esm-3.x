@@ -11,10 +11,7 @@
 }
 
 .vitalsChartContainer {
-  display: flex;
-  margin: 0rem spacing.$spacing-05;
-  flex-direction: row;
-  justify-content: space-between;
+  margin-bottom: spacing.$spacing-05;
 }
 
 .vitalSignsArea {
@@ -39,6 +36,7 @@
 .vitalsSignLabel {
   @extend .label01;
   margin-bottom: 1rem;
+  margin-left: 1.5rem;
   display: inline-block;
 }
 
