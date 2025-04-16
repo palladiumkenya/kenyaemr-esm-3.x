@@ -262,6 +262,7 @@
   "selectExemptionCategory": "Select exemption category",
   "selectInsuranceScheme": "Select insurance scheme",
   "selectitemstobeclaimed": "Select items that are to be included in the claims",
+  "selectLineItemToPay": "Select line item to pay",
   "selectPaymentMethod": "Select payment method",
   "selectPaymentMode": "Select payment mode",
   "selectTimesheet": "Select timesheet",

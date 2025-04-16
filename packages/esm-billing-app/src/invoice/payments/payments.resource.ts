@@ -1,6 +1,8 @@
 import useSWR from 'swr';
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../../config-schema';
+import { LineItemStockQuery, type StockItemResponse } from '../../types';
+import React from 'react';
 
 type PaymentMethod = {
   uuid: string;
@@ -59,6 +61,37 @@ export const usePaymentModes = () => {
   };
 };
 
+export const useStockItems = (queries: LineItemStockQuery[]) => {
+  const urls = queries.map(
+    (query) =>
+      `${restBaseUrl}/stockmanagement/stockitem?limit=10&q=${encodeURIComponent(query.drugName)}&totalCount=true`,
+  );
+
+  const { data, error, isLoading } = useSWR<Array<FetchResponse<{ results: StockItemResponse[] }>>>(urls, (urls) =>
+    Promise.all(urls.map((url) => openmrsFetch(url))),
+  );
+
+  const lineItemToStockMap = React.useMemo(() => {
+    const map = new Map<string, string>();
+    data?.forEach((response, index) => {
+      const query = queries[index];
+      const matchingItem = response.data.results.find(
+        (item) =>
+          item.drugName.toLowerCase().includes(query.drugName.toLowerCase()) && item.conceptUuid === query.conceptUuid,
+      );
+      if (matchingItem) {
+        map.set(query.lineItemUuid, matchingItem.uuid);
+      }
+    });
+    return map;
+  }, [data, queries]);
+
+  return {
+    isLoading,
+    error,
+    lineItemToStockMap,
+  };
+};
 export const checkPaymentStatus = (transactionId: string) => {
   const url = `${restBaseUrl}/rmsdataexchange/api/rmsmpesachecker?transactionId=${transactionId}`;
   return openmrsFetch<PaymentStatusResponse>(url);

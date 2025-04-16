@@ -113,31 +113,38 @@ export const createPaymentPayload = (
   remainingBalance,
   selectedBillableItems,
   timesheetDetails,
+  lineItemToStockMap?: Map<string, string>,
 ) => {
   const { totalAmount, payments = [], lineItems = [] } = billDetails;
   const initialPaymentStatus = remainingBalance <= 0 ? PaymentStatus.PAID : PaymentStatus.PENDING;
 
   // Transform existing payments
-  const existingPayments = payments.map((payment) => ({
-    amount: payment.amount,
-    amountTendered: payment.amountTendered,
-    attributes: payment.attributes.map((attribute) => ({
-      attributeType: attribute.attributeType?.uuid,
-      value: attribute.value,
-    })),
-    instanceType: payment.instanceType.uuid,
-  }));
+  const existingPayments = payments.map((payment) => {
+    return {
+      amount: payment.amount,
+      amountTendered: payment.amountTendered,
+      attributes: payment.attributes.map((attribute) => ({
+        attributeType: attribute.attributeType?.uuid,
+        value: attribute.value,
+      })),
+      instanceType: payment.instanceType.uuid,
+      item: lineItemToStockMap?.get(payment?.item),
+    };
+  });
 
   // Transform new payments
-  const currentPayments = paymentFormValues.map((formValue) => ({
-    amount: parseFloat(totalAmount.toFixed(2)),
-    amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
-    attributes: formValue.method?.attributeTypes?.map((attribute) => ({
-      attributeType: attribute.uuid,
-      value: formValue.referenceCode,
-    })),
-    instanceType: formValue.method?.uuid,
-  }));
+  const currentPayments = paymentFormValues.map((formValue, index) => {
+    return {
+      amount: parseFloat(totalAmount.toFixed(2)),
+      amountTendered: parseFloat(Number(formValue.amount).toFixed(2)),
+      attributes: formValue.method?.attributeTypes?.map((attribute) => ({
+        attributeType: attribute.uuid,
+        value: formValue.referenceCode,
+      })),
+      instanceType: formValue.method?.uuid,
+      item: lineItemToStockMap?.get(formValue?.itemUuid),
+    };
+  });
 
   // Combine and calculate payments
   const consolidatedPayments = [...currentPayments, ...existingPayments];
