@@ -179,7 +179,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     () => getProviderAttributeValue(attributeTypeMapping.providerAddress),
     [attributeTypeMapping, getProviderAttributeValue],
   );
-  const providerUnqiueIdentifier = useMemo(
+  const providerUniqueIdentifier = useMemo(
     () => getProviderAttributeValue(attributeTypeMapping.providerUniqueIdentifier),
     [attributeTypeMapping, getProviderAttributeValue],
   );
@@ -215,7 +215,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       nationalId: nationalId,
       passportNumber: passportNumber,
       registrationNumber: registrationNumber,
-      providerUnqiueIdentifier: providerUnqiueIdentifier,
+      providerUniqueIdentifier: providerUniqueIdentifier,
     };
   }, [
     isInitialValuesEmpty,
@@ -228,7 +228,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     nationalId,
     passportNumber,
     registrationNumber,
-    providerUnqiueIdentifier,
+    providerUniqueIdentifier,
   ]);
 
   function extractAttributeValue(attributes, prefix: string) {
@@ -339,7 +339,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             ),
           );
           setValue('passportNumber', healthWorkerPassPortNumber);
-          setValue('providerUnqiueIdentifier', fetchedHealthWorker?.entry[0]?.resource?.id);
+          setValue('providerUniqueIdentifier', fetchedHealthWorker?.entry[0]?.resource?.id);
           setHealthWorker(fetchedHealthWorker);
         },
       });
@@ -368,7 +368,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         },
         {
           attributeType: attributeTypeMapping.providerUniqueIdentifier,
-          value: data.providerUnqiueIdentifier,
+          value: data.providerUniqueIdentifier,
         },
         {
           attributeType: attributeTypeMapping.providerNationalId,
@@ -462,7 +462,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             },
             {
               attributeType: providerUniqueIdentifierAttributeTypeUuid,
-              value: data?.providerUnqiueIdentifier,
+              value: data?.providerUniqueIdentifier,
             },
           ].filter((attr) => attr?.value !== undefined && attr?.value !== null && attr?.value !== '');
 
@@ -767,20 +767,20 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         <span className={styles.formHeaderSection}>{t('providerDetails', 'Provider details')}</span>
                         <ResponsiveWrapper>
                           <Controller
-                            name="providerUnqiueIdentifier"
+                            name="providerUniqueIdentifier"
                             control={userFormMethods.control}
                             render={({ field }) => (
                               <TextInput
                                 {...field}
-                                id="providerUnqiueIdentifier"
+                                id="providerUniqueIdentifier"
                                 type="text"
-                                labelText={t('providerUnqiueIdentifier', 'Provider Unqiue Identifier')}
+                                labelText={t('providerUniqueIdentifier', 'Provider Unique Identifier')}
                                 placeholder={t(
-                                  'providerUnqiueIdentifierPlaceholder',
+                                  'providerUniqueIdentifierPlaceholder',
                                   'Enter Provider Unqiue Identifier',
                                 )}
-                                invalid={!!errors.providerUnqiueIdentifier}
-                                invalidText={errors.providerUnqiueIdentifier?.message}
+                                invalid={!!errors.providerUniqueIdentifier}
+                                invalidText={errors.providerUniqueIdentifier?.message}
                               />
                             )}
                           />
