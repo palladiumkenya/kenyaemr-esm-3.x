@@ -101,6 +101,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     providerNationalIdUuid,
     licenseNumberUuid,
     licenseExpiryDateUuid,
+    providerUniqueIdentifierAttributeTypeUuid,
   } = useConfig<ConfigObject>();
   const [searchHWR, setSearchHWR] = useState({
     identifierType: identifierTypes[0]?.key ?? '',
@@ -121,6 +122,8 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       phoneNumber: providerAttributeType.find((type) => type.uuid === phoneNumberUuid)?.uuid || '',
       providerAddress: providerAttributeType.find((type) => type.uuid === providerAddressUuid)?.uuid || '',
       passportNumber: providerAttributeType.find((type) => type.uuid === passportNumberUuid)?.uuid || '',
+      providerUniqueIdentifier:
+        providerAttributeType.find((type) => type.uuid === providerUniqueIdentifierAttributeTypeUuid)?.uuid || '',
     };
   }, [
     licenseBodyUuid,
@@ -176,6 +179,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     () => getProviderAttributeValue(attributeTypeMapping.providerAddress),
     [attributeTypeMapping, getProviderAttributeValue],
   );
+  const providerUnqiueIdentifier = useMemo(
+    () => getProviderAttributeValue(attributeTypeMapping.providerUniqueIdentifier),
+    [attributeTypeMapping, getProviderAttributeValue],
+  );
   type UserFormSchema = z.infer<typeof userManagementFormSchema>;
   const formDefaultValues = useMemo(() => {
     if (isInitialValuesEmpty) {
@@ -208,6 +215,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       nationalId: nationalId,
       passportNumber: passportNumber,
       registrationNumber: registrationNumber,
+      providerUnqiueIdentifier: providerUnqiueIdentifier,
     };
   }, [
     isInitialValuesEmpty,
@@ -220,6 +228,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     nationalId,
     passportNumber,
     registrationNumber,
+    providerUnqiueIdentifier,
   ]);
 
   function extractAttributeValue(attributes, prefix: string) {
@@ -330,6 +339,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             ),
           );
           setValue('passportNumber', healthWorkerPassPortNumber);
+          setValue('providerUnqiueIdentifier', fetchedHealthWorker?.entry[0]?.resource?.id);
           setHealthWorker(fetchedHealthWorker);
         },
       });
@@ -355,6 +365,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         {
           attributeType: attributeTypeMapping?.providerHieFhirReference,
           value: JSON.stringify(healthWorker),
+        },
+        {
+          attributeType: attributeTypeMapping.providerUniqueIdentifier,
+          value: data.providerUnqiueIdentifier,
         },
         {
           attributeType: attributeTypeMapping.providerNationalId,
@@ -445,6 +459,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
             {
               attributeType: passportNumberUuid,
               value: data?.passportNumber,
+            },
+            {
+              attributeType: providerUniqueIdentifierAttributeTypeUuid,
+              value: data?.providerUnqiueIdentifier,
             },
           ].filter((attr) => attr?.value !== undefined && attr?.value !== null && attr?.value !== '');
 
@@ -747,6 +765,26 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                     {hasProviderAccount && (
                       <ResponsiveWrapper>
                         <span className={styles.formHeaderSection}>{t('providerDetails', 'Provider details')}</span>
+                        <ResponsiveWrapper>
+                          <Controller
+                            name="providerUnqiueIdentifier"
+                            control={userFormMethods.control}
+                            render={({ field }) => (
+                              <TextInput
+                                {...field}
+                                id="providerUnqiueIdentifier"
+                                type="text"
+                                labelText={t('providerUnqiueIdentifier', 'Provider Unqiue Identifier')}
+                                placeholder={t(
+                                  'providerUnqiueIdentifierPlaceholder',
+                                  'Enter Provider Unqiue Identifier',
+                                )}
+                                invalid={!!errors.providerUnqiueIdentifier}
+                                invalidText={errors.providerUnqiueIdentifier?.message}
+                              />
+                            )}
+                          />
+                        </ResponsiveWrapper>
                         <ResponsiveWrapper>
                           <Controller
                             name="nationalId"

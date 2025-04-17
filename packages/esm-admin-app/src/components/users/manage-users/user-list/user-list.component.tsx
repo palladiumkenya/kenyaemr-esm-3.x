@@ -42,6 +42,7 @@ import styles from './user-list.scss';
 import { ConfigObject } from '../../../../config-schema';
 import { formatDateTime } from '../../../../utils/utils';
 import UserDetails from '../user-details/user-details.component';
+import upperCase from 'lodash-es/upperCase';
 
 type FilterType = 'allUsers' | 'activeLicensed' | 'expiredLicensed' | 'licensedExpiringSoon' | 'unlicensed';
 
@@ -63,8 +64,14 @@ const UserList: React.FC = () => {
   const { users, isLoading: isLoadingUsers, error: usersError } = useUsers();
   const { provider, isLoading, error: providerError } = useProvider();
   const [syncLoading, setSyncLoading] = useState(false);
-  const { licenseNumberUuid, licenseExpiryDateUuid, providerNationalIdUuid, licenseBodyUuid, passportNumberUuid } =
-    useConfig<ConfigObject>();
+  const {
+    licenseNumberUuid,
+    licenseExpiryDateUuid,
+    providerNationalIdUuid,
+    licenseBodyUuid,
+    passportNumberUuid,
+    providerUniqueIdentifierAttributeTypeUuid,
+  } = useConfig<ConfigObject>();
 
   const [pageSize, setPageSize] = useState(10);
   const [searchQuery, setSearchQuery] = useState('');
@@ -199,6 +206,10 @@ const UserList: React.FC = () => {
       header: t('licenseNumber', 'License Number'),
     },
     {
+      key: 'providerUniqueIdentifier',
+      header: t('providerUniqueIdentifier', 'Provider Unique Identifier'),
+    },
+    {
       key: 'licenseExpiryDate',
       header: t('licenseExpiryDate', 'License Expiry Date'),
     },
@@ -221,6 +232,11 @@ const UserList: React.FC = () => {
     const licenseNumber = licenseNumberAttribute ? licenseNumberAttribute.value : '--';
     const licenseExpiryDate = licenseExpiryDateAttribute ? licenseExpiryDateAttribute.value : '--';
 
+    const providerUniqueIdentifierAttribute = userProvider?.attributes.find(
+      (attr) => attr?.attributeType?.uuid === providerUniqueIdentifierAttributeTypeUuid,
+    );
+    const providerUniqueIdentifier = providerUniqueIdentifierAttribute ? providerUniqueIdentifierAttribute.value : '--';
+
     const providerNationalId = userProvider?.attributes.find(
       (attr) => attr?.attributeType?.uuid === providerNationalIdUuid,
     );
@@ -232,9 +248,10 @@ const UserList: React.FC = () => {
     return {
       id: user.uuid,
       systemId: user.systemId,
-      names: capitalize(user.person.display),
+      names: upperCase(user.person.display),
       licenseNumber: licenseNumber,
       licenseExpiryDate: formatDateTime(new Date(licenseExpiryDate)),
+      providerUniqueIdentifier: providerUniqueIdentifier,
       userProvider,
       user,
       actions: (

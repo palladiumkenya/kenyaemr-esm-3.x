@@ -26,6 +26,7 @@ interface ProviderAttributes {
   registrationNumber?: ProviderAttribute;
   emailAddress?: ProviderAttribute;
   passportNumber: ProviderAttribute;
+  providerUnqiueIdentifier: ProviderAttribute;
 }
 
 const UserDetails: React.FC<UserDetailsProps> = ({ provider, user }) => {
@@ -41,6 +42,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ provider, user }) => {
     registrationNumber: 'License Body',
     emailAddress: 'Provider Address',
     passportNumber: 'Provider passport number',
+    providerUnqiueIdentifier: 'Provider unique identifier',
   };
 
   const attributes: ProviderAttributes = Object.entries(attributeMap).reduce((acc, [key, display]) => {
@@ -60,6 +62,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ provider, user }) => {
     registrationNumber,
     emailAddress,
     passportNumber,
+    providerUnqiueIdentifier,
   } = attributes;
 
   const formattedExpiryDate = dateAttr?.value ? dayjs(dateAttr.value).format('YYYY-MM-DD') : null;
@@ -104,6 +107,11 @@ const UserDetails: React.FC<UserDetailsProps> = ({ provider, user }) => {
                 <span className={styles.statusTag}>
                   {qualification?.value && <Tag type="cyan">{capitalize(qualification?.value)}</Tag>}
                 </span>
+                <span className={styles.statusTag}>
+                  {providerUnqiueIdentifier?.value && (
+                    <Tag type="cyan">{capitalize(providerUnqiueIdentifier?.value)}</Tag>
+                  )}
+                </span>
               </div>
             </div>
 
@@ -134,9 +142,13 @@ const UserDetails: React.FC<UserDetailsProps> = ({ provider, user }) => {
                   {t('registrationNumber', 'Registration number')}:{' '}
                   {registrationNumber?.value ? registrationNumber.value : '--'}
                 </span>
+                <span className={styles.middot}>&middot; </span>
+
                 <span className={styles.spanField}>
                   {t('passportNumber', 'Passport number')}: {passportNumber?.value ? passportNumber.value : '--'}
                 </span>
+                <span className={styles.middot}>&middot; </span>
+
                 <span className={styles.spanField}>
                   {t('licenseExpiryDate', 'License expiry date')}: {formattedExpiryDate ? formattedExpiryDate : '--'}
                 </span>
