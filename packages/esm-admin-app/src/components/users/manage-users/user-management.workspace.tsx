@@ -136,6 +136,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     providerHieFhirReference,
     providerNationalIdUuid,
     qualificationUuid,
+    providerUniqueIdentifierAttributeTypeUuid,
   ]);
 
   const providerAttributes = useMemo(() => provider.flatMap((item) => item.attributes || []), [provider]);
