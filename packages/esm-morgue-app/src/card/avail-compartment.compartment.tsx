@@ -1,6 +1,6 @@
-import { Tag } from '@carbon/react';
+import { Tag, InlineLoading } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { ConfigurableLink, useVisit } from '@openmrs/esm-framework';
+import { ConfigurableLink, useVisit, usePatient } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,6 +8,7 @@ import { toUpperCase } from '../helpers/expression-helper';
 import { Patient } from '../types';
 import { convertDateToDays } from '../utils/utils';
 import styles from './compartment.scss';
+import { usePerson } from '../hook/useMorgue.resource';
 
 interface AvailableCompartmentProps {
   patientInfo: Patient;
@@ -24,6 +25,9 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
 
+  if (!patientInfo?.person?.dead) {
+    return null;
+  }
   const causeOfDeathDisplay = patientInfo?.person?.causeOfDeath?.display;
 
   const causeOfDeathMessage = causeOfDeathDisplay
@@ -45,6 +49,7 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
   }`;
   const lengthOfStayDays = parseInt(lengthOfStay.match(/\d+/)?.[0] || '0', 10);
   const timeSpentTagType = lengthOfStayDays > 17 ? 'red' : 'blue';
+
   return (
     <div className={styles.cardView}>
       <div className={styles.cardRow}>
