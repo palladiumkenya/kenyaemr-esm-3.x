@@ -57,6 +57,11 @@ export const configSchema = {
     _description: 'UUID for person phone number attribute',
     _default: 'b2c38640-2603-4629-aebd-3b54f33f1e3a',
   },
+  providerUniqueIdentifierAttributeTypeUuid: {
+    _type: Type.String,
+    _description: 'UUID for provider unique identifier attribute type',
+    _default: 'dace9d99-9f29-4653-9eae-c05929f34a32',
+  },
   identifierTypes: {
     _type: Type.Array,
     _elements: {
@@ -84,6 +89,7 @@ export interface ConfigObject {
   providerNationalIdUuid: string;
   passportNumberUuid: string;
   providerHieFhirReference: string;
+  providerUniqueIdentifierAttributeTypeUuid: string;
   phoneNumberUuid: string;
   providerAddressUuid: string;
   qualificationUuid: string;

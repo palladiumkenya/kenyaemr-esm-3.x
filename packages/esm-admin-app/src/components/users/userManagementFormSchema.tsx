@@ -43,6 +43,7 @@ const UserManagementFormSchema = (existingUsernames: Array<string>, isEdit?: boo
     nationalId: z.string().optional(),
     passportNumber: z.string().optional(),
     isEditProvider: z.boolean().optional(),
+    providerUniqueIdentifier: z.string().optional(),
   });
 
   return { userManagementFormSchema };
