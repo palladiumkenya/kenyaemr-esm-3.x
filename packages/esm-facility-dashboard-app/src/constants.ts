@@ -20,22 +20,6 @@ export const formatNewDate = (date: Date | null | undefined) => {
   return date ? new Date(date) : '';
 };
 
-// Generate Dammy dates
-export const sevenDaysRunningDates = (index: number, endDate: Date = new Date()): string => {
-  const date = new Date(endDate);
-  date.setDate(date.getDate() - index);
-  return date.toISOString().split('T')[0];
-};
-
 export const formattedDate = (date: Date) => {
   return date ? dayjs(date).format(DATE_PICKER_FORMAT) : '';
-};
-
-export const getNumberOfDays = (startDate?: Date, endDate?: Date) => {
-  if (!startDate || !endDate) {
-    return 7;
-  }
-  const start = dayjs(startDate);
-  const end = dayjs(endDate);
-  return end.diff(start, 'day');
 };

@@ -23,11 +23,11 @@
   "numberHivPositive": "Number HIV positive",
   "numberTestedPositiveNotLinked": "Number tested positive not linked",
   "pbfwNotLinked": "High risk -ve PBFW Not linked to PrEP",
-  "percentage": "Percentage",
-  "percentageDelatedEAC": "% Delayed EAC",
-  "percentageHEIOutcome": "% of Undocumented final outcome",
-  "percentageMissedVL": "% of missed opportunity VL",
-  "percentagePendingPCRDNAResults": "% of HEI (6-8 weeks) without DNA-PCR Results",
+  "numberOfPatients": "Number of Patients",
+  "numberDelayedEAC": "Number Delayed EAC",
+  "numberHEIOutcome": "Number of Undocumented final outcome",
+  "numberMissedVL": "Number of missed opportunity VL",
+  "numberOfPendingPCRDNAResults": "Number of HEI (6-8 weeks) without DNA-PCR Results",
   "prepNotlinked": "High risk -ve PBFW not on PrEP",
   "progressInAddressingLinkedToArt": "Progress in addressing Linkage to ART",
   "progresstracking": "Progress tracking",
@@ -35,5 +35,8 @@
   "surveillance": "Surveillance",
   "surveillanceSummary": "Surveillance Summary",
   "viewOnSuperset": "View on Superset",
-  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks"
+  "virallyUnSuppressedWithoutAdherenceCounselingFor2Weeks": "Virally Unsuppressed clients without enhanced adherence counseling (EAC) within 2 weeks",
+  "noheiFinalOutcomes": "No Undocumented final outcome data to display",
+  "noPendingPCRDNAResults": "No PendingPCRDNAResults data to display",
+  "noDelayedEAC": "No Delayed EAC data to display"
 }
