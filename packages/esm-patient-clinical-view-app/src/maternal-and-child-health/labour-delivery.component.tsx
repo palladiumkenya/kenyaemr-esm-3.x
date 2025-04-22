@@ -100,7 +100,6 @@ const LabourDelivery: React.FC<LabourDeliveryProps> = ({ patientUuid }) => {
         }}
         formConceptMap={labourAndDeliveryConceptMap}
       />
-      <Partograph patientUuid={patientUuid} />
     </>
   );
 };

@@ -89,6 +89,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         contractionDuration: '--', // TODO: get from obsGroup 163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
       };
     }) ?? [];
+
   const chartData =
     encounters.map((encounter) => {
       const groupMembers = encounter.groupMembers;
@@ -99,12 +100,13 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       });
       return {
         id: `${encounter.uuid}`,
-        date: formatDate(parseDate(encounter.obsDatetime.toString()), { mode: 'wide', time: true }),
+        date: encounter.obsDatetime,
         fetalHeartRate: groupmembersObj[FetalHeartRate],
         cervicalDilation: groupmembersObj[CervicalDilation],
         descentOfHead: descentOfHeadObj[groupmembersObj[SurgicalProcedure]],
       };
     }) ?? [];
+
   const handleAddHistory = () => {
     launchPatientWorkspace('patient-form-entry-workspace', {
       workspaceTitle: headerTitle,
@@ -114,7 +116,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       formInfo: {
         encounterUuid: '',
         formUuid: PartographEncounterFormUuid,
-        additionalProps: {} ?? {},
       },
     });
   };
@@ -178,6 +179,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
                   <Button
                     kind="ghost"
+                    onClick={handleAddHistory}
                     renderIcon={(props) => <Add {...props} size={16} />}
                     iconDescription="Add vitals">
                     {t('add', 'Add')}

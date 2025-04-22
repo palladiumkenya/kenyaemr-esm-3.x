@@ -63,7 +63,10 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
               label={t('healthWorkerName', 'Health worker name')}
               value={practitioner?.name?.[0]?.text}
             />
-
+            <HealthWorkerInfo
+              label={t('providerUniqueIdentifier', 'Provider unique identifier')}
+              value={practitioner?.id}
+            />
             {practitioner?.telecom?.map((telecom, index) => (
               <HealthWorkerInfo key={index} label={capitalize(telecom?.system)} value={telecom?.value || '--'} />
             ))}

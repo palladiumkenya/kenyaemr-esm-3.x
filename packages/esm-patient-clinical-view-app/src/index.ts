@@ -56,6 +56,7 @@ import DeleteRelationshipConfirmDialog from './relationships/modals/delete-relat
 import DeceasedDetailsView from './deceased-panel/tabs/tabs.component';
 import DeceasedPanelDashboardLink from './deceased-panel/dashboard-link/dashboard-link.component';
 import EndRelationshipWorkspace from './case-management/workspace/case-management-workspace.component';
+import Partograph from './maternal-and-child-health/partography/partograph.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -128,6 +129,7 @@ export const maternalAndChildHealthSideNavGroup = getSyncLifecycle(
 export const antenatalCare = getSyncLifecycle(AntenatalCare, options);
 export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
+export const partograph = getSyncLifecycle(Partograph, options);
 
 // Case Management
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);

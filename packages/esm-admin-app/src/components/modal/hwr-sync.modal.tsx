@@ -30,6 +30,7 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
     qualificationUuid,
     providerAddressUuid,
     providerHieFhirReference,
+    providerUniqueIdentifierAttributeTypeUuid,
   } = config;
 
   const attributeMapping = {
@@ -89,6 +90,7 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
             ?.valueCodeableConcept?.coding?.[0]?.display,
         nationalId: resource?.identifier?.find((id) => id.type?.coding?.some((code) => code.code === 'national-id'))
           ?.value,
+        providerUniqueIdentifier: resource?.id,
       };
 
       const updatableAttributes = [
@@ -100,6 +102,10 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
         { attributeType: providerHieFhirReference, value: JSON.stringify(healthWorker) },
         { attributeType: providerAddressUuid, value: extractedAttributes.email },
         { attributeType: providerNationalIdUuid, value: extractedAttributes.nationalId },
+        {
+          attributeType: providerUniqueIdentifierAttributeTypeUuid,
+          value: extractedAttributes.providerUniqueIdentifier,
+        },
       ].filter((attr) => attr.value !== undefined && attr.value !== null && attr.value !== '');
 
       await Promise.all(
