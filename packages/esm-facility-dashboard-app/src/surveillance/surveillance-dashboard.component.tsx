@@ -10,35 +10,55 @@ import MissedOpportunityChart from './charts/missed-opportunity-vl-chart.compone
 import DNAPCRPendingCharts from './charts/dna-pcr-pending-chart.component';
 import HEIFinalOutcomesChart from './charts/hei-final-outcome.component';
 import { SurveillanceindicatorsFilter } from '../types';
+import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 const SurveillancelanceDashboard = () => {
   const { t } = useTranslation();
   const [currFilters, setCurrFilters] = useState<SurveillanceindicatorsFilter>({
     indicator: 'getHivPositiveNotLinked',
   });
+  const [activeTab, setActiveTab] = useState(0);
 
   return (
     <div>
       <FacilityDashboardHeader title={t('surveillance', 'Surveillance')} />
-      <SurveillanceFilters filters={currFilters} onFiltersChange={setCurrFilters} />
-      <SurveillanceSummaryCards startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      {currFilters.indicator === 'getHivPositiveNotLinked' && (
-        <HIVPositiveNotLinkedToART startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      )}
-      {currFilters.indicator === 'getPregnantPostpartumNotInPrep' && (
-        <PBFWNotInPrep startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      )}
-      {currFilters.indicator === 'getEligibleForVlSampleNotTaken' && (
-        <DelayedEACCharts startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      )}
-      {currFilters.indicator === 'getVirallyUnsuppressedWithoutEAC' && (
-        <MissedOpportunityChart startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      )}
-      {currFilters.indicator === 'getHeiSixToEightWeeksWithoutPCRResults' && (
-        <DNAPCRPendingCharts startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      )}
-      {currFilters.indicator === 'getHei24MonthsWithoutDocumentedOutcome' && (
-        <HEIFinalOutcomesChart startDate={currFilters.startdate} endDate={currFilters.endDate} />
-      )}
+
+      <Tabs onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
+        <TabList>
+          <Tab>{t('kpi', 'KPI')}</Tab>
+          <Tab>{t('monitoringCharts', 'Monitoring charts')}</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <>
+              <SurveillanceFilters filters={currFilters} onFiltersChange={setCurrFilters} tabSelected={activeTab} />
+              <SurveillanceSummaryCards startDate={currFilters.startdate} endDate={currFilters.endDate} />
+            </>
+          </TabPanel>
+          <TabPanel>
+            <>
+              <SurveillanceFilters filters={currFilters} onFiltersChange={setCurrFilters} tabSelected={activeTab} />
+              {currFilters.indicator === 'getHivPositiveNotLinked' && (
+                <HIVPositiveNotLinkedToART startDate={currFilters.startdate} endDate={currFilters.endDate} />
+              )}
+              {currFilters.indicator === 'getPregnantPostpartumNotInPrep' && (
+                <PBFWNotInPrep startDate={currFilters.startdate} endDate={currFilters.endDate} />
+              )}
+              {currFilters.indicator === 'getEligibleForVlSampleNotTaken' && (
+                <DelayedEACCharts startDate={currFilters.startdate} endDate={currFilters.endDate} />
+              )}
+              {currFilters.indicator === 'getVirallyUnsuppressedWithoutEAC' && (
+                <MissedOpportunityChart startDate={currFilters.startdate} endDate={currFilters.endDate} />
+              )}
+              {currFilters.indicator === 'getHeiSixToEightWeeksWithoutPCRResults' && (
+                <DNAPCRPendingCharts startDate={currFilters.startdate} endDate={currFilters.endDate} />
+              )}
+              {currFilters.indicator === 'getHei24MonthsWithoutDocumentedOutcome' && (
+                <HEIFinalOutcomesChart startDate={currFilters.startdate} endDate={currFilters.endDate} />
+              )}
+            </>
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
     </div>
   );
 };

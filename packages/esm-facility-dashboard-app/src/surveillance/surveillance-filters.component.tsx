@@ -9,8 +9,9 @@ import { formatDatetime } from '@openmrs/esm-framework';
 type Props = {
   filters: SurveillanceindicatorsFilter;
   onFiltersChange?: (filters: SurveillanceindicatorsFilter) => void;
+  tabSelected?: number;
 };
-const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
+const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange, tabSelected }) => {
   const { t } = useTranslation();
   const MaxDate: Date = today();
   const indicators = [
@@ -23,48 +24,52 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange }) => {
   ];
   return (
     <div className={styles.filtersContainer}>
-      <DatePicker
-        datePickerType="range"
-        minDate={formatDatetime(MaxDate)}
-        locale="en"
-        dateFormat={DATE_PICKER_CONTROL_FORMAT}
-        onChange={(dates: Array<Date>) => {
-          if (onFiltersChange) {
-            onFiltersChange({
-              ...filters,
-              startdate: dates[0],
-              endDate: dates[1],
-            });
-          }
-        }}>
-        <DatePickerInput
-          id="date-picker-input-id-start"
-          placeholder={DATE_PICKER_FORMAT}
-          labelText={t('startDate', 'Start date')}
-          size="md"
-        />
-        <DatePickerInput
-          id="date-picker-input-id-finish"
-          placeholder={DATE_PICKER_FORMAT}
-          labelText={t('endDate', 'End date')}
-          size="md"
-        />
-      </DatePicker>
+      {tabSelected === 0 && (
+        <DatePicker
+          datePickerType="range"
+          minDate={formatDatetime(MaxDate)}
+          locale="en"
+          dateFormat={DATE_PICKER_CONTROL_FORMAT}
+          onChange={(dates: Array<Date>) => {
+            if (onFiltersChange) {
+              onFiltersChange({
+                ...filters,
+                startdate: dates[0],
+                endDate: dates[1],
+              });
+            }
+          }}>
+          <DatePickerInput
+            id="date-picker-input-id-start"
+            placeholder={DATE_PICKER_FORMAT}
+            labelText={t('startDate', 'Start date')}
+            size="md"
+          />
+          <DatePickerInput
+            id="date-picker-input-id-finish"
+            placeholder={DATE_PICKER_FORMAT}
+            labelText={t('endDate', 'End date')}
+            size="md"
+          />
+        </DatePicker>
+      )}
 
-      <Dropdown
-        className={styles.filterInput}
-        autoAlign
-        id="filters"
-        itemToString={(item: { key: string; label: string }) =>
-          indicators.find(({ key }) => key === item.key)?.label ?? ''
-        }
-        items={indicators}
-        selectedItem={indicators.find(({ key }) => key === filters.indicator)}
-        label={t('indicator', 'Indicator')}
-        onChange={({ selectedItem: { key } }) => {
-          onFiltersChange({ ...filters, indicator: key });
-        }}
-      />
+      {tabSelected === 1 && (
+        <Dropdown
+          className={styles.filterInput}
+          autoAlign
+          id="filters"
+          itemToString={(item: { key: string; label: string }) =>
+            indicators.find(({ key }) => key === item.key)?.label ?? ''
+          }
+          items={indicators}
+          selectedItem={indicators.find(({ key }) => key === filters.indicator)}
+          label={t('indicator', 'Indicator')}
+          onChange={({ selectedItem: { key } }) => {
+            onFiltersChange({ ...filters, indicator: key });
+          }}
+        />
+      )}
     </div>
   );
 };
