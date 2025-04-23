@@ -25,10 +25,12 @@ export function useMedicationOrderAction(medicationRequestBundle?: MedicationReq
       const stockItem = service?.stockItem.split(':')[0];
       return stockItem === stockItemUuid;
     }) || [];
+  const billableItemServiceStatus = billableItem.some((item) => item.serviceStatus === 'DISABLED');
 
   const dispenseFormProps = medicationRequestBundle ? createMedicationDispenseProps({ medicationRequestBundle }) : null;
 
-  const shouldShowBillModal = stockItemQuantity > 0 && itemHasBill.length < 1 && billableItem.length > 0;
+  const shouldShowBillModal =
+    stockItemQuantity > 0 && itemHasBill.length < 1 && billableItem.length > 0 && !billableItemServiceStatus;
   const isDisabled = hasPendingPayment || (stockItemQuantity < 1 && !!drugUuid);
 
   // Modification is allowed only when:
