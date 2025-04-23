@@ -21,7 +21,10 @@ type MedicationDispense = {
 };
 
 export const createMedicationDispenseProps = (props) => {
-  const { patientUuid, encounterUuid, medicationRequestBundle, quantityRemaining, session, providers = [] } = props;
+  const { medicationRequestBundle, quantityRemaining, session, providers = [] } = props;
+  const request = medicationRequestBundle.request;
+  const patientUuid = request?.subject?.reference?.split('/')?.[1] || null;
+  const encounterUuid = request?.encounter?.reference?.split('/')?.[1] || null;
 
   return {
     patientUuid,
