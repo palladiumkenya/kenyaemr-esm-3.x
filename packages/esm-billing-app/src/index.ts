@@ -11,7 +11,7 @@ import RefundLineItem from './billable-services/bill-manager/bill-actions/refund
 import WaiveBillActionButton from './billable-services/bill-manager/bill-actions/waive-bill-action-button.component';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
-import { DeleteBillableServiceModal } from './billable-services/bill-manager/modals/serviceItemCard.component';
+import DeleteBillableServiceModal from './billable-services/bill-manager/modals/delete-billable-service.modal';
 import CreateBillItemModal from './billable-services/bill-manager/modals/create-bill-item-modal.component';
 import CancelBillWorkspace from './billable-services/bill-manager/workspaces/cancel-bill/cancel-bill.workspace';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill/edit-bill-form.workspace';
