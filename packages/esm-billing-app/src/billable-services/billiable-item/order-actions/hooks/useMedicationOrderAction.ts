@@ -54,7 +54,6 @@ export function useMedicationOrderAction(medicationRequestBundle?: MedicationReq
 
     return t('dispense', 'Dispense');
   };
-
   return {
     isLoading,
     isDisabled,
