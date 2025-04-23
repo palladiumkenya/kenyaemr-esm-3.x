@@ -81,6 +81,7 @@
   "dateCreated": "Date Created",
   "delete": "Delete",
   "deleteBill": "Delete Bill",
+  "deleteChargeItem": "Delete charge item",
   "description": "Description",
   "discard": "Discard",
   "discardClaim": "Discard Claim",
