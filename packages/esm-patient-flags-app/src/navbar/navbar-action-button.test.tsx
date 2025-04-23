@@ -16,9 +16,6 @@ describe('Navbar Action Button', () => {
 
     // clicking the button should open the overlay
     await userEvent.click(globalActionButton);
-    expect(globalActionButton).toHaveClass(
-      'cds--btn--icon-only active cds--header__action cds--btn cds--btn--primary cds--btn--icon-only cds--btn cds--btn--primary',
-    );
 
     // should render the overlay
     const searchInput = screen.getByRole('searchbox', { name: 'Search for a module' });

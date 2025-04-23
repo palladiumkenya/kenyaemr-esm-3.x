@@ -50,7 +50,7 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
     if (dispenseFormProps) {
       launchWorkspace('dispense-workspace', dispenseFormProps);
     }
-  }, [modalName, shouldShowBillModal, handleModalClose, medicationRequestBundle, dispenseFormProps, patientUuid]);
+  }, [shouldShowBillModal, medicationRequestBundle, dispenseFormProps, patientUuid]);
 
   if (!closeable) {
     return null;
