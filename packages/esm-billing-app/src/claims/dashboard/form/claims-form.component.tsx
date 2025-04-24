@@ -12,6 +12,7 @@ import {
   Stack,
   TextInput,
   TextInputSkeleton,
+  ComboBox,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
@@ -29,6 +30,7 @@ import useProvider from '../../../hooks/useProvider';
 import { LineItem, MappedBill } from '../../../types';
 import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
 import { processClaims, SHAPackagesAndInterventionVisitAttribute, useVisit } from './claims-form.resource';
+import useProviderList from '../../../hooks/useProviderList';
 
 import styles from './claims-form.scss';
 import debounce from 'lodash-es/debounce';
@@ -75,6 +77,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   } = useSession();
   const { providerLoading: providerLoading, provider, error: providerError } = useProvider(providerUuid);
   const { visitAttributeTypes } = useConfig<BillingConfig>();
+  const { providers = [], providersLoading } = useProviderList();
 
   const packagesAndinterventions = useMemo(() => {
     if (recentVisit) {
@@ -407,26 +410,19 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                   control={control}
                   name="provider"
                   render={({ field }) => (
-                    <Dropdown
-                      ref={field.ref}
+                    <ComboBox
+                      {...field}
+                      id="provider"
                       invalid={shouldShowError('provider')}
                       invalidText={errors.provider?.message}
-                      id="provider"
+                      placeholder={t('providerPlaceholder', 'Select Provider')}
                       titleText={t('provider', 'Provider')}
-                      onChange={(e) => {
-                        field.onChange(e.selectedItem);
-                        setValidationEnabled(true);
+                      items={providers}
+                      itemToString={(item) => item?.display?.split('-')?.at(-1)?.trim() ?? ''}
+                      selectedItem={providers?.find((p) => p?.uuid === field.value)}
+                      onChange={({ selectedItem }) => {
+                        field.onChange(selectedItem ? selectedItem.display?.split('-')?.at(-1)?.trim() : '');
                       }}
-                      initialSelectedItem={provider.uuid}
-                      label="Choose option"
-                      items={[provider].map((r) => r.uuid)}
-                      itemToString={(item) =>
-                        [provider]
-                          .find((r) => r.uuid === item)
-                          ?.display.split('-')
-                          .at(-1)
-                          .trim() ?? ''
-                      }
                     />
                   )}
                 />
