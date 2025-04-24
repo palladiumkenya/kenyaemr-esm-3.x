@@ -420,8 +420,9 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                       items={providers}
                       itemToString={(item) => item?.display?.split('-')?.at(-1)?.trim() ?? ''}
                       selectedItem={providers?.find((p) => p?.uuid === field.value)}
-                      onChange={({ selectedItem }) => {
-                        field.onChange(selectedItem ? selectedItem.display?.split('-')?.at(-1)?.trim() : '');
+                      onChange={({ e }) => {
+                        field.onChange(e.selectedItem);
+                        setValidationEnabled(true);
                       }}
                     />
                   )}
