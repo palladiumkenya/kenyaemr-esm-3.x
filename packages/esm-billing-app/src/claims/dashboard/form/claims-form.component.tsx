@@ -77,7 +77,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   } = useSession();
   const { providerLoading: providerLoading, provider, error: providerError } = useProvider(providerUuid);
   const { visitAttributeTypes } = useConfig<BillingConfig>();
-  const { providers = [], providersLoading } = useProviderList();
+  const { providers, providersLoading } = useProviderList();
 
   const packagesAndinterventions = useMemo(() => {
     if (recentVisit) {
@@ -420,8 +420,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                       items={providers}
                       itemToString={(item) => item?.display?.split('-')?.at(-1)?.trim() ?? ''}
                       selectedItem={providers?.find((p) => p?.uuid === field.value)}
-                      onChange={({ e }) => {
-                        field.onChange(e.selectedItem);
+                      onChange={({ selectedItem }) => {
+                        field.onChange(selectedItem?.display?.split('-')?.at(-1)?.trim() ?? '');
                         setValidationEnabled(true);
                       }}
                     />

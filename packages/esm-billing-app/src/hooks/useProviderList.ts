@@ -4,13 +4,13 @@ import useSWR from 'swr';
 import { Provider } from '../types';
 
 const useProviderList = () => {
-  const cutomPresentation = 'custom:(uuid,display,links)';
-  const url = `${restBaseUrl}/provider?v=${cutomPresentation}`;
+  const customPresentation = 'custom:(uuid,display,links)';
+  const url = `${restBaseUrl}/provider?v=${customPresentation}`;
 
   const { data, error, isLoading } = useSWR<{ data: { results: Array<Provider> } }>(url, openmrsFetch);
 
   return {
-    providers: data?.data?.results,
+    providers: data?.data?.results ?? [],
     error,
     providersLoading: isLoading,
   };
