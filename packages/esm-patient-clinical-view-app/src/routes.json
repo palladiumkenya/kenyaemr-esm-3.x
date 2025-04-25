@@ -95,8 +95,7 @@
       "component": "labourAndDeliveryLink",
       "slot": "maternal-and-child-health-slot",
       "meta": {
-        "columns": 1,
-        "columnSpan": 1,
+        "fullWidth": true,
         "slot": "patient-chart-labour-and-delivery-dashboard-slot",
         "path": "labour-and-delivery-dashboard",
         "layoutMode": "anchored"
@@ -105,7 +104,10 @@
     {
       "name": "labour-and-delivery-dashboard",
       "slot": "patient-chart-labour-and-delivery-dashboard-slot",
-      "component": "labourAndDelivery"
+      "component": "labourAndDelivery",
+      "meta": {
+        "fullWidth": true
+      }
     },
     {
       "name": "hiv-care-and-treatment-dashboard-group-link",
@@ -275,7 +277,7 @@
       "online": true,
       "offline": false
     },
-     {
+    {
       "name": "deceased-panel-dashboard-link",
       "component": "deceasedPanelDashboardLink",
       "slot": "patient-chart-dashboard-slot",
@@ -295,6 +297,14 @@
       "order": 0,
       "online": true,
       "offline": false
+    },
+    {
+      "name": "parto-graph-chart",
+      "slot": "patient-chart-labour-and-delivery-dashboard-slot",
+      "component": "partograph",
+      "meta": {
+        "fullWidth": true
+      }
     }
   ],
   "modals": [
@@ -357,7 +367,7 @@
       "title": "Other Relationships Form",
       "type": "form"
     },
-     {
+    {
       "name": "end-relationship-form",
       "component": "endRelationshipWorkspace",
       "title": "Discontinue relationship form",

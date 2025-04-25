@@ -13,7 +13,7 @@
     "coverage": "yarn test --coverage",
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
-    "start": "openmrs develop --sources packages/esm-billing-app  --port 8150 --backend https://hie.kenyahmis.org --config-url https://hie.kenyahmis.org/openmrs/spa/kenyaemr.config.json https://hie.kenyahmis.org/openmrs/spa/openmrs.config.json",
+    "start": " openmrs develop",
     "verify": "turbo run lint && turbo run typescript && turbo run test --color --concurrency=5",
     "preinstall": "npx only-allow yarn"
   },

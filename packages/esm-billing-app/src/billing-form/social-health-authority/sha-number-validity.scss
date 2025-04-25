@@ -10,6 +10,21 @@
 .hieCard {
   height: layout.$layout-03;
   display: grid;
+  grid-template-columns: 4fr 1fr 1fr;
+  grid-row: auto;
+  align-items: center;
+  column-gap: layout.$spacing-03;
+  border-bottom: 1px solid colors.$cool-gray-20;
+
+  &:hover {
+    cursor: pointer;
+    background-color: colors.$cool-gray-10;
+  }
+}
+
+.hieCardPHC {
+  height: layout.$layout-03;
+  display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-row: auto;
   align-items: center;

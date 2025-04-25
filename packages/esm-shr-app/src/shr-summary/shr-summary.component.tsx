@@ -1,5 +1,10 @@
 import { DataTableSkeleton, Layer, Tile, Tabs, TabList, Tab, TabPanel, TabPanels } from '@carbon/react';
-import { CardHeader, EmptyDataIllustration, ErrorState, getPatientUuidFromUrl } from '@openmrs/esm-patient-common-lib';
+import {
+  CardHeader,
+  EmptyDataIllustration,
+  ErrorState,
+  getPatientUuidFromStore,
+} from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import usePatientIdentifiers from '../hooks/usePatientIdentifiers';

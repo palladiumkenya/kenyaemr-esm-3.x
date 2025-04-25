@@ -19,7 +19,7 @@ import dayjs from 'dayjs';
 import { formatDate, restBaseUrl, useVisit } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
-import { getPatientUuidFromUrl, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { getPatientUuidFromStore, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useHeiOutcome } from '../hooks/useHeiOutcome';
 
 export interface ProgramEnrollmentProps {
@@ -65,7 +65,7 @@ const programDetailsMap = {
 
 const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [], programName }) => {
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(getPatientUuidFromUrl());
+  const { currentVisit } = useVisit(getPatientUuidFromStore());
   const { heiOutcome } = useHeiOutcome(currentVisit?.patient?.uuid);
   const orderedEnrollments = orderBy(enrollments, 'dateEnrolled', 'desc');
   const headers = useMemo(

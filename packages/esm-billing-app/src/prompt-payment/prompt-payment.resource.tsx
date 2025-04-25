@@ -173,7 +173,6 @@ export const usePatientBills = (patientUuid: string) => {
   const patientBills = useMemo(() => {
     return data?.data?.results?.map(mapBillProperties) ?? [];
   }, [data?.data?.results]);
-
   return {
     patientBills: patientBills ?? [],
     isLoading,

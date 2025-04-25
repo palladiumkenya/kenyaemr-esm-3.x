@@ -1,9 +1,14 @@
-import { OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
+import { Concept, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { ServiceConcept, ServiceTypesResponse } from '../types';
+import { type ChargeAble } from './billables/charge-summary.resource';
+
+type ExtendedResponseObject = ChargeAble & {
+  concept: Concept;
+};
 
 type ResponseObject = {
-  results: Array<OpenmrsResource>;
+  results: Array<ExtendedResponseObject>;
 };
 
 export const useBillableServices = () => {
@@ -36,11 +41,21 @@ export const createBillableService = (payload: any, uuid?: string) => {
     },
   });
 };
-export const deleteBillableService = (payload: any) => {
-  const url = `/ws/rest/v1/cashier/api/deletebillable-service`;
+/**
+ * Deletes a billable service by its unique identifier (UUID).
+ *
+ * @param uuid - The unique identifier of the billable service to be deleted.
+ * @returns A promise that resolves with the response of the DELETE request.
+ *
+ * @remarks
+ * This function sends a DELETE request to the OpenMRS REST API endpoint
+ * for billable services. Ensure that the `uuid` provided corresponds to
+ * an existing billable service.
+ */
+export const deleteBillableService = (uuid: string) => {
+  const url = `/ws/rest/v1/cashier/api/billable-service/${uuid}`;
   return openmrsFetch(url, {
-    method: 'POST',
-    body: payload,
+    method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
     },

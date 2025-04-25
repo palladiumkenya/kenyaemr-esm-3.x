@@ -17,6 +17,10 @@ export type SurveillanceSummary = {
   getMonthlyHivPositiveNotLinkedPatients: HivPositiveNotLinkedData;
   getMonthlyHighRiskPBFWNotOnPrep: HivPositiveNotLinkedData;
   getMonthlyHighRiskPBFWNotOnPrepPatients: HivPositiveNotLinkedData;
+  getMonthlyHeiDNAPCRPending: HivPositiveNotLinkedData;
+  getMonthlyEligibleForVlSampleNotTaken: HivPositiveNotLinkedData;
+  getMonthlyHei24MonthsWithoutDocumentedOutcome: HivPositiveNotLinkedData;
+  getMonthlyVirallyUnsuppressedWithoutEAC: HivPositiveNotLinkedData;
 };
 
 export type IndicationMode = 'decreasing' | 'increasing';
