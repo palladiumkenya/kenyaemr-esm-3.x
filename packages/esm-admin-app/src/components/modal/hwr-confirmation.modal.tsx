@@ -5,6 +5,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { type PractitionerResponse } from '../../types';
 import styles from './hwr-confirmation.modal.scss';
+import { formatDateTime } from '../../utils/utils';
 
 interface HealthWorkerInfoProps {
   label: string;
@@ -37,6 +38,12 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
     ?.split('&')[0];
 
   const practitioner = healthWorker?.entry?.[0]?.resource;
+
+  const licenseRenewalDate = practitioner?.identifier?.find((id) =>
+    id.type?.coding?.some((code) => code.code === 'license-number'),
+  )?.period?.end;
+
+  const isLicenseValid = licenseRenewalDate ? new Date(licenseRenewalDate) > new Date() : false;
 
   return (
     <>
@@ -85,10 +92,7 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
 
             <HealthWorkerInfo
               label={t('renewalDate', 'Renewal Date')}
-              value={
-                practitioner?.identifier?.find((id) => id.type?.coding?.some((code) => code.code === 'license-number'))
-                  ?.period?.end || '--'
-              }
+              value={formatDateTime(licenseRenewalDate) || '--'}
             />
 
             <HealthWorkerInfo
@@ -112,8 +116,8 @@ const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, hea
             <HealthWorkerInfo
               label={t('licenseValid', 'License Validity')}
               value={
-                <Tag type={practitioner?.active ? 'green' : 'red'}>
-                  {practitioner?.active ? t('licenseValid', 'License Valid') : t('licenseExpired', 'License Expired')}
+                <Tag type={isLicenseValid ? 'green' : 'red'}>
+                  {isLicenseValid ? t('licenseValid', 'License Valid') : t('licenseExpired', 'License Expired')}
                 </Tag>
               }
             />
