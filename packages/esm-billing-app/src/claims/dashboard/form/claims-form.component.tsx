@@ -415,7 +415,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                       id="provider"
                       invalid={shouldShowError('provider')}
                       invalidText={errors.provider?.message}
-                      placeholder={t('providerPlaceholder', 'Select Provider')}
+                      placeholder={t('selectProvider', 'Select Provider')}
                       titleText={t('provider', 'Provider')}
                       items={providers}
                       itemToString={(item) => item?.display?.split('-')?.at(-1)?.trim() ?? ''}
