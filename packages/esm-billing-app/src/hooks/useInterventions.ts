@@ -10,102 +10,124 @@ export type InterventionsFilter = {
   applicable_gender?: 'MALE' | 'FEMALE';
 };
 
-type Data = {
+export interface Data {
+  id: number;
+  isMultisession: boolean;
+  fund: string;
+  supportedScheme: string;
+  parentBenefitName: string;
+  parentBenefitCode: string;
+  benefitCode: string;
+  benefitName: string;
+  guid: string;
+  created: string;
+  updated: string;
+  replicated: string;
+  owner: number;
+  needsPreauth: boolean;
+  levelsApplicable: string[];
+  paymentMechanism: string;
+  coverageLevel: string;
+  annualQuantityLimit: number;
+  annualQuantityLimitChoice: any;
+  annualQuantityLimitType: string;
+  overallTariff: string;
+  overallTariffHasLimit: boolean;
+  annualLimitValue: any;
+  usageFrequencyLimit: any;
+  usageFrequencyType: string;
   status: string;
-  data: Array<{
-    interventionName: string;
-    interventionCode: string;
-    interventionPackage: string;
-    interventionSubPackage: string;
-    interventionDescription?: string;
-    insuranceSchemes: Array<{
-      rules: Array<{
-        ruleName: string;
-        ruleCode: string;
-        value: string;
-      }>;
-    }>;
-  }>;
-};
-export const useInterventions = (filters: InterventionsFilter) => {
-  const fetcher = (url: string) => {
-    return openmrsFetch(url, {
-      method: 'POST',
-      body: {
-        searchKeyAndValues: {
-          ...filters,
-          // scheme_code: 'UHC',
-          applicable_gender: filters.applicable_gender ? `ALL,${filters.applicable_gender}` : undefined,
-        },
-      },
-    });
-  };
+  needsManualPreauthApproval: boolean;
+  needsDoctorAuthorization: boolean;
+  numberOfDoctorsRequired: any;
+  needsMemberAuthorization: boolean;
+  accessPoint: string;
+  name: string;
+  code: string;
+  active: boolean;
+  activeForUhc: boolean;
+  diagnosisBlock: any[];
+  diagnosisList: any[];
+  applicableGender: string;
+  applicableFacilityOwnership: string;
+  upperAgeLimit: any;
+  lowerAgeLimit: any;
+  investigationTariff: any;
+  investigationTariffHasLimit: boolean;
+  managementTariff: any;
+  managementTariffHasLimit: boolean;
+  isIntraMetro: boolean;
+  tariffPerAdditionalKilometer: string;
+  needApprovalBeforeClaimSubmission: boolean;
+  needsProtocols: boolean;
+  level_2_tariff: string;
+  level_3_tariff: string;
+  level_4_tariff: string;
+  level_5_tariff: string;
+  level_6_tariff: string;
+  protocolUsed: any;
+  tariffLimitPerIndividual: any;
+  complexity: string;
+  comment: any;
+  retiredOn: any;
+  requiresSurgicalPreauth: boolean;
+  requiresRenalPreauth: boolean;
+  requiresOncologyPreauth: boolean;
+  requiresRadiologyPreauth: boolean;
+  requiresOpticalPreauth: boolean;
+  applicableSchemes: string[];
+  benefit: number;
+}
 
+export const useInterventions = (filters: InterventionsFilter) => {
   const { error: facilityLevelError, isLoading: isLoadingFacilityLevel, level } = useFacilityLevel();
   const urlParams = new URLSearchParams({
     ...filters,
     synchronize: 'false',
   });
   const url = `${restBaseUrl}/kenyaemr/sha-interventions?${urlParams.toString()}`;
-  const { isLoading, error, data } = useSWR<FetchResponse<Data>>(url, openmrsFetch);
+  const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<Data> }>>(url, openmrsFetch);
+  const mapper = ({ benefitCode, benefitName, parentBenefitCode }: Data): any => ({
+    interventionCode: benefitCode,
+    interventionName: benefitName,
+    interventionPackage: parentBenefitCode,
+  });
+
   const interventions = useMemo(() => {
     const packageCodes = filters.package_code?.split(',') || [];
-    return data?.data?.data
+    return data?.data?.results
       ?.filter((d) => {
         // 1. Filter by package code (only if defined)
-        if (packageCodes.length > 0 && !packageCodes.includes(d.interventionPackage)) {
+        if (packageCodes.length > 0 && !packageCodes.includes(d.parentBenefitCode)) {
           return false;
         }
 
         // 2. Filter by applicable gender (only if defined)
         if (
           filters.applicable_gender &&
-          d.insuranceSchemes?.some((s) =>
-            s.rules?.some(
-              (r) =>
-                r.ruleCode === 'applicable_gender' &&
-                r.value && // Ensure value exists
-                !['ALL', filters.applicable_gender].includes(r.value),
-            ),
-          )
+          d.applicableGender &&
+          !['ALL', filters.applicable_gender].includes(d.applicableGender)
         ) {
           return false;
         }
 
         // 3. Filter by levels applicable (only if level is defined)
-        if (
-          level &&
-          d.insuranceSchemes?.some((s) =>
-            s.rules?.some(
-              (r) =>
-                r.ruleCode === 'levels_applicable' &&
-                r.value && // Ensure value exists
-                !String(r.value).includes(level), // Convert to string to avoid array issues
-            ),
-          )
-        ) {
+        // if (level && d.levelsApplicable && !d.levelsApplicable.includes(level)) {
+        //   return false;
+        // }
+
+        if (level && d.levelsApplicable && !d.levelsApplicable.some((l) => level.includes(l))) {
           return false;
         }
 
         return true; // Keep item if it passes all filters
       })
-      ?.map(({ interventionCode, interventionName, interventionPackage, interventionSubPackage }) => ({
-        interventionCode,
-        subCategoryBenefitsPackage: interventionSubPackage,
-        interventionName,
-        interventionPackage,
-      })) as SHAIntervention[];
+      ?.map(mapper);
   }, [data, filters, level]); // Ensure proper memoization
   const allInterventions = useMemo(() => {
-    return (data?.data?.data ?? []).map(
-      ({ interventionCode, interventionName, interventionPackage, interventionSubPackage }) => ({
-        interventionCode,
-        subCategoryBenefitsPackage: interventionSubPackage,
-        interventionName,
-        interventionPackage,
-      }),
-    ) as SHAIntervention[];
+    return (data?.data?.results ?? []).map(mapper);
   }, [data]);
+
   return {
     isLoading: isLoading || isLoadingFacilityLevel,
     interventions: interventions ?? [],
