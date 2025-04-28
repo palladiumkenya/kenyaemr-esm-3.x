@@ -274,16 +274,16 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         healthWorker: fetchedHealthWorker,
         onConfirm: () => {
           dispose();
-          const fullName = fetchedHealthWorker?.entry[0]?.resource?.name[0]?.text;
+          const fullName = fetchedHealthWorker?.entry[0]?.resource?.name[0]?.text?.trim();
 
-          const nameParts = fullName.split(' ');
+          const nameParts = fullName.replace(/\s+/g, ' ').split(' ');
 
           const hasTitle = nameParts[0].endsWith('.');
           const nameWithoutTitle = hasTitle ? nameParts.slice(1) : nameParts;
 
-          const givenName = nameWithoutTitle[0];
-          const middleName = nameWithoutTitle.slice(1, -1).join(' ');
-          const familyName = nameWithoutTitle[nameWithoutTitle.length - 1];
+          const givenName = nameWithoutTitle[0] || '';
+          const familyName = nameWithoutTitle.length > 1 ? nameWithoutTitle[nameWithoutTitle.length - 1] : '';
+          const middleName = nameWithoutTitle.length > 2 ? nameWithoutTitle.slice(1, -1).join(' ') : '';
           const healthWorkerPassPortNumber = fetchedHealthWorker?.link
             ?.find(
               (link: { relation: string; url: string }) =>
