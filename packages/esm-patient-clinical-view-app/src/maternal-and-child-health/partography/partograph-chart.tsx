@@ -138,7 +138,7 @@ const PartographChart: React.FC<PartographChartProps> = ({ partograpyComponents 
     const currentOption = partographSignOptions.find((option) => option.id === selectedPartographSign.id);
     // Update to the new option or default to the first option
     setSelectedPartographSign(currentOption || partographSignOptions[0]);
-  }, [partographSignOptions]);
+  }, [partographSignOptions, selectedPartographSign.id]);
 
   return (
     <div className={styles.vitalsChartContainer}>

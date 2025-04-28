@@ -178,7 +178,7 @@ const LabManifestsTable = () => {
           ),
         };
       }) ?? [],
-    [results, t],
+    [results, handleLaunchRequeueConfirmModal, labmanifestTypes, size, t],
   );
 
   if (isLoading) {
