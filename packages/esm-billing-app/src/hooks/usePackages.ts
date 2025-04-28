@@ -10,17 +10,17 @@ const usePackages = () => {
   const url = `${restBaseUrl}/kenyaemr/sha-benefits-package?synchronize=false`;
 
   const { data, isLoading, error } = useSWR<
-    FetchResponse<{ data: Array<{ code: string; name: string; description?: string }> }>
+    FetchResponse<{ result: Array<{ benefitCode: string; benefitName: string; description?: string }> }>
   >(url, openmrsFetch);
 
   return {
     isLoading,
-    packages: (data?.data.data ?? []).map(
+    packages: (data?.data.result ?? []).map(
       (category) =>
         ({
-          uuid: `${category.code}`,
-          packageCode: category.code,
-          packageName: category.name,
+          uuid: `${category.benefitCode}`,
+          packageCode: category.benefitCode,
+          packageName: category.benefitName,
         } as Package),
     ),
     error,
