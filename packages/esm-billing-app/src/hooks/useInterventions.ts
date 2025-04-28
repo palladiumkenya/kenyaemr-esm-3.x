@@ -1,8 +1,7 @@
 import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import useSWR from 'swr';
-import { SHAIntervention } from '../types';
-import useFacilityLevel from './useFacilityLevel';
 import { useMemo } from 'react';
+import useSWR from 'swr';
+import useFacilityLevel from './useFacilityLevel';
 
 export type InterventionsFilter = {
   package_code?: string;
@@ -29,32 +28,32 @@ export interface Data {
   paymentMechanism: string;
   coverageLevel: string;
   annualQuantityLimit: number;
-  annualQuantityLimitChoice: any;
+  annualQuantityLimitChoice: string;
   annualQuantityLimitType: string;
   overallTariff: string;
   overallTariffHasLimit: boolean;
-  annualLimitValue: any;
-  usageFrequencyLimit: any;
+  annualLimitValue: string;
+  usageFrequencyLimit: string;
   usageFrequencyType: string;
   status: string;
   needsManualPreauthApproval: boolean;
   needsDoctorAuthorization: boolean;
-  numberOfDoctorsRequired: any;
+  numberOfDoctorsRequired: string;
   needsMemberAuthorization: boolean;
   accessPoint: string;
   name: string;
   code: string;
   active: boolean;
   activeForUhc: boolean;
-  diagnosisBlock: any[];
-  diagnosisList: any[];
+  diagnosisBlock: string[];
+  diagnosisList: string[];
   applicableGender: string;
   applicableFacilityOwnership: string;
-  upperAgeLimit: any;
-  lowerAgeLimit: any;
-  investigationTariff: any;
+  upperAgeLimit: string;
+  lowerAgeLimit: string;
+  investigationTariff: string;
   investigationTariffHasLimit: boolean;
-  managementTariff: any;
+  managementTariff: string;
   managementTariffHasLimit: boolean;
   isIntraMetro: boolean;
   tariffPerAdditionalKilometer: string;
@@ -65,11 +64,11 @@ export interface Data {
   level_4_tariff: string;
   level_5_tariff: string;
   level_6_tariff: string;
-  protocolUsed: any;
-  tariffLimitPerIndividual: any;
+  protocolUsed: string;
+  tariffLimitPerIndividual: string;
   complexity: string;
-  comment: any;
-  retiredOn: any;
+  comment: string;
+  retiredOn: string;
   requiresSurgicalPreauth: boolean;
   requiresRenalPreauth: boolean;
   requiresOncologyPreauth: boolean;
@@ -110,11 +109,6 @@ export const useInterventions = (filters: InterventionsFilter) => {
         ) {
           return false;
         }
-
-        // 3. Filter by levels applicable (only if level is defined)
-        // if (level && d.levelsApplicable && !d.levelsApplicable.includes(level)) {
-        //   return false;
-        // }
 
         if (level && d.levelsApplicable && !d.levelsApplicable.some((l) => level.includes(l))) {
           return false;
