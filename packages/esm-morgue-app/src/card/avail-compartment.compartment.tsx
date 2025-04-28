@@ -1,6 +1,6 @@
 import { Tag } from '@carbon/react';
 import { View } from '@carbon/react/icons';
-import { ConfigurableLink, useVisit } from '@openmrs/esm-framework';
+import { ConfigurableLink, useVisit, UserHasAccess } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -69,11 +69,13 @@ const AvailableCompartment: React.FC<AvailableCompartmentProps> = ({ patientInfo
           )}
         </span>
         <span className={styles.viewDetails}>
-          <ConfigurableLink
-            className={styles.viewDetailsLink}
-            to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/deceased-panel`}>
-            <View size={20} />
-          </ConfigurableLink>
+          <UserHasAccess privilege="o3 : View Mortuary Records">
+            <ConfigurableLink
+              className={styles.viewDetailsLink}
+              to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/deceased-panel`}>
+              <View size={20} />
+            </ConfigurableLink>
+          </UserHasAccess>
         </span>
       </div>
       <div className={styles.borderLine}></div>
