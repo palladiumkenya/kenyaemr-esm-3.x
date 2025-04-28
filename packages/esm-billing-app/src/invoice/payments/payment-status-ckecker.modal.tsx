@@ -81,7 +81,7 @@ const PaymentStatusCheckerModal: React.FC<PaymentStatusCheckerModalProps> = ({
     } finally {
       setChecking(false);
     }
-  }, [transactionid, t]);
+  }, [transactionid, selectedLineItems, onClose, mobilemoneypaymentMethod, globalActiveSheet, bill, t]);
   return (
     <React.Fragment>
       <ModalHeader className={styles.heading} closeModal={onClose}>
