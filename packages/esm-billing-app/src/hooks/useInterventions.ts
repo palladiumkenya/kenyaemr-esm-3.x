@@ -9,7 +9,7 @@ export type InterventionsFilter = {
   applicable_gender?: 'MALE' | 'FEMALE';
 };
 
-export interface Data {
+interface Intervention {
   id: number;
   isMultisession: boolean;
   fund: string;
@@ -85,8 +85,8 @@ export const useInterventions = (filters: InterventionsFilter) => {
     synchronize: 'false',
   });
   const url = `${restBaseUrl}/kenyaemr/sha-interventions?${urlParams.toString()}`;
-  const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<Data> }>>(url, openmrsFetch);
-  const mapper = ({ benefitCode, benefitName, parentBenefitCode }: Data): any => ({
+  const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<Intervention> }>>(url, openmrsFetch);
+  const mapper = ({ benefitCode, benefitName, parentBenefitCode }: Intervention): any => ({
     interventionCode: benefitCode,
     interventionName: benefitName,
     interventionPackage: parentBenefitCode,
