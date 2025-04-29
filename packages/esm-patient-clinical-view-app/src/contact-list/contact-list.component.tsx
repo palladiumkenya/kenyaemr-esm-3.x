@@ -3,6 +3,8 @@ import {
   DataTable,
   DataTableSkeleton,
   Layer,
+  OverflowMenu,
+  OverflowMenuItem,
   Pagination,
   Table,
   TableBody,
@@ -13,7 +15,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   ErrorState,
@@ -26,10 +28,12 @@ import {
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
+import { ConfigObject } from '../config-schema';
 import useContacts from '../hooks/useContacts';
+import { deleteRelationship } from '../relationships/relationship.resources';
 import styles from './contact-list.scss';
 import HIVStatus from './hiv-status.component';
-import { deleteRelationship } from '../relationships/relationship.resources';
 
 interface ContactListProps {
   patientUuid: string;
@@ -40,11 +44,13 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('contactList', 'Contact list');
   const layout = useLayoutType();
-
+  const size = layout === 'tablet' ? 'lg' : 'md';
   const { contacts, error, isLoading } = useContacts(patientUuid);
   const { results, totalPages, currentPage, goTo } = usePagination(contacts, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
-
+  const {
+    formsList: { htsClientTracingFormUuid },
+  } = useConfig<ConfigObject>();
   const headers = [
     {
       header: t('listingDate', 'Listing date'),
@@ -104,6 +110,24 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
     });
   };
 
+  const handleLaunchContactTracingForm = () => {
+    launchWorkspace('patient-form-entry-workspace', {
+      workspaceTitle: 'Clinical Encounter',
+      mutateForm: () => {
+        mutate((key) => true, undefined, {
+          revalidate: true,
+        });
+      },
+      formInfo: {
+        encounterUuid: '',
+        formUuid: htsClientTracingFormUuid,
+        patientUuid,
+        visitTypeUuid: '',
+        visitUuid: '',
+      },
+    });
+  };
+
   const handleEditRelationship = (relationShipUuid: string) => {
     launchWorkspace('relationship-update-form', {
       relationShipUuid,
@@ -137,20 +161,14 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         ipvOutcome: relation.ipvOutcome ?? '--',
         actions: (
           <>
-            <Button
-              renderIcon={Edit}
-              hasIconOnly
-              kind="ghost"
-              iconDescription="Edit"
-              onClick={() => handleEditRelationship(relation.uuid)}
-            />
-            <Button
-              renderIcon={TrashCan}
-              hasIconOnly
-              kind="ghost"
-              iconDescription="Delete"
-              onClick={() => deleteRelationship(relation.uuid)}
-            />
+            <OverflowMenu size={size} flipped>
+              <OverflowMenuItem itemText={t('edit', 'Edit')} onClick={() => handleEditRelationship(relation.uuid)} />
+              <OverflowMenuItem
+                itemText={t('traceContact', 'Trace Contact')}
+                onClick={() => handleLaunchContactTracingForm()}
+              />
+              <OverflowMenuItem itemText={t('delete', 'Delete')} onClick={() => deleteRelationship(relation.uuid)} />
+            </OverflowMenu>
           </>
         ),
       };
