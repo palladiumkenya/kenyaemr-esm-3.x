@@ -90,7 +90,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
   const onSubmit = async (data: BillableFormSchema) => {
     const formPayload = formatBillableServicePayloadForSubmission(data, initialValues?.['uuid']);
     try {
-      const response = await createBillableService(formPayload);
+      const response = await createBillableService(formPayload, initialValues?.['uuid']);
       if (response.ok) {
         showSnackbar({
           title: inEditMode
@@ -108,12 +108,13 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
         closeWorkspaceWithSavedChanges();
       }
     } catch (e) {
+      const errorMessage = e?.responseBody?.error?.message;
       showSnackbar({
         title: t('error', 'Error'),
         kind: 'error',
         subtitle: inEditMode
           ? t('serviceUpdateFailed', 'Service failed to update')
-          : t('serviceCreationFailed', 'Service creation failed'),
+          : t('serviceCreationFailed', 'Service creation failed {{errorMessage}}', { errorMessage }),
         isLowContrast: true,
         timeoutInMs: 5000,
       });
@@ -137,12 +138,12 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
 
   const handleError = (err) => {
     console.error(JSON.stringify(err, null, 2));
+    const formSchemaError = JSON.stringify(err, null, 2);
     showSnackbar({
       title: t('serviceCreationFailed', 'Service creation failed'),
-      subtitle: t(
-        'serviceCreationFailedSubtitle',
-        'The service creation failed, view browser console for more details',
-      ),
+      subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed, {{formSchemaError}}', {
+        formSchemaError,
+      }),
       kind: 'error',
       isLowContrast: true,
       timeoutInMs: 5000,

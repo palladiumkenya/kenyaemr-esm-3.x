@@ -18,7 +18,8 @@
     "preinstall": "npx only-allow yarn"
   },
   "resolutions": {
-    "sass": "^1.54.3"
+    "sass": "^1.54.3",
+    "webpack": "5.74.0"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"

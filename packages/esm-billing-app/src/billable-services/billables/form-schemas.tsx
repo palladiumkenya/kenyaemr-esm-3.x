@@ -26,7 +26,7 @@ export const billableFormSchema = z.object({
   servicePrices: z.array(servicePriceSchema).min(1, 'At least one price is required'),
   serviceStatus: z.enum(['ENABLED', 'DISABLED']),
   concept: ServiceConceptSchema,
-  stockItem: z.string().optional(),
+  stockItem: z.string().nullable().optional(),
 });
 
 export type BillableFormSchema = z.infer<typeof billableFormSchema>;

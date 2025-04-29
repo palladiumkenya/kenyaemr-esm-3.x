@@ -57,7 +57,7 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
   const onSubmit = async (formValues: BillableFormSchema) => {
     const payload = formatBillableServicePayloadForSubmission(formValues, initialValues?.['uuid']);
     try {
-      const response = await createBillableService(payload);
+      const response = await createBillableService(payload, initialValues?.['uuid']);
       if (response.ok) {
         showSnackbar({
           title: t('commodityBillableCreated', 'Commodity price created successfully'),
@@ -70,9 +70,17 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
         closeWorkspaceWithSavedChanges();
       }
     } catch (e) {
+      const errorMessage =
+        e?.responseBody?.error?.message || e?.message || t('unknownError', 'An unknown error occurred');
       showSnackbar({
         title: t('commodityBillableCreationFailed', 'Commodity price creation failed'),
-        subtitle: t('commodityBillableCreationFailedSubtitle', 'The commodity price creation failed'),
+        subtitle: t(
+          'commodityBillableCreationFailedSubtitle',
+          'The commodity price creation failed: {{errorMessage}}',
+          {
+            errorMessage: String(errorMessage).trim(),
+          },
+        ),
         kind: 'error',
         isLowContrast: true,
         timeoutInMs: 5000,

@@ -24,16 +24,16 @@ export const formatBillableServicePayloadForSubmission = (
 ): BillableServicePayload => {
   const formPayload = {
     name: formData.name,
-    shortName: formData.name,
+    shortName: formData.shortName,
     serviceType: formData.serviceType.uuid,
     servicePrices: formData.servicePrices.map((servicePrice) => ({
       paymentMode: servicePrice.paymentMode.uuid,
-      price: servicePrice.price.toFixed(2),
+      price: servicePrice.price,
       name: servicePrice.paymentMode.name,
     })),
     serviceStatus: formData.serviceStatus,
     concept: formData.concept.concept.uuid,
-    stockItem: formData?.stockItem ? formData.stockItem : '',
+    stockItem: formData.stockItem || null,
   };
 
   return uuid ? Object.assign(formPayload, { uuid: uuid }) : formPayload;
@@ -68,6 +68,7 @@ export function mapInputToPayloadSchema(service): BillableFormSchema {
       },
       display: service?.concept?.display,
     },
+    stockItem: service?.stockItem?.uuid ?? null,
   };
 
   return payload;
