@@ -131,53 +131,55 @@ const LabManifestsTable = () => {
 
   const tableRows = useMemo(
     () =>
-      results?.map((manifest) => {
-        return {
-          id: `${manifest.uuid}`,
-          startDate: manifest.startDate ? formatDate(parseDate(manifest.startDate)) : '--',
-          endDate: manifest.endDate ? formatDate(parseDate(manifest.endDate)) : '--',
-          courrier: manifest.courierName ? manifest.courierName : '--',
-          labPersonContact: manifest.labPersonContact ?? '--',
-          type: labmanifestTypes.find((type) => `${type.id}` === manifest?.manifestType)?.type ?? '--',
-          status: manifest.manifestStatus ?? '--',
-          dispatch: manifest.dispatchDate ? formatDate(parseDate(manifest.dispatchDate)) : '--',
-          manifestId: manifest.manifestId ?? '--',
-          samples: `${manifest.samples.length}`,
-          actions: (
-            <OverflowMenu flipped size={size} aria-label="overflow-menu">
-              <OverflowMenuItem
-                itemText={t('viewManifest', 'View Manifest')}
-                onClick={() => handleViewManifestSamples(manifest.uuid)}
-              />
-              {editableManifestStatus.includes(manifest.manifestStatus) && (
+      (
+        results?.map((manifest) => {
+          return {
+            id: `${manifest.uuid}`,
+            startDate: parseDate(manifest.startDate),
+            endDate: manifest.endDate ? parseDate(manifest.endDate) : '--',
+            courrier: manifest.courierName ? manifest.courierName : '--',
+            labPersonContact: manifest.labPersonContact ?? '--',
+            type: labmanifestTypes.find((type) => `${type.id}` === manifest?.manifestType)?.type ?? '--',
+            status: manifest.manifestStatus ?? '--',
+            dispatch: manifest.dispatchDate ? parseDate(manifest.dispatchDate) : '--',
+            manifestId: manifest.manifestId ?? '--',
+            samples: `${manifest.samples.length}`,
+            actions: (
+              <OverflowMenu flipped size={size} aria-label="overflow-menu">
                 <OverflowMenuItem
-                  itemText={t('editmanifest', 'Edit Manifest')}
-                  onClick={() => handleEditManifest(manifest)}
+                  itemText={t('viewManifest', 'View Manifest')}
+                  onClick={() => handleViewManifestSamples(manifest.uuid)}
                 />
-              )}
-              {printableManifestStatus.includes(manifest.manifestStatus) && (
-                <>
+                {editableManifestStatus.includes(manifest.manifestStatus) && (
                   <OverflowMenuItem
-                    itemText={t('printManifest', 'Print Manifest')}
-                    onClick={() => handlePrintManifest(manifest)}
+                    itemText={t('editmanifest', 'Edit Manifest')}
+                    onClick={() => handleEditManifest(manifest)}
                   />
-                  <OverflowMenuItem
-                    itemText={t('printManifestLog', 'Print Manifest Log')}
-                    onClick={() => handlePrintManifest(manifest, true)}
-                  />
-                </>
-              )}
+                )}
+                {printableManifestStatus.includes(manifest.manifestStatus) && (
+                  <>
+                    <OverflowMenuItem
+                      itemText={t('printManifest', 'Print Manifest')}
+                      onClick={() => handlePrintManifest(manifest)}
+                    />
+                    <OverflowMenuItem
+                      itemText={t('printManifestLog', 'Print Manifest Log')}
+                      onClick={() => handlePrintManifest(manifest, true)}
+                    />
+                  </>
+                )}
 
-              {resubmittableManifestStatus.includes(manifest.manifestStatus) && (
-                <OverflowMenuItem
-                  itemText={t('requeueManifest', 'Requeue Manifest')}
-                  onClick={() => handleLaunchRequeueConfirmModal(manifest)}
-                />
-              )}
-            </OverflowMenu>
-          ),
-        };
-      }) ?? [],
+                {resubmittableManifestStatus.includes(manifest.manifestStatus) && (
+                  <OverflowMenuItem
+                    itemText={t('requeueManifest', 'Requeue Manifest')}
+                    onClick={() => handleLaunchRequeueConfirmModal(manifest)}
+                  />
+                )}
+              </OverflowMenu>
+            ),
+          };
+        }) ?? []
+      ).sort((a, b) => b.startDate.getTime() - a.startDate.getTime()),
     [results, handleLaunchRequeueConfirmModal, labmanifestTypes, size, t],
   );
 
@@ -186,6 +188,16 @@ const LabManifestsTable = () => {
   }
   if (error) {
     return <ErrorState headerTitle={headerTitle} error={error} />;
+  }
+  function customSortRow(cellA, cellB, { sortDirection, sortStates, locale, key, compare }) {
+    // Convert Date objects to timestamps for comparison
+    const valueA = cellA instanceof Date ? cellA.getTime() : cellA;
+    const valueB = cellB instanceof Date ? cellB.getTime() : cellB;
+    if (sortDirection === sortStates.DESC) {
+      return compare(valueB, valueA, locale);
+    }
+
+    return compare(valueA, valueB, locale);
   }
 
   if (manifests.length === 0) {
@@ -234,6 +246,7 @@ const LabManifestsTable = () => {
         useZebraStyles
         size="sm"
         rows={tableRows ?? []}
+        sortRow={customSortRow}
         headers={headers}
         render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
           <TableContainer {...getTableContainerProps()}>
@@ -254,9 +267,10 @@ const LabManifestsTable = () => {
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    ))}
+                    {row.cells.map((cell) => {
+                      const value = cell.value instanceof Date ? formatDate(cell.value) : cell.value;
+                      return <TableCell key={cell.id}>{value}</TableCell>;
+                    })}
                   </TableRow>
                 ))}
               </TableBody>
