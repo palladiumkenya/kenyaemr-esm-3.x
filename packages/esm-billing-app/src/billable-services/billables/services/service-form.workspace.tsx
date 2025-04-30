@@ -115,16 +115,14 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
         closeWorkspaceWithSavedChanges();
       }
     } catch (e) {
-      const errorMessage = e?.responseBody?.error?.message;
+      const formSchemaError = JSON.stringify(e, null, 2);
+      const errorMessage = e?.servicePrices?.root?.message || 'Unknown error occurred';
       showSnackbar({
         title: t('serviceCreationFailed', 'Service creation failed'),
         subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed: {{errorMessage}}', {
           errorMessage,
         }),
         kind: 'error',
-        subtitle: inEditMode
-          ? t('serviceUpdateFailed', 'Service failed to update')
-          : t('serviceCreationFailed', 'Service creation failed {{errorMessage}}', { errorMessage }),
         isLowContrast: true,
         timeoutInMs: 5000,
       });
@@ -148,11 +146,14 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
 
   const handleError = (err) => {
     console.error(JSON.stringify(err, null, 2));
-    const formSchemaError = JSON.stringify(err, null, 2);
+    const errorMessage = Object.entries(err as Record<string, { message: string }>)
+      .map(([field, error]) => `${field}: ${error.message}`)
+      .join('; ');
+
     showSnackbar({
       title: t('serviceCreationFailed', 'Service creation failed'),
-      subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed, {{formSchemaError}}', {
-        formSchemaError,
+      subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed: {{errorMessage}}', {
+        errorMessage,
       }),
       kind: 'error',
       isLowContrast: true,
