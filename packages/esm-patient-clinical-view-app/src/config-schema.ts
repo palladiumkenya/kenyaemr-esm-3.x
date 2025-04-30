@@ -9,6 +9,7 @@ export const configSchema = {
       mchMotherConsultation: 'c6d09e05-1f25-4164-8860-9f32c5a02df0',
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
       kpPeerCalender: 'c4f9db39-2c18-49a6-bf9b-b243d673c64d',
+      htsEcounterUuid: '9c0a7a57-62ff-4f75-babe-5835b0e921b7', // Used with Contact tracing
     },
   },
   caseManagementForms: {
@@ -46,6 +47,16 @@ export const configSchema = {
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
       autopsyFormUuid: '2b61a73-4971-4fc0-b20b-9a30176317e2',
       htsClientTracingFormUuid: '15ed03d2-c972-11e9-a32f-2a2ae2dbcce4',
+    },
+  },
+  htsClientTracingConceptsUuids: {
+    _type: Type.Object,
+    _description: 'Concept Uuids for hts client tracing',
+    _default: {
+      modeOfClienttracingConceptUuid: 'a55f9516-ddb6-47ec-b10d-cb99d1d0bd41',
+      reasonNotContactedConceptUuid: '1779AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      tracingStatusConceptUuid: '159811AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      remarksConceptUuid: '163042AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
   defaulterTracingEncounterUuid: {
@@ -274,7 +285,18 @@ export interface ConfigObject {
   morgueDischargeEncounterUuid: string;
   caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
   peerCalendarOutreactForm: string;
-  encounterTypes: { mchMotherConsultation: string; hivTestingServices: string; kpPeerCalender: string };
+  htsClientTracingConceptsUuids: {
+    modeOfClienttracingConceptUuid: string;
+    reasonNotContactedConceptUuid: string;
+    tracingStatusConceptUuid: string;
+    remarksConceptUuid: string;
+  };
+  encounterTypes: {
+    mchMotherConsultation: string;
+    hivTestingServices: string;
+    kpPeerCalender: string;
+    htsEcounterUuid: string;
+  };
   formsList: {
     labourAndDelivery: string;
     antenatal: string;

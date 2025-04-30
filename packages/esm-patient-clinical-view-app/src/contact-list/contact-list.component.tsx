@@ -10,6 +10,9 @@ import {
   TableBody,
   TableCell,
   TableContainer,
+  TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
   TableHead,
   TableHeader,
   TableRow,
@@ -33,6 +36,7 @@ import { ConfigObject } from '../config-schema';
 import useContacts from '../hooks/useContacts';
 import { deleteRelationship } from '../relationships/relationship.resources';
 import styles from './contact-list.scss';
+import ContactTracingHistory from './contact-tracing-history.component';
 import HIVStatus from './hiv-status.component';
 
 interface ContactListProps {
@@ -110,9 +114,9 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
     });
   };
 
-  const handleLaunchContactTracingForm = () => {
+  const handleLaunchContactTracingForm = (contactUuid: string) => {
     launchWorkspace('patient-form-entry-workspace', {
-      workspaceTitle: 'Clinical Encounter',
+      workspaceTitle: 'Contact Tracing',
       mutateForm: () => {
         mutate((key) => true, undefined, {
           revalidate: true,
@@ -121,7 +125,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       formInfo: {
         encounterUuid: '',
         formUuid: htsClientTracingFormUuid,
-        patientUuid,
+        patientUuid: 'contactUuid',
         visitTypeUuid: '',
         visitUuid: '',
       },
@@ -165,7 +169,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
               <OverflowMenuItem itemText={t('edit', 'Edit')} onClick={() => handleEditRelationship(relation.uuid)} />
               <OverflowMenuItem
                 itemText={t('traceContact', 'Trace Contact')}
-                onClick={() => handleLaunchContactTracingForm()}
+                onClick={() => handleLaunchContactTracingForm(patientUuid)}
               />
               <OverflowMenuItem itemText={t('delete', 'Delete')} onClick={() => deleteRelationship(relation.uuid)} />
             </OverflowMenu>
@@ -209,11 +213,20 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       <DataTable
         rows={tableRows ?? []}
         headers={headers}
-        render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
+        render={({
+          rows,
+          headers,
+          getHeaderProps,
+          getTableProps,
+          getTableContainerProps,
+          getRowProps,
+          getExpandedRowProps,
+        }) => (
           <TableContainer {...getTableContainerProps()}>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
+                  <TableExpandHeader aria-label="expand row" />
                   {headers.map((header) => (
                     <TableHeader
                       {...getHeaderProps({
@@ -227,11 +240,25 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    ))}
-                  </TableRow>
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow
+                      {...getRowProps({
+                        row,
+                      })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableExpandRow>
+
+                    <TableExpandedRow
+                      colSpan={headers.length + 1}
+                      className="demo-expanded-td"
+                      {...getExpandedRowProps({
+                        row,
+                      })}>
+                      <ContactTracingHistory patientUuid={results.find((r) => r.uuid === row.id)?.patientUuid} />
+                    </TableExpandedRow>
+                  </React.Fragment>
                 ))}
               </TableBody>
             </Table>
