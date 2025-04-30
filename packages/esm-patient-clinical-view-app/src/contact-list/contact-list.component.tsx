@@ -115,19 +115,14 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   };
 
   const handleLaunchContactTracingForm = (contactUuid: string) => {
-    launchWorkspace('patient-form-entry-workspace', {
-      workspaceTitle: 'Contact Tracing',
+    launchWorkspace('kenyaemr-cusom-form-entry-workspace', {
+      formUuid: htsClientTracingFormUuid,
+      patientUuid: contactUuid,
+      encounterUuid: '',
       mutateForm: () => {
         mutate((key) => true, undefined, {
           revalidate: true,
         });
-      },
-      formInfo: {
-        encounterUuid: '',
-        formUuid: htsClientTracingFormUuid,
-        patientUuid: 'contactUuid',
-        visitTypeUuid: '',
-        visitUuid: '',
       },
     });
   };
