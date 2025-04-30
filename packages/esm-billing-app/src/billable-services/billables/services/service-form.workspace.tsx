@@ -50,7 +50,14 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
     resolver: zodResolver(billableFormSchema),
     defaultValues: initialValues
       ? mapInputToPayloadSchema(initialValues)
-      : { servicePrices: [], serviceStatus: 'ENABLED' },
+      : {
+          name: '',
+          shortName: '',
+          concept: null,
+          serviceType: null,
+          serviceStatus: 'ENABLED',
+          servicePrices: [],
+        },
   });
 
   const {
@@ -108,13 +115,14 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
         closeWorkspaceWithSavedChanges();
       }
     } catch (e) {
-      const errorMessage = e?.responseBody?.error?.message;
+      const formSchemaError = JSON.stringify(e, null, 2);
+      const errorMessage = e?.servicePrices?.root?.message || 'Unknown error occurred';
       showSnackbar({
-        title: t('error', 'Error'),
+        title: t('serviceCreationFailed', 'Service creation failed'),
+        subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed: {{errorMessage}}', {
+          errorMessage,
+        }),
         kind: 'error',
-        subtitle: inEditMode
-          ? t('serviceUpdateFailed', 'Service failed to update')
-          : t('serviceCreationFailed', 'Service creation failed {{errorMessage}}', { errorMessage }),
         isLowContrast: true,
         timeoutInMs: 5000,
       });
@@ -138,11 +146,14 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
 
   const handleError = (err) => {
     console.error(JSON.stringify(err, null, 2));
-    const formSchemaError = JSON.stringify(err, null, 2);
+    const errorMessage = Object.entries(err as Record<string, { message: string }>)
+      .map(([field, error]) => `${field}: ${error.message}`)
+      .join('; ');
+
     showSnackbar({
       title: t('serviceCreationFailed', 'Service creation failed'),
-      subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed, {{formSchemaError}}', {
-        formSchemaError,
+      subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed: {{errorMessage}}', {
+        errorMessage,
       }),
       kind: 'error',
       isLowContrast: true,
@@ -168,11 +179,12 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                 control={control}
                 render={({ field }) => (
                   <TextInput
+                    id="serviceName"
                     {...field}
                     type="text"
                     labelText={t('serviceName', 'Service name')}
                     invalid={!!errors.name}
-                    invalidText={errors?.name?.message}
+                    invalidtext={errors?.name?.message}
                   />
                 )}
               />
@@ -183,11 +195,12 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                 control={control}
                 render={({ field }) => (
                   <TextInput
+                    id="serviceShortName"
                     {...field}
                     type="text"
                     labelText={t('serviceShortName', 'Service short name')}
                     invalid={!!errors.shortName}
-                    invalidText={errors?.shortName?.message}
+                    invalidtext={errors?.shortName?.message}
                   />
                 )}
               />
@@ -211,6 +224,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                 render={({ field }) => {
                   return (
                     <ComboBox
+                      id="serviceType"
                       onChange={({ selectedItem }) => field.onChange(selectedItem)}
                       titleText={t('serviceType', 'Service type')}
                       items={serviceTypes ?? []}
@@ -219,7 +233,12 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                       disabled={isLoadingServiceTypes}
                       initialSelectedItem={field.value}
                       invalid={!!errors.serviceType}
-                      invalidText={errors?.serviceType?.message}
+                      invalidtext={errors?.serviceType?.message}
+                      itemToElement={(item) => (
+                        <div role="option" aria-selected={field.value?.uuid === item?.uuid}>
+                          {item?.display}
+                        </div>
+                      )}
                     />
                   );
                 }}

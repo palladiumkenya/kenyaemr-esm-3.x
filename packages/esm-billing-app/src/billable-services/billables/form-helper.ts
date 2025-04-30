@@ -52,8 +52,8 @@ export function mapInputToPayloadSchema(service): BillableFormSchema {
     name: service.name,
     shortName: service.shortName,
     serviceType: {
-      uuid: service?.serviceType?.uuid ?? '',
-      display: service?.serviceType?.display ?? '',
+      uuid: service?.serviceType?.uuid,
+      display: service?.serviceType?.display,
     },
     servicePrices: servicePrices,
     serviceStatus: service.serviceStatus,

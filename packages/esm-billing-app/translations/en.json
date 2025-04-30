@@ -265,6 +265,7 @@
   "selectitemstobeclaimed": "Select items that are to be included in the claims",
   "selectPaymentMethod": "Select payment method",
   "selectPaymentMode": "Select payment mode",
+  "selectProvider": "Select Provider",
   "selectTimesheet": "Select timesheet",
   "sendClaim": "Pre authorization request sent successfully",
   "sendClaimError": "Pre authorization request failed, please try later",
