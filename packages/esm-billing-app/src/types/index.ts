@@ -285,12 +285,35 @@ export interface Payment {
   attributes: Attribute[];
   amount: number;
   amountTendered: number;
+  billLineItem: BillLineItem;
   dateCreated: number;
   voided: boolean;
   resourceVersion: string;
 }
+export interface BillLineItem {
+  uuid: string;
+  display: string;
+  voided: boolean;
+  voidReason: any;
+  item: string;
+  billableService: string;
+  quantity: number;
+  price: number;
+  priceName: string;
+  priceUuid: string;
+  lineItemOrder: number;
+  paymentStatus: string;
+  itemOrServiceConceptUuid: string;
+  serviceTypeUuid: string;
+  resourceVersion: string;
+}
 
-export type FormPayment = { method: PaymentMethod; amount: string | number; referenceCode?: number | string };
+export type FormPayment = {
+  method: PaymentMethod;
+  amount: string | number;
+  referenceCode?: number | string;
+  lineItemUuid: string;
+};
 
 export type PaymentFormValue = {
   payment: Array<FormPayment>;
