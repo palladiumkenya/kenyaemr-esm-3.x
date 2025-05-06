@@ -13,12 +13,10 @@ const ORDER_TYPE = {
 const OrderActionButton: React.FC<Record<string, any>> = (props) => {
   const conceptClass = props?.order?.concept?.conceptClass?.uuid;
   if (Object.hasOwn(props, 'medicationRequestBundle')) {
-    const { medicationRequestBundle, modalName, additionalProps, actionText, closeable } = props;
+    const { medicationRequestBundle, actionText, closeable } = props;
     return (
       <MedicationOrderButton
         medicationRequestBundle={medicationRequestBundle}
-        modalName={modalName}
-        additionalProps={additionalProps}
         actionText={actionText}
         closeable={closeable}
       />
@@ -26,15 +24,8 @@ const OrderActionButton: React.FC<Record<string, any>> = (props) => {
   }
 
   if (props.order?.orderType?.name === ORDER_TYPE.LAB) {
-    const { order, modalName, additionalProps, actionText } = props;
-    return (
-      <GenericOrderButton
-        order={order}
-        modalName={modalName}
-        additionalProps={additionalProps}
-        actionText={actionText}
-      />
-    );
+    const { order, actionText } = props;
+    return <GenericOrderButton order={order} actionText={actionText} />;
   }
 
   if (conceptClass === ORDER_TYPE.PROCEDURE) {

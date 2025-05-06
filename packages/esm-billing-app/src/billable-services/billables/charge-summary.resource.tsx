@@ -1,4 +1,4 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, type OpenmrsResource } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 export type ChargeAble = {
@@ -6,7 +6,7 @@ export type ChargeAble = {
   name: string;
   shortName: string;
   serviceStatus: 'ENABLED' | 'DISABLED';
-  stockItem: string;
+  stockItem: OpenmrsResource;
   serviceType: {
     uuid: string;
     display: string;
