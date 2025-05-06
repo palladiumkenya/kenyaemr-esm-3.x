@@ -38,6 +38,7 @@ const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeSe
           control={control}
           render={({ field }) => (
             <ComboBox
+              id={`servicePrices.${index}.paymentMode`}
               onChange={({ selectedItem }) => field.onChange(selectedItem)}
               titleText={t('paymentMethodDescription', 'Payment method {{methodName}}', {
                 methodName: servicePrices[index]?.paymentMode?.name ?? '',
@@ -59,9 +60,10 @@ const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeSe
           control={control}
           render={({ field }) => (
             <NumberInput
+              id={`servicePrices.${index}.price`}
               onChange={(e) => field.onChange(parseFloat(e.target.value))}
               type="number"
-              labelText={t('price', 'Price')}
+              label={t('price', 'Price')}
               placeholder={t('enterPrice', 'Enter price')}
               defaultValue={field.value}
               invalid={!!errors?.servicePrices?.[index]?.price}
@@ -70,11 +72,7 @@ const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeSe
           )}
         />
       </ResponsiveWrapper>
-      <IconButton
-        kind="danger--tertiary"
-        size="md"
-        label={t('delete', 'Delete')}
-        onClick={() => removeServicePrice(index)}>
+      <IconButton kind="tertiary" size="md" label={t('delete', 'Delete')} onClick={() => removeServicePrice(index)}>
         <TrashCan />
       </IconButton>
     </div>

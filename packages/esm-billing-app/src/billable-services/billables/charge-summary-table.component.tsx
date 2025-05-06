@@ -133,7 +133,7 @@ const ChargeSummaryTable: React.FC = () => {
             <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
               <TableToolbarContent>
                 <TableToolbarSearch
-                  placeHolder={t('searchForChargeItem', 'Search for charge item')}
+                  placeholder={t('searchForChargeItem', 'Search for charge item')}
                   onChange={(e) => setSearchString(e.target.value)}
                   persistent
                   size={size}
