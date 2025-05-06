@@ -2,6 +2,7 @@ import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework
 import { useMemo } from 'react';
 import useSWR from 'swr';
 import useFacilityLevel from './useFacilityLevel';
+import { SHAIntervention } from '../types';
 
 export type InterventionsFilter = {
   package_code?: string;
@@ -124,8 +125,8 @@ export const useInterventions = (filters: InterventionsFilter) => {
 
   return {
     isLoading: isLoading || isLoadingFacilityLevel,
-    interventions: interventions ?? [],
-    allInterventions,
+    interventions: (interventions ?? []) as Array<SHAIntervention>,
+    allInterventions: (allInterventions ?? []) as Array<SHAIntervention>,
     error: error || facilityLevelError,
   };
 };

@@ -80,7 +80,13 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ categories,
           selectedItems={field.value}
           label={t('chooseInterventions', 'Choose interventions')}
           items={interventions_.map((r) => r.interventionCode)}
-          itemToString={(item) => interventions_.find((r) => r.interventionCode === item)?.interventionName ?? ''}
+          itemToString={(item) => {
+            const _intervention = interventions_.find((r) => r.interventionCode === item);
+            if (!_intervention) {
+              return '';
+            }
+            return `${_intervention.interventionPackage}-${_intervention.interventionName}`;
+          }}
         />
       )}
     />
