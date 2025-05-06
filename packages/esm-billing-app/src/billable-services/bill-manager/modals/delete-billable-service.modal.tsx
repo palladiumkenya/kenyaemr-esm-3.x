@@ -16,7 +16,7 @@ const DeleteBillableServiceModal: React.FC<DeleteBillableServiceModalProps> = ({
   const { t } = useTranslation();
 
   const handleMutation = () => {
-    const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(uuid,display),servicePrices:(uuid,name,paymentMode,price),concept:(uuid,display))`;
+    const url = `${restBaseUrl}/cashier/billableService`;
     mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, { revalidate: true });
   };
 

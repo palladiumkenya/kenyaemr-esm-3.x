@@ -31,7 +31,13 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
   const formMethods = useForm<BillableFormSchema>({
     resolver: zodResolver(billableFormSchema),
     defaultValues: initialValues
-      ? mapInputToPayloadSchema(initialValues)
+      ? {
+          ...mapInputToPayloadSchema(initialValues),
+          serviceType: {
+            uuid: initialValues.serviceType?.uuid ?? '',
+            display: initialValues.serviceType?.display ?? '',
+          },
+        }
       : { servicePrices: [], serviceStatus: 'ENABLED' },
   });
 
@@ -57,7 +63,7 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
   const onSubmit = async (formValues: BillableFormSchema) => {
     const payload = formatBillableServicePayloadForSubmission(formValues, initialValues?.['uuid']);
     try {
-      const response = await createBillableService(payload);
+      const response = await createBillableService(payload, initialValues?.['uuid']);
       if (response.ok) {
         showSnackbar({
           title: t('commodityBillableCreated', 'Commodity price created successfully'),
@@ -70,9 +76,17 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
         closeWorkspaceWithSavedChanges();
       }
     } catch (e) {
+      const errorMessage =
+        e?.responseBody?.error?.message || e?.message || t('unknownError', 'An unknown error occurred');
       showSnackbar({
         title: t('commodityBillableCreationFailed', 'Commodity price creation failed'),
-        subtitle: t('commodityBillableCreationFailedSubtitle', 'The commodity price creation failed'),
+        subtitle: t(
+          'commodityBillableCreationFailedSubtitle',
+          'The commodity price creation failed: {{errorMessage}}',
+          {
+            errorMessage: String(errorMessage).trim(),
+          },
+        ),
         kind: 'error',
         isLowContrast: true,
         timeoutInMs: 5000,
@@ -99,14 +113,32 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
     [fields, control, remove, errors],
   );
 
+  function flattenErrors(errors: Record<string, any>): string[] {
+    const messages: string[] = [];
+
+    Object.entries(errors).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((item, index) => {
+          Object.entries(item as Record<string, { message: string }>).forEach(([subKey, subVal]) => {
+            messages.push(`${key}[${index}].${subKey}: ${subVal.message}`);
+          });
+        });
+      } else if (typeof value === 'object' && value?.message) {
+        messages.push(`${key}: ${value.message}`);
+      }
+    });
+
+    return messages;
+  }
+
   const handleError = (err) => {
     console.error(JSON.stringify(err, null, 2));
+    const errorMessage = flattenErrors(err).join('; ');
     showSnackbar({
-      title: t('commodityBillableCreationFailed', 'Commodity price creation failed'),
-      subtitle: t(
-        'commodityBillableCreationFailedSubtitle',
-        'The commodity price creation failed, view browser console for more details',
-      ),
+      title: t('serviceCreationFailed', 'Service creation failed'),
+      subtitle: t('serviceCreationFailedSubtitle', 'The service creation failed: {{errorMessage}}', {
+        errorMessage,
+      }),
       kind: 'error',
       isLowContrast: true,
       timeoutInMs: 5000,
