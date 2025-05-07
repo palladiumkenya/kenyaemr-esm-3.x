@@ -48,7 +48,7 @@
     },
     {
       "name": "manifest-status-change-confirm-dialog",
-      "component": "manifestStatusChangeConfirmDialog"
+      "component": "manifestStatusChangeConfirmModal"
     },
     {
       "name": "lab-manifest-requeue-confirn-modal",

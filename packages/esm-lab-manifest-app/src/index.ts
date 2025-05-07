@@ -41,8 +41,8 @@ export const sampleDeleteConfirmDialog = getAsyncLifecycle(
   () => import('./forms/sample-delete-confirm-dialog.modal'),
   options,
 );
-export const manifestStatusChangeConfirmDialog = getAsyncLifecycle(
-  () => import('./forms/manifest-status-change-confirm-dialog.modal'),
+export const manifestStatusChangeConfirmModal = getAsyncLifecycle(
+  () => import('./forms/manifest-status-change-confirm.modal'),
   options,
 );
 export const requeueLabManifestConfirmModal = getAsyncLifecycle(

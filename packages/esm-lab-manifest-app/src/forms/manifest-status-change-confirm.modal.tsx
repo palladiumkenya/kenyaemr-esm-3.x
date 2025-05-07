@@ -5,12 +5,12 @@ import LabManifestSamples from '../tables/lab-manifest-samples.component';
 import { MappedLabManifest } from '../types';
 import styles from './lab-manifest-form.scss';
 
-type ManifestStatusChangeConfirmDialogProps = {
+type ManifestStatusChangeConfirmModalProps = {
   onClose: () => void;
   onConfirm: () => Promise<void>;
   manifest: MappedLabManifest;
 };
-const ManifestStatusChangeConfirmDialog: React.FC<ManifestStatusChangeConfirmDialogProps> = ({
+const ManifestStatusChangeConfirmModal: React.FC<ManifestStatusChangeConfirmModalProps> = ({
   manifest,
   onClose,
   onConfirm,
@@ -47,4 +47,4 @@ const ManifestStatusChangeConfirmDialog: React.FC<ManifestStatusChangeConfirmDia
   );
 };
 
-export default ManifestStatusChangeConfirmDialog;
+export default ManifestStatusChangeConfirmModal;
