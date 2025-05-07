@@ -53,9 +53,9 @@ import OrderActionButton from './billable-services/billiable-item/order-actions/
 
 // Claims Management Components
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
-import { RetryClaimRequest } from './claims/claims-management/table/retry-claim-request.modal';
-
-// Payment Components
+import { ManageClaimRequest } from './claims/claims-management/table/manage-claim-request.modal';
+import { configSchema } from './config-schema';
+import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import ReceiptPrintPreviewModal from './invoice/print-bill-receipt/receipt-print-preview.modal';
@@ -232,7 +232,7 @@ export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillab
 
 // Claims Management Components
 export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
-export const retryClaimRequestModal = getSyncLifecycle(RetryClaimRequest, options);
+export const manageClaimRequestModal = getSyncLifecycle(ManageClaimRequest, options);
 
 // App Startup
 export function startupApp() {

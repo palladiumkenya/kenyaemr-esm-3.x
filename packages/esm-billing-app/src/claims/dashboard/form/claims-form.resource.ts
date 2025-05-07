@@ -90,3 +90,10 @@ export const usePackages = () => {
     error: undefined,
   };
 };
+
+export const updateClaimStatus = (externalId: string) => {
+  const url = `/ws/rest/v1/insuranceclaims/claim/update-status?externalId=${externalId}`;
+  return openmrsFetch(url, {
+    method: 'GET',
+  });
+};
