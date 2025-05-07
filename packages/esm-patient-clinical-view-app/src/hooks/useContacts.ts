@@ -109,17 +109,21 @@ const useContacts = (patientUuid: string) => {
     url,
     openmrsFetch,
   );
+  const pnsRelationships = useMemo(
+    () => config.relationshipTypesList.filter((rl) => rl.category.some((c) => c === 'pns')),
+    [config],
+  );
   const relationships = useMemo(() => {
     return data?.data?.results?.length
       ? extractContactData(
           patientUuid,
           data?.data?.results.filter((rel) =>
-            config.pnsRelationships.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
+            pnsRelationships.some((famRel) => famRel.uuid === rel.relationshipType.uuid),
           ),
           config,
         )
       : [];
-  }, [data?.data?.results, patientUuid, config]);
+  }, [data?.data?.results, patientUuid, config, pnsRelationships]);
   return {
     contacts: relationships,
     error,
