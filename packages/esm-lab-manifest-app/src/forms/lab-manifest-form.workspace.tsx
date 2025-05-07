@@ -10,17 +10,26 @@ import {
   TextInput,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, parseDate, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import {
+  DefaultWorkspaceProps,
+  parseDate,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { LabManifestConfig } from '../config-schema';
 import {
+  DRAFT_MANIFEST_STATUS,
   editableManifestStatus,
   LabManifestFilters,
   labManifestFormSchema,
   mutateManifestLinks,
+  READY_TO_SEND_MANIFEST_STATUS,
   saveLabManifest,
 } from '../lab-manifest.resources';
 import { County, MappedLabManifest } from '../types';
@@ -52,6 +61,28 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const controlSize = layout === 'tablet' ? 'xl' : 'sm';
   const onSubmit = async (values: LabManifestFormType) => {
     try {
+      const requireConfirmation =
+        values.manifestStatus === READY_TO_SEND_MANIFEST_STATUS && manifest?.manifestStatus === DRAFT_MANIFEST_STATUS;
+      if (requireConfirmation) {
+        const dispose = showModal('manifest-status-change-confirm-dialog', {
+          onClose: () => dispose(),
+          onConfirm: async () => {
+            try {
+              await saveLabManifest(values, manifest?.uuid);
+              mutateManifestLinks(manifest?.uuid, values?.manifestStatus, manifest?.manifestStatus);
+              closeWorkspace();
+              showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Lab manifest created successfully!' });
+            } catch (error) {
+              showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error creating lab manifest' });
+            } finally {
+              dispose();
+            }
+          },
+          manifest,
+        });
+        return;
+      }
+
       await saveLabManifest(values, manifest?.uuid);
       mutateManifestLinks(manifest?.uuid, values?.manifestStatus, manifest?.manifestStatus);
       closeWorkspace();

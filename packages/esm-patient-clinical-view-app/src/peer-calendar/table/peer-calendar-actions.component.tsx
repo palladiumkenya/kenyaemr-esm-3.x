@@ -34,7 +34,7 @@ const PeerCalendarActions: React.FC<PeerCalendarActionsProps> = ({ peer: { patie
   const to = dayjs(firstDay).add(1, 'month').format('YYYY-MM-DD');
 
   const handleLauchPeerOutreachForm = (encounterUuid?: string) => {
-    launchWorkspace('peer-calendar-form', {
+    launchWorkspace('kenyaemr-cusom-form-entry-workspace', {
       formUuid,
       patientUuid,
       encounterUuid: encounterUuid ?? '',

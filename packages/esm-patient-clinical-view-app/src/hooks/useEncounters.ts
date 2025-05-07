@@ -3,8 +3,14 @@ import useSWR from 'swr';
 import { Encounter } from '../types';
 import pickBy from 'lodash/pickBy';
 
-const useEncounters = (patientUuid: string, encounterTypeUuid: string, fromdate?: string, todate?: string) => {
-  const customeRepresntation = 'custom:(uuid,display,encounterDatetime,obs:(uuid,display,value:(uuid,display)))';
+const useEncounters = (
+  patientUuid: string,
+  encounterTypeUuid: string,
+  fromdate?: string,
+  todate?: string,
+  v?: string,
+) => {
+  const customeRepresntation = v ?? 'custom:(uuid,display,encounterDatetime,obs:(uuid,display,value:(uuid,display)))';
 
   const params = new URLSearchParams(
     pickBy(
