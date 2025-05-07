@@ -27,7 +27,7 @@ import {
   usePagination,
 } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LabManifestConfig } from '../config-schema';
 import { useLabManifests } from '../hooks';
@@ -121,13 +121,16 @@ const LabManifestsTable = () => {
     }
   };
 
-  const handleLaunchRequeueConfirmModal = (labManifest: MappedLabManifest) => {
-    const dispose = showModal('lab-manifest-requeue-confirn-modal', {
-      labManifest,
-      onClose: () => dispose(),
-      filter: currFilter,
-    });
-  };
+  const handleLaunchRequeueConfirmModal = useCallback(
+    (labManifest: MappedLabManifest) => {
+      const dispose = showModal('lab-manifest-requeue-confirn-modal', {
+        labManifest,
+        onClose: () => dispose(),
+        filter: currFilter,
+      });
+    },
+    [currFilter],
+  );
 
   const tableRows = useMemo(
     () =>
