@@ -85,7 +85,7 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ categories,
             if (!_intervention) {
               return '';
             }
-            return `${_intervention.interventionPackage}-${_intervention.interventionName}`;
+            return `${_intervention.interventionCode}-${_intervention.interventionName}`;
           }}
         />
       )}
