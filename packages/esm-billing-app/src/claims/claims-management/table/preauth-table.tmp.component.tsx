@@ -36,6 +36,7 @@ const PreauthTableTemporary: React.FC = () => {
       { value: 'REJECTED', label: t('rejected', 'Rejected') },
       { value: 'CHECKED', label: t('checked', 'Checked') },
       { value: 'VALUATED', label: t('valuated', 'Valuated') },
+      { value: 'APPROVED', label: t('approved', 'Approved') },
     ],
     [t],
   );
@@ -106,11 +107,11 @@ const PreauthTableTemporary: React.FC = () => {
       </div>
     );
   }
-
-  const handleRetry = (claimId: string) => {
-    const dispose = showModal('retry-claim-request-modal', {
+  const handleClaimAction = (claimId: string, modalType: 'retry' | 'update') => {
+    const dispose = showModal('manage-claim-request-modal', {
       closeModal: () => dispose(),
       claimId,
+      modalType,
     });
   };
 
@@ -148,16 +149,28 @@ const PreauthTableTemporary: React.FC = () => {
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>
                           {cell.info.header === 'status' ? (
-                            <ClaimStatus cell={cell} row={row} />
-                          ) : cell.info.header === 'action' && ['ENTERED', 'ERRORED'].includes(rowStatus) ? (
+                            <ClaimStatus row={row} />
+                          ) : cell.info.header === 'action' ? (
                             <OverflowMenu size={size} flipped>
+                              {['ENTERED', 'ERRORED'].includes(rowStatus) && (
+                                <OverflowMenuItem
+                                  itemText={t('retryRequest', 'Retry request')}
+                                  onClick={() => handleClaimAction(row.id, 'retry')}
+                                />
+                              )}
                               <OverflowMenuItem
-                                itemText={t('retryRequest', 'Retry request')}
-                                onClick={() => handleRetry(row.id)}
+                                itemText={t('updateStatus', 'Update status')}
+                                onClick={() => handleClaimAction(row.id, 'update')}
                               />
                             </OverflowMenu>
                           ) : cell.info.header === 'dateFrom' ? (
                             formatDate(parseDate(cell.value))
+                          ) : cell.info.header === 'approvedTotal' ? (
+                            ['APPROVED'].includes(rowStatus) ? (
+                              row.cells.find((c) => c.info.header === 'claimedTotal')?.value || cell.value
+                            ) : (
+                              cell.value
+                            )
                           ) : (
                             cell.value
                           )}
@@ -193,15 +206,32 @@ const PreauthTableTemporary: React.FC = () => {
 };
 
 export default PreauthTableTemporary;
-
-const ClaimStatus = ({ cell, row }: { cell: { value: string }; row: any }) => {
+const ClaimStatus = ({ row }: { row: any }) => {
   const { claims } = useFacilityClaims();
+  const { t } = useTranslation();
 
   const claim = claims.find((claim) => claim.id === row.id);
+
+  const getTagType = (status) => {
+    switch (status) {
+      case 'ENTERED':
+        return 'blue';
+      case 'ERRORED':
+        return 'red';
+      case 'REJECTED':
+        return 'red';
+      case 'CHECKED':
+        return 'green';
+      case 'VALUATED':
+        return 'purple';
+      default:
+        return 'gray';
+    }
+  };
+
   return (
     <div className={styles.claimStatus}>
-      <p>{cell.value}</p>
-      {claim.externalId && <Tag type="blue">{claim.externalId}</Tag>}
+      <Tag type={getTagType(claim.status)}>{claim.status}</Tag>
     </div>
   );
 };
