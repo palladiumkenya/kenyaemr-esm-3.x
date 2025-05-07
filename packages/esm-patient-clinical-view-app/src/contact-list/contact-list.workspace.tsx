@@ -59,8 +59,12 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
 
   const config = useConfig<ConfigObject>();
   const { data } = useMappedRelationshipTypes();
+  const pnsRelationships = useMemo(
+    () => config.relationshipTypesList.filter((rl) => rl.category.some((c) => c === 'pns')),
+    [config],
+  );
   const pnsRelationshipTypes = data
-    ? config.pnsRelationships.map((rel) => ({
+    ? pnsRelationships.map((rel) => ({
         ...rel,
         display: data!.find((r) => r.uuid === rel.uuid)?.display,
       }))
@@ -106,7 +110,8 @@ const ContactListForm: React.FC<ContactListFormProps> = ({
   const observableSexualAssault = form.watch('sexualAssault');
   const observableMode = form.watch('mode');
   const showIPVRelatedFields =
-    config.pnsRelationships.findIndex((r) => r.uuid === observableRelationship && r.sexual) !== -1;
+    pnsRelationships.findIndex((r) => r.uuid === observableRelationship && r.category.some((c) => c === 'sexual')) !==
+    -1;
 
   useEffect(() => {
     if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes(BOOLEAN_YES)) {

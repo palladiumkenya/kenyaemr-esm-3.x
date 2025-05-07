@@ -347,7 +347,7 @@
       "type": "form"
     },
     {
-      "name": "peer-calendar-form",
+      "name": "kenyaemr-cusom-form-entry-workspace",
       "component": "peerCalendarFormEntry",
       "title": "KVP Peer Educator Outreach Calendar",
       "type": "form",

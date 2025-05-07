@@ -9,6 +9,7 @@ export const configSchema = {
       mchMotherConsultation: 'c6d09e05-1f25-4164-8860-9f32c5a02df0',
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
       kpPeerCalender: 'c4f9db39-2c18-49a6-bf9b-b243d673c64d',
+      htsEcounterUuid: '9c0a7a57-62ff-4f75-babe-5835b0e921b7', // Used with Contact tracing
     },
   },
   caseManagementForms: {
@@ -45,6 +46,17 @@ export const configSchema = {
       clinicalEncounterFormUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
       autopsyFormUuid: '2b61a73-4971-4fc0-b20b-9a30176317e2',
+      htsClientTracingFormUuid: '15ed03d2-c972-11e9-a32f-2a2ae2dbcce4',
+    },
+  },
+  htsClientTracingConceptsUuids: {
+    _type: Type.Object,
+    _description: 'Concept Uuids for hts client tracing',
+    _default: {
+      modeOfClienttracingConceptUuid: 'a55f9516-ddb6-47ec-b10d-cb99d1d0bd41',
+      reasonNotContactedConceptUuid: '1779AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      tracingStatusConceptUuid: '159811AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      remarksConceptUuid: '163042AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
   defaulterTracingEncounterUuid: {
@@ -166,45 +178,54 @@ export const configSchema = {
       contactIPVOutcome: '49c543c2-a72a-4b0a-8cca-39c375c0726f',
     },
   },
-  familyRelationshipsTypeList: {
+  relationshipTypesList: {
     _type: Type.Array,
-    _description: 'List of Family relationship types (Used to list contacts)',
+    _description: 'List of Categorized relationship types',
     _default: [
       {
         uuid: '8d91a01c-c2cc-11de-8d13-0010c6dffd0f',
         display: 'Sibling/Sibling',
+        category: ['family'],
       },
       {
         uuid: '8d91a210-c2cc-11de-8d13-0010c6dffd0f',
         display: 'Parent/Child',
+        category: ['family'],
       },
       {
         uuid: '8d91a3dc-c2cc-11de-8d13-0010c6dffd0f',
         display: 'Aunt/Uncle/Niece/Nephew',
+        category: ['family'],
       },
       {
         uuid: '5f115f62-68b7-11e3-94ee-6bef9086de92',
         display: 'Guardian/Dependant',
+        category: ['other'],
       },
       {
         uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
         display: 'Spouse/Spouse',
+        category: ['sexual', 'pns', 'family'],
       },
       {
         uuid: '007b765f-6725-4ae9-afee-9966302bace4',
         display: 'Partner/Partner',
+        category: ['sexual', 'pns'],
       },
       {
         uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
         display: 'Co-wife/Co-wife',
+        category: ['pns'],
       },
       {
         uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
         display: 'Injectable-drug-user/Injectable-druguser',
+        category: ['pns'],
       },
       {
         uuid: '76edc1fe-c5ce-4608-b326-c8ecd1020a73',
         display: 'SNS/SNS',
+        category: ['other'],
       },
     ],
   },
@@ -212,32 +233,6 @@ export const configSchema = {
     _type: Type.String,
     _description: 'Peer Educator Relationship type',
     _default: '96adecc2-e7cd-41d0-b577-08eb4834abcb',
-  },
-  pnsRelationships: {
-    _type: Type.Array,
-    _description: 'List of Patner relationship (PNS - Patner Notification Service)',
-    _default: [
-      {
-        uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
-        display: 'Spouse/Spouse',
-        sexual: true,
-      },
-      {
-        uuid: '007b765f-6725-4ae9-afee-9966302bace4',
-        display: 'Partner/Partner',
-        sexual: true,
-      },
-      {
-        uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
-        display: 'Co-wife/Co-wife',
-        sexual: false,
-      },
-      {
-        uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
-        display: 'Injectable-drug-user/Injectable-druguser',
-        sexual: false,
-      },
-    ],
   },
   admissionLocationTagUuid: {
     _type: Type.UUID,
@@ -290,7 +285,18 @@ export interface ConfigObject {
   morgueDischargeEncounterUuid: string;
   caseManagementForms: Array<{ id: string; title: string; formUuid: string; encounterTypeUuid: string }>;
   peerCalendarOutreactForm: string;
-  encounterTypes: { mchMotherConsultation: string; hivTestingServices: string; kpPeerCalender: string };
+  htsClientTracingConceptsUuids: {
+    modeOfClienttracingConceptUuid: string;
+    reasonNotContactedConceptUuid: string;
+    tracingStatusConceptUuid: string;
+    remarksConceptUuid: string;
+  };
+  encounterTypes: {
+    mchMotherConsultation: string;
+    hivTestingServices: string;
+    kpPeerCalender: string;
+    htsEcounterUuid: string;
+  };
   formsList: {
     labourAndDelivery: string;
     antenatal: string;
@@ -302,6 +308,7 @@ export interface ConfigObject {
     clinicalEncounterFormUuid: string;
     peerCalendarOutreactForm: string;
     autopsyFormUuid: string;
+    htsClientTracingFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
   autopsyEncounterFormUuid: string;
@@ -327,8 +334,11 @@ export interface ConfigObject {
     livingWithContact: string;
     contactIPVOutcome: string;
   };
-  familyRelationshipsTypeList: Array<{ uuid: string; display: string }>;
-  pnsRelationships: Array<{ uuid: string; display: string; sexual: boolean }>;
+  relationshipTypesList: Array<{
+    uuid: string;
+    display: string;
+    category: Array<'sexual' | 'pns' | 'family' | 'other'>;
+  }>;
   admissionLocationTagUuid: {
     _type: Type.UUID;
     _description: 'UUID for the location tag of the `Admission Location`. Patients may only be admitted to inpatient care in a location with this tag';
