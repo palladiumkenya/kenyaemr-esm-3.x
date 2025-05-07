@@ -54,8 +54,6 @@ import OrderActionButton from './billable-services/billiable-item/order-actions/
 // Claims Management Components
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 import { ManageClaimRequest } from './claims/claims-management/table/manage-claim-request.modal';
-import { configSchema } from './config-schema';
-import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
 import ReceiptPrintPreviewModal from './invoice/print-bill-receipt/receipt-print-preview.modal';
