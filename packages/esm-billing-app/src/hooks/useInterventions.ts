@@ -87,9 +87,9 @@ export const useInterventions = (filters: InterventionsFilter) => {
   });
   const url = `${restBaseUrl}/kenyaemr/sha-interventions?${urlParams.toString()}`;
   const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<Intervention> }>>(url, openmrsFetch);
-  const mapper = ({ benefitCode, benefitName, parentBenefitCode }: Intervention): any => ({
+  const mapper = ({ benefitCode, name, parentBenefitCode }: Intervention): any => ({
     interventionCode: benefitCode,
-    interventionName: benefitName,
+    interventionName: name,
     interventionPackage: parentBenefitCode,
   });
 
