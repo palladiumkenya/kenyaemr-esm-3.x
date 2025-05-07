@@ -82,10 +82,7 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ categories,
           items={interventions_.map((r) => r.interventionCode)}
           itemToString={(item) => {
             const _intervention = interventions_.find((r) => r.interventionCode === item);
-            if (!_intervention) {
-              return '';
-            }
-            return `${_intervention.interventionCode}-${_intervention.interventionName}`;
+            return _intervention?.interventionName ?? '';
           }}
         />
       )}
