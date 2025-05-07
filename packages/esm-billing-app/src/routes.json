@@ -309,8 +309,8 @@
       "component": "deletePaymentModeModal"
     },
     {
-      "name": "retry-claim-request-modal",
-      "component": "retryClaimRequestModal"
+      "name": "manage-claim-request-modal",
+      "component": "manageClaimRequestModal"
     },
     {
       "name": "paid-bill-receipt-print-preview-modal",
