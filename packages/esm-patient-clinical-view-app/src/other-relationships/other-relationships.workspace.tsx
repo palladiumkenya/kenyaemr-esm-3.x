@@ -1,7 +1,7 @@
 import { Button, ButtonSet, Column, ComboBox, DatePicker, DatePickerInput, Form, Stack, TextArea } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useConfig, useSession } from '@openmrs/esm-framework';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -36,8 +36,11 @@ export const OtherRelationshipsForm: React.FC<OtherRelationshipsFormProps> = ({ 
   const { t } = useTranslation();
   const { data: mappedRelationshipTypes } = useMappedRelationshipTypes();
   const config = useConfig<ConfigObject>();
-  const { familyRelationshipsTypeList } = config;
-  const familyRelationshipTypesUUIDs = new Set(familyRelationshipsTypeList.map((r) => r.uuid));
+  const familyRelationships = useMemo(
+    () => config.relationshipTypesList.filter((rl) => rl.category.some((c) => c === 'family')),
+    [config],
+  );
+  const familyRelationshipTypesUUIDs = new Set(familyRelationships.map((r) => r.uuid));
   const otherRelationshipTypes = mappedRelationshipTypes.filter((type) => !familyRelationshipTypesUUIDs.has(type.uuid));
   const session = useSession();
   const relationshipTypes = otherRelationshipTypes.map((relationship) => ({

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -39,11 +39,14 @@ export const OtherRelationships: React.FC<OtherRelationshipsProps> = ({ patientU
   const { t } = useTranslation();
   const config = useConfig<ConfigObject>();
   const layout = useLayoutType();
-  const { concepts, familyRelationshipsTypeList } = config;
+  const { concepts } = config;
   const [pageSize, setPageSize] = useState(10);
-
+  const familyRelationships = useMemo(
+    () => config.relationshipTypesList.filter((rl) => rl.category.some((c) => c === 'family')),
+    [config],
+  );
   const { relationships, error, isLoading, isValidating } = usePatientRelationships(patientUuid);
-  const familyRelationshipTypeUUIDs = new Set(familyRelationshipsTypeList.map((type) => type.uuid));
+  const familyRelationshipTypeUUIDs = new Set(familyRelationships.map((type) => type.uuid));
   const nonFamilyRelationships = relationships.filter((r) => !familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
 
   const headerTitle = t('otherRelationships', 'Other Relationships');
