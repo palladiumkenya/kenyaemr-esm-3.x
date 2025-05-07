@@ -13,6 +13,8 @@ export const resubmittableManifestStatus = [
   'Complete errors',
   'Complete results',
 ];
+export const READY_TO_SEND_MANIFEST_STATUS = 'Ready to send';
+export const DRAFT_MANIFEST_STATUS = 'Draft';
 
 export const LabManifestFilters = [
   {

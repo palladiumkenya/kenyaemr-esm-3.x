@@ -224,7 +224,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     return (
       <EmptyState
         headerTitle={t('manifestSamples', 'Manifest Samples')}
-        displayText={t('notLabManifetToDisplay', 'There is no lab manifets data to display.')}
+        displayText={t('labManifestSamples', 'Lab manifest samples')}
       />
     );
   }
