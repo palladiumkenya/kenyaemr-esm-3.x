@@ -1,24 +1,20 @@
 import React, { useCallback } from 'react';
 import { Edit } from '@carbon/react/icons';
-import { showModal, launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { BaseOrderButton } from './base-order-button.component';
 import { useMedicationOrderAction, useOrderByUuid } from '../hooks/useMedicationOrderAction';
-import { launchPrescriptionEditWorkspace, useModalHandler } from '../hooks/useModalHandler';
+import { launchPrescriptionEditWorkspace } from '../hooks/useModalHandler';
 import { useTranslation } from 'react-i18next';
 export interface MedicationOrderButtonProps {
   medicationRequestBundle?: {
     request: fhir.MedicationRequest;
   };
-  modalName?: string;
-  additionalProps?: Record<string, unknown>;
   actionText?: string;
   closeable?: boolean;
 }
 
 export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
   medicationRequestBundle,
-  modalName,
-  additionalProps,
   actionText,
   closeable = true,
 }) => {
@@ -35,14 +31,13 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
   const { data: order, isLoading: isOrderLoading } = useOrderByUuid(medicationRequestBundle?.request?.id);
   const isLoading = isMedicationOrderLoading && isOrderLoading;
 
-  const { handleModalClose } = useModalHandler(additionalProps?.mutateUrl as string);
   const buttonText = actionText ?? defaultButtonText;
   const launchModal = useCallback(() => {
     if (shouldShowBillModal) {
-      const dispose = showModal('create-bill-item-modal', {
-        patientUuid,
+      launchWorkspace('create-bill-workspace', {
+        order,
+        patientUuid: order?.patient?.uuid,
         medicationRequestBundle,
-        closeModal: () => dispose(),
       });
       return;
     }
@@ -50,7 +45,7 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
     if (dispenseFormProps) {
       launchWorkspace('dispense-workspace', dispenseFormProps);
     }
-  }, [shouldShowBillModal, medicationRequestBundle, dispenseFormProps, patientUuid]);
+  }, [shouldShowBillModal, medicationRequestBundle, dispenseFormProps, patientUuid, order]);
 
   if (!closeable) {
     return null;

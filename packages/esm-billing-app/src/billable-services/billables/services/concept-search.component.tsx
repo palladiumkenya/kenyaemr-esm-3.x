@@ -39,8 +39,6 @@ const ConceptSearch: React.FC<ConceptSearchProps> = ({
               ? selectedConcept?.concept?.display
               : conceptToLookup ?? defaultValues?.concept?.concept?.display
           }
-          invalid={!!errors.concept}
-          invalidText={errors?.concept?.message}
         />
       </ResponsiveWrapper>
       {isSearching && (

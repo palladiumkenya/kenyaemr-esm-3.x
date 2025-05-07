@@ -75,7 +75,13 @@ const SHABenefitPackangesAndInterventions: React.FC<Props> = ({ patientUuid }) =
                   selectedItems={field.value}
                   label={t('choosePackage', 'Choose package')}
                   items={packages.map((r) => r.uuid)}
-                  itemToString={(item) => packages.find((r) => r.uuid === item)?.packageName ?? ''}
+                  itemToString={(item) => {
+                    const _package = packages.find((r) => r.uuid === item);
+                    if (!_package) {
+                      return '';
+                    }
+                    return `${_package.packageCode}-${_package.packageName}`;
+                  }}
                 />
               )}
             </>

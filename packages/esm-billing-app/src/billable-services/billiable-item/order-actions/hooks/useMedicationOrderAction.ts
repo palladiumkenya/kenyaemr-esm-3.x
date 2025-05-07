@@ -22,8 +22,11 @@ export function useMedicationOrderAction(medicationRequestBundle?: MedicationReq
 
   const billableItem =
     billableServices?.filter((service) => {
-      const stockItem = service?.stockItem.split(':')[0];
-      return stockItem === stockItemUuid;
+      if (service?.stockItem !== null && service?.stockItem !== undefined) {
+        const serviceStockItemUuid = service?.stockItem?.uuid;
+        return serviceStockItemUuid === stockItemUuid;
+      }
+      return false;
     }) || [];
   const billableItemServiceStatus = billableItem.some((item) => item.serviceStatus === 'DISABLED');
 
