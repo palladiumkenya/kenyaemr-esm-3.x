@@ -47,6 +47,10 @@
       "component": "sampleDeleteConfirmDialog"
     },
     {
+      "name": "manifest-status-change-confirm-dialog",
+      "component": "manifestStatusChangeConfirmModal"
+    },
+    {
       "name": "lab-manifest-requeue-confirn-modal",
       "component": "requeueLabManifestConfirmModal"
     }

@@ -3,17 +3,22 @@ import {
   DataTable,
   DataTableSkeleton,
   Layer,
+  OverflowMenu,
+  OverflowMenuItem,
   Pagination,
   Table,
   TableBody,
   TableCell,
   TableContainer,
+  TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
   TableHead,
   TableHeader,
   TableRow,
   Tile,
 } from '@carbon/react';
-import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import {
   ConfigurableLink,
   ErrorState,
@@ -26,10 +31,13 @@ import {
 import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
+import { ConfigObject } from '../config-schema';
 import useContacts from '../hooks/useContacts';
-import styles from './contact-list.scss';
-import HIVStatus from './hiv-status.component';
 import { deleteRelationship } from '../relationships/relationship.resources';
+import styles from './contact-list.scss';
+import ContactTracingHistory from './contact-tracing-history.component';
+import HIVStatus from './hiv-status.component';
 
 interface ContactListProps {
   patientUuid: string;
@@ -40,11 +48,13 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('contactList', 'Contact list');
   const layout = useLayoutType();
-
+  const size = layout === 'tablet' ? 'lg' : 'md';
   const { contacts, error, isLoading } = useContacts(patientUuid);
   const { results, totalPages, currentPage, goTo } = usePagination(contacts, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
-
+  const {
+    formsList: { htsClientTracingFormUuid },
+  } = useConfig<ConfigObject>();
   const headers = [
     {
       header: t('listingDate', 'Listing date'),
@@ -104,6 +114,19 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
     });
   };
 
+  const handleLaunchContactTracingForm = (contactUuid: string) => {
+    launchWorkspace('kenyaemr-cusom-form-entry-workspace', {
+      formUuid: htsClientTracingFormUuid,
+      patientUuid: contactUuid,
+      encounterUuid: '',
+      mutateForm: () => {
+        mutate((key) => true, undefined, {
+          revalidate: true,
+        });
+      },
+    });
+  };
+
   const handleEditRelationship = (relationShipUuid: string) => {
     launchWorkspace('relationship-update-form', {
       relationShipUuid,
@@ -137,20 +160,14 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         ipvOutcome: relation.ipvOutcome ?? '--',
         actions: (
           <>
-            <Button
-              renderIcon={Edit}
-              hasIconOnly
-              kind="ghost"
-              iconDescription="Edit"
-              onClick={() => handleEditRelationship(relation.uuid)}
-            />
-            <Button
-              renderIcon={TrashCan}
-              hasIconOnly
-              kind="ghost"
-              iconDescription="Delete"
-              onClick={() => deleteRelationship(relation.uuid)}
-            />
+            <OverflowMenu size={size} flipped>
+              <OverflowMenuItem itemText={t('edit', 'Edit')} onClick={() => handleEditRelationship(relation.uuid)} />
+              <OverflowMenuItem
+                itemText={t('traceContact', 'Trace Contact')}
+                onClick={() => handleLaunchContactTracingForm(patientUuid)}
+              />
+              <OverflowMenuItem itemText={t('delete', 'Delete')} onClick={() => deleteRelationship(relation.uuid)} />
+            </OverflowMenu>
           </>
         ),
       };
@@ -191,11 +208,20 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
       <DataTable
         rows={tableRows ?? []}
         headers={headers}
-        render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
+        render={({
+          rows,
+          headers,
+          getHeaderProps,
+          getTableProps,
+          getTableContainerProps,
+          getRowProps,
+          getExpandedRowProps,
+        }) => (
           <TableContainer {...getTableContainerProps()}>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
+                  <TableExpandHeader aria-label="expand row" />
                   {headers.map((header) => (
                     <TableHeader
                       {...getHeaderProps({
@@ -209,11 +235,25 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    ))}
-                  </TableRow>
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow
+                      {...getRowProps({
+                        row,
+                      })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableExpandRow>
+
+                    <TableExpandedRow
+                      colSpan={headers.length + 1}
+                      className="demo-expanded-td"
+                      {...getExpandedRowProps({
+                        row,
+                      })}>
+                      <ContactTracingHistory patientUuid={results.find((r) => r.uuid === row.id)?.patientUuid} />
+                    </TableExpandedRow>
+                  </React.Fragment>
                 ))}
               </TableBody>
             </Table>
