@@ -571,6 +571,7 @@ export type FacilityClaim = {
   } | null;
   patient?: { display: string };
   externalId: string;
+  responseUUID: string;
 };
 export type BillingPromptType = 'patient-chart' | 'billing-orders';
 
@@ -590,4 +591,41 @@ export interface Filter {
   serviceTypes?: Array<string>;
   cashiers?: Array<string>;
   status?: string;
+}
+export interface DataTableRow {
+  id: string;
+  cells: Array<Cell>;
+}
+
+export interface Cell {
+  id: string;
+  value: any;
+  info: Info;
+}
+
+export interface Info {
+  header: string;
+}
+
+export interface Claim {
+  id: string;
+  status: string;
+  claimCode?: string;
+  providerName?: string;
+  patientName?: string;
+  claimedTotal?: number | string;
+  approvedTotal?: number | string;
+  dateFrom: string;
+}
+
+export interface Header {
+  key: string;
+  header: string;
+}
+
+export interface TableProps {
+  title: string;
+  emptyStateText: string;
+  emptyStateHeader: string;
+  includeClaimCode?: boolean;
 }
