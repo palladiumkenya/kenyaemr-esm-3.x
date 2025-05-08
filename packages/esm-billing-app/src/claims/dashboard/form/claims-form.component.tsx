@@ -411,7 +411,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                   name="provider"
                   render={({ field }) => (
                     <ComboBox
-                      {...field}
                       id="provider"
                       invalid={shouldShowError('provider')}
                       invalidText={errors.provider?.message}
@@ -419,11 +418,16 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                       titleText={t('provider', 'Provider')}
                       items={providers}
                       itemToString={(item) => item?.display?.split('-')?.at(-1)?.trim() ?? ''}
-                      selectedItem={providers?.find((p) => p?.uuid === field.value)}
+                      initialSelectedItem={
+                        field.value && providers ? providers.find((p) => p.uuid === field.value) : null
+                      }
                       onChange={({ selectedItem }) => {
-                        field.onChange(selectedItem?.display?.split('-')?.at(-1)?.trim() ?? '');
+                        field.onChange(selectedItem?.uuid || '');
                         setValidationEnabled(true);
                       }}
+                      name={field.name}
+                      onBlur={field.onBlur}
+                      ref={field.ref}
                     />
                   )}
                 />

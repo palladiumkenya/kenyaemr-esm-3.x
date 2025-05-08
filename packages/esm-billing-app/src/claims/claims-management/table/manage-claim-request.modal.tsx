@@ -1,4 +1,4 @@
-import { Button, Loading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -47,7 +47,7 @@ export const ManageClaimRequest = ({
 
   const handleUpdateStatus = () => {
     setIsSubmitting(true);
-    updateClaimStatus(claim.externalId)
+    updateClaimStatus(claim.responseUUID)
       .then(() => {
         mutate();
         showSnackbar({
@@ -96,7 +96,7 @@ export const ManageClaimRequest = ({
         <Button type="submit" onClick={handleSubmit}>
           {isSubmitting ? (
             <>
-              <Loading withOverlay={false} small />
+              <InlineLoading withOverlay={false} small />
               {modalType === 'retry' ? t('retrying', 'Retrying') : t('updating', 'Updating')}
             </>
           ) : modalType === 'retry' ? (
