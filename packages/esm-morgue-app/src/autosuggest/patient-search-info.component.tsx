@@ -7,28 +7,15 @@ import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 
 type PatientSearchInfoProps = {
   patient: Patient;
-  onClick?: () => void;
   disabled?: boolean;
 };
 
-const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient, onClick, disabled }) => {
+const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient, disabled }) => {
   const responsiveSize = useLayoutType() === 'tablet' ? 'lg' : 'md';
   const { t } = useTranslation();
-  const { admissionLocation } = useAdmissionLocation();
-  const isAdmitted = admissionLocation?.bedLayouts
-    .map((bed) => bed.patients)
-    .flat()
-    .some((p) => p.uuid === patient.uuid);
 
   const handleClick = () => {
-    if (isAdmitted) {
-      showSnackbar({
-        title: t('deceasedAlreadyAdmitted', 'Deceased patient Already Admitted'),
-        subtitle: t('patientAlreadyAdmittedMessage', 'This deceased patient has already been admitted.'),
-        kind: 'error',
-        isLowContrast: true,
-      });
-    } else {
+    if (!disabled) {
       launchWorkspace('patient-additional-info-form', {
         workspaceTitle: t('admissionForm', 'Admission form'),
         patientUuid: patient.uuid,
@@ -38,11 +25,11 @@ const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient, onClick,
 
   return (
     <div
-      className={`${styles.patientInfoContainer} ${!disabled && !isAdmitted ? styles.pointer : styles.notAllowed}`}
+      className={`${styles.patientInfoContainer} ${!disabled ? styles.pointer : styles.notAllowed}`}
       onClick={!disabled ? handleClick : undefined}>
       <Tile className={styles.patientInfo}>
         <div className={styles.patientAvatar} role="img">
-          <PatientPhoto patientUuid={patient.uuid} patientName={patient?.person?.display} />
+          <PatientPhoto patientUuid={patient?.uuid} patientName={patient?.person?.display} />
         </div>
         <div className={styles.patientDetails}>
           <h2 className={styles.patientName}>{patient?.person?.display}</h2>
@@ -61,13 +48,6 @@ const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient, onClick,
           <div className={styles.causeDisplay}>{patient?.person?.causeOfDeath?.display}</div>
         </div>
       </Tile>
-      {isAdmitted && (
-        <div className={styles.admissionRequestActionBar}>
-          <Row className={styles.buttonRow}>
-            <p>{t('deceasedHasAlreadyBeenAdmitted', 'Deceased has already been admitted')}</p>
-          </Row>
-        </div>
-      )}
     </div>
   );
 };
