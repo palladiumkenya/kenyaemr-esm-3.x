@@ -91,8 +91,8 @@ export const usePackages = () => {
   };
 };
 
-export const updateClaimStatus = (externalId: string) => {
-  const url = `/ws/rest/v1/insuranceclaims/claim/update-status?externalId=${externalId}`;
+export const updateClaimStatus = (responseUUID: string) => {
+  const url = `/ws/rest/v1/insuranceclaims/claim/update-status?externalId=${responseUUID}`;
   return openmrsFetch(url, {
     method: 'GET',
   });
