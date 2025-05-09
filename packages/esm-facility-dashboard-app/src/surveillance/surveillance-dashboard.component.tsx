@@ -24,8 +24,8 @@ const SurveillancelanceDashboard = () => {
 
       <Tabs onChange={({ selectedIndex }) => setActiveTab(selectedIndex)}>
         <TabList>
-          <Tab>{t('kpi', 'KPI')}</Tab>
-          <Tab>{t('monitoringCharts', 'Monitoring charts')}</Tab>
+          <Tab>{t('realTimeGapReview', 'Realtime gap review')}</Tab>
+          <Tab>{t('progressTracker', 'Progress tracker')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
