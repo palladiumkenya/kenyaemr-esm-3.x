@@ -1,6 +1,6 @@
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace, navigate } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, UserHasAccess } from '@openmrs/esm-framework';
 import { Movement, Return, ShareKnowledge } from '@carbon/react/icons';
 import React from 'react';
 import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
@@ -50,21 +50,33 @@ const ActionButton: React.FC<ActionButtonProps> = ({ patientUuid }) => {
 
   return (
     <div className={styles.actionButton}>
-      <Button kind="primary" size="sm" renderIcon={Return} onClick={handleNavigateToAllocationPage}>
-        {t('allocation', 'Allocation View')}
-      </Button>
+      <UserHasAccess privilege="o3 : View Mortuary Dashboard">
+        <Button kind="primary" size="sm" renderIcon={Return} onClick={handleNavigateToAllocationPage}>
+          {t('allocation', 'Allocation View')}
+        </Button>
+      </UserHasAccess>
+
       {isPatientInAdmissionLocation && (
         <>
-          <Button
-            kind="secondary"
-            size="sm"
-            renderIcon={ShareKnowledge}
-            onClick={() => handleSwapForm(patientUuid, bedId)}>
-            {t('swapCompartment', 'Swap compartment')}
-          </Button>
-          <Button kind="danger" size="sm" renderIcon={Movement} onClick={() => handleDischargeForm(patientUuid, bedId)}>
-            {t('discharge', 'Discharge body')}
-          </Button>
+          <UserHasAccess privilege="o3: Swap Mortuary Compartments">
+            <Button
+              kind="secondary"
+              size="sm"
+              renderIcon={ShareKnowledge}
+              onClick={() => handleSwapForm(patientUuid, bedId)}>
+              {t('swapCompartment', 'Swap compartment')}
+            </Button>
+          </UserHasAccess>
+
+          <UserHasAccess privilege="o3: Discharge Body from Mortuary">
+            <Button
+              kind="danger"
+              size="sm"
+              renderIcon={Movement}
+              onClick={() => handleDischargeForm(patientUuid, bedId)}>
+              {t('discharge', 'Discharge body')}
+            </Button>
+          </UserHasAccess>
         </>
       )}
     </div>

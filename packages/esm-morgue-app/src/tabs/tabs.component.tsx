@@ -1,6 +1,6 @@
 import { Button, Layer, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { SearchAdvanced } from '@carbon/react/icons';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace, UserHasAccess } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import useEmrConfiguration from '../hook/useAdmitPatient';
@@ -56,14 +56,16 @@ export const MorgueTabs: React.FC = () => {
             ))}
           </TabList>
           <div className={styles.actionBtn}>
-            <Button
-              kind="primary"
-              renderIcon={(props) => <SearchAdvanced size={40} {...props} />}
-              onClick={() => handleAdmitBodyWorkspace()}
-              className={styles.actionBtn}
-              disabled={isLoadingDischargedPatient}>
-              {t('admitBodies', 'Admit bodies')}
-            </Button>
+            <UserHasAccess privilege="o3 : Admit Body to Mortuary">
+              <Button
+                kind="primary"
+                renderIcon={(props) => <SearchAdvanced size={40} {...props} />}
+                onClick={() => handleAdmitBodyWorkspace()}
+                className={styles.actionBtn}
+                disabled={isLoadingDischargedPatient}>
+                {t('admitBodies', 'Admit bodies')}
+              </Button>
+            </UserHasAccess>
           </div>
         </div>
 
