@@ -91,6 +91,7 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const layout = useLayoutType();
   const size = layout === 'tablet' ? 'lg' : 'md';
+  const filteredClaimIds = filteredClaims.map((claim) => claim.responseUUID);
 
   const getHeaders = (): Header[] => {
     let baseHeaders = [
@@ -135,7 +136,7 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
     );
   }
 
-  const handleClaimAction = (claimId: string, modalType: 'retry' | 'update') => {
+  const handleClaimAction = (claimId: string, modalType: 'retry' | 'update' | 'all') => {
     const dispose = showModal('manage-claim-request-modal', {
       closeModal: () => dispose(),
       claimId,
@@ -203,7 +204,12 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
     <div className={styles.dataTableSkeleton}>
       <div className={styles.tableHeader}>
         <CardHeader title={t(title)}>{''}</CardHeader>
-        <ClaimsFilterHeader filters={filters} onFilterChanged={setFilters} statusOptions={status} />
+        <ClaimsFilterHeader
+          filters={filters}
+          onFilterChanged={setFilters}
+          statusOptions={status}
+          filteredClaimIds={filteredClaimIds}
+        />
       </div>
       <DataTable rows={results} headers={headers} isSortable useZebraStyles>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (

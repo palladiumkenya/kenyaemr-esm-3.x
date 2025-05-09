@@ -629,3 +629,10 @@ export interface TableProps {
   emptyStateHeader: string;
   includeClaimCode?: boolean;
 }
+
+export interface ProgressTracker {
+  completed: number;
+  total: number;
+  success?: number;
+  failed?: number;
+}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { UserHasAccess } from '@openmrs/esm-framework';
 import DeceasedFilter from '../header/admitted-queue-header.component';
 import styles from './admitted-queue.scss';
 import CompartmentView from '../card/compartment-view.compartment';
@@ -41,7 +42,9 @@ export const AdmittedQueue: React.FC = () => {
             subTitle={t('noAdmittedBodies', 'There are no admitted bodies matching your search')}
           />
         ) : (
-          <CompartmentView />
+          <UserHasAccess privilege="o3 : View Mortuary Compartments">
+            <CompartmentView />
+          </UserHasAccess>
         )}
       </div>
     </div>

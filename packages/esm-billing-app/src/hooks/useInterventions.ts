@@ -79,54 +79,95 @@ interface Intervention {
   benefit: number;
 }
 
+/**
+ * Hook to fetch and filter interventions based on provided filters
+ * @param filters Object containing filtering criteria
+ * @returns Object with loading state, filtered interventions, all interventions, and any errors
+ */
 export const useInterventions = (filters: InterventionsFilter) => {
   const { error: facilityLevelError, isLoading: isLoadingFacilityLevel, level } = useFacilityLevel();
+
+  // Build URL parameters for the API call
   const urlParams = new URLSearchParams({
-    ...filters,
+    ...(filters || {}),
     synchronize: 'false',
   });
+
   const url = `${restBaseUrl}/kenyaemr/sha-interventions?${urlParams.toString()}`;
   const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<Intervention> }>>(url, openmrsFetch);
-  const mapper = ({ benefitCode, name, parentBenefitCode }: Intervention): any => ({
+
+  // Mapper function to transform intervention data
+  const mapper = ({ benefitCode, name, parentBenefitCode }: Intervention): SHAIntervention => ({
     interventionCode: benefitCode,
     interventionName: name,
     interventionPackage: parentBenefitCode,
+    ...({} as any),
   });
 
+  // Filter and map interventions
   const interventions = useMemo(() => {
-    const packageCodes = filters.package_code?.split(',') || [];
-    return data?.data?.results
-      ?.filter((d) => {
-        // 1. Filter by package code (only if defined)
-        if (packageCodes.length > 0 && !packageCodes.includes(d.parentBenefitCode)) {
-          return false;
-        }
+    if (!data?.data?.results) {
+      return [];
+    }
 
-        // 2. Filter by applicable gender (only if defined)
-        if (
-          filters.applicable_gender &&
-          d.applicableGender &&
-          !['ALL', filters.applicable_gender].includes(d.applicableGender)
-        ) {
-          return false;
-        }
+    const packageCodes = filters.package_code?.split(',').filter(Boolean) || [];
 
-        if (level && d.levelsApplicable && !d.levelsApplicable.some((l) => level.includes(l))) {
-          return false;
-        }
+    // Filter based on criteria
+    const filteredResults = data.data.results.filter((intervention) => {
+      // Filter by package code (only if defined)
+      if (packageCodes.length > 0 && !packageCodes.includes(intervention.parentBenefitCode)) {
+        return false;
+      }
 
-        return true; // Keep item if it passes all filters
-      })
-      ?.map(mapper);
-  }, [data, filters, level]); // Ensure proper memoization
+      // Filter by applicable gender (only if defined)
+      if (
+        filters.applicable_gender &&
+        intervention.applicableGender &&
+        !['ALL', filters.applicable_gender].includes(intervention.applicableGender)
+      ) {
+        return false;
+      }
+
+      // Filter by facility level
+      if (level && intervention.levelsApplicable && !intervention.levelsApplicable.some((l) => level.includes(l))) {
+        return false;
+      }
+
+      return true; // Keep item if it passes all filters
+    });
+
+    // Map to the required format and ensure uniqueness by interventionCode
+    const mappedInterventions = filteredResults.map(mapper);
+
+    // Remove duplicates based on interventionCode
+    const uniqueInterventions = Array.from(
+      new Map(mappedInterventions.map((item) => [item.interventionCode, item])),
+    ).map(([, value]) => value);
+
+    return uniqueInterventions;
+  }, [data, filters, level]);
+
+  // Map all interventions without filtering
   const allInterventions = useMemo(() => {
-    return (data?.data?.results ?? []).map(mapper);
+    if (!data?.data?.results) {
+      return [];
+    }
+
+    // Map to the required format and ensure uniqueness
+    const mappedInterventions = data.data.results.map(mapper);
+
+    // Remove duplicates based on interventionCode
+    const uniqueInterventions = Array.from(
+      new Map(mappedInterventions.map((item) => [item.interventionCode, item])),
+    ).map(([, value]) => value);
+
+    return uniqueInterventions;
   }, [data]);
 
   return {
     isLoading: isLoading || isLoadingFacilityLevel,
-    interventions: (interventions ?? []) as Array<SHAIntervention>,
-    allInterventions: (allInterventions ?? []) as Array<SHAIntervention>,
+    interventions: interventions as Array<SHAIntervention>,
+    allInterventions: allInterventions as Array<SHAIntervention>,
     error: error || facilityLevelError,
   };
 };
