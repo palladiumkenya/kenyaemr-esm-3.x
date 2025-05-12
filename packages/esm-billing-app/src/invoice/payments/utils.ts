@@ -126,6 +126,7 @@ export const createPaymentPayload = (
       value: attribute.value,
     })),
     instanceType: payment.instanceType.uuid,
+    billLineItem: payment.billLineItem?.uuid,
   }));
 
   // Transform new payments
@@ -137,6 +138,7 @@ export const createPaymentPayload = (
       value: formValue.referenceCode,
     })),
     instanceType: formValue.method?.uuid,
+    billLineItem: formValue.lineItemUuid,
   }));
 
   // Combine and calculate payments

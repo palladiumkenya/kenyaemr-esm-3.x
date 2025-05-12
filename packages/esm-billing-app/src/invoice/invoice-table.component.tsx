@@ -151,7 +151,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
                       {...getRowProps({
                         row,
                       })}>
-                      {rows.length > 1 && isSelectable && (
+                      {isSelectable && (
                         <TableSelectRow
                           aria-label="Select row"
                           {...getSelectionProps({ row })}

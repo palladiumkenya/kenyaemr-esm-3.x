@@ -19,9 +19,9 @@
 
 .paymentMethodContainer {
   display: grid;
-  grid-template-columns: repeat(4, minmax(auto, 1fr));
+  grid-template-columns: repeat(5, minmax(auto, 1fr));
   align-items: flex-start;
-  column-gap: 1rem;
+  column-gap: layout.$spacing-02;
   margin: 0.625rem 0;
   width: 100%;
 }
@@ -51,4 +51,7 @@
 
 .removeButton {
   color: colors.$red-60;
+}
+.lineItemDropdown {
+  min-width: 10rem;
 }
