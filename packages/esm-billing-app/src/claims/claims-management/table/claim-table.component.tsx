@@ -92,6 +92,9 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
   const layout = useLayoutType();
   const size = layout === 'tablet' ? 'lg' : 'md';
   const filteredClaimIds = filteredClaims.map((claim) => claim.responseUUID);
+  const responseUUIDs = filteredClaimIds
+    .map((claimId) => claims.find((c) => c.responseUUID === claimId)?.responseUUID)
+    .filter((uuid) => uuid);
 
   const getHeaders = (): Header[] => {
     let baseHeaders = [
@@ -208,7 +211,7 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
           filters={filters}
           onFilterChanged={setFilters}
           statusOptions={status}
-          filteredClaimIds={filteredClaimIds}
+          filteredClaimIds={responseUUIDs}
         />
       </div>
       <DataTable rows={results} headers={headers} isSortable useZebraStyles>
