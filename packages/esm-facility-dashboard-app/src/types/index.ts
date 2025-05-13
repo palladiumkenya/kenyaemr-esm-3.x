@@ -37,3 +37,11 @@ export type HivPositiveNotLinked = {
   value: number;
   group?: string;
 };
+
+export type Linkage = {
+  group?: string;
+  value?: number;
+};
+export type LinkageData = {
+  data: Array<Linkage>;
+};

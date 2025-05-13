@@ -8,6 +8,7 @@ import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import styles from './charts.scss';
 import { InlineLoading } from '@carbon/react';
+import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
 type HIVPositiveNotLinkedToARTProps = {
   startDate?: Date;
   endDate?: Date;
@@ -15,7 +16,8 @@ type HIVPositiveNotLinkedToARTProps = {
 const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
 
-  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
+  const { error, isLoading, surveillanceSummary, getCompletedPercentage, getPendingPercentage } =
+    useFacilityDashboardSurveillance(startDate, endDate);
 
   const hivPositivePatientValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHivPositiveNotLinked');
 
@@ -23,6 +25,25 @@ const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ s
     surveillanceSummary,
     'getMonthlyHivPositiveNotLinkedPatients',
   );
+
+  const cummulativeHivPositivePatientData = {
+    data: [
+      {
+        group: 'Completed',
+        value: getCompletedPercentage(
+          surveillanceSummary?.getHivPositiveNotLinked,
+          surveillanceSummary?.getHivTestedPositive,
+        ),
+      },
+      {
+        group: 'Pending',
+        value: getPendingPercentage(
+          surveillanceSummary?.getHivPositiveNotLinked,
+          surveillanceSummary?.getHivTestedPositive,
+        ),
+      },
+    ],
+  };
 
   return (
     <div>
@@ -46,6 +67,26 @@ const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ s
               <BaseArtProgressTrackingChart data={monthlyHivPositivePatientData} />
             ) : (
               <EmptyState subTitle={'No Linkage to ART data to display'} />
+            )}
+          </div>
+          <div className={styles.chart}>
+            {surveillanceSummary?.getHivTestedPositive > 0 ? (
+              <div className={styles.cummulativeChart}>
+                <BaseCummulativeProgressTrackingChart
+                  data={cummulativeHivPositivePatientData}
+                  title={t(
+                    'cummulativeProgressOfAddressingLinkedToArt',
+                    'Cummulative progress of addressing Linkage to ART',
+                  )}
+                />
+              </div>
+            ) : (
+              <EmptyState
+                subTitle={t(
+                  'noCummulativeHivPositiveNotLinked',
+                  'No cummulative HIV +VE Not linked to ART data to display',
+                )}
+              />
             )}
           </div>
         </>
