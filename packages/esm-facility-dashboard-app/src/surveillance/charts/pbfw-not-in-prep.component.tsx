@@ -8,6 +8,7 @@ import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import styles from './charts.scss';
 import { InlineLoading } from '@carbon/react';
+import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
 
 type PBFWNotInPrepProps = {
   startDate?: Date;
@@ -15,13 +16,33 @@ type PBFWNotInPrepProps = {
 };
 const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
+  const { error, isLoading, surveillanceSummary, getCompletedPercentage, getPendingPercentage } =
+    useFacilityDashboardSurveillance(startDate, endDate);
   const highRiskPBFWNotOnPrepValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHighRiskPBFWNotOnPrep');
 
   const monthlyhighRiskPBFWNotOnPrepPatientData = useSurveillanceData(
     surveillanceSummary,
     'getMonthlyHighRiskPBFWNotOnPrepPatients',
   );
+
+  const cummulativeHighRiskPBFWNotOnPrepValueData = {
+    data: [
+      {
+        group: 'Completed',
+        value: getCompletedPercentage(
+          surveillanceSummary?.getPregnantPostpartumNotInPrep,
+          surveillanceSummary?.getPregnantOrPostpartumClients,
+        ),
+      },
+      {
+        group: 'Pending',
+        value: getPendingPercentage(
+          surveillanceSummary?.getPregnantPostpartumNotInPrep,
+          surveillanceSummary?.getPregnantOrPostpartumClients,
+        ),
+      },
+    ],
+  };
 
   return (
     <div>
@@ -43,6 +64,21 @@ const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => 
           <div className={styles.chart}>
             {monthlyhighRiskPBFWNotOnPrepPatientData.length > 0 ? (
               <BaseProgressTrackingChart data={monthlyhighRiskPBFWNotOnPrepPatientData} />
+            ) : (
+              <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
+            )}
+          </div>
+          <div className={styles.chart}>
+            {surveillanceSummary?.getPregnantOrPostpartumClients > 0 ? (
+              <div className={styles.cummulativeChart}>
+                <BaseCummulativeProgressTrackingChart
+                  data={cummulativeHighRiskPBFWNotOnPrepValueData}
+                  title={t(
+                    'cummulativeProgressMissedoppotunityVL',
+                    'Cummulative progress of missed opportunity in viral load testing',
+                  )}
+                />
+              </div>
             ) : (
               <EmptyState subTitle={t('noHighRiskPBFW', 'No High risk PBFW Not on PrEP data to display')} />
             )}

@@ -1,0 +1,48 @@
+import { ScaleTypes, SimpleBarChart, BarChartOptions } from '@carbon/charts-react';
+import { Layer } from '@carbon/react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import styles from './charts.scss';
+import { LinkageData } from '../../types';
+
+type Props = {
+  data: LinkageData;
+  height?: string;
+  title?: string;
+};
+
+const BaseCummulativeProgressTrackingChart: React.FC<Props> = ({ data, title, height = '400px' }) => {
+  const { t } = useTranslation();
+
+  const chartData = data?.data || [];
+
+  const options: BarChartOptions = {
+    title: title,
+    axes: {
+      left: {
+        mapsTo: 'value',
+        ticks: {
+          values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
+        },
+      },
+      bottom: {
+        mapsTo: 'group',
+        scaleType: ScaleTypes.LABELS,
+      },
+    },
+    height,
+    color: {
+      scale: {
+        Completed: '#008000',
+        Pending: '#FF0000',
+      },
+    },
+  };
+  return (
+    <Layer className={styles.chartContainer}>
+      <SimpleBarChart options={options} data={chartData} />
+    </Layer>
+  );
+};
+
+export default BaseCummulativeProgressTrackingChart;
