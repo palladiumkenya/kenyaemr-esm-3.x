@@ -97,8 +97,8 @@ export const useInterventions = (filters: InterventionsFilter) => {
   const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<Intervention> }>>(url, openmrsFetch);
 
   // Mapper function to transform intervention data
-  const mapper = ({ benefitCode, name, parentBenefitCode }: Intervention): SHAIntervention => ({
-    interventionCode: benefitCode,
+  const mapper = ({ code, name, parentBenefitCode }: Intervention): SHAIntervention => ({
+    interventionCode: code,
     interventionName: name,
     interventionPackage: parentBenefitCode,
     ...({} as any),
@@ -112,9 +112,9 @@ export const useInterventions = (filters: InterventionsFilter) => {
 
     const packageCodes = filters.package_code?.split(',').filter(Boolean) || [];
 
-    // Filter based on criteria
-    const filteredResults = data.data.results.filter((intervention) => {
+    const filteredResults = data.data.results.filter((intervention, i) => {
       // Filter by package code (only if defined)
+
       if (packageCodes.length > 0 && !packageCodes.includes(intervention.parentBenefitCode)) {
         return false;
       }
@@ -128,9 +128,14 @@ export const useInterventions = (filters: InterventionsFilter) => {
         return false;
       }
 
-      // Filter by facility level
-      if (level && intervention.levelsApplicable && !intervention.levelsApplicable.some((l) => level.includes(l))) {
-        return false;
+      // // Filter by facility level
+      if (level && intervention.levelsApplicable && Array.isArray(intervention.levelsApplicable)) {
+        // Check if level starts with any of the intervention.levelsApplicable values
+        const levelMatched = intervention.levelsApplicable.some((appLevel) => level.startsWith(appLevel));
+
+        if (!levelMatched) {
+          return false;
+        }
       }
 
       return true; // Keep item if it passes all filters
@@ -139,12 +144,7 @@ export const useInterventions = (filters: InterventionsFilter) => {
     // Map to the required format and ensure uniqueness by interventionCode
     const mappedInterventions = filteredResults.map(mapper);
 
-    // Remove duplicates based on interventionCode
-    const uniqueInterventions = Array.from(
-      new Map(mappedInterventions.map((item) => [item.interventionCode, item])),
-    ).map(([, value]) => value);
-
-    return uniqueInterventions;
+    return mappedInterventions;
   }, [data, filters, level]);
 
   // Map all interventions without filtering
