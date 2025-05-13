@@ -30,7 +30,7 @@ const BaseCummulativeProgressTrackingChart: React.FC<Props> = ({ data, title, he
         scaleType: ScaleTypes.LABELS,
       },
     },
-    height,
+    height: height,
     color: {
       scale: {
         Completed: '#008000',
