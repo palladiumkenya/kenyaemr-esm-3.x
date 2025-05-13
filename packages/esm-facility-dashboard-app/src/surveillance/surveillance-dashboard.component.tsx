@@ -12,6 +12,7 @@ import HEIFinalOutcomesChart from './charts/hei-final-outcome.component';
 import { SurveillanceindicatorsFilter } from '../types';
 import { Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { formattedDate, thirtyDays, today } from '../constants';
+import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 const SurveillancelanceDashboard = () => {
   const { t } = useTranslation();
   const [currFilters, setCurrFilters] = useState<SurveillanceindicatorsFilter>({
@@ -39,6 +40,7 @@ const SurveillancelanceDashboard = () => {
           </TabPanel>
           <TabPanel>
             <>
+              {/* <CardHeader title={t('thirtyDaysProgressTrack', 'Thirty days progress tracking')}>{''}</CardHeader> */}
               <SurveillanceFilters filters={currFilters} onFiltersChange={setCurrFilters} tabSelected={activeTab} />
               {currFilters.indicator === 'getHivPositiveNotLinked' && (
                 <HIVPositiveNotLinkedToART startDate={defaultStartDate} endDate={defaultEndDate} />
