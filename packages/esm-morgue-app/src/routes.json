@@ -13,7 +13,10 @@
       "meta": {
         "name": "morgue",
         "title": "morgue",
-        "slot": "morgue-dashboard-slot"
+        "slot": "morgue-dashboard-slot",
+        "privileges": [
+          "o3 : View Mortuary Dashboard"
+        ]
       }
     },
     {
@@ -21,7 +24,19 @@
       "component": "actionBarButtons",
       "slot": "mortuary-action-buttons-slot",
       "meta": {
-        "fullWidth": false
+        "fullWidth": false,
+        "privileges": [
+          "o3 : View Mortuary Dashboard",
+          "o3 : Admit Body to Mortuary",
+          "o3 : Edit Mortuary Records",
+          "o3 : Discharge Body from Mortuary",
+          "o3 : View Mortuary Compartments",
+          "o3 : Swap Mortuary Compartments",
+          "o3 : View Mortuary Billing",
+          "o3 : Process Mortuary Payments",
+          "o3 : View Mortuary Reports",
+          "o3 : Generate Mortuary Reports"
+        ]
       }
     },
     {
@@ -35,10 +50,15 @@
     {
       "component": "root",
       "name": "morgue-dashboard-root",
-      "slot": "morgue-dashboard-slot"
+      "slot": "morgue-dashboard-slot",
+      "meta": {
+        "privileges": [
+          "o3 : View Mortuary Dashboard"
+        ]
+      }
     }
   ],
-   "workspaces": [
+  "workspaces": [
     {
       "name": "patient-additional-info-form",
       "component": "patientAdditionalInfoForm",

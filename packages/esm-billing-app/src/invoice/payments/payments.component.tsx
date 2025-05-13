@@ -67,7 +67,6 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
       globalActiveSheet,
     );
     remove();
-
     processBillPayment(paymentPayload, bill.uuid).then(
       (resp) => {
         showSnackbar({
@@ -142,7 +141,12 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
                 className={styles.paymentError}
               />
             )}
-            <PaymentForm {...formArrayMethods} disablePayment={amountDue <= 0} amountDue={amountDue} />
+            <PaymentForm
+              {...formArrayMethods}
+              selectedLineItems={selectedLineItems}
+              disablePayment={amountDue <= 0}
+              amountDue={amountDue}
+            />
           </div>
         </div>
         <div className={styles.divider} />

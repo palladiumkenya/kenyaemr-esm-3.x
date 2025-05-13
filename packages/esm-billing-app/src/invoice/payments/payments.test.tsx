@@ -6,6 +6,7 @@ import { mockBill, mockedActiveSheet, mockLineItems, mockPaymentModes } from '..
 import { processBillPayment, usePaymentModes } from '../../billing.resource';
 import { useClockInStatus } from '../../payment-points/use-clock-in-status';
 import Payments from './payments.component';
+
 const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
 const mockUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockShowSnackbar = showSnackbar as jest.MockedFunction<typeof showSnackbar>;
@@ -31,6 +32,7 @@ describe('Payment', () => {
         },
       },
     };
+
     mockProcessBillPayment.mockRejectedValueOnce(mockFieldErrorResponse);
     mockUsePaymentModes.mockReturnValue({
       paymentModes: mockPaymentModes,
@@ -49,10 +51,19 @@ describe('Payment', () => {
     });
 
     render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
+
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
-    await user.click(screen.getByRole('combobox', { name: /Payment method/i }));
-    const cashOption = screen.getByRole('option', { name: /Cash/i });
+
+    const lineItemDropdown = await screen.findByRole('combobox', { name: /Select line item to pay/i });
+    await user.click(lineItemDropdown);
+
+    const lineItemOptions = await screen.findAllByRole('option');
+    await user.click(lineItemOptions[0]);
+
+    const paymentMethodDropdown = await screen.findByRole('combobox', { name: /Payment method/i });
+    await user.click(paymentMethodDropdown);
+    const cashOption = await screen.findByRole('option', { name: /Cash/i });
     await user.click(cashOption);
 
     const amountInput = screen.getByRole('spinbutton', { name: /Amount/i });
@@ -71,6 +82,8 @@ describe('Payment', () => {
             billableService: 'c15d25b9-12bb-441d-9241-cae541dd4575',
             display: 'BillLineItem',
             item: 'c15d25b9-12bb-441d-9241-cae541dd4575',
+            itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+            serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 0,
             order: null,
             paymentStatus: 'PAID',
@@ -87,6 +100,8 @@ describe('Payment', () => {
             billableService: '04be5832-5440-44d0-83d2-5c0dfd0ac7de',
             display: 'BillLineItem',
             item: '04be5832-5440-44d0-83d2-5c0dfd0ac7de',
+            itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+            serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 1,
             order: null,
             paymentStatus: 'PAID',
@@ -103,6 +118,8 @@ describe('Payment', () => {
             billableService: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
             display: 'BillLineItem',
             item: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
+            itemOrServiceConceptUuid: 'c42525b9-12bb-441d-9241-cae541dd4575',
+            serviceTypeUuid: '915d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 2,
             order: null,
             paymentStatus: 'PAID',
@@ -133,7 +150,13 @@ describe('Payment', () => {
         ],
         patient: 'b2fcf02b-7ee3-4d16-a48f-576be2b103aa',
         payments: [
-          { amount: 100, amountTendered: 100, attributes: [], instanceType: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74' },
+          {
+            amount: 100,
+            amountTendered: 100,
+            attributes: [],
+            instanceType: '63eff7a4-6f82-43c4-a333-dbcc58fe9f74',
+            billLineItem: '314c25fd-2c90-4a7f-9f98-c99cd3f153e8',
+          },
         ],
         status: 'PENDING',
       },
@@ -158,18 +181,27 @@ describe('Payment', () => {
       error: null,
       mutate: jest.fn(),
     });
+
     render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
+
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
 
-    // Check if the payment method field is focused
-    expect(screen.getByRole('combobox', { name: /Payment method/i })).toHaveFocus();
-    await user.click(screen.getByRole('combobox', { name: /Payment method/i }));
-    const cashOption = screen.getByRole('option', { name: /Cash/i });
+    const lineItemDropdown = await screen.findByRole('combobox', { name: /Select line item to pay/i });
+    expect(lineItemDropdown).toHaveFocus();
+
+    await user.click(lineItemDropdown);
+    const lineItemOptions = await screen.findAllByRole('option');
+    await user.click(lineItemOptions[0]);
+
+    const paymentMethodField = await screen.findByRole('combobox', { name: /Payment method/i });
+    expect(paymentMethodField).toHaveFocus();
+
+    await user.click(paymentMethodField);
+    const cashOption = await screen.findByRole('option', { name: /Cash/i });
     await user.click(cashOption);
-    // Check if the amount field is focused
-    expect(screen.getByRole('spinbutton', { name: /Amount/i })).toHaveFocus();
+
     const amountInput = screen.getByRole('spinbutton', { name: /Amount/i });
-    await user.type(amountInput, '100');
+    expect(amountInput).toHaveFocus();
   });
 });

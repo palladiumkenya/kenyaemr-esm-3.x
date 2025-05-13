@@ -23,6 +23,7 @@ export function usePaymentSchema(bill: MappedBill) {
         return amountDue >= 0 && value > 0;
       }, 'Amount paid should not be greater than amount due'),
       referenceCode: z.string(),
+      lineItemUuid: z.string().uuid().nonempty({ message: 'Line item selection is required' }),
     })
     .refine(
       (data) => {
