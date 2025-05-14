@@ -261,15 +261,15 @@ export const configSchema = {
     _default: [
       {
         label: 'Cardex Nursing Plan',
-        uuid: '89891ea0-444f-48bf-98e6-f97e87607f7e',
+        uuid: '1f81d5e2-3569-40cf-bbb9-361a53ba409b',
       },
       {
         label: 'IPD Procedure Form',
-        uuid: '3853ed6d-dddd-4459-b441-25cd6a459ed4',
+        uuid: '2b9c2b94-0b03-416a-b312-eef49b42f72c',
       },
       {
         label: 'Newborn Unit Admission ',
-        uuid: 'e8110437-e3cc-4238-bfc1-414bdd4de6a4',
+        uuid: '5b0a08f5-87c1-40cc-8c09-09c33b44523d',
       },
       {
         label: 'Partograph Form',
@@ -365,15 +365,15 @@ export interface ConfigObject {
     _default: [
       {
         label: 'Cardex Nursing Plan';
-        uuid: '89891ea0-444f-48bf-98e6-f97e87607f7e';
+        uuid: '1f81d5e2-3569-40cf-bbb9-361a53ba409b';
       },
       {
         label: 'IPD Procedure Form';
-        uuid: '3853ed6d-dddd-4459-b441-25cd6a459ed4';
+        uuid: '2b9c2b94-0b03-416a-b312-eef49b42f72c';
       },
       {
         label: 'Newborn Unit Admission ';
-        uuid: 'e8110437-e3cc-4238-bfc1-414bdd4de6a4';
+        uuid: '5b0a08f5-87c1-40cc-8c09-09c33b44523d';
       },
       {
         label: 'Partograph Form';
