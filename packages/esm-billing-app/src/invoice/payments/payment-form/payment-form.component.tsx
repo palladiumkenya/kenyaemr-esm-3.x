@@ -6,33 +6,23 @@ import { Button, Dropdown, NumberInputSkeleton, TextInput, NumberInput } from '@
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import styles from './payment-form.scss';
 import { usePaymentModes } from '../../../billing.resource';
-import { type LineItem, PaymentFormValue, PaymentMethod } from '../../../types';
-import { extractBillableName } from '../../../utils';
+import { PaymentFormValue, PaymentMethod } from '../../../types';
 
 type PaymentFormProps = {
   disablePayment: boolean;
   amountDue: number;
-  append: (obj: { method: PaymentMethod; amount: number; referenceCode: string; lineItemUuid: string }) => void;
+  append: (obj: { method: PaymentMethod; amount: number; referenceCode: string }) => void;
   fields: FieldArrayWithId<PaymentFormValue, 'payment', 'id'>[];
   remove: UseFieldArrayRemove;
-  selectedLineItems: Array<LineItem>;
 };
 
-const PaymentForm: React.FC<PaymentFormProps> = ({
-  disablePayment,
-  amountDue,
-  append,
-  remove,
-  fields,
-  selectedLineItems,
-}) => {
+const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, append, remove, fields }) => {
   const { t } = useTranslation();
   const {
     control,
     formState: { errors },
     setFocus,
     getValues,
-    watch,
   } = useFormContext<PaymentFormValue>();
   const { paymentModes, isLoading, error } = usePaymentModes();
 
@@ -41,26 +31,9 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     const attributes = formValues?.payment?.[index]?.method?.attributeTypes ?? [];
     return attributes.some((attribute) => attribute.required) || attributes?.length > 0;
   };
-  const paymentValues = watch('payment');
 
-  const getUsedItemUuids = (currentIndex: number) => {
-    return paymentValues
-      .map((payment, index) => (index !== currentIndex ? payment?.lineItemUuid : null))
-      .filter(Boolean);
-  };
-  const getAvailableLineItems = (currentIndex: number) => {
-    const usedUuids = getUsedItemUuids(currentIndex);
-    return selectedLineItems.filter((item) => item.paymentStatus === 'PENDING' && !usedUuids.includes(item.uuid));
-  };
   const handleAppendPaymentMode = useCallback(() => {
-    const availableItems = getAvailableLineItems(fields.length);
-    const initialItemUuid = availableItems.length === 1 ? availableItems[0].uuid : '';
-    append({
-      method: null,
-      amount: null,
-      referenceCode: '',
-      lineItemUuid: initialItemUuid,
-    });
+    append({ method: null, amount: null, referenceCode: '' });
     setFocus(`payment.${fields.length}.method`);
   }, [append, fields.length, setFocus]);
 
@@ -80,91 +53,67 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
 
   return (
     <div className={styles.container}>
-      {fields.map((field, index) => {
-        const availableLineItems = getAvailableLineItems(index);
-        return (
-          <div key={field.id} className={styles.paymentMethodContainer}>
-            <Controller
-              control={control}
-              name={`payment.${index}.lineItemUuid`}
-              render={({ field }) => (
-                <Dropdown
-                  {...field}
-                  id="paymentLineItem"
-                  onChange={({ selectedItem }) => {
-                    field.onChange(selectedItem?.uuid);
-                    setFocus(`payment.${index}.method`);
-                  }}
-                  titleText={t('selectLineItemToPay', 'Select line item to pay')}
-                  label={t('selectLineItemToPay', 'Select line item to pay')}
-                  items={availableLineItems}
-                  itemToString={(item) => extractBillableName(item)}
-                  invalid={!!errors?.payment?.[index]?.lineItemUuid}
-                  invalidText={errors?.payment?.[index]?.lineItemUuid?.message}
-                  className={styles.lineItemDropdown}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name={`payment.${index}.method`}
-              render={({ field }) => (
-                <Dropdown
-                  {...field}
-                  id="paymentMethod"
-                  onChange={({ selectedItem }) => {
-                    setFocus(`payment.${index}.amount`);
-                    field.onChange(selectedItem);
-                  }}
-                  titleText={t('paymentMethod', 'Payment method')}
-                  label={t('selectPaymentMethod', 'Select payment method')}
-                  items={paymentModes}
-                  itemToString={(item) => (item ? item.name : '')}
-                  invalid={!!errors?.payment?.[index]?.method}
-                  invalidText={errors?.payment?.[index]?.method?.message}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name={`payment.${index}.amount`}
-              render={({ field }) => (
-                <NumberInput
-                  {...field}
-                  id="paymentAmount"
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                  invalid={!!errors?.payment?.[index]?.amount}
-                  invalidText={errors?.payment?.[index]?.amount?.message}
-                  label={t('amount', 'Amount')}
-                  placeholder={t('enterAmount', 'Enter amount')}
-                />
-              )}
-            />
-            {shouldShowReferenceCode(index) && (
-              <Controller
-                name={`payment.${index}.referenceCode`}
-                control={control}
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="paymentReferenceCode"
-                    labelText={t('referenceNumber', 'Reference number')}
-                    placeholder={t('enterReferenceNumber', 'Enter ref. number')}
-                    type="text"
-                    invalid={!!errors?.payment?.[index]?.referenceCode}
-                    invalidText={errors?.payment?.[index]?.referenceCode?.message}
-                  />
-                )}
+      {fields.map((field, index) => (
+        <div key={field.id} className={styles.paymentMethodContainer}>
+          <Controller
+            control={control}
+            name={`payment.${index}.method`}
+            render={({ field }) => (
+              <Dropdown
+                {...field}
+                id="paymentMethod"
+                onChange={({ selectedItem }) => {
+                  setFocus(`payment.${index}.amount`);
+                  field.onChange(selectedItem);
+                }}
+                titleText={t('paymentMethod', 'Payment method')}
+                label={t('selectPaymentMethod', 'Select payment method')}
+                items={paymentModes}
+                itemToString={(item) => (item ? item.name : '')}
+                invalid={!!errors?.payment?.[index]?.method}
+                invalidText={errors?.payment?.[index]?.method?.message}
               />
             )}
-            <div className={styles.removeButtonContainer}>
-              <TrashCan onClick={() => handleRemovePaymentMode(index)} className={styles.removeButton} size={20} />
-            </div>
+          />
+          <Controller
+            control={control}
+            name={`payment.${index}.amount`}
+            render={({ field }) => (
+              <NumberInput
+                {...field}
+                id="paymentAmount"
+                onChange={(e) => field.onChange(Number(e.target.value))}
+                invalid={!!errors?.payment?.[index]?.amount}
+                invalidText={errors?.payment?.[index]?.amount?.message}
+                label={t('amount', 'Amount')}
+                placeholder={t('enterAmount', 'Enter amount')}
+              />
+            )}
+          />
+          {shouldShowReferenceCode(index) && (
+            <Controller
+              name={`payment.${index}.referenceCode`}
+              control={control}
+              render={({ field }) => (
+                <TextInput
+                  {...field}
+                  id="paymentReferenceCode"
+                  labelText={t('referenceNumber', 'Reference number')}
+                  placeholder={t('enterReferenceNumber', 'Enter ref. number')}
+                  type="text"
+                  invalid={!!errors?.payment?.[index]?.referenceCode}
+                  invalidText={errors?.payment?.[index]?.referenceCode?.message}
+                />
+              )}
+            />
+          )}
+          <div className={styles.removeButtonContainer}>
+            <TrashCan onClick={() => handleRemovePaymentMode(index)} className={styles.removeButton} size={20} />
           </div>
-        );
-      })}
+        </div>
+      ))}
       <Button
-        disabled={disablePayment || !selectedLineItems.length}
+        disabled={disablePayment}
         size="md"
         onClick={handleAppendPaymentMode}
         className={styles.paymentButtons}

@@ -166,9 +166,3 @@ export const computeWaivedAmount = (bill: MappedBill) => {
     .filter((payment) => payment.instanceType.name.toLowerCase() === 'waiver')
     .reduce((curr: number, prev) => curr + Number(prev.amountTendered), 0);
 };
-
-export const extractBillableName = (billableService: string | { billableService: string }) => {
-  const parts =
-    typeof billableService === 'string' ? billableService.split(':') : billableService.billableService.split(':');
-  return parts.length > 1 ? parts[1] : '';
-};
