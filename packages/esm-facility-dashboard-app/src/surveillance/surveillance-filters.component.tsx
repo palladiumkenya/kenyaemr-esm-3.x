@@ -16,7 +16,7 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange, tabSel
   const MaxDate: Date = today();
   const indicators = [
     { key: 'getHivPositiveNotLinked', label: 'HIV +ve not linked' },
-    { key: 'getPregnantPostpartumNotInPrep', label: 'High risk +ve PBFW not on PrEP' },
+    { key: 'getPregnantPostpartumNotInPrep', label: 'High risk -ve PBFW not enrolled to PrEP' },
     { key: 'getEligibleForVlSampleNotTaken', label: 'Delayed EAC' },
     { key: 'getVirallyUnsuppressedWithoutEAC', label: 'Missed opportunity VL' },
     { key: 'getHeiSixToEightWeeksWithoutPCRResults', label: 'DNA-PCR Pending' },
