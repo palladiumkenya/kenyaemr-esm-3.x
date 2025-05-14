@@ -34,6 +34,7 @@ type ClaimsTableProps = {
 
 const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, isLoadingBill, onSelectItem }) => {
   const { t } = useTranslation();
+  const { lineItems } = bill;
   const layout = useLayoutType();
   const responsiveSize = isDesktop(layout) ? 'sm' : 'lg';
   const [selectedLineItems, setSelectedLineItems] = useState<LineItem[]>([]);
@@ -42,33 +43,20 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  // Filter line items that are paid and paid through Insurance
-  const insurancePaidLineItems = useMemo(() => {
-    return (bill.lineItems || []).filter((lineItem) => {
-      // Check if payment status is PAID
-      const isPaid = lineItem.paymentStatus === 'PAID';
-
-      // Check if there's an Insurance payment for this line item
-      const hasInsurancePayment = bill.payments?.some(
-        (payment) => payment.billLineItem?.uuid === lineItem.uuid && payment.instanceType?.name === 'Insurance',
-      );
-
-      return isPaid && hasInsurancePayment;
-    });
-  }, [bill.lineItems, bill.payments]);
+  const paidLineItems = useMemo(() => (lineItems || []).filter((item) => item.paymentStatus === 'PAID'), [lineItems]);
 
   const filteredLineItems = useMemo(() => {
     if (!debouncedSearchTerm) {
-      return insurancePaidLineItems;
+      return paidLineItems;
     }
 
     return fuzzy
-      .filter(debouncedSearchTerm, insurancePaidLineItems, {
-        extract: (lineItem: LineItem) => `${lineItem.item || lineItem.billableService}`,
+      .filter(debouncedSearchTerm, paidLineItems, {
+        extract: (lineItem: LineItem) => `${lineItem.item}`,
       })
       .sort((r1, r2) => r1.score - r2.score)
       .map((result) => result.original);
-  }, [debouncedSearchTerm, insurancePaidLineItems]);
+  }, [debouncedSearchTerm, paidLineItems]);
 
   const paginatedLineItems = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
@@ -81,20 +69,11 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
     { header: t('serialNo', 'Serial No'), key: 'serialno' },
     { header: t('billItem', 'Bill Item'), key: 'inventoryname' },
     { header: t('status', 'Status'), key: 'status' },
-    { header: t('paymentMethod', 'Payment Method'), key: 'paymentMethod' },
     { header: t('totalAmount', 'Total amount'), key: 'total' },
     { header: t('billCreationDate', 'Bill creation date'), key: 'dateofbillcreation' },
   ];
 
-  const processBillItem = (item) => {
-    const itemName = item?.item || item?.billableService;
-    return itemName?.split(':')[1]?.trim() || itemName;
-  };
-
-  const getPaymentMethod = (lineItemUuid: string) => {
-    const payment = bill.payments?.find((p) => p.billLineItem?.uuid === lineItemUuid);
-    return payment?.instanceType?.name || 'Unknown';
-  };
+  const processBillItem = (item) => (item?.item || item?.billableService)?.split(':')[1];
 
   const tableRows: Array<typeof DataTableRow> = useMemo(
     () =>
@@ -105,12 +84,11 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           inventoryname: processBillItem(item),
           serialno: bill.receiptNumber,
           status: item.paymentStatus,
-          paymentMethod: getPaymentMethod(item.uuid),
           total: item.price * item.quantity,
           dateofbillcreation: formatDate(new Date(bill.dateCreated), { mode: 'standard' }),
         };
       }) ?? [],
-    [bill.dateCreated, bill.receiptNumber, bill.payments, paginatedLineItems],
+    [bill.dateCreated, bill.receiptNumber, paginatedLineItems],
   );
 
   if (isLoadingBill) {
@@ -148,10 +126,10 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
             className={styles.tableContainer}
             description={
               <span className={styles.tableDescription}>
-                <span>{t('insurancePaidItems', 'Items paid through Insurance')}</span>
+                <span>{t('selectitemstobeclaimed', 'Select items that are to be included in the claims')}</span>
               </span>
             }
-            title={t('claimableItems', 'Claimable Items')}>
+            title={t('lineItems', 'Line items')}>
             <div className={styles.toolbarWrapper}>
               <TableToolbar {...getToolbarProps()} className={styles.tableToolbar} size={responsiveSize}>
                 <TableToolbarContent className={styles.headerContainer}>
@@ -165,7 +143,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
                 </TableToolbarContent>
               </TableToolbar>
             </div>
-            <Table {...getTableProps()} aria-label="insurance claim line items" className={styles.table}>
+            <Table {...getTableProps()} aria-label="claim line items" className={styles.table}>
               <TableHead>
                 <TableRow>
                   {isSelectable ? <TableHeader /> : null}
@@ -206,13 +184,14 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
           <Layer>
             <Tile className={styles.filterEmptyStateTile}>
               <p className={styles.filterEmptyStateContent}>
-                {t('noInsurancePaidItems', 'No items paid through insurance found')}
+                {t('noMatchingItemsToDisplay', 'No matching items to display')}
               </p>
+              <p className={styles.filterEmptyStateHelper}>{t('checkFilters', 'Check the filters above')}</p>
             </Tile>
           </Layer>
         </div>
       )}
-      {filteredLineItems.length > pageSize && (
+      {tableRows.length > pageSize && (
         <Pagination
           forwardText="Next page"
           backwardText="Previous page"
