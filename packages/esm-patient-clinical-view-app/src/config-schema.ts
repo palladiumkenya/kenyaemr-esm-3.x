@@ -274,6 +274,7 @@ export const configSchema = {
       {
         label: 'Partograph Form',
         uuid: '3791e5b7-2cdc-44fc-982b-a81135367c96',
+        hideExpression: 'age >= 10 && gender === "female"',
       },
     ],
   },
@@ -339,48 +340,6 @@ export interface ConfigObject {
     display: string;
     category: Array<'sexual' | 'pns' | 'family' | 'other'>;
   }>;
-  admissionLocationTagUuid: {
-    _type: Type.UUID;
-    _description: 'UUID for the location tag of the `Admission Location`. Patients may only be admitted to inpatient care in a location with this tag';
-    _default: '233de33e-2778-4f9a-a398-fa09da9daa14';
-  };
-  inpatientVisitUuid: {
-    _type: Type.UUID;
-    _description: 'UUID for the inpatient visit';
-    _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914';
-  };
-  restrictWardAdministrationToLoginLocation: {
-    _type: Type.Boolean;
-    _description: 'UUID for the inpatient visit';
-    _default: false;
-  };
-  patientListForAdmissionUrl: {
-    _type: Type.String;
-    _description: 'Endpoint for fetching list of patients eligible for ward admission';
-    _default: '';
-  };
-  inPatientForms: {
-    _type: Type.Array;
-    _description: 'List of forms that can be filled out for in-patients';
-    _default: [
-      {
-        label: 'Cardex Nursing Plan';
-        uuid: '1f81d5e2-3569-40cf-bbb9-361a53ba409b';
-      },
-      {
-        label: 'IPD Procedure Form';
-        uuid: '2b9c2b94-0b03-416a-b312-eef49b42f72c';
-      },
-      {
-        label: 'Newborn Unit Admission ';
-        uuid: '5b0a08f5-87c1-40cc-8c09-09c33b44523d';
-      },
-      {
-        label: 'Partograph Form';
-        uuid: '3791e5b7-2cdc-44fc-982b-a81135367c96';
-      },
-    ];
-  };
 }
 
 export interface PartograpyComponents {
@@ -405,5 +364,5 @@ export type BedManagementConfig = {
   inpatientVisitUuid: string;
   restrictWardAdministrationToLoginLocation: boolean;
   patientListForAdmissionUrl: string;
-  inPatientForms: Array<{ label: string; uuid: string }>;
+  inPatientForms: Array<{ label: string; uuid: string; hideExpression: string }>;
 };
