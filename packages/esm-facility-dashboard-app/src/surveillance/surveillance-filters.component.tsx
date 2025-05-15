@@ -5,6 +5,7 @@ import { SurveillanceindicatorsFilter } from '../types';
 import styles from './surveillance.scss';
 import { DATE_PICKER_CONTROL_FORMAT, DATE_PICKER_FORMAT, today } from '../constants';
 import { formatDatetime } from '@openmrs/esm-framework';
+import { CardHeader } from '@openmrs/esm-patient-common-lib/src';
 
 type Props = {
   filters: SurveillanceindicatorsFilter;
@@ -16,7 +17,7 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange, tabSel
   const MaxDate: Date = today();
   const indicators = [
     { key: 'getHivPositiveNotLinked', label: 'HIV +ve not linked' },
-    { key: 'getPregnantPostpartumNotInPrep', label: 'High risk +ve PBFW not on PrEP' },
+    { key: 'getPregnantPostpartumNotInPrep', label: 'High risk -ve PBFW not enrolled to PrEP' },
     { key: 'getEligibleForVlSampleNotTaken', label: 'Delayed EAC' },
     { key: 'getVirallyUnsuppressedWithoutEAC', label: 'Missed opportunity VL' },
     { key: 'getHeiSixToEightWeeksWithoutPCRResults', label: 'DNA-PCR Pending' },
@@ -24,7 +25,7 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange, tabSel
   ];
   return (
     <div className={styles.filtersContainer}>
-      {tabSelected === 0 && (
+      {tabSelected === 0 ? (
         <DatePicker
           datePickerType="range"
           minDate={formatDatetime(MaxDate)}
@@ -52,23 +53,29 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange, tabSel
             size="md"
           />
         </DatePicker>
+      ) : (
+        <div className={styles.cardHeaderContainer}>
+          <CardHeader title={t('thirtyDaysProgressTracker', 'Thirty days progress tracker')}>{''}</CardHeader>
+        </div>
       )}
 
       {tabSelected === 1 && (
-        <Dropdown
-          className={styles.filterInput}
-          autoAlign
-          id="filters"
-          itemToString={(item: { key: string; label: string }) =>
-            indicators.find(({ key }) => key === item.key)?.label ?? ''
-          }
-          items={indicators}
-          selectedItem={indicators.find(({ key }) => key === filters.indicator)}
-          label={t('indicator', 'Indicator')}
-          onChange={({ selectedItem: { key } }) => {
-            onFiltersChange({ ...filters, indicator: key });
-          }}
-        />
+        <div className={styles.dropdownContainer}>
+          <Dropdown
+            className={styles.filterInput}
+            autoAlign
+            id="filters"
+            itemToString={(item: { key: string; label: string }) =>
+              indicators.find(({ key }) => key === item.key)?.label ?? ''
+            }
+            items={indicators}
+            selectedItem={indicators.find(({ key }) => key === filters.indicator)}
+            label={t('indicator', 'Indicator')}
+            onChange={({ selectedItem: { key } }) => {
+              onFiltersChange({ ...filters, indicator: key });
+            }}
+          />
+        </div>
       )}
     </div>
   );

@@ -30,7 +30,7 @@ const BaseArtProgressTrackingChart: React.FC<Props> = ({ data, height = '400px' 
         title: t('numberHivPositive', 'Number HIV positive'),
         mapsTo: 'value',
         scaleType: ScaleTypes.LINEAR,
-        domain: [minValue, maxValue],
+        domain: [0, maxValue],
       },
     },
     color: {

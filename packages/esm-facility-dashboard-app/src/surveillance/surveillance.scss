@@ -7,10 +7,19 @@
   display: flex;
   flex-direction: row;
   gap: layout.$spacing-05;
-  justify-content: flex-end;
+  justify-content: space-between;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .filterInput {
   width: 330px;
+}
+
+.cardHeaderContainer {
+  flex: 1;
+}
+
+.dropdownContainer {
+  margin-left: auto;
 }
