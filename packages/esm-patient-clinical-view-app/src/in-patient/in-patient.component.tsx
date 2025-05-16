@@ -31,8 +31,12 @@ const InPatient: React.FC<InPatientProps> = ({ patientUuid, patient }) => {
       return true;
     }
     const age = dayjs().diff(dayjs(patient.birthDate), 'year');
+    const ageInDays = dayjs().diff(dayjs(patient.birthDate), 'day');
+    const ageInMonths = dayjs().diff(dayjs(patient.birthDate), 'month');
     const gender = patient.gender;
-    const hide = form.hideExpression ? evaluateAsBoolean(form.hideExpression, { age, gender }) : false;
+    const hide = form.hideExpression
+      ? evaluateAsBoolean(form.hideExpression, { age, gender, ageInDays, ageInMonths })
+      : false;
     return hide;
   });
 

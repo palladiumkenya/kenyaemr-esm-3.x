@@ -270,6 +270,7 @@ export const configSchema = {
       {
         label: 'Newborn Unit Admission ',
         uuid: '5b0a08f5-87c1-40cc-8c09-09c33b44523d',
+        hideExpression: 'ageInDays < 28',
       },
       {
         label: 'Partograph Form',
