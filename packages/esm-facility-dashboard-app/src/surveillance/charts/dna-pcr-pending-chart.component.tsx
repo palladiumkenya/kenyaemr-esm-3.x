@@ -8,16 +8,22 @@ import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import { InlineLoading } from '@carbon/react';
 import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 type DNAPCRPendingChartsProps = {
   startDate?: Date;
   endDate?: Date;
 };
 const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const { error, isLoading, surveillanceSummary, getCompletedPercentage, getPendingPercentage } =
-    useFacilityDashboardSurveillance(startDate, endDate);
-
-  const PendingPCRDNAResultsValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHeiDNAPCRPending');
+  const {
+    error,
+    isLoading,
+    surveillanceSummary,
+    getCompletedPercentage,
+    getPendingPercentage,
+    getThirtydaysRunninPercentage,
+    getThirtydaysRunninPendingPercentage,
+  } = useFacilityDashboardSurveillance(startDate, endDate);
 
   const cummulativeDnapcrPendingData = {
     data: [
@@ -37,16 +43,42 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
       },
     ],
   };
+
+  const thirtyDaysrunningData = getThirtydaysRunninPercentage(
+    surveillanceSummary?.getMonthlyHeiSixToEightWeeksOld.data,
+    surveillanceSummary?.getMonthlyHeiDNAPCRPending.data,
+  );
+
+  const lineGraphData = getThirtydaysRunninPendingPercentage(
+    surveillanceSummary?.getMonthlyHeiSixToEightWeeksOld.data,
+    surveillanceSummary?.getMonthlyHeiDNAPCRPending.data,
+  );
+
+  if (error) {
+    return <EmptyState subTitle={t('errorLoadingData', 'Error loading data')} />;
+  }
+
   return (
     <>
       <div className={styles.chart}>
         {isLoading ? (
           <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
-        ) : PendingPCRDNAResultsValue.length > 0 ? (
+        ) : lineGraphData.length > 0 ? (
           <BaseIndicatorTrendChart
-            data={PendingPCRDNAResultsValue}
+            data={lineGraphData}
             title={t('dnapcrPending', 'HEI (6-8 weeks) without DNA-PCR results')}
-            yAxisTitle={t('numberOfPendingPCRDNAResults', 'Number of HEI (6-8 weeks) without DNA-PCR results')}
+            yAxisTitle={t('percentageOfPendingPCRDNAResults', '% HEI (6-8 weeks) without DNA-PCR results')}
+          />
+        ) : (
+          <EmptyState subTitle={t('noPendingPCRDNAResults', 'No pending PCR DNA results data to display')} />
+        )}
+      </div>
+      <div className={styles.chart}>
+        {thirtyDaysrunningData.length > 0 ? (
+          <BaseProgressTrackingChart
+            data={thirtyDaysrunningData}
+            stackTitle={t('progressInAdressingHEIPCRResults ', 'Progress in adressing  HEI PCR results')}
+            leftAxiTtitle={t('percentageHEIPCRResults', '% HEI (6-8 weeks) PCR result')}
           />
         ) : (
           <EmptyState subTitle={t('noPendingPCRDNAResults', 'No pending PCR DNA results data to display')} />
@@ -57,10 +89,7 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
           <div className={styles.cummulativeChart}>
             <BaseCummulativeProgressTrackingChart
               data={cummulativeDnapcrPendingData}
-              title={t(
-                'cummulativeProgressDnapcrPending',
-                'Cummulative progress of HEI (6-8 weeks) without DNA-PCR results',
-              )}
+              title={t('cummulativeProgressDnapcrPending', 'Cumilative Progress in adressing  HEI PCR results')}
             />
           </div>
         ) : (

@@ -3,39 +3,45 @@ import { Layer } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './charts.scss';
+import { useChartDomain } from '../../hooks/useSurveillanceData';
 
 type Props = {
-  data: Array<{ group: string; key: string; value: number }>;
+  data: Array<{ group?: string; day: string; value: number }>;
+  height?: string;
+  stackTitle?: string;
+  leftAxiTtitle?: string;
 };
 
-const BaseProgressTrackingChart: React.FC<Props> = ({ data }) => {
+const BaseProgressTrackingChart: React.FC<Props> = ({ data, stackTitle, leftAxiTtitle, height = '300px' }) => {
   const { t } = useTranslation();
 
+  const [minValue, maxValue] = useChartDomain(data);
+
   const options: StackedBarChartOptions = {
-    title: t('progresstracking', 'Progress tracking'),
+    title: stackTitle,
     legend: {
       enabled: true,
     },
     axes: {
       bottom: {
-        title: t('days', 'Days'),
-        mapsTo: 'key',
+        title: t('day', 'Day'),
+        mapsTo: 'day',
         scaleType: ScaleTypes.LABELS,
       },
       left: {
-        title: t('percentage', 'Percentage'),
+        title: leftAxiTtitle,
         mapsTo: 'value',
         scaleType: ScaleTypes.LINEAR,
-        percentage: true,
+        domain: [0, 100],
       },
     },
     color: {
       scale: {
-        Declined: '#00416a', //Dark Imperial Blue
-        StartedPrEP: '#c46210', //Alloy Orange
+        Completed: '#008000',
+        Pending: '#FF0000',
       },
     },
-    height: '400px',
+    height,
     data: {
       groupMapsTo: 'group',
     },

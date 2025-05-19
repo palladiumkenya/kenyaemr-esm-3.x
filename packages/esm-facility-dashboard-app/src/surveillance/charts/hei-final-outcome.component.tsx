@@ -8,6 +8,7 @@ import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import { InlineLoading } from '@carbon/react';
 import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 type HEIFinalOutcomesChartProps = {
   startDate?: Date;
   endDate?: Date;
@@ -15,13 +16,15 @@ type HEIFinalOutcomesChartProps = {
 
 const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const { error, isLoading, surveillanceSummary, getCompletedPercentage, getPendingPercentage } =
-    useFacilityDashboardSurveillance(startDate, endDate);
-
-  const heiFinalOutcomesValue = useSurveillanceData(
+  const {
+    error,
+    isLoading,
     surveillanceSummary,
-    'getMonthlyHei24MonthsWithoutDocumentedOutcome',
-  );
+    getCompletedPercentage,
+    getPendingPercentage,
+    getThirtydaysRunninPercentage,
+    getThirtydaysRunninPendingPercentage,
+  } = useFacilityDashboardSurveillance(startDate, endDate);
 
   const cummulativeHeiFinalOutcomesData = {
     data: [
@@ -41,19 +44,44 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
       },
     ],
   };
+
+  const thirtyDaysrunningData = getThirtydaysRunninPercentage(
+    surveillanceSummary?.getMonthlyHei24MonthsOld.data,
+    surveillanceSummary?.getMonthlyHei24MonthsWithoutDocumentedOutcome.data,
+  );
+
+  const lineGraphData = getThirtydaysRunninPendingPercentage(
+    surveillanceSummary?.getMonthlyHei24MonthsOld.data,
+    surveillanceSummary?.getMonthlyHei24MonthsWithoutDocumentedOutcome.data,
+  );
+
+  if (error) {
+    return <EmptyState subTitle={t('errorLoadingData', 'Error loading data')} />;
+  }
   return (
     <>
       <div className={styles.chart}>
         {isLoading ? (
           <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
-        ) : heiFinalOutcomesValue.length > 0 ? (
+        ) : lineGraphData.length > 0 ? (
           <BaseIndicatorTrendChart
-            data={heiFinalOutcomesValue}
+            data={lineGraphData}
             title={t('heiFinalOutcomes', 'Undocumented final outcome')}
-            yAxisTitle={t('numberHEIOutcome', 'Number of undocumented final outcome')}
+            yAxisTitle={t('percentageHEIOutcome', '% undocumented final outcome')}
           />
         ) : (
           <EmptyState subTitle={t('noheiFinalOutcomes', 'No undocumented final outcome data to display')} />
+        )}
+      </div>
+      <div className={styles.chart}>
+        {thirtyDaysrunningData.length > 0 ? (
+          <BaseProgressTrackingChart
+            data={thirtyDaysrunningData}
+            stackTitle={t('progressInAdressingHEIFinalOutcome', 'Progress in adressing HEI final Outcome')}
+            leftAxiTtitle={t('percentageHEIFinalOutcome', '% HEI final outcome')}
+          />
+        ) : (
+          <EmptyState subTitle={t('noHEIFinalOutcome', 'No HEI final outcome data to display')} />
         )}
       </div>
       <div className={styles.chart}>
@@ -61,7 +89,7 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
           <div className={styles.cummulativeChart}>
             <BaseCummulativeProgressTrackingChart
               data={cummulativeHeiFinalOutcomesData}
-              title={t('cummulativeProgressHeiFinalOutcomes', 'Cummulative progress of undocumented final outcome')}
+              title={t('cummulativeProgressHeiFinalOutcomes', 'Cumilative progress in adressing HEI final outcome')}
             />
           </div>
         ) : (

@@ -7,16 +7,22 @@ import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import { InlineLoading } from '@carbon/react';
 import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 type MissedOpportunityChartProps = {
   startDate?: Date;
   endDate?: Date;
 };
 const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
-  const { error, isLoading, surveillanceSummary, getCompletedPercentage, getPendingPercentage } =
-    useFacilityDashboardSurveillance(startDate, endDate);
-
-  const missedoppotunityVLValue = useSurveillanceData(surveillanceSummary, 'getMonthlyEligibleForVlSampleNotTaken');
+  const {
+    error,
+    isLoading,
+    surveillanceSummary,
+    getCompletedPercentage,
+    getPendingPercentage,
+    getThirtydaysRunninPercentage,
+    getThirtydaysRunninPendingPercentage,
+  } = useFacilityDashboardSurveillance(startDate, endDate);
 
   const cummulativeMissedoppotunityVLData = {
     data: [
@@ -36,19 +42,44 @@ const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDa
       },
     ],
   };
+
+  const thirtyDaysrunningData = getThirtydaysRunninPercentage(
+    surveillanceSummary?.getMonthlyEligibleForVl.data,
+    surveillanceSummary?.getMonthlyEligibleForVlSampleNotTaken.data,
+  );
+
+  const lineGraphData = getThirtydaysRunninPendingPercentage(
+    surveillanceSummary?.getMonthlyEligibleForVl.data,
+    surveillanceSummary?.getMonthlyEligibleForVlSampleNotTaken.data,
+  );
+
+  if (error) {
+    return <EmptyState subTitle={t('errorLoadingData', 'Error loading data')} />;
+  }
   return (
     <>
       <div className={styles.chart}>
         {isLoading ? (
           <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
-        ) : missedoppotunityVLValue.length > 0 ? (
+        ) : lineGraphData.length > 0 ? (
           <BaseIndicatorTrendChart
-            data={missedoppotunityVLValue}
+            data={lineGraphData}
             title={t('missedoppotunityVL', 'Missed opportunity in viral load testing')}
-            yAxisTitle={t('numberMissedVL', 'Number of missed opportunity VL')}
+            yAxisTitle={t('percentageMissedVL', '% of missed opportunity VL')}
           />
         ) : (
           <EmptyState subTitle={t('nomissedoppotunityVL', 'No missed opportunity VL data to display')} />
+        )}
+      </div>
+      <div className={styles.chart}>
+        {thirtyDaysrunningData.length > 0 ? (
+          <BaseProgressTrackingChart
+            data={thirtyDaysrunningData}
+            stackTitle={t('progressInAdressingDelayedVL', 'Progress in adressing delayed VL testing')}
+            leftAxiTtitle={t('percentageEligibleForVL', '% eligible for VL')}
+          />
+        ) : (
+          <EmptyState subTitle={t('noEligibleForVL', 'No eligible for VL data to display')} />
         )}
       </div>
       <div className={styles.chart}>
@@ -56,10 +87,7 @@ const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDa
           <div className={styles.cummulativeChart}>
             <BaseCummulativeProgressTrackingChart
               data={cummulativeMissedoppotunityVLData}
-              title={t(
-                'cummulativeProgressMissedoppotunityVL',
-                'Cummulative progress of missed opportunity in viral load testing',
-              )}
+              title={t('cummulativeProgressMissedoppotunityVL', 'Cumilative Progress in adressing delayed VL Testing')}
             />
           </div>
         ) : (

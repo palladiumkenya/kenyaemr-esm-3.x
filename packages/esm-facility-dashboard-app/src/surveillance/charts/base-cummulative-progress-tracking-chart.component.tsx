@@ -9,9 +9,10 @@ type Props = {
   data: LinkageData;
   height?: string;
   title?: string;
+  yAxisTitle?: string;
 };
 
-const BaseCummulativeProgressTrackingChart: React.FC<Props> = ({ data, title, height = '400px' }) => {
+const BaseCummulativeProgressTrackingChart: React.FC<Props> = ({ data, title, yAxisTitle, height = '300px' }) => {
   const { t } = useTranslation();
 
   const chartData = data?.data || [];
@@ -20,10 +21,11 @@ const BaseCummulativeProgressTrackingChart: React.FC<Props> = ({ data, title, he
     title: title,
     axes: {
       left: {
+        title: yAxisTitle,
+        scaleType: ScaleTypes.LINEAR,
+        domain: [0, 100],
+        includeZero: true,
         mapsTo: 'value',
-        ticks: {
-          values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100],
-        },
       },
       bottom: {
         mapsTo: 'group',
