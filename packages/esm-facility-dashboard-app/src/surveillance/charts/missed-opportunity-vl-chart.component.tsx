@@ -6,7 +6,7 @@ import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSu
 import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import { InlineLoading } from '@carbon/react';
-import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseCumulativeProgressTrackingChart from './base-cumulative-progress-tracking-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 type MissedOpportunityChartProps = {
   startDate?: Date;
@@ -24,7 +24,7 @@ const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDa
     getThirtydaysRunninPendingPercentage,
   } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const cummulativeMissedoppotunityVLData = {
+  const cumulativeMissedoppotunityVLData = {
     data: [
       {
         group: 'Completed',
@@ -75,7 +75,7 @@ const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDa
         {thirtyDaysrunningData.length > 0 ? (
           <BaseProgressTrackingChart
             data={thirtyDaysrunningData}
-            stackTitle={t('progressInAdressingDelayedVL', 'Progress in adressing delayed VL testing')}
+            stackTitle={t('progressInAddressingDelayedVL', 'Progress in addressing delayed VL testing')}
             leftAxiTtitle={t('percentageEligibleForVL', '% eligible for VL')}
           />
         ) : (
@@ -84,15 +84,15 @@ const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDa
       </div>
       <div className={styles.chart}>
         {surveillanceSummary?.getEligibleForVl > 0 ? (
-          <div className={styles.cummulativeChart}>
-            <BaseCummulativeProgressTrackingChart
-              data={cummulativeMissedoppotunityVLData}
-              title={t('cummulativeProgressMissedoppotunityVL', 'Cumilative Progress in adressing delayed VL Testing')}
+          <div className={styles.cumulativeChart}>
+            <BaseCumulativeProgressTrackingChart
+              data={cumulativeMissedoppotunityVLData}
+              title={t('cumulativeProgressMissedoppotunityVL', 'Cumilative Progress in addressing delayed VL Testing')}
             />
           </div>
         ) : (
           <EmptyState
-            subTitle={t('noCummulativeMissedoppotunityVL', 'No cummulative missed opportunity VL data to display')}
+            subTitle={t('noCumulativeMissedoppotunityVL', 'No cumulative missed opportunity VL data to display')}
           />
         )}
       </div>

@@ -7,7 +7,7 @@ import EmptyState from '../empty-state/empty-state-log.components';
 import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
 import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import { InlineLoading } from '@carbon/react';
-import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseCumulativeProgressTrackingChart from './base-cumulative-progress-tracking-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 type DelayedEACChartsProps = {
   startDate?: Date;
@@ -26,7 +26,7 @@ const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate 
     getThirtydaysRunninPendingPercentage,
   } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const cummulativedelayedEACValueData = {
+  const cumulativedelayedEACValueData = {
     data: [
       {
         group: 'Completed',
@@ -77,7 +77,7 @@ const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate 
         {thirtyDaysrunningData.length > 0 ? (
           <BaseProgressTrackingChart
             data={thirtyDaysrunningData}
-            stackTitle={t('progressInAdressingDelayedEAC', 'Progress in adressing delayed EAC')}
+            stackTitle={t('progressInAddressingDelayedEAC', 'Progress in addressing delayed EAC')}
             leftAxiTtitle={t('percentageDelayedEAC', '% Delayed EAC')}
           />
         ) : (
@@ -86,10 +86,10 @@ const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate 
       </div>
       <div className={styles.chart}>
         {surveillanceSummary?.getVirallyUnsuppressed > 0 ? (
-          <div className={styles.cummulativeChart}>
-            <BaseCummulativeProgressTrackingChart
-              data={cummulativedelayedEACValueData}
-              title={t('cummulativeProgressDelayedEAC', 'Cumilative Progress in adressing delayed EAC')}
+          <div className={styles.cumulativeChart}>
+            <BaseCumulativeProgressTrackingChart
+              data={cumulativedelayedEACValueData}
+              title={t('cumulativeProgressDelayedEAC', 'Cumilative Progress in addressing delayed EAC')}
             />
           </div>
         ) : (

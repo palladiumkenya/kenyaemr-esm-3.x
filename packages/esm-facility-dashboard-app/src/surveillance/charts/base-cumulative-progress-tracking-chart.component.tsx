@@ -12,7 +12,7 @@ type Props = {
   yAxisTitle?: string;
 };
 
-const BaseCummulativeProgressTrackingChart: React.FC<Props> = ({ data, title, yAxisTitle, height = '300px' }) => {
+const BaseCumulativeProgressTrackingChart: React.FC<Props> = ({ data, title, yAxisTitle, height = '300px' }) => {
   const { t } = useTranslation();
 
   const chartData = data?.data || [];
@@ -47,4 +47,4 @@ const BaseCummulativeProgressTrackingChart: React.FC<Props> = ({ data, title, yA
   );
 };
 
-export default BaseCummulativeProgressTrackingChart;
+export default BaseCumulativeProgressTrackingChart;

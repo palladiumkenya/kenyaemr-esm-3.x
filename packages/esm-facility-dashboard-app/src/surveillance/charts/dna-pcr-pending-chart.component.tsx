@@ -7,7 +7,7 @@ import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSu
 import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import { InlineLoading } from '@carbon/react';
-import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseCumulativeProgressTrackingChart from './base-cumulative-progress-tracking-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 type DNAPCRPendingChartsProps = {
   startDate?: Date;
@@ -25,7 +25,7 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
     getThirtydaysRunninPendingPercentage,
   } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const cummulativeDnapcrPendingData = {
+  const cumulativeDnapcrPendingData = {
     data: [
       {
         group: 'Completed',
@@ -77,7 +77,7 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
         {thirtyDaysrunningData.length > 0 ? (
           <BaseProgressTrackingChart
             data={thirtyDaysrunningData}
-            stackTitle={t('progressInAdressingHEIPCRResults ', 'Progress in adressing  HEI PCR results')}
+            stackTitle={t('progressInAddressingHEIPCRResults ', 'Progress in addressing  HEI PCR results')}
             leftAxiTtitle={t('percentageHEIPCRResults', '% HEI (6-8 weeks) PCR result')}
           />
         ) : (
@@ -86,15 +86,15 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
       </div>
       <div className={styles.chart}>
         {surveillanceSummary?.getHeiSixToEightWeeksOld > 0 ? (
-          <div className={styles.cummulativeChart}>
-            <BaseCummulativeProgressTrackingChart
-              data={cummulativeDnapcrPendingData}
-              title={t('cummulativeProgressDnapcrPending', 'Cumilative Progress in adressing  HEI PCR results')}
+          <div className={styles.cumulativeChart}>
+            <BaseCumulativeProgressTrackingChart
+              data={cumulativeDnapcrPendingData}
+              title={t('cumulativeProgressDnapcrPending', 'Cumilative Progress in addressing  HEI PCR results')}
             />
           </div>
         ) : (
           <EmptyState
-            subTitle={t('noCummulativeDnapcrPending', 'No cummulative HEI (6-8 weeks) without DNA-PCR data to display')}
+            subTitle={t('noCumulativeDnapcrPending', 'No cumulative HEI (6-8 weeks) without DNA-PCR data to display')}
           />
         )}
       </div>

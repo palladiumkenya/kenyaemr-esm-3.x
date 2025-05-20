@@ -7,7 +7,7 @@ import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSu
 import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import { InlineLoading } from '@carbon/react';
-import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseCumulativeProgressTrackingChart from './base-cumulative-progress-tracking-chart.component';
 import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 type HEIFinalOutcomesChartProps = {
   startDate?: Date;
@@ -26,7 +26,7 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
     getThirtydaysRunninPendingPercentage,
   } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const cummulativeHeiFinalOutcomesData = {
+  const cumulativeHeiFinalOutcomesData = {
     data: [
       {
         group: 'Completed',
@@ -77,7 +77,7 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
         {thirtyDaysrunningData.length > 0 ? (
           <BaseProgressTrackingChart
             data={thirtyDaysrunningData}
-            stackTitle={t('progressInAdressingHEIFinalOutcome', 'Progress in adressing HEI final Outcome')}
+            stackTitle={t('progressInAddressingHEIFinalOutcome', 'Progress in addressing HEI final Outcome')}
             leftAxiTtitle={t('percentageHEIFinalOutcome', '% HEI final outcome')}
           />
         ) : (
@@ -86,10 +86,10 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
       </div>
       <div className={styles.chart}>
         {surveillanceSummary?.getHei24MonthsOld > 0 ? (
-          <div className={styles.cummulativeChart}>
-            <BaseCummulativeProgressTrackingChart
-              data={cummulativeHeiFinalOutcomesData}
-              title={t('cummulativeProgressHeiFinalOutcomes', 'Cumilative progress in adressing HEI final outcome')}
+          <div className={styles.cumulativeChart}>
+            <BaseCumulativeProgressTrackingChart
+              data={cumulativeHeiFinalOutcomesData}
+              title={t('cumulativeProgressHeiFinalOutcomes', 'Cumilative progress in addressing HEI final outcome')}
             />
           </div>
         ) : (

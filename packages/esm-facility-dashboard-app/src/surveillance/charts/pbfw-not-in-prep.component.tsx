@@ -7,7 +7,7 @@ import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSu
 import EmptyState from '../empty-state/empty-state-log.components';
 import styles from './charts.scss';
 import { InlineLoading } from '@carbon/react';
-import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseCumulativeProgressTrackingChart from './base-cumulative-progress-tracking-chart.component';
 
 type PBFWNotInPrepProps = {
   startDate?: Date;
@@ -25,7 +25,7 @@ const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => 
     getThirtydaysRunninPendingPercentage,
   } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const cummulativeHighRiskPBFWNotOnPrepValueData = {
+  const cumulativeHighRiskPBFWNotOnPrepValueData = {
     data: [
       {
         group: 'Completed',
@@ -85,12 +85,12 @@ const PBFWNotInPrep: React.FC<PBFWNotInPrepProps> = ({ startDate, endDate }) => 
       <br />
       <div className={styles.chart}>
         {surveillanceSummary?.getPregnantOrPostpartumClients > 0 ? (
-          <div className={styles.cummulativeChart}>
-            <BaseCummulativeProgressTrackingChart
-              data={cummulativeHighRiskPBFWNotOnPrepValueData}
+          <div className={styles.cumulativeChart}>
+            <BaseCumulativeProgressTrackingChart
+              data={cumulativeHighRiskPBFWNotOnPrepValueData}
               title={t(
-                'cummulativeProgressMissedoppotunityVL',
-                'Cummulative progress of missed opportunity in viral load testing',
+                'cumulativeProgressMissedoppotunityVL',
+                'Cumulative progress of missed opportunity in viral load testing',
               )}
             />
           </div>

@@ -7,7 +7,7 @@ import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSu
 import EmptyState from '../empty-state/empty-state-log.components';
 import styles from './charts.scss';
 import { InlineLoading } from '@carbon/react';
-import BaseCummulativeProgressTrackingChart from './base-cummulative-progress-tracking-chart.component';
+import BaseCumulativeProgressTrackingChart from './base-cumulative-progress-tracking-chart.component';
 type HIVPositiveNotLinkedToARTProps = {
   startDate?: Date;
   endDate?: Date;
@@ -25,7 +25,7 @@ const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ s
     getThirtydaysRunninPendingPercentage,
   } = useFacilityDashboardSurveillance(startDate, endDate);
 
-  const cummulativeHivPositivePatientData = {
+  const cumulativeHivPositivePatientData = {
     data: [
       {
         group: 'Completed',
@@ -88,12 +88,12 @@ const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ s
           </div>
           <div className={styles.chart}>
             {surveillanceSummary?.getHivTestedPositive > 0 ? (
-              <div className={styles.cummulativeChart}>
-                <BaseCummulativeProgressTrackingChart
-                  data={cummulativeHivPositivePatientData}
+              <div className={styles.cumulativeChart}>
+                <BaseCumulativeProgressTrackingChart
+                  data={cumulativeHivPositivePatientData}
                   title={t(
-                    'cummulativeProgressOfAddressingLinkedToArt',
-                    'Cummulative progress of addressing Linkage to ART',
+                    'cumulativeProgressOfAddressingLinkedToArt',
+                    'Cumulative progress of addressing Linkage to ART',
                   )}
                   yAxisTitle={t('percentageHivPositive', '% HIV positive')}
                 />
@@ -101,8 +101,8 @@ const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ s
             ) : (
               <EmptyState
                 subTitle={t(
-                  'noCummulativeHivPositiveNotLinked',
-                  'No cummulative HIV +VE Not linked to ART data to display',
+                  'noCumulativeHivPositiveNotLinked',
+                  'No cumulative HIV +VE Not linked to ART data to display',
                 )}
               />
             )}
