@@ -89,7 +89,7 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
           <div className={styles.cumulativeChart}>
             <BaseCumulativeProgressTrackingChart
               data={cumulativeDnapcrPendingData}
-              title={t('cumulativeProgressDnapcrPending', 'Cumilative Progress in addressing  HEI PCR results')}
+              title={t('cumulativeProgressDnapcrPending', 'Cumulative Progress in addressing  HEI PCR results')}
             />
           </div>
         ) : (

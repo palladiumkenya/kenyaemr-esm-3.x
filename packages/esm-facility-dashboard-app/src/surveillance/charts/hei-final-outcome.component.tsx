@@ -89,7 +89,7 @@ const HEIFinalOutcomesChart: React.FC<HEIFinalOutcomesChartProps> = ({ startDate
           <div className={styles.cumulativeChart}>
             <BaseCumulativeProgressTrackingChart
               data={cumulativeHeiFinalOutcomesData}
-              title={t('cumulativeProgressHeiFinalOutcomes', 'Cumilative progress in addressing HEI final outcome')}
+              title={t('cumulativeProgressHeiFinalOutcomes', 'Cumulative progress in addressing HEI final outcome')}
             />
           </div>
         ) : (

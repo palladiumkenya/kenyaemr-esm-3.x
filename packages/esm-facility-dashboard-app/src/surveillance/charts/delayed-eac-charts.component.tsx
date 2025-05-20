@@ -70,7 +70,7 @@ const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate 
             yAxisTitle={t('numberDelayedEAC', 'Number of Delayed EAC')}
           />
         ) : (
-          <EmptyState subTitle={t('noDelayedEAC', 'No Delayed EAC data to display')} />
+          <EmptyState subTitle={t('noDelayedEAC', 'No delayed EAC data to display')} />
         )}
       </div>
       <div className={styles.chart}>
@@ -89,11 +89,11 @@ const DelayedEACCharts: React.FC<DelayedEACChartsProps> = ({ startDate, endDate 
           <div className={styles.cumulativeChart}>
             <BaseCumulativeProgressTrackingChart
               data={cumulativedelayedEACValueData}
-              title={t('cumulativeProgressDelayedEAC', 'Cumilative Progress in addressing delayed EAC')}
+              title={t('cumulativeProgressDelayedEAC', 'Cumulative Progress in addressing delayed EAC')}
             />
           </div>
         ) : (
-          <EmptyState subTitle={t('noDelayedEAC', 'No Delayed EAC data to display')} />
+          <EmptyState subTitle={t('noDelayedEAC', 'No delayed EAC data to display')} />
         )}
       </div>
     </>

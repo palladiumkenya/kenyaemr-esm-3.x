@@ -87,7 +87,7 @@ const MissedOpportunityChart: React.FC<MissedOpportunityChartProps> = ({ startDa
           <div className={styles.cumulativeChart}>
             <BaseCumulativeProgressTrackingChart
               data={cumulativeMissedoppotunityVLData}
-              title={t('cumulativeProgressMissedoppotunityVL', 'Cumilative Progress in addressing delayed VL Testing')}
+              title={t('cumulativeProgressMissedoppotunityVL', 'Cumulative Progress in addressing delayed VL Testing')}
             />
           </div>
         ) : (
