@@ -174,7 +174,7 @@ export interface Attribute {
 export interface UserProperties {
   loginAttempts?: string;
   lastViewedPatientIds?: string;
-  forceChange: string;
+  forcePassword: string;
 }
 
 export interface UserRoleSchema {
