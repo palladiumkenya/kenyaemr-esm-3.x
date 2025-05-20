@@ -172,8 +172,9 @@ export interface Attribute {
 }
 
 export interface UserProperties {
-  loginAttempts: string;
-  lastViewedPatientIds: string;
+  loginAttempts?: string;
+  lastViewedPatientIds?: string;
+  forceChange: string;
 }
 
 export interface UserRoleSchema {

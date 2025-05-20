@@ -411,6 +411,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         name: role.display,
         description: role.description || '',
       })),
+      userProperties: {
+        forceChange: String(data.forcePasswordChange),
+      },
     };
 
     const showSnackbarMessage = (title: string, subtitle: string, kind: 'success' | 'error') => {
