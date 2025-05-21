@@ -15,7 +15,7 @@ type Props = {
   yAxisTitle: string;
   height?: string;
 };
-const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle, height = '400px' }) => {
+const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle, height = '300px' }) => {
   const { t } = useTranslation();
   const [minValue, maxValue] = useChartDomain(data);
   const options: LineChartOptions = {
@@ -27,7 +27,7 @@ const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle, hei
       left: {
         title: yAxisTitle,
         scaleType: ScaleTypes.LINEAR,
-        domain: [minValue, maxValue],
+        domain: [0, 100],
         includeZero: true,
         mapsTo: 'value',
       },
@@ -37,7 +37,13 @@ const BaseIndicatorTrendChart: React.FC<Props> = ({ data, title, yAxisTitle, hei
         mapsTo: 'day',
       },
     },
-    height,
+    height: height,
+    color: {
+      scale: {
+        Completed: '#008000',
+        Pending: '#FF0000',
+      },
+    },
   };
 
   return (

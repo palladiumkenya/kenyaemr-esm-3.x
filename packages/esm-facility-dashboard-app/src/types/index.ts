@@ -21,6 +21,12 @@ export type SurveillanceSummary = {
   getMonthlyEligibleForVlSampleNotTaken: HivPositiveNotLinkedData;
   getMonthlyHei24MonthsWithoutDocumentedOutcome: HivPositiveNotLinkedData;
   getMonthlyVirallyUnsuppressedWithoutEAC: HivPositiveNotLinkedData;
+  getMonthlyPatientsTestedHivPositive: HivPositiveNotLinkedData;
+  getMonthlyPregnantOrPostpartumClients: HivPositiveNotLinkedData;
+  getMonthlyHeiSixToEightWeeksOld: HivPositiveNotLinkedData;
+  getMonthlyEligibleForVl: HivPositiveNotLinkedData;
+  getMonthlyHei24MonthsOld: HivPositiveNotLinkedData;
+  getMonthlyVirallyUnsuppressed: HivPositiveNotLinkedData;
 };
 
 export type IndicationMode = 'decreasing' | 'increasing';
@@ -36,4 +42,12 @@ export type HivPositiveNotLinked = {
   day: string;
   value: number;
   group?: string;
+};
+
+export type Linkage = {
+  group?: string;
+  value?: number;
+};
+export type LinkageData = {
+  data: Array<Linkage>;
 };
