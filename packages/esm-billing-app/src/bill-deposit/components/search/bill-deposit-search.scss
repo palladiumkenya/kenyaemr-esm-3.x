@@ -1,0 +1,107 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+@use '@carbon/type';
+
+.searchResultsContainer {
+  margin-top: layout.$spacing-05;
+  position: relative;
+  min-height: 200px;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$gray-20;
+}
+.searchBar {
+  & form {
+    border: none;
+  }
+}
+
+.billDepositSearchContainer {
+  background-color: colors.$white-0;
+}
+
+.depositResultsHeader {
+  height: layout.$layout-04;
+  background-color: colors.$white-0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInDown 0.3s ease-out forwards;
+  margin-bottom: layout.$spacing-05;
+  border-bottom: 1px solid colors.$gray-20;
+
+  & .patientInfo {
+    align-items: center;
+    display: flex;
+    column-gap: layout.$spacing-03;
+
+    & .patientName {
+      @include type.type-style('heading-03');
+      color: colors.$gray-100;
+      margin: 0 layout.$spacing-03 0 layout.$spacing-05;
+    }
+
+    & .patientGender {
+      @include type.type-style('body-compact-02');
+      color: colors.$gray-70;
+    }
+
+    & .patientIdentifier {
+      @include type.type-style('body-compact-02');
+      color: colors.$gray-70;
+      margin: 0 layout.$spacing-03;
+    }
+  }
+
+  & .actions {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.initialLoadingContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  width: 100%;
+}
+
+.loadingOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  backdrop-filter: blur(2px);
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -13,6 +13,7 @@ import PaymentModeHome from './payment-modes/payment-mode-home.component';
 import { ClockInBoundary } from './payment-points/clock-in-boundary.component';
 import { PaymentPoint } from './payment-points/payment-point/payment-point.component';
 import { PaymentPoints } from './payment-points/payment-points.component';
+import BillDepositDashboard from './bill-deposit/components/dashboard/bill-deposit-dashboard.component';
 
 const RootComponent: React.FC = () => {
   const baseName = window.getOpenmrsSpaBase() + 'home/billing';
@@ -46,6 +47,7 @@ const RootComponent: React.FC = () => {
         <Route path="/charge-items" element={<ChargeItemsDashboard />} />
         <Route path="/payment-modes" element={<PaymentModeHome />} />
         <Route path="/billable-exemptions" element={<BillableExemptions />} />
+        <Route path="/bill-deposit" element={<BillDepositDashboard />} />
       </Routes>
     </BrowserRouter>
   );

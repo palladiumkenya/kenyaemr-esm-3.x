@@ -152,6 +152,11 @@
       "slot": "billing-dashboard-link-slot"
     },
     {
+      "component": "billDepositDashboardLink",
+      "name": "bill-deposit-dashboard-link",
+      "slots": ["billing-dashboard-link-slot","billing-dashboard-group-nav-slot"]
+    },
+    {
       "component": "paymentHistoryLink",
       "name": "payment-history-link",
       "slot": "billing-dashboard-link-slot"
@@ -285,9 +290,15 @@
       "type": "other-form"
     },
     {
-      "name": "bill-deposit-workspace",
-      "component": "billDepositWorkspace",
-      "title": "Bill Deposit Workspace",
+      "name": "add-deposit-workspace",
+      "component": "addDepositWorkspace",
+      "title": "Add Deposit",
+      "type": "other-form"
+    },
+    {
+      "name":"deposit-transaction-workspace",
+      "component": "depositTransactionWorkspace",
+      "title": "Deposit Transaction",
       "type": "other-form"
     }
   ],
@@ -323,6 +334,14 @@
     {
       "name": "create-bill-item-modal",
       "component": "createBillItemModal"
+    },
+    {
+      "name": "delete-deposit-modal",
+      "component": "deleteDepositModal"
+    },
+    {
+      "name": "reverse-transaction-modal",
+      "component": "reverseTransactionModal"
     }
   ]
 }

@@ -24,6 +24,7 @@
   min-height: 300px;
   background-color: colors.$gray-10;
   row-gap: layout.$spacing-02;
+  border: 1px solid colors.$gray-20;
 
   & form {
     border: none;
