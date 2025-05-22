@@ -2,6 +2,11 @@ import { Type } from '@openmrs/esm-framework';
 import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
+  requireMaritalStatusOnAgeGreaterThanOrEqualTo: {
+    _type: Type.Number,
+    _description: 'Age in years',
+    _default: 10,
+  },
   encounterTypes: {
     _type: Type.Object,
     _description: 'List of encounter type UUIDs',
@@ -200,12 +205,12 @@ export const configSchema = {
       {
         uuid: '5f115f62-68b7-11e3-94ee-6bef9086de92',
         display: 'Guardian/Dependant',
-        category: ['other'],
+        category: ['family'],
       },
       {
         uuid: 'd6895098-5d8d-11e3-94ee-b35a4132a5e3',
         display: 'Spouse/Spouse',
-        category: ['sexual', 'pns', 'family'],
+        category: ['sexual', 'family'],
       },
       {
         uuid: '007b765f-6725-4ae9-afee-9966302bace4',
@@ -215,7 +220,17 @@ export const configSchema = {
       {
         uuid: '2ac0d501-eadc-4624-b982-563c70035d46',
         display: 'Co-wife/Co-wife',
-        category: ['pns'],
+        category: ['family'],
+      },
+      {
+        uuid: 'a8058424-5ddf-4ce2-a5ee-6e08d01b5960',
+        display: 'Care-giver/Care-giver',
+        category: ['family'],
+      },
+      {
+        uuid: '3667e52f-8653-40e1-b227-a7278d474020',
+        display: 'Primary caregiver/Primary caregiver',
+        category: ['family'],
       },
       {
         uuid: '58da0d1e-9c89-42e9-9412-275cef1e0429',
@@ -225,7 +240,7 @@ export const configSchema = {
       {
         uuid: '76edc1fe-c5ce-4608-b326-c8ecd1020a73',
         display: 'SNS/SNS',
-        category: ['other'],
+        category: ['pns'],
       },
     ],
   },
@@ -282,6 +297,7 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  requireMaritalStatusOnAgeGreaterThanOrEqualTo: number;
   peerEducatorRelationship: string;
   morgueVisitTypeUuid: string;
   morgueDischargeEncounterUuid: string;
@@ -339,7 +355,7 @@ export interface ConfigObject {
   relationshipTypesList: Array<{
     uuid: string;
     display: string;
-    category: Array<'sexual' | 'pns' | 'family' | 'other'>;
+    category: Array<'sexual' | 'pns' | 'family'>;
   }>;
 }
 

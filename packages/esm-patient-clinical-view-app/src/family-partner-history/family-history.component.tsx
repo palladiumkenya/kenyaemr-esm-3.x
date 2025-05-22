@@ -30,6 +30,7 @@ import ConceptObservations from './concept-obs.component';
 import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
 import { deleteRelationship } from '../relationships/relationship.resources';
+import HIVStatus from '../contact-list/hiv-status.component';
 
 interface FamilyHistoryProps {
   patientUuid: string;
@@ -42,18 +43,15 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
   const { relationships, error, isLoading, isValidating } = usePatientRelationships(patientUuid);
-  const familyRelationshipTypes = useMemo(
-    () => config.relationshipTypesList.filter((rl) => rl.category.some((c) => c === 'family')),
-    [config],
-  );
-  const familyRelationshipTypeUUIDs = new Set(familyRelationshipTypes.map((type) => type.uuid));
-  const familyRelationships = relationships.filter((r) => familyRelationshipTypeUUIDs.has(r.relationshipTypeUUID));
-
   const headerTitle = t('familyContacts', 'Family contacts');
-  const { results, totalPages, currentPage, goTo } = usePagination(familyRelationships, pageSize);
+  const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const headers = [
+    {
+      header: t('listingDate', 'Listing date'),
+      key: 'startDate',
+    },
     {
       header: t('name', 'Name'),
       key: 'name',
@@ -67,6 +65,10 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
       key: 'age',
     },
     {
+      header: t('sex', 'Sex'),
+      key: 'sex',
+    },
+    {
       header: t('alive', 'Alive'),
       key: 'alive',
     },
@@ -77,6 +79,26 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     {
       header: t('chronicDisease', 'Chronic Disease'),
       key: 'chronicDisease',
+    },
+    {
+      header: t('hivStatus', 'HIV Status'),
+      key: 'hivStatus',
+    },
+    {
+      header: t('baselineHivStatus', 'Baseline HIV Status'),
+      key: 'baseLineivStatus',
+    },
+    {
+      header: t('livingWithClient', 'Living with client'),
+      key: 'livingWithClient',
+    },
+    {
+      header: t('pnsAproach', 'PNS Aproach'),
+      key: 'pnsAproach',
+    },
+    {
+      header: t('ipvOutcome', 'IPV Outcome'),
+      key: 'ipvOutcome',
     },
     { header: t('actions', 'Actions'), key: 'actions' },
   ];
@@ -99,6 +121,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
 
       return {
         id: `${relation.uuid}`,
+        startDate: relation.startDate ?? '--',
         name: (
           <ConfigurableLink
             style={{ textDecoration: 'none' }}
@@ -108,12 +131,20 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
         ),
         relation: relation?.relationshipType,
         age: relation?.relativeAge ?? '--',
+        sex: relation.gender,
+
         alive: relation?.dead ? t('dead', 'Dead') : t('alive', 'Alive'),
         causeOfDeath: (
           <ConceptObservations patientUuid={patientUuid} conceptUuid={concepts.probableCauseOfDeathConceptUuid} />
         ),
         patientUuid: relation,
         chronicDisease: <ConceptObservations patientUuid={patientUuid} conceptUuid={concepts.problemListConceptUuid} />,
+        hivStatus: <HIVStatus relativeUuid={relation.relativeUuid} />,
+        baseLineivStatus: relation.baselineHIVStatus ?? '--',
+        livingWithClient: relation.livingWithClient ?? '--',
+        pnsAproach: relation.pnsAproach ?? '--',
+        ipvOutcome: relation.ipvOutcome ?? '--',
+
         actions: (
           <>
             <Button
@@ -154,7 +185,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (familyRelationships.length === 0) {
+  if (relationships.length === 0) {
     return (
       <Layer>
         <Tile className={styles.tile}>

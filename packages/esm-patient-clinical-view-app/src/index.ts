@@ -44,8 +44,6 @@ import CaseManagementForm from './case-management/workspace/case-management.work
 import Relationships from './relationships/relationships.component';
 import CaseEncounterOverviewComponent from './case-management/encounters/case-encounter-overview.component';
 import FamilyRelationshipForm from './family-partner-history/family-relationship.workspace';
-import { OtherRelationships } from './other-relationships/other-relationships.component';
-import { OtherRelationshipsForm } from './other-relationships/other-relationships.workspace';
 import InPatient from './in-patient/in-patient.component';
 import { inPatientMeta } from './in-patient/in-patient.meta';
 import PeerCalendar from './peer-calendar/peer-calendar.component';
@@ -98,9 +96,7 @@ export const familyHistoryLink = getSyncLifecycle(createDashboardLink(familyHist
 export const familyRelationshipForm = getSyncLifecycle(FamilyRelationshipForm, options);
 
 // Dashboard links for Other relationships and the corresponding view in the patient chart
-export const otherRelationships = getSyncLifecycle(OtherRelationships, options);
 export const otherRelationshipsLink = getSyncLifecycle(createDashboardLink(otherRelationshipsDashboardMeta), options);
-export const otherRelationshipsForm = getSyncLifecycle(OtherRelationshipsForm, options);
 
 // Relationships links for Family History and the corresponding view in the patient chart
 export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
