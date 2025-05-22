@@ -5,6 +5,9 @@ import { Patient } from '../types';
 import { ConfigObject } from '../config-schema';
 import omit from 'lodash/omit';
 
+export const BOOLEAN_YES = '1065';
+export const BOOLEAN_NO = '1066';
+
 export const relationshipUpdateFormSchema = z
   .object({
     startDate: z.date({ coerce: true }).max(new Date(), 'Can not be a furture date'),
@@ -72,6 +75,15 @@ export const relationshipFormSchema = z.object({
   startDate: z.date({ coerce: true }),
   endDate: z.date({ coerce: true }).optional(),
   mode: z.enum(['create', 'search']).default('search'),
+  baselineStatus: z.string().optional(),
+  preferedPNSAproach: z.string().optional(),
+  livingWithClient: z.string().optional(),
+
+  physicalAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+  threatened: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+  sexualAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
+  ipvOutCome: z.enum(['True', 'False']).optional(),
+
   personBInfo: z
     .object({
       givenName: z.string().min(1, 'Given name required'),
@@ -102,7 +114,7 @@ export const saveRelationship = async (
   data: z.infer<typeof relationshipFormSchema>,
   config: ConfigObject,
   session: Session,
-  extraAttributes: Array<{ attributeType: string; value: string }> = [],
+  extraAttributes: Array<{ attributeType: string; value: string; attribute?: string }> = [],
 ) => {
   // Handle patient creation
   let patient: string = data.personB;
@@ -155,14 +167,12 @@ export const saveRelationship = async (
   if (data.mode === 'search' && extraAttributes.length > 0) {
     const results = await Promise.allSettled(
       extraAttributes.map((attr) =>
-        openmrsFetch(`${restBaseUrl}/person/${patient}/attribute`, {
+        openmrsFetch(`${restBaseUrl}/person/${patient}/attribute/${attr.attribute ?? ''}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            attr,
-          }),
+          body: JSON.stringify(omit(attr, ['attribute'])),
         }),
       ),
     );

@@ -11,7 +11,7 @@ import {
   TextInput,
 } from '@carbon/react';
 import { Calculator } from '@carbon/react/icons';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, useConfig } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,7 @@ import { fetchPerson, relationshipFormSchema } from '../relationship.resources';
 import styles from './form.scss';
 import { MARITAL_STATUS_CONCEPT_UUID } from '../relationships-constants';
 import PatientSearchInfo from '../../autosuggest/patient-search-info.component';
+import { ConfigObject } from '../../config-schema';
 
 type PatientSearchCreateProps = {};
 
@@ -33,6 +34,7 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
     const abortController = new AbortController();
     return await fetchPerson(query, abortController);
   };
+  const { requireMaritalStatusOnAgeGreaterThanOrEqualTo } = useConfig<ConfigObject>();
 
   const handleAdd = () => form.setValue('mode', 'create');
   const maritalStatus = useMemo(
@@ -52,6 +54,17 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
   };
 
   const mode = form.watch('mode');
+  const dobObservable = form.watch('personBInfo.birthdate');
+  const age = useMemo(() => {
+    if (!dobObservable) {
+      return '';
+    }
+    const dob = new Date(dobObservable);
+    const today = new Date();
+    const ageInMs = today.getTime() - dob.getTime();
+    const ageInYears = Math.floor(ageInMs / (1000 * 60 * 60 * 24 * 365.25));
+    return ageInYears.toString();
+  }, [dobObservable]);
 
   return (
     <>
@@ -198,28 +211,30 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
               {t('fromAge', 'From Age')}
             </Button>
           </Column>
-          <Column>
-            <Controller
-              control={form.control}
-              name="personBInfo.maritalStatus"
-              render={({ field, fieldState: { error } }) => (
-                <Dropdown
-                  ref={field.ref}
-                  invalid={error?.message}
-                  invalidText={error?.message}
-                  id="maritalStatus"
-                  titleText={t('maritalStatus', 'Marital status')}
-                  onChange={(e) => {
-                    field.onChange(e.selectedItem);
-                  }}
-                  initialSelectedItem={field.value}
-                  label="Choose option"
-                  items={maritalStatus.map((r) => r.value)}
-                  itemToString={(item) => maritalStatus.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            />
-          </Column>
+          {age && Number(age) >= requireMaritalStatusOnAgeGreaterThanOrEqualTo && (
+            <Column>
+              <Controller
+                control={form.control}
+                name="personBInfo.maritalStatus"
+                render={({ field, fieldState: { error } }) => (
+                  <Dropdown
+                    ref={field.ref}
+                    invalid={error?.message}
+                    invalidText={error?.message}
+                    id="maritalStatus"
+                    titleText={t('maritalStatus', 'Marital status')}
+                    onChange={(e) => {
+                      field.onChange(e.selectedItem);
+                    }}
+                    initialSelectedItem={field.value}
+                    label="Choose option"
+                    items={maritalStatus.map((r) => r.value)}
+                    itemToString={(item) => maritalStatus.find((r) => r.value === item)?.label ?? ''}
+                  />
+                )}
+              />
+            </Column>
+          )}
           <span className={styles.sectionHeader}>{t('contact', 'Contact')}</span>
           <Column>
             <Controller

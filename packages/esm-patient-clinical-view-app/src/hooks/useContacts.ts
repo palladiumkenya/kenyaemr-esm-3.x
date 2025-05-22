@@ -84,7 +84,7 @@ function getContact(relationship: Relationship, config: ConfigObject, person: 'p
     endDate: !relationship.endDate ? null : formatDate(parseDate(relationship.endDate)),
   } as Contact;
 }
-function extractContactData(
+export function extractContactData(
   patientIdentifier: string,
   relationships: Array<Relationship>,
   config: ConfigObject,

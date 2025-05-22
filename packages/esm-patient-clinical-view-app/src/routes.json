@@ -19,14 +19,6 @@
       "offline": false
     },
     {
-      "name": "other-relationships",
-      "slot": "patient-chart-family-history-slot",
-      "component": "otherRelationships",
-      "order": 0,
-      "online": true,
-      "offline": false
-    },
-    {
       "name": "relationships-link",
       "component": "relationshipsLink",
       "slot": "patient-chart-dashboard-slot",
@@ -332,12 +324,6 @@
       "name": "family-relationship-form",
       "component": "familyRelationshipForm",
       "title": "Family Relationship Form",
-      "type": "form"
-    },
-    {
-      "name": "other-relationship-form",
-      "component": "otherRelationshipsForm",
-      "title": "Other Relationships Form",
       "type": "form"
     },
     {

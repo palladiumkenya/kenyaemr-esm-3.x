@@ -35,7 +35,7 @@ const ContactTracingHistory: React.FC<ContactTracingHistoryProps> = ({ patientUu
 
   const handleLaunchContactTracingForm = (encounterUuid: string) => {
     launchWorkspace('kenyaemr-cusom-form-entry-workspace', {
-      workspaceTitle: 'Contact tracing form',
+      workspaceTitle: t('contactTracingForm', 'Contact tracing form'),
       formUuid: htsClientTracingFormUuid,
       patientUuid,
       encounterUuid,
