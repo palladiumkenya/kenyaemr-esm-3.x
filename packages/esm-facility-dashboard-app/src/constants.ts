@@ -23,3 +23,7 @@ export const formatNewDate = (date: Date | null | undefined) => {
 export const formattedDate = (date: Date) => {
   return date ? dayjs(date).format(DATE_PICKER_FORMAT) : '';
 };
+
+export const thirtyDays = () => {
+  return dayjs().subtract(30, 'day').toDate();
+};

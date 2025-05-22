@@ -2,12 +2,12 @@ import '@carbon/charts/styles.css';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import BaseIndicatorTrendChart from './base-indicator-trend-chart.component';
-import BaseArtProgressTrackingChart from './base-art-progress-tracking-chart.component';
+import BaseProgressTrackingChart from './base-progress-tracking-chart.component';
 import useFacilityDashboardSurveillance from '../../hooks/useFacilityDashboardSurveillance';
-import { useSurveillanceData } from '../../hooks/useSurveillanceData';
 import EmptyState from '../empty-state/empty-state-log.components';
 import styles from './charts.scss';
 import { InlineLoading } from '@carbon/react';
+import BaseCumulativeProgressTrackingChart from './base-cumulative-progress-tracking-chart.component';
 type HIVPositiveNotLinkedToARTProps = {
   startDate?: Date;
   endDate?: Date;
@@ -15,40 +15,99 @@ type HIVPositiveNotLinkedToARTProps = {
 const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ startDate, endDate }) => {
   const { t } = useTranslation();
 
-  const { error, isLoading, surveillanceSummary } = useFacilityDashboardSurveillance(startDate, endDate);
-
-  const hivPositivePatientValue = useSurveillanceData(surveillanceSummary, 'getMonthlyHivPositiveNotLinked');
-
-  const monthlyHivPositivePatientData = useSurveillanceData(
+  const {
+    error,
+    isLoading,
     surveillanceSummary,
-    'getMonthlyHivPositiveNotLinkedPatients',
+    getCompletedPercentage,
+    getPendingPercentage,
+    getThirtydaysRunninPercentage,
+    getThirtydaysRunninPendingPercentage,
+  } = useFacilityDashboardSurveillance(startDate, endDate);
+
+  const cumulativeHivPositivePatientData = {
+    data: [
+      {
+        group: 'Completed',
+        value: getCompletedPercentage(
+          surveillanceSummary?.getHivPositiveNotLinked,
+          surveillanceSummary?.getHivTestedPositive,
+        ),
+      },
+      {
+        group: 'Pending',
+        value: getPendingPercentage(
+          surveillanceSummary?.getHivPositiveNotLinked,
+          surveillanceSummary?.getHivTestedPositive,
+        ),
+      },
+    ],
+  };
+
+  const notLinkedToArtData = getThirtydaysRunninPercentage(
+    surveillanceSummary?.getMonthlyPatientsTestedHivPositive.data,
+    surveillanceSummary?.getMonthlyHivPositiveNotLinkedPatients.data,
   );
 
+  const lineGraphData = getThirtydaysRunninPendingPercentage(
+    surveillanceSummary?.getMonthlyPatientsTestedHivPositive.data,
+    surveillanceSummary?.getMonthlyHivPositiveNotLinkedPatients.data,
+  );
+
+  if (error) {
+    return <EmptyState subTitle={t('errorLoadingData', 'Error loading data')} />;
+  }
+
   return (
-    <div>
+    <div className={styles.chartContainer}>
       {isLoading ? (
         <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
       ) : (
-        <>
+        <div className={styles.chartContainer}>
           <div className={styles.chart}>
-            {hivPositivePatientValue.length > 0 ? (
+            {lineGraphData.length > 0 ? (
               <BaseIndicatorTrendChart
-                data={hivPositivePatientValue}
+                data={lineGraphData}
                 title={t('hivPositiveNotLinkedToART', 'HIV +VE Not linked to ART')}
-                yAxisTitle={t('numberTestedPositiveNotLinked', 'Number tested positive not linked')}
+                yAxisTitle={t('percentageTestedPositiveNotLinked', '% tested positive not linked')}
               />
             ) : (
               <EmptyState subTitle={t('noHivPositiveNotLinked', 'No HIV +VE Not linked to ART data to display')} />
             )}
           </div>
           <div className={styles.chart}>
-            {monthlyHivPositivePatientData.length > 0 ? (
-              <BaseArtProgressTrackingChart data={monthlyHivPositivePatientData} />
+            {notLinkedToArtData.length > 0 ? (
+              <BaseProgressTrackingChart
+                data={notLinkedToArtData}
+                stackTitle={t('progressInAddressingLinkedToArt', 'Progress in addressing Linkage to ART')}
+                leftAxiTtitle={t('percentageHivPositive', '% HIV positive')}
+              />
             ) : (
               <EmptyState subTitle={'No Linkage to ART data to display'} />
             )}
           </div>
-        </>
+          <div className={styles.chart}>
+            {surveillanceSummary?.getHivTestedPositive > 0 ? (
+              <div className={styles.cumulativeChart}>
+                <BaseCumulativeProgressTrackingChart
+                  data={cumulativeHivPositivePatientData}
+                  title={t(
+                    'cumulativeProgressOfAddressingLinkedToArt',
+                    'Cumulative progress of addressing Linkage to ART',
+                  )}
+                  yAxisTitle={t('percentageHivPositive', '% HIV positive')}
+                />
+              </div>
+            ) : (
+              <EmptyState
+                subTitle={t(
+                  'noCumulativeHivPositiveNotLinked',
+                  'No cumulative HIV +VE Not linked to ART data to display',
+                )}
+              />
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
