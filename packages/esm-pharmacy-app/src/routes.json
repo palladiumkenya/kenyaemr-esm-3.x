@@ -8,7 +8,6 @@
     {
       "component": "pharmacyDashboardLink",
       "name": "pharmacy-dashboard-link",
-      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "pharmacy",
         "title": "pharmacy",
