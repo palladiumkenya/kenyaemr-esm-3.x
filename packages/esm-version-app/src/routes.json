@@ -13,16 +13,6 @@
   ],
   "extensions": [
     {
-      "component": "homeDashboardLink",
-      "name": "kenyaemr-home-page-link",
-      "order": 0,
-      "meta": {
-        "name": "",
-        "title": "KenyaEMR Home page",
-        "slot": "kenyaemr-home-page-slot"
-      }
-    },
-    {
       "component": "homeRoot",
       "name": "kenya-emr-home-root",
       "slot": "kenyaemr-home-page-slot"
@@ -34,21 +24,13 @@
         "name": "diagnostics",
         "title": "Diagnostics",
         "slot": "diagnostics-slot"
-      }
+      },
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "diagnosticsRoot",
       "name": "diagnostics-root",
       "slot": "diagnostics-slot"
-    },
-    {
-      "component": "billingDashboardNavGroup",
-      "name": "billing-dashboard-nav-group",
-      "meta": {
-        "name": "billing",
-        "title": "Billing",
-        "slot": "billing-dashboard-slot"
-      }
     },
     {
       "component": "claimsManagementSideNavGroup",
@@ -58,7 +40,8 @@
         "title": "Claims management Overview",
         "slot": "case-management-slot"
       },
-      "featureFlag": "healthInformationExchange"
+      "featureFlag": "healthInformationExchange",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "linkageServicesDashboardNavGroup",
@@ -67,7 +50,8 @@
         "name": "linkage-services",
         "title": "Linkage Services",
         "slot": "linkage-services-slot"
-      }
+      },
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "linkageServicesRoot",
@@ -97,7 +81,8 @@
     {
       "component": "patientServicesDashboardNavGroup",
       "name": "patient-services-dashboard-nav-group",
-      "order": 1
+      "order": 1,
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "patientChartClinicalConsultationNavGroup",

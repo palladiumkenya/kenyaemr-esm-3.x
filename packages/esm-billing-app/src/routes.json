@@ -21,8 +21,7 @@
       "name": "billing-dashboard-link",
       "slot": "homepage-dashboard-slot",
       "meta": {
-        "name": "billing",
-        "title": "billing",
+       
         "slot": "billing-dashboard-slot"
       }
     },
