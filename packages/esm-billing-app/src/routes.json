@@ -16,6 +16,17 @@
     }
   ],
   "extensions": [
+
+    {
+      "name": "billing-module-nav-group-link",
+      "component": "billingModuleNavGroup",
+      "meta": {
+        "name": "billing",
+        "title": "Billing",
+        "slot": "billing-dashboard-slot"
+      },
+      "slot": "homepage-dashboard-slot"
+    },
     {
       "component": "billingDashboardLink",
       "name": "billing-dashboard-link",
