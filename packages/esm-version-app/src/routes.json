@@ -13,6 +13,17 @@
   ],
   "extensions": [
     {
+      "component": "homeDashboardLink",
+      "name": "kenyaemr-home-page-link",
+      "slot": "homepage-dashboard-slot",
+      "order": 0,
+      "meta": {
+        "name": "",
+        "title": "KenyaEMR Home page",
+        "slot": "kenyaemr-home-page-slot"
+      }
+    },
+    {
       "component": "homeRoot",
       "name": "kenya-emr-home-root",
       "slot": "kenyaemr-home-page-slot"
@@ -64,19 +75,18 @@
     },
     {
       "component": "referralsDashboardLink",
-      "name": "kenyaemr-referrals-dashboard-link"
+      "name": "kenyaemr-referrals-dashboard-link",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "wardsDashboardLink",
-      "name": "kenyaemr-wards-dashboard-link"
+      "name": "kenyaemr-wards-dashboard-link",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "mortuaryDashboardLink",
-      "name": "kenyaemr-morgue-dashboard-link"
-    },
-    {
-      "component": "providersDashboardLink",
-      "name": "kenyaemr-providers-dashboard-link"
+      "name": "kenyaemr-morgue-dashboard-link",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "patientServicesDashboardNavGroup",

@@ -6,7 +6,6 @@ import {
   Money,
   Stethoscope,
   TcpIpService,
-  UserAdmin,
   UserMultiple,
   Hotel,
 } from '@carbon/react/icons';
@@ -94,10 +93,6 @@ export const inpatientDashboardLink = getSyncLifecycle(
 );
 export const referralsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/referrals', title: 'Referrals', icon: TcpIpService }),
-  options,
-);
-export const providersDashboardLink = getSyncLifecycle(
-  createLeftPanelLink({ route: '/home/providers', title: 'Providers', icon: UserAdmin }),
   options,
 );
 export const wardsDashboardLink = getSyncLifecycle(
