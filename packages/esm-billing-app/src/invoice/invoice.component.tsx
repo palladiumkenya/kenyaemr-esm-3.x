@@ -142,7 +142,7 @@ const Invoice: React.FC = () => {
             queueEntry.queue.uuid,
             queueEntry.queueEntryUuid,
             abortController,
-            response?.data?.stopDatetime,
+            response?.data?.stopDatetime ? new Date(response.data.stopDatetime) : new Date(),
           );
         }
 
