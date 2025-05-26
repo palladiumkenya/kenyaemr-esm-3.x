@@ -1,0 +1,11 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.billDepositDashboard {
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.tabsContainer {
+  margin: layout.$layout-01;
+  background-color: colors.$white-0;
+}
