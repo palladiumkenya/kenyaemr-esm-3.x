@@ -149,6 +149,15 @@ export const chargeableItemsLink = getSyncLifecycle(
   options,
 );
 
+export const billingModuleNavGroup = getSyncLifecycle(
+  createDashboardGroup({
+    title: 'Billing',
+    slotName: 'billing-dashboard-link-slot',
+    isExpanded: false,
+  }),
+  options,
+);
+
 // Claims Management Links
 export const claimsManagementSideNavGroup = getSyncLifecycle(
   createDashboardGroup({
