@@ -2,22 +2,11 @@ import { Session } from '@openmrs/esm-framework';
 import omit from 'lodash/omit';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
-import { relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
-import { Enrollment, HTSEncounter } from '../types';
+import { BOOLEAN_YES, relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
+import { Enrollment, HTSEncounter, Person } from '../types';
 import { replaceAll } from '../utils/expression-helper';
-export const BOOLEAN_YES = '1065';
-export const BOOLEAN_NO = '1066';
 
 export const ContactListFormSchema = relationshipFormSchema
-  .extend({
-    physicalAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
-    threatened: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
-    sexualAssault: z.enum([BOOLEAN_YES, BOOLEAN_NO]).optional(),
-    livingWithClient: z.string().optional(),
-    baselineStatus: z.string().optional(),
-    preferedPNSAproach: z.string().optional(),
-    ipvOutCome: z.enum(['True', 'False']).optional(),
-  })
   .refine(
     (data) => {
       return !(data.mode === 'search' && !data.personB);
@@ -67,6 +56,7 @@ export const saveContact = async (
   data: z.infer<typeof ContactListFormSchema>,
   config: ConfigObject,
   session: Session,
+  personAttributes: Person['attributes'] = [],
 ) => {
   const { baselineStatus, ipvOutCome, preferedPNSAproach, livingWithClient } = data;
 
@@ -90,6 +80,9 @@ export const saveContact = async (
             {
               attributeType: config.contactPersonAttributesUuid.baselineHIVStatus,
               value: replaceAll(baselineStatus, 'A', ''),
+              attribute: personAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus,
+              )?.uuid,
             },
           ]
         : []),
@@ -108,6 +101,9 @@ export const saveContact = async (
             {
               attributeType: config.contactPersonAttributesUuid.preferedPnsAproach,
               value: replaceAll(preferedPNSAproach, 'A', ''),
+              attribute: personAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach,
+              )?.uuid,
             },
           ]
         : []),
@@ -117,6 +113,9 @@ export const saveContact = async (
             {
               attributeType: config.contactPersonAttributesUuid.livingWithContact,
               value: replaceAll(livingWithClient, 'A', ''),
+              attribute: personAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.livingWithContact,
+              )?.uuid,
             },
           ]
         : []),
@@ -125,6 +124,9 @@ export const saveContact = async (
             {
               attributeType: config.contactPersonAttributesUuid.contactIPVOutcome,
               value: ipvOutCome,
+              attribute: personAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.contactIPVOutcome,
+              )?.uuid,
             },
           ]
         : []),

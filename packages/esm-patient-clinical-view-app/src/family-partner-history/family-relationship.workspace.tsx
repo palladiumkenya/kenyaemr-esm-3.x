@@ -1,4 +1,4 @@
-import { Button, ButtonSet, Column, ComboBox, DatePicker, DatePickerInput, Form, Stack, TextArea } from '@carbon/react';
+import { Button, ButtonSet, Column, ComboBox, DatePicker, DatePickerInput, Form, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
@@ -6,8 +6,11 @@ import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-for
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
+import { saveContact } from '../contact-list/contact-list.resource';
+import usePersonAttributes from '../hooks/usePersonAttributes';
+import RelationshipBaselineInfoFormSection from '../relationships/forms/baseline-info-form-section.component';
 import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
-import { relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
+import { relationshipFormSchema } from '../relationships/relationship.resources';
 import { uppercaseText } from '../utils/expression-helper';
 import styles from './family-relationship.scss';
 import { useMappedRelationshipTypes } from './relationships.resource';
@@ -57,12 +60,14 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
     },
     resolver: zodResolver(schema),
   });
+  const personUuid = form.watch('personB');
+  const { attributes } = usePersonAttributes(personUuid);
 
   const { control, handleSubmit } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      await saveRelationship(data, config, session, []); /// Remove notes from payload since endpoint doesn't expect it to avoid 400 error
+      await saveContact(data, config, session, attributes); /// Remove notes from payload since endpoint doesn't expect it to avoid 400 error
       closeWorkspace();
     } catch (error) {}
   };
@@ -83,7 +88,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
                   titleText={t('relationship', 'Relationship')}
                   placeholder="Relationship to patient"
                   items={relationshipTypes}
-                  itemToString={(item) => (item ? uppercaseText(item.text) : '')}
+                  itemToString={(item) => item?.text ?? ''}
                   onChange={(e) => field.onChange(e.selectedItem?.id)}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
@@ -142,6 +147,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
               )}
             />
           </Column>
+          <RelationshipBaselineInfoFormSection />
         </Stack>
 
         <ButtonSet className={styles.buttonSet}>

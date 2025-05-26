@@ -9,7 +9,6 @@ const HomeRoot = () => {
     <BrowserRouter basename={baseName}>
       <Routes>
         <Route path="/" element={<ExtensionSlot name="home-dashboard-slot" />} />
-        <Route path="/providers/*" element={<ExtensionSlot name="providers-dashboard-slot" />} />
         <Route path="/referrals/*" element={<ExtensionSlot name="referrals-slot" />} />
         <Route path="/bed-admission/*" element={<ExtensionSlot name="bed-admission-dashboard-slot" />} />
         <Route path="/morgue/*" element={<ExtensionSlot name="morgue-dashboard-slot" />} />

@@ -19,14 +19,6 @@
       "offline": false
     },
     {
-      "name": "other-relationships",
-      "slot": "patient-chart-family-history-slot",
-      "component": "otherRelationships",
-      "order": 0,
-      "online": true,
-      "offline": false
-    },
-    {
       "name": "relationships-link",
       "component": "relationshipsLink",
       "slot": "patient-chart-dashboard-slot",
@@ -200,7 +192,6 @@
     {
       "component": "caseManagementDashboardLink",
       "name": "case-management-dashboard-link",
-      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "case-management",
         "title": "Case Management",
@@ -261,7 +252,6 @@
     {
       "component": "peerCalendarDashboardLink",
       "name": "peer-calendar-dashboard-link",
-      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "peer-calendar",
         "title": "Peer Calendar",
@@ -332,12 +322,6 @@
       "name": "family-relationship-form",
       "component": "familyRelationshipForm",
       "title": "Family Relationship Form",
-      "type": "form"
-    },
-    {
-      "name": "other-relationship-form",
-      "component": "otherRelationshipsForm",
-      "title": "Other Relationships Form",
       "type": "form"
     },
     {

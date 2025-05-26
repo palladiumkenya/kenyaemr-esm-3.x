@@ -46,7 +46,7 @@ interface ContactListProps {
 const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
-  const headerTitle = t('contactList', 'Contact list');
+  const headerTitle = t('pnsContactList', 'PNS Contact list');
   const layout = useLayoutType();
   const size = layout === 'tablet' ? 'lg' : 'md';
   const { contacts, error, isLoading } = useContacts(patientUuid);
@@ -117,6 +117,8 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
   const handleLaunchContactTracingForm = (contactUuid: string) => {
     launchWorkspace('kenyaemr-cusom-form-entry-workspace', {
       formUuid: htsClientTracingFormUuid,
+      workspaceTitle: t('contactTracingForm', 'Contact tracing form'),
+
       patientUuid: contactUuid,
       encounterUuid: '',
       mutateForm: () => {

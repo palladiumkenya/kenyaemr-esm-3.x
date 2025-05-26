@@ -17,7 +17,8 @@ import rootComponent from './root.component';
 import BillingForm from './billing-form/billing-form.component';
 import BillingCheckInForm from './billing-form/billing-checkin-form.component';
 import BillHistory from './bill-history/bill-history.component';
-import BillDepositWorkspace from './billing-form/bill-deposit/bill-deposit.workspace';
+
+// Bill Deposit Components
 
 // Benefits Package Components
 import BenefitsPackage from './benefits-package/benefits-package.component';
@@ -65,6 +66,13 @@ import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component
 import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
 import { ClockIn } from './payment-points/payment-point/clock-in.modal';
 import { ClockOut } from './payment-points/payment-point/clock-out.modal';
+
+// Bill Deposit Components
+import BillDepositSearch from './bill-deposit/components/search/bill-deposit-search.component';
+import AddDepositWorkspace from './bill-deposit/components/forms/add-deposit.workspace';
+import DeleteDepositModal from './bill-deposit/components/modal/delete-deposit.modal';
+import ReverseTransactionModal from './bill-deposit/components/modal/reverse-transaction.modal';
+import DepositTransactionWorkspace from './bill-deposit/components/forms/deposit-transactions/deposit-transaction.workspace';
 
 // Translation
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -141,6 +149,15 @@ export const chargeableItemsLink = getSyncLifecycle(
   options,
 );
 
+export const billingModuleNavGroup = getSyncLifecycle(
+  createDashboardGroup({
+    title: 'Billing',
+    slotName: 'billing-dashboard-link-slot',
+    isExpanded: false,
+  }),
+  options,
+);
+
 // Claims Management Links
 export const claimsManagementSideNavGroup = getSyncLifecycle(
   createDashboardGroup({
@@ -167,6 +184,14 @@ export const preAuthRequestsDashboardLink = getSyncLifecycle(
   options,
 );
 
+// Bill Deposit Links
+export const billDepositDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: 'bill-deposit',
+    title: 'Bill Deposit',
+  }),
+  options,
+);
 export const benefitsPackageDashboardLink = getSyncLifecycle(
   createDashboardLink({
     ...benefitsPackageDashboardMeta,
@@ -181,7 +206,6 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
-export const billDepositWorkspace = getSyncLifecycle(BillDepositWorkspace, options);
 
 // Bill Manager Components
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
@@ -232,6 +256,12 @@ export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillab
 export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 export const manageClaimRequestModal = getSyncLifecycle(ManageClaimRequest, options);
 
+// Bill Deposit Components
+export const billDepositSearch = getSyncLifecycle(BillDepositSearch, options);
+export const addDepositWorkspace = getSyncLifecycle(AddDepositWorkspace, options);
+export const deleteDepositModal = getSyncLifecycle(DeleteDepositModal, options);
+export const depositTransactionWorkspace = getSyncLifecycle(DepositTransactionWorkspace, options);
+export const reverseTransactionModal = getSyncLifecycle(ReverseTransactionModal, options);
 // App Startup
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);

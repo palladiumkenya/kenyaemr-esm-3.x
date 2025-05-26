@@ -7,7 +7,6 @@
     {
       "component": "labManifestSideNavGroup",
       "name": "lab-manifest-dashboard-link",
-      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "lab-manifest",
         "title": "Lab manifest Overview",

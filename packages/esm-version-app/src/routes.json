@@ -15,6 +15,7 @@
     {
       "component": "homeDashboardLink",
       "name": "kenyaemr-home-page-link",
+      "slot": "homepage-dashboard-slot",
       "order": 0,
       "meta": {
         "name": "",
@@ -34,21 +35,13 @@
         "name": "diagnostics",
         "title": "Diagnostics",
         "slot": "diagnostics-slot"
-      }
+      },
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "diagnosticsRoot",
       "name": "diagnostics-root",
       "slot": "diagnostics-slot"
-    },
-    {
-      "component": "billingDashboardNavGroup",
-      "name": "billing-dashboard-nav-group",
-      "meta": {
-        "name": "billing",
-        "title": "Billing",
-        "slot": "billing-dashboard-slot"
-      }
     },
     {
       "component": "claimsManagementSideNavGroup",
@@ -58,7 +51,8 @@
         "title": "Claims management Overview",
         "slot": "case-management-slot"
       },
-      "featureFlag": "healthInformationExchange"
+      "featureFlag": "healthInformationExchange",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "linkageServicesDashboardNavGroup",
@@ -67,7 +61,8 @@
         "name": "linkage-services",
         "title": "Linkage Services",
         "slot": "linkage-services-slot"
-      }
+      },
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "linkageServicesRoot",
@@ -80,24 +75,24 @@
     },
     {
       "component": "referralsDashboardLink",
-      "name": "kenyaemr-referrals-dashboard-link"
+      "name": "kenyaemr-referrals-dashboard-link",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "wardsDashboardLink",
-      "name": "kenyaemr-wards-dashboard-link"
+      "name": "kenyaemr-wards-dashboard-link",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "mortuaryDashboardLink",
-      "name": "kenyaemr-morgue-dashboard-link"
-    },
-    {
-      "component": "providersDashboardLink",
-      "name": "kenyaemr-providers-dashboard-link"
+      "name": "kenyaemr-morgue-dashboard-link",
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "patientServicesDashboardNavGroup",
       "name": "patient-services-dashboard-nav-group",
-      "order": 1
+      "order": 1,
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "patientChartClinicalConsultationNavGroup",
