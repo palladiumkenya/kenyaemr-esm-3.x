@@ -46,12 +46,12 @@ const HIVPositiveNotLinkedToART: React.FC<HIVPositiveNotLinkedToARTProps> = ({ s
 
   const notLinkedToArtData = getThirtydaysRunninPercentage(
     surveillanceSummary?.getMonthlyPatientsTestedHivPositive.data,
-    surveillanceSummary?.getMonthlyHivPositiveNotLinkedPatients.data,
+    surveillanceSummary?.getMonthlyHivPositiveNotLinked.data,
   );
 
   const lineGraphData = getThirtydaysRunninPendingPercentage(
     surveillanceSummary?.getMonthlyPatientsTestedHivPositive.data,
-    surveillanceSummary?.getMonthlyHivPositiveNotLinkedPatients.data,
+    surveillanceSummary?.getMonthlyHivPositiveNotLinked.data,
   );
 
   if (error) {
