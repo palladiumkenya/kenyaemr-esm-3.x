@@ -83,15 +83,6 @@ export const billingSummaryDashboardLink = getSyncLifecycle(
   options,
 );
 
-export const billingDashboardLink = getSyncLifecycle(
-  createDashboardGroup({
-    title: 'Billing',
-    slotName: 'billing-dashboard-link-slot',
-    isExpanded: false,
-  }),
-  options,
-);
-
 // Navigation Links
 export const billingOverviewLink = getSyncLifecycle(
   createLeftPanelLink({
@@ -145,25 +136,6 @@ export const chargeableItemsLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'charge-items',
     title: 'Charge Items',
-  }),
-  options,
-);
-
-export const billingModuleNavGroup = getSyncLifecycle(
-  createDashboardGroup({
-    title: 'Billing',
-    slotName: 'billing-dashboard-link-slot',
-    isExpanded: false,
-  }),
-  options,
-);
-
-// Claims Management Links
-export const claimsManagementSideNavGroup = getSyncLifecycle(
-  createDashboardGroup({
-    title: 'Claims Management',
-    slotName: 'claims-management-dashboard-link-slot',
-    isExpanded: false,
   }),
   options,
 );
