@@ -118,6 +118,7 @@ export const useModuleLinks = () => {
       label: t('reports', 'Reports'),
       url: `${openmrsSpaBase}reports`,
       icon: <Report size={24} />,
+      privilege: 'o3: View Reports',
     },
   ];
 };
