@@ -1,4 +1,4 @@
-import { Button, InlineLoading, InlineNotification, ButtonSkeleton } from '@carbon/react';
+import { Button, InlineLoading } from '@carbon/react';
 import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
 import {
   ExtensionSlot,
@@ -61,7 +61,10 @@ const Invoice: React.FC = () => {
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
 
   const isShaFacilityStatusValid =
-    shaFacilityStatus && shaFacilityStatus.shaFacilityId && shaFacilityStatus.operationalStatus;
+    shaFacilityStatus &&
+    shaFacilityStatus.shaFacilityId &&
+    shaFacilityStatus.operationalStatus &&
+    shaFacilityStatus?.registrationNumber;
 
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];

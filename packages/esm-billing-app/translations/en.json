@@ -274,6 +274,8 @@
   "serviceConcept": "Service Concept",
   "serviceType": "Service Type",
   "shaBenefits": "SHA benefits",
+  "shaFacilityRegistrationRequired": "Facility registration number Required",
+  "shaFacilityRegistrationRequiredDescription": "Facility registration number is required to process claims. Please update facility registration number details.",
   "shaNo": "SHA NUMBER: ",
   "SHIF": "Social Health Insurance Fund",
   "shortName": "Short Name",
