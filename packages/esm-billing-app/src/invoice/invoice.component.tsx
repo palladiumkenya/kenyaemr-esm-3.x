@@ -1,4 +1,4 @@
-import { Button, InlineLoading } from '@carbon/react';
+import { Button, InlineLoading, InlineNotification, ButtonSkeleton } from '@carbon/react';
 import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
 import {
   ExtensionSlot,
@@ -8,6 +8,7 @@ import {
   setCurrentVisit,
   showModal,
   showSnackbar,
+  showToast,
   updateVisit,
   useFeatureFlag,
   usePatient,
@@ -24,7 +25,7 @@ import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
 import { LineItem } from '../types';
 import InvoiceTable from './invoice-table.component';
-import { removeQueuedPatient, useVisitQueueEntry } from './invoice.resource';
+import { removeQueuedPatient, useShaFacilityStatus, useVisitQueueEntry } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import ReceiptPrintButton from './print-bill-receipt/receipt-print-button.component';
@@ -38,6 +39,7 @@ interface InvoiceDetailsProps {
 const Invoice: React.FC = () => {
   const { t } = useTranslation();
   const { data: facilityInfo } = useDefaultFacility();
+  const { shaFacilityStatus } = useShaFacilityStatus();
   const { billUuid, patientUuid } = useParams();
   const [isPrinting, setIsPrinting] = useState(false);
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
@@ -57,9 +59,12 @@ const Invoice: React.FC = () => {
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
+
+  const isShaFacilityStatusValid =
+    shaFacilityStatus && shaFacilityStatus.shaFacilityId && shaFacilityStatus.operationalStatus;
+
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
-    // remove duplicates
     const uniqueLineItems = [...new Set([...lineItems, ...paidLineItems])];
     setSelectedLineItems(uniqueLineItems);
   };
@@ -165,6 +170,19 @@ const Invoice: React.FC = () => {
   };
 
   const handleViewClaims = async () => {
+    if (!isShaFacilityStatusValid) {
+      showToast({
+        critical: true,
+        kind: 'warning',
+        title: t('shaFacilityRegistrationRequired', 'Facility registration number Required'),
+        description: t(
+          'shaFacilityRegistrationRequiredDescription',
+          'Facility registration number is required to process claims. Please update facility registration number details.',
+        ),
+      });
+      return;
+    }
+
     if (currentVisit) {
       await handleEndVisit();
       navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
@@ -204,6 +222,7 @@ const Invoice: React.FC = () => {
           tooltipPosition="left">
           {t('mpesaPayment', 'MPESA Payment')}
         </Button>
+
         {isProcessClaimsFormEnabled && isInsurancePayment(bill?.payments) && (
           <Button
             onClick={handleViewClaims}
