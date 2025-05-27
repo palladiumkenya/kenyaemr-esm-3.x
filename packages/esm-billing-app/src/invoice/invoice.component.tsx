@@ -146,11 +146,11 @@ const Invoice: React.FC = () => {
         const response = await updateVisit(currentVisit.uuid, endVisitPayload, abortController);
 
         if (queueEntry) {
-          removeQueuedPatient(
+          await removeQueuedPatient(
             queueEntry.queue.uuid,
             queueEntry.queueEntryUuid,
             abortController,
-            response?.data?.stopDatetime,
+            new Date(response?.data?.stopDatetime ?? Date.now()),
           );
         }
 
