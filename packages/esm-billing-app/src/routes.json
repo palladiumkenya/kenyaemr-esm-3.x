@@ -16,23 +16,11 @@
     }
   ],
   "extensions": [
-
-    {
-      "name": "billing-module-nav-group-link",
-      "component": "billingModuleNavGroup",
-      "meta": {
-        "name": "billing",
-        "title": "Billing",
-        "slot": "billing-dashboard-slot"
-      },
-      "slot": "homepage-dashboard-slot"
-    },
     {
       "component": "billingDashboardLink",
       "name": "billing-dashboard-link",
       "slot": "homepage-dashboard-slot",
       "meta": {
-       
         "slot": "billing-dashboard-slot"
       }
     },
@@ -159,53 +147,42 @@
       "component": "billingOverviewLink",
       "name": "billing-overview-link",
       "order": 0,
-      "slot": "billing-dashboard-link-slot"
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "billDepositDashboardLink",
       "name": "bill-deposit-dashboard-link",
-      "slots": ["billing-dashboard-link-slot","billing-dashboard-group-nav-slot"]
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "paymentHistoryLink",
       "name": "payment-history-link",
-      "slot": "billing-dashboard-link-slot"
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "paymentPointsLink",
       "name": "payment-points-link",
-      "slot": "billing-dashboard-link-slot"
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "paymentModesLink",
       "name": "payment-modes-link",
-      "slot": "billing-dashboard-link-slot"
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "billManagerLink",
       "name": "bill-manager-link",
-      "slot": "billing-dashboard-link-slot"
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "chargeableItemsLink",
       "name": "chargeable-items-link",
-      "slot": "billing-dashboard-link-slot"
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "billableExemptionsLink",
       "name": "billable-exemptions-link",
-      "slot": "billing-dashboard-link-slot"
-    },
-    {
-      "component": "claimsManagementSideNavGroup",
-      "name": "claims-management-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "claims-management",
-        "title": "Claims management Overview",
-        "slot": "case-management-slot"
-      },
-      "featureFlag": "healthInformationExchange"
+      "slot": "billing-dashboard-group-nav-slot"
     },
     {
       "component": "claimsManagementOverviewDashboardLink",
@@ -306,7 +283,7 @@
       "type": "other-form"
     },
     {
-      "name":"deposit-transaction-workspace",
+      "name": "deposit-transaction-workspace",
       "component": "depositTransactionWorkspace",
       "title": "Deposit Transaction",
       "type": "other-form"

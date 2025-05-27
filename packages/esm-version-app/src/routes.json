@@ -98,6 +98,7 @@
       "component": "patientChartClinicalConsultationNavGroup",
       "order": 3,
       "name": "patient-chart-clinical-consultation-nav-group",
+      "slot": "patient-chart-dashboard-slot",
       "meta": {
         "name": "clinical-consultation",
         "title": "Clinical consultation",
