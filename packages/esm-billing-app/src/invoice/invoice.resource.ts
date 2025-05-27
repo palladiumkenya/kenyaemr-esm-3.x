@@ -1,5 +1,15 @@
-import { Concept, openmrsFetch, restBaseUrl, toDateObjectStrict, toOmrsIsoString, Visit } from '@openmrs/esm-framework';
+import {
+  Concept,
+  FetchResponse,
+  openmrsFetch,
+  restBaseUrl,
+  toDateObjectStrict,
+  toOmrsIsoString,
+  useSession,
+  Visit,
+} from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import { type ShaFacilityStatusResponse } from '../types';
 
 export interface VisitQueueEntry {
   queueEntry: VisitQueueEntry;
@@ -79,3 +89,23 @@ export function removeQueuedPatient(
     signal: abortController.signal,
   });
 }
+
+export const useShaFacilityStatus = () => {
+  const { authenticated } = useSession();
+
+  const url = `${restBaseUrl}/kenyaemr/sha-facility-status?synchronize=true`;
+
+  const { data, isLoading, error, mutate } = useSWR<FetchResponse<ShaFacilityStatusResponse>>(
+    authenticated ? url : null,
+    openmrsFetch,
+  );
+
+  const shaFacilityStatus = data?.data;
+
+  return {
+    shaFacilityStatus,
+    isLoading,
+    error,
+    mutate,
+  };
+};
