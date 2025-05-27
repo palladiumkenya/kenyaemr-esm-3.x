@@ -103,6 +103,16 @@
         "title": "Clinical consultation",
         "slot": "clinical-consultation-slot"
       }
+    },
+    {
+      "component": "billingDashboardNavGroup",
+      "slot": "homepage-dashboard-slot",
+      "name": "billing-dashboard-nav-group",
+      "meta": {
+        "name": "billing",
+        "title": "Billing",
+        "slot": "billing-dashboard-slot"
+      }
     }
   ]
 }
