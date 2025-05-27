@@ -177,10 +177,10 @@ const Invoice: React.FC = () => {
       showToast({
         critical: true,
         kind: 'warning',
-        title: t('shaFacilityRegistrationRequired', 'Facility registration number Required'),
+        title: t('shaFacilityLicenseNumberRequired', 'Facility license number Required'),
         description: t(
-          'shaFacilityRegistrationRequiredDescription',
-          'Facility registration number is required to process claims. Please update facility registration number details.',
+          'shaFacilityLicenseNumbernRequiredDescription',
+          'Facility license number is required to process claims. Please update facility license number details.',
         ),
       });
       return;
