@@ -18,30 +18,48 @@
       "slot": "homepage-dashboard-slot",
       "order": 0,
       "meta": {
-        "name": "",
+        "name": "home",
         "title": "KenyaEMR Home page",
-        "slot": "kenyaemr-home-page-slot"
+        "slot": "kenyaemr-home-dashboard-slot"
       }
     },
     {
       "component": "homeRoot",
-      "name": "kenya-emr-home-root",
-      "slot": "kenyaemr-home-page-slot"
+      "slot": "kenyaemr-home-dashboard-slot",
+      "name": "kenyaemr-home"
     },
     {
-      "component": "diagnosticsDashboardNavGroup",
-      "name": "diagnostics-dashboard-nav-group",
+      "component": "patientServicesDashboardNavGroup",
+      "name": "patient-services-dashboard-nav-group",
+      "order": 1,
+      "slot": "homepage-dashboard-slot",
       "meta": {
-        "name": "diagnostics",
-        "title": "Diagnostics",
-        "slot": "diagnostics-slot"
+        "name": "patient-services-dashboard",
+        "title": "Patient Services",
+        "slot": "kenyaemr-home-dashboard-slot"
+      }
+    },
+    {
+      "component": "linkageServicesDashboardNavGroup",
+      "name": "linkage-services-dashboard-nav-group",
+      "order": 2,
+      "meta": {
+        "name": "linkage-services",
+        "title": "Linkage Services",
+        "slot": "kenyaemr-home-dashboard-slot"
       },
       "slot": "homepage-dashboard-slot"
     },
     {
-      "component": "diagnosticsRoot",
-      "name": "diagnostics-root",
-      "slot": "diagnostics-slot"
+      "component": "diagnosticsDashboardNavGroup",
+      "name": "diagnostics-dashboard-nav-group",
+      "order": 3,
+      "meta": {
+        "name": "diagnostics",
+        "title": "Diagnostics",
+        "slot": "kenyaemr-home-dashboard-slot"
+      },
+      "slot": "homepage-dashboard-slot"
     },
     {
       "component": "claimsManagementSideNavGroup",
@@ -49,50 +67,41 @@
       "meta": {
         "name": "claims-management",
         "title": "Claims management Overview",
-        "slot": "case-management-slot"
+        "slot": "billing-dashboard-slot"
       },
       "featureFlag": "healthInformationExchange",
       "slot": "homepage-dashboard-slot"
     },
-    {
-      "component": "linkageServicesDashboardNavGroup",
-      "name": "linkage-services-dashboard-nav-group",
-      "meta": {
-        "name": "linkage-services",
-        "title": "Linkage Services",
-        "slot": "linkage-services-slot"
-      },
-      "slot": "homepage-dashboard-slot"
-    },
-    {
-      "component": "linkageServicesRoot",
-      "name": "linkage-services-root",
-      "slot": "linkage-services-slot"
-    },
-    {
-      "component": "inpatientDashboardLink",
-      "name": "kenya-emr-inpatient-dashboard-link"
-    },
+    
     {
       "component": "referralsDashboardLink",
       "name": "kenyaemr-referrals-dashboard-link",
-      "slot": "homepage-dashboard-slot"
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "referrals",
+        "title": "Referrals",
+        "slot": "referrals-slot"
+      }
     },
     {
       "component": "wardsDashboardLink",
       "name": "kenyaemr-wards-dashboard-link",
-      "slot": "homepage-dashboard-slot"
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "ward",
+        "title": "Ward",
+        "slot": "ward-dashboard-slot"
+      }
     },
     {
       "component": "mortuaryDashboardLink",
       "name": "kenyaemr-morgue-dashboard-link",
-      "slot": "homepage-dashboard-slot"
-    },
-    {
-      "component": "patientServicesDashboardNavGroup",
-      "name": "patient-services-dashboard-nav-group",
-      "order": 1,
-      "slot": "homepage-dashboard-slot"
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "morgue",
+        "title": "Mortuary",
+        "slot": "morgue-dashboard-slot"
+      }
     },
     {
       "component": "patientChartClinicalConsultationNavGroup",

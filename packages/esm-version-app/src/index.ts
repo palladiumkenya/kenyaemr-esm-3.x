@@ -1,19 +1,19 @@
 import {
   HealthCross,
   Home,
-  Movement,
   HospitalBed,
+  Hotel,
   Money,
+  Movement,
   Stethoscope,
   TcpIpService,
   UserMultiple,
-  Hotel,
 } from '@carbon/react/icons';
 import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import HomeRoot from './app-navigation/root-overrides.component';
 import { createDashboardGroup, createLeftPanelLink } from './app-navigation/nav-utils';
 import { configSchema } from './config-schema';
 import rootComponent from './root.component';
-import HomeRoot from './app-navigation/home-root.component';
 
 const moduleName = '@kenyaemr/esm-version-app';
 
@@ -89,7 +89,7 @@ export const homeDashboardLink = getSyncLifecycle(
 export const homeRoot = getSyncLifecycle(HomeRoot, options);
 export const inpatientDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/bed-admission', title: 'In Patient View', icon: HospitalBed }),
-  options,
+  options, // uses slot bed-admission-dashboard-slot
 );
 export const referralsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/referrals', title: 'Referrals', icon: TcpIpService }),
