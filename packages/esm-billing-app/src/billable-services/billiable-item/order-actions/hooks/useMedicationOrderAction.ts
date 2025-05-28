@@ -7,6 +7,7 @@ import { createMedicationDispenseProps } from '../../test-order/dispense.resourc
 
 interface MedicationRequest {
   request: fhir.MedicationRequest;
+  dispenses: Array<fhir.MedicationDispense>;
 }
 
 export function useMedicationOrderAction(medicationRequestBundle?: MedicationRequest) {
@@ -35,14 +36,31 @@ export function useMedicationOrderAction(medicationRequestBundle?: MedicationReq
   const shouldShowBillModal =
     stockItemQuantity > 0 && itemHasBill.length < 1 && billableItem.length > 0 && !billableItemServiceStatus;
   const isDisabled = hasPendingPayment || (stockItemQuantity < 1 && !!drugUuid);
+  const isANonBillableItem = billableItem.length === 0;
+  const hasBeenDispensed = medicationRequestBundle?.dispenses?.length > 0;
 
-  // Modification is allowed only when:
-  // 1. There are no pending payments
-  // 2. Stock item is available (quantity > 0)
-  // 3. Item hasn't been billed yet (no existing bills)
-  // 4. Item exists in billable items list
-  const shouldAllowModify =
-    !hasPendingPayment && stockItemQuantity > 0 && itemHasBill.length < 1 && billableItem.length > 0;
+  /**
+   * Determines if modification of the medication order is allowed based on several conditions:
+   * 1. No pending payments exist
+   * 2. Stock item is available (quantity > 0)
+   * 3. Item hasn't been billed yet (no existing bills)
+   * 4. Item exists in billable items list
+   * 5. Special case: Non-billable items that haven't been dispensed can be modified
+   */
+  const shouldAllowModify = (() => {
+    // Special case: Non-billable items that haven't been dispensed can always be modified
+    if (!hasBeenDispensed && isANonBillableItem) {
+      return true;
+    }
+
+    // For all other cases, check the standard conditions
+    const hasNoPendingPayments = !hasPendingPayment;
+    const hasAvailableStock = stockItemQuantity > 0;
+    const hasNoExistingBills = itemHasBill.length < 1;
+    const isBillableItem = billableItem.length > 0;
+
+    return hasNoPendingPayments && hasAvailableStock && hasNoExistingBills && isBillableItem;
+  })();
 
   const getButtonText = () => {
     if (hasPendingPayment) {
