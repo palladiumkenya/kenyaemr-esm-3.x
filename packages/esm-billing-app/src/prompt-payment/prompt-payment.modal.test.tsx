@@ -78,6 +78,10 @@ const mockMappedBill = [
     display: 'Bill #BILL-001',
     referenceCodes: 'REF-001',
     adjustmentReason: undefined,
+    balance: 50.0,
+    totalPayments: 50.0,
+    totalDeposits: 50.0,
+    totalExempted: 50.0,
   },
 ];
 
