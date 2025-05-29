@@ -49,12 +49,7 @@ export const checkPaymentMethodExclusion = (currentVisit: Visit | null, excluded
 };
 
 const calculateBillBalance = (bills: Array<MappedBill>): number => {
-  const flattenBills = bills.flatMap((bill) => bill.lineItems.filter((item) => item.paymentStatus !== 'EXEMPTED'));
-
-  const totalBill = flattenBills.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
-  const totalPayments = bills.flatMap((bill) => bill.payments).reduce((acc, curr) => acc + curr.amountTendered, 0);
-
-  return totalBill - totalPayments;
+  return bills.reduce((acc, curr) => acc + curr.balance, 0);
 };
 
 /**

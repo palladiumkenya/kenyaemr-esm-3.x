@@ -23,18 +23,14 @@ import { useBill, useDefaultFacility } from '../billing.resource';
 import { spaBasePath } from '../constants';
 import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
-import { LineItem } from '../types';
+import { LineItem, MappedBill } from '../types';
 import InvoiceTable from './invoice-table.component';
 import { removeQueuedPatient, useShaFacilityStatus, useVisitQueueEntry } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import ReceiptPrintButton from './print-bill-receipt/receipt-print-button.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
-
-interface InvoiceDetailsProps {
-  label: string;
-  value: string | number;
-}
+import capitalize from 'lodash-es/capitalize';
 
 const Invoice: React.FC = () => {
   const { t } = useTranslation();
@@ -99,14 +95,6 @@ const Invoice: React.FC = () => {
     setSelectedLineItems(paidLineItems);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bill?.lineItems?.length]);
-
-  const invoiceDetails = {
-    'Total Amount': convertToCurrency(bill?.totalAmount),
-    'Amount Tendered': convertToCurrency(bill?.tenderedAmount),
-    'Invoice Number': bill.receiptNumber,
-    'Date And Time': formatDatetime(parseDate(bill.dateCreated), { mode: 'standard', noToday: true }),
-    'Invoice Status': bill?.status,
-  };
 
   if (isLoadingPatient || isLoadingBill || isVisitLoading) {
     return (
@@ -197,13 +185,7 @@ const Invoice: React.FC = () => {
   return (
     <div className={styles.invoiceContainer}>
       {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
-      <div className={styles.detailsContainer}>
-        <section className={styles.details}>
-          {Object.entries(invoiceDetails).map(([key, val]) => (
-            <InvoiceDetails key={key} label={key} value={val} />
-          ))}
-        </section>
-      </div>
+      <InvoiceSummary bill={bill} />
       <div className={styles.actionArea}>
         <ReceiptPrintButton bill={bill} />
         <Button
@@ -256,10 +238,50 @@ const Invoice: React.FC = () => {
   );
 };
 
-function InvoiceDetails({ label, value }: InvoiceDetailsProps) {
+function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
+  const { t } = useTranslation();
   return (
-    <div>
-      <h1 className={styles.label}>{label}</h1>
+    <>
+      <div className={styles.invoiceSummary}>
+        <span className={styles.invoiceSummaryTitle}>{t('invoiceSummary', 'Invoice Summary')}</span>
+      </div>
+      <div className={styles.invoiceSummaryContainer}>
+        <div className={styles.invoiceCard}>
+          <InvoiceSummaryItem label={t('invoiceNumber', 'Invoice Number')} value={bill.receiptNumber} />
+          <InvoiceSummaryItem
+            label={t('dateAndTime', 'Date And Time')}
+            value={formatDatetime(parseDate(bill.dateCreated), { mode: 'standard', noToday: true })}
+          />
+          <InvoiceSummaryItem label={t('invoiceStatus', 'Invoice Status')} value={bill?.status} />
+          <InvoiceSummaryItem label={t('cashPoint', 'Cash Point')} value={bill?.cashPointName} />
+          <InvoiceSummaryItem label={t('cashier', 'Cashier')} value={capitalize(bill?.cashier?.display)} />
+        </div>
+        <div className={styles.divider} />
+        <div className={styles.invoiceCard}>
+          <InvoiceSummaryItem label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill?.totalAmount)} />
+          <InvoiceSummaryItem
+            label={t('totalExempted', 'Total Exempted')}
+            value={convertToCurrency(bill?.totalExempted)}
+          />
+          <InvoiceSummaryItem
+            label={t('totalPayments', 'Total Payments')}
+            value={convertToCurrency(bill?.totalPayments)}
+          />
+          <InvoiceSummaryItem
+            label={t('totalDeposits', 'Total Deposits')}
+            value={convertToCurrency(bill?.totalDeposits)}
+          />
+          <InvoiceSummaryItem label={t('balance', 'Balance')} value={convertToCurrency(bill?.balance)} />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function InvoiceSummaryItem({ label, value }: { readonly label: string; readonly value: string | number }) {
+  return (
+    <div className={styles.invoiceSummaryItem}>
+      <span className={styles.label}>{label}</span>
       <span className={styles.value}>{value}</span>
     </div>
   );
