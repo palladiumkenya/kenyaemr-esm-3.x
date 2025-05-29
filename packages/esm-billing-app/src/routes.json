@@ -17,14 +17,6 @@
   ],
   "extensions": [
     {
-      "component": "billingDashboardLink",
-      "name": "billing-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "slot": "billing-dashboard-slot"
-      }
-    },
-    {
       "component": "benefitsPackageDashboardLink",
       "name": "benefits-package-dashboard-link",
       "slot": "patient-chart-dashboard-slot",
