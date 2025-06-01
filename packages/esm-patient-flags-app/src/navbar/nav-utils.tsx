@@ -62,12 +62,6 @@ export const useModuleLinks = () => {
       privilege: 'o3: View Form Builder Dashboard',
     },
     {
-      label: 'Legacy Admin ',
-      url: `/openmrs/index.htm`,
-      icon: <User size={24} />,
-      privilege: 'coreapps.systemAdministration',
-    },
-    {
       label: 'Manage Stocks ',
       url: `${openmrsSpaBase}stock-management`,
       icon: <Report size={24} />,

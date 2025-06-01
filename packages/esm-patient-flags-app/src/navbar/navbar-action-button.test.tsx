@@ -26,7 +26,6 @@ describe('Navbar Action Button', () => {
       'Facility Dashboard',
       'Clear Cache',
       'Form Builder',
-      'Legacy Admin',
       'Manage Stocks',
     ];
     kenyaemrLinks.forEach((link) => {
