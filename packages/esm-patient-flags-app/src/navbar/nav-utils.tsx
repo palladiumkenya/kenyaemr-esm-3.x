@@ -101,7 +101,7 @@ export const useModuleLinks = () => {
       label: 'Administration',
       url: `${openmrsSpaBase}admin`,
       icon: <User size={24} />,
-      privilage: 'o3: View Administration Dashboard',
+      privilege: 'o3: View Administration Dashboard',
     },
     {
       label: 'Cross Border',
