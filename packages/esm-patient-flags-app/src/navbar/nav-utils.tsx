@@ -42,7 +42,7 @@ export const useModuleLinks = () => {
       label: 'KenyaEMR Home',
       url: `/openmrs/kenyaemr/userHome.page?`,
       icon: <Home size={24} />,
-      privilege: 'coreapps.systemAdministration',
+      privilege: 'o3: View KenyaEMR 2x Home Page',
     },
     {
       label: 'Facility Dashboard ',
