@@ -145,8 +145,8 @@ const usePerson = (uuid: string) => {
 
 export default usePerson;
 
-export const createPersonAttribute = (payload: any, providerUuid: string) => {
-  const url = `${restBaseUrl}/person/${providerUuid}/attribute`;
+export const createPersonAttribute = (payload: any, personUuid: string) => {
+  const url = `${restBaseUrl}/person/${personUuid}/attribute`;
   return openmrsFetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -156,8 +156,8 @@ export const createPersonAttribute = (payload: any, providerUuid: string) => {
   });
 };
 
-export const updatePersonAttributes = (payload: any, providerUuid: string, attributeUuid: string) => {
-  const url = `${restBaseUrl}/person/${providerUuid}/attribute/${attributeUuid}`;
+export const updatePersonAttributes = (payload: any, personUuid: string, attributeUuid: string) => {
+  const url = `${restBaseUrl}/person/${personUuid}/attribute/${attributeUuid}`;
   return openmrsFetch(url, {
     method: 'POST',
     body: JSON.stringify(payload),
