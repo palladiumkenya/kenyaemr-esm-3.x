@@ -346,6 +346,12 @@
       "type": "form"
     },
     {
+      "name": "contact-list-update-form",
+      "component": "contactListUpdateForm",
+      "title": "Contact List Update Form",
+      "type": "form"
+    },
+    {
       "name": "other-relationship-form",
       "component": "otherRelationshipsForm",
       "title": "Other Relationships Form",

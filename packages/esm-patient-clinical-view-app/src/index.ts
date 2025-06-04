@@ -55,6 +55,7 @@ import DeceasedDetailsView from './deceased-panel/tabs/tabs.component';
 import DeceasedPanelDashboardLink from './deceased-panel/dashboard-link/dashboard-link.component';
 import EndRelationshipWorkspace from './case-management/workspace/case-management-workspace.component';
 import Partograph from './maternal-and-child-health/partography/partograph.component';
+import ContactListUpdateForm from './contact-list/forms/contact-list-update.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -109,6 +110,7 @@ export const contactList = getSyncLifecycle(ContactList, options);
 export const contactListLink = getSyncLifecycle(createDashboardLink(contactListDashboardMeta), options);
 export const contactListForm = getSyncLifecycle(ContactListForm, options);
 export const birthDateCalculator = getSyncLifecycle(BirthDateCalculator, options);
+export const contactListUpdateForm = getSyncLifecycle(ContactListUpdateForm, options);
 
 // Peer Clendar
 export const peerCalendar = getSyncLifecycle(PeerCalendar, options);
