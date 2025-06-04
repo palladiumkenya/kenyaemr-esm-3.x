@@ -145,6 +145,34 @@ const RelationshipBaselineInfoFormSection = () => {
 
   return (
     <>
+      <Column>
+        <Controller
+          control={form.control}
+          name="livingWithClient"
+          render={({ field, fieldState: { error } }) => (
+            <>
+              {isLoading ? (
+                <SelectSkeleton />
+              ) : (
+                <Dropdown
+                  ref={field.ref}
+                  invalid={!!error?.message}
+                  invalidText={error?.message}
+                  id="livingWithClient"
+                  titleText={t('livingWithClient', 'Living with client')}
+                  onChange={(e: { selectedItem: string }) => {
+                    field.onChange(e.selectedItem);
+                  }}
+                  selectedItem={field.value}
+                  label="Select"
+                  items={contactLivingWithPatient.map((r) => r.value)}
+                  itemToString={(item: string) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
+                />
+              )}
+            </>
+          )}
+        />
+      </Column>
       {showIPVRelatedFields && (
         <>
           <span className={styles.sectionHeader}>{t('ipvQuestions', 'IPV Questions')}</span>
@@ -241,34 +269,7 @@ const RelationshipBaselineInfoFormSection = () => {
           </Column>
         </>
       )}
-      <Column>
-        <Controller
-          control={form.control}
-          name="livingWithClient"
-          render={({ field, fieldState: { error } }) => (
-            <>
-              {isLoading ? (
-                <SelectSkeleton />
-              ) : (
-                <Dropdown
-                  ref={field.ref}
-                  invalid={!!error?.message}
-                  invalidText={error?.message}
-                  id="livingWithClient"
-                  titleText={t('livingWithClient', 'Living with client')}
-                  onChange={(e: { selectedItem: string }) => {
-                    field.onChange(e.selectedItem);
-                  }}
-                  selectedItem={field.value}
-                  label="Select"
-                  items={contactLivingWithPatient.map((r) => r.value)}
-                  itemToString={(item: string) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            </>
-          )}
-        />
-      </Column>
+
       <span className={styles.sectionHeader}>{t('baselineInformation', 'Baseline Information')}</span>
       <Column>
         <Controller
