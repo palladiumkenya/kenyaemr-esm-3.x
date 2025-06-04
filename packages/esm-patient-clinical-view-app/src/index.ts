@@ -49,7 +49,6 @@ import { inPatientMeta } from './in-patient/in-patient.meta';
 import PeerCalendar from './peer-calendar/peer-calendar.component';
 import PeerForm from './peer-calendar/forms/peer-form.workspace';
 import FormEntryWorkspace from './peer-calendar/forms/form-entry.workspace';
-import RelationshipUpdateForm from './relationships/forms/relationships-update-form.workspace';
 import DeleteRelationshipConfirmDialog from './relationships/modals/delete-relationship-dialog.modal';
 import DeceasedDetailsView from './deceased-panel/tabs/tabs.component';
 import DeceasedPanelDashboardLink from './deceased-panel/dashboard-link/dashboard-link.component';
@@ -102,7 +101,6 @@ export const otherRelationshipsLink = getSyncLifecycle(createDashboardLink(other
 // Relationships links for Family History and the corresponding view in the patient chart
 export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
 export const relationships = getSyncLifecycle(Relationships, options);
-export const relationshipUpdateForm = getSyncLifecycle(RelationshipUpdateForm, options);
 export const relationshipDeleteConfirmialog = getSyncLifecycle(DeleteRelationshipConfirmDialog, options);
 
 // Contacts
