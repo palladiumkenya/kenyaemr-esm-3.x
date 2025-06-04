@@ -528,7 +528,7 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                     field.onChange(e.selectedItem);
                   }}
                   selectedItem={field.value}
-                  className={styles.preferedPNSAproach}
+                  className={styles.preferredPnsApproach}
                   label="Select Approach"
                   items={pnsAproach.map((r) => r.value)}
                   itemToString={(item: string) => pnsAproach.find((r) => r.value === item)?.label ?? ''}

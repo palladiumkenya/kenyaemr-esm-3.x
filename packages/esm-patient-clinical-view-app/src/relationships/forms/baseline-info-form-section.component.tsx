@@ -23,8 +23,16 @@ import useRelativeHTSEncounter from '../../hooks/useRelativeHTSEncounter';
 
 const RelationshipBaselineInfoFormSection = () => {
   const form = useFormContext<z.infer<typeof relationshipFormSchema>>();
-  const { enrollment, error } = useRelativeHivEnrollment(form.watch('personB'));
-  const { encounters, isLoading: encounterLoading } = useRelativeHTSEncounter(form.watch('personB'));
+  const {
+    enrollment,
+    isLoading: enrollmentLoading,
+    error: enrollmentError,
+  } = useRelativeHivEnrollment(form.watch('personB'));
+  const {
+    encounters,
+    isLoading: encounterLoading,
+    error: encounterError,
+  } = useRelativeHTSEncounter(form.watch('personB'));
   const hivStatusPersonB = getHivStatusBasedOnEnrollmentAndHTSEncounters(encounters, enrollment);
 
   const { t } = useTranslation();
@@ -151,7 +159,7 @@ const RelationshipBaselineInfoFormSection = () => {
           name="livingWithClient"
           render={({ field, fieldState: { error } }) => (
             <>
-              {isLoading ? (
+              {isLoading || encounterLoading || enrollmentLoading ? (
                 <SelectSkeleton />
               ) : (
                 <Dropdown
@@ -243,7 +251,7 @@ const RelationshipBaselineInfoFormSection = () => {
               name="ipvOutCome"
               render={({ field, fieldState: { error } }) => (
                 <>
-                  {isLoading ? (
+                  {isLoading || encounterLoading || enrollmentLoading ? (
                     <SelectSkeleton />
                   ) : (
                     <Dropdown
@@ -277,7 +285,7 @@ const RelationshipBaselineInfoFormSection = () => {
           name="baselineStatus"
           render={({ field, fieldState: { error } }) => (
             <>
-              {isLoading ? (
+              {isLoading || encounterLoading || enrollmentLoading ? (
                 <SelectSkeleton />
               ) : (
                 <Dropdown
@@ -305,7 +313,7 @@ const RelationshipBaselineInfoFormSection = () => {
           name="preferedPNSAproach"
           render={({ field, fieldState: { error } }) => (
             <>
-              {isLoading ? (
+              {isLoading || encounterLoading || enrollmentLoading ? (
                 <SelectSkeleton />
               ) : (
                 <Dropdown
