@@ -340,12 +340,6 @@
       "canHide": true
     },
     {
-      "name": "relationship-update-form",
-      "component": "relationshipUpdateForm",
-      "title": "Relationship Update Form",
-      "type": "form"
-    },
-    {
       "name": "contact-list-update-form",
       "component": "contactListUpdateForm",
       "title": "Contact List Update Form",
