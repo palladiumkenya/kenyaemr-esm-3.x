@@ -38,6 +38,8 @@ import { deleteRelationship } from '../relationships/relationship.resources';
 import styles from './contact-list.scss';
 import ContactTracingHistory from './contact-tracing-history.component';
 import HIVStatus from './hiv-status.component';
+import { type Contact } from '../types';
+import { extractNameString, uppercaseText } from '../utils/expression-helper';
 
 interface ContactListProps {
   patientUuid: string;
@@ -129,12 +131,13 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
     });
   };
 
-  const handleEditRelationship = (relationShipUuid: string) => {
-    launchWorkspace('relationship-update-form', {
-      relationShipUuid,
+  const handleEditContactListUpdateForm = (relation: Contact) => {
+    launchWorkspace('contact-list-update-form', {
+      relation,
+      workspaceTitle: t('editContactList', 'Edit contact list'),
+      patientUuid,
     });
   };
-
   const tableRows =
     results?.map((relation) => {
       const patientUuid = relation.patientUuid;
@@ -146,7 +149,7 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
           <ConfigurableLink
             style={{ textDecoration: 'none' }}
             to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
-            {relation.name}
+            {extractNameString(uppercaseText(relation.name))}
           </ConfigurableLink>
         ),
         contactCreated: relation.personContactCreated ?? 'No',
@@ -163,7 +166,10 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
         actions: (
           <>
             <OverflowMenu size={size} flipped>
-              <OverflowMenuItem itemText={t('edit', 'Edit')} onClick={() => handleEditRelationship(relation.uuid)} />
+              <OverflowMenuItem
+                itemText={t('edit', 'Edit')}
+                onClick={() => handleEditContactListUpdateForm(relation)}
+              />
               <OverflowMenuItem
                 itemText={t('traceContact', 'Trace Contact')}
                 onClick={() => handleLaunchContactTracingForm(patientUuid)}
