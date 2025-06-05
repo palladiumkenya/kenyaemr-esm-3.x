@@ -255,3 +255,10 @@ export interface Visit {
   stopDatetime?: string;
   encounters;
 }
+
+export interface ContactAttributeData {
+  baselineStatus?: string;
+  preferedPNSAproach?: string;
+  livingWithClient?: string;
+  ipvOutCome?: string;
+}

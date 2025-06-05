@@ -6,7 +6,10 @@ import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { ConfigObject } from '../../config-schema';
 import { contactListConceptMap } from '../../contact-list/contact-list-concept-map';
-import { contactIPVOutcomeOptions } from '../../contact-list/contact-list.resource';
+import {
+  contactIPVOutcomeOptions,
+  getHivStatusBasedOnEnrollmentAndHTSEncounters,
+} from '../../contact-list/contact-list.resource';
 import usePersonAttributes from '../../hooks/usePersonAttributes';
 import { BOOLEAN_NO, BOOLEAN_YES, relationshipFormSchema } from '../relationship.resources';
 import {
@@ -15,9 +18,23 @@ import {
   PNS_APROACH_CONCEPT_UUID,
 } from '../relationships-constants';
 import styles from './form.scss';
+import useRelativeHivEnrollment from '../../hooks/useRelativeHivEnrollment';
+import useRelativeHTSEncounter from '../../hooks/useRelativeHTSEncounter';
 
 const RelationshipBaselineInfoFormSection = () => {
   const form = useFormContext<z.infer<typeof relationshipFormSchema>>();
+  const {
+    enrollment,
+    isLoading: enrollmentLoading,
+    error: enrollmentError,
+  } = useRelativeHivEnrollment(form.watch('personB'));
+  const {
+    encounters,
+    isLoading: encounterLoading,
+    error: encounterError,
+  } = useRelativeHTSEncounter(form.watch('personB'));
+  const hivStatusPersonB = getHivStatusBasedOnEnrollmentAndHTSEncounters(encounters, enrollment);
+
   const { t } = useTranslation();
   const personUuid = form.watch('personB');
   const config = useConfig<ConfigObject>();
@@ -82,12 +99,16 @@ const RelationshipBaselineInfoFormSection = () => {
 
   useEffect(() => {
     if (attributes.length) {
-      // HIV Status
       const hivStatusAttribute = attributes.find(
         (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus,
       );
       if (hivStatusAttribute) {
         const value = hivStatus.find((r) => r.value.startsWith(hivStatusAttribute.value))?.value;
+        if (value) {
+          setValue('baselineStatus', value);
+        }
+      } else if (hivStatusPersonB) {
+        const value = hivStatus.find((r) => r.label.toLowerCase().includes(hivStatusPersonB.toLowerCase()))?.value;
         if (value) {
           setValue('baselineStatus', value);
         }
@@ -122,11 +143,44 @@ const RelationshipBaselineInfoFormSection = () => {
           setValue('ipvOutCome', value as any);
         }
       }
+    } else if (hivStatusPersonB) {
+      const value = hivStatus.find((r) => r.label.toLowerCase().includes(hivStatusPersonB.toLowerCase()))?.value;
+      if (value) {
+        setValue('baselineStatus', value);
+      }
     }
-  }, [attributes, setValue, config, hivStatus, pnsAproach, contactLivingWithPatient]);
+  }, [attributes, setValue, config, hivStatus, pnsAproach, contactLivingWithPatient, hivStatusPersonB]);
 
   return (
     <>
+      <Column>
+        <Controller
+          control={form.control}
+          name="livingWithClient"
+          render={({ field, fieldState: { error } }) => (
+            <>
+              {isLoading || encounterLoading || enrollmentLoading ? (
+                <SelectSkeleton />
+              ) : (
+                <Dropdown
+                  ref={field.ref}
+                  invalid={!!error?.message}
+                  invalidText={error?.message}
+                  id="livingWithClient"
+                  titleText={t('livingWithClient', 'Living with client')}
+                  onChange={(e: { selectedItem: string }) => {
+                    field.onChange(e.selectedItem);
+                  }}
+                  selectedItem={field.value}
+                  label="Select"
+                  items={contactLivingWithPatient.map((r) => r.value)}
+                  itemToString={(item: string) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
+                />
+              )}
+            </>
+          )}
+        />
+      </Column>
       {showIPVRelatedFields && (
         <>
           <span className={styles.sectionHeader}>{t('ipvQuestions', 'IPV Questions')}</span>
@@ -197,7 +251,7 @@ const RelationshipBaselineInfoFormSection = () => {
               name="ipvOutCome"
               render={({ field, fieldState: { error } }) => (
                 <>
-                  {isLoading ? (
+                  {isLoading || encounterLoading || enrollmentLoading ? (
                     <SelectSkeleton />
                   ) : (
                     <Dropdown
@@ -223,34 +277,7 @@ const RelationshipBaselineInfoFormSection = () => {
           </Column>
         </>
       )}
-      <Column>
-        <Controller
-          control={form.control}
-          name="livingWithClient"
-          render={({ field, fieldState: { error } }) => (
-            <>
-              {isLoading ? (
-                <SelectSkeleton />
-              ) : (
-                <Dropdown
-                  ref={field.ref}
-                  invalid={!!error?.message}
-                  invalidText={error?.message}
-                  id="livingWithClient"
-                  titleText={t('livingWithClient', 'Living with client')}
-                  onChange={(e: { selectedItem: string }) => {
-                    field.onChange(e.selectedItem);
-                  }}
-                  selectedItem={field.value}
-                  label="Select"
-                  items={contactLivingWithPatient.map((r) => r.value)}
-                  itemToString={(item: string) => contactLivingWithPatient.find((r) => r.value === item)?.label ?? ''}
-                />
-              )}
-            </>
-          )}
-        />
-      </Column>
+
       <span className={styles.sectionHeader}>{t('baselineInformation', 'Baseline Information')}</span>
       <Column>
         <Controller
@@ -258,7 +285,7 @@ const RelationshipBaselineInfoFormSection = () => {
           name="baselineStatus"
           render={({ field, fieldState: { error } }) => (
             <>
-              {isLoading ? (
+              {isLoading || encounterLoading || enrollmentLoading ? (
                 <SelectSkeleton />
               ) : (
                 <Dropdown
@@ -286,7 +313,7 @@ const RelationshipBaselineInfoFormSection = () => {
           name="preferedPNSAproach"
           render={({ field, fieldState: { error } }) => (
             <>
-              {isLoading ? (
+              {isLoading || encounterLoading || enrollmentLoading ? (
                 <SelectSkeleton />
               ) : (
                 <Dropdown

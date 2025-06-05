@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -14,8 +14,10 @@ import {
   TableRow,
   Tile,
   Button,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
-import { Add, Edit, TrashCan } from '@carbon/react/icons';
+import { Add } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   ConfigurableLink,
@@ -31,6 +33,8 @@ import type { ConfigObject } from '../config-schema';
 import styles from './family-history.scss';
 import { deleteRelationship } from '../relationships/relationship.resources';
 import HIVStatus from '../contact-list/hiv-status.component';
+import { type Contact } from '../types';
+import { extractNameString, uppercaseText } from '../utils/expression-helper';
 
 interface FamilyHistoryProps {
   patientUuid: string;
@@ -42,6 +46,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
   const { concepts } = config;
   const layout = useLayoutType();
   const [pageSize, setPageSize] = useState(10);
+  const size = layout === 'tablet' ? 'lg' : 'md';
   const { relationships, error, isLoading, isValidating } = usePatientRelationships(patientUuid);
   const headerTitle = t('familyContacts', 'Family contacts');
   const { results, totalPages, currentPage, goTo } = usePagination(relationships, pageSize);
@@ -109,9 +114,11 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
       patientUuid,
     });
   };
-  const handleEditRelationship = (relationShipUuid: string) => {
-    launchWorkspace('relationship-update-form', {
-      relationShipUuid,
+  const handleEditRelationship = (relation: Contact) => {
+    launchWorkspace('contact-list-update-form', {
+      relation,
+      workspaceTitle: t('editContactList', 'Edit contact list'),
+      patientUuid,
     });
   };
 
@@ -126,7 +133,7 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
           <ConfigurableLink
             style={{ textDecoration: 'none' }}
             to={window.getOpenmrsSpaBase() + `patient/${relation.relativeUuid}/chart/Patient Summary`}>
-            {relation.name}
+            {extractNameString(uppercaseText(relation.name))}
           </ConfigurableLink>
         ),
         relation: relation?.relationshipType,
@@ -147,20 +154,10 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
 
         actions: (
           <>
-            <Button
-              renderIcon={Edit}
-              hasIconOnly
-              kind="ghost"
-              iconDescription="Edit"
-              onClick={() => handleEditRelationship(relation.uuid)}
-            />
-            <Button
-              renderIcon={TrashCan}
-              hasIconOnly
-              kind="ghost"
-              iconDescription="Delete"
-              onClick={() => deleteRelationship(relation.uuid)}
-            />
+            <OverflowMenu size={size} flipped>
+              <OverflowMenuItem itemText={t('edit', 'Edit')} onClick={() => handleEditRelationship(relation)} />
+              <OverflowMenuItem itemText={t('delete', 'Delete')} onClick={() => deleteRelationship(relation.uuid)} />
+            </OverflowMenu>
           </>
         ),
       };

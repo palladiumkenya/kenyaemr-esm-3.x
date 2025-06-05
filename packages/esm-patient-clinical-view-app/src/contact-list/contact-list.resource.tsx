@@ -1,10 +1,11 @@
-import { Session } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, Patient, restBaseUrl, Session, showSnackbar } from '@openmrs/esm-framework';
 import omit from 'lodash/omit';
 import { z } from 'zod';
 import { ConfigObject } from '../config-schema';
 import { BOOLEAN_YES, relationshipFormSchema, saveRelationship } from '../relationships/relationship.resources';
-import { Enrollment, HTSEncounter, Person } from '../types';
+import { type ContactAttributeData, Enrollment, HTSEncounter, type Person } from '../types';
 import { replaceAll } from '../utils/expression-helper';
+import useSWR, { mutate } from 'swr';
 
 export const ContactListFormSchema = relationshipFormSchema
   .refine(
@@ -132,4 +133,89 @@ export const saveContact = async (
         : []),
     ],
   );
+};
+
+const usePerson = (uuid: string) => {
+  const customRepresentation = `custom:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display)))`;
+  const url = `${restBaseUrl}/person/${uuid}?v=${customRepresentation}`;
+  const { isLoading, error, data } = useSWR<FetchResponse<Patient['person']>>(url, openmrsFetch);
+  const person = data?.data;
+  return { isLoading, error, person };
+};
+
+export default usePerson;
+
+export const createPersonAttribute = (payload: any, personUuid: string) => {
+  const url = `${restBaseUrl}/person/${personUuid}/attribute`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const updatePersonAttributes = (payload: any, personUuid: string, attributeUuid: string) => {
+  const url = `${restBaseUrl}/person/${personUuid}/attribute/${attributeUuid}`;
+  return openmrsFetch(url, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const updateContactAttributes = async (
+  personUuid: string,
+  attributeData: ContactAttributeData,
+  config: ConfigObject,
+  existingAttributes: Person['attributes'] = [],
+) => {
+  try {
+    const updatableAttributes = [
+      {
+        attributeType: config?.contactPersonAttributesUuid?.baselineHIVStatus,
+        value: replaceAll(attributeData?.baselineStatus, 'A', ''),
+      },
+      {
+        attributeType: config?.contactPersonAttributesUuid?.preferedPnsAproach,
+        value: replaceAll(attributeData?.preferedPNSAproach, 'A', ''),
+      },
+      {
+        attributeType: config?.contactPersonAttributesUuid?.livingWithContact,
+        value: replaceAll(attributeData?.livingWithClient, 'A', ''),
+      },
+      {
+        attributeType: config?.contactPersonAttributesUuid?.contactIPVOutcome,
+        value: attributeData?.ipvOutCome,
+      },
+    ].filter((attr) => attr?.value !== undefined && attr?.value !== null && attr?.value !== '');
+
+    await Promise.allSettled(
+      updatableAttributes?.map((attr) => {
+        const existingAttribute = existingAttributes?.find((at) => at?.attributeType?.uuid === attr?.attributeType);
+
+        const payload = {
+          attributeType: attr?.attributeType,
+          value: attr?.value,
+        };
+
+        if (!existingAttribute?.uuid) {
+          return createPersonAttribute(payload, personUuid);
+        }
+        return updatePersonAttributes(payload, personUuid, existingAttribute.uuid);
+      }),
+    );
+
+    mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/person`));
+  } catch (error) {
+    showSnackbar({
+      title: 'Error',
+      kind: 'error',
+      subtitle: 'Failed to update person attributes: ' + error?.message,
+    });
+    throw error;
+  }
 };
