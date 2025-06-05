@@ -19,7 +19,7 @@ jest.mock('react-to-print', () => {
 
   return {
     ...originalModule,
-    useReactToPrint: jest.fn(),
+    useReactToPrint: jest.fn().mockReturnValue(jest.fn()),
   };
 });
 

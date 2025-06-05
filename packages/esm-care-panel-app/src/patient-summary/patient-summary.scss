@@ -1,6 +1,7 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
+@use '@carbon/layout';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .bodyContainer {
@@ -53,13 +54,14 @@
 }
 
 .value {
-  @include type.type-style('productive-heading-03');
+  @include type.type-style('body-02');
   color: colors.$gray-100;
+  margin-top: spacing.$spacing-03;
 }
 
 .label {
-  @include type.type-style('label-01');
-  color: $text-02;
+  @include type.type-style('label-02');
+  color: colors.$gray-70;
 }
 
 .container {
@@ -67,12 +69,18 @@
   flex-direction: row;
   padding-left: 1rem;
   flex-wrap: wrap;
+  width: 100%;
+  justify-content: flex-start;
+  gap: layout.$spacing-04;
 }
 
 .content {
-  margin-top: spacing.$spacing-05;
-  width: 30%;
-  margin-left: spacing.$spacing-03;
+  display: flex;
+  flex-direction: column;
+  gap: spacing.$spacing-01;
+  width: calc(33.333% - layout.$spacing-04);
+  min-width: 0;
+  margin-top: spacing.$spacing-03;
 }
 
 .btnHidden {
@@ -81,4 +89,11 @@
 
 .btnShow {
   visibility: visible;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 1rem 0;
+  width: 100%;
 }
