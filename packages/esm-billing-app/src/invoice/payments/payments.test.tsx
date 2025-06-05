@@ -6,6 +6,8 @@ import { mockBill, mockedActiveSheet, mockLineItems, mockPaymentModes } from '..
 import { processBillPayment, usePaymentModes } from '../../billing.resource';
 import { useClockInStatus } from '../../payment-points/use-clock-in-status';
 import Payments from './payments.component';
+import { LineItem, PaymentMethod } from '../../types';
+
 const mockProcessBillPayment = processBillPayment as jest.MockedFunction<typeof processBillPayment>;
 const mockUsePaymentModes = usePaymentModes as jest.MockedFunction<typeof usePaymentModes>;
 const mockShowSnackbar = showSnackbar as jest.MockedFunction<typeof showSnackbar>;
@@ -17,6 +19,37 @@ jest.mock('../../billing.resource', () => ({
 
 jest.mock('../../payment-points/use-clock-in-status');
 const mockedUseClockInStatus = useClockInStatus as jest.Mock;
+
+// Update mockPaymentModes to include all required properties
+const updatedMockPaymentModes: PaymentMethod[] = mockPaymentModes.map((mode) => ({
+  ...mode,
+  retireReason: null,
+  auditInfo: {
+    dateCreated: '2024-01-01',
+    creator: {
+      uuid: 'user-1',
+      display: 'Test User',
+      links: [{ rel: 'self', uri: '/ws/rest/v1/user/user-1', resourceAlias: 'user' }],
+    },
+    dateChanged: null,
+    changedBy: null,
+  },
+  sortOrder: null,
+  resourceVersion: '1.8',
+}));
+
+// Update mockLineItems to include all required properties
+const updatedMockLineItems: LineItem[] = mockLineItems.map((item) => ({
+  ...item,
+  itemOrServiceConceptUuid: 'concept-uuid-1',
+  serviceTypeUuid: 'servicetype-uuid-1',
+  order: {
+    uuid: 'order-uuid-1',
+    display: item.billableService.split(':')[1],
+    links: [],
+    type: 'testorder',
+  },
+}));
 
 describe('Payment', () => {
   test('should display error when posting payment fails', async () => {
@@ -33,7 +66,7 @@ describe('Payment', () => {
     };
     mockProcessBillPayment.mockRejectedValueOnce(mockFieldErrorResponse);
     mockUsePaymentModes.mockReturnValue({
-      paymentModes: mockPaymentModes,
+      paymentModes: updatedMockPaymentModes,
       isLoading: false,
       error: null,
       mutate: jest.fn(),
@@ -48,7 +81,7 @@ describe('Payment', () => {
       isClockedInCurrentPaymentPoint: false,
     });
 
-    render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
+    render(<Payments bill={mockBill as any} selectedLineItems={updatedMockLineItems} />);
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
     await user.click(screen.getByRole('combobox', { name: /Payment method/i }));
@@ -72,8 +105,13 @@ describe('Payment', () => {
             display: 'BillLineItem',
             item: 'c15d25b9-12bb-441d-9241-cae541dd4575',
             lineItemOrder: 0,
-            order: null,
-            paymentStatus: 'PAID',
+            order: {
+              uuid: 'order-uuid-1',
+              display: 'Medical Certificate',
+              links: [],
+              type: 'testorder',
+            },
+            paymentStatus: 'PENDING',
             price: 500,
             priceName: 'Default',
             priceUuid: '',
@@ -82,14 +120,21 @@ describe('Payment', () => {
             uuid: '314c25fd-2c90-4a7f-9f98-c99cd3f153e8',
             voidReason: null,
             voided: false,
+            itemOrServiceConceptUuid: 'concept-uuid-1',
+            serviceTypeUuid: 'servicetype-uuid-1',
           },
           {
             billableService: '04be5832-5440-44d0-83d2-5c0dfd0ac7de',
             display: 'BillLineItem',
             item: '04be5832-5440-44d0-83d2-5c0dfd0ac7de',
             lineItemOrder: 1,
-            order: null,
-            paymentStatus: 'PAID',
+            order: {
+              uuid: 'order-uuid-1',
+              display: 'Registration New',
+              links: [],
+              type: 'testorder',
+            },
+            paymentStatus: 'PENDING',
             price: 100,
             priceName: 'Default',
             priceUuid: '',
@@ -98,14 +143,21 @@ describe('Payment', () => {
             uuid: '60365e7e-d29e-4f13-b64b-9aecb5d36031',
             voidReason: null,
             voided: false,
+            itemOrServiceConceptUuid: 'concept-uuid-1',
+            serviceTypeUuid: 'servicetype-uuid-1',
           },
           {
             billableService: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
             display: 'BillLineItem',
             item: '3f5d0684-a280-477e-a67b-2a956a1f6dca',
             lineItemOrder: 2,
-            order: null,
-            paymentStatus: 'PAID',
+            order: {
+              uuid: 'order-uuid-1',
+              display: 'Registration Revist',
+              links: [],
+              type: 'testorder',
+            },
+            paymentStatus: 'PENDING',
             price: 50,
             priceName: 'Default',
             priceUuid: '',
@@ -114,6 +166,8 @@ describe('Payment', () => {
             uuid: '006ee634-f1cf-4552-b751-f721679527af',
             voidReason: null,
             voided: false,
+            itemOrServiceConceptUuid: 'concept-uuid-1',
+            serviceTypeUuid: 'servicetype-uuid-1',
           },
           {
             billableService: 'Hemoglobin',
@@ -153,12 +207,12 @@ describe('Payment', () => {
   test('should automatically focus on the payment method field when user clicks add payment options', async () => {
     const user = userEvent.setup();
     mockUsePaymentModes.mockReturnValue({
-      paymentModes: mockPaymentModes,
+      paymentModes: updatedMockPaymentModes,
       isLoading: false,
       error: null,
       mutate: jest.fn(),
     });
-    render(<Payments bill={mockBill as any} selectedLineItems={mockLineItems} />);
+    render(<Payments bill={mockBill as any} selectedLineItems={updatedMockLineItems} />);
     const addPaymentMethod = screen.getByRole('button', { name: /Add payment option/i });
     await user.click(addPaymentMethod);
 

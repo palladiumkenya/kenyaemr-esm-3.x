@@ -22,6 +22,10 @@ export interface MappedBill {
   display?: string;
   referenceCodes?: string;
   adjustmentReason?: string;
+  totalPayments?: number;
+  totalDeposits?: number;
+  totalExempted?: number;
+  balance?: number;
 }
 
 interface LocationLink {
@@ -137,6 +141,10 @@ export interface PatientInvoice {
   adjustmentReason: any;
   id: number;
   resourceVersion: string;
+  totalPayments?: number;
+  totalDeposits?: number;
+  totalExempted?: number;
+  balance?: number;
 }
 
 export interface PatientDetails {

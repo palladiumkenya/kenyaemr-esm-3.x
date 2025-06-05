@@ -42,8 +42,8 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   });
 
   const totalWaivedAmount = computeWaivedAmount(bill);
-  const totalAmountTendered = formValues?.reduce((curr: number, prev) => curr + Number(prev.amount), 0) ?? 0;
-  const amountDue = Number(bill.totalAmount) - (Number(bill.tenderedAmount) + Number(totalAmountTendered));
+  const totalAmountTendered = formValues?.reduce((curr: number, prev) => Number(prev.amount) + curr, 0) ?? 0;
+  const amountDue = bill.balance - totalAmountTendered;
 
   // selected line items amount due
   const selectedLineItemsAmountDue =
@@ -148,6 +148,10 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
         <div className={styles.divider} />
         <div className={styles.paymentTotals}>
           <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill.totalAmount)} />
+          <InvoiceBreakDown
+            label={t('totalDeposits', 'Total Deposits')}
+            value={convertToCurrency(bill.totalDeposits)}
+          />
           <InvoiceBreakDown
             label={t('totalTendered', 'Total Tendered')}
             value={convertToCurrency(bill.tenderedAmount + totalAmountTendered)}
