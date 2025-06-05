@@ -73,17 +73,17 @@ const Invoice: React.FC = () => {
   };
 
   const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
+    contentRef: componentRef,
     documentTitle: `Invoice ${bill?.receiptNumber} - ${patient?.name?.[0]?.given?.join(' ')} ${
       patient?.name?.[0].family
     }`,
-    onBeforePrint() {
+    onBeforePrint: async () => {
       setIsPrinting(true);
+      return Promise.resolve();
     },
     onAfterPrint() {
       setIsPrinting(false);
     },
-    removeAfterPrint: true,
   });
 
   const handleBillPayment = () => {

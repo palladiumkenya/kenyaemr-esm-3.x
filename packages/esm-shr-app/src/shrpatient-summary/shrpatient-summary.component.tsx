@@ -24,8 +24,11 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
   const isTablet = useLayoutType() == 'tablet';
 
   const printRef = useReactToPrint({
-    content: () => componentRef.current,
-    onBeforeGetContent: () => setPrintMode(true),
+    contentRef: componentRef,
+    onBeforePrint: async () => {
+      setPrintMode(true);
+      return Promise.resolve();
+    },
     onAfterPrint: () => setPrintMode(false),
     pageStyle: styles.pageStyle,
     documentTitle: 'Shared Health Records',
