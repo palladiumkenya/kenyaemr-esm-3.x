@@ -1,5 +1,5 @@
-import { openmrsFetch, restBaseUrl, Session, showModal, showSnackbar } from '@openmrs/esm-framework';
-import { mutate } from 'swr';
+import { FetchResponse, openmrsFetch, restBaseUrl, Session, showModal, showSnackbar } from '@openmrs/esm-framework';
+import useSWR, { mutate } from 'swr';
 import { z } from 'zod';
 import { Patient } from '../types';
 import { ConfigObject } from '../config-schema';
@@ -229,4 +229,18 @@ export const saveRelationship = async (
     showSnackbar({ title: 'Error saving relationship', kind: 'error', subtitle: error?.message });
     throw error;
   }
+};
+
+export const usePatientBirthdate = (patientUuid?: string) => {
+  const customRep = 'custom:(person:(birthdate))';
+  const url = `${restBaseUrl}/patient/${patientUuid}?v=${customRep}`;
+  const { data, error, isLoading } = useSWR<FetchResponse<{ person: { birthdate: string } }>>(
+    patientUuid ? url : null,
+    openmrsFetch,
+  );
+  return {
+    isLoading,
+    error,
+    birthdate: data?.data?.person?.birthdate,
+  };
 };

@@ -1,5 +1,5 @@
 import { Column, Dropdown, RadioButton, RadioButtonGroup, SelectSkeleton } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { parseDate, useConfig, usePatient } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ import {
   getHivStatusBasedOnEnrollmentAndHTSEncounters,
 } from '../../contact-list/contact-list.resource';
 import usePersonAttributes from '../../hooks/usePersonAttributes';
-import { BOOLEAN_NO, BOOLEAN_YES, relationshipFormSchema } from '../relationship.resources';
+import { BOOLEAN_NO, BOOLEAN_YES, relationshipFormSchema, usePatientBirthdate } from '../relationship.resources';
 import {
   LIVING_WITH_PATIENT_CONCEPT_UUID,
   PARTNER_HIV_STATUS_CONCEPT_UUID,
@@ -40,16 +40,7 @@ const RelationshipBaselineInfoFormSection = () => {
   const config = useConfig<ConfigObject>();
   const { setValue } = form;
   const { attributes, isLoading } = usePersonAttributes(personUuid);
-
-  const hivStatus = useMemo(
-    () =>
-      Object.entries(contactListConceptMap[PARTNER_HIV_STATUS_CONCEPT_UUID].answers).map(([uuid, display]) => ({
-        label: display,
-        value: uuid,
-      })),
-    [],
-  );
-
+  const { isLoading: isPatientloading, birthdate } = usePatientBirthdate(personUuid);
   const pnsAproach = useMemo(
     () =>
       Object.entries(contactListConceptMap[PNS_APROACH_CONCEPT_UUID].answers).map(([uuid, display]) => ({
@@ -76,6 +67,35 @@ const RelationshipBaselineInfoFormSection = () => {
     config.relationshipTypesList.findIndex(
       (r) => r.uuid === observableRelationship && r.category.some((c) => c === 'sexual'),
     ) !== -1;
+  const mode = form.watch('mode');
+  const dobCreateMode = form.watch('personBInfo.birthdate');
+  const patientMonths = useMemo(() => {
+    let birthDate: Date | undefined;
+    if (mode === 'create' && dobCreateMode) {
+      birthDate = dobCreateMode;
+    } else if (mode === 'search') {
+      birthDate = birthdate ? parseDate(birthdate) : undefined;
+    }
+    if (birthDate) {
+      return Math.floor((new Date().getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
+    }
+  }, [mode, dobCreateMode, birthdate]);
+  const hivStatus = useMemo(
+    () =>
+      Object.entries(contactListConceptMap[PARTNER_HIV_STATUS_CONCEPT_UUID].answers).reduce((prev, [uuid, display]) => {
+        if (display === 'HIV exposed Infant' && (patientMonths === undefined || patientMonths > 24)) {
+          return prev;
+        }
+        return [
+          ...prev,
+          {
+            label: display,
+            value: uuid,
+          },
+        ];
+      }, []),
+    [patientMonths],
+  );
 
   useEffect(() => {
     if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes(BOOLEAN_YES)) {
@@ -285,7 +305,7 @@ const RelationshipBaselineInfoFormSection = () => {
           name="baselineStatus"
           render={({ field, fieldState: { error } }) => (
             <>
-              {isLoading || encounterLoading || enrollmentLoading ? (
+              {isLoading || encounterLoading || enrollmentLoading || isPatientloading ? (
                 <SelectSkeleton />
               ) : (
                 <Dropdown

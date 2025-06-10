@@ -13,7 +13,7 @@ import {
   RadioButton,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, parseDate, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +30,7 @@ import {
   relationshipFormSchema,
   relationshipUpdateFormSchema,
   updateRelationship,
+  usePatientBirthdate,
 } from '../../relationships/relationship.resources';
 import { type Contact } from '../../types';
 import { ConfigObject } from '../../config-schema';
@@ -55,15 +56,6 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
   const config = useConfig<ConfigObject>();
 
   const { t } = useTranslation();
-
-  const hivStatus = useMemo(
-    () =>
-      Object.entries(contactListConceptMap[PARTNER_HIV_STATUS_CONCEPT_UUID].answers).map(([uuid, display]) => ({
-        label: display,
-        value: uuid,
-      })),
-    [],
-  );
 
   const pnsAproach = useMemo(
     () =>
@@ -110,6 +102,31 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
       ) !== -1
     );
   }, [observableRelationship, config.relationshipTypesList]);
+  const { isLoading: isPatientloading, birthdate } = usePatientBirthdate(relationship?.personB?.uuid);
+
+  const patientMonths = useMemo(() => {
+    let birthDate = birthdate ? parseDate(birthdate) : undefined;
+    if (birthDate) {
+      return Math.floor((new Date().getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 30.44));
+    }
+  }, [birthdate]);
+
+  const hivStatus = useMemo(
+    () =>
+      Object.entries(contactListConceptMap[PARTNER_HIV_STATUS_CONCEPT_UUID].answers).reduce((prev, [uuid, display]) => {
+        if (display === 'HIV exposed Infant' && (patientMonths === undefined || patientMonths > 24)) {
+          return prev;
+        }
+        return [
+          ...prev,
+          {
+            label: display,
+            value: uuid,
+          },
+        ];
+      }, []),
+    [patientMonths],
+  );
 
   useEffect(() => {
     if (relationship && relationshipTypes.length > 0) {
