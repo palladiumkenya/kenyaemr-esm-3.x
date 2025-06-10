@@ -2728,6 +2728,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@kenyaemr/esm-adr-app@workspace:packages/esm-adr-app":
+  version: 0.0.0-use.local
+  resolution: "@kenyaemr/esm-adr-app@workspace:packages/esm-adr-app"
+  dependencies:
+    lodash-es: "npm:^4.17.15"
+    react-to-print: "npm:^3.1.0"
+  peerDependencies:
+    "@carbon/react": 1.x
+    "@openmrs/esm-framework": 6.x
+    react: ^18.1.0
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    swr: 2.x
+  languageName: unknown
+  linkType: soft
+
 "@kenyaemr/esm-billing-app@workspace:packages/esm-billing-app":
   version: 0.0.0-use.local
   resolution: "@kenyaemr/esm-billing-app@workspace:packages/esm-billing-app"
