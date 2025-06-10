@@ -539,6 +539,7 @@ export interface shifIdentifiersResponse {
 export type FacilityClaim = {
   uuid: string;
   claimCode: string;
+  use: string;
   dateFrom: string;
   dateTo: string;
   claimedTotal: number;
@@ -606,6 +607,7 @@ export interface TableProps {
   emptyStateText: string;
   emptyStateHeader: string;
   includeClaimCode?: boolean;
+  use?: string;
 }
 
 export interface ProgressTracker {

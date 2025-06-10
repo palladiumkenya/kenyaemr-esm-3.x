@@ -259,6 +259,7 @@ const ClaimsManagementTable: React.FC = () => {
       emptyStateText="emptyClaimsState"
       emptyStateHeader="emptyClaimsHeader"
       includeClaimCode={true}
+      use="claim"
     />
   );
 };
