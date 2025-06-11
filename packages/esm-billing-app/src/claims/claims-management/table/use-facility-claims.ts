@@ -4,7 +4,7 @@ import { FacilityClaim } from '../../../types';
 
 export const useFacilityClaims = () => {
   const customPresentation =
-    'custom:(uuid,claimCode,dateFrom,dateTo,claimedTotal,approvedTotal,status,externalId,responseUUID,provider:(display),patient:(display))';
+    'custom:(uuid,claimCode,use,dateFrom,dateTo,claimedTotal,approvedTotal,status,externalId,responseUUID,provider:(display),patient:(display))';
   const url = `${restBaseUrl}/claim?v=${customPresentation}`;
 
   const { data, error, isLoading, mutate, isValidating } = useSWR<FetchResponse<{ results: Array<FacilityClaim> }>>(
