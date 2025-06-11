@@ -547,10 +547,12 @@ export type FacilityClaim = {
   status: 'REJECTED' | 'ENTERED' | 'CHECKED' | 'VALUATED' | 'ERRORED';
   provider: {
     display: string;
+    person?: { display?: string };
   } | null;
-  patient?: { display: string };
+  patient?: { display: string; uuid?: string };
   externalId: string;
   responseUUID: string;
+  insurer?: string;
 };
 export type BillingPromptType = 'patient-chart' | 'billing-orders';
 
