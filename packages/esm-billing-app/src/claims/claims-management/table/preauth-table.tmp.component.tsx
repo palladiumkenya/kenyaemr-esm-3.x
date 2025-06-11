@@ -8,6 +8,7 @@ const PreauthTableTemporary: React.FC = () => {
       emptyStateText="emptyPreauthState"
       emptyStateHeader="emptyPreauthHeader"
       includeClaimCode={false}
+      use="preauthorization"
     />
   );
 };

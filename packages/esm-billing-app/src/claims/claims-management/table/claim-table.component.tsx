@@ -39,7 +39,13 @@ const ClaimStatus = ({ row }: { row: DataTableRow }) => {
   );
 };
 
-const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHeader, includeClaimCode = false }) => {
+const ClaimsTable: React.FC<TableProps> = ({
+  title,
+  emptyStateText,
+  emptyStateHeader,
+  includeClaimCode = false,
+  use = 'claim',
+}) => {
   const { claims, isLoading } = useFacilityClaims();
   const { t } = useTranslation();
   const [filters, setFilters] = useState<ClaimsPreAuthFilter>({
@@ -60,6 +66,10 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
   );
 
   const [pageSize, setPageSize] = useState(5);
+
+  const claimsByUse = useMemo(() => {
+    return claims.filter((claim) => claim.use === use);
+  }, [claims, use]);
 
   const filterClaims = (claim: Claim) => {
     const status = filters?.status;
@@ -85,15 +95,15 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
     return statusMatch && searchMatch && dateMatch;
   };
 
-  const filteredClaims = claims.filter(filterClaims);
+  const filteredClaims = claimsByUse.filter(filterClaims);
   const { paginated, goTo, results, currentPage } = usePagination(filteredClaims, pageSize);
-  const { pageSizes } = usePaginationInfo(pageSize, claims.length, currentPage, results.length);
+  const { pageSizes } = usePaginationInfo(pageSize, claimsByUse.length, currentPage, results.length);
   const responsiveSize = isDesktop(useLayoutType()) ? 'sm' : 'lg';
   const layout = useLayoutType();
   const size = layout === 'tablet' ? 'lg' : 'md';
   const filteredClaimIds = filteredClaims.map((claim) => claim.responseUUID);
   const responseUUIDs = filteredClaimIds
-    .map((claimId) => claims.find((c) => c.responseUUID === claimId)?.responseUUID)
+    .map((claimId) => claimsByUse.find((c) => c.responseUUID === claimId)?.responseUUID)
     .filter((uuid) => uuid);
 
   const getHeaders = (): Header[] => {
@@ -131,7 +141,7 @@ const ClaimsTable: React.FC<TableProps> = ({ title, emptyStateText, emptyStateHe
     );
   }
 
-  if (claims.length === 0) {
+  if (claimsByUse.length === 0) {
     return (
       <div className={styles.claimsTable}>
         <EmptyState displayText={t(emptyStateText)} headerTitle={t(emptyStateHeader)} />
