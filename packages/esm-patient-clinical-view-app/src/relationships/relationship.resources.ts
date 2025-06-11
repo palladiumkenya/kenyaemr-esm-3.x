@@ -7,6 +7,8 @@ import omit from 'lodash/omit';
 
 export const BOOLEAN_YES = '1065';
 export const BOOLEAN_NO = '1066';
+export const HIV_EXPOSED_INFANT = 'HIV exposed infant';
+export const INFANT_AGE_THRESHOLD_IN_MONTHS = 24;
 
 export const relationshipUpdateFormSchema = z
   .object({

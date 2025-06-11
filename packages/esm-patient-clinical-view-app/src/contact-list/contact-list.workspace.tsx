@@ -1,6 +1,6 @@
 import { Button, ButtonSet, Column, DatePicker, DatePickerInput, Dropdown, Form, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, useConfig, useSession } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, parseDate, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,8 @@ import RelationshipBaselineInfoFormSection from '../relationships/forms/baseline
 import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
 import styles from './contact-list-form.scss';
 import { ContactListFormSchema, saveContact } from './contact-list.resource';
+import dayjs from 'dayjs';
+import { usePatientBirthdate } from '../relationships/relationship.resources';
 interface ContactListFormProps extends DefaultWorkspaceProps {
   patientUuid: string;
   props: any;
@@ -45,6 +47,21 @@ const ContactListForm: React.FC<ContactListFormProps> = ({ closeWorkspace, patie
         display: data!.find((r) => r.uuid === rel.uuid)?.display,
       }))
     : [];
+  const { isLoading: isPatientloading, birthdate } = usePatientBirthdate(personUuid);
+  const mode = form.watch('mode');
+  const dobCreateMode = form.watch('personBInfo.birthdate');
+  const patientAgeMonths = useMemo(() => {
+    let birthDate: Date | null = null;
+    if (mode === 'create') {
+      birthDate = dobCreateMode;
+    } else {
+      birthDate = birthdate ? parseDate(birthdate) : null;
+    }
+    if (birthDate) {
+      return dayjs().diff(birthDate, 'month');
+    }
+    return null;
+  }, [mode, dobCreateMode, birthdate]);
 
   const onSubmit = async (values: ContactListFormType) => {
     try {
@@ -133,7 +150,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({ closeWorkspace, patie
             />
           </Column>
 
-          <RelationshipBaselineInfoFormSection />
+          <RelationshipBaselineInfoFormSection patientAgeMonths={patientAgeMonths} patientUuid={personUuid} />
         </Stack>
 
         <ButtonSet className={styles.buttonSet}>
