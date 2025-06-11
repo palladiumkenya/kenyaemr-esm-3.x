@@ -5,18 +5,18 @@
 .invoiceBreakdown {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-items: flex-end;
+  align-items: flex-start;
   margin: layout.$spacing-02 0;
 }
 
 .label {
-  @include type.type-style('heading-03');
+  @include type.type-style('legal-02');
   color: colors.$gray-100;
-  text-align: end;
+  text-align: start;
 }
 
 .value {
-  @extend .label;
+  @include type.type-style('heading-01');
   font-weight: bold;
   margin-left: layout.$spacing-03;
   text-align: start;

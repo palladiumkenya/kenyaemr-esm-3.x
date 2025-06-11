@@ -31,18 +31,6 @@
   row-gap: 1.5rem;
 }
 
-.label {
-  @include type.type-style('body-compact-02');
-  color: colors.$gray-70;
-  margin: layout.$spacing-01;
-}
-
-.value {
-  @include type.type-style('heading-03');
-  display: inline-block;
-  margin-top: layout.$spacing-04;
-}
-
 .backButton {
   margin: layout.$spacing-04;
 
@@ -108,4 +96,46 @@
   & > button {
     max-height: 2rem;
   }
+}
+
+.invoiceSummaryContainer {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: layout.$spacing-05;
+  margin: 0 layout.$spacing-05 layout.$spacing-05 layout.$spacing-05;
+  background-color: colors.$white;
+  padding: layout.$spacing-05;
+
+  .divider {
+    width: 1px;
+    background-color: colors.$gray-20;
+    margin: 0 layout.$spacing-05;
+  }
+}
+
+.invoiceSummaryItem {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: layout.$spacing-05;
+  justify-content: center;
+
+  .label {
+    @include type.type-style('legal-02');
+    color: colors.$gray-70;
+  }
+
+  .value {
+    @include type.type-style('heading-01');
+    color: colors.$gray-70;
+  }
+}
+
+.invoiceSummaryTitle {
+  @include type.type-style('heading-01');
+  color: colors.$gray-70;
+  margin: layout.$spacing-05 layout.$spacing-05 0 layout.$spacing-05;
+  background-color: colors.$white;
+  display: block;
+  border-bottom: 1px solid colors.$gray-20;
+  padding: layout.$spacing-04;
 }
