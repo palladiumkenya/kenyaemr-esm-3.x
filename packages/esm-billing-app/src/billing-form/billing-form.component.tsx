@@ -129,7 +129,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
               {lineItemsOnservable.map(({ billableService, quantity, price }, index) => {
                 const service = billableServices.find((serv) => serv.uuid === billableService);
                 return (
-                  <TableRow>
+                  <TableRow key={billableService}>
                     <TableCell>{service?.name}</TableCell>
                     <TableCell>
                       <Controller
@@ -146,7 +146,6 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                             className="form-control"
                             id={billableService}
                             min={1}
-                            max={100}
                           />
                         )}
                       />
