@@ -270,7 +270,7 @@ export const billingFormSchema = z.object({
     .array(
       z.object({
         billableService: z.string().uuid(),
-        quantity: z.number({ coerce: true }).min(1).max(100),
+        quantity: z.number({ coerce: true }).min(1),
         price: z.number({ coerce: true }),
         priceName: z.string().optional().default('Default'),
         priceUuid: z.string().uuid(),

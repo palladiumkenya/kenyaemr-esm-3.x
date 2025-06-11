@@ -49,13 +49,13 @@ const Invoice: React.FC = () => {
   };
   usePaymentsReconciler(billUuid);
   const {
-    currentVisit,
+    activeVisit,
     isLoading: isVisitLoading,
     error: visitError,
     currentVisitIsRetrospective,
     mutate: mutateVisit,
   } = useVisit(patientUuid);
-  const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
+  const { queueEntry } = useVisitQueueEntry(patientUuid, activeVisit?.uuid);
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
@@ -143,7 +143,7 @@ const Invoice: React.FC = () => {
       const abortController = new AbortController();
 
       try {
-        const response = await updateVisit(currentVisit.uuid, endVisitPayload, abortController);
+        const response = await updateVisit(activeVisit?.uuid, endVisitPayload, abortController);
 
         if (queueEntry) {
           await removeQueuedPatient(
@@ -186,7 +186,7 @@ const Invoice: React.FC = () => {
       return;
     }
 
-    if (currentVisit) {
+    if (activeVisit) {
       await handleEndVisit();
       navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
     } else {
@@ -235,7 +235,7 @@ const Invoice: React.FC = () => {
             renderIcon={BaggageClaim}
             iconDescription="Add"
             tooltipPosition="bottom">
-            {currentVisit ? t('endVisitAndClaim', 'End visit and Process claims') : t('claim', 'Process claims')}
+            {activeVisit ? t('endVisitAndClaim', 'End visit and Process claims') : t('claim', 'Process claims')}
           </Button>
         )}
       </div>
