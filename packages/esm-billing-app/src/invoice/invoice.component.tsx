@@ -93,7 +93,7 @@ const Invoice: React.FC = () => {
     const retrospectiveVisitUrlSuffix = `/${retrospectiveVisitUuid}?v=${defaultVisitCustomRepresentation}`;
     const activeVisitUrl = `${restBaseUrl}/visit${activeVisitUrlSuffix}`;
     const retroVisitUrl = `${restBaseUrl}/visit${retrospectiveVisitUrlSuffix}`;
-    await mutate((key) => key.startsWith(activeVisitUrl) || key.startsWith(retroVisitUrl));
+    await mutate((key) => typeof key === 'string' && (key.startsWith(activeVisitUrl) || key.startsWith(retroVisitUrl)));
   };
 
   useEffect(() => {
