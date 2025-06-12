@@ -1,11 +1,12 @@
 import { Button, InlineLoading } from '@carbon/react';
 import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
 import {
+  defaultVisitCustomRepresentation,
   ExtensionSlot,
   formatDatetime,
   navigate,
   parseDate,
-  setCurrentVisit,
+  restBaseUrl,
   showModal,
   showSnackbar,
   showToast,
@@ -13,6 +14,7 @@ import {
   useFeatureFlag,
   usePatient,
   useVisit,
+  useVisitContextStore,
 } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import React, { useEffect, useRef, useState } from 'react';
@@ -25,12 +27,13 @@ import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
 import { LineItem, MappedBill } from '../types';
 import InvoiceTable from './invoice-table.component';
-import { removeQueuedPatient, useShaFacilityStatus, useVisitQueueEntry } from './invoice.resource';
+import { useShaFacilityStatus } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import ReceiptPrintButton from './print-bill-receipt/receipt-print-button.component';
 import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import capitalize from 'lodash-es/capitalize';
+import { mutate } from 'swr';
 
 const Invoice: React.FC = () => {
   const { t } = useTranslation();
@@ -44,14 +47,8 @@ const Invoice: React.FC = () => {
     return payments?.some((payment) => payment.instanceType.name === 'Insurance');
   };
   usePaymentsReconciler(billUuid);
-  const {
-    activeVisit,
-    isLoading: isVisitLoading,
-    error: visitError,
-    currentVisitIsRetrospective,
-    mutate: mutateVisit,
-  } = useVisit(patientUuid);
-  const { queueEntry } = useVisitQueueEntry(patientUuid, activeVisit?.uuid);
+  const { activeVisit, isLoading: isVisitLoading, error: visitError } = useVisit(patientUuid);
+  const { patientUuid: visitStorePatientUuid, manuallySetVisitUuid } = useVisitContextStore();
   const [selectedLineItems, setSelectedLineItems] = useState([]);
   const componentRef = useRef<HTMLDivElement>(null);
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
@@ -90,6 +87,15 @@ const Invoice: React.FC = () => {
     });
   };
 
+  const mutateClaimForm = async () => {
+    const activeVisitUrlSuffix = `?patient=${patientUuid}&v=${defaultVisitCustomRepresentation}&includeInactive=false`;
+    const retrospectiveVisitUuid = patientUuid && visitStorePatientUuid == patientUuid ? manuallySetVisitUuid : null;
+    const retrospectiveVisitUrlSuffix = `/${retrospectiveVisitUuid}?v=${defaultVisitCustomRepresentation}`;
+    const activeVisitUrl = `${restBaseUrl}/visit${activeVisitUrlSuffix}`;
+    const retroVisitUrl = `${restBaseUrl}/visit${retrospectiveVisitUrlSuffix}`;
+    await mutate((key) => key.startsWith(activeVisitUrl) || key.startsWith(retroVisitUrl));
+  };
+
   useEffect(() => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
     setSelectedLineItems(paidLineItems);
@@ -121,32 +127,19 @@ const Invoice: React.FC = () => {
   }
 
   const handleEndVisit = async () => {
-    if (currentVisitIsRetrospective) {
-      setCurrentVisit(null, null);
-    } else {
+    if (activeVisit) {
       const endVisitPayload = {
         stopDatetime: new Date(),
       };
 
       const abortController = new AbortController();
-
       try {
-        const response = await updateVisit(activeVisit?.uuid, endVisitPayload, abortController);
-
-        if (queueEntry) {
-          await removeQueuedPatient(
-            queueEntry.queue.uuid,
-            queueEntry.queueEntryUuid,
-            abortController,
-            new Date(response?.data?.stopDatetime ?? Date.now()),
-          );
-        }
-
-        mutateVisit();
+        await updateVisit(activeVisit.uuid, endVisitPayload, abortController);
+        await mutateClaimForm();
         showSnackbar({
           isLowContrast: true,
           kind: 'success',
-          subtitle: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+          subtitle: t('visitEndSuccessssfully', 'visit ended successfully'),
           title: t('visitEnded', 'Visit ended'),
         });
       } catch (error) {
@@ -154,7 +147,7 @@ const Invoice: React.FC = () => {
           title: t('errorEndingVisit', 'Error ending visit'),
           kind: 'error',
           isLowContrast: false,
-          subtitle: error?.message || 'An error occurred',
+          subtitle: error?.message,
         });
       }
     }
