@@ -24,6 +24,7 @@ const conceptIdNameMap = new Map([
   ['160551', 'Passive referral'],
   ['703', 'Positive'],
   ['664', 'Negative'],
+  ['166563', 'HIV exposed Infant'],
   ['1067', 'Unknown'],
   ['1066', 'No'],
   ['1065', 'Yes'],

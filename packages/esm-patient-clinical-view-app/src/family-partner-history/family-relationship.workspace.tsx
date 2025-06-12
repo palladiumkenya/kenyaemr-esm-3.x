@@ -1,6 +1,6 @@
 import { Button, ButtonSet, Column, ComboBox, DatePicker, DatePickerInput, Form, Stack } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useConfig, useSession } from '@openmrs/esm-framework';
+import { parseDate, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { Controller, FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -10,10 +10,11 @@ import { saveContact } from '../contact-list/contact-list.resource';
 import usePersonAttributes from '../hooks/usePersonAttributes';
 import RelationshipBaselineInfoFormSection from '../relationships/forms/baseline-info-form-section.component';
 import PatientSearchCreate from '../relationships/forms/patient-search-create-form';
-import { relationshipFormSchema } from '../relationships/relationship.resources';
+import { relationshipFormSchema, usePatientBirthdate } from '../relationships/relationship.resources';
 import { uppercaseText } from '../utils/expression-helper';
 import styles from './family-relationship.scss';
 import { useMappedRelationshipTypes } from './relationships.resource';
+import dayjs from 'dayjs';
 
 const schema = relationshipFormSchema
   .refine(
@@ -62,7 +63,21 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
   });
   const personUuid = form.watch('personB');
   const { attributes } = usePersonAttributes(personUuid);
-
+  const { isLoading: isPatientloading, birthdate } = usePatientBirthdate(personUuid);
+  const mode = form.watch('mode');
+  const dobCreateMode = form.watch('personBInfo.birthdate');
+  const patientAgeMonths = useMemo(() => {
+    let birthDate: Date | null = null;
+    if (mode === 'create') {
+      birthDate = dobCreateMode;
+    } else {
+      birthDate = birthdate ? parseDate(birthdate) : null;
+    }
+    if (birthDate) {
+      return dayjs().diff(birthDate, 'month');
+    }
+    return null;
+  }, [mode, dobCreateMode, birthdate]);
   const { control, handleSubmit } = form;
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
@@ -147,7 +162,7 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
               )}
             />
           </Column>
-          <RelationshipBaselineInfoFormSection />
+          <RelationshipBaselineInfoFormSection patientUuid={personUuid} patientAgeMonths={patientAgeMonths} />
         </Stack>
 
         <ButtonSet className={styles.buttonSet}>
