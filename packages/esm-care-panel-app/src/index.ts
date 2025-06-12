@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { dashboardMeta, hivPatientSummaryDashboardMeta } from './dashboard.meta';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
@@ -9,6 +9,8 @@ import regimenFormComponent from './regimen-editor/regimen-form.component';
 import CarePanelDashboard from './care-panel-dashboard/care-panel-dashboard.component';
 import PatientSummary from './patient-summary/patient-summary.component';
 import DispensingPatientVitals from './dispensing-patient-details/patient-vitals.component';
+import PatientDischargeSideRailIcon from './patient-discharge/discharge-workspace-siderail.component';
+import PatientDischargeWorkspace from './patient-discharge/patient-discharge.workspace';
 
 const moduleName = '@kenyaemr/esm-care-panel-app';
 
@@ -48,3 +50,9 @@ export const hivPatientSummary = getSyncLifecycle(PatientSummary, options);
 export const regimenFormWorkspace = getSyncLifecycle(regimenFormComponent, options);
 
 export const dispensingPaentientVitals = getSyncLifecycle(DispensingPatientVitals, options);
+
+export const patientDischargeSideRailIcon = getSyncLifecycle(PatientDischargeSideRailIcon, options);
+export const patientDischargeWorkspace = getAsyncLifecycle(
+  () => import('./patient-discharge/patient-discharge.workspace'),
+  options,
+);
