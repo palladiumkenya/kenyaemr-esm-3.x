@@ -22,6 +22,10 @@ export interface MappedBill {
   display?: string;
   referenceCodes?: string;
   adjustmentReason?: string;
+  totalPayments?: number;
+  totalDeposits?: number;
+  totalExempted?: number;
+  balance?: number;
 }
 
 interface LocationLink {
@@ -137,6 +141,10 @@ export interface PatientInvoice {
   adjustmentReason: any;
   id: number;
   resourceVersion: string;
+  totalPayments?: number;
+  totalDeposits?: number;
+  totalExempted?: number;
+  balance?: number;
 }
 
 export interface PatientDetails {
@@ -547,10 +555,12 @@ export type FacilityClaim = {
   status: 'REJECTED' | 'ENTERED' | 'CHECKED' | 'VALUATED' | 'ERRORED';
   provider: {
     display: string;
+    person?: { display?: string };
   } | null;
-  patient?: { display: string };
+  patient?: { display: string; uuid?: string };
   externalId: string;
   responseUUID: string;
+  insurer?: string;
 };
 export type BillingPromptType = 'patient-chart' | 'billing-orders';
 

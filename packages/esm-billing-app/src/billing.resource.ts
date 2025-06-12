@@ -59,6 +59,10 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
       .map((ref) => `${ref.paymentMode}: ${ref.value}`)
       .join(', '),
     adjustmentReason: bill?.adjustmentReason,
+    balance: bill?.balance,
+    totalPayments: bill?.totalPayments,
+    totalDeposits: bill?.totalDeposits,
+    totalExempted: bill?.totalExempted,
   };
 
   return mappedBill;
@@ -134,6 +138,10 @@ export const useBill = (billUuid: string) => {
       payments: bill?.payments,
       totalAmount: bill?.lineItems?.map((item) => item.price * item.quantity).reduce((prev, curr) => prev + curr, 0),
       tenderedAmount: bill?.payments?.map((item) => item.amountTendered).reduce((prev, curr) => prev + curr, 0),
+      totalPayments: bill?.totalPayments,
+      totalDeposits: bill?.totalDeposits,
+      totalExempted: bill?.totalExempted,
+      balance: bill?.balance,
     };
 
     return mappedBill;

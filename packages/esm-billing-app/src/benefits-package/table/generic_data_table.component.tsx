@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 type GenericDataTableProps = {
   headers: Array<{ key: string; header: string }>;
-  rows: Array<Record<string, any>>;
+  rows: any;
   title: string;
   renderActionComponent?: () => ReactNode;
 };
