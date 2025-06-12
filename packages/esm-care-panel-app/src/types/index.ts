@@ -1,3 +1,5 @@
+import { OpenmrsResource, Patient, Visit } from '@openmrs/esm-framework';
+
 type HIVData = {
   whoStage: number;
   whoStageDate: string;
@@ -244,4 +246,34 @@ export interface Enrollment {
     name: string;
     uuid: string;
   };
+}
+
+export type WardPatient = {
+  /**
+   * Taken either from the inpatientAdmission object, the inpatientRequest object
+   * or the admissionLocation object (which contains the bed)
+   */
+  patient: Patient;
+
+  /**
+   * Taken either from the inpatientAdmission object, the inpatientRequest object
+   * or the admissionLocation object (which contains the bed)
+   */
+  visit: Visit;
+
+  /**
+   * the bed assigned to the patient. This object is only set if the patient
+   * has a bed assigned
+   */
+  bed: Bed;
+};
+
+interface Bed {
+  id: number;
+  uuid: string;
+  bedNumber: string;
+  bedType: OpenmrsResource;
+  row: number;
+  column: number;
+  status: OpenmrsResource;
 }

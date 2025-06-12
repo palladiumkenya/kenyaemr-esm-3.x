@@ -58,6 +58,11 @@
       "order": 1,
       "online": true,
       "offline": true
+    },
+    {
+      "name": "patient-discharge-side-rail-icon",
+      "component": "patientDischargeSideRailIcon",
+      "slot": "action-menu-ward-patient-items-slot"
     }
   ],
   "workspaces": [
@@ -69,6 +74,16 @@
       "canMaximize": true,
       "canHide": true,
       "width": "wider"
+    },
+    {
+      "name": "patient-care-discharge-workspace",
+      "title": "Patient Discharge",
+      "component": "patientDischargeWorkspace",
+      "type": "workspace",
+      "canMaximize": true,
+      "canHide": true,
+      "width": "extra-wide",
+      "groups": ["ward-patient"]
     }
   ]
 }
