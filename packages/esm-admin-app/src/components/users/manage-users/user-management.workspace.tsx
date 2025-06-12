@@ -187,7 +187,10 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   type UserFormSchema = z.infer<typeof userManagementFormSchema>;
   const formDefaultValues = useMemo(() => {
     if (isInitialValuesEmpty) {
-      return {};
+      return {
+        forcePasswordChange: false,
+        gender: 'M' as 'M' | 'F',
+      };
     }
     const extractNameParts = (display = '') => {
       const nameParts = display.split(' ');
@@ -209,7 +212,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
           display: role.display,
           description: role.description,
         })) || [],
-      gender: initialUserValue.person?.gender,
+      gender: (initialUserValue.person?.gender ?? 'M') as 'M' | 'F',
       providerLicense: providerLicenseNumber,
       licenseExpiryDate: licenseExpiryDate ? new Date(licenseExpiryDate) : undefined,
       qualification: qualification,
@@ -217,6 +220,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       passportNumber: passportNumber,
       registrationNumber: registrationNumber,
       providerUniqueIdentifier: providerUniqueIdentifier,
+      forcePasswordChange: initialUserValue?.userProperties?.forcePassword === 'true' ? true : false,
     };
   }, [
     isInitialValuesEmpty,
@@ -411,6 +415,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         name: role.display,
         description: role.description || '',
       })),
+      userProperties: {
+        forcePassword: data.forcePasswordChange ? 'true' : 'false',
+      },
     };
 
     const showSnackbarMessage = (title: string, subtitle: string, kind: 'success' | 'error') => {
