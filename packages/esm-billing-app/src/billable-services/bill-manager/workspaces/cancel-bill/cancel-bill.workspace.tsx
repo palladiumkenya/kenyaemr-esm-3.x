@@ -108,7 +108,7 @@ const CancelBillWorkspace: React.FC<CancelBillWorkspaceProps> = ({
         </ResponsiveWrapper>
       </div>
       <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} disabled={!isValid || !isDirty || isSubmitting} kind="primary" type="submit">

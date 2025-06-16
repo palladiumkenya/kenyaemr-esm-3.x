@@ -184,7 +184,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                     type="text"
                     labelText={t('serviceName', 'Service name')}
                     invalid={!!errors.name}
-                    invalidtext={errors?.name?.message}
+                    invalidText={errors?.name?.message}
                   />
                 )}
               />
@@ -200,7 +200,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                     type="text"
                     labelText={t('serviceShortName', 'Service short name')}
                     invalid={!!errors.shortName}
-                    invalidtext={errors?.shortName?.message}
+                    invalidText={errors?.shortName?.message}
                   />
                 )}
               />
@@ -233,7 +233,7 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                       disabled={isLoadingServiceTypes}
                       initialSelectedItem={field.value}
                       invalid={!!errors.serviceType}
-                      invalidtext={errors?.serviceType?.message}
+                      invalidText={errors?.serviceType?.message}
                       itemToElement={(item) => (
                         <div role="option" aria-selected={field.value?.uuid === item?.uuid}>
                           {item?.display}
@@ -271,13 +271,13 @@ const AddServiceForm: React.FC<AddServiceFormProps> = ({
                 lowContrast={true}
                 statusIconDescription="notification"
                 title={t('paymentMethodRequired', 'Payment method required')}
-                subTitle={t('atLeastOnePriceRequired', 'At least one price is required')}
+                subtitle={t('atLeastOnePriceRequired', 'At least one price is required')}
               />
             )}
           </Stack>
         </div>
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
+          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button disabled={isSubmitting || !isDirty} style={{ maxWidth: '50%' }} kind="primary" type="submit">

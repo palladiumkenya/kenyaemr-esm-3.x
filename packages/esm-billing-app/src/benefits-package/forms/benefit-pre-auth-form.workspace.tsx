@@ -128,7 +128,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
               render={({ field }) => (
                 <Dropdown
                   ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   id="patient"
                   titleText={t('patient', 'Patient')}
@@ -152,7 +152,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
                   {provider && (
                     <Dropdown
                       ref={field.ref}
-                      invalid={form.formState.errors[field.name]?.message}
+                      invalid={!!form.formState.errors[field.name]?.message}
                       invalidText={form.formState.errors[field.name]?.message}
                       id="provider"
                       titleText={t('provider', 'Provider')}
@@ -184,7 +184,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
               render={({ field }) => (
                 <Dropdown
                   ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   id="facility"
                   titleText={t('facility', 'Facility')}
@@ -209,7 +209,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
               render={({ field }) => (
                 <MultiSelect
                   ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   id="diagnoses"
                   titleText={t('finalDiagnosis', 'Final Diagnosis')}
@@ -233,7 +233,7 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
           </Column>
         </Stack>
         <div className={styles.btnSet}>
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} kind="primary" type="submit" disabled={isSubmitting}>

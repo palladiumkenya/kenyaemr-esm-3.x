@@ -88,7 +88,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
   if (isLoading) {
     return (
       <div className={styles.loaderContainer}>
-        <DataTableSkeleton showHeader={false} showToolbar={false} zebra size={responsiveSize} />
+        <DataTableSkeleton showHeader={false} showToolbar={false} zebra />
       </div>
     );
   }

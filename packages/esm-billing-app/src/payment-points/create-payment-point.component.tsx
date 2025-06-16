@@ -52,7 +52,6 @@ export const CreatePaymentPoint = ({ closeModal }) => {
       })
       .finally(() => setIsSubmitting(false));
   };
-
   return (
     <Form>
       <ModalHeader closeModal={closeModal}>Create Payment Point</ModalHeader>
@@ -62,11 +61,11 @@ export const CreatePaymentPoint = ({ closeModal }) => {
           name="cashPointName"
           render={({ field }) => (
             <TextInput
+              id="cashPointName"
               {...field}
               size="md"
               labelText={t('cashPointName', 'Cash Point Name')}
               invalid={!!errors.cashPointName}
-              invalidText={errors.cashPointName?.message}
               className={styles.cashPoint}
             />
           )}
@@ -80,7 +79,7 @@ export const CreatePaymentPoint = ({ closeModal }) => {
               size="md"
               labelText={t('description', 'Description')}
               invalid={!!errors.description}
-              invalidText={errors.description?.message}
+              id="description"
             />
           )}
         />

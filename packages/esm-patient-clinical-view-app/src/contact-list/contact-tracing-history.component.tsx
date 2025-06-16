@@ -94,7 +94,7 @@ const ContactTracingHistory: React.FC<ContactTracingHistoryProps> = ({ patientUu
           />
         ),
       })),
-    [results],
+    [results, t],
   );
 
   if (contactTracesHistory.length === 0) {

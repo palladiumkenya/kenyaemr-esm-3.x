@@ -127,6 +127,7 @@ const DepositTransactionWorkspace: React.FC<DepositTransactionWorkspaceProps> = 
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
+    // eslint-disable-line react-hooks/exhaustive-deps
   }, [isDirty]);
 
   if (error) {
@@ -184,7 +185,7 @@ const DepositTransactionWorkspace: React.FC<DepositTransactionWorkspaceProps> = 
                 invalid={!!errors.amount}
                 invalidText={errors.amount?.message}
                 label={t('amount', 'Amount')}
-                onChange={({ target }) => field.onChange(Number(target.value))}
+                onChange={({ target }, { value }) => field.onChange(Number(value))}
                 max={deposit?.availableBalance}
                 min={0}
                 size="md"
@@ -223,7 +224,6 @@ const DepositTransactionWorkspace: React.FC<DepositTransactionWorkspaceProps> = 
                 id="reason"
                 invalid={!!errors.reason}
                 invalidText={errors.reason?.message}
-                label={t('reason', 'Reason')}
                 onChange={({ target }) => field.onChange(target.value)}
                 max={deposit?.availableBalance}
                 size="md"
@@ -234,7 +234,7 @@ const DepositTransactionWorkspace: React.FC<DepositTransactionWorkspaceProps> = 
         </ResponsiveWrapper>
       </div>
       <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
+        <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={() => closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button disabled={isSubmitting || !isDirty} style={{ maxWidth: '50%' }} kind="primary" type="submit">

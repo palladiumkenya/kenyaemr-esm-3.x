@@ -38,13 +38,13 @@ const headers = [
 const BenefitsTable = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromStore();
-  const { isLoading, preAuthRequests } = usePreAuthRequests();
+  const { isLoading } = usePreAuthRequests();
 
-  const { claims, mutate } = useFacilityClaims();
+  const { claims } = useFacilityClaims();
 
   const claimsByUse = useMemo(() => {
     return claims.filter((claim) => claim.use === 'preauthorization' && claim.patientId === patientUuid);
-  }, [claims]);
+  }, [claims, patientUuid]);
 
   if (isLoading) {
     return (

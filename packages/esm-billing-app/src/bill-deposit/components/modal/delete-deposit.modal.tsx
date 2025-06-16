@@ -41,7 +41,7 @@ const DeleteDepositModal: React.FC<DeleteDepositModalProps> = ({ isOpen, onClose
 
   return (
     <div>
-      <ModalHeader onClose={onClose}>{t('deleteDeposit', 'Delete Deposit')}</ModalHeader>
+      <ModalHeader closeModal={() => onClose()}>{t('deleteDeposit', 'Delete Deposit')}</ModalHeader>
       <ModalBody>{t('deleteDepositConfirmation', 'Are you sure you want to delete this deposit?')}</ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={onClose}>

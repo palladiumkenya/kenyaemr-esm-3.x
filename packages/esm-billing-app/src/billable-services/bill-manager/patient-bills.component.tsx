@@ -78,7 +78,6 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
       <DataTable
         rows={tableRows}
         headers={tableHeaders}
-        compact
         size="sm"
         useZebraStyles
         render={({
