@@ -9,39 +9,30 @@ import {
   InlineLoading,
   Stack,
   Tile,
-  RadioButtonGroup,
-  RadioButton,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, parseDate, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 import React, { useEffect, useMemo } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
+import PatientInfo from '../../case-management/workspace/patient-info.component';
+import { ConfigObject } from '../../config-schema';
+import { updateContactAttributes } from '../../contact-list/contact-list.resource';
+import usePersonAttributes from '../../hooks/usePersonAttributes';
 import useRelationship from '../../hooks/useRelationship';
 import useRelationshipTypes from '../../hooks/useRelationshipTypes';
-import styles from './contact-list-update.scss';
-import PatientInfo from '../../case-management/workspace/patient-info.component';
-import usePerson, { contactIPVOutcomeOptions, updateContactAttributes } from '../../contact-list/contact-list.resource';
+import RelationshipBaselineInfoFormSection from '../../relationships/forms/baseline-info-form-section.component';
 import {
-  BOOLEAN_NO,
-  BOOLEAN_YES,
   relationshipFormSchema,
   relationshipUpdateFormSchema,
   updateRelationship,
   usePatientBirthdate,
 } from '../../relationships/relationship.resources';
 import { type Contact } from '../../types';
-import { ConfigObject } from '../../config-schema';
-import { contactListConceptMap } from '../../contact-list/contact-list-concept-map';
-import {
-  LIVING_WITH_PATIENT_CONCEPT_UUID,
-  PARTNER_HIV_STATUS_CONCEPT_UUID,
-  PNS_APROACH_CONCEPT_UUID,
-} from '../../relationships/relationships-constants';
-import dayjs from 'dayjs';
-import RelationshipBaselineInfoFormSection from '../../relationships/forms/baseline-info-form-section.component';
+import styles from './contact-list-update.scss';
 
 interface ContactListUpdateFormProps extends DefaultWorkspaceProps {
   relation: Contact;
@@ -54,28 +45,11 @@ type ContactListUpdateFormType = z.infer<typeof relationshipFormSchema>;
 const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWorkspace, relation, patientUuid }) => {
   const { error, isLoading, relationship } = useRelationship(relation?.uuid);
   const { isLoading: typesLoading, error: typesError, relationshipTypes } = useRelationshipTypes();
-  const { person } = usePerson(relationship?.personB?.uuid);
+  const persionUuid = relationship?.personB?.uuid;
+  const { attributes } = usePersonAttributes(relationship?.personB?.uuid);
   const config = useConfig<ConfigObject>();
 
   const { t } = useTranslation();
-
-  const pnsAproach = useMemo(
-    () =>
-      Object.entries(contactListConceptMap[PNS_APROACH_CONCEPT_UUID].answers).map(([uuid, display]) => ({
-        label: display,
-        value: uuid,
-      })),
-    [],
-  );
-
-  const contactLivingWithPatient = useMemo(
-    () =>
-      Object.entries(contactListConceptMap[LIVING_WITH_PATIENT_CONCEPT_UUID].answers).map(([uuid, display]) => ({
-        label: display,
-        value: uuid,
-      })),
-    [],
-  );
 
   const form = useForm<ContactListUpdateFormType>({
     defaultValues: {},
@@ -140,28 +114,17 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
 
   const onSubmit = async (values: ContactListUpdateFormType) => {
     try {
-      const data = form.getValues();
-
       await updateRelationship(relationship.uuid, values);
-
       await updateContactAttributes(
-        person?.uuid,
+        persionUuid,
         {
-          baselineStatus: data?.baselineStatus,
-          preferedPNSAproach: data?.preferedPNSAproach,
-          livingWithClient: data?.livingWithClient,
-          ipvOutCome: data?.ipvOutCome,
+          baselineStatus: values?.baselineStatus,
+          preferedPNSAproach: values?.preferedPNSAproach,
+          livingWithClient: values?.livingWithClient,
+          ipvOutCome: values?.ipvOutCome,
         },
         config,
-        person?.attributes?.map((attr) => ({
-          uuid: attr.uuid,
-          display: attr.display ?? '',
-          value: attr.value,
-          attributeType: {
-            uuid: attr.attributeType.uuid,
-            display: attr.attributeType.display ?? '',
-          },
-        })),
+        attributes,
       );
 
       showSnackbar({

@@ -169,45 +169,79 @@ export const updatePersonAttributes = (payload: any, personUuid: string, attribu
 
 export const updateContactAttributes = async (
   personUuid: string,
-  attributeData: ContactAttributeData,
+  attributes: ContactAttributeData,
   config: ConfigObject,
   existingAttributes: Person['attributes'] = [],
 ) => {
   try {
-    const updatableAttributes = [
-      {
-        attributeType: config?.contactPersonAttributesUuid?.baselineHIVStatus,
-        value: replaceAll(attributeData?.baselineStatus, 'A', ''),
-      },
-      {
-        attributeType: config?.contactPersonAttributesUuid?.preferedPnsAproach,
-        value: replaceAll(attributeData?.preferedPNSAproach, 'A', ''),
-      },
-      {
-        attributeType: config?.contactPersonAttributesUuid?.livingWithContact,
-        value: replaceAll(attributeData?.livingWithClient, 'A', ''),
-      },
-      {
-        attributeType: config?.contactPersonAttributesUuid?.contactIPVOutcome,
-        value: attributeData?.ipvOutCome,
-      },
-    ].filter((attr) => attr?.value !== undefined && attr?.value !== null && attr?.value !== '');
+    const { baselineStatus, ipvOutCome, livingWithClient, preferedPNSAproach } = attributes;
+    const attrs = [
+      ...(baselineStatus
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.baselineHIVStatus,
+              value: replaceAll(baselineStatus, 'A', ''),
+              attribute: existingAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus,
+              )?.uuid,
+            },
+          ]
+        : []),
+      ...(preferedPNSAproach
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.preferedPnsAproach,
+              value: replaceAll(preferedPNSAproach, 'A', ''),
+              attribute: existingAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach,
+              )?.uuid,
+            },
+          ]
+        : []),
+      ...(livingWithClient
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.livingWithContact,
+              value: replaceAll(livingWithClient, 'A', ''),
+              attribute: existingAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.livingWithContact,
+              )?.uuid,
+            },
+          ]
+        : []),
+      ...(ipvOutCome
+        ? [
+            {
+              attributeType: config.contactPersonAttributesUuid.contactIPVOutcome,
+              value: ipvOutCome,
+              attribute: existingAttributes.find(
+                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.contactIPVOutcome,
+              )?.uuid,
+            },
+          ]
+        : []),
+    ];
 
-    await Promise.allSettled(
-      updatableAttributes?.map((attr) => {
-        const existingAttribute = existingAttributes?.find((at) => at?.attributeType?.uuid === attr?.attributeType);
-
-        const payload = {
-          attributeType: attr?.attributeType,
-          value: attr?.value,
-        };
-
-        if (!existingAttribute?.uuid) {
-          return createPersonAttribute(payload, personUuid);
-        }
-        return updatePersonAttributes(payload, personUuid, existingAttribute.uuid);
-      }),
+    const results = await Promise.allSettled(
+      attrs.map((attr) =>
+        openmrsFetch(`${restBaseUrl}/person/${personUuid}/attribute/${attr.attribute ?? ''}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(omit(attr, ['attribute'])),
+        }),
+      ),
     );
+
+    if (results.length && results.every((r) => r.status === 'fulfilled')) {
+      showSnackbar({ title: 'Success ', kind: 'success', subtitle: 'Patient attributes updated succesfully' });
+    }
+    results.forEach((res) => {
+      if (res.status === 'rejected') {
+        showSnackbar({ title: 'Error updating patient attribute', kind: 'error', subtitle: res.reason?.message });
+      }
+    });
 
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/person`));
   } catch (error) {
