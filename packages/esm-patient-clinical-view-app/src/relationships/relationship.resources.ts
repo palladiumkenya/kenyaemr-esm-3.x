@@ -1,5 +1,5 @@
-import { openmrsFetch, restBaseUrl, Session, showModal, showSnackbar } from '@openmrs/esm-framework';
-import { mutate } from 'swr';
+import { FetchResponse, openmrsFetch, restBaseUrl, Session, showModal, showSnackbar } from '@openmrs/esm-framework';
+import useSWR, { mutate } from 'swr';
 import { z } from 'zod';
 import { Patient } from '../types';
 import { ConfigObject } from '../config-schema';
@@ -7,6 +7,8 @@ import omit from 'lodash/omit';
 
 export const BOOLEAN_YES = '1065';
 export const BOOLEAN_NO = '1066';
+export const HIV_EXPOSED_INFANT = 'HIV exposed infant';
+export const INFANT_AGE_THRESHOLD_IN_MONTHS = 24;
 
 export const relationshipUpdateFormSchema = z
   .object({
@@ -229,4 +231,18 @@ export const saveRelationship = async (
     showSnackbar({ title: 'Error saving relationship', kind: 'error', subtitle: error?.message });
     throw error;
   }
+};
+
+export const usePatientBirthdate = (patientUuid?: string) => {
+  const customRep = 'custom:(person:(birthdate))';
+  const url = `${restBaseUrl}/patient/${patientUuid}?v=${customRep}`;
+  const { data, error, isLoading } = useSWR<FetchResponse<{ person: { birthdate: string } }>>(
+    patientUuid ? url : null,
+    openmrsFetch,
+  );
+  return {
+    isLoading,
+    error,
+    birthdate: data?.data?.person?.birthdate,
+  };
 };

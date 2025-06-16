@@ -1,6 +1,6 @@
 import { Column, Dropdown, RadioButton, RadioButtonGroup, SelectSkeleton } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import React, { useEffect, useMemo } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -11,45 +11,40 @@ import {
   getHivStatusBasedOnEnrollmentAndHTSEncounters,
 } from '../../contact-list/contact-list.resource';
 import usePersonAttributes from '../../hooks/usePersonAttributes';
-import { BOOLEAN_NO, BOOLEAN_YES, relationshipFormSchema } from '../relationship.resources';
+import useRelativeHivEnrollment from '../../hooks/useRelativeHivEnrollment';
+import useRelativeHTSEncounter from '../../hooks/useRelativeHTSEncounter';
+import {
+  BOOLEAN_NO,
+  BOOLEAN_YES,
+  HIV_EXPOSED_INFANT,
+  INFANT_AGE_THRESHOLD_IN_MONTHS,
+  relationshipFormSchema,
+} from '../relationship.resources';
 import {
   LIVING_WITH_PATIENT_CONCEPT_UUID,
   PARTNER_HIV_STATUS_CONCEPT_UUID,
   PNS_APROACH_CONCEPT_UUID,
 } from '../relationships-constants';
 import styles from './form.scss';
-import useRelativeHivEnrollment from '../../hooks/useRelativeHivEnrollment';
-import useRelativeHTSEncounter from '../../hooks/useRelativeHTSEncounter';
 
-const RelationshipBaselineInfoFormSection = () => {
+type RelationshipBaselineInfoFormSectionProps = {
+  patientAgeMonths?: number;
+  patientUuid?: string;
+};
+
+const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectionProps> = ({
+  patientAgeMonths = null,
+  patientUuid,
+}) => {
   const form = useFormContext<z.infer<typeof relationshipFormSchema>>();
-  const {
-    enrollment,
-    isLoading: enrollmentLoading,
-    error: enrollmentError,
-  } = useRelativeHivEnrollment(form.watch('personB'));
-  const {
-    encounters,
-    isLoading: encounterLoading,
-    error: encounterError,
-  } = useRelativeHTSEncounter(form.watch('personB'));
+  const { enrollment, isLoading: enrollmentLoading, error: enrollmentError } = useRelativeHivEnrollment(patientUuid);
+  const { encounters, isLoading: encounterLoading, error: encounterError } = useRelativeHTSEncounter(patientUuid);
   const hivStatusPersonB = getHivStatusBasedOnEnrollmentAndHTSEncounters(encounters, enrollment);
 
   const { t } = useTranslation();
-  const personUuid = form.watch('personB');
   const config = useConfig<ConfigObject>();
   const { setValue } = form;
-  const { attributes, isLoading } = usePersonAttributes(personUuid);
-
-  const hivStatus = useMemo(
-    () =>
-      Object.entries(contactListConceptMap[PARTNER_HIV_STATUS_CONCEPT_UUID].answers).map(([uuid, display]) => ({
-        label: display,
-        value: uuid,
-      })),
-    [],
-  );
-
+  const { attributes, isLoading } = usePersonAttributes(patientUuid);
   const pnsAproach = useMemo(
     () =>
       Object.entries(contactListConceptMap[PNS_APROACH_CONCEPT_UUID].answers).map(([uuid, display]) => ({
@@ -76,6 +71,26 @@ const RelationshipBaselineInfoFormSection = () => {
     config.relationshipTypesList.findIndex(
       (r) => r.uuid === observableRelationship && r.category.some((c) => c === 'sexual'),
     ) !== -1;
+
+  const hivStatus = useMemo(
+    () =>
+      Object.entries(contactListConceptMap[PARTNER_HIV_STATUS_CONCEPT_UUID].answers).reduce((prev, [uuid, display]) => {
+        if (
+          display === HIV_EXPOSED_INFANT &&
+          (patientAgeMonths === null || patientAgeMonths > INFANT_AGE_THRESHOLD_IN_MONTHS)
+        ) {
+          return prev;
+        }
+        return [
+          ...prev,
+          {
+            label: display,
+            value: uuid,
+          },
+        ];
+      }, []),
+    [patientAgeMonths],
+  );
 
   useEffect(() => {
     if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes(BOOLEAN_YES)) {
