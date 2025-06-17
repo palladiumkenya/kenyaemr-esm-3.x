@@ -2,7 +2,7 @@
 @use '@carbon/type';
 @use '@carbon/colors'; // Import Carbon colors
 
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .genericContainer {
   margin: layout.$spacing-05;

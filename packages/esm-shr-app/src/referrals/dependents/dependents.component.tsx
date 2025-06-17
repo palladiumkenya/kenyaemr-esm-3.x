@@ -61,14 +61,14 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, patientUuid })
     phoneNumber: dependent.phoneNumber,
     gender: capitalize(dependent.gender),
     actions: (
-      <Button size="xs" kind="ghost" onClick={() => handleRegisterDependent(dependent)}>
+      <Button size="sm" kind="ghost" onClick={() => handleRegisterDependent(dependent)}>
         {t('registerDependent', 'Register Dependent')}
       </Button>
     ),
   }));
 
   if (isLoading) {
-    return <DataTableSkeleton size="xs" aria-label={t('dependents')} headers={headers} showHeader showToolbar />;
+    return <DataTableSkeleton aria-label={t('dependents')} headers={headers} showHeader showToolbar />;
   }
 
   if (error) {
