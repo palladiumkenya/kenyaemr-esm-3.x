@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .bodyShort01 {
   @include type.type-style('body-compact-01');
