@@ -130,7 +130,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
         rows={tableRows}
         headers={tableHeader}
         render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer size="sm" {...getTableContainerProps()}>
+          <TableContainer {...getTableContainerProps()}>
             <Table size="sm" {...getTableProps()} aria-label={t('defaulterTracing', 'Defaulter tracing')}>
               <TableHead>
                 <TableRow>
@@ -157,7 +157,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
                       <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}
                     <TableCell className="cds--table-column-menu">
-                      <OverflowMenu aria-label="overflow-menu" flipped="false">
+                      <OverflowMenu aria-label="overflow-menu" flipped={false}>
                         <OverflowMenuItem
                           onClick={() => handleOpenOrEditDefaulterTracingForm(encounters[index]?.uuid)}
                           itemText={t('edit', 'Edit')}

@@ -73,7 +73,7 @@ const MaternalSummary: React.FC<MaternalSummaryProps> = ({ patientUuid }) => {
       foetalPresentation: '',
       maternalCondition: '',
       actions: (
-        <OverflowMenu aria-label="overflow-menu" flipped="false">
+        <OverflowMenu aria-label="overflow-menu" flipped={false}>
           <OverflowMenuItem onClick={() => handleOpenOrEditMaternalForm(encounter.uuid)} itemText={t('edit', 'Edit')} />
           <OverflowMenuItem itemText={t('delete', 'Delete')} isDelete />
         </OverflowMenu>

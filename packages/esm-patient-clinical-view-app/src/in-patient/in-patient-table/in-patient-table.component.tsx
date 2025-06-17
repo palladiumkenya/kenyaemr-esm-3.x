@@ -74,7 +74,7 @@ const InPatientTable: React.FC<InPatientTableProps> = ({ tableRows }) => {
 
   return (
     <>
-      <DataTable className={styles.tableContainer} size="sm" useZebraStyles rows={paginatedRows} headers={headers}>
+      <DataTable size="sm" useZebraStyles rows={paginatedRows} headers={headers}>
         {({
           rows,
           headers,

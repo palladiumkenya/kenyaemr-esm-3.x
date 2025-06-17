@@ -120,7 +120,7 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({
         smokingDuration: getObsFromEncounter(encounter, Smoking_Duration_UUID),
         otherSubstanceAbuse: getObsFromEncounter(encounter, Other_Substance_Abuse_UUID),
         actions: (
-          <OverflowMenu aria-label="overflow-menu" flipped="false">
+          <OverflowMenu aria-label="overflow-menu" flipped={false}>
             <OverflowMenuItem
               onClick={() => handleOpenOrEditClinicalEncounterForm(encounter.uuid)}
               itemText={t('edit', 'Edit')}
@@ -163,7 +163,7 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({
         rows={tableRows}
         headers={tableHeader}
         render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer size="sm" {...getTableContainerProps()}>
+          <TableContainer {...getTableContainerProps()}>
             <Table size="sm" {...getTableProps()} aria-label="sample table">
               <TableHead>
                 <TableRow>

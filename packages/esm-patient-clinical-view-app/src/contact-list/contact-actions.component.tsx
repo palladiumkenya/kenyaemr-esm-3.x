@@ -24,8 +24,8 @@ const ContactActions: React.FC<ContactActionsProps> = ({ relativeUuid, baseLineH
   if (isLoading || encounterLoading) {
     return (
       <Row>
-        <ButtonSkeleton kind="tertiary" size="sm" hasIconOnly />
-        <ButtonSkeleton kind="tertiary" size="sm" hasIconOnly />
+        <ButtonSkeleton size="sm" />
+        <ButtonSkeleton size="sm" />
       </Row>
     );
   }

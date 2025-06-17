@@ -59,7 +59,7 @@ const ClinicalEncounter: React.FC<SurgicalSummaryProps> = ({
       admittingDoctor: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
       admissionWard: getObsFromEncounter(encounter, AdmissionWard_UUID),
       actions: (
-        <OverflowMenu aria-label="overflow-menu" flipped="false">
+        <OverflowMenu aria-label="overflow-menu" flipped={false}>
           <OverflowMenuItem
             onClick={() => handleOpenOrEditClinicalEncounterForm(encounter.uuid)}
             itemText={t('edit', 'Edit')}

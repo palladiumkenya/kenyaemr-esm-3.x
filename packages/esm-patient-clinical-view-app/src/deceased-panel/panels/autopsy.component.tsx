@@ -110,7 +110,7 @@ const AutopsyView: React.FC = () => {
     formName: encounter?.form?.name,
     mortician: encounter?.encounterProviders[0]?.provider?.name,
     action: (
-      <OverflowMenu aria-label="overflow-menu" flipped="false">
+      <OverflowMenu aria-label="overflow-menu" flipped={false}>
         <OverflowMenuItem onClick={() => handleLaunchAutopsyForm(encounter.uuid)} itemText={t('edit', 'Edit')} />
       </OverflowMenu>
     ),

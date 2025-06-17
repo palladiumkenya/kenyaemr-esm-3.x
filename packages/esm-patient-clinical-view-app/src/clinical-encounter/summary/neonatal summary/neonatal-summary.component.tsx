@@ -52,7 +52,7 @@ const NeonatalSummary: React.FC<NeonatalSummaryProps> = ({ patientUuid }) => {
       babyGivenVitaminK: getObsFromEncounter(encounter, GivenVitaminK_UUID),
 
       actions: (
-        <OverflowMenu aria-label="overflow-menu" flipped="false">
+        <OverflowMenu aria-label="overflow-menu" flipped={false}>
           <OverflowMenuItem
             onClick={() => handleOpenOrEditNeonatalSummaryForm(encounter.uuid)}
             itemText={t('edit', 'Edit')}

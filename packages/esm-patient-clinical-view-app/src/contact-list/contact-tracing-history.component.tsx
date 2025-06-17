@@ -121,9 +121,9 @@ const ContactTracingHistory: React.FC<ContactTracingHistoryProps> = ({ patientUu
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
+                        isSortable: true,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>

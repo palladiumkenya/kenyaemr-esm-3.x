@@ -221,9 +221,9 @@ const FamilyHistory: React.FC<FamilyHistoryProps> = ({ patientUuid }) => {
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
+                        isSortable: true,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>

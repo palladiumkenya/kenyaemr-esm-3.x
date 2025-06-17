@@ -46,12 +46,13 @@ const BirthDateCalculator = ({ onClose, props: { date, onBirthDateChange } }) =>
           <Column>
             <Layer>
               <TextInput
+                id="age"
                 placeholder="age"
                 labelText={t('age', 'Age')}
                 type="number"
                 min={5}
                 value={formState.age}
-                onChange={(e) => setFormState({ ...formState, age: e.target.value })}
+                onChange={(e) => setFormState({ ...formState, age: parseInt(e.target.value) })}
               />
             </Layer>
           </Column>
@@ -61,7 +62,7 @@ const BirthDateCalculator = ({ onClose, props: { date, onBirthDateChange } }) =>
                 datePickerType="single"
                 value={formState.fromDate}
                 onChange={([date]) => setFormState({ ...formState, fromDate: date })}>
-                <DatePickerInput placeholder="mm/dd/yyyy" labelText={t('onDate', 'On Date')} size="xl" />
+                <DatePickerInput id="onDate" placeholder="mm/dd/yyyy" labelText={t('onDate', 'On Date')} size="lg" />
               </DatePicker>
             </Layer>
           </Column>

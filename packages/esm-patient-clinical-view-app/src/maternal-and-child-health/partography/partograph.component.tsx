@@ -204,9 +204,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                                 <TableHeader
                                   {...getHeaderProps({
                                     header,
-                                    isSortable: header.isSortable,
+                                    isSortable: true,
                                   })}>
-                                  {header.header?.content ?? header.header}
+                                  {header.header}
                                 </TableHeader>
                               ))}
                             </TableRow>
