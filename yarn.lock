@@ -2861,6 +2861,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2877,6 +2878,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2893,6 +2895,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2909,6 +2912,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2925,6 +2929,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2941,6 +2946,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2957,6 +2963,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2974,6 +2981,7 @@ __metadata:
     "@carbon/charts-react": "npm:^1.5.2"
     d3: "npm:^7.6.1"
     lodash-es: "npm:^4.17.21"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2988,6 +2996,7 @@ __metadata:
   resolution: "@kenyaemr/esm-patient-flags-app@workspace:packages/esm-patient-flags-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -3003,6 +3012,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -3019,6 +3029,7 @@ __metadata:
   dependencies:
     lodash-es: "npm:^4.17.15"
     react-to-print: "npm:^3.1.0"
+    webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 7.x
