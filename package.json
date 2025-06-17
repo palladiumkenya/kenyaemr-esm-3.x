@@ -13,7 +13,7 @@
     "coverage": "yarn test --coverage",
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
-    "start": " openmrs develop",
+    "start": " openmrs develop --sources packages/esm-facility-dashboard-app --port 8150 --backend http://192.168.100.36:8080 --config-url http://192.168.100.36:8080/openmrs/spa/kenyaemr.config.json http://192.168.100.36:8080/openmrs/spa/openmrs.config.json",
     "verify": "turbo run lint && turbo run typescript && turbo run test --color --concurrency=5",
     "preinstall": "npx only-allow yarn"
   },

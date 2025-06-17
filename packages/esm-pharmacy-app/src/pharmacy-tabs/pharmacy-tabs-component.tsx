@@ -9,7 +9,7 @@ export const PharmacyTabs: React.FC = () => {
   const { t } = useTranslation();
   return (
     <main>
-      <Tabs className={styles.tabs}>
+      <Tabs>
         <TabList className={styles.tablist} aria-label="List tabs" contained>
           <Tab className={styles.tab}>{t('patients', 'Assigned Patients')}</Tab>
           <Tab className={styles.tab}>{t('users', 'Asigned Users')}</Tab>
