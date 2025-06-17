@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StructuredListSkeleton, ContentSwitcher, Switch } from '@carbon/react';
+import { StructuredListSkeleton, ContentSwitcher, Switch, type SwitchEventHandlersParams } from '@carbon/react';
 import styles from './care-panel.scss';
 import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import ProgramSummary from '../program-summary/program-summary.component';
@@ -17,17 +17,11 @@ interface CarePanelProps {
   launchPatientWorkspace: Function;
 }
 
-type SwitcherItem = {
-  index: number;
-  name?: string;
-  text?: string;
-};
-
-const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launchPatientWorkspace }) => {
+const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub }) => {
   const { t } = useTranslation();
   const { isLoading, error, enrollments, isValidating } = useEnrollmentHistory(patientUuid);
   const switcherHeaders = sortBy(Object.keys(enrollments || {}));
-  const [switchItem, setSwitcherItem] = useState<SwitcherItem>({ index: 0 });
+  const [switchItem, setSwitcherItem] = useState<SwitchEventHandlersParams>({ index: 0 });
   const patientEnrollments = useMemo(
     () => (isLoading ? [] : enrollments[switchItem?.name || first(switcherHeaders)]),
     [enrollments, isLoading, switchItem?.name, switcherHeaders],
@@ -36,7 +30,7 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   if (isLoading) {
     return (
       <div className={styles.widgetCard}>
-        <StructuredListSkeleton role="progressbar" />
+        <StructuredListSkeleton />
       </div>
     );
   }
@@ -54,29 +48,27 @@ const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub, launch
   }
 
   return (
-    <>
-      <div className={styles.widgetCard}>
-        <CardHeader title={t('carePanel', 'Care Panel')}>
-          <div className={styles.contextSwitcherContainer}>
-            <ContentSwitcher selectedIndex={switchItem?.index} onChange={setSwitcherItem}>
-              {switcherHeaders?.map((enrollment) => (
-                <Switch key={enrollment} name={enrollment} text={enrollment} />
-              ))}
-            </ContentSwitcher>
-          </div>
-        </CardHeader>
-        <div style={{ width: '100%', minHeight: '20rem' }}>
-          <ProgramSummary patientUuid={patientUuid} programName={switcherHeaders[switchItem?.index]} />
-          <RegimenHistory patientUuid={patientUuid} category={switcherHeaders[switchItem?.index]} />
-          <ProgramEnrollment
-            patientUuid={patientUuid}
-            programName={switcherHeaders[switchItem?.index]}
-            enrollments={patientEnrollments}
-            formEntrySub={formEntrySub}
-          />
+    <div className={styles.widgetCard}>
+      <CardHeader title={t('carePanel', 'Care Panel')}>
+        <div className={styles.contextSwitcherContainer}>
+          <ContentSwitcher size="md" selectedIndex={switchItem?.index} onChange={(params) => setSwitcherItem(params)}>
+            {switcherHeaders?.map((enrollment) => (
+              <Switch key={enrollment} name={enrollment} text={enrollment} />
+            ))}
+          </ContentSwitcher>
         </div>
+      </CardHeader>
+      <div style={{ width: '100%', minHeight: '20rem' }}>
+        <ProgramSummary patientUuid={patientUuid} programName={switcherHeaders[switchItem?.index]} />
+        <RegimenHistory patientUuid={patientUuid} category={switcherHeaders[switchItem?.index]} />
+        <ProgramEnrollment
+          patientUuid={patientUuid}
+          programName={switcherHeaders[switchItem?.index]}
+          enrollments={patientEnrollments}
+          formEntrySub={formEntrySub}
+        />
       </div>
-    </>
+    </div>
   );
 };
 
