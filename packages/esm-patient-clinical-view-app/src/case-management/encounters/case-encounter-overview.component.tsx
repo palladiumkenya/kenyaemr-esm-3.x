@@ -1,11 +1,14 @@
 import { ComboBox, DataTableSkeleton, Dropdown, Layer, Pagination, Tile } from '@carbon/react';
-import { formatDate, showModal, showSnackbar, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
-  CardHeader,
-  EmptyDataIllustration,
-  launchPatientWorkspace,
-  usePaginationInfo,
-} from '@openmrs/esm-patient-common-lib';
+  formatDate,
+  launchWorkspace,
+  showModal,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
+import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyedMutator } from 'swr';
@@ -30,7 +33,7 @@ const CaseEncounterHeader = ({ patientUuid, mutate, onFilterChange }: CaseEncoun
   const { caseManagementForms } = useConfig<ConfigObject>();
 
   const handleOpenOrEditClinicalEncounterForm = (formUuid: string, encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
       mutateForm: mutate,
       formInfo: {
@@ -145,7 +148,7 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
     const encounterTypeUuid = encounter.encounterType?.uuid ?? '';
     const formUuid = encounter.form?.uuid ?? '';
 
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle,
       mutateForm: mutateVisits,
       formInfo: {

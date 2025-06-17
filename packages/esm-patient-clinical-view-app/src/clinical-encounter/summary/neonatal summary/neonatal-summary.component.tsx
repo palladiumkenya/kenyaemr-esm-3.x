@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace } from '@openmrs/esm-framework';
 import {
   MchEncounterType_UUID,
   ModeOfDelivery_UUID,
@@ -10,7 +10,7 @@ import {
   GivenVitaminK_UUID,
 } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
-import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
 import { useNeonatalSummary } from '../../../hooks/useNeonatalSummary';
 import SummaryCard from '../summary-card.component';
@@ -26,7 +26,7 @@ const NeonatalSummary: React.FC<NeonatalSummaryProps> = ({ patientUuid }) => {
   const { encounters, isLoading, error, mutate } = useNeonatalSummary(patientUuid, MchEncounterType_UUID);
 
   const handleOpenOrEditNeonatalSummaryForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Neonatal Summary',
       mutateForm: mutate,
       formInfo: {

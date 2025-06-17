@@ -1,12 +1,19 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, isDesktop, parseDate, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import {
+  formatDate,
+  isDesktop,
+  launchWorkspace,
+  parseDate,
+  useConfig,
+  useLayoutType,
+  usePagination,
+} from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
   ErrorState,
   getPatientUuidFromStore,
-  launchPatientWorkspace,
   usePaginationInfo,
 } from '@openmrs/esm-patient-common-lib';
 import {
@@ -50,7 +57,7 @@ const AutopsyView: React.FC = () => {
   const { pageSizes } = usePaginationInfo(pageSize, encounters?.length, currentPage, results?.length);
 
   const handleLaunchAutopsyForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: t('autopsyReport', 'Autopsy report'),
       mutateForm: () => mutate(),
       formInfo: {

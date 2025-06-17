@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
-import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, DataTableSkeleton } from '@carbon/react';
 import { useClinicalEncounter } from '../../../hooks/useClinicalEncounter';
 import { ConfigObject } from '../../../config-schema';
@@ -54,7 +54,7 @@ const MaternalSummary: React.FC<MaternalSummaryProps> = ({ patientUuid }) => {
     ],
   );
   const handleOpenOrEditMaternalForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
       mutateForm: mutate,
       formInfo: {

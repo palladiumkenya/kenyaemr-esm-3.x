@@ -16,9 +16,9 @@ import {
 import { Edit } from '@carbon/react/icons';
 import { Encounter } from '../encounter-observations/visit.resource';
 import { useTranslation } from 'react-i18next';
-import { formatDatetime, usePagination, Visit } from '@openmrs/esm-framework';
+import { formatDatetime, launchWorkspace, usePagination, Visit } from '@openmrs/esm-framework';
 import EncounterObservations from '../encounter-observations';
-import { EmptyState, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './in-patient-table.scss';
 import { mutate } from 'swr';
 
@@ -51,7 +51,7 @@ const InPatientTable: React.FC<InPatientTableProps> = ({ tableRows }) => {
   }, [results]);
 
   const onEncounterEdit = (encounter: Encounter) => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: encounter.form.display,
       mutateForm: () => {
         mutate((key) => typeof key === 'string' && key.startsWith(`/ws/rest/v1/encounter`), undefined, {

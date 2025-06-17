@@ -1,12 +1,11 @@
 import { Button, DataTableSkeleton, Layer, Tile } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyDataIllustration,
   ErrorState,
   getPatientUuidFromStore,
-  launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +33,7 @@ const PatientSHRSummaryTable: React.FC<PatientSHRSummaryTableProps> = () => {
   }
 
   const handleInitiateAuthorization = () => {
-    launchPatientWorkspace('shr-authorization-form', {
+    launchWorkspace('shr-authorization-form', {
       workspaceTitle: 'SHR Pull Authorization Form',
       patientUuid,
       onVerified: () => {

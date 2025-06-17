@@ -11,11 +11,10 @@ import first from 'lodash/first';
 import sortBy from 'lodash/sortBy';
 import { ErrorState } from '@openmrs/esm-framework';
 
-interface CarePanelProps {
+type CarePanelProps = {
   patientUuid: string;
   formEntrySub: any;
-  launchPatientWorkspace: Function;
-}
+};
 
 const CarePanel: React.FC<CarePanelProps> = ({ patientUuid, formEntrySub }) => {
   const { t } = useTranslation();
