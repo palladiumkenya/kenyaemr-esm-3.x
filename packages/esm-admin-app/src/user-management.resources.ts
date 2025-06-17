@@ -183,11 +183,15 @@ export function useStockTagLocations() {
 
 export const useUserRoleScopes = () => {
   const apiUrl = `${restBaseUrl}/stockmanagement/userrolescope?v=full`;
-  const { data, error, isLoading } = useSWR<{ data: PageableResult<UserRoleScope> }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: PageableResult<UserRoleScope> }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
   return {
     items: data?.data,
     loadingRoleScope: isLoading,
     userRoleScopeError: error,
+    isValidating,
   };
 };
 

@@ -11,20 +11,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
   OverflowMenu,
   OverflowMenuItem,
+  InlineLoading,
 } from '@carbon/react';
-import { AddAlt, ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
+import { ArrowDownLeft, ArrowLeft } from '@carbon/react/icons';
 import styles from '../../manage-user.scss';
-import {
-  isDesktop,
-  launchWorkspace,
-  restBaseUrl,
-  showModal,
-  showSnackbar,
-  WorkspaceContainer,
-} from '@openmrs/esm-framework';
+import { restBaseUrl, showModal, showSnackbar } from '@openmrs/esm-framework';
 import { deleteUserRoleScopes, handleMutation, useUserRoleScopes } from '../../../../../user-management.resources';
 import { User, UserRoleScope } from '../../../../../types';
 
@@ -34,17 +27,13 @@ interface StockUserRoleScopesListProps {
   onAddUserRoleScope?: (isAddRoleScope: boolean) => void;
 }
 
-const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({
-  user,
-  onEditUserRoleScope,
-  onAddUserRoleScope,
-}) => {
+const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({ user, onEditUserRoleScope }) => {
   const { t } = useTranslation();
 
   // Fetch user role scopes
-  const { items: userRoleScopes, loadingRoleScope } = useUserRoleScopes();
+  const { items: userRoleScopes, loadingRoleScope, isValidating } = useUserRoleScopes();
   const [deletingUserScope, setDeletingUserScope] = useState(false);
-  const size = 'mid';
+  const size = 'md';
 
   const tableHeaders = useMemo(
     () => [
@@ -134,14 +123,16 @@ const StockUserRoleScopesList: React.FC<StockUserRoleScopesListProps> = ({
   }, [userRoleScopes, t, user.uuid, showDeleteUserRoleScopeModal, onEditUserRoleScope]);
 
   if (loadingRoleScope) {
-    return <DataTableSkeleton role="progressbar" />;
+    return <DataTableSkeleton />;
   }
 
   return (
     <div>
-      <CardHeader title="Manage User Role Scope" children={''}></CardHeader>
+      <CardHeader title="Manage User Role Scope">
+        {isValidating && <InlineLoading description={t('refreshingUserScopes', 'Refreshing user scopes...')} />}
+      </CardHeader>
       <div className={styles.dataTable}>
-        <DataTable useZebraStyle size={size} rows={tableRows} headers={tableHeaders}>
+        <DataTable useZebraStyles size={size} rows={tableRows} headers={tableHeaders}>
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
             <TableContainer>
               <Table {...getTableProps()} aria-label="user role scope table">
