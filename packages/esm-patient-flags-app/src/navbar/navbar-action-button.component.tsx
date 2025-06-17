@@ -16,9 +16,8 @@ const NavbarActionButton: React.FC<NavbarActionButtonProps> = () => {
   const [showOverlay, setShowOverlay] = React.useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const toggleOverlay = (event) => {
+  const toggleOverlay = () => {
     setShowOverlay((prevState) => !prevState);
-    event.stopPropagation();
   };
   const ref = useOnClickOutside<HTMLDivElement>(toggleOverlay, showOverlay);
 
@@ -42,9 +41,7 @@ const NavbarActionButton: React.FC<NavbarActionButtonProps> = () => {
       <HeaderGlobalAction
         aria-label={t('kenyaEMRModules', 'KenyaEMR Modules')}
         aria-labelledby={t('kenyaEMRModules', 'KenyaEMR Modules')}
-        enterDelayMs={500}
-        name="kenyaEMRModules"
-        onClick={toggleOverlay}
+        onClick={() => toggleOverlay()}
         className={showOverlay ? styles.active : styles.slotStyles}>
         {showOverlay ? <Close size={20} /> : <Switcher size={20} />}
       </HeaderGlobalAction>
