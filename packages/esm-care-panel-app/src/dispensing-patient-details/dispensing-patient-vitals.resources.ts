@@ -125,9 +125,7 @@ const useVisitTriagEncounter = (encounterUuid: string) => {
     }>
   >(isLoading || error || !visitUuid ? null : url, openmrsFetch);
   const visitEncounters = data?.data?.encounters ?? [];
-  const triageEncounter = useMemo(() => {
-    return visitEncounters.find((e) => e.encounterType.uuid === triageEncounterType)?.uuid;
-  }, [visitEncounters]);
+  const triageEncounter = visitEncounters.find((e) => e.encounterType.uuid === triageEncounterType)?.uuid;
   return {
     encounter: triageEncounter,
     isLoading: isLoading || visitloading,
