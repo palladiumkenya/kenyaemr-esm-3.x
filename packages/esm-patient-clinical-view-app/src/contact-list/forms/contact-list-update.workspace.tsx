@@ -13,7 +13,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DefaultWorkspaceProps, parseDate, restBaseUrl, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
@@ -45,18 +45,19 @@ type ContactListUpdateFormType = z.infer<typeof relationshipFormSchema>;
 const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWorkspace, relation, patientUuid }) => {
   const { error, isLoading, relationship } = useRelationship(relation?.uuid);
   const { isLoading: typesLoading, error: typesError, relationshipTypes } = useRelationshipTypes();
-  const persionUuid = relationship?.personB?.uuid;
-  const { attributes } = usePersonAttributes(relationship?.personB?.uuid);
+  const personUuid = relationship?.personB?.uuid;
+  const { attributes } = usePersonAttributes(personUuid);
   const config = useConfig<ConfigObject>();
-
   const { t } = useTranslation();
-
-  const form = useForm<ContactListUpdateFormType>({
-    defaultValues: {},
+  const form = useForm<z.infer<typeof relationshipUpdateFormSchema>>({
     resolver: zodResolver(relationshipUpdateFormSchema),
+    mode: 'all',
   });
+  const { setValue } = form;
+  const { isLoading: isPatientLoading, birthdate } = usePatientBirthdate(relationship?.personB?.uuid);
 
-  const { isLoading: isPatientloading, birthdate } = usePatientBirthdate(relationship?.personB?.uuid);
+  // Use ref to track if initial values have been set
+  const initialValuesSet = useRef(false);
 
   const patientAgeMonths = useMemo(() => {
     let birthDate = birthdate ? parseDate(birthdate) : null;
@@ -67,56 +68,40 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
   }, [birthdate]);
 
   useEffect(() => {
-    if (relationship && relationshipTypes.length > 0) {
-      if (relationship.endDate) {
-        form.setValue('endDate', new Date(relationship.endDate));
-      }
+    // Only set initial values once when data is available and not already set
+    if (relationshipTypes.length > 0 && !initialValuesSet.current && relationship) {
       if (relationship.startDate) {
-        form.setValue('startDate', new Date(relationship.startDate));
-      }
-      if (relationship.relationshipType) {
-        form.setValue('relationshipType', relationship.relationshipType.uuid);
-      }
-    }
-  }, [relationship, relationshipTypes, form]);
-
-  useEffect(() => {
-    if (relation) {
-      if (relation.startDate) {
         try {
-          const startDate = new Date(relation.startDate);
-          form.setValue('startDate', startDate);
+          const startDate = parseDate(relationship.startDate);
+          setValue('startDate', startDate);
         } catch (e) {
-          console.warn('Invalid start date format:', relation.startDate);
+          console.warn('Invalid start date format:', relationship.startDate);
         }
       }
 
-      if (relation.endDate) {
+      if (relationship.endDate) {
         try {
-          const endDate = new Date(relation.endDate);
-          form.setValue('endDate', endDate);
+          const endDate = parseDate(relationship.endDate);
+          setValue('endDate', endDate);
         } catch (e) {
-          console.warn('Invalid end date format:', relation.endDate);
+          console.warn('Invalid end date format:', relationship.endDate);
         }
       }
 
-      if (relation.relationshipType && relationshipTypes.length > 0) {
-        const relType = relationshipTypes.find(
-          (type) =>
-            type.displayBIsToA === relation.relationshipType || type.displayAIsToB === relation.relationshipType,
-        );
-        if (relType) {
-          form.setValue('relationshipType', relType.uuid);
-        }
+      if (relationship.relationshipType?.uuid) {
+        setValue('relationshipType', relationship.relationshipType.uuid);
       }
+
+      // Mark that initial values have been set
+      initialValuesSet.current = true;
     }
-  }, [relation, relationshipTypes, form]);
+  }, [relationshipTypes, setValue, relationship]);
 
   const onSubmit = async (values: ContactListUpdateFormType) => {
     try {
       await updateRelationship(relationship.uuid, values);
       await updateContactAttributes(
-        persionUuid,
+        personUuid,
         {
           baselineStatus: values?.baselineStatus,
           preferedPNSAproach: values?.preferedPNSAproach,
@@ -130,7 +115,7 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
       showSnackbar({
         title: 'Success',
         kind: 'success',
-        subtitle: t('relationshipUpdated', ' Relationship updated successfully'),
+        subtitle: t('relationshipUpdated', 'Relationship updated successfully'),
       });
 
       mutate((key) => {
@@ -141,13 +126,13 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
     } catch (error) {
       showSnackbar({
         title: 'Error',
-        subtitle: 'Failure updating relationship! ' + JSON.stringify(error),
+        subtitle: 'Failure updating relationship! ' + (error?.message || JSON.stringify(error)),
         kind: 'error',
       });
     }
   };
 
-  if (isLoading || typesLoading) {
+  if (isLoading || typesLoading || isPatientLoading) {
     return (
       <div className={styles.loading}>
         <InlineLoading status="active" iconDescription="Loading" description="Loading form..." />
@@ -166,6 +151,17 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
     );
   }
 
+  if (!relationship) {
+    return (
+      <div className={styles.error}>
+        <Tile id="no-relationship">
+          <strong>Error:</strong>
+          <p>{t('noRelationshipFound', 'No relationship data found')}</p>
+        </Tile>
+      </div>
+    );
+  }
+
   return (
     <FormProvider {...form}>
       <Form onSubmit={form.handleSubmit(onSubmit)}>
@@ -173,7 +169,6 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
           <Column>
             <PatientInfo patientUuid={relationship?.personB?.uuid || relation?.relativeUuid} />
           </Column>
-
           <span className={styles.sectionHeader}>{t('relationship', 'Relationship')}</span>
           <Column>
             <Controller
@@ -185,7 +180,8 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                   dateFormat="d/m/Y"
                   id="startDate"
                   datePickerType="single"
-                  {...field}
+                  value={field.value}
+                  onChange={(v) => field.onChange(v[0])}
                   ref={undefined}
                   invalid={!!error?.message}
                   invalidText={error?.message}>
@@ -213,8 +209,8 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                   dateFormat="d/m/Y"
                   id="endDate"
                   datePickerType="single"
-                  {...field}
-                  ref={undefined}
+                  value={field.value}
+                  onChange={(dates) => field.onChange(dates[0])}
                   invalid={!!error?.message}
                   invalidText={error?.message}>
                   <DatePickerInput
@@ -222,7 +218,7 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                     name="enddate-input"
                     invalid={!!error?.message}
                     invalidText={error?.message}
-                    placeholder="mm/dd/yyyy"
+                    placeholder="dd/mm/yyyy"
                     labelText={t('endDate', 'End Date')}
                     size="xl"
                   />
@@ -254,10 +250,7 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
             />
           </Column>
 
-          <RelationshipBaselineInfoFormSection
-            patientAgeMonths={patientAgeMonths}
-            patientUuid={relationship?.personB?.uuid}
-          />
+          <RelationshipBaselineInfoFormSection patientAgeMonths={patientAgeMonths} patientUuid={personUuid} />
         </Stack>
 
         <ButtonSet className={styles.buttonSet}>
@@ -265,7 +258,7 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>
-            {t('submit', 'Submit')}
+            {form.formState.isSubmitting ? t('submitting', 'Submitting...') : t('submit', 'Submit')}
           </Button>
         </ButtonSet>
       </Form>

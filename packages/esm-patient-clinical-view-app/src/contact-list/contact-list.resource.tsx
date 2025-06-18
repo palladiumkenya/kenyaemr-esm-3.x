@@ -167,6 +167,43 @@ export const updatePersonAttributes = (payload: any, personUuid: string, attribu
   });
 };
 
+const ATTRIBUTE_MAPPINGS = [
+  { key: 'baselineStatus', configPath: 'baselineHIVStatus', cleanValue: true },
+  { key: 'preferedPNSAproach', configPath: 'preferedPnsAproach', cleanValue: true },
+  { key: 'livingWithClient', configPath: 'livingWithContact', cleanValue: true },
+  { key: 'ipvOutCome', configPath: 'contactIPVOutcome', cleanValue: false },
+];
+
+const createAttribute = (
+  attributeType: string,
+  value: string,
+  existingAttributes: Person['attributes'],
+  cleanValue: boolean = true,
+) => ({
+  attributeType,
+  value: cleanValue ? replaceAll(value, 'A', '') : value,
+  attribute: existingAttributes.find((a) => a.attributeType.uuid === attributeType)?.uuid,
+});
+
+const buildAttributes = (
+  attributes: ContactAttributeData,
+  config: ConfigObject,
+  existingAttributes: Person['attributes'] = [],
+) => {
+  if (!attributes) {
+    return [];
+  }
+
+  return ATTRIBUTE_MAPPINGS.filter((m) => attributes[m.key]).map((m) =>
+    createAttribute(
+      config.contactPersonAttributesUuid[m.configPath],
+      attributes[m.key],
+      existingAttributes,
+      m.cleanValue,
+    ),
+  );
+};
+
 export const updateContactAttributes = async (
   personUuid: string,
   attributes: ContactAttributeData,
@@ -174,53 +211,7 @@ export const updateContactAttributes = async (
   existingAttributes: Person['attributes'] = [],
 ) => {
   try {
-    const { baselineStatus, ipvOutCome, livingWithClient, preferedPNSAproach } = attributes;
-    const attrs = [
-      ...(baselineStatus
-        ? [
-            {
-              attributeType: config.contactPersonAttributesUuid.baselineHIVStatus,
-              value: replaceAll(baselineStatus, 'A', ''),
-              attribute: existingAttributes.find(
-                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus,
-              )?.uuid,
-            },
-          ]
-        : []),
-      ...(preferedPNSAproach
-        ? [
-            {
-              attributeType: config.contactPersonAttributesUuid.preferedPnsAproach,
-              value: replaceAll(preferedPNSAproach, 'A', ''),
-              attribute: existingAttributes.find(
-                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach,
-              )?.uuid,
-            },
-          ]
-        : []),
-      ...(livingWithClient
-        ? [
-            {
-              attributeType: config.contactPersonAttributesUuid.livingWithContact,
-              value: replaceAll(livingWithClient, 'A', ''),
-              attribute: existingAttributes.find(
-                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.livingWithContact,
-              )?.uuid,
-            },
-          ]
-        : []),
-      ...(ipvOutCome
-        ? [
-            {
-              attributeType: config.contactPersonAttributesUuid.contactIPVOutcome,
-              value: ipvOutCome,
-              attribute: existingAttributes.find(
-                (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.contactIPVOutcome,
-              )?.uuid,
-            },
-          ]
-        : []),
-    ];
+    const attrs = buildAttributes(attributes, config, existingAttributes);
 
     const results = await Promise.allSettled(
       attrs.map((attr) =>
