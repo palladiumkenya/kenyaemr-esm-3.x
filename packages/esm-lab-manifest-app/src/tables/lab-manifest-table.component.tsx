@@ -208,6 +208,7 @@ const LabManifestsTable = () => {
       <Layer className={styles.tile}>
         <CardHeader title={headerTitle}>
           <Dropdown
+            titleText={t('manifestStatus', 'Manifest status')}
             className={styles.dropDownFilter}
             id="manifestStatus"
             onChange={({ selectedItem }) => {
@@ -233,6 +234,7 @@ const LabManifestsTable = () => {
       <CardHeader title={headerTitle}>
         <div style={{ padding: '10px' }}>
           <Dropdown
+            titleText={t('manifestStatus', 'Manifest status')}
             style={{ minWidth: '300px' }}
             id="manifestStatus"
             onChange={({ selectedItem }) => {
@@ -260,9 +262,9 @@ const LabManifestsTable = () => {
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
+                        isSortable: true,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>

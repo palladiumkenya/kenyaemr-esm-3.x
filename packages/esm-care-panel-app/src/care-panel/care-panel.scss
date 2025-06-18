@@ -1,13 +1,14 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .bodyShort01 {
   @include type.type-style('body-compact-01');
 }
 
 .widgetCard {
-  background-color: $ui-background;
+  background-color: colors.$white;
   border: 1px solid $ui-03;
   position: relative;
 }

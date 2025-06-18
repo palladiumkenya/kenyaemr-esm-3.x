@@ -42,7 +42,7 @@ const ReverseTransactionModal: React.FC<ReverseTransactionModalProps> = ({ onClo
 
   return (
     <div>
-      <ModalHeader onClose={onClose}>{t('reverseTransaction', 'Reverse Transaction')}</ModalHeader>
+      <ModalHeader closeModal={onClose}>{t('reverseTransaction', 'Reverse Transaction')}</ModalHeader>
       <ModalBody>{t('reverseTransactionConfirmation', 'Are you sure you want to reverse this transaction?')}</ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={onClose}>

@@ -11,13 +11,14 @@ import {
   Search,
   TableContainer,
   Button,
+  DataTableHeader,
 } from '@carbon/react';
 import { Download } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useDebounce, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { convertToCurrency } from '../../helpers/functions';
-import { MappedBill } from '../../types';
+import { DataTableRow, MappedBill } from '../../types';
 import { exportToExcel } from '../../helpers/excelExport';
 import dayjs from 'dayjs';
 
@@ -25,7 +26,7 @@ export const PaymentHistoryTable = ({
   headers,
   rows = [],
 }: {
-  headers: Array<Record<string, any>>;
+  headers: Array<DataTableHeader>;
   rows: Array<MappedBill>;
 }) => {
   const { t } = useTranslation();
@@ -58,6 +59,7 @@ export const PaymentHistoryTable = ({
   const transformedRows = results.map((row) => {
     return {
       ...row,
+      id: `${row.id}`,
       billingService: row.lineItems.map((item) => item.billableService).join(', '),
       totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
       referenceCodes: row.payments
@@ -74,7 +76,7 @@ export const PaymentHistoryTable = ({
         totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
       };
     });
-    const data = dataForExport.map((row: (typeof transformedRows)[0]) => {
+    const data = dataForExport.map((row) => {
       return {
         'Receipt Number': row.receiptNumber,
         'Patient ID': row.identifier,

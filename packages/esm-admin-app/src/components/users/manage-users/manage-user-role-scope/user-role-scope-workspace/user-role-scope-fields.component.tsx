@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Control, Controller, useFormContext, UseFormReturn } from 'react-hook-form';
+import { Control, Controller, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import styles from './user-role-fields.scss';
 import { formatDatetime, ResponsiveWrapper } from '@openmrs/esm-framework';
@@ -82,7 +82,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
               onChange={({ selectedItem }) => {
                 field.onChange(selectedItem ? selectedItem.display.trim() : '');
               }}
-              disabled={userRoleScopeInitialValues}
+              disabled={!!userRoleScopeInitialValues}
             />
           )}
         />
@@ -156,17 +156,13 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
                         value={[value?.activeFrom, value?.activeTo]}>
                         <DatePickerInput
                           id="date-picker-input-id-start"
-                          name="activeFrom"
                           placeholder={DATE_PICKER_FORMAT}
                           labelText={t('activeFrom', 'Active From')}
-                          value={value?.activeFrom}
                         />
                         <DatePickerInput
                           id="date-picker-input-id-finish"
-                          name="activeTo"
                           placeholder={DATE_PICKER_FORMAT}
                           labelText={t('activeTo', 'Active To')}
-                          value={value?.activeTo}
                         />
                       </DatePicker>
                     );
@@ -178,7 +174,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
         </Column>
       </ResponsiveWrapper>
       <ResponsiveWrapper>
-        <Column key={t('stockOperation', 'Stock Operation')} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+        <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
           <CheckboxGroup legendText={t('stockOperation', 'Stock Operation')} className={styles.checkboxGroupGrid}>
             {loadingStock ? (
               <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />
@@ -234,7 +230,7 @@ const UserRoleScopeFormFields: React.FC<UserRoleScopeFields> = ({
         </Column>
       </ResponsiveWrapper>
       <ResponsiveWrapper>
-        <Column key={t('stockLocation', 'Stock Location')} xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
+        <Column xsm={8} md={12} lg={12} className={styles.checkBoxColumn}>
           <CheckboxGroup legendText={t('stockLocation', 'Stock Location')} className={styles.checkboxGroupGrid}>
             {loadingStock ? (
               <InlineLoading status="active" iconDescription="Loading" description="Loading data..." />

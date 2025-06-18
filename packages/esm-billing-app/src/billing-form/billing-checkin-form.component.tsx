@@ -63,7 +63,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
     );
   }, []);
 
-  const handleBillingService = (selectedItems: Array<BillingService>) => {
+  const handleBillingService = (selectedItems) => {
     const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
     const billStatus = hasPatientBeenExempted(attributes, isPatientExempted)
       ? EXEMPTED_PAYMENT_STATUS

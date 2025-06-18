@@ -234,9 +234,9 @@ const ContactList: React.FC<ContactListProps> = ({ patientUuid }) => {
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
+                        isSortable: true,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>

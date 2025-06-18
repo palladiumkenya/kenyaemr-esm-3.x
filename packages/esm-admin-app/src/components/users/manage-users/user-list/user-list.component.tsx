@@ -299,6 +299,8 @@ const UserList: React.FC = () => {
           <div className={styles.buttonContainer}>
             <p className={styles.filterByText}>{t('filterBy', 'Filter by:')}</p>
             <Dropdown
+              hideLabel={true}
+              titleText={t('filter', 'Filter')}
               id="filter-dropdown"
               label={t('filter', 'Filter')}
               className={styles.dropDownFilter}
@@ -310,7 +312,7 @@ const UserList: React.FC = () => {
                 { id: 'unlicensed', label: t('Unlicensed', 'Unlicensed') },
               ]}
               itemToString={(item) => (item ? item.label : '')}
-              onChange={({ selectedItem }) => setSelectedFilter(selectedItem.id)}
+              onChange={({ selectedItem }) => setSelectedFilter(selectedItem.id as FilterType)}
               selectedItem={{ id: selectedFilter, label: t(selectedFilter, selectedFilter) }}
               size={isDesktop(layout) ? 'lg' : 'sm'}
             />

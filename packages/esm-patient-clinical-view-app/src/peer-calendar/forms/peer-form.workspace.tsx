@@ -80,7 +80,7 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
             render={({ field }) => (
               <Dropdown
                 ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 id="relationship"
                 titleText={t('relationshipType', 'RelationshipbType')}
@@ -105,7 +105,7 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
             render={({ field }) => (
               <Dropdown
                 ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 id="peerEducator"
                 titleText={t('peerEducator', 'Peer Educator')}
@@ -132,16 +132,16 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
                 value={field.value}
                 onChange={field.onChange}
                 dateFormat="d/m/Y"
-                id="startDate"
                 datePickerType="single"
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
-                  invalid={form.formState.errors[field.name]?.message}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   placeholder="mm/dd/yyyy"
                   labelText={t('startDate', 'Start Date')}
-                  size={'xl'}
+                  size="lg"
+                  id="startDate"
                 />
               </DatePicker>
             )}
@@ -156,16 +156,16 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
                 value={field.value}
                 onChange={field.onChange}
                 dateFormat="d/m/Y"
-                id="endDate"
                 datePickerType="single"
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
-                  invalid={form.formState.errors[field.name]?.message}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   placeholder="mm/dd/yyyy"
                   labelText={t('endDate', 'End Date')}
-                  size="xl"
+                  size="lg"
+                  id="endDate"
                 />
               </DatePicker>
             )}
@@ -173,7 +173,7 @@ const PeerForm: React.FC<PeerFormProps> = ({ closeWorkspace }) => {
         </Column>
       </Stack>
       <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>

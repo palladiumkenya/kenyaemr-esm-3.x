@@ -2,8 +2,8 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import CarePrograms from './care-programs.component';
 import * as careProgramsHook from '../hooks/useCarePrograms';
-import { launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
-import { useVisit, launchWorkspace } from '@openmrs/esm-framework';
+import { launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace, useVisit } from '@openmrs/esm-framework';
 import { PatientCarePrograms } from '../hooks/useCarePrograms';
 import userEvent from '@testing-library/user-event';
 
@@ -17,6 +17,7 @@ const testProps = {
   error: null,
   carePrograms: [],
   mutate: jest.fn(),
+  mutateEligiblePrograms: jest.fn(),
 };
 
 const mockAPIResponse: Array<PatientCarePrograms> = [
@@ -45,7 +46,6 @@ const mockAPIResponse: Array<PatientCarePrograms> = [
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   ...jest.requireActual('@openmrs/esm-patient-common-lib'),
   launchStartVisitPrompt: jest.fn(),
-  launchPatientWorkspace: jest.fn(),
 }));
 
 describe('CarePrograms', () => {
@@ -95,7 +95,7 @@ describe('CarePrograms', () => {
     const enrollButton = screen.getByRole('button', { name: /Enroll/ });
     const discontinueButton = screen.getByRole('button', { name: /Discontinue/ });
     await user.click(enrollButton);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+    expect(launchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
         additionalProps: { enrollmenrDetails: expect.anything() },
         encounterUuid: '',
@@ -106,7 +106,7 @@ describe('CarePrograms', () => {
     });
 
     await user.click(discontinueButton);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
+    expect(launchWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
       formInfo: {
         additionalProps: {
           enrollmenrDetails: {

@@ -2,7 +2,6 @@ import {
   Button,
   ButtonSet,
   Column,
-  Dropdown,
   Form,
   InlineLoading,
   InlineNotification,
@@ -141,6 +140,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         trigger();
       }
     }, 500),
+    // eslint-disable-line react-hooks/exhaustive-deps
     [formInitialized, trigger],
   );
 

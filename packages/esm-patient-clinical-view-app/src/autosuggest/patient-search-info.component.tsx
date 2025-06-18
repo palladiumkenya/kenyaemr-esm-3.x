@@ -10,7 +10,7 @@ const PatientSearchInfo: React.FC<PatientSearchInfoProps> = ({ patient }) => {
   return (
     <Tile className={styles.patientInfo}>
       <div className={styles.patientAvatar} role="img">
-        <PatientPhoto patientUuid={patient.uuid} patientName={patient.person.display} size="small" />
+        <PatientPhoto patientUuid={patient.uuid} patientName={patient.person.display} />
       </div>
       <div className={styles.patientDetails}>
         <h2 className={styles.patientName}>{patient.person.display}</h2>

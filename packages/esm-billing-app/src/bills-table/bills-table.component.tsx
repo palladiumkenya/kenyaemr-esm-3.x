@@ -142,7 +142,6 @@ const BillsTable: React.FC<BillTableProps> = ({ defaultBillPaymentStatus = '' })
           showToolbar={false}
           zebra
           columnCount={headerData?.length}
-          size={responsiveSize}
         />
       </div>
     );

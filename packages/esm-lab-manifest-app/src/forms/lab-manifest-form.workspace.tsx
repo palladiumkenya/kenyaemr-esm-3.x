@@ -58,7 +58,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
   const { t } = useTranslation();
   const observableSelectedCounty = form.watch('county');
   const layout = useLayoutType();
-  const controlSize = layout === 'tablet' ? 'xl' : 'sm';
+  const controlSize = layout === 'tablet' ? 'sm' : 'md';
   const onSubmit = async (values: LabManifestFormType) => {
     try {
       const requireConfirmation =
@@ -105,13 +105,13 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
                 value={field.value}
                 onChange={field.onChange}
                 dateFormat="d/m/Y"
-                id="startDate"
                 datePickerType="single"
                 className={styles.datePickerInput}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
-                  invalid={form.formState.errors[field.name]?.message}
+                  id={field.name}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   placeholder="mm/dd/yyyy"
                   labelText={t('startDate', 'Start Date')}
@@ -131,16 +131,16 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
                 onChange={field.onChange}
                 className={styles.datePickerInput}
                 dateFormat="d/m/Y"
-                id="endDate"
                 datePickerType="single"
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
-                  invalid={form.formState.errors[field.name]?.message}
+                  id={field.name}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   placeholder="mm/dd/yyyy"
                   labelText={t('endDate', 'End Date')}
-                  size="xl"
+                  size={controlSize}
                 />
               </DatePicker>
             )}
@@ -154,7 +154,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             render={({ field }) => (
               <Dropdown
                 ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 id="manifestType"
                 titleText={t('manifestType', 'Manifest Type')}
@@ -177,18 +177,18 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             render={({ field }) => (
               <DatePicker
                 dateFormat="d/m/Y"
-                id="dispatchDate"
                 datePickerType="single"
                 className={styles.datePickerInput}
                 {...field}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <DatePickerInput
-                  invalid={form.formState.errors[field.name]?.message}
+                  id={field.name}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   placeholder="mm/dd/yyyy"
                   labelText={t('dispatchDate', 'Dispatch Date')}
-                  size="xl"
+                  size={controlSize}
                 />
               </DatePicker>
             )}
@@ -200,7 +200,8 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="courierName"
             render={({ field }) => (
               <TextInput
-                invalid={form.formState.errors[field.name]?.message}
+                id={field.name}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 {...field}
                 placeholder="Courier name"
@@ -215,7 +216,8 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="personHandedTo"
             render={({ field }) => (
               <TextInput
-                invalid={form.formState.errors[field.name]?.message}
+                id={field.name}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 {...field}
                 placeholder="Person name"
@@ -232,7 +234,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             render={({ field }) => (
               <Dropdown
                 ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 id="county"
                 titleText={t('county', 'County')}
@@ -255,7 +257,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             render={({ field }) => (
               <Dropdown
                 ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 id="subCounty"
                 titleText={t('subCounty', 'Sub county')}
@@ -282,7 +284,8 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="facilityEmail"
             render={({ field }) => (
               <TextInput
-                invalid={form.formState.errors[field.name]?.message}
+                id={field.name}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 {...field}
                 placeholder="Facility Email"
@@ -297,8 +300,9 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="facilityPhoneContact"
             render={({ field }) => (
               <TextInput
+                id={field.name}
                 {...field}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 placeholder="Phone number"
                 labelText={t('facilityPhoneContact', 'Facility phone contact')}
@@ -312,7 +316,8 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="clinicianName"
             render={({ field }) => (
               <TextInput
-                invalid={form.formState.errors[field.name]?.message}
+                id={field.name}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 {...field}
                 placeholder="Clinician name"
@@ -327,8 +332,9 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="clinicianContact"
             render={({ field }) => (
               <TextInput
+                id={field.name}
                 {...field}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 placeholder="Clinician contact"
                 labelText={t('clinicianContact', 'Clinician phone contact')}
@@ -342,8 +348,9 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="labPersonContact"
             render={({ field }) => (
               <TextInput
+                id={field.name}
                 {...field}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
                 placeholder="Lab person contact"
                 labelText={t('labPersonContact', 'Lab person contact')}
@@ -358,10 +365,10 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
             name="manifestStatus"
             render={({ field }) => (
               <Dropdown
+                id={field.name}
                 ref={field.ref}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}
-                id="manifestStatus"
                 titleText={t('status', 'Status')}
                 onChange={(e) => {
                   field.onChange(e.selectedItem);
@@ -381,7 +388,7 @@ const LabManifestForm: React.FC<LabManifestFormProps> = ({ closeWorkspace, manif
       </Stack>
 
       <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">

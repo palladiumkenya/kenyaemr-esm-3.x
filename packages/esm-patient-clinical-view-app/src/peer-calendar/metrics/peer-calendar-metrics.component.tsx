@@ -1,7 +1,6 @@
 import { Button, Layer, Row, SkeletonPlaceholder } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { useSession } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchWorkspace, useSession } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Peer, ReportingPeriod } from '../../types';
@@ -31,7 +30,7 @@ const PeerCalendarMetricsHeader: React.FC<PeerCalendarMetricsHeaderProps> = ({
 
   const { t } = useTranslation();
   const handleAddPeer = () => {
-    launchPatientWorkspace('peers-form', {});
+    launchWorkspace('peers-form', {});
   };
 
   if (isLoading) {

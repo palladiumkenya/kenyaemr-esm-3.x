@@ -6,7 +6,6 @@ import {
   restBaseUrl,
   showSnackbar,
   useLayoutType,
-  formatDatetime,
   useConfig,
   showModal,
   parseDate,
@@ -30,7 +29,6 @@ import {
   ComboBox,
   DatePickerInput,
   DatePicker,
-  Tile,
   Search,
   Row,
 } from '@carbon/react';
@@ -41,15 +39,12 @@ import {
   createUser,
   handleMutation,
   useRoles,
-  usePersonAttribute,
   useProvider,
   useProviderAttributeType,
-  useLocation,
   createProvider,
 } from '../../../user-management.resources';
 import UserManagementFormSchema from '../userManagementFormSchema';
-import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib/src';
-import { ChevronSortUp, Query, ChevronRight } from '@carbon/react/icons';
+import { ChevronLeft, Query, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
 import { type PractitionerResponse, Provider, User } from '../../../types';
 import { searchHealthCareWork } from '../../hook/searchHealthCareWork';
@@ -550,9 +545,9 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const getSubmitButtonText = () =>
     t(isSaveAndClose() ? 'saveAndClose' : 'next', isSaveAndClose() ? 'Save & close' : 'Next');
 
-  const getSubmitButtonType = () => (isSaveAndClose() ? 'submit' : '');
+  const getSubmitButtonType = () => (isSaveAndClose() ? 'submit' : 'button');
 
-  const getSubmitButtonIcon = () => (isSaveAndClose() ? '' : ChevronRight);
+  const getSubmitButtonIcon = () => (isSaveAndClose() ? ChevronLeft : ChevronRight);
 
   const handleBackClick = () => {
     if (hasDemographicInfo) {
@@ -577,7 +572,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         <div className={styles.leftLayout}>
           <ProgressIndicator
             currentIndex={currentIndex}
-            spaceEquality={true}
+            spaceEqually={true}
             vertical={true}
             className={styles.progressIndicator}
             onChange={(newIndex) => {
@@ -603,7 +598,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                         {searchHWR.isHWRLoading ? (
                           <InlineLoading
                             className={styles.formLoading}
-                            active={searchHWR.isHWRLoading}
                             description={t('pullDetailsfromHWR', 'Pulling data from Health worker registry...')}
                           />
                         ) : (
@@ -628,6 +622,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 </span>
                                 <Row className={styles.formRow}>
                                   <Search
+                                    labelText={t('enterIdentifierNumber', 'Enter identifier number')}
                                     className={styles.formSearch}
                                     defaultValue={searchHWR.identifier}
                                     placeholder={t('enterIdentifierNumber', 'Enter identifier number')}
@@ -936,7 +931,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     className={styles.multilineCheckboxLabel}>
                                     <Checkbox
                                       className={styles.checkboxLabelSingleLine}
-                                      {...field}
                                       id="isEditProvider"
                                       labelText={t('EditProviderDetails', 'Edit provider details?')}
                                       checked={field.value || false}
@@ -958,7 +952,6 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                   className={styles.multilineCheckboxLabel}>
                                   <Checkbox
                                     className={styles.checkboxLabelSingleLine}
-                                    {...field}
                                     id="providerIdentifiersa"
                                     labelText={t('providerIdentifiers', 'Create a Provider account for this user')}
                                     checked={field.value || false}
@@ -1051,13 +1044,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 className={styles.checkboxGroupGrid}>
                                 <Checkbox
                                   className={styles.multilineCheckboxLabel}
-                                  {...field}
                                   id="forcePasswordChange"
                                   labelText={t(
                                     'forcePasswordChangeHelper',
                                     'Optionally require this user to change their password on next login',
                                   )}
-                                  checked={field.value || false}
+                                  checked={!!field.value || false}
                                   onChange={(e) => field.onChange(e.target.checked)}
                                 />
                               </CheckboxGroup>

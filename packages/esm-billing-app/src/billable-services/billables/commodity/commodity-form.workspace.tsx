@@ -186,13 +186,13 @@ const CommodityForm: React.FC<CommodityFormProps> = ({
                 lowContrast={true}
                 statusIconDescription="notification"
                 title={t('paymentMethodRequired', 'Payment method required')}
-                subTitle={t('atLeastOnePriceRequired', 'At least one price is required')}
+                subtitle={t('atLeastOnePriceRequired', 'At least one price is required')}
               />
             )}
           </Stack>
         </div>
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
+          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button disabled={isSubmitting || !isDirty} style={{ maxWidth: '50%' }} kind="primary" type="submit">

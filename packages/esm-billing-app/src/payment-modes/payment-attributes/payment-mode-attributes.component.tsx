@@ -83,6 +83,7 @@ const PaymentModeAttributeFields: React.FC<PaymentModeAttributeFields> = ({
             name={`attributeTypes.${index}.retiredReason`}
             render={({ field }) => (
               <TextInput
+                id={`attributeTypes.${index}.retireReason`}
                 {...field}
                 labelText={t('attributeRetiredReason', 'Attribute retired reason')}
                 placeholder={t('enterAttributeRetiredReason', 'Enter attribute retired reason')}
@@ -100,9 +101,10 @@ const PaymentModeAttributeFields: React.FC<PaymentModeAttributeFields> = ({
           render={({ field }) => (
             <Dropdown
               {...field}
+              label={t('attributeFormat', 'Attribute format')}
               id={`attributeTypes.${index}.format`}
               titleText={t('attributeFormat', 'Attribute format')}
-              placeholder={t('selectAttributeFormat', 'Select attribute format')}
+              aria-placeholder={t('selectAttributeFormat', 'Select attribute format')}
               onChange={(event) => field.onChange(event.selectedItem)}
               initialSelectedItem={field.value}
               helperText={t('attributeFormatHelperText', 'The format of the attribute value e.g Free text, Number')}
@@ -120,6 +122,7 @@ const PaymentModeAttributeFields: React.FC<PaymentModeAttributeFields> = ({
           render={({ field }) => (
             <TextInput
               {...field}
+              id={`attributeTypes.${index}.regExp`}
               labelText={t('regExp', 'Regular expression')}
               placeholder={t('enterRegExp', 'Enter regular expression')}
             />

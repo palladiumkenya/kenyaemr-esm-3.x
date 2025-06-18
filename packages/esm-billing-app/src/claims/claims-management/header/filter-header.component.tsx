@@ -30,11 +30,13 @@ const ClaimsFilterHeader: React.FC<ClaimsFilterHeaderProps> = ({
   return (
     <div className={styles.filterContainer}>
       <Search
+        labelText={t('searchForPatient', 'Search for patient')}
         placeholder={t('searchPLaceHolder', 'Search by provider or patient')}
         onChange={({ target: { value } }) => onFilterChanged((fil) => ({ ...fil, search: value }))}
         value={filters.search}
       />
       <Dropdown
+        hideLabel
         className={styles.input}
         id="status"
         onChange={({ selectedItem }) => {
@@ -44,13 +46,24 @@ const ClaimsFilterHeader: React.FC<ClaimsFilterHeaderProps> = ({
         label={t('preauthStatus', 'Filter by Status')}
         items={status.map((s) => s.value)}
         itemToString={(item) => status.find((s) => s.value === item)?.label ?? ''}
+        titleText={t('preauthStatus', 'Filter by Status')}
       />
       <DatePicker
         datePickerType="range"
         value={[filters.fromDate, filters.toDate]}
         onChange={([fromDate, toDate]) => onFilterChanged((fil) => ({ ...fil, fromDate, toDate }))}>
-        <DatePickerInput id="date-picker-input-id-start" placeholder="mm/dd/yyyy" size="md" />
-        <DatePickerInput id="date-picker-input-id-finish" placeholder="mm/dd/yyyy" size="md" />
+        <DatePickerInput
+          labelText={t('startDate', 'Start date')}
+          id="date-picker-input-id-start"
+          placeholder="mm/dd/yyyy"
+          size="md"
+        />
+        <DatePickerInput
+          labelText={t('endDatetime', 'End date')}
+          id="date-picker-input-id-finish"
+          placeholder="mm/dd/yyyy"
+          size="md"
+        />
       </DatePicker>
       <Button kind="primary" onClick={handleUpdateAllStatuses} disabled={filteredClaimIds.length === 0}>
         {t('updateAllStatuses', 'Update All')}

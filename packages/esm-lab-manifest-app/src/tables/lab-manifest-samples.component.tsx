@@ -263,7 +263,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
                   <TableRow>
                     <TableSelectAll {...getSelectionProps()} />
                     {headers.map((header, i) => (
-                      <TableHeader key={i} {...getHeaderProps({ header, isSortable: header.isSortable })}>
+                      <TableHeader key={i} {...getHeaderProps({ header, isSortable: true })}>
                         {header.header}
                       </TableHeader>
                     ))}

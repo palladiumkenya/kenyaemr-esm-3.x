@@ -72,7 +72,12 @@ const MPISearch: React.FC = () => {
                   type="submit">
                   Submit
                 </Button>
-                <TextInput type="text" labelText="Text input label" helperText="Optional help text" />
+                <TextInput
+                  id="mpiSearchTerm"
+                  type="text"
+                  labelText="Text input label"
+                  helperText="Optional help text"
+                />
               </form>
             </Layer>
           </TabPanel>

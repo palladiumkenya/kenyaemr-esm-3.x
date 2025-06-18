@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, parseDate, useConfig } from '@openmrs/esm-framework';
 import { AdmissionDate_UUID, PriorityOfAdmission_UUID, AdmissionWard_UUID } from '../utils/constants';
 import { getObsFromEncounter } from '../ui/encounter-list/encounter-list-utils';
-import { EmptyState, launchPatientWorkspace, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { OverflowMenu, OverflowMenuItem, InlineLoading } from '@carbon/react';
 import { ConfigObject } from '../config-schema';
 import SummaryCard from './summary/summary-card.component';
@@ -34,7 +34,7 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({
     formsList: { clinicalEncounterFormUuid },
   } = useConfig<ConfigObject>();
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Clinical Encounter',
       mutateForm: mutate,
       formInfo: {
@@ -60,7 +60,7 @@ const ClinicalEncounter: React.FC<ClinicalEncounterProps> = ({
       admittingDoctor: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].provider.name : '',
       admissionWard: getObsFromEncounter(encounter, AdmissionWard_UUID),
       actions: (
-        <OverflowMenu aria-label="overflow-menu" flipped="false">
+        <OverflowMenu aria-label="overflow-menu" flipped={false}>
           <OverflowMenuItem
             onClick={() => handleOpenOrEditClinicalEncounterForm(encounter.uuid)}
             itemText={t('edit', 'Edit')}

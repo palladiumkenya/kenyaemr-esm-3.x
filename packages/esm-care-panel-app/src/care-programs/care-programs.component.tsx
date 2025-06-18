@@ -14,16 +14,10 @@ import {
   DataTableSkeleton,
 } from '@carbon/react';
 import { Close, DocumentAdd } from '@carbon/react/icons';
-import {
-  CardHeader,
-  EmptyState,
-  launchStartVisitPrompt,
-  ErrorState,
-  launchPatientWorkspace,
-} from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, launchStartVisitPrompt, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
-import { formatDate, restBaseUrl, useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, restBaseUrl, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
 import { mutate } from 'swr';
 
@@ -64,7 +58,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
         : `${careProgram.display} Enrollment form`;
 
       currentVisit
-        ? launchPatientWorkspace('patient-form-entry-workspace', {
+        ? launchWorkspace('patient-form-entry-workspace', {
             workspaceTitle: workspaceTitle,
             mutateForm: () => {
               handleMutations();

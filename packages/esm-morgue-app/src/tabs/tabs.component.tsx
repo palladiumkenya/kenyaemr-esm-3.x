@@ -48,7 +48,7 @@ export const MorgueTabs: React.FC = () => {
   };
   return (
     <div className={styles.referralsList} data-testid="">
-      <Tabs selected={0} role="navigation">
+      <Tabs>
         <div className={styles.tabsContainer}>
           <TabList aria-label="Content Switcher as Tabs" contained>
             {tabPanels.map((tab, index) => (

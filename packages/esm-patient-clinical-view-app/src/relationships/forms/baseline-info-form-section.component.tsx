@@ -211,7 +211,7 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
                     '1. Has he/she ever hit, kicked, slapped, or otherwise physically hurt you?',
                   )}
                   {...field}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   className={styles.billingItem}>
                   <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="physicalAssault_yes" />
@@ -229,7 +229,7 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
                   id="threatened"
                   legendText={t('threatened', '2. Has he/she ever threatened to hurt you?')}
                   {...field}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   className={styles.billingItem}>
                   <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="threatened_yes" />
@@ -250,7 +250,7 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
                     '3.Has he/she ever forced you to do something sexually that made you feel uncomfortable?',
                   )}
                   {...field}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   className={styles.billingItem}>
                   <RadioButton labelText={t('yes', 'Yes')} value={BOOLEAN_YES} id="sexualAssault_yes" />
@@ -271,7 +271,7 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
                   ) : (
                     <Dropdown
                       ref={field.ref}
-                      invalid={error?.message}
+                      invalid={!!error?.message}
                       invalidText={error?.message}
                       id="ipvOutCome"
                       titleText={t('ipvOutCome', 'IPV Outcome')}

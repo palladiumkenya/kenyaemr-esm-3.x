@@ -29,8 +29,8 @@ export const LabManifestTabs: React.FC<LabManifestTabsProps> = ({ manifestUuid }
   }
 
   return (
-    <main>
-      <Tabs className={styles.tabs}>
+    <main className={styles.tabs}>
+      <Tabs>
         <TabList className={styles.tablist} aria-label="List tabs" contained>
           <Tab className={styles.tab}>{t('manifestSamples', 'ManifestSamples')}</Tab>
 

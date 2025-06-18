@@ -162,7 +162,7 @@ const ClaimsTable: React.FC<TableProps> = ({
     return <ClaimStatus row={row} />;
   };
 
-  const renderActionCell = (row: DataTableRow, rowStatus: string, size: string) => {
+  const renderActionCell = (row: DataTableRow, rowStatus: string, size: 'lg' | 'md' | 'sm') => {
     return (
       <OverflowMenu size={size} flipped>
         {['ENTERED', 'ERRORED'].includes(rowStatus) && (

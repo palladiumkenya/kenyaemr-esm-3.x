@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { ChangeEvent, useCallback } from 'react';
 import { Controller, FieldArrayWithId, UseFieldArrayRemove, useFieldArray, useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { TrashCan, Add } from '@carbon/react/icons';
@@ -82,7 +82,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ disablePayment, amountDue, ap
               <NumberInput
                 {...field}
                 id="paymentAmount"
-                onChange={(e) => field.onChange(Number(e.target.value))}
+                onChange={(e, { value }) => field.onChange(Number(value))}
                 invalid={!!errors?.payment?.[index]?.amount}
                 invalidText={errors?.payment?.[index]?.amount?.message}
                 label={t('amount', 'Amount')}

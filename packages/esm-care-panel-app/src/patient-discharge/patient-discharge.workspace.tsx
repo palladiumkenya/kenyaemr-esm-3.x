@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, InlineNotification } from '@carbon/react';
 import {
@@ -46,7 +46,17 @@ export function PatientDischargeWorkspace(props: PatientDischargeWorkspaceProps)
       handlePostResponse: (encounter: Encounter) =>
         handleDischarge(encounter, wardPatient, emrConfiguration as Record<string, unknown>, currentVisit),
     }),
-    [patientUuid, currentVisit, encounterUuid, patient, closeWorkspace, promptBeforeClosing, emrConfiguration],
+    [
+      patientUuid,
+      currentVisit,
+      encounterUuid,
+      patient,
+      closeWorkspace,
+      promptBeforeClosing,
+      emrConfiguration,
+      closeWorkspaceWithSavedChanges,
+      handleDischarge,
+    ],
   );
 
   const isLoading = isLoadingVisit || isLoadingPatient || isLoadingEmrConfiguration;

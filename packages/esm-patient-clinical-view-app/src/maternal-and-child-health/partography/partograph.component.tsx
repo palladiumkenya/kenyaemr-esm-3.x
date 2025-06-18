@@ -15,14 +15,8 @@ import {
   Button,
 } from '@carbon/react';
 import { Add, ChartLineSmooth } from '@carbon/react/icons';
-import {
-  EmptyDataIllustration,
-  ErrorState,
-  CardHeader,
-  launchPatientWorkspace,
-  EmptyState,
-} from '@openmrs/esm-patient-common-lib';
-import { formatDate, isDesktop, parseDate, useLayoutType } from '@openmrs/esm-framework';
+import { EmptyDataIllustration, ErrorState, CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { formatDate, isDesktop, launchWorkspace, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import styles from './labour-delivery.scss';
 import { usePartograph } from '../../hooks/usePartograph';
 import dayjs from 'dayjs';
@@ -108,7 +102,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     }) ?? [];
 
   const handleAddHistory = () => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: headerTitle,
       mutateForm: () => {
         mutate();
@@ -204,9 +198,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                                 <TableHeader
                                   {...getHeaderProps({
                                     header,
-                                    isSortable: header.isSortable,
+                                    isSortable: true,
                                   })}>
-                                  {header.header?.content ?? header.header}
+                                  {header.header}
                                 </TableHeader>
                               ))}
                             </TableRow>

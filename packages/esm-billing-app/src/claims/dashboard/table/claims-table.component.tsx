@@ -15,8 +15,6 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
-  type DataTableHeader,
-  type DataTableRow,
 } from '@carbon/react';
 import { formatDate, isDesktop, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import fuzzy from 'fuzzy';
@@ -64,7 +62,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
     return filteredLineItems.slice(startIndex, endIndex);
   }, [filteredLineItems, currentPage, pageSize]);
 
-  const tableHeaders: Array<typeof DataTableHeader> = [
+  const tableHeaders = [
     { header: t('no', 'No'), key: 'no' },
     { header: t('serialNo', 'Serial No'), key: 'serialno' },
     { header: t('billItem', 'Bill Item'), key: 'inventoryname' },
@@ -75,7 +73,7 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
 
   const processBillItem = (item) => (item?.item || item?.billableService)?.split(':')[1];
 
-  const tableRows: Array<typeof DataTableRow> = useMemo(
+  const tableRows = useMemo(
     () =>
       paginatedLineItems?.map((item, index) => {
         return {
@@ -94,18 +92,12 @@ const ClaimsTable: React.FC<ClaimsTableProps> = ({ bill, isSelectable = true, is
   if (isLoadingBill) {
     return (
       <div className={styles.loaderContainer}>
-        <DataTableSkeleton
-          columnCount={tableHeaders.length}
-          showHeader={false}
-          showToolbar={false}
-          size={responsiveSize}
-          zebra
-        />
+        <DataTableSkeleton columnCount={tableHeaders.length} showHeader={false} showToolbar={false} zebra />
       </div>
     );
   }
 
-  const handleRowSelection = (row: typeof DataTableRow, checked: boolean) => {
+  const handleRowSelection = (row, checked: boolean) => {
     const matchingRow = filteredLineItems.find((item) => item.uuid === row.id);
     let newSelectedLineItems;
 

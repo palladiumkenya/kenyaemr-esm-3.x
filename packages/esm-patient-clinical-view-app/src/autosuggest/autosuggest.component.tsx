@@ -1,4 +1,4 @@
-import { Layer, Search, type SearchProps } from '@carbon/react';
+import { Layer, Search } from '@carbon/react';
 import classNames from 'classnames';
 import React, { type HTMLAttributes, ReactNode, useEffect, useRef, useState } from 'react';
 import styles from './autosuggest.scss';
@@ -140,7 +140,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const query = e.target.value;
     onSuggestionSelected(name, undefined);
 
@@ -154,7 +154,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     }
   };
 
-  const handleClear = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleClear = () => {
     onSuggestionSelected(name, undefined);
   };
 
