@@ -44,7 +44,7 @@ const ReferralTabs: React.FC<ReferralTabsProps> = () => {
   return (
     <div className={styles.referralsList} data-testid="referralsList-list">
       <div className={styles.tabsContainer}>
-        <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange} className={styles.tabs}>
+        <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange}>
           <TabList aria-label="Referrals tabs" contained>
             <Tab className={styles.tab}>{t('fromCommunity', 'From Community')}</Tab>
             <Tab className={styles.tab}>{t('fromFacility', 'From Facility')}</Tab>

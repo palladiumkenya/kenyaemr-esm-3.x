@@ -18,7 +18,7 @@ const ProgramSummary: React.FC<ProgramSummaryProps> = ({ patientUuid, programNam
 
   const isTablet = useLayoutType() == 'tablet';
   if (isLoading) {
-    return <StructuredListSkeleton role="progressbar" />;
+    return <StructuredListSkeleton />;
   }
   if (isError) {
     return <span>{t('errorProgramSummary', 'Error loading HIV summary')}</span>;

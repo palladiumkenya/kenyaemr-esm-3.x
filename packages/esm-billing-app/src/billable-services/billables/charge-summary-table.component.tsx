@@ -21,7 +21,7 @@ import {
 import { CategoryAdd, Download, Upload, WatsonHealthScalpelSelect } from '@carbon/react/icons';
 import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import React, { useMemo, useState } from 'react';
+import React, { ChangeEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../../helpers';
 import styles from './charge-summary-table.scss';
@@ -134,7 +134,7 @@ const ChargeSummaryTable: React.FC = () => {
               <TableToolbarContent>
                 <TableToolbarSearch
                   placeholder={t('searchForChargeItem', 'Search for charge item')}
-                  onChange={(e) => setSearchString(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value)}
                   persistent
                   size={size}
                 />

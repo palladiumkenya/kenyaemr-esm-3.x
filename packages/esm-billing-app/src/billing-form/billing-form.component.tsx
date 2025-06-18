@@ -156,6 +156,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                         name={`lineItems.${index}.priceUuid`}
                         render={({ field }) => (
                           <Dropdown
+                            hideLabel
                             ref={field.ref}
                             invalid={form.formState.errors[field.name]?.message}
                             invalidText={form.formState.errors[field.name]?.message}
@@ -166,7 +167,8 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                               form.setValue(`lineItems.${index}.price`, price ?? 0);
                             }}
                             selectedItem={field.value}
-                            label="Choose method"
+                            label={t('choosePrice', 'Choose price')}
+                            titleText={t('choosePrice', 'Choose price')}
                             items={service?.servicePrices.map((r) => r.uuid) ?? []}
                             itemToString={(item) => service?.servicePrices.find((r) => r.uuid === item)?.name ?? ''}
                           />

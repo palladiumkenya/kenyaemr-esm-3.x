@@ -227,7 +227,7 @@ export const useMortuaryOperation = () => {
           queueEntry.queue.uuid,
           queueEntry.queueEntryUuid,
           abortController,
-          response?.data?.stopDatetime,
+          new Date(response?.data?.stopDatetime),
         );
       }
     },

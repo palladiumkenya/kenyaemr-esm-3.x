@@ -29,7 +29,7 @@ describe('CarePanel Component', () => {
       isLoading: false,
       isError: false,
     });
-    render(<CarePanel patientUuid={mockPatientUuid} formEntrySub={jest.fn()} launchPatientWorkspace={jest.fn()} />);
+    render(<CarePanel patientUuid={mockPatientUuid} formEntrySub={jest.fn()} />);
     expect(screen.getByText('Care Panel')).toBeInTheDocument();
   });
 
@@ -40,7 +40,7 @@ describe('CarePanel Component', () => {
       isError: false,
     });
 
-    render(<CarePanel patientUuid={mockPatientUuid} formEntrySub={jest.fn()} launchPatientWorkspace={jest.fn()} />);
+    render(<CarePanel patientUuid={mockPatientUuid} formEntrySub={jest.fn()} />);
 
     expect(screen.getByTestId('mocked-structured-list-skeleton')).toBeInTheDocument();
     expect(screen.queryByTestId('mocked-program-summary')).not.toBeInTheDocument();
@@ -54,7 +54,7 @@ describe('CarePanel Component', () => {
       isError: true,
     });
 
-    render(<CarePanel patientUuid={mockPatientUuid} formEntrySub={jest.fn()} launchPatientWorkspace={jest.fn()} />);
+    render(<CarePanel patientUuid={mockPatientUuid} formEntrySub={jest.fn()} />);
 
     expect(screen.getByText('Error loading program enrollments')).toBeInTheDocument();
     expect(screen.queryByTestId('mocked-structured-list-skeleton')).not.toBeInTheDocument();

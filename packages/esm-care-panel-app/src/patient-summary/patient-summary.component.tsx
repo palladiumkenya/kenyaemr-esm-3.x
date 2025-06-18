@@ -38,7 +38,7 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
   }, [showPrintComponent, handlePrint]);
 
   if (isLoading) {
-    return <StructuredListSkeleton role="progressbar" />;
+    return <StructuredListSkeleton />;
   }
   if (error) {
     return <span>{t('errorPatientSummary', 'Error loading patient summary')}</span>;

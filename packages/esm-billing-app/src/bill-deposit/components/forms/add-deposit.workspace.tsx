@@ -147,7 +147,7 @@ const AddDepositWorkspace: React.FC<AddDepositWorkspaceProps> = ({
                 id="amount"
                 invalidText={errors.amount?.message}
                 label={t('amount', 'Amount')}
-                onChange={(e, { value }) => field.onChange(parseInt(value, 10))}
+                onChange={(e, { value }) => field.onChange(parseInt(value.toString(), 10))}
                 size="md"
                 step={1}
                 value={field.value}
@@ -192,7 +192,7 @@ const AddDepositWorkspace: React.FC<AddDepositWorkspaceProps> = ({
         </ResponsiveWrapper>
       </div>
       <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-        <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
+        <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button disabled={isSubmitting || !isDirty} style={{ maxWidth: '50%' }} kind="primary" type="submit">

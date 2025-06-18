@@ -13,6 +13,7 @@ const FilterTableHeader: React.FC<FilterTableHeaderProps> = ({ onSearch, searchT
   return (
     <div>
       <Search
+        labelText={t('searchTable', 'Search table')}
         placeholder={t('searchThisTable', 'Search this table')}
         onClear={() => {
           onSearch('');

@@ -132,7 +132,7 @@ export const BillableExemptionsViewer = () => {
             </div>
           </div>
           {error && <ErrorNotification error={error} title={t('schemaLoadError', 'Error loading schema')} />}
-          <Tabs onChange={handleTabChange} selected={selectedIndex}>
+          <Tabs onChange={handleTabChange} selectedIndex={selectedIndex}>
             <TabList aria-label="Schema previews">
               <Tab>{t('preview', 'Schema Preview')}</Tab>
               <Tab>{schema ? t('editSchema', 'Edit Schema') : t('addSchema', 'Add Schema')}</Tab>

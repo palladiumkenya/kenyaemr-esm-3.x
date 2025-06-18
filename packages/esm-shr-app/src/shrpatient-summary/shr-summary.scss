@@ -1,7 +1,7 @@
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .bodyContainer {
   margin: spacing.$spacing-03;
@@ -158,7 +158,7 @@
 }
 
 .summaryContainer {
-  background-color: $ui-background;
+  background-color: colors.$white;
   display: grid;
   grid-template-columns: max-content auto;
   padding: 1rem 0rem;

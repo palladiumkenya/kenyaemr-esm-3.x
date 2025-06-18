@@ -40,13 +40,13 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
         <Tile className={styles.detailHeaderContentLoading}>
           <Row className={styles.detailHeaderContentRow}>
             {Array.from({ length: 8 }).map((_, index) => (
-              <SkeletonText style={{ maxWidth: '100px' }} key={index} />
+              <SkeletonText key={index} />
             ))}
           </Row>
           <hr />
           <Row className={styles.detailHeaderContentRow}>
-            <SkeletonText style={{ maxWidth: '100px' }} />
-            <SkeletonText style={{ maxWidth: '100px' }} />
+            <SkeletonText />
+            <SkeletonText />
           </Row>
         </Tile>
       </Layer>

@@ -55,7 +55,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
       : lineItems;
   }, [debouncedSearchTerm, lineItems]);
 
-  const tableHeaders: Array<typeof DataTableHeader> = [
+  const tableHeaders = [
     { header: 'No', key: 'no' },
     { header: 'Bill item', key: 'billItem' },
     { header: 'Bill code', key: 'billCode' },
@@ -66,7 +66,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
   ];
   const processBillItem = (item) => (item?.item || item?.billableService)?.split(':')[1];
 
-  const tableRows: Array<typeof DataTableRow> = useMemo(
+  const tableRows = useMemo(
     () =>
       filteredLineItems?.map((item, index) => {
         return {
@@ -86,18 +86,12 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ bill, isSelectable = true, 
   if (isLoadingBill) {
     return (
       <div className={styles.loaderContainer}>
-        <DataTableSkeleton
-          columnCount={tableHeaders.length}
-          showHeader={false}
-          showToolbar={false}
-          size={responsiveSize}
-          zebra
-        />
+        <DataTableSkeleton columnCount={tableHeaders.length} showHeader={false} showToolbar={false} zebra />
       </div>
     );
   }
 
-  const handleRowSelection = (row: typeof DataTableRow, checked: boolean) => {
+  const handleRowSelection = (row, checked: boolean) => {
     const matchingRow = filteredLineItems.find((item) => item.uuid === row.id);
     let newSelectedLineItems;
 

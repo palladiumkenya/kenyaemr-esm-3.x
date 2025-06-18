@@ -42,7 +42,7 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
 
   // If still loading
   if (isLoading) {
-    return <StructuredListSkeleton role="progressbar" />;
+    return <StructuredListSkeleton />;
   }
 
   // If there is an error
@@ -216,7 +216,7 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
           <hr />
 
           <div className={styles.summaryContainer}>
-            <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
+            <Tabs>
               <TabList aria-label="Shared Medical Record tabs" className={styles.tablist}>
                 <Tab
                   className={`${styles.tab} ${styles.bodyLong01}`}

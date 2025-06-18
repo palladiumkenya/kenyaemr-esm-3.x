@@ -105,7 +105,7 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({
         accidentOrTrauma: getObsFromEncounter(encounter, ACCIDENT_TRAUMA_UUID),
         finalDiagnosis: encounter.diagnoses.length > 0 ? encounter.diagnoses[0].diagnosis.coded.display : '--',
         actions: (
-          <OverflowMenu aria-label="overflow-menu" flipped="false">
+          <OverflowMenu aria-label="overflow-menu" flipped={false}>
             <OverflowMenuItem
               onClick={() => handleOpenOrEditClinicalEncounterForm(encounter.uuid)}
               itemText={t('edit', 'Edit')}
@@ -148,7 +148,7 @@ const OutPatientMedicalHistory: React.FC<OutPatientMedicalHistoryProps> = ({
         rows={tableRows}
         headers={tableHeader}
         render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer size="sm" {...getTableContainerProps()}>
+          <TableContainer {...getTableContainerProps()}>
             <Table size="sm" {...getTableProps()} aria-label="sample table">
               <TableHead>
                 <TableRow>

@@ -126,11 +126,10 @@ export const ClockIn = ({
           <SelectSkeleton />
         ) : (
           <Select
+            id="paymentPointUuid"
             {...register('paymentPointUUID')}
             labelText={t('selectPaymentPoint', 'Select payment point')}
             helperText={t('selectPaymentPointMessage', 'Select the payment point on which you will be clocked in.')}
-            label={t('paymentPoint', 'Payment point')}
-            placeholder={t('pleaseSelectPaymentPoint', 'Please select a payment point')}
             invalid={!!errors.paymentPointUUID}
             invalidText={errors.paymentPointUUID?.message}>
             {paymentPoints.map((point) => (

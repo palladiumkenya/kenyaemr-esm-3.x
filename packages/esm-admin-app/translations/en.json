@@ -73,6 +73,7 @@
   "recreateTables": "Recreate tables",
   "refreshDwapi": "Refresh DWAPI tables",
   "refreshed": "refreshed",
+  "refreshingUserScopes": "Refreshing user scopes...",
   "refreshTables": "Refresh tables",
   "registrationNumber": "Registration number",
   "remove": "Remove",

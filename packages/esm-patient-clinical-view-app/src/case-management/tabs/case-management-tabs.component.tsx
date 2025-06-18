@@ -21,8 +21,8 @@ const CaseManagementTabs: React.FC<CaseManagementTabsProps> = ({ setActiveTabInd
   };
 
   return (
-    <div data-id="case-management-list">
-      <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange} className={styles.tabs}>
+    <div className={styles.tabs} data-id="case-management-list">
+      <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange}>
         <div style={{ display: 'flex' }}>
           <TabList style={{ paddingLeft: '1rem' }} aria-label="case-management-tabs" contained>
             <Tab className={styles.tab}>

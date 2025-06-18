@@ -25,7 +25,7 @@ const RegimenHistory: React.FC<RegimenHistoryProps> = ({ patientUuid, category }
   const { regimen, isLoading, error } = useRegimenHistory(patientUuid, RegimenType[category]);
 
   if (isLoading) {
-    return <StructuredListSkeleton role="progressbar" />;
+    return <StructuredListSkeleton />;
   }
 
   if (error) {

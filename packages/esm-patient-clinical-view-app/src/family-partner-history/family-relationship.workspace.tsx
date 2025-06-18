@@ -120,18 +120,18 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
-                  id="startDate"
                   datePickerType="single"
                   {...field}
                   ref={undefined}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}>
                   <DatePickerInput
-                    invalid={error?.message}
+                    invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('startDate', 'Start Date')}
-                    size="xl"
+                    size="lg"
+                    id="startDate"
                   />
                 </DatePicker>
               )}
@@ -145,18 +145,18 @@ const FamilyRelationshipForm: React.FC<RelationshipFormProps> = ({ closeWorkspac
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
-                  id="endDate"
                   datePickerType="single"
                   {...field}
                   ref={undefined}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}>
                   <DatePickerInput
-                    invalid={error?.message}
+                    invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('endDate', 'End Date')}
-                    size="xl"
+                    size="lg"
+                    id="endDate"
                   />
                 </DatePicker>
               )}

@@ -68,7 +68,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
               <RadioButtonGroup
                 legendText={t('authMethod', 'Authorization Method')}
                 {...field}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 className={styles.radioGroupInput}
                 invalidText={form.formState.errors[field.name]?.message}>
                 {AUTH_TYPES.map(({ label, value }, index) => (
@@ -85,7 +85,8 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
               name="receiver"
               render={({ field }) => (
                 <TextInput
-                  invalid={form.formState.errors[field.name]?.message}
+                  id={field.name}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   {...field}
                   placeholder={t('patientPhoneNUmber', 'Patient Phone number')}
@@ -103,7 +104,8 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
               render={({ field }) => (
                 <Row className={styles.otpInputRow}>
                   <TextInput
-                    invalid={form.formState.errors[field.name]?.message}
+                    id={field.name}
+                    invalid={!!form.formState.errors[field.name]?.message}
                     invalidText={form.formState.errors[field.name]?.message}
                     {...field}
                     placeholder={
@@ -133,7 +135,7 @@ const SHRAuthorizationForm: React.FC<SHRAuthorizationFormProps> = ({
         )}
       </Stack>
       <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>

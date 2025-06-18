@@ -1,5 +1,5 @@
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .cardContainer {
   background-color: $ui-02;

@@ -168,6 +168,7 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
           <Column className={styles.identifierTypeColumn}>
             <span className={styles.identifierTypeHeader}>{t('identifierNumber', 'Identifier number*')}</span>
             <Search
+              labelText={t('enterIdentifierNumber', 'Enter identifier number')}
               className={styles.formSearch}
               value={searchHWR.identifier}
               placeholder={t('enterIdentifierNumber', 'Enter identifier number')}

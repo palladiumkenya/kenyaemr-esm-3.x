@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 type GenericDataTableProps = {
   headers: Array<{ key: string; header: string }>;
+  // TODO : Map row to correct carbon data-table row type
   rows: Array<Record<string, any>>;
   title: string;
   renderActionComponent?: () => ReactNode;
@@ -31,7 +32,7 @@ const GenericDataTable: React.FC<GenericDataTableProps> = ({ headers, rows, titl
   return (
     <div className={styles.widgetContainer}>
       <CardHeader title={title}>{renderActionComponent?.()}</CardHeader>
-      <DataTable useZebraStyles size="sm" rows={rows} headers={headers}>
+      <DataTable useZebraStyles size="sm" rows={rows as any} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <Table {...getTableProps()}>
             <TableHead>

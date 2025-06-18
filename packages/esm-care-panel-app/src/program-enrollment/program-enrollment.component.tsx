@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Tile,
@@ -12,14 +12,15 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   TableContainer,
+  DataTableHeader,
 } from '@carbon/react';
 import styles from './program-enrollment.scss';
 import isEmpty from 'lodash/isEmpty';
 import dayjs from 'dayjs';
-import { formatDate, restBaseUrl, useVisit } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, restBaseUrl, useVisit } from '@openmrs/esm-framework';
 import orderBy from 'lodash/orderBy';
 import { mutate } from 'swr';
-import { getPatientUuidFromStore, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import { useHeiOutcome } from '../hooks/useHeiOutcome';
 
 export interface ProgramEnrollmentProps {
@@ -68,11 +69,11 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
   const { currentVisit } = useVisit(getPatientUuidFromStore());
   const { heiOutcome } = useHeiOutcome(currentVisit?.patient?.uuid);
   const orderedEnrollments = orderBy(enrollments, 'dateEnrolled', 'desc');
-  const headers = useMemo(
+  const headers: Array<DataTableHeader> = useMemo(
     () =>
       Object.entries(programDetailsMap[programName] ?? { ...shareObjProperty }).map(([key, value]) => ({
         key,
-        header: value,
+        header: value as ReactNode,
       })),
     [programName],
   );
@@ -104,7 +105,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
   };
 
   const handleDiscontinue = (enrollment) => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: enrollment?.discontinuationFormName,
       mutateForm: handleMutation,
       formInfo: {
@@ -112,15 +113,15 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
         visitTypeUuid: currentVisit?.visitType?.uuid ?? '',
         visitUuid: currentVisit?.uuid ?? '',
         formUuid: enrollment?.discontinuationFormUuid,
-        additionalProps:
-          { enrollmentDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
-          {},
+        additionalProps: {
+          enrollmentDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid },
+        },
       },
     });
   };
 
   const handleHeiOutcome = () => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'HEI Outcome',
       mutateForm: () => {
         mutate((key) => true, undefined, {
@@ -138,7 +139,7 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
   };
 
   const handleEditEnrollment = (enrollment) => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: enrollment?.enrollmentFormName,
       mutateForm: () => {
         mutate(
@@ -153,9 +154,9 @@ const ProgramEnrollment: React.FC<ProgramEnrollmentProps> = ({ enrollments = [],
         formUuid: enrollment?.enrollmentFormUuid,
         visitTypeUuid: currentVisit?.visitType?.uuid ?? '',
         visitUuid: currentVisit?.uuid ?? '',
-        additionalProps:
-          { enrollmentDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid } } ??
-          {},
+        additionalProps: {
+          enrollmentDetails: { dateEnrolled: new Date(enrollment.dateEnrolled), uuid: enrollment.enrollmentUuid },
+        },
       },
     });
   };

@@ -71,7 +71,7 @@ const PharmacyAssignmentForm: React.FC<PharmacyAssignmentFormProps> = ({
                 legendText={t('entityType', 'Entity Type')}
                 {...field}
                 defaultSelected={field.value}
-                invalid={form.formState.errors[field.name]?.message}
+                invalid={!!form.formState.errors[field.name]?.message}
                 invalidText={form.formState.errors[field.name]?.message}>
                 <RadioButton labelText={t('user', 'User')} value="org.openmrs.User" id="org.openmrs.User" />
                 <RadioButton labelText={t('user', 'Patient')} value="org.openmrs.Patient" id="org.openmrs.Patient" />
@@ -107,7 +107,7 @@ const PharmacyAssignmentForm: React.FC<PharmacyAssignmentFormProps> = ({
         </Column>
       </Stack>
       <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit">

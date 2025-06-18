@@ -86,9 +86,7 @@ const FacilityInfo: React.FC = () => {
           {isShaFacilityLoading || isLocalFacilityLoading ? (
             <InlineLoading
               description={t('synchronizingFacilityData', 'Please wait, Synchronizing Info.')}
-              size="md"
               className={styles.loading}
-              withOverlay
             />
           ) : (
             <Button kind="primary" onClick={synchronizeFacilityData}>

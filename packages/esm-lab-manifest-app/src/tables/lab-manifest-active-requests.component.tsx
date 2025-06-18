@@ -185,7 +185,7 @@ const LabManifestActiveRequests: React.FC<LabManifestActiveRequestsProps> = ({ m
                   <TableRow>
                     <TableSelectAll {...getSelectionProps()} />
                     {headers.map((header, i) => (
-                      <TableHeader key={i} {...getHeaderProps({ header, isSortable: header.isSortable })}>
+                      <TableHeader key={i} {...getHeaderProps({ header, isSortable: true })}>
                         {header.header}
                       </TableHeader>
                     ))}

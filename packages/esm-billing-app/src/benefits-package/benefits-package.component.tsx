@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import BenefitsTable from './table/benefits-table.component';
 import styles from './benefits-package.scss';
 import { useTranslation } from 'react-i18next';
-import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import Benefits from './benefits/benefits.component';
 import { Layer, Tile, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Task, Upload } from '@carbon/react/icons';

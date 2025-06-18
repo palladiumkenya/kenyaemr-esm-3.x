@@ -15,7 +15,7 @@ const PharmacyDetailHeader = () => {
   const { error, isLoading, pharmacy } = usePharmacy(pharmacyUuid);
 
   if (isLoading) {
-    return <SkeletonText style={{ height: '40px' }} />;
+    return <SkeletonText />;
   }
   return (
     <div className={styles.header}>

@@ -12,8 +12,8 @@ interface RelationshipsTabProps {
 export const RelationshipsTab: React.FC<RelationshipsTabProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   return (
-    <main>
-      <Tabs className={styles.relationshipTabs}>
+    <main className={styles.relationshipTabs}>
+      <Tabs>
         <TabList className={styles.relationshipTablist} aria-label="List tabs" contained>
           <Tab className={styles.relationshipTab}>{t('family', 'Family')}</Tab>
           <Tab className={styles.relationshipTab}>{t('pnsContacts', 'PNS Contacts')}</Tab>

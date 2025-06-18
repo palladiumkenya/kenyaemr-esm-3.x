@@ -40,6 +40,7 @@
   "pullReferrals": "Pull Referrals",
   "pullSHRRecords": "Pull SHR Records",
   "reaction": "Reaction",
+  "reason": "Reason",
   "reasonCode": "Reason Code",
   "refer": "Refer Patient",
   "referError": "Facility Referal Error",
@@ -65,5 +66,6 @@
   "shrSummary": "SHR Summary",
   "status": "Status",
   "value": "Value",
+  "viewReasons": "View reasons",
   "vitals": "Vitals"
 }
