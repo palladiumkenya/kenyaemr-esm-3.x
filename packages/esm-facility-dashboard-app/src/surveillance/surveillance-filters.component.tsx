@@ -62,6 +62,7 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange, tabSel
       {tabSelected === 1 && (
         <div className={styles.dropdownContainer}>
           <Dropdown
+            titleText={t('indicator', 'Indicator')}
             className={styles.filterInput}
             autoAlign
             id="filters"

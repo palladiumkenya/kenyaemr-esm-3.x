@@ -25,8 +25,7 @@ const DashboardGroupExtension: React.FC<Props> = ({ basePath, title, isExpanded,
             {icon && React.createElement(icon)}
             {title}
           </span>
-        }
-        style={{ border: 'none' }}>
+        }>
         <ExtensionSlot name={slotName ?? title} state={{ basePath }} />
       </AccordionItem>
     </Accordion>

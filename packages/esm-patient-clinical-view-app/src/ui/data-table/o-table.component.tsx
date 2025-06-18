@@ -36,9 +36,9 @@ export const OTable: React.FC<TableProps> = ({ tableHeaders, tableRows, formConc
                     className={`${styles.productiveHeading01} ${styles.text02}`}
                     {...getHeaderProps({
                       header,
-                      isSortable: header.isSortable,
+                      isSortable: true,
                     })}>
-                    {header.header?.content ?? header.header}
+                    {header.header}
                   </TableHeader>
                 ))}
               </TableRow>

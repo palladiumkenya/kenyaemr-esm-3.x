@@ -93,104 +93,102 @@ const LabManifestOrdersToManifestForm: React.FC<LabManifestOrdersToManifestFormP
   };
 
   return (
-    <React.Fragment>
-      <Form onSubmit={form.handleSubmit(onSubmit)}>
-        <ModalHeader closeModal={onClose} className={styles.heading}>
-          {t('updateSampleDetails', 'Update Sample Details')}
-        </ModalHeader>
-        <ModalBody>
-          <Stack gap={4} className={styles.grid}>
-            <Column>
+    <Form onSubmit={form.handleSubmit(onSubmit)}>
+      <ModalHeader closeModal={onClose} className={styles.heading}>
+        {t('updateSampleDetails', 'Update Sample Details')}
+      </ModalHeader>
+      <ModalBody>
+        <Stack gap={4} className={styles.grid}>
+          <Column>
+            <Controller
+              control={form.control}
+              name="sampleType"
+              render={({ field }) => (
+                <Dropdown
+                  ref={field.ref}
+                  invalid={!!form.formState.errors[field.name]?.message}
+                  invalidText={form.formState.errors[field.name]?.message}
+                  id="manifestType"
+                  titleText={t('sampleType', 'Sample Type')}
+                  onChange={(e) => {
+                    field.onChange(e.selectedItem);
+                  }}
+                  initialSelectedItem={field.value}
+                  label="Choose option"
+                  items={sampleTypes
+                    .filter((type) => type.labManifestType.includes(`${manifest?.manifestType}`))
+                    .map((r) => r.sampleType)}
+                  itemToString={(item) => item ?? ''}
+                />
+              )}
+            />
+          </Column>
+          <Row className={styles.datePickersRow}>
+            <Column className={styles.inputRow}>
               <Controller
                 control={form.control}
-                name="sampleType"
+                name="sampleCollectionDate"
                 render={({ field }) => (
-                  <Dropdown
-                    ref={field.ref}
-                    invalid={form.formState.errors[field.name]?.message}
-                    invalidText={form.formState.errors[field.name]?.message}
-                    id="manifestType"
-                    titleText={t('sampleType', 'Sample Type')}
-                    onChange={(e) => {
-                      field.onChange(e.selectedItem);
-                    }}
-                    initialSelectedItem={field.value}
-                    label="Choose option"
-                    items={sampleTypes
-                      .filter((type) => type.labManifestType.includes(`${manifest?.manifestType}`))
-                      .map((r) => r.sampleType)}
-                    itemToString={(item) => item ?? ''}
-                  />
+                  <DatePicker
+                    className={styles.datePickerInput}
+                    dateFormat="d/m/Y"
+                    datePickerType="single"
+                    {...field}
+                    invalid={!!form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}>
+                    <DatePickerInput
+                      id={field.name}
+                      invalid={!!form.formState.errors[field.name]?.message}
+                      invalidText={form.formState.errors[field.name]?.message}
+                      placeholder="mm/dd/yyyy"
+                      labelText={t('sampleCollectionDate', 'Sample collection date')}
+                      size="lg"
+                    />
+                  </DatePicker>
                 )}
               />
             </Column>
-            <Row className={styles.datePickersRow}>
-              <Column className={styles.inputRow}>
-                <Controller
-                  control={form.control}
-                  name="sampleCollectionDate"
-                  render={({ field }) => (
-                    <DatePicker
-                      className={styles.datePickerInput}
-                      dateFormat="d/m/Y"
-                      id="sampleCollectionDate"
-                      datePickerType="single"
-                      {...field}
-                      invalid={form.formState.errors[field.name]?.message}
-                      invalidText={form.formState.errors[field.name]?.message}>
-                      <DatePickerInput
-                        invalid={form.formState.errors[field.name]?.message}
-                        invalidText={form.formState.errors[field.name]?.message}
-                        placeholder="mm/dd/yyyy"
-                        labelText={t('sampleCollectionDate', 'Sample collection date')}
-                        size="xl"
-                      />
-                    </DatePicker>
-                  )}
-                />
-              </Column>
-              <Column className={styles.inputRow}>
-                <Controller
-                  control={form.control}
-                  name="sampleSeparationDate"
-                  render={({ field }) => (
-                    <DatePicker
-                      className={styles.datePickerInput}
-                      dateFormat="d/m/Y"
-                      id="sampleSeparationDate"
-                      datePickerType="single"
-                      {...field}
-                      invalid={form.formState.errors[field.name]?.message}
-                      invalidText={form.formState.errors[field.name]?.message}>
-                      <DatePickerInput
-                        invalid={form.formState.errors[field.name]?.message}
-                        invalidText={form.formState.errors[field.name]?.message}
-                        placeholder="mm/dd/yyyy"
-                        labelText={t('sampleSeparationDate', 'Sample seperation date')}
-                        size="xl"
-                      />
-                    </DatePicker>
-                  )}
-                />
-              </Column>
-            </Row>
-            <div className={styles.previewContainer}>
-              <ActiveOrdersSelectionPreview orders={orders} />
-            </div>
-          </Stack>
-        </ModalBody>
-        <ModalFooter>
-          <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.button} kind="secondary" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">
-              Add Samples
-            </Button>
-          </ButtonSet>
-        </ModalFooter>
-      </Form>
-    </React.Fragment>
+            <Column className={styles.inputRow}>
+              <Controller
+                control={form.control}
+                name="sampleSeparationDate"
+                render={({ field }) => (
+                  <DatePicker
+                    className={styles.datePickerInput}
+                    dateFormat="d/m/Y"
+                    datePickerType="single"
+                    {...field}
+                    invalid={!!form.formState.errors[field.name]?.message}
+                    invalidText={form.formState.errors[field.name]?.message}>
+                    <DatePickerInput
+                      id={field.name}
+                      invalid={!!form.formState.errors[field.name]?.message}
+                      invalidText={form.formState.errors[field.name]?.message}
+                      placeholder="mm/dd/yyyy"
+                      labelText={t('sampleSeparationDate', 'Sample seperation date')}
+                      size="lg"
+                    />
+                  </DatePicker>
+                )}
+              />
+            </Column>
+          </Row>
+          <div className={styles.previewContainer}>
+            <ActiveOrdersSelectionPreview orders={orders} />
+          </div>
+        </Stack>
+      </ModalBody>
+      <ModalFooter>
+        <ButtonSet className={styles.buttonSet}>
+          <Button className={styles.button} kind="secondary" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button className={styles.button} kind="primary" disabled={form.formState.isSubmitting} type="submit">
+            Add Samples
+          </Button>
+        </ButtonSet>
+      </ModalFooter>
+    </Form>
   );
 };
 

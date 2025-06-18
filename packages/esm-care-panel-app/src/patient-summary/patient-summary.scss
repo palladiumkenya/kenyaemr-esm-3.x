@@ -2,7 +2,7 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/colors';
 @use '@carbon/layout';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .bodyContainer {
   margin: spacing.$spacing-03;

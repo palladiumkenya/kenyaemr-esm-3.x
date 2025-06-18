@@ -41,7 +41,7 @@ const DeletePaymentModeModal: React.FC<DeletePaymentModeModalProps> = ({ closeMo
 
   return (
     <>
-      <ModalHeader onClose={closeModal} className={styles.modalHeaderLabel} closeModal={closeModal}>
+      <ModalHeader className={styles.modalHeaderLabel} closeModal={closeModal}>
         {t('deletePaymentMode', 'Delete Payment Mode')}
       </ModalHeader>
       <ModalBody className={styles.modalHeaderHeading}>

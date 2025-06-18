@@ -256,13 +256,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 name="period"
                 control={control}
                 render={({ field }) => (
-                  <TimePickerSelect
-                    {...field}
-                    className={styles.formDeathTimepickerSelector}
-                    id="time-picker-select"
-                    labelText={t('selectPeriod', 'AM/PM')}
-                    invalid={!!errors.period}
-                    invalidText={errors.period?.message}>
+                  <TimePickerSelect {...field} className={styles.formDeathTimepickerSelector} id="time-picker-select">
                     <SelectItem value="AM" text="AM" />
                     <SelectItem value="PM" text="PM" />
                   </TimePickerSelect>
@@ -287,7 +281,7 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 className={styles.radioButtonGroup}
                 defaultSelected={morgueVisitTypeUuid}
                 orientation="vertical"
-                onChange={(visitType) => setValue('visitType', visitType)}
+                onChange={(visitType) => setValue('visitType', visitType.toString())}
                 name="radio-button-group"
                 valueSelected={visitTypeValue}
                 invalid={!!errors.visitType}
@@ -350,9 +344,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                     onChange={({ selectedItem }) => field.onChange(selectedItem)}
                     id="insurance-scheme"
                     items={insuranceSchemes}
-                    itemToString={(item) => (item ? item : '')}
+                    itemToString={(item) => (item ? item.toString() : '')}
                     titleText={t('insuranceScheme', 'Insurance scheme')}
-                    label={t('selectInsuranceScheme', 'Select insurance scheme')}
                     invalid={!!errors.insuranceScheme}
                     invalidText={errors.insuranceScheme?.message}
                   />
@@ -391,22 +384,20 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 return (
                   <>
                     {availableServices.length > 0 ? (
-                      <>
-                        <FilterableMultiSelect
-                          id="billing-service"
-                          className={styles.formAdmissionDatepicker}
-                          titleText={t('searchServices', 'Search services')}
-                          items={availableServices.map((service) => service.uuid)}
-                          itemToString={(item) => availableServices.find((i) => i.uuid === item)?.name ?? ''}
-                          onChange={({ selectedItems }) => {
-                            field.onChange(selectedItems);
-                          }}
-                          placeholder={t('Service', 'Service')}
-                          initialSelectedItems={field.value}
-                          invalid={!!errors.services}
-                          invalidText={errors.services?.message}
-                        />
-                      </>
+                      <FilterableMultiSelect
+                        id="billing-service"
+                        className={styles.formAdmissionDatepicker}
+                        titleText={t('searchServices', 'Search services')}
+                        items={availableServices.map((service) => service.uuid)}
+                        itemToString={(item) => availableServices.find((i) => i.uuid === item)?.name ?? ''}
+                        onChange={({ selectedItems }) => {
+                          field.onChange(selectedItems);
+                        }}
+                        placeholder={t('Service', 'Service')}
+                        initialSelectedItems={field.value}
+                        invalid={!!errors.services}
+                        invalidText={errors.services?.message}
+                      />
                     ) : (
                       <InlineNotification
                         kind="warning"
@@ -486,7 +477,6 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                     labelText={t('obNumber', 'OB Number')}
                     invalid={!!errors.obNumber}
                     invalidText={errors.obNumber?.message}
-                    label={t('ChooseOptions', 'Choose option')}
                   />
                 )}
               />
@@ -549,8 +539,8 @@ const PatientAdditionalInfoForm: React.FC<PatientAdditionalInfoFormProps> = ({ c
                 titleText={t('availableCompartment', 'Available Compartment')}
                 label={t('ChooseOptions', 'Choose option')}
                 onChange={({ selectedItem }) => field.onChange(selectedItem?.bedId)}
-                initialSelectedItems={field.value}
                 invalid={!!errors.availableCompartment}
+                initialSelectedItem={field.value as any}
                 invalidText={errors.availableCompartment?.message}
               />
             )}

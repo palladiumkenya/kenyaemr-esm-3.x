@@ -71,7 +71,7 @@ const PackageInterventions: React.FC<PackageInterventionsProps> = ({ categories,
         <MultiSelect
           ref={field.ref}
           disabled={!categories || categories.length === 0}
-          invalid={form.formState.errors[field.name]?.message}
+          invalid={!!form.formState.errors[field.name]?.message}
           invalidText={form.formState.errors[field.name]?.message}
           id="interventions"
           titleText={t('interventions', 'Interventions')}

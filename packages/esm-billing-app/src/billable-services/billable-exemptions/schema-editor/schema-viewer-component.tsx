@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { TreeView, TreeNode } from '@carbon/react';
+import { TreeView, TreeNode, type TreeNodeProps } from '@carbon/react';
 import styles from './schema-viewer.scss';
 
 interface SchemaViewerProps {
@@ -44,8 +44,8 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
     }
   }, [data]);
 
-  const handleSelect = useCallback((selectedNodeIds: Array<string>) => {
-    setSelectedNodes(selectedNodeIds);
+  const handleSelect = useCallback((selectedNodeIds: Partial<TreeNodeProps> & { activeNodeId?: string | number }) => {
+    setSelectedNodes(selectedNodeIds as Array<string>);
   }, []);
 
   const handleToggle = useCallback((nodeId: string) => {
@@ -70,7 +70,6 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
           label={node.label}
           isExpanded={isExpanded}
           onToggle={() => handleToggle(node.id)}
-          multiselect={true}
           className={styles.treeView}>
           {node.children && renderTreeNodes(node.children)}
         </TreeNode>
@@ -81,7 +80,7 @@ const SchemaViewer: React.FC<SchemaViewerProps> = ({ data }) => {
     <div className={styles.treeViewContainer}>
       <TreeView
         label="Exemption schema"
-        selectedIds={selectedNodes}
+        selected={selectedNodes}
         onSelect={(_, selectedNodeIds) => handleSelect(selectedNodeIds)}
         hideLabel
         multiselect>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   Contacted_UUID,
   MissedAppointmentDate_UUID,
@@ -9,7 +9,7 @@ import {
   TracingType_UUID,
 } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import {
   Button,
   DataTable,
@@ -42,7 +42,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
     defaulterTracingEncounterUuid,
   );
   const handleOpenOrEditDefaulterTracingForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Defaulter Tracing',
       mutateForm: () => mutate(),
       formInfo: {
@@ -130,7 +130,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
         rows={tableRows}
         headers={tableHeader}
         render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer size="sm" {...getTableContainerProps()}>
+          <TableContainer {...getTableContainerProps()}>
             <Table size="sm" {...getTableProps()} aria-label={t('defaulterTracing', 'Defaulter tracing')}>
               <TableHead>
                 <TableRow>
@@ -157,7 +157,7 @@ const DefaulterTracing: React.FC<PatientTracingProps> = ({ patientUuid }) => {
                       <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}
                     <TableCell className="cds--table-column-menu">
-                      <OverflowMenu aria-label="overflow-menu" flipped="false">
+                      <OverflowMenu aria-label="overflow-menu" flipped={false}>
                         <OverflowMenuItem
                           onClick={() => handleOpenOrEditDefaulterTracingForm(encounters[index]?.uuid)}
                           itemText={t('edit', 'Edit')}

@@ -1,9 +1,11 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '../../root.scss';
+@use '@carbon/colors';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '../../root.scss';
 
 .widgetContainer {
-  background-color: $ui-background;
+  background-color: colors.$white;
   margin-bottom: 1rem;
   padding: 1rem 0.625rem;
 }
@@ -29,7 +31,7 @@
 }
 
 .newServiceEnrolmentBtn > button {
-  background-color: $ui-background;
+  background-color: colors.$white;
 }
 
 .widgetContainer :global(.cds--data-table) thead th button span {

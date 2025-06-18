@@ -212,13 +212,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                   name="period"
                   control={control}
                   render={({ field }) => (
-                    <TimePickerSelect
-                      {...field}
-                      className={styles.formDeathTimepickerSelector}
-                      id="time-picker-select"
-                      labelText={t('selectPeriod', 'AM/PM')}
-                      invalid={!!errors.period}
-                      invalidText={errors.period?.message}>
+                    <TimePickerSelect {...field} className={styles.formDeathTimepickerSelector} id="time-picker-select">
                       <SelectItem value="AM" text="AM" />
                       <SelectItem value="PM" text="PM" />
                     </TimePickerSelect>

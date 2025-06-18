@@ -162,9 +162,9 @@ export const PharmacyUsers: React.FC = () => {
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
+                        isSortable: true,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>

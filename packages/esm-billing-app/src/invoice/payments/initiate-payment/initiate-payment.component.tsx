@@ -118,6 +118,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
       <ModalBody>
         {isPDSLFacility && (
           <ContentSwitcher
+            size="md"
             selectedIndex={hasMadePayment ? 1 : 0}
             onChange={({ name }) => {
               setHasMadepayment(name === 'paymentMade');
@@ -144,6 +145,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
                 render={({ field }) => (
                   <Layer>
                     <TextInput
+                      id="phoneNumber"
                       {...field}
                       size="md"
                       labelText={t('Phone Number', 'Phone Number')}
@@ -163,6 +165,7 @@ const InitiatePaymentDialog: React.FC<InitiatePaymentDialogProps> = ({ closeModa
               render={({ field }) => (
                 <Layer>
                   <TextInput
+                    id="billAmount"
                     {...field}
                     size="md"
                     labelText={t('billAmount', 'Bill Amount')}
