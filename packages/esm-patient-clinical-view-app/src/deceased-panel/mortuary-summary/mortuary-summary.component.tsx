@@ -19,18 +19,10 @@ const MortuarySummary: React.FC = () => {
   const patientUuid = getPatientUuidFromStore();
   const { person, isLoading } = usePerson(patientUuid);
   const { activeVisit, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
-  const startDate = activeVisit?.startDatetime;
-  const compartment = activeVisit?.encounters[0]?.location?.display;
 
   if (isLoading || isActiveLoading) {
     return (
-      <InlineLoading
-        status="active"
-        iconDescription="Loading"
-        Suggested
-        change
-        description={t('loadData', 'Loading summary data...')}
-      />
+      <InlineLoading status="active" iconDescription="Loading" description={t('loadData', 'Loading summary data...')} />
     );
   }
 
@@ -38,7 +30,7 @@ const MortuarySummary: React.FC = () => {
     <div className={styles.summaryContainer}>
       <p className={styles.morgueLabel}>{''}</p>
       <ExtensionSlot name="deceased-banner-info-slot" state={{ patientUuid }} />
-      <Tabs className={classNames(styles.verticalTabs, layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs)}>
+      <Tabs>
         <TabList aria-label="morgue summary tabs" className={styles.tablist}>
           <Tab className={styles.tab} id="billing-tab">
             {t('billingHistory', 'Billing history')}

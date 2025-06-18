@@ -187,7 +187,7 @@ const FacilityReferralForm: React.FC<FacilityReferralProp> = ({ closeWorkspace }
         )}
         <span className={styles.sectionHeader}>Clinical Notes</span>
         <Column>
-          <TextArea rows={4} id="text-area-1" className={styles.reasonTextbox} />
+          <TextArea labelText={t('reason', 'Reason')} rows={4} id="text-area-1" className={styles.reasonTextbox} />
         </Column>
       </Stack>
 

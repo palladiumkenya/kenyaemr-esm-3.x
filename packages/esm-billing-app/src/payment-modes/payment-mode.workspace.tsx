@@ -166,7 +166,6 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
                 control={formMethods.control}
                 render={({ field }) => (
                   <Toggle
-                    {...field}
                     labelText={t('enablePaymentMode', 'Enable payment mode')}
                     labelA="Off"
                     labelB="On"
@@ -193,7 +192,7 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
           </Stack>
         </div>
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={closeWorkspace}>
+          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={() => closeWorkspace}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button

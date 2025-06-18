@@ -2,7 +2,7 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/layout';
 @use '@carbon/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
 
 .widgetContainer {
   background-color: colors.$white-0;

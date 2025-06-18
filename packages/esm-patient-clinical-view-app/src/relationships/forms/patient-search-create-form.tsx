@@ -74,6 +74,7 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
           name="mode"
           render={({ field }) => (
             <ContentSwitcher
+              size="md"
               selectedIndex={field.value == 'search' ? 0 : 1}
               onChange={(value) => {
                 let { index, name, text } = value;
@@ -128,7 +129,8 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
               name="personBInfo.givenName"
               render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={error?.message}
+                  id={field.name}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   {...field}
                   placeholder="First name"
@@ -143,7 +145,8 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
               name="personBInfo.middleName"
               render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={error?.message}
+                  id={field.name}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   {...field}
                   placeholder="Middle name"
@@ -158,7 +161,8 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
               name="personBInfo.familyName"
               render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={error?.message}
+                  id={field.name}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   {...field}
                   placeholder="Last name"
@@ -172,17 +176,15 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
               control={form.control}
               name="personBInfo.gender"
               render={({ field, fieldState: { error } }) => (
-                <>
-                  <RadioButtonGroup
-                    name="personBInfo.gender"
-                    legendText={t('sex', 'Sex')}
-                    {...field}
-                    invalid={error?.message}
-                    invalidText={error?.message}>
-                    <RadioButton labelText={t('male', 'Male')} value="M" id="M" />
-                    <RadioButton labelText={t('female', 'Female')} value="F" id="F" />
-                  </RadioButtonGroup>
-                </>
+                <RadioButtonGroup
+                  name="personBInfo.gender"
+                  legendText={t('sex', 'Sex')}
+                  {...field}
+                  invalid={!!error?.message}
+                  invalidText={error?.message}>
+                  <RadioButton labelText={t('male', 'Male')} value="M" id="M" />
+                  <RadioButton labelText={t('female', 'Female')} value="F" id="F" />
+                </RadioButtonGroup>
               )}
             />
           </Column>
@@ -194,15 +196,16 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
                 <DatePicker
                   datePickerType="single"
                   {...field}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   className={styles.datePickerInput}>
                   <DatePickerInput
-                    invalid={error?.message}
+                    id={field.name}
+                    invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('dateOfBirth', 'Date of birth')}
-                    size="xl"
+                    size="lg"
                   />
                 </DatePicker>
               )}
@@ -219,7 +222,7 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
                 render={({ field, fieldState: { error } }) => (
                   <Dropdown
                     ref={field.ref}
-                    invalid={error?.message}
+                    invalid={!!error?.message}
                     invalidText={error?.message}
                     id="maritalStatus"
                     titleText={t('maritalStatus', 'Marital status')}
@@ -242,7 +245,8 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
               name="personBInfo.address"
               render={({ field, fieldState: { error } }) => (
                 <TextInput
-                  invalid={error?.message}
+                  id={field.name}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   {...field}
                   placeholder="Physical Address/Landmark"
@@ -258,7 +262,8 @@ const PatientSearchCreate: React.FC<PatientSearchCreateProps> = () => {
               render={({ field, fieldState: { error } }) => (
                 <TextInput
                   {...field}
-                  invalid={error?.message}
+                  id={field.name}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   placeholder="Phone number"
                   labelText={t('phoneNumber', 'Phone number')}

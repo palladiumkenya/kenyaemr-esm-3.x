@@ -1,5 +1,5 @@
 import React, { type HTMLAttributes, useEffect, useRef, useState } from 'react';
-import { Layer, Search, type SearchProps } from '@carbon/react';
+import { Layer, Search } from '@carbon/react';
 import classNames from 'classnames';
 import styles from './autosuggest.scss';
 import { showSnackbar } from '@openmrs/esm-framework';
@@ -70,7 +70,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
     };
   }, [wrapper]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e) => {
     const query = e.target.value;
     onSuggestionSelected(name, undefined);
 

@@ -1,9 +1,11 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '../../root.scss';
+@use '@carbon/colors';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+@use '../../root.scss';
 
 .widgetContainer {
-  background-color: $ui-background;
+  background-color: colors.$white;
   border: 1px solid #e0e0e0;
   margin-bottom: 1rem;
 }
@@ -48,7 +50,7 @@
   }
 }
 .widgetCard {
-  background-color: $ui-background;
+  background-color: colors.$white;
   border: 1px solid $ui-03;
 }
 
@@ -82,11 +84,11 @@
 
     &:global(.cds--btn--tertiary:focus) {
       background-color: $interactive-01;
-      color: $ui-background;
+      color: colors.$white;
     }
 
     &:global(.cds--btn--tertiary:hover) {
-      color: $ui-background;
+      color: colors.$white;
       background-color: $interactive-01;
     }
 

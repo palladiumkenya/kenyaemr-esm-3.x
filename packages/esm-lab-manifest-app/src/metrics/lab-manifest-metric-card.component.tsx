@@ -13,7 +13,7 @@ const MetricCard: React.FC<MetricCardProps> = ({ title, status = [] }) => {
   const { isLoading, error, metrics, statusAggregates } = useLabManifestMetrics();
 
   if (isLoading) {
-    return <SkeletonPlaceholder style={{ flex: 1 }} />;
+    return <SkeletonPlaceholder />;
   }
 
   if (error) {

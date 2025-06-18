@@ -50,10 +50,9 @@ export const TimesheetsFilter = () => {
   return (
     <Form {...form}>
       <Select
+        id="timesheet"
         {...register('timesheet')}
-        label={t('selectTimesheet', 'Select timesheet')}
         labelText={t('timesheet', 'Timesheet')}
-        placeholder={t('filterByTimesheet', 'Filter by timesheet')}
         className={styles.timesheetsFilter}>
         <SelectItem value={undefined} text={'No timesheet'} />
         {selectedCashiersTimesheets.map((sheet) => (

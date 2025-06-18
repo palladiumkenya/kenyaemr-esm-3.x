@@ -89,6 +89,7 @@ const PaymentStatusCheckerModal: React.FC<PaymentStatusCheckerModalProps> = ({
       </ModalHeader>
       <ModalBody>
         <ContentSwitcher
+          size="md"
           selectedIndex={paymentMade ? 1 : 0}
           onChange={({ name }) => {
             onPaymentMadestatusChange?.(name === 'paymentMade');
@@ -98,7 +99,6 @@ const PaymentStatusCheckerModal: React.FC<PaymentStatusCheckerModalProps> = ({
         </ContentSwitcher>
         <TextInput
           value={transactionid}
-          defaultWidth={300}
           id="text-input-1"
           labelText={t('transactionId', 'Transaction Id')}
           placeholder={t('exampletransactionId', 'e.g TRMEWECEDD')}

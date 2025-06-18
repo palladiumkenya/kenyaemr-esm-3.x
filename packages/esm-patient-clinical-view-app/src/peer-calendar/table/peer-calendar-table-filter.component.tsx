@@ -2,9 +2,11 @@ import { Dropdown } from '@carbon/react';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+type FilterStatus = 'completed' | 'pending' | 'all';
+
 type PeerCalendarTableFilterProps = {
   filterStatus?: 'completed' | 'pending' | 'all';
-  onUpdateFilterStatus: (status: 'completed' | 'pending' | 'all') => void;
+  onUpdateFilterStatus: (status: FilterStatus) => void;
 };
 
 const PeerCalendarTableFilter: React.FC<PeerCalendarTableFilterProps> = ({
@@ -13,13 +15,14 @@ const PeerCalendarTableFilter: React.FC<PeerCalendarTableFilterProps> = ({
 }) => {
   const { t } = useTranslation();
   const statuses = useMemo(() => ['completed', 'pending', 'all'], []);
-  const [_state, _setState] = useState<'completed' | 'pending' | 'all'>('completed');
+  const [_state, setSate] = useState<'completed' | 'pending' | 'all'>('completed');
   return (
     <div style={{ width: '200px' }}>
       <Dropdown
+        titleText={t('filterByStatue', 'Filter by status')}
         id="filterByStatus"
         onChange={(e) => {
-          onUpdateFilterStatus(e.selectedItem);
+          onUpdateFilterStatus(e.selectedItem as FilterStatus);
         }}
         selectedItem={filterStatus}
         label={t('filterByStatus', 'Filter by status')}

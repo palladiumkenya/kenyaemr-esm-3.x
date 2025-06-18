@@ -75,7 +75,7 @@ export const RefundBillModal: React.FC<RefundBillModalProps> = ({ onClose, bill,
 
   return (
     <>
-      <ModalHeader onClose={onClose} className={styles.modalHeaderLabel}>
+      <ModalHeader closeModal={onClose} className={styles.modalHeaderLabel}>
         {t('refundBill', 'Refund Bill')}
       </ModalHeader>
       <ModalBody className={styles.modalHeaderHeading}>

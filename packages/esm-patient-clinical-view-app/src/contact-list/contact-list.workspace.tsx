@@ -84,20 +84,18 @@ const ContactListForm: React.FC<ContactListFormProps> = ({ closeWorkspace, patie
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
-                  id="startDate"
                   datePickerType="single"
                   {...field}
                   ref={undefined}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}>
                   <DatePickerInput
                     id={`startdate-input`}
-                    name="startdate-input"
-                    invalid={error?.message}
+                    invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('startDate', 'Start Date')}
-                    size="xl"
+                    size="lg"
                   />
                 </DatePicker>
               )}
@@ -111,17 +109,17 @@ const ContactListForm: React.FC<ContactListFormProps> = ({ closeWorkspace, patie
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
-                  id="endDate"
                   datePickerType="single"
                   {...field}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}>
                   <DatePickerInput
-                    invalid={error?.message}
+                    id="endDate"
+                    invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('endDate', 'End Date')}
-                    size="xl"
+                    size="lg"
                   />
                 </DatePicker>
               )}
@@ -134,7 +132,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({ closeWorkspace, patie
               render={({ field, fieldState: { error } }) => (
                 <Dropdown
                   ref={field.ref}
-                  invalid={error?.message}
+                  invalid={!!error?.message}
                   invalidText={error?.message}
                   id="relationshipToPatient"
                   titleText={t('relationToPatient', 'Relation to patient')}
@@ -154,7 +152,7 @@ const ContactListForm: React.FC<ContactListFormProps> = ({ closeWorkspace, patie
         </Stack>
 
         <ButtonSet className={styles.buttonSet}>
-          <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
             {t('discard', 'Discard')}
           </Button>
           <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>

@@ -65,7 +65,7 @@ const SHABenefitPackangesAndInterventions: React.FC<Props> = ({ patientUuid }) =
               ) : (
                 <MultiSelect
                   ref={field.ref}
-                  invalid={form.formState.errors[field.name]?.message}
+                  invalid={!!form.formState.errors[field.name]?.message}
                   invalidText={form.formState.errors[field.name]?.message}
                   id="packages"
                   titleText={t('package', 'Packages')}

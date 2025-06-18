@@ -1,6 +1,7 @@
 import {
   Button,
   DataTable,
+  DataTableHeader,
   DataTableSkeleton,
   Layer,
   Pagination,
@@ -57,7 +58,7 @@ export const PharmacyPatients: React.FC = () => {
     });
   };
 
-  const headers = [
+  const headers: Array<DataTableHeader> = [
     {
       header: t('openmrsId', 'OpenMRS ID'),
       key: 'openmrsId',
@@ -193,9 +194,9 @@ export const PharmacyPatients: React.FC = () => {
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
+                        isSortable: true,
                       })}>
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>

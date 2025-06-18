@@ -61,7 +61,7 @@ const PriceField: React.FC<PriceFieldProps> = ({ field, index, control, removeSe
           render={({ field }) => (
             <NumberInput
               id={`servicePrices.${index}.price`}
-              onChange={(e) => field.onChange(parseFloat(e.target.value))}
+              onChange={(e, { value }) => field.onChange(parseFloat(value.toString()))}
               type="number"
               label={t('price', 'Price')}
               placeholder={t('enterPrice', 'Enter price')}

@@ -64,7 +64,7 @@ const DepositTable: React.FC<DepositTableProps> = ({ deposits }) => {
 
   return (
     <>
-      <DataTable size="sm" useZebraStyles rows={results} headers={headers} isExpandable>
+      <DataTable size="sm" useZebraStyles rows={results} headers={headers}>
         {({
           rows,
           headers,

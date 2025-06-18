@@ -1,13 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboButton, MenuItem, DataTableSkeleton } from '@carbon/react';
-import {
-  CardHeader,
-  EmptyState,
-  launchPatientWorkspace,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
-import { useConfig, useVisit, evaluateAsBoolean } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { useConfig, useVisit, evaluateAsBoolean, launchWorkspace } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { BedManagementConfig } from '../config-schema';
 import { usePatientEncounters } from './in-patient.resource';
@@ -41,7 +36,7 @@ const InPatient: React.FC<InPatientProps> = ({ patientUuid, patient }) => {
   });
 
   const handleLaunchForm = (form: { label: string; uuid: string }) => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: form.label,
       mutateForm: () => mutate(),
       formInfo: {

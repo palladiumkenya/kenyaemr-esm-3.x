@@ -220,7 +220,6 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
-                  id="startDate"
                   datePickerType="single"
                   {...field}
                   ref={undefined}
@@ -228,12 +227,11 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                   invalidText={error?.message}>
                   <DatePickerInput
                     id={`startdate-input`}
-                    name="startdate-input"
                     invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('startDate', 'Start Date')}
-                    size="xl"
+                    size="lg"
                   />
                 </DatePicker>
               )}
@@ -248,7 +246,6 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                 <DatePicker
                   className={styles.datePickerInput}
                   dateFormat="d/m/Y"
-                  id="endDate"
                   datePickerType="single"
                   {...field}
                   ref={undefined}
@@ -256,12 +253,11 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                   invalidText={error?.message}>
                   <DatePickerInput
                     id="enddate-input"
-                    name="enddate-input"
                     invalid={!!error?.message}
                     invalidText={error?.message}
                     placeholder="mm/dd/yyyy"
                     labelText={t('endDate', 'End Date')}
-                    size="xl"
+                    size="lg"
                   />
                 </DatePicker>
               )}
@@ -285,7 +281,7 @@ const ContactListUpdateForm: React.FC<ContactListUpdateFormProps> = ({ closeWork
                   selectedItem={field.value}
                   label="Select Relationship"
                   items={relationshipTypes.map((r) => r.uuid)}
-                  itemToString={(item) => relationshipTypes.find((r) => r.uuid === item)?.displayBIsToA ?? ''}
+                  itemToString={(item) => relationshipTypes.find((r) => r.uuid === item)?.displayBIsToA.toString()}
                 />
               )}
             />

@@ -86,9 +86,7 @@ const Dashboard: React.FC = () => {
             description={t('etlsOperationsLoading', 'Please wait {{currentOperation}} is in progress...', {
               currentOperation,
             })}
-            size="md"
             className={styles.loading}
-            withOverlay
           />
         ) : (
           <ComboButton tooltipAlignment="left" label={t('etlOperation', 'ETL operations')} size="md">

@@ -22,7 +22,7 @@ const Benefits: React.FC = () => {
       <div className={styles.search}>
         <Search
           labelText={t('searchBenefits', 'Search benefits')}
-          placeHolderText={t('searchByBenefit', 'Search by benefit')}
+          placeholder={t('searchByBenefit', 'Search by benefit')}
           onChange={(e) => setSearchTerm(e.target.value)}
           value={searchTerm}
         />

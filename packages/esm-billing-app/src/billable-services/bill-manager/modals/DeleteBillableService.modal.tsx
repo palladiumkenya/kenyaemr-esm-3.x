@@ -36,7 +36,7 @@ export const DeleteBillableServiceModal: React.FC<{
 
   return (
     <React.Fragment>
-      <ModalHeader onClose={onClose} className={styles.modalHeaderHeading} closeModal={onClose}>
+      <ModalHeader className={styles.modalHeaderHeading} closeModal={onClose}>
         {t('deleteBillableService', 'Delete Billable Service')}
       </ModalHeader>
       <ModalBody>

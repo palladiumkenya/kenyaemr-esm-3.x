@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   Alcohol_Use_UUID,
   Alcohol_Use_Duration_UUID,
@@ -9,7 +9,7 @@ import {
   Other_Substance_Abuse_UUID,
 } from '../../../utils/constants';
 import { getObsFromEncounter } from '../../../ui/encounter-list/encounter-list-utils';
-import { EmptyState, launchPatientWorkspace, ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, CardHeader } from '@openmrs/esm-patient-common-lib';
 import {
   OverflowMenu,
   OverflowMenuItem,
@@ -52,7 +52,7 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({
 
   const headerTitle = t('socialHistory', 'Social History');
   const handleOpenOrEditClinicalEncounterForm = (encounterUUID = '') => {
-    launchPatientWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('patient-form-entry-workspace', {
       workspaceTitle: 'Social History',
       mutateForm: mutate(
         (key) => typeof key === 'string' && key.startsWith('/openmrs/ws/rest/v1/kenyaemr/flags'),
@@ -120,7 +120,7 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({
         smokingDuration: getObsFromEncounter(encounter, Smoking_Duration_UUID),
         otherSubstanceAbuse: getObsFromEncounter(encounter, Other_Substance_Abuse_UUID),
         actions: (
-          <OverflowMenu aria-label="overflow-menu" flipped="false">
+          <OverflowMenu aria-label="overflow-menu" flipped={false}>
             <OverflowMenuItem
               onClick={() => handleOpenOrEditClinicalEncounterForm(encounter.uuid)}
               itemText={t('edit', 'Edit')}
@@ -163,7 +163,7 @@ const OutPatientSocialHistory: React.FC<OutPatientSocialHistoryProps> = ({
         rows={tableRows}
         headers={tableHeader}
         render={({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer size="sm" {...getTableContainerProps()}>
+          <TableContainer {...getTableContainerProps()}>
             <Table size="sm" {...getTableProps()} aria-label="sample table">
               <TableHead>
                 <TableRow>

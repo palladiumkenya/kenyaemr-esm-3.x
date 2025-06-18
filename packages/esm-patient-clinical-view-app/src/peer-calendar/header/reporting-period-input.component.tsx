@@ -22,6 +22,7 @@ const ReportingPeriodInput: React.FC<ReportingPeriodInputProps> = ({
       <Column className={styles.reportingPeriodInput}>Select Period:</Column>
       <Column className={styles.reportingPeriodInput}>
         <Dropdown
+          titleText={t('reportingMonth', 'Reporting month')}
           type="inline"
           id="reportingMonth"
           autoAlign={true}
@@ -36,6 +37,7 @@ const ReportingPeriodInput: React.FC<ReportingPeriodInputProps> = ({
       </Column>
       <Column className={styles.reportingPeriodInput}>
         <Dropdown
+          titleText={t('reportingYear', 'Reporting year')}
           type="inline"
           autoAlign={true}
           id="reportingYear"
@@ -45,7 +47,7 @@ const ReportingPeriodInput: React.FC<ReportingPeriodInputProps> = ({
           initialSelectedItem={reportigPeriod?.year}
           label={t('reportingYear', 'Year')}
           items={years.map((r) => r)}
-          itemToString={(item) => years.find((r) => r === item) ?? ''}
+          itemToString={(item) => years.find((r) => r === item).toString() ?? ''}
         />
       </Column>
     </div>

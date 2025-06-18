@@ -1,11 +1,11 @@
 import { Button, DataTableSkeleton } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
-import { getPatientUuidFromStore, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePreAuthRequests } from '../../hooks/use-pre-auth-requests';
 import GenericDataTable from './generic_data_table.component';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, parseDate } from '@openmrs/esm-framework';
 import { useFacilityClaims } from '../../claims/claims-management/table/use-facility-claims';
 
 const headers = [
@@ -38,13 +38,13 @@ const headers = [
 const BenefitsTable = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromStore();
-  const { isLoading, preAuthRequests } = usePreAuthRequests();
+  const { isLoading } = usePreAuthRequests();
 
-  const { claims, mutate } = useFacilityClaims();
+  const { claims } = useFacilityClaims();
 
   const claimsByUse = useMemo(() => {
     return claims.filter((claim) => claim.use === 'preauthorization' && claim.patientId === patientUuid);
-  }, [claims]);
+  }, [claims, patientUuid]);
 
   if (isLoading) {
     return (
@@ -61,7 +61,7 @@ const BenefitsTable = () => {
   }
   //
   const handleLaunchPreAuthForm = () => {
-    launchPatientWorkspace('benefits-pre-auth-form', {
+    launchWorkspace('benefits-pre-auth-form', {
       workspaceTitle: 'Pre Auth Form',
       patientUuid,
     });
