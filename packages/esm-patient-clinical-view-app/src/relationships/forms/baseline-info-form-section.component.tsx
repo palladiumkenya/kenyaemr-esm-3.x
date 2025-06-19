@@ -167,8 +167,11 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
       }
     }
   }, [
-    attributes.length, // Use length instead of full array to prevent unnecessary re-renders
+    attributes,
+    contactLivingWithPatient,
+    hivStatus,
     hivStatusPersonB,
+    pnsAproach,
     setValue,
     config.contactPersonAttributesUuid.baselineHIVStatus,
     config.contactPersonAttributesUuid.preferedPnsAproach,
