@@ -1,7 +1,7 @@
-import { FetchResponse, fhirBaseUrl, openmrsFetch, parseDate, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { FetchResponse, fhirBaseUrl, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import { CarePanelConfig } from '../config-schema';
-import { useMemo } from 'react';
 
 export interface Entry {
   fullUrl: string;
@@ -104,49 +104,18 @@ type DispensingVitals = {
   dateRecoded?: Date;
 };
 
-const useVisitTriagEncounter = (encounterUuid: string) => {
-  const vistUrl = `${restBaseUrl}/encounter/${encounterUuid}?v=custom:(visit:(uuid))`;
-  const {
-    data: visitData,
-    isLoading,
-    error,
-  } = useSWR<FetchResponse<{ visit: { uuid: string } }>>(vistUrl, openmrsFetch);
-  const visitUuid = visitData?.data?.visit?.uuid;
-  const v = 'custom:(encounters:(uuid,display,encounterType:(uuid,display)))';
-  const triageEncounterType = 'd1059fb9-a079-4feb-a749-eedd709ae542';
-  const url = `${restBaseUrl}/visit/${visitUuid}?v=${v}`;
-  const {
-    data,
-    error: visitError,
-    isLoading: visitloading,
-  } = useSWR<
-    FetchResponse<{
-      encounters: Array<{ uuid: string; display: string; encounterType: { uuid: string; display: string } }>;
-    }>
-  >(isLoading || error || !visitUuid ? null : url, openmrsFetch);
-  const visitEncounters = data?.data?.encounters ?? [];
-  const triageEncounter = visitEncounters.find((e) => e.encounterType.uuid === triageEncounterType)?.uuid;
-  return {
-    encounter: triageEncounter,
-    isLoading: isLoading || visitloading,
-    error: error ?? visitError,
-  };
-};
-
-export const usePatientVitals = (patientUuid: string, encounterUuid: string) => {
+export const usePatientVitals = (patientUuid: string) => {
   const { dispensingVitalsConcepts } = useConfig<CarePanelConfig>();
-  const { encounter, error: encounterError, isLoading: isLoadingEncounter } = useVisitTriagEncounter(encounterUuid);
   const urlParams = new URLSearchParams({
-    patient: patientUuid,
     code: dispensingVitalsConcepts.map(({ uuid }) => uuid).join(','),
-    encounter,
+    'subject:Patient': patientUuid,
+    _summary: 'data',
+    _sort: '-date',
+    _count: '1',
   });
   const url = `${fhirBaseUrl}/Observation?${urlParams.toString()}`;
 
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ entry: Array<Entry> }>>(
-    encounter ? url : null,
-    openmrsFetch,
-  );
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ entry: Array<Entry> }>>(url, openmrsFetch);
   const vitals = useMemo<Array<DispensingVitals>>(
     () =>
       (data?.data?.entry ?? []).map((entry) => ({
@@ -159,8 +128,8 @@ export const usePatientVitals = (patientUuid: string, encounterUuid: string) => 
   );
   return {
     vitals,
-    isLoading: isLoading || isLoadingEncounter,
+    isLoading,
     mutate,
-    error: error ?? encounterError,
+    error,
   };
 };

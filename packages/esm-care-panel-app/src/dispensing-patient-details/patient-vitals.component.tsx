@@ -7,8 +7,8 @@ type PatientVitalsProps = {
   patientUuid: string;
   encounterUuid: string;
 };
-const DispensingPatientVitals: React.FC<PatientVitalsProps> = ({ encounterUuid, patientUuid }) => {
-  const { vitals, error, isLoading } = usePatientVitals(patientUuid, encounterUuid);
+const DispensingPatientVitals: React.FC<PatientVitalsProps> = ({ patientUuid }) => {
+  const { vitals, error, isLoading } = usePatientVitals(patientUuid);
 
   if (isLoading || error || !vitals.length) {
     return null;
