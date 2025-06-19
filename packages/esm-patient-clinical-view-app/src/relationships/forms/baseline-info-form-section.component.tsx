@@ -45,6 +45,7 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
   const config = useConfig<ConfigObject>();
   const { setValue } = form;
   const { attributes, isLoading } = usePersonAttributes(patientUuid);
+
   const pnsAproach = useMemo(
     () =>
       Object.entries(contactListConceptMap[PNS_APROACH_CONCEPT_UUID].answers).map(([uuid, display]) => ({
@@ -92,6 +93,7 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
     [patientAgeMonths],
   );
 
+  // useEffect for IPV outcome logic
   useEffect(() => {
     if ([observablePhysicalAssault, observableThreatened, observableSexualAssault].includes(BOOLEAN_YES)) {
       form.setValue('ipvOutCome', 'True');
@@ -103,68 +105,79 @@ const RelationshipBaselineInfoFormSection: FC<RelationshipBaselineInfoFormSectio
     if (!showIPVRelatedFields) {
       form.setValue('ipvOutCome', undefined);
     }
-  }, [
-    observablePhysicalAssault,
-    observableThreatened,
-    observableSexualAssault,
-    observableRelationship,
-    form,
-    showIPVRelatedFields,
-  ]);
+  }, [observablePhysicalAssault, observableThreatened, observableSexualAssault, form, showIPVRelatedFields]);
 
+  // Set initial values from attributes only once
   useEffect(() => {
-    if (attributes.length) {
-      const hivStatusAttribute = attributes.find(
-        (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus,
-      );
-      if (hivStatusAttribute) {
-        const value = hivStatus.find((r) => r.value.startsWith(hivStatusAttribute.value))?.value;
-        if (value) {
-          setValue('baselineStatus', value);
+    // Only set values once when attributes are loaded and not already set
+    if (attributes.length > 0 || hivStatusPersonB) {
+      if (attributes.length > 0) {
+        const hivStatusAttribute = attributes.find(
+          (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus,
+        );
+        if (hivStatusAttribute) {
+          const value = hivStatus.find((r) => r.value.startsWith(hivStatusAttribute.value))?.value;
+          if (value) {
+            setValue('baselineStatus', value);
+          }
         }
-      } else if (hivStatusPersonB) {
+
+        const pnsAproachAttribute = attributes.find(
+          (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach,
+        );
+        if (pnsAproachAttribute) {
+          const value = pnsAproach.find((r) => r.value.startsWith(pnsAproachAttribute.value))?.value;
+          if (value) {
+            setValue('preferedPNSAproach', value);
+          }
+        }
+
+        const livingWithPatientAttribute = attributes.find(
+          (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.livingWithContact,
+        );
+        if (livingWithPatientAttribute) {
+          const value = contactLivingWithPatient.find((r) =>
+            r.value.startsWith(livingWithPatientAttribute.value),
+          )?.value;
+          if (value) {
+            setValue('livingWithClient', value);
+          }
+        }
+
+        const ipvAttr = attributes.find(
+          (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.contactIPVOutcome,
+        );
+        if (ipvAttr) {
+          const value = contactIPVOutcomeOptions.find((r) => r.value.startsWith(ipvAttr.value))?.value;
+          if (value) {
+            setValue('ipvOutCome', value as any);
+          }
+        }
+      }
+
+      // Handle hivStatusPersonB when no attributes but HIV status is available
+      if (
+        hivStatusPersonB &&
+        !attributes.find((a) => a.attributeType.uuid === config.contactPersonAttributesUuid.baselineHIVStatus)
+      ) {
         const value = hivStatus.find((r) => r.label.toLowerCase().includes(hivStatusPersonB.toLowerCase()))?.value;
         if (value) {
           setValue('baselineStatus', value);
         }
       }
-
-      const pnsAproachAttribute = attributes.find(
-        (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.preferedPnsAproach,
-      );
-      if (pnsAproachAttribute) {
-        const value = pnsAproach.find((r) => r.value.startsWith(pnsAproachAttribute.value))?.value;
-        if (value) {
-          setValue('preferedPNSAproach', value);
-        }
-      }
-
-      const livingWithPatientAttribute = attributes.find(
-        (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.livingWithContact,
-      );
-      if (livingWithPatientAttribute) {
-        const value = contactLivingWithPatient.find((r) => r.value.startsWith(livingWithPatientAttribute.value))?.value;
-        if (value) {
-          setValue('livingWithClient', value);
-        }
-      }
-
-      const ipvAttr = attributes.find(
-        (a) => a.attributeType.uuid === config.contactPersonAttributesUuid.contactIPVOutcome,
-      );
-      if (ipvAttr) {
-        const value = contactIPVOutcomeOptions.find((r) => r.value.startsWith(ipvAttr.value))?.value;
-        if (value) {
-          setValue('ipvOutCome', value as any);
-        }
-      }
-    } else if (hivStatusPersonB) {
-      const value = hivStatus.find((r) => r.label.toLowerCase().includes(hivStatusPersonB.toLowerCase()))?.value;
-      if (value) {
-        setValue('baselineStatus', value);
-      }
     }
-  }, [attributes, setValue, config, hivStatus, pnsAproach, contactLivingWithPatient, hivStatusPersonB]);
+  }, [
+    attributes,
+    contactLivingWithPatient,
+    hivStatus,
+    hivStatusPersonB,
+    pnsAproach,
+    setValue,
+    config.contactPersonAttributesUuid.baselineHIVStatus,
+    config.contactPersonAttributesUuid.preferedPnsAproach,
+    config.contactPersonAttributesUuid.livingWithContact,
+    config.contactPersonAttributesUuid.contactIPVOutcome,
+  ]);
 
   return (
     <>

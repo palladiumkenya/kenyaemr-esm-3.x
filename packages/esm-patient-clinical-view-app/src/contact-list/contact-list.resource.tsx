@@ -167,47 +167,72 @@ export const updatePersonAttributes = (payload: any, personUuid: string, attribu
   });
 };
 
+const ATTRIBUTE_MAPPINGS = [
+  { key: 'baselineStatus', configPath: 'baselineHIVStatus', cleanValue: true },
+  { key: 'preferedPNSAproach', configPath: 'preferedPnsAproach', cleanValue: true },
+  { key: 'livingWithClient', configPath: 'livingWithContact', cleanValue: true },
+  { key: 'ipvOutCome', configPath: 'contactIPVOutcome', cleanValue: false },
+];
+
+const createAttribute = (
+  attributeType: string,
+  value: string,
+  existingAttributes: Person['attributes'],
+  cleanValue: boolean = true,
+) => ({
+  attributeType,
+  value: cleanValue ? replaceAll(value, 'A', '') : value,
+  attribute: existingAttributes.find((a) => a.attributeType.uuid === attributeType)?.uuid,
+});
+
+const buildAttributes = (
+  attributes: ContactAttributeData,
+  config: ConfigObject,
+  existingAttributes: Person['attributes'] = [],
+) => {
+  if (!attributes) {
+    return [];
+  }
+
+  return ATTRIBUTE_MAPPINGS.filter((m) => attributes[m.key]).map((m) =>
+    createAttribute(
+      config.contactPersonAttributesUuid[m.configPath],
+      attributes[m.key],
+      existingAttributes,
+      m.cleanValue,
+    ),
+  );
+};
+
 export const updateContactAttributes = async (
   personUuid: string,
-  attributeData: ContactAttributeData,
+  attributes: ContactAttributeData,
   config: ConfigObject,
   existingAttributes: Person['attributes'] = [],
 ) => {
   try {
-    const updatableAttributes = [
-      {
-        attributeType: config?.contactPersonAttributesUuid?.baselineHIVStatus,
-        value: replaceAll(attributeData?.baselineStatus, 'A', ''),
-      },
-      {
-        attributeType: config?.contactPersonAttributesUuid?.preferedPnsAproach,
-        value: replaceAll(attributeData?.preferedPNSAproach, 'A', ''),
-      },
-      {
-        attributeType: config?.contactPersonAttributesUuid?.livingWithContact,
-        value: replaceAll(attributeData?.livingWithClient, 'A', ''),
-      },
-      {
-        attributeType: config?.contactPersonAttributesUuid?.contactIPVOutcome,
-        value: attributeData?.ipvOutCome,
-      },
-    ].filter((attr) => attr?.value !== undefined && attr?.value !== null && attr?.value !== '');
+    const attrs = buildAttributes(attributes, config, existingAttributes);
 
-    await Promise.allSettled(
-      updatableAttributes?.map((attr) => {
-        const existingAttribute = existingAttributes?.find((at) => at?.attributeType?.uuid === attr?.attributeType);
-
-        const payload = {
-          attributeType: attr?.attributeType,
-          value: attr?.value,
-        };
-
-        if (!existingAttribute?.uuid) {
-          return createPersonAttribute(payload, personUuid);
-        }
-        return updatePersonAttributes(payload, personUuid, existingAttribute.uuid);
-      }),
+    const results = await Promise.allSettled(
+      attrs.map((attr) =>
+        openmrsFetch(`${restBaseUrl}/person/${personUuid}/attribute/${attr.attribute ?? ''}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(omit(attr, ['attribute'])),
+        }),
+      ),
     );
+
+    if (results.length && results.every((r) => r.status === 'fulfilled')) {
+      showSnackbar({ title: 'Success ', kind: 'success', subtitle: 'Patient attributes updated succesfully' });
+    }
+    results.forEach((res) => {
+      if (res.status === 'rejected') {
+        showSnackbar({ title: 'Error updating patient attribute', kind: 'error', subtitle: res.reason?.message });
+      }
+    });
 
     mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/person`));
   } catch (error) {
