@@ -4,32 +4,17 @@ import { z } from 'zod';
 import { Patient } from '../types';
 import { ConfigObject } from '../config-schema';
 import omit from 'lodash/omit';
+import pick from 'lodash/pick';
 
 export const BOOLEAN_YES = '1065';
 export const BOOLEAN_NO = '1066';
 export const HIV_EXPOSED_INFANT = 'HIV exposed infant';
 export const INFANT_AGE_THRESHOLD_IN_MONTHS = 24;
 
-export const relationshipUpdateFormSchema = z
-  .object({
-    startDate: z.date({ coerce: true }).max(new Date(), 'Can not be a furture date'),
-    endDate: z.date({ coerce: true }).optional(),
-    relationshipType: z.string().uuid(),
-  })
-  .refine(
-    (data) => {
-      if (data.endDate && data.startDate && data.endDate < data.startDate) {
-        return false;
-      }
-      return true;
-    },
-    { message: 'End date must be after start date', path: ['endDate'] },
-  );
-
 export const updateRelationship = (relationshipUuid: string, payload: z.infer<typeof relationshipUpdateFormSchema>) => {
   const url = `${restBaseUrl}/relationship/${relationshipUuid}`;
   return openmrsFetch(url, {
-    body: JSON.stringify(payload),
+    body: JSON.stringify(pick(payload, ['relationshipType', 'startDate', 'endDate'])),
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -99,6 +84,18 @@ export const relationshipFormSchema = z.object({
     })
     .optional(),
 });
+
+export const relationshipUpdateFormSchema = relationshipFormSchema
+  .omit({ personBInfo: true, mode: true, personA: true, personB: true })
+  .refine(
+    (data) => {
+      if (data.endDate && data.startDate && data.endDate < data.startDate) {
+        return false;
+      }
+      return true;
+    },
+    { message: 'End date must be after start date', path: ['endDate'] },
+  );
 
 export function generateOpenmrsIdentifier(source: string) {
   const abortController = new AbortController();
