@@ -43,7 +43,15 @@ export const createEditBillPayload = (lineItem, data, bill, adjustmentReason: st
     cashPoint: bill.cashPointUuid,
     cashier: bill.cashier.uuid,
     lineItems: bill.lineItems.map((li) => formatLineItem(li.uuid === lineItem.uuid ? updatedLineItem : li)),
-    payments: bill.payments,
+    payments: bill.payments.map((payment) => ({
+      amount: payment.amount,
+      amountTendered: payment.amountTendered,
+      attributes: payment.attributes.map((attribute) => ({
+        attributeType: attribute.attributeType?.uuid,
+        value: attribute.value,
+      })),
+      instanceType: payment.instanceType.uuid,
+    })),
     patient: bill.patientUuid,
     status: bill.status,
     billAdjusted: bill.uuid,
