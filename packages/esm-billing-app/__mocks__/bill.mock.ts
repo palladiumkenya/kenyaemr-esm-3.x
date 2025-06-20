@@ -1,4 +1,4 @@
-import { MappedBill } from '../src/types';
+import { MappedBill, PaymentStatus } from '../src/types';
 
 export const mockBillData: Array<MappedBill> = [
   {
@@ -7,7 +7,7 @@ export const mockBillData: Array<MappedBill> = [
     patientName: 'John Doe',
     identifier: 'TEST123',
     patientUuid: 'patient-uuid-1',
-    status: 'PENDING',
+    status: PaymentStatus.PENDING,
     receiptNumber: '1000-1',
     cashier: {
       uuid: 'cashier-uuid-1',
@@ -74,7 +74,11 @@ export const mockCurrentBillableService = {
   uuid: 'service-uuid-1',
   name: 'TEST SERVICE',
   shortName: 'TEST SERVICE',
-  serviceStatus: 'ENABLED',
+  serviceStatus: 'ENABLED' as const,
+  stockItem: {
+    uuid: 'stock-item-uuid-1',
+    display: 'Test Stock Item',
+  },
   serviceType: {
     uuid: 'servicetype-uuid-1',
     display: 'Test Service',
