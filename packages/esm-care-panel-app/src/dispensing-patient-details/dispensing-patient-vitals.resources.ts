@@ -1,7 +1,7 @@
 import { FetchResponse, fhirBaseUrl, openmrsFetch, parseDate, useConfig } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 import useSWR from 'swr';
 import { CarePanelConfig } from '../config-schema';
-import { useMemo } from 'react';
 
 export interface Entry {
   fullUrl: string;
@@ -104,14 +104,17 @@ type DispensingVitals = {
   dateRecoded?: Date;
 };
 
-export const usePatientVitals = (patientUuid: string, encounterUuid: string) => {
+export const usePatientVitals = (patientUuid: string) => {
   const { dispensingVitalsConcepts } = useConfig<CarePanelConfig>();
   const urlParams = new URLSearchParams({
-    patient: patientUuid,
     code: dispensingVitalsConcepts.map(({ uuid }) => uuid).join(','),
-    encounter: encounterUuid,
+    'subject:Patient': patientUuid,
+    _summary: 'data',
+    _sort: '-date',
+    _count: '1',
   });
   const url = `${fhirBaseUrl}/Observation?${urlParams.toString()}`;
+
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ entry: Array<Entry> }>>(url, openmrsFetch);
   const vitals = useMemo<Array<DispensingVitals>>(
     () =>
