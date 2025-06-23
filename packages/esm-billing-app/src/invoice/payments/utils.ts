@@ -140,7 +140,16 @@ export const createPaymentPayload = (
   }));
 
   // Combine and calculate payments
-  const consolidatedPayments = [...currentPayments, ...existingPayments];
+  const consolidatedPayments =
+    [...currentPayments, ...existingPayments]?.map((payment) => ({
+      amount: payment.amount,
+      amountTendered: payment.amountTendered,
+      attributes: payment.attributes.map((attribute) => ({
+        attributeType: attribute.attributeType?.uuid,
+        value: attribute.value,
+      })),
+      instanceType: payment.instanceType.uuid,
+    })) ?? [];
   const totalPaidAmount = consolidatedPayments.reduce((sum, payment) => sum + payment.amountTendered, 0);
 
   // Process selected items and update their payment status
