@@ -1,0 +1,26 @@
+@use '@carbon/layout';
+
+.encounterContainer {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05;
+}
+
+.encounterTable {
+  display: flex;
+  flex-direction: column;
+
+  & > section {
+    position: sticky;
+    top: 0;
+  }
+}
+
+.pagination {
+  overflow: hidden;
+
+  &:global(.cds--pagination) {
+    border-top: none;
+  }
+}
