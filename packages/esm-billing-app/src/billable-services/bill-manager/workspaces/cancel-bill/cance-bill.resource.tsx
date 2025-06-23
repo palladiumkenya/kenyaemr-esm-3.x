@@ -27,7 +27,15 @@ export const createCancelBillPayload = (bill, lineItem, reason) => {
     cashPoint: bill.cashPointUuid,
     cashier: bill.cashier.uuid,
     lineItems: updatedLineItems.map((li) => formatLineItem(li)),
-    payments: bill.payments,
+    payments: bill.payments.map((payment) => ({
+      amount: payment.amount,
+      amountTendered: payment.amountTendered,
+      attributes: payment.attributes.map((attribute) => ({
+        attributeType: attribute.attributeType?.uuid,
+        value: attribute.value,
+      })),
+      instanceType: payment.instanceType.uuid,
+    })),
     patient: bill.patientUuid,
     status: hasOneLineItem ? PaymentStatus.CANCELLED : PaymentStatus.ADJUSTED,
     billAdjusted: bill.uuid,
