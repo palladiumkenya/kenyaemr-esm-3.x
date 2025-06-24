@@ -1,7 +1,6 @@
 import {
   DataTable,
   DataTableSkeleton,
-  Dropdown,
   Layer,
   OverflowMenu,
   OverflowMenuItem,
@@ -13,6 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tile,
 } from '@carbon/react';
 import {
   ErrorState,
@@ -26,10 +26,11 @@ import {
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
-import { CardHeader, EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LabManifestConfig } from '../config-schema';
+import LabManifestTableFilterHeader from '../header/lab-manifest-table-filters-header.component';
 import { useLabManifests } from '../hooks';
 import {
   editableManifestStatus,
@@ -206,47 +207,21 @@ const LabManifestsTable = () => {
   if (manifests.length === 0) {
     return (
       <Layer className={styles.tile}>
-        <CardHeader title={headerTitle}>
-          <Dropdown
-            titleText={t('manifestStatus', 'Manifest status')}
-            className={styles.dropDownFilter}
-            id="manifestStatus"
-            onChange={({ selectedItem }) => {
-              setCurrFilter(LabManifestFilters.find((lb) => lb.value === selectedItem).params);
-            }}
-            initialSelectedItem={LabManifestFilters.find((lb) => lb.params === currFilter).value}
-            label={t('selectManifestStatus', 'Select manifest status')}
-            items={LabManifestFilters.map((mn) => mn.value)}
-            itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
-          />
-        </CardHeader>
-        <EmptyDataIllustration />
-        <p className={styles.content}>
-          {t('notLabManifetToDisplay', 'There are no {{status}} lab manifets data to display.', {
-            status: LabManifestFilters.find((lm) => lm.params === currFilter)?.label ?? '',
-          })}
-        </p>
+        <LabManifestTableFilterHeader filter={currFilter} onFilterChange={setCurrFilter} title={headerTitle} />
+        <Tile>
+          <EmptyDataIllustration />
+          <p className={styles.content}>
+            {t('notLabManifetToDisplay', 'There are no {{status}} lab manifets data to display.', {
+              status: LabManifestFilters.find((lm) => lm.params === currFilter)?.label ?? '',
+            })}
+          </p>
+        </Tile>
       </Layer>
     );
   }
   return (
     <div className={styles.widgetContainer}>
-      <CardHeader title={headerTitle}>
-        <div style={{ padding: '10px' }}>
-          <Dropdown
-            titleText={t('manifestStatus', 'Manifest status')}
-            style={{ minWidth: '300px' }}
-            id="manifestStatus"
-            onChange={({ selectedItem }) => {
-              setCurrFilter(LabManifestFilters.find((lb) => lb.value === selectedItem).params);
-            }}
-            initialSelectedItem={LabManifestFilters.find((lb) => lb.params === currFilter).value}
-            label={t('selectManifestStatus', 'Select manifest status')}
-            items={LabManifestFilters.map((mn) => mn.value)}
-            itemToString={(item) => LabManifestFilters.find((lm) => lm.value === item)?.label ?? ''}
-          />
-        </div>
-      </CardHeader>
+      <LabManifestTableFilterHeader filter={currFilter} onFilterChange={setCurrFilter} title={headerTitle} />
       <DataTable
         useZebraStyles
         size="sm"

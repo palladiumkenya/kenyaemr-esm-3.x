@@ -1,18 +1,24 @@
 import { Button, ButtonSet, Layer, Row, SkeletonText, Tile } from '@carbon/react';
-import { ArrowLeft, Edit, Printer } from '@carbon/react/icons';
-import { formatDate, launchWorkspace, navigate, parseDate, showSnackbar } from '@openmrs/esm-framework';
-import React from 'react';
+import { ArrowLeft, Edit, Printer, Queued } from '@carbon/react/icons';
+import { formatDate, launchWorkspace, navigate, parseDate, showModal, showSnackbar } from '@openmrs/esm-framework';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
 import styles from './lab-manifest-header.scss';
-import { editableManifestStatus, printableManifestStatus, printManifest } from '../lab-manifest.resources';
+import {
+  editableManifestStatus,
+  printableManifestStatus,
+  printManifest,
+  resubmittableManifestStatus,
+} from '../lab-manifest.resources';
+import { MappedLabManifest } from '../types';
 
 interface LabManifestDetailHeaderProps {
   manifestUuid: string;
 }
 
 const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manifestUuid }) => {
-  const { isLoading, manifest } = useLabManifest(manifestUuid);
+  const { isLoading, manifest, mutate } = useLabManifest(manifestUuid);
   const { t } = useTranslation();
 
   const handleGoBack = () => {
@@ -32,6 +38,17 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
     } catch (error) {
       showSnackbar({ title: 'Failure', subtitle: 'Error printing manifest', kind: 'error' });
     }
+  };
+
+  const handleLaunchRequeueConfirmModal = () => {
+    const dispose = showModal('lab-manifest-requeue-confirn-modal', {
+      labManifest: manifest,
+      onClose: () => {
+        dispose();
+        mutate();
+      },
+      filter: manifest.manifestStatus,
+    });
   };
 
   if (isLoading) {
@@ -76,18 +93,31 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
         <Button kind="tertiary" renderIcon={ArrowLeft} onClick={handleGoBack}>
           {t('back', 'Back')}
         </Button>
-        <Row className={styles.btnSetRight}>
+        <Row className={styles.btnSetRight} style={{ gap: '2px' }}>
           {editableManifestStatus.includes(manifest.manifestStatus) && (
-            <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest}>
+            <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest} size="md">
               {t('editManifest', 'Edit Manifest')}
+            </Button>
+          )}
+          {resubmittableManifestStatus.includes(manifest.manifestStatus) && (
+            <Button kind="tertiary" renderIcon={Queued} onClick={handleLaunchRequeueConfirmModal} size="md">
+              {t('requeueManifest', 'Requeue Manifest')}
             </Button>
           )}
           {printableManifestStatus.includes(manifest.manifestStatus) && (
             <>
-              <Button kind="secondary" renderIcon={Printer} onClick={async () => await handlePrintManifest(false)}>
+              <Button
+                kind="tertiary"
+                renderIcon={Printer}
+                onClick={async () => await handlePrintManifest(false)}
+                size="md">
                 {t('printManifest', 'Print Manifest')}
               </Button>
-              <Button kind="secondary" renderIcon={Printer} onClick={async () => await handlePrintManifest(true)}>
+              <Button
+                kind="tertiary"
+                renderIcon={Printer}
+                onClick={async () => await handlePrintManifest(true)}
+                size="md">
                 {t('printManifestLog', 'Print Manifest log')}
               </Button>
             </>
