@@ -148,7 +148,7 @@ export const createPaymentPayload = (
         attributeType: attribute.attributeType?.uuid,
         value: attribute.value,
       })),
-      instanceType: payment.instanceType.uuid,
+      instanceType: payment?.instanceType,
     })) ?? [];
   const totalPaidAmount = consolidatedPayments.reduce((sum, payment) => sum + payment.amountTendered, 0);
 
