@@ -1,17 +1,16 @@
-import { Button, ButtonSet, Layer, Row, SkeletonText, Tile } from '@carbon/react';
+import { Button, Layer, Row, SkeletonText, Tile } from '@carbon/react';
 import { ArrowLeft, Edit, Printer, Queued } from '@carbon/react/icons';
 import { formatDate, launchWorkspace, navigate, parseDate, showModal, showSnackbar } from '@openmrs/esm-framework';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
-import styles from './lab-manifest-header.scss';
 import {
   editableManifestStatus,
   printableManifestStatus,
   printManifest,
   resubmittableManifestStatus,
 } from '../lab-manifest.resources';
-import { MappedLabManifest } from '../types';
+import styles from './lab-manifest-header.scss';
 
 interface LabManifestDetailHeaderProps {
   manifestUuid: string;
@@ -93,7 +92,7 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
         <Button kind="tertiary" renderIcon={ArrowLeft} onClick={handleGoBack}>
           {t('back', 'Back')}
         </Button>
-        <Row className={styles.btnSetRight} style={{ gap: '2px' }}>
+        <Row className={styles.btnSetRight}>
           {editableManifestStatus.includes(manifest.manifestStatus) && (
             <Button kind="primary" renderIcon={Edit} onClick={handleEditManifest} size="md">
               {t('editManifest', 'Edit Manifest')}

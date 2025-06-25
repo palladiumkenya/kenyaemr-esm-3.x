@@ -3,6 +3,7 @@ import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import React, { FC } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LabManifestFilters } from '../lab-manifest.resources';
+import styles from './lab-manifest-header.scss';
 
 type LabManifestTableFilterHeaderProps = {
   title: string;
@@ -14,9 +15,9 @@ const LabManifestTableFilterHeader: FC<LabManifestTableFilterHeaderProps> = ({ t
   const { t } = useTranslation();
   return (
     <CardHeader title={title}>
-      <div style={{ padding: '10px' }}>
+      <div className={styles.statusFilterContainer}>
         <Dropdown
-          style={{ minWidth: '300px' }}
+          className={styles.statusFilter}
           id="manifestStatus"
           onChange={({ selectedItem }) => {
             onFilterChange(LabManifestFilters.find((lb) => lb.value === selectedItem).params);

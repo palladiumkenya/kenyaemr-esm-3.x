@@ -70,15 +70,6 @@ svg.iconOverrides {
   fill: var(--brand-03);
 }
 
-.cardContainer {
-  background-color: colors.$white;
-  display: flex;
-  justify-content: space-between;
-  padding: 0 layout.$spacing-05 layout.$spacing-07 layout.$spacing-03;
-  flex-flow: row wrap;
-  margin-top: -(layout.$spacing-03);
-}
-
 .manifestDetailHeader {
   display: flex;
   justify-content: space-between;
@@ -110,6 +101,8 @@ svg.iconOverrides {
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: layout.$spacing-02;
+
 }
 
 .detailHeaderContainer {
@@ -137,4 +130,12 @@ svg.iconOverrides {
 
 .samplesCountValue {
   @include type.type-style('heading-04');
+}
+
+.statusFilter {
+  min-width: 300px;
+}
+
+.statusFilterContainer {
+  padding: layout.$spacing-02;
 }

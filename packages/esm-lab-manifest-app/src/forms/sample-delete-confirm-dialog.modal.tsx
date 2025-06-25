@@ -17,15 +17,14 @@ import {
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { LabManifestSample } from '../hooks/useLabManifestOrders';
 import styles from '../tables/lab-manifest-table.scss';
-import PatientNameCell from '../tables/patient-name-cell.component';
 import PatientCCCNumbercell from '../tables/patient-ccc-no-cell.component';
-import { LabmanifestSample } from '../hooks/useLabManifestOrders';
 
 interface SampleDeleteConfirmDialogProps {
   onClose: () => void;
   onDelete: () => void;
-  samples?: Array<LabmanifestSample>;
+  samples?: Array<LabManifestSample>;
 }
 const SampleDeleteConfirmDialog: React.FC<SampleDeleteConfirmDialogProps> = ({ onClose, onDelete, samples = [] }) => {
   const { t } = useTranslation();

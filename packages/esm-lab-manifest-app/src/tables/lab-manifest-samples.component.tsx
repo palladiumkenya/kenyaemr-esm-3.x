@@ -21,7 +21,7 @@ import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
-import useLabManifestOrders, { LabmanifestSample } from '../hooks/useLabManifestOrders';
+import useLabManifestOrders, { LabManifestSample } from '../hooks/useLabManifestOrders';
 import {
   mutateManifestLinks,
   printSpecimentLabel,
@@ -120,7 +120,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     });
   };
 
-  const handleDeleteSelectedSamples = (selected: Array<LabmanifestSample>) => {
+  const handleDeleteSelectedSamples = (selected: Array<LabManifestSample>) => {
     if (selected.length > 0) {
       const dispose = showModal('sample-delete-confirm-dialog', {
         onClose: () => dispose(),
@@ -159,7 +159,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
     }
   };
 
-  async function handlePrintSpecimenLabel(sample: LabmanifestSample) {
+  async function handlePrintSpecimenLabel(sample: LabManifestSample) {
     try {
       await printSpecimentLabel(sample.uuid);
     } catch (error) {
