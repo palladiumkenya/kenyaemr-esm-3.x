@@ -9,9 +9,6 @@ type Props = {
 const PatientNameCell: React.FC<Props> = ({ patient }) => {
   const patientChartUrl = '${openmrsSpaBase}/patient/${patientUuid}/chart/Patient Summary';
   const { display, uuid: patientUuid } = patient ?? {};
-  if (!patient) {
-    return <>--</>;
-  }
   return (
     <ConfigurableLink
       to={patientChartUrl}
