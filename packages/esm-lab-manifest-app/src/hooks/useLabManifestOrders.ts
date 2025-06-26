@@ -28,7 +28,7 @@ export interface LabManifestSample {
 
 export interface LabManifest {
   uuid: string;
-  identifier: any;
+  identifier?: string;
   status: string;
   labManifestOrders: Array<LabManifestOrder>;
 }
