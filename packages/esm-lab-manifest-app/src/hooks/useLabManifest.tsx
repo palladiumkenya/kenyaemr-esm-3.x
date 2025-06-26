@@ -5,12 +5,13 @@ import { LabManifest } from '../types';
 
 const useLabManifest = (manifestUuid: string) => {
   const url = `${restBaseUrl}/labmanifest/${manifestUuid}`;
-  const { isLoading, error, data } = useSWR<FetchResponse<LabManifest>>(url, openmrsFetch);
+  const { isLoading, error, data, mutate } = useSWR<FetchResponse<LabManifest>>(url, openmrsFetch);
 
   return {
     isLoading,
     error,
     manifest: data?.data ? extractLabManifest(data!.data!) : undefined,
+    mutate,
   };
 };
 

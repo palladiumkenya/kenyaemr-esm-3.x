@@ -17,9 +17,8 @@ import {
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { LabManifestSample } from '../hooks/useLabManifestOrders';
 import styles from '../tables/lab-manifest-table.scss';
-import { LabManifestSample } from '../types';
-import PatientNameCell from '../tables/patient-name-cell.component';
 import PatientCCCNumbercell from '../tables/patient-ccc-no-cell.component';
 
 interface SampleDeleteConfirmDialogProps {
@@ -68,7 +67,7 @@ const SampleDeleteConfirmDialog: React.FC<SampleDeleteConfirmDialogProps> = ({ o
         sampleType: sample.sampleType ?? '--',
         status: sample.status,
         batchNumber: sample.batchNumber ?? '--',
-        patient: sample?.order?.patient?.uuid ? <PatientNameCell patientUuid={sample?.order?.patient?.uuid} /> : '--',
+        patient: sample?.order?.patient?.display ?? '--',
         cccKDODNumber: sample?.order?.patient?.uuid ? (
           <PatientCCCNumbercell patientUuid={sample?.order?.patient?.uuid} />
         ) : (

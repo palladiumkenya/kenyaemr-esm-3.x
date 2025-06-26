@@ -4,6 +4,7 @@ import {
   DataTable,
   DataTableSkeleton,
   Pagination,
+  Search,
   Table,
   TableBody,
   TableCell,
@@ -15,29 +16,21 @@ import {
   TableSelectRow,
 } from '@carbon/react';
 import { ArrowRight, Printer, TrashCan } from '@carbon/react/icons';
-import {
-  ConfigurableLink,
-  ErrorState,
-  formatDate,
-  parseDate,
-  showModal,
-  showSnackbar,
-  usePagination,
-} from '@openmrs/esm-framework';
+import { ErrorState, formatDate, parseDate, showModal, showSnackbar, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLabManifest } from '../hooks';
+import useLabManifestOrders, { LabManifestSample } from '../hooks/useLabManifestOrders';
 import {
   mutateManifestLinks,
   printSpecimentLabel,
   removeSampleFromTheManifest,
   sampleRemovableManifestStatus,
 } from '../lab-manifest.resources';
-import { LabManifestSample } from '../types';
 import styles from './lab-manifest-table.scss';
-import PatientNameCell from './patient-name-cell.component';
 import PatientCCCNumbercell from './patient-ccc-no-cell.component';
+import PatientNameCell from './patient-name-cell.component';
 
 interface LabManifestSamplesProps {
   manifestUuid: string;
@@ -45,11 +38,17 @@ interface LabManifestSamplesProps {
 
 const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid }) => {
   const { error, isLoading, manifest } = useLabManifest(manifestUuid);
-  const samples: Array<LabManifestSample> = manifest?.samples ?? [];
+  const {
+    labmanifestOrders,
+    setSearchvalue,
+    searchValue,
+    isLoading: isLoadingLabOrders,
+    error: labOrderErrors,
+  } = useLabManifestOrders(manifestUuid);
   const { t } = useTranslation();
   const [pageSize, setPageSize] = useState(10);
   const headerTitle = t('labManifestSamples', 'Lab Manifest Samples');
-  const { results, totalPages, currentPage, goTo } = usePagination(samples, pageSize);
+  const { results, totalPages, currentPage, goTo } = usePagination(labmanifestOrders, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, totalPages, currentPage, results.length);
 
   const headers = [
@@ -96,7 +95,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
   const handleDeleteManifestSample = (sampleUUid: string) => {
     const dispose = showModal('sample-delete-confirm-dialog', {
       onClose: () => dispose(),
-      samples: samples.filter((s) => s.uuid === sampleUUid),
+      samples: labmanifestOrders.filter((s) => s.uuid === sampleUUid),
       onDelete: async () => {
         try {
           await removeSampleFromTheManifest(sampleUUid);
@@ -108,7 +107,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
             subtitle: t('sampleRemoveSuccess', 'Sample removed from manifest successfully!'),
           });
         } catch (e: any) {
-          const _sample = samples.find((sample) => sample.uuid === sampleUUid);
+          const _sample = labmanifestOrders.find((sample) => sample.uuid === sampleUUid);
           showSnackbar({
             title: t('errorRemovingSample', 'Error removing sample {{sample}} from the manifest', {
               sample: _sample.id ?? _sample?.uuid,
@@ -169,17 +168,13 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
   }
 
   const tableRows =
-    (results as LabManifestSample[])?.map((sample) => {
+    results?.map((sample) => {
       return {
         id: `${sample.uuid}`,
         sampleType: sample.sampleType ?? '--',
         status: sample.status,
         batchNumber: sample.batchNumber ?? '--',
-        patientName: sample?.order?.patient?.uuid ? (
-          <PatientNameCell patientUuid={sample?.order?.patient?.uuid} />
-        ) : (
-          '--'
-        ),
+        patientName: <PatientNameCell patient={sample?.order?.patient} />,
         cccKDODNumber: sample?.order?.patient ? (
           <PatientCCCNumbercell patientUuid={sample?.order?.patient?.uuid} />
         ) : (
@@ -213,14 +208,14 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
       };
     }) ?? [];
 
-  if (isLoading) {
+  if (isLoading || isLoadingLabOrders) {
     return <DataTableSkeleton rowCount={5} />;
   }
-  if (error) {
+  if (error || labOrderErrors) {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (samples.length === 0) {
+  if (labmanifestOrders.length === 0) {
     return (
       <EmptyState
         headerTitle={t('manifestSamples', 'Manifest Samples')}
@@ -228,6 +223,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
       />
     );
   }
+
   return (
     <div className={styles.widgetContainer}>
       <DataTable
@@ -249,7 +245,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
             <CardHeader title={headerTitle}>
               <Button
                 onClick={() => {
-                  const data = selectedRows.map(({ id }) => samples.find((s) => s.uuid === id));
+                  const data = selectedRows.map(({ id }) => labmanifestOrders.find((s) => s.uuid === id));
                   handleDeleteSelectedSamples(data);
                 }}
                 renderIcon={ArrowRight}
@@ -257,6 +253,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
                 {t('deleteSelectedSamples', 'Remove Selected Samples')}
               </Button>
             </CardHeader>
+            <Search labelText={''} value={searchValue} onChange={({ target: { value } }) => setSearchvalue(value)} />
             <TableContainer {...getTableContainerProps()}>
               <Table {...getTableProps()}>
                 <TableHead>
@@ -289,7 +286,7 @@ const LabManifestSamples: React.FC<LabManifestSamplesProps> = ({ manifestUuid })
         page={currentPage}
         pageSize={pageSize}
         pageSizes={pageSizes}
-        totalItems={samples.length}
+        totalItems={labmanifestOrders.length}
         onChange={({ page, pageSize }) => {
           goTo(page);
           setPageSize(pageSize);
