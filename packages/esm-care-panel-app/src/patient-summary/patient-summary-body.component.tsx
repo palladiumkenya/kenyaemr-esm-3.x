@@ -196,7 +196,16 @@ const PatientSummaryBody: React.FC<PatientSummaryBodyProps> = ({ data }) => {
       <PatientSummaryRow
         items={[
           { label: t('dapsone', 'Dapsone'), value: data?.dapsone },
-          { label: t('tpt', 'TPT'), value: data?.onIpt },
+          {
+            label: t('tpt', 'TPT'),
+            value: data?.clinicsEnrolled
+              ?.toLowerCase()
+              .split(',')
+              .map((s) => s.trim())
+              ?.includes('tpt')
+              ? 'Yes'
+              : 'No',
+          },
           { label: t('clinicsEnrolled', 'Clinics Enrolled'), value: data?.clinicsEnrolled },
         ]}
       />
