@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-adr-app",
-  "version": "1.0.0",
+  "version": "5.4.1",
   "description": "ADR App for KenyaEMR",
   "browser": "dist/kenyaemr-esm-adr-app.js",
   "main": "src/index.ts",
