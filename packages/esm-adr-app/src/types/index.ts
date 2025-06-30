@@ -11,8 +11,11 @@ export interface MappedAdrEncounter {
   patientName: string;
   encounterType: string;
   encounterDatetime: string;
-  visit: string;
-  form: string;
+  visitTypeName: string;
+  formName: string;
   location: string;
   provider: string;
+  formUuid?: string;
+  visitUuid?: string;
+  visitTypeUuid?: string;
 }

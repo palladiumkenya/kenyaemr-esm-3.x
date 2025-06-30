@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import AdrAssessmentApp from './root.component';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
@@ -17,6 +17,7 @@ export const importTranslation = require.context('../translations', false, /.jso
 export const adrAssessmentApp = getSyncLifecycle(AdrAssessmentApp, options);
 export const adrAssessmentSideNav = getSyncLifecycle(SideMenu, options);
 export const adrAssessmentSummary = getSyncLifecycle(Summary, options);
+export const patientAdrWorkspace = getAsyncLifecycle(() => import('./components/patient-adr.workspace'), options);
 
 // Dashboard link for the search page
 export const overviewDashboardLink = getSyncLifecycle(

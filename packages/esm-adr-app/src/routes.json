@@ -10,6 +10,16 @@
     }
   ],
   "workspaces": [
+    {
+      "name": "patient-adr-workspace",
+      "title": "ADR Assessment Review",
+      "component": "patientAdrWorkspace",
+      "type": "workspace",
+      "canMaximize": true,
+      "canHide": true,
+      "width": "extra-wide"
+    }
+
 
   ],
   "extensions": [
