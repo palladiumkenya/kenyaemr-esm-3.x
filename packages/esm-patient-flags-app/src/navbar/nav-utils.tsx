@@ -110,6 +110,12 @@ export const useModuleLinks = () => {
       privilege: 'o3: View Cross Border Dashboard',
     },
     {
+      label: 'ADR Assessment',
+      url: `${openmrsSpaBase}adr-assessment`,
+      icon: <WatsonHealthCrossReference size={24} />,
+      privilege: 'o3: View ADR Assessment Dashboard',
+    },
+    {
       label: t('reports', 'Reports'),
       url: `${openmrsSpaBase}reports`,
       icon: <Report size={24} />,
