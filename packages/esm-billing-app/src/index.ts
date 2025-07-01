@@ -57,7 +57,6 @@ import ClaimsManagementOverview from './claims/claims-management/main/claims-ove
 import { ManageClaimRequest } from './claims/claims-management/table/manage-claim-request.modal';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
-import ReceiptPrintPreviewModal from './invoice/print-bill-receipt/receipt-print-preview.modal';
 import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
 import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
 import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
@@ -73,6 +72,9 @@ import AddDepositWorkspace from './bill-deposit/components/forms/add-deposit.wor
 import DeleteDepositModal from './bill-deposit/components/modal/delete-deposit.modal';
 import ReverseTransactionModal from './bill-deposit/components/modal/reverse-transaction.modal';
 import DepositTransactionWorkspace from './bill-deposit/components/forms/deposit-transactions/deposit-transaction.workspace';
+
+// Print Preview Components
+import PrintPreviewModal from './print-preview/print-preview.modal';
 
 // Translation
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -212,7 +214,6 @@ export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
 export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, options);
 export const paymentModeWorkspace = getSyncLifecycle(PaymentModeWorkspace, options);
 export const deletePaymentModeModal = getSyncLifecycle(DeletePaymentModeModal, options);
-export const paidBillReceiptPrintPreviewModal = getSyncLifecycle(ReceiptPrintPreviewModal, options);
 
 // Payment Points Components
 export const createPaymentPoint = getSyncLifecycle(CreatePaymentPoint, options);
@@ -234,6 +235,10 @@ export const addDepositWorkspace = getSyncLifecycle(AddDepositWorkspace, options
 export const deleteDepositModal = getSyncLifecycle(DeleteDepositModal, options);
 export const depositTransactionWorkspace = getSyncLifecycle(DepositTransactionWorkspace, options);
 export const reverseTransactionModal = getSyncLifecycle(ReverseTransactionModal, options);
+
+// Print Preview Components
+export const printPreviewModal = getSyncLifecycle(PrintPreviewModal, options);
+
 // App Startup
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);

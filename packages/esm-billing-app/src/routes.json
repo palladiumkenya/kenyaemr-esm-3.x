@@ -303,10 +303,6 @@
       "component": "manageClaimRequestModal"
     },
     {
-      "name": "paid-bill-receipt-print-preview-modal",
-      "component": "paidBillReceiptPrintPreviewModal"
-    },
-    {
       "name": "clock-in-modal",
       "component": "clockIn"
     },
@@ -321,6 +317,10 @@
     {
       "name": "reverse-transaction-modal",
       "component": "reverseTransactionModal"
+    },
+    {
+      "name": "print-preview-modal",
+      "component": "printPreviewModal"
     }
   ]
 }

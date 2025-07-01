@@ -1,4 +1,3 @@
-import { restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 
 const fetcher = async (url: string) => {
@@ -12,8 +11,7 @@ const fetcher = async (url: string) => {
   return URL.createObjectURL(blob);
 };
 
-export const usePaidBillReceiptFileObjectUrl = (billId: number) => {
-  const url = `/openmrs${restBaseUrl}/cashier/receipt?billId=${billId}`;
+export const usePrintPreview = (url: string) => {
   const { data, isLoading, error, mutate } = useSWR<String>(url, fetcher);
-  return { url: data, isLoading, error, mutate };
+  return { data, isLoading, error, mutate };
 };
