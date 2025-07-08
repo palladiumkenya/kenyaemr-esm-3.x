@@ -1,5 +1,5 @@
 import React from 'react';
-import { ModalBody, ModalFooter, ModalHeader, Button, Heading, TextArea } from '@carbon/react';
+import { ModalBody, ModalFooter, ModalHeader, Button, TextArea } from '@carbon/react';
 import { type MappedBill } from '../types';
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency } from '../helpers';
@@ -57,9 +57,7 @@ const BillActionModal: React.FC<BillActionModalProps> = (props) => {
         throw new Error('Failed to close bill');
       }
     } catch (error) {
-      const errorResponseBody =
-        error?.responseBody?.error?.message ||
-        t('errorResponseBodyMessage', 'An error occurred while closing the bill');
+      const errorResponseBody = error?.responseBody?.error || t('errorResponseBodyMessage', 'An error occurred');
 
       showSnackbar({
         title: t('billClosedFailed', 'Bill closing failed'),

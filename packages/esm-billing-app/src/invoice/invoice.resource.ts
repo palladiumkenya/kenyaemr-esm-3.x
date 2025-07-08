@@ -140,10 +140,13 @@ export const useShaFacilityStatus = () => {
  * @throws {Error} When the API call fails or returns an error response
  */
 export function reOpenOrCloseBill(billUuid: string, action: 'reopen' | 'close', payload: { reason: string }) {
-  return openmrsFetch(`${restBaseUrl}/cashier/bill/${billUuid}/${action}?reason=${payload.reason}`, {
+  return openmrsFetch(`${restBaseUrl}/kenyaemr-cashier/bill/${billUuid}/${action}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+    },
+    body: {
+      reason: payload.reason,
     },
   });
 }

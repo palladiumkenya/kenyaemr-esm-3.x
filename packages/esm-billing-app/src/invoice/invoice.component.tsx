@@ -13,6 +13,7 @@ import {
   updateVisit,
   useFeatureFlag,
   usePatient,
+  UserHasAccess,
   useVisit,
   useVisitContextStore,
 } from '@openmrs/esm-framework';
@@ -220,32 +221,38 @@ export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
     });
   };
 
+  const shouldCloseBill = bill.balance === 0 && !bill.closed;
+
   return (
     <>
       <div className={styles.invoiceSummary}>
         <span className={styles.invoiceSummaryTitle}>{t('invoiceSummary', 'Invoice Summary')}</span>
         <div className="invoiceSummaryActions">
-          {!bill?.closed && (
-            <Button
-              kind="danger--ghost"
-              size="sm"
-              renderIcon={Close}
-              iconDescription="Add"
-              tooltipPosition="right"
-              onClick={() => launchBillCloseOrReopenModal('close')}>
-              {t('closeBill', 'Close Bill')}
-            </Button>
+          {shouldCloseBill && (
+            <UserHasAccess privilege="Close Cashier Bills">
+              <Button
+                kind="danger--ghost"
+                size="sm"
+                renderIcon={Close}
+                iconDescription="Add"
+                tooltipPosition="right"
+                onClick={() => launchBillCloseOrReopenModal('close')}>
+                {t('closeBill', 'Close Bill')}
+              </Button>
+            </UserHasAccess>
           )}
           {bill?.closed && (
-            <Button
-              kind="ghost"
-              size="sm"
-              renderIcon={FolderOpen}
-              iconDescription="Add"
-              tooltipPosition="right"
-              onClick={() => launchBillCloseOrReopenModal('reopen')}>
-              {t('reopen', 'Reopen')}
-            </Button>
+            <UserHasAccess privilege="Reopen Cashier Bills">
+              <Button
+                kind="ghost"
+                size="sm"
+                renderIcon={FolderOpen}
+                iconDescription="Add"
+                tooltipPosition="right"
+                onClick={() => launchBillCloseOrReopenModal('reopen')}>
+                {t('reopen', 'Reopen')}
+              </Button>
+            </UserHasAccess>
           )}
         </div>
       </div>
