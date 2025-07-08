@@ -1,5 +1,5 @@
 import { Button, InlineLoading } from '@carbon/react';
-import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
+import { BaggageClaim, Close, Printer, Wallet, FolderOpen } from '@carbon/react/icons';
 import {
   defaultVisitCustomRepresentation,
   ExtensionSlot,
@@ -212,10 +212,42 @@ const Invoice: React.FC = () => {
 
 export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
   const { t } = useTranslation();
+  const launchBillCloseOrReopenModal = (action: 'close' | 'reopen') => {
+    const dispose = showModal('bill-action-modal', {
+      closeModal: () => dispose(),
+      bill: bill,
+      action,
+    });
+  };
+
   return (
     <>
       <div className={styles.invoiceSummary}>
         <span className={styles.invoiceSummaryTitle}>{t('invoiceSummary', 'Invoice Summary')}</span>
+        <div className="invoiceSummaryActions">
+          {!bill?.closed && (
+            <Button
+              kind="danger--ghost"
+              size="sm"
+              renderIcon={Close}
+              iconDescription="Add"
+              tooltipPosition="right"
+              onClick={() => launchBillCloseOrReopenModal('close')}>
+              {t('closeBill', 'Close Bill')}
+            </Button>
+          )}
+          {bill?.closed && (
+            <Button
+              kind="ghost"
+              size="sm"
+              renderIcon={FolderOpen}
+              iconDescription="Add"
+              tooltipPosition="right"
+              onClick={() => launchBillCloseOrReopenModal('reopen')}>
+              {t('reopen', 'Reopen')}
+            </Button>
+          )}
+        </div>
       </div>
       <div className={styles.invoiceSummaryContainer}>
         <div className={styles.invoiceCard}>

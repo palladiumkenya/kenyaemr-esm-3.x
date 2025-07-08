@@ -33,6 +33,7 @@ import RefundLineItem from './billable-services/bill-manager/bill-actions/refund
 import WaiveBillActionButton from './billable-services/bill-manager/bill-actions/waive-bill-action-button.component';
 import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
 import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
+import BillActionModal from './modal/bill-action.modal';
 import DeleteBillableServiceModal from './billable-services/bill-manager/modals/delete-billable-service.modal';
 import CancelBillWorkspace from './billable-services/bill-manager/workspaces/cancel-bill/cancel-bill.workspace';
 import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill/edit-bill-form.workspace';
@@ -188,6 +189,7 @@ export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
 export const waiveBillForm = getSyncLifecycle(WaiveBillForm, options);
 export const editBillForm = getSyncLifecycle(EditBillForm, options);
 export const refundBillModal = getSyncLifecycle(RefundBillModal, options);
+export const billActionModal = getSyncLifecycle(BillActionModal, options);
 export const cancelBillWorkspace = getSyncLifecycle(CancelBillWorkspace, options);
 export const waiveBillActionButton = getSyncLifecycle(WaiveBillActionButton, options);
 export const deleteBillActionButton = getSyncLifecycle(DeleteBillActionButton, options);

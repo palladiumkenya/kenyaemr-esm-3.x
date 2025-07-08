@@ -109,3 +109,41 @@ export const useShaFacilityStatus = () => {
     mutate,
   };
 };
+
+/**
+ * Reopens or closes a bill by making an API call to the billing service.
+ *
+ * This function allows authorized users to either reopen a closed bill or close an open bill.
+ * The action requires a reason to be provided for audit trail purposes.
+ *
+ * @param {string} billUuid - The unique identifier of the bill to be modified
+ * @param {'reopen' | 'close'} action - The action to perform on the bill
+ *   - 'reopen': Reopens a previously closed bill
+ *   - 'close': Closes an open bill
+ * @param {Object} payload - The payload containing the reason for the action
+ * @param {string} payload.reason - A descriptive reason explaining why the bill is being reopened or closed
+ *
+ * @returns {Promise<FetchResponse>} A promise that resolves to the API response
+ *
+ * @example
+ * // Reopen a closed bill
+ * const result = await reOpenOrCloseBill('bill-uuid-123', 'reopen', {
+ *   reason: 'Patient returned for additional services'
+ * });
+ *
+ * @example
+ * // Close an open bill
+ * const result = await reOpenOrCloseBill('bill-uuid-456', 'close', {
+ *   reason: 'Services completed and payment received'
+ * });
+ *
+ * @throws {Error} When the API call fails or returns an error response
+ */
+export function reOpenOrCloseBill(billUuid: string, action: 'reopen' | 'close', payload: { reason: string }) {
+  return openmrsFetch(`${restBaseUrl}/cashier/bill/${billUuid}/${action}?reason=${payload.reason}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
