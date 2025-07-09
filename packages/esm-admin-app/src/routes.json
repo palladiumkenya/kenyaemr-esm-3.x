@@ -13,10 +13,10 @@
       "component": "userManagementLeftPannelLink",
       "name": "user-management-left-panel-link",
       "slot": "admin-left-panel-slot"
-    },
+    }, 
     {
-      "component": "etlAdministrationLeftPannelLink",
-      "name": "etl-administration-left-panel-link",
+      "component": "locationsLeftPanelLink",
+      "name": "locations-left-panel-link",
       "slot": "admin-left-panel-slot"
     },
     {
@@ -41,6 +41,12 @@
       "type": "other-form",
        "canMaximize": true,
       "width": "extra-wide"
+    },
+    {
+      "name": "add-location-workspace",
+      "title": "Add Location",
+      "component": "addLocation",
+      "type": "workspace"
     }
   ],
   "modals": [

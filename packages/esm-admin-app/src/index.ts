@@ -9,6 +9,7 @@ import HWRConfirmModal from './components/modal/hwr-confirmation.modal';
 import HWREmptyModal from './components/modal/hwr-empty.modal.component';
 import UserRoleScopeWorkspace from './components/users/manage-users/manage-user-role-scope/user-role-scope-workspace/user-role-scope.workspace';
 import HWRSyncModal from './components/modal/hwr-sync.modal';
+import AddLocationWorkspace from './components/locations/forms/add-location/add-location.workspace';
 
 const options = {
   featureName: 'esm-admin-app',
@@ -36,6 +37,10 @@ export const etlAdministrationLeftPannelLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'ETL Administration', name: 'etl-administration' }),
   options,
 );
+export const locationsLeftPanelLink = getSyncLifecycle(
+  createLeftPanelLink({ title: 'Locations', name: 'locations' }),
+  options,
+);
 export const facilitySetupLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'Facility Details', name: 'facility-setup' }),
   options,
@@ -44,3 +49,5 @@ export const facilitySetupLeftPanelLink = getSyncLifecycle(
 export const hwrConfirmationModal = getSyncLifecycle(HWRConfirmModal, options);
 export const hwrEmptyModal = getSyncLifecycle(HWREmptyModal, options);
 export const hwrSyncModal = getSyncLifecycle(HWRSyncModal, options);
+
+export const addLocation = getSyncLifecycle(AddLocationWorkspace, options);
