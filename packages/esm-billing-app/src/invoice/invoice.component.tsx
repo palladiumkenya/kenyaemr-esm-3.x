@@ -17,11 +17,10 @@ import {
   useVisitContextStore,
 } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useReactToPrint } from 'react-to-print';
-import { useBill, useDefaultFacility } from '../billing.resource';
+import { useBill } from '../billing.resource';
 import { spaBasePath } from '../constants';
 import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
@@ -31,16 +30,14 @@ import { useShaFacilityStatus } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import ReceiptPrintButton from './print-bill-receipt/receipt-print-button.component';
-import PrintableInvoice from './printable-invoice/printable-invoice.component';
 import capitalize from 'lodash-es/capitalize';
 import { mutate } from 'swr';
+import startCase from 'lodash-es/startCase';
 
 const Invoice: React.FC = () => {
   const { t } = useTranslation();
-  const { data: facilityInfo } = useDefaultFacility();
   const { shaFacilityStatus } = useShaFacilityStatus();
   const { billUuid, patientUuid } = useParams();
-  const [isPrinting, setIsPrinting] = useState(false);
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
   const isInsurancePayment = (payments) => {
@@ -50,7 +47,6 @@ const Invoice: React.FC = () => {
   const { activeVisit, isLoading: isVisitLoading, error: visitError } = useVisit(patientUuid);
   const { patientUuid: visitStorePatientUuid, manuallySetVisitUuid } = useVisitContextStore();
   const [selectedLineItems, setSelectedLineItems] = useState([]);
-  const componentRef = useRef<HTMLDivElement>(null);
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
 
   const isShaFacilityStatusValid =
@@ -65,19 +61,13 @@ const Invoice: React.FC = () => {
     setSelectedLineItems(uniqueLineItems);
   };
 
-  const handlePrint = useReactToPrint({
-    contentRef: componentRef,
-    documentTitle: `Invoice ${bill?.receiptNumber} - ${patient?.name?.[0]?.given?.join(' ')} ${
-      patient?.name?.[0].family
-    }`,
-    onBeforePrint: async () => {
-      setIsPrinting(true);
-      return Promise.resolve();
-    },
-    onAfterPrint() {
-      setIsPrinting(false);
-    },
-  });
+  const handlePrint = () => {
+    const dispose = showModal('print-preview-modal', {
+      onClose: () => dispose(),
+      title: `${t('invoice', 'Invoice')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
+      documentUrl: `/openmrs${restBaseUrl}/cashier/print?documentType=invoice&billId=${bill?.id}`,
+    });
+  };
 
   const handleBillPayment = () => {
     const dispose = showModal('initiate-payment-modal', {
@@ -185,11 +175,10 @@ const Invoice: React.FC = () => {
           onClick={handlePrint}
           kind="tertiary"
           size="sm"
-          disabled={isPrinting}
           renderIcon={Printer}
           iconDescription="Add"
           tooltipPosition="right">
-          {isPrinting ? t('printingInvoice', 'Printing invoice...') : t('printInvoice', 'Print invoice')}
+          {t('printInvoice', 'Print invoice')}
         </Button>
         <Button
           onClick={handleBillPayment}
@@ -217,21 +206,11 @@ const Invoice: React.FC = () => {
 
       <InvoiceTable bill={bill} isLoadingBill={isLoadingBill} onSelectItem={handleSelectItem} />
       <Payments bill={bill} selectedLineItems={selectedLineItems} />
-
-      <div className={styles.printContainer}>
-        <PrintableInvoice
-          ref={componentRef}
-          facilityInfo={facilityInfo}
-          bill={bill}
-          patient={patient}
-          isPrinting={isPrinting}
-        />
-      </div>
     </div>
   );
 };
 
-function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
+export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
   const { t } = useTranslation();
   return (
     <>
@@ -271,7 +250,7 @@ function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
   );
 }
 
-function InvoiceSummaryItem({ label, value }: { readonly label: string; readonly value: string | number }) {
+export function InvoiceSummaryItem({ label, value }: { readonly label: string; readonly value: string | number }) {
   return (
     <div className={styles.invoiceSummaryItem}>
       <span className={styles.label}>{label}</span>
