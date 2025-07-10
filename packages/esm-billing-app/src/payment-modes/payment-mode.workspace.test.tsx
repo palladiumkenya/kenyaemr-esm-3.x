@@ -99,7 +99,7 @@ describe('PaymentModeWorkspace', () => {
     // Key in attribute type name, description, required and format
     const attributeTypeNameInput = screen.getByRole('textbox', { name: /Attribute name/i });
     const attributeTypeDescriptionInput = screen.getByRole('textbox', { name: /Attribute description/i });
-    const attributeRegExpInput = screen.getByRole('textbox', { name: /Enter regular expression/i });
+    const attributeRegExpInput = screen.getByRole('textbox', { name: /Regular expression/i });
     const attributeRetiredToggle = screen.getByRole('switch', { name: /Attribute retired/i });
     const attributeRequiredToggle = screen.getByRole('switch', { name: /Attribute required/i });
 
@@ -146,6 +146,62 @@ describe('PaymentModeWorkspace', () => {
         retired: true,
       },
       '',
+    );
+  });
+
+  test('should submit payload with attributeTypes and uuid when in edit mode', async () => {
+    const initialPaymentMode = {
+      uuid: '123',
+      name: 'Test Name',
+      description: 'Test Description',
+      retired: false,
+      attributeTypes: [
+        {
+          name: 'Test Attribute Name',
+          uuid: '456',
+          format: 'java.lang.String',
+          regExp: null,
+          attributeOrder: 0,
+          foreignKey: null,
+          description: 'Test Attribute Description',
+          retired: false,
+          required: false,
+        },
+      ],
+    };
+
+    const user = userEvent.setup();
+    render(<PaymentModeWorkspace {...testProps} initialPaymentMode={initialPaymentMode} />);
+
+    // make the attribute type required
+    const attributeRequiredToggle = screen.getByRole('switch', { name: /Attribute required/i });
+    await user.click(attributeRequiredToggle);
+
+    // click save and close
+    const saveAndCloseButton = screen.getByRole('button', { name: /Save & Close/i });
+    await user.click(saveAndCloseButton);
+
+    // should call createPaymentMode with attributeTypes and uuid
+    expect(mockCreatePaymentMode).toHaveBeenCalledWith(
+      {
+        description: 'Test Description',
+        name: 'Test Name',
+        attributeTypes: [
+          {
+            name: 'Test Attribute Name',
+            uuid: '456',
+            description: 'Test Attribute Description',
+            retired: false,
+            required: true,
+            format: 'java.lang.String',
+            regExp: null,
+            attributeOrder: 0,
+            foreignKey: null,
+          },
+        ],
+        retired: false,
+      },
+      '123',
     );
   });
 });
