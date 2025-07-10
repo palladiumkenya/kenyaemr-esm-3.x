@@ -8,7 +8,7 @@ const usePaymentModeFormSchema = () => {
       retired: z.boolean().default(false),
       retiredReason: z.string().optional(),
       format: z.string().optional(),
-      regExp: z.string().optional(),
+      regExp: z.union([z.string(), z.null()]).optional(),
       required: z.boolean().default(false),
     })
     .refine(
