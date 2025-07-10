@@ -27,11 +27,6 @@ export function startupApp() {
       parent: `${window.spaBase}/home`,
     },
   ]);
-  registerFeatureFlag(
-    'mortuaryFeatureFlag',
-    'Mortuary App Service',
-    'Mortuary feature flag, this enables and disables the mortuary app feature',
-  );
 }
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);

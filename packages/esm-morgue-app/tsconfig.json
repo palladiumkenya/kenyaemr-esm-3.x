@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "other/admitted-queue-header.component.tsx", "other/morgue-illustration.component.tsx"],
   "exclude": ["src/**/*.test.tsx"]
 }

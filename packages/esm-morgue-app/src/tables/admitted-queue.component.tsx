@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { UserHasAccess } from '@openmrs/esm-framework';
-import DeceasedFilter from '../header/admitted-queue-header.component';
+import DeceasedFilter from '../../other/admitted-queue-header.component';
 import styles from './admitted-queue.scss';
 import CompartmentView from '../card/compartment-view.compartment';
 import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';

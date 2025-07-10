@@ -1,0 +1,30 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+
+.cardContainer {
+  background-color: colors.$white-0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-content: space-between;
+  padding: layout.$spacing-05;
+}
+
+.switcher {
+  width: 150px;
+  margin-right: layout.$spacing-03;
+  margin-left: layout.$spacing-03;
+}
+
+.switcherContainer {
+  margin-right: layout.$spacing-06;
+  margin-left: layout.$spacing-06;
+  border: 1px solid colors.$gray-20;
+}
+
+.tabListContainer {
+  background: colors.$gray-20;
+  padding-top: layout.$spacing-04;
+}
+.tabsContainer {
+  margin-top: layout.$spacing-04;
+}

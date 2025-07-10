@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { UserHasAccess } from '@openmrs/esm-framework';
-import MainComponent from './component/main.component';
+import MainComponent from './home/home.component';
 import { AdmittedQueue } from './tables/admitted-queue.component';
 
 const Root: React.FC = () => {
