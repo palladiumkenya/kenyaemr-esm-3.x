@@ -1,9 +1,10 @@
 import { Button } from '@carbon/react';
 import { Printer } from '@carbon/react/icons';
-import { showModal } from '@openmrs/esm-framework';
+import { restBaseUrl, showModal } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MappedBill, PaymentStatus } from '../../types';
+import startCase from 'lodash-es/startCase';
 
 interface ReceiptPrintButtonProps {
   bill: MappedBill;
@@ -15,9 +16,10 @@ const ReceiptPrintButton: React.FC<ReceiptPrintButtonProps> = ({ bill }) => {
   const isPrintingDisabled = shouldDisablePrinting(bill);
 
   const handlePrintClick = () => {
-    const dispose = showModal('paid-bill-receipt-print-preview-modal', {
+    const dispose = showModal('print-preview-modal', {
       onClose: () => dispose(),
-      bill,
+      title: `${t('receipt', 'Receipt')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
+      documentUrl: `/openmrs${restBaseUrl}/cashier/receipt?billId=${bill.id}`,
     });
   };
 
