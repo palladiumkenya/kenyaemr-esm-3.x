@@ -22,7 +22,7 @@ import {
 } from '@carbon/react';
 
 import styles from './payment-mode-dashboard.scss';
-import { formatDate, launchWorkspace, showModal, useDebounce } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, showModal, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { PaymentMode } from '../types';
 import startCase from 'lodash/startCase';
 
@@ -30,7 +30,7 @@ type PaymentModeDashboardProps = {};
 
 const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
   const { t } = useTranslation();
-  const size = 'md';
+  const size = useLayoutType() === 'tablet' ? 'md' : 'sm';
   const { paymentModes = [], isLoading } = usePaymentModes(false);
   const [searchTerm, setSearchTerm] = useState('');
 

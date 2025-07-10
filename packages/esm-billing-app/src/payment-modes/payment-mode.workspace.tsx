@@ -54,16 +54,22 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
   });
 
   const mappedAttributeTypes = (attributes) => {
-    return {
+    const uuid = initialPaymentMode?.uuid
+      ? initialPaymentMode.attributeTypes.find((a) => a.name === attributes.name)?.uuid
+      : null;
+
+    const attributeType = {
       name: attributes.name,
       description: attributes.description,
       retired: attributes.retired,
       attributeOrder: attributes?.attributeOrder ?? 0,
       format: attributes?.format ?? '',
       foreignKey: attributes?.foreignKey ?? null,
-      regExp: attributes?.regExp ?? '',
+      regExp: attributes?.regExp ?? null,
       required: attributes.required,
     };
+
+    return uuid ? { ...attributeType, uuid } : attributeType;
   };
 
   const onSubmit = async (data: PaymentModeFormSchema) => {
@@ -192,7 +198,7 @@ const PaymentModeWorkspace: React.FC<PaymentModeWorkspaceProps> = ({
           </Stack>
         </div>
         <ButtonSet className={classNames({ [styles.tablet]: isTablet, [styles.desktop]: !isTablet })}>
-          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={() => closeWorkspace}>
+          <Button style={{ maxWidth: '50%' }} kind="secondary" onClick={() => closeWorkspace()}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button
