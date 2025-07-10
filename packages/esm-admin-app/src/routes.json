@@ -47,6 +47,24 @@
       "title": "Add Location",
       "component": "addLocation",
       "type": "workspace"
+    },
+    {
+      "name": "search-location-workspace",
+      "title": "Search Location",
+      "component": "searchLocationWorkspace",
+      "type": "workspace"
+    },
+    {
+      "name": "hwr-sync-workspace",
+      "title": "HWR Sync Workspace",
+      "component": "hwrSyncWorkspace",
+      "type": "other-form"
+    },
+    {
+      "name": "hwr-sync-modal",
+      "title": "HWR Sync Modal",
+      "component": "hwrSyncModal",
+      "type": "modal"
     }
   ],
   "modals": [

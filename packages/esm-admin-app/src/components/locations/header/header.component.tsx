@@ -26,7 +26,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
       <PageHeaderContent
         illustration={
           <ConfigurableLink to={`${window.getOpenmrsSpaBase()}bed-management`}>
-            <EuropeAfrica className={styles.inPatientPictogram} />
+            <EuropeAfrica className={styles.illustrationPictogram} />
           </ConfigurableLink>
         }
         title={title}

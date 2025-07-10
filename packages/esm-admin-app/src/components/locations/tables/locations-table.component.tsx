@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -15,131 +15,36 @@ import {
   TableHeader,
   TableRow,
   Tile,
+  Tag,
 } from '@carbon/react';
-import { Add, Edit } from '@carbon/react/icons';
-import {
-  ErrorState,
-  WorkspaceContainer,
-  isDesktop as desktopLayout,
-  launchWorkspace,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import { Add } from '@carbon/react/icons';
+import { WorkspaceContainer, isDesktop as desktopLayout, launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import styles from './locations-table.scss';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
-import { useFacilityLocations } from '../hooks/UseFacilityLocations';
+import { useFacilitiesTagged } from './locations-table.resource';
+import { useLocationTags } from '../hooks/useLocationTags';
 
 const LocationsTable: React.FC = () => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = desktopLayout(layout);
   const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { allLocations, isLoading, error, mutate } = useFacilityLocations();
-
-  const layout = useLayoutType();
-  const isTablet = layout === 'tablet';
-  const responsiveSize = isTablet ? 'lg' : 'sm';
-  const isDesktop = desktopLayout(layout);
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
-    setCurrentPage(1);
-  };
-
-  const searchedLocations = useMemo(() => {
-    if (!allLocations || !Array.isArray(allLocations)) {
-      return [];
-    }
-
-    if (!searchTerm.trim()) {
-      return allLocations;
-    }
-
-    const lowercaseSearchTerm = searchTerm.toLowerCase();
-
-    const matchingLocations = [];
-    const nonMatchingLocations = [];
-
-    allLocations.forEach((location) => {
-      const name = (location.name || location.display || '').toLowerCase();
-      const description = (location.description || '').toLowerCase();
-      const masterFacilityCode = (location?.attributes?.map((attr) => attr.value)?.[0] || '').toLowerCase();
-      const address = `${location.address5 || ''} ${location.address6 || ''}`.trim().toLowerCase();
-      const countyDistrict = (location.countyDistrict || '').toLowerCase();
-      const stateProvince = (location.stateProvince || '').toLowerCase();
-      const country = (location.country || '').toLowerCase();
-
-      const isMatch =
-        name.includes(lowercaseSearchTerm) ||
-        description.includes(lowercaseSearchTerm) ||
-        masterFacilityCode.includes(lowercaseSearchTerm) ||
-        address.includes(lowercaseSearchTerm) ||
-        countyDistrict.includes(lowercaseSearchTerm) ||
-        stateProvince.includes(lowercaseSearchTerm) ||
-        country.includes(lowercaseSearchTerm);
-
-      if (isMatch) {
-        matchingLocations.push({ ...location, isMatch: true });
-      } else {
-        nonMatchingLocations.push({ ...location, isMatch: false });
-      }
-    });
-
-    return [...matchingLocations, ...nonMatchingLocations];
-  }, [allLocations, searchTerm]);
-
-  const totalCount = searchedLocations.length;
-  const totalPages = Math.ceil(totalCount / pageSize);
-  const startIndex = (currentPage - 1) * pageSize;
-  const endIndex = startIndex + pageSize;
-  const paginatedLocations = searchedLocations.slice(startIndex, endIndex);
-
-  const paginated = totalPages > 1;
-
-  const highlightSearchTerm = (text: string, searchTerm: string) => {
-    if (!searchTerm.trim() || !text) {
-      return text;
-    }
-
-    const escapedSearchTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${escapedSearchTerm})`, 'gi');
-    const parts = text.split(regex);
-
-    return parts.map((part, index) =>
-      regex.test(part) ? (
-        <mark key={index} style={{ backgroundColor: '#ffeb3b', padding: '0 2px' }}>
-          {part}
-        </mark>
-      ) : (
-        part
-      ),
-    );
-  };
-
-  const locationData = useMemo(() => {
-    if (!paginatedLocations || !Array.isArray(paginatedLocations)) {
-      return [];
-    }
-
-    return paginatedLocations.map((location) => ({
-      uuid: location.uuid,
-      name: location.name || location.display,
-      display: location.display,
-      description: location.description || '-',
-      stateProvince: location.stateProvince || '-',
-      country: location.country || '-',
-      countyDistrict: location.countyDistrict || '-',
-      address: `${location.address5 || ''} ${location.address6 || ''}`.trim() || '-',
-      masterFacilityCode: location?.attributes?.map((attr) => attr.value)?.[0] || '-',
-      tags: location.tags || [],
-      location: location,
-      isMatch: location.isMatch || false,
-    }));
-  }, [paginatedLocations]);
+  const { locationTagList, isLoading: tagsLoading, error: tagsError } = useLocationTags();
+  const { facilityList, isLoading: taggedLoading } = useFacilitiesTagged({ results: locationTagList });
 
   const handleAddLocationWorkspace = () => {
     launchWorkspace('add-location-workspace', {
       workspaceTitle: t('addLocation', 'Add Location'),
+    });
+  };
+
+  const handleSearchLocationWorkspace = () => {
+    launchWorkspace('search-location-workspace', {
+      workspaceTitle: t('tagLocation', 'Tag Location'),
     });
   };
 
@@ -153,78 +58,68 @@ const LocationsTable: React.FC = () => {
       header: t('description', 'Description'),
     },
     {
-      key: 'masterFacilityCode',
-      header: t('facilityCode', 'Facility Code'),
-    },
-    {
-      key: 'address',
-      header: t('address', 'Address'),
-    },
-    {
-      key: 'countyDistrict',
-      header: t('district', 'District'),
-    },
-    {
-      key: 'stateProvince',
-      header: t('province', 'Province'),
-    },
-    {
-      key: 'country',
-      header: t('country', 'Country'),
-    },
-    {
-      key: 'actions',
-      header: t('actions', 'Actions'),
+      key: 'tags',
+      header: t('tags', 'Tags'),
     },
   ];
 
-  const tableRows = useMemo(() => {
-    return locationData.map((location) => ({
-      id: location.uuid,
-      name: highlightSearchTerm(location.name, searchTerm),
-      description: highlightSearchTerm(location.description, searchTerm),
-      masterFacilityCode: highlightSearchTerm(location.masterFacilityCode, searchTerm),
-      address: highlightSearchTerm(location.address, searchTerm),
-      countyDistrict: highlightSearchTerm(location.countyDistrict, searchTerm),
-      stateProvince: highlightSearchTerm(location.stateProvince, searchTerm),
-      country: highlightSearchTerm(location.country, searchTerm),
-      actions: (
-        <>
-          <Button
-            renderIcon={Edit}
-            onClick={() => {
-              launchWorkspace('add-location-workspace', {
-                workspaceTitle: t('editLocation', 'Edit location'),
-                location: location.location,
-              });
-            }}
-            kind={'ghost'}
-            iconDescription={t('editLocation', 'Edit location')}
-            hasIconOnly
-            size={responsiveSize}
-            tooltipPosition="right"
-          />
-        </>
-      ),
-    }));
-  }, [locationData, searchTerm, responsiveSize, mutate, t]);
+  const getLocationTags = (resource) => {
+    if (!resource?.meta?.tag) {
+      return [];
+    }
 
-  if (isLoading && !allLocations?.length) {
+    return resource.meta.tag.filter((tag) => tag.system && tag.system.includes('location-tag')).map((tag) => tag.code);
+  };
+
+  const rows = useMemo(() => {
+    const uniqueFacilities = new Map();
+
+    facilityList.forEach((facility) => {
+      const resource = facility.resource;
+      const uuid = resource?.id;
+
+      if (uuid && !uniqueFacilities.has(uuid)) {
+        uniqueFacilities.set(uuid, facility);
+      }
+    });
+
+    return Array.from(uniqueFacilities.values()).map((facility) => {
+      const resource = facility.resource;
+      const tags = getLocationTags(resource);
+
+      return {
+        id: resource?.id,
+        name: resource?.name || resource?.partOf?.display || '--',
+        description: resource?.description || '--',
+        tags: tags.length > 0 ? tags.join(', ') : '--',
+      };
+    });
+  }, [facilityList]);
+
+  const filteredRows = useMemo(() => {
+    if (!searchTerm) {
+      return rows;
+    }
+
+    return rows.filter(
+      (row) =>
+        row.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        row.tags.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [rows, searchTerm]);
+
+  const paginatedRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredRows.slice(startIndex, endIndex);
+  }, [filteredRows, currentPage, pageSize]);
+
+  if (tagsLoading || (taggedLoading && !facilityList.length)) {
     return (
       <>
         <div className={styles.widgetCard}>
           <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />
-        </div>
-      </>
-    );
-  }
-
-  if (error) {
-    const headerTitle = t('errorFetchingLocations', 'Error fetching locations');
-    return (
-      <>
-        <div className={styles.widgetCard}>
-          <ErrorState error={error} headerTitle={headerTitle} />
         </div>
       </>
     );
@@ -235,13 +130,16 @@ const LocationsTable: React.FC = () => {
       <div className={styles.widgetCard}>
         <CardHeader title={t('locations', 'Locations')}>
           <span className={styles.backgroundDataFetchingIndicator}>
-            <span>{isLoading ? <InlineLoading /> : null}</span>
+            <span>{tagsLoading ? <InlineLoading /> : null}</span>
           </span>
           <div className={styles.headerActions}>
             <>
               <div className={styles.filterContainer}>
                 <Search
-                  onChange={handleSearch}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   placeholder={t('search', 'Search location')}
                   value={searchTerm}
                   labelText={t('search', 'Search location')}
@@ -253,11 +151,17 @@ const LocationsTable: React.FC = () => {
                 onClick={handleAddLocationWorkspace}>
                 {t('addLocation', 'Add Location')}
               </Button>
+              <Button
+                kind="ghost"
+                renderIcon={(props) => <Add size={16} {...props} />}
+                onClick={handleSearchLocationWorkspace}>
+                {t('tagLocation', 'Tag Location')}
+              </Button>
             </>
           </div>
         </CardHeader>
 
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
+        <DataTable rows={paginatedRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getTableProps }) => {
             return (
               <TableContainer>
@@ -271,15 +175,21 @@ const LocationsTable: React.FC = () => {
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        style={{
-                          backgroundColor: locationData.find((loc) => loc.uuid === row.id)?.isMatch
-                            ? '#f0f8ff'
-                            : 'transparent',
-                        }}>
+                      <TableRow key={row.id}>
                         {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                          <TableCell key={cell.id}>
+                            {cell.id.includes('tags') && cell.value !== 'No tags' ? (
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                {cell.value.split(', ').map((tag, index) => (
+                                  <Tag key={index} type="blue" size="sm">
+                                    {tag}
+                                  </Tag>
+                                ))}
+                              </div>
+                            ) : (
+                              cell.value
+                            )}
+                          </TableCell>
                         ))}
                       </TableRow>
                     ))}
@@ -291,41 +201,35 @@ const LocationsTable: React.FC = () => {
                       <div className={styles.tileContent}>
                         <p className={styles.content}>
                           {searchTerm
-                            ? t(
-                                'searchResults',
-                                `Found ${searchedLocations.filter((loc) => loc.isMatch).length} matching results`,
-                              )
+                            ? t('noSearchResults', `No results found for "${searchTerm}"`)
                             : t('noData', 'No data to display')}
                         </p>
                         <p className={styles.helper}>
                           {searchTerm
-                            ? t('matchingResultsShownFirst', 'Matching results are shown first and highlighted')
+                            ? t('tryDifferentSearch', 'Try a different search term')
                             : t('checkFilters', 'Check the filters above')}
                         </p>
                       </div>
                     </Tile>
                   </div>
                 ) : null}
-                {paginated && (
-                  <Pagination
-                    backwardText="Previous page"
-                    forwardText="Next page"
-                    page={currentPage}
-                    pageNumberText="Page Number"
-                    pageSize={pageSize}
-                    pageSizes={[10, 20, 30, 40, 50]}
-                    totalItems={totalCount}
-                    onChange={({ pageSize: newPageSize, page }) => {
-                      if (newPageSize !== pageSize) {
-                        setPageSize(newPageSize);
-                        setCurrentPage(1);
-                      }
-                      if (page !== currentPage) {
-                        setCurrentPage(page);
-                      }
-                    }}
-                  />
-                )}
+                <Pagination
+                  backwardText="Previous page"
+                  forwardText="Next page"
+                  page={currentPage}
+                  pageSize={pageSize}
+                  pageSizes={[10, 20, 30, 40, 50]}
+                  totalItems={filteredRows.length}
+                  onChange={({ pageSize: newPageSize, page }) => {
+                    if (newPageSize !== pageSize) {
+                      setPageSize(newPageSize);
+                      setCurrentPage(1);
+                    }
+                    if (page !== currentPage) {
+                      setCurrentPage(page);
+                    }
+                  }}
+                />
               </TableContainer>
             );
           }}
