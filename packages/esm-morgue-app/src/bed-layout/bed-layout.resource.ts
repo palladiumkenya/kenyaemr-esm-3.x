@@ -1,6 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework/src';
 import { useMemo } from 'react';
 import useSWR from 'swr';
+import { type Bed, type MappedBedData } from '../typess';
 
 export const useBedsForLocation = (locationUuid: string) => {
   const apiUrl = `${restBaseUrl}/bed?locationUuid=${locationUuid}&v=full`;

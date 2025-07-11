@@ -43,3 +43,26 @@ export interface Attribute {
   uuid: string;
   display: string;
 }
+
+export interface Bed {
+  id: number;
+  uuid: string;
+  bedNumber: string;
+  bedType?: BedType;
+  row: number;
+  column: number;
+  status: 'AVAILABLE' | 'OCCUPIED';
+}
+export interface BedType {
+  uuid: string;
+  name: string;
+  displayName: string;
+  description: string;
+}
+export type MappedBedData = Array<{
+  id: number;
+  number: string;
+  type: string;
+  status: string;
+  uuid: string;
+}>;
