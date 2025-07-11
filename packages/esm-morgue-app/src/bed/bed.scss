@@ -2,27 +2,105 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 
-// .container {
-//   flex-grow: 1;
-// }
+.container {
+  flex-grow: 1;
+}
 
 .tileContainer {
   border: 1px solid colors.$gray-20;
-  height: 2.875rem;
-  //   padding: layout.$spacing-05;
+  min-height: 2.875rem;
+  padding: layout.$spacing-05;
   margin: layout.$spacing-03 layout.$spacing-03;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
 }
 
 .tileHeader {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: layout.$spacing-03;
+  align-items: center;
+}
+
+.tagContainer {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.tagIcon {
+  width: 1rem;
+  height: 1rem;
+  color: colors.$gray-70;
+  margin-left: -#{layout.$spacing-02};
+}
+
+.patientInfoRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-04;
+  flex-wrap: wrap;
+}
+
+.patientName {
+  @include type.type-style('body-01');
+  color: colors.$gray-100;
+  font-weight: 500;
+  text-transform: capitalize;
 }
 
 .middot {
-  margin: 0 layout.$spacing-03;
+  color: colors.$gray-70;
+  font-weight: bold;
 }
+
+.gender {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  font-weight: 500;
+}
+
+.age {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  font-weight: 500;
+}
+
+.ageUnit {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  margin-left: layout.$spacing-01;
+}
+
+.causeOfDeathRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-01;
+}
+
+.causeLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  font-weight: 500;
+}
+
+.causeValue {
+  @include type.type-style('label-01');
+  color: colors.$gray-100;
+}
+
+.additionalContentRow {
+  border-top: 1px solid colors.$gray-20;
+  padding-top: layout.$spacing-03;
+  margin-top: layout.$spacing-02;
+}
+
+.cardWithChildren {
+  .tileContainer {
+    min-height: auto;
+  }
+}
+
 .headerLabel {
   @include type.type-style('heading-compact-01');
   color: colors.$gray-70;

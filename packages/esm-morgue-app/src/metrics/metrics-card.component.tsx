@@ -4,7 +4,7 @@ import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
   label: string;
-  value: number | string;
+  value: number | string | React.ReactNode;
   headerLabel: string;
   children?: React.ReactNode;
 }

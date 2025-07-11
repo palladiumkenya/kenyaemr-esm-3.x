@@ -4,8 +4,9 @@ import { useTranslation } from 'react-i18next';
 import styles from './content-switcher.scss';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import BedLayout from '../bed-layout/bed-layout.component';
+import { MortuaryPatient } from '../typess';
+import BedLineListView from '../bed-linelist-view/bed-linelist-view.component';
 
-// Enum for better type safety and readability
 enum ViewType {
   LIST = 0,
   CARD = 1,
@@ -23,7 +24,12 @@ interface TabConfig {
   defaultLabel: string;
 }
 
-const CustomContentSwitcher: React.FC = () => {
+interface CustomContentSwitcherProps {
+  awaitingQueueDeceasedPatients: MortuaryPatient[];
+  isLoading: boolean;
+}
+
+const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({ awaitingQueueDeceasedPatients, isLoading }) => {
   const { t } = useTranslation();
   const [selectedView, setSelectedView] = React.useState<ViewType>(ViewType.LIST);
   const [selectedTab, setSelectedTab] = React.useState<TabType>(TabType.AWAITING_ADMISSION);
@@ -54,11 +60,10 @@ const CustomContentSwitcher: React.FC = () => {
         case TabType.AWAITING_ADMISSION:
           return isListView ? (
             <div className={styles.listContainer}>
-              <h2>{t('awaitingAdmissionList', 'Awaiting Admission - List View')}</h2>
-              {/* Add your list component here */}
+              <BedLineListView awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients} isLoading={isLoading} />
             </div>
           ) : (
-            <BedLayout />
+            <BedLayout awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients} isLoading={isLoading} />
           );
 
         case TabType.ADMITTED:
@@ -66,11 +71,13 @@ const CustomContentSwitcher: React.FC = () => {
             <div className={styles.listContainer}>
               <h2>{t('admittedList', 'Admitted - List View')}</h2>
               {/* Add your admitted patients list component here */}
+              <p>Count: 0</p>
             </div>
           ) : (
             <div className={styles.cardContainer}>
               <h2>{t('admittedCard', 'Admitted - Card View')}</h2>
               {/* Add your admitted patients card component here */}
+              <p>Count: 0</p>
             </div>
           );
 
@@ -79,11 +86,13 @@ const CustomContentSwitcher: React.FC = () => {
             <div className={styles.listContainer}>
               <h2>{t('dischargeList', 'Discharge - List View')}</h2>
               {/* Add your discharge list component here */}
+              <p>Count: 0</p>
             </div>
           ) : (
             <div className={styles.cardContainer}>
               <h2>{t('dischargeCard', 'Discharge - Card View')}</h2>
               {/* Add your discharge card component here */}
+              <p>Count: 0</p>
             </div>
           );
 
@@ -91,7 +100,7 @@ const CustomContentSwitcher: React.FC = () => {
           return null;
       }
     },
-    [selectedView, t],
+    [selectedView, t, awaitingQueueDeceasedPatients, isLoading],
   );
 
   return (
