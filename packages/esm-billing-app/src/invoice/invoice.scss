@@ -148,3 +148,19 @@
     color: colors.$gray-70;
   }
 }
+
+.popoverContent {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+
+  & > button {
+    width: 100%;
+  }
+}
+
+.printButton {
+  svg {
+    fill: colors.$blue-60;
+  }
+}
