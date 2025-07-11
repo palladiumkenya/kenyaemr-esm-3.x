@@ -1,5 +1,5 @@
 import { Button, InlineLoading } from '@carbon/react';
-import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
+import { BaggageClaim, Close, Printer, Wallet, FolderOpen } from '@carbon/react/icons';
 import {
   defaultVisitCustomRepresentation,
   ExtensionSlot,
@@ -13,6 +13,7 @@ import {
   updateVisit,
   useFeatureFlag,
   usePatient,
+  UserHasAccess,
   useVisit,
   useVisitContextStore,
 } from '@openmrs/esm-framework';
@@ -212,10 +213,48 @@ const Invoice: React.FC = () => {
 
 export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
   const { t } = useTranslation();
+  const launchBillCloseOrReopenModal = (action: 'close' | 'reopen') => {
+    const dispose = showModal('bill-action-modal', {
+      closeModal: () => dispose(),
+      bill: bill,
+      action,
+    });
+  };
+
+  const shouldCloseBill = bill.balance === 0 && !bill.closed;
+
   return (
     <>
       <div className={styles.invoiceSummary}>
         <span className={styles.invoiceSummaryTitle}>{t('invoiceSummary', 'Invoice Summary')}</span>
+        <div className="invoiceSummaryActions">
+          {shouldCloseBill && (
+            <UserHasAccess privilege="Close Cashier Bills">
+              <Button
+                kind="danger--ghost"
+                size="sm"
+                renderIcon={Close}
+                iconDescription="Add"
+                tooltipPosition="right"
+                onClick={() => launchBillCloseOrReopenModal('close')}>
+                {t('closeBill', 'Close Bill')}
+              </Button>
+            </UserHasAccess>
+          )}
+          {bill?.closed && (
+            <UserHasAccess privilege="Reopen Cashier Bills">
+              <Button
+                kind="ghost"
+                size="sm"
+                renderIcon={FolderOpen}
+                iconDescription="Add"
+                tooltipPosition="right"
+                onClick={() => launchBillCloseOrReopenModal('reopen')}>
+                {t('reopen', 'Reopen')}
+              </Button>
+            </UserHasAccess>
+          )}
+        </div>
       </div>
       <div className={styles.invoiceSummaryContainer}>
         <div className={styles.invoiceCard}>

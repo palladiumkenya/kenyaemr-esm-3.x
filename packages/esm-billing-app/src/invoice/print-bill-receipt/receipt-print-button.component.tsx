@@ -42,8 +42,8 @@ const ReceiptPrintButton: React.FC<ReceiptPrintButtonProps> = ({ bill }) => {
  * @returns true if printing should be disabled, false otherwise
  */
 function shouldDisablePrinting(bill: MappedBill): boolean {
-  const hasPayments = bill.payments.length > 0;
-  const hasExemptedItems = bill.lineItems.some((item) => item.paymentStatus === PaymentStatus.EXEMPTED);
+  const hasPayments = bill?.payments?.length > 0;
+  const hasExemptedItems = bill?.lineItems?.some((item) => item.paymentStatus === PaymentStatus.EXEMPTED);
 
   // If there are exempted items, we need special handling
   if (hasExemptedItems) {

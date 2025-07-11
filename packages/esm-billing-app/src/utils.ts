@@ -162,6 +162,10 @@ export function waitForASecond(): Promise<string> {
 }
 
 export const computeWaivedAmount = (bill: MappedBill) => {
+  if (!bill.payments) {
+    return 0;
+  }
+
   return bill.payments
     .filter((payment) => payment.instanceType.name.toLowerCase() === 'waiver')
     .reduce((curr: number, prev) => curr + Number(prev.amountTendered), 0);

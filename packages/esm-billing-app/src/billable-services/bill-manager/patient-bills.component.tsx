@@ -12,8 +12,6 @@ import {
   TableExpandRow,
   TableCell,
   TableExpandedRow,
-  Tile,
-  Button,
 } from '@carbon/react';
 import { convertToCurrency } from '../../helpers';
 import { useTranslation } from 'react-i18next';
@@ -21,8 +19,7 @@ import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedBill, PaymentStatus } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
-import { Scalpel, ShoppingCartMinus, TrashCan } from '@carbon/react/icons';
-import { ExtensionSlot, launchWorkspace, showModal } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
 type PatientBillsProps = {
   bills: Array<MappedBill>;

@@ -321,6 +321,10 @@
     {
       "name": "print-preview-modal",
       "component": "printPreviewModal"
+    },
+    {
+      "name": "bill-action-modal",
+      "component": "billActionModal"
     }
   ]
 }

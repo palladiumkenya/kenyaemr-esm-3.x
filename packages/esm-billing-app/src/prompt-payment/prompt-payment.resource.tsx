@@ -71,7 +71,7 @@ const shouldShowPrompt = (
 const hasOnlyOrderBills = (bills: Array<MappedBill>): boolean => {
   const flattenedBills = bills.flatMap((bill) => bill.lineItems);
   // check if all line items are orders, line item with order has order not set to null
-  return flattenedBills.every((item) => item.order);
+  return flattenedBills.every((item) => item?.order);
 };
 
 /**

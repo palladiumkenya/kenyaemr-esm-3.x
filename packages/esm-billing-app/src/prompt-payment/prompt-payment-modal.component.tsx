@@ -28,7 +28,6 @@ const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
   const { shouldShowBillingPrompt, isLoading, bills } = useBillingPrompt(patientUuid, 'patient-chart');
   const [showModal, setShowModal] = useState({ loadingModal: true, billingModal: true });
   const { enforceBillPayment } = useConfig<BillingConfig>();
-
   const closeButtonText = enforceBillPayment
     ? t('navigateBack', 'Navigate back')
     : t('proceedToCare', 'Proceed to care');
@@ -42,7 +41,9 @@ const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
   const lineItems = bills
     .filter((bill) => bill.status !== 'PAID')
     .flatMap((bill) => bill.lineItems)
-    .filter((lineItem) => lineItem.paymentStatus !== 'EXEMPTED' && !lineItem.voided);
+    .filter(
+      (lineItem) => lineItem?.paymentStatus !== 'EXEMPTED' && lineItem?.paymentStatus !== 'PAID' && !lineItem?.voided,
+    );
 
   if (!shouldShowBillingPrompt) {
     return null;
@@ -71,6 +72,7 @@ const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
                 <StructuredListCell head>{t('item', 'Item')}</StructuredListCell>
                 <StructuredListCell head>{t('quantity', 'Quantity')}</StructuredListCell>
                 <StructuredListCell head>{t('unitPrice', 'Unit price')}</StructuredListCell>
+                <StructuredListCell head>{t('status', 'Status')}</StructuredListCell>
                 <StructuredListCell head>{t('total', 'Total')}</StructuredListCell>
               </StructuredListRow>
             </StructuredListHead>
@@ -81,6 +83,7 @@ const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
                     <StructuredListCell>{extractString(lineItem.billableService || lineItem.item)}</StructuredListCell>
                     <StructuredListCell>{lineItem.quantity}</StructuredListCell>
                     <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
+                    <StructuredListCell>{lineItem.paymentStatus}</StructuredListCell>
                     <StructuredListCell>{convertToCurrency(lineItem.quantity * lineItem.price)}</StructuredListCell>
                   </StructuredListRow>
                 );

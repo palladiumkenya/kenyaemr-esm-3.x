@@ -36,7 +36,6 @@ export const patientBillsHeaders = [
 export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, patientUuid }) => {
   const { t } = useTranslation();
   const { patient, isLoading, error } = usePatient(patientUuid);
-
   if (isLoading) {
     return <InlineLoading status="active" description={t('loading', 'Loading...')} />;
   }
@@ -63,7 +62,7 @@ export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, pat
         style={{ textDecoration: 'none', maxWidth: '50%' }}
         to={billingUrl}
         templateParams={{ patientUuid: bill.patientUuid, uuid: bill.uuid }}>
-        {bill.lineItems.map((item) => item.billableService.split(':')[1]).join(', ')}
+        {bill.lineItems.map((item) => item?.billableService?.split(':')[1]).join(', ')}
       </ConfigurableLink>
     ),
     totalAmount: convertToCurrency(bill.totalAmount),
