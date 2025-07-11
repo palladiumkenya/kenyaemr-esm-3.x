@@ -1,0 +1,35 @@
+{
+    "results": [
+        {
+            "uuid": "45a10dd9-edaa-4e50-a2d7-343fef0415eb",
+            "display": "10 Engineer VCT",
+            "name": "10 Engineer VCT",
+            "description": "Dispensary",
+            "stateProvince": "Laikipia",
+            "country": "Kenya",
+            "countyDistrict": "Laikipia",
+            "address5": "Nanyuki",
+            "address6": "Laikipia East",
+            "tags": [],
+
+            "attributes": [
+                {
+                    "display": "Master Facility Code: 14180",
+                    "uuid": "21e6dc68-46e7-4f2e-916c-4281c62dad6b",
+                    "attributeType": {
+                        "uuid": "8a845a89-6aa5-4111-81d3-0af31c45c002",
+                        "display": "Master Facility Code",
+                        "links": [
+                            {
+                                "rel": "self",
+                                "uri": "https://qa.kenyahmis.org/openmrs/ws/rest/v1/locationattributetype/8a845a89-6aa5-4111-81d3-0af31c45c002",
+                                "resourceAlias": "locationattributetype"
+                            }
+                        ]
+                    },
+                    "value": "14180"
+                }
+            ]
+        }
+    ]
+}
