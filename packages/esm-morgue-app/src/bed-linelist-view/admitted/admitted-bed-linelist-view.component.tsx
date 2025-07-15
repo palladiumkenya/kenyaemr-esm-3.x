@@ -19,7 +19,6 @@ import styles from '../bed-linelist-view.scss';
 import { convertDateToDays, formatDateTime } from '../../utils/utils';
 import { Patient, Person, type MortuaryLocationResponse } from '../../typess';
 import { useVisit } from '@openmrs/esm-framework';
-import { get } from 'ace-builds-internal/config';
 
 interface AdmittedBedLineListViewProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -54,7 +53,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
 
   const AdmissionDate = ({ patientUuid }: { patientUuid: string }) => {
     const { activeVisit } = useVisit(patientUuid);
-    return activeVisit?.startDatetime ? formatDateTime(activeVisit.startDatetime) : '-';
+    return <>{activeVisit?.startDatetime ? formatDateTime(activeVisit.startDatetime) : '-'}</>;
   };
 
   const headers = [
