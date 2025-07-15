@@ -1,4 +1,4 @@
-import { FetchResponse, fhirBaseUrl, openmrsFetch } from '@openmrs/esm-framework';
+import { FetchResponse, fhirBaseUrl, openmrsFetch, useFhirFetchAll } from '@openmrs/esm-framework';
 import { type FHIRBundle, FHIRLocation, LocationTagsResponse } from '../types';
 import useSWR from 'swr';
 
@@ -17,7 +17,7 @@ export async function getFacilitiesByLocationTags(
     .filter(Boolean)
     .join(',');
 
-  const url = `${fhirBaseUrl}/Location?_summary=data&_tag=${tagNames}`;
+  const url = `${useFhirFetchAll}/Location?_summary=data&_tag=${tagNames}`;
   const response = await openmrsFetch<FHIRBundle>(url);
 
   const locations = response.data?.entry?.map((entry) => entry.resource) ?? [];
