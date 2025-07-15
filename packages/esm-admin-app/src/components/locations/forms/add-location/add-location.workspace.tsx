@@ -89,12 +89,14 @@ const AddLocationWorkspace: React.FC<AddLocationWorkspaceProps> = ({
     };
 
     try {
-      await saveOrUpdateLocation(locationPayload, location?.uuid);
+      const locationUuid = location?.uuid && typeof location.uuid === 'string' ? location.uuid : undefined;
+
+      await saveOrUpdateLocation(locationPayload, locationUuid);
 
       showSnackbar({
         title: t('success', 'Success'),
         kind: 'success',
-        subtitle: location?.uuid
+        subtitle: locationUuid
           ? t('locationUpdated', 'Location {{locationName}} was updated successfully.', {
               locationName: data.name,
             })

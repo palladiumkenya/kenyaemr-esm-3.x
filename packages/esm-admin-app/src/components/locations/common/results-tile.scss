@@ -62,3 +62,25 @@
     color: colors.$gray-100;
   }
 }
+
+.description {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+  font-size: layout.$spacing-01;
+}
+.locationName {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  font-weight: bold;
+}
+.locationDetails {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  font-size: layout.$spacing-01;
+}
+.tags {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  font-size: layout.$spacing-01;
+}

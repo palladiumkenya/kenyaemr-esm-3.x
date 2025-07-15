@@ -20,15 +20,15 @@ const ResultsTile: React.FC<ResultsTileProps> = ({ location, onClose }) => {
         {onClose && <Close size={16} className={styles.closeIcon} onClick={onClose} />}
         <Hospital className={styles.illustrationPictogram} />
         <div className={styles.details}>
-          <div style={{ fontWeight: 'bold' }}>{location.display || location.name}</div>
-          {location.description && <div style={{ fontSize: '0.875rem', color: '#666' }}>{location.description}</div>}
+          <div className={styles.locationName}>{location.display || location.name}</div>
+          {location.description && <div className={styles.description}>{location.description}</div>}
           {(location.stateProvince || location.country) && (
-            <div style={{ fontSize: '0.75rem', color: '#888' }}>
+            <div className={styles.locationDetails}>
               {[location.stateProvince, location.country].filter(Boolean).join(', ')}
             </div>
           )}
           {location.tags && (
-            <div style={{ fontSize: '0.75rem', color: '#888' }}>
+            <div className={styles.tags}>
               {location.tags.map((tag, index) => (
                 <Tag key={index} className={styles.tag}>
                   {tag.display || tag.name}
