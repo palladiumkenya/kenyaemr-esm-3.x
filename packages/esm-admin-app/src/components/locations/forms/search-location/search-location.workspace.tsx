@@ -16,7 +16,7 @@ import { z } from 'zod';
 import { LocationAutosuggest } from '../../auto-suggest/location-autosuggest.component';
 import ResultsTile from '../../common/results-tile.component';
 import { extractErrorMessagesFromResponse } from '../../helpers';
-import { editLocation } from '../../hooks/useLocation';
+import { saveOrUpdateLocation } from '../../hooks/useLocation';
 import { useLocationTags } from '../../hooks/useLocationTags';
 import { LocationResponse } from '../../types';
 import styles from './search-location.workspace.scss';
@@ -78,7 +78,7 @@ const SearchLocationWorkspace: React.FC<AddLocationWorkspaceProps> = ({
         tags: locationTagsUuid,
       };
 
-      await editLocation(locationUuid, locationPayload);
+      await saveOrUpdateLocation(locationUuid, locationPayload);
 
       showSnackbar({
         title: t('success', 'Success'),
