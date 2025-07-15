@@ -57,7 +57,7 @@ const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
           <InlineLoading
             status="active"
             iconDescription="Loading"
-            description={t('patientBilling', 'Verifying patient bills')}
+            description={t('verifyingPatientBills', 'Verifying patient bills')}
           />
         </ModalBody>
       ) : (
