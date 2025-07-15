@@ -1,0 +1,48 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.tileContainer {
+  background-color: colors.$white-0;
+  border-top: 1px solid colors.$gray-20;
+  padding: layout.$spacing-09 0;
+}
+
+.tileNoContent {
+  margin: auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: layout.$spacing-05;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+}
+
+.illustrationPictogram {
+  width: layout.$spacing-07;
+  height: layout.$spacing-07;
+  fill: var(--brand-03);
+  flex-shrink: 0;
+}
