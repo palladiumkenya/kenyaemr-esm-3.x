@@ -1,5 +1,5 @@
-import { Button, InlineLoading } from '@carbon/react';
-import { BaggageClaim, Printer, Wallet } from '@carbon/react/icons';
+import { Button, InlineLoading, Popover, PopoverContent } from '@carbon/react';
+import { BaggageClaim, Close, Printer, Wallet, FolderOpen } from '@carbon/react/icons';
 import {
   defaultVisitCustomRepresentation,
   ExtensionSlot,
@@ -13,6 +13,7 @@ import {
   updateVisit,
   useFeatureFlag,
   usePatient,
+  UserHasAccess,
   useVisit,
   useVisitContextStore,
 } from '@openmrs/esm-framework';
@@ -29,7 +30,6 @@ import InvoiceTable from './invoice-table.component';
 import { useShaFacilityStatus } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
-import ReceiptPrintButton from './print-bill-receipt/receipt-print-button.component';
 import capitalize from 'lodash-es/capitalize';
 import { mutate } from 'swr';
 import startCase from 'lodash-es/startCase';
@@ -170,16 +170,6 @@ const Invoice: React.FC = () => {
       {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
       <InvoiceSummary bill={bill} />
       <div className={styles.actionArea}>
-        <ReceiptPrintButton bill={bill} />
-        <Button
-          onClick={handlePrint}
-          kind="tertiary"
-          size="sm"
-          renderIcon={Printer}
-          iconDescription="Add"
-          tooltipPosition="right">
-          {t('printInvoice', 'Print invoice')}
-        </Button>
         <Button
           onClick={handleBillPayment}
           disabled={bill?.status === 'PAID'}
@@ -212,10 +202,117 @@ const Invoice: React.FC = () => {
 
 export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
   const { t } = useTranslation();
+  const launchBillCloseOrReopenModal = (action: 'close' | 'reopen') => {
+    const dispose = showModal('bill-action-modal', {
+      closeModal: () => dispose(),
+      bill: bill,
+      action,
+    });
+  };
+
+  const shouldCloseBill = bill.balance === 0 && !bill.closed;
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handlePrint = (documentType: string, documentTitle: string) => {
+    const dispose = showModal('print-preview-modal', {
+      onClose: () => dispose(),
+      title: documentTitle,
+      documentUrl: `/openmrs${restBaseUrl}/cashier/print?documentType=${documentType}&billId=${bill?.id}`,
+    });
+  };
+
   return (
     <>
       <div className={styles.invoiceSummary}>
         <span className={styles.invoiceSummaryTitle}>{t('invoiceSummary', 'Invoice Summary')}</span>
+        <div className="invoiceSummaryActions">
+          <Popover
+            isTabTip
+            align="bottom-right"
+            onKeyDown={() => {}}
+            onRequestClose={() => setIsOpen(false)}
+            open={isOpen}>
+            <button
+              className={styles.printButton}
+              aria-expanded
+              aria-label="Settings"
+              onClick={() => setIsOpen(!isOpen)}
+              type="button">
+              <Printer />
+            </button>
+            <PopoverContent>
+              <div className={styles.popoverContent}>
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() =>
+                    handlePrint(
+                      'invoice',
+                      `${t('invoice', 'Invoice')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
+                    )
+                  }
+                  renderIcon={Printer}>
+                  {t('printInvoice', 'Print Invoice')}
+                </Button>
+                {bill.balance === 0 && (
+                  <Button
+                    kind="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const dispose = showModal('print-preview-modal', {
+                        onClose: () => dispose(),
+                        title: `${t('receipt', 'Receipt')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
+                        documentUrl: `/openmrs${restBaseUrl}/cashier/receipt?billId=${bill.id}`,
+                      });
+                    }}
+                    renderIcon={Printer}>
+                    {t('printReceipt', 'Print Receipt')}
+                  </Button>
+                )}
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() =>
+                    handlePrint(
+                      'billstatement',
+                      `${t('billStatement', 'Bill Statement')} ${bill?.receiptNumber} - ${startCase(
+                        bill?.patientName,
+                      )}`,
+                    )
+                  }
+                  renderIcon={Printer}>
+                  {t('printBillStatement', 'Print Bill Statement')}
+                </Button>
+              </div>
+            </PopoverContent>
+          </Popover>
+          {shouldCloseBill && (
+            <UserHasAccess privilege="Close Cashier Bills">
+              <Button
+                kind="danger--ghost"
+                size="sm"
+                renderIcon={Close}
+                iconDescription="Add"
+                tooltipPosition="right"
+                onClick={() => launchBillCloseOrReopenModal('close')}>
+                {t('closeBill', 'Close Bill')}
+              </Button>
+            </UserHasAccess>
+          )}
+          {bill?.closed && (
+            <UserHasAccess privilege="Reopen Cashier Bills">
+              <Button
+                kind="ghost"
+                size="sm"
+                renderIcon={FolderOpen}
+                iconDescription="Add"
+                tooltipPosition="right"
+                onClick={() => launchBillCloseOrReopenModal('reopen')}>
+                {t('reopen', 'Reopen')}
+              </Button>
+            </UserHasAccess>
+          )}
+        </div>
       </div>
       <div className={styles.invoiceSummaryContainer}>
         <div className={styles.invoiceCard}>

@@ -63,6 +63,7 @@ export const mapBillProperties = (bill: PatientInvoice): MappedBill => {
     totalPayments: bill?.totalPayments,
     totalDeposits: bill?.totalDeposits,
     totalExempted: bill?.totalExempted,
+    closed: bill?.closed,
   };
 
   return mappedBill;
@@ -142,6 +143,7 @@ export const useBill = (billUuid: string) => {
       totalDeposits: bill?.totalDeposits,
       totalExempted: bill?.totalExempted,
       balance: bill?.balance,
+      closed: bill?.closed,
     };
 
     return mappedBill;

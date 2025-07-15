@@ -130,12 +130,37 @@
   }
 }
 
-.invoiceSummaryTitle {
-  @include type.type-style('heading-01');
-  color: colors.$gray-70;
+.invoiceSummary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin: layout.$spacing-05 layout.$spacing-05 0 layout.$spacing-05;
   background-color: colors.$white;
-  display: block;
   border-bottom: 1px solid colors.$gray-20;
-  padding: layout.$spacing-04;
+  padding: layout.$spacing-01 layout.$spacing-04;
+
+  .invoiceSummaryActions {
+    display: flex;
+    gap: layout.$spacing-04;
+  }
+  .invoiceSummaryTitle {
+    @include type.type-style('heading-01');
+    color: colors.$gray-70;
+  }
+}
+
+.popoverContent {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+
+  & > button {
+    width: 100%;
+  }
+}
+
+.printButton {
+  svg {
+    fill: colors.$blue-60;
+  }
 }

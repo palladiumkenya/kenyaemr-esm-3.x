@@ -26,6 +26,7 @@ export interface MappedBill {
   totalDeposits?: number;
   totalExempted?: number;
   balance?: number;
+  closed?: boolean;
 }
 
 interface LocationLink {
@@ -145,6 +146,7 @@ export interface PatientInvoice {
   totalDeposits?: number;
   totalExempted?: number;
   balance?: number;
+  closed?: boolean;
 }
 
 export interface PatientDetails {
