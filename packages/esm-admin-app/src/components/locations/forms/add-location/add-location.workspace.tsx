@@ -23,11 +23,11 @@ import classNames from 'classnames';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styles from './add-location.workspace.scss';
-import { editLocation, saveLocation } from '../../hooks/useLocation';
-import { LocationResponse, type AdmissionLocationResponse } from '../../types';
+import { type LocationResponse } from '../../types';
 import { extractErrorMessagesFromResponse } from '../../helpers';
 import { useLocationTags } from '../../hooks/useLocationTags';
 import { mutate } from 'swr';
+import { saveOrUpdateLocation } from '../../hooks/useLocation';
 
 type AddLocationWorkspaceProps = DefaultWorkspaceProps & {
   location?: LocationResponse;
@@ -89,16 +89,14 @@ const AddLocationWorkspace: React.FC<AddLocationWorkspaceProps> = ({
     };
 
     try {
-      if (location?.uuid) {
-        await editLocation(location.uuid, locationPayload);
-      } else {
-        await saveLocation(locationPayload);
-      }
+      const locationUuid = location?.uuid && typeof location.uuid === 'string' ? location.uuid : undefined;
+
+      await saveOrUpdateLocation(locationPayload, locationUuid);
 
       showSnackbar({
         title: t('success', 'Success'),
         kind: 'success',
-        subtitle: location?.uuid
+        subtitle: locationUuid
           ? t('locationUpdated', 'Location {{locationName}} was updated successfully.', {
               locationName: data.name,
             })

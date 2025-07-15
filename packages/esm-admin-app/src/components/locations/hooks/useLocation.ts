@@ -1,19 +1,13 @@
 import { restBaseUrl, openmrsFetch } from '@openmrs/esm-framework';
-import useSWR from 'swr';
 
-export const saveLocation = async (locationPayload) => {
-  const url = `${restBaseUrl}/location`;
-  return await openmrsFetch(url, {
-    method: 'POST',
-    body: locationPayload,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-};
+export const saveOrUpdateLocation = async (locationPayload, locationUuid) => {
+  if (typeof locationPayload === 'string' && typeof locationUuid === 'object') {
+    const temp = locationPayload;
+    locationPayload = locationUuid;
+    locationUuid = temp;
+  }
 
-export const editLocation = async (locationUuid, locationPayload) => {
-  const url = `${restBaseUrl}/location/${locationUuid}`;
+  const url = locationUuid ? `${restBaseUrl}/location/${locationUuid}` : `${restBaseUrl}/location`;
   return await openmrsFetch(url, {
     method: 'POST',
     body: locationPayload,
