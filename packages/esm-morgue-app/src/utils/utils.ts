@@ -59,8 +59,13 @@ export const formatDateTime = (date) => {
   return dayjs(date).format('DD-MMM-YYYY, hh:mm A');
 };
 
-// Utility functions to get the current date and time
-
+/**
+ * Returns the current time in 12-hour format as an object with `time` and `period` properties.
+ *
+ * @returns {Object} - An object with `time` and `period` properties.
+ * @property {string} time - The current time in HH:MM format, e.g. "12:34".
+ * @property {string} period - The period of the day, either "AM" or "PM".
+ */
 export const getCurrentTime = () => {
   const now = new Date();
   const hours = now.getHours() % 12 || 12;

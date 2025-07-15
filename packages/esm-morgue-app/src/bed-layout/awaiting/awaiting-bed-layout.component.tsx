@@ -1,17 +1,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import styles from './bed-layout.scss';
-import BedCard from '../bed/bed.component';
-import { MortuaryPatient } from '../typess';
+import styles from '../bed-layout.scss';
+import BedCard from '../../bed/bed.component';
+import { MortuaryPatient } from '../../typess';
+import { useAwaitingPatients } from '../../home/home.resource';
 
 interface BedLayoutProps {
   awaitingQueueDeceasedPatients: MortuaryPatient[];
   isLoading: boolean;
 }
 
-const BedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPatients, isLoading }) => {
+const AwaitingBedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPatients, isLoading }) => {
   const { t } = useTranslation();
+
+  const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
 
   if (isLoading) {
     return (
@@ -21,7 +24,7 @@ const BedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPatients, is
     );
   }
 
-  if (awaitingQueueDeceasedPatients.length === 0) {
+  if (trulyAwaitingPatients.length === 0) {
     return (
       <div className={styles.emptyState}>
         <p>{t('noDeceasedPatients', 'No deceased patients awaiting admission')}</p>
@@ -32,13 +35,14 @@ const BedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPatients, is
   return (
     <div className={styles.bedLayoutWrapper}>
       <div className={styles.bedLayoutContainer}>
-        {awaitingQueueDeceasedPatients.map((mortuaryPatient, index) => {
+        {trulyAwaitingPatients.map((mortuaryPatient) => {
           const patientUuid = mortuaryPatient?.person?.person?.uuid;
           const patientName = mortuaryPatient?.person?.person?.display;
           const gender = mortuaryPatient?.person?.person?.gender;
           const age = mortuaryPatient?.person?.person?.age;
           const causeOfDeath = mortuaryPatient?.person?.person?.causeOfDeath?.display;
           const dateOfDeath = mortuaryPatient?.person?.person?.deathDate;
+
           return (
             <BedCard
               key={patientUuid}
@@ -47,8 +51,9 @@ const BedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPatients, is
               age={age}
               causeOfDeath={causeOfDeath}
               dateOfDeath={dateOfDeath}
-              onAdmit={() => {}}
-              onCancel={() => {}}
+              onAdmit={() => {}} // You should implement this
+              onCancel={() => {}} // You should implement this
+              patientUuid={patientUuid}
             />
           );
         })}
@@ -57,4 +62,4 @@ const BedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPatients, is
   );
 };
 
-export default BedLayout;
+export default AwaitingBedLayout;

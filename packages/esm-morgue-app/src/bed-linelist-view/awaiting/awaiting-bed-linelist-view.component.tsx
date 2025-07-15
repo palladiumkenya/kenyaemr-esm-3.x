@@ -14,25 +14,32 @@ import {
   Pagination,
   OverflowMenu,
   OverflowMenuItem,
+  DataTableSkeleton,
 } from '@carbon/react';
-import styles from './bed-linelist-view.scss';
-import { MortuaryPatient } from '../typess';
-import { formatDateTime } from '../utils/utils';
+import styles from '../bed-linelist-view.scss';
+import { formatDateTime } from '../../utils/utils';
+import { type MortuaryLocationResponse, type MortuaryPatient } from '../../typess';
+import { launchWorkspace } from '@openmrs/esm-framework';
+import { useAwaitingPatients } from '../../home/home.resource';
 
-interface BedLineListViewProps {
-  awaitingQueueDeceasedPatients: MortuaryPatient[];
+interface AwaitingBedLineListViewProps {
+  awaitingQueueDeceasedPatients: Array<MortuaryPatient>;
+  mortuaryLocation: MortuaryLocationResponse;
   isLoading: boolean;
   paginated?: boolean;
   initialPageSize?: number;
   pageSizes?: number[];
+  mutated?: () => void;
 }
 
-const BedLineListView: React.FC<BedLineListViewProps> = ({
+const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
   awaitingQueueDeceasedPatients,
   isLoading,
+  mortuaryLocation,
   paginated = true,
   initialPageSize = 10,
   pageSizes = [10, 20, 30, 40, 50],
+  mutated,
 }) => {
   const { t } = useTranslation();
 
@@ -50,7 +57,6 @@ const BedLineListView: React.FC<BedLineListViewProps> = ({
     { key: 'action', header: t('action', 'Action') },
   ];
 
-  // Helper function to calculate days between dates
   const calculateDaysInQueue = (dateOfDeath: string): number => {
     if (!dateOfDeath) {
       return 0;
@@ -61,11 +67,14 @@ const BedLineListView: React.FC<BedLineListViewProps> = ({
     return Math.floor(timeDiff / (1000 * 3600 * 24));
   };
 
-  // Helper function to format date
+  const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
 
-  // Transform patient data to table rows
   const allRows = useMemo(() => {
-    return awaitingQueueDeceasedPatients.map((mortuaryPatient, index) => {
+    if (!trulyAwaitingPatients || trulyAwaitingPatients.length === 0) {
+      return [];
+    }
+
+    return trulyAwaitingPatients.map((mortuaryPatient, index) => {
       const patientUuid = mortuaryPatient?.person?.person?.uuid || `patient-${index}`;
       const patientName = mortuaryPatient?.person?.person?.display || '-';
       const gender = mortuaryPatient?.person?.person?.gender || '-';
@@ -76,25 +85,38 @@ const BedLineListView: React.FC<BedLineListViewProps> = ({
       return {
         id: patientUuid,
         admissionDate: formatDateTime(dateOfDeath),
-        idNumber: mortuaryPatient?.person.identifiers?.[0]?.display || '-',
+        idNumber:
+          mortuaryPatient?.person?.identifiers
+            ?.find((id) => id.display?.includes('OpenMRS ID'))
+            ?.display?.split('=')?.[1]
+            ?.trim() || '-',
         name: patientName,
         gender: gender,
         age: age.toString(),
-        bedNumber: '-', // This would come from bed assignment if available
+        bedNumber: '-',
         daysAdmitted: daysInQueue.toString(),
-        action: patientUuid, // We'll use this for the action buttons
+        action: patientUuid,
       };
     });
-  }, [awaitingQueueDeceasedPatients]);
+  }, [trulyAwaitingPatients]);
 
   const totalCount = allRows.length;
   const startIndex = (currentPage - 1) * currPageSize;
   const endIndex = startIndex + currPageSize;
   const paginatedRows = paginated ? allRows.slice(startIndex, endIndex) : allRows;
 
-  const handleAdmit = (patientUuid: string, patientName: string) => {};
+  const handleAdmit = (patientData: MortuaryPatient) => {
+    launchWorkspace('admit-deceased-person-form', {
+      workspaceTitle: t('admissionForm', 'Admission form'),
+      patientData,
+      mortuaryLocation,
+      mutated,
+    });
+  };
 
-  const handleCancel = (patientUuid: string, patientName: string) => {};
+  const handleCancel = (patientUuid: string, patientName: string) => {
+    // TODO: Implement cancel functionality
+  };
 
   const goTo = (page: number) => {
     setCurrentPage(page);
@@ -113,12 +135,12 @@ const BedLineListView: React.FC<BedLineListViewProps> = ({
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
-        <InlineLoading description={t('loadingPatients', 'Loading patients...')} />
+        <DataTableSkeleton columnCount={headers.length} rowCount={5} />
       </div>
     );
   }
 
-  if (awaitingQueueDeceasedPatients.length === 0) {
+  if (!trulyAwaitingPatients || trulyAwaitingPatients.length === 0) {
     return (
       <div className={styles.emptyState}>
         <p>{t('noDeceasedPatients', 'No deceased patients awaiting admission')}</p>
@@ -147,9 +169,7 @@ const BedLineListView: React.FC<BedLineListViewProps> = ({
               </TableHead>
               <TableBody>
                 {rows.map((row) => {
-                  const patientData = awaitingQueueDeceasedPatients.find(
-                    (patient) => patient?.person?.person?.uuid === row.id,
-                  );
+                  const patientData = trulyAwaitingPatients.find((patient) => patient?.person?.person?.uuid === row.id);
                   const patientName = patientData?.person?.person?.display || '';
 
                   return (
@@ -160,8 +180,9 @@ const BedLineListView: React.FC<BedLineListViewProps> = ({
                             <div className={styles.actionButtons}>
                               <OverflowMenu flipped>
                                 <OverflowMenuItem
-                                  onClick={() => handleAdmit(row.id, patientName)}
+                                  onClick={() => handleAdmit(patientData)}
                                   itemText={t('admit', 'Admit')}
+                                  disabled={!patientData}
                                 />
                                 <OverflowMenuItem
                                   onClick={() => handleCancel(row.id, patientName)}
@@ -197,4 +218,4 @@ const BedLineListView: React.FC<BedLineListViewProps> = ({
   );
 };
 
-export default BedLineListView;
+export default AwaitingBedLineListView;

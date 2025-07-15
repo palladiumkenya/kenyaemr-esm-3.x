@@ -48,3 +48,9 @@ export const admitBodyForm = getAsyncLifecycle(() => import('./workspaces/admit-
 export const swapForm = getAsyncLifecycle(() => import('./workspaces/swap-unit.workspace'), options);
 export const actionBarButtons = getAsyncLifecycle(() => import('./extension/actionButton.component'), options);
 export const bannerInfo = getAsyncLifecycle(() => import('./extension/deceasedInfoBanner.component'), options);
+
+// new clean code
+export const admitDeceasedPersonForm = getAsyncLifecycle(
+  () => import('./forms/admit-deceased-person-workspace/admit-deceased-person.workspace'),
+  options,
+);

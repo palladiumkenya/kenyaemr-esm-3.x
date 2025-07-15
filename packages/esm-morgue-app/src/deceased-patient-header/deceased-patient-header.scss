@@ -1,0 +1,50 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.patientHeader {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: flex-start;
+}
+
+.patientInfo {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.patientDetails {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  flex-wrap: wrap;
+}
+
+.middot {
+  color: colors.$gray-70;
+  font-weight: bold;
+}
+
+.gender {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  font-weight: 500;
+}
+
+.age {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  font-weight: 500;
+}
+
+.ageUnit {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  margin-left: layout.$spacing-01;
+}
+
+.patientName {
+  @include type.type-style('body-01');
+  margin-bottom: layout.$spacing-01;
+}

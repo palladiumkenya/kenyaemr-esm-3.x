@@ -1,6 +1,11 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
+  mortuaryLocationTagUuid: {
+    _type: Type.String,
+    _description: 'UUID for mortuary location tag',
+    _default: '1dbbfe22-d21f-499c-bf33-cc9f75b6c7e8',
+  },
   morgueVisitTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue visit',
@@ -16,11 +21,7 @@ export const configSchema = {
     _description: ' UUID for insurance payment mode',
     _default: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
   },
-  morgueCompartmentTagUuid: {
-    _type: Type.String,
-    _description: 'UUID for morgue compartment tag',
-    _default: 'a69f6810-fa6a-4423-a3e4-f88e8ac032dd',
-  },
+
   tagNumberUuid: {
     _type: Type.String,
     _description: 'UUID for tag number concept',
@@ -124,7 +125,7 @@ export type ConfigObject = {
   morgueVisitTypeUuid: string;
   morgueDepartmentServiceTypeUuid: string;
   insurancepaymentModeUuid: string;
-  morgueCompartmentTagUuid: string;
+  mortuaryLocationTagUuid: string;
   tagNumberUuid: string;
   morgueAdmissionEncounterType: string;
   nextOfKinNameUuid: string;

@@ -81,6 +81,11 @@
       "component": "swapForm",
       "title": "Swap form",
       "type": "other-form"
+    },{
+      "name": "admit-deceased-person-form",
+      "component": "admitDeceasedPersonForm",
+      "title": "Admit Deceased Person",
+      "type": "other-form"
     }
   ],
   "pages": [

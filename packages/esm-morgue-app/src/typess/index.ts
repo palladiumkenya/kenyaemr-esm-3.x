@@ -1,27 +1,30 @@
-export interface MortuaryPatient {
-  patient: Patient;
-  person: Person2;
-  personName: PersonName;
-  resourceVersion: string;
-}
+import { type OpenmrsResourceStrict, type OpenmrsResource, Concept } from '@openmrs/esm-framework';
 
-export interface Patient {
-  uuid: string;
-  display: string;
-  identifiers: Identifier[];
-  person: Person;
-  voided: boolean;
-  links: Link7[];
-  resourceVersion: string;
-}
-
-export interface Identifier {
+export interface BaseEntity {
   uuid: string;
   display: string;
 }
+
+export interface Identifier extends BaseEntity {
+  identifierType: string;
+  identifier: string;
+}
+
+export interface CauseOfDeath extends BaseEntity {}
+
+export interface PreferredAddress extends BaseEntity {
+  display: any;
+}
+
+export interface Attribute extends BaseEntity {}
+
+export interface PreferredName extends BaseEntity {}
+
 export interface Person {
   uuid: string;
   display: string;
+  identifiers?: Identifier[];
+  person?: Person;
   gender: string;
   age: number;
   birthdate: string;
@@ -29,146 +32,13 @@ export interface Person {
   dead: boolean;
   deathDate: string;
   causeOfDeath: CauseOfDeath;
+  preferredName?: PreferredName;
   preferredAddress: PreferredAddress;
   attributes: Attribute[];
   voided: boolean;
   birthtime: any;
   deathdateEstimated: boolean;
-}
-
-export interface CauseOfDeath {
-  uuid: string;
-  display: string;
-}
-
-export interface PreferredAddress {
-  uuid: string;
-  display: any;
-}
-export interface Attribute {
-  uuid: string;
-  display: string;
-  links: Link5[];
-}
-
-export interface Link5 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Link6 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Link7 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Person2 {
-  uuid: string;
-  display: string;
-  identifiers: Identifier2[];
-  person: Person3;
-  voided: boolean;
-  links: Link14[];
-  resourceVersion: string;
-}
-
-export interface Identifier2 {
-  uuid: string;
-  display: string;
-  links: Link8[];
-}
-
-export interface Link8 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Person3 {
-  uuid: string;
-  display: string;
-  gender: string;
-  age: number;
-  birthdate: string;
-  birthdateEstimated: boolean;
-  dead: boolean;
-  deathDate: string;
-  causeOfDeath: CauseOfDeath2;
-  preferredName: PreferredName2;
-  preferredAddress: PreferredAddress2;
-  attributes: Attribute2[];
-  voided: boolean;
-  birthtime: any;
-  deathdateEstimated: boolean;
-  links: Link13[];
-  resourceVersion: string;
-}
-
-export interface CauseOfDeath2 {
-  uuid: string;
-  display: string;
-  links: Link9[];
-}
-
-export interface Link9 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface PreferredName2 {
-  uuid: string;
-  display: string;
-  links: Link10[];
-}
-
-export interface Link10 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface PreferredAddress2 {
-  uuid: string;
-  display: any;
-  links: Link11[];
-}
-
-export interface Link11 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Attribute2 {
-  uuid: string;
-  display: string;
-  links: Link12[];
-}
-
-export interface Link12 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Link13 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
-}
-
-export interface Link14 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
+  resourceVersion?: string;
 }
 
 export interface PersonName {
@@ -178,15 +48,44 @@ export interface PersonName {
   middleName: string;
   familyName: string;
   familyName2: any;
-  voided: boolean;
-  links: Link15[];
+}
+
+export interface Patient {
+  uuid: string;
+  display: string;
+  identifiers: Identifier[];
+  person: Person;
+}
+
+export interface MortuaryPatient {
+  patient: Patient;
+  person: Person;
+  personName: PersonName;
   resourceVersion: string;
 }
 
-export interface Link15 {
-  rel: string;
-  uri: string;
-  resourceAlias: string;
+export interface BedType extends BaseEntity {
+  name: string;
+  displayName: string;
+  description: string;
+}
+
+export type BedStatus = 'AVAILABLE' | 'OCCUPIED';
+
+export interface BedTag extends BaseEntity {
+  id?: number;
+  name: string;
+}
+
+export interface BedTagMap {
+  uuid: string;
+  bedTag: BedTag;
+}
+
+export interface Location extends BaseEntity {
+  name: string;
+  description: string;
+  tags?: BaseEntity[];
 }
 
 export interface Bed {
@@ -196,14 +95,37 @@ export interface Bed {
   bedType?: BedType;
   row: number;
   column: number;
-  status: 'AVAILABLE' | 'OCCUPIED';
+  status: BedStatus;
 }
-export interface BedType {
-  uuid: string;
-  name: string;
-  displayName: string;
-  description: string;
+
+export interface BedLayout {
+  rowNumber: number;
+  columnNumber: number;
+  bedNumber: string;
+  bedId: number;
+  bedUuid: string;
+  status: BedStatus;
+  bedType: BedType;
+  location: string;
+  patients: Patient[];
+  bedTagMaps: BedTagMap[];
 }
+
+export interface AdmissionLocationResponse {
+  results: Array<{
+    ward: Location;
+    totalBeds: number;
+    occupiedBeds: number;
+  }>;
+}
+
+export interface MortuaryLocationResponse {
+  totalBeds: number;
+  occupiedBeds: number;
+  ward: Location;
+  bedLayouts: BedLayout[];
+}
+
 export type MappedBedData = Array<{
   id: number;
   number: string;
@@ -211,3 +133,211 @@ export type MappedBedData = Array<{
   status: string;
   uuid: string;
 }>;
+
+export interface VisitTypeResponse extends BaseEntity {
+  name: string;
+}
+
+export interface PaymentMethod {
+  uuid: string;
+  name: string;
+  description: string;
+  retired: boolean;
+  retireReason: null;
+  attributeTypes: AttributeType[];
+  sortOrder: null;
+  resourceVersion: string;
+}
+
+interface AttributeType {
+  uuid: string;
+  name: string;
+  description: string;
+  retired: boolean;
+  attributeOrder: number;
+  format: string;
+  foreignKey: string | null;
+  regExp: string | null;
+  required: boolean;
+}
+
+export interface Encounter extends OpenmrsResourceStrict {
+  encounterDatetime?: string;
+  patient?: Patient;
+  location?: Location;
+  form?: OpenmrsResource;
+  encounterType?: EncounterType;
+  obs?: Array<Observation>;
+  orders?: any;
+  voided?: boolean;
+  visit?: Visit;
+  encounterProviders?: Array<EncounterProvider>;
+  diagnoses?: any;
+}
+
+export interface Observation extends OpenmrsResourceStrict {
+  concept: OpenmrsResource;
+  person: Person;
+  obsDatetime: string;
+  accessionNumber: string;
+  obsGroup: Observation;
+  value: number | string | boolean | OpenmrsResource;
+  valueCodedName: OpenmrsResource;
+  groupMembers: Array<Observation>;
+  comment: string;
+  location: Location;
+  order: OpenmrsResource;
+  encounter: Encounter;
+  voided: boolean;
+}
+export interface EncounterProvider extends OpenmrsResourceStrict {
+  provider?: OpenmrsResource;
+  encounterRole?: EncounterRole;
+  voided?: boolean;
+}
+
+export interface EncounterType extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
+}
+
+export interface EncounterRole extends OpenmrsResourceStrict {
+  name?: string;
+  description?: string;
+  retired?: boolean;
+}
+
+export interface Visit {
+  uuid: string;
+  display?: string;
+  encounters: EncounterList[];
+  patient?: {
+    uuid: string;
+    display: string;
+    person: {
+      uuid: string;
+      display: string;
+      gender: string;
+      birthdate: string;
+      dead: boolean;
+      age: number;
+      deathDate: string;
+      causeOfDeath: {
+        uuid: string;
+        display: string;
+      };
+    };
+  };
+  visitType: VisitType;
+  location?: Location;
+  startDatetime: string;
+  stopDatetime?: string;
+}
+
+export interface VisitType {
+  uuid: string;
+  display: string;
+  name?: string;
+}
+
+export interface EncounterList {
+  uuid: string;
+  display: string;
+  encounterDatetime: string;
+  patient: {
+    uuid: string;
+    display: string;
+    person: {
+      uuid: string;
+      display: string;
+      gender: string;
+      birthdate: string;
+      dead: boolean;
+      age: number;
+      deathDate: string;
+      causeOfDeath: {
+        uuid: string;
+        display: string;
+      };
+    };
+  };
+  form: string;
+  encounterType: {
+    uuid: string;
+    display: string;
+    name: string;
+  };
+}
+
+export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
+export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
+export type QueueStatus = 'Finished Service' | 'In Service' | 'Waiting';
+
+export interface Queue {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+  location: Location;
+  service: string;
+  allowedPriorities: Array<Concept>;
+  allowedStatuses: Array<Concept>;
+}
+export interface MappedVisitQueueEntry {
+  id: string;
+  name: string;
+  patientUuid: string;
+  priority: MappedQueuePriority;
+  priorityUuid: string;
+  service: string;
+  status: QueueStatus;
+  statusUuid: string;
+  visitUuid: string;
+  visitType: string;
+  queue: Queue;
+  queueEntryUuid: string;
+}
+
+export type DispositionType = 'ADMIT' | 'DISCHARGE' | 'TRANSFER';
+
+export interface LocationTag extends OpenmrsResource {
+  name: string;
+}
+export interface EmrApiConfigurationResponse {
+  admissionEncounterType: OpenmrsResource;
+  clinicianEncounterRole: OpenmrsResource;
+  consultFreeTextCommentsConcept: OpenmrsResource;
+  visitNoteEncounterType: OpenmrsResource;
+  inpatientNoteEncounterType: OpenmrsResource;
+  transferRequestEncounterType: OpenmrsResource;
+  transferWithinHospitalEncounterType: OpenmrsResource;
+  exitFromInpatientEncounterType: OpenmrsResource;
+  supportsTransferLocationTag: LocationTag;
+  supportsAdmissionLocationTag: LocationTag;
+  supportsLoginLocationTag: LocationTag;
+  supportsVisitsLocationTag: LocationTag;
+  dispositionDescriptor: {
+    admissionLocationConcept: OpenmrsResource;
+    dateOfDeathConcept: OpenmrsResource;
+    dispositionConcept: OpenmrsResource;
+    internalTransferLocationConcept: OpenmrsResource;
+    dispositionSetConcept: OpenmrsResource;
+  };
+  dispositions: Array<{
+    encounterTypes: null;
+    keepsVisitOpen: null;
+    additionalObs: null;
+    careSettingTypes: ['OUTPATIENT'];
+    name: string;
+    conceptCode: string;
+    type: DispositionType;
+    actions: [];
+    excludedEncounterTypes: Array<string>;
+    uuid: string;
+  }>;
+  bedAssignmentEncounterType: OpenmrsResource;
+  cancelADTRequestEncounterType: OpenmrsResource;
+  denyAdmissionConcept: OpenmrsResource;
+  admissionDecisionConcept: OpenmrsResource;
+}
