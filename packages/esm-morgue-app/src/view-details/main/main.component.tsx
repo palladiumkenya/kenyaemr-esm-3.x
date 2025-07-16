@@ -1,12 +1,10 @@
 import { Layer, Tile } from '@carbon/react';
-import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ConfigObject } from '../../config-schema';
-import { usePatientDischargedStatus } from '../hook/useMorgueVisit';
-import MortuarySummary from '../mortuary-summary/mortuary-summary.component';
 import styles from './tabs.scss';
+import MortuarySummary from '../view-details.component';
 
 const DeceasedDetailsView: React.FC = () => {
   const { t } = useTranslation();

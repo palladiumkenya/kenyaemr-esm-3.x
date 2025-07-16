@@ -5,20 +5,18 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs, InlineLoading } from '@carbon/
 import { ExtensionSlot, useConfig, useLayoutType } from '@openmrs/esm-framework';
 
 import styles from './mortuary-summary.scss';
-import BillingHistoryView from '../panels/billing-history.component';
-import AutopsyView from '../panels/autopsy.component';
-import AttachmentView from '../panels/attachement.component';
 import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
-import usePerson from '../hook/usePerson';
-import { useActiveMorgueVisit } from '../hook/useMorgueVisit';
+import { usePerson } from '../deceased-patient-header/deceasedInfo/deceased-info.resource';
+import BillingHistoryView from './panels/billing-history.component';
+import AutopsyView from './panels/autopsy.component';
+import AttachmentView from './panels/attachement.component';
+import { useActiveMorgueVisit } from './view-details.resource';
 
 const MortuarySummary: React.FC = () => {
-  const config = useConfig();
   const { t } = useTranslation();
-  const layout = useLayoutType();
   const patientUuid = getPatientUuidFromStore();
-  const { person, isLoading } = usePerson(patientUuid);
-  const { activeVisit, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
+  const { isLoading } = usePerson(patientUuid);
+  const { isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
 
   if (isLoading || isActiveLoading) {
     return (

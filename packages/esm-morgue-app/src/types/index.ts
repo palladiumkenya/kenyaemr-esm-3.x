@@ -534,3 +534,32 @@ export interface Individual {
   };
   display: string;
 }
+
+export interface OpenmrsEncounter extends OpenmrsResource {
+  encounterDatetime: string;
+  encounterType: {
+    uuid: string;
+    display: string;
+  };
+  patient: string;
+  location: string;
+  encounterProviders?: Array<{
+    encounterRole: string;
+    provider: { uuid: string; person: { uuid: string; display: string }; name: string };
+    display?: string;
+  }>;
+  obs: Array<OpenmrsResource>;
+
+  form?: { name: string; uuid: string };
+
+  visit?: {
+    visitType: {
+      uuid: string;
+      display: string;
+    };
+  };
+  diagnoses?: Array<{
+    uuid: string;
+    diagnosis: { coded: { display: string } };
+  }>;
+}

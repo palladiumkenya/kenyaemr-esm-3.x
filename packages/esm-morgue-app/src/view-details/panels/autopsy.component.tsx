@@ -37,14 +37,14 @@ import {
 import { Add } from '@carbon/react/icons';
 import styles from './panels.scss';
 import { ConfigObject } from '../../config-schema';
-import { useAutospyEncounter } from '../hook/useEncounter';
 import EncounterObservations from './observations/observation.component';
 import { Observation } from '../../types';
+import { useAutospyEncounter } from '../view-details.resource';
 
 const AutopsyView: React.FC = () => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromStore();
-  const { formsList, autopsyEncounterFormUuid } = useConfig<ConfigObject>();
+  const { autopsyFormUuid, autopsyEncounterFormUuid } = useConfig<ConfigObject>();
   const { encounters, isLoading, error, mutate, isValidating } = useAutospyEncounter(
     patientUuid,
     autopsyEncounterFormUuid,
@@ -62,7 +62,7 @@ const AutopsyView: React.FC = () => {
       mutateForm: () => mutate(),
       formInfo: {
         encounterUuid: encounterUUID,
-        formUuid: formsList?.autopsyFormUuid,
+        formUuid: autopsyFormUuid,
         patientUuid,
         visitTypeUuid: '',
         visitUuid: '',
