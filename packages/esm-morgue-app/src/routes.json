@@ -6,19 +6,6 @@
   },
   "extensions": [
     {
-      "component": "morgueDashboardLink",
-      "name": "morgue-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "morgue",
-        "title": "morgue",
-        "slot": "morgue-dashboard-slot",
-        "privileges": [
-          "o3 : View Mortuary Dashboard"
-        ]
-      }
-    },
-    {
       "name": "action-buttons",
       "component": "actionBarButtons",
       "slot": "mortuary-action-buttons-slot",
