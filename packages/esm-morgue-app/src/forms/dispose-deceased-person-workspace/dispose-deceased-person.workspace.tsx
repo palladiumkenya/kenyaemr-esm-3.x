@@ -6,6 +6,7 @@ import {
   DatePickerInput,
   Form,
   InlineLoading,
+  InlineNotification,
   SelectItem,
   Stack,
   TextInput,
@@ -32,7 +33,10 @@ import { z } from 'zod';
 import styles from './dispose-deceased-person.scss';
 import DeceasedInfo from '../../deceased-patient-header/deceasedInfo/deceased-info.component';
 import { PatientInfo } from '../../types';
-import { usePersonAttributes } from '../discharge-deceased-person-workspace/discharge-body.resource';
+import {
+  useBlockDischargeWithPendingBills,
+  usePersonAttributes,
+} from '../discharge-deceased-person-workspace/discharge-body.resource';
 import { ConfigObject } from '../../config-schema';
 import { getCurrentTime } from '../../utils/utils';
 import { disposeSchema } from '../../schemas';
@@ -58,7 +62,9 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
   const { disposeBody, isLoadingEmrConfiguration } = useMortuaryOperation();
   const { createOrUpdatePersonAttribute, personAttributes } = usePersonAttributes(personUuid);
   const { mutateAll, mutateAwaitingQueuePatients } = useAwaitingQueuePatients();
-
+  const { isDischargeBlocked, blockingMessage, isLoadingBills } = useBlockDischargeWithPendingBills({
+    patientUuid,
+  });
   const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
 
   const { nextOfKinNameUuid, nextOfKinRelationshipUuid, nextOfKinPhoneUuid, nextOfKinAddressUuid } =
@@ -184,6 +190,15 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
       <div className={styles.formContainer}>
         <Stack gap={3}>
           <DeceasedInfo patientUuid={patientUuid} />
+          {isDischargeBlocked && (
+            <InlineNotification
+              kind="error"
+              title={t('disposeBlocked', 'Dispose Blocked')}
+              subtitle={blockingMessage}
+              lowContrast={true}
+              className={styles.blockingNotification}
+            />
+          )}
           <ResponsiveWrapper>
             <div className={styles.dateTimePickerContainer}>
               <Column>
@@ -383,7 +398,11 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
         <Button className={styles.buttonContainer} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.buttonContainer} disabled={isSubmitting || !isDirty} kind="primary" type="submit">
+        <Button
+          className={styles.buttonContainer}
+          disabled={isSubmitting || !isDirty || isDischargeBlocked || isLoadingBills}
+          kind="primary"
+          type="submit">
           {isSubmitting ? (
             <span className={styles.inlineLoading}>
               {t('submitting', 'Submitting...')}
