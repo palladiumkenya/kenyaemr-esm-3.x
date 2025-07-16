@@ -47,10 +47,6 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
     launchPatientWorkspace({ workspaceTitle: t('billingForm', 'Billing Form') });
   };
 
-  const handleLaunchBillDepositForm = () => {
-    launchWorkspace('bill-deposit-workspace', { workspaceTitle: t('billDepositForm', 'Bill Deposit Form') });
-  };
-
   const headerData = [
     {
       header: t('visitTime', 'Visit time'),
@@ -101,7 +97,7 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
     return (
       <EmptyState
         displayText={'Patient Billing'}
-        headerTitle={t('patientBilling', 'Patient billing')}
+        headerTitle={t('patientBillingHistory', 'Patient billing history')}
         launchForm={handleLaunchBillForm}
       />
     );
@@ -109,13 +105,10 @@ const BillHistory: React.FC<BillHistoryProps> = ({ patientUuid }) => {
 
   return (
     <div>
-      <CardHeader title={t('patientBilling', 'Patient billing')}>
+      <CardHeader title={t('patientBillingHistory', 'Patient billing history')}>
         <div>
           <Button renderIcon={Add} onClick={handleLaunchBillForm} kind="ghost">
             {t('addBill', 'Add bill item(s)')}
-          </Button>
-          <Button renderIcon={Add} onClick={handleLaunchBillDepositForm} kind="ghost">
-            {t('addDeposit', 'Add deposit')}
           </Button>
         </div>
       </CardHeader>

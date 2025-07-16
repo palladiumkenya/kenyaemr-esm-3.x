@@ -238,7 +238,10 @@ export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
               aria-label="Settings"
               onClick={() => setIsOpen(!isOpen)}
               type="button">
-              <Printer />
+              <span className={styles.printButtonContent}>
+                <span className={styles.printButtonText}>{t('print', 'Print')}</span>
+                <Printer />
+              </span>
             </button>
             <PopoverContent>
               <div className={styles.popoverContent}>
