@@ -51,7 +51,7 @@ import { getCurrentTime } from '../../utils/utils';
 import { deceasedPatientAdmitSchema } from '../../schemas';
 import { ConfigObject } from '../../config-schema';
 import { DeceasedPatientHeader } from '../../deceased-patient-header/deceased-patient-header.component';
-import { type MortuaryLocationResponse, type MortuaryPatient } from '../../typess';
+import { type MortuaryLocationResponse, type MortuaryPatient } from '../../types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { PENDING_PAYMENT_STATUS } from '../../constants';
@@ -61,6 +61,7 @@ type AdmitDeceasedPersonProps = DefaultWorkspaceProps & {
   patientData: MortuaryPatient;
   mortuaryLocation: MortuaryLocationResponse;
   mutated;
+  deceasedPatientUuid?: string;
 };
 
 const MAX_RESULTS = 5;
@@ -70,6 +71,7 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
   patientData,
   mortuaryLocation,
   mutated,
+  deceasedPatientUuid,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -86,7 +88,7 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
   const { cashPoints } = useCashPoint();
   const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
 
-  const patientUuid = patientData?.patient?.uuid || '';
+  const patientUuid = patientData?.patient?.uuid || deceasedPatientUuid;
 
   const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
 
@@ -328,39 +330,41 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
                   />
                   <div className={styles.compartmentListContainer}>
                     {filteredBeds.length > 0 ? (
-                      <Controller
-                        control={control}
-                        name="availableCompartment"
-                        render={({ field }) => (
-                          <RadioButtonGroup
-                            className={styles.radioButtonGroup}
-                            orientation="vertical"
-                            name="availableCompartment"
-                            valueSelected={field.value}
-                            onChange={field.onChange}>
-                            {filteredBeds.map((bed, index) => (
-                              <div key={index} className={styles.compartmentOption}>
-                                <div className={styles.radioButtonWrapper}>
-                                  <RadioButton
-                                    className={styles.radioButton}
-                                    id={`compartment-${index}`}
-                                    labelText={bed.bedNumber}
-                                    value={bed.bedId}
-                                  />
+                      <>
+                        <Controller
+                          control={control}
+                          name="availableCompartment"
+                          render={({ field }) => (
+                            <RadioButtonGroup
+                              className={styles.radioButtonGroup}
+                              orientation="vertical"
+                              name="availableCompartment"
+                              valueSelected={field.value}
+                              onChange={field.onChange}>
+                              {filteredBeds.map((bed, index) => (
+                                <div key={index} className={styles.compartmentOption}>
+                                  <div className={styles.radioButtonWrapper}>
+                                    <RadioButton
+                                      className={styles.radioButton}
+                                      id={`compartment-${index}`}
+                                      labelText={bed.bedNumber}
+                                      value={bed.bedId}
+                                    />
+                                  </div>
+                                  <div className={styles.compartmentTags}>
+                                    <Tag type={bed.bedType?.display === 'VIP' ? 'green' : 'blue'} size="sm">
+                                      {bed.bedType?.displayName || ''}
+                                    </Tag>
+                                    <Tag type={bed.status === 'AVAILABLE' ? 'green' : 'red'} size="sm">
+                                      {bed?.status || ''}
+                                    </Tag>
+                                  </div>
                                 </div>
-                                <div className={styles.compartmentTags}>
-                                  <Tag type={bed.bedType?.displayName === 'VIP' ? 'green' : 'blue'} size="sm">
-                                    {bed.bedType?.displayName || ''}
-                                  </Tag>
-                                  <Tag type={bed.status === 'AVAILABLE' ? 'green' : 'red'} size="sm">
-                                    {bed?.status || ''}
-                                  </Tag>
-                                </div>
-                              </div>
-                            ))}
-                          </RadioButtonGroup>
-                        )}
-                      />
+                              ))}
+                            </RadioButtonGroup>
+                          )}
+                        />
+                      </>
                     ) : (
                       <Layer>
                         <Tile className={styles.emptyStateTile}>
@@ -541,7 +545,7 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
                   label={t('ChooseOptions', 'Choose option')}
                   titleText={t(
                     'isPoliceCase',
-                    'Is the body associated with a police case? If so, can you provide the OB number?*',
+                    'Is the body anextIDNo: z.sssociated with a police case? If so, can you provide the OB number?*',
                   )}
                 />
               </Column>

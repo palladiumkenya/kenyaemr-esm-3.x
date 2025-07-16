@@ -1,7 +1,7 @@
 import { FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
-import { type MortuaryLocationResponse, type AdmissionLocationResponse, type Bed, type MappedBedData } from '../typess';
+import { type MortuaryLocationResponse, type AdmissionLocationResponse, type Bed, type MappedBedData } from '../types';
 import { ConfigObject } from '../config-schema';
 
 export const useLocation = () => {

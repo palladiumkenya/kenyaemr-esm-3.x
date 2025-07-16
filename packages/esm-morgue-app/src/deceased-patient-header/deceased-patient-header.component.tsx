@@ -4,7 +4,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDeceasedName } from '../utils/utils';
 import styles from './deceased-patient-header.scss';
-import { type MortuaryPatient } from '../typess';
+import { type MortuaryPatient } from '../types';
 
 interface DeceasedPatientHeaderProps {
   patientData: MortuaryPatient;

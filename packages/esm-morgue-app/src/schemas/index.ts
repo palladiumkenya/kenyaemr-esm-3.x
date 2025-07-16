@@ -46,3 +46,21 @@ export const dischargeSchema = z.object({
     .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
     .nonempty('Next of kin phone number is required'),
 });
+
+export const disposeSchema = z.object({
+  dateOfDischarge: z.date({ coerce: true }).refine((date) => !!date, 'Date of discharge is required'),
+  timeOfDischarge: z.string().nonempty('Time of discharge is required'),
+  period: z
+    .string()
+    .nonempty('AM/PM is required')
+    .regex(/^(AM|PM)$/i, 'Invalid period'),
+  serialNumber: z.string().nonempty('Serial Number is required'),
+  courtOrderCaseNumber: z.string().nonempty('Court Order Case Number is required'),
+  nextOfKinNames: z.string().nonempty('Next of kin names is required'),
+  relationshipType: z.string().nonempty('Next of kin relationship is required'),
+  nextOfKinAddress: z.string().nonempty('Next of kin address is required'),
+  nextOfKinContact: z
+    .string()
+    .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits')
+    .nonempty('Next of kin phone number is required'),
+});

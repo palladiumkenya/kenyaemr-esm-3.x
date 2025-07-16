@@ -1,24 +1,34 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from '@carbon/react';
+import { InlineLoading, SkeletonText } from '@carbon/react';
 import styles from '../bed-layout.scss';
 import BedCard from '../../bed/bed.component';
-import { MortuaryPatient } from '../../typess';
+import { MortuaryPatient, MortuaryLocationResponse } from '../../types';
 import { useAwaitingPatients } from '../../home/home.resource';
+import { launchWorkspace } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
 
 interface BedLayoutProps {
   awaitingQueueDeceasedPatients: MortuaryPatient[];
+  mortuaryLocation: MortuaryLocationResponse;
   isLoading: boolean;
+  mutated?: () => void;
 }
 
-const AwaitingBedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPatients, isLoading }) => {
+const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
+  awaitingQueueDeceasedPatients,
+  mortuaryLocation,
+  isLoading,
+  mutated,
+}) => {
   const { t } = useTranslation();
 
   const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
 
   if (isLoading) {
     return (
-      <div className={styles.loadingContainer}>
+      <div className={styles.emptyState}>
+        <SkeletonText />
         <InlineLoading description={t('loadingPatients', 'Loading patients...')} />
       </div>
     );
@@ -27,10 +37,22 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPati
   if (trulyAwaitingPatients.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <p>{t('noDeceasedPatients', 'No deceased patients awaiting admission')}</p>
+        <EmptyState
+          headerTitle={t('noAwaitingPatients', 'No awaiting patients found')}
+          displayText={t('noAwaitingPatientsDescription', 'There are currently no awaiting patients to display.')}
+        />
       </div>
     );
   }
+
+  const handleAdmit = (patientData: MortuaryPatient) => {
+    launchWorkspace('admit-deceased-person-form', {
+      workspaceTitle: t('admissionForm', 'Admission form'),
+      patientData,
+      mortuaryLocation,
+      mutated,
+    });
+  };
 
   return (
     <div className={styles.bedLayoutWrapper}>
@@ -51,9 +73,8 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({ awaitingQueueDeceasedPati
               age={age}
               causeOfDeath={causeOfDeath}
               dateOfDeath={dateOfDeath}
-              onAdmit={() => {}} // You should implement this
-              onCancel={() => {}} // You should implement this
               patientUuid={patientUuid}
+              onAdmit={() => handleAdmit(mortuaryPatient)}
             />
           );
         })}

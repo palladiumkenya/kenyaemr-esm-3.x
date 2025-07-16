@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MorgueTabs } from '../tabs/tabs.component';
 import Header from '../header/header.component';
 import styles from './home.scss';
 import Summary from '../summary/summary.component';
@@ -10,21 +9,30 @@ import { useLocation, useMortuaryAdmissionLocation } from '../bed-layout/bed-lay
 
 const HomeViewComponent: React.FC = () => {
   const { t } = useTranslation();
-  const {
-    awaitingQueueDeceasedPatients,
-    isLoadingAwaitingQueuePatients,
-    errorFetchingAwaitingQueuePatients,
-    mutateAwaitingQueuePatients,
-  } = useAwaitingQueuePatients();
+
+  const [selectedLocation, setSelectedLocation] = React.useState<string>('');
 
   const { locations, isLoading: isLoadingLocation, error: locationError } = useLocation();
-  const [selectedLocation, setSelectedLocation] = React.useState<string>('');
+
   const {
     admissionLocation,
     isLoading: isLoadingAdmission,
     error: admissionError,
     mutate,
   } = useMortuaryAdmissionLocation(selectedLocation);
+
+  const {
+    awaitingQueueDeceasedPatients,
+    admittedPatients,
+    dischargedPatients,
+    dischargedPatientsCount,
+    isLoadingAwaitingQueuePatients,
+    isLoadingDischarge,
+    isLoadingAll,
+    errorFetchingAwaitingQueuePatients,
+    mutateAwaitingQueuePatients,
+    mutateAll,
+  } = useAwaitingQueuePatients(admissionLocation);
 
   const locationItems = React.useMemo(() => {
     return locations.map((location) => ({
@@ -53,12 +61,12 @@ const HomeViewComponent: React.FC = () => {
       <Header title={t('mortuary', 'Mortuary')} />
       <Summary
         awaitingQueueCount={trulyAwaitingPatients.length}
-        admittedCount={0}
-        dischargedCount={0}
-        isLoading={isLoadingAwaitingQueuePatients}
+        admittedCount={admittedPatients.length}
+        dischargedCount={dischargedPatientsCount}
+        isLoading={isLoadingAll}
       />
       <CustomContentSwitcher
-        awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
+        awaitingQueueDeceasedPatients={trulyAwaitingPatients}
         isLoading={isLoadingAwaitingQueuePatients}
         locationItems={locationItems}
         selectedLocation={selectedLocation}
@@ -69,8 +77,9 @@ const HomeViewComponent: React.FC = () => {
         admissionError={admissionError}
         onLocationChange={handleLocationChange}
         mutate={mutate}
+        dischargedPatients={dischargedPatients}
+        isLoadingDischarge={isLoadingDischarge}
       />
-      {/* <MorgueTabs /> */}
     </section>
   );
 };

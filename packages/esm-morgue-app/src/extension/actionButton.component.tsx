@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { launchWorkspace, navigate, UserHasAccess } from '@openmrs/esm-framework';
 import { Movement, Return, ShareKnowledge } from '@carbon/react/icons';
 import React from 'react';
-import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 import styles from './actionButton.scss';
 
 interface ActionButtonProps {
@@ -12,19 +11,18 @@ interface ActionButtonProps {
 
 const ActionButton: React.FC<ActionButtonProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { admissionLocation, isLoading, error } = useAdmissionLocation();
 
-  const isPatientInAdmissionLocation = admissionLocation?.bedLayouts?.some((bed) =>
-    bed.patients.some((patient) => patient.uuid === patientUuid),
-  );
+  // const isPatientInAdmissionLocation = admissionLocation?.bedLayouts?.some((bed) =>
+  //   bed.patients.some((patient) => patient.uuid === patientUuid),
+  // );
 
-  const bedId = admissionLocation?.bedLayouts?.find((bed) =>
-    bed.patients.some((patient) => patient.uuid === patientUuid),
-  )?.bedId;
+  // const bedId = admissionLocation?.bedLayouts?.find((bed) =>
+  //   bed.patients.some((patient) => patient.uuid === patientUuid),
+  // )?.bedId;
 
-  const personUuid = admissionLocation?.bedLayouts
-    ?.find((bed) => bed.patients.some((patient) => patient.uuid === patientUuid))
-    ?.patients.find((patient) => patient.uuid === patientUuid)?.person?.uuid;
+  // const personUuid = admissionLocation?.bedLayouts
+  //   ?.find((bed) => bed.patients.some((patient) => patient.uuid === patientUuid))
+  //   ?.patients.find((patient) => patient.uuid === patientUuid)?.person?.uuid;
 
   const handleNavigateToAllocationPage = () =>
     navigate({
@@ -36,7 +34,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ patientUuid }) => {
       workspaceTitle: t('dischargeForm', 'Discharge form'),
       patientUuid: uuid,
       bedId,
-      personUuid,
+      personUuid: '',
     });
   };
 
@@ -56,24 +54,20 @@ const ActionButton: React.FC<ActionButtonProps> = ({ patientUuid }) => {
         </Button>
       </UserHasAccess>
 
-      {isPatientInAdmissionLocation && (
+      {false && (
         <>
           <UserHasAccess privilege="o3: Swap Mortuary Compartments">
             <Button
               kind="secondary"
               size="sm"
               renderIcon={ShareKnowledge}
-              onClick={() => handleSwapForm(patientUuid, bedId)}>
+              onClick={() => handleSwapForm(patientUuid, 0)}>
               {t('swapCompartment', 'Swap compartment')}
             </Button>
           </UserHasAccess>
 
           <UserHasAccess privilege="o3: Discharge Body from Mortuary">
-            <Button
-              kind="danger"
-              size="sm"
-              renderIcon={Movement}
-              onClick={() => handleDischargeForm(patientUuid, bedId)}>
+            <Button kind="danger" size="sm" renderIcon={Movement} onClick={() => handleDischargeForm(patientUuid, 0)}>
               {t('discharge', 'Discharge body')}
             </Button>
           </UserHasAccess>

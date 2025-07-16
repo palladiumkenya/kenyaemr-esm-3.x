@@ -16,9 +16,16 @@ interface BedProps {
   bedType?: string;
   causeOfDeath: string;
   dateOfDeath: string;
-  patientUuid: string; // Added patientUuid prop
+  patientUuid: string;
   onAdmit?: () => void;
-  onCancel?: () => void;
+  onPostmortem?: () => void;
+  onDischarge?: () => void;
+  onSwapCompartment?: () => void;
+  onDispose?: () => void;
+  onPrintGatePass?: () => void;
+  onPrintPostmortem?: () => void;
+  onViewDetails?: () => void;
+  isDischarged?: boolean;
 }
 
 const BedCard: React.FC<BedProps> = ({
@@ -31,19 +38,26 @@ const BedCard: React.FC<BedProps> = ({
   dateOfDeath,
   patientUuid,
   onAdmit,
-  onCancel,
+  onPostmortem,
+  onDischarge,
+  onSwapCompartment,
+  onDispose,
+  onPrintGatePass,
+  onPrintPostmortem,
+  onViewDetails,
+  isDischarged = false,
 }) => {
   const { t } = useTranslation();
   const { activeVisit } = useVisit(patientUuid);
 
   const lengthOfStay = activeVisit?.startDatetime
     ? convertDateToDays(activeVisit.startDatetime)
-    : calculateDaysAdmitted(dateOfDeath);
+    : calculateDaysInMortuary(dateOfDeath);
 
   const isAdmitted = !!activeVisit;
   const timeSpentTagType = lengthOfStay > 7 ? 'red' : lengthOfStay > 3 ? 'magenta' : 'green';
 
-  function calculateDaysAdmitted(dateOfDeath: string): number {
+  function calculateDaysInMortuary(dateOfDeath: string): number {
     if (!dateOfDeath) {
       return 0;
     }
@@ -58,21 +72,48 @@ const BedCard: React.FC<BedProps> = ({
       <Tile className={styles.tileContainer}>
         <div className={styles.tileHeader}>
           <div className={styles.tagContainer}>
-            {bedNumber ? (
-              <Tag type="cool-gray" className={styles.bedNumberTag}>
-                {bedNumber}
-              </Tag>
-            ) : (
-              <Tag type="cool-gray" className={styles.bedNumberTag}>
-                {t('awaiting', 'Awaiting')}
-              </Tag>
-            )}
-            <TagIcon className={styles.tagIcon} />
+            <div className={styles.tagContainer}>
+              {bedNumber ? (
+                <Tag type="cool-gray" className={styles.bedNumberTag}>
+                  {bedNumber}
+                </Tag>
+              ) : (
+                !isDischarged && (
+                  <Tag type="cool-gray" className={styles.bedNumberTag}>
+                    {t('awaiting', 'Awaiting')}
+                  </Tag>
+                )
+              )}
+              {isDischarged && (
+                <Tag type="blue" className={styles.statusTag}>
+                  {t('discharged', 'Discharged')}
+                </Tag>
+              )}
+              <TagIcon className={styles.tagIcon} />
+            </div>
           </div>
           <div>
             {bedType ? <Tag type="green">{startCase(bedType)}</Tag> : null}
             <OverflowMenu flipped>
-              <OverflowMenuItem onClick={onAdmit} itemText={t('admitBody', 'Admit')} disabled={!onAdmit} />
+              {onAdmit && <OverflowMenuItem onClick={onAdmit} itemText={t('admit', 'Admit')} />}
+              {onViewDetails && (
+                <OverflowMenuItem onClick={onViewDetails} itemText={t('viewDetails', 'View details')} />
+              )}
+              {onPostmortem && <OverflowMenuItem onClick={onPostmortem} itemText={t('postmortem', 'Postmortem')} />}
+              {onDischarge && <OverflowMenuItem onClick={onDischarge} itemText={t('discharge', 'Discharge')} />}
+              {onSwapCompartment && (
+                <OverflowMenuItem onClick={onSwapCompartment} itemText={t('swapCompartment', 'Swap Compartment')} />
+              )}
+              {onDispose && <OverflowMenuItem onClick={onDispose} itemText={t('dispose', 'Dispose')} />}
+              {onPrintGatePass && (
+                <OverflowMenuItem onClick={onPrintGatePass} itemText={t('printGatePass', 'Gate Pass')} />
+              )}
+              {onPrintPostmortem && (
+                <OverflowMenuItem
+                  onClick={onPrintPostmortem}
+                  itemText={t('printPostmortemReport', 'Postmortem Report')}
+                />
+              )}
             </OverflowMenu>
           </div>
         </div>
@@ -91,7 +132,7 @@ const BedCard: React.FC<BedProps> = ({
           <span className={styles.causeValue}>{startCase(causeOfDeath)}</span>
         </div>
         <div className={styles.patientInfoRow}>
-          <span className={styles.causeLabel}>{t('dateQueued', 'Date queued')}</span>
+          <span className={styles.causeLabel}>{t('dateOfDeath', 'Date of death')}</span>
           <span className={styles.causeValue}>{formatDateTime(dateOfDeath)}</span>
         </div>
         {isAdmitted && (
@@ -112,7 +153,7 @@ const BedCard: React.FC<BedProps> = ({
               <span className={styles.causeLabel}>{lengthOfStay}</span>{' '}
               {lengthOfStay === 1 ? t('day', 'Day') : t('days', 'Days')}
             </Tag>
-            {isAdmitted && <Tag type={'green'}>{t('admitted', 'Admitted')}</Tag>}
+            {isAdmitted && !isDischarged && <Tag type="green">{t('admitted', 'Admitted')}</Tag>}
           </div>
         </div>
       </Tile>

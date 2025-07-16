@@ -74,6 +74,19 @@ export const getCurrentTime = () => {
   return { time: `${hours}:${minutes}`, period };
 };
 
+export function parseDisplayText(displayText: string): { name: string; openmrsId: string } | null {
+  const regex = /(.*) \(OpenMRS ID: (.*)\)/;
+  const match = displayText.match(regex);
+
+  if (match && match.length === 3) {
+    const name = match[1].trim();
+    const openmrsId = match[2].trim();
+    return { name, openmrsId };
+  } else {
+    return null;
+  }
+}
+
 export const patientInfoSchema = z.object({
   dateOfAdmission: z
     .date({ coerce: true })

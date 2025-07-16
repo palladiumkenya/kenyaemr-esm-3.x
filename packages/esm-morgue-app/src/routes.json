@@ -86,6 +86,21 @@
       "component": "admitDeceasedPersonForm",
       "title": "Admit Deceased Person",
       "type": "other-form"
+    },
+    {
+      "name": "mortuary-form-entry",
+      "component": "mortuaryFormEntry",
+      "title": "Mortuary Form Entry",
+      "type": "form",
+      "width": "extra-wide",
+      "canMaximize": true,
+      "canHide": true
+    },
+    {
+      "name": "dispose-deceased-person-form",
+      "component": "disposeDeceasedPersonForm",
+      "title": "Dispose Deceased Person",
+      "type": "other-form"
     }
   ],
   "pages": [

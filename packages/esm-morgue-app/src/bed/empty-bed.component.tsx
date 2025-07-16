@@ -11,9 +11,10 @@ interface EmptyBedProps {
   bedNumber?: string;
   bedType?: string;
   onAdmit?: () => void;
+  isEmpty?: boolean;
 }
 
-const EmptyBedCard: React.FC<EmptyBedProps> = ({ bedNumber, onAdmit, bedType }) => {
+const EmptyBedCard: React.FC<EmptyBedProps> = ({ bedNumber, onAdmit, bedType, isEmpty }) => {
   const { t } = useTranslation();
 
   return (
@@ -25,10 +26,14 @@ const EmptyBedCard: React.FC<EmptyBedProps> = ({ bedNumber, onAdmit, bedType }) 
             <TagIcon className={styles.tagIcon} />
           </div>
           <div>
-            <Tag type="green">{startCase(bedType)}</Tag>
-            <OverflowMenu flipped>
-              <OverflowMenuItem onClick={onAdmit} itemText={t('admitBody', 'Admit')} disabled={!onAdmit} />
-            </OverflowMenu>
+            {!isEmpty && (
+              <>
+                <Tag type="green">{startCase(bedType)}</Tag>
+                <OverflowMenu flipped>
+                  <OverflowMenuItem onClick={onAdmit} itemText={t('admitBody', 'Admit')} disabled={!onAdmit} />
+                </OverflowMenu>
+              </>
+            )}
           </div>
         </div>
         <span>

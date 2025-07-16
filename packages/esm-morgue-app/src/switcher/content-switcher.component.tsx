@@ -17,9 +17,11 @@ import styles from './content-switcher.scss';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import AwaitingBedLayout from '../bed-layout/awaiting/awaiting-bed-layout.component';
 import BedLayout from '../bed-layout/admitted/admitted-bed-layout.component';
-import { MortuaryLocationResponse, MortuaryPatient } from '../typess';
+import { MortuaryLocationResponse, MortuaryPatient } from '../types';
 import AwaitingBedLineListView from '../bed-linelist-view/awaiting/awaiting-bed-linelist-view.component';
 import AdmittedBedLineListView from '../bed-linelist-view/admitted/admitted-bed-linelist-view.component';
+import DischargedBedLayout from '../bed-layout/discharged/discharged-bed-layout.component';
+import DischargedBedLineListView from '../bed-linelist-view/discharged/discharged-bed-line-view.component';
 
 enum ViewType {
   LIST = 0,
@@ -54,6 +56,8 @@ interface CustomContentSwitcherProps {
   admissionError: Error;
   onLocationChange: (data: { selectedItem: { id: string; text: string } }) => void;
   mutate: () => void;
+  dischargedPatients?: any[];
+  isLoadingDischarge?: boolean;
 }
 
 const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
@@ -68,6 +72,8 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
   admissionError,
   onLocationChange,
   mutate,
+  dischargedPatients = [],
+  isLoadingDischarge = false,
 }) => {
   const { t } = useTranslation();
   const [selectedView, setSelectedView] = React.useState<ViewType>(ViewType.LIST);
@@ -103,36 +109,60 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
               />
             </div>
           ) : (
-            <AwaitingBedLayout awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients} isLoading={isLoading} />
+            <AwaitingBedLayout
+              mortuaryLocation={admissionLocation}
+              awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
+              isLoading={isLoading}
+              mutated={mutate}
+            />
           );
 
         case TabType.ADMITTED:
           return isListView ? (
             <div className={styles.listContainer}>
-              <AdmittedBedLineListView AdmittedDeceasedPatient={admissionLocation} isLoading={isLoadingAdmission} />
+              <AdmittedBedLineListView
+                AdmittedDeceasedPatient={admissionLocation}
+                isLoading={isLoadingAdmission}
+                mutate={mutate}
+              />
             </div>
           ) : (
-            <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={false} />
+            <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={isLoadingAdmission} mutate={mutate} />
           );
 
         case TabType.DISCHARGE:
           return isListView ? (
             <div className={styles.listContainer}>
-              <h2>{t('dischargeList', 'Discharge - List View')}</h2>
-              <p>Count: 0</p>
+              <DischargedBedLineListView
+                AdmittedDeceasedPatient={admissionLocation}
+                isLoading={isLoadingDischarge}
+                mutate={mutate}
+              />
             </div>
           ) : (
-            <div className={styles.cardContainer}>
-              <h2>{t('dischargeCard', 'Discharge - Card View')}</h2>
-              <p>Count: 0</p>
-            </div>
+            <DischargedBedLayout
+              AdmittedDeceasedPatient={admissionLocation}
+              isLoading={isLoadingDischarge}
+              mutate={mutate}
+            />
           );
 
         default:
           return null;
       }
     },
-    [selectedView, t, awaitingQueueDeceasedPatients, isLoading, admissionLocation, isLoadingAdmission, mutate],
+    [
+      selectedView,
+      t,
+      awaitingQueueDeceasedPatients,
+      isLoading,
+      admissionLocation,
+      isLoadingAdmission,
+      isLoadingDischarge,
+      dischargedPatients,
+
+      mutate,
+    ],
   );
 
   return (
@@ -163,7 +193,15 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
           <div className={styles.tabListContainer}>
             <TabList scrollDebounceWait={200}>
               {tabs.map((tab) => (
-                <Tab key={tab.id}>{t(tab.labelKey, tab.defaultLabel)}</Tab>
+                <Tab key={tab.id}>
+                  {t(tab.labelKey, tab.defaultLabel)}
+                  {tab.id === 'awaiting-admission' && ` (${awaitingQueueDeceasedPatients?.length || 0})`}
+                  {tab.id === 'admitted' &&
+                    ` (${
+                      admissionLocation?.bedLayouts?.reduce((total, bed) => total + (bed.patients?.length || 0), 0) || 0
+                    })`}
+                  {tab.id === 'discharge' && ` (${dischargedPatients?.length || 0})`}
+                </Tab>
               ))}
             </TabList>
           </div>

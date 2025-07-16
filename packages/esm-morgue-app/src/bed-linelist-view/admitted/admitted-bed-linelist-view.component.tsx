@@ -15,10 +15,13 @@ import {
   Tag,
   DataTableSkeleton,
 } from '@carbon/react';
+import { launchWorkspace, useConfig, useVisit } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { convertDateToDays, formatDateTime } from '../../utils/utils';
-import { Patient, Person, type MortuaryLocationResponse } from '../../typess';
-import { useVisit } from '@openmrs/esm-framework';
+import { Patient, Person, type MortuaryLocationResponse } from '../../types';
+import { ConfigObject } from '../../config-schema';
+import { mutate as mutateSWR } from 'swr';
+import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
 
 interface AdmittedBedLineListViewProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -26,6 +29,11 @@ interface AdmittedBedLineListViewProps {
   paginated?: boolean;
   initialPageSize?: number;
   pageSizes?: number[];
+  onPostmortem?: (patientUuid: string) => void;
+  onDischarge?: (patientUuid: string) => void;
+  onSwapCompartment?: (patientUuid: string, bedId: string) => void;
+  onDispose?: (patientUuid: string) => void;
+  mutate?: () => void;
 }
 
 const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
@@ -34,8 +42,14 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
   paginated = true,
   initialPageSize = 10,
   pageSizes = [10, 20, 30, 40, 50],
+  onPostmortem,
+  onDischarge,
+  onSwapCompartment,
+  onDispose,
+  mutate,
 }) => {
   const { t } = useTranslation();
+  const { autopsyFormUuid } = useConfig<ConfigObject>();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currPageSize, setCurrPageSize] = useState(initialPageSize);
@@ -69,6 +83,64 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     { key: 'status', header: t('status', 'Status') },
     { key: 'action', header: t('action', 'Action') },
   ];
+
+  const handlePostmortem = (patientUuid: string) => {
+    if (onPostmortem) {
+      onPostmortem(patientUuid);
+    } else {
+      launchWorkspace('mortuary-form-entry', {
+        formUuid: autopsyFormUuid,
+        workspaceTitle: t('postmortemForm', 'Postmortem form'),
+        patientUuid: patientUuid,
+        encounterUuid: '',
+        mutateForm: () => {
+          mutateSWR((key) => true, undefined, {
+            revalidate: true,
+          });
+        },
+      });
+    }
+  };
+
+  const handleDischarge = (patientUuid: string, bedId: number) => {
+    if (onDischarge) {
+      onDischarge(patientUuid);
+    } else {
+      launchWorkspace('discharge-body-form', {
+        workspaceTitle: t('dischargeForm', 'Discharge form'),
+        patientUuid: patientUuid,
+        bedId,
+        mutate,
+      });
+    }
+  };
+
+  const handleSwapCompartment = (patientUuid: string, bedId: number) => {
+    if (onSwapCompartment) {
+      onSwapCompartment(patientUuid, bedId.toString());
+    } else {
+      launchWorkspace('swap-unit-form', {
+        workspaceTitle: t('swapCompartment', 'Swap compartment'),
+        patientUuid: patientUuid,
+        bedId,
+        mortuaryLocation: AdmittedDeceasedPatient,
+        mutate,
+      });
+    }
+  };
+
+  const handleDispose = (patientUuid: string, bedId: number) => {
+    if (onDispose) {
+      onDispose(patientUuid);
+    } else {
+      launchWorkspace('dispose-deceased-person-form', {
+        workspaceTitle: t('disposeForm', 'Dispose form'),
+        patientUuid: patientUuid,
+        bedId,
+        mutate,
+      });
+    }
+  };
 
   const calculateDaysAdmitted = (dateOfDeath: string): number => {
     if (!dateOfDeath) {
@@ -153,6 +225,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
           causeOfDeath: '-',
           daysAdmitted: '-',
           isEmpty: true,
+          bedId,
         });
       } else {
         for (const patient of patients) {
@@ -180,13 +253,14 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
             isEmpty: false,
             patientUuid,
             bedUuid,
+            bedId,
           });
         }
       }
     }
 
     return rows;
-  }, [AdmittedDeceasedPatient, getCompartmentShare, t, isLoading]);
+  }, [getCompartmentShare, AdmittedDeceasedPatient, t, isLoading]);
 
   if (isLoading) {
     return (
@@ -199,7 +273,10 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
   if (!AdmittedDeceasedPatient) {
     return (
       <div className={styles.loadingContainer}>
-        <DataTableSkeleton columnCount={headers.length} rowCount={5} zebra />
+        <EmptyState
+          headerTitle={t('noAdmittedPatients', 'No admitted patients found')}
+          displayText={t('noAdmittedPatientsDescription', 'There are currently no admitted patients to display.')}
+        />
       </div>
     );
   }
@@ -208,18 +285,6 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
   const startIndex = (currentPage - 1) * currPageSize;
   const endIndex = startIndex + currPageSize;
   const paginatedRows = paginated ? allRows.slice(startIndex, endIndex) : allRows;
-
-  const handleDischarge = (patientUuid: string, patientName: string) => {
-    // Implement discharge logic
-  };
-
-  const handleAssignBed = (bedUuid: string, bedNumber: string) => {
-    // Implement bed assignment logic
-  };
-
-  const handleEditPatient = (patientUuid: string) => {
-    // Implement edit patient logic
-  };
 
   const goTo = (page: number) => setCurrentPage(page);
 
@@ -291,25 +356,30 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
                         if (cell.info.header === 'action') {
                           return (
                             <TableCell key={cell.id}>
-                              <OverflowMenu flipped>
-                                {rowData.isEmpty ? (
+                              {!rowData.isEmpty && (
+                                <OverflowMenu flipped>
                                   <OverflowMenuItem
-                                    onClick={() => handleAssignBed(rowData.bedUuid, rowData.bedNumber)}
-                                    itemText={t('assignBed', 'Assign Bed')}
+                                    onClick={() => handlePostmortem(rowData.patientUuid)}
+                                    itemText={t('viewDetails', 'View details')}
                                   />
-                                ) : (
-                                  <>
-                                    <OverflowMenuItem
-                                      onClick={() => handleEditPatient(rowData.patientUuid)}
-                                      itemText={t('edit', 'Edit')}
-                                    />
-                                    <OverflowMenuItem
-                                      onClick={() => handleDischarge(rowData.patientUuid, rowData.patientName)}
-                                      itemText={t('discharge', 'Discharge')}
-                                    />
-                                  </>
-                                )}
-                              </OverflowMenu>
+                                  <OverflowMenuItem
+                                    onClick={() => handlePostmortem(rowData.patientUuid)}
+                                    itemText={t('postmortemForm', 'Postmortem')}
+                                  />
+                                  <OverflowMenuItem
+                                    onClick={() => handleSwapCompartment(rowData.patientUuid, rowData.bedId)}
+                                    itemText={t('compartmentSwap', 'Compartment swap')}
+                                  />
+                                  <OverflowMenuItem
+                                    onClick={() => handleDispose(rowData.patientUuid, rowData.bedId)}
+                                    itemText={t('disposeForm', 'Dispose')}
+                                  />
+                                  <OverflowMenuItem
+                                    onClick={() => handleDischarge(rowData.patientUuid, rowData.bedId)}
+                                    itemText={t('dischargeForm', 'Discharge')}
+                                  />
+                                </OverflowMenu>
+                              )}
                             </TableCell>
                           );
                         }

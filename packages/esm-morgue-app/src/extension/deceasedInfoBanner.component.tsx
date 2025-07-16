@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { launchWorkspace, navigate, usePatient, useVisit } from '@openmrs/esm-framework';
 import { Movement, Return, ShareKnowledge } from '@carbon/react/icons';
 import React from 'react';
-import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 import styles from './actionButton.scss';
 import { convertDateToDays, formatDateTime } from '../utils/utils';
 import { Console } from '@carbon/pictograms-react';
@@ -14,13 +13,13 @@ interface BannerInfoProps {
 
 const BannerInfo: React.FC<BannerInfoProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { admissionLocation, isLoading, error } = useAdmissionLocation();
+  // const { admissionLocation, isLoading, error } = useAdmissionLocation();
   const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
 
-  const bedNumber =
-    admissionLocation?.bedLayouts?.find((bed) => bed.patients.some((patient) => patient.uuid === patientUuid))
-      ?.bedNumber || t('discharged', 'Discharged');
+  // const bedNumber =
+  //   admissionLocation?.bedLayouts?.find((bed) => bed.patients.some((patient) => patient.uuid === patientUuid))
+  //     ?.bedNumber || t('discharged', 'Discharged');
 
   const timeAndDateOfDeath = patient?.deceasedDateTime;
 
@@ -47,7 +46,7 @@ const BannerInfo: React.FC<BannerInfoProps> = ({ patientUuid }) => {
         </div>
         <div className={styles.wrapMetrics}>
           <span className={styles.metricLabel}>{t('compartment', 'Compartment')}</span>
-          <span className={styles.metricValue}>{bedNumber}</span>
+          <span className={styles.metricValue}>{''}</span>
         </div>
       </div>
     </div>

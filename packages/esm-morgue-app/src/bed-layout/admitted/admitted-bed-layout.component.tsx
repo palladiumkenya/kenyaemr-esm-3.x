@@ -1,19 +1,96 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
+import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-layout.scss';
 import BedCard from '../../bed/bed.component';
-import { type MortuaryLocationResponse } from '../../typess';
+import { type MortuaryLocationResponse } from '../../types';
 import EmptyBedCard from '../../bed/empty-bed.component';
 import Divider from '../../bed/divider/divider.component';
+import { ConfigObject } from '../../config-schema';
+import { mutate as mutateSWR } from 'swr';
 
 interface BedLayoutProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
   isLoading: boolean;
+  onAdmit?: (patientUuid: string) => void;
+  onPostmortem?: (patientUuid: string) => void;
+  onDischarge?: (patientUuid: string) => void;
+  onSwapCompartment?: (patientUuid: string, bedId: string) => void;
+  onDispose?: (patientUuid: string) => void;
+  mutate?: () => void;
 }
 
-const BedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient, isLoading }) => {
+const BedLayout: React.FC<BedLayoutProps> = ({
+  AdmittedDeceasedPatient,
+  isLoading,
+  onPostmortem,
+  onDischarge,
+  onSwapCompartment,
+  onDispose,
+  mutate,
+}) => {
   const { t } = useTranslation();
+  const { autopsyFormUuid } = useConfig<ConfigObject>();
+
+  const handlePostmortem = (patientUuid: string) => {
+    if (onPostmortem) {
+      onPostmortem(patientUuid);
+    } else {
+      launchWorkspace('mortuary-form-entry', {
+        formUuid: autopsyFormUuid,
+        workspaceTitle: t('postmortemForm', 'Postmortem form'),
+
+        patientUuid: patientUuid,
+        encounterUuid: '',
+        mutateForm: () => {
+          mutateSWR((key) => true, undefined, {
+            revalidate: true,
+          });
+        },
+      });
+    }
+  };
+
+  const handleDischarge = (patientUuid: string, bedId: number) => {
+    if (onDischarge) {
+      onDischarge(patientUuid);
+    } else {
+      launchWorkspace('discharge-body-form', {
+        workspaceTitle: t('dischargeForm', 'Discharge form'),
+        patientUuid: patientUuid,
+        bedId,
+        mutate,
+      });
+    }
+  };
+
+  const handleSwapCompartment = (patientUuid: string, bedId: number) => {
+    if (onSwapCompartment) {
+      onSwapCompartment(patientUuid, bedId.toString());
+    } else {
+      launchWorkspace('swap-unit-form', {
+        workspaceTitle: t('swapCompartment', 'Swap compartment'),
+        patientUuid: patientUuid,
+        bedId,
+        mortuaryLocation: AdmittedDeceasedPatient,
+        mutate,
+      });
+    }
+  };
+
+  const handleDispose = (patientUuid: string, bedId: number) => {
+    if (onDispose) {
+      onDispose(patientUuid);
+    } else {
+      launchWorkspace('dispose-deceased-person-form', {
+        workspaceTitle: t('disposeForm', 'Dispose form'),
+        patientUuid: patientUuid,
+        bedId,
+        mutate,
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -38,6 +115,7 @@ const BedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient, isLoadin
                 key={bedLayout.bedUuid || `empty-bed-${bedLayout.bedId}-${index}`}
                 bedNumber={bedLayout.bedNumber}
                 bedType={bedLayout.bedType?.displayName}
+                isEmpty={isEmpty}
               />
             );
           }
@@ -59,6 +137,10 @@ const BedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient, isLoadin
                         dateOfDeath={patient.person?.deathDate}
                         bedNumber={bedLayout.bedNumber}
                         bedType={bedLayout.bedType?.displayName}
+                        onPostmortem={() => handlePostmortem(patient.uuid)}
+                        onDischarge={() => handleDischarge(patient.uuid, bedLayout.bedId)}
+                        onSwapCompartment={() => handleSwapCompartment(patient.uuid, bedLayout.bedId)}
+                        onDispose={() => handleDispose(patient.uuid, bedLayout.bedId)}
                       />
                       {patientIndex < patients.length - 1 && <Divider />}
                     </React.Fragment>
@@ -74,6 +156,16 @@ const BedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient, isLoadin
                   dateOfDeath={patients[0].person?.deathDate}
                   bedNumber={bedLayout.bedNumber}
                   bedType={bedLayout.bedType?.displayName}
+                  onPostmortem={() => handlePostmortem(patients[0].uuid)}
+                  onDischarge={() => handleDischarge(patients[0].uuid, bedLayout.bedId)}
+                  onSwapCompartment={() => handleSwapCompartment(patients[0].uuid, bedLayout.bedId)}
+                  onDispose={() => handleDispose(patients[0].uuid, bedLayout.bedId)}
+                  onViewDetails={() =>
+                    launchWorkspace('patient-details', {
+                      patientUuid: patients[0].uuid,
+                      workspaceTitle: t('patientDetails', 'Patient Details'),
+                    })
+                  }
                 />
               )}
             </div>
