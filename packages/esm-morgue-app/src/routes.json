@@ -9,7 +9,6 @@
       "component": "morgueDashboardLink",
       "name": "morgue-dashboard-link",
       "slot": "homepage-dashboard-slot",
-      "featureFlag": "mortuaryFeatureFlag",
       "meta": {
         "name": "morgue",
         "title": "morgue",
@@ -48,6 +47,11 @@
       }
     },
     {
+      "name": "mortuary-summary-info",
+      "component": "mortuarySummary",
+      "slot": "mortuary-summary-info-slot"
+    },
+    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot",
@@ -81,6 +85,26 @@
       "name": "swap-unit-form",
       "component": "swapForm",
       "title": "Swap form",
+      "type": "other-form"
+    },{
+      "name": "admit-deceased-person-form",
+      "component": "admitDeceasedPersonForm",
+      "title": "Admit Deceased Person",
+      "type": "other-form"
+    },
+    {
+      "name": "mortuary-form-entry",
+      "component": "mortuaryFormEntry",
+      "title": "Mortuary Form Entry",
+      "type": "form",
+      "width": "extra-wide",
+      "canMaximize": true,
+      "canHide": true
+    },
+    {
+      "name": "dispose-deceased-person-form",
+      "component": "disposeDeceasedPersonForm",
+      "title": "Dispose Deceased Person",
       "type": "other-form"
     }
   ],

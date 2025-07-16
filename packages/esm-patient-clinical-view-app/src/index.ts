@@ -50,8 +50,6 @@ import PeerCalendar from './peer-calendar/peer-calendar.component';
 import PeerForm from './peer-calendar/forms/peer-form.workspace';
 import FormEntryWorkspace from './peer-calendar/forms/form-entry.workspace';
 import DeleteRelationshipConfirmDialog from './relationships/modals/delete-relationship-dialog.modal';
-import DeceasedDetailsView from './deceased-panel/tabs/tabs.component';
-import DeceasedPanelDashboardLink from './deceased-panel/dashboard-link/dashboard-link.component';
 import EndRelationshipWorkspace from './case-management/workspace/case-management-workspace.component';
 import Partograph from './maternal-and-child-health/partography/partograph.component';
 import ContactListUpdateForm from './contact-list/forms/contact-list-update.workspace';
@@ -134,12 +132,6 @@ export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
 export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
 // export const caseEncounterHeader = getSyncLifecycle(CaseEncounterHeader, options);
 export const caseEncounterTable = getSyncLifecycle(CaseEncounterOverviewComponent, options);
-
-// Morgue deceased details
-export const deceasedPanelDashboardLink = getSyncLifecycle(DeceasedPanelDashboardLink, options);
-
-export const deceasedDetailsTabs = getSyncLifecycle(DeceasedDetailsView, options);
-
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);
 export const postnatalCareLink = getSyncLifecycle(createDashboardLink(postnatalDashboardMeta), options);

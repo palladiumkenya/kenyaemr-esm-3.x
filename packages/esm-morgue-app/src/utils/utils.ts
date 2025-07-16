@@ -59,8 +59,13 @@ export const formatDateTime = (date) => {
   return dayjs(date).format('DD-MMM-YYYY, hh:mm A');
 };
 
-// Utility functions to get the current date and time
-
+/**
+ * Returns the current time in 12-hour format as an object with `time` and `period` properties.
+ *
+ * @returns {Object} - An object with `time` and `period` properties.
+ * @property {string} time - The current time in HH:MM format, e.g. "12:34".
+ * @property {string} period - The period of the day, either "AM" or "PM".
+ */
 export const getCurrentTime = () => {
   const now = new Date();
   const hours = now.getHours() % 12 || 12;
@@ -68,6 +73,19 @@ export const getCurrentTime = () => {
   const period = now.getHours() >= 12 ? 'PM' : 'AM';
   return { time: `${hours}:${minutes}`, period };
 };
+
+export function parseDisplayText(displayText: string): { name: string; openmrsId: string } | null {
+  const regex = /(.*) \(OpenMRS ID: (.*)\)/;
+  const match = displayText.match(regex);
+
+  if (match && match.length === 3) {
+    const name = match[1].trim();
+    const openmrsId = match[2].trim();
+    return { name, openmrsId };
+  } else {
+    return null;
+  }
+}
 
 export const patientInfoSchema = z.object({
   dateOfAdmission: z

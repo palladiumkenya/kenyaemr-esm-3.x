@@ -1,0 +1,56 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.formContainer {
+  margin: layout.$spacing-05;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.tablet {
+  padding: layout.$spacing-06 layout.$spacing-05;
+  background-color: colors.$white;
+}
+
+.desktop {
+  padding: 0;
+  padding: layout.$spacing-01 layout.$spacing-04;
+}
+.buttonContainer {
+  max-width: 50%;
+}
+.inlineLoading {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+.formDeathTimepickerSelector {
+  min-width: layout.$spacing-05;
+  margin-top: layout.$spacing-06;
+}
+.formAdmissionTimepicker input {
+  min-width: 11rem;
+}
+.formAdmissionDatepicker input {
+  min-width: 23rem;
+}
+.dateTimeSection {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-02;
+  align-items: center;
+  padding-top: layout.$spacing-03;
+}
+
+.sectionField {
+  padding-top: layout.$spacing-03;
+}

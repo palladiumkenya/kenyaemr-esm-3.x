@@ -3,28 +3,24 @@ import { useTranslation } from 'react-i18next';
 import { launchWorkspace, navigate, usePatient, useVisit } from '@openmrs/esm-framework';
 import { Movement, Return, ShareKnowledge } from '@carbon/react/icons';
 import React from 'react';
-import { useAdmissionLocation } from '../hook/useMortuaryAdmissionLocation';
 import styles from './actionButton.scss';
 import { convertDateToDays, formatDateTime } from '../utils/utils';
 import { Console } from '@carbon/pictograms-react';
+import { type Visit } from '../types';
 
 interface BannerInfoProps {
   patientUuid: string;
+  visit: Visit;
+  bedNumber?: string;
 }
 
-const BannerInfo: React.FC<BannerInfoProps> = ({ patientUuid }) => {
+const BannerInfo: React.FC<BannerInfoProps> = ({ patientUuid, visit, bedNumber }) => {
   const { t } = useTranslation();
-  const { admissionLocation, isLoading, error } = useAdmissionLocation();
   const { patient } = usePatient(patientUuid);
-  const { currentVisit } = useVisit(patientUuid);
-
-  const bedNumber =
-    admissionLocation?.bedLayouts?.find((bed) => bed.patients.some((patient) => patient.uuid === patientUuid))
-      ?.bedNumber || t('discharged', 'Discharged');
 
   const timeAndDateOfDeath = patient?.deceasedDateTime;
 
-  const startDate = currentVisit?.startDatetime;
+  const startDate = visit?.startDatetime;
 
   const lengthOfStay = `${convertDateToDays(startDate)} ${
     convertDateToDays(startDate) === 1 ? t('day', 'Day') : t('days', 'Days')

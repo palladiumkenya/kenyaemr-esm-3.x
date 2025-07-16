@@ -1,6 +1,12 @@
 import { Type } from '@openmrs/esm-framework';
+import _default from 'react-hook-form/dist/utils/createSubject';
 
 export const configSchema = {
+  mortuaryLocationTagUuid: {
+    _type: Type.String,
+    _description: 'UUID for mortuary location tag',
+    _default: '1dbbfe22-d21f-499c-bf33-cc9f75b6c7e8',
+  },
   morgueVisitTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue visit',
@@ -16,23 +22,19 @@ export const configSchema = {
     _description: ' UUID for insurance payment mode',
     _default: 'beac329b-f1dc-4a33-9e7c-d95821a137a6',
   },
-  morgueCompartmentTagUuid: {
-    _type: Type.String,
-    _description: 'UUID for morgue compartment tag',
-    _default: 'a69f6810-fa6a-4423-a3e4-f88e8ac032dd',
-  },
+
   tagNumberUuid: {
     _type: Type.String,
     _description: 'UUID for tag number concept',
     _default: 'f2b35679-7ba9-4619-92cb-6872b0c6bf57',
   },
-  morgueAdmissionEncounterType: {
+  morgueAdmissionEncounterTypeUuid: {
     _type: Type.String,
     _description: 'Encounter type for morgue admission',
     _default: '3d2df845-6f3c-45e7-b91a-d828a1f9c2e8',
   },
   morgueDischargeEncounterTypeUuid: {
-    type: Type.String,
+    _type: Type.String,
     _description: 'Encounter type for morgue discharge',
     _default: '3d618f40b-b5a3-4f17-81c8-2f04e2aad58e',
   },
@@ -96,6 +98,31 @@ export const configSchema = {
     _description: 'UUID for admin user',
     _default: 'e02c40e5-04e7-11e5-ae3c-a0b3cc4f922f',
   },
+  autopsyFormUuid: {
+    _type: Type.String,
+    _description: 'UUID for autopsy form',
+    _default: '2b61a73-4971-4fc0-b20b-9a30176317e2',
+  },
+  autopsyEncounterFormUuid: {
+    _type: Type.String,
+    _description: 'Encounter UUID for autopsy',
+    _default: '32b61a73-4971-4fc0-b20b-9a30176317e2',
+  },
+  nextOfKinNamesUuid: {
+    _type: Type.String,
+    _description: 'UUID for next of kin names concept',
+    _default: '830bef6d-b01f-449d-9f8d-ac0fede8dbd3',
+  },
+  courtOrderCaseNumberUuid: {
+    _type: Type.String,
+    _description: 'UUID for court order case number concept',
+    _default: '26e0da6c-3e53-4f7d-9a3a-1c2f634450f7',
+  },
+  serialNumberUuid: {
+    _type: Type.String,
+    _description: 'UUID for serial number concept',
+    _default: '1646AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
 };
 
 export interface BillingConfig {
@@ -124,9 +151,9 @@ export type ConfigObject = {
   morgueVisitTypeUuid: string;
   morgueDepartmentServiceTypeUuid: string;
   insurancepaymentModeUuid: string;
-  morgueCompartmentTagUuid: string;
+  mortuaryLocationTagUuid: string;
   tagNumberUuid: string;
-  morgueAdmissionEncounterType: string;
+  morgueAdmissionEncounterTypeUuid: string;
   nextOfKinNameUuid: string;
   nextOfKinRelationshipUuid: string;
   nextOfKinAddressUuid: string;
@@ -141,4 +168,9 @@ export type ConfigObject = {
   dischargeAreaUuid: string;
   morgueDischargeEncounterTypeUuid: string;
   adminUuid: string;
+  autopsyFormUuid: string;
+  autopsyEncounterFormUuid: string;
+  nextOfKinNamesUuid: string;
+  courtOrderCaseNumberUuid: string;
+  serialNumberUuid: string;
 };

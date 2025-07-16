@@ -1,0 +1,144 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.formContainer {
+  margin: layout.$spacing-05;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.tablet {
+  padding: layout.$spacing-06 layout.$spacing-05;
+  background-color: colors.$white;
+}
+
+.desktop {
+  padding: 0;
+  padding: layout.$spacing-01 layout.$spacing-05;
+}
+.buttonContainer {
+  max-width: 50%;
+}
+.inlineLoading {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+.formDeathTimepickerSelector {
+  min-width: layout.$spacing-05;
+  margin-top: layout.$spacing-06;
+}
+.formAdmissionTimepicker input {
+  min-width: 11rem;
+}
+.formAdmissionDatepicker input {
+  min-width: 24rem;
+}
+.dateTimeSection {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-02;
+  align-items: center;
+}
+
+.radioButtonGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: layout.$spacing-03;
+  min-height: layout.$spacing-10;
+  width: 100%;
+  @include type.type-style('body-compact-01');
+}
+
+.radioButton {
+  padding: layout.$spacing-02 layout.$spacing-05;
+  margin: layout.$spacing-03 0;
+}
+
+.visitTypeOverviewWrapper {
+  margin: layout.$spacing-05 0;
+  border: 0.0625rem solid colors.$gray-30;
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) > div:nth-child(2) {
+  position: relative;
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) span * {
+  display: none;
+}
+
+.compartmentListContainer {
+  max-height: 15rem;
+  overflow-y: auto;
+  margin-top: layout.$spacing-03;
+  padding-right: layout.$spacing-03;
+}
+
+.radioButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+  width: 100%;
+  padding-left: layout.$spacing-05;
+}
+
+.compartmentOption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 110%;
+  padding: layout.$spacing-03 0;
+  border-bottom: 1px solid colors.$gray-20;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.radioButtonWrapper {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  flex: 1;
+}
+
+.compartmentTags {
+  display: flex;
+  gap: layout.$spacing-03;
+  align-items: center;
+  margin-left: auto;
+}
+.radioButton {
+  margin: 0;
+  padding: 0;
+}
+.emptyStateTile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: layout.$spacing-06;
+  text-align: center;
+  margin: layout.$spacing-05 0;
+}
+
+.emptyStateContent {
+  @include type.type-style('body-01');
+  color: colors.$gray-70;
+  margin-top: layout.$spacing-05;
+  max-width: 20rem;
+}
+.sectionField {
+  padding-top: layout.$spacing-03;
+}
