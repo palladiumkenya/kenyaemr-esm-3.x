@@ -563,3 +563,57 @@ export interface OpenmrsEncounter extends OpenmrsResource {
     diagnosis: { coded: { display: string } };
   }>;
 }
+
+export enum PaymentStatus {
+  POSTED = 'POSTED',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
+  CREDITED = 'CREDITED',
+  CANCELLED = 'CANCELLED',
+  ADJUSTED = 'ADJUSTED',
+  EXEMPTED = 'EXEMPTED',
+}
+
+export interface PatientInvoice {
+  uuid: string;
+  display: string;
+  voided: boolean;
+  voidReason: string | null;
+  adjustedBy: any[];
+  billAdjusted: any;
+  cashPoint: CashPoint;
+  dateCreated: string;
+  lineItems: LineItem[];
+  patient: Patient;
+  payments: Payment[];
+  receiptNumber: string;
+  status: PaymentStatus;
+  adjustmentReason: any;
+  id: number;
+  resourceVersion: string;
+  totalPayments?: number;
+  totalDeposits?: number;
+  totalExempted?: number;
+  balance?: number;
+  closed?: boolean;
+}
+
+interface CashPoint extends BaseEntity {
+  location: Location;
+}
+
+export interface LineItem extends BaseEntity {}
+export interface Payment {
+  uuid: string;
+  instanceType: PaymentInstanceType;
+  attributes: Attribute[];
+  amount: number;
+  amountTendered: number;
+  dateCreated: number;
+  voided: boolean;
+  resourceVersion: string;
+}
+
+interface PaymentInstanceType extends BaseEntity {
+  name: string;
+}

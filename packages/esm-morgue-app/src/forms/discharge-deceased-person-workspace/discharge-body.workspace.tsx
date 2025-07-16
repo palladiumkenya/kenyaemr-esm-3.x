@@ -6,6 +6,7 @@ import {
   DatePickerInput,
   Form,
   InlineLoading,
+  InlineNotification,
   SelectItem,
   Stack,
   TextInput,
@@ -32,7 +33,7 @@ import { z } from 'zod';
 import styles from './discharge-body.scss';
 import DeceasedInfo from '../../deceased-patient-header/deceasedInfo/deceased-info.component';
 import { PatientInfo } from '../../types';
-import { usePersonAttributes } from './discharge-body.resource';
+import { useBills, useBlockDischargeWithPendingBills, usePersonAttributes } from './discharge-body.resource';
 import { ConfigObject } from '../../config-schema';
 import { getCurrentTime } from '../../utils/utils';
 import { dischargeSchema } from '../../schemas';
@@ -57,6 +58,9 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
   const { queueEntry } = useVisitQueueEntry(patientUuid, activeVisit?.uuid);
   const { dischargeBody, isLoadingEmrConfiguration } = useMortuaryOperation();
   const { createOrUpdatePersonAttribute, personAttributes } = usePersonAttributes(personUuid);
+  const { isDischargeBlocked, blockingMessage, isLoadingBills } = useBlockDischargeWithPendingBills({
+    patientUuid,
+  });
 
   const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
 
@@ -169,6 +173,15 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
       <div className={styles.formContainer}>
         <Stack gap={3}>
           <DeceasedInfo patientUuid={patientUuid} />
+          {isDischargeBlocked && (
+            <InlineNotification
+              kind="error"
+              title={t('dischargeBlocked', 'Discharge Blocked')}
+              subtitle={blockingMessage}
+              lowContrast={true}
+              className={styles.blockingNotification}
+            />
+          )}
           <ResponsiveWrapper>
             <div className={styles.dateTimePickerContainer}>
               <Column>
@@ -344,7 +357,11 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
         <Button className={styles.buttonContainer} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.buttonContainer} disabled={isSubmitting || !isDirty} kind="primary" type="submit">
+        <Button
+          className={styles.buttonContainer}
+          disabled={isSubmitting || !isDirty || isDischargeBlocked || isLoadingBills}
+          kind="primary"
+          type="submit">
           {isSubmitting ? (
             <span className={styles.inlineLoading}>
               {t('submitting', 'Submitting' + '...')}
