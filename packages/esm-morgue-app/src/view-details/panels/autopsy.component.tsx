@@ -57,7 +57,7 @@ const AutopsyView: React.FC = () => {
   const { pageSizes } = usePaginationInfo(pageSize, encounters?.length, currentPage, results?.length);
 
   const handleLaunchAutopsyForm = (encounterUUID = '') => {
-    launchWorkspace('patient-form-entry-workspace', {
+    launchWorkspace('mortuary-form-entry', {
       workspaceTitle: t('autopsyReport', 'Autopsy report'),
       mutateForm: () => mutate(),
       formInfo: {
