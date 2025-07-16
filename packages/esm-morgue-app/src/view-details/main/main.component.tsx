@@ -1,32 +1,33 @@
+import React from 'react';
+import { useParams } from 'react-router-dom';
 import { Layer, Tile } from '@carbon/react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import styles from './tabs.scss';
+import styles from './main.scss';
 import MortuarySummary from '../view-details.component';
+import Header from '../../header/header.component';
 
 const DeceasedDetailsView: React.FC = () => {
-  const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromStore();
+  const { patientUuid, bedNumber } = useParams<{ patientUuid: string; bedNumber?: string }>();
 
   return (
-    <div className={styles.deceasedDetailsContainer}>
-      <Layer className={styles.container}>
-        <Tile>
-          <div className={styles.headingContainer}>
-            <div className={styles.desktopHeading}>
-              <h4>{t('mortuaryView', 'Mortuary view')}</h4>
+    <>
+      <Header title="Mortuary chart" />
+      <div className={styles.deceasedDetailsContainer}>
+        <Layer className={styles.container}>
+          <Tile>
+            <div className={styles.headingContainer}>
+              <div className={styles.desktopHeading}>
+                <h4>Mortuary view</h4>
+              </div>
+              <div className={styles.actionBtn}>
+                <ExtensionSlot name="mortuary-action-buttons-slot" state={{ patientUuid }} />
+              </div>
             </div>
-            <div className={styles.actionBtn}>
-              <ExtensionSlot name="mortuary-action-buttons-slot" state={{ patientUuid }} />
-            </div>
-          </div>
-        </Tile>
-
-        <MortuarySummary />
-      </Layer>
-    </div>
+          </Tile>
+          <MortuarySummary bedNumber={bedNumber} />
+        </Layer>
+      </div>
+    </>
   );
 };
 

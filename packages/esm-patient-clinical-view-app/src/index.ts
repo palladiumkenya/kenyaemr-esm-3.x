@@ -132,7 +132,6 @@ export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
 export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
 // export const caseEncounterHeader = getSyncLifecycle(CaseEncounterHeader, options);
 export const caseEncounterTable = getSyncLifecycle(CaseEncounterOverviewComponent, options);
-
 // Dashboard links for Maternal and Child Health services
 export const antenatalCareLink = getSyncLifecycle(createDashboardLink(antenatalDashboardMeta), options);
 export const postnatalCareLink = getSyncLifecycle(createDashboardLink(postnatalDashboardMeta), options);

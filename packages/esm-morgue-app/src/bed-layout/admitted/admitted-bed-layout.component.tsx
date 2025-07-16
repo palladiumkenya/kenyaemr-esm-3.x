@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading } from '@carbon/react';
-import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-layout.scss';
 import BedCard from '../../bed/bed.component';
 import { type MortuaryLocationResponse } from '../../types';
@@ -141,6 +141,14 @@ const BedLayout: React.FC<BedLayoutProps> = ({
                         onDischarge={() => handleDischarge(patient.uuid, bedLayout.bedId)}
                         onSwapCompartment={() => handleSwapCompartment(patient.uuid, bedLayout.bedId)}
                         onDispose={() => handleDispose(patient.uuid, bedLayout.bedId)}
+                        onViewDetails={() => {
+                          const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
+                          const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patient.uuid}`;
+                          const to = hasBedInfo
+                            ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
+                            : `${base}/mortuary-chart`;
+                          navigate({ to });
+                        }}
                       />
                       {patientIndex < patients.length - 1 && <Divider />}
                     </React.Fragment>
@@ -160,12 +168,14 @@ const BedLayout: React.FC<BedLayoutProps> = ({
                   onDischarge={() => handleDischarge(patients[0].uuid, bedLayout.bedId)}
                   onSwapCompartment={() => handleSwapCompartment(patients[0].uuid, bedLayout.bedId)}
                   onDispose={() => handleDispose(patients[0].uuid, bedLayout.bedId)}
-                  onViewDetails={() =>
-                    launchWorkspace('patient-details', {
-                      patientUuid: patients[0].uuid,
-                      workspaceTitle: t('patientDetails', 'Patient Details'),
-                    })
-                  }
+                  onViewDetails={() => {
+                    const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
+                    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patients[0].uuid}`;
+                    const to = hasBedInfo
+                      ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
+                      : `${base}/mortuary-chart`;
+                    navigate({ to });
+                  }}
                 />
               )}
             </div>

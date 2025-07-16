@@ -47,6 +47,11 @@
       }
     },
     {
+      "name": "mortuary-summary-info",
+      "component": "mortuarySummary",
+      "slot": "mortuary-summary-info-slot"
+    },
+    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot",

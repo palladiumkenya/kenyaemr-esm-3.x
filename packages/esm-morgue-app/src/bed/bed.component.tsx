@@ -97,7 +97,7 @@ const BedCard: React.FC<BedProps> = ({
             <OverflowMenu flipped>
               {onAdmit && <OverflowMenuItem onClick={onAdmit} itemText={t('admit', 'Admit')} />}
               {onViewDetails && (
-                <OverflowMenuItem onClick={onViewDetails} itemText={t('viewDetails', 'View details')} />
+                <OverflowMenuItem onClick={() => onViewDetails()} itemText={t('viewDetails', 'View details')} />
               )}
               {onPostmortem && <OverflowMenuItem onClick={onPostmortem} itemText={t('postmortem', 'Postmortem')} />}
               {onDischarge && <OverflowMenuItem onClick={onDischarge} itemText={t('discharge', 'Discharge')} />}

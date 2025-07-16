@@ -4,19 +4,24 @@ import { useTranslation } from 'react-i18next';
 import { Tab, TabList, TabPanel, TabPanels, Tabs, InlineLoading } from '@carbon/react';
 import { ExtensionSlot, useConfig, useLayoutType } from '@openmrs/esm-framework';
 
-import styles from './mortuary-summary.scss';
+import styles from './views-details.scss';
 import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import { usePerson } from '../deceased-patient-header/deceasedInfo/deceased-info.resource';
 import BillingHistoryView from './panels/billing-history.component';
 import AutopsyView from './panels/autopsy.component';
 import AttachmentView from './panels/attachement.component';
 import { useActiveMorgueVisit } from './view-details.resource';
+import BannerInfo from '../extension/deceasedInfoBanner.component';
 
-const MortuarySummary: React.FC = () => {
+interface MortuarySummaryProps {
+  bedNumber?: string;
+}
+
+const MortuarySummary: React.FC<MortuarySummaryProps> = ({ bedNumber }) => {
   const { t } = useTranslation();
   const patientUuid = getPatientUuidFromStore();
   const { isLoading } = usePerson(patientUuid);
-  const { isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
+  const { activeVisit, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
 
   if (isLoading || isActiveLoading) {
     return (
@@ -26,8 +31,8 @@ const MortuarySummary: React.FC = () => {
 
   return (
     <div className={styles.summaryContainer}>
-      <p className={styles.morgueLabel}>{''}</p>
-      <ExtensionSlot name="deceased-banner-info-slot" state={{ patientUuid }} />
+      <p className={styles.morgueLabel}></p>
+      <BannerInfo patientUuid={patientUuid} visit={activeVisit} bedNumber={bedNumber} />
       <Tabs>
         <TabList aria-label="morgue summary tabs" className={styles.tablist}>
           <Tab className={styles.tab} id="billing-tab">

@@ -57,3 +57,5 @@ export const dischargeBodyForm = getAsyncLifecycle(
 );
 export const mortuaryFormEntry = getSyncLifecycle(FormEntryWorkspace, options);
 export const disposeDeceasedPersonForm = getSyncLifecycle(DisposeForm, options);
+export const mortuaryChartView = getAsyncLifecycle(() => import('./view-details/main/main.component'), options);
+export const mortuarySummary = getAsyncLifecycle(() => import('./summary/summary.component'), options);

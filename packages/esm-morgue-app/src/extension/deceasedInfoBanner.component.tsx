@@ -6,24 +6,21 @@ import React from 'react';
 import styles from './actionButton.scss';
 import { convertDateToDays, formatDateTime } from '../utils/utils';
 import { Console } from '@carbon/pictograms-react';
+import { type Visit } from '../types';
 
 interface BannerInfoProps {
   patientUuid: string;
+  visit: Visit;
+  bedNumber?: string;
 }
 
-const BannerInfo: React.FC<BannerInfoProps> = ({ patientUuid }) => {
+const BannerInfo: React.FC<BannerInfoProps> = ({ patientUuid, visit, bedNumber }) => {
   const { t } = useTranslation();
-  // const { admissionLocation, isLoading, error } = useAdmissionLocation();
   const { patient } = usePatient(patientUuid);
-  const { currentVisit } = useVisit(patientUuid);
-
-  // const bedNumber =
-  //   admissionLocation?.bedLayouts?.find((bed) => bed.patients.some((patient) => patient.uuid === patientUuid))
-  //     ?.bedNumber || t('discharged', 'Discharged');
 
   const timeAndDateOfDeath = patient?.deceasedDateTime;
 
-  const startDate = currentVisit?.startDatetime;
+  const startDate = visit?.startDatetime;
 
   const lengthOfStay = `${convertDateToDays(startDate)} ${
     convertDateToDays(startDate) === 1 ? t('day', 'Day') : t('days', 'Days')
@@ -46,7 +43,7 @@ const BannerInfo: React.FC<BannerInfoProps> = ({ patientUuid }) => {
         </div>
         <div className={styles.wrapMetrics}>
           <span className={styles.metricLabel}>{t('compartment', 'Compartment')}</span>
-          <span className={styles.metricValue}>{''}</span>
+          <span className={styles.metricValue}>{bedNumber}</span>
         </div>
       </div>
     </div>

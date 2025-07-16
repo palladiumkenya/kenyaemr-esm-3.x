@@ -15,7 +15,7 @@ import {
   Tag,
   DataTableSkeleton,
 } from '@carbon/react';
-import { launchWorkspace, useConfig, useVisit } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, useConfig, useVisit } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { convertDateToDays, formatDateTime } from '../../utils/utils';
 import { Patient, Person, type MortuaryLocationResponse } from '../../types';
@@ -359,7 +359,16 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
                               {!rowData.isEmpty && (
                                 <OverflowMenu flipped>
                                   <OverflowMenuItem
-                                    onClick={() => handlePostmortem(rowData.patientUuid)}
+                                    onClick={() => {
+                                      const hasBedInfo = rowData.bedNumber && rowData.bedId;
+                                      const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${
+                                        rowData.patientUuid
+                                      }`;
+                                      const to = hasBedInfo
+                                        ? `${base}/compartment/${rowData.bedNumber}/${rowData.bedId}/mortuary-chart`
+                                        : `${base}/mortuary-chart`;
+                                      navigate({ to });
+                                    }}
                                     itemText={t('viewDetails', 'View details')}
                                   />
                                   <OverflowMenuItem
