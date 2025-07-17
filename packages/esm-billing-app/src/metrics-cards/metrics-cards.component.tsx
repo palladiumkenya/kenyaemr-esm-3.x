@@ -14,10 +14,10 @@ export default function MetricsCards() {
 
   const cards = useMemo(
     () => [
-      { title: `Today's Total Bills`, count: totalBills },
-      { title: `Today's Paid Bills`, count: paidBills },
-      { title: `Today's Pending Bills`, count: pendingBills },
-      { title: `Today's Exempted Bills`, count: exemptedBills },
+      { title: t('todayTotalBills', "Today's Total Bills"), count: totalBills },
+      { title: t('todayPaidBills', "Today's Paid Bills"), count: paidBills },
+      { title: t('todayPendingBills', "Today's Pending Bills"), count: pendingBills },
+      { title: t('todayExemptedBills', "Today's Exempted Bills"), count: exemptedBills },
     ],
     [totalBills, paidBills, pendingBills, exemptedBills],
   );
@@ -25,7 +25,11 @@ export default function MetricsCards() {
   if (isLoading) {
     return (
       <section className={styles.container}>
-        <InlineLoading status="active" iconDescription="Loading" description="Loading bill metrics..." />
+        <InlineLoading
+          status="active"
+          iconDescription="Loading"
+          description={t('loadingBillMetrics', 'Loading bill metrics...')}
+        />
       </section>
     );
   }

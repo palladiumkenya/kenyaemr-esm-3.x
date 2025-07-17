@@ -1,0 +1,18 @@
+{
+  "clearSearch": "የፍለጋ ግብዓትን አጽዳ",
+  "crossBorder": "ድንበር ተሻጋሪ",
+  "crossBorderEncounters": "ድንበር ተሻጋሪ ግኝቶች",
+  "encounters": "ግኝቶች",
+  "endDate": "የማብቂያ ቀን",
+  "mpiSearch": "MPI ፍለጋ",
+  "noEncountersFound": "ድንበር ተሻጋሪ ግኝቶች",
+  "noEncountersFoundTitle": "ምንም ግኝቶች አልተገኙም",
+  "referral": "ሪፈራል",
+  "screening": "ምርመራ",
+  "searchLabel": "ፍለጋ",
+  "searchPlaceholder": "የታካሚውን ስም ወይም መታወቂያ በመጠቀም ይፈልጉ",
+  "startDate": "የመጀመሪያ ቀን",
+  "summaryOfCrossBorderEncounters": "የድንበር ተሻጋሪ ግኝቶች ማጠቃለያ",
+  "totalCrossBorderReferral": "አጠቃላይ ድንበር ተሻጋሪ ሪፈራል",
+  "totalCrossBorderScreening": "አጠቃላይ ድንበር ተሻጋሪ ምርመራ"
+}

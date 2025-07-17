@@ -29,7 +29,7 @@ const BillingTabs = () => {
       <Tabs selectedIndex={activeTabIndex} onChange={handleTabChange}>
         <div style={{ display: 'flex' }}>
           <TabList style={{ paddingLeft: '1rem' }} aria-label="Billing tabs" contained>
-            <Tab>{"Today's bills"}</Tab>
+            <Tab>{t('todayBills', "Today's bills")}</Tab>
             <Tab>{t('patientBills', 'Patient Bill')}</Tab>
           </TabList>
           {isLoading ? (

@@ -104,7 +104,7 @@ const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
 
   return (
     <div>
-      <CardHeader title="Payment Modes">
+      <CardHeader title={t('paymentModes', 'Payment Modes')}>
         <Button
           onClick={() =>
             launchWorkspace('payment-mode-workspace', { workspaceTitle: t('addPaymentMode', 'Add Payment Mode') })
