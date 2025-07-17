@@ -18,7 +18,7 @@ const HomeViewComponent: React.FC = () => {
     admissionLocation,
     isLoading: isLoadingAdmission,
     error: admissionError,
-    mutate,
+    mutate: mutateAdmissionLocation,
   } = useMortuaryAdmissionLocation(selectedLocation);
 
   const {
@@ -33,6 +33,11 @@ const HomeViewComponent: React.FC = () => {
     mutateAwaitingQueuePatients,
     mutateAll,
   } = useAwaitingQueuePatients(admissionLocation);
+
+  const mutateAllData = React.useCallback(() => {
+    mutateAdmissionLocation();
+    mutateAll();
+  }, [mutateAdmissionLocation, mutateAll]);
 
   const locationItems = React.useMemo(() => {
     return locations.map((location) => ({
@@ -76,7 +81,7 @@ const HomeViewComponent: React.FC = () => {
         locationError={locationError}
         admissionError={admissionError}
         onLocationChange={handleLocationChange}
-        mutate={mutate}
+        mutate={mutateAllData}
         dischargedPatients={dischargedPatients}
         isLoadingDischarge={isLoadingDischarge}
       />

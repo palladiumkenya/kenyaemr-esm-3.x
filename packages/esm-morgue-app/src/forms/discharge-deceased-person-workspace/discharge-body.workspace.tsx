@@ -171,17 +171,25 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formContainer}>
+        {isLoadingBills && (
+          <InlineLoading
+            status="active"
+            iconDescription="Loading"
+            description={t('loadingBills', 'Loading bills...')}
+          />
+        )}
+
+        {isDischargeBlocked && (
+          <InlineNotification
+            kind="warning"
+            title={t('warningMsg', 'Warning')}
+            subtitle={blockingMessage}
+            lowContrast={true}
+            className={styles.blockingNotification}
+          />
+        )}
         <Stack gap={3}>
           <DeceasedInfo patientUuid={patientUuid} />
-          {isDischargeBlocked && (
-            <InlineNotification
-              kind="error"
-              title={t('dischargeBlocked', 'Discharge Blocked')}
-              subtitle={blockingMessage}
-              lowContrast={true}
-              className={styles.blockingNotification}
-            />
-          )}
           <ResponsiveWrapper>
             <div className={styles.dateTimePickerContainer}>
               <Column>

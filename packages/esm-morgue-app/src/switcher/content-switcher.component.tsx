@@ -153,7 +153,6 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     },
     [
       selectedView,
-      t,
       awaitingQueueDeceasedPatients,
       isLoading,
       admissionLocation,
