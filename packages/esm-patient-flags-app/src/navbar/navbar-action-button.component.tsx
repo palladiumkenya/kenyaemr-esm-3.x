@@ -4,7 +4,7 @@ import styles from './navbar-action-button.scss';
 import { useDebounce, useOnClickOutside } from '@openmrs/esm-framework';
 import NavBarOverlay from './navbar-overlay.component';
 import { Switcher, Close } from '@carbon/react/icons';
-import { useModuleLinks } from './nav-utils';
+import { useModuleLinks } from './nav-utils.component';
 import { useTranslation } from 'react-i18next';
 
 type NavbarActionButtonProps = {};

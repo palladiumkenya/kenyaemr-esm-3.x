@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { parseParams } from './utils';
 import { CarbonIconType } from '@carbon/react/icons';
 import styles from './nav.scss';
+import { useTranslation } from 'react-i18next';
 export interface LinkConfig {
   route: string;
   title: string;
@@ -12,6 +13,7 @@ export interface LinkConfig {
 }
 
 export const LinkExtension: React.FC<LinkConfig> = ({ route, title, otherRoutes = [], icon }) => {
+  const { t } = useTranslation();
   const spaBasePath = window.getOpenmrsSpaBase();
   const location = useLocation();
   const path = useMemo(() => location.pathname.replace(spaBasePath, ''), [spaBasePath, location]);
@@ -42,7 +44,7 @@ export const LinkExtension: React.FC<LinkConfig> = ({ route, title, otherRoutes 
         styles.itemTitle
       }`}>
       {icon && React.createElement(icon)}
-      {title}
+      {t(title)}
     </ConfigurableLink>
   );
 };
