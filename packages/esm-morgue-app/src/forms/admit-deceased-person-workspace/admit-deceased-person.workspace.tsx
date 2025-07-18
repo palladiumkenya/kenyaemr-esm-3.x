@@ -229,7 +229,6 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
           <DeceasedPatientHeader patientData={patientData} />
           <ResponsiveWrapper>
             <FormGroup legendText="">
-              <Column></Column>
               <Column>
                 <Controller
                   name="dateOfAdmission"
@@ -335,33 +334,35 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
                           control={control}
                           name="availableCompartment"
                           render={({ field }) => (
-                            <RadioButtonGroup
-                              className={styles.radioButtonGroup}
-                              orientation="vertical"
-                              name="availableCompartment"
-                              valueSelected={field.value}
-                              onChange={field.onChange}>
-                              {filteredBeds.map((bed, index) => (
-                                <div key={index} className={styles.compartmentOption}>
+                            <div className={styles.radioButtonGroup}>
+                              {filteredBeds.map((bed) => (
+                                <div key={bed.bedId} className={styles.compartmentOption}>
                                   <div className={styles.radioButtonWrapper}>
                                     <RadioButton
                                       className={styles.radioButton}
-                                      id={`compartment-${index}`}
+                                      id={`compartment-${bed.bedId}`}
                                       labelText={bed.bedNumber}
                                       value={bed.bedId}
+                                      name="availableCompartment"
+                                      checked={field.value === bed.bedId}
+                                      onChange={(value, name, event) => {
+                                        field.onChange(bed.bedId);
+                                      }}
                                     />
                                   </div>
                                   <div className={styles.compartmentTags}>
-                                    <Tag type={bed.bedType?.display === 'VIP' ? 'green' : 'blue'} size="sm">
-                                      {bed.bedType?.displayName || ''}
-                                    </Tag>
+                                    {bed.bedType && (
+                                      <Tag type={bed.bedType?.display === 'VIP' ? 'green' : 'blue'} size="sm">
+                                        {bed.bedType?.displayName || ''}
+                                      </Tag>
+                                    )}
                                     <Tag type={bed.status === 'AVAILABLE' ? 'green' : 'red'} size="sm">
                                       {bed?.status || ''}
                                     </Tag>
                                   </div>
                                 </div>
                               ))}
-                            </RadioButtonGroup>
+                            </div>
                           )}
                         />
                       </>

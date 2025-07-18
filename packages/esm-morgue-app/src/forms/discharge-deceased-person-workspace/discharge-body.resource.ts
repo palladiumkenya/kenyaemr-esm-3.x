@@ -45,16 +45,24 @@ export const usePersonAttributes = (personUuid: string) => {
   ) => {
     const { attributeType, value } = payload;
 
-    const existingAttribute = person.attributes.find((attr) => attr.uuid === attributeType);
+    const existingAttribute = person.attributes.find((attr) => attr.attributeType?.uuid === attributeType);
 
-    if (existingAttribute) {
-      return updatePersonAttributes(
-        { attributeType: existingAttribute.uuid, value },
-        personUuid,
-        existingAttribute.uuid,
-      );
-    } else {
-      return createPersonAttribute({ attributeType, value }, personUuid);
+    try {
+      if (existingAttribute) {
+        return await updatePersonAttributes({ attributeType, value }, personUuid, existingAttribute.uuid);
+      } else {
+        return await createPersonAttribute({ attributeType, value }, personUuid);
+      }
+    } catch (error) {
+      console.error('Error creating/updating person attribute:', error);
+
+      if (error?.responseBody?.error?.message?.includes('already in use')) {
+        throw new Error(
+          `The identifier "${value}" is already in use by another patient. Please use a different identifier.`,
+        );
+      }
+
+      throw error;
     }
   };
 
@@ -117,6 +125,7 @@ export const useBills = (
 
 interface UseBlockDischargeWithPendingBillsProps {
   patientUuid: string;
+  actionType: 'discharge' | 'dispose';
 }
 
 interface UseBlockDischargeWithPendingBillsReturn {
@@ -130,6 +139,7 @@ interface UseBlockDischargeWithPendingBillsReturn {
 
 export const useBlockDischargeWithPendingBills = ({
   patientUuid,
+  actionType,
 }: UseBlockDischargeWithPendingBillsProps): UseBlockDischargeWithPendingBillsReturn => {
   const { bills, isLoading, isValidating, error } = useBills(patientUuid, '');
 
@@ -160,9 +170,28 @@ export const useBlockDischargeWithPendingBills = ({
     const pendingBills =
       bills?.filter((bill) => {
         const isPending = bill.status === PaymentStatus.PENDING;
-        const hasBalance = bill.balance && bill.balance > 0;
         const isNotVoided = !bill.voided;
-        const isNotClosed = !bill.closed;
+
+        let hasBalance = false;
+        if (bill.balance !== undefined) {
+          hasBalance = bill.balance > 0;
+        } else {
+          const totalAmount =
+            bill.lineItems?.reduce((sum, item) => {
+              return sum + (item as any).price * (item as any).quantity;
+            }, 0) || 0;
+
+          const totalPayments =
+            bill.totalPayments || bill.payments?.reduce((sum, payment) => sum + (payment.amount || 0), 0) || 0;
+
+          const totalExempted = bill.totalExempted || 0;
+          const totalDeposits = bill.totalDeposits || 0;
+
+          const outstandingBalance = totalAmount - totalPayments - totalExempted - totalDeposits;
+          hasBalance = outstandingBalance > 0;
+        }
+
+        const isNotClosed = bill.closed !== undefined ? !bill.closed : true;
 
         return isPending && hasBalance && isNotVoided && isNotClosed;
       }) || [];
@@ -170,13 +199,31 @@ export const useBlockDischargeWithPendingBills = ({
     const pendingBillsCount = pendingBills.length;
     const isDischargeBlocked = pendingBillsCount > 0;
 
-    const blockingMessage = isDischargeBlocked
-      ? `Sorry, ${pendingBillsCount} pending bill(s) with outstanding balance of Ksh.${pendingBills.reduce(
-          (acc, curr) => acc + curr.balance,
-          0,
-        )} must be settled before discharging a deceased patient.`
-      : '';
+    const totalOutstandingBalance = pendingBills.reduce((acc, bill) => {
+      if (bill.balance !== undefined) {
+        return acc + bill.balance;
+      } else {
+        const totalAmount =
+          bill.lineItems?.reduce((sum, item) => {
+            return sum + (item as any).price * (item as any).quantity;
+          }, 0) || 0;
 
+        const totalPayments =
+          bill.totalPayments || bill.payments?.reduce((sum, payment) => sum + (payment.amount || 0), 0) || 0;
+
+        const totalExempted = bill.totalExempted || 0;
+        const totalDeposits = bill.totalDeposits || 0;
+
+        const outstandingBalance = totalAmount - totalPayments - totalExempted - totalDeposits;
+        return acc + Math.max(0, outstandingBalance);
+      }
+    }, 0);
+
+    const blockingMessage = isDischargeBlocked
+      ? `The deceased patient cannot be ${actionType}d due to ${pendingBillsCount} unpaid ${
+          pendingBillsCount === 1 ? 'bill' : 'bills'
+        } (Total balance: Ksh.${totalOutstandingBalance.toLocaleString()}). Please visit the cashier to settle all outstanding bills before ${actionType}.`
+      : '';
     return {
       isDischargeBlocked,
       pendingBills,
@@ -185,7 +232,7 @@ export const useBlockDischargeWithPendingBills = ({
       billsError: error,
       blockingMessage,
     };
-  }, [bills, isLoading, isValidating, error]);
+  }, [bills, isLoading, isValidating, error, actionType]);
 
   return result;
 };
