@@ -358,10 +358,7 @@ export interface PatientInfo {
     };
   };
   uuid: string;
-  attributes: {
-    uuid: string;
-    display: string;
-  }[];
+  attributes: Attribute[];
 }
 
 export interface UseVisitQueueEntries {

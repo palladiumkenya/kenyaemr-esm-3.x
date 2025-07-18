@@ -102,13 +102,14 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     }
   };
 
-  const handleDischarge = (patientUuid: string, bedId: number) => {
+  const handleDischarge = (patientUuid: string, personUuid: string, bedId: number) => {
     if (onDischarge) {
       onDischarge(patientUuid);
     } else {
       launchWorkspace('discharge-body-form', {
         workspaceTitle: t('dischargeForm', 'Discharge form'),
         patientUuid: patientUuid,
+        personUuid,
         bedId,
         mutate,
       });
@@ -129,13 +130,14 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     }
   };
 
-  const handleDispose = (patientUuid: string, bedId: number) => {
+  const handleDispose = (patientUuid: string, personUuid: string, bedId: number) => {
     if (onDispose) {
       onDispose(patientUuid);
     } else {
       launchWorkspace('dispose-deceased-person-form', {
         workspaceTitle: t('disposeForm', 'Dispose form'),
         patientUuid: patientUuid,
+        personUuid: personUuid,
         bedId,
         mutate,
       });
@@ -254,6 +256,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
             patientUuid,
             bedUuid,
             bedId,
+            personUuid: patient.person?.uuid || '',
           });
         }
       }
@@ -380,11 +383,15 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
                                     itemText={t('compartmentSwap', 'Compartment swap')}
                                   />
                                   <OverflowMenuItem
-                                    onClick={() => handleDispose(rowData.patientUuid, rowData.bedId)}
+                                    onClick={() =>
+                                      handleDispose(rowData.patientUuid, rowData.personUuid, rowData.bedId)
+                                    }
                                     itemText={t('disposeForm', 'Dispose')}
                                   />
                                   <OverflowMenuItem
-                                    onClick={() => handleDischarge(rowData.patientUuid, rowData.bedId)}
+                                    onClick={() =>
+                                      handleDischarge(rowData.patientUuid, rowData.personUuid, rowData.bedId)
+                                    }
                                     itemText={t('dischargeForm', 'Discharge')}
                                   />
                                 </OverflowMenu>

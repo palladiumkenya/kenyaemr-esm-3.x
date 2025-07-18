@@ -52,13 +52,14 @@ const BedLayout: React.FC<BedLayoutProps> = ({
     }
   };
 
-  const handleDischarge = (patientUuid: string, bedId: number) => {
+  const handleDischarge = (patientUuid: string, personUuid: string, bedId: number) => {
     if (onDischarge) {
       onDischarge(patientUuid);
     } else {
       launchWorkspace('discharge-body-form', {
         workspaceTitle: t('dischargeForm', 'Discharge form'),
         patientUuid: patientUuid,
+        personUuid,
         bedId,
         mutate,
       });
@@ -79,13 +80,14 @@ const BedLayout: React.FC<BedLayoutProps> = ({
     }
   };
 
-  const handleDispose = (patientUuid: string, bedId: number) => {
+  const handleDispose = (patientUuid: string, personUuid: string, bedId: number) => {
     if (onDispose) {
       onDispose(patientUuid);
     } else {
       launchWorkspace('dispose-deceased-person-form', {
         workspaceTitle: t('disposeForm', 'Dispose form'),
         patientUuid: patientUuid,
+        personUuid,
         bedId,
         mutate,
       });
@@ -138,9 +140,9 @@ const BedLayout: React.FC<BedLayoutProps> = ({
                         bedNumber={bedLayout.bedNumber}
                         bedType={bedLayout.bedType?.displayName}
                         onPostmortem={() => handlePostmortem(patient.uuid)}
-                        onDischarge={() => handleDischarge(patient.uuid, bedLayout.bedId)}
+                        onDischarge={() => handleDischarge(patient.uuid, patient.person?.uuid, bedLayout.bedId)}
                         onSwapCompartment={() => handleSwapCompartment(patient.uuid, bedLayout.bedId)}
-                        onDispose={() => handleDispose(patient.uuid, bedLayout.bedId)}
+                        onDispose={() => handleDispose(patient.uuid, patient.person?.uuid, bedLayout.bedId)}
                         onViewDetails={() => {
                           const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
                           const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patient.uuid}`;
@@ -165,9 +167,9 @@ const BedLayout: React.FC<BedLayoutProps> = ({
                   bedNumber={bedLayout.bedNumber}
                   bedType={bedLayout.bedType?.displayName}
                   onPostmortem={() => handlePostmortem(patients[0].uuid)}
-                  onDischarge={() => handleDischarge(patients[0].uuid, bedLayout.bedId)}
+                  onDischarge={() => handleDischarge(patients[0].uuid, patients[0].person?.uuid, bedLayout.bedId)}
                   onSwapCompartment={() => handleSwapCompartment(patients[0].uuid, bedLayout.bedId)}
-                  onDispose={() => handleDispose(patients[0].uuid, bedLayout.bedId)}
+                  onDispose={() => handleDispose(patients[0].uuid, patients[0].person?.uuid, bedLayout.bedId)}
                   onViewDetails={() => {
                     const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
                     const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patients[0].uuid}`;
