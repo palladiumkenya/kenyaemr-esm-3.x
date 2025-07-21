@@ -44,14 +44,13 @@ import { useMortuaryOperation } from '../admit-deceased-person-workspace/admit-d
 interface DischargeFormProps {
   closeWorkspace: () => void;
   patientUuid: string;
-  personUuid: string;
   bedId: number;
   mutate: () => void;
 }
 
 type DischargeFormValues = z.infer<typeof dischargeSchema>;
 
-const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUuid, bedId, personUuid, mutate }) => {
+const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUuid, bedId, mutate }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -65,7 +64,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
     createOrUpdatePersonAttribute,
     personAttributes,
     isLoading: isLoadingAttributes,
-  } = usePersonAttributes(personUuid);
+  } = usePersonAttributes(patientUuid);
 
   const { isDischargeBlocked, blockingMessage, isLoadingBills } = useBlockDischargeWithPendingBills({
     patientUuid,
@@ -197,7 +196,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
             attributeData.uuid = attr.existingUuid;
           }
 
-          await createOrUpdatePersonAttribute(personUuid, attributeData, patientInfo);
+          await createOrUpdatePersonAttribute(patientUuid, attributeData, patientInfo);
         } catch (error) {
           showSnackbar({
             title: t('errorUpdatingAttribute', 'Error Updating Attribute'),
