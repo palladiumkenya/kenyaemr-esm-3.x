@@ -17,7 +17,7 @@ import {
   OverflowMenuItem,
   DataTableSkeleton,
 } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { showModal, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
 import { type MortuaryLocationResponse } from '../../types';
@@ -88,6 +88,37 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
   const handlePrintGatePass = (patientUuid: string) => {
     if (onPrintGatePass) {
       onPrintGatePass(patientUuid);
+    } else {
+      // Find the specific patient data
+      const patientData = dischargedPatients.find((patient) => patient?.uuid === patientUuid);
+
+      if (patientData) {
+        // Create the deceased person details object
+        const deceasedPersonDetails = {
+          uuid: patientData.uuid,
+          person: {
+            display: patientData.person?.display || '',
+            age: patientData.person?.age || 0,
+            gender: patientData.person?.gender || '',
+            birthdate: patientData.person?.birthdate || '',
+            deathDate: patientData.person?.deathDate || '',
+            causeOfDeath: patientData.person?.causeOfDeath || null,
+          },
+          identifiers: patientData.identifiers || [],
+          admissionDate: patientData.uuid || '', // You might need to get this from encounter data
+          // Optional fields - you can populate these from your data source or leave as defaults
+          paperNumber: '',
+          paymentMethod: '',
+          accountOfficer: '',
+          nurseInCharge: '',
+          securityGuard: '',
+        };
+
+        const dispose = showModal('print-confirmation-modal', {
+          onClose: () => dispose(),
+          deceasedPersonDetails: deceasedPersonDetails,
+        });
+      }
     }
   };
 

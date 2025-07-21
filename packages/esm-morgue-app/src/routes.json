@@ -90,6 +90,12 @@
       "type": "other-form"
     }
   ],
+    "modals": [
+    {
+      "name": "print-confirmation-modal",
+      "component": "printConfirmationModal"
+    }
+  ],
   "pages": [
     {
       "component": "root",
