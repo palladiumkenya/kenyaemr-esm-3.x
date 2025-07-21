@@ -87,14 +87,15 @@ export const billingSummaryDashboardLink = getSyncLifecycle(
 );
 
 // Navigation Links
+// t('overview', 'Overview')
 export const billingOverviewLink = getSyncLifecycle(
   createLeftPanelLink({
     name: '',
-    title: 'Overview',
+    title: 'overview',
   }),
   options,
 );
-
+// t('Exemptions', 'Exemptions')
 export const billableExemptionsLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'billable-exemptions',
@@ -102,7 +103,7 @@ export const billableExemptionsLink = getSyncLifecycle(
   }),
   options,
 );
-
+// t('Payment History', 'Payment History')
 export const paymentHistoryLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'payment-history',
@@ -110,7 +111,7 @@ export const paymentHistoryLink = getSyncLifecycle(
   }),
   options,
 );
-
+// t('Payment Points', 'Payment Points')
 export const paymentPointsLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'payment-points',
@@ -118,7 +119,7 @@ export const paymentPointsLink = getSyncLifecycle(
   }),
   options,
 );
-
+// t('Payment Modes', 'Payment Modes')
 export const paymentModesLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'payment-modes',
@@ -126,7 +127,7 @@ export const paymentModesLink = getSyncLifecycle(
   }),
   options,
 );
-
+// t('Bill Manager', 'Bill Manager')
 export const billManagerLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'bill-manager',
@@ -134,7 +135,7 @@ export const billManagerLink = getSyncLifecycle(
   }),
   options,
 );
-
+// t('Charge Items', 'Charge Items')
 export const chargeableItemsLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'charge-items',
@@ -142,7 +143,7 @@ export const chargeableItemsLink = getSyncLifecycle(
   }),
   options,
 );
-
+// t('Claims Overview', 'Claims Overview')
 export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'claims-overview',
@@ -150,7 +151,7 @@ export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
   }),
   options,
 );
-
+// t('Pre-Auth Requests', 'Pre-Auth Requests')
 export const preAuthRequestsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'preauth-requests',
@@ -159,7 +160,7 @@ export const preAuthRequestsDashboardLink = getSyncLifecycle(
   options,
 );
 
-// Bill Deposit Links
+// t('Bill Deposit', 'Bill Deposit')
 export const billDepositDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'bill-deposit',
@@ -167,6 +168,7 @@ export const billDepositDashboardLink = getSyncLifecycle(
   }),
   options,
 );
+// t('Insurance benefits', 'Insurance benefits')
 export const benefitsPackageDashboardLink = getSyncLifecycle(
   createDashboardLink({
     ...benefitsPackageDashboardMeta,

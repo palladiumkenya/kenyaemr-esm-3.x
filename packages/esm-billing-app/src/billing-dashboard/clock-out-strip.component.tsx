@@ -41,10 +41,10 @@ export const ClockOutStrip = () => {
       </div>
       <div>
         <Button kind="ghost" renderIcon={Shuffle} onClick={openClockInModal}>
-          Switch Payment Point
+          {t('switchPaymentPoint', 'Switch Payment Point')}
         </Button>
         <Button className={styles.clockIn} onClick={openClockOutModal} kind="danger" renderIcon={IbmCloudSysdigSecure}>
-          Clock Out
+          {t('clockOut', 'Clock Out')}
         </Button>
       </div>
     </div>

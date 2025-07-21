@@ -9,7 +9,7 @@ import {
   TcpIpService,
   UserMultiple,
 } from '@carbon/react/icons';
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
 import HomeRoot from './app-navigation/root-overrides.component';
 import { createDashboardGroup, createLeftPanelLink } from './app-navigation/nav-utils';
 import { configSchema } from './config-schema';
@@ -34,7 +34,7 @@ export const diagnosticsDashboardNavGroup = getSyncLifecycle(
   }),
   options,
 );
-// clinical-appointments-dashboard-link
+// t('Patient services', 'Patient services')
 export const patientServicesDashboardNavGroup = getSyncLifecycle(
   createDashboardGroup({
     slotName: 'patient-services-group-nav-slot',
@@ -44,6 +44,7 @@ export const patientServicesDashboardNavGroup = getSyncLifecycle(
   }),
   options,
 );
+// t('Linkage services', 'Linkage services')
 export const linkageServicesDashboardNavGroup = getSyncLifecycle(
   createDashboardGroup({
     slotName: 'linkage-services-group-nav-slot',
@@ -53,16 +54,18 @@ export const linkageServicesDashboardNavGroup = getSyncLifecycle(
   }),
   options,
 );
+// t('Billing module', 'Billing module')
 export const billingDashboardNavGroup = getSyncLifecycle(
   createDashboardGroup({
     slotName: 'billing-dashboard-group-nav-slot',
-    title: 'Billing Module',
+    title: 'Billing module',
     icon: Money,
     isExpanded: false,
   }),
   options,
 );
 
+// t('Claims management', 'Claims management')
 export const claimsManagementSideNavGroup = getSyncLifecycle(
   createDashboardGroup({
     title: 'Claims Management',
@@ -73,6 +76,7 @@ export const claimsManagementSideNavGroup = getSyncLifecycle(
   options,
 );
 
+// t('clinicalConsultation', 'Clinical consultation')
 export const patientChartClinicalConsultationNavGroup = getSyncLifecycle(
   createDashboardGroup({
     title: 'Clinical Consultation',
@@ -82,6 +86,7 @@ export const patientChartClinicalConsultationNavGroup = getSyncLifecycle(
   options,
 );
 
+// t('Home', 'Home')
 export const homeDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home', title: 'Home', icon: Home }),
   options,
@@ -91,14 +96,17 @@ export const inpatientDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/bed-admission', title: 'In Patient View', icon: HospitalBed }),
   options, // uses slot bed-admission-dashboard-slot
 );
+// t('Referrals', 'Referrals')
 export const referralsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/referrals', title: 'Referrals', icon: TcpIpService }),
   options,
 );
+// t('Wards', 'Wards')
 export const wardsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/ward', title: 'Wards', icon: HospitalBed }),
   options,
 );
+// t('Mortuary', 'Mortuary')
 export const mortuaryDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/morgue', title: 'Mortuary', icon: Hotel }),
   options,
