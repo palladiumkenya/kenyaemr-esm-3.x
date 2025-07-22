@@ -45,13 +45,12 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
   const { sessionLocation } = useSession();
 
   const handlePrint = useReactToPrint({
-    content: () => printRef.current,
+    contentRef: printRef,
     documentTitle: 'Mortuary Gate Pass',
     onAfterPrint: () => {
       setPrintError(null);
     },
     onPrintError: (_, error) => {
-      console.error('Print error:', error);
       setPrintError(error?.message || 'An error occurred while printing');
     },
     pageStyle: `
@@ -89,17 +88,17 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
     const openMRSId = deceasedPersonDetails.identifiers?.find(
       (id) => id.identifierType?.display?.includes('OpenMRS ID') || id.display?.includes('OpenMRS ID'),
     );
-    return openMRSId?.identifier || '...........................';
+    return openMRSId?.identifier;
   };
 
   const formatDateTime = (dateString: string) => {
     if (!dateString) {
-      return '...........................';
+      return;
     }
     try {
       return formatDate(parseDate(dateString), { mode: 'standard', time: false });
     } catch {
-      return '...........................';
+      return;
     }
   };
 
@@ -134,9 +133,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                 <div className={styles.topInfoRow}>
                   <div className={styles.infoItem}>
                     <span className={styles.label}>PAPER NO:</span>
-                    <span className={styles.value}>
-                      {deceasedPersonDetails.paperNumber || '...........................'}
-                    </span>
+                    <span className={styles.value}>{deceasedPersonDetails.paperNumber}</span>
                   </div>
                   <div className={styles.infoItem}>
                     <span className={styles.label}>PATIENT NO:</span>
@@ -158,9 +155,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                   </div>
                   <div className={styles.ageField}>
                     <span className={styles.label}>AGE:</span>
-                    <span className={styles.value}>
-                      {deceasedPersonDetails.person.age || '...........................'}
-                    </span>
+                    <span className={styles.value}>{deceasedPersonDetails.person.age}</span>
                   </div>
                 </div>
                 <div className={styles.secondInfoRow}>
@@ -208,15 +203,12 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                 </div>
               </div>
 
-              {/* Signatures Section */}
               <div className={styles.signaturesSection}>
                 <div className={styles.signatureBlock}>
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
                       <span className={styles.label}>Account Officer:</span>
-                      <span className={styles.nameValue}>
-                        {deceasedPersonDetails.accountOfficer || '...........................'}
-                      </span>
+                      <span className={styles.nameValue}>{deceasedPersonDetails.accountOfficer}</span>
                     </div>
                     <div className={styles.signField}>
                       <span className={styles.label}>Sign:</span>
@@ -233,9 +225,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
                       <span className={styles.label}>Nurse Officer Incharge:</span>
-                      <span className={styles.nameValue}>
-                        {deceasedPersonDetails.nurseInCharge || '...........................'}
-                      </span>
+                      <span className={styles.nameValue}>{deceasedPersonDetails.nurseInCharge}</span>
                     </div>
                     <div className={styles.signField}>
                       <span className={styles.label}>Sign:</span>
@@ -252,9 +242,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
                       <span className={styles.label}>S. Guard Name:</span>
-                      <span className={styles.nameValue}>
-                        {deceasedPersonDetails.securityGuard || '...........................'}
-                      </span>
+                      <span className={styles.nameValue}>{deceasedPersonDetails.securityGuard}</span>
                     </div>
                     <div className={styles.signField}>
                       <span className={styles.label}>Sign:</span>
@@ -268,7 +256,6 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                 </div>
               </div>
 
-              {/* Footer Note */}
               <div className={styles.footerNote}>
                 <div className={styles.noteText}>
                   <strong>N/B:</strong> This form should be filled in duplicate, one copy to be retained in the ward and
