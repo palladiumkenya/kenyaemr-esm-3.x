@@ -155,7 +155,6 @@ const Invoice: React.FC = () => {
           'Facility license number is required to process claims. Please update facility license number details.',
         ),
       });
-      return;
     }
 
     if (activeVisit) {
