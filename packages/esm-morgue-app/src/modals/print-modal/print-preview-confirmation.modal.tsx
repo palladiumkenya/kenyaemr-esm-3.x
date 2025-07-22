@@ -32,29 +32,6 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
         size: A4;
         margin: 15mm;
       }
-      @media print {
-        body {
-          -webkit-print-color-adjust: exact !important;
-          color-adjust: exact !important;
-          font-family: Arial, sans-serif !important;
-          font-size: 11px !important;
-          line-height: 1.3 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-        * {
-          -webkit-print-color-adjust: exact !important;
-          color-adjust: exact !important;
-          color: #000000 !important;
-        }
-        .${styles.printableContent} {
-          page-break-inside: avoid !important;
-          border: none !important;
-          padding: 0 !important;
-          margin: 0 !important;
-          box-shadow: none !important;
-        }
-      }
     `,
   });
 
@@ -98,7 +75,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
                 <div className={styles.topInfoRow}>
                   <div className={styles.infoItem}>
                     <span className={styles.label}>PAPER NO:</span>
-                    <span className={styles.value}>{''}</span>
+                    <span className={styles.value}>{getPatientNumber()}</span>
                   </div>
                   <div className={styles.infoItem}>
                     <span className={styles.label}>PATIENT NO:</span>

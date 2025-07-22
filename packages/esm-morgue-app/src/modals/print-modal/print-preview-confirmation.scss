@@ -5,12 +5,12 @@
 .container {
   padding: layout.$spacing-06;
   margin-bottom: layout.$spacing-05;
-  background-color: white;
+  background-color: colors.$white;
 
   @media print {
     padding: 0;
     margin: 0;
-    background-color: white;
+    background-color: colors.$white;
   }
 }
 
@@ -21,21 +21,20 @@
 }
 
 .printableContent {
-  background-color: white;
+  background-color: colors.$white;
   width: 210mm;
   min-height: 297mm;
   margin: 0 auto;
-  padding: 15mm;
+  padding: layout.$spacing-07;
   box-sizing: border-box;
-  font-family: Arial, sans-serif;
   font-size: 11px;
   line-height: 1.3;
-  color: black;
+  color: colors.$black;
 
   @media print {
     width: 100%;
     height: 100%;
-    padding: 15mm;
+    padding: layout.$spacing-07;
     margin: 0;
     box-shadow: none;
     border: none;
@@ -46,12 +45,12 @@
 
 .printableHeader {
   text-align: center;
-  margin-bottom: 20px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid black;
+  margin-bottom: layout.$spacing-05;
+  padding-bottom: layout.$spacing-03;
+  border-bottom: 1px solid colors.$black;
 
   @media print {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid colors.$black;
   }
 }
 
@@ -63,64 +62,64 @@
 
 .facilityName {
   font-weight: 700;
-  color: black;
+  color: colors.$black;
   text-transform: uppercase;
   letter-spacing: 2px;
-  margin-bottom: 8px;
+  margin-bottom: layout.$spacing-03;
   font-size: 14px;
 
   @media print {
-    color: black;
+    color: colors.$black;
   }
 }
 
 .heading {
   font-weight: 600;
-  color: black;
+  color: colors.$black;
   text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 12px;
 
   @media print {
-    color: black;
+    color: colors.$black;
   }
 }
 
 .printableBody {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: layout.$spacing-05;
 }
 
 .gatePassForm {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: layout.$spacing-05;
 }
 
 .topInfoRow {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  padding: 8px;
-  border: 1px solid black;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
   border-radius: 2px;
 
   @media print {
-    border: 1px solid black;
+    border: 1px solid colors.$black;
   }
 }
 
 .secondInfoRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 8px;
-  border: 1px solid black;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
   border-radius: 2px;
 
   @media print {
-    border: 1px solid black;
+    border: 1px solid colors.$black;
   }
 }
 
@@ -129,123 +128,123 @@
 .ageField {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: layout.$spacing-02;
 }
 
 .paymentSection {
-  padding: 10px;
-  border: 1px solid black;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
   border-radius: 2px;
-  margin: 10px 0;
+  margin: layout.$spacing-03 0;
 
   @media print {
-    border: 1px solid black;
+    border: 1px solid colors.$black;
   }
 }
 
 .sectionTitle {
   font-weight: 600;
-  color: black;
-  margin-bottom: 10px;
+  color: colors.$black;
+  margin-bottom: layout.$spacing-03;
   font-size: 11px;
 
   @media print {
-    color: black;
+    color: colors.$black;
   }
 }
 
 .paymentGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: layout.$spacing-03;
 }
 
 .paymentOption {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: layout.$spacing-02;
 }
 
 .checkbox {
   width: 12px;
   height: 12px;
-  border: 1px solid black;
-  background-color: white;
+  border: 1px solid colors.$black;
+  background-color: colors.$white;
   flex-shrink: 0;
 }
 
 .optionLabel {
-  color: black;
+  color: colors.$black;
   font-size: 10px;
 }
 
 .signaturesSection {
-  margin-top: 15px;
-  padding-top: 10px;
-  border-top: 1px solid black;
+  margin-top: layout.$spacing-05;
+  padding-top: layout.$spacing-03;
+  border-top: 1px solid colors.$black;
 }
 
 .signatureBlock {
-  margin-bottom: 10px;
+  margin-bottom: layout.$spacing-03;
 }
 
 .signatureRow {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 12px;
+  gap: layout.$spacing-03;
   align-items: center;
-  padding: 6px;
+  padding: layout.$spacing-02;
 }
 
 .nameField,
 .signField {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: layout.$spacing-02;
 }
 
 .signatureLine {
-  border-bottom: 1px solid black;
-  height: 18px;
+  border-bottom: 1px solid colors.$black;
+  height: layout.$spacing-04;
   width: 100%;
 }
 
 .nameValue {
-  color: black;
-  border-bottom: 1px solid black;
-  padding: 2px;
-  min-height: 18px;
+  color: colors.$black;
+  border-bottom: 1px solid colors.$black;
+  padding: layout.$spacing-01;
+  min-height: layout.$spacing-04;
   display: flex;
   align-items: center;
   font-size: 10px;
 }
 
 .footerNote {
-  margin-top: 15px;
-  padding: 8px;
-  border: 1px solid black;
+  margin-top: layout.$spacing-05;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
   border-radius: 2px;
 }
 
 .noteText {
-  color: black;
+  color: colors.$black;
   line-height: 1.4;
   font-size: 10px;
 }
 
 .label {
   font-weight: 600;
-  color: black;
+  color: colors.$black;
   font-size: 10px;
   white-space: nowrap;
 }
 
 .value,
 .valueWide {
-  color: black;
-  border-bottom: 1px solid black;
-  padding: 2px;
-  min-height: 18px;
+  color: colors.$black;
+  border-bottom: 1px solid colors.$black;
+  padding: layout.$spacing-01;
+  min-height: layout.$spacing-04;
   display: flex;
   align-items: center;
   font-size: 10px;
@@ -271,6 +270,6 @@
     width: 100%;
     height: 100%;
     margin: 0;
-    padding: 15mm;
+    padding: layout.$spacing-07;
   }
 }

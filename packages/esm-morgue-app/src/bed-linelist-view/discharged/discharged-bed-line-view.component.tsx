@@ -54,6 +54,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
 
   const {
     dischargedPatientUuids,
+    encounters,
     isLoading: encountersLoading,
     error: encountersError,
   } = useMortuaryDischargeEncounter(morgueDischargeEncounterTypeUuid, AdmittedDeceasedPatient);
