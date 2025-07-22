@@ -25,7 +25,7 @@ import {
   useLayoutType,
   useVisit,
 } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate as mutateSWR } from 'swr';
@@ -47,37 +47,56 @@ import { useMortuaryOperation } from '../admit-deceased-person-workspace/admit-d
 interface DisposeFormProps {
   closeWorkspace: () => void;
   patientUuid: string;
-  personUuid: string;
   bedId: number;
   mutate: () => void;
 }
 
 type DisposeFormValues = z.infer<typeof disposeSchema>;
 
-const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, bedId, personUuid, mutate }) => {
+const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, bedId, mutate }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+
   const { activeVisit, currentVisitIsRetrospective } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, activeVisit?.uuid);
+
   const { disposeBody, isLoadingEmrConfiguration } = useMortuaryOperation();
-  const { createOrUpdatePersonAttribute, personAttributes } = usePersonAttributes(personUuid);
-  const { mutateAll, mutateAwaitingQueuePatients } = useAwaitingQueuePatients();
+
+  const {
+    createOrUpdatePersonAttribute,
+    personAttributes,
+    isLoading: isLoadingAttributes,
+  } = usePersonAttributes(patientUuid);
+
   const { isDischargeBlocked, blockingMessage, isLoadingBills } = useBlockDischargeWithPendingBills({
     patientUuid,
+    actionType: 'dispose',
   });
-  const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
 
   const { nextOfKinNameUuid, nextOfKinRelationshipUuid, nextOfKinPhoneUuid, nextOfKinAddressUuid } =
     useConfig<ConfigObject>();
 
+  const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
+
   const getAttributeValue = useCallback(
     (attributeTypeUuid: string) => {
-      if (!personAttributes) {
+      if (!personAttributes || !Array.isArray(personAttributes)) {
         return '';
       }
-      const attributes = Array.isArray(personAttributes) ? personAttributes : [];
-      const attribute = attributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
+      const attribute = personAttributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
       return attribute ? attribute.value : '';
+    },
+    [personAttributes],
+  );
+
+  const getExistingAttributeUuid = useCallback(
+    (attributeTypeUuid: string) => {
+      if (!personAttributes || !Array.isArray(personAttributes)) {
+        return null;
+      }
+      const attribute = personAttributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
+      return attribute ? attribute.uuid : null;
     },
     [personAttributes],
   );
@@ -87,6 +106,7 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
     setValue,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
+    watch,
   } = useForm<DisposeFormValues>({
     resolver: zodResolver(disposeSchema),
     defaultValues: {
@@ -104,22 +124,32 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
 
   useEffect(() => {
     if (Array.isArray(personAttributes) && personAttributes.length > 0) {
-      setValue('nextOfKinNames', getAttributeValue(nextOfKinNameUuid));
-      setValue('relationshipType', getAttributeValue(nextOfKinRelationshipUuid));
-      setValue('nextOfKinContact', getAttributeValue(nextOfKinPhoneUuid));
-      setValue('nextOfKinAddress', getAttributeValue(nextOfKinAddressUuid));
+      const initialValues = {
+        nextOfKinNames: getAttributeValue(nextOfKinNameUuid),
+        relationshipType: getAttributeValue(nextOfKinRelationshipUuid),
+        nextOfKinContact: getAttributeValue(nextOfKinPhoneUuid),
+        nextOfKinAddress: getAttributeValue(nextOfKinAddressUuid),
+      };
+
+      Object.entries(initialValues).forEach(([field, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          setValue(field as keyof DisposeFormValues, value);
+        }
+      });
     }
   }, [
     personAttributes,
+    setValue,
     getAttributeValue,
     nextOfKinNameUuid,
     nextOfKinRelationshipUuid,
     nextOfKinPhoneUuid,
     nextOfKinAddressUuid,
-    setValue,
   ]);
 
   const onSubmit = async (data: DisposeFormValues) => {
+    setSubmissionError(null);
+
     if (currentVisitIsRetrospective) {
       setCurrentVisit(null, null);
       closeWorkspace();
@@ -127,35 +157,63 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
     }
 
     try {
-      const nextOfKinAttributes = [
-        { attributeType: nextOfKinNameUuid, value: data.nextOfKinNames },
-        { attributeType: nextOfKinRelationshipUuid, value: data.relationshipType },
-        { attributeType: nextOfKinPhoneUuid, value: data.nextOfKinContact },
-        { attributeType: nextOfKinAddressUuid, value: data.nextOfKinAddress },
-      ];
+      await disposeBody(activeVisit, queueEntry, bedId, data);
+
+      const attributeUpdates = [
+        {
+          uuid: nextOfKinNameUuid,
+          value: data.nextOfKinNames,
+          existingUuid: getExistingAttributeUuid(nextOfKinNameUuid),
+        },
+        {
+          uuid: nextOfKinRelationshipUuid,
+          value: data.relationshipType,
+          existingUuid: getExistingAttributeUuid(nextOfKinRelationshipUuid),
+        },
+        {
+          uuid: nextOfKinPhoneUuid,
+          value: data.nextOfKinContact,
+          existingUuid: getExistingAttributeUuid(nextOfKinPhoneUuid),
+        },
+        {
+          uuid: nextOfKinAddressUuid,
+          value: data.nextOfKinAddress,
+          existingUuid: getExistingAttributeUuid(nextOfKinAddressUuid),
+        },
+      ].filter((attr) => attr.value !== undefined && attr.value !== null && attr.value !== '');
 
       const patientInfo: PatientInfo = {
         uuid: activeVisit.patient.uuid,
-        attributes: (activeVisit?.patient?.person?.attributes || []).map((attr) => ({
-          uuid: attr.uuid,
-          display: attr.display || '',
-        })),
+        attributes: personAttributes || [],
       };
 
-      for (const attribute of nextOfKinAttributes) {
+      for (const attr of attributeUpdates) {
         try {
-          await createOrUpdatePersonAttribute(patientUuid, attribute, patientInfo);
-        } catch (attributeError) {
+          const attributeData: any = {
+            attributeType: attr.uuid,
+            value: attr.value,
+          };
+
+          if (attr.existingUuid) {
+            attributeData.uuid = attr.existingUuid;
+          }
+
+          await createOrUpdatePersonAttribute(patientUuid, attributeData, patientInfo);
+        } catch (error) {
           showSnackbar({
-            title: t('errorDisposingPatient', 'Error disposing patient'),
-            subtitle: attributeError?.message || t('unknownError', 'Unknown error occurred'),
+            title: t('errorUpdatingAttribute', 'Error Updating Attribute'),
+            subtitle: t('errorUpdatingAttributeDescription', 'An error occurred while updating the attribute'),
             kind: 'error',
             isLowContrast: true,
           });
         }
       }
 
-      await disposeBody(activeVisit, queueEntry, bedId, data);
+      await Promise.all([
+        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/visit`)),
+        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/patient`)),
+        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${fhirBaseUrl}/Encounter`)),
+      ]);
 
       showSnackbar({
         title: t('disposedDeceasedPatient', 'Deceased patient disposed'),
@@ -164,41 +222,66 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
         isLowContrast: true,
       });
 
-      mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/visit`));
-      mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/patient`));
-      mutateSWR((key) => typeof key === 'string' && key.startsWith(`${fhirBaseUrl}/Encounter`));
-      mutateAwaitingQueuePatients();
-      mutateAll();
       mutate();
       closeWorkspace();
     } catch (error) {
+      let errorMessage = t('disposeUnknownError', 'An unknown error occurred');
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.responseBody?.error?.message) {
+        errorMessage = error.responseBody.error.message.replace(/\[|\]/g, '');
+      } else if (error?.responseBody?.error?.globalErrors) {
+        errorMessage = error.responseBody.error.globalErrors[0]?.message || errorMessage;
+      }
+
+      setSubmissionError(errorMessage);
       showSnackbar({
-        title: t('errorDisposingPatient', 'Error disposing patient'),
-        subtitle: error?.message || t('unknownError', 'Unknown error occurred'),
+        title: t('disposedError', 'Dispose Error'),
+        subtitle: errorMessage,
         kind: 'error',
         isLowContrast: true,
       });
     }
   };
 
-  if (isLoadingEmrConfiguration || !personAttributes || !activeVisit) {
-    return <InlineLoading status="active" iconDescription="Loading" description="Loading ..." />;
+  if (isLoadingEmrConfiguration || isLoadingAttributes || !activeVisit) {
+    return <InlineLoading status="active" iconDescription="Loading" description={t('loading', 'Loading...')} />;
   }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formContainer}>
+        {isLoadingBills && (
+          <InlineLoading
+            status="active"
+            iconDescription="Loading"
+            description={t('loadingBills', 'Loading bills...')}
+          />
+        )}
+
+        {isDischargeBlocked && (
+          <InlineNotification
+            kind="warning"
+            title={t('warningMsg', 'Warning')}
+            subtitle={blockingMessage}
+            lowContrast={true}
+            className={styles.blockingNotification}
+          />
+        )}
+
+        {submissionError && (
+          <InlineNotification
+            kind="error"
+            title={t('error', 'Error')}
+            subtitle={submissionError}
+            lowContrast={true}
+            className={styles.errorNotification}
+          />
+        )}
+
         <Stack gap={3}>
           <DeceasedInfo patientUuid={patientUuid} />
-          {isDischargeBlocked && (
-            <InlineNotification
-              kind="error"
-              title={t('disposeBlocked', 'Dispose Blocked')}
-              subtitle={blockingMessage}
-              lowContrast={true}
-              className={styles.blockingNotification}
-            />
-          )}
+
           <ResponsiveWrapper>
             <div className={styles.dateTimePickerContainer}>
               <Column>
@@ -377,6 +460,7 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
               />
             </Column>
           </ResponsiveWrapper>
+
           <ResponsiveWrapper>
             <Column>
               <ExtensionSlot
@@ -390,6 +474,7 @@ const DisposeForm: React.FC<DisposeFormProps> = ({ closeWorkspace, patientUuid, 
           </ResponsiveWrapper>
         </Stack>
       </div>
+
       <ButtonSet
         className={classNames({
           [styles.tablet]: isTablet,

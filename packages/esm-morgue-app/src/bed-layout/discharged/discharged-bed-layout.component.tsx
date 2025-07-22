@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from '@carbon/react';
+import { DataTableSkeleton, InlineLoading, Pagination } from '@carbon/react';
 import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-layout.scss';
 import { type MortuaryLocationResponse } from '../../types';
@@ -31,6 +31,11 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
     dischargedPatientUuids,
     isLoading: encountersLoading,
     error: encountersError,
+    currentPage,
+    totalCount,
+    currPageSize,
+    setCurrPageSize,
+    goTo,
   } = useMortuaryDischargeEncounter(morgueDischargeEncounterTypeUuid, AdmittedDeceasedPatient);
 
   const {
@@ -51,6 +56,13 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
     }
   };
 
+  const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newPageSize = parseInt(event.target.value, 10);
+    setCurrPageSize(newPageSize);
+    // Reset to first page when changing page size
+    goTo(1);
+  };
+
   if (isLoading || encountersLoading || patientsLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -69,8 +81,8 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
 
   if (!dischargedPatients || dischargedPatients.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <p>{t('noDischargedPatients', 'No discharged patients found')}</p>
+      <div className={styles.loadingContainer}>
+        <DataTableSkeleton columnCount={5} rowCount={5} zebra />
       </div>
     );
   }
@@ -101,6 +113,23 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
             />
           );
         })}
+      </div>
+
+      <div className={styles.paginationFooter}>
+        <Pagination
+          page={currentPage || 1}
+          totalItems={totalCount || 0}
+          pageSize={currPageSize}
+          pageSizes={[10, 20, 50, 100]}
+          onChange={({ page, pageSize }: { page: number; pageSize: number }) => {
+            if (pageSize !== currPageSize) {
+              setCurrPageSize(pageSize);
+              goTo(1);
+            } else {
+              goTo(page);
+            }
+          }}
+        />
       </div>
     </div>
   );

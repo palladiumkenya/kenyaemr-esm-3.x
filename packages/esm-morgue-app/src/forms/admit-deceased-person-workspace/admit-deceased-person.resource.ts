@@ -26,6 +26,7 @@ import { z } from 'zod';
 import dayjs from 'dayjs';
 import { customRepProps } from '../../constants';
 import { BillingConfig, ConfigObject } from '../../config-schema';
+import { parseDischargeDateTime } from '../../utils/utils';
 
 export const useVisitType = () => {
   const customRepresentation = 'custom:(uuid,display,name)';
@@ -132,6 +133,56 @@ export const useMortuaryOperation = (location?: string) => {
     morgueAdmissionEncounterTypeUuid,
   } = useConfig<ConfigObject>();
 
+  const createDisposalMortuaryEncounter = useCallback(
+    async (visit: Visit, data: z.infer<typeof disposeSchema>, encounterDateTime: Date) => {
+      const obs = [];
+
+      if (data.courtOrderCaseNumber && data.courtOrderCaseNumber.trim() !== '' && courtOrderCaseNumberUuid) {
+        obs.push({
+          concept: courtOrderCaseNumberUuid,
+          value: data.courtOrderCaseNumber.trim(),
+        });
+      }
+
+      if (data.serialNumber && data.serialNumber.trim() !== '' && serialNumberUuid) {
+        obs.push({
+          concept: serialNumberUuid,
+          value: data.serialNumber.trim(),
+        });
+      }
+
+      const encounterPayload = {
+        encounterDatetime: encounterDateTime.toISOString(),
+        patient: visit?.patient?.uuid,
+        encounterType: morgueDischargeEncounterTypeUuid,
+        location: visit?.location?.uuid,
+        encounterProviders: [
+          {
+            provider: currentProvider?.uuid,
+            encounterRole: emrConfiguration?.clinicianEncounterRole?.uuid,
+          },
+        ],
+        visit: visit?.uuid,
+        ...(obs.length > 0 && { obs }),
+      };
+
+      return openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: encounterPayload,
+      });
+    },
+    [
+      currentProvider?.uuid,
+      emrConfiguration?.clinicianEncounterRole?.uuid,
+      courtOrderCaseNumberUuid,
+      serialNumberUuid,
+      morgueDischargeEncounterTypeUuid,
+    ],
+  );
+
   const createMortuaryAdmissionEncounter = useCallback(
     async (
       patientUuid: string,
@@ -150,20 +201,21 @@ export const useMortuaryOperation = (location?: string) => {
       }: z.infer<typeof deceasedPatientAdmitSchema>,
     ) => {
       const obs = [];
-      if (tagNumber) {
-        obs.push({ concept: tagNumberUuid, value: tagNumber });
+
+      if (tagNumber && tagNumber.trim() !== '' && tagNumberUuid) {
+        obs.push({ concept: tagNumberUuid, value: tagNumber.trim() });
       }
-      if (obNumber) {
-        obs.push({ concept: obNumberUuid, value: obNumber });
+      if (obNumber && obNumber.trim() !== '' && obNumberUuid) {
+        obs.push({ concept: obNumberUuid, value: obNumber.trim() });
       }
-      if (policeName) {
-        obs.push({ concept: policeNameUuid, value: policeName });
+      if (policeName && policeName.trim() !== '' && policeNameUuid) {
+        obs.push({ concept: policeNameUuid, value: policeName.trim() });
       }
-      if (policeIDNo) {
-        obs.push({ concept: policeIDNumber, value: policeIDNo });
+      if (policeIDNo && policeIDNo.trim() !== '' && policeIDNumber) {
+        obs.push({ concept: policeIDNumber, value: policeIDNo.trim() });
       }
-      if (dischargeArea) {
-        obs.push({ concept: dischargeAreaUuid, value: dischargeArea });
+      if (dischargeArea && dischargeArea.trim() !== '' && dischargeAreaUuid) {
+        obs.push({ concept: dischargeAreaUuid, value: dischargeArea.trim() });
       }
 
       const visitAttributes = [];
@@ -206,30 +258,19 @@ export const useMortuaryOperation = (location?: string) => {
       policeNameUuid,
       tagNumberUuid,
       morgueAdmissionEncounterTypeUuid,
-      nextOfKinNameUuid,
-      courtOrderCaseNumberUuid,
-      serialNumberUuid,
-      morgueDischargeEncounterTypeUuid,
-      visitPaymentMethodAttributeUuid,
-      burialPermitNumberUuid,
     ],
   );
 
-  const createDisposalMortuaryEncounter = useCallback(
-    async (visit: Visit, data: z.infer<typeof disposeSchema>) => {
+  const createDischargeMortuaryEncounter = useCallback(
+    async (visit: Visit, data: z.infer<typeof dischargeSchema>, encounterDateTime: Date) => {
       const obs = [];
-      if (data.nextOfKinNames) {
-        obs.push({ concept: nextOfKinNameUuid, value: data.nextOfKinNames });
-      }
-      if (data.courtOrderCaseNumber) {
-        obs.push({ concept: courtOrderCaseNumberUuid, value: data.courtOrderCaseNumber });
-      }
-      if (data.serialNumber) {
-        obs.push({ concept: serialNumberUuid, value: data.serialNumber });
+
+      if (data.burialPermitNumber && data.burialPermitNumber.trim() !== '' && burialPermitNumberUuid) {
+        obs.push({ concept: burialPermitNumberUuid, value: data.burialPermitNumber.trim() });
       }
 
       const encounterPayload = {
-        encounterDatetime: data?.dateOfDischarge,
+        encounterDatetime: encounterDateTime.toISOString(),
         patient: visit?.patient?.uuid,
         encounterType: morgueDischargeEncounterTypeUuid,
         location: visit?.location?.uuid,
@@ -240,8 +281,9 @@ export const useMortuaryOperation = (location?: string) => {
           },
         ],
         visit: visit?.uuid,
-        obs: obs.length > 0 ? obs : undefined,
+        ...(obs.length > 0 && { obs }),
       };
+
       return openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
         method: 'POST',
         headers: {
@@ -250,9 +292,13 @@ export const useMortuaryOperation = (location?: string) => {
         body: encounterPayload,
       });
     },
-    [burialPermitNumberUuid, currentProvider?.uuid, emrConfiguration?.clinicianEncounterRole?.uuid],
+    [
+      burialPermitNumberUuid,
+      currentProvider?.uuid,
+      emrConfiguration?.clinicianEncounterRole?.uuid,
+      morgueDischargeEncounterTypeUuid,
+    ],
   );
-
   const assignDeceasedToCompartment = useCallback(
     async (patientUuid: string, bedId: number, encounterUuid: string) =>
       openmrsFetch(`${restBaseUrl}/beds/${bedId}`, {
@@ -284,38 +330,6 @@ export const useMortuaryOperation = (location?: string) => {
     [assignDeceasedToCompartment, createMortuaryAdmissionEncounter],
   );
 
-  const createDischargeMortuaryEncounter = useCallback(
-    async (visit: Visit, data: z.infer<typeof dischargeSchema>) => {
-      const obs = [];
-      if (data.burialPermitNumber) {
-        obs.push({ concept: burialPermitNumberUuid, value: data.burialPermitNumber });
-      }
-
-      const encounterPayload = {
-        encounterDatetime: data?.dateOfDischarge,
-        patient: visit?.patient?.uuid,
-        encounterType: morgueDischargeEncounterTypeUuid,
-        location: visit?.location,
-        encounterProviders: [
-          {
-            provider: currentProvider?.uuid,
-            encounterRole: emrConfiguration?.clinicianEncounterRole?.uuid,
-          },
-        ],
-        visit: visit?.uuid,
-        obs: obs.length > 0 ? obs : undefined,
-      };
-      return openmrsFetch<Encounter>(`${restBaseUrl}/encounter`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-        },
-        body: encounterPayload,
-      });
-    },
-    [burialPermitNumberUuid, currentProvider?.uuid, emrConfiguration?.clinicianEncounterRole?.uuid],
-  );
-
   const removeDeceasedFromCompartment = useCallback(
     async (patientUuid: string, bedId: number) =>
       openmrsFetch(`${restBaseUrl}/beds/${bedId}?patientUuid=${patientUuid}`, {
@@ -325,12 +339,13 @@ export const useMortuaryOperation = (location?: string) => {
   );
 
   const endCurrentVisit = useCallback(
-    async (currentVisit: Visit, queueEntry: MappedVisitQueueEntry, data: z.infer<typeof dischargeSchema>) => {
+    async (currentVisit: Visit, queueEntry: MappedVisitQueueEntry, stopDateTime: Date) => {
       const abortController = new AbortController();
+
       const response = await updateVisit(
         currentVisit.uuid,
         {
-          stopDatetime: new Date(),
+          stopDatetime: stopDateTime,
         },
         abortController,
       );
@@ -349,22 +364,49 @@ export const useMortuaryOperation = (location?: string) => {
 
   const dischargeBody = useCallback(
     async (visit: Visit, queueEntry: MappedVisitQueueEntry, bedId: number, data: z.infer<typeof dischargeSchema>) => {
-      const dischargeEncounter = await createDischargeMortuaryEncounter(visit, data);
-      const compartment = await removeDeceasedFromCompartment(visit?.patient?.uuid, bedId);
-      await endCurrentVisit(visit, queueEntry, data);
-      return { dischargeEncounter, compartment };
-    },
-    [createDischargeMortuaryEncounter, endCurrentVisit, removeDeceasedFromCompartment],
-  );
+      try {
+        const dischargeDateTime = parseDischargeDateTime({
+          ...data,
+          dateOfDischarge: data.dateOfDischarge ?? new Date(),
+        });
 
+        const dischargeEncounter = await createDischargeMortuaryEncounter(visit, data, dischargeDateTime);
+
+        const compartment = await removeDeceasedFromCompartment(visit?.patient?.uuid, bedId);
+
+        const visitStopTime = new Date(dischargeDateTime.getTime() + 60000); // 1 minute after discharge
+
+        await endCurrentVisit(visit, queueEntry, visitStopTime);
+
+        return { dischargeEncounter, compartment };
+      } catch (error) {
+        throw error;
+      }
+    },
+    [createDischargeMortuaryEncounter, endCurrentVisit, removeDeceasedFromCompartment, parseDischargeDateTime],
+  );
   const disposeBody = useCallback(
     async (visit: Visit, queueEntry: MappedVisitQueueEntry, bedId: number, data: z.infer<typeof disposeSchema>) => {
-      const disposeEncounter = await createDischargeMortuaryEncounter(visit, data);
-      const compartment = await removeDeceasedFromCompartment(visit?.patient?.uuid, bedId);
-      await endCurrentVisit(visit, queueEntry, data);
-      return { disposeEncounter, compartment };
+      try {
+        const disposalDateTime = parseDischargeDateTime({
+          ...data,
+          dateOfDischarge: data.dateOfDischarge ?? new Date(),
+        });
+
+        const disposeEncounter = await createDisposalMortuaryEncounter(visit, data, disposalDateTime);
+
+        const compartment = await removeDeceasedFromCompartment(visit?.patient?.uuid, bedId);
+
+        const visitStopTime = new Date(disposalDateTime.getTime() + 60000);
+
+        await endCurrentVisit(visit, queueEntry, visitStopTime);
+
+        return { disposeEncounter, compartment };
+      } catch (error) {
+        throw error;
+      }
     },
-    [createDisposalMortuaryEncounter, endCurrentVisit, removeDeceasedFromCompartment],
+    [createDisposalMortuaryEncounter, endCurrentVisit, removeDeceasedFromCompartment, parseDischargeDateTime],
   );
 
   const createEncounterForCompartmentSwap = useCallback(
