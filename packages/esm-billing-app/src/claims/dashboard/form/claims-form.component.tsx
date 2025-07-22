@@ -14,7 +14,7 @@ import {
   ComboBox,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { formatDatetime, navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -22,7 +22,6 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import SHABenefitPackangesAndInterventions from '../../../benefits-package/forms/packages-and-interventions-form.component';
 import { BillingConfig } from '../../../config-schema';
-import { formatDate } from '../../../helpers/functions';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
 import useProvider from '../../../hooks/useProvider';
@@ -155,8 +154,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         diagnoses: diagnoses?.map((d) => d.id) ?? [],
         visitType: recentVisit?.visitType?.display || '',
         facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
-        treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
-        treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
+        treatmentStart: formatDatetime(new Date(recentVisit?.startDatetime || '')),
+        treatmentEnd: formatDatetime(new Date(recentVisit?.stopDatetime || '')),
         packages: packagesAndinterventions?.packages ?? [],
         interventions: packagesAndinterventions?.interventions ?? [],
         provider: providerUuid,
