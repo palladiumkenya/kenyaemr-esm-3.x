@@ -14,7 +14,7 @@ import {
   ComboBox,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { formatDatetime, navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +32,7 @@ import useProviderList from '../../../hooks/useProviderList';
 
 import styles from './claims-form.scss';
 import debounce from 'lodash-es/debounce';
+import { convertFormattedDateToISO, formatDateTime } from '../../utils';
 
 type ClaimsFormProps = {
   bill: MappedBill;
@@ -154,8 +155,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         diagnoses: diagnoses?.map((d) => d.id) ?? [],
         visitType: recentVisit?.visitType?.display || '',
         facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
-        treatmentStart: formatDatetime(new Date(recentVisit?.startDatetime || '')),
-        treatmentEnd: formatDatetime(new Date(recentVisit?.stopDatetime || '')),
+        treatmentStart: formatDateTime(recentVisit?.startDatetime || ''),
+        treatmentEnd: formatDateTime(recentVisit?.stopDatetime || ''),
         packages: packagesAndinterventions?.packages ?? [],
         interventions: packagesAndinterventions?.interventions ?? [],
         provider: providerUuid,
@@ -209,8 +210,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       providedItems,
       claimExplanation: data.claimExplanation,
       claimJustification: data.claimJustification,
-      startDate: data.treatmentStart,
-      endDate: data.treatmentEnd,
+      startDate: convertFormattedDateToISO(data.treatmentStart),
+      endDate: convertFormattedDateToISO(data.treatmentEnd),
       location: mflCodeValue,
       diagnoses: data.diagnoses,
       paidInFacility: true,
