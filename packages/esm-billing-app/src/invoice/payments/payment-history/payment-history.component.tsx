@@ -3,24 +3,26 @@ import { DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCel
 import { MappedBill } from '../../../types';
 import { formatDate } from '@openmrs/esm-framework';
 import { convertToCurrency } from '../../../helpers';
+import { useTranslation } from 'react-i18next';
 
 type PaymentHistoryProps = {
   bill: MappedBill;
 };
 
 const PaymentHistory: React.FC<PaymentHistoryProps> = ({ bill }) => {
+  const { t } = useTranslation();
   const headers = [
     {
       key: 'dateCreated',
-      header: 'Date of payment',
+      header: t('dateOfPayment', 'Date of payment'),
     },
     {
       key: 'amountTendered',
-      header: 'Amount tendered',
+      header: t('amountTendered', 'Amount tendered'),
     },
     {
       key: 'paymentMethod',
-      header: 'Payment method',
+      header: t('paymentMethod', 'Payment method'),
     },
   ];
   const rows = bill?.payments?.map((payment) => ({

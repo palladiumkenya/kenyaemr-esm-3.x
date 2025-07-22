@@ -1,0 +1,23 @@
+{
+  "administration": "አስተዳደር",
+  "adrAssessment": "የኤዲአር ግምገማ",
+  "bedManagement": "የአልጋ አስተዳደር",
+  "billing": "ክፍያ",
+  "clearCache": "መሸጎጫ አጽዳ",
+  "clearSearch": "ፍለጋ አጽዳ",
+  "crossBorder": "ድንበር ተሻጋሪ",
+  "dispensingApp": "የመድኃኒት ማከፋፈያ መተግበሪያ",
+  "emptyLinkSearchText": "የፍለጋ መስፈርቶቹን የሚያሟሉ ምንም አገናኞች የሉም",
+  "errorPatientFlags": "የታካሚ ባንዲራዎችን በመጫን ላይ ስህተት",
+  "facilityDashboard": "የተቋም ዳሽቦርድ",
+  "formBuilder": "የቅጽ ገንቢ",
+  "kenyaemrHome": "ኬንያEMR መነሻ",
+  "kenyaEMRHome": "ኬንያEMR መነሻ",
+  "kenyaEMRModules": "ኬንያEMR ሞጁሎች",
+  "labManifestApp": "የላብራቶሪ ማኒፌስት መተግበሪያ",
+  "manageStocks": "አክሲዮኖችን አስተዳድር",
+  "reports": "ሪፖርቶች",
+  "search": "ሞጁል ፈልግ",
+  "suppliesDispensing": "አቅርቦቶች ማከፋፈል",
+  "systemInfo": "የስርዓት መረጃ"
+}
