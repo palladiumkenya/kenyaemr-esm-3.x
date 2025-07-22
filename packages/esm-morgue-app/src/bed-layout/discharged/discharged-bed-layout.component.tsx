@@ -31,7 +31,6 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
     dischargedPatientUuids,
     isLoading: encountersLoading,
     error: encountersError,
-    itemsDisplayed,
     currentPage,
     totalCount,
     currPageSize,

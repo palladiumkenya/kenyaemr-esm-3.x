@@ -33,8 +33,6 @@ export const useMortuaryDischargeEncounter = (
     currentItems,
   );
 
-  const pageSizeOptions = [10, 20, 50, 100];
-
   const dischargedPatientUuids = useMemo(() => {
     if (!data) {
       return [];
@@ -79,7 +77,6 @@ export const useMortuaryDischargeEncounter = (
     paginated,
     currentPage,
     pageSizes: calculatedPageSizes,
-    pageSizeOptions,
     itemsDisplayed,
     goTo,
     currPageSize,
