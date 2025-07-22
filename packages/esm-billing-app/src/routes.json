@@ -279,6 +279,12 @@
       "component": "depositTransactionWorkspace",
       "title": "Deposit Transaction",
       "type": "other-form"
+    },
+    {
+      "name": "payment-workspace",
+      "component": "paymentWorkspace",
+      "title": "Payment Workspace",
+      "type": "other-form"
     }
   ],
   "modals": [

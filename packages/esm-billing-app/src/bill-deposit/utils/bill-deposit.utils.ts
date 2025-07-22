@@ -1,6 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type BillDeposit, type CreateDepositPayload } from '../types/bill-deposit.types';
 import { MAX_REFERENCE_NUMBER_COUNTER } from '../constants/bill-deposit.constants';
+import { formatCurrencySimple } from '../../helpers/currency';
 
 /**
  * Generates a unique reference number for bill deposits
@@ -55,13 +56,10 @@ export const deleteDeposit = async (uuid: string) => {
 };
 
 /**
- * Formats a deposit amount with currency symbol
+ * Formats a deposit amount with currency symbol based on locale
  */
 export const formatDepositAmount = (amount: number): string => {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'KES',
-  }).format(amount);
+  return formatCurrencySimple(amount);
 };
 
 /**

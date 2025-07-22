@@ -23,6 +23,7 @@ import {
 
 import { LineItem, MappedBill } from '../../../../types';
 import { processBillPayment } from '../../../../billing.resource';
+import { formatCurrencySimple } from '../../../../helpers/currency';
 import styles from './edit-bill.scss';
 import { createEditBillPayload } from './edit-bill-util';
 import classNames from 'classnames';
@@ -93,10 +94,7 @@ export const EditBillForm: React.FC<EditBillFormProps> = ({
     return <InlineLoading description={t('loading', 'Loading')} />;
   }
 
-  const formattedPrice = Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'KES',
-  }).format(lineItem.price);
+  const formattedPrice = formatCurrencySimple(lineItem.price);
 
   const subtitleText = `${t('currentPriceAndQuantity', 'Current price and quantity')}: ${t(
     'price',
