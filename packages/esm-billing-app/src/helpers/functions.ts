@@ -92,3 +92,11 @@ export function extractNameString(formattedString: string) {
 export function formatDate(date) {
   return dayjs(date).format('YYYY-MM-DD');
 }
+
+export const formatDateTime = (dateString: string) => {
+  if (!dateString) {
+    return '';
+  }
+  const date = new Date(dateString);
+  return date.toLocaleString();
+};

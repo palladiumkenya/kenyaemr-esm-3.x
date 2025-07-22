@@ -22,7 +22,7 @@ import { useParams } from 'react-router-dom';
 import { z } from 'zod';
 import SHABenefitPackangesAndInterventions from '../../../benefits-package/forms/packages-and-interventions-form.component';
 import { BillingConfig } from '../../../config-schema';
-import { formatDate } from '../../../helpers/functions';
+import { formatDate, formatDateTime } from '../../../helpers/functions';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
 import useProvider from '../../../hooks/useProvider';
@@ -155,8 +155,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         diagnoses: diagnoses?.map((d) => d.id) ?? [],
         visitType: recentVisit?.visitType?.display || '',
         facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
-        treatmentStart: recentVisit?.startDatetime ? formatDate(recentVisit.startDatetime) : '',
-        treatmentEnd: recentVisit?.stopDatetime ? formatDate(recentVisit.stopDatetime) : '',
+        treatmentStart: formatDateTime(recentVisit?.startDatetime || ''),
+        treatmentEnd: formatDateTime(recentVisit?.stopDatetime || ''),
         packages: packagesAndinterventions?.packages ?? [],
         interventions: packagesAndinterventions?.interventions ?? [],
         provider: providerUuid,
