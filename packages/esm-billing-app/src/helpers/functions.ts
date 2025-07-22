@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { Payment, LineItem } from '../types';
+import { formatCurrency } from './currency';
 
 // amount already paid
 export function calculateTotalAmountTendered(payments: Array<Payment>) {
@@ -33,19 +34,7 @@ export function calculateTotalAmount(lineItems: Array<LineItem>) {
 }
 
 export const convertToCurrency = (amountToConvert: number) => {
-  const formatter = new Intl.NumberFormat('en-KE', {
-    style: 'currency',
-    currency: 'KES',
-    minimumFractionDigits: 2,
-  });
-
-  let formattedAmount = formatter.format(Math.abs(amountToConvert));
-
-  if (amountToConvert < 0) {
-    formattedAmount = `- ${formattedAmount}`;
-  }
-
-  return formattedAmount;
+  return formatCurrency(amountToConvert);
 };
 
 export const getGender = (gender: string, t) => {

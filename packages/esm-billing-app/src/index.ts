@@ -76,6 +76,7 @@ import DepositTransactionWorkspace from './bill-deposit/components/forms/deposit
 
 // Print Preview Components
 import PrintPreviewModal from './print-preview/print-preview.modal';
+import PaymentWorkspace from './invoice/payments/payment-form/payment.workspace';
 
 // Translation
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -218,6 +219,7 @@ export const visitAttributeTags = getSyncLifecycle(VisitAttributeTags, options);
 export const initiatePaymentDialog = getSyncLifecycle(InitiatePaymentDialog, options);
 export const paymentModeWorkspace = getSyncLifecycle(PaymentModeWorkspace, options);
 export const deletePaymentModeModal = getSyncLifecycle(DeletePaymentModeModal, options);
+export const paymentWorkspace = getSyncLifecycle(PaymentWorkspace, options);
 
 // Payment Points Components
 export const createPaymentPoint = getSyncLifecycle(CreatePaymentPoint, options);

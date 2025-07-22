@@ -4,6 +4,7 @@ import {
   defaultVisitCustomRepresentation,
   ExtensionSlot,
   formatDatetime,
+  launchWorkspace,
   navigate,
   parseDate,
   restBaseUrl,
@@ -172,7 +173,7 @@ const Invoice: React.FC = () => {
       <div className={styles.actionArea}>
         <Button
           onClick={handleBillPayment}
-          disabled={bill?.status === 'PAID'}
+          disabled={bill?.balance === 0}
           size="sm"
           renderIcon={Wallet}
           iconDescription="Add"
@@ -257,21 +258,19 @@ export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
                   renderIcon={Printer}>
                   {t('printInvoice', 'Print Invoice')}
                 </Button>
-                {bill.balance === 0 && (
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    onClick={() => {
-                      const dispose = showModal('print-preview-modal', {
-                        onClose: () => dispose(),
-                        title: `${t('receipt', 'Receipt')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
-                        documentUrl: `/openmrs${restBaseUrl}/cashier/receipt?billId=${bill.id}`,
-                      });
-                    }}
-                    renderIcon={Printer}>
-                    {t('printReceipt', 'Print Receipt')}
-                  </Button>
-                )}
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const dispose = showModal('print-preview-modal', {
+                      onClose: () => dispose(),
+                      title: `${t('receipt', 'Receipt')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
+                      documentUrl: `/openmrs${restBaseUrl}/cashier/receipt?billId=${bill.id}`,
+                    });
+                  }}
+                  renderIcon={Printer}>
+                  {t('printReceipt', 'Print Receipt')}
+                </Button>
                 <Button
                   kind="ghost"
                   size="sm"
@@ -315,6 +314,22 @@ export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
               </Button>
             </UserHasAccess>
           )}
+          <Button
+            kind="ghost"
+            size="sm"
+            renderIcon={Wallet}
+            iconDescription="Add"
+            tooltipPosition="right"
+            onClick={() =>
+              launchWorkspace('payment-workspace', {
+                bill,
+                workspaceTitle: t('additionalPayment', 'Additional Payment (Balance {{billBalance}})', {
+                  billBalance: convertToCurrency(bill.balance),
+                }),
+              })
+            }>
+            {t('additionalPayment', 'Additional Payment')}
+          </Button>
         </div>
       </div>
       <div className={styles.invoiceSummaryContainer}>
