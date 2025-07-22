@@ -20,7 +20,7 @@ import {
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
-import { type MortuaryLocationResponse } from '../../types';
+import { type Patient, type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import usePatients, { useMortuaryDischargeEncounter } from '../../bed-layout/discharged/discharged-bed-layout.resource';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -31,8 +31,8 @@ interface DischargedBedLineListViewProps {
   paginated?: boolean;
   initialPageSize?: number;
   pageSizes?: number[];
-  onPrintGatePass?: (patientUuid: string) => void;
-  onPrintPostmortem?: (patientUuid: string) => void;
+  onPrintGatePass?: (patient: any) => void; // Changed to accept patient object
+  onPrintPostmortem?: (patient: any) => void; // Changed to accept patient object
   mutate?: () => void;
 }
 
@@ -85,46 +85,20 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     return Math.floor(timeDiff / (1000 * 3600 * 24));
   };
 
-  const handlePrintGatePass = (patientUuid: string) => {
+  const handlePrintGatePass = (patient: Patient) => {
     if (onPrintGatePass) {
-      onPrintGatePass(patientUuid);
+      onPrintGatePass(patient);
     } else {
-      // Find the specific patient data
-      const patientData = dischargedPatients.find((patient) => patient?.uuid === patientUuid);
-
-      if (patientData) {
-        // Create the deceased person details object
-        const deceasedPersonDetails = {
-          uuid: patientData.uuid,
-          person: {
-            display: patientData.person?.display || '',
-            age: patientData.person?.age || 0,
-            gender: patientData.person?.gender || '',
-            birthdate: patientData.person?.birthdate || '',
-            deathDate: patientData.person?.deathDate || '',
-            causeOfDeath: patientData.person?.causeOfDeath || null,
-          },
-          identifiers: patientData.identifiers || [],
-          admissionDate: patientData.uuid || '', // You might need to get this from encounter data
-          // Optional fields - you can populate these from your data source or leave as defaults
-          paperNumber: '',
-          paymentMethod: '',
-          accountOfficer: '',
-          nurseInCharge: '',
-          securityGuard: '',
-        };
-
-        const dispose = showModal('print-confirmation-modal', {
-          onClose: () => dispose(),
-          deceasedPersonDetails: deceasedPersonDetails,
-        });
-      }
+      const dispose = showModal('print-confirmation-modal', {
+        onClose: () => dispose(),
+        patient: patient,
+      });
     }
   };
 
-  const handlePrintPostmortem = (patientUuid: string) => {
+  const handlePrintPostmortem = (patient: any) => {
     if (onPrintPostmortem) {
-      onPrintPostmortem(patientUuid);
+      onPrintPostmortem(patient);
     }
   };
 
@@ -144,6 +118,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
 
       return {
         id: patientUuid,
+        patient: patient, // Store the entire patient object in the row
         idNumber:
           patient?.identifiers
             ?.find((id) => id.display?.includes('OpenMRS ID'))
@@ -234,8 +209,8 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
               </TableHead>
               <TableBody>
                 {rows.map((row) => {
-                  const patientData = dischargedPatients.find((patient) => patient?.uuid === row.id);
-                  const patientName = patientData?.person?.display || '';
+                  const rowData = paginatedRows.find((r) => r.id === row.id);
+                  const patientData = rowData?.patient;
 
                   return (
                     <TableRow key={row.id} {...getRowProps({ row })}>
@@ -245,12 +220,12 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
                             <div className={styles.actionButtons}>
                               <OverflowMenu flipped>
                                 <OverflowMenuItem
-                                  onClick={() => handlePrintGatePass(row.id)}
+                                  onClick={() => handlePrintGatePass(patientData)}
                                   itemText={t('printGatePass', 'Gate Pass')}
                                   disabled={!patientData}
                                 />
                                 <OverflowMenuItem
-                                  onClick={() => handlePrintPostmortem(row.id)}
+                                  onClick={() => handlePrintPostmortem(patientData)}
                                   itemText={t('printPostmortem', 'Postmortem')}
                                   disabled={!patientData}
                                 />

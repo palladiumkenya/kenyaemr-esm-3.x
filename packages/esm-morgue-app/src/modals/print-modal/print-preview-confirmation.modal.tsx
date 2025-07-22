@@ -2,43 +2,17 @@ import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ButtonSet, ModalBody, ModalFooter, InlineNotification } from '@carbon/react';
 import { useReactToPrint } from 'react-to-print';
-import { formatDate, parseDate, useSession } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, parseDate, useSession } from '@openmrs/esm-framework';
 import styles from './print-preview-confirmation.scss';
-
-interface DeceasedPersonDetails {
-  uuid: string;
-  person: {
-    display: string;
-    age: number;
-    gender: string;
-    birthdate: string;
-    deathDate: string;
-    causeOfDeath?: {
-      display: string;
-    };
-  };
-  identifiers?: Array<{
-    identifier: string;
-    identifierType: {
-      uuid: string;
-      display: string;
-    };
-    display: string;
-  }>;
-  admissionDate?: string;
-  paperNumber?: string;
-  paymentMethod?: string;
-  accountOfficer?: string;
-  nurseInCharge?: string;
-  securityGuard?: string;
-}
+import { type Patient } from '../../types';
+import { formatDateTime } from '../../utils/utils';
 
 type PrintPreviewModalProps = {
   onClose: () => void;
-  deceasedPersonDetails: DeceasedPersonDetails;
+  patient: Patient;
 };
 
-const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceasedPersonDetails }) => {
+const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient }) => {
   const { t } = useTranslation();
   const [printError, setPrintError] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
@@ -85,31 +59,22 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
   });
 
   const getPatientNumber = () => {
-    const openMRSId = deceasedPersonDetails.identifiers?.find(
-      (id) => id.identifierType?.display?.includes('OpenMRS ID') || id.display?.includes('OpenMRS ID'),
-    );
-    return openMRSId?.identifier;
-  };
-
-  const formatDateTime = (dateString: string) => {
-    if (!dateString) {
-      return;
-    }
-    try {
-      return formatDate(parseDate(dateString), { mode: 'standard', time: false });
-    } catch {
-      return;
-    }
+    const openMRSId =
+      patient.identifiers
+        ?.find((id) => id.display?.includes('OpenMRS ID'))
+        ?.display?.split('=')?.[1]
+        ?.trim() || '';
+    return openMRSId;
   };
 
   const getCurrentDateTime = () => {
     const now = new Date();
     return {
-      date: formatDate(now, { mode: 'standard', time: false }),
+      date: formatDate(now, { mode: 'standard' }),
       time: now.toLocaleTimeString('en-US', {
+        hour12: false,
         hour: '2-digit',
         minute: '2-digit',
-        hour12: false,
       }),
     };
   };
@@ -133,7 +98,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                 <div className={styles.topInfoRow}>
                   <div className={styles.infoItem}>
                     <span className={styles.label}>PAPER NO:</span>
-                    <span className={styles.value}>{deceasedPersonDetails.paperNumber}</span>
+                    <span className={styles.value}>{''}</span>
                   </div>
                   <div className={styles.infoItem}>
                     <span className={styles.label}>PATIENT NO:</span>
@@ -151,21 +116,21 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                 <div className={styles.secondInfoRow}>
                   <div className={styles.patientField}>
                     <span className={styles.label}>PATIENT NAMES:</span>
-                    <span className={styles.valueWide}>{deceasedPersonDetails.person.display}</span>
+                    <span className={styles.valueWide}>{patient.person?.display || ''}</span>
                   </div>
                   <div className={styles.ageField}>
                     <span className={styles.label}>AGE:</span>
-                    <span className={styles.value}>{deceasedPersonDetails.person.age}</span>
+                    <span className={styles.value}>{patient.person?.age || ''}</span>
                   </div>
                 </div>
                 <div className={styles.secondInfoRow}>
                   <div className={styles.patientField}>
-                    <span className={styles.label}>DATE OF BIRTH:</span>
-                    <span className={styles.valueWide}>{formatDateTime(deceasedPersonDetails.person.birthdate)}</span>
+                    <span className={styles.label}>DATE OF ADMISSION:</span>
+                    <span className={styles.valueWide}>{formatDateTime(patient.person?.birthdate)}</span>
                   </div>
                   <div className={styles.ageField}>
-                    <span className={styles.label}>DATE OF DEATH:</span>
-                    <span className={styles.value}>{formatDateTime(deceasedPersonDetails.person.deathDate)}</span>
+                    <span className={styles.label}>DATE OF DISCHARGE:</span>
+                    <span className={styles.value}>{formatDateTime(patient.person?.deathDate)}</span>
                   </div>
                 </div>
               </div>
@@ -196,9 +161,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                   </div>
                   <div className={styles.paymentOption}>
                     <span className={styles.checkbox}></span>
-                    <span className={styles.optionLabel}>
-                      Others: {deceasedPersonDetails.paymentMethod || '...........................'}
-                    </span>
+                    <span className={styles.optionLabel}>Others: {'...........................'}</span>
                   </div>
                 </div>
               </div>
@@ -208,7 +171,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
                       <span className={styles.label}>Account Officer:</span>
-                      <span className={styles.nameValue}>{deceasedPersonDetails.accountOfficer}</span>
+                      <span className={styles.nameValue}>{''}</span>
                     </div>
                     <div className={styles.signField}>
                       <span className={styles.label}>Sign:</span>
@@ -225,7 +188,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
                       <span className={styles.label}>Nurse Officer Incharge:</span>
-                      <span className={styles.nameValue}>{deceasedPersonDetails.nurseInCharge}</span>
+                      <span className={styles.nameValue}>{''}</span>
                     </div>
                     <div className={styles.signField}>
                       <span className={styles.label}>Sign:</span>
@@ -242,7 +205,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, deceased
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
                       <span className={styles.label}>S. Guard Name:</span>
-                      <span className={styles.nameValue}>{deceasedPersonDetails.securityGuard}</span>
+                      <span className={styles.nameValue}>{''}</span>
                     </div>
                     <div className={styles.signField}>
                       <span className={styles.label}>Sign:</span>

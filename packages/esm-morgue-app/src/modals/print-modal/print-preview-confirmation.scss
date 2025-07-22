@@ -124,7 +124,9 @@
   }
 }
 
-.infoItem, .patientField, .ageField {
+.infoItem,
+.patientField,
+.ageField {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -193,10 +195,10 @@
   gap: 12px;
   align-items: center;
   padding: 6px;
-  border-bottom: 1px dotted #666;
 }
 
-.nameField, .signField {
+.nameField,
+.signField {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -238,7 +240,8 @@
   white-space: nowrap;
 }
 
-.value, .valueWide {
+.value,
+.valueWide {
   color: black;
   border-bottom: 1px solid black;
   padding: 2px;
@@ -257,7 +260,8 @@
   body * {
     visibility: hidden;
   }
-  .printableContent, .printableContent * {
+  .printableContent,
+  .printableContent * {
     visibility: visible;
   }
   .printableContent {
