@@ -177,7 +177,6 @@ export const useMortuaryOperation = (location?: string) => {
     [
       currentProvider?.uuid,
       emrConfiguration?.clinicianEncounterRole?.uuid,
-      nextOfKinNameUuid,
       courtOrderCaseNumberUuid,
       serialNumberUuid,
       morgueDischargeEncounterTypeUuid,
