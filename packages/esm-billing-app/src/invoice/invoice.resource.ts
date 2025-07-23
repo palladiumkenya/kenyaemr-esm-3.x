@@ -9,7 +9,7 @@ import {
   Visit,
 } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { type ShaFacilityStatusResponse } from '../types';
+import { type checkSHARegNumResponse } from '../types';
 
 export interface VisitQueueEntry {
   queueEntry: VisitQueueEntry;
@@ -90,20 +90,19 @@ export function removeQueuedPatient(
   });
 }
 
-export const useShaFacilityStatus = () => {
+export const useCheckShareGnum = () => {
   const { authenticated } = useSession();
+  const url = `${restBaseUrl}/kenyaemr/checksharegnum`;
 
-  const url = `${restBaseUrl}/kenyaemr/sha-facility-status?synchronize=true`;
-
-  const { data, isLoading, error, mutate } = useSWR<FetchResponse<ShaFacilityStatusResponse>>(
+  const { data, isLoading, error, mutate } = useSWR<FetchResponse<checkSHARegNumResponse>>(
     authenticated ? url : null,
     openmrsFetch,
   );
 
-  const shaFacilityStatus = data?.data;
+  const checkSHARegNum = data?.data;
 
   return {
-    shaFacilityStatus,
+    checkSHARegNum,
     isLoading,
     error,
     mutate,

@@ -48,21 +48,3 @@ export const formatDateTime = (dateString: string) => {
   const date = new Date(dateString);
   return date.toLocaleString();
 };
-
-/**
- * Converts a formatted date string back to ISO format
- * @param {string} formattedDate - Date string in locale format (e.g., "7/22/2025, 3:03:43 PM")
- * @returns {string} - ISO date string (e.g., "2025-07-22T15:03:43.000Z")
- */
-export const convertFormattedDateToISO = (formattedDate) => {
-  if (!formattedDate) {
-    return null;
-  }
-
-  try {
-    const date = new Date(formattedDate);
-    return date.toISOString();
-  } catch {
-    return null;
-  }
-};

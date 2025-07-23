@@ -628,15 +628,6 @@ export interface ProgressTracker {
   success?: number;
   failed?: number;
 }
-export interface ShaFacilityStatusResponse {
-  operationalStatus: string;
-  approved: string;
-  kephLevel: string;
-  shaFacilityId: string;
-  shaFacilityExpiryDate: string;
+export interface checkSHARegNumResponse {
   registrationNumber: string;
-  mflCode: string;
-  shaFacilityLicenseNumber: string;
-  facilityRegistryCode: string;
-  source: string;
 }
