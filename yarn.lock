@@ -2840,6 +2840,7 @@ __metadata:
     react-hook-form: "npm:^7.45.1"
     react-i18next: "npm:^11.18.6"
     react-router-dom: "npm:^6.3.0"
+    react-to-print: "npm:2.14.13"
     rxjs: "npm:^6.6.3"
     sass: "npm:^1.54.3"
     swc-loader: "npm:^0.2.3"
@@ -2860,7 +2861,7 @@ __metadata:
   resolution: "@kenyaemr/esm-admin-app@workspace:packages/esm-admin-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -2877,7 +2878,6 @@ __metadata:
   resolution: "@kenyaemr/esm-adr-app@workspace:packages/esm-adr-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 6.x
@@ -2893,7 +2893,7 @@ __metadata:
   resolution: "@kenyaemr/esm-billing-app@workspace:packages/esm-billing-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -2910,7 +2910,7 @@ __metadata:
   resolution: "@kenyaemr/esm-care-panel-app@workspace:packages/esm-care-panel-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -2927,7 +2927,7 @@ __metadata:
   resolution: "@kenyaemr/esm-cross-border-app@workspace:packages/esm-cross-border-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -2944,7 +2944,7 @@ __metadata:
   resolution: "@kenyaemr/esm-facility-dashboard-app@workspace:packages/esm-facility-dashboard-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -2961,7 +2961,7 @@ __metadata:
   resolution: "@kenyaemr/esm-lab-manifest-app@workspace:packages/esm-lab-manifest-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -2978,7 +2978,7 @@ __metadata:
   resolution: "@kenyaemr/esm-morgue-app@workspace:packages/esm-morgue-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -3027,7 +3027,7 @@ __metadata:
   resolution: "@kenyaemr/esm-pharmacy-app@workspace:packages/esm-pharmacy-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -3044,7 +3044,7 @@ __metadata:
   resolution: "@kenyaemr/esm-shr-app@workspace:packages/esm-shr-app"
   dependencies:
     lodash-es: "npm:^4.17.15"
-    react-to-print: "npm:^3.1.0"
+    react-to-print: "npm:2.14.13"
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
@@ -17604,12 +17604,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-to-print@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "react-to-print@npm:3.1.0"
+"react-to-print@npm:2.14.13":
+  version: 2.14.13
+  resolution: "react-to-print@npm:2.14.13"
   peerDependencies:
-    react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ~19
-  checksum: 10/e2d1c5168d72d0d0aa452c3a4b1d9469474652d0fe9c3a52ba819df93e580808fc97bb7f89a6dca7d3b40969b79e609349adb87c6cb5783928c80e57a18753d1
+    react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 10/cc4e438b5b7e5c67a73ca3d87ff0f1b5a550a7e6c1a1911cded14c9591b286efd82029bd0447e016b0b404f274d546a108e760fd7867e6b73342dba450282a29
   languageName: node
   linkType: hard
 
