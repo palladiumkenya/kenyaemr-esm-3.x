@@ -10,9 +10,10 @@ import { formatDateTime } from '../../utils/utils';
 type PrintPreviewModalProps = {
   onClose: () => void;
   patient: Patient;
+  encounterDate?: string;
 };
 
-const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient }) => {
+const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient, encounterDate }) => {
   const { t } = useTranslation();
   const [printError, setPrintError] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
@@ -66,7 +67,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
             <div className={styles.printableHeader}>
               <div className={styles.facilityDetails}>
                 <div className={styles.facilityName}>{sessionLocation?.display}</div>
-                <div className={styles.heading}>MORTUARY GATE PASS</div>
+                <div className={styles.heading}>{t('mortuaryGatePass', 'Mortuary Gate Pass')}</div>
               </div>
             </div>
 
@@ -74,71 +75,74 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
               <div className={styles.gatePassForm}>
                 <div className={styles.topInfoRow}>
                   <div className={styles.infoItem}>
-                    <span className={styles.label}>PAPER NO:</span>
+                    <span className={styles.label}>{t('paperNo', 'Paper No' + ':')}</span>
                     <span className={styles.value}>{getPatientNumber()}</span>
                   </div>
                   <div className={styles.infoItem}>
-                    <span className={styles.label}>PATIENT NO:</span>
+                    <span className={styles.label}>{t('patientNo', 'Patient No' + ':')}</span>
                     <span className={styles.value}>{getPatientNumber()}</span>
                   </div>
                   <div className={styles.infoItem}>
-                    <span className={styles.label}>DATE:</span>
+                    <span className={styles.label}>{t('date', 'Date' + ':')}</span>
                     <span className={styles.value}>{currentDateTime.date}</span>
                   </div>
                   <div className={styles.infoItem}>
-                    <span className={styles.label}>TIME:</span>
+                    <span className={styles.label}>{t('time', 'Time' + ':')}</span>
                     <span className={styles.value}>{currentDateTime.time}</span>
                   </div>
                 </div>
                 <div className={styles.secondInfoRow}>
                   <div className={styles.patientField}>
-                    <span className={styles.label}>PATIENT NAMES:</span>
+                    <span className={styles.label}>{t('patientName', 'Patient Name' + ':')}</span>
                     <span className={styles.valueWide}>{patient.person?.display || ''}</span>
                   </div>
                   <div className={styles.ageField}>
-                    <span className={styles.label}>AGE:</span>
+                    <span className={styles.label}>{t('age', 'Age' + ':')}</span>
                     <span className={styles.value}>{patient.person?.age || ''}</span>
                   </div>
                 </div>
                 <div className={styles.secondInfoRow}>
                   <div className={styles.patientField}>
-                    <span className={styles.label}>DATE OF ADMISSION:</span>
-                    <span className={styles.valueWide}>{formatDateTime(patient.person?.birthdate)}</span>
+                    <span className={styles.label}>{t('dateOfAdmission', 'Date of Admission' + ':')}</span>
+                    <span className={styles.valueWide}>{formatDateTime(patient.person?.deathDate)}</span>
                   </div>
                   <div className={styles.ageField}>
-                    <span className={styles.label}>DATE OF DISCHARGE:</span>
-                    <span className={styles.value}>{formatDateTime(patient.person?.deathDate)}</span>
+                    <span className={styles.label}>{t('dateOfDischarge', 'Date of Discharge' + ':')}</span>
+                    <span className={styles.value}>{formatDateTime(encounterDate)}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Payment Section */}
               <div className={styles.paymentSection}>
-                <div className={styles.sectionTitle}>Method of payment (tick as appropriate)</div>
+                <div className={styles.sectionTitle}>
+                  {t('methodOfPayment', 'Method of payment (tick as appropriate)')}
+                </div>
                 <div className={styles.paymentGrid}>
                   <div className={styles.paymentOption}>
                     <span className={styles.checkbox}></span>
-                    <span className={styles.optionLabel}>Cash</span>
+                    <span className={styles.optionLabel}>{t('cash', 'Cash')}</span>
                   </div>
                   <div className={styles.paymentOption}>
                     <span className={styles.checkbox}></span>
-                    <span className={styles.optionLabel}>Cheque</span>
+                    <span className={styles.optionLabel}>{t('cheque', 'Cheque')}</span>
                   </div>
                   <div className={styles.paymentOption}>
                     <span className={styles.checkbox}></span>
-                    <span className={styles.optionLabel}>SHA</span>
+                    <span className={styles.optionLabel}>{t('sha', 'SHA')}</span>
                   </div>
                   <div className={styles.paymentOption}>
                     <span className={styles.checkbox}></span>
-                    <span className={styles.optionLabel}>Scheme</span>
+                    <span className={styles.optionLabel}>{t('scheme', 'Scheme')}</span>
                   </div>
                   <div className={styles.paymentOption}>
                     <span className={styles.checkbox}></span>
-                    <span className={styles.optionLabel}>M.R.M</span>
+                    <span className={styles.optionLabel}>{t('mrM', 'M.R.M')}</span>
                   </div>
                   <div className={styles.paymentOption}>
                     <span className={styles.checkbox}></span>
-                    <span className={styles.optionLabel}>Others: {'...........................'}</span>
+                    <span className={styles.optionLabel}>
+                      {t('others', 'Others:')} {'...........................'}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -147,15 +151,15 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
                 <div className={styles.signatureBlock}>
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
-                      <span className={styles.label}>Account Officer:</span>
+                      <span className={styles.label}>{t('accountOfficer', 'Account Officer:')}</span>
                       <span className={styles.nameValue}>{''}</span>
                     </div>
                     <div className={styles.signField}>
-                      <span className={styles.label}>Sign:</span>
+                      <span className={styles.label}>{t('sign', 'Sign:')}</span>
                       <div className={styles.signatureLine}></div>
                     </div>
                     <div className={styles.dateField}>
-                      <span className={styles.label}>Date:</span>
+                      <span className={styles.label}>{t('date', 'Date:')}</span>
                       <div className={styles.signatureLine}></div>
                     </div>
                   </div>
@@ -164,15 +168,15 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
                 <div className={styles.signatureBlock}>
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
-                      <span className={styles.label}>Nurse Officer Incharge:</span>
+                      <span className={styles.label}>{t('nurseOfficerIncharge', 'Nurse Officer Incharge:')}</span>
                       <span className={styles.nameValue}>{''}</span>
                     </div>
                     <div className={styles.signField}>
-                      <span className={styles.label}>Sign:</span>
+                      <span className={styles.label}>{t('sign', 'Sign:')}</span>
                       <div className={styles.signatureLine}></div>
                     </div>
                     <div className={styles.dateField}>
-                      <span className={styles.label}>Date:</span>
+                      <span className={styles.label}>{t('date', 'Date:')}</span>
                       <div className={styles.signatureLine}></div>
                     </div>
                   </div>
@@ -181,15 +185,15 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
                 <div className={styles.signatureBlock}>
                   <div className={styles.signatureRow}>
                     <div className={styles.nameField}>
-                      <span className={styles.label}>S. Guard Name:</span>
+                      <span className={styles.label}>{t('securityGuardName', 'S. Guard Name:')}</span>
                       <span className={styles.nameValue}>{''}</span>
                     </div>
                     <div className={styles.signField}>
-                      <span className={styles.label}>Sign:</span>
+                      <span className={styles.label}>{t('sign', 'Sign:')}</span>
                       <div className={styles.signatureLine}></div>
                     </div>
                     <div className={styles.dateField}>
-                      <span className={styles.label}>Date:</span>
+                      <span className={styles.label}>{t('date', 'Date:')}</span>
                       <div className={styles.signatureLine}></div>
                     </div>
                   </div>
@@ -198,8 +202,11 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient 
 
               <div className={styles.footerNote}>
                 <div className={styles.noteText}>
-                  <strong>N/B:</strong> This form should be filled in duplicate, one copy to be retained in the ward and
-                  the other to be left at the main gate
+                  <strong>{t('nb', 'N/B:')}</strong>{' '}
+                  {t(
+                    'formDuplicateNote',
+                    'This form should be filled in duplicate, one copy to be retained in the ward and the other to be left at the main gate',
+                  )}
                 </div>
               </div>
             </div>
