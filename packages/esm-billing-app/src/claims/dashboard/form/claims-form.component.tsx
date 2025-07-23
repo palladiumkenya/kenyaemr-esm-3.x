@@ -32,7 +32,7 @@ import useProviderList from '../../../hooks/useProviderList';
 
 import styles from './claims-form.scss';
 import debounce from 'lodash-es/debounce';
-import { convertFormattedDateToISO, formatDateTime } from '../../utils';
+import { formatDateTime } from '../../utils';
 
 type ClaimsFormProps = {
   bill: MappedBill;
