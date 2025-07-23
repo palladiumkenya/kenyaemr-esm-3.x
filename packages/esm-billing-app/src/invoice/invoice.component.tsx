@@ -28,16 +28,16 @@ import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
 import { LineItem, MappedBill } from '../types';
 import InvoiceTable from './invoice-table.component';
-import { useShaFacilityStatus } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import capitalize from 'lodash-es/capitalize';
 import { mutate } from 'swr';
 import startCase from 'lodash-es/startCase';
+import { useCheckShareGnum } from './invoice.resource';
 
 const Invoice: React.FC = () => {
   const { t } = useTranslation();
-  const { shaFacilityStatus } = useShaFacilityStatus();
+  const { checkSHARegNum } = useCheckShareGnum();
   const { billUuid, patientUuid } = useParams();
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
@@ -51,10 +51,7 @@ const Invoice: React.FC = () => {
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
 
   const isShaFacilityStatusValid =
-    shaFacilityStatus &&
-    shaFacilityStatus.shaFacilityId &&
-    shaFacilityStatus.operationalStatus &&
-    shaFacilityStatus?.registrationNumber;
+    checkSHARegNum?.registrationNumber && checkSHARegNum.registrationNumber.trim() !== '';
 
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];

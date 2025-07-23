@@ -14,7 +14,7 @@ import {
   ComboBox,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
+import { navigate, showSnackbar, toOmrsIsoString, useConfig, useSession } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -210,8 +210,8 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       providedItems,
       claimExplanation: data.claimExplanation,
       claimJustification: data.claimJustification,
-      startDate: convertFormattedDateToISO(data.treatmentStart),
-      endDate: convertFormattedDateToISO(data.treatmentEnd),
+      startDate: toOmrsIsoString(data.treatmentStart),
+      endDate: toOmrsIsoString(data.treatmentEnd),
       location: mflCodeValue,
       diagnoses: data.diagnoses,
       paidInFacility: true,
