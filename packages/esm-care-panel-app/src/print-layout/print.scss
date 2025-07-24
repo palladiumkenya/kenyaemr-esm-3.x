@@ -14,6 +14,41 @@
   img {
     margin-bottom: 20px;
   }
+
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    .printPage,
+    .printPage * {
+      visibility: visible;
+    }
+
+    .printPage {
+      position: absolute;
+      left: 0;
+      top: 0;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    .bodyContainer {
+      box-shadow: none;
+    }
+
+    .card {
+      padding: 0;
+    }
+
+    .section {
+      margin-bottom: 16px;
+    }
+
+    .sectionTitle {
+      color: #000000;
+    }
+  }
 }
 
 .bodyContainer {
@@ -66,39 +101,4 @@
 .value {
   color: #161616;
   flex: 1;
-}
-
-@media print {
-  body * {
-    visibility: hidden;
-  }
-
-  .printPage,
-  .printPage * {
-    visibility: visible;
-  }
-
-  .printPage {
-    position: absolute;
-    left: 0;
-    top: 0;
-    padding: 0;
-    box-shadow: none;
-  }
-
-  .bodyContainer {
-    box-shadow: none;
-  }
-
-  .card {
-    padding: 0;
-  }
-
-  .section {
-    margin-bottom: 16px;
-  }
-
-  .sectionTitle {
-    color: #000000;
-  }
 }
