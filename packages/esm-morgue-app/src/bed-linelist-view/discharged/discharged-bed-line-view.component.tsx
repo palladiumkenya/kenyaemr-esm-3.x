@@ -1,4 +1,3 @@
-// DischargedBedLineListView.tsx
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -17,13 +16,14 @@ import {
   OverflowMenuItem,
   DataTableSkeleton,
 } from '@carbon/react';
-import { showModal, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, PrinterIcon, showModal, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
 import { type Patient, type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import usePatients, { useMortuaryDischargeEncounter } from '../../bed-layout/discharged/discharged-bed-layout.resource';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { Printer } from '@carbon/react/icons';
 
 interface DischargedBedLineListViewProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -32,7 +32,6 @@ interface DischargedBedLineListViewProps {
   initialPageSize?: number;
   pageSizes?: number[];
   onPrintGatePass?: (patient: any, encounterDate?: string) => void;
-  onPrintPostmortem?: (patient: any, encounterDate?: string) => void;
   mutate?: () => void;
 }
 
@@ -43,7 +42,6 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
   initialPageSize = 10,
   pageSizes = [10, 20, 30, 40, 50],
   onPrintGatePass,
-  onPrintPostmortem,
   mutate,
 }) => {
   const { t } = useTranslation();
@@ -109,12 +107,6 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     }
   };
 
-  const handlePrintPostmortem = (patient: any, encounterDate?: string) => {
-    if (onPrintPostmortem) {
-      onPrintPostmortem(patient, encounterDate);
-    }
-  };
-
   const allRows = useMemo(() => {
     if (!dischargedPatients || dischargedPatients.length === 0) {
       return [];
@@ -151,7 +143,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     });
 
     return rows;
-  }, [dischargedPatients, getEncounterDateForPatient, encounters]);
+  }, [dischargedPatients, getEncounterDateForPatient]);
 
   const totalCount = allRows.length;
   const startIndex = (currentPage - 1) * currPageSize;
@@ -235,16 +227,15 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
                         <TableCell key={cell.id} {...getCellProps({ cell })}>
                           {cell.info.header === 'action' ? (
                             <div className={styles.actionButtons}>
-                              <OverflowMenu flipped>
+                              <OverflowMenu renderIcon={Printer} flipped>
                                 <OverflowMenuItem
                                   onClick={() => handlePrintGatePass(patientData, encounterDate)}
                                   itemText={t('printGatePass', 'Gate Pass')}
                                   disabled={!patientData}
                                 />
-                                <OverflowMenuItem
-                                  onClick={() => handlePrintPostmortem(patientData, encounterDate)}
-                                  itemText={t('printPostmortem', 'Postmortem')}
-                                  disabled={!patientData}
+                                <ExtensionSlot
+                                  name="print-post-mortem-overflow-menu-item-slot"
+                                  state={{ patientUuid: row.id }}
                                 />
                               </OverflowMenu>
                             </div>

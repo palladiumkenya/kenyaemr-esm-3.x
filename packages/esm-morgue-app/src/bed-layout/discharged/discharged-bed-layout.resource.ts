@@ -17,7 +17,7 @@ export const useMortuaryDischargeEncounter = (
 ) => {
   const pageSizes = [10, 20, 50, 100];
   const locationUuid = admissionLocation?.ward?.uuid;
-  const [currPageSize, setCurrPageSize] = useState(10);
+  const [currPageSize, setCurrPageSize] = useState(100);
   const urls = !admissionLocation
     ? null
     : `${fhirBaseUrl}/Encounter?_summary=data&type=${dischargeEncounterTypeUuid}&location=${locationUuid}`;

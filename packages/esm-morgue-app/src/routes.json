@@ -34,6 +34,11 @@
       }
     },
     {
+      "name": "print-post-mortem-overflow-menu-item",
+      "component": "printPostMortemOverflowMenuItem",
+      "slot": "print-post-mortem-overflow-menu-item-slot"
+    },
+    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot",
@@ -94,6 +99,10 @@
     {
       "name": "print-confirmation-modal",
       "component": "printConfirmationModal"
+    },
+    {
+      "name": "autopsy-report-modal",
+      "component": "autopsyReportModal"
     }
   ],
   "pages": [
