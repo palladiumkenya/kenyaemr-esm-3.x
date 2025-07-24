@@ -42,7 +42,6 @@ import { ConfigObject } from '../../config-schema';
 import EncounterObservations from './observations/observation.component';
 import { Observation } from '../../types';
 import { useAutospyEncounter } from '../view-details.resource';
-// import { deleteEncounter } from '../case-encounter-table.resource'; // Import delete function
 import { useParams } from 'react-router-dom';
 
 interface RouteParams {
@@ -78,49 +77,13 @@ const AutopsyView: React.FC = () => {
       mutateForm: () => {
         mutate();
       },
-      formUuid: autopsyFormUuid, // Pass formUuid directly as a top-level property
+      formUuid: autopsyFormUuid,
       encounterUuid: encounterUUID,
       patientUuid,
       visitTypeUuid: '',
       visitUuid: '',
     });
   };
-
-  // Delete Encounter Handler
-  // const handleDeleteAutopsyEncounter = React.useCallback(
-  //   (encounterUuid: string, encounterTypeName?: string) => {
-  //     console.log('Attempting to delete encounter:', encounterUuid);
-  //     const close = showModal('delete-encounter-modal', {
-  //       close: () => close(),
-  //       encounterTypeName: encounterTypeName || t('autopsyReport', 'Autopsy Report'),
-  //       onConfirmation: () => {
-  //         const abortController = new AbortController();
-  //         deleteEncounter(encounterUuid, abortController)
-  //           .then(() => {
-  //             console.log('Successfully deleted encounter:', encounterUuid);
-  //             mutate(); // Refresh autopsy encounters
-  //             showSnackbar({
-  //               isLowContrast: true,
-  //               title: t('autopsyDeleted', 'Autopsy report deleted'),
-  //               subtitle: `${t('autopsyReport', 'Autopsy report')} ${t('successfullyDeleted', 'successfully deleted')}`,
-  //               kind: 'success',
-  //             });
-  //           })
-  //           .catch((error) => {
-  //             console.error('Error deleting encounter:', error);
-  //             showSnackbar({
-  //               isLowContrast: false,
-  //               title: t('error', 'Error'),
-  //               subtitle: `${t('autopsyReport', 'Autopsy report')} ${t('failedDeleting', "couldn't be deleted")}`,
-  //               kind: 'error',
-  //             });
-  //           });
-  //         close();
-  //       },
-  //     });
-  //   },
-  //   [t, mutate],
-  // );
 
   const tableHeader = [
     {
@@ -161,7 +124,6 @@ const AutopsyView: React.FC = () => {
     return <EmptyState displayText={headerTitle} headerTitle={headerTitle} launchForm={handleLaunchAutopsyForm} />;
   }
 
-  // Map encounters to table rows with enhanced actions
   const tableRows = encounters.map((encounter) => {
     const row = {
       id: `${encounter.uuid}`,
@@ -173,12 +135,6 @@ const AutopsyView: React.FC = () => {
       action: (
         <OverflowMenu aria-label="autopsy-actions" flipped={false}>
           <OverflowMenuItem onClick={() => handleLaunchAutopsyForm(encounter.uuid)} itemText={t('edit', 'Edit')} />
-          {/* <OverflowMenuItem
-            onClick={() => handleDeleteAutopsyEncounter(encounter.uuid, encounter?.encounterType?.display)}
-            itemText={t('delete', 'Delete')}
-            hasDivider
-            isDelete
-          /> */}
         </OverflowMenu>
       ),
       obs: encounter?.obs,
