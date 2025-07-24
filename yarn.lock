@@ -2859,7 +2859,6 @@ __metadata:
     react-hook-form: "npm:^7.45.1"
     react-i18next: "npm:^11.18.6"
     react-router-dom: "npm:^6.3.0"
-    react-to-print: "npm:2.14.13"
     rxjs: "npm:^6.6.3"
     sass: "npm:^1.54.3"
     swc-loader: "npm:^0.2.3"
