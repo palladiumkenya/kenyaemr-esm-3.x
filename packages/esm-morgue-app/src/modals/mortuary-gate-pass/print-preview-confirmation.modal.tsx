@@ -20,7 +20,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient,
   const { sessionLocation } = useSession();
 
   const handlePrint = useReactToPrint({
-    contentRef: printRef,
+    content: () => printRef.current,
     documentTitle: 'Mortuary Gate Pass',
     onAfterPrint: () => {
       setPrintError(null);

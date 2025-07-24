@@ -43,7 +43,7 @@ const AutopsyReportModal: React.FC<AutopsyReportModalProps> = ({ onClose, encoun
   }, [sortedEncounters]);
 
   const handlePrint = useReactToPrint({
-    contentRef: printRef,
+    content: () => printRef.current,
     documentTitle: 'Post-Mortem Report',
     onAfterPrint: () => {
       setPrintError(null);
