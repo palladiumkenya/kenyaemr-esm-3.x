@@ -1,28 +1,37 @@
-import {
-  FetchResponse,
-  fhirBaseUrl,
-  openmrsFetch,
-  restBaseUrl,
-  useFhirFetchAll,
-  useFhirPagination,
-} from '@openmrs/esm-framework';
+import { FetchResponse, fhirBaseUrl, openmrsFetch, restBaseUrl, useFhirPagination } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { type Patient, type FHIREncounter, MortuaryLocationResponse, Entry } from '../../types';
+import { type Patient, MortuaryLocationResponse, Entry } from '../../types';
 import { useMemo, useState } from 'react';
 import { parseDisplayText } from '../../utils/utils';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 export const useMortuaryDischargeEncounter = (
   dischargeEncounterTypeUuid: string,
   admissionLocation: MortuaryLocationResponse,
 ) => {
-  const pageSizes = [10, 20, 50, 100];
-  const locationUuid = admissionLocation?.ward?.uuid;
   const [currPageSize, setCurrPageSize] = useState(100);
+  const locationUuid = admissionLocation?.ward?.uuid;
+
   const urls = !admissionLocation
     ? null
     : `${fhirBaseUrl}/Encounter?_summary=data&type=${dischargeEncounterTypeUuid}&location=${locationUuid}`;
+
   const { data, isLoading, error, paginated, currentPage, goTo, totalCount, currentPageSize, mutate } =
     useFhirPagination<Entry>(urls, currPageSize);
+
+  const currentItems = useMemo(() => {
+    if (!data) {
+      return 0;
+    }
+    return data.length;
+  }, [data]);
+
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    currPageSize,
+    totalCount || 0,
+    currentPage || 1,
+    currentItems,
+  );
 
   const dischargedPatientUuids = useMemo(() => {
     if (!data) {
@@ -67,7 +76,8 @@ export const useMortuaryDischargeEncounter = (
     error: error,
     paginated,
     currentPage,
-    pageSizes,
+    pageSizes: calculatedPageSizes,
+    itemsDisplayed,
     goTo,
     currPageSize,
     setCurrPageSize,

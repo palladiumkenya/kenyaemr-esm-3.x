@@ -4,6 +4,7 @@ import {
   defaultVisitCustomRepresentation,
   ExtensionSlot,
   formatDatetime,
+  launchWorkspace,
   navigate,
   parseDate,
   restBaseUrl,
@@ -27,16 +28,16 @@ import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
 import { LineItem, MappedBill } from '../types';
 import InvoiceTable from './invoice-table.component';
-import { useShaFacilityStatus } from './invoice.resource';
 import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import capitalize from 'lodash-es/capitalize';
 import { mutate } from 'swr';
 import startCase from 'lodash-es/startCase';
+import { useCheckShareGnum } from './invoice.resource';
 
 const Invoice: React.FC = () => {
   const { t } = useTranslation();
-  const { shaFacilityStatus } = useShaFacilityStatus();
+  const { checkSHARegNum } = useCheckShareGnum();
   const { billUuid, patientUuid } = useParams();
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const { bill, isLoading: isLoadingBill, error: billingError } = useBill(billUuid);
@@ -50,10 +51,7 @@ const Invoice: React.FC = () => {
   const isProcessClaimsFormEnabled = useFeatureFlag('healthInformationExchange');
 
   const isShaFacilityStatusValid =
-    shaFacilityStatus &&
-    shaFacilityStatus.shaFacilityId &&
-    shaFacilityStatus.operationalStatus &&
-    shaFacilityStatus?.registrationNumber;
+    checkSHARegNum?.registrationNumber && checkSHARegNum.registrationNumber.trim() !== '';
 
   const handleSelectItem = (lineItems: Array<LineItem>) => {
     const paidLineItems = bill?.lineItems?.filter((item) => item.paymentStatus === 'PAID') ?? [];
@@ -172,7 +170,7 @@ const Invoice: React.FC = () => {
       <div className={styles.actionArea}>
         <Button
           onClick={handleBillPayment}
-          disabled={bill?.status === 'PAID'}
+          disabled={bill?.balance === 0}
           size="sm"
           renderIcon={Wallet}
           iconDescription="Add"
@@ -257,21 +255,19 @@ export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
                   renderIcon={Printer}>
                   {t('printInvoice', 'Print Invoice')}
                 </Button>
-                {bill.balance === 0 && (
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    onClick={() => {
-                      const dispose = showModal('print-preview-modal', {
-                        onClose: () => dispose(),
-                        title: `${t('receipt', 'Receipt')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
-                        documentUrl: `/openmrs${restBaseUrl}/cashier/receipt?billId=${bill.id}`,
-                      });
-                    }}
-                    renderIcon={Printer}>
-                    {t('printReceipt', 'Print Receipt')}
-                  </Button>
-                )}
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={() => {
+                    const dispose = showModal('print-preview-modal', {
+                      onClose: () => dispose(),
+                      title: `${t('receipt', 'Receipt')} ${bill?.receiptNumber} - ${startCase(bill?.patientName)}`,
+                      documentUrl: `/openmrs${restBaseUrl}/cashier/receipt?billId=${bill.id}`,
+                    });
+                  }}
+                  renderIcon={Printer}>
+                  {t('printReceipt', 'Print Receipt')}
+                </Button>
                 <Button
                   kind="ghost"
                   size="sm"
@@ -315,6 +311,22 @@ export function InvoiceSummary({ bill }: { readonly bill: MappedBill }) {
               </Button>
             </UserHasAccess>
           )}
+          <Button
+            kind="ghost"
+            size="sm"
+            renderIcon={Wallet}
+            iconDescription="Add"
+            tooltipPosition="right"
+            onClick={() =>
+              launchWorkspace('payment-workspace', {
+                bill,
+                workspaceTitle: t('additionalPayment', 'Additional Payment (Balance {{billBalance}})', {
+                  billBalance: convertToCurrency(bill.balance),
+                }),
+              })
+            }>
+            {t('additionalPayment', 'Additional Payment')}
+          </Button>
         </div>
       </div>
       <div className={styles.invoiceSummaryContainer}>

@@ -291,3 +291,8 @@ export const billingFormSchema = z.object({
     )
     .min(1),
 });
+
+export const addPaymentToBill = (billUuid: string, payload: Record<string, any>) => {
+  const url = `${restBaseUrl}/cashier/bill/${billUuid}/payment`;
+  return openmrsFetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: payload });
+};

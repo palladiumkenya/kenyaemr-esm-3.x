@@ -1,8 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
-import { useReactToPrint } from 'react-to-print';
+import { render, screen, act } from '@testing-library/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { usePatientSummary } from '../hooks/usePatientSummary';
 import { mockPatient } from '../../../../__mocks__/patient-summary.mock';
@@ -12,15 +11,20 @@ jest.mock('../hooks/usePatientSummary');
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedUsePatientSummary = usePatientSummary as jest.Mock;
-const mockedUseReactToPrint = jest.mocked(useReactToPrint);
 
-jest.mock('react-to-print', () => {
-  const originalModule = jest.requireActual('react-to-print');
+// Mock window.open and window.print
+const mockOpen = jest.fn();
+const mockPrint = jest.fn();
+const mockClose = jest.fn();
 
-  return {
-    ...originalModule,
-    useReactToPrint: jest.fn().mockReturnValue(jest.fn()),
-  };
+Object.defineProperty(window, 'open', {
+  writable: true,
+  value: mockOpen,
+});
+
+Object.defineProperty(window, 'print', {
+  writable: true,
+  value: mockPrint,
 });
 
 describe('PatientSummary', () => {
@@ -30,13 +34,18 @@ describe('PatientSummary', () => {
       error: false,
       isLoading: true,
     });
+
+    // Reset mocks
+    mockOpen.mockClear();
+    mockPrint.mockClear();
+    mockClose.mockClear();
   });
 
   afterEach(() => jest.clearAllMocks());
 
   it('renders a skeleton loader when loading', () => {
     render(<PatientSummary patientUuid={mockPatient.uuid} />);
-    const skeletonLoader = screen.getByRole('progressbar');
+    const skeletonLoader = document.querySelector('.cds--skeleton');
     expect(skeletonLoader).toBeInTheDocument();
   });
 
@@ -99,6 +108,18 @@ describe('PatientSummary', () => {
 
     mockedUseConfig.mockReturnValue({ logo: {} });
 
+    // Mock the print window
+    const mockPrintWindow = {
+      document: {
+        write: jest.fn(),
+        close: jest.fn(),
+      },
+      focus: jest.fn(),
+      print: jest.fn(),
+      close: jest.fn(),
+    };
+    mockOpen.mockReturnValue(mockPrintWindow);
+
     render(<PatientSummary patientUuid={mockPatient.uuid} />);
 
     const printButton = screen.getByRole('button', { name: /print/i });
@@ -107,7 +128,12 @@ describe('PatientSummary', () => {
     await screen.findByText(/patient summary/i);
     await user.click(printButton);
 
-    // FIXME: Why does this happen twice?
-    expect(mockedUseReactToPrint).toHaveBeenCalled();
+    // Wait for the print functionality to be triggered
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 150));
+    });
+
+    // Verify that window.open was called
+    expect(mockOpen).toHaveBeenCalledWith('', '_blank');
   });
 });

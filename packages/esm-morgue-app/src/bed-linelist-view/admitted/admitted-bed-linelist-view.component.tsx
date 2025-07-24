@@ -254,6 +254,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
             patientUuid,
             bedUuid,
             bedId,
+            personUuid: patient.person?.uuid || '',
           });
         }
       }

@@ -1,8 +1,7 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StructuredListSkeleton } from '@carbon/react';
 import { usePatientSummary } from '../hooks/usePatientSummary';
-import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print-layout/print.component';
 import PatientSummaryHeader from './patient-summary-header.component';
 import PatientSummaryBody from './patient-summary-body.component';
@@ -19,13 +18,25 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
   const printRef = useRef<HTMLDivElement>(null);
   const [showPrintComponent, setShowPrintComponent] = useState(false);
 
-  const handlePrint = useReactToPrint({
-    contentRef: printRef,
-    documentTitle: 'Patient Summary',
-    onAfterPrint: () => {
-      setShowPrintComponent(false);
-    },
-  });
+  const handlePrint = useCallback(async () => {
+    try {
+      // TODO: use backend to generate the print content
+      if (printRef.current) {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          const printContent = printRef.current.innerHTML;
+          printWindow.document.documentElement.innerHTML = printContent;
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        }
+      }
+    } catch (error) {
+      console.error('Print error:', error);
+      // Fallback to browser print
+      window.print();
+    }
+  }, []);
 
   const onPrintClick = () => {
     setShowPrintComponent(true);
@@ -33,7 +44,11 @@ const PatientSummary: React.FC<PatientSummaryProps> = ({ patientUuid }) => {
 
   useEffect(() => {
     if (showPrintComponent && printRef.current) {
-      handlePrint?.();
+      // Use setTimeout to ensure the component is fully rendered
+      setTimeout(() => {
+        handlePrint();
+        setShowPrintComponent(false);
+      }, 100);
     }
   }, [showPrintComponent, handlePrint]);
 

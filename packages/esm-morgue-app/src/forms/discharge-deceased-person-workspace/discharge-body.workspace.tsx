@@ -25,7 +25,7 @@ import {
   useLayoutType,
   useVisit,
 } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate as mutateSWR } from 'swr';
@@ -33,7 +33,7 @@ import { z } from 'zod';
 import styles from './discharge-body.scss';
 import DeceasedInfo from '../../deceased-patient-header/deceasedInfo/deceased-info.component';
 import { PatientInfo } from '../../types';
-import { useBills, useBlockDischargeWithPendingBills, usePersonAttributes } from './discharge-body.resource';
+import { useBlockDischargeWithPendingBills, usePersonAttributes } from './discharge-body.resource';
 import { ConfigObject } from '../../config-schema';
 import { getCurrentTime } from '../../utils/utils';
 import { dischargeSchema } from '../../schemas';
@@ -44,47 +44,66 @@ import { useMortuaryOperation } from '../admit-deceased-person-workspace/admit-d
 interface DischargeFormProps {
   closeWorkspace: () => void;
   patientUuid: string;
-  personUuid: string;
   bedId: number;
   mutate: () => void;
 }
 
 type DischargeFormValues = z.infer<typeof dischargeSchema>;
 
-const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUuid, bedId, personUuid, mutate }) => {
+const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUuid, bedId, mutate }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+
   const { activeVisit, currentVisitIsRetrospective } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, activeVisit?.uuid);
+
   const { dischargeBody, isLoadingEmrConfiguration } = useMortuaryOperation();
-  const { createOrUpdatePersonAttribute, personAttributes } = usePersonAttributes(personUuid);
+
+  const {
+    createOrUpdatePersonAttribute,
+    personAttributes,
+    isLoading: isLoadingAttributes,
+  } = usePersonAttributes(patientUuid);
+
   const { isDischargeBlocked, blockingMessage, isLoadingBills } = useBlockDischargeWithPendingBills({
     patientUuid,
+    actionType: 'discharge',
   });
+
+  const { nextOfKinNameUuid, nextOfKinRelationshipUuid, nextOfKinPhoneUuid, nextOfKinAddressUuid } =
+    useConfig<ConfigObject>();
 
   const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
 
-  const { nextOfKinAddressUuid, nextOfKinNameUuid, nextOfKinPhoneUuid, nextOfKinRelationshipUuid } =
-    useConfig<ConfigObject>();
-
   const getAttributeValue = useCallback(
     (attributeTypeUuid: string) => {
-      if (!personAttributes) {
+      if (!personAttributes || !Array.isArray(personAttributes)) {
         return '';
       }
-      const attributes = Array.isArray(personAttributes) ? personAttributes : [];
-      const attribute = attributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
+      const attribute = personAttributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
       return attribute ? attribute.value : '';
     },
     [personAttributes],
   );
 
+  const getExistingAttributeUuid = useCallback(
+    (attributeTypeUuid: string) => {
+      if (!personAttributes || !Array.isArray(personAttributes)) {
+        return null;
+      }
+      const attribute = personAttributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
+      return attribute ? attribute.uuid : null;
+    },
+    [personAttributes],
+  );
+
   const {
-    watch,
     control,
     setValue,
     handleSubmit,
     formState: { errors, isDirty, isSubmitting },
+    watch,
   } = useForm<DischargeFormValues>({
     resolver: zodResolver(dischargeSchema),
     defaultValues: {
@@ -92,96 +111,176 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
       timeOfDischarge: defaultTime,
       period: defaultPeriod,
       burialPermitNumber: '',
+      nextOfKinNames: '',
+      relationshipType: '',
+      nextOfKinContact: '',
+      nextOfKinAddress: '',
     },
   });
+
   useEffect(() => {
     if (Array.isArray(personAttributes) && personAttributes.length > 0) {
-      setValue('nextOfKinNames', getAttributeValue(nextOfKinNameUuid));
-      setValue('relationshipType', getAttributeValue(nextOfKinRelationshipUuid));
-      setValue('nextOfKinContact', getAttributeValue(nextOfKinPhoneUuid));
-      setValue('nextOfKinAddress', getAttributeValue(nextOfKinAddressUuid));
+      const initialValues = {
+        nextOfKinNames: getAttributeValue(nextOfKinNameUuid),
+        relationshipType: getAttributeValue(nextOfKinRelationshipUuid),
+        nextOfKinContact: getAttributeValue(nextOfKinPhoneUuid),
+        nextOfKinAddress: getAttributeValue(nextOfKinAddressUuid),
+      };
+
+      Object.entries(initialValues).forEach(([field, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          setValue(field as keyof DischargeFormValues, value);
+        }
+      });
     }
   }, [
     personAttributes,
+    setValue,
     getAttributeValue,
     nextOfKinNameUuid,
     nextOfKinRelationshipUuid,
     nextOfKinPhoneUuid,
     nextOfKinAddressUuid,
-    setValue,
   ]);
+
   const onSubmit = async (data: DischargeFormValues) => {
+    setSubmissionError(null);
+
     if (currentVisitIsRetrospective) {
       setCurrentVisit(null, null);
       closeWorkspace();
-    } else {
-      try {
-        const nextOfKinAttributes = [
-          { attributeType: nextOfKinNameUuid, value: data.nextOfKinNames },
-          { attributeType: nextOfKinRelationshipUuid, value: data.relationshipType },
-          { attributeType: nextOfKinPhoneUuid, value: data.nextOfKinContact },
-          { attributeType: nextOfKinAddressUuid, value: data.nextOfKinAddress },
-        ];
-        const patientInfo: PatientInfo = {
-          uuid: activeVisit.patient.uuid,
-          attributes: (activeVisit?.patient?.person?.attributes || []).map((attr) => ({
-            uuid: attr.uuid,
-            display: attr.display || '',
-          })),
-        };
+      return;
+    }
 
-        for (const attribute of nextOfKinAttributes) {
-          await createOrUpdatePersonAttribute(patientUuid, attribute, patientInfo);
+    try {
+      // First, perform the discharge operation
+      await dischargeBody(activeVisit, queueEntry, bedId, data);
+
+      // Then update person attributes
+      const attributeUpdates = [
+        {
+          uuid: nextOfKinNameUuid,
+          value: data.nextOfKinNames,
+          existingUuid: getExistingAttributeUuid(nextOfKinNameUuid),
+        },
+        {
+          uuid: nextOfKinRelationshipUuid,
+          value: data.relationshipType,
+          existingUuid: getExistingAttributeUuid(nextOfKinRelationshipUuid),
+        },
+        {
+          uuid: nextOfKinPhoneUuid,
+          value: data.nextOfKinContact,
+          existingUuid: getExistingAttributeUuid(nextOfKinPhoneUuid),
+        },
+        {
+          uuid: nextOfKinAddressUuid,
+          value: data.nextOfKinAddress,
+          existingUuid: getExistingAttributeUuid(nextOfKinAddressUuid),
+        },
+      ].filter((attr) => attr.value !== undefined && attr.value !== null && attr.value !== '');
+
+      const patientInfo: PatientInfo = {
+        uuid: activeVisit.patient.uuid,
+        attributes: personAttributes || [],
+      };
+
+      for (const attr of attributeUpdates) {
+        try {
+          const attributeData: any = {
+            attributeType: attr.uuid,
+            value: attr.value,
+          };
+
+          if (attr.existingUuid) {
+            attributeData.uuid = attr.existingUuid;
+          }
+
+          await createOrUpdatePersonAttribute(patientUuid, attributeData, patientInfo);
+        } catch (error) {
+          showSnackbar({
+            title: t('errorUpdatingAttribute', 'Error Updating Attribute'),
+            subtitle: t('errorUpdatingAttributeDescription', 'An error occurred while updating the attribute'),
+            kind: 'error',
+            isLowContrast: true,
+          });
         }
-
-        await dischargeBody(activeVisit, queueEntry, bedId, data);
-
-        showSnackbar({
-          title: t('dischargeDeceasedPatient', 'Deceased patient'),
-          subtitle: t('deceasedPatientDischargedSuccessfully', 'Deceased patient has been discharged successfully'),
-          kind: 'success',
-          isLowContrast: true,
-        });
-        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/visit`));
-        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/patient`));
-        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${fhirBaseUrl}/Encounter`));
-
-        mutate();
-        closeWorkspace();
-      } catch (error) {
-        console.error(error);
-        const errorMessage = JSON.stringify(error?.responseBody?.error?.message?.replace(/\[/g, '').replace(/\]/g, ''));
-        showSnackbar({
-          title: t('visitError', 'Visit Error'),
-          subtitle: t(
-            'visitErrorMessage',
-            `An error has occurred while ending visit, Contact system administrator quoting this error ${errorMessage}`,
-          ),
-          kind: 'error',
-          isLowContrast: true,
-        });
       }
+
+      // Invalidate relevant caches
+      await Promise.all([
+        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/visit`)),
+        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/patient`)),
+        mutateSWR((key) => typeof key === 'string' && key.startsWith(`${fhirBaseUrl}/Encounter`)),
+      ]);
+
+      showSnackbar({
+        title: t('dischargeDeceasedPatient', 'Deceased patient discharged'),
+        subtitle: t('deceasedPatientDischargedSuccessfully', 'Deceased patient has been discharged successfully'),
+        kind: 'success',
+        isLowContrast: true,
+      });
+
+      mutate();
+      closeWorkspace();
+    } catch (error) {
+      let errorMessage = t('dischargeUnknownError', 'An unknown error occurred');
+      if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.responseBody?.error?.message) {
+        errorMessage = error.responseBody.error.message.replace(/\[|\]/g, '');
+      } else if (error?.responseBody?.error?.globalErrors) {
+        errorMessage = error.responseBody.error.globalErrors[0]?.message || errorMessage;
+      }
+
+      setSubmissionError(errorMessage);
+      showSnackbar({
+        title: t('dischargeError', 'Discharge Error'),
+        subtitle: errorMessage,
+        kind: 'error',
+        isLowContrast: true,
+      });
     }
   };
 
-  if (isLoadingEmrConfiguration || !personAttributes) {
-    return <InlineLoading status="active" iconDescription="Loading" description="Loading ..." />;
+  if (isLoadingEmrConfiguration || isLoadingAttributes || !activeVisit) {
+    return <InlineLoading status="active" iconDescription="Loading" description={t('loading', 'Loading...')} />;
   }
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formContainer}>
+        {isLoadingBills && (
+          <InlineLoading
+            status="active"
+            iconDescription="Loading"
+            description={t('loadingBills', 'Loading bills...')}
+          />
+        )}
+
+        {isDischargeBlocked && (
+          <InlineNotification
+            kind="warning"
+            title={t('warningMsg', 'Warning')}
+            subtitle={blockingMessage}
+            lowContrast={true}
+            className={styles.blockingNotification}
+          />
+        )}
+
+        {submissionError && (
+          <InlineNotification
+            kind="error"
+            title={t('error', 'Error')}
+            subtitle={submissionError}
+            lowContrast={true}
+            className={styles.errorNotification}
+          />
+        )}
+
         <Stack gap={3}>
           <DeceasedInfo patientUuid={patientUuid} />
-          {isDischargeBlocked && (
-            <InlineNotification
-              kind="error"
-              title={t('dischargeBlocked', 'Discharge Blocked')}
-              subtitle={blockingMessage}
-              lowContrast={true}
-              className={styles.blockingNotification}
-            />
-          )}
+
           <ResponsiveWrapper>
             <div className={styles.dateTimePickerContainer}>
               <Column>
@@ -200,9 +299,9 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                       value={field.value ? new Date(field.value) : null}>
                       <DatePickerInput
                         {...field}
-                        id="date-of-admission"
+                        id="date-of-discharge"
                         placeholder="yyyy-mm-dd"
-                        labelText={t('dateOfAdmission', 'Date of discharge*')}
+                        labelText={t('dateOfDischarge', 'Date of discharge*')}
                         invalid={!!errors.dateOfDischarge}
                         invalidText={errors.dateOfDischarge?.message}
                       />
@@ -245,6 +344,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                 </div>
               </Column>
             </div>
+
             <Column className={styles.fieldColumn}>
               <Controller
                 name="burialPermitNumber"
@@ -263,6 +363,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                 )}
               />
             </Column>
+
             <Column className={styles.fieldColumn}>
               <Controller
                 name="nextOfKinNames"
@@ -281,6 +382,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                 )}
               />
             </Column>
+
             <Column className={styles.fieldColumn}>
               <Controller
                 name="relationshipType"
@@ -288,17 +390,18 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    id="relationship"
+                    id="relationshipType"
                     type="text"
                     className={styles.sectionField}
-                    placeholder={t('relationship', 'Relationship')}
-                    labelText={t('relationship', 'Relationship')}
+                    placeholder={t('relationshipType', 'Relationship')}
+                    labelText={t('relationshipType', 'Relationship')}
                     invalid={!!errors.relationshipType}
                     invalidText={errors.relationshipType?.message}
                   />
                 )}
               />
             </Column>
+
             <Column className={styles.fieldColumn}>
               <Controller
                 name="nextOfKinContact"
@@ -306,17 +409,18 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                 render={({ field }) => (
                   <TextInput
                     {...field}
-                    id="telephone"
+                    id="nextOfKinContact"
                     type="text"
-                    className={styles.fieldSection}
-                    placeholder={t('telephone', 'Telephone number')}
-                    labelText={t('telephone', 'Telephone number')}
+                    className={styles.sectionField}
+                    placeholder={t('nextOfKinContact', 'Next of kin contact')}
+                    labelText={t('nextOfKinContact', 'Next of kin contact')}
                     invalid={!!errors.nextOfKinContact}
                     invalidText={errors.nextOfKinContact?.message}
                   />
                 )}
               />
             </Column>
+
             <Column className={styles.fieldColumn}>
               <Controller
                 name="nextOfKinAddress"
@@ -336,6 +440,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
               />
             </Column>
           </ResponsiveWrapper>
+
           <ResponsiveWrapper>
             <Column>
               <ExtensionSlot
@@ -349,6 +454,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
           </ResponsiveWrapper>
         </Stack>
       </div>
+
       <ButtonSet
         className={classNames({
           [styles.tablet]: isTablet,
@@ -364,7 +470,7 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
           type="submit">
           {isSubmitting ? (
             <span className={styles.inlineLoading}>
-              {t('submitting', 'Submitting' + '...')}
+              {t('submitting', 'Submitting...')}
               <InlineLoading status="active" iconDescription="Loading" />
             </span>
           ) : (

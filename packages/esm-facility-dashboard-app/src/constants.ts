@@ -14,7 +14,7 @@ export const sevenDaysAgo = () => {
 
 export const DATE_PICKER_CONTROL_FORMAT = 'd/m/Y';
 
-export const DATE_PICKER_FORMAT = 'DD/MM/YYYY';
+export const DATE_PICKER_FORMAT = 'YYYY-MM-DD';
 
 export const formatNewDate = (date: Date | null | undefined) => {
   return date ? new Date(date) : '';

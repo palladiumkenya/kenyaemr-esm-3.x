@@ -108,11 +108,6 @@ export const configSchema = {
     _description: 'Encounter UUID for autopsy',
     _default: '465a92f2-baf8-42e9-9612-53064be868e8',
   },
-  nextOfKinNamesUuid: {
-    _type: Type.String,
-    _description: 'UUID for next of kin names concept',
-    _default: '830bef6d-b01f-449d-9f8d-ac0fede8dbd3',
-  },
   courtOrderCaseNumberUuid: {
     _type: Type.String,
     _description: 'UUID for court order case number concept',
@@ -170,7 +165,6 @@ export type ConfigObject = {
   adminUuid: string;
   autopsyFormUuid: string;
   autopsyEncounterFormUuid: string;
-  nextOfKinNamesUuid: string;
   courtOrderCaseNumberUuid: string;
   serialNumberUuid: string;
 };

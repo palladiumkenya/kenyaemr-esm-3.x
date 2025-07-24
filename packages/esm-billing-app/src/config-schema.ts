@@ -34,6 +34,7 @@ export interface BillingConfig {
     enable: boolean;
     duration: number;
   };
+  localeCurrencyMapping: Record<string, string>;
 }
 
 export const configSchema: ConfigSchema = {
@@ -205,6 +206,18 @@ export const configSchema: ConfigSchema = {
     _default: {
       enable: true,
       duration: 24,
+    },
+  },
+  localeCurrencyMapping: {
+    _type: Type.Object,
+    _description: 'Mapping of locale codes to currency codes for internationalization',
+    _default: {
+      en: 'KES',
+      sw: 'KES',
+      am: 'ETB',
+      'en-KE': 'KES',
+      'sw-KE': 'KES',
+      'am-ET': 'ETB',
     },
   },
 };

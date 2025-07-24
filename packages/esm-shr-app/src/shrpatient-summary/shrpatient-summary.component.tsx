@@ -1,11 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useCallback } from 'react';
 import styles from './shr-summary.scss';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, StructuredListSkeleton, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType, useSession } from '@openmrs/esm-framework';
 import { useSHRSummary } from '../hooks/useSHRSummary';
 import { Printer } from '@carbon/react/icons';
-import { useReactToPrint } from 'react-to-print';
 import PrintComponent from '../print-layout/print.component';
 import SHRDataTable from './shrDataTable.component';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -23,22 +22,50 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
   const { t } = useTranslation();
   const isTablet = useLayoutType() == 'tablet';
 
-  const printRef = useReactToPrint({
-    contentRef: componentRef,
-    onBeforePrint: async () => {
+  // Custom print handler to avoid React 18 compatibility issues
+  const handlePrint = useCallback(async () => {
+    try {
       setPrintMode(true);
-      return Promise.resolve();
-    },
-    onAfterPrint: () => setPrintMode(false),
-    pageStyle: styles.pageStyle,
-    documentTitle: 'Shared Health Records',
-  });
 
-  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-  const handlePrint = async () => {
-    await delay(500);
-    printRef();
-  };
+      // Wait for the component to render in print mode
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      if (componentRef.current) {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          const printContent = componentRef.current.innerHTML;
+          printWindow.document.documentElement.innerHTML = `
+            <head>
+              <title>Shared Health Records</title>
+              <style>
+                body { font-family: Arial, sans-serif; margin: 20px; }
+                .bodyContainer { max-width: 1200px; margin: 0 auto; }
+                .card { border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; }
+                .title { font-size: 18px; font-weight: bold; margin-bottom: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; font-weight: bold; }
+                .tablist { display: none; }
+                .tabpanel { display: block !important; }
+              </style>
+            </head>
+            <body>
+              ${printContent}
+            </body>
+          `;
+          printWindow.focus();
+          printWindow.print();
+          printWindow.close();
+        }
+      }
+    } catch (error) {
+      console.error('Print error:', error);
+      // Fallback to browser print
+      window.print();
+    } finally {
+      setPrintMode(false);
+    }
+  }, []);
 
   // If still loading
   if (isLoading) {
@@ -210,7 +237,17 @@ const SharedHealthRecordsSummary: React.FC<SHRSummaryProps> = ({ patientUuid }) 
 
         <div className={styles.card}>
           <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-            <h4 className={styles.title}> {t('shrPatientSHRSummary', 'Patient SHR Summary')}</h4>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h4 className={styles.title}> {t('shrPatientSHRSummary', 'Patient SHR Summary')}</h4>
+              <Button
+                kind="ghost"
+                renderIcon={Printer}
+                onClick={handlePrint}
+                iconDescription={t('print', 'Print')}
+                size="sm">
+                {t('print', 'Print')}
+              </Button>
+            </div>
           </div>
 
           <hr />

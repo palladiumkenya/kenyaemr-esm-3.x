@@ -24,7 +24,7 @@ interface MortuaryApiResponse {
 
 export const useAwaitingQueuePatients = (admissionLocation?: MortuaryLocationResponse) => {
   const { morgueDischargeEncounterTypeUuid } = useConfig<ConfigObject>();
-  const [currPageSize, setCurrPageSize] = useState(10);
+  const [currPageSize, setCurrPageSize] = useState(100);
 
   const customRepresentation =
     'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name)),person:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),preferredAddress:(uuid,stateProvince,countyDistrict,address4)))';
