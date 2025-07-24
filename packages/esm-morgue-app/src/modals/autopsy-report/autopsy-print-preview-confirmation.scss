@@ -14,6 +14,14 @@
   }
 }
 
+.encounterSelection {
+  margin-bottom: layout.$spacing-05;
+
+  @media print {
+    display: none;
+  }
+}
+
 .noPrint {
   @media print {
     display: none !important;
@@ -246,6 +254,20 @@
   margin-right: layout.$spacing-04;
 }
 
+.checkbox {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: colors.$black;
+  }
+}
+
 .optionLabel {
   color: colors.$black;
   font-size: 11px;
@@ -255,15 +277,19 @@
 .specimenGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: layout.$spacing-03;
-  margin-top: layout.$spacing-02;
+  gap: layout.$spacing-04;
+  margin-top: layout.$spacing-03;
 }
 
 .specimenOption {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: layout.$spacing-02;
   padding: layout.$spacing-02 0;
+
+  .field {
+    margin-top: layout.$spacing-02;
+  }
 }
 
 .signaturesSection {
@@ -332,7 +358,7 @@
 
 .footer {
   margin-top: layout.$spacing-07;
-  padding-top: layout.$spacing-04;
+  padding-top: layout.$spacing-05;
   border-top: 1px solid colors.$black;
   text-align: center;
   page-break-inside: avoid;
@@ -342,73 +368,28 @@
   font-size: 10px;
   color: colors.$black;
   font-style: italic;
+  line-height: 1.4;
+  margin-bottom: layout.$spacing-04;
+}
+
+.footerDetails {
+  margin-top: layout.$spacing-04;
+  padding-top: layout.$spacing-03;
+  border-top: 1px solid colors.$gray-30;
+  font-size: 9px;
+  color: colors.$gray-70;
+  text-align: center;
   line-height: 1.3;
-}
 
-// Enhanced print-specific styles
-@media print {
-  body * {
-    visibility: hidden;
-  }
-  .printableContent,
-  .printableContent * {
-    visibility: visible;
-  }
-  .printableContent {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 15mm;
-  }
+  div {
+    margin-bottom: layout.$spacing-02;
 
-  .formSection {
-    page-break-inside: avoid;
-    margin-bottom: 8mm;
-  }
-
-  .sectionTitle {
-    page-break-after: avoid;
-  }
-
-  .fieldRow {
-    page-break-inside: avoid;
-  }
-
-  .signaturesSection {
-    page-break-before: avoid;
-    page-break-inside: avoid;
-  }
-
-  .signatureBlock {
-    page-break-inside: avoid;
-  }
-
-  .systemRow {
-    page-break-inside: avoid;
-  }
-
-  // Ensure proper spacing for print
-  .largeTextArea,
-  .systemTextArea {
-    min-height: 15mm;
-  }
-
-  .printableHeader {
-    margin-bottom: 10mm;
-  }
-
-  .footer {
-    position: fixed;
-    bottom: 10mm;
-    left: 15mm;
-    right: 15mm;
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 }
 
-// Professional government document styling
 .printableContent {
   h1,
   h2,
@@ -426,13 +407,11 @@
     font-family: 'Times New Roman', serif;
   }
 
-  // Official document numbering
   .referenceNumber {
     font-weight: 700;
     text-transform: uppercase;
   }
 
-  // Government seal placeholder
   .sealPlaceholder {
     width: 60px;
     height: 60px;
@@ -447,30 +426,272 @@
   }
 }
 
-// Responsive adjustments for smaller screens
-@media screen and (max-width: 768px) {
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 20mm 20mm 20mm;
+
+    @top-center {
+      content: '';
+    }
+
+    @bottom-center {
+      content: '';
+    }
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .printableContent,
+  .printableContent * {
+    visibility: visible;
+  }
+
   .printableContent {
-    width: 100%;
-    padding: layout.$spacing-04;
-    font-size: 10px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
+  }
+
+  .printableHeader {
+    margin-bottom: 8mm !important;
+    padding-bottom: 3mm !important;
+    page-break-after: avoid;
+  }
+
+  .facilityName {
+    font-size: 14pt !important;
+    margin-bottom: 2mm !important;
+  }
+
+  .heading {
+    font-size: 12pt !important;
+    margin-bottom: 2mm !important;
+  }
+
+  .subheading {
+    font-size: 10pt !important;
+  }
+
+  .formSection {
+    page-break-inside: avoid;
+    margin-bottom: 6mm !important;
+
+    &:last-of-type {
+      margin-bottom: 0 !important;
+    }
+  }
+
+  .sectionTitle {
+    page-break-after: avoid;
+    font-size: 11pt !important;
+    margin-bottom: 3mm !important;
+    padding: 1mm 0 !important;
+  }
+
+  .sectionSubtitle {
+    font-size: 9pt !important;
+    margin-bottom: 2mm !important;
   }
 
   .fieldRow {
-    flex-direction: column;
-    gap: layout.$spacing-02;
+    page-break-inside: avoid;
+    margin-bottom: 2mm !important;
   }
 
-  .signatureRow {
-    grid-template-columns: 1fr;
-    gap: layout.$spacing-03;
+  .field,
+  .fieldWide {
+    margin-bottom: 1mm !important;
+  }
+
+  .label {
+    font-size: 10pt !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5mm !important;
+  }
+
+  .value {
+    font-size: 10pt !important;
+    padding: 1mm 2mm !important;
+    min-height: 4mm !important;
+    border-bottom: 1pt solid black !important;
+  }
+
+  .textArea,
+  .largeTextArea {
+    min-height: 12mm !important;
+    padding: 2mm !important;
+    border: 1pt solid black !important;
+    font-size: 10pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .systemTextArea {
+    min-height: 10mm !important;
+    padding: 2mm !important;
+    border: 1pt solid black !important;
+    font-size: 10pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .systemRow {
+    page-break-inside: avoid;
+    margin-bottom: 3mm !important;
   }
 
   .specimenGrid {
-    grid-template-columns: 1fr;
+    display: block !important;
+
+    .specimenOption {
+      display: block !important;
+      margin-bottom: 2mm !important;
+      page-break-inside: avoid;
+
+      .checkbox {
+        display: inline-block !important;
+        width: 3mm !important;
+        height: 3mm !important;
+        margin-right: 2mm !important;
+        vertical-align: middle;
+
+        svg {
+          width: 3mm !important;
+          height: 3mm !important;
+        }
+      }
+
+      .optionLabel {
+        font-size: 10pt !important;
+        display: inline !important;
+        vertical-align: middle;
+      }
+
+      .field {
+        margin-left: 5mm !important;
+        margin-top: 1mm !important;
+      }
+    }
+  }
+
+  .signaturesSection {
+    page-break-before: avoid;
+    page-break-inside: avoid;
+    margin-top: 10mm !important;
+    padding-top: 5mm !important;
+    border-top: 2pt solid black !important;
+  }
+
+  .signatureBlock {
+    page-break-inside: avoid;
+    margin-bottom: 8mm !important;
+  }
+
+  .signatureRow {
+    display: block !important;
+
+    .nameField,
+    .signField,
+    .dateField {
+      display: inline-block !important;
+      width: 30% !important;
+      margin-right: 3% !important;
+      vertical-align: bottom;
+
+      &:last-child {
+        margin-right: 0 !important;
+      }
+    }
+  }
+
+  .nameValue {
+    font-size: 10pt !important;
+    padding: 1mm 2mm !important;
+    min-height: 4mm !important;
+    border-bottom: 1pt solid black !important;
+  }
+
+  .signatureLine {
+    border-bottom: 1pt solid black !important;
+    height: 4mm !important;
+    margin-top: 1mm !important;
+  }
+
+  .qualificationRow {
+    margin-top: 2mm !important;
+    font-size: 10pt !important;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3mm 0 !important;
+    margin-top: 8mm !important;
+    border-top: 1pt solid black !important;
+    background: white !important;
+    page-break-inside: avoid;
+  }
+
+  .footerText {
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
+    margin-bottom: 2mm !important;
+    color: black !important;
+  }
+
+  .footerDetails {
+    font-size: 8pt !important;
+    color: black !important;
+    line-height: 1.1 !important;
+    padding-top: 1mm !important;
+    border-top: 0.5pt solid #666 !important;
+
+    div {
+      margin-bottom: 1mm !important;
+
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
+
+  .encounterSelection,
+  .btnSet,
+  .noPrint {
+    display: none !important;
+  }
+
+  .printableBody > .formSection:nth-child(n + 8) {
+    page-break-before: auto;
+  }
+
+  .signaturesSection {
+    break-before: auto;
   }
 }
-
-// High contrast mode for accessibility
 @media (prefers-contrast: high) {
   .printableContent {
     .value,
@@ -484,6 +705,11 @@
 
     .checkbox {
       border: 3px solid colors.$black;
+    }
+
+    .footerDetails {
+      color: colors.$black;
+      border-top: 2px solid colors.$black;
     }
   }
 }

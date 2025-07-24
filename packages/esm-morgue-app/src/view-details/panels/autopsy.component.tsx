@@ -8,16 +8,8 @@ import {
   useConfig,
   useLayoutType,
   usePagination,
-  showModal,
-  showSnackbar,
 } from '@openmrs/esm-framework';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  getPatientUuidFromStore,
-  usePaginationInfo,
-} from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   Button,
   DataTable,
@@ -196,10 +188,7 @@ const AutopsyView: React.FC = () => {
                         {row.isExpanded && encounter ? (
                           <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
                             <div className={styles.container} key={i}>
-                              <EncounterObservations
-                                observations={encounter.obs as Observation[]}
-                                // title={t('autopsyFindings', 'Autopsy Findings')}
-                              />
+                              <EncounterObservations observations={encounter.obs as Observation[]} />
                             </div>
                           </TableExpandedRow>
                         ) : (

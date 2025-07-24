@@ -2803,7 +2803,7 @@ __metadata:
   dependencies:
     "@carbon/pictograms-react": "npm:^11.66.0"
     "@hookform/resolvers": "npm:^3.1.1"
-    "@openmrs/esm-framework": "npm:next"
+    "@openmrs/esm-framework": "npm:^6.3.1-pre.3204"
     "@openmrs/esm-patient-common-lib": "npm:next"
     "@playwright/test": "npm:^1.30.0"
     "@swc/cli": "npm:^0.1.57"
@@ -2849,7 +2849,7 @@ __metadata:
     jest-cli: "npm:^29.7.0"
     jest-environment-jsdom: "npm:^29.7.0"
     lodash: "npm:^4.17.21"
-    openmrs: "npm:next"
+    openmrs: "npm:^6.3.1-pre.3204"
     pinst: "npm:^3.0.0"
     prettier: "npm:^2.2.1"
     pretty-quick: "npm:^2.0.2"
@@ -3464,7 +3464,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-framework@npm:6.3.1-pre.3204, @openmrs/esm-framework@npm:next":
+"@openmrs/esm-framework@npm:6.3.1-pre.3204, @openmrs/esm-framework@npm:^6.3.1-pre.3204":
   version: 6.3.1-pre.3204
   resolution: "@openmrs/esm-framework@npm:6.3.1-pre.3204"
   dependencies:
@@ -16022,7 +16022,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"openmrs@npm:next":
+"openmrs@npm:^6.3.1-pre.3204":
   version: 6.3.1-pre.3204
   resolution: "openmrs@npm:6.3.1-pre.3204"
   dependencies:
