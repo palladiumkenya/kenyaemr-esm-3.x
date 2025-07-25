@@ -12,14 +12,18 @@ import AutopsyView from './panels/autopsy.component';
 import AttachmentView from './panels/attachement.component';
 import { useActiveMorgueVisit } from './view-details.resource';
 import BannerInfo from '../extension/deceasedInfoBanner.component';
+import { useParams } from 'react-router-dom';
 
 interface MortuarySummaryProps {
   bedNumber?: string;
 }
-
+interface RouteParams {
+  patientUuid: string;
+  [key: string]: string | undefined;
+}
 const MortuarySummary: React.FC<MortuarySummaryProps> = ({ bedNumber }) => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromStore();
+  const { patientUuid } = useParams<RouteParams>();
   const { isLoading } = usePerson(patientUuid);
   const { activeVisit, isLoading: isActiveLoading } = useActiveMorgueVisit(patientUuid);
 

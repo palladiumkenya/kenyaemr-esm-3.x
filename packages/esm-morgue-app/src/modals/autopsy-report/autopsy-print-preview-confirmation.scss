@@ -1,0 +1,715 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  padding: layout.$spacing-06;
+  margin-bottom: layout.$spacing-05;
+  background-color: colors.$white;
+
+  @media print {
+    padding: 0;
+    margin: 0;
+    background-color: colors.$white;
+  }
+}
+
+.encounterSelection {
+  margin-bottom: layout.$spacing-05;
+
+  @media print {
+    display: none;
+  }
+}
+
+.noPrint {
+  @media print {
+    display: none !important;
+  }
+}
+
+.printableContent {
+  background-color: colors.$white;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: 20mm;
+  box-sizing: border-box;
+  font-family: 'Times New Roman', serif;
+  font-size: 11px;
+  line-height: 1.4;
+  color: colors.$black;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  @media print {
+    width: 100%;
+    height: 100%;
+    padding: 15mm;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    page-break-after: avoid;
+    page-break-before: avoid;
+  }
+}
+
+.printableHeader {
+  text-align: center;
+  margin-bottom: layout.$spacing-06;
+  padding-bottom: layout.$spacing-04;
+  border-bottom: 3px double colors.$black;
+
+  @media print {
+    border-bottom: 3px double colors.$black;
+  }
+}
+
+.facilityDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.facilityName {
+  font-weight: 700;
+  color: colors.$black;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: layout.$spacing-02;
+  font-size: 16px;
+  font-family: 'Times New Roman', serif;
+
+  @media print {
+    color: colors.$black;
+  }
+}
+
+.heading {
+  font-weight: 700;
+  color: colors.$black;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 14px;
+  margin-bottom: layout.$spacing-02;
+  text-decoration: underline;
+
+  @media print {
+    color: colors.$black;
+  }
+}
+
+.subheading {
+  font-weight: 500;
+  color: colors.$black;
+  font-size: 12px;
+  font-style: italic;
+}
+
+.printableBody {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.formSection {
+  margin-bottom: layout.$spacing-05;
+  page-break-inside: avoid;
+}
+
+.sectionTitle {
+  font-weight: 700;
+  color: colors.$black;
+  font-size: 12px;
+  margin-bottom: layout.$spacing-04;
+  padding: layout.$spacing-02 0;
+  border-bottom: 2px solid colors.$black;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  @media print {
+    color: colors.$black;
+    border-bottom: 2px solid colors.$black;
+  }
+}
+
+.sectionSubtitle {
+  font-size: 10px;
+  color: colors.$black;
+  margin-bottom: layout.$spacing-03;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-04;
+}
+
+.fieldRow {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: flex-start;
+  margin-bottom: layout.$spacing-03;
+}
+
+.field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.fieldWide {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+  margin-bottom: layout.$spacing-03;
+}
+
+.systemRow {
+  margin-bottom: layout.$spacing-04;
+  page-break-inside: avoid;
+}
+
+.systemField {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.label {
+  font-weight: 600;
+  color: colors.$black;
+  font-size: 11px;
+  line-height: 1.2;
+  margin-bottom: layout.$spacing-01;
+}
+
+.required {
+  color: colors.$red-60;
+  margin-left: 2px;
+}
+
+.value {
+  color: colors.$black;
+  font-size: 11px;
+  padding: layout.$spacing-02;
+  border-bottom: 1px solid colors.$black;
+  min-height: layout.$spacing-05;
+  display: flex;
+  align-items: center;
+  background-color: colors.$white;
+}
+
+.textArea {
+  color: colors.$black;
+  font-size: 11px;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
+  min-height: layout.$spacing-07;
+  background-color: colors.$white;
+  line-height: 1.4;
+}
+
+.largeTextArea {
+  color: colors.$black;
+  font-size: 11px;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
+  min-height: 60px;
+  background-color: colors.$white;
+  line-height: 1.4;
+}
+
+.systemTextArea {
+  color: colors.$black;
+  font-size: 11px;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
+  min-height: 40px;
+  background-color: colors.$white;
+  line-height: 1.4;
+}
+
+.underlineField {
+  border-bottom: 1px solid colors.$black;
+  min-height: layout.$spacing-05;
+  width: 100%;
+}
+
+.checkboxGroup {
+  display: flex;
+  gap: layout.$spacing-04;
+  flex-wrap: wrap;
+  margin-top: layout.$spacing-02;
+}
+
+.checkboxOption {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  margin-right: layout.$spacing-04;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    fill: colors.$black;
+  }
+}
+
+.optionLabel {
+  color: colors.$black;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.specimenGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: layout.$spacing-04;
+  margin-top: layout.$spacing-03;
+}
+
+.specimenOption {
+  display: flex;
+  align-items: flex-start;
+  gap: layout.$spacing-02;
+  padding: layout.$spacing-02 0;
+
+  .field {
+    margin-top: layout.$spacing-02;
+  }
+}
+
+.signaturesSection {
+  margin-top: layout.$spacing-07;
+  padding-top: layout.$spacing-05;
+  border-top: 2px solid colors.$black;
+  page-break-inside: avoid;
+}
+
+.signatureBlock {
+  margin-bottom: layout.$spacing-06;
+  page-break-inside: avoid;
+}
+
+.signatureRow {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr 1fr;
+  gap: layout.$spacing-05;
+  align-items: end;
+  padding: layout.$spacing-03 0;
+}
+
+.nameField,
+.signField,
+.dateField {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.signatureLine {
+  border-bottom: 1px solid colors.$black;
+  height: layout.$spacing-05;
+  width: 100%;
+  margin-top: layout.$spacing-02;
+}
+
+.qualificationRow {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  margin-top: layout.$spacing-03;
+}
+
+.qualificationLine {
+  border-bottom: 1px solid colors.$black;
+  height: layout.$spacing-05;
+  flex: 1;
+}
+
+.nameValue {
+  color: colors.$black;
+  border-bottom: 1px solid colors.$black;
+  padding: layout.$spacing-02;
+  min-height: layout.$spacing-05;
+  display: flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.btnSet {
+  width: 100%;
+  margin-top: layout.$spacing-05;
+}
+
+.footer {
+  margin-top: layout.$spacing-07;
+  padding-top: layout.$spacing-05;
+  border-top: 1px solid colors.$black;
+  text-align: center;
+  page-break-inside: avoid;
+}
+
+.footerText {
+  font-size: 10px;
+  color: colors.$black;
+  font-style: italic;
+  line-height: 1.4;
+  margin-bottom: layout.$spacing-04;
+}
+
+.footerDetails {
+  margin-top: layout.$spacing-04;
+  padding-top: layout.$spacing-03;
+  border-top: 1px solid colors.$gray-30;
+  font-size: 9px;
+  color: colors.$gray-70;
+  text-align: center;
+  line-height: 1.3;
+
+  div {
+    margin-bottom: layout.$spacing-02;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.printableContent {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Times New Roman', serif;
+    font-weight: 700;
+  }
+
+  p,
+  span,
+  div {
+    font-family: 'Times New Roman', serif;
+  }
+
+  .referenceNumber {
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .sealPlaceholder {
+    width: 60px;
+    height: 60px;
+    border: 2px solid colors.$black;
+    border-radius: 50%;
+    margin: 0 auto layout.$spacing-03;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    text-align: center;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm 20mm 20mm 20mm;
+
+    @top-center {
+      content: '';
+    }
+
+    @bottom-center {
+      content: '';
+    }
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background: white !important;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  .printableContent,
+  .printableContent * {
+    visibility: visible;
+  }
+
+  .printableContent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    font-size: 11pt !important;
+    line-height: 1.3 !important;
+  }
+
+  .printableHeader {
+    margin-bottom: 8mm !important;
+    padding-bottom: 3mm !important;
+    page-break-after: avoid;
+  }
+
+  .facilityName {
+    font-size: 14pt !important;
+    margin-bottom: 2mm !important;
+  }
+
+  .heading {
+    font-size: 12pt !important;
+    margin-bottom: 2mm !important;
+  }
+
+  .subheading {
+    font-size: 10pt !important;
+  }
+
+  .formSection {
+    page-break-inside: avoid;
+    margin-bottom: 6mm !important;
+
+    &:last-of-type {
+      margin-bottom: 0 !important;
+    }
+  }
+
+  .sectionTitle {
+    page-break-after: avoid;
+    font-size: 11pt !important;
+    margin-bottom: 3mm !important;
+    padding: 1mm 0 !important;
+  }
+
+  .sectionSubtitle {
+    font-size: 9pt !important;
+    margin-bottom: 2mm !important;
+  }
+
+  .fieldRow {
+    page-break-inside: avoid;
+    margin-bottom: 2mm !important;
+  }
+
+  .field,
+  .fieldWide {
+    margin-bottom: 1mm !important;
+  }
+
+  .label {
+    font-size: 10pt !important;
+    font-weight: 600 !important;
+    margin-bottom: 0.5mm !important;
+  }
+
+  .value {
+    font-size: 10pt !important;
+    padding: 1mm 2mm !important;
+    min-height: 4mm !important;
+    border-bottom: 1pt solid black !important;
+  }
+
+  .textArea,
+  .largeTextArea {
+    min-height: 12mm !important;
+    padding: 2mm !important;
+    border: 1pt solid black !important;
+    font-size: 10pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .systemTextArea {
+    min-height: 10mm !important;
+    padding: 2mm !important;
+    border: 1pt solid black !important;
+    font-size: 10pt !important;
+    line-height: 1.2 !important;
+  }
+
+  .systemRow {
+    page-break-inside: avoid;
+    margin-bottom: 3mm !important;
+  }
+
+  .specimenGrid {
+    display: block !important;
+
+    .specimenOption {
+      display: block !important;
+      margin-bottom: 2mm !important;
+      page-break-inside: avoid;
+
+      .checkbox {
+        display: inline-block !important;
+        width: 3mm !important;
+        height: 3mm !important;
+        margin-right: 2mm !important;
+        vertical-align: middle;
+
+        svg {
+          width: 3mm !important;
+          height: 3mm !important;
+        }
+      }
+
+      .optionLabel {
+        font-size: 10pt !important;
+        display: inline !important;
+        vertical-align: middle;
+      }
+
+      .field {
+        margin-left: 5mm !important;
+        margin-top: 1mm !important;
+      }
+    }
+  }
+
+  .signaturesSection {
+    page-break-before: avoid;
+    page-break-inside: avoid;
+    margin-top: 10mm !important;
+    padding-top: 5mm !important;
+    border-top: 2pt solid black !important;
+  }
+
+  .signatureBlock {
+    page-break-inside: avoid;
+    margin-bottom: 8mm !important;
+  }
+
+  .signatureRow {
+    display: block !important;
+
+    .nameField,
+    .signField,
+    .dateField {
+      display: inline-block !important;
+      width: 30% !important;
+      margin-right: 3% !important;
+      vertical-align: bottom;
+
+      &:last-child {
+        margin-right: 0 !important;
+      }
+    }
+  }
+
+  .nameValue {
+    font-size: 10pt !important;
+    padding: 1mm 2mm !important;
+    min-height: 4mm !important;
+    border-bottom: 1pt solid black !important;
+  }
+
+  .signatureLine {
+    border-bottom: 1pt solid black !important;
+    height: 4mm !important;
+    margin-top: 1mm !important;
+  }
+
+  .qualificationRow {
+    margin-top: 2mm !important;
+    font-size: 10pt !important;
+  }
+
+  .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 3mm 0 !important;
+    margin-top: 8mm !important;
+    border-top: 1pt solid black !important;
+    background: white !important;
+    page-break-inside: avoid;
+  }
+
+  .footerText {
+    font-size: 9pt !important;
+    line-height: 1.2 !important;
+    margin-bottom: 2mm !important;
+    color: black !important;
+  }
+
+  .footerDetails {
+    font-size: 8pt !important;
+    color: black !important;
+    line-height: 1.1 !important;
+    padding-top: 1mm !important;
+    border-top: 0.5pt solid #666 !important;
+
+    div {
+      margin-bottom: 1mm !important;
+
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
+
+  .encounterSelection,
+  .btnSet,
+  .noPrint {
+    display: none !important;
+  }
+
+  .printableBody > .formSection:nth-child(n + 8) {
+    page-break-before: auto;
+  }
+
+  .signaturesSection {
+    break-before: auto;
+  }
+}
+@media (prefers-contrast: high) {
+  .printableContent {
+    .value,
+    .textArea,
+    .largeTextArea,
+    .systemTextArea,
+    .nameValue {
+      border: 2px solid colors.$black;
+      background-color: colors.$white;
+    }
+
+    .checkbox {
+      border: 3px solid colors.$black;
+    }
+
+    .footerDetails {
+      color: colors.$black;
+      border-top: 2px solid colors.$black;
+    }
+  }
+}

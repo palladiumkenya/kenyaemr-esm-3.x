@@ -106,7 +106,7 @@ export const configSchema = {
   autopsyEncounterFormUuid: {
     _type: Type.String,
     _description: 'Encounter UUID for autopsy',
-    _default: '32b61a73-4971-4fc0-b20b-9a30176317e2',
+    _default: '465a92f2-baf8-42e9-9612-53064be868e8',
   },
   courtOrderCaseNumberUuid: {
     _type: Type.String,

@@ -16,13 +16,14 @@ import {
   OverflowMenuItem,
   DataTableSkeleton,
 } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, PrinterIcon, showModal, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
-import { type MortuaryLocationResponse } from '../../types';
+import { type Patient, type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import usePatients, { useMortuaryDischargeEncounter } from '../../bed-layout/discharged/discharged-bed-layout.resource';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { Printer } from '@carbon/react/icons';
 
 interface DischargedBedLineListViewProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -30,8 +31,7 @@ interface DischargedBedLineListViewProps {
   paginated?: boolean;
   initialPageSize?: number;
   pageSizes?: number[];
-  onPrintGatePass?: (patientUuid: string) => void;
-  onPrintPostmortem?: (patientUuid: string) => void;
+  onPrintGatePass?: (patient: any, encounterDate?: string) => void;
   mutate?: () => void;
 }
 
@@ -42,7 +42,6 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
   initialPageSize = 10,
   pageSizes = [10, 20, 30, 40, 50],
   onPrintGatePass,
-  onPrintPostmortem,
   mutate,
 }) => {
   const { t } = useTranslation();
@@ -53,6 +52,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
 
   const {
     dischargedPatientUuids,
+    encounters,
     isLoading: encountersLoading,
     error: encountersError,
   } = useMortuaryDischargeEncounter(morgueDischargeEncounterTypeUuid, AdmittedDeceasedPatient);
@@ -71,6 +71,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     { key: 'causeOfDeath', header: t('causeOfDeath', 'Cause of Death') },
     { key: 'dateOfDeath', header: t('dateOfDeath', 'Date of Death') },
     { key: 'daysSinceDeath', header: t('daysSinceDeath', 'Days Since Death') },
+    { key: 'dischargeDate', header: t('dischargeDate', 'Discharge Date') },
     { key: 'action', header: t('action', 'Action') },
   ];
 
@@ -84,15 +85,25 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     return Math.floor(timeDiff / (1000 * 3600 * 24));
   };
 
-  const handlePrintGatePass = (patientUuid: string) => {
-    if (onPrintGatePass) {
-      onPrintGatePass(patientUuid);
+  const getEncounterDateForPatient = (patientUuid: string): string | null => {
+    if (!encounters || encounters.length === 0) {
+      return null;
     }
+
+    const patientEncounter = encounters.find((encounter) => encounter.patient?.uuid === patientUuid);
+
+    return patientEncounter?.encounterDateTime || null;
   };
 
-  const handlePrintPostmortem = (patientUuid: string) => {
-    if (onPrintPostmortem) {
-      onPrintPostmortem(patientUuid);
+  const handlePrintGatePass = (patient: Patient, encounterDate?: string) => {
+    if (onPrintGatePass) {
+      onPrintGatePass(patient, encounterDate);
+    } else {
+      const dispose = showModal('print-confirmation-modal', {
+        onClose: () => dispose(),
+        patient: patient,
+        encounterDate: encounterDate,
+      });
     }
   };
 
@@ -109,9 +120,12 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
       const causeOfDeath = patient?.person?.causeOfDeath?.display || '-';
       const dateOfDeath = patient?.person?.deathDate;
       const daysSinceDeath = calculateDaysSinceDeath(dateOfDeath);
+      const encounterDate = getEncounterDateForPatient(patientUuid);
 
       return {
         id: patientUuid,
+        patient: patient,
+        encounterDate: encounterDate,
         idNumber:
           patient?.identifiers
             ?.find((id) => id.display?.includes('OpenMRS ID'))
@@ -123,12 +137,13 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
         causeOfDeath: causeOfDeath,
         dateOfDeath: formatDateTime(dateOfDeath),
         daysSinceDeath: daysSinceDeath.toString(),
+        dischargeDate: formatDateTime(encounterDate),
         action: patientUuid,
       };
     });
 
     return rows;
-  }, [dischargedPatients]);
+  }, [dischargedPatients, getEncounterDateForPatient]);
 
   const totalCount = allRows.length;
   const startIndex = (currentPage - 1) * currPageSize;
@@ -202,8 +217,9 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
               </TableHead>
               <TableBody>
                 {rows.map((row) => {
-                  const patientData = dischargedPatients.find((patient) => patient?.uuid === row.id);
-                  const patientName = patientData?.person?.display || '';
+                  const rowData = paginatedRows.find((r) => r.id === row.id);
+                  const patientData = rowData?.patient;
+                  const encounterDate = rowData?.encounterDate;
 
                   return (
                     <TableRow key={row.id} {...getRowProps({ row })}>
@@ -211,16 +227,15 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
                         <TableCell key={cell.id} {...getCellProps({ cell })}>
                           {cell.info.header === 'action' ? (
                             <div className={styles.actionButtons}>
-                              <OverflowMenu flipped>
+                              <OverflowMenu renderIcon={Printer} flipped>
                                 <OverflowMenuItem
-                                  onClick={() => handlePrintGatePass(row.id)}
+                                  onClick={() => handlePrintGatePass(patientData, encounterDate)}
                                   itemText={t('printGatePass', 'Gate Pass')}
                                   disabled={!patientData}
                                 />
-                                <OverflowMenuItem
-                                  onClick={() => handlePrintPostmortem(row.id)}
-                                  itemText={t('printPostmortem', 'Postmortem')}
-                                  disabled={!patientData}
+                                <ExtensionSlot
+                                  name="print-post-mortem-overflow-menu-item-slot"
+                                  state={{ patientUuid: row.id }}
                                 />
                               </OverflowMenu>
                             </div>
