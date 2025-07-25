@@ -22,6 +22,7 @@ import { Patient, Person, type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import { mutate as mutateSWR } from 'swr';
 import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
+import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 
 interface AdmittedBedLineListViewProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -274,9 +275,12 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
   if (!AdmittedDeceasedPatient) {
     return (
       <div className={styles.loadingContainer}>
-        <EmptyState
-          headerTitle={t('noAdmittedPatients', 'No admitted patients found')}
-          displayText={t('noAdmittedPatientsDescription', 'There are currently no admitted patients to display.')}
+        <EmptyMorgueAdmission
+          title={t('noAdmittedPatient', 'No deceased patients currently admitted')}
+          subTitle={t(
+            'noAdmittedPatientsDescription',
+            'There are no admitted deceased patients to display at this time.',
+          )}
         />
       </div>
     );

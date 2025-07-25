@@ -8,6 +8,7 @@ import { ConfigObject } from '../../config-schema';
 import { mutate as mutateSWR } from 'swr';
 import usePatients, { useMortuaryDischargeEncounter } from './discharged-bed-layout.resource';
 import BedCard from '../../bed/bed.component';
+import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 
 interface BedLayoutProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -56,13 +57,6 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
     }
   };
 
-  const handlePageSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newPageSize = parseInt(event.target.value, 10);
-    setCurrPageSize(newPageSize);
-    // Reset to first page when changing page size
-    goTo(1);
-  };
-
   if (isLoading || encountersLoading || patientsLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -81,9 +75,13 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
 
   if (!dischargedPatients || dischargedPatients.length === 0) {
     return (
-      <div className={styles.loadingContainer}>
-        <DataTableSkeleton columnCount={5} rowCount={5} zebra />
-      </div>
+      <EmptyMorgueAdmission
+        title={t('noDischargedPatient', 'No deceased patients currently discharged')}
+        subTitle={t(
+          'noDischargedPatientsDescription',
+          'There are no discharged deceased patients to display at this time.',
+        )}
+      />
     );
   }
 

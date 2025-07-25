@@ -28,3 +28,16 @@
 .tabsContainer {
   margin-top: layout.$spacing-04;
 }
+
+.tabSkeletonContainer {
+  padding: layout.$spacing-05;
+
+  .tabListSkeleton {
+    display: flex;
+    gap: layout.$spacing-03;
+    margin-top: layout.$spacing-03;
+  }
+}
+.searchSkeleton {
+  padding: layout.$spacing-04;
+}

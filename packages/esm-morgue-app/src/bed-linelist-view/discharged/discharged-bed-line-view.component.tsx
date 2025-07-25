@@ -23,6 +23,7 @@ import { type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import usePatients, { useMortuaryDischargeEncounter } from '../../bed-layout/discharged/discharged-bed-layout.resource';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 
 interface DischargedBedLineListViewProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -173,9 +174,12 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
   if (!dischargedPatients || dischargedPatients.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <EmptyState
-          headerTitle={t('noDischargedPatients', 'No discharged patients found')}
-          displayText={t('noDischargedPatientsDescription', 'There are currently no discharged patients to display.')}
+        <EmptyMorgueAdmission
+          title={t('noDischargedPatient', 'No deceased patients currently discharged')}
+          subTitle={t(
+            'noDischargedPatientsDescription',
+            'There are no discharged deceased patients to display at this time.',
+          )}
         />
       </div>
     );

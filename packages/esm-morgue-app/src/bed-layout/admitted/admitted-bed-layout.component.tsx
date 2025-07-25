@@ -9,6 +9,7 @@ import EmptyBedCard from '../../bed/empty-bed.component';
 import Divider from '../../bed/divider/divider.component';
 import { ConfigObject } from '../../config-schema';
 import { mutate as mutateSWR } from 'swr';
+import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 
 interface BedLayoutProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -101,6 +102,17 @@ const BedLayout: React.FC<BedLayoutProps> = ({
   }
 
   const bedLayouts = AdmittedDeceasedPatient?.bedLayouts || [];
+  if (!bedLayouts) {
+    return (
+      <EmptyMorgueAdmission
+        title={t('noAdmittedPatient', 'No deceased patients currently admitted')}
+        subTitle={t(
+          'noAdmittedPatientsDescription',
+          'There are no admitted deceased patients to display at this time.',
+        )}
+      />
+    );
+  }
 
   return (
     <div className={styles.bedLayoutWrapper}>
