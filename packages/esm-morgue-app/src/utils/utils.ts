@@ -110,3 +110,9 @@ export const parseDischargeDateTime = (data: {
 
   return dischargeDateTime;
 };
+
+export const documentId = () => {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substr(2, 9);
+  return `PM-${timestamp}-${random}`.toUpperCase();
+};

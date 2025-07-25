@@ -34,6 +34,11 @@
       }
     },
     {
+      "name": "print-post-mortem-overflow-menu-item",
+      "component": "printPostMortemOverflowMenuItem",
+      "slot": "print-post-mortem-overflow-menu-item-slot"
+    },
+    {
       "component": "root",
       "name": "morgue-dashboard-root",
       "slot": "morgue-dashboard-slot",
@@ -88,6 +93,16 @@
       "component": "disposeDeceasedPersonForm",
       "title": "Dispose Deceased Person",
       "type": "other-form"
+    }
+  ],
+    "modals": [
+    {
+      "name": "print-confirmation-modal",
+      "component": "printConfirmationModal"
+    },
+    {
+      "name": "autopsy-report-modal",
+      "component": "autopsyReportModal"
     }
   ],
   "pages": [

@@ -156,7 +156,8 @@ const CreateBillWorkspace: React.FC<CreateBillWorkspaceProps> = ({
   const defaultPaymentStatus = 'PENDING';
   const isTablet = useLayoutType() === 'tablet';
   const { cashPointUuid, cashierUuid } = useConfig<BillingConfig>();
-  const { billableItem, isLoading } = useBillableItem(order?.concept?.uuid ?? order?.drug?.concept?.uuid);
+  const drugUuid = order?.drug?.uuid;
+  const { billableItem, isLoading } = useBillableItem(order?.concept?.uuid ?? order?.drug?.concept?.uuid, drugUuid);
 
   const comboBoxItems =
     billableItem?.servicePrices?.map((item) => ({

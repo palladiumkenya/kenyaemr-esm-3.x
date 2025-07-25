@@ -6,7 +6,7 @@ import { Tag as TagIcon } from '@carbon/react/icons';
 import capitalize from 'lodash-es/capitalize';
 import startCase from 'lodash-es/startCase';
 import { formatDateTime, convertDateToDays } from '../utils/utils';
-import { useVisit } from '@openmrs/esm-framework';
+import { ExtensionSlot, useVisit } from '@openmrs/esm-framework';
 
 interface BedProps {
   bedNumber?: string;
@@ -23,7 +23,6 @@ interface BedProps {
   onSwapCompartment?: () => void;
   onDispose?: () => void;
   onPrintGatePass?: () => void;
-  onPrintPostmortem?: () => void;
   onViewDetails?: () => void;
   isDischarged?: boolean;
 }
@@ -43,7 +42,6 @@ const BedCard: React.FC<BedProps> = ({
   onSwapCompartment,
   onDispose,
   onPrintGatePass,
-  onPrintPostmortem,
   onViewDetails,
   isDischarged = false,
 }) => {
@@ -97,9 +95,16 @@ const BedCard: React.FC<BedProps> = ({
             <OverflowMenu flipped>
               {onAdmit && <OverflowMenuItem onClick={onAdmit} itemText={t('admit', 'Admit')} />}
               {onViewDetails && (
-                <OverflowMenuItem onClick={() => onViewDetails()} itemText={t('viewDetails', 'View details')} />
+                <OverflowMenuItem onClick={onViewDetails} itemText={t('viewDetails', 'View details')} />
               )}
-              {onPostmortem && <OverflowMenuItem onClick={onPostmortem} itemText={t('postmortem', 'Postmortem')} />}
+              {isDischarged && (
+                <ExtensionSlot
+                  name="print-post-mortem-overflow-menu-item-slot"
+                  state={{
+                    patientUuid: patientUuid,
+                  }}
+                />
+              )}
               {onDischarge && <OverflowMenuItem onClick={onDischarge} itemText={t('discharge', 'Discharge')} />}
               {onSwapCompartment && (
                 <OverflowMenuItem onClick={onSwapCompartment} itemText={t('swapCompartment', 'Swap Compartment')} />
@@ -107,12 +112,6 @@ const BedCard: React.FC<BedProps> = ({
               {onDispose && <OverflowMenuItem onClick={onDispose} itemText={t('dispose', 'Dispose')} />}
               {onPrintGatePass && (
                 <OverflowMenuItem onClick={onPrintGatePass} itemText={t('printGatePass', 'Gate Pass')} />
-              )}
-              {onPrintPostmortem && (
-                <OverflowMenuItem
-                  onClick={onPrintPostmortem}
-                  itemText={t('printPostmortemReport', 'Postmortem Report')}
-                />
               )}
             </OverflowMenu>
           </div>

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { launchWorkspace, showModal, useConfig } from '@openmrs/esm-framework';
 import { DataTableSkeleton, InlineLoading, Pagination } from '@carbon/react';
-import { launchWorkspace, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-layout.scss';
-import { type MortuaryLocationResponse } from '../../types';
+import { Patient, type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import { mutate as mutateSWR } from 'swr';
 import usePatients, { useMortuaryDischargeEncounter } from './discharged-bed-layout.resource';
@@ -13,7 +13,7 @@ import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.compo
 interface BedLayoutProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
   isLoading: boolean;
-  onPrintGatePass?: (patientUuid: string) => void;
+  onPrintGatePass?: (patient: Patient, encounterDate?: string) => void;
   onPrintPostmortem?: (patientUuid: string) => void;
   mutate?: () => void;
 }
@@ -30,6 +30,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
 
   const {
     dischargedPatientUuids,
+    encounters,
     isLoading: encountersLoading,
     error: encountersError,
     currentPage,
@@ -45,9 +46,25 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
     error: patientsError,
   } = usePatients(dischargedPatientUuids || []);
 
-  const handlePrintGatePass = (patientUuid: string) => {
+  const getEncounterDateForPatient = (patientUuid: string): string | null => {
+    if (!encounters || encounters.length === 0) {
+      return null;
+    }
+
+    const patientEncounter = encounters.find((encounter) => encounter.patient?.uuid === patientUuid);
+
+    return patientEncounter?.encounterDateTime || null;
+  };
+
+  const handlePrintGatePass = (patient: Patient, encounterDate?: string) => {
     if (onPrintGatePass) {
-      onPrintGatePass(patientUuid);
+      onPrintGatePass(patient, encounterDate);
+    } else {
+      const dispose = showModal('print-confirmation-modal', {
+        onClose: () => dispose(),
+        patient: patient,
+        encounterDate: encounterDate,
+      });
     }
   };
 
@@ -95,6 +112,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
           const age = patient?.person?.age;
           const causeOfDeath = patient?.person?.causeOfDeath?.display;
           const dateOfDeath = patient?.person?.deathDate;
+          const encounterDate = getEncounterDateForPatient(patientUuid);
 
           return (
             <BedCard
@@ -105,8 +123,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
               causeOfDeath={causeOfDeath}
               dateOfDeath={dateOfDeath}
               patientUuid={patientUuid}
-              onPrintGatePass={() => handlePrintGatePass(patientUuid)}
-              onPrintPostmortem={() => handlePrintPostmortem(patientUuid)}
+              onPrintGatePass={() => handlePrintGatePass(patient, encounterDate)}
               isDischarged={true}
             />
           );

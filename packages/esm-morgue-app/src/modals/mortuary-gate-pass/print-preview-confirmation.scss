@@ -1,0 +1,333 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.container {
+  padding: layout.$spacing-06;
+  margin-bottom: layout.$spacing-05;
+  background-color: colors.$white;
+
+  @media print {
+    padding: 0;
+    margin: 0;
+    background-color: colors.$white;
+  }
+}
+
+.noPrint {
+  @media print {
+    display: none !important;
+  }
+}
+
+.printableContent {
+  background-color: colors.$white;
+  width: 210mm;
+  min-height: 297mm;
+  margin: 0 auto;
+  padding: layout.$spacing-07;
+  box-sizing: border-box;
+  font-size: 11px;
+  line-height: 1.3;
+  color: colors.$black;
+
+  @media print {
+    width: 100%;
+    height: 100%;
+    padding: layout.$spacing-07;
+    margin: 0;
+    box-shadow: none;
+    border: none;
+    page-break-after: avoid;
+    page-break-before: avoid;
+  }
+}
+
+.printableHeader {
+  text-align: center;
+  margin-bottom: layout.$spacing-05;
+  padding-bottom: layout.$spacing-03;
+  border-bottom: 1px solid colors.$black;
+
+  @media print {
+    border-bottom: 1px solid colors.$black;
+  }
+}
+
+.facilityDetails {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.facilityName {
+  font-weight: 700;
+  color: colors.$black;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: layout.$spacing-03;
+  font-size: 14px;
+
+  @media print {
+    color: colors.$black;
+  }
+}
+
+.heading {
+  font-weight: 600;
+  color: colors.$black;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 12px;
+
+  @media print {
+    color: colors.$black;
+  }
+}
+
+.printableBody {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.gatePassForm {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+}
+
+.topInfoRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
+  border-radius: 2px;
+
+  @media print {
+    border: 1px solid colors.$black;
+  }
+}
+
+.secondInfoRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
+  border-radius: 2px;
+
+  @media print {
+    border: 1px solid colors.$black;
+  }
+}
+
+.infoItem,
+.patientField,
+.ageField {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.paymentSection {
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
+  border-radius: 2px;
+  margin: layout.$spacing-03 0;
+
+  @media print {
+    border: 1px solid colors.$black;
+  }
+}
+
+.sectionTitle {
+  font-weight: 600;
+  color: colors.$black;
+  margin-bottom: layout.$spacing-03;
+  font-size: 11px;
+
+  @media print {
+    color: colors.$black;
+  }
+}
+
+.paymentGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: layout.$spacing-03;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.checkbox {
+  width: 12px;
+  height: 12px;
+  border: 1px solid colors.$black;
+  background-color: colors.$white;
+  flex-shrink: 0;
+}
+
+.optionLabel {
+  color: colors.$black;
+  font-size: 10px;
+}
+
+.signaturesSection {
+  margin-top: layout.$spacing-05;
+  padding-top: layout.$spacing-03;
+  border-top: 1px solid colors.$black;
+}
+
+.signatureBlock {
+  margin-bottom: layout.$spacing-03;
+}
+
+.signatureRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: layout.$spacing-03;
+  align-items: center;
+  padding: layout.$spacing-02;
+}
+
+.nameField,
+.signField {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.signatureLine {
+  border-bottom: 1px solid colors.$black;
+  height: layout.$spacing-04;
+  width: 100%;
+}
+
+.nameValue {
+  color: colors.$black;
+  border-bottom: 1px solid colors.$black;
+  padding: layout.$spacing-01;
+  min-height: layout.$spacing-04;
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+}
+
+.footerNote {
+  margin-top: layout.$spacing-05;
+  padding: layout.$spacing-03;
+  border: 1px solid colors.$black;
+  border-radius: 2px;
+}
+
+.noteText {
+  color: colors.$black;
+  line-height: 1.4;
+  font-size: 10px;
+}
+
+.label {
+  font-weight: 600;
+  color: colors.$black;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.value,
+.valueWide {
+  color: colors.$black;
+  border-bottom: 1px solid colors.$black;
+  padding: layout.$spacing-01;
+  min-height: layout.$spacing-04;
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+}
+
+.btnSet {
+  width: 100%;
+  margin-top: layout.$spacing-05;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .printableContent,
+  .printableContent * {
+    visibility: visible;
+  }
+  .printableContent {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: layout.$spacing-07;
+  }
+}
+
+.footer {
+  margin-top: layout.$spacing-06;
+  padding-top: layout.$spacing-04;
+  border-top: 1px solid colors.$black;
+  text-align: center;
+  page-break-inside: avoid;
+
+  @media print {
+    position: fixed !important;
+    bottom: layout.$spacing-05 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: layout.$spacing-03 0 !important;
+    background: colors.$white !important;
+    border-top: 0.5pt solid colors.$gray-50 !important;
+    z-index: 1000 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+.footerDetails {
+  margin-top: layout.$spacing-03;
+  padding-top: layout.$spacing-03;
+  border-top: 1px solid colors.$gray-30;
+  font-size: layout.$spacing-02;
+  color: colors.$gray-70;
+  text-align: center;
+  line-height: 1.3;
+
+  div {
+    margin-bottom: layout.$spacing-02;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @media print {
+    margin: 0 !important;
+    padding: layout.$spacing-02 0 !important;
+    border-top: none !important;
+    font-size: 7pt !important;
+    color: colors.$gray-50 !important;
+    line-height: 1.1 !important;
+
+    div {
+      margin-bottom: layout.$spacing-01 !important;
+      display: inline-block !important;
+
+      &:last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
+}
