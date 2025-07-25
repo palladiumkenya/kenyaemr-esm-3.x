@@ -1,6 +1,7 @@
 import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
+import first from 'lodash-es/first';
 
 type BillableItemResponse = {
   uuid: string;
@@ -19,13 +20,18 @@ type BillableItemResponse = {
   }>;
 };
 
-export const useBillableItem = (billableItemId: string) => {
+export const useBillableItem = (billableItemId: string, drugUuid?: string) => {
   const customRepresentation = `v=custom:(uuid,name,concept:(uuid,display),servicePrices:(uuid,price,paymentMode:(uuid,name)))`;
+  const url = drugUuid
+    ? `${restBaseUrl}/cashier/billableService?${customRepresentation}&drugUuid=${drugUuid}`
+    : `${restBaseUrl}/cashier/billableService?${customRepresentation}`;
   const { data, error, isLoading } = useSWRImmutable<{ data: { results: Array<BillableItemResponse> } }>(
-    `${restBaseUrl}/cashier/billableService?${customRepresentation}`,
+    url,
     openmrsFetch,
   );
-  const billableItem = data?.data?.results?.find((item) => item?.concept?.uuid === billableItemId);
+  const billableItem = drugUuid
+    ? first(data?.data?.results)
+    : data?.data?.results?.find((item) => item?.concept?.uuid === billableItemId);
 
   return {
     billableItem: billableItem,
