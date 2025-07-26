@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from '@carbon/react';
+import { InlineLoading, Search } from '@carbon/react';
 import { launchWorkspace, navigate, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-layout.scss';
 import BedCard from '../../bed/bed.component';
@@ -33,6 +33,11 @@ const BedLayout: React.FC<BedLayoutProps> = ({
 }) => {
   const { t } = useTranslation();
   const { autopsyFormUuid } = useConfig<ConfigObject>();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
   const handlePostmortem = (patientUuid: string) => {
     if (onPostmortem) {
@@ -41,7 +46,6 @@ const BedLayout: React.FC<BedLayoutProps> = ({
       launchWorkspace('mortuary-form-entry', {
         formUuid: autopsyFormUuid,
         workspaceTitle: t('postmortemForm', 'Postmortem form'),
-
         patientUuid: patientUuid,
         encounterUuid: '',
         mutateForm: () => {
@@ -93,6 +97,38 @@ const BedLayout: React.FC<BedLayoutProps> = ({
     }
   };
 
+  const filteredBedLayouts = useMemo(() => {
+    if (!AdmittedDeceasedPatient?.bedLayouts || !searchTerm.trim()) {
+      return AdmittedDeceasedPatient?.bedLayouts || [];
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase().trim();
+
+    return AdmittedDeceasedPatient.bedLayouts.filter((bedLayout) => {
+      const bedNumber = bedLayout.bedNumber?.toString().toLowerCase() || '';
+      const bedType = bedLayout.bedType?.displayName?.toLowerCase() || '';
+
+      if (bedNumber.includes(lowerSearchTerm) || bedType.includes(lowerSearchTerm)) {
+        return true;
+      }
+
+      const patients = bedLayout.patients || [];
+      return patients.some((patient) => {
+        const patientName = patient.person?.display?.toLowerCase() || '';
+        const gender = patient.person?.gender?.toLowerCase() || '';
+        const patientId = patient.uuid?.toLowerCase() || '';
+        const causeOfDeath = patient.person?.causeOfDeath?.display?.toLowerCase() || '';
+
+        return (
+          patientName.includes(lowerSearchTerm) ||
+          gender.includes(lowerSearchTerm) ||
+          patientId.includes(lowerSearchTerm) ||
+          causeOfDeath.includes(lowerSearchTerm)
+        );
+      });
+    });
+  }, [AdmittedDeceasedPatient?.bedLayouts, searchTerm]);
+
   if (isLoading) {
     return (
       <div className={styles.loadingContainer}>
@@ -101,8 +137,31 @@ const BedLayout: React.FC<BedLayoutProps> = ({
     );
   }
 
-  const bedLayouts = AdmittedDeceasedPatient?.bedLayouts || [];
-  if (!bedLayouts) {
+  const bedLayouts = filteredBedLayouts;
+  if (!bedLayouts || bedLayouts.length === 0) {
+    if (searchTerm.trim()) {
+      return (
+        <>
+          <div className={styles.searchContainer}>
+            <Search
+              labelText={t('searchDeceasedPatients', 'Search deceased patients')}
+              placeholder={t(
+                'searchPatientsPlaceholder',
+                'Search by name, ID number, gender, compartment, or bed type...',
+              )}
+              value={searchTerm}
+              onChange={handleSearchChange}
+              size="sm"
+            />
+          </div>
+          <EmptyMorgueAdmission
+            title={t('noMatchingPatients', 'No matching patients found')}
+            subTitle={t('noMatchingPatientsDescription', 'Try adjusting your search terms to find deceased patients.')}
+          />
+        </>
+      );
+    }
+
     return (
       <EmptyMorgueAdmission
         title={t('noAdmittedPatient', 'No deceased patients currently admitted')}
@@ -115,86 +174,97 @@ const BedLayout: React.FC<BedLayoutProps> = ({
   }
 
   return (
-    <div className={styles.bedLayoutWrapper}>
-      <div className={styles.bedLayoutContainer}>
-        {bedLayouts.map((bedLayout, index) => {
-          const patients = bedLayout.patients || [];
-          const isEmpty = bedLayout.status === 'AVAILABLE' || patients.length === 0;
+    <>
+      <div className={styles.searchContainer}>
+        <Search
+          labelText={t('searchDeceasedPatients', 'Search deceased patients')}
+          placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, gender, compartment, or bed type...')}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          size="sm"
+        />
+      </div>
+      <div className={styles.bedLayoutWrapper}>
+        <div className={styles.bedLayoutContainer}>
+          {bedLayouts.map((bedLayout, index) => {
+            const patients = bedLayout.patients || [];
+            const isEmpty = bedLayout.status === 'AVAILABLE' || patients.length === 0;
 
-          if (isEmpty) {
-            return (
-              <EmptyBedCard
-                key={bedLayout.bedUuid || `empty-bed-${bedLayout.bedId}-${index}`}
-                bedNumber={bedLayout.bedNumber}
-                bedType={bedLayout.bedType?.displayName}
-                isEmpty={isEmpty}
-              />
-            );
-          }
-
-          return (
-            <div
-              key={bedLayout.bedUuid}
-              className={`${styles.bedContainer} ${patients.length > 1 ? styles.sharedBedContainer : ''}`}>
-              {patients.length > 1 ? (
-                <div className={styles.horizontalLayout}>
-                  {patients.map((patient, patientIndex) => (
-                    <React.Fragment key={patient.uuid}>
-                      <BedCard
-                        patientUuid={patient.uuid}
-                        patientName={patient.person?.display}
-                        gender={patient.person?.gender}
-                        age={patient.person?.age}
-                        causeOfDeath={patient.person?.causeOfDeath?.display}
-                        dateOfDeath={patient.person?.deathDate}
-                        bedNumber={bedLayout.bedNumber}
-                        bedType={bedLayout.bedType?.displayName}
-                        onPostmortem={() => handlePostmortem(patient.uuid)}
-                        onDischarge={() => handleDischarge(patient.uuid, bedLayout.bedId)}
-                        onSwapCompartment={() => handleSwapCompartment(patient.uuid, bedLayout.bedId)}
-                        onDispose={() => handleDispose(patient.uuid, bedLayout.bedId)}
-                        onViewDetails={() => {
-                          const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
-                          const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patient.uuid}`;
-                          const to = hasBedInfo
-                            ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
-                            : `${base}/mortuary-chart`;
-                          navigate({ to });
-                        }}
-                      />
-                      {patientIndex < patients.length - 1 && <Divider />}
-                    </React.Fragment>
-                  ))}
-                </div>
-              ) : (
-                <BedCard
-                  patientUuid={patients[0].uuid}
-                  patientName={patients[0].person?.display}
-                  gender={patients[0].person?.gender}
-                  age={patients[0].person?.age}
-                  causeOfDeath={patients[0].person?.causeOfDeath?.display}
-                  dateOfDeath={patients[0].person?.deathDate}
+            if (isEmpty) {
+              return (
+                <EmptyBedCard
+                  key={bedLayout.bedUuid || `empty-bed-${bedLayout.bedId}-${index}`}
                   bedNumber={bedLayout.bedNumber}
                   bedType={bedLayout.bedType?.displayName}
-                  onPostmortem={() => handlePostmortem(patients[0].uuid)}
-                  onDischarge={() => handleDischarge(patients[0].uuid, bedLayout.bedId)}
-                  onSwapCompartment={() => handleSwapCompartment(patients[0].uuid, bedLayout.bedId)}
-                  onDispose={() => handleDispose(patients[0].uuid, bedLayout.bedId)}
-                  onViewDetails={() => {
-                    const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
-                    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patients[0].uuid}`;
-                    const to = hasBedInfo
-                      ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
-                      : `${base}/mortuary-chart`;
-                    navigate({ to });
-                  }}
+                  isEmpty={isEmpty}
                 />
-              )}
-            </div>
-          );
-        })}
+              );
+            }
+
+            return (
+              <div
+                key={bedLayout.bedUuid}
+                className={`${styles.bedContainer} ${patients.length > 1 ? styles.sharedBedContainer : ''}`}>
+                {patients.length > 1 ? (
+                  <div className={styles.horizontalLayout}>
+                    {patients.map((patient, patientIndex) => (
+                      <React.Fragment key={patient.uuid}>
+                        <BedCard
+                          patientUuid={patient.uuid}
+                          patientName={patient.person?.display}
+                          gender={patient.person?.gender}
+                          age={patient.person?.age}
+                          causeOfDeath={patient.person?.causeOfDeath?.display}
+                          dateOfDeath={patient.person?.deathDate}
+                          bedNumber={bedLayout.bedNumber}
+                          bedType={bedLayout.bedType?.displayName}
+                          onPostmortem={() => handlePostmortem(patient.uuid)}
+                          onDischarge={() => handleDischarge(patient.uuid, bedLayout.bedId)}
+                          onSwapCompartment={() => handleSwapCompartment(patient.uuid, bedLayout.bedId)}
+                          onDispose={() => handleDispose(patient.uuid, bedLayout.bedId)}
+                          onViewDetails={() => {
+                            const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
+                            const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patient.uuid}`;
+                            const to = hasBedInfo
+                              ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
+                              : `${base}/mortuary-chart`;
+                            navigate({ to });
+                          }}
+                        />
+                        {patientIndex < patients.length - 1 && <Divider />}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                ) : (
+                  <BedCard
+                    patientUuid={patients[0].uuid}
+                    patientName={patients[0].person?.display}
+                    gender={patients[0].person?.gender}
+                    age={patients[0].person?.age}
+                    causeOfDeath={patients[0].person?.causeOfDeath?.display}
+                    dateOfDeath={patients[0].person?.deathDate}
+                    bedNumber={bedLayout.bedNumber}
+                    bedType={bedLayout.bedType?.displayName}
+                    onPostmortem={() => handlePostmortem(patients[0].uuid)}
+                    onDischarge={() => handleDischarge(patients[0].uuid, bedLayout.bedId)}
+                    onSwapCompartment={() => handleSwapCompartment(patients[0].uuid, bedLayout.bedId)}
+                    onDispose={() => handleDispose(patients[0].uuid, bedLayout.bedId)}
+                    onViewDetails={() => {
+                      const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
+                      const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patients[0].uuid}`;
+                      const to = hasBedInfo
+                        ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
+                        : `${base}/mortuary-chart`;
+                      navigate({ to });
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

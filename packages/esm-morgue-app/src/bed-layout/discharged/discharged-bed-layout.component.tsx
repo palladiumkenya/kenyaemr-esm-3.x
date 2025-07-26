@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace, showModal, useConfig } from '@openmrs/esm-framework';
-import { DataTableSkeleton, InlineLoading, Pagination } from '@carbon/react';
+import { showModal, useConfig } from '@openmrs/esm-framework';
+import { InlineLoading, Pagination, Search } from '@carbon/react';
 import styles from '../bed-layout.scss';
 import { Patient, type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
-import { mutate as mutateSWR } from 'swr';
 import usePatients, { useMortuaryDischargeEncounter } from './discharged-bed-layout.resource';
 import BedCard from '../../bed/bed.component';
 import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
@@ -18,15 +17,10 @@ interface BedLayoutProps {
   mutate?: () => void;
 }
 
-const DischargedBedLayout: React.FC<BedLayoutProps> = ({
-  AdmittedDeceasedPatient,
-  isLoading,
-  onPrintGatePass,
-  onPrintPostmortem,
-  mutate,
-}) => {
+const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient, isLoading, onPrintGatePass }) => {
   const { t } = useTranslation();
   const { morgueDischargeEncounterTypeUuid } = useConfig<ConfigObject>();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const {
     dischargedPatientUuids,
@@ -45,6 +39,33 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
     isLoading: patientsLoading,
     error: patientsError,
   } = usePatients(dischargedPatientUuids || []);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  // Filter patients based on search term
+  const filteredPatients = useMemo(() => {
+    if (!dischargedPatients || !searchTerm.trim()) {
+      return dischargedPatients || [];
+    }
+
+    const lowerSearchTerm = searchTerm.toLowerCase().trim();
+
+    return dischargedPatients.filter((patient) => {
+      const patientName = patient?.person?.display?.toLowerCase() || '';
+      const gender = patient?.person?.gender?.toLowerCase() || '';
+      const patientId = patient?.uuid?.toLowerCase() || '';
+      const causeOfDeath = patient?.person?.causeOfDeath?.display?.toLowerCase() || '';
+
+      return (
+        patientName.includes(lowerSearchTerm) ||
+        gender.includes(lowerSearchTerm) ||
+        patientId.includes(lowerSearchTerm) ||
+        causeOfDeath.includes(lowerSearchTerm)
+      );
+    });
+  }, [dischargedPatients, searchTerm]);
 
   const getEncounterDateForPatient = (patientUuid: string): string | null => {
     if (!encounters || encounters.length === 0) {
@@ -65,12 +86,6 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
         patient: patient,
         encounterDate: encounterDate,
       });
-    }
-  };
-
-  const handlePrintPostmortem = (patientUuid: string) => {
-    if (onPrintPostmortem) {
-      onPrintPostmortem(patientUuid);
     }
   };
 
@@ -102,51 +117,90 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({
     );
   }
 
+  const patientsToShow = filteredPatients;
+
+  if (searchTerm.trim() && patientsToShow.length === 0) {
+    return (
+      <>
+        <div className={styles.searchContainer}>
+          <Search
+            labelText={t('searchDeceasedPatients', 'Search deceased patients')}
+            placeholder={t(
+              'searchPatientsPlaceholder',
+              'Search by name, ID number, gender, compartment, or bed type...',
+            )}
+            value={searchTerm}
+            onChange={handleSearchChange}
+            size="sm"
+          />
+        </div>
+        <EmptyMorgueAdmission
+          title={t('noMatchingDischargedPatients', 'No matching discharged patients found')}
+          subTitle={t(
+            'noMatchingDischargedPatientsDescription',
+            'Try adjusting your search terms to find discharged patients.',
+          )}
+        />
+      </>
+    );
+  }
+
   return (
-    <div className={styles.bedLayoutWrapper}>
-      <div className={styles.bedLayoutContainer}>
-        {dischargedPatients.map((patient) => {
-          const patientUuid = patient?.uuid;
-          const patientName = patient?.person?.display;
-          const gender = patient?.person?.gender;
-          const age = patient?.person?.age;
-          const causeOfDeath = patient?.person?.causeOfDeath?.display;
-          const dateOfDeath = patient?.person?.deathDate;
-          const encounterDate = getEncounterDateForPatient(patientUuid);
-
-          return (
-            <BedCard
-              key={patientUuid}
-              patientName={patientName}
-              gender={gender}
-              age={age}
-              causeOfDeath={causeOfDeath}
-              dateOfDeath={dateOfDeath}
-              patientUuid={patientUuid}
-              onPrintGatePass={() => handlePrintGatePass(patient, encounterDate)}
-              isDischarged={true}
-            />
-          );
-        })}
-      </div>
-
-      <div className={styles.paginationFooter}>
-        <Pagination
-          page={currentPage || 1}
-          totalItems={totalCount || 0}
-          pageSize={currPageSize}
-          pageSizes={[10, 20, 50, 100]}
-          onChange={({ page, pageSize }: { page: number; pageSize: number }) => {
-            if (pageSize !== currPageSize) {
-              setCurrPageSize(pageSize);
-              goTo(1);
-            } else {
-              goTo(page);
-            }
-          }}
+    <>
+      <div className={styles.searchContainer}>
+        <Search
+          labelText={t('searchDeceasedPatients', 'Search deceased patients')}
+          placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, gender, compartment, or bed type...')}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          size="sm"
         />
       </div>
-    </div>
+      <div className={styles.bedLayoutWrapper}>
+        <div className={styles.bedLayoutContainer}>
+          {patientsToShow.map((patient) => {
+            const patientUuid = patient?.uuid;
+            const patientName = patient?.person?.display;
+            const gender = patient?.person?.gender;
+            const age = patient?.person?.age;
+            const causeOfDeath = patient?.person?.causeOfDeath?.display;
+            const dateOfDeath = patient?.person?.deathDate;
+            const encounterDate = getEncounterDateForPatient(patientUuid);
+
+            return (
+              <BedCard
+                key={patientUuid}
+                patientName={patientName}
+                gender={gender}
+                age={age}
+                causeOfDeath={causeOfDeath}
+                dateOfDeath={dateOfDeath}
+                patientUuid={patientUuid}
+                onPrintGatePass={() => handlePrintGatePass(patient, encounterDate)}
+                isDischarged={true}
+              />
+            );
+          })}
+        </div>
+
+        <div className={styles.paginationFooter}>
+          <Pagination
+            page={currentPage || 1}
+            totalItems={totalCount || 0}
+            pageSize={currPageSize}
+            pageSizes={[10, 20, 50, 100]}
+            onChange={({ page, pageSize }: { page: number; pageSize: number }) => {
+              if (pageSize !== currPageSize) {
+                setCurrPageSize(pageSize);
+                goTo(1);
+              } else {
+                goTo(page);
+              }
+            }}
+          />
+        </div>
+      </div>
+    </>
   );
 };
 

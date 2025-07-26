@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -15,6 +15,7 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   DataTableSkeleton,
+  Search,
 } from '@carbon/react';
 import { ExtensionSlot, PrinterIcon, showModal, useConfig } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
@@ -50,6 +51,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currPageSize, setCurrPageSize] = useState(initialPageSize);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const {
     dischargedPatientUuids,
@@ -76,7 +78,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     { key: 'action', header: t('action', 'Action') },
   ];
 
-  const calculateDaysSinceDeath = (dateOfDeath: string): number => {
+  const calculateDaysSinceDeath = useCallback((dateOfDeath: string): number => {
     if (!dateOfDeath) {
       return 0;
     }
@@ -84,29 +86,34 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     const currentDate = new Date();
     const timeDiff = currentDate.getTime() - deathDate.getTime();
     return Math.floor(timeDiff / (1000 * 3600 * 24));
-  };
+  }, []);
 
-  const getEncounterDateForPatient = (patientUuid: string): string | null => {
-    if (!encounters || encounters.length === 0) {
-      return null;
-    }
+  const getEncounterDateForPatient = useCallback(
+    (patientUuid: string): string | null => {
+      if (!encounters || encounters.length === 0) {
+        return null;
+      }
 
-    const patientEncounter = encounters.find((encounter) => encounter.patient?.uuid === patientUuid);
+      const patientEncounter = encounters.find((encounter) => encounter.patient?.uuid === patientUuid);
+      return patientEncounter?.encounterDateTime || null;
+    },
+    [encounters],
+  );
 
-    return patientEncounter?.encounterDateTime || null;
-  };
-
-  const handlePrintGatePass = (patient: Patient, encounterDate?: string) => {
-    if (onPrintGatePass) {
-      onPrintGatePass(patient, encounterDate);
-    } else {
-      const dispose = showModal('print-confirmation-modal', {
-        onClose: () => dispose(),
-        patient: patient,
-        encounterDate: encounterDate,
-      });
-    }
-  };
+  const handlePrintGatePass = useCallback(
+    (patient: Patient, encounterDate?: string) => {
+      if (onPrintGatePass) {
+        onPrintGatePass(patient, encounterDate);
+      } else {
+        const dispose = showModal('print-confirmation-modal', {
+          onClose: () => dispose(),
+          patient: patient,
+          encounterDate: encounterDate,
+        });
+      }
+    },
+    [onPrintGatePass],
+  );
 
   const allRows = useMemo(() => {
     if (!dischargedPatients || dischargedPatients.length === 0) {
@@ -122,16 +129,17 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
       const dateOfDeath = patient?.person?.deathDate;
       const daysSinceDeath = calculateDaysSinceDeath(dateOfDeath);
       const encounterDate = getEncounterDateForPatient(patientUuid);
+      const idNumber =
+        patient?.identifiers
+          ?.find((id) => id.display?.includes('OpenMRS ID'))
+          ?.display?.split('=')?.[1]
+          ?.trim() || '-';
 
       return {
         id: patientUuid,
         patient: patient,
         encounterDate: encounterDate,
-        idNumber:
-          patient?.identifiers
-            ?.find((id) => id.display?.includes('OpenMRS ID'))
-            ?.display?.split('=')?.[1]
-            ?.trim() || '-',
+        idNumber,
         name: patientName,
         gender: gender,
         age: age.toString(),
@@ -140,32 +148,61 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
         daysSinceDeath: daysSinceDeath.toString(),
         dischargeDate: formatDateTime(encounterDate),
         action: patientUuid,
+        searchableText: `${patientName} ${idNumber} ${gender} ${causeOfDeath}`.toLowerCase(),
       };
     });
 
     return rows;
-  }, [dischargedPatients, getEncounterDateForPatient]);
+  }, [dischargedPatients, calculateDaysSinceDeath, getEncounterDateForPatient]);
 
-  const totalCount = allRows.length;
-  const startIndex = (currentPage - 1) * currPageSize;
-  const endIndex = startIndex + currPageSize;
-  const paginatedRows = paginated ? allRows.slice(startIndex, endIndex) : allRows;
+  const filteredRows = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return allRows;
+    }
 
-  const goTo = (page: number) => {
+    const searchLower = searchTerm.toLowerCase().trim();
+    return allRows.filter(
+      (row) =>
+        row.searchableText.includes(searchLower) ||
+        row.name.toLowerCase().includes(searchLower) ||
+        row.idNumber.toLowerCase().includes(searchLower) ||
+        row.gender.toLowerCase().includes(searchLower) ||
+        row.causeOfDeath.toLowerCase().includes(searchLower),
+    );
+  }, [allRows, searchTerm]);
+
+  const goTo = useCallback((page: number) => {
     setCurrentPage(page);
-  };
+  }, []);
 
-  const handlePaginationChange = ({ page: newPage, pageSize }: { page: number; pageSize: number }) => {
-    if (newPage !== currentPage) {
-      goTo(newPage);
-    }
-    if (pageSize !== currPageSize) {
-      setCurrPageSize(pageSize);
-      setCurrentPage(1);
-    }
-  };
+  const handlePaginationChange = useCallback(
+    ({ page: newPage, pageSize }: { page: number; pageSize: number }) => {
+      if (newPage !== currentPage) {
+        goTo(newPage);
+      }
+      if (pageSize !== currPageSize) {
+        setCurrPageSize(pageSize);
+        setCurrentPage(1);
+      }
+    },
+    [currentPage, currPageSize, goTo],
+  );
+
+  const handleSearchChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
+  }, []);
+
+  const clearSearch = useCallback(() => {
+    setSearchTerm('');
+    setCurrentPage(1);
+  }, []);
 
   const isLoadingData = isLoading || encountersLoading || patientsLoading;
+  const hasSearchTerm = searchTerm.trim().length > 0;
+  const hasNoSearchResults = hasSearchTerm && filteredRows.length === 0;
+  const hasPatients = dischargedPatients && dischargedPatients.length > 0;
+  const totalCount = filteredRows.length;
 
   if (isLoadingData) {
     return (
@@ -181,12 +218,12 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
         <EmptyState
           headerTitle={t('noDischargedPatients', 'No discharged patients found')}
           displayText={t('noDischargedPatientsDescription', 'There are currently no discharged patients to display.')}
-        />{' '}
+        />
       </div>
     );
   }
 
-  if (!dischargedPatients || dischargedPatients.length === 0) {
+  if (!hasPatients) {
     return (
       <div className={styles.emptyState}>
         <EmptyMorgueAdmission
@@ -200,72 +237,101 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
     );
   }
 
+  const startIndex = (currentPage - 1) * currPageSize;
+  const endIndex = startIndex + currPageSize;
+  const paginatedRows = paginated ? filteredRows.slice(startIndex, endIndex) : filteredRows;
+
+  const NoSearchResults = () => (
+    <div className={styles.emptyState}>
+      <EmptyMorgueAdmission
+        title={t('noSearchResults', 'We couldn’t find anything')}
+        subTitle={t('tryAgain', 'Try adjusting your search {{searchTerm}} and try again', { searchTerm })}
+      />
+    </div>
+  );
+
   return (
     <div className={styles.bedLayoutWrapper}>
-      <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getCellProps }) => (
-          <TableContainer>
-            <Table {...getTableProps()} aria-label="discharged patients table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      key={header.key}
-                      {...getHeaderProps({
-                        header,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => {
-                  const rowData = paginatedRows.find((r) => r.id === row.id);
-                  const patientData = rowData?.patient;
-                  const encounterDate = rowData?.encounterDate;
+      <div className={styles.searchContainer}>
+        <Search
+          labelText={t('searchPatients', 'Search Patients')}
+          placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, gender, or cause of death...')}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          size="sm"
+        />
+      </div>
 
-                  return (
-                    <TableRow key={row.id} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id} {...getCellProps({ cell })}>
-                          {cell.info.header === 'action' ? (
-                            <div className={styles.actionButtons}>
-                              <OverflowMenu renderIcon={Printer} flipped>
-                                <OverflowMenuItem
-                                  onClick={() => handlePrintGatePass(patientData, encounterDate)}
-                                  itemText={t('printGatePass', 'Gate Pass')}
-                                  disabled={!patientData}
-                                />
-                                <ExtensionSlot
-                                  name="print-post-mortem-overflow-menu-item-slot"
-                                  state={{ patientUuid: row.id }}
-                                />
-                              </OverflowMenu>
-                            </div>
-                          ) : (
-                            cell.value
-                          )}
-                        </TableCell>
+      {hasNoSearchResults ? (
+        <NoSearchResults />
+      ) : (
+        <>
+          <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
+            {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getCellProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()} aria-label="discharged patients table">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          key={header.key}
+                          {...getHeaderProps({
+                            header,
+                          })}>
+                          {header.header}
+                        </TableHeader>
                       ))}
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => {
+                      const rowData = paginatedRows.find((r) => r.id === row.id);
+                      const patientData = rowData?.patient;
+                      const encounterDate = rowData?.encounterDate;
 
-      {paginated && !isLoadingData && totalCount > 0 && (
-        <Pagination
-          page={currentPage}
-          pageSize={currPageSize}
-          pageSizes={pageSizes}
-          totalItems={totalCount}
-          size={'sm'}
-          onChange={handlePaginationChange}
-        />
+                      return (
+                        <TableRow key={row.id} {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id} {...getCellProps({ cell })}>
+                              {cell.info.header === 'action' ? (
+                                <div className={styles.actionButtons}>
+                                  <OverflowMenu renderIcon={Printer} flipped>
+                                    <OverflowMenuItem
+                                      onClick={() => handlePrintGatePass(patientData, encounterDate)}
+                                      itemText={t('printGatePass', 'Gate Pass')}
+                                      disabled={!patientData}
+                                    />
+                                    <ExtensionSlot
+                                      name="print-post-mortem-overflow-menu-item-slot"
+                                      state={{ patientUuid: row.id }}
+                                    />
+                                  </OverflowMenu>
+                                </div>
+                              ) : (
+                                cell.value
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+
+          {paginated && !isLoadingData && totalCount > 0 && (
+            <Pagination
+              page={currentPage}
+              pageSize={currPageSize}
+              pageSizes={pageSizes}
+              totalItems={totalCount}
+              size={'sm'}
+              onChange={handlePaginationChange}
+            />
+          )}
+        </>
       )}
     </div>
   );

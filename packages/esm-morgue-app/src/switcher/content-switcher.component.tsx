@@ -99,7 +99,8 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     (tabIndex: TabType) => {
       const isListView = selectedView === ViewType.LIST;
 
-      if (isLoading) {
+      // Show loading skeleton if any relevant data is still loading
+      if (isLoading || isLoadingAdmission || (tabIndex === TabType.DISCHARGE && isLoadingDischarge)) {
         return (
           <div className={styles.loadingContainer}>
             <DataTableSkeleton showHeader={false} showToolbar={false} />
@@ -114,26 +115,34 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
               <AwaitingBedLineListView
                 awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
                 mortuaryLocation={admissionLocation}
-                isLoading={false}
+                isLoading={isLoading}
                 mutated={mutate}
               />
             </div>
           ) : (
-            <AwaitingBedLayout
-              mortuaryLocation={admissionLocation}
-              awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
-              isLoading={false}
-              mutated={mutate}
-            />
+            <>
+              <AwaitingBedLayout
+                mortuaryLocation={admissionLocation}
+                awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
+                isLoading={isLoading}
+                mutated={mutate}
+              />
+            </>
           );
 
         case TabType.ADMITTED:
           return isListView ? (
             <div className={styles.listContainer}>
-              <AdmittedBedLineListView AdmittedDeceasedPatient={admissionLocation} isLoading={false} mutate={mutate} />
+              <AdmittedBedLineListView
+                AdmittedDeceasedPatient={admissionLocation}
+                isLoading={isLoadingAdmission}
+                mutate={mutate}
+              />
             </div>
           ) : (
-            <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={false} mutate={mutate} />
+            <>
+              <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={isLoadingAdmission} mutate={mutate} />
+            </>
           );
 
         case TabType.DISCHARGE:
@@ -141,19 +150,34 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
             <div className={styles.listContainer}>
               <DischargedBedLineListView
                 AdmittedDeceasedPatient={admissionLocation}
-                isLoading={false}
+                isLoading={isLoadingDischarge}
                 mutate={mutate}
               />
             </div>
           ) : (
-            <DischargedBedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={false} mutate={mutate} />
+            <>
+              <DischargedBedLayout
+                AdmittedDeceasedPatient={admissionLocation}
+                isLoading={isLoadingDischarge}
+                mutate={mutate}
+              />
+            </>
           );
 
         default:
           return null;
       }
     },
-    [selectedView, isLoading, awaitingQueueDeceasedPatients, admissionLocation, dischargedPatients, mutate],
+    [
+      selectedView,
+      isLoading,
+      isLoadingAdmission,
+      isLoadingDischarge,
+      awaitingQueueDeceasedPatients,
+      admissionLocation,
+      dischargedPatients,
+      mutate,
+    ],
   );
 
   return (
@@ -180,11 +204,6 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
       </CardHeader>
 
       <div className={styles.tabsContainer}>
-        {isLoading ? (
-          <TextInputSkeleton className={styles.searchSkeleton} />
-        ) : (
-          <Search labelText={t('searchPatients', 'Search Patients')} />
-        )}
         <Tabs selectedIndex={selectedTab} onChange={handleTabChange}>
           {isLoading || isLoadingAdmission || isLoadingDischarge ? (
             <div className={styles.tabSkeletonContainer}>
@@ -223,4 +242,5 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     </div>
   );
 };
+
 export default CustomContentSwitcher;
