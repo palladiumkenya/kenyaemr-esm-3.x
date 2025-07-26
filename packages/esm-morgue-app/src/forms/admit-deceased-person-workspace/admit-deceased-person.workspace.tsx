@@ -95,13 +95,6 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
 
   const { morgueVisitTypeUuid, morgueDepartmentServiceTypeUuid, insurancepaymentModeUuid } = useConfig<ConfigObject>();
-  const handleMutation = () => {
-    const url = `${restBaseUrl}/morgue`;
-
-    mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, {
-      revalidate: true,
-    });
-  };
 
   const handlePoliceCaseChange = (selectedItem: string | null) => {
     setIsPoliceCase(selectedItem);
@@ -219,7 +212,6 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
       },
     );
     mutated();
-    handleMutation();
     closeWorkspace();
   };
   return (
