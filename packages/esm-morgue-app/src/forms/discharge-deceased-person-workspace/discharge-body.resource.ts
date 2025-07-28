@@ -3,7 +3,6 @@ import useSWR from 'swr';
 import { Patient, PatientInfo, PatientInvoice, PaymentStatus } from '../../types';
 import dayjs from 'dayjs';
 import sortBy from 'lodash-es/sortBy';
-import isEmpty from 'lodash-es/isEmpty';
 import { useMemo } from 'react';
 
 export const usePersonAttributes = (personUuid: string) => {

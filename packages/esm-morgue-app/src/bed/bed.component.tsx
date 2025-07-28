@@ -21,7 +21,6 @@ interface BedProps {
   onPostmortem?: () => void;
   onDischarge?: () => void;
   onSwapCompartment?: () => void;
-  onDispose?: () => void;
   onPrintGatePass?: () => void;
   onViewDetails?: () => void;
   isDischarged?: boolean;
@@ -40,7 +39,6 @@ const BedCard: React.FC<BedProps> = ({
   onPostmortem,
   onDischarge,
   onSwapCompartment,
-  onDispose,
   onPrintGatePass,
   onViewDetails,
   isDischarged = false,
@@ -109,7 +107,7 @@ const BedCard: React.FC<BedProps> = ({
               {onSwapCompartment && (
                 <OverflowMenuItem onClick={onSwapCompartment} itemText={t('swapCompartment', 'Swap Compartment')} />
               )}
-              {onDispose && <OverflowMenuItem onClick={onDispose} itemText={t('dispose', 'Dispose')} />}
+              {onPostmortem && <OverflowMenuItem onClick={onPostmortem} itemText={t('postmortem', 'Postmortem')} />}
               {onPrintGatePass && (
                 <OverflowMenuItem onClick={onPrintGatePass} itemText={t('printGatePass', 'Gate Pass')} />
               )}

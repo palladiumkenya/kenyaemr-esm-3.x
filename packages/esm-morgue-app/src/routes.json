@@ -87,12 +87,6 @@
       "width": "extra-wide",
       "canMaximize": true,
       "canHide": true
-    },
-    {
-      "name": "dispose-deceased-person-form",
-      "component": "disposeDeceasedPersonForm",
-      "title": "Dispose Deceased Person",
-      "type": "other-form"
     }
   ],
     "modals": [

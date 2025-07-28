@@ -131,19 +131,6 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     }
   };
 
-  const handleDispose = (patientUuid: string, bedId: number) => {
-    if (onDispose) {
-      onDispose(patientUuid);
-    } else {
-      launchWorkspace('dispose-deceased-person-form', {
-        workspaceTitle: t('disposeForm', 'Dispose form'),
-        patientUuid: patientUuid,
-        bedId,
-        mutate,
-      });
-    }
-  };
-
   const calculateDaysAdmitted = (dateOfDeath: string): number => {
     if (!dateOfDeath) {
       return 0;
@@ -268,7 +255,6 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     return rows;
   }, [getCompartmentShare, AdmittedDeceasedPatient, t, isLoading]);
 
-  // Filter rows based on search term
   const filteredRows = useMemo(() => {
     if (!searchTerm.trim()) {
       return allRows;
@@ -435,10 +421,6 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
                                       <OverflowMenuItem
                                         onClick={() => handleSwapCompartment(rowData.patientUuid, rowData.bedId)}
                                         itemText={t('compartmentSwap', 'Compartment swap')}
-                                      />
-                                      <OverflowMenuItem
-                                        onClick={() => handleDispose(rowData.patientUuid, rowData.bedId)}
-                                        itemText={t('disposeForm', 'Dispose')}
                                       />
                                       <OverflowMenuItem
                                         onClick={() => handleDischarge(rowData.patientUuid, rowData.bedId)}
