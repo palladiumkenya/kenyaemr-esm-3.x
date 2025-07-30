@@ -43,5 +43,11 @@
       "component": "adrAssessmentSummary",
       "slot": "adr-assessment-overview-dashboard-slot"
     }
+  ],
+  "modals": [
+    {
+      "name": "adr-print-preview-modal",
+      "component": "adrPrintPreviewModal"
+    }
   ]
 }
