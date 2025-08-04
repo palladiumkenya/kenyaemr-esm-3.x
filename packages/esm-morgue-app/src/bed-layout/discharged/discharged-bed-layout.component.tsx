@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showModal, useConfig } from '@openmrs/esm-framework';
+import { showModal, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { InlineLoading, Pagination, Search } from '@carbon/react';
 import styles from '../bed-layout.scss';
 import { Patient, type MortuaryLocationResponse, EnhancedPatient } from '../../types';
@@ -22,6 +22,8 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
   const { t } = useTranslation();
   const { morgueDischargeEncounterTypeUuid } = useConfig<ConfigObject>();
   const [searchTerm, setSearchTerm] = useState('');
+  const isTablet = useLayoutType() === 'tablet';
+  const controlSize = isTablet ? 'md' : 'sm';
 
   const {
     dischargedPatientUuids,
@@ -145,7 +147,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
             )}
             value={searchTerm}
             onChange={handleSearchChange}
-            size="sm"
+            size={controlSize}
           />
         </div>
         <EmptyMorgueAdmission

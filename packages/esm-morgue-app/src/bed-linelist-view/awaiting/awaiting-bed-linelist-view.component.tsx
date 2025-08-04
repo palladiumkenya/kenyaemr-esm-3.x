@@ -20,7 +20,7 @@ import {
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
 import { type MortuaryLocationResponse, type MortuaryPatient } from '../../types';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { useAwaitingPatients } from '../../home/home.resource';
 import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 
@@ -44,6 +44,8 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
   mutated,
 }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
+  const controlSize = isTablet ? 'md' : 'sm';
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currPageSize, setCurrPageSize] = useState(initialPageSize);
@@ -185,7 +187,7 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
         placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, or gender...')}
         value={searchTerm}
         onChange={handleSearchChange}
-        size="sm"
+        size={controlSize}
       />
       {hasNoSearchResults ? (
         <EmptyMorgueAdmission

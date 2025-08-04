@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Search } from '@carbon/react';
-import { launchWorkspace, navigate, useConfig } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import styles from '../bed-layout.scss';
 import BedCard from '../../bed/bed.component';
 import { type MortuaryLocationResponse } from '../../types';
@@ -34,6 +34,8 @@ const BedLayout: React.FC<BedLayoutProps> = ({
   const { t } = useTranslation();
   const { autopsyFormUuid } = useConfig<ConfigObject>();
   const [searchTerm, setSearchTerm] = useState('');
+  const isTablet = useLayoutType() === 'tablet';
+  const controlSize = isTablet ? 'md' : 'sm';
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -164,7 +166,7 @@ const BedLayout: React.FC<BedLayoutProps> = ({
               )}
               value={searchTerm}
               onChange={handleSearchChange}
-              size="sm"
+              size={controlSize}
             />
           </div>
           <EmptyMorgueAdmission

@@ -4,7 +4,7 @@ import { InlineLoading, Search, SkeletonText } from '@carbon/react';
 import styles from '../bed-layout.scss';
 import { MortuaryPatient, MortuaryLocationResponse, EnhancedPatient } from '../../types';
 import { useAwaitingPatients } from '../../home/home.resource';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
 import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 import { getOriginalPatient, transformMortuaryPatient } from '../../helpers/expression-helper';
@@ -27,6 +27,8 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
+  const isTablet = useLayoutType() === 'tablet';
+  const controlSize = isTablet ? 'md' : 'sm';
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value);
@@ -108,7 +110,7 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
             )}
             value={searchTerm}
             onChange={handleSearchChange}
-            size="sm"
+            size={controlSize}
           />
         </div>
         <EmptyMorgueAdmission

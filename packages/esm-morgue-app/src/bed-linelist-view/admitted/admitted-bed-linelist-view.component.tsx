@@ -16,7 +16,7 @@ import {
   DataTableSkeleton,
   Search,
 } from '@carbon/react';
-import { launchWorkspace, navigate, useConfig, useVisit } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { convertDateToDays, formatDateTime } from '../../utils/utils';
 import { Patient, Person, type MortuaryLocationResponse } from '../../types';
@@ -51,6 +51,8 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { autopsyFormUuid } = useConfig<ConfigObject>();
+  const isTablet = useLayoutType() === 'tablet';
+  const controlSize = isTablet ? 'md' : 'sm';
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currPageSize, setCurrPageSize] = useState(initialPageSize);
@@ -342,7 +344,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
           placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, gender, compartment, or bed type...')}
           value={searchTerm}
           onChange={handleSearchChange}
-          size="sm"
+          size={controlSize}
         />
       </div>
       {hasNoSearchResults ? (
