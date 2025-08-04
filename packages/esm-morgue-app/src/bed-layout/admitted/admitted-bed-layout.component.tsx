@@ -10,6 +10,8 @@ import Divider from '../../bed/divider/divider.component';
 import { ConfigObject } from '../../config-schema';
 import { mutate as mutateSWR } from 'swr';
 import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
+import { PatientProvider } from '../../context/deceased-person-context';
+import { transformAdmittedPatient } from '../../helpers/expression-helper';
 
 interface BedLayoutProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -37,7 +39,9 @@ const BedLayout: React.FC<BedLayoutProps> = ({
     setSearchTerm(event.target.value);
   };
 
-  const handlePostmortem = (patientUuid: string) => {
+  const handlePostmortem = (patientUuid: string, bedInfo?: { bedNumber: string; bedId: number }) => {
+    const hasBedInfo = bedInfo?.bedNumber && bedInfo?.bedId;
+
     if (onPostmortem) {
       onPostmortem(patientUuid);
     } else {
@@ -53,9 +57,14 @@ const BedLayout: React.FC<BedLayoutProps> = ({
         },
       });
     }
+    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patientUuid}`;
+    const to = hasBedInfo
+      ? `${base}/compartment/${bedInfo.bedNumber}/${bedInfo.bedId}/mortuary-chart`
+      : `${base}/mortuary-chart`;
+    navigate({ to });
   };
 
-  const handleDischarge = (patientUuid: string, bedId: number) => {
+  const handleDischarge = (patientUuid: string, bedId?: number) => {
     if (onDischarge) {
       onDischarge(patientUuid);
     } else {
@@ -68,9 +77,9 @@ const BedLayout: React.FC<BedLayoutProps> = ({
     }
   };
 
-  const handleSwapCompartment = (patientUuid: string, bedId: number) => {
+  const handleSwapCompartment = (patientUuid: string, bedId?: number) => {
     if (onSwapCompartment) {
-      onSwapCompartment(patientUuid, bedId.toString());
+      onSwapCompartment(patientUuid, bedId?.toString() || '');
     } else {
       launchWorkspace('swap-unit-form', {
         workspaceTitle: t('swapCompartment', 'Swap compartment'),
@@ -80,6 +89,15 @@ const BedLayout: React.FC<BedLayoutProps> = ({
         mutate,
       });
     }
+  };
+
+  const handleViewDetails = (patientUuid: string, bedInfo?: { bedNumber: string; bedId: number }) => {
+    const hasBedInfo = bedInfo?.bedNumber && bedInfo?.bedId;
+    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patientUuid}`;
+    const to = hasBedInfo
+      ? `${base}/compartment/${bedInfo.bedNumber}/${bedInfo.bedId}/mortuary-chart`
+      : `${base}/mortuary-chart`;
+    navigate({ to });
   };
 
   const filteredBedLayouts = useMemo(() => {
@@ -113,6 +131,16 @@ const BedLayout: React.FC<BedLayoutProps> = ({
       });
     });
   }, [AdmittedDeceasedPatient?.bedLayouts, searchTerm]);
+
+  const patientContextValue = {
+    mortuaryLocation: AdmittedDeceasedPatient,
+    isLoading,
+    mutate,
+    onPostmortem: handlePostmortem,
+    onDischarge: handleDischarge,
+    onSwapCompartment: handleSwapCompartment,
+    onViewDetails: handleViewDetails,
+  };
 
   if (isLoading) {
     return (
@@ -159,7 +187,7 @@ const BedLayout: React.FC<BedLayoutProps> = ({
   }
 
   return (
-    <>
+    <PatientProvider value={patientContextValue}>
       <div className={styles.searchContainer}>
         <Search
           labelText={t('searchDeceasedPatients', 'Search deceased patients')}
@@ -195,24 +223,16 @@ const BedLayout: React.FC<BedLayoutProps> = ({
                     {patients.map((patient, patientIndex) => (
                       <React.Fragment key={patient.uuid}>
                         <BedCard
-                          patientUuid={patient.uuid}
-                          patientName={patient.person?.display}
-                          gender={patient.person?.gender}
-                          age={patient.person?.age}
-                          causeOfDeath={patient.person?.causeOfDeath?.display}
-                          dateOfDeath={patient.person?.deathDate}
-                          bedNumber={bedLayout.bedNumber}
-                          bedType={bedLayout.bedType?.displayName}
-                          onDischarge={() => handleDischarge(patient.uuid, bedLayout.bedId)}
-                          onSwapCompartment={() => handleSwapCompartment(patient.uuid, bedLayout.bedId)}
-                          onPostmortem={() => handlePostmortem(patient.uuid)}
-                          onViewDetails={() => {
-                            const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
-                            const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patient.uuid}`;
-                            const to = hasBedInfo
-                              ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
-                              : `${base}/mortuary-chart`;
-                            navigate({ to });
+                          patient={transformAdmittedPatient(patient, {
+                            bedNumber: bedLayout.bedNumber,
+                            bedId: bedLayout.bedId,
+                            bedType: bedLayout.bedType?.displayName,
+                          })}
+                          showActions={{
+                            discharge: true,
+                            swapCompartment: true,
+                            postmortem: true,
+                            viewDetails: true,
                           }}
                         />
                         {patientIndex < patients.length - 1 && <Divider />}
@@ -221,24 +241,16 @@ const BedLayout: React.FC<BedLayoutProps> = ({
                   </div>
                 ) : (
                   <BedCard
-                    patientUuid={patients[0].uuid}
-                    patientName={patients[0].person?.display}
-                    gender={patients[0].person?.gender}
-                    age={patients[0].person?.age}
-                    causeOfDeath={patients[0].person?.causeOfDeath?.display}
-                    dateOfDeath={patients[0].person?.deathDate}
-                    bedNumber={bedLayout.bedNumber}
-                    bedType={bedLayout.bedType?.displayName}
-                    onDischarge={() => handleDischarge(patients[0].uuid, bedLayout.bedId)}
-                    onSwapCompartment={() => handleSwapCompartment(patients[0].uuid, bedLayout.bedId)}
-                    onPostmortem={() => handlePostmortem(patients[0].uuid)}
-                    onViewDetails={() => {
-                      const hasBedInfo = bedLayout.bedNumber && bedLayout.bedId;
-                      const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patients[0].uuid}`;
-                      const to = hasBedInfo
-                        ? `${base}/compartment/${bedLayout.bedNumber}/${bedLayout.bedId}/mortuary-chart`
-                        : `${base}/mortuary-chart`;
-                      navigate({ to });
+                    patient={transformAdmittedPatient(patients[0], {
+                      bedNumber: bedLayout.bedNumber,
+                      bedId: bedLayout.bedId,
+                      bedType: bedLayout.bedType?.displayName,
+                    })}
+                    showActions={{
+                      discharge: true,
+                      swapCompartment: true,
+                      postmortem: true,
+                      viewDetails: true,
                     }}
                   />
                 )}
@@ -247,7 +259,7 @@ const BedLayout: React.FC<BedLayoutProps> = ({
           })}
         </div>
       </div>
-    </>
+    </PatientProvider>
   );
 };
 

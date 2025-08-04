@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { showModal, useConfig } from '@openmrs/esm-framework';
 import { InlineLoading, Pagination, Search } from '@carbon/react';
 import styles from '../bed-layout.scss';
-import { Patient, type MortuaryLocationResponse } from '../../types';
+import { Patient, type MortuaryLocationResponse, EnhancedPatient } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import usePatients, { useMortuaryDischargeEncounter } from './discharged-bed-layout.resource';
 import BedCard from '../../bed/bed.component';
 import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
-
+import { transformDischargedPatient, extractPatientFromEnhanced } from '../../helpers/expression-helper';
+import { PatientProvider } from '../../context/deceased-person-context';
 interface BedLayoutProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
   isLoading: boolean;
@@ -44,7 +45,6 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
     setSearchTerm(event.target.value);
   };
 
-  // Filter patients based on search term
   const filteredPatients = useMemo(() => {
     if (!dischargedPatients || !searchTerm.trim()) {
       return dischargedPatients || [];
@@ -77,16 +77,30 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
     return patientEncounter?.encounterDateTime || null;
   };
 
-  const handlePrintGatePass = (patient: Patient, encounterDate?: string) => {
-    if (onPrintGatePass) {
-      onPrintGatePass(patient, encounterDate);
+  const handlePrintGatePass = (patient: EnhancedPatient | Patient, encounterDate?: string) => {
+    let originalPatient: Patient | null = null;
+
+    if ('originalPatient' in patient || 'originalMortuaryPatient' in patient) {
+      originalPatient = extractPatientFromEnhanced(patient as EnhancedPatient);
     } else {
+      originalPatient = patient as Patient;
+    }
+
+    if (onPrintGatePass && originalPatient) {
+      onPrintGatePass(originalPatient, encounterDate);
+    } else if (originalPatient) {
       const dispose = showModal('print-confirmation-modal', {
         onClose: () => dispose(),
-        patient: patient,
+        patient: originalPatient,
         encounterDate: encounterDate,
       });
     }
+  };
+
+  const patientContextValue = {
+    mortuaryLocation: AdmittedDeceasedPatient,
+    isLoading: isLoading || encountersLoading || patientsLoading,
+    onPrintGatePass: handlePrintGatePass,
   };
 
   if (isLoading || encountersLoading || patientsLoading) {
@@ -146,7 +160,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
   }
 
   return (
-    <>
+    <PatientProvider value={patientContextValue}>
       <div className={styles.searchContainer}>
         <Search
           labelText={t('searchDeceasedPatients', 'Search deceased patients')}
@@ -159,25 +173,15 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
       <div className={styles.bedLayoutWrapper}>
         <div className={styles.bedLayoutContainer}>
           {patientsToShow.map((patient) => {
-            const patientUuid = patient?.uuid;
-            const patientName = patient?.person?.display;
-            const gender = patient?.person?.gender;
-            const age = patient?.person?.age;
-            const causeOfDeath = patient?.person?.causeOfDeath?.display;
-            const dateOfDeath = patient?.person?.deathDate;
-            const encounterDate = getEncounterDateForPatient(patientUuid);
+            const encounterDate = getEncounterDateForPatient(patient.uuid);
 
             return (
               <BedCard
-                key={patientUuid}
-                patientName={patientName}
-                gender={gender}
-                age={age}
-                causeOfDeath={causeOfDeath}
-                dateOfDeath={dateOfDeath}
-                patientUuid={patientUuid}
-                onPrintGatePass={() => handlePrintGatePass(patient, encounterDate)}
-                isDischarged={true}
+                key={patient.uuid}
+                patient={transformDischargedPatient(patient, encounterDate)}
+                showActions={{
+                  printGatePass: true,
+                }}
               />
             );
           })}
@@ -200,7 +204,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
           />
         </div>
       </div>
-    </>
+    </PatientProvider>
   );
 };
 

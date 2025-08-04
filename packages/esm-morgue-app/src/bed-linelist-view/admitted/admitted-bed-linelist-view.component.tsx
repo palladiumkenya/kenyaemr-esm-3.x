@@ -86,7 +86,9 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     { key: 'action', header: t('action', 'Action') },
   ];
 
-  const handlePostmortem = (patientUuid: string) => {
+  const handlePostmortem = (patientUuid: string, bedInfo?: { bedNumber: string; bedId: number }) => {
+    const hasBedInfo = bedInfo?.bedNumber && bedInfo?.bedId;
+
     if (onPostmortem) {
       onPostmortem(patientUuid);
     } else {
@@ -96,14 +98,18 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
         patientUuid: patientUuid,
         encounterUuid: '',
         mutateForm: () => {
-          mutateSWR(() => true, undefined, {
+          mutateSWR((key) => true, undefined, {
             revalidate: true,
           });
         },
       });
     }
+    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patientUuid}`;
+    const to = hasBedInfo
+      ? `${base}/compartment/${bedInfo.bedNumber}/${bedInfo.bedId}/mortuary-chart`
+      : `${base}/mortuary-chart`;
+    navigate({ to });
   };
-
   const handleDischarge = (patientUuid: string, bedId: number) => {
     if (onDischarge) {
       onDischarge(patientUuid);

@@ -1,57 +1,37 @@
 import React from 'react';
-import { Layer, OverflowMenu, OverflowMenuItem, Tag, Tile } from '@carbon/react';
-import styles from './bed.scss';
+import { Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Tag as TagIcon } from '@carbon/react/icons';
-import capitalize from 'lodash-es/capitalize';
-import startCase from 'lodash-es/startCase';
-import { formatDateTime, convertDateToDays } from '../utils/utils';
-import { ExtensionSlot, useVisit } from '@openmrs/esm-framework';
-
-interface BedProps {
-  bedNumber?: string;
-  patientName: string;
-  gender: string;
-  age: number;
-  bedType?: string;
-  causeOfDeath: string;
-  dateOfDeath: string;
-  patientUuid: string;
-  onAdmit?: () => void;
-  onPostmortem?: () => void;
-  onDischarge?: () => void;
-  onSwapCompartment?: () => void;
-  onPrintGatePass?: () => void;
-  onViewDetails?: () => void;
-  isDischarged?: boolean;
-}
-
-const BedCard: React.FC<BedProps> = ({
-  bedNumber,
-  patientName,
-  gender,
-  age,
-  causeOfDeath,
-  bedType,
-  dateOfDeath,
-  patientUuid,
-  onAdmit,
-  onPostmortem,
-  onDischarge,
-  onSwapCompartment,
-  onPrintGatePass,
-  onViewDetails,
-  isDischarged = false,
+import { convertDateToDays } from '../utils/utils';
+import { useVisit } from '@openmrs/esm-framework';
+import styles from './bed.scss';
+import { PatientCardProps } from '../types';
+import { usePatientContext } from '../context/deceased-person-context';
+import DeceasedPatientCardHeader from './components/deceased-patient-card-header.component';
+import DeceasedPatientInfo from './components/deceased-patient-info.component';
+import DeceasedPatientStatusFooter from './components/deceased-patient-status-footer.component';
+import { getOriginalPatient } from '../helpers/expression-helper';
+const BedCard: React.FC<PatientCardProps> = ({
+  patient,
+  showActions = {
+    admit: false,
+    discharge: false,
+    postmortem: false,
+    swapCompartment: false,
+    printGatePass: false,
+    viewDetails: false,
+  },
 }) => {
   const { t } = useTranslation();
-  const { activeVisit } = useVisit(patientUuid);
+  const { activeVisit } = useVisit(patient.uuid);
+  const { onAdmit, onPostmortem, onDischarge, onSwapCompartment, onPrintGatePass, onViewDetails } = usePatientContext();
 
   const lengthOfStay = activeVisit?.startDatetime
     ? convertDateToDays(activeVisit.startDatetime)
-    : calculateDaysInMortuary(dateOfDeath);
+    : calculateDaysInMortuary(patient.person.deathDate);
 
   const isAdmitted = !!activeVisit;
-  const timeSpentTagType = lengthOfStay > 7 ? 'red' : lengthOfStay > 3 ? 'magenta' : 'green';
+  const timeSpentTagType: 'red' | 'magenta' | 'green' =
+    lengthOfStay > 7 ? 'red' : lengthOfStay > 3 ? 'magenta' : 'green';
 
   function calculateDaysInMortuary(dateOfDeath: string): number {
     if (!dateOfDeath) {
@@ -63,96 +43,47 @@ const BedCard: React.FC<BedProps> = ({
     return Math.floor(timeDiff / (1000 * 3600 * 24));
   }
 
+  const handleAction = (actionType: string) => {
+    switch (actionType) {
+      case 'admit':
+        // For admit action, we need to pass the original MortuaryPatient if available
+        const originalPatient = getOriginalPatient(patient);
+        if (originalPatient) {
+          onAdmit?.(originalPatient);
+        } else {
+          onAdmit?.(patient);
+        }
+        break;
+      case 'postmortem':
+        onPostmortem?.(patient.uuid);
+        break;
+      case 'discharge':
+        onDischarge?.(patient.uuid, patient.bedInfo?.bedId);
+        break;
+      case 'swapCompartment':
+        onSwapCompartment?.(patient.uuid, patient.bedInfo?.bedId);
+        break;
+      case 'printGatePass':
+        onPrintGatePass?.(patient, patient.encounterDate);
+        break;
+      case 'viewDetails':
+        onViewDetails?.(patient.uuid, patient.bedInfo);
+        break;
+    }
+  };
+
   return (
     <Layer className={`${styles.cardWithChildren} ${styles.container}`}>
       <Tile className={styles.tileContainer}>
-        <div className={styles.tileHeader}>
-          <div className={styles.tagContainer}>
-            <div className={styles.tagContainer}>
-              {bedNumber ? (
-                <Tag type="cool-gray" className={styles.bedNumberTag}>
-                  {bedNumber}
-                </Tag>
-              ) : (
-                !isDischarged && (
-                  <Tag type="cool-gray" className={styles.bedNumberTag}>
-                    {t('awaiting', 'Awaiting')}
-                  </Tag>
-                )
-              )}
-              {isDischarged && (
-                <Tag type="blue" className={styles.statusTag}>
-                  {t('discharged', 'Discharged')}
-                </Tag>
-              )}
-              <TagIcon className={styles.tagIcon} />
-            </div>
-          </div>
-          <div>
-            {bedType ? <Tag type="green">{startCase(bedType)}</Tag> : null}
-            <OverflowMenu flipped>
-              {onAdmit && <OverflowMenuItem onClick={onAdmit} itemText={t('admit', 'Admit')} />}
-              {onViewDetails && (
-                <OverflowMenuItem onClick={onViewDetails} itemText={t('viewDetails', 'View details')} />
-              )}
-              {isDischarged && (
-                <ExtensionSlot
-                  name="print-post-mortem-overflow-menu-item-slot"
-                  state={{
-                    patientUuid: patientUuid,
-                  }}
-                />
-              )}
-              {onDischarge && <OverflowMenuItem onClick={onDischarge} itemText={t('discharge', 'Discharge')} />}
-              {onSwapCompartment && (
-                <OverflowMenuItem onClick={onSwapCompartment} itemText={t('swapCompartment', 'Swap Compartment')} />
-              )}
-              {onPostmortem && <OverflowMenuItem onClick={onPostmortem} itemText={t('postmortem', 'Postmortem')} />}
-              {onPrintGatePass && (
-                <OverflowMenuItem onClick={onPrintGatePass} itemText={t('printGatePass', 'Gate Pass')} />
-              )}
-            </OverflowMenu>
-          </div>
-        </div>
-
-        <div className={styles.patientInfoRow}>
-          <span className={styles.patientName}>{capitalize(patientName)}</span>
-          <span className={styles.middot}>•</span>
-          <span className={styles.gender}>{gender}</span>
-          <span className={styles.middot}>•</span>
-          <span className={styles.age}>{age}</span>
-          <span className={styles.ageUnit}>{t('yearsOld', 'Yrs old')}</span>
-        </div>
-
-        <div className={styles.causeOfDeathRow}>
-          <span className={styles.causeLabel}>{t('causeOfDeath', 'Cause of death')}</span>
-          <span className={styles.causeValue}>{startCase(causeOfDeath)}</span>
-        </div>
-        <div className={styles.patientInfoRow}>
-          <span className={styles.causeLabel}>{t('dateOfDeath', 'Date of death')}</span>
-          <span className={styles.causeValue}>{formatDateTime(dateOfDeath)}</span>
-        </div>
-        {isAdmitted && (
-          <div className={styles.patientInfoRow}>
-            <span className={styles.causeLabel}>{t('admissionDate', 'Admission Date')}</span>
-            <span className={styles.causeValue}>
-              {activeVisit?.startDatetime ? formatDateTime(activeVisit.startDatetime) : '-'}
-            </span>
-          </div>
-        )}
-        <div className={styles.borderLine}></div>
-        <div className={styles.cardRow}>
-          <span className={styles.causeLabel}>
-            {isAdmitted ? t('timeSpent', 'Time spent') : t('daysInMortuary', 'Days in mortuary')}
-          </span>
-          <div className={styles.tagsContainer}>
-            <Tag size="md" type={timeSpentTagType}>
-              <span className={styles.causeLabel}>{lengthOfStay}</span>{' '}
-              {lengthOfStay === 1 ? t('day', 'Day') : t('days', 'Days')}
-            </Tag>
-            {isAdmitted && !isDischarged && <Tag type="green">{t('admitted', 'Admitted')}</Tag>}
-          </div>
-        </div>
+        <DeceasedPatientCardHeader patient={patient} showActions={showActions} onAction={handleAction} />
+        <DeceasedPatientInfo patient={patient} />
+        <DeceasedPatientStatusFooter
+          patient={patient}
+          isAdmitted={isAdmitted}
+          lengthOfStay={lengthOfStay}
+          timeSpentTagType={timeSpentTagType}
+          activeVisit={activeVisit}
+        />
       </Tile>
     </Layer>
   );

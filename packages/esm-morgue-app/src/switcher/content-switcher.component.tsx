@@ -99,7 +99,6 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     (tabIndex: TabType) => {
       const isListView = selectedView === ViewType.LIST;
 
-      // Show loading skeleton if any relevant data is still loading
       if (isLoading || isLoadingAdmission || (tabIndex === TabType.DISCHARGE && isLoadingDischarge)) {
         return (
           <div className={styles.loadingContainer}>
