@@ -31,8 +31,8 @@ const handleClearCache = async () => {
 
 export const useModuleLinks = () => {
   const { t } = useTranslation();
-  const config = useConfig<ConfigObject>();
-  return [
+  const { excludeLinks } = useConfig<ConfigObject>();
+  const moduleLinks = [
     {
       label: t('systemInfo', 'System Info'),
       url: `${openmrsSpaBase}about`,
@@ -117,9 +117,11 @@ export const useModuleLinks = () => {
     },
     {
       label: t('reports', 'Reports'),
-      url: `${openmrsSpaBase}reports`,
+      url: `/openmrs/kenyaemr/reports/reportsHome.page`,
       icon: <Report size={24} />,
       privilege: 'o3: View Reports',
     },
   ];
+
+  return moduleLinks.filter((link) => !excludeLinks.some((excludeLink) => excludeLink === link.label));
 };
