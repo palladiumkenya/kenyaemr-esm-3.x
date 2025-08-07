@@ -1,7 +1,6 @@
 import { Accordion, AccordionItem } from '@carbon/react';
 import { CarbonIconType } from '@carbon/react/icons';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { registerNavGroup } from '@openmrs/esm-patient-common-lib';
 import React, { useEffect } from 'react';
 import styles from './nav.scss';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +13,7 @@ type Props = {
 };
 const DashboardGroupExtension: React.FC<Props> = ({ basePath, title, isExpanded, slotName, icon }) => {
   const { t } = useTranslation();
-  useEffect(() => {
-    registerNavGroup(slotName);
-  }, [slotName]);
+  // TODO: ensure nav group is working
 
   return (
     <Accordion>
