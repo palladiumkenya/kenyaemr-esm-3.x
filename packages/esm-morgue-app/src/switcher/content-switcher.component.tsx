@@ -11,6 +11,8 @@ import {
   Search,
   ComboBox,
   SkeletonText,
+  RadioButtonSkeleton,
+  TextInputSkeleton,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './content-switcher.scss';
@@ -97,6 +99,14 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     (tabIndex: TabType) => {
       const isListView = selectedView === ViewType.LIST;
 
+      if (isLoading || isLoadingAdmission || (tabIndex === TabType.DISCHARGE && isLoadingDischarge)) {
+        return (
+          <div className={styles.loadingContainer}>
+            <DataTableSkeleton showHeader={false} showToolbar={false} />
+          </div>
+        );
+      }
+
       switch (tabIndex) {
         case TabType.AWAITING_ADMISSION:
           return isListView ? (
@@ -109,12 +119,14 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
               />
             </div>
           ) : (
-            <AwaitingBedLayout
-              mortuaryLocation={admissionLocation}
-              awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
-              isLoading={isLoading}
-              mutated={mutate}
-            />
+            <>
+              <AwaitingBedLayout
+                mortuaryLocation={admissionLocation}
+                awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
+                isLoading={isLoading}
+                mutated={mutate}
+              />
+            </>
           );
 
         case TabType.ADMITTED:
@@ -127,7 +139,9 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
               />
             </div>
           ) : (
-            <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={isLoadingAdmission} mutate={mutate} />
+            <>
+              <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={isLoadingAdmission} mutate={mutate} />
+            </>
           );
 
         case TabType.DISCHARGE:
@@ -140,11 +154,13 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
               />
             </div>
           ) : (
-            <DischargedBedLayout
-              AdmittedDeceasedPatient={admissionLocation}
-              isLoading={isLoadingDischarge}
-              mutate={mutate}
-            />
+            <>
+              <DischargedBedLayout
+                AdmittedDeceasedPatient={admissionLocation}
+                isLoading={isLoadingDischarge}
+                mutate={mutate}
+              />
+            </>
           );
 
         default:
@@ -153,23 +169,22 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     },
     [
       selectedView,
-      awaitingQueueDeceasedPatients,
       isLoading,
-      admissionLocation,
       isLoadingAdmission,
       isLoadingDischarge,
+      awaitingQueueDeceasedPatients,
+      admissionLocation,
       dischargedPatients,
-
       mutate,
     ],
   );
 
   return (
     <div className={styles.switcherContainer}>
-      <CardHeader title={t('mortuaryOperations', 'Mortuary operations')}>
+      <CardHeader title={isLoading ? t('loading', 'Loading...') : t('mortuaryOperations', 'Mortuary operations')}>
         {locationItems.length > 1 &&
           (isLoadingLocation ? (
-            <SkeletonText />
+            <RadioButtonSkeleton />
           ) : (
             <ComboBox
               items={locationItems}
@@ -182,28 +197,39 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
           ))}
 
         <ContentSwitcher size="sm" className={styles.switcher} selectedIndex={selectedView} onChange={handleViewChange}>
-          <Switch>{t('listView', 'List')}</Switch>
-          <Switch>{t('cardView', 'Card')}</Switch>
+          <Switch>{isLoading ? <RadioButtonSkeleton /> : t('listView', 'List')}</Switch>
+          <Switch>{isLoading ? <RadioButtonSkeleton /> : t('cardView', 'Card')}</Switch>
         </ContentSwitcher>
       </CardHeader>
+
       <div className={styles.tabsContainer}>
-        <Search labelText={t('searchPatients', 'Search Patients')} />
         <Tabs selectedIndex={selectedTab} onChange={handleTabChange}>
-          <div className={styles.tabListContainer}>
-            <TabList scrollDebounceWait={200}>
-              {tabs.map((tab) => (
-                <Tab key={tab.id}>
-                  {t(tab.labelKey, tab.defaultLabel)}
-                  {tab.id === 'awaiting-admission' && ` (${awaitingQueueDeceasedPatients?.length || 0})`}
-                  {tab.id === 'admitted' &&
-                    ` (${
-                      admissionLocation?.bedLayouts?.reduce((total, bed) => total + (bed.patients?.length || 0), 0) || 0
-                    })`}
-                  {tab.id === 'discharge' && ` (${dischargedPatients?.length || 0})`}
-                </Tab>
-              ))}
-            </TabList>
-          </div>
+          {isLoading || isLoadingAdmission || isLoadingDischarge ? (
+            <div className={styles.tabSkeletonContainer}>
+              <div className={styles.tabListSkeleton}>
+                {[1, 2, 3].map((i) => (
+                  <RadioButtonSkeleton key={i} className={styles.tabSkeleton} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className={styles.tabListContainer}>
+              <TabList scrollDebounceWait={200}>
+                {tabs.map((tab) => (
+                  <Tab key={tab.id}>
+                    {t(tab.labelKey, tab.defaultLabel)}
+                    {tab.id === 'awaiting-admission' && ` (${awaitingQueueDeceasedPatients?.length || 0})`}
+                    {tab.id === 'admitted' &&
+                      ` (${
+                        admissionLocation?.bedLayouts?.reduce((total, bed) => total + (bed.patients?.length || 0), 0) ||
+                        0
+                      })`}
+                    {tab.id === 'discharge' && ` (${dischargedPatients?.length || 0})`}
+                  </Tab>
+                ))}
+              </TabList>
+            </div>
+          )}
 
           <TabPanels>
             {tabs.map((_, index) => (

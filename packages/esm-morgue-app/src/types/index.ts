@@ -1,4 +1,9 @@
-import { type OpenmrsResourceStrict, type OpenmrsResource, Concept } from '@openmrs/esm-framework';
+import {
+  type OpenmrsResourceStrict,
+  type OpenmrsResource,
+  Concept,
+  type Visit as OpenmrsVisit,
+} from '@openmrs/esm-framework';
 
 export interface BaseEntity {
   uuid: string;
@@ -613,4 +618,41 @@ export interface Payment {
 
 interface PaymentInstanceType extends BaseEntity {
   name: string;
+}
+export interface EnhancedPatient {
+  uuid: string;
+  person: {
+    display: string;
+    gender: string;
+    age: number;
+    deathDate: string;
+    causeOfDeath?: {
+      display: string;
+    };
+  };
+  bedInfo?: {
+    bedNumber: string;
+    bedId: number;
+    bedType?: string;
+  };
+  visitInfo?: {
+    activeVisit?: OpenmrsVisit;
+    admissionDate?: string;
+  };
+  isDischarged?: boolean;
+  encounterDate?: string;
+  originalMortuaryPatient?: MortuaryPatient;
+  originalPatient?: Patient;
+}
+
+export interface PatientCardProps {
+  patient: EnhancedPatient;
+  showActions?: {
+    admit?: boolean;
+    discharge?: boolean;
+    postmortem?: boolean;
+    swapCompartment?: boolean;
+    printGatePass?: boolean;
+    viewDetails?: boolean;
+  };
 }

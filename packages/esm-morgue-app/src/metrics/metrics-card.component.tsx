@@ -3,9 +3,9 @@ import { Layer, Tile } from '@carbon/react';
 import styles from './metrics-card.scss';
 
 interface MetricsCardProps {
-  label: string;
+  label: string | React.ReactNode;
   value: number | string | React.ReactNode;
-  headerLabel: string;
+  headerLabel: string | React.ReactNode;
   children?: React.ReactNode;
 }
 

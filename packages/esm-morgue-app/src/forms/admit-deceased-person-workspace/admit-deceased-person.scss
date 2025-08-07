@@ -141,3 +141,17 @@
 .sectionField {
   padding-top: layout.$spacing-03;
 }
+.radioButton {
+  padding: 0;
+  margin-top: layout.$spacing-03;
+}
+
+.radioButton:last-child {
+  margin-bottom: 0;
+}
+
+.supportingDocuments {
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+  border-bottom: 1px solid colors.$gray-20;
+}
