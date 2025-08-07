@@ -1,18 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styles from './clinical-view-section.scss';
 import { useTranslation } from 'react-i18next';
 import { Information } from '@carbon/react/icons';
 import { Tooltip } from '@carbon/react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { DashboardGroupExtensionProps } from './dashboard-group.component';
-import { registerNavGroup } from '@openmrs/esm-patient-common-lib';
 
 export const ClinicalViewSection: React.FC<DashboardGroupExtensionProps> = ({ title, basePath }) => {
   const slotName = 'clinical-view-section';
   const { t } = useTranslation();
-  useEffect(() => {
-    registerNavGroup(slotName);
-  }, [slotName]);
+  // TODO: ensure nav group is working
   return (
     <>
       <div className={styles.container}>

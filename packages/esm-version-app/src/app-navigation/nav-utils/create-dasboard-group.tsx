@@ -1,7 +1,7 @@
 import React from 'react';
 import DashboardGroupExtension from './dashboard-group-extension.component';
 import { CarbonIconType } from '@carbon/react/icons';
-import { createDashboardGroup as cdg } from '@openmrs/esm-patient-common-lib';
+
 type Conf = {
   title: string;
   slotName: string;
