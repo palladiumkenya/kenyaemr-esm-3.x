@@ -24,7 +24,7 @@ type DrugOrderProps = {
 const DrugOrder: React.FC<DrugOrderProps> = ({ order }) => {
   const { t } = useTranslation();
   const { stockItem, isLoading: isLoadingInventory } = useSockItemInventory(order?.drug?.uuid);
-  const { billableItem, isLoading } = useBillableItem(order?.drug.concept.uuid);
+  const { billableItem, isLoading } = useBillableItem(order?.drug.concept.uuid, order?.drug.uuid);
   if (isLoading || isLoadingInventory) {
     return null;
   }
