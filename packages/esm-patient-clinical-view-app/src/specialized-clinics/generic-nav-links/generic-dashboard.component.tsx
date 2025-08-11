@@ -9,37 +9,24 @@ import { DataTableSkeleton, Button } from '@carbon/react';
 import GenericTable from './generic-table.component';
 import { deleteEncounter } from '../../case-management/encounters/case-encounter-table.resource';
 
-type GenericDashboardProps = { patientUuid: string };
+type GenericDashboardProps = {
+  patientUuid: string;
+  clinicConfig: {
+    formUuid: string;
+    encounterTypeUuid: string;
+    title: string;
+  };
+};
 
-const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
+const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid, clinicConfig }) => {
   const { t } = useTranslation();
-  const { specialClinics } = useConfig<ConfigObject>();
-  const [clinic, setClinic] = useState('');
-  const clinicInfo = specialClinics.find(({ id }) => id === clinic);
   const { encounters, isLoading, error, mutate } = useEncounters(
-    clinicInfo?.encounterTypeUuid,
-    clinicInfo?.formUuid,
+    clinicConfig.encounterTypeUuid,
+    clinicConfig.formUuid,
     patientUuid,
   );
 
-  useEffect(() => {
-    const handleURLChange = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const clinicParam = urlParams.get('clinic');
-      if (clinicParam) {
-        setClinic(clinicParam);
-      }
-    };
-
-    // Call once on initial load
-    handleURLChange();
-    window.onpopstate = handleURLChange;
-    return () => {
-      window.onpopstate = null;
-    };
-  }, []);
-
-  const clinicalFormTitle = capitalize(clinic.replace('-', ' '));
+  const clinicalFormTitle = capitalize(clinicConfig.title.replace('-', ' '));
 
   const handleWorkspaceForm = () => {
     launchWorkspace('patient-form-entry-workspace', {
@@ -47,7 +34,7 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
       mutateForm: mutate,
       formInfo: {
         encounterUuid: '',
-        formUuid: clinicInfo?.formUuid,
+        formUuid: clinicConfig.formUuid,
         additionalProps: {},
       },
     });
@@ -58,7 +45,7 @@ const GenericDashboard: React.FC<GenericDashboardProps> = ({ patientUuid }) => {
       mutateForm: mutate,
       formInfo: {
         encounterUuid: encounterUuid,
-        formUuid: clinicInfo?.formUuid,
+        formUuid: clinicConfig.formUuid,
         additionalProps: {},
       },
     });

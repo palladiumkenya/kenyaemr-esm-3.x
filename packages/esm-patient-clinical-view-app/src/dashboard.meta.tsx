@@ -47,19 +47,17 @@ export const familyHistoryDashboardMeta = {
   columns: 1,
   title: 'Family History',
   path: 'family-history',
-  icon: '',
+  icon: 'omrs-icon-pedestrian-family',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
 };
 
 export const contactListDashboardMeta = {
-  slot: 'patient-chart-relationships-slot',
+  slot: 'patient-chart-contact-list-slot',
   columns: 1,
-  title: 'Contact List',
+  title: 'Contact Listing',
   path: 'contact-list',
-  icon: '',
-  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
-  config: {},
+  icon: 'omrs-icon-information',
 };
 
 export const otherRelationshipsDashboardMeta = {
@@ -77,9 +75,7 @@ export const relationshipsDashboardMeta = {
   columns: 1,
   title: 'Relationships',
   path: 'relationships',
-  icon: '',
-  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
-  config: {},
+  icon: 'omrs-icon-group',
 };
 
 export const labourDeliveryDashboardMeta = {
@@ -107,9 +103,7 @@ export const peerCalendarDashboardMeta = {
   title: 'Peer Calendar',
   path: 'peer-calendar',
   columns: 1,
-  moduleName: '@kenyaemr/esm-patient-clinical-view-app',
-  config: {},
-  icon: '',
+  icon: 'omrs-icon-calendar-heat-map',
 };
 export const caseEncounterDashboardMeta = {
   slot: 'patient-chart-relationships-slot',
@@ -118,15 +112,15 @@ export const caseEncounterDashboardMeta = {
   path: 'case-management-encounters',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
-  icon: '',
+  icon: 'omrs-icon-events',
 };
 
-export const morgueDeceasedDetailsDashboardMeta = {
-  slot: 'patient-chart-deceased-panel-slot',
+export const specialClinicsDashboardMeta = {
+  slot: 'patient-chart-special-clinics-slot',
   columns: 1,
-  title: 'Deceased Panel',
-  path: 'deceased-panel',
+  title: 'Special Clinics',
+  path: 'special-clinics',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   config: {},
-  icon: '',
+  icon: 'omrs-icon-location',
 };

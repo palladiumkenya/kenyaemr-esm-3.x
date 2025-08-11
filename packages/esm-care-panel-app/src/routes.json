@@ -45,7 +45,7 @@
     },
     {
       "name": "hiv-patient-visit-summary",
-      "slot": "patient-chart-hiv-patient-summary-slot",
+      "slot": "hiv-patient-summary-slot",
       "component": "hivPatientSummary",
       "order": 3,
       "online": true,

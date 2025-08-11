@@ -55,7 +55,10 @@ export const referralReasonsDialogPopup = getSyncLifecycle(ReferralReasonsDialog
 
 // Dashboard links for referrals and the corresponding view in the patient chart
 export const referralWidget = getSyncLifecycle(ReferralChartView, options);
-export const referralLink = getSyncLifecycle(createDashboardLink({ ...referralDashboardMeta, icon: '' }), options);
+export const referralLink = getSyncLifecycle(
+  createDashboardLink({ ...referralDashboardMeta, icon: 'omrs-icon-message-queue' }),
+  options,
+);
 export const facilityRefferalForm = getSyncLifecycle(FacilityRefferalForm, options);
 
 // SHR Summary
