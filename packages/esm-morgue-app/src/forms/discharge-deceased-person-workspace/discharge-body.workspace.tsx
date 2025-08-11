@@ -1,3 +1,4 @@
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -5,8 +6,11 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
+  FormGroup,
   InlineLoading,
   InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
   SelectItem,
   Stack,
   TextInput,
@@ -16,39 +20,35 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ExtensionSlot,
-  fhirBaseUrl,
   ResponsiveWrapper,
-  restBaseUrl,
-  setCurrentVisit,
   showSnackbar,
   useConfig,
   useLayoutType,
   useVisit,
+  usePatient,
+  restBaseUrl,
+  fhirBaseUrl,
+  setCurrentVisit, // Add this import
 } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { mutate as mutateSWR } from 'swr';
-import { z } from 'zod';
 import styles from './discharge-body.scss';
 import DeceasedInfo from '../../deceased-patient-header/deceasedInfo/deceased-info.component';
-import { PatientInfo } from '../../types';
 import { useBlockDischargeWithPendingBills, usePersonAttributes } from './discharge-body.resource';
-import { ConfigObject } from '../../config-schema';
 import { getCurrentTime } from '../../utils/utils';
-import { dischargeSchema } from '../../schemas';
+import { dischargeFormSchema, DischargeType } from '../../schemas';
 import { useVisitQueueEntry } from '../../home/home.resource';
 import classNames from 'classnames';
 import { useMortuaryOperation } from '../admit-deceased-person-workspace/admit-deceased-person.resource';
-
+import { ConfigObject } from '../../config-schema';
+import { PatientInfo } from '../../types';
+import { mutate as mutateSWR } from 'swr';
 interface DischargeFormProps {
   closeWorkspace: () => void;
   patientUuid: string;
   bedId: number;
   mutate: () => void;
 }
-
-type DischargeFormValues = z.infer<typeof dischargeSchema>;
 
 const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUuid, bedId, mutate }) => {
   const { t } = useTranslation();
@@ -57,93 +57,80 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
 
   const { activeVisit, currentVisitIsRetrospective } = useVisit(patientUuid);
   const { queueEntry } = useVisitQueueEntry(patientUuid, activeVisit?.uuid);
-
-  const { dischargeBody, isLoadingEmrConfiguration } = useMortuaryOperation();
+  const { dischargeBody } = useMortuaryOperation();
+  const { patient } = usePatient(patientUuid);
 
   const {
     createOrUpdatePersonAttribute,
     personAttributes,
     isLoading: isLoadingAttributes,
   } = usePersonAttributes(patientUuid);
-
   const { isDischargeBlocked, blockingMessage, isLoadingBills } = useBlockDischargeWithPendingBills({
     patientUuid,
     actionType: 'discharge',
   });
 
-  const { nextOfKinNameUuid, nextOfKinRelationshipUuid, nextOfKinPhoneUuid, nextOfKinAddressUuid } =
+  const { nextOfKinNameUuid, nextOfKinRelationshipUuid, nextOfKinPhoneUuid, nextOfKinNationalIdUuid } =
     useConfig<ConfigObject>();
-
   const { time: defaultTime, period: defaultPeriod } = getCurrentTime();
-
-  const getAttributeValue = useCallback(
-    (attributeTypeUuid: string) => {
-      if (!personAttributes || !Array.isArray(personAttributes)) {
-        return '';
-      }
-      const attribute = personAttributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
-      return attribute ? attribute.value : '';
-    },
-    [personAttributes],
-  );
-
-  const getExistingAttributeUuid = useCallback(
-    (attributeTypeUuid: string) => {
-      if (!personAttributes || !Array.isArray(personAttributes)) {
-        return null;
-      }
-      const attribute = personAttributes.find((attr) => attr.attributeType.uuid === attributeTypeUuid);
-      return attribute ? attribute.uuid : null;
-    },
-    [personAttributes],
-  );
 
   const {
     control,
     setValue,
     handleSubmit,
-    formState: { errors, isDirty, isSubmitting },
     watch,
-  } = useForm<DischargeFormValues>({
-    resolver: zodResolver(dischargeSchema),
+    formState: { errors, isDirty, isSubmitting },
+  } = useForm({
+    resolver: zodResolver(dischargeFormSchema),
     defaultValues: {
+      dischargeType: 'discharge',
       dateOfDischarge: new Date(),
       timeOfDischarge: defaultTime,
       period: defaultPeriod,
       burialPermitNumber: '',
+      dischargeArea: '',
+      receivingArea: '',
+      reasonForTransfer: '',
       nextOfKinNames: '',
       relationshipType: '',
       nextOfKinContact: '',
-      nextOfKinAddress: '',
+      nextOfKinNationalId: '',
+      serialNumber: '',
+      courtOrderCaseNumber: '',
     },
   });
 
-  useEffect(() => {
-    if (Array.isArray(personAttributes) && personAttributes.length > 0) {
-      const initialValues = {
-        nextOfKinNames: getAttributeValue(nextOfKinNameUuid),
-        relationshipType: getAttributeValue(nextOfKinRelationshipUuid),
-        nextOfKinContact: getAttributeValue(nextOfKinPhoneUuid),
-        nextOfKinAddress: getAttributeValue(nextOfKinAddressUuid),
-      };
+  const selectedDischargeType = watch('dischargeType');
 
-      Object.entries(initialValues).forEach(([field, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          setValue(field as keyof DischargeFormValues, value);
-        }
-      });
+  useEffect(() => {
+    if (personAttributes?.length) {
+      setValue('nextOfKinNames', getAttributeValue(nextOfKinNameUuid));
+      setValue('relationshipType', getAttributeValue(nextOfKinRelationshipUuid));
+      setValue('nextOfKinContact', getAttributeValue(nextOfKinPhoneUuid));
+      setValue('nextOfKinNationalId', getAttributeValue(nextOfKinNationalIdUuid));
     }
   }, [
     personAttributes,
     setValue,
-    getAttributeValue,
     nextOfKinNameUuid,
     nextOfKinRelationshipUuid,
     nextOfKinPhoneUuid,
-    nextOfKinAddressUuid,
+    nextOfKinNationalIdUuid,
   ]);
 
-  const onSubmit = async (data: DischargeFormValues) => {
+  const getAttributeValue = useCallback(
+    (attributeTypeUuid: string) =>
+      personAttributes?.find((attr) => attr.attributeType.uuid === attributeTypeUuid)?.value || '',
+    [personAttributes],
+  );
+
+  const getExistingAttributeUuid = useCallback(
+    (attributeTypeUuid: string) =>
+      personAttributes?.find((attr) => attr.attributeType.uuid === attributeTypeUuid)?.uuid || null,
+    [personAttributes],
+  );
+
+  const onSubmit = async (data) => {
     setSubmissionError(null);
 
     if (currentVisitIsRetrospective) {
@@ -153,10 +140,8 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
     }
 
     try {
-      // First, perform the discharge operation
       await dischargeBody(activeVisit, queueEntry, bedId, data);
 
-      // Then update person attributes
       const attributeUpdates = [
         {
           uuid: nextOfKinNameUuid,
@@ -174,9 +159,9 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
           existingUuid: getExistingAttributeUuid(nextOfKinPhoneUuid),
         },
         {
-          uuid: nextOfKinAddressUuid,
-          value: data.nextOfKinAddress,
-          existingUuid: getExistingAttributeUuid(nextOfKinAddressUuid),
+          uuid: nextOfKinNationalIdUuid,
+          value: data.nextOfKinNationalId,
+          existingUuid: getExistingAttributeUuid(nextOfKinNationalIdUuid),
         },
       ].filter((attr) => attr.value !== undefined && attr.value !== null && attr.value !== '');
 
@@ -207,7 +192,6 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
         }
       }
 
-      // Invalidate relevant caches
       await Promise.all([
         mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/visit`)),
         mutateSWR((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/patient`)),
@@ -243,109 +227,120 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
     }
   };
 
-  if (isLoadingEmrConfiguration || isLoadingAttributes || !activeVisit) {
-    return <InlineLoading status="active" iconDescription="Loading" description={t('loading', 'Loading...')} />;
-  }
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formContainer}>
-        {isLoadingBills && (
-          <InlineLoading
-            status="active"
-            iconDescription="Loading"
-            description={t('loadingBills', 'Loading bills...')}
-          />
-        )}
-
+        {isLoadingBills && <InlineLoading description={t('loadingBills', 'Loading bills...')} />}
         {isDischargeBlocked && (
-          <InlineNotification
-            kind="warning"
-            title={t('warningMsg', 'Warning')}
-            subtitle={blockingMessage}
-            lowContrast={true}
-            className={styles.blockingNotification}
-          />
+          <InlineNotification kind="warning" title={t('warning', 'Warning')} subtitle={blockingMessage} lowContrast />
         )}
-
         {submissionError && (
-          <InlineNotification
-            kind="error"
-            title={t('error', 'Error')}
-            subtitle={submissionError}
-            lowContrast={true}
-            className={styles.errorNotification}
-          />
+          <InlineNotification kind="error" title={t('error', 'Error')} subtitle={submissionError} lowContrast />
         )}
 
         <Stack gap={3}>
           <DeceasedInfo patientUuid={patientUuid} />
 
-          <ResponsiveWrapper>
-            <div className={styles.dateTimePickerContainer}>
-              <Column>
-                <Controller
-                  name="dateOfDischarge"
-                  control={control}
-                  render={({ field }) => (
-                    <DatePicker
-                      datePickerType="single"
-                      className={styles.formAdmissionDatepicker}
-                      onChange={(event) => {
-                        if (event.length) {
-                          field.onChange(event[0]);
-                        }
-                      }}
-                      value={field.value ? new Date(field.value) : null}>
-                      <DatePickerInput
-                        {...field}
-                        id="date-of-discharge"
-                        placeholder="yyyy-mm-dd"
-                        labelText={t('dateOfDischarge', 'Date of discharge*')}
-                        invalid={!!errors.dateOfDischarge}
-                        invalidText={errors.dateOfDischarge?.message}
-                      />
-                    </DatePicker>
-                  )}
-                />
-              </Column>
+          <FormGroup legendText={t('dischargeType', 'Discharge type')}>
+            <Controller
+              name="dischargeType"
+              control={control}
+              render={({ field }) => (
+                <RadioButtonGroup
+                  name="dischargeType"
+                  orientation="vertical"
+                  value={field.value}
+                  defaultSelected={field.value}
+                  onChange={field.onChange}>
+                  <RadioButton
+                    className={styles.radioButton}
+                    value="discharge"
+                    labelText={t('discharge', 'Discharge')}
+                  />
+                  <RadioButton className={styles.radioButton} value="transfer" labelText={t('transfer', 'Transfer')} />
+                  <RadioButton className={styles.radioButton} value="dispose" labelText={t('dispose', 'Dispose')} />
+                </RadioButtonGroup>
+              )}
+            />
+          </FormGroup>
 
-              <Column>
-                <div className={styles.dateTimeSection}>
-                  <ResponsiveWrapper>
-                    <Controller
-                      name="timeOfDischarge"
-                      control={control}
-                      render={({ field }) => (
-                        <TimePicker
+          {(selectedDischargeType === 'discharge' || selectedDischargeType === 'transfer') && (
+            <ResponsiveWrapper>
+              <div className={styles.dateTimePickerContainer}>
+                <Column>
+                  <Controller
+                    name="dateOfDischarge"
+                    control={control}
+                    render={({ field }) => (
+                      <DatePicker
+                        datePickerType="single"
+                        className={styles.formAdmissionDatepicker}
+                        onChange={(event) => {
+                          if (event.length) {
+                            field.onChange(event[0]);
+                          }
+                        }}
+                        value={field.value ? new Date(field.value) : null}>
+                        <DatePickerInput
                           {...field}
-                          id="time-of-discharge-picker"
-                          labelText={t('timeOfDischarge', 'Time of discharge*')}
-                          className={styles.formAdmissionTimepicker}
-                          invalid={!!errors.timeOfDischarge}
-                          invalidText={errors.timeOfDischarge?.message}
+                          id="date-of-discharge"
+                          placeholder="yyyy-mm-dd"
+                          labelText={
+                            selectedDischargeType === 'discharge'
+                              ? t('dateOfDischarge', 'Date of discharge*')
+                              : t('dateOfTransfer', 'Date of transfer*')
+                          }
+                          invalid={!!errors.dateOfDischarge}
+                          invalidText={errors.dateOfDischarge?.message}
                         />
-                      )}
-                    />
-                    <Controller
-                      name="period"
-                      control={control}
-                      render={({ field }) => (
-                        <TimePickerSelect
-                          {...field}
-                          className={styles.formDeathTimepickerSelector}
-                          id="time-picker-select">
-                          <SelectItem value="AM" text="AM" />
-                          <SelectItem value="PM" text="PM" />
-                        </TimePickerSelect>
-                      )}
-                    />
-                  </ResponsiveWrapper>
-                </div>
-              </Column>
-            </div>
+                      </DatePicker>
+                    )}
+                  />
+                </Column>
 
-            <Column className={styles.fieldColumn}>
+                <Column>
+                  <div className={styles.dateTimeSection}>
+                    <ResponsiveWrapper>
+                      <Controller
+                        name="timeOfDischarge"
+                        control={control}
+                        render={({ field }) => (
+                          <TimePicker
+                            {...field}
+                            id="time-of-discharge-picker"
+                            labelText={
+                              selectedDischargeType === 'discharge'
+                                ? t('timeOfDischarge', 'Time of discharge*')
+                                : t('timeOfTransfer', 'Time of transfer*')
+                            }
+                            className={styles.formAdmissionTimepicker}
+                            invalid={!!errors.timeOfDischarge}
+                            invalidText={errors.timeOfDischarge?.message}
+                          />
+                        )}
+                      />
+                      <Controller
+                        name="period"
+                        control={control}
+                        render={({ field }) => (
+                          <TimePickerSelect
+                            {...field}
+                            className={styles.formDeathTimepickerSelector}
+                            id="time-picker-select">
+                            <SelectItem value="AM" text="AM" />
+                            <SelectItem value="PM" text="PM" />
+                          </TimePickerSelect>
+                        )}
+                      />
+                    </ResponsiveWrapper>
+                  </div>
+                </Column>
+              </div>
+            </ResponsiveWrapper>
+          )}
+
+          <ResponsiveWrapper>
+            <Column>
               <Controller
                 name="burialPermitNumber"
                 control={control}
@@ -353,88 +348,9 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
                   <TextInput
                     {...field}
                     id="burialPermitNumber"
-                    type="text"
-                    className={styles.sectionField}
-                    placeholder={t('burialPermitNumber', 'Burial permit number')}
-                    labelText={t('burialPermitNumber', 'Burial permit number')}
+                    labelText={t('permitSerialNumber', 'Permit serial number*')}
                     invalid={!!errors.burialPermitNumber}
                     invalidText={errors.burialPermitNumber?.message}
-                  />
-                )}
-              />
-            </Column>
-
-            <Column className={styles.fieldColumn}>
-              <Controller
-                name="nextOfKinNames"
-                control={control}
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="nextOfKinNames"
-                    type="text"
-                    className={styles.sectionField}
-                    placeholder={t('nextOfKinNames', 'Next of kin names')}
-                    labelText={t('nextOfKinNames', 'Next of kin names')}
-                    invalid={!!errors.nextOfKinNames}
-                    invalidText={errors.nextOfKinNames?.message}
-                  />
-                )}
-              />
-            </Column>
-
-            <Column className={styles.fieldColumn}>
-              <Controller
-                name="relationshipType"
-                control={control}
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="relationshipType"
-                    type="text"
-                    className={styles.sectionField}
-                    placeholder={t('relationshipType', 'Relationship')}
-                    labelText={t('relationshipType', 'Relationship')}
-                    invalid={!!errors.relationshipType}
-                    invalidText={errors.relationshipType?.message}
-                  />
-                )}
-              />
-            </Column>
-
-            <Column className={styles.fieldColumn}>
-              <Controller
-                name="nextOfKinContact"
-                control={control}
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="nextOfKinContact"
-                    type="text"
-                    className={styles.sectionField}
-                    placeholder={t('nextOfKinContact', 'Next of kin contact')}
-                    labelText={t('nextOfKinContact', 'Next of kin contact')}
-                    invalid={!!errors.nextOfKinContact}
-                    invalidText={errors.nextOfKinContact?.message}
-                  />
-                )}
-              />
-            </Column>
-
-            <Column className={styles.fieldColumn}>
-              <Controller
-                name="nextOfKinAddress"
-                control={control}
-                render={({ field }) => (
-                  <TextInput
-                    {...field}
-                    id="nextOfKinAddress"
-                    type="text"
-                    className={styles.sectionField}
-                    placeholder={t('nextOfKinAddress', 'Next of kin address')}
-                    labelText={t('nextOfKinAddress', 'Next of kin address')}
-                    invalid={!!errors.nextOfKinAddress}
-                    invalidText={errors.nextOfKinAddress?.message}
                   />
                 )}
               />
@@ -443,36 +359,179 @@ const DischargeForm: React.FC<DischargeFormProps> = ({ closeWorkspace, patientUu
 
           <ResponsiveWrapper>
             <Column>
-              <ExtensionSlot
-                name="patient-chart-attachments-dashboard-slot"
-                className={styles.sectionField}
-                state={{
-                  patientUuid,
-                }}
+              <Controller
+                name="dischargeArea"
+                control={control}
+                render={({ field }) => (
+                  <TextInput
+                    {...field}
+                    id="dischargeArea"
+                    labelText={t('dischargeArea', 'Discharge Area*')}
+                    invalid={!!errors.dischargeArea}
+                    invalidText={errors.dischargeArea?.message}
+                  />
+                )}
               />
             </Column>
           </ResponsiveWrapper>
+
+          {selectedDischargeType === 'transfer' && (
+            <>
+              <ResponsiveWrapper>
+                <Column>
+                  <Controller
+                    name="receivingArea"
+                    control={control}
+                    render={({ field }) => (
+                      <TextInput
+                        {...field}
+                        id="receivingArea"
+                        labelText={t('receivingArea', 'Receiving mortuary*')}
+                        invalid={!!errors.receivingArea}
+                        invalidText={errors.receivingArea?.message}
+                      />
+                    )}
+                  />
+                </Column>
+              </ResponsiveWrapper>
+              <ResponsiveWrapper>
+                <Column>
+                  <Controller
+                    name="reasonForTransfer"
+                    control={control}
+                    render={({ field }) => (
+                      <TextInput
+                        {...field}
+                        id="reasonForTransfer"
+                        labelText={t('reasonForTransfer', 'Reason for transfer*')}
+                        invalid={!!errors.reasonForTransfer}
+                        invalidText={errors.reasonForTransfer?.message}
+                      />
+                    )}
+                  />
+                </Column>
+              </ResponsiveWrapper>
+            </>
+          )}
+
+          {selectedDischargeType === 'dispose' && (
+            <>
+              <ResponsiveWrapper>
+                <Column>
+                  <Controller
+                    name="serialNumber"
+                    control={control}
+                    render={({ field }) => (
+                      <TextInput
+                        {...field}
+                        id="serialNumber"
+                        labelText={t('serialNumber', 'Serial Number*')}
+                        invalid={!!errors.serialNumber}
+                        invalidText={errors.serialNumber?.message}
+                      />
+                    )}
+                  />
+                </Column>
+              </ResponsiveWrapper>
+              <ResponsiveWrapper>
+                <Column>
+                  <Controller
+                    name="courtOrderCaseNumber"
+                    control={control}
+                    render={({ field }) => (
+                      <TextInput
+                        {...field}
+                        id="courtOrderCaseNumber"
+                        labelText={t('courtOrderCaseNumber', 'Court Order Case Number*')}
+                        invalid={!!errors.courtOrderCaseNumber}
+                        invalidText={errors.courtOrderCaseNumber?.message}
+                      />
+                    )}
+                  />
+                </Column>
+              </ResponsiveWrapper>
+            </>
+          )}
+
+          <FormGroup legendText={t('nextOfKinInformation', 'Next of Kin Information')}>
+            <Stack gap={3}>
+              <Column>
+                <Controller
+                  name="nextOfKinNames"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="nextOfKinNames"
+                      labelText={t('nextOfKinNames', 'Next of kin names*')}
+                      invalid={!!errors.nextOfKinNames}
+                      invalidText={errors.nextOfKinNames?.message}
+                    />
+                  )}
+                />
+              </Column>
+              <Column>
+                <Controller
+                  name="relationshipType"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="relationshipType"
+                      labelText={t('relationshipType', 'Relationship*')}
+                      invalid={!!errors.relationshipType}
+                      invalidText={errors.relationshipType?.message}
+                    />
+                  )}
+                />
+              </Column>
+              <Column>
+                <Controller
+                  name="nextOfKinContact"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="nextOfKinContact"
+                      labelText={t('nextOfKinContact', 'Next of kin contact*')}
+                      invalid={!!errors.nextOfKinContact}
+                      invalidText={errors.nextOfKinContact?.message}
+                    />
+                  )}
+                />
+              </Column>
+              <Column>
+                <Controller
+                  name="nextOfKinNationalId"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput
+                      {...field}
+                      id="nextOfKinNationalId"
+                      labelText={t('nextOfKinNationalId', 'Next of kin National ID*')}
+                      invalid={!!errors.nextOfKinNationalId}
+                      invalidText={errors.nextOfKinNationalId?.message}
+                    />
+                  )}
+                />
+              </Column>
+            </Stack>
+          </FormGroup>
+
+          <ExtensionSlot name="patient-chart-attachments-dashboard-slot" state={{ patientUuid }} />
         </Stack>
       </div>
 
-      <ButtonSet
-        className={classNames({
-          [styles.tablet]: isTablet,
-          [styles.desktop]: !isTablet,
-        })}>
-        <Button className={styles.buttonContainer} kind="secondary" onClick={() => closeWorkspace()}>
+      <ButtonSet className={classNames(styles.buttonSet, { [styles.tablet]: isTablet })}>
+        <Button kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button
-          className={styles.buttonContainer}
-          disabled={isSubmitting || !isDirty || isDischargeBlocked || isLoadingBills}
           kind="primary"
-          type="submit">
+          type="submit"
+          disabled={isSubmitting || !isDirty || isDischargeBlocked || isLoadingBills || !patient}>
           {isSubmitting ? (
-            <span className={styles.inlineLoading}>
-              {t('submitting', 'Submitting...')}
-              <InlineLoading status="active" iconDescription="Loading" />
-            </span>
+            <InlineLoading description={t('submitting', 'Submitting...')} />
           ) : (
             t('saveAndClose', 'Save & close')
           )}

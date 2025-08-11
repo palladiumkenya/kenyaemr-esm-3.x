@@ -1,0 +1,23 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.dashboardContainer {
+  height: layout.$layout-04;
+  align-content: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  background-color: colors.$white;
+  margin-bottom: layout.$layout-01;
+  padding: layout.$layout-01;
+}
+
+.dashboardTitle {
+  @include type.type-style('heading-01');
+}
+
+.dropdown {
+  width: 23rem;
+}

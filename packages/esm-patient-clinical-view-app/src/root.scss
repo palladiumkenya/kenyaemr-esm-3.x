@@ -1,23 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
+@use '@carbon/type';
 @use '~@openmrs/esm-styleguide/src/vars' as *;
-
-$ui-01: #f4f4f4;
-$ui-02: #ffffff;
-$ui-03: #e0e0e0;
-$ui-05: #161616;
-$color-gray-70: #525252;
-$color-blue-60-2: #0f62fe;
-$color-yellow-50: #feecae;
-$inverse-support-03: #f1c21b;
-$warning-background: #fff8e1;
-$openmrs-background-grey: #f4f4f4;
-$danger: #da1e28;
-$interactive-01: #0f62fe;
-$brand-teal-01: #3197d9;
-$ohri-input-width: 22.313rem;
-$ohri-home-background: #ededed;
-$button-primary: #0078a6;
 
 .productiveHeading01 {
   @include type.type-style('heading-compact-01');
@@ -69,51 +52,4 @@ $button-primary: #0078a6;
 
 .text02 {
   color: $text-02;
-}
-
-aside {
-  background-color: $ui-02 !important;
-}
-
-// Login Overrides
-
-div[class*='-esm-login__styles__center'] > img {
-  width: 140px; // design has 120px
-}
-
-:global(.tab-12rem) > button {
-  width: 12rem !important;
-}
-
-:global(.tab-14rem) > button {
-  width: 14rem !important;
-}
-
-:global(.tab-16rem) > button {
-  width: 16rem !important;
-}
-
-:global(.cds--overflow-menu) > div {
-  width: 15rem !important;
-}
-
-nav :global(.cds--accordion__title) {
-  color: #525252;
-  font-weight: 600 !important;
-}
-
-nav :global(.cds--accordion__content) {
-  padding-bottom: 0 !important;
-  padding-top: 0 !important;
-}
-
-nav :global(.cds--accordion__content) > a {
-  background-color: #cecece !important;
-  color: #161616 !important;
-  border-left-color: var(--brand-01) !important;
-  font: bolder;
-}
-
-:global(.cds--tab--list) button {
-  max-width: 16rem !important;
 }

@@ -71,64 +71,27 @@ const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({
     ],
   );
   return (
-    <div>
-      <Layer>
-        <Tile>
-          <div className={styles.desktopHeading}>
-            <h4>{t('clinicalEncounter', 'Clinical encounter')}</h4>
-          </div>
-        </Tile>
-      </Layer>
-      <Layer style={{ backgroundColor: 'white', padding: '0 1rem' }}>
-        <Tabs>
-          <TabList contained activation="manual" aria-label="List of tabs">
-            <Tab renderIcon={Friendship}>{t('socialHistory', 'Social History')}</Tab>
-            <Tab renderIcon={ReminderMedical}>{t('medicalHistory', 'Medical History')}</Tab>
-            {isInPatient && <Tab renderIcon={CloudMonitoring}>{t('encounterDetails', 'Encounter details')}</Tab>}
-            {isInPatient && <Tab renderIcon={Activity}>{t('surgicalSummary', 'Surgical Summary')}</Tab>}
-            {isInPatient && <Tab renderIcon={UserMultiple}>{t('neonatalSummary', 'Neonatal Summary')}</Tab>}
-            {isInPatient && <Tab renderIcon={UserFollow}>{t('maternalSummary', 'Maternal Summary')}</Tab>}
-            {isInPatient && <Tab renderIcon={Dashboard}>{t('inPatientSummary', 'In-Patient Summary')}</Tab>}
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              {
-                <OutPatientSocialHistory
-                  patientUuid={patientUuid}
-                  encounters={encounters}
-                  isLoading={isLoading}
-                  error={error}
-                  mutate={mutate}
-                  isValidating={isValidating}
-                />
-              }
-            </TabPanel>
-            <TabPanel>
-              {
-                <OutPatientMedicalHistory
-                  patientUuid={patientUuid}
-                  encounters={encounters}
-                  isLoading={isLoading}
-                  error={error}
-                  mutate={mutate}
-                  isValidating={isValidating}
-                />
-              }
-            </TabPanel>
-            <TabPanel>
-              {
-                <ClinicalEncounter
-                  patientUuid={patientUuid}
-                  encounters={encounters}
-                  isLoading={isLoading}
-                  error={error}
-                  mutate={mutate}
-                  isValidating={isValidating}
-                />
-              }
-            </TabPanel>
-            <TabPanel>
-              <SurgicalSummary
+    <Layer>
+      <Tile>
+        <div className={styles.desktopHeading}>
+          <h4>{t('clinicalEncounter', 'Clinical encounter')}</h4>
+        </div>
+      </Tile>
+
+      <Tabs>
+        <TabList contained activation="manual" aria-label="List of tabs">
+          <Tab renderIcon={Friendship}>{t('socialHistory', 'Social History')}</Tab>
+          <Tab renderIcon={ReminderMedical}>{t('medicalHistory', 'Medical History')}</Tab>
+          {isInPatient && <Tab renderIcon={CloudMonitoring}>{t('encounterDetails', 'Encounter details')}</Tab>}
+          {isInPatient && <Tab renderIcon={Activity}>{t('surgicalSummary', 'Surgical Summary')}</Tab>}
+          {isInPatient && <Tab renderIcon={UserMultiple}>{t('neonatalSummary', 'Neonatal Summary')}</Tab>}
+          {isInPatient && <Tab renderIcon={UserFollow}>{t('maternalSummary', 'Maternal Summary')}</Tab>}
+          {isInPatient && <Tab renderIcon={Dashboard}>{t('inPatientSummary', 'In-Patient Summary')}</Tab>}
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            {
+              <OutPatientSocialHistory
                 patientUuid={patientUuid}
                 encounters={encounters}
                 isLoading={isLoading}
@@ -136,15 +99,11 @@ const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({
                 mutate={mutate}
                 isValidating={isValidating}
               />
-            </TabPanel>
-            <TabPanel>
-              <NeonatalSummary patientUuid={patientUuid} />
-            </TabPanel>
-            <TabPanel>
-              <MaternalSummary patientUuid={patientUuid} />
-            </TabPanel>
-            <TabPanel>
-              <InPatientSummary
+            }
+          </TabPanel>
+          <TabPanel>
+            {
+              <OutPatientMedicalHistory
                 patientUuid={patientUuid}
                 encounters={encounters}
                 isLoading={isLoading}
@@ -152,11 +111,49 @@ const ClinicalEncounterDashboard: React.FC<ClinicalEncounterDashboardProps> = ({
                 mutate={mutate}
                 isValidating={isValidating}
               />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Layer>
-    </div>
+            }
+          </TabPanel>
+          <TabPanel>
+            {
+              <ClinicalEncounter
+                patientUuid={patientUuid}
+                encounters={encounters}
+                isLoading={isLoading}
+                error={error}
+                mutate={mutate}
+                isValidating={isValidating}
+              />
+            }
+          </TabPanel>
+          <TabPanel>
+            <SurgicalSummary
+              patientUuid={patientUuid}
+              encounters={encounters}
+              isLoading={isLoading}
+              error={error}
+              mutate={mutate}
+              isValidating={isValidating}
+            />
+          </TabPanel>
+          <TabPanel>
+            <NeonatalSummary patientUuid={patientUuid} />
+          </TabPanel>
+          <TabPanel>
+            <MaternalSummary patientUuid={patientUuid} />
+          </TabPanel>
+          <TabPanel>
+            <InPatientSummary
+              patientUuid={patientUuid}
+              encounters={encounters}
+              isLoading={isLoading}
+              error={error}
+              mutate={mutate}
+              isValidating={isValidating}
+            />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Layer>
   );
 };
 export default ClinicalEncounterDashboard;
