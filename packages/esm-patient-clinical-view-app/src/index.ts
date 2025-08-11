@@ -9,7 +9,7 @@ import {
   peerCalendarDashboardMeta,
   relationshipsDashboardMeta,
   specialClinicsDashboardMeta,
-} from './dashboard.meta';
+} from './dashboard/dashboard.meta';
 import { maternalAndChildHealthDashboardMeta } from './maternal-and-child-health/mch-dashboard.meta';
 import { hivCareAndTreatmentDashboardMeta } from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
 import { inPatientMeta } from './in-patient/in-patient.meta';
@@ -43,9 +43,9 @@ import PeerCalendar from './peer-calendar/peer-calendar.component';
 import PeerForm from './peer-calendar/forms/peer-form.workspace';
 import FormEntryWorkspace from './peer-calendar/forms/form-entry.workspace';
 
-import { createLeftPanelLink } from './left-panel-link.component';
 import { configSchema } from './config-schema';
 import SpecialClinicDashboard from './special-clinics/special-clinic.component';
+import { createDashboardLink as createDashboardLink2 } from './dashboard/createDashboardLink';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -56,7 +56,10 @@ const options = {
 
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-export const hivCareAndTreatmentLink = getSyncLifecycle(createDashboardLink(hivCareAndTreatmentDashboardMeta), options);
+export const hivCareAndTreatmentLink = getSyncLifecycle(
+  createDashboardLink2(hivCareAndTreatmentDashboardMeta),
+  options,
+);
 export const hivCareAndTreatment = getSyncLifecycle(HivCareAndTreatment, options);
 
 export const relationshipsLink = getSyncLifecycle(createDashboardLink(relationshipsDashboardMeta), options);
@@ -77,12 +80,12 @@ export const contactListUpdateForm = getSyncLifecycle(ContactListUpdateForm, opt
 export const birthDateCalculator = getSyncLifecycle(BirthDateCalculator, options);
 
 export const peerCalendar = getSyncLifecycle(PeerCalendar, options);
-export const peerCalendarDashboardLink = getSyncLifecycle(createLeftPanelLink(peerCalendarDashboardMeta), options);
+export const peerCalendarDashboardLink = getSyncLifecycle(createDashboardLink(peerCalendarDashboardMeta), options);
 export const peersForm = getSyncLifecycle(PeerForm, options);
 export const peerCalendarFormEntry = getSyncLifecycle(FormEntryWorkspace, options);
 
 export const maternalAndChildHealthDashboardLink = getSyncLifecycle(
-  createDashboardLink(maternalAndChildHealthDashboardMeta),
+  createDashboardLink2(maternalAndChildHealthDashboardMeta),
   options,
 );
 export const maternalAndChildHealthDashboard = getSyncLifecycle(MaternalAndChildDashboard, options);
@@ -91,7 +94,7 @@ export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 export const partograph = getSyncLifecycle(Partograph, options);
 
-export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
+export const caseManagementDashboardLink = getSyncLifecycle(createDashboardLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
 export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);

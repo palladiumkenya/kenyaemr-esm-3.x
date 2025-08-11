@@ -5,4 +5,5 @@ export const hivCareAndTreatmentDashboardMeta = {
   path: 'hiv-care-and-treatment-dashboard',
   moduleName: '@kenyaemr/esm-patient-clinical-view-app',
   icon: 'omrs-icon-programs',
+  showWhenExpression: 'patientEnrollments.filter(enrollment => enrollment.program.name === "HIV").length > 0',
 };
