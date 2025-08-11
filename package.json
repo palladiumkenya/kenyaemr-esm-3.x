@@ -13,7 +13,7 @@
     "coverage": "yarn test --coverage",
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
-    "start": "openmrs develop",
+    "start": "openmrs develop --sources packages/esm-patient-flags-app --port 8095 --backend https://qa.kenyahmis.org --config-url https://qa.kenyahmis.org/openmrs/spa/openmrs.config.json  https://qa.kenyahmis.org/openmrs/spa/kenyaemr.spa.json",
     "verify": "turbo run lint && turbo run typescript",
     "preinstall": "npx only-allow yarn"
   },
