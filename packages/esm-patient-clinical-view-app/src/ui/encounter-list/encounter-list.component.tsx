@@ -1,20 +1,11 @@
 import { ErrorState, isDesktop, navigate, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './encounter-list.scss';
 import { OTable } from '../data-table/o-table.component';
-import {
-  Button,
-  Link,
-  OverflowMenu,
-  OverflowMenuItem,
-  Pagination,
-  DataTableSkeleton,
-  Layer,
-  Tile,
-} from '@carbon/react';
+import { Link, OverflowMenu, OverflowMenuItem, Pagination, DataTableSkeleton, Layer } from '@carbon/react';
 import { useEncounterRows } from '../../hooks/useEncounterRows';
-import { EmptyDataIllustration, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { OpenmrsEncounter } from '../../types';
 
 export interface O3FormSchema {

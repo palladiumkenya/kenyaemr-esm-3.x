@@ -1,5 +1,4 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/layout';
 @use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 @use '../../root.scss';
@@ -14,7 +13,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
+  padding: layout.$spacing-04 0 layout.$spacing-04 layout.$spacing-05;
 }
 
 .widgetHeaderContainer > h4:after {
@@ -49,10 +48,10 @@
 .content {
   @extend .productiveHeading01;
   color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
 }
 
 .errorContainer {
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
 }

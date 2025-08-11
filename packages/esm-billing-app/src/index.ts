@@ -83,7 +83,7 @@ export const importTranslation = require.context('../translations', false, /.jso
 
 // Dashboard Links
 export const billingSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...dashboardMeta, icon: '', moduleName }),
+  createDashboardLink({ ...dashboardMeta, icon: 'omrs-icon-money', moduleName }),
   options,
 );
 

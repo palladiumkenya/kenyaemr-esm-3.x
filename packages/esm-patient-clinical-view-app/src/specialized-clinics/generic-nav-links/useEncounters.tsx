@@ -9,10 +9,10 @@ export const useEncounters = (encounterUuid: string, formUuid: string, patientUu
     openmrsFetch,
   );
   const filteredByEncounterTypeUuid =
-    data?.data?.results.filter(
-      (encounter) => encounter.encounterType.uuid === encounterUuid && encounter.form.uuid === formUuid,
+    data?.data?.results?.filter(
+      (encounter) => encounter?.encounterType?.uuid === encounterUuid && encounter.form?.uuid === formUuid,
     ) ?? [];
-  return { encounters: filteredByEncounterTypeUuid, isLoading, isValidating, error, mutate };
+  return { encounters: filteredByEncounterTypeUuid ?? [], isLoading, isValidating, error, mutate };
 };
 
 export const genericTableHeader = [
