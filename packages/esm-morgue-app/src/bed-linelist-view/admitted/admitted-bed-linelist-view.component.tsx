@@ -14,14 +14,15 @@ import {
   OverflowMenuItem,
   Tag,
   DataTableSkeleton,
+  Search,
 } from '@carbon/react';
-import { launchWorkspace, navigate, useConfig, useVisit } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import styles from '../bed-linelist-view.scss';
 import { convertDateToDays, formatDateTime } from '../../utils/utils';
 import { Patient, Person, type MortuaryLocationResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import { mutate as mutateSWR } from 'swr';
-import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
+import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 
 interface AdmittedBedLineListViewProps {
   AdmittedDeceasedPatient: MortuaryLocationResponse | null;
@@ -50,9 +51,12 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const { autopsyFormUuid } = useConfig<ConfigObject>();
+  const isTablet = useLayoutType() === 'tablet';
+  const controlSize = isTablet ? 'md' : 'sm';
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currPageSize, setCurrPageSize] = useState(initialPageSize);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const DaysInMortuary = ({ patientUuid }: { patientUuid: string }) => {
     const { activeVisit } = useVisit(patientUuid);
@@ -84,7 +88,9 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     { key: 'action', header: t('action', 'Action') },
   ];
 
-  const handlePostmortem = (patientUuid: string) => {
+  const handlePostmortem = (patientUuid: string, bedInfo?: { bedNumber: string; bedId: number }) => {
+    const hasBedInfo = bedInfo?.bedNumber && bedInfo?.bedId;
+
     if (onPostmortem) {
       onPostmortem(patientUuid);
     } else {
@@ -100,8 +106,12 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
         },
       });
     }
+    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patientUuid}`;
+    const to = hasBedInfo
+      ? `${base}/compartment/${bedInfo.bedNumber}/${bedInfo.bedId}/mortuary-chart`
+      : `${base}/mortuary-chart`;
+    navigate({ to });
   };
-
   const handleDischarge = (patientUuid: string, bedId: number) => {
     if (onDischarge) {
       onDischarge(patientUuid);
@@ -124,19 +134,6 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
         patientUuid: patientUuid,
         bedId,
         mortuaryLocation: AdmittedDeceasedPatient,
-        mutate,
-      });
-    }
-  };
-
-  const handleDispose = (patientUuid: string, bedId: number) => {
-    if (onDispose) {
-      onDispose(patientUuid);
-    } else {
-      launchWorkspace('dispose-deceased-person-form', {
-        workspaceTitle: t('disposeForm', 'Dispose form'),
-        patientUuid: patientUuid,
-        bedId,
         mutate,
       });
     }
@@ -226,6 +223,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
           daysAdmitted: '-',
           isEmpty: true,
           bedId,
+          searchableText: `${bedNumber} ${bedType}`.toLowerCase(),
         });
       } else {
         for (const patient of patients) {
@@ -236,6 +234,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
           const causeOfDeath = patient.person?.causeOfDeath?.display || t('unknown', 'Unknown');
           const dateOfDeath = patient.person?.deathDate;
           const daysAdmitted = calculateDaysAdmitted(dateOfDeath).toString();
+          const idNumber = getIdNumber(patient);
 
           rows.push({
             id: `${bedUuid}-${patientUuid}`,
@@ -244,7 +243,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
             bedType,
             status: bedStatus,
             patientName,
-            idNumber: getIdNumber(patient),
+            idNumber,
             gender,
             age,
             dateOfDeath: formatDateTime(dateOfDeath),
@@ -255,6 +254,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
             bedUuid,
             bedId,
             personUuid: patient.person?.uuid || '',
+            searchableText: `${patientName} ${idNumber} ${gender} ${bedNumber} ${bedType}`.toLowerCase(),
           });
         }
       }
@@ -262,6 +262,32 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
 
     return rows;
   }, [getCompartmentShare, AdmittedDeceasedPatient, t, isLoading]);
+
+  const filteredRows = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return allRows;
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    return allRows.filter(
+      (row) =>
+        row.searchableText.includes(searchLower) ||
+        row.patientName.toLowerCase().includes(searchLower) ||
+        row.idNumber.toLowerCase().includes(searchLower) ||
+        row.gender.toLowerCase().includes(searchLower) ||
+        row.bedNumber?.toString().includes(searchLower) ||
+        row.bedType.toLowerCase().includes(searchLower),
+    );
+  }, [allRows, searchTerm]);
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
+  };
+
+  const hasSearchTerm = searchTerm.trim().length > 0;
+  const hasNoSearchResults = hasSearchTerm && filteredRows.length === 0;
+  const totalCount = filteredRows.length;
 
   if (isLoading) {
     return (
@@ -274,18 +300,20 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
   if (!AdmittedDeceasedPatient) {
     return (
       <div className={styles.loadingContainer}>
-        <EmptyState
-          headerTitle={t('noAdmittedPatients', 'No admitted patients found')}
-          displayText={t('noAdmittedPatientsDescription', 'There are currently no admitted patients to display.')}
+        <EmptyMorgueAdmission
+          title={t('noAdmittedPatient', 'No deceased patients currently admitted')}
+          subTitle={t(
+            'noAdmittedPatientsDescription',
+            'There are no admitted deceased patients to display at this time.',
+          )}
         />
       </div>
     );
   }
 
-  const totalCount = allRows.length;
   const startIndex = (currentPage - 1) * currPageSize;
   const endIndex = startIndex + currPageSize;
-  const paginatedRows = paginated ? allRows.slice(startIndex, endIndex) : allRows;
+  const paginatedRows = paginated ? filteredRows.slice(startIndex, endIndex) : filteredRows;
 
   const goTo = (page: number) => setCurrentPage(page);
 
@@ -299,120 +327,140 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     }
   };
 
+  const NoSearchResults = () => (
+    <div className={styles.emptyState}>
+      <EmptyMorgueAdmission
+        title={t('noSearchResults', 'We couldn’t find anything')}
+        subTitle={t('tryAgain', 'Try adjusting your search {{searchTerm}} and try again', { searchTerm })}
+      />
+    </div>
+  );
+
   return (
     <div className={styles.bedLayoutWrapper}>
-      <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getCellProps }) => (
-          <TableContainer>
-            <Table {...getTableProps()} aria-label="mortuary beds table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader key={header.key} {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => {
-                  const rowData = allRows.find((r) => r.id === row.id);
-                  if (!rowData) {
-                    return null;
-                  }
-
-                  return (
-                    <TableRow key={row.id} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => {
-                        const cellKey = cell.info.header as keyof typeof rowData;
-
-                        if (cell.info.header === 'daysAdmitted' && !rowData.isEmpty) {
-                          return (
-                            <TableCell key={cell.id}>
-                              <DaysInMortuary patientUuid={rowData.patientUuid} />
-                            </TableCell>
-                          );
-                        }
-
-                        if (cell.info.header === 'admissionDate' && !rowData.isEmpty) {
-                          return (
-                            <TableCell key={cell.id}>
-                              <AdmissionDate patientUuid={rowData.patientUuid} />
-                            </TableCell>
-                          );
-                        }
-
-                        if (cell.info.header === 'status') {
-                          return (
-                            <TableCell key={cell.id}>
-                              <Tag type={rowData.status === 'AVAILABLE' ? 'green' : 'red'} size="sm">
-                                {rowData.status === 'AVAILABLE'
-                                  ? t('available', 'Available')
-                                  : t('occupied', 'Occupied')}
-                              </Tag>
-                            </TableCell>
-                          );
-                        }
-
-                        if (cell.info.header === 'action') {
-                          return (
-                            <TableCell key={cell.id}>
-                              {!rowData.isEmpty && (
-                                <OverflowMenu flipped>
-                                  <OverflowMenuItem
-                                    onClick={() => {
-                                      const hasBedInfo = rowData.bedNumber && rowData.bedId;
-                                      const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${
-                                        rowData.patientUuid
-                                      }`;
-                                      const to = hasBedInfo
-                                        ? `${base}/compartment/${rowData.bedNumber}/${rowData.bedId}/mortuary-chart`
-                                        : `${base}/mortuary-chart`;
-                                      navigate({ to });
-                                    }}
-                                    itemText={t('viewDetails', 'View details')}
-                                  />
-                                  <OverflowMenuItem
-                                    onClick={() => handlePostmortem(rowData.patientUuid)}
-                                    itemText={t('postmortemForm', 'Postmortem')}
-                                  />
-                                  <OverflowMenuItem
-                                    onClick={() => handleSwapCompartment(rowData.patientUuid, rowData.bedId)}
-                                    itemText={t('compartmentSwap', 'Compartment swap')}
-                                  />
-                                  <OverflowMenuItem
-                                    onClick={() => handleDispose(rowData.patientUuid, rowData.bedId)}
-                                    itemText={t('disposeForm', 'Dispose')}
-                                  />
-                                  <OverflowMenuItem
-                                    onClick={() => handleDischarge(rowData.patientUuid, rowData.bedId)}
-                                    itemText={t('dischargeForm', 'Discharge')}
-                                  />
-                                </OverflowMenu>
-                              )}
-                            </TableCell>
-                          );
-                        }
-                        return <TableCell key={cell.id}>{rowData[cellKey] || '-'}</TableCell>;
-                      })}
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
-
-      {paginated && !isLoading && totalCount > 0 && (
-        <Pagination
-          page={currentPage}
-          pageSize={currPageSize}
-          pageSizes={pageSizes}
-          totalItems={totalCount}
-          size={'sm'}
-          onChange={handlePaginationChange}
+      <div className={styles.searchContainer}>
+        <Search
+          labelText={t('noSearchDeceasedPatients', 'Search deceased patients')}
+          placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, gender, compartment, or bed type...')}
+          value={searchTerm}
+          onChange={handleSearchChange}
+          size={controlSize}
         />
+      </div>
+      {hasNoSearchResults ? (
+        <NoSearchResults />
+      ) : (
+        <>
+          <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
+            {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()} aria-label="mortuary beds table">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                          {header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => {
+                      const rowData = allRows.find((r) => r.id === row.id);
+                      if (!rowData) {
+                        return null;
+                      }
+
+                      return (
+                        <TableRow key={row.id} {...getRowProps({ row })}>
+                          {row.cells.map((cell) => {
+                            const cellKey = cell.info.header as keyof typeof rowData;
+
+                            if (cell.info.header === 'daysAdmitted' && !rowData.isEmpty) {
+                              return (
+                                <TableCell key={cell.id}>
+                                  <DaysInMortuary patientUuid={rowData.patientUuid} />
+                                </TableCell>
+                              );
+                            }
+
+                            if (cell.info.header === 'admissionDate' && !rowData.isEmpty) {
+                              return (
+                                <TableCell key={cell.id}>
+                                  <AdmissionDate patientUuid={rowData.patientUuid} />
+                                </TableCell>
+                              );
+                            }
+
+                            if (cell.info.header === 'status') {
+                              return (
+                                <TableCell key={cell.id}>
+                                  <Tag type={rowData.status === 'AVAILABLE' ? 'green' : 'red'} size="sm">
+                                    {rowData.status === 'AVAILABLE'
+                                      ? t('available', 'Available')
+                                      : t('occupied', 'Occupied')}
+                                  </Tag>
+                                </TableCell>
+                              );
+                            }
+
+                            if (cell.info.header === 'action') {
+                              return (
+                                <TableCell key={cell.id}>
+                                  {!rowData.isEmpty && (
+                                    <OverflowMenu flipped>
+                                      <OverflowMenuItem
+                                        onClick={() => {
+                                          const hasBedInfo = rowData.bedNumber && rowData.bedId;
+                                          const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${
+                                            rowData.patientUuid
+                                          }`;
+                                          const to = hasBedInfo
+                                            ? `${base}/compartment/${rowData.bedNumber}/${rowData.bedId}/mortuary-chart`
+                                            : `${base}/mortuary-chart`;
+                                          navigate({ to });
+                                        }}
+                                        itemText={t('viewDetails', 'View details')}
+                                      />
+                                      <OverflowMenuItem
+                                        onClick={() => handlePostmortem(rowData.patientUuid)}
+                                        itemText={t('postmortemForm', 'Postmortem')}
+                                      />
+                                      <OverflowMenuItem
+                                        onClick={() => handleSwapCompartment(rowData.patientUuid, rowData.bedId)}
+                                        itemText={t('compartmentSwap', 'Compartment swap')}
+                                      />
+                                      <OverflowMenuItem
+                                        onClick={() => handleDischarge(rowData.patientUuid, rowData.bedId)}
+                                        itemText={t('dischargeForm', 'Discharge')}
+                                      />
+                                    </OverflowMenu>
+                                  )}
+                                </TableCell>
+                              );
+                            }
+                            return <TableCell key={cell.id}>{rowData[cellKey] || '-'}</TableCell>;
+                          })}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+
+          {paginated && !isLoading && totalCount > 0 && (
+            <Pagination
+              page={currentPage}
+              pageSize={currPageSize}
+              pageSizes={pageSizes}
+              totalItems={totalCount}
+              size={'sm'}
+              onChange={handlePaginationChange}
+            />
+          )}
+        </>
       )}
     </div>
   );

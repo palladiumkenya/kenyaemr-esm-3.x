@@ -1,4 +1,3 @@
-// AwaitingBedLineListView.tsx
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -16,12 +15,14 @@ import {
   OverflowMenu,
   OverflowMenuItem,
   DataTableSkeleton,
+  Search,
 } from '@carbon/react';
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
 import { type MortuaryLocationResponse, type MortuaryPatient } from '../../types';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
 import { useAwaitingPatients } from '../../home/home.resource';
+import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
 
 interface AwaitingBedLineListViewProps {
   awaitingQueueDeceasedPatients: Array<MortuaryPatient>;
@@ -43,9 +44,12 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
   mutated,
 }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
+  const controlSize = isTablet ? 'md' : 'sm';
 
   const [currentPage, setCurrentPage] = useState(1);
   const [currPageSize, setCurrPageSize] = useState(initialPageSize);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
 
@@ -82,31 +86,51 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
       const age = mortuaryPatient?.person?.person?.age || '-';
       const dateOfDeath = mortuaryPatient?.person?.person?.deathDate;
       const daysInQueue = calculateDaysInQueue(dateOfDeath);
+      const idNumber =
+        mortuaryPatient?.person?.identifiers
+          ?.find((id) => id.display?.includes('OpenMRS ID'))
+          ?.display?.split('=')?.[1]
+          ?.trim() || '-';
 
       return {
         id: patientUuid,
         admissionDate: formatDateTime(dateOfDeath),
-        idNumber:
-          mortuaryPatient?.person?.identifiers
-            ?.find((id) => id.display?.includes('OpenMRS ID'))
-            ?.display?.split('=')?.[1]
-            ?.trim() || '-',
+        idNumber,
         name: patientName,
         gender: gender,
         age: age.toString(),
         bedNumber: '-',
         daysAdmitted: daysInQueue.toString(),
         action: patientUuid,
+        searchableText: `${patientName} ${idNumber} ${gender}`.toLowerCase(),
       };
     });
 
     return rows;
   }, [trulyAwaitingPatients]);
 
-  const totalCount = allRows.length;
+  const filteredRows = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return allRows;
+    }
+
+    const searchLower = searchTerm.toLowerCase().trim();
+    return allRows.filter(
+      (row) =>
+        row.searchableText.includes(searchLower) ||
+        row.name.toLowerCase().includes(searchLower) ||
+        row.idNumber.toLowerCase().includes(searchLower) ||
+        row.gender.toLowerCase().includes(searchLower),
+    );
+  }, [allRows, searchTerm]);
+
+  const hasSearchTerm = searchTerm.trim().length > 0;
+  const hasNoSearchResults = hasSearchTerm && filteredRows.length === 0;
+
+  const totalCount = filteredRows.length;
   const startIndex = (currentPage - 1) * currPageSize;
   const endIndex = startIndex + currPageSize;
-  const paginatedRows = paginated ? allRows.slice(startIndex, endIndex) : allRows;
+  const paginatedRows = paginated ? filteredRows.slice(startIndex, endIndex) : filteredRows;
 
   const handleAdmit = (patientData: MortuaryPatient) => {
     launchWorkspace('admit-deceased-person-form', {
@@ -117,7 +141,7 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
     });
   };
 
-  const handleCancel = (patientUuid: string, patientName: string) => {
+  const handleCancel = () => {
     // TODO: Implement cancel functionality
   };
 
@@ -133,6 +157,11 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
       setCurrPageSize(pageSize);
       setCurrentPage(1);
     }
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    setCurrentPage(1);
   };
 
   if (isLoading) {
@@ -153,69 +182,84 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
 
   return (
     <div className={styles.bedLayoutWrapper}>
-      <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
-        {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getCellProps }) => (
-          <TableContainer>
-            <Table {...getTableProps()} aria-label="deceased patients table">
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      key={header.key}
-                      {...getHeaderProps({
-                        header,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => {
-                  const patientData = trulyAwaitingPatients.find((patient) => patient?.person?.person?.uuid === row.id);
-                  const patientName = patientData?.person?.person?.display || '';
-
-                  return (
-                    <TableRow key={row.id} {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id} {...getCellProps({ cell })}>
-                          {cell.info.header === 'action' ? (
-                            <div className={styles.actionButtons}>
-                              <OverflowMenu flipped>
-                                <OverflowMenuItem
-                                  onClick={() => handleAdmit(patientData)}
-                                  itemText={t('admit', 'Admit')}
-                                  disabled={!patientData}
-                                />
-                                <OverflowMenuItem
-                                  onClick={() => handleCancel(row.id, patientName)}
-                                  itemText={t('cancel', 'Cancel')}
-                                />
-                              </OverflowMenu>
-                            </div>
-                          ) : (
-                            cell.value
-                          )}
-                        </TableCell>
+      <Search
+        labelText={t('noSearchDeceasedPatients', 'Search deceased patients')}
+        placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, or gender...')}
+        value={searchTerm}
+        onChange={handleSearchChange}
+        size={controlSize}
+      />
+      {hasNoSearchResults ? (
+        <EmptyMorgueAdmission
+          title={t('noSearchResults', 'We couldn’t find anything')}
+          subTitle={t('tryAgain', 'Try adjusting your search {{searchTerm}} and try again', { searchTerm })}
+        />
+      ) : (
+        <>
+          <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
+            {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getCellProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()} aria-label="deceased patients table">
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          key={header.key}
+                          {...getHeaderProps({
+                            header,
+                          })}>
+                          {header.header}
+                        </TableHeader>
                       ))}
                     </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => {
+                      const patientData = trulyAwaitingPatients.find(
+                        (patient) => patient?.person?.person?.uuid === row.id,
+                      );
+                      const patientName = patientData?.person?.person?.display || '';
 
-      {paginated && !isLoading && totalCount > 0 && (
-        <Pagination
-          page={currentPage}
-          pageSize={currPageSize}
-          pageSizes={pageSizes}
-          totalItems={totalCount}
-          size={'sm'}
-          onChange={handlePaginationChange}
-        />
+                      return (
+                        <TableRow key={row.id} {...getRowProps({ row })}>
+                          {row.cells.map((cell) => (
+                            <TableCell key={cell.id} {...getCellProps({ cell })}>
+                              {cell.info.header === 'action' ? (
+                                <div className={styles.actionButtons}>
+                                  <OverflowMenu flipped>
+                                    <OverflowMenuItem
+                                      onClick={() => handleAdmit(patientData)}
+                                      itemText={t('admit', 'Admit')}
+                                      disabled={!patientData}
+                                    />
+                                    <OverflowMenuItem onClick={() => handleCancel()} itemText={t('cancel', 'Cancel')} />
+                                  </OverflowMenu>
+                                </div>
+                              ) : (
+                                cell.value
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+
+          {paginated && !isLoading && totalCount > 0 && (
+            <Pagination
+              page={currentPage}
+              pageSize={currPageSize}
+              pageSizes={pageSizes}
+              totalItems={totalCount}
+              size={'sm'}
+              onChange={handlePaginationChange}
+            />
+          )}
+        </>
       )}
     </div>
   );

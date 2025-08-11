@@ -48,10 +48,10 @@ export const configSchema = {
     _description: 'UUID for next of kin relationship concept',
     _default: 'd0aa9fd1-2ac5-45d8-9c5e-4317c622c8f5',
   },
-  nextOfKinAddressUuid: {
+  nextOfKinNationalIdUuid: {
     _type: Type.String,
-    _description: 'UUID for next of kin address concept',
-    _default: '7cf22bec-d90a-46ad-9f48-035952261294',
+    _description: 'UUID for next of kin national ID concept',
+    _default: '73d34479-2f9e-4de3-a5e6-1f79a17459bb',
   },
   nextOfKinPhoneUuid: {
     _type: Type.String,
@@ -118,6 +118,128 @@ export const configSchema = {
     _description: 'UUID for serial number concept',
     _default: '1646AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  receivingAreaUuid: {
+    _type: Type.String,
+    _description: 'UUID for receiving area concept',
+    _default: '159495AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  reasonForTransferUuid: {
+    _type: Type.String,
+    _description: 'UUID for reason for transfer concept',
+    _default: '162720AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  locationOfDeathQuestionUuid: {
+    _type: Type.String,
+    _description: 'UUID for location of death question concept',
+    _default: '1541AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  locationOfDeathTypesList: {
+    _type: Type.Array,
+    _description: 'List of location of death types',
+    _default: [
+      {
+        concept: '1589AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'InPatient',
+      },
+      {
+        concept: '160473AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Outpatient',
+      },
+      {
+        concept: '1601AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Dead on arrival',
+      },
+      {
+        concept: '1536AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Home',
+      },
+      {
+        concept: '1067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Unknown (Police case)',
+      },
+    ],
+  },
+  deathConfirmationTypes: {
+    _type: Type.Array,
+    _description: 'List of death confirmation types',
+    _default: [
+      {
+        concept: '1065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Yes',
+      },
+      {
+        concept: '1066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'No',
+      },
+    ],
+  },
+  deathConfirmationQuestionUuid: {
+    _type: Type.String,
+    _description: 'UUID for death confirmation question concept',
+    _default: '165793AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  deathNotificationUuid: {
+    _type: Type.String,
+    _description: 'UUID for death notification concept',
+    _default: '162727AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  attendingClinicianUuid: {
+    _type: Type.String,
+    _description: 'UUID for attending clinician concept',
+    _default: '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  doctorRemarksUuid: {
+    _type: Type.String,
+    _description: 'UUID for doctor remarks concept',
+    _default: '161011AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  causeOfDeathUuid: {
+    _type: Type.String,
+    _description: 'UUID for cause of death concept',
+    _default: '160218AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  deadBodyPreservationTypeUuid: {
+    _type: Type.Array,
+    _description: 'List of dead body preservation types',
+    _default: [
+      {
+        concept: 'bb78fcee-99c8-4073-9224-69c668917405',
+        label: 'Body embalment',
+      },
+      {
+        concept: '167231AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Cold storage',
+      },
+    ],
+  },
+  deadBodyPreservationQuestionUuid: {
+    _type: Type.String,
+    _description: 'UUID for dead body preservation question concept',
+    _default: 'c67be9a5-f497-4082-af81-11753f65ed4b',
+  },
+  bodyEmbalmmentTypesUuid: {
+    _type: Type.Array,
+    _description: 'List of body embalmment types',
+    _default: [
+      {
+        concept: '166402AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Arterial',
+      },
+      {
+        concept: '160494AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Cavity',
+      },
+      {
+        concept: '151870AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        label: 'Hypodermic',
+      },
+    ],
+  },
+  autopsyPermissionUuid: {
+    _type: Type.String,
+    _description: 'UUID for autopsy permission concept',
+    _default: '1707AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
 };
 
 export interface BillingConfig {
@@ -151,7 +273,7 @@ export type ConfigObject = {
   morgueAdmissionEncounterTypeUuid: string;
   nextOfKinNameUuid: string;
   nextOfKinRelationshipUuid: string;
-  nextOfKinAddressUuid: string;
+  nextOfKinNationalIdUuid: string;
   nextOfKinPhoneUuid: string;
   visitPaymentMethodAttributeUuid: string;
   policeStatementUuid: string;
@@ -167,4 +289,18 @@ export type ConfigObject = {
   autopsyEncounterFormUuid: string;
   courtOrderCaseNumberUuid: string;
   serialNumberUuid: string;
+  receivingAreaUuid: string;
+  reasonForTransferUuid: string;
+  locationOfDeathQuestionUuid: string;
+  locationOfDeathTypesList: Array<{ concept: string; label: string }>;
+  deathConfirmationTypes: Array<{ concept: string; label: string }>;
+  deathConfirmationQuestionUuid: string;
+  deathNotificationUuid: string;
+  attendingClinicianUuid: string;
+  doctorRemarksUuid: string;
+  causeOfDeathUuid: string;
+  deadBodyPreservationTypeUuid: Array<{ concept: string; label: string }>;
+  deadBodyPreservationQuestionUuid: string;
+  bodyEmbalmmentTypesUuid: Array<{ concept: string; label: string }>;
+  autopsyPermissionUuid: string;
 };

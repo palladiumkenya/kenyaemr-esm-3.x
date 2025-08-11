@@ -22,7 +22,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({ patientUuid }) => {
     <div className={styles.actionButton}>
       <UserHasAccess privilege="o3 : View Mortuary Dashboard">
         <Button kind="primary" size="sm" renderIcon={Return} onClick={handleNavigateToHomePage}>
-          {t('allocation', 'Allocation View')}
+          {t('backToHome', 'Back to Home')}
         </Button>
       </UserHasAccess>
     </div>

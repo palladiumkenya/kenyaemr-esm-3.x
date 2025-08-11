@@ -1,5 +1,5 @@
 import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
-import { createDashboardGroup, createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 import { configSchema } from './config-schema';
 import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
