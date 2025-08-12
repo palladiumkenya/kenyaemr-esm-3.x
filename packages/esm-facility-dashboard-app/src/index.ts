@@ -3,6 +3,8 @@ import { configSchema } from './config-schema';
 import { moduleName } from './constants';
 import Root from './root.component';
 import { createLeftPanelLink } from './left-pannel-link.component';
+import Air from './air/air.component';
+import Reports from './reports/reports.component';
 
 const options = {
   featureName: 'esm-facility-dashboard-app',
@@ -26,3 +28,5 @@ export const aboveSiteDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ title: 'Above site Dashboard', name: 'above-site' }),
   options,
 );
+export const airDashboardLink = getSyncLifecycle(Air, options);
+export const reportsboardLink = getSyncLifecycle(Reports, options);
