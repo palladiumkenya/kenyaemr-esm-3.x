@@ -1,24 +1,24 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
 @use '@carbon/layout';
-@use '~@openmrs/esm-styleguide/src/vars' as *;
+@use '@carbon/type';
 
 .heading {
   @include type.type-style('heading-compact-01');
-  margin: spacing.$spacing-05 0 spacing.$spacing-05;
+  margin: layout.$spacing-05 0 layout.$spacing-05;
 }
 
 .warningContainer {
-  background-color: $carbon--red-50;
-  padding: spacing.$spacing-04;
-  margin: spacing.$spacing-03 0 spacing.$spacing-03;
+  background-color: colors.$red-50;
+  padding: layout.$spacing-04;
+  margin: layout.$spacing-03 0 layout.$spacing-03;
   display: flex;
   justify-content: space-between;
+
   .warning {
     @include type.type-style('heading-compact-01');
-    color: $ui-05;
   }
 }
+
 .form {
   display: flex;
   flex-direction: column;
@@ -30,18 +30,20 @@
   margin-top: auto;
   display: flex;
   justify-content: flex-end;
-  margin-right: spacing.$spacing-04;
+  margin-right: layout.$spacing-04;
 }
 
 .grid {
-  margin: 0 spacing.$spacing-05;
+  margin: 0 layout.$spacing-05;
   padding: 0rem;
 }
+
 .textbox {
-  margin-bottom: spacing.$spacing-10;
+  margin-bottom: layout.$spacing-10;
 }
+
 .button {
-  height: spacing.$spacing-10;
+  height: layout.$spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: baseline;
@@ -53,7 +55,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: spacing.$spacing-05;
+  margin: layout.$spacing-05;
   row-gap: 1.5rem;
   position: relative;
 
@@ -74,33 +76,75 @@
 
 .sectionHeader {
   @include type.type-style('heading-02');
-  margin-top: spacing.$spacing-05;
+  margin-top: layout.$spacing-05;
 }
 
+// Search results container
+.searchResults {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid colors.$gray-30;
+  border-radius: 4px;
+  margin-top: layout.$spacing-03;
+}
+
+// Individual result tiles
+.resultTile {
+  cursor: pointer;
+  border-bottom: 1px solid colors.$gray-20;
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+// Selected facility/items display
+.selectedItem {
+  margin-top: layout.$spacing-03;
+}
+
+// Selected reasons tags
+.selectedItems {
+  display: flex;
+  flex-wrap: wrap;
+  gap: layout.$spacing-03;
+  margin-top: layout.$spacing-03;
+}
+
+// Error message styling
+.errorMessage {
+  @include type.type-style('body-compact-01');
+  color: colors.$red-60;
+  margin-top: layout.$spacing-02;
+}
+
+// Global media query for tablet/mobile
 :global(.omrs-breakpoint-lt-desktop) {
   .form {
     height: var(--tablet-workspace-window-height);
   }
 
   .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
-    justify-content: flex-end;
-    gap: spacing.$spacing-05;
     padding: 0;
     margin-top: auto;
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
+    gap: layout.$spacing-05;
   }
 }
 
+// Legacy styles (consider removing if not used)
 .reasonList {
   display: flex;
   flex-direction: column;
-  gap: spacing.$spacing-05;
+  gap: layout.$spacing-05;
   max-height: 15rem;
   overflow-y: auto;
-  border-radius: spacing.$spacing-05;
+  border-radius: layout.$spacing-05;
   padding: 0.5rem;
 }
 
@@ -110,7 +154,7 @@
 }
 
 .reasonTile {
-  padding: spacing.$spacing-05;
+  padding: layout.$spacing-05;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -120,8 +164,92 @@
 .selectedReasons {
   display: flex;
   flex-wrap: wrap;
-  gap: spacing.$spacing-05;
+  gap: layout.$spacing-05;
 }
+
 .reasonTextbox {
-  margin-bottom: spacing.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+}
+
+.tile {
+  position: relative;
+}
+
+.tileContainer {
+  background-color: colors.$white-0;
+  border-top: 1px solid colors.$gray-20;
+  padding: layout.$spacing-10 0;
+}
+
+.tileNoContent {
+  margin: auto;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: layout.$spacing-05;
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+}
+
+.illustrationPictogram {
+  width: layout.$spacing-07;
+  height: layout.$spacing-07;
+  fill: var(--brand-03);
+  flex-shrink: 0;
+}
+
+.closeIcon {
+  cursor: pointer;
+  color: colors.$gray-70;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    color: colors.$gray-100;
+  }
+}
+
+.description {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+
+.facilityInfo {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  font-weight: bold;
+}
+
+.locationDetails {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+}
+
+.tags {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
 }
