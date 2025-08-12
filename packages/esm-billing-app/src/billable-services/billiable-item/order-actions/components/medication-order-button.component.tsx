@@ -1,9 +1,9 @@
 import React, { useCallback } from 'react';
 import { Edit } from '@carbon/react/icons';
-import { launchWorkspace, navigateAndLaunchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace } from '@openmrs/esm-framework';
 import { BaseOrderButton } from './base-order-button.component';
 import { useMedicationOrderAction, useOrderByUuid } from '../hooks/useMedicationOrderAction';
-import { launchPrescriptionEditWorkspace } from '../hooks/useModalHandler';
+import { launchPrescriptionEditWorkspace, navigateAndLaunchWorkspace } from '../hooks/useModalHandler';
 import { useTranslation } from 'react-i18next';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib/src';
 import { Button } from '@carbon/react';
@@ -46,12 +46,13 @@ const ModifyButton: React.FC<ModifyButtonProps> = ({ currentVisit, isLoading, or
       kind="danger--tertiary"
       size="lg"
       onClick={() =>
-        navigateAndLaunchWorkspace({
-          targetUrl: `\${openmrsSpaBase}/patient/${patientUuid}/chart`,
-          contextKey: `patient/${patientUuid}`,
-          workspaceName: 'start-visit-workspace-form',
-          additionalProps: { patientUuid },
-        })
+        navigateAndLaunchWorkspace(
+          `\${openmrsSpaBase}/patient/${patientUuid}/chart`,
+          `patient/${patientUuid}`,
+          'start-visit-workspace-form',
+          { patientUuid },
+          patientUuid,
+        )
       }>
       {t('activeVisitRequired', 'Start visit to modify')}
     </Button>
@@ -75,7 +76,7 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
   } = useMedicationOrderAction(medicationRequestBundle);
   const { data: order, isLoading: isOrderLoading } = useOrderByUuid(medicationRequestBundle?.request?.id);
   const isLoading = isMedicationOrderLoading && isOrderLoading;
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { activeVisit: currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const buttonText = actionText ?? defaultButtonText;
 
   const launchModal = useCallback(() => {
