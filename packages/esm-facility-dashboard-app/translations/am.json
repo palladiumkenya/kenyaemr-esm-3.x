@@ -1,6 +1,7 @@
 {
   "aboveSiteDashboard": "ከጣቢያ በላይ ዳሽቦርድ",
   "aboveSiteFacilityDashboard": "ከጣቢያ በላይ የተቋም ዳሽቦርድ",
+  "air": "Air",
   "cumulativeProgressDelayedEAC": "ዘግይቶ EACን በመፍታት የተጠራቀመ ሂደት",
   "cumulativeProgressDnapcrPending": "የHEI PCR ውጤቶችን በመፍታት የተጠራቀመ ሂደት",
   "cumulativeProgressHeiFinalOutcomes": "የHEI የመጨረሻ ውጤትን በመፍታት የተጠራቀመ ሂደት",
@@ -55,6 +56,7 @@
   "progressInAddressingLinkedToArt": "ከኤአርቲ ጋር ያለውን ትስስር በመፍታት ላይ ያለው ሂደት",
   "progressTracker": "የሂደት መከታተያ",
   "realTimeGapReview": "የእውነተኛ ጊዜ ክፍተት ግምገማ",
+  "Reports": "Reports",
   "startDate": "የመጀመሪያ ቀን",
   "surveillance": "ክትትል",
   "surveillanceSummary": "የክትትል ማጠቃለያ",
