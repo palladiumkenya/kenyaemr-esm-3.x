@@ -1,4 +1,4 @@
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { launchWorkspace, navigate, getGlobalStore } from '@openmrs/esm-framework';
 import { getPatientChartStore, Order } from '@openmrs/esm-patient-common-lib';
 import { useCallback } from 'react';
 import { mutate } from 'swr';
@@ -18,6 +18,10 @@ export function useModalHandler(mutateUrl?: string) {
     handleModalClose,
   };
 }
+
+export const getWorkspaceStore = () => {
+  return getGlobalStore('workspace');
+};
 
 export const launchPrescriptionEditWorkspace = (order: Order, patientUuid: string) => {
   const newItem = {
@@ -67,5 +71,38 @@ export const launchPrescriptionEditWorkspace = (order: Order, patientUuid: strin
     patientUuid,
   });
 
-  launchWorkspace('add-drug-order', { patientUuid, order: newItem });
+  const targetUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Medications`;
+  const workspaceName = 'add-drug-order';
+  const additionalProps = {
+    patientUuid,
+    order: newItem,
+  };
+
+  navigateAndLaunchWorkspace(targetUrl, `patient/${patientUuid}`, workspaceName, additionalProps, patientUuid);
+};
+
+export const navigateAndLaunchWorkspace = (
+  targetUrl: string,
+  contextKey: string,
+  workspaceName: string,
+  additionalProps: any,
+  patientUuid: string,
+) => {
+  const workspaceStore = getWorkspaceStore();
+
+  // Set up a one-time event listener for when navigation completes
+  const handleRoutingComplete = (event: Event) => {
+    // Remove the listener after it fires once
+    window.removeEventListener('single-spa:routing-event', handleRoutingComplete);
+
+    // Now that navigation is complete, change context and launch workspace
+    workspaceStore.setState({ context: `patient/${patientUuid}`, openWorkspaces: [], prompt: null });
+    launchWorkspace(workspaceName, additionalProps);
+  };
+
+  // Add the event listener before navigating
+  window.addEventListener('single-spa:routing-event', handleRoutingComplete);
+
+  // Navigate to the target URL
+  navigate({ to: targetUrl });
 };
