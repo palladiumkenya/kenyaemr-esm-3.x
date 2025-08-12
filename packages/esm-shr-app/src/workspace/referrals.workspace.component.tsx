@@ -18,7 +18,12 @@ import { z } from 'zod';
 import PatientInfo from './referral-patient-info.component';
 import styles from './referral.workspace.scss';
 import { Hospital, Close } from '@carbon/react/icons';
-import { useFacilities, useReasons, sendReferralToArtDirectory } from './referral-workspace.resource';
+import {
+  useFacilities,
+  useReasons,
+  useSendReferralToArtDirectory,
+  useSystemSetting,
+} from './referral-workspace.resource';
 import usePatient from '../hooks/usePatient';
 import { type Concept, type Facility, type ReferralPayload } from '../types';
 import { FacilityReferralFormData, facilityReferralSchema, ValidationErrors } from '../schema';
@@ -39,8 +44,10 @@ interface FacilityReferralProps {
 
 const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace, patientUuid: initialPatientUuid }) => {
   const { t } = useTranslation();
-  const config = useConfig();
-  const sendingFacilityMflCode = config.facilityMflCode;
+  const { mflCodeValue } = useSystemSetting('facility.mflcode');
+  const { mutate: sendReferral } = useSendReferralToArtDirectory();
+
+  const sendingFacilityMflCode = mflCodeValue;
 
   const [patientUuid, setPatientUuid] = useState(initialPatientUuid || '');
   const [patientSelected, setPatientSelected] = useState(!!initialPatientUuid);
@@ -95,11 +102,11 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
     }
   };
 
-  const submitReferral = async (formData: FacilityReferralFormData) => {
+  const buildReferralPayload = (formData: FacilityReferralFormData): ReferralPayload => {
     const receivingFacilityMflCode = selectedFacility.attributes?.[0]?.value || '';
-
     const deathInfo = getPatientDeathInfo(patient);
-    const apiPayload: ReferralPayload = {
+
+    return {
       MESSAGE_HEADER: {
         SENDING_APPLICATION: 'KENYAEMR',
         SENDING_FACILITY: sendingFacilityMflCode || '18080',
@@ -151,9 +158,6 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
         },
       },
     };
-
-    const result = await sendReferralToArtDirectory(apiPayload);
-    return result;
   };
 
   const onSubmit = async (event: React.FormEvent) => {
@@ -215,7 +219,8 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
         clinicalNotes,
       };
 
-      await submitReferral(formData);
+      const payload = buildReferralPayload(formData);
+      await sendReferral(payload);
 
       showSnackbar({
         kind: 'success',
@@ -409,7 +414,7 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
                 <div className={styles.searchResults}>
                   {reasons.map((reason) => (
                     <Tile key={reason.uuid} className={styles.resultTile} onClick={() => handleReasonSelect(reason)}>
-                      {reason.name.name}
+                      {reason.name.toString()}
                     </Tile>
                   ))}
                 </div>
@@ -418,7 +423,7 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
                 <div className={styles.selectedItems}>
                   {selectedReasons.map((reason) => (
                     <Tag key={reason.uuid} size="lg" type="gray" filter onClose={() => handleRemoveReason(reason.uuid)}>
-                      {reason.name.name}
+                      {reason.name.toString()}
                     </Tag>
                   ))}
                 </div>
