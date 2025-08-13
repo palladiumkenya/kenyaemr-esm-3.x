@@ -414,7 +414,7 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
                 <div className={styles.searchResults}>
                   {reasons.map((reason) => (
                     <Tile key={reason.uuid} className={styles.resultTile} onClick={() => handleReasonSelect(reason)}>
-                      {reason.name.toString()}
+                      {reason.name.name}
                     </Tile>
                   ))}
                 </div>
@@ -423,7 +423,7 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
                 <div className={styles.selectedItems}>
                   {selectedReasons.map((reason) => (
                     <Tag key={reason.uuid} size="lg" type="gray" filter onClose={() => handleRemoveReason(reason.uuid)}>
-                      {reason.name.toString()}
+                      {reason.name.name}
                     </Tag>
                   ))}
                 </div>
@@ -432,7 +432,6 @@ const FacilityReferralForm: React.FC<FacilityReferralProps> = ({ closeWorkspace,
                 <div className={styles.errorMessage}>{validationErrors.selectedReasons}</div>
               )}
             </Column>
-
             <Column>
               <h4 className={styles.sectionHeader}>{t('clinicalNotes', 'Clinical Notes')}</h4>
               <TextArea
