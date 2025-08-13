@@ -1,23 +1,22 @@
-import React from 'react';
 import {
   ChartColumn,
+  ChemistryReference,
   DocumentAdd,
   Home,
+  HospitalBed,
+  IbmCloudGateKeeper,
   Medication,
   Receipt,
   Renew,
+  Report,
   User,
   VolumeFileStorage,
-  Report,
-  InventoryManagement,
-  HospitalBed,
-  ChemistryReference,
-  IbmCloudant,
   WatsonHealthCrossReference,
 } from '@carbon/react/icons';
 import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ConfigObject } from '../config-schema';
 const openmrsSpaBase = window['getOpenmrsSpaBase']();
 
 const handleClearCache = async () => {
@@ -31,7 +30,7 @@ const handleClearCache = async () => {
 
 export const useModuleLinks = () => {
   const { t } = useTranslation();
-  const { excludeLinks } = useConfig<ConfigObject>();
+  const { excludeLinks, instanceName } = useConfig<ConfigObject>();
   const moduleLinks = [
     {
       label: t('systemInfo', 'System Info'),
@@ -39,7 +38,7 @@ export const useModuleLinks = () => {
       icon: <VolumeFileStorage size={24} />,
     },
     {
-      label: t('kenyaemrHome', 'KenyaEMR Home'),
+      label: t('instanceHomeLink', '{{instanceName}}Home', { instanceName }),
       url: `/openmrs/kenyaemr/userHome.page?`,
       icon: <Home size={24} />,
       privilege: 'o3: View KenyaEMR 2x Home Page',
@@ -120,6 +119,12 @@ export const useModuleLinks = () => {
       url: `/openmrs/kenyaemr/reports/reportsHome.page`,
       icon: <Report size={24} />,
       privilege: 'o3: View Reports',
+    },
+    {
+      label: t('legacyAdmin', 'Legacy Admin'),
+      url: `/openmrs/admin`,
+      icon: <IbmCloudGateKeeper size={24} />,
+      privilege: 'o3: View Legacy Admin Dashboard',
     },
   ];
 
