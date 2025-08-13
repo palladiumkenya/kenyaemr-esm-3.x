@@ -2784,7 +2784,7 @@ __metadata:
   dependencies:
     "@carbon/pictograms-react": "npm:^11.66.0"
     "@hookform/resolvers": "npm:^3.1.1"
-    "@openmrs/esm-framework": "npm:next"
+    "@openmrs/esm-framework": "npm:^7.0.1-pre.3259"
     "@openmrs/esm-patient-common-lib": "npm:next"
     "@playwright/test": "npm:^1.30.0"
     "@swc/cli": "npm:^0.1.57"
@@ -3433,7 +3433,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openmrs/esm-framework@npm:7.0.1-pre.3259, @openmrs/esm-framework@npm:next":
+"@openmrs/esm-framework@npm:7.0.1-pre.3259, @openmrs/esm-framework@npm:^7.0.1-pre.3259":
   version: 7.0.1-pre.3259
   resolution: "@openmrs/esm-framework@npm:7.0.1-pre.3259"
   dependencies:

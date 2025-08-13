@@ -1,4 +1,4 @@
-import { FetchResponse, openmrsFetch, Patient, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { type FetchResponse, openmrsFetch, type Patient, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { ReferralConfigObject } from '../config-schema';
 

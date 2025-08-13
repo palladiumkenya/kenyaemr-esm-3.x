@@ -209,3 +209,115 @@ export interface PatientIdentifier {
     display: string;
   };
 }
+
+export interface Concept {
+  uuid: string;
+  name: {
+    name: string;
+  };
+  conceptClass: {
+    name: string;
+  };
+}
+
+export interface ReasonResponse {
+  results: Concept[];
+}
+export interface Facility {
+  uuid: string;
+  name: string;
+  attributes: [
+    {
+      value: string;
+    },
+  ];
+}
+
+export interface FacilityResponse {
+  results: Facility[];
+}
+
+export interface ReferralPayload {
+  MESSAGE_HEADER: {
+    SENDING_APPLICATION: string;
+    SENDING_FACILITY: string;
+    RECEIVING_APPLICATION: string;
+    RECEIVING_FACILITY: string;
+    MESSAGE_DATETIME: string;
+    SECURITY: null;
+    MESSAGE_TYPE: string;
+    PROCESSING_ID: string;
+  };
+  PATIENT_IDENTIFICATION: {
+    EXTERNAL_PATIENT_ID: {
+      ID: string | null;
+      IDENTIFIER_TYPE: string;
+      ASSIGNING_AUTHORITY: string;
+    };
+    INTERNAL_PATIENT_ID: Array<{
+      ID: string;
+      IDENTIFIER_TYPE: string;
+      ASSIGNING_AUTHORITY: string;
+    }>;
+    PATIENT_NAME: {
+      FIRST_NAME: string;
+      MIDDLE_NAME: string;
+      LAST_NAME: string;
+    };
+    MOTHER_NAME: {
+      FIRST_NAME: string | null;
+      MIDDLE_NAME: string | null;
+      LAST_NAME: string | null;
+    };
+    DATE_OF_BIRTH: string;
+    SEX: string;
+    PATIENT_ADDRESS: {
+      PHYSICAL_ADDRESS: {
+        VILLAGE: string;
+        WARD: string;
+        SUB_COUNTY: string;
+        COUNTY: string;
+        GPS_LOCATION: string | null;
+        NEAREST_LANDMARK: string | null;
+      };
+      POSTAL_ADDRESS: string | null;
+    };
+    PHONE_NUMBER: string;
+    MARITAL_STATUS: string | null;
+    DEATH_DATE: string | null;
+    DEATH_INDICATOR: string | null;
+    DATE_OF_BIRTH_PRECISION: string;
+  };
+  DISCONTINUATION_MESSAGE: {
+    DISCONTINUATION_REASON: string;
+    EFFECTIVE_DISCONTINUATION_DATE: string;
+    TARGET_PROGRAM: string;
+    SERVICE_REQUEST: {
+      TRANSFER_STATUS: string;
+      TRANSFER_INTENT: string;
+      TRANSFER_PRIORITY: string;
+      TRANSFER_OUT_DATE: string;
+      TO_ACCEPTANCE_DATE: string | null;
+      SENDING_FACILITY_MFLCODE: string;
+      RECEIVING_FACILITY_MFLCODE: string;
+      SUPPORTING_INFO: string | null;
+    };
+  };
+}
+
+interface ApiSuccessResponse {
+  status: 'success';
+  message: ReferralPayload;
+}
+
+export interface ReferralResponse {
+  success: boolean;
+  data: ApiSuccessResponse;
+  payload: ReferralPayload;
+}
+
+export interface ReferralError extends Error {
+  status?: number;
+  statusText?: string;
+  responseBody?: string;
+}

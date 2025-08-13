@@ -16,10 +16,16 @@ export const configSchema = {
     _description: 'Social Health Authority Unique Identification Number',
     _default: '24aedd37-b5be-4e08-8311-3721b8d5100d',
   },
+  artDirectoryUrl: {
+    _type: Type.String,
+    _description: 'URL for the ART Directory',
+    _default: 'https://art.kenyahmis.org/api/patients',
+  },
 };
 
 export type ReferralConfigObject = {
   nationalPatientUniqueIdentifier: string;
   phoneNumberAttributeType: string;
   socialHealthAuthorityIdentifierType: string;
+  artDirectoryUrl: string;
 };
