@@ -13,6 +13,15 @@
       "component": "aboveSiteDashboardLink",
       "name": "above-site-dashboard-link",
       "slot": "facility-dashboard-left-panel-slot"
+    },{
+      "component": "airDashboardLink",
+      "name": "air-dashboard-link",
+      "slot": "facility-dashboard-left-panel-slot"
+    },
+    {
+      "component": "reportsboardLink",
+      "name": "reports-dashboard-link",
+      "slot": "facility-dashboard-left-panel-slot"
     }
   ],
   "workspaces": [],

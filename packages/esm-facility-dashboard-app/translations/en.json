@@ -1,6 +1,7 @@
 {
   "aboveSiteDashboard": "Above site facility Dashboard",
   "aboveSiteFacilityDashboard": "Above site facility Dashboard",
+  "air": "Air",
   "cumulativeProgressDelayedEAC": "Cumulative Progress in addressing delayed EAC",
   "cumulativeProgressDnapcrPending": "Cumulative Progress in addressing  HEI PCR results",
   "cumulativeProgressHeiFinalOutcomes": "Cumulative progress in addressing HEI final outcome",
@@ -55,6 +56,7 @@
   "progressInAddressingLinkedToArt": "Progress in addressing Linkage to ART",
   "progressTracker": "Progress tracker",
   "realTimeGapReview": "Realtime gap review",
+  "Reports": "Reports",
   "startDate": "Start date",
   "surveillance": "Surveillance",
   "surveillanceSummary": "Surveillance Summary",
