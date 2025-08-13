@@ -35,28 +35,44 @@ export function deepMerge(obj1: Record<string, any>, obj2: Record<string, any>) 
 }
 
 export const getPatientName = (patient: Patient) => {
+  let displayName = '';
+
   if (patient?.person?.preferredName?.display) {
-    const nameParts = patient.person.preferredName.display.split(' ');
-    return {
-      FIRST_NAME: nameParts[0] || 'UNKNOWN',
-      MIDDLE_NAME: nameParts[1] || '',
-      LAST_NAME: nameParts[nameParts.length - 1] || 'PATIENT',
-    };
+    displayName = patient.person.preferredName.display;
+  } else if (patient?.person?.display || patient?.display) {
+    displayName = patient.person?.display || patient.display;
   }
 
-  if (patient?.person?.display || patient?.display) {
-    const nameParts = (patient.person?.display || patient.display).split(' ');
+  if (displayName) {
+    const nameParts = displayName.trim().split(/\s+/).filter(Boolean);
+
+    if (nameParts.length === 1) {
+      return {
+        FIRST_NAME: nameParts[0],
+        MIDDLE_NAME: '',
+        LAST_NAME: '',
+      };
+    }
+
+    if (nameParts.length === 2) {
+      return {
+        FIRST_NAME: nameParts[0],
+        MIDDLE_NAME: '',
+        LAST_NAME: nameParts[1],
+      };
+    }
+
     return {
-      FIRST_NAME: nameParts[0] || 'UNKNOWN',
-      MIDDLE_NAME: nameParts[1] || '',
-      LAST_NAME: nameParts[nameParts.length - 1] || 'PATIENT',
+      FIRST_NAME: nameParts[0],
+      MIDDLE_NAME: nameParts.slice(1, -1).join(' '),
+      LAST_NAME: nameParts[nameParts.length - 1],
     };
   }
 
   return {
-    FIRST_NAME: 'UNKNOWN',
+    FIRST_NAME: '',
     MIDDLE_NAME: '',
-    LAST_NAME: 'PATIENT',
+    LAST_NAME: '',
   };
 };
 
