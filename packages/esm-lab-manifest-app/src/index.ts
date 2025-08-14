@@ -59,14 +59,14 @@ export const requeueLabManifestConfirmModal = getAsyncLifecycle(
 export const manifestOverviewDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'lab-manifest/overview',
-    title: 'Overview',
+    title: 'Manifest overview',
   }),
   options,
 );
 export const manifestsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'lab-manifest',
-    title: 'Manifests',
+    title: 'Lab manifests',
   }),
   options,
 );

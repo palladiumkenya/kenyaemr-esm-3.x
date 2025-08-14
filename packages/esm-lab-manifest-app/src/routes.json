@@ -26,12 +26,14 @@
     {
       "component": "manifestOverviewDashboardLink",
       "name": "manifest-overview-link",
-      "slot": "lab-manifest-dashbaord-link-slot"
+      "order": 1,
+      "slot": "diagnostics-group-nav-slot"
     },
     {
       "component": "manifestsDashboardLink",
       "name": "manifests-dashboard-link",
-      "slot": "lab-manifest-dashbaord-link-slot"
+      "order": 2,
+      "slot": "diagnostics-group-nav-slot"
     },
     {
       "name": "lab-manifest-form",
