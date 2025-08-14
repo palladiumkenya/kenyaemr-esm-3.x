@@ -46,6 +46,7 @@ import FormEntryWorkspace from './peer-calendar/forms/form-entry.workspace';
 import { configSchema } from './config-schema';
 import SpecialClinicDashboard from './special-clinics/special-clinic.component';
 import { createDashboardLink as createDashboardLink2 } from './dashboard/createDashboardLink';
+import { createLeftPanelLink } from './left-panel-link.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -80,7 +81,7 @@ export const contactListUpdateForm = getSyncLifecycle(ContactListUpdateForm, opt
 export const birthDateCalculator = getSyncLifecycle(BirthDateCalculator, options);
 
 export const peerCalendar = getSyncLifecycle(PeerCalendar, options);
-export const peerCalendarDashboardLink = getSyncLifecycle(createDashboardLink(peerCalendarDashboardMeta), options);
+export const peerCalendarDashboardLink = getSyncLifecycle(createLeftPanelLink(peerCalendarDashboardMeta), options);
 export const peersForm = getSyncLifecycle(PeerForm, options);
 export const peerCalendarFormEntry = getSyncLifecycle(FormEntryWorkspace, options);
 
@@ -94,7 +95,7 @@ export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
 export const partograph = getSyncLifecycle(Partograph, options);
 
-export const caseManagementDashboardLink = getSyncLifecycle(createDashboardLink(caseManagementDashboardMeta), options);
+export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
 export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
