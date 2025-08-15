@@ -3,20 +3,25 @@ import { useTranslation } from 'react-i18next';
 import styles from './empty-morgue-admission.scss';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { DocumentUnknown, IbmWatsonKnowledgeStudio } from '@carbon/react/icons';
+import { Tile } from '@carbon/react';
 
 interface EmptyDeceasedSearchProps {
   title: string;
-  subTitle: string;
 }
 
-const EmptyMorgueAdmission: React.FC<EmptyDeceasedSearchProps> = ({ title, subTitle }) => {
+const EmptyMorgueAdmission: React.FC<EmptyDeceasedSearchProps> = ({ title }) => {
   const { t } = useTranslation();
 
   return (
-    <div className={styles.emptyStateContainer}>
-      <IbmWatsonKnowledgeStudio className={styles.iconOverrides} />
-      <p className={styles.title}>{title}</p>
-      <p className={styles.subTitle}>{subTitle}</p>
+    <div className={styles.tileContainer}>
+      <Tile className={styles.tile}>
+        <div className={styles.tileContent}>
+          <p className={styles.content}>{title}</p>
+          <p className={styles.emptyStateHelperText}>
+            {t('checkFilters', 'Please check the filters above and try again')}
+          </p>
+        </div>
+      </Tile>
     </div>
   );
 };

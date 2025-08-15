@@ -56,10 +56,8 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
   }, [trulyAwaitingPatients, searchTerm]);
 
   const handleAdmit = (enhancedPatient: EnhancedPatient) => {
-    // Extract the original MortuaryPatient from the enhanced patient
     const originalPatient = getOriginalPatient(enhancedPatient);
     if (originalPatient && 'patient' in originalPatient) {
-      // This is a MortuaryPatient
       launchWorkspace('admit-deceased-person-form', {
         workspaceTitle: t('admissionForm', 'Admission form'),
         patientData: originalPatient,
@@ -85,13 +83,10 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
     );
   }
 
-  if (trulyAwaitingPatients.length === 0) {
+  if (!trulyAwaitingPatients.length) {
     return (
-      <div className={styles.emptyState}>
-        <EmptyState
-          headerTitle={t('noAwaitingPatients', 'No awaiting patients found')}
-          displayText={t('noAwaitingPatientsDescription', 'There are currently no awaiting patients to display.')}
-        />
+      <div>
+        <EmptyMorgueAdmission title={t('noAwaitingPatients', 'No awaiting patients found')} />
       </div>
     );
   }
@@ -113,13 +108,7 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
             size={controlSize}
           />
         </div>
-        <EmptyMorgueAdmission
-          title={t('noMatchingAwaitingPatients', 'No matching awaiting patients found')}
-          subTitle={t(
-            'noMatchingAwaitingPatientsDescription',
-            'Try adjusting your search terms to find awaiting patients.',
-          )}
-        />
+        <EmptyMorgueAdmission title={t('noMatchingAwaitingPatients', 'No matching awaiting patients found')} />
       </>
     );
   }

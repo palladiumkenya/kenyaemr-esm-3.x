@@ -1,0 +1,71 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.container {
+  border-top: 0.063rem solid colors.$gray-20;
+  border-bottom: 0.063rem solid colors.$gray-20;
+  background-color: colors.$white-0;
+}
+
+.activePatientContainer,
+.deceasedPatientContainer {
+  background-color: colors.$white-0;
+}
+
+.buttonCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.patientBanner {
+  display: flex;
+}
+
+.patientAvatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: layout.$spacing-05;
+  border-radius: 1px;
+}
+
+.patientAvatarButton {
+  cursor: pointer;
+  border: none;
+  padding: 0px;
+  background: none;
+}
+
+.contactDetails {
+  width: 100%;
+  display: flex;
+
+  a {
+    @include type.type-style('body-compact-01');
+    text-decoration: none;
+  }
+}
+
+.tabletContactDetails {
+  display: block;
+
+  .row {
+    &:first-child {
+      border-bottom: 1px solid colors.$gray-20;
+    }
+  }
+
+  .row > .col {
+    &:nth-of-type(2n + 1) {
+      border-right: 1px solid colors.$gray-20;
+    }
+  }
+}
+
+.toggleContactDetailsButton {
+  > svg {
+    fill: colors.$blue-60 !important;
+  }
+}

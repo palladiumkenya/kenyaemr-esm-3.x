@@ -116,3 +116,47 @@ export const documentId = () => {
   const random = Math.random().toString(36).substr(2, 9);
   return `PM-${timestamp}-${random}`.toUpperCase();
 };
+
+/**
+ * Returns an object with the current date and time in the format "DD-MMM-YYYY, hh:mm A".
+ * If the current date and time cannot be retrieved, it returns the current date and time in the format "DD-MMM-YYYY, HH:mm".
+ *
+ * @return {Object} An object with `date` and `time` properties.
+ * @property {string} date - The current date in the format "DD-MMM-YYYY".
+ * @property {string} time - The current time in the format "hh:mm A" or "HH:mm".
+ */
+export const getAbsoluteDateTime = () => {
+  const now = new Date();
+  const formatted = formatDateTime(now);
+  if (formatted && formatted !== '--') {
+    const parts = formatted.split(', ');
+    return {
+      date:
+        parts[0] ||
+        now.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric',
+        }),
+      time:
+        parts[1] ||
+        now.toLocaleTimeString('en-US', {
+          hour12: false,
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+    };
+  }
+  return {
+    date: now.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    }),
+    time: now.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+    }),
+  };
+};
