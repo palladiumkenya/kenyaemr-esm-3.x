@@ -83,7 +83,7 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
     );
   }
 
-  if (!trulyAwaitingPatients.length) {
+  if (trulyAwaitingPatients.length) {
     return (
       <div>
         <EmptyMorgueAdmission title={t('noAwaitingPatients', 'No awaiting patients found')} />

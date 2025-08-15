@@ -149,14 +149,16 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     return Math.floor(timeDiff / (1000 * 3600 * 24));
   };
 
-  const getCompartmentShare = (patients: any[]) => {
-    if (!patients || patients.length === 0) {
-      return t('empty', 'Empty');
-    }
-    return patients.length > 1
-      ? t('sharedCompartment', '{{count}} sharing', { count: patients.length })
-      : t('singleOccupancy', 'Single');
-  };
+  const getCompartmentShare = useMemo(() => {
+    return (patients: any[]) => {
+      if (!patients || patients.length === 0) {
+        return t('empty', 'Empty');
+      }
+      return patients.length > 1
+        ? t('sharedCompartment', '{{count}} sharing', { count: patients.length })
+        : t('singleOccupancy', 'Single');
+    };
+  }, [t]);
 
   const getIdNumber = (patient: Patient) => {
     if (!patient?.identifiers) {
