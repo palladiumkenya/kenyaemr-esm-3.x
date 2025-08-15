@@ -122,15 +122,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
   }
 
   if (!dischargedPatients || dischargedPatients.length === 0) {
-    return (
-      <EmptyMorgueAdmission
-        title={t('noDischargedPatient', 'No deceased patients currently discharged')}
-        subTitle={t(
-          'noDischargedPatientsDescription',
-          'There are no discharged deceased patients to display at this time.',
-        )}
-      />
-    );
+    return <EmptyMorgueAdmission title={t('noDischargedPatient', 'No deceased patients currently discharged')} />;
   }
 
   const patientsToShow = filteredPatients;
@@ -150,13 +142,7 @@ const DischargedBedLayout: React.FC<BedLayoutProps> = ({ AdmittedDeceasedPatient
             size={controlSize}
           />
         </div>
-        <EmptyMorgueAdmission
-          title={t('noMatchingDischargedPatients', 'No matching discharged patients found')}
-          subTitle={t(
-            'noMatchingDischargedPatientsDescription',
-            'Try adjusting your search terms to find discharged patients.',
-          )}
-        />
+        <EmptyMorgueAdmission title={t('noMatchingDischargedPatients', 'No matching discharged patients found')} />
       </>
     );
   }

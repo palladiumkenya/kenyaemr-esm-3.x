@@ -228,13 +228,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
   if (!hasPatients) {
     return (
       <div className={styles.emptyState}>
-        <EmptyMorgueAdmission
-          title={t('noDischargedPatient', 'No deceased patients currently discharged')}
-          subTitle={t(
-            'noDischargedPatientsDescription',
-            'There are no discharged deceased patients to display at this time.',
-          )}
-        />
+        <EmptyMorgueAdmission title={t('noDischargedPatient', 'No deceased patients currently discharged')} />
       </div>
     );
   }
@@ -245,10 +239,7 @@ const DischargedBedLineListView: React.FC<DischargedBedLineListViewProps> = ({
 
   const NoSearchResults = () => (
     <div className={styles.emptyState}>
-      <EmptyMorgueAdmission
-        title={t('noSearchResults', 'We couldn’t find anything')}
-        subTitle={t('tryAgain', 'Try adjusting your search {{searchTerm}} and try again', { searchTerm })}
-      />
+      <EmptyMorgueAdmission title={t('noSearchResults', 'We couldn’t find anything')} />
     </div>
   );
 

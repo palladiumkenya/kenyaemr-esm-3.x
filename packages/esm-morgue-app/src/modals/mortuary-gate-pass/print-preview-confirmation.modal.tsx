@@ -4,7 +4,7 @@ import { useReactToPrint } from 'react-to-print';
 import { formatDate, formatDatetime, parseDate, useSession } from '@openmrs/esm-framework';
 import styles from './print-preview-confirmation.scss';
 import { type Patient } from '../../types';
-import { formatDateTime, documentId } from '../../utils/utils';
+import { formatDateTime, documentId, getAbsoluteDateTime } from '../../utils/utils';
 import { useTranslation } from 'react-i18next';
 
 type PrintPreviewModalProps = {
@@ -47,19 +47,7 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient,
     return openMRSId;
   };
 
-  const getCurrentDateTime = () => {
-    const now = new Date();
-    return {
-      date: formatDate(now, { mode: 'standard' }),
-      time: now.toLocaleTimeString('en-US', {
-        hour12: false,
-        hour: '2-digit',
-        minute: '2-digit',
-      }),
-    };
-  };
-
-  const currentDateTime = getCurrentDateTime();
+  const currentDateTime = getAbsoluteDateTime();
 
   return (
     <>
@@ -215,8 +203,8 @@ const PrintPreviewModal: React.FC<PrintPreviewModalProps> = ({ onClose, patient,
                 <div className={styles.noteText}>
                   <strong>{t('nb', 'N/B:')}</strong>{' '}
                   {t(
-                    'formDuplicateNote',
-                    'This form should be filled in duplicate, one copy to be retained in the ward and the other to be left at the main gate',
+                    'formDuplicateNotes',
+                    'This form should be filled in duplicate, one copy to be retained in the mortuary and the other to be left at the main gate',
                   )}
                 </div>
               </div>

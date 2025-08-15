@@ -16,6 +16,7 @@ import {
   OverflowMenuItem,
   DataTableSkeleton,
   Search,
+  Tile,
 } from '@carbon/react';
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
@@ -174,8 +175,8 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
 
   if (!trulyAwaitingPatients || trulyAwaitingPatients.length === 0) {
     return (
-      <div className={styles.emptyState}>
-        <p>{t('noDeceasedPatients', 'No deceased patients awaiting admission')}</p>
+      <div>
+        <EmptyMorgueAdmission title={t('noDeceasedPatients', 'No deceased patients awaiting admission found')} />
       </div>
     );
   }
@@ -190,10 +191,7 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
         size={controlSize}
       />
       {hasNoSearchResults ? (
-        <EmptyMorgueAdmission
-          title={t('noSearchResults', 'We couldn’t find anything')}
-          subTitle={t('tryAgain', 'Try adjusting your search {{searchTerm}} and try again', { searchTerm })}
-        />
+        <EmptyMorgueAdmission title={t('noSearchResults', 'We couldn’t find anything')} />
       ) : (
         <>
           <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
