@@ -1,5 +1,34 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
 .actionButtons {
   display: flex;
   gap: 0.5rem;
   align-items: center;
+}
+.tileContainer {
+  background-color: colors.$white;
+  border-top: 1px solid colors.$gray-20;
+  padding: 3rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-03;
+}
+.emptyStateHelperText {
+  @include type.type-style('helper-text-02');
 }

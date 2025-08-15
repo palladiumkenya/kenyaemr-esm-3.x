@@ -149,14 +149,16 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
     return Math.floor(timeDiff / (1000 * 3600 * 24));
   };
 
-  const getCompartmentShare = (patients: any[]) => {
-    if (!patients || patients.length === 0) {
-      return t('empty', 'Empty');
-    }
-    return patients.length > 1
-      ? t('sharedCompartment', '{{count}} sharing', { count: patients.length })
-      : t('singleOccupancy', 'Single');
-  };
+  const getCompartmentShare = useMemo(() => {
+    return (patients: any[]) => {
+      if (!patients || patients.length === 0) {
+        return t('empty', 'Empty');
+      }
+      return patients.length > 1
+        ? t('sharedCompartment', '{{count}} sharing', { count: patients.length })
+        : t('singleOccupancy', 'Single');
+    };
+  }, [t]);
 
   const getIdNumber = (patient: Patient) => {
     if (!patient?.identifiers) {
@@ -299,14 +301,8 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
 
   if (!AdmittedDeceasedPatient) {
     return (
-      <div className={styles.loadingContainer}>
-        <EmptyMorgueAdmission
-          title={t('noAdmittedPatient', 'No deceased patients currently admitted')}
-          subTitle={t(
-            'noAdmittedPatientsDescription',
-            'There are no admitted deceased patients to display at this time.',
-          )}
-        />
+      <div>
+        <EmptyMorgueAdmission title={t('noAdmittedPatient', 'No deceased patients currently admitted')} />
       </div>
     );
   }
@@ -329,10 +325,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
 
   const NoSearchResults = () => (
     <div className={styles.emptyState}>
-      <EmptyMorgueAdmission
-        title={t('noSearchResults', 'We couldn’t find anything')}
-        subTitle={t('tryAgain', 'Try adjusting your search {{searchTerm}} and try again', { searchTerm })}
-      />
+      <EmptyMorgueAdmission title={t('noSearchResults', 'We couldn’t find anything')} />
     </div>
   );
 

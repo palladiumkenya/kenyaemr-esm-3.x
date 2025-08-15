@@ -169,23 +169,12 @@ const BedLayout: React.FC<BedLayoutProps> = ({
               size={controlSize}
             />
           </div>
-          <EmptyMorgueAdmission
-            title={t('noMatchingPatients', 'No matching patients found')}
-            subTitle={t('noMatchingPatientsDescription', 'Try adjusting your search terms to find deceased patients.')}
-          />
+          <EmptyMorgueAdmission title={t('noMatchingPatients', 'No matching patients found')} />
         </>
       );
     }
 
-    return (
-      <EmptyMorgueAdmission
-        title={t('noAdmittedPatient', 'No deceased patients currently admitted')}
-        subTitle={t(
-          'noAdmittedPatientsDescription',
-          'There are no admitted deceased patients to display at this time.',
-        )}
-      />
-    );
+    return <EmptyMorgueAdmission title={t('noAdmittedPatient', 'No deceased patients currently admitted')} />;
   }
 
   return (
