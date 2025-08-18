@@ -15,7 +15,7 @@ export function useLabOrderAction(order?: Order) {
   const { isLoading: isLoadingBillableServices, billableServices } = useBillableServices();
 
   const serviceBillingStatus =
-    billableServices?.find((service) => service.concept.uuid === order.concept.uuid)?.serviceStatus === 'ENABLED';
+    billableServices?.find((service) => service?.concept?.uuid === order?.concept?.uuid)?.serviceStatus === 'ENABLED';
 
   const { isLoading, hasPendingPayment, itemHasBill } = useBillStatus(orderUuid, patientUuid);
   const shouldShowBillModal = itemHasBill.length < 1 && serviceBillingStatus;
