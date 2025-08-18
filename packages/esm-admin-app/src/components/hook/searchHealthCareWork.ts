@@ -3,8 +3,8 @@ import { HWR_API_NO_CREDENTIALS, PROVIDER_NOT_FOUND, RESOURCE_NOT_FOUND, UNKNOWN
 import useSWR from 'swr';
 import { useState } from 'react';
 
-export const searchHealthCareWork = async (identifierType: string, identifierNumber: string) => {
-  const url = `${restBaseUrl}/kenyaemr/practitionersearch?identifierType=${identifierType}&identifierNumber=${identifierNumber}`;
+export const searchHealthCareWork = async (identifierType: string, identifierNumber: string, regulator: string) => {
+  const url = `${restBaseUrl}/kenyaemr/practitionersearch?identifierType=${identifierType}&identifierNumber=${identifierNumber}&regulator=${regulator}`;
   const response = await fetch(makeUrl(url));
   if (response.ok) {
     const responseData = await response.json();
