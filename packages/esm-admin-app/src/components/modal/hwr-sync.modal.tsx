@@ -31,6 +31,7 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
     providerAddressUuid,
     providerHieFhirReference,
     providerUniqueIdentifierAttributeTypeUuid,
+    regulatorOptions,
   } = config;
 
   const attributeMapping = {
@@ -45,6 +46,7 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
   const [searchHWR, setSearchHWR] = useState({
     identifierType: identifierTypes[0]?.key,
     identifier: attributeMapping[identifierTypes[0]?.key],
+    regulator: regulatorOptions[0]?.key,
   });
 
   const handleIdentifierTypeChange = (selectedItem: { key: string; name: string } | null) => {
@@ -56,16 +58,25 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
     }));
   };
 
+  const handleRegulatorChange = (selectedItem: { key: string; name: string } | null) => {
+    const selectedKey = selectedItem?.key ?? '';
+    setSearchHWR((prev) => ({
+      ...prev,
+      regulator: selectedKey,
+    }));
+  };
+
   const isSearchDisabled = () => !searchHWR.identifier;
 
   const handleSync = async () => {
     try {
       setSyncLoading(true);
-
       const healthWorker: PractitionerResponse = await searchHealthCareWork(
         searchHWR.identifierType,
         searchHWR.identifier,
+        searchHWR.regulator,
       );
+
       const resource = healthWorker.entry[0]?.resource;
 
       const extractedAttributes = {
@@ -99,7 +110,17 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
         { attributeType: licenseExpiryDateUuid, value: parseDate(extractedAttributes.licenseDate) },
         { attributeType: phoneNumberUuid, value: extractedAttributes.phoneNumber },
         { attributeType: qualificationUuid, value: extractedAttributes.qualification },
-        { attributeType: providerHieFhirReference, value: JSON.stringify(healthWorker) },
+        {
+          attributeType: providerHieFhirReference,
+          // Include regulator info in the health worker reference
+          value: JSON.stringify({
+            ...healthWorker,
+            searchParameters: {
+              regulator: searchHWR.regulator,
+              identifierType: searchHWR.identifierType,
+            },
+          }),
+        },
         { attributeType: providerAddressUuid, value: extractedAttributes.email },
         { attributeType: providerNationalIdUuid, value: extractedAttributes.nationalId },
         {
@@ -161,6 +182,18 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
               placeholder={t('chooseIdentifierType', 'Choose identifier type')}
               initialSelectedItem={identifierTypes.find((item) => item.key === searchHWR.identifierType)}
               items={identifierTypes}
+              itemToString={(item) => (item ? item.name : '')}
+              className={styles.ComboBox}
+            />
+          </Column>
+          <Column className={styles.identifierTypeColumn}>
+            <ComboBox
+              onChange={({ selectedItem }) => handleRegulatorChange(selectedItem)}
+              id="regulatorOptions"
+              titleText={t('regulator', 'Regulator')}
+              placeholder={t('chooseRegulator', 'Choose regulator')}
+              initialSelectedItem={regulatorOptions.find((item) => item.key === searchHWR.regulator)}
+              items={regulatorOptions}
               itemToString={(item) => (item ? item.name : '')}
               className={styles.ComboBox}
             />

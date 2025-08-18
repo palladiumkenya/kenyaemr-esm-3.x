@@ -78,6 +78,27 @@ export const configSchema = {
     ],
     _description: 'List of identifier types with unique keys for each.',
   },
+  regulatorOptions: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.Object,
+      properties: {
+        key: { _type: Type.String },
+        name: { _type: Type.String },
+      },
+    },
+    _default: [
+      { key: 'Clinical Officers Council', name: 'Clinical Officers Council' },
+      { key: 'Pharmacy and Poisons Board', name: 'Pharmacy and Poisons Board' },
+      { key: 'Nursing Council', name: 'Nursing Council' },
+      { key: 'KMPDC', name: 'Kenya Medical Practitioners and Dentists Council (KMPDC)' },
+      {
+        key: 'Kenya Medical Laboratory Technicians & Technologists Board',
+        name: 'Kenya Medical Laboratory Technicians & Technologists Board',
+      },
+    ],
+    _description: 'List of regulator options with unique keys for each.',
+  },
 };
 
 export interface UserProperties {
@@ -99,6 +120,10 @@ export interface ConfigObject {
   personPhonenumberAttributeUuid: string;
   licenseExpiryDateUuid: string;
   identifierTypes: Array<{
+    key: string;
+    name: string;
+  }>;
+  regulatorOptions: Array<{
     key: string;
     name: string;
   }>;

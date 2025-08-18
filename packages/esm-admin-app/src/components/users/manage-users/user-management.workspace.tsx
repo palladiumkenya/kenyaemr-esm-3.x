@@ -85,6 +85,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
   const {
     identifierTypes,
+    regulatorOptions,
     licenseBodyUuid,
     passportNumberUuid,
     personEmailAttributeUuid,
@@ -100,10 +101,12 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
   } = useConfig<ConfigObject>();
   const [searchHWR, setSearchHWR] = useState({
     identifierType: identifierTypes[0]?.key ?? '',
+    regulator: regulatorOptions[0]?.key ?? '',
     identifier: '',
     isHWRLoading: false,
   });
   const defaultIdentifierType = identifierTypes.find((item) => item.key === searchHWR.identifierType);
+  const defaultRegulator = regulatorOptions.find((item) => item.key === searchHWR.regulator);
 
   const attributeTypeMapping = useMemo(() => {
     return {
@@ -259,6 +262,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
       const fetchedHealthWorker: PractitionerResponse = await searchHealthCareWork(
         searchHWR.identifierType,
         searchHWR.identifier,
+        searchHWR.regulator,
       );
       if (!fetchedHealthWorker?.entry || fetchedHealthWorker.entry.length === 0) {
         showModal('hwr-empty-modal', { errorCode: t('noResults', 'No results found') });
@@ -617,6 +621,19 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                 />
                               </Column>
                               <Column>
+                                <ComboBox
+                                  onChange={({ selectedItem }) => {
+                                    setSearchHWR({ ...searchHWR, regulator: selectedItem?.key ?? '' });
+                                  }}
+                                  id="formRegulatorOptions"
+                                  titleText={t('regulator', 'Regulator')}
+                                  placeholder={t('chooseRegulatorType', 'Choose regulator option')}
+                                  initialSelectedItem={defaultRegulator}
+                                  items={regulatorOptions}
+                                  itemToString={(item) => (item ? item.name : '')}
+                                />
+                              </Column>
+                              <Column>
                                 <span className={styles.formIdentifierType}>
                                   {t('identifierNumber', 'Identifier number*')}
                                 </span>
@@ -635,6 +652,13 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
                                     kind="secondary"
                                     size="md"
                                     renderIcon={Query}
+                                    disabled={
+                                      !searchHWR.identifier ||
+                                      searchHWR.isHWRLoading ||
+                                      !searchHWR.identifierType ||
+                                      !searchHWR.regulator
+                                    }
+                                    iconDescription={t('search', 'Search')}
                                     hasIconOnly
                                     className={styles.formSearchButton}
                                     onClick={handleSearch}
