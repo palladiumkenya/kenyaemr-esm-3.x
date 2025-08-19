@@ -88,7 +88,7 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
 
   return (
     <section>
-      <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
+      <div className={styles.sectionTitle}>{t('modeOfPayment', 'Mode of payment')}</div>
       <div className={styles.sectionField}>
         <div className={styles.sectionFieldLayer}>
           <Controller

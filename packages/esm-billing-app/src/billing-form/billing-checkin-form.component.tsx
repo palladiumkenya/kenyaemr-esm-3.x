@@ -132,7 +132,7 @@ const BillingCheckInForm: React.FC<BillingCheckInFormProps> = ({ patientUuid, se
       {hieFeatureFlags && isInsuranceSchemeSha && <SHABenefitPackangesAndInterventions patientUuid={patientUuid} />}
       {paymentMethod && (
         <section className={styles.sectionContainer}>
-          <div className={styles.sectionTitle}>{t('billing', 'Billing')}</div>
+          <div className={styles.sectionTitle}>{t('ChargeableService', 'Chargeable service')}</div>
           <div className={styles.sectionField}>
             <FilterableMultiSelect
               key={isPatientExemptedValue}
