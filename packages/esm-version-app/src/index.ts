@@ -7,6 +7,7 @@ import {
   Movement,
   Stethoscope,
   TcpIpService,
+  UserFollow,
   UserMultiple,
 } from '@carbon/react/icons';
 import { defineConfigSchema, getSyncLifecycle, translateFrom } from '@openmrs/esm-framework';
@@ -109,6 +110,11 @@ export const wardsDashboardLink = getSyncLifecycle(
 // t('Mortuary', 'Mortuary')
 export const mortuaryDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/morgue', title: 'Mortuary', icon: Hotel }),
+  options,
+);
+// t('Registration', 'Registration')
+export const registrationDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({ route: '/home/registration', title: 'Registration', icon: UserFollow }),
   options,
 );
 
