@@ -216,6 +216,11 @@
       "name": "cancel-line-item",
       "component": "cancelLineItem",
       "slot": "bill-actions-overflow-menu-slot"
+    },
+    {
+      "name": "patient-info-sha-status",
+      "component": "patientBannerShaStatus",
+      "slot": "patient-banner-tags-slot"
     }
   ],
   "workspaces": [
