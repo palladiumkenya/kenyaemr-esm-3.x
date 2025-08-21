@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 import { configSchema } from './config-schema';
@@ -244,6 +244,13 @@ export const reverseTransactionModal = getSyncLifecycle(ReverseTransactionModal,
 
 // Print Preview Components
 export const printPreviewModal = getSyncLifecycle(PrintPreviewModal, options);
+export const patientBannerShaStatus = getAsyncLifecycle(
+  () => import('./billing-form/social-health-authority/patient-banner-sha-status.extension'),
+  {
+    featureName: 'patient-sha-status',
+    moduleName,
+  },
+);
 
 // App Startup
 export function startupApp() {
