@@ -3,20 +3,20 @@
 @use '@carbon/colors';
 
 .input {
-    border-radius: layout.$spacing-03;
-    padding: layout.$spacing-03;
-    width: 40px;
-    font-weight: bold;
-    text-align: center;
+  border-radius: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  width: 40px;
+  font-weight: bold;
+  text-align: center;
 }
 
 .container {
-    display: flex;
-    flex-direction: column;
-    gap: layout.$spacing-03
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
 }
 
 .label {
-    @include type.type-style('heading-01');
-    font-weight: normal;
+  @include type.type-style('heading-01');
+  font-weight: normal;
 }
