@@ -27,3 +27,4 @@ export * from './radiology';
 export * from './reports';
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
+export const otpVerificationModal = getAsyncLifecycle(() => import('./shared-components/otp-verification'), options);

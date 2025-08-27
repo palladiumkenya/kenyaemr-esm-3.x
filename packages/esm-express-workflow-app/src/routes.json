@@ -204,5 +204,10 @@
       "slot": "triage-dashboard-slot"
     }
   ],
-  "modals": []
+  "modals": [
+    {
+      "component": "otpVerificationModal",
+      "name": "otp-verification-modal"
+    }
+  ]
 }

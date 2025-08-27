@@ -1,0 +1,26 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.button {
+    height: layout.$spacing-10;
+    display: flex;
+    align-content: flex-start;
+    align-items: baseline;
+    min-width: 20%;
+}
+
+.buttonSet {
+    padding: 0rem;
+    margin-top: layout.$spacing-05;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: layout.$spacing-05;
+}
+
+
+
+.sectionHeader {
+    @include type.type-style('heading-02');
+}

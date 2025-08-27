@@ -8,5 +8,15 @@
     width: 40px;
     font-weight: bold;
     text-align: center;
+}
 
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: layout.$spacing-03
+}
+
+.label {
+    @include type.type-style('heading-01');
+    font-weight: normal;
 }
