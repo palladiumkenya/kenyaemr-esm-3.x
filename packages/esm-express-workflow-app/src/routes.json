@@ -44,20 +44,20 @@
       "slot": "admissions-dashboard-slot"
     },
     {
-      "component": "consulationLeftPanelLink",
-      "name": "consulation-dashboard-link",
+      "component": "consultationLeftPanelLink",
+      "name": "consultation-dashboard-link",
       "slot": "express-workflow-left-panel-slot",
       "order": 3,
       "meta": {
-        "name": "consulation",
-        "slot": "consulation-dashboard-slot",
-        "title": "Consulation"
+        "name": "consultation",
+        "slot": "consultation-dashboard-slot",
+        "title": "Consultation"
       }
     },
     {
-      "component": "consulationDashboard",
-      "name": "consulation-dashboard",
-      "slot": "consulation-dashboard-slot"
+      "component": "consultationDashboard",
+      "name": "consultation-dashboard",
+      "slot": "consultation-dashboard-slot"
     },
     {
       "component": "facilityLeftPanelLink",
