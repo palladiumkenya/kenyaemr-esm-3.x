@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json.openmrs.org/routes.schema.json",
+  "backendDependencies": {
+    "fhir2": ">=1.2",
+    "webservices.rest": "^2.24.0"
+  },
+  "pages": [
+    {
+      "component": "root",
+      "route": "express-workflow"
+    }
+  ],
+  "extensions": [
+    {
+      "component": "accountingLeftPanelLink",
+      "name": "accounting-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 10,
+      "meta": {
+        "name": "accounting",
+        "slot": "accounting-dashboard-slot",
+        "title": "Accounting"
+      }
+    },
+    {
+      "component": "accountingDashboard",
+      "name": "accounting-dashboard",
+      "slot": "accounting-dashboard-slot"
+    },
+    {
+      "component": "admissionsLeftPanelLink",
+      "name": "admissions-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 9,
+      "meta": {
+        "name": "admissions",
+        "slot": "admissions-dashboard-slot",
+        "title": "Admissions"
+      }
+    },
+    {
+      "component": "admissionsDashboard",
+      "name": "admissions-dashboard",
+      "slot": "admissions-dashboard-slot"
+    },
+    {
+      "component": "consulationLeftPanelLink",
+      "name": "consulation-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 3,
+      "meta": {
+        "name": "consulation",
+        "slot": "consulation-dashboard-slot",
+        "title": "Consulation"
+      }
+    },
+    {
+      "component": "consulationDashboard",
+      "name": "consulation-dashboard",
+      "slot": "consulation-dashboard-slot"
+    },
+    {
+      "component": "facilityLeftPanelLink",
+      "name": "facility-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 0,
+      "meta": {
+        "name": "dashboard",
+        "slot": "facility-dashboard-slot",
+        "title": "Dashboard"
+      }
+    },
+    {
+      "component": "facilityDashboard",
+      "name": "facility-dashboard",
+      "slot": "facility-dashboard-slot"
+    },
+    {
+      "component": "laboratoryLeftPanelLink",
+      "name": "lab-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 5,
+      "meta": {
+        "name": "lab",
+        "slot": "lab-dashboard-slot",
+        "title": "Lab"
+      }
+    },
+    {
+      "component": "labDashboard",
+      "name": "lab-dashboard",
+      "slot": "lab-dashboard-slot"
+    },
+    {
+      "component": "mchLeftPanelLink",
+      "name": "mch-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 4,
+      "meta": {
+        "name": "mch",
+        "slot": "mch-dashboard-slot",
+        "title": "MCH"
+      }
+    },
+    {
+      "component": "mchDashboard",
+      "name": "mch-dashboard",
+      "slot": "mch-dashboard-slot"
+    },
+    {
+      "component": "pharmacyLeftPanelLink",
+      "name": "pharmacy-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 7,
+      "meta": {
+        "name": "pharmacy",
+        "slot": "pharmacy-dashboard-slot",
+        "title": "Pharmacy"
+      }
+    },
+    {
+      "component": "pharmacyDashboard",
+      "name": "pharmacy-dashboard",
+      "slot": "pharmacy-dashboard-slot"
+    },
+    {
+      "component": "proceduresLeftPanelLink",
+      "name": "procedures-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 8,
+      "meta": {
+        "name": "procedures",
+        "slot": "procedures-dashboard-slot",
+        "title": "Procedures"
+      }
+    },
+    {
+      "component": "proceduresDashboard",
+      "name": "procedures-dashboard",
+      "slot": "procedures-dashboard-slot"
+    },
+    {
+      "component": "radiologyLeftPanelLink",
+      "name": "radiology-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 6,
+      "meta": {
+        "name": "radiology",
+        "slot": "radiology-dashboard-slot",
+        "title": "Radiology"
+      }
+    },
+    {
+      "component": "radiologyDashboard",
+      "name": "radiology-dashboard",
+      "slot": "radiology-dashboard-slot"
+    },
+    {
+      "component": "registrationLeftPanelLink",
+      "name": "registration-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 1,
+      "meta": {
+        "name": "registration",
+        "slot": "registration-dashboard-slot",
+        "title": "Registration"
+      }
+    },
+    {
+      "component": "registrationDashboard",
+      "name": "registration-dashboard",
+      "slot": "registration-dashboard-slot"
+    },
+    {
+      "component": "reportsLeftPanelLink",
+      "name": "reports-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 11,
+      "meta": {
+        "name": "reports",
+        "slot": "reports-dashboard-slot",
+        "title": "Reports"
+      }
+    },
+    {
+      "component": "reportsDashboard",
+      "name": "reports-dashboard",
+      "slot": "reports-dashboard-slot"
+    },
+    {
+      "component": "triageLeftPanelLink",
+      "name": "triage-dashboard-link",
+      "slot": "express-workflow-left-panel-slot",
+      "order": 2,
+      "meta": {
+        "name": "triage",
+        "slot": "triage-dashboard-slot",
+        "title": "Triage"
+      }
+    },
+    {
+      "component": "triageDashboard",
+      "name": "triage-dashboard",
+      "slot": "triage-dashboard-slot"
+    }
+  ],
+  "modals": []
+}
