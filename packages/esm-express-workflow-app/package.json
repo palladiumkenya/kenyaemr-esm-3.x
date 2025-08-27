@@ -2,7 +2,7 @@
   "name": "@kenyaemr/esm-express-workflow-app",
   "version": "5.4.1",
   "description": "Express workflow app for OpenMRS 3",
-  "browser": "dist/openmrs-esm-express-workflow-app.js",
+  "browser": "dist/kenyaemr-esm-express-workflow-app.js",
   "main": "src/index.ts",
   "source": true,
   "license": "MPL-2.0",
@@ -24,7 +24,8 @@
     "extends browserslist-config-openmrs"
   ],
   "keywords": [
-    "openmrs"
+    "openmrs",
+    "kenyaemr"
   ],
   "publishConfig": {
     "access": "public"
