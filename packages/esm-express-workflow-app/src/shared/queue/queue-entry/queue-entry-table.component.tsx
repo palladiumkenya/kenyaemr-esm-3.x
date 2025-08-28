@@ -25,7 +25,7 @@ type QueueEntryTableProps = {
 
 const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triage', queue }) => {
   const { t } = useTranslation();
-  const { queueEntries, isLoading, error } = useQueueEntries();
+  const { queueEntries, isLoading, error } = useQueueEntries({ location: [queue?.location.uuid] });
   const pageSize = 10;
   const { currentPage, goTo, results } = usePagination(queueEntries, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, queueEntries.length, currentPage, results.length);
@@ -73,6 +73,10 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triag
 
   if (isLoading) {
     return <DataTableSkeleton aria-label={t('queueEntries', 'Queue Entries')} />;
+  }
+
+  if (queueEntries.length === 0) {
+    return <div>{t('noQueueEntries', 'No queue entries found')}</div>;
   }
 
   return (

@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import { useLeftNav } from '@openmrs/esm-framework';
+import { useLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import styles from './root.scss';
 import DashboardContainer from './components/dashboard/dashboard-container.component';
 import { spaBasePath } from './constants';
@@ -14,6 +14,7 @@ const Root: React.FC = () => {
         <Routes>
           <Route path="/:dashboard/*" element={<DashboardContainer />} />
         </Routes>
+        <WorkspaceContainer contextKey="express-workflow" />
       </main>
     </BrowserRouter>
   );

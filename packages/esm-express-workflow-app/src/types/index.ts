@@ -43,3 +43,25 @@ export type QueueEntry = {
   providerWaitingFor: OpenmrsResource | null;
   previousQueueEntry: QueueEntry | null;
 };
+
+export type QueueEntryFilters = {
+  queues?: string[]; // UUIDs of queues
+  location?: string[]; // UUIDs of locations
+  service?: string[]; // UUIDs of services
+  patient?: string; // Patient UUID
+  visit?: string; // Visit UUID
+  hasVisit?: boolean;
+  priorities?: string[]; // UUIDs of priority concepts
+  statuses?: string[]; // UUIDs of status concepts
+  locationsWaitingFor?: string[]; // UUIDs of locations
+  providersWaitingFor?: string[]; // UUIDs of providers
+  queuesComingFrom?: string[]; // UUIDs of queues
+  startedOnOrAfter?: string; // ISO date string
+  startedOnOrBefore?: string; // ISO date string
+  startedOn?: string; // ISO date string
+  isEnded?: boolean;
+  endedOnOrAfter?: string; // ISO date string
+  endedOnOrBefore?: string; // ISO date string
+  endedOn?: string; // ISO date string
+  includedVoided?: boolean;
+};
