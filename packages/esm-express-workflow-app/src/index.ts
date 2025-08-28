@@ -17,7 +17,7 @@ export * from './components/facility-dashboard';
 export * from './components/registration';
 export * from './components/triage';
 export * from './components/accounting';
-export * from './components/consulation';
+export * from './components/consultation';
 export * from './components/admissions';
 export * from './components/lab';
 export * from './components/mch';
