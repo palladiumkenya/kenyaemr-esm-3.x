@@ -11,6 +11,7 @@ import UserRoleScopeWorkspace from './components/users/manage-users/manage-user-
 import HWRSyncModal from './components/modal/hwr-sync.modal';
 import AddLocationWorkspace from './components/locations/forms/add-location/add-location.workspace';
 import SearchLocationWorkspace from './components/locations/forms/search-location/search-location.workspace';
+import ProviderBannerTag from './components/provider-banner/provider-banner.component';
 
 const options = {
   featureName: 'esm-admin-app',
@@ -53,3 +54,6 @@ export const hwrSyncModal = getSyncLifecycle(HWRSyncModal, options);
 
 export const addLocation = getSyncLifecycle(AddLocationWorkspace, options);
 export const searchLocationWorkspace = getSyncLifecycle(SearchLocationWorkspace, options);
+
+// t('providerBanner', 'Provider banner')
+export const providerBanner = getSyncLifecycle(ProviderBannerTag, options);
