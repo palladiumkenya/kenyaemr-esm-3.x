@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StructuredListSkeleton, ContentSwitcher, Switch, type SwitchEventHandlersParams } from '@carbon/react';
+import { StructuredListSkeleton, ContentSwitcher, Switch } from '@carbon/react';
 import styles from './care-panel.scss';
 import { useEnrollmentHistory } from '../hooks/useEnrollmentHistory';
 import ProgramSummary from '../program-summary/program-summary.component';
@@ -10,6 +10,7 @@ import RegimenHistory from '../regimen/regimen-history.component';
 import first from 'lodash/first';
 import sortBy from 'lodash/sortBy';
 import { ErrorState } from '@openmrs/esm-framework';
+import { type SwitchEventHandlersParams } from '@carbon/react/lib/components/Switch/Switch';
 
 type CarePanelProps = {
   patientUuid: string;
