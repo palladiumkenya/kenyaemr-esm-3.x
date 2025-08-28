@@ -24,10 +24,10 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
       <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
       <div>
         <div className={styles.cards}>
-          <Card title={t('awaitingConsultation', 'Awaiting consultation')} value={queues.length.toString()} />
-          <Card title={t('awaitingInvestigation', 'Awaiting Investigation')} value={queues.length.toString()} />
-          <Card title={t('investigationComplete', 'Investigation complete')} value={queues.length.toString()} />
-          <Card title={t('visitComplete', 'Visit complete')} value={queues.length.toString()} />
+          <Card title={t('awaitingConsultation', 'Awaiting consultation')} value={'20'} />
+          <Card title={t('awaitingInvestigation', 'Awaiting Investigation')} value={'5'} />
+          <Card title={t('investigationComplete', 'Investigation complete')} value={'7'} />
+          <Card title={t('visitComplete', 'Visit complete')} value={'4'} />
         </div>
         <QueueTab queues={consultationQueues} />
       </div>
