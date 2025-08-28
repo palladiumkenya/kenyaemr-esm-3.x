@@ -26,5 +26,7 @@ export * from './components/procedures';
 export * from './components/radiology';
 export * from './components/reports';
 
+export * from './shared/express-workflow-workspace';
+
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 export const otpVerificationModal = getAsyncLifecycle(() => import('./shared-components/otp-verification'), options);

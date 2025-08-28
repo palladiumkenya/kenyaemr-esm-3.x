@@ -16,7 +16,10 @@ type TriageProps = {
 const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   const { t } = useTranslation();
   const { queues, isLoading, error } = useQueues();
-  const triageQueues = queues.filter((queue) => queue.name.toLowerCase().includes('triage'));
+  const triageQueues = queues
+    .filter((queue) => queue.name.toLowerCase().includes('triage'))
+    .filter((queue) => !queue.location.display.toLowerCase().includes('mch'))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   if (isLoading) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
@@ -27,9 +30,8 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
       <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
       <div>
         <div className={styles.cards}>
-          <Card title="Total Patients" value={queues.length.toString()} />
-          <Card title="Total Patients" value={queues.length.toString()} />
-          <Card title="Total Patients" value={queues.length.toString()} />
+          <Card title={t('patientInWaiting', 'Patient in waiting')} value={queues.length.toString()} />
+          <Card title={t('patientAttended', 'Patient attended')} value={String(10)} />
         </div>
         <QueueTab queues={triageQueues} />
       </div>

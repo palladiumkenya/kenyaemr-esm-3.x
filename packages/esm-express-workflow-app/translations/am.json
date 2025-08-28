@@ -1,11 +1,19 @@
 {
-  "cancel": "Cancel",
-  "changePhoneNumber": "Change phone number",
-  "otpRequestError": "Error requesting OTP",
-  "otpVerification": "OTP Verification",
-  "otpVerificationError": "Error Verifying OTP",
-  "phoneNumber": "Phone number",
-  "sendOtp": "Send OTP",
-  "verify": "Verify",
-  "verifyingOtp": "Verifying OTP"
+  "age": "Age",
+  "errorLoadingPatient": "Error loading patient",
+  "gender": "Gender",
+  "identifier": "Identifier",
+  "loadingPatient": "Loading patient...",
+  "loadingQueues": "Loading queues...",
+  "name": "Name",
+  "nextPage": "Next page",
+  "noQueueEntries": "No queue entries found",
+  "patientAttended": "Patient attended",
+  "patientInWaiting": "Patient in waiting",
+  "previousPage": "Previous page",
+  "priority": "Priority",
+  "programManagement": "Program Management",
+  "queueEntries": "Queue Entries",
+  "visitTime": "Visit Time",
+  "vitalsAndAnthropometrics": "Vitals and Anthropometrics"
 }
