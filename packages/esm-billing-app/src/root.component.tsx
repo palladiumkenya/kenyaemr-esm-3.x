@@ -4,7 +4,7 @@ import { BillableExemptions } from './billable-exemption/billable-exemptions.com
 import BillManager from './billable-services/bill-manager/bill-manager.component';
 import { ChargeItemsDashboard } from './billable-services/dashboard/dashboard.component';
 import { PaymentHistory } from './billable-services/payment-history/payment-history.component';
-import { BillingDashboard } from './billing-dashboard/billing-dashboard.component';
+import BillingDashboard from './billing-dashboard/billing-dashboard.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
 import ClaimScreen from './claims/dashboard/claims-dashboard.component';

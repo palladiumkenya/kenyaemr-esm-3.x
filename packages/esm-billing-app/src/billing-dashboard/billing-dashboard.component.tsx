@@ -7,7 +7,7 @@ import styles from './billing-dashboard.scss';
 import { ClockOutStrip } from './clock-out-strip.component';
 import { UserHasAccess } from '@openmrs/esm-framework';
 
-export function BillingDashboard() {
+function BillingDashboard() {
   const { t } = useTranslation();
 
   return (
@@ -21,3 +21,4 @@ export function BillingDashboard() {
     </main>
   );
 }
+export default BillingDashboard;
