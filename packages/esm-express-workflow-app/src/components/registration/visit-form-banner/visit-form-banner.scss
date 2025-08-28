@@ -1,0 +1,47 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.patientInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: layout.$spacing-07;
+}
+
+.patientAvatar {
+  width: layout.$spacing-11;
+  height: layout.$spacing-11;
+  margin: layout.$spacing-03 0 layout.$spacing-03 layout.$spacing-05;
+  border-radius: 1px;
+  font-weight: unset;
+  line-height: unset;
+}
+
+.patientDetails {
+  flex: 1;
+}
+
+.patientName {
+  @include type.type-style('heading-02');
+  margin-bottom: layout.$spacing-02;
+}
+
+.demographics {
+  display: flex;
+  align-items: center;
+  margin-bottom: layout.$spacing-02;
+  text-transform: uppercase;
+}
+
+.identifiers {
+  display: flex;
+  flex-direction: column;
+}
+
+.middot {
+  margin: 0 0.25rem;
+}
+.causeDisplay {
+  font-size: type.type-scale(2);
+}
