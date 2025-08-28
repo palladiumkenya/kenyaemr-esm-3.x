@@ -72,6 +72,7 @@ jobs:
 
   pre_release:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     needs: build
     if: github.event_name == 'push'
 
@@ -99,6 +100,13 @@ jobs:
         run: yarn turbo run build --cache-dir=".turbo" --concurrency=5 --no-daemon
         env:
           TURBO_CACHE_KEY: ${{ github.sha }}
+          TURBO_LOG_ORDER: stream
+          TURBO_TELEMETRY_DISABLED: "1"
+          NODE_OPTIONS: "--max_old_space_size=4096"
+
+      - name: Debug build (serialize on failure)
+        if: failure()
+        run: yarn workspaces foreach -ptv --topological run build
 
       - name: Configure Git
         run: |
