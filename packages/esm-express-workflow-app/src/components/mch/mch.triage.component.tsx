@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../hooks/useServiceQueues';
 import Card from '../../shared/cards/card.component';
 import QueueTab from '../../shared/queue/queue-tab.component';
-import styles from './triage.scss';
+import styles from './mch.scss';
 
 const MCHTriage: React.FC = () => {
   const { t } = useTranslation();

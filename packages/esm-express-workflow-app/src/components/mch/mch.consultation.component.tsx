@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../hooks/useServiceQueues';
 import Card from '../../shared/cards/card.component';
 import QueueTab from '../../shared/queue/queue-tab.component';
-import styles from './consultation.scss';
+import styles from './mch.scss';
 type ConsultationProps = {
   dashboardTitle: string;
 };

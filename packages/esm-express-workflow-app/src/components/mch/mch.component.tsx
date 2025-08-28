@@ -6,6 +6,7 @@ import styles from './mch.scss';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import MCHTriage from './mch.triage.component';
 import MCHConsultation from './mch.consultation.component';
+import toUpper from 'lodash/toUpper';
 
 type MchProps = {
   dashboardTitle: string;
@@ -17,7 +18,7 @@ const MCH: React.FC<MchProps> = ({ dashboardTitle }) => {
     <div>
       <PageHeader
         className={styles.pageHeader}
-        title={`${capitalize(dashboardTitle)} ${selectedIndex === 1 ? 'Triage' : 'Consultation'}`}
+        title={`${toUpper(dashboardTitle)} ${selectedIndex === 0 ? 'Triage' : 'Consultation'}`}
         illustration={<HomePictogram />}
       />
       <Tabs
