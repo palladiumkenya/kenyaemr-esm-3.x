@@ -1,5 +1,7 @@
 {
   "age": "Age",
+  "awaitingConsultation": "Awaiting consultation",
+  "awaitingInvestigation": "Awaiting Investigation",
   "cancel": "Cancel",
   "changePhoneNumber": "Change phone number",
   "chooseIdentifierType": "Choose identifier type",
@@ -38,6 +40,7 @@
   "validationError": "Validation Error",
   "verify": "Verify",
   "verifyingOtp": "Verifying OTP",
+  "visitComplete": "Visit complete",
   "visitFormBanner": "Visit Form Banner",
   "visitTime": "Visit Time",
   "vitalsAndAnthropometrics": "Vitals and Anthropometrics"
