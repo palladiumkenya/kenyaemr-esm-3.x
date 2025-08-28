@@ -3,6 +3,7 @@ import styles from './registration.scss';
 import { PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import IllustrationSvg from './illustration-svg/illustration.component';
+import SearchBar from './search-bar/search-bar.component';
 
 const Registration: React.FC = () => {
   const { t } = useTranslation();
@@ -12,6 +13,7 @@ const Registration: React.FC = () => {
       <PageHeader className={styles.header} data-testid="patient-queue-header">
         <PageHeaderContent title={t('registration', 'Registration')} illustration={<IllustrationSvg />} />
       </PageHeader>
+      <SearchBar />
     </div>
   );
 };
