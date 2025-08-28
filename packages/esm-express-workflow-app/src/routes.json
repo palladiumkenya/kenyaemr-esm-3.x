@@ -220,7 +220,12 @@
       "canHide": true
     }
   ],
-  "modals": [],
+  "modals": [
+    {
+      "component": "otpVerificationModal",
+      "name": "otp-verification-modal"
+    }
+  ],
   "workspaceGroups": [
     {
       "name": "express-workflow",
