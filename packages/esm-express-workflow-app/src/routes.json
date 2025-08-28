@@ -204,5 +204,26 @@
       "slot": "triage-dashboard-slot"
     }
   ],
-  "modals": []
+  "workspaces": [
+    {
+      "name": "express-workflow-workspace",
+      "component": "expressWorkflowWorkspace",
+      "title": "Express Workflow Workspace",
+      "type": "workspace",
+      "canMaximize": true,
+      "canHide": true
+    }
+  ],
+  "modals": [],
+  "workspaceGroups": [
+    {
+      "name": "express-workflow",
+      "members": [
+        "add-drug-order",
+        "order-basket",
+        "add-lab-order",
+        "express-workflow-workspace"
+      ]
+    }
+  ]
 }

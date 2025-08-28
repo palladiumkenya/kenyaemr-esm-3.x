@@ -9,7 +9,7 @@ type QueueTabProps = {
 };
 
 const QueueTab: React.FC<QueueTabProps> = ({ queues }) => {
-  const [selectedQueue, setSelectedQueue] = useState<Queue | null>(null);
+  const [selectedQueue, setSelectedQueue] = useState<Queue | undefined>(queues[0]);
   return (
     <div className={styles.queueTab}>
       <Tabs>
