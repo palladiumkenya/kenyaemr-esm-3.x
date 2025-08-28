@@ -1,5 +1,11 @@
 {
   "cancel": "Cancel",
+  "changePhoneNumber": "Change phone number",
+  "otpRequestError": "Error requesting OTP",
   "otpVerification": "OTP Verification",
-  "verify": "Verify"
+  "otpVerificationError": "Error Verifying OTP",
+  "phoneNumber": "Phone number",
+  "sendOtp": "Send OTP",
+  "verify": "Verify",
+  "verifyingOtp": "Verifying OTP"
 }
