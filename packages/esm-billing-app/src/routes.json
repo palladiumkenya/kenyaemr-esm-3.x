@@ -17,6 +17,11 @@
   ],
   "extensions": [
     {
+      "component": "billingDashboard",
+      "name": "billing-dashboard",
+      "slot": "accounting-dashboard-slot"
+    },
+    {
       "component": "benefitsPackageDashboardLink",
       "name": "benefits-package-dashboard-link",
       "slot": "patient-chart-dashboard-slot",
