@@ -97,16 +97,12 @@ jobs:
         run: yarn workspaces foreach --worktree --topological --exclude @kenyaemr/esm-3.x-apps version "$(node -e "console.log(require('semver').inc(require('./package.json').version, 'patch'))")-pre.${{ github.run_number }}"
 
       - name: Build
-        run: yarn turbo run build --cache-dir=".turbo" --concurrency=5 --no-daemon
+        run: yarn turbo run build --cache-dir=".turbo" --concurrency=2
         env:
           TURBO_CACHE_KEY: ${{ github.sha }}
           TURBO_LOG_ORDER: stream
           TURBO_TELEMETRY_DISABLED: "1"
           NODE_OPTIONS: "--max_old_space_size=4096"
-
-      - name: Debug build (serialize on failure)
-        if: failure()
-        run: yarn workspaces foreach -ptv --topological run build
 
       - name: Configure Git
         run: |
