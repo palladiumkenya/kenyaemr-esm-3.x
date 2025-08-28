@@ -32,6 +32,6 @@ export const root = getAsyncLifecycle(() => import('./root.component'), options)
 
 // t('visitFormBanner', 'Visit Form Banner')
 export const visitFormBanner = getAsyncLifecycle(
-  () => import('./registration/visit-form-banner/visit-form-banner.component'),
+  () => import('./components/registration/visit-form-banner/visit-form-banner.component'),
   options,
 );

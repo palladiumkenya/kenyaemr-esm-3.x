@@ -2,8 +2,8 @@ import React from 'react';
 import styles from './registration.scss';
 import { PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import IllustrationSvg from './illustration-svg/illustration.component';
 import SearchBar from './search-bar/search-bar.component';
+import IllustrationSvg from './illustration-svg/illustration.component';
 
 const Registration: React.FC = () => {
   const { t } = useTranslation();

@@ -14,7 +14,6 @@ const Root: React.FC = () => {
         <Routes>
           <Route path="/:dashboard/*" element={<DashboardContainer />} />
         </Routes>
-        <WorkspaceContainer contextKey="express-workflow" />
       </main>
       <WorkspaceContainer contextKey="express-workflow" />
     </BrowserRouter>

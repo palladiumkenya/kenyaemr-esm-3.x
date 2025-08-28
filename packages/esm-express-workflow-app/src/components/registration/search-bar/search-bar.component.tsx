@@ -4,10 +4,10 @@ import { navigate, showToast, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon, Add, CloseLarge } from '@carbon/react/icons';
 import { Button, Column, ComboBox, InlineLoading, Search, Tile } from '@carbon/react';
-import { PatientSearchConfig } from '../../config-schema';
 import { type EligibilityResponse, type HIEBundleResponse, type IdentifierTypeItem } from '../type';
 import { getNationalIdFromPatient } from '../helper';
 import { searchPatientFromHIE } from './search-bar.resource';
+import { PatientSearchConfig } from '../../../config-schema';
 
 const SearchBar: React.FC = () => {
   const { t } = useTranslation();
