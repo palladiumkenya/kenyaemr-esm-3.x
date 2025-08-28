@@ -145,7 +145,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
               kind="primary"
               onClick={handleVerify}
               className={styles.button}>
-              {isLoading ? <InlineLoading title={t('verifyingOtp', 'Verifying OTP')} /> : t('verify', 'Verify')}
+              {isLoading ? <InlineLoading description={t('verifyingOtp', 'Verifying OTP')} /> : t('verify', 'Verify')}
             </Button>
           ) : (
             <Button

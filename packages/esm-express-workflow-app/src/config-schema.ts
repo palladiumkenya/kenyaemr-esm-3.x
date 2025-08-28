@@ -17,10 +17,20 @@ export const configSchema = {
     ],
     _description: 'List of identifier types with unique keys for each.',
   },
+  supersetDashboardConfig: {
+    _type: Type.Object,
+    _description: 'Superset embeded dashboards config',
+    _default: {
+      host: 'http://34.35.62.41:8080',
+      dashboardId: 'bd7102f9-9291-4a11-9b98-8a17d9142cac',
+    },
+  },
 };
 
-export interface ExpressWorkflowConfig {}
-
-export type PatientSearchConfig = {
+export type ExpressWorkflowConfig = {
   identifierTypes: Array<{ identifierType: string; identifierValue: string }>;
+  supersetDashboardConfig: {
+    host: string;
+    dashboardId: string;
+  };
 };
