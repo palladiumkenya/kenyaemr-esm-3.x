@@ -13,6 +13,7 @@
   "identificationType": "Identification Type",
   "identifier": "Identifier",
   "identifierNumber": "Identifier number*",
+  "investigationComplete": "Investigation complete",
   "loadingPatient": "Loading patient...",
   "loadingQueues": "Loading queues...",
   "name": "Name",
