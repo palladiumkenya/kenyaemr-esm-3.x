@@ -5,7 +5,7 @@ import { PedestrianFamily } from '@carbon/react/icons';
 const IllustrationSvg: React.FC = () => {
   return (
     <div className={styles.svgContainer}>
-      <PedestrianFamily className={styles.iconOveriders} />
+      <PedestrianFamily />
     </div>
   );
 };
