@@ -81,13 +81,13 @@
       "slot": "express-workflow-left-panel-slot",
       "order": 5,
       "meta": {
-        "name": "lab",
+        "name": "laboratory",
         "slot": "lab-dashboard-slot",
         "title": "Lab"
       }
     },
     {
-      "component": "labDashboard",
+      "component": "laboratoryDashboard",
       "name": "lab-dashboard",
       "slot": "lab-dashboard-slot"
     },
