@@ -22,3 +22,8 @@
 .sectionHeader {
   @include type.type-style('heading-02');
 }
+
+.changeNoBtn {
+  width: 100%;
+  min-height: 100%;
+}
