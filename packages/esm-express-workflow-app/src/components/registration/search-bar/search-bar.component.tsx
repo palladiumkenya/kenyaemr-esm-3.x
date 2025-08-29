@@ -7,14 +7,14 @@ import { Button, Column, ComboBox, InlineLoading, Search, Tile } from '@carbon/r
 import { type EligibilityResponse, type HIEBundleResponse, type IdentifierTypeItem } from '../type';
 import { getNationalIdFromPatient } from '../helper';
 import { searchPatientFromHIE } from './search-bar.resource';
-import { PatientSearchConfig } from '../../../config-schema';
+import { ExpressWorkflowConfig } from '../../../config-schema';
 
 const SearchBar: React.FC = () => {
   const { t } = useTranslation();
 
   const addPatient = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-registration' }), []);
 
-  const { identifierTypes } = useConfig<PatientSearchConfig>();
+  const { identifierTypes } = useConfig<ExpressWorkflowConfig>();
 
   const identifierTypeItems: Array<IdentifierTypeItem> = identifierTypes.map((item) => ({
     id: item.identifierValue,
