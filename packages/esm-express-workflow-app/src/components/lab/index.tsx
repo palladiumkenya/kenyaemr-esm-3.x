@@ -13,7 +13,7 @@ export const laboratoryRootDashboard = getSyncLifecycle(Laboratory, options);
 export const laboratoryLeftPanelLink = getSyncLifecycle(
   createDashboardLink({
     title: 'Labs',
-    path: 'laboratory',
+    path: 'lab',
     icon: 'omrs-icon-microscope',
   }),
   options,

@@ -80,16 +80,16 @@
       "name": "lab-dashboard-link",
       "slot": "express-workflow-left-panel-slot",
       "order": 5,
-      "meta": {
-        "name": "laboratory",
-        "slot": "root-laboratory-dashboard-slot",
+    "meta": {
+        "name": "lab",
+        "slot": "lab-dashboard-slot",
         "title": "Lab"
       }
     },
     {
-      "component": "laboratoryRootDashboard",
+      "component": "labDashboard",
       "name": "lab-dashboard",
-      "slot": "root-laboratory-dashboard-slot"
+      "slot": "lab-dashboard-slot"
     },
     {
       "component": "mchLeftPanelLink",
