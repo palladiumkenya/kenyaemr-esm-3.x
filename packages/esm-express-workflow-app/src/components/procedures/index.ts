@@ -9,7 +9,7 @@ const options = {
   moduleName,
 };
 
-export const proceduresDashboard = getSyncLifecycle(Procedures, options);
+export const proceduresRootDashboard = getSyncLifecycle(Procedures, options);
 export const proceduresLeftPanelLink = getSyncLifecycle(
   createDashboardLink({
     title: 'Procedures',

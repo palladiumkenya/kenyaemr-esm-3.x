@@ -4,7 +4,7 @@ import React from 'react';
 const Radiology: React.FC = () => {
   return (
     <div>
-      <ExtensionSlot name="imaging-dashboard-slot" />
+      <ExtensionSlot name="express-radiology-dashboard-slot" />
     </div>
   );
 };
