@@ -28,6 +28,12 @@
       "component": "facilitySetupLeftPanelLink",
       "name": "facility-setup-left-panel-link",
       "slot": "admin-left-panel-slot"
+    },
+    {
+      "component": "providerBanner",
+      "name": "provider-banner",
+      "slot": "top-nav-info-slot",
+      "order":1
     }
   ],
   "workspaces": [

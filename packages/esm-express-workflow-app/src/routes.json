@@ -224,6 +224,9 @@
     {
       "component": "otpVerificationModal",
       "name": "otp-verification-modal"
+    }, {
+      "component": "facilityDashboardAuthorizationModal",
+      "name": "facility-dashboard-authorization-form-modal"
     }
   ],
   "workspaceGroups": [

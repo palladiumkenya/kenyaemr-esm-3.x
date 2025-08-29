@@ -19,7 +19,7 @@
     {
       "component": "billingDashboard",
       "name": "billing-dashboard",
-      "slot": "accounting-dashboard-slot"
+      "slot": "accounting-slot"
     },
     {
       "component": "benefitsPackageDashboardLink",
