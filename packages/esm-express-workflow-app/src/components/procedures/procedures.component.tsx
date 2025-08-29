@@ -4,7 +4,7 @@ import React from 'react';
 const Procedures: React.FC = () => {
   return (
     <div>
-      <ExtensionSlot name="procedures-dashboard-slot" />
+      <ExtensionSlot name="express-procedures-dashboard-slot" />
     </div>
   );
 };
