@@ -9,7 +9,7 @@ const options = {
   moduleName,
 };
 
-export const radiologyDashboard = getSyncLifecycle(Radiology, options);
+export const radiologyRootDashboard = getSyncLifecycle(Radiology, options);
 export const radiologyLeftPanelLink = getSyncLifecycle(
   createDashboardLink({
     title: 'Radiology',

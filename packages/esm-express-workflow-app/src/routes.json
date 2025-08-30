@@ -80,16 +80,16 @@
       "name": "lab-dashboard-link",
       "slot": "express-workflow-left-panel-slot",
       "order": 5,
-      "meta": {
-        "name": "laboratory",
-        "slot": "laboratory-dashboard-slot",
+    "meta": {
+        "name": "lab",
+        "slot": "lab-dashboard-slot",
         "title": "Lab"
       }
     },
     {
-      "component": "laboratoryDashboard",
+      "component": "labDashboard",
       "name": "lab-dashboard",
-      "slot": "laboratory-dashboard-slot"
+      "slot": "lab-dashboard-slot"
     },
     {
       "component": "mchLeftPanelLink",
@@ -130,14 +130,14 @@
       "order": 8,
       "meta": {
         "name": "procedures",
-        "slot": "procedures-dashboard-slot",
+        "slot": "root-procedures-dashboard-slot",
         "title": "Procedures"
       }
     },
     {
-      "component": "proceduresDashboard",
+      "component": "proceduresRootDashboard",
       "name": "procedures-dashboard",
-      "slot": "procedures-dashboard-slot"
+      "slot": "root-procedures-dashboard-slot"
     },
     {
       "component": "radiologyLeftPanelLink",
@@ -146,14 +146,14 @@
       "order": 6,
       "meta": {
         "name": "radiology",
-        "slot": "radiology-dashboard-slot",
+        "slot": "root-radiology-dashboard-slot",
         "title": "Radiology"
       }
     },
     {
-      "component": "radiologyDashboard",
+      "component": "radiologyRootDashboard",
       "name": "radiology-dashboard",
-      "slot": "radiology-dashboard-slot"
+      "slot": "root-radiology-dashboard-slot"
     },
     {
       "component": "registrationLeftPanelLink",
