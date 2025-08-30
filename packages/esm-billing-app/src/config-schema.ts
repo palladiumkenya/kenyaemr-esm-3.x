@@ -28,6 +28,8 @@ export interface BillingConfig {
   mobileMoneyPaymentModeUUID: string;
   concepts: {
     emergencyPriorityConceptUuid: string;
+    consultationServiceType: string;
+    registrationServiceType: string;
   };
   paymentMethodsUuidsThatShouldNotShowPrompt: Array<string>;
   promptDuration: {
@@ -189,6 +191,16 @@ export const configSchema: ConfigSchema = {
       _type: Type.String,
       _description: 'The concept uuid for emergency priority',
       _default: '037446f4-adfc-40b3-928c-a39a4826b1bf',
+    },
+    consultationServiceType: {
+      _type: Type.UUID,
+      _description: 'Clinical consultation service type concept Uuid',
+      _default: '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    registrationServiceType: {
+      _type: Type.UUID,
+      _description: 'Registrationn service type concept Uuid',
+      _default: 'b4b020ed-24a1-4c50-bcbd-12695cbe89d5',
     },
   },
   paymentMethodsUuidsThatShouldNotShowPrompt: {
