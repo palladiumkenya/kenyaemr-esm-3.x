@@ -13,7 +13,7 @@ const DashboardContainer: React.FC = () => {
   const activeDashboard = dashboards.find((dashboard) => dashboard.name === params?.dashboard) || dashboards[0];
 
   return (
-    <div>
+    <div className={styles.dashboardContainer}>
       <ExtensionSlot
         className={styles.dashboardView}
         name={activeDashboard?.slot}
