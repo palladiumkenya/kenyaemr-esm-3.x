@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import styles from './search.scss';
-import { ErrorState, navigate, showToast, useConfig } from '@openmrs/esm-framework';
+import { navigate, showToast, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon, Add, CloseLarge } from '@carbon/react/icons';
 import { Button, Column, ComboBox, InlineLoading, Search, Tile } from '@carbon/react';
-import { type EligibilityResponse, type HIEBundleResponse, type IdentifierTypeItem, type LocalResponse } from '../type';
+import { type HIEBundleResponse, type IdentifierTypeItem, type LocalResponse } from '../type';
 import { getNationalIdFromPatient, convertLocalPatientToFHIR } from '../helper';
 import { searchPatientFromHIE, usePatient, useSHAEligibility } from './search-bar.resource';
 import { PatientSearchConfig } from '../../../config-schema';
@@ -17,7 +17,7 @@ const SearchBar: React.FC = () => {
 
   const addPatient = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-registration' }), []);
 
-  const { identifierTypes } = useConfig<PatientSearchConfig>();
+  const { identifierTypes } = useConfig<ExpressWorkflowConfig>();
 
   const identifierTypeItems: Array<IdentifierTypeItem> = identifierTypes.map((item) => ({
     id: item.identifierValue,

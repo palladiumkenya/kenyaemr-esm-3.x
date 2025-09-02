@@ -6,7 +6,6 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Tabs,
   TextInput,
   Tile,
 } from '@carbon/react';
@@ -15,14 +14,14 @@ import { useTranslation } from 'react-i18next';
 import styles from './otp-verification.scss';
 import PinPut from '../pin-put/pinput.component';
 import { Phone } from '@carbon/react/icons';
-export const PHONE_NUMBER_REGEX = /^(\+?254|0)((7|1)\d{8})$/;
+import { PHONE_NUMBER_REGEX } from '../../constants';
 
 type OTPVerificationModalProps = {
   onClose?: () => void;
   otpLength?: number;
   onVerify?: (otp: string) => Promise<void>;
   onVerificationSuccess?: () => void;
-  obsecureText?: boolean;
+  obscureText?: boolean;
   centerBoxes?: boolean;
   phoneNumber: string;
   renderOtpTrigger: (phoneNumber: string) => React.ReactNode;
@@ -34,7 +33,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
   onVerify,
   otpLength = 5,
   centerBoxes,
-  obsecureText,
+  obscureText,
   phoneNumber,
   renderOtpTrigger,
   onRequestOtp,
@@ -107,7 +106,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
                 onChange={setOtp}
                 numInputs={otpLength}
                 centerBoxes={centerBoxes}
-                obsecureText={obsecureText}
+                obscureText={obscureText}
               />
             ) : null}
             {mode === 'landing' && (
@@ -145,7 +144,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
               kind="primary"
               onClick={handleVerify}
               className={styles.button}>
-              {isLoading ? <InlineLoading title={t('verifyingOtp', 'Verifying OTP')} /> : t('verify', 'Verify')}
+              {isLoading ? <InlineLoading description={t('verifyingOtp', 'Verifying OTP')} /> : t('verify', 'Verify')}
             </Button>
           ) : (
             <Button

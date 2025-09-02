@@ -40,6 +40,7 @@
   "dependencies": {
     "@carbon/react": "^1.83.0",
     "@hookform/resolvers": "^3.9.1",
+    "@superset-ui/embedded-sdk": "^0.2.0",
     "classnames": "^2.3.2",
     "lodash-es": "^4.17.15",
     "react-hook-form": "^7.54.0",

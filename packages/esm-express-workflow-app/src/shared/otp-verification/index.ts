@@ -1,11 +1,11 @@
 import { showModal } from '@openmrs/esm-framework';
-import { default as otpverificationModal } from './otp-verification.modal';
+import { default as otpVerificationModal } from './otp-verification.modal';
 /**
  * Options for configuring the OTP Verification modal.
  *
  * @property {number} [otpLength] - The number of digits required for the OTP. Defaults to implementation-specific value.
  * @property {(otp: string) => Promise<void>} [onVerify] - Callback invoked when the user submits the OTP. Should return a promise that resolves on successful verification.
- * @property {boolean} [obsecureText] - If true, the OTP input will be obscured (e.g., password-style input).
+ * @property {boolean} [obscureText] - If true, the OTP input will be obscured (e.g., password-style input).
  * @property {boolean} [centerBoxes] - If true, OTP input boxes will be centered in the modal.
  * @property {string} phoneNumber - The phone number to which the OTP will be sent.
  * @property {(phoneNumber: string) => React.ReactNode} renderOtpTrigger - Function to render a custom component for triggering OTP requests.
@@ -15,9 +15,9 @@ import { default as otpverificationModal } from './otp-verification.modal';
  * @example
  * <Button
  *   onClick={() =>
- *     lauchOtpVerificationModal({
+ *     launchOtpVerificationModal({
  *       otpLength: 4,
- *       obsecureText: false,
+ *       obscureText: false,
  *       phoneNumber: '254700000000',
  *       renderOtpTrigger: (p) => (
  *         <>
@@ -40,10 +40,10 @@ import { default as otpverificationModal } from './otp-verification.modal';
  *   Launch Otp verification Modal
  * </Button>
  */
-export type OTPVerificationmodalOptions = {
+export type OTPVerificationModalOptions = {
   otpLength?: number;
   onVerify?: (otp: string) => Promise<void>;
-  obsecureText?: boolean;
+  obscureText?: boolean;
   centerBoxes?: boolean;
   phoneNumber: string;
   renderOtpTrigger: (phoneNumber: string) => React.ReactNode;
@@ -55,11 +55,11 @@ export type OTPVerificationmodalOptions = {
  *
  *
  */
-export const lauchOtpVerificationModal = (props: OTPVerificationmodalOptions) => {
+export const launchOtpVerificationModal = (props: OTPVerificationModalOptions) => {
   const dispose = showModal('otp-verification-modal', {
     onClose: () => dispose(),
     size: 'xs',
     ...props,
   });
 };
-export default otpverificationModal;
+export default otpVerificationModal;

@@ -1,0 +1,179 @@
+@use '@carbon/type';
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-03;
+  width: 100%;
+}
+
+.label {
+  @include type.type-style('heading-01');
+  font-weight: 500;
+  color: colors.$gray-100;
+  margin-bottom: layout.$spacing-02;
+  cursor: pointer;
+
+  &:hover {
+    color: colors.$gray-80;
+  }
+}
+
+.input {
+  border-radius: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  width: 48px;
+  height: 48px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 1.125rem;
+  border: 2px solid colors.$gray-50;
+  background-color: colors.$white;
+  color: colors.$gray-100;
+  transition: all 0.2s ease-in-out;
+  outline: none;
+
+  &:focus {
+    border-color: colors.$blue-60;
+    box-shadow: 0 0 0 2px colors.$blue-20;
+    transform: scale(1.02);
+  }
+
+  &:hover:not(:disabled) {
+    border-color: colors.$gray-40;
+    background-color: colors.$gray-10;
+  }
+
+  &::placeholder {
+    color: colors.$gray-50;
+    font-weight: 400;
+  }
+}
+
+.inputError {
+  border-color: colors.$red-60;
+  background-color: colors.$red-10;
+
+  &:focus {
+    border-color: colors.$red-60;
+    box-shadow: 0 0 0 2px colors.$red-20;
+  }
+
+  &:hover {
+    border-color: colors.$red-50;
+    background-color: colors.$red-20;
+  }
+}
+
+.inputDisabled {
+  background-color: colors.$gray-20;
+  border-color: colors.$gray-30;
+  color: colors.$gray-50;
+  cursor: not-allowed;
+
+  &:focus,
+  &:hover {
+    border-color: colors.$gray-30;
+    background-color: colors.$gray-20;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+.inputFocused {
+  border-color: colors.$blue-60;
+  box-shadow: 0 0 0 2px colors.$blue-20;
+}
+
+.separator {
+  color: colors.$gray-50;
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin: 0 layout.$spacing-02;
+  user-select: none;
+}
+
+.messageContainer {
+  margin-top: layout.$spacing-02;
+  min-height: 20px;
+}
+
+.errorMessage {
+  @include type.type-style('body-short-01');
+  color: colors.$red-60;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+
+  &::before {
+    content: '⚠';
+    font-size: 0.875rem;
+  }
+}
+
+.helperText {
+  @include type.type-style('body-short-01');
+  color: colors.$gray-70;
+  font-weight: 400;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .input {
+    width: 44px;
+    height: 44px;
+    font-size: 1rem;
+  }
+
+  .separator {
+    font-size: 1.125rem;
+    margin: 0 layout.$spacing-01;
+  }
+}
+
+@media (max-width: 480px) {
+  .input {
+    width: 40px;
+    height: 40px;
+    font-size: 0.875rem;
+    padding: layout.$spacing-02;
+  }
+
+  .separator {
+    font-size: 1rem;
+    margin: 0 layout.$spacing-01;
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .input {
+    border-width: 3px;
+
+    &:focus {
+      border-width: 4px;
+    }
+  }
+
+  .inputError {
+    border-width: 3px;
+
+    &:focus {
+      border-width: 4px;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .input {
+    transition: none;
+
+    &:focus {
+      transform: none;
+    }
+  }
+}

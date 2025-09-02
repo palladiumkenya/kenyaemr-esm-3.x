@@ -11,6 +11,7 @@ const options = {
 };
 
 export const triageDashboard = getSyncLifecycle(TriageDashboard, options);
+// t('Triage', 'Triage')
 export const triageLeftPanelLink = getSyncLifecycle(
   createDashboardLink({
     title: 'Triage',
