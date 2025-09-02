@@ -162,7 +162,6 @@ export type HIEEligibilityResponse = {
   eligibility_response: EligibilityResponse | string;
   end: string;
 };
-
 export interface HIEBundleResponse {
   resourceType: string;
   id: string;
@@ -205,4 +204,110 @@ export interface HIEBundleResponse {
       }[];
     };
   }[];
+}
+
+export type HIEPatient = NonNullable<HIEBundleResponse['entry']>[0]['resource'];
+export type HIEContact = NonNullable<HIEPatient['contact']>[0];
+
+export interface InputDependent {
+  id?: string;
+  name: string;
+  relationship: string;
+  gender: "male" | "female" | "other";
+  birthDate?: string;
+  nationalId?: string;
+  shaNumber?: string;
+  birthCertificate?: string;
+  householdNumber?: string;
+  phoneNumber?: string;
+  email?: string;
+  county?: string;
+  subCounty?: string;
+  ward?: string;
+  village?: string;
+  contactData?: {
+    name?: {
+      family?: string;
+      given?: string[];
+    };
+  };
+}
+
+export interface DependentPayload {
+  name: string;
+  relationship: string;
+  gender: string;
+  dependentInfo: HIEContact;
+}
+
+export interface PatientCardProps {
+  bundle: HIEBundleResponse;
+  bundleIndex: number;
+  localSearchResults: any[];
+  convertLocalPatientToFHIR: (patient: any) => fhir.Patient;
+  syncedPatients: Set<string>;
+  showDependentsForPatient: Set<string>;
+  hasDependents: (patient: fhir.Patient) => boolean;
+  hasDifferences: (local: fhir.Patient, hie: fhir.Patient) => boolean;
+  eligibilityResponse: EligibilityResponse | null;
+  isEligibilityLoading: boolean;
+  handleSyncSuccess: (patientId: string) => void;
+  handleOtpVerification: (patient: fhir.Patient) => void;
+  toggleDependentsVisibility: (patientKey: string) => void;
+  PatientPhoto: React.FC<{ patientUuid: string; patientName: string }>;
+  EnhancedPatientBannerPatientInfo: React.FC<{
+    patient: fhir.Patient;
+    renderedFrom: string;
+    eligibilityData?: EligibilityResponse;
+    isEligibilityLoading: boolean;
+  }>;
+  PatientSyncButton: React.FC<{
+    localPatient: fhir.Patient;
+    hiePatient: fhir.Patient;
+    onSyncSuccess: (patientId: string) => void;
+    size?: string;
+    kind?: string;
+  }>;
+  DependentsComponent: React.FC<{ patient: fhir.Patient }>;
+}
+
+export interface LocalPatientCardProps {
+  localSearchResults: any[];
+  convertLocalPatientToFHIR: (localPatient: any) => fhir.Patient;
+  syncedPatients: Set<string>;
+  showDependentsForPatient: Set<string>;
+  hasDependents: (patient: fhir.Patient) => boolean;
+  eligibilityResponse: EligibilityResponse | null;
+  isEligibilityLoading: boolean;
+  toggleDependentsVisibility: (patientKey: string) => void;
+  PatientPhoto: React.FC<{ patientUuid: string; patientName: string }>;
+  EnhancedPatientBannerPatientInfo: React.FC<{
+    patient: fhir.Patient;
+    renderedFrom: string;
+    eligibilityData?: EligibilityResponse;
+    isEligibilityLoading: boolean;
+  }>;
+  DependentsComponent: React.FC<{ patient: fhir.Patient }>;
+}
+
+export interface SearchBarProps {
+  PatientPhoto: React.FC<{ patientUuid: string; patientName: string }>;
+  EnhancedPatientBannerPatientInfo: React.FC<{
+    patient: fhir.Patient;
+    renderedFrom: string;
+    eligibilityData?: EligibilityResponse;
+    isEligibilityLoading: boolean;
+  }>;
+  PatientSyncButton: React.FC<{
+    localPatient: fhir.Patient;
+    hiePatient: fhir.Patient;
+    onSyncSuccess: (patientId: string) => void;
+    size?: string;
+    kind?: string;
+  }>;
+  DependentsComponent: React.FC<{ patient: fhir.Patient }>;
+  convertLocalPatientToFHIR: (patient: any) => fhir.Patient;
+  hasDependents: (patient: fhir.Patient) => boolean;
+  hasDifferences: (local: fhir.Patient, hie: fhir.Patient) => boolean;
+  handleOtpVerification: (patient: fhir.Patient) => void;
 }

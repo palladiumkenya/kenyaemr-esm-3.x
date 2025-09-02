@@ -3,12 +3,76 @@
 @use '@carbon/colors';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.container {
+  border-bottom: 0.063rem solid $ui-03;
+  background-color: colors.$gray-10;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+  width: 100%;
+  align-items: center;
+  padding: layout.$spacing-05;
+  margin-bottom: layout.$spacing-04;
+  margin: 0 auto layout.$spacing-04 auto;
+  gap: layout.$spacing-04;
+}
+
 .patientSearchTile {
   min-height: auto;
   padding-left: layout.$spacing-09;
   padding-right: layout.$spacing-09;
   margin-bottom: layout.$spacing-05;
   background-color: colors.$white;
+}
+
+.clearButton {
+  text-align: center;
+  display: flex;
+}
+
+.searchForm {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+  margin-top: layout.$spacing-03;
+}
+
+.searchRow {
+  display: flex;
+  gap: layout.$spacing-05;
+  align-items: end;
+}
+
+.identifierNumberColumn {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.identifierTypeHeader {
+  color: colors.$gray-70;
+  display: inline-block;
+  font-size: layout.$spacing-04;
+  line-height: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+  vertical-align: baseline;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: layout.$spacing-03;
+  gap: layout.$spacing-03;
+}
+
+.searchResultsContainer {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: layout.$spacing-05;
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-04;
+  align-items: flex-start;
+  justify-content: center;
 }
 
 .formHeaderSection {
@@ -29,44 +93,114 @@
     bottom: -0.75rem;
     left: 0;
   }
+
+  & > span {
+    @include type.type-style('body-01');
+  }
 }
 
-.searchForm {
+.searchResults {
   display: flex;
-  flex-direction: column;
-  gap: layout.$spacing-05;
-  margin-top: layout.$spacing-03;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: layout.$spacing-05;
+  margin-left: layout.$spacing-05;
 }
 
-.searchRow {
-  display: flex;
-  align-items: end;
-}
-
-.identifierTypeColumn {
-  margin-right: layout.$spacing-05;
-}
-
-.identifierNumberColumn {
+.hieResultsSection,
+.localResultsSection {
   flex: 1;
-  margin-bottom: 0;
+  min-width: 300px;
+  max-width: 500px;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-20;
+  border-radius: 4px;
+  padding: layout.$spacing-04;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.identifierTypeHeader {
-  color: colors.$gray-70;
-  display: inline-block;
-  font-size: layout.$spacing-04;
-  line-height: layout.$spacing-05;
+.hieResultsSection {
+  background-color: $ui-02;
+}
+
+.localResultsSection {
+  background-color: colors.$gray-10;
+}
+
+.resultsHeader {
+  text-align: left;
   margin-bottom: layout.$spacing-03;
-  vertical-align: baseline;
-}
-.searchButton {
-  min-width: 150px;
+  padding-bottom: layout.$spacing-02;
+  border-bottom: 1px solid colors.$gray-20;
 }
 
-.buttonContainer {
+.patientInfo {
+  grid-column: 1;
+  grid-row: 1 / -1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: layout.$spacing-04;
+  align-items: center;
+}
+
+.buttonCol {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   justify-content: flex-end;
-  margin-top: layout.$spacing-03;
+  align-items: center;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   gap: layout.$spacing-03;
+}
+
+.patientAvatar {
+  margin-top: layout.$spacing-06;
+}
+
+.dependentsSection {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 100%;
+  margin-top: layout.$spacing-04;
+  border-top: 1px solid colors.$gray-20;
+  padding-top: layout.$spacing-04;
+}
+
+.noDependents {
+  padding-bottom: layout.$spacing-04;
+}
+
+.emptyStateContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  width: 100%;
+  background-color: colors.$white;
+  row-gap: layout.$spacing-02;
+
+  & form {
+    border: none;
+  }
+
+  svg {
+    width: 190px;
+    height: 90px;
+  }
+
+  .title {
+    @include type.type-style('heading-01');
+    color: colors.$cool-gray-70;
+  }
+
+  .subTitle {
+    color: colors.$cool-gray-70;
+    font-size: layout.$spacing-05;
+  }
 }

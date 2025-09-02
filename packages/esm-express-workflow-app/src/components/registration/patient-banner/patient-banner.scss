@@ -1,0 +1,154 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+
+.patientBanner {
+  display: flex;
+}
+
+.patientName {
+  @include type.type-style('heading-03');
+  color: colors.$gray-100;
+  font-weight: 600;
+  margin-right: layout.$spacing-02;
+}
+
+.patientAvatar {
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: layout.$spacing-05;
+  border-radius: 1px;
+}
+
+.patientAvatarButton {
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  background: none;
+}
+
+.patientInfo {
+  display: flex;
+  flex-direction: column;
+  padding: layout.$spacing-05 layout.$spacing-03 layout.$spacing-02 0;
+  width: 100%;
+}
+
+.demographics {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  margin-top: layout.$spacing-02;
+  flex-wrap: wrap;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.flexRow {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+}
+
+.tagsSlot {
+  @extend .flexRow;
+  margin: 0 layout.$spacing-03;
+}
+
+.identifiers {
+  @include type.type-style('body-compact-02');
+  color: colors.$gray-70;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.identifier {
+  display: flex;
+  align-items: center;
+}
+
+.primaryIdentifier,
+.secondaryIdentifier {
+  @include type.type-style('body-compact-02');
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.primaryIdentifier {
+  color: colors.$gray-100;
+
+  .value {
+    font-weight: bold;
+  }
+}
+
+.secondaryIdentifier {
+  .identifier {
+    @include type.type-style('body-compact-02');
+    align-self: baseline;
+  }
+}
+
+.gender {
+  display: flex;
+  align-items: center;
+  color: colors.$gray-70;
+  gap: layout.$spacing-01;
+}
+
+.separator {
+  margin: layout.$spacing-01;
+}
+
+.tag {
+  font-size: inherit !important;
+  margin: 0 !important;
+}
+
+.tooltipPadding {
+  padding: layout.$spacing-02;
+}
+
+.tooltipSmallText {
+  font-size: 80%;
+}
+
+.actionsButtonText {
+  @include type.type-style('body-compact-01');
+  color: $interactive-01;
+}
+
+// Overriding styles for RTL support
+html[dir='rtl'] {
+  .demographics {
+    display: flex;
+    gap: layout.$spacing-02;
+  }
+
+  .tag {
+    margin: layout.$spacing-02 0 layout.$spacing-02 layout.$spacing-02;
+  }
+
+  .patientName {
+    margin-right: unset;
+    margin-left: layout.$spacing-02;
+  }
+}
+
+.identifiers {
+  @include type.type-style('body-compact-02');
+  color: $ui-04;
+  margin-top: layout.$spacing-02;
+  text-align: left;
+}
