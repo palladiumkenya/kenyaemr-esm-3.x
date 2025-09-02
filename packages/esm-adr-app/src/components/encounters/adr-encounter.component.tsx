@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import {
-  Button,
   DataTable,
+  Layer,
+  OverflowMenu,
+  OverflowMenuItem,
   Pagination,
   Table,
   TableBody,
@@ -17,7 +19,6 @@ import {
 import styles from './encounter.scss';
 import { useTranslation } from 'react-i18next';
 import {
-  ActionMenuButton,
   formatDatetime,
   isDesktop,
   launchWorkspace,
@@ -44,7 +45,6 @@ const AdrEncounter: React.FC<adrEncounterProps> = ({ encounters }) => {
     { header: 'Visit type', key: 'visitTypeName' },
     { header: 'Form name', key: 'formName' },
     { header: 'Provider', key: 'provider' },
-    { header: 'Actions', key: 'action' },
   ];
   const sortedEncounters = encounters.sort((a, b) => {
     const dateA = new Date(a.encounterDatetime || 0).getTime();
@@ -67,11 +67,6 @@ const AdrEncounter: React.FC<adrEncounterProps> = ({ encounters }) => {
     formName: encounter?.formName,
     id: encounter?.encounterUuid,
     provider: encounter?.provider || '--',
-    action: (
-      <Button kind="tertiary" renderIcon={ReviewIcon} onClick={() => handler(encounter)}>
-        {t('review', 'Review')}
-      </Button>
-    ),
   }));
   if (encounters.length === 0) {
     return (
@@ -86,58 +81,68 @@ const AdrEncounter: React.FC<adrEncounterProps> = ({ encounters }) => {
 
   return (
     <div className={styles.encounterContainer}>
-      <DataTable size={responsiveSize} rows={tableRows} headers={headers}>
-        {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getTableProps,
-          getToolbarProps,
-          onInputChange,
-          getTableContainerProps,
-        }) => (
-          <TableContainer
-            className={styles.encounterTable}
-            title={t('adrAssessmentEncounters', 'ADR Assessment Encounters')}
-            description={t('summaryOfAdrAssessmentEncounters', 'Summary of ADR assessment encounters')}
-            {...getTableContainerProps()}>
-            <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
-              <TableToolbarContent>
-                <TableToolbarSearch persistent onChange={onInputChange} />
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table {...getTableProps()} aria-label={t('encounters', 'Encounters')}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      key={header.key}
-                      {...getHeaderProps({
-                        header,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    {...getRowProps({
-                      row,
-                    })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
+      <Layer>
+        <DataTable size={responsiveSize} rows={tableRows} headers={headers} useZebraStyles={false}>
+          {({
+            rows,
+            headers,
+            getHeaderProps,
+            getRowProps,
+            getTableProps,
+            getToolbarProps,
+            onInputChange,
+            getTableContainerProps,
+          }) => (
+            <TableContainer
+              className={styles.encounterTable}
+              title={t('adrAssessmentEncounters', 'ADR Assessment Encounters')}
+              description={t('summaryOfAdrAssessmentEncounters', 'Summary of ADR assessment encounters')}
+              {...getTableContainerProps()}>
+              <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
+                <TableToolbarContent>
+                  <TableToolbarSearch persistent onChange={onInputChange} />
+                </TableToolbarContent>
+              </TableToolbar>
+              <Table {...getTableProps()} aria-label={t('encounters', 'Encounters')}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        key={header.key}
+                        {...getHeaderProps({
+                          header,
+                        })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
+                    <TableHeader aria-label={t('actions', 'Actions')} />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, index) => (
+                    <TableRow
+                      key={row.id}
+                      {...getRowProps({
+                        row,
+                      })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                      <TableCell className="cds--table-column-menu">
+                        <OverflowMenu size="sm" flipped>
+                          <OverflowMenuItem onClick={() => handler(encounters[index])}>
+                            {t('review', 'Review')}
+                          </OverflowMenuItem>
+                        </OverflowMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+      </Layer>
       {paginated && (
         <Pagination
           forwardText="Next page"

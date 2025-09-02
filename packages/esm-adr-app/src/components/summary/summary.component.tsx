@@ -5,7 +5,20 @@ import styles from './summary.scss';
 import AdrEncounter from '../encounters/adr-encounter.component';
 import { useTranslation } from 'react-i18next';
 import { useAdrAssessmentEncounter } from '../encounters/encounter.resource';
-import { DataTableSkeleton, DatePicker, DatePickerInput } from '@carbon/react';
+import {
+  Button,
+  Checkbox,
+  DataTableSkeleton,
+  Layer,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+  TextInput,
+} from '@carbon/react';
+import { CloudMonitoring, Activity, IbmWatsonDiscovery, Settings, Search } from '@carbon/react/icons';
+import PatientSearch from '../patient-search/patient-search.component';
 
 type SummaryProps = {};
 
@@ -45,39 +58,22 @@ const Summary: React.FC<SummaryProps> = () => {
   }
 
   return (
-    <>
-      <div className={styles.filterContainer}>
-        <DatePicker
-          maxDate={new Date()}
-          datePickerType="range"
-          className={styles.dateRangePicker}
-          value={[...dateRange]}
-          onChange={handleDateRangeChange}>
-          <DatePickerInput
-            id="date-picker-input-id-start"
-            placeholder="mm/dd/yyyy"
-            labelText={t('startDate', 'Start date')}
-            size="md"
-          />
-          <DatePickerInput
-            id="date-picker-input-id-finish"
-            placeholder="mm/dd/yyyy"
-            labelText={t('endDate', 'End date')}
-            size="md"
-          />
-        </DatePicker>
-      </div>
-      <div className={styles.summaryContainer}>
-        <div className={styles.summaryCard}>
-          <h4>{t('adrAssessment', 'ADR Assessment')}</h4>
-          <div>
-            <h6>{t('totalAdrAssessment', 'Total ADR assessment')}</h6>
-            <p>{counts.assessment}</p>
-          </div>
-        </div>
-      </div>
-      <AdrEncounter encounters={encounters} />
-    </>
+    <div className={styles.summaryContainer}>
+      <Tabs>
+        <TabList contained>
+          <Tab renderIcon={Search}>{t('search', 'Search')}</Tab>
+          <Tab renderIcon={CloudMonitoring}>{t('adrEncounters', 'ADR Encounters')}</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <PatientSearch />
+          </TabPanel>
+          <TabPanel>
+            <AdrEncounter encounters={encounters} />
+          </TabPanel>
+        </TabPanels>
+      </Tabs>
+    </div>
   );
 };
 

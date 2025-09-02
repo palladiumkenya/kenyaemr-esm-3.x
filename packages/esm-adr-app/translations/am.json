@@ -1,12 +1,14 @@
 {
+  "actions": "Actions",
   "adrAssessment": "የኤዲአር ግምገማ",
   "adrAssessmentEncounters": "የኤዲአር ግምገማ ግኝቶች",
+  "adrEncounters": "ADR Encounters",
   "encounters": "ግኝቶች",
-  "endDate": "የማብቂያ ቀን",
+  "error": "Error",
+  "loading": "Loading...",
   "noAdrEncountersFound": "ምንም የኤዲአር ግኝቶች አልተገኙም",
   "noEncountersFoundTitle": "ምንም ግኝቶች አልተገኙም",
   "review": "ይገምግሙ",
-  "startDate": "የመጀመሪያ ቀን",
-  "summaryOfAdrAssessmentEncounters": "የኤዲአር ግምገማ ግኝቶች ማጠቃለያ",
-  "totalAdrAssessment": "ጠቅላላ የኤዲአር ግምገማ"
+  "search": "Search",
+  "summaryOfAdrAssessmentEncounters": "የኤዲአር ግምገማ ግኝቶች ማጠቃለያ"
 }
