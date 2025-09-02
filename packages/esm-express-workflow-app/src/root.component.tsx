@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { useLeftNav } from '@openmrs/esm-framework';
+
 import styles from './root.scss';
 import DashboardContainer from './components/dashboard/dashboard-container.component';
 import { spaBasePath } from './constants';

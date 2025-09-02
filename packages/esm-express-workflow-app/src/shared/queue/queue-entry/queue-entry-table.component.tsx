@@ -1,32 +1,21 @@
 import React from 'react';
-import {
-  DataTable,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-  DataTableSkeleton,
-  Pagination,
-} from '@carbon/react';
-import { useQueueEntries } from '../../../hooks/useServiceQueues';
+import { DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell, Pagination } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { age, ConfigurableLink, formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
-import styles from './queue-entry-table.scss';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+
+import styles from './queue-entry-table.scss';
 import { spaBasePath } from '../../../constants';
-import { Queue } from '../../../types/index';
+import { type QueueEntry } from '../../../types/index';
 
 type QueueEntryTableProps = {
   navigatePath?: string;
-  queue: Queue | null;
+  queueEntries: Array<QueueEntry>;
 };
 
-const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triage', queue }) => {
-  const { t } = useTranslation();
-  const { queueEntries, isLoading, error } = useQueueEntries({ location: [queue?.location.uuid] });
+const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triage', queueEntries }) => {
   const pageSize = 10;
+  const { t } = useTranslation();
   const { currentPage, goTo, results } = usePagination(queueEntries, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, queueEntries.length, currentPage, results.length);
 
@@ -71,12 +60,8 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triag
     priority: queueEntry.priority.name.display,
   }));
 
-  if (isLoading) {
-    return <DataTableSkeleton aria-label={t('queueEntries', 'Queue Entries')} />;
-  }
-
   if (queueEntries.length === 0) {
-    return <div>{t('noQueueEntries', 'No queue entries found')}</div>;
+    return <div>{t('noPatientsAwaiting', 'No patients awaiting service')}</div>;
   }
 
   return (
@@ -110,7 +95,7 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triag
         page={currentPage}
         pageSize={pageSize}
         totalItems={queueEntries.length}
-        onChange={({ page, pageSize }) => {
+        onChange={({ page }) => {
           goTo(page);
         }}
       />

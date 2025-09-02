@@ -1,16 +1,12 @@
-import React, { useEffect, useMemo } from 'react';
-import {
-  ErrorState,
-  ExtensionSlot,
-  fetchCurrentPatient,
-  setCurrentVisit,
-  WorkspaceContainer,
-} from '@openmrs/esm-framework';
+import React, { useMemo } from 'react';
+import useSWR from 'swr';
+import { ErrorState, ExtensionSlot, fetchCurrentPatient, WorkspaceContainer } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
-import styles from './patient-chart.scss';
 import { InlineLoading, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import useSWR from 'swr';
+
+import { useInitialize } from './useInitialize';
+import styles from './patient-chart.scss';
 
 const PatientChart: React.FC = () => {
   const { t } = useTranslation();
@@ -24,14 +20,7 @@ const PatientChart: React.FC = () => {
 
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
-  useEffect(() => {
-    if (patientUuid) {
-      setCurrentVisit(patientUuid, null);
-    }
-    return () => {
-      setCurrentVisit(null, null);
-    };
-  }, [patientUuid]);
+  useInitialize(patientUuid, state);
 
   if (isLoading) {
     return <InlineLoading description={t('loadingPatient', 'Loading patient...')} />;
@@ -41,22 +30,34 @@ const PatientChart: React.FC = () => {
     return <ErrorState headerTitle={t('errorLoadingPatient', 'Error loading patient')} error={error} />;
   }
 
+  // TODO: A config to dynamically add tabs through dashboard config
+  const patientChartTabsExtensionSlotConfig = [
+    {
+      title: t('vitalsAndAnthropometric', 'Vitals and Anthropometric'),
+      slotName: 'vitals-and-anthropometric-slot',
+    },
+    {
+      title: t('programManagement', 'Program Management'),
+      slotName: 'program-management-slot',
+    },
+  ];
+
   return (
     <div className={styles.patientChart}>
       {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
       <div className={styles.tabsContainer}>
         <Tabs>
           <TabList contained>
-            <Tab>{t('vitalsAndAnthropometric', 'Vitals and Anthropometric')}</Tab>
-            <Tab>{t('programManagement', 'Program Management')}</Tab>
+            {patientChartTabsExtensionSlotConfig.map((tabConfig, index) => (
+              <Tab key={index}>{tabConfig.title}</Tab>
+            ))}
           </TabList>
           <TabPanels>
-            <TabPanel>
-              <ExtensionSlot name="vitals-and-anthropometric-slot" state={state} />
-            </TabPanel>
-            <TabPanel>
-              <ExtensionSlot name="program-management-slot" state={state} />
-            </TabPanel>
+            {patientChartTabsExtensionSlotConfig.map((tabConfig, index) => (
+              <TabPanel key={index}>
+                <ExtensionSlot className={styles.extensionSlot} name={tabConfig.slotName} state={state} />
+              </TabPanel>
+            ))}
           </TabPanels>
         </Tabs>
         <WorkspaceContainer

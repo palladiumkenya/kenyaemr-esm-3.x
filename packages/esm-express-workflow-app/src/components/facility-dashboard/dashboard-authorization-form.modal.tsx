@@ -77,7 +77,7 @@ const DashboardAuthorizationForm: FC<DashboardAuthorizationFormProps> = ({ onClo
             <TextInput
               {...field}
               id={'username'}
-              labelText={t('usename', 'Username')}
+              labelText={t('userName', 'User name')}
               invalid={Boolean(fieldState?.error)}
               invalidText={fieldState?.error?.message}
             />
