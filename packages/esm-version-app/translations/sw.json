@@ -1,13 +1,13 @@
 {
-  "Billing module": "Billing module",
+  "Accounting module": "Accounting module",
   "Claims management": "Claims management",
   "clinicalConsultation": "Clinical consultation",
   "Home": "Home",
   "Linkage services": "Linkage services",
   "Mortuary": "Mortuary",
-  "Patient services": "Patient services",
+  "Queues and Appointment": "Queues and Appointment",
   "Referrals": "Referrals",
   "Registration": "Registration",
   "systemInfo": "System Info",
-  "Wards": "Wards"
+  "Admissions": "Admissions"
 }

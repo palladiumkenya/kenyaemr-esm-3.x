@@ -39,7 +39,7 @@ export const diagnosticsDashboardNavGroup = getSyncLifecycle(
 export const patientServicesDashboardNavGroup = getSyncLifecycle(
   createDashboardGroup({
     slotName: 'patient-services-group-nav-slot',
-    title: 'Patient services',
+    title: 'Queues and Appointment',
     icon: UserMultiple,
     isExpanded: false,
   }),
@@ -59,7 +59,7 @@ export const linkageServicesDashboardNavGroup = getSyncLifecycle(
 export const billingDashboardNavGroup = getSyncLifecycle(
   createDashboardGroup({
     slotName: 'billing-dashboard-group-nav-slot',
-    title: 'Billing module',
+    title: 'Accounting module',
     icon: Money,
     isExpanded: false,
   }),
@@ -102,9 +102,9 @@ export const referralsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/referrals', title: 'Referrals', icon: TcpIpService }),
   options,
 );
-// t('Wards', 'Wards')
+// t('Admissions', 'Admissions')
 export const wardsDashboardLink = getSyncLifecycle(
-  createLeftPanelLink({ route: '/home/ward', title: 'Wards', icon: HospitalBed }),
+  createLeftPanelLink({ route: '/home/ward', title: 'Admissions', icon: HospitalBed }),
   options,
 );
 // t('Mortuary', 'Mortuary')
