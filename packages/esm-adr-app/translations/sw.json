@@ -1,14 +1,12 @@
 {
-  "actions": "Actions",
   "adrAssessment": "ADR Assessment",
   "adrAssessmentEncounters": "ADR Assessment Encounters",
-  "adrEncounters": "ADR Encounters",
   "encounters": "Encounters",
-  "error": "Error",
-  "loading": "Loading...",
+  "endDate": "End date",
   "noAdrEncountersFound": "Adr assessment encounters",
   "noEncountersFoundTitle": "No encounters found",
   "review": "Review",
-  "search": "Search",
-  "summaryOfAdrAssessmentEncounters": "Summary of ADR assessment encounters"
+  "startDate": "Start date",
+  "summaryOfAdrAssessmentEncounters": "Summary of ADR assessment encounters",
+  "totalAdrAssessment": "Total ADR assessment"
 }
