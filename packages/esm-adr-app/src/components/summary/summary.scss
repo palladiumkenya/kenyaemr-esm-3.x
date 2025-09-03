@@ -2,8 +2,11 @@
 @use '@carbon/colors';
 
 .summaryContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: layout.$spacing-05;
   padding: layout.$spacing-05;
-  background-color: colors.$white;
 }
 
 .summaryCard {
