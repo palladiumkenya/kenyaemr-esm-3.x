@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
 import { Routes, BrowserRouter, Route } from 'react-router-dom';
-import { setLeftNav, unsetLeftNav } from '@openmrs/esm-framework';
+import { setLeftNav, unsetLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import Dashboard from './components/dashboard/home-dashboard.component';
-import AdrPatientSummary from './components/adr-patient-summary/patient-summary.component';
 
 const AdrAssessmentApp = () => {
   const spaBasePath = `${window.spaBase}/adr-assessment`;
@@ -18,8 +17,8 @@ const AdrAssessmentApp = () => {
         <Routes>
           <Route path="/adr-assessment" element={<Dashboard />} />
           <Route path="/adr-assessment/:dashboard/*" element={<Dashboard />} />
-          <Route path="/adr-assessment/:dashboard/:patientUuid" element={<AdrPatientSummary />} />
         </Routes>
+        <WorkspaceContainer key="adr-assessment" contextKey="adr-assessment"></WorkspaceContainer>
       </BrowserRouter>
     </main>
   );
