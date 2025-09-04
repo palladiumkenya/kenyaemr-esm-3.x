@@ -24,10 +24,9 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
     try {
       return getDependentsFromContacts(patient);
     } catch (error) {
-      console.error('Error getting dependents:', error);
       return [];
     }
-  }, [patient?.id]);
+  }, [patient]);
 
   const dependentUuids = useMemo(() => {
     return dependents.map((dependent) => {
@@ -240,7 +239,7 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
     };
 
     searchForExistingPatients();
-  }, [dependents]);
+  }, [dependents, localPatientCache]);
 
   if (dependents.length === 0) {
     return <div>{t('noDependentsFound', 'No dependents found for this patient')}</div>;
