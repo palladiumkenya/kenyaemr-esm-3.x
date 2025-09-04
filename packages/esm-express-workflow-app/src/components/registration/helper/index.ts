@@ -562,7 +562,6 @@ export const getEligibilityTags = (patient: fhir.Patient, eligibilityData?: Elig
   const hasValidCRSHA = hasCROrSHANumber(patient);
   const parsedEligibilityData = parseEligibilityResponse(eligibilityData);
 
-  // PHC eligibility check
   if (hasValidCRSHA) {
     tags.push({ text: 'Eligible for PHC', type: 'green' });
   }
@@ -570,7 +569,6 @@ export const getEligibilityTags = (patient: fhir.Patient, eligibilityData?: Elig
   if (parsedEligibilityData) {
     const { status, coverageType, reason } = parsedEligibilityData;
 
-    // Coverage type tag (always show if available)
     if (coverageType) {
       const formatCoverageType = (type: string) => {
         return type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
@@ -582,7 +580,6 @@ export const getEligibilityTags = (patient: fhir.Patient, eligibilityData?: Elig
     }
 
     if (status === 1) {
-      // Patient is eligible
       if (!hasValidCRSHA) {
         tags.push({ text: 'Eligible for PHC', type: 'green' });
       }
@@ -593,21 +590,18 @@ export const getEligibilityTags = (patient: fhir.Patient, eligibilityData?: Elig
         tags.push({ text: 'Eligible for Civil Servants Scheme', type: 'purple' });
       }
     } else {
-      // Patient is not eligible
       if (!hasValidCRSHA) {
         tags.push({ text: 'Not eligible for PHC', type: 'red' });
       }
 
-      // Add reason tag if available
       if (reason && reason.trim()) {
         tags.push({
-          text: `Reason: ${reason}`,
+          text: `${reason}`,
           type: 'red',
         });
       }
     }
   } else if (!hasValidCRSHA) {
-    // No eligibility data and no valid CR/SHA
     tags.push({ text: 'Not eligible for PHC', type: 'red' });
   }
 

@@ -1,0 +1,10 @@
+@use '@carbon/layout';
+
+.metricTilesSlot {
+  display: flex;
+  margin: layout.$spacing-03 layout.$spacing-03 0 layout.$spacing-03;
+
+  [data-extension-id] {
+    flex-grow: 1;
+  }
+}

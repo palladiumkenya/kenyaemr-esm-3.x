@@ -26,19 +26,24 @@ const GENDER_ICONS = {
   Male: <GenderMale />,
 } as const;
 
-const GENDER_MAP = {
+const GENDER_MAP: Record<string, 'Male' | 'Female'> = {
   male: 'Male',
   female: 'Female',
-} as const;
+  m: 'Male',
+  f: 'Female',
+};
 
 const getGender = (gender: string) => {
-  const normalizedGender = gender.toLowerCase() as Gender;
+  const normalizedGender = gender.toLowerCase();
   const iconKey = GENDER_MAP[normalizedGender] ?? 'Unknown';
+
   return {
-    displayText: getCoreTranslation(normalizedGender, gender),
+    displayText: iconKey,
     iconKey,
   };
 };
+
+
 
 export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPatientInfoProps> = ({
   patient,

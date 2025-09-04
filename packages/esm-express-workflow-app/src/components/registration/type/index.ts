@@ -311,3 +311,19 @@ export interface SearchBarProps {
   hasDifferences: (local: fhir.Patient, hie: fhir.Patient) => boolean;
   handleOtpVerification: (patient: fhir.Patient) => void;
 }
+
+export interface OtpPayload {
+  otp: string;
+  receiver: string;
+}
+
+export interface OtpContext extends Record<string, string | number> {
+  otp: string;
+  patient_name: string;
+  expiry_time: number;
+}
+
+export interface OtpResponse {
+  success: boolean;
+  message: string;
+}

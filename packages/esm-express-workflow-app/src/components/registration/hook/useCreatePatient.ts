@@ -7,7 +7,7 @@ export interface PatientRegistrationPayload {
   name: string;
   gender: string;
   birthDate?: string;
-  patientData: HIEPatient | any; // Can be HIE patient or dependent contact data
+  patientData: HIEPatient | any;
   type: 'hie-patient' | 'dependent';
 }
 

@@ -1,16 +1,18 @@
+// Updated SearchBar component with proper patient rendering logic
 import React, { useState } from 'react';
 import styles from './search.scss';
-import { navigate, showToast, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, launchWorkspace, navigate, showToast, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon, Add, CloseLarge } from '@carbon/react/icons';
 import { Button, Column, ComboBox, InlineLoading, Search, Tile } from '@carbon/react';
 import { type HIEBundleResponse, type IdentifierTypeItem, type LocalResponse } from '../type';
 import { getNationalIdFromPatient, convertLocalPatientToFHIR } from '../helper';
 import { searchPatientFromHIE, usePatient, useSHAEligibility } from './search-bar.resource';
-import { PatientSearchConfig } from '../../../config-schema';
 import { EmptySvg } from '../empty-svg/empty-svg.component';
 import HIEDisplayCard from '../card/HIE-card/hie-card.component';
+import { ExpressWorkflowConfig } from '../../../config-schema';
 import LocalPatientCard from '../card/Local-card/local-card.component';
+import Metrics from '../metrics/metrics.component';
 
 const SearchBar: React.FC = () => {
   const { t } = useTranslation();
@@ -60,6 +62,70 @@ const SearchBar: React.FC = () => {
     }
   };
 
+  // Helper function to get National IDs from HIE patients for comparison
+  const getHiePatientNationalIds = (results: Array<HIEBundleResponse> | null): Set<string> => {
+    const nationalIds = new Set<string>();
+
+    if (!results || !Array.isArray(results)) return nationalIds;
+
+    results.forEach((bundle) => {
+      bundle.entry?.forEach((entry) => {
+        const nationalId = getNationalIdFromPatient(entry.resource);
+        if (nationalId) {
+          nationalIds.add(nationalId);
+        }
+      });
+    });
+
+    return nationalIds;
+  };
+
+  // Helper function to get National IDs from local patients for comparison
+  const getLocalPatientNationalIds = (results: LocalResponse | null): Set<string> => {
+    const nationalIds = new Set<string>();
+
+    if (!results || !Array.isArray(results)) return nationalIds;
+
+    results.forEach((patient) => {
+      const fhirPatient = convertLocalPatientToFHIR(patient);
+      const nationalId = getNationalIdFromPatient(fhirPatient);
+      if (nationalId) {
+        nationalIds.add(nationalId);
+      }
+    });
+
+    return nationalIds;
+  };
+
+  // Helper function to filter HIE results that don't exist locally
+  const filterHieResults = (
+    hieResults: Array<HIEBundleResponse> | null,
+    localResults: LocalResponse | null,
+  ): Array<HIEBundleResponse> | null => {
+    if (!hieResults || !Array.isArray(hieResults)) return hieResults;
+    if (!localResults || !Array.isArray(localResults)) return hieResults;
+
+    const localNationalIds = getLocalPatientNationalIds(localResults);
+
+    const filteredResults = hieResults
+      .map((bundle) => {
+        const filteredEntries =
+          bundle.entry?.filter((entry) => {
+            const nationalId = getNationalIdFromPatient(entry.resource);
+            return nationalId ? !localNationalIds.has(nationalId) : true;
+          }) || [];
+
+        return {
+          ...bundle,
+          entry: filteredEntries,
+          total: filteredEntries.length,
+        };
+      })
+      .filter((bundle) => bundle.entry && bundle.entry.length > 0);
+
+    return filteredResults.length > 0 ? filteredResults : null;
+  };
+
   const getHiePatientCount = (results: Array<HIEBundleResponse> | null): number => {
     if (!results || !Array.isArray(results)) return 0;
     return results.reduce((total, bundle) => {
@@ -83,53 +149,84 @@ const SearchBar: React.FC = () => {
   const renderSearchResults = () => {
     if (!hasSearched) return null;
 
+    // Filter HIE results to exclude patients that exist locally
+    const filteredHieResults = filterHieResults(searchResults, localSearchResults);
+
     const hasHieResults =
-      searchResults &&
-      Array.isArray(searchResults) &&
-      searchResults.length > 0 &&
-      searchResults.some((bundle) => bundle.total > 0 && bundle.entry && bundle.entry.length > 0);
+      filteredHieResults &&
+      Array.isArray(filteredHieResults) &&
+      filteredHieResults.length > 0 &&
+      filteredHieResults.some((bundle) => bundle.total > 0 && bundle.entry && bundle.entry.length > 0);
 
     const hasLocalResults = localSearchResults && Array.isArray(localSearchResults) && localSearchResults.length > 0;
 
-    // if (!hasHieResults && !hasLocalResults) {
-    //   return <ErrorState subTitle={t('checkFilters', 'Please check the filters above and try again')} />;
-    // }
+    // Show empty state if no results found
+    if (!hasHieResults && !hasLocalResults) {
+      return (
+        <div className={styles.emptyStateContainer}>
+          <EmptySvg />
+          <p className={styles.title}>{t('noPatientFound', 'No Patient Found')}</p>
+          <p className={styles.subTitle}>
+            {t('tryDifferentIdentifier', 'Try searching with a different identifier or check the identifier type')}
+          </p>
+        </div>
+      );
+    }
+
+    console.log('Rendering search results:', {
+      hasSearched,
+      hasHieResults,
+      hasLocalResults,
+      filteredHieResults,
+      localSearchResults,
+      hieResultCount: getHiePatientCount(filteredHieResults),
+      localResultCount: localSearchResults?.length || 0,
+    });
 
     return (
       <div className={styles.searchResultsContainer}>
-        {hasHieResults && (
-          <div className={styles.hieResultsSection}>
+        {/* Render Local Patient Results First - Revisit Patients */}
+        {hasLocalResults && (
+          <div className={styles.localResultsSection}>
             <div className={styles.resultsHeader}>
               <span className={styles.identifierTypeHeader}>
-                {t('hieResults', 'Patient(s) found {{count}}', {
-                  count: getHiePatientCount(searchResults),
+                {t('revisitPatientResults', 'Revisit patient(s) ({{count}})', {
+                  count: localSearchResults?.length || 0,
                 })}
               </span>
             </div>
             <div>
-              {searchResults!.map((bundle, index) => (
+              <LocalPatientCard
+                localSearchResults={localSearchResults!}
+                syncedPatients={syncedPatients}
+                searchedNationalId={searchedNationalId}
+                otpExpiryMinutes={5}
+                hieSearchResults={searchResults}
+              />
+            </div>
+          </div>
+        )}
+
+        {hasHieResults && (
+          <div className={styles.hieResultsSection}>
+            <div className={styles.resultsHeader}>
+              <span className={styles.identifierTypeHeader}>
+                {t('newPatientResults', 'New patient(s) found ({{count}})', {
+                  count: getHiePatientCount(filteredHieResults),
+                })}
+              </span>
+            </div>
+            <div>
+              {filteredHieResults!.map((bundle, index) => (
                 <HIEDisplayCard
                   key={`hie-${index}`}
                   bundle={bundle}
                   bundleIndex={index}
                   searchedNationalId={searchedNationalId}
+                  otpExpiryMinutes={5}
+                  localSearchResults={localSearchResults}
                 />
               ))}
-            </div>
-          </div>
-        )}
-
-        {hasLocalResults && !syncedPatients.has(convertLocalPatientToFHIR(localSearchResults[0]).id) && (
-          <div className={styles.localResultsSection}>
-            <div className={styles.resultsHeader}>
-              <span className={styles.identifierTypeHeader}>{t('revisitPatient', 'Revisit patient')}</span>
-            </div>
-            <div>
-              <LocalPatientCard
-                localSearchResults={localSearchResults}
-                syncedPatients={syncedPatients}
-                searchedNationalId={searchedNationalId}
-              />
             </div>
           </div>
         )}
@@ -156,22 +253,13 @@ const SearchBar: React.FC = () => {
     setShowDependentsForPatient(new Set());
 
     try {
-      console.log('Step 1: Starting HIE search...');
-      console.log('Step 2: Starting eligibility check...');
-      console.log('Step 3: Starting local search...');
-
-      // Set search query for local search hook (this will trigger the usePatient hook)
       setSearchQuery(identifier.trim());
 
-      // Run HIE search - the local search will be handled by the usePatient hook automatically
       const [hiePatientData] = await Promise.allSettled([searchPatientFromHIE(identifierType, identifier.trim())]);
 
-      console.log('HIE search completed');
 
-      // Process HIE results
       let normalizedHieResults: Array<HIEBundleResponse> | null = null;
       if (hiePatientData.status === 'fulfilled' && hiePatientData.value) {
-        console.log('HIE search successful:', hiePatientData.value);
         if (Array.isArray(hiePatientData.value)) {
           normalizedHieResults = hiePatientData.value;
         } else {
@@ -179,22 +267,17 @@ const SearchBar: React.FC = () => {
         }
         setSearchResults(normalizedHieResults);
 
-        // Set National ID from HIE results for eligibility check
         const firstPatient = normalizedHieResults[0]?.entry?.[0]?.resource;
         if (firstPatient) {
           const nationalId = getNationalIdFromPatient(firstPatient);
           if (nationalId) {
-            console.log('Step 2a: Checking eligibility for National ID:', nationalId);
             setSearchedNationalId(nationalId);
           }
         }
-      } else if (hiePatientData.status === 'rejected') {
-        console.error('HIE search failed:', hiePatientData.reason);
       }
 
       setHasSearched(true);
     } catch (error: any) {
-      console.error('Unexpected error during search:', error);
       setHasSearched(true);
       showToast({
         title: t('error', 'Error'),
@@ -203,24 +286,8 @@ const SearchBar: React.FC = () => {
       });
     } finally {
       setIsSearching(false);
-      console.log('Search process completed');
     }
   };
-
-  // Process local patient data from hook
-  React.useEffect(() => {
-    if (localPatientData && localPatientData.length > 0 && hasSearched) {
-      console.log('Local search successful:', localPatientData);
-      setLocalSearchResults(localPatientData);
-    }
-  }, [localPatientData, hasSearched]);
-
-  // Log eligibility results when available
-  React.useEffect(() => {
-    if (eligibilityResponse && searchedNationalId) {
-      console.log('Eligibility check successful:', eligibilityResponse);
-    }
-  }, [eligibilityResponse, searchedNationalId]);
 
   return (
     <>
@@ -246,36 +313,37 @@ const SearchBar: React.FC = () => {
 
             <Column className={styles.identifierNumberColumn}>
               <span className={styles.identifierTypeHeader}>{t('identifierNumber', 'Identifier number*')}</span>
-              <Search
-                labelText={t('enterIdentifierNumber', 'Enter identifier number')}
-                className={styles.formSearch}
-                value={identifier}
-                placeholder={t('enterIdentifierNumber', 'Enter identifier number')}
-                id="formSearchHealthWorkers"
-                onChange={(value) => setIdentifier(value.target.value)}
-                onKeyPress={(event) => {
-                  if (event.key === 'Enter' && !isSearching && identifierType && identifier.trim()) {
-                    handleSearchPatient();
-                  }
-                }}
-              />
-            </Column>
-            <Column>
-              <Button
-                kind="primary"
-                onClick={handleSearchPatient}
-                size="md"
-                renderIcon={SearchIcon}
-                disabled={isSearching || !identifierType || !identifier.trim()}
-                className={styles.searchButton}>
-                {isSearching || isLocalSearching ? (
-                  <div style={{ alignItems: 'center' }}>
-                    <InlineLoading status="active" description={t('pullFromHIE', 'Pulling from registry...')} />
-                  </div>
-                ) : (
-                  t('searchPatients', 'Search for Patient(s)')
-                )}
-              </Button>
+              <div className={styles.searchInputContainer}>
+                <Search
+                  labelText={t('enterIdentifierNumber', 'Enter identifier number')}
+                  className={styles.formSearch}
+                  value={identifier}
+                  placeholder={t('enterIdentifierNumber', 'Enter identifier number')}
+                  id="formSearchHealthWorkers"
+                  onChange={(value) => setIdentifier(value.target.value)}
+                  onKeyPress={(event) => {
+                    if (event.key === 'Enter' && !isSearching && identifierType && identifier.trim()) {
+                      handleSearchPatient();
+                    }
+                  }}
+                />
+                <Button
+                  kind="primary"
+                  onClick={handleSearchPatient}
+                  size="md"
+                  renderIcon={isSearching || isLocalSearching ? undefined : SearchIcon}
+                  className={styles.attachedSearchButton}
+                  disabled={isSearching || !identifierType || !identifier.trim()}>
+                  {isSearching || isLocalSearching ? (
+                    <>
+                      <InlineLoading status="active" />
+                      <span className={styles.loadingText}>{t('searching', 'Searching...')}</span>
+                    </>
+                  ) : (
+                    t('searchPatients', 'Search for Patient(s)')
+                  )}
+                </Button>
+              </div>
             </Column>
           </div>
 

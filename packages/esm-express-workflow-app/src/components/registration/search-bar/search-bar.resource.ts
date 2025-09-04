@@ -37,6 +37,63 @@ export const usePatient = (searchQuery: string) => {
   return { patient, isLoading, error };
 };
 
+// Search local patient by identifier (National ID, Birth Certificate, SHA, etc.)
+export const searchLocalPatientByIdentifier = async (identifierValue: string, identifierType?: string) => {
+  if (!identifierValue) return null;
+
+  try {
+    const customRepresentation =
+      'custom:(patientId,uuid,identifiers,display,patientIdentifier:(uuid,identifier),person:(gender,age,birthdate,birthdateEstimated,personName,addresses,display,dead,deathDate),attributes:(value,attributeType:(uuid,display)))';
+
+    // Search by identifier value
+    const response = await openmrsFetch(
+      `${restBaseUrl}/patient?identifier=${encodeURIComponent(identifierValue)}&v=${customRepresentation}`,
+    );
+
+    if (response?.data?.results && response.data.results.length > 0) {
+      // Return the first matching patient
+      return response.data.results[0];
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error searching local patient by identifier:', error);
+    return null;
+  }
+};
+
+// Hook to search local patient by identifier with caching
+export const useLocalPatientByIdentifier = (identifierValue: string | null) => {
+  const { data, error, isLoading } = useSWR(
+    identifierValue ? `local-patient-${identifierValue}` : null,
+    () => (identifierValue ? searchLocalPatientByIdentifier(identifierValue) : null),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 300000, // 5 minutes
+    },
+  );
+
+  return {
+    localPatient: data,
+    isLoading,
+    error,
+  };
+};
+
+// Search multiple identifiers at once (for dependents)
+export const searchLocalPatientsByIdentifiers = async (identifiers: Array<{ value: string; type: string }>) => {
+  const results = await Promise.allSettled(
+    identifiers.map((identifier) => searchLocalPatientByIdentifier(identifier.value, identifier.type)),
+  );
+
+  return results.map((result, index) => ({
+    identifier: identifiers[index],
+    patient: result.status === 'fulfilled' ? result.value : null,
+    error: result.status === 'rejected' ? result.reason : null,
+  }));
+};
+
 export const useSHAEligibility = (nationalId: string) => {
   const url =
     nationalId && nationalId.trim().length > 0
