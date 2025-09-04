@@ -230,7 +230,8 @@
         "add-drug-order",
         "order-basket",
         "add-lab-order",
-        "express-workflow-workspace"
+        "express-workflow-workspace",
+        "start-visit-workspace-form"
       ]
     }
   ]

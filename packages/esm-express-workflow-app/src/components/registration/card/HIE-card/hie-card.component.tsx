@@ -7,7 +7,15 @@ import styles from '../card.scss';
 import DependentsComponent from '../../dependants/dependants.component';
 import { LocalResponse, type HIEBundleResponse, type EligibilityResponse } from '../../type';
 import { hasDependents } from '../../helper';
-import { launchWorkspace, PatientPhoto, useVisit, showModal, ExtensionSlot } from '@openmrs/esm-framework';
+import {
+  launchWorkspace,
+  PatientPhoto,
+  useVisit,
+  showModal,
+  ExtensionSlot,
+  navigate,
+  closeWorkspace,
+} from '@openmrs/esm-framework';
 import { EnhancedPatientBannerPatientInfo } from '../../patient-banner/patient-banner.component';
 import { findExistingLocalPatient, registerOrLaunchHIEPatient } from '../../search-bar/search-bar.resource';
 import { launchOtpVerificationModal } from '../../../../shared/otp-verification';
@@ -144,9 +152,12 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
     });
   };
 
-  const handleQueuePatient = (activeVisit: any) => {
+  const handleQueuePatient = (activeVisit: any, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
-      closeModal: () => dispose(),
+      closeModal: () => {
+        navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
+        dispose();
+      },
       activeVisit,
     });
   };
@@ -289,7 +300,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                       )}
 
                       {hasLocal && hasActiveVisit && (
-                        <Button kind="secondary" size="sm" onClick={() => handleQueuePatient(activeVisit)}>
+                        <Button kind="secondary" size="sm" onClick={() => handleQueuePatient(activeVisit, patientUuid)}>
                           {t('queuePatient', 'Queue Patient')}
                         </Button>
                       )}
@@ -299,7 +310,27 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                           kind="secondary"
                           size="sm"
                           onClick={async () => {
-                            await registerOrLaunchHIEPatient(patient, t);
+                            const localPatient = await registerOrLaunchHIEPatient(patient, t);
+                            launchWorkspace('start-visit-workspace-form', {
+                              patientUuid: localPatient.uuid,
+                              workspaceTitle: t('checkInPatientWorkspaceTitle', 'Check in patient'),
+                              closeWorkspace: () => {
+                                closeWorkspace('start-visit-workspace-form', {
+                                  onWorkspaceClose: () => {
+                                    navigate({ to: `\${openmrsSpaBase}/patient/${localPatient.uuid}/chart` });
+                                  },
+                                  ignoreChanges: true,
+                                });
+                              },
+                              closeWorkspaceWithSavedChanges: () => {
+                                closeWorkspace('start-visit-workspace-form', {
+                                  onWorkspaceClose: () => {
+                                    navigate({ to: `$\{openmrsSpaBase}/patient/${localPatient.uuid}/chart` });
+                                  },
+                                  ignoreChanges: true,
+                                });
+                              },
+                            });
                           }}>
                           {t('register', 'Register')}
                         </Button>
