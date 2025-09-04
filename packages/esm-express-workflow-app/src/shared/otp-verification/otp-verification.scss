@@ -88,3 +88,15 @@
   text-decoration: underline;
   opacity: 0.8;
 }
+
+.expiryInfo {
+  margin-top: layout.$spacing-05;
+  padding: layout.$spacing-04;
+}
+
+.expiryText {
+  margin: 0;
+  font-size: layout.$spacing-05;
+  line-height: 1.29;
+  font-weight: 400;
+}

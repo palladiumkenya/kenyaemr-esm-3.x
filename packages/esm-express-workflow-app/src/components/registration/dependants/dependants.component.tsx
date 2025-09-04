@@ -1,125 +1,246 @@
-import React, { useState } from 'react';
-import { DataTable, Table, TableHead, TableBody, TableRow, TableCell, TableHeader, Button } from '@carbon/react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { DataTable, Table, TableHead, TableBody, TableRow, TableCell, TableHeader, Button, Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { launchWorkspace, showSnackbar, showModal } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
 import styles from './dependants.scss';
-import { createDependentPatient } from './dependants.resource';
-import { maskName, transformToDependentPayload } from '../helper';
+import { maskName } from '../helper';
+import { findExistingLocalPatient, registerOrLaunchDependent } from '../search-bar/search-bar.resource';
+import { getDependentsFromContacts, useMultipleActiveVisits } from './dependants.resource';
+import { HIEBundleResponse, HIEPatient } from '../type';
 
 type DependentProps = {
-  patient: fhir.Patient;
+  patient: HIEPatient;
+  localSearchResults?: any[] | null;
 };
 
-const DependentsComponent: React.FC<DependentProps> = ({ patient }) => {
+const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchResults = null }) => {
   const { t } = useTranslation();
   const [submittingStates, setSubmittingStates] = useState<Record<string, boolean>>({});
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [localPatientCache, setLocalPatientCache] = useState<Map<string, any>>(new Map());
 
-  const getDependentsFromContacts = (patient: fhir.Patient) => {
-    if (!patient?.contact) {
+  const dependents = useMemo(() => {
+    try {
+      return getDependentsFromContacts(patient);
+    } catch (error) {
+      console.error('Error getting dependents:', error);
       return [];
     }
+  }, [patient?.id]);
 
-    return patient.contact.map((contact, index) => {
-      const relationship = contact.relationship?.[0]?.coding?.[0]?.display || 'Unknown';
+  const dependentUuids = useMemo(() => {
+    return dependents.map((dependent) => {
+      const localPatient = localPatientCache.get(dependent.id);
+      return localPatient?.uuid || null;
+    });
+  }, [dependents, localPatientCache]);
 
-      const name =
-        contact.name?.text?.trim() ||
-        `${contact.name?.given?.join(' ') || ''} ${contact.name?.family || ''}`.trim() ||
-        'Unknown';
+  const visits = useMultipleActiveVisits(dependentUuids);
 
-      const phoneContact = contact.telecom?.find((t) => t.system === 'phone');
-      const phoneNumber = phoneContact?.value || 'N/A';
+  const handleQueuePatient = useCallback((activeVisit: any) => {
+    const dispose = showModal('transition-patient-to-latest-queue-modal', {
+      closeModal: () => dispose(),
+      activeVisit,
+    });
+  }, []);
 
-      const emailContact = contact.telecom?.find((t) => t.system === 'email');
-      const email = emailContact?.value || 'N/A';
+  const handleDependentAction = useCallback(
+    async (dependent: any) => {
+      const localPatient = localPatientCache.get(dependent.id);
 
-      const gender = contact.gender || 'Unknown';
+      if (localPatient) {
+        const localPatientName =
+          localPatient.person?.personName?.display ||
+          `${localPatient.person?.personName?.givenName || ''} ${localPatient.person?.personName?.middleName || ''} ${
+            localPatient.person?.personName?.familyName || ''
+          }`.trim() ||
+          dependent.name;
 
-      const birthDateExtension = contact.extension?.find(
-        (ext) => ext.url === 'https://ts.kenya-hie.health/fhir/StructureDefinition/date_of_birth',
-      );
-      const birthDate = birthDateExtension?.valueString || 'Unknown';
+        launchWorkspace('start-visit-workspace-form', {
+          patientUuid: localPatient.uuid,
+          workspaceTitle: t('checkInPatientWorkspaceTitle', 'Check in patient'),
+        });
+      } else {
+        setSubmittingStates((prev) => ({ ...prev, [dependent.id]: true }));
 
-      const identifierExtensions = contact.extension?.filter((ext) => ext.url === 'identifiers') || [];
-      const shaNumber = identifierExtensions.find(
-        (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'sha-number',
-      )?.valueIdentifier?.value;
+        try {
+          await registerOrLaunchDependent(dependent, t);
+        } catch (error) {
+          showSnackbar({
+            title: t('dependentRegistrationError', 'Error registering dependent'),
+            subtitle: t('dependentRegistrationErrorSubtitle', 'Error registering dependent: {{error}}', {
+              error: (error as Error).message,
+            }),
+            kind: 'error',
+            isLowContrast: false,
+          });
+        } finally {
+          setSubmittingStates((prev) => ({ ...prev, [dependent.id]: false }));
+        }
+      }
+    },
+    [localPatientCache, t],
+  );
 
-      const nationalId = identifierExtensions.find(
-        (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'national-id',
-      )?.valueIdentifier?.value;
+  const headers = useMemo(
+    () => [
+      {
+        key: 'name',
+        header: t('name', 'Name'),
+      },
+      {
+        key: 'relationship',
+        header: t('relationship', 'Relationship'),
+      },
+      {
+        key: 'gender',
+        header: t('gender', 'Gender'),
+      },
+      {
+        key: 'birthDate',
+        header: t('birthDate', 'Birth Date'),
+      },
+      {
+        key: 'identifiers',
+        header: t('identifiers', 'Identifiers'),
+      },
+      {
+        key: 'status',
+        header: t('status', 'Status'),
+      },
+      {
+        key: 'actions',
+        header: t('actions', 'Actions'),
+      },
+    ],
+    [t],
+  );
 
-      const birthCertificate = identifierExtensions.find(
-        (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'birth-certificate',
-      )?.valueIdentifier?.value;
+  const rows = useMemo(() => {
+    return dependents.map((dependent, index) => {
+      const localPatient = localPatientCache.get(dependent.id);
+      const isLocal = !!localPatient;
+      const isSubmitting = submittingStates[dependent.id];
+      const isLoading = loadingStates[dependent.id];
+
+      const visitData = visits[index] || { activeVisit: null, isLoading: false };
+      const dependentActiveVisit = visitData.activeVisit;
+      const isLoadingVisit = visitData.isLoading;
+      const hasActiveVisit = !!dependentActiveVisit;
+
+      const identifierParts = [];
+      if (dependent.nationalId && dependent.nationalId !== 'N/A') {
+        identifierParts.push(`ID: ${dependent.nationalId}`);
+      }
+      if (dependent.shaNumber && dependent.shaNumber !== 'N/A') {
+        identifierParts.push(`SHA: ${dependent.shaNumber}`);
+      }
+      if (dependent.birthCertificate && dependent.birthCertificate !== 'N/A') {
+        identifierParts.push(`BC: ${dependent.birthCertificate}`);
+      }
+      const identifiersDisplay = identifierParts.length > 0 ? identifierParts.join(', ') : 'N/A';
 
       return {
-        id: contact.id || `contact-${index}`,
-        name,
-        relationship,
-        phoneNumber,
-        email,
-        gender,
-        birthDate,
-        shaNumber,
-        nationalId,
-        birthCertificate,
-        contactData: contact,
+        id: dependent.id,
+        name: maskName ? maskName(capitalize(dependent.name.toLowerCase())) : capitalize(dependent.name.toLowerCase()),
+        relationship: capitalize(dependent.relationship.toLowerCase()),
+        gender: capitalize(dependent.gender),
+        birthDate: dependent.birthDate !== 'Unknown' ? dependent.birthDate : 'N/A',
+        status: (
+          <div>
+            {hasActiveVisit && (
+              <Tag type="blue" size="md">
+                {t('checkedIn', 'Checked In')}
+              </Tag>
+            )}
+            {!hasActiveVisit && !isLoadingVisit && (
+              <Tag type="gray" size="md">
+                {t('notCheckedIn', 'Not Checked In')}
+              </Tag>
+            )}
+          </div>
+        ),
+        identifiers: identifiersDisplay,
+        actions: (
+          <div className={styles.actionButtons}>
+            {!isLocal && (
+              <Button
+                size="sm"
+                kind="ghost"
+                onClick={() => handleDependentAction(dependent)}
+                disabled={isSubmitting || isLoading}>
+                {isSubmitting
+                  ? t('processing', 'Processing...')
+                  : isLoading
+                  ? t('searching', 'Searching...')
+                  : t('registerDependent', 'Register Dependent')}
+              </Button>
+            )}
+
+            {isLocal && !hasActiveVisit && (
+              <Button
+                size="sm"
+                kind="secondary"
+                onClick={() => handleDependentAction(dependent)}
+                disabled={isSubmitting || isLoading || isLoadingVisit}>
+                {isLoadingVisit ? t('searching', 'Searching...') : t('checkIn', 'Check In')}
+              </Button>
+            )}
+
+            {isLocal && hasActiveVisit && (
+              <Button
+                size="sm"
+                kind="secondary"
+                onClick={() => handleQueuePatient(dependentActiveVisit)}
+                disabled={isSubmitting || isLoading || isLoadingVisit}>
+                {t('queuePatient', 'Queue Patient')}
+              </Button>
+            )}
+          </div>
+        ),
       };
     });
-  };
+  }, [
+    dependents,
+    localPatientCache,
+    submittingStates,
+    loadingStates,
+    visits,
+    handleDependentAction,
+    handleQueuePatient,
+    t,
+  ]);
 
-  const dependents = getDependentsFromContacts(patient);
-
-  const handleRegisterDependent = async (dependent: any) => {
-    setSubmittingStates((prev) => ({ ...prev, [dependent.id]: true }));
-
-    try {
-      const dependentPayload = transformToDependentPayload(dependent);
-      await createDependentPatient(dependentPayload, t);
-    } catch (error) {
-      console.error('Failed to register dependent:', error);
-    } finally {
-      setSubmittingStates((prev) => ({ ...prev, [dependent.id]: false }));
+  useEffect(() => {
+    if (dependents.length === 0) {
+      return;
     }
-  };
 
-  const headers = [
-    {
-      key: 'name',
-      header: t('name', 'Name'),
-    },
-    {
-      key: 'relationship',
-      header: t('relationship', 'Relationship'),
-    },
-    {
-      key: 'gender',
-      header: t('gender', 'Gender'),
-    },
-    {
-      key: 'actions',
-      header: t('actions', 'Actions'),
-    },
-  ];
+    const searchForExistingPatients = async () => {
+      const searchPromises = dependents.map(async (dependent) => {
+        if (localPatientCache.has(dependent.id)) {
+          return;
+        }
 
-  const rows = dependents.map((dependent) => ({
-    id: dependent.id,
-    name: maskName(capitalize(dependent.name.toLowerCase())),
-    relationship: capitalize(dependent.relationship.toLowerCase()),
-    gender: capitalize(dependent.gender),
-    actions: (
-      <Button
-        size="sm"
-        kind="ghost"
-        onClick={() => handleRegisterDependent(dependent)}
-        disabled={submittingStates[dependent.id]}>
-        {submittingStates[dependent.id]
-          ? t('registering', 'Registering...')
-          : t('registerDependent', 'Register Dependent')}
-      </Button>
-    ),
-  }));
+        setLoadingStates((prev) => ({ ...prev, [dependent.id]: true }));
+
+        try {
+          const existingPatient = await findExistingLocalPatient(dependent.contactData, true);
+          setLocalPatientCache((prev) => new Map(prev.set(dependent.id, existingPatient)));
+        } catch (error) {
+          console.warn(`Error searching for dependent ${dependent.id}:`, error);
+          setLocalPatientCache((prev) => new Map(prev.set(dependent.id, null)));
+        } finally {
+          setLoadingStates((prev) => ({ ...prev, [dependent.id]: false }));
+        }
+      });
+
+      await Promise.all(searchPromises);
+    };
+
+    searchForExistingPatients();
+  }, [dependents]);
 
   if (dependents.length === 0) {
     return <div>{t('noDependentsFound', 'No dependents found for this patient')}</div>;

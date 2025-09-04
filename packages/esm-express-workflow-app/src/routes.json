@@ -202,12 +202,6 @@
       "component": "triageDashboard",
       "name": "triage-dashboard",
       "slot": "triage-dashboard-slot"
-    },
-    {
-      "component": "visitFormBanner",
-      "name": "visit-form-banner",
-      "slot": "visit-form-header-slot",
-      "order": 0
     }
   ],
   "workspaces": [

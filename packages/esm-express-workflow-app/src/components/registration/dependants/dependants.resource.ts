@@ -2,12 +2,13 @@ import { getSessionLocation, launchWorkspace, openmrsFetch, restBaseUrl, showSna
 import { DependentPayload, HIEPatient } from '../type';
 import { generateIdentifier, getIdentifierTypeUUID } from '../helper';
 import { openmrsId, openmrsIdSource } from '../constant';
+import { useEffect, useState } from 'react';
 
 export interface PatientRegistrationPayload {
   name: string;
   gender: string;
   birthDate?: string;
-  patientData: HIEPatient | any; // Can be HIE patient or dependent contact data
+  patientData: HIEPatient | any;
   type: 'hie-patient' | 'dependent';
 }
 
@@ -25,10 +26,8 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
     let addresses = [];
 
     if (type === 'hie-patient') {
-      // Handle HIE Patient registration
       const hiePatient = patientData as HIEPatient;
 
-      // Extract identifiers from HIE patient
       identifiers =
         hiePatient.identifier
           ?.map((id) => ({
@@ -39,14 +38,12 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
           }))
           .filter((identifier) => identifier.identifierType) || [];
 
-      // Extract names
       const patientName = hiePatient.name?.[0];
       if (patientName) {
         givenName = patientName.given?.[0] || '';
         middleName = patientName.given?.slice(1).join(' ') || '';
         familyName = patientName.family || '';
 
-        // Fallback to text if structured name is not available
         if (!givenName && !familyName && patientName.text) {
           const nameParts = patientName.text.trim().split(' ');
           givenName = nameParts[0] || '';
@@ -58,7 +55,6 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
       patientBirthDate = hiePatient.birthDate;
       patientGender = hiePatient.gender;
 
-      // Extract addresses
       addresses =
         hiePatient.address?.map((addr) => ({
           address1: '',
@@ -70,7 +66,6 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
           countyDistrict: '',
         })) || [];
     } else if (type === 'dependent') {
-      // Handle dependent registration (existing logic)
       const dependentInfo = patientData;
 
       identifiers =
@@ -116,18 +111,16 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
       ];
     }
 
-    // Set preferred identifier
     if (identifiers.length > 0) {
       identifiers[0].preferred = true;
     }
 
-    // Extract phone number for attributes
     const phoneAttributes = [];
     if (type === 'hie-patient') {
       const phoneContact = patientData.telecom?.find((t: any) => t.system === 'phone');
       if (phoneContact?.value) {
         phoneAttributes.push({
-          attributeType: 'b2c38640-2603-4629-aebd-3b54f33f1e3a', // Telephone contact attribute type UUID
+          attributeType: 'b2c38640-2603-4629-aebd-3b54f33f1e3a',
           value: phoneContact.value,
         });
       }
@@ -163,7 +156,6 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
       identifiers: [...identifiers],
     };
 
-    // Generate OpenMRS identifier
     try {
       const identifierResponse = await generateIdentifier(openmrsIdSource);
       const location = await getSessionLocation();
@@ -186,7 +178,7 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
         openmrsIdentifier.preferred = true;
       }
     } catch (identifierError) {
-      console.warn('Failed to generate OpenMRS identifier, proceeding without it:', identifierError);
+      throw new Error('Failed to generate OpenMRS identifier');
     }
 
     if (registrationPayload.identifiers.length === 0) {
@@ -237,7 +229,6 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
   }
 }
 
-// Wrapper function for backward compatibility with dependent registration
 export async function createDependentPatient(dependent: DependentPayload, t: any) {
   const payload: PatientRegistrationPayload = {
     name: dependent.name,
@@ -248,7 +239,6 @@ export async function createDependentPatient(dependent: DependentPayload, t: any
 
   const result = await createPatient(payload, t);
 
-  // Launch start visit workspace for dependents
   launchWorkspace('start-visit-workspace-form', {
     patientUuid: result.uuid,
     workspaceTitle: t('startVisitWorkspaceTitle', 'Start Visit for {{patientName}}', {
@@ -259,7 +249,6 @@ export async function createDependentPatient(dependent: DependentPayload, t: any
   return result;
 }
 
-// New function for HIE patient registration
 export async function createHIEPatient(hiePatient: HIEPatient, t: any) {
   const patientName =
     hiePatient.name?.[0]?.text ||
@@ -276,7 +265,6 @@ export async function createHIEPatient(hiePatient: HIEPatient, t: any) {
 
   const result = await createPatient(payload, t);
 
-  // Launch start visit workspace for HIE patients after registration
   launchWorkspace('start-visit-workspace-form', {
     patientUuid: result.uuid,
     workspaceTitle: t('startVisitWorkspaceTitle', 'Start Visit for {{patientName}}', {
@@ -286,3 +274,136 @@ export async function createHIEPatient(hiePatient: HIEPatient, t: any) {
 
   return result;
 }
+
+export const getDependentsFromContacts = (patient: HIEPatient) => {
+  if (!patient?.contact) {
+    return [];
+  }
+
+  return patient.contact.map((contact, index) => {
+    const relationship = contact.relationship?.[0]?.coding?.[0]?.display || 'Unknown';
+
+    const name =
+      contact.name?.text?.trim() ||
+      `${contact.name?.given?.join(' ') || ''} ${contact.name?.family || ''}`.trim() ||
+      'Unknown';
+
+    const phoneContact = contact.telecom?.find((t) => t.system === 'phone');
+    const phoneNumber = phoneContact?.value || 'N/A';
+
+    const emailContact = contact.telecom?.find((t) => t.system === 'email');
+    const email = emailContact?.value || 'N/A';
+
+    const gender = contact.gender || 'Unknown';
+
+    const birthDateExtension = contact.extension?.find(
+      (ext) => ext.url === 'https://ts.kenya-hie.health/fhir/StructureDefinition/date_of_birth',
+    );
+    const birthDate = birthDateExtension?.valueString || 'Unknown';
+
+    const identifierExtensions = contact.extension?.filter((ext) => ext.url === 'identifiers') || [];
+    const shaNumber = identifierExtensions.find((ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'sha-number')
+      ?.valueIdentifier?.value;
+
+    const nationalId = identifierExtensions.find(
+      (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'national-id',
+    )?.valueIdentifier?.value;
+
+    const birthCertificate = identifierExtensions.find(
+      (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'birth-certificate',
+    )?.valueIdentifier?.value;
+
+    return {
+      id: contact.id || `contact-${index}`,
+      name,
+      relationship,
+      phoneNumber,
+      email,
+      gender,
+      birthDate,
+      shaNumber,
+      nationalId,
+      birthCertificate,
+      contactData: contact,
+    };
+  });
+};
+
+export const useActiveVisit = (patientUuid: string | null) => {
+  const [activeVisit, setActiveVisit] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!patientUuid) {
+      setActiveVisit(null);
+      return;
+    }
+
+    const fetchActiveVisit = async () => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch(
+          `/openmrs/ws/rest/v1/visit?patient=${patientUuid}&includeInactive=false&v=default`,
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        const visits = data?.results || [];
+        setActiveVisit(visits.length > 0 ? visits[0] : null);
+      } catch (err) {
+        console.warn(`Error fetching active visit for patient ${patientUuid}:`, err);
+        setError(err);
+        setActiveVisit(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchActiveVisit();
+  }, [patientUuid]);
+
+  return { activeVisit, isLoading, error };
+};
+
+export const useMultipleActiveVisits = (patientUuids: (string | null)[]) => {
+  const [visits, setVisits] = useState<Array<{ activeVisit: any; isLoading: boolean }>>([]);
+
+  useEffect(() => {
+    const fetchAllActiveVisits = async () => {
+      const visitPromises = patientUuids.map(async (uuid) => {
+        if (!uuid) {
+          return { activeVisit: null, isLoading: false };
+        }
+
+        try {
+          const response = await fetch(`/openmrs/ws/rest/v1/visit?patient=${uuid}&includeInactive=false&v=default`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          const visitResults = data?.results || [];
+          return { activeVisit: visitResults.length > 0 ? visitResults[0] : null, isLoading: false };
+        } catch (error) {
+          console.warn(`Error fetching active visit for patient ${uuid}:`, error);
+          return { activeVisit: null, isLoading: false };
+        }
+      });
+
+      const visitResults = await Promise.all(visitPromises);
+      setVisits(visitResults);
+    };
+
+    if (patientUuids.length > 0) {
+      setVisits(patientUuids.map(() => ({ activeVisit: null, isLoading: true })));
+      fetchAllActiveVisits();
+    } else {
+      setVisits([]);
+    }
+  }, [patientUuids]);
+
+  return visits;
+};

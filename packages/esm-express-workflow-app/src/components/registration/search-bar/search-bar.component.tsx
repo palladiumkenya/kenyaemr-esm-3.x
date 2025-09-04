@@ -1,7 +1,6 @@
-// Updated SearchBar component with proper patient rendering logic
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './search.scss';
-import { ExtensionSlot, launchWorkspace, navigate, showToast, useConfig } from '@openmrs/esm-framework';
+import { navigate, showToast, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon, Add, CloseLarge } from '@carbon/react/icons';
 import { Button, Column, ComboBox, InlineLoading, Search, Tile } from '@carbon/react';
@@ -12,7 +11,6 @@ import { EmptySvg } from '../empty-svg/empty-svg.component';
 import HIEDisplayCard from '../card/HIE-card/hie-card.component';
 import { ExpressWorkflowConfig } from '../../../config-schema';
 import LocalPatientCard from '../card/Local-card/local-card.component';
-import Metrics from '../metrics/metrics.component';
 
 const SearchBar: React.FC = () => {
   const { t } = useTranslation();
@@ -41,16 +39,31 @@ const SearchBar: React.FC = () => {
   const [searchedNationalId, setSearchedNationalId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [syncedPatients, setSyncedPatients] = useState<Set<string>>(new Set());
+  const [isEligibilityReady, setIsEligibilityReady] = useState(false);
 
   const [selectedIdentifierItem, setSelectedIdentifierItem] = useState<IdentifierTypeItem | null>(
     defaultIdentifierType || null,
   );
 
-  // Use the existing hook for eligibility data
   const { data: eligibilityResponse, isLoading: isEligibilityLoading } = useSHAEligibility(searchedNationalId);
-
-  // Use the existing hook for local patient search
   const { patient: localPatientData, isLoading: isLocalSearching } = usePatient(searchQuery);
+
+  useEffect(() => {
+    if (localPatientData && searchQuery) {
+      const localResults: LocalResponse = Array.isArray(localPatientData) ? localPatientData : [localPatientData];
+      setLocalSearchResults(localResults);
+    } else if (searchQuery && !isLocalSearching && !localPatientData) {
+      setLocalSearchResults(null);
+    }
+  }, [localPatientData, searchQuery, isLocalSearching]);
+
+  useEffect(() => {
+    if (searchedNationalId && !isEligibilityLoading) {
+      setIsEligibilityReady(true);
+    } else if (!searchedNationalId) {
+      setIsEligibilityReady(false);
+    }
+  }, [searchedNationalId, isEligibilityLoading]);
 
   const handleIdentifierTypeChange = (selectedItem: IdentifierTypeItem | null): void => {
     if (selectedItem) {
@@ -62,27 +75,6 @@ const SearchBar: React.FC = () => {
     }
   };
 
-  // Helper function to get National IDs from HIE patients for comparison
-  const getHiePatientNationalIds = (results: Array<HIEBundleResponse> | null): Set<string> => {
-    const nationalIds = new Set<string>();
-
-    if (!results || !Array.isArray(results)) {
-      return nationalIds;
-    }
-
-    results.forEach((bundle) => {
-      bundle.entry?.forEach((entry) => {
-        const nationalId = getNationalIdFromPatient(entry.resource);
-        if (nationalId) {
-          nationalIds.add(nationalId);
-        }
-      });
-    });
-
-    return nationalIds;
-  };
-
-  // Helper function to get National IDs from local patients for comparison
   const getLocalPatientNationalIds = (results: LocalResponse | null): Set<string> => {
     const nationalIds = new Set<string>();
 
@@ -101,7 +93,8 @@ const SearchBar: React.FC = () => {
     return nationalIds;
   };
 
-  // Helper function to filter HIE results that don't exist locally
+  // Extract HIE dependents data for local patients
+
   const filterHieResults = (
     hieResults: Array<HIEBundleResponse> | null,
     localResults: LocalResponse | null,
@@ -152,6 +145,7 @@ const SearchBar: React.FC = () => {
     setSearchedNationalId('');
     setShowDependentsForPatient(new Set());
     setSearchQuery('');
+    setIsEligibilityReady(false);
     setSelectedIdentifierItem(defaultIdentifierType || null);
     setIdentifierType(defaultIdentifierType?.key || '');
   };
@@ -161,18 +155,16 @@ const SearchBar: React.FC = () => {
       return null;
     }
 
-    // Filter HIE results to exclude patients that exist locally
     const filteredHieResults = filterHieResults(searchResults, localSearchResults);
-
     const hasHieResults =
       filteredHieResults &&
       Array.isArray(filteredHieResults) &&
       filteredHieResults.length > 0 &&
       filteredHieResults.some((bundle) => bundle.total > 0 && bundle.entry && bundle.entry.length > 0);
-
     const hasLocalResults = localSearchResults && Array.isArray(localSearchResults) && localSearchResults.length > 0;
 
-    // Show empty state if no results found
+    // Get HIE dependents data for local patients
+
     if (!hasHieResults && !hasLocalResults) {
       return (
         <div className={styles.emptyStateContainer}>
@@ -187,7 +179,6 @@ const SearchBar: React.FC = () => {
 
     return (
       <div className={styles.searchResultsContainer}>
-        {/* Render Local Patient Results First - Revisit Patients */}
         {hasLocalResults && (
           <div className={styles.localResultsSection}>
             <div className={styles.resultsHeader}>
@@ -204,6 +195,7 @@ const SearchBar: React.FC = () => {
                 searchedNationalId={searchedNationalId}
                 otpExpiryMinutes={5}
                 hieSearchResults={searchResults}
+                eligibilityResponse={eligibilityResponse}
               />
             </div>
           </div>
@@ -227,6 +219,7 @@ const SearchBar: React.FC = () => {
                   searchedNationalId={searchedNationalId}
                   otpExpiryMinutes={5}
                   localSearchResults={localSearchResults}
+                  eligibilityResponse={eligibilityResponse}
                 />
               ))}
             </div>
@@ -253,6 +246,7 @@ const SearchBar: React.FC = () => {
     setSyncedPatients(new Set());
     setSearchedNationalId('');
     setShowDependentsForPatient(new Set());
+    setIsEligibilityReady(false);
 
     try {
       setSearchQuery(identifier.trim());
