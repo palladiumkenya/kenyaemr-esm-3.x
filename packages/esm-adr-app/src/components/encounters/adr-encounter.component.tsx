@@ -22,12 +22,14 @@ import {
   isDesktop,
   launchWorkspace,
   parseDate,
+  restBaseUrl,
+  showModal,
   useLayoutType,
   usePagination,
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedAdrEncounter } from '../../types';
-import { TaskView } from '@carbon/react/icons';
+import { Printer, TaskView } from '@carbon/react/icons';
 type adrEncounterProps = {
   encounters: Array<MappedAdrEncounter>;
 };
@@ -68,9 +70,24 @@ const AdrEncounter: React.FC<adrEncounterProps> = ({ encounters }) => {
     id: encounter?.encounterUuid,
     provider: encounter?.provider || '--',
     action: (
-      <Button kind="tertiary" renderIcon={ReviewIcon} onClick={() => handler(encounter)}>
-        {t('review', 'Review')}
-      </Button>
+      <>
+        <Button kind="tertiary" renderIcon={ReviewIcon} onClick={() => handler(encounter)}>
+          {t('review', 'Review')}
+        </Button>
+        <Button
+          kind="ghost"
+          size="sm"
+          onClick={() => {
+            const dispose = showModal('adr-print-preview-modal', {
+              onClose: () => dispose(),
+              title: `${t('adrReport', 'ADR Report')} - ${encounter.patientName}`,
+              documentUrl: `/openmrs${restBaseUrl}/kenyaemr/adpdf/view?patientUuid=${encounter.patientUuid}`,
+            });
+          }}
+          renderIcon={Printer}>
+          {t('printReport', 'Print Report')}
+        </Button>
+      </>
     ),
   }));
   if (encounters.length === 0) {
