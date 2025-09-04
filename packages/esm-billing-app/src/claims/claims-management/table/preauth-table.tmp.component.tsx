@@ -6,7 +6,7 @@ const PreauthTableTemporary: React.FC = () => {
     <ClaimsTable
       title="preauthsRequests"
       emptyStateText="emptyPreauthState"
-      emptyStateHeader="emptyPreauthHeader"
+      emptyStateHeader="Preauth"
       includeClaimCode={false}
       use="preauthorization"
     />
