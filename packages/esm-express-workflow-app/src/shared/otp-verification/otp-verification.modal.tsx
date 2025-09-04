@@ -60,7 +60,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
       onClose?.();
       onVerificationSuccess?.();
     } catch (error) {
-      setError({ type: 'verification', error });
+      setError({ type: 'verification', error: error as Error });
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +79,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
       setIsCountdownActive(true);
       setCountdownResetTrigger((prev) => prev + 1);
     } catch (error) {
-      setError({ type: 'request', error });
+      setError({ type: 'request', error: error as Error });
     } finally {
       setRequestingOtp(false);
     }
@@ -88,7 +88,13 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
   const handleUseDifferentNumber = () => {
     setOtp('');
     setIsCountdownActive(false);
+    setNewPhoneNumber(currentPhoneNumber);
     setMode('change-number');
+  };
+
+  const handleBackToLanding = () => {
+    setNewPhoneNumber(currentPhoneNumber);
+    setMode('landing');
   };
 
   const handleCountdownExpired = () => {
@@ -99,6 +105,10 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
     setOtp('');
     setIsCountdownActive(false);
     setMode('landing');
+  };
+
+  const isValidPhoneNumber = (phone: string) => {
+    return PHONE_NUMBER_REGEX.test(phone);
   };
 
   return (
@@ -177,9 +187,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
                   {t('useADifferentNumber', 'Use a different number')}
                 </Button>
               </div>
-            ) : null}
-
-            {mode === 'change-number' && (
+            ) : mode === 'change-number' ? (
               <div className={styles.changeNumberContainer}>
                 <TextInput
                   id={'otp-phone-number'}
@@ -188,12 +196,14 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
                   onChange={(ev) => setNewPhoneNumber(ev.target.value)}
                   placeholder={t('enterPhoneNumber', 'Enter phone number')}
                   className={styles.phoneInput}
+                  invalid={newPhoneNumber.length > 0 && !isValidPhoneNumber(newPhoneNumber)}
+                  invalidText={t('invalidPhoneNumber', 'Please enter a valid phone number')}
                 />
-                <Button kind="ghost" size="sm" onClick={() => setMode('landing')} className={styles.backButton}>
+                <Button kind="ghost" size="sm" onClick={handleBackToLanding} className={styles.backButton}>
                   {t('back', 'Back')}
                 </Button>
               </div>
-            )}
+            ) : null}
           </div>
         )}
       </ModalBody>
@@ -230,11 +240,15 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
 
           {mode === 'change-number' && (
             <Button
-              disabled={!PHONE_NUMBER_REGEX.test(newPhoneNumber)}
+              disabled={!isValidPhoneNumber(newPhoneNumber) || requestingOtp}
               kind="primary"
               onClick={() => handleRequestingOtp(newPhoneNumber)}
               className={styles.button}>
-              {t('sendOtp', 'Send OTP')}
+              {requestingOtp ? (
+                <InlineLoading description={t('sendingOtp', 'Sending OTP...')} />
+              ) : (
+                t('sendOtp', 'Send OTP')
+              )}
             </Button>
           )}
         </ButtonSet>

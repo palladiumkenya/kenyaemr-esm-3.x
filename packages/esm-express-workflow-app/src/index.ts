@@ -31,9 +31,3 @@ export const otpVerificationModal = getAsyncLifecycle(
   () => import('./shared/otp-verification/otp-verification.modal'),
   options,
 );
-
-// t('visitFormBanner', 'Visit Form Banner')
-export const visitFormBanner = getAsyncLifecycle(
-  () => import('./components/registration/visit-form-banner/visit-form-banner.component'),
-  options,
-);
