@@ -77,7 +77,7 @@
       "featureFlag": "healthInformationExchange",
       "slot": "homepage-dashboard-slot"
     },
-    
+
     {
       "component": "referralsDashboardLink",
       "name": "kenyaemr-referrals-dashboard-link",
@@ -135,7 +135,7 @@
       "slot": "homepage-dashboard-slot",
       "name": "billing-dashboard-nav-group",
       "meta": {
-        "name": "Accounting",
+        "name": "billing",
         "title": "Accounting",
         "slot": "billing-dashboard-slot"
       }
