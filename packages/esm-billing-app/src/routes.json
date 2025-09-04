@@ -184,13 +184,12 @@
     {
       "component": "claimsManagementOverviewDashboardLink",
       "name": "claims-management-overview-link",
-      "order": 0,
-      "slot": "claims-management-dashboard-link-slot"
+      "slots": ["claims-management-dashboard-link-slot","billing-dashboard-group-nav-slot"]
     },
     {
       "component": "preAuthRequestsDashboardLink",
       "name": "preauthrequest-overview-link",
-      "slot": "claims-management-dashboard-link-slot"
+      "slots": ["claims-management-dashboard-link-slot","billing-dashboard-group-nav-slot"]
     },
     {
       "component": "claimsOverview",
