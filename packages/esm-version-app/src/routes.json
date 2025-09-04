@@ -73,8 +73,7 @@
         "title": "Claims management Overview",
         "slot": "billing-dashboard-slot"
       },
-      "featureFlag": "healthInformationExchange",
-      "slot": "homepage-dashboard-slot"
+      "featureFlag": "healthInformationExchange"
     },
 
     {
@@ -85,16 +84,6 @@
         "name": "referrals",
         "title": "Referrals",
         "slot": "referrals-slot"
-      }
-    },
-    {
-      "component": "wardsDashboardLink",
-      "name": "kenyaemr-wards-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "admissions",
-        "title": "Admissions",
-        "slot": "ward-dashboard-slot"
       }
     },
     {

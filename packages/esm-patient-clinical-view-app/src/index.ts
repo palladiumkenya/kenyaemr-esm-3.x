@@ -6,6 +6,7 @@ import {
   caseEncounterDashboardMeta,
   caseManagementDashboardMeta,
   contactListDashboardMeta,
+  dispensingDashboardMeta,
   peerCalendarDashboardMeta,
   relationshipsDashboardMeta,
   specialClinicsDashboardMeta,
@@ -47,6 +48,7 @@ import { configSchema } from './config-schema';
 import SpecialClinicDashboard from './special-clinics/special-clinic.component';
 import { createDashboardLink as createDashboardLink2 } from './dashboard/createDashboardLink';
 import { createLeftPanelLink } from './left-panel-link.component';
+import Pharmacy from './dispensing/pharmacy.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -107,6 +109,9 @@ export const inPatientChartDashboard = getSyncLifecycle(InPatient, options);
 
 export const specialClinicsDashboardLink = getSyncLifecycle(createDashboardLink(specialClinicsDashboardMeta), options);
 export const specialClinicsDashboard = getSyncLifecycle(SpecialClinicDashboard, options);
+
+export const pharmacyLink = getSyncLifecycle(createLeftPanelLink(dispensingDashboardMeta), options);
+export const pharmacy = getSyncLifecycle(Pharmacy, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
