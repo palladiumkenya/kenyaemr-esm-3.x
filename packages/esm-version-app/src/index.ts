@@ -92,6 +92,12 @@ export const homeDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home', title: 'Home', icon: Home }),
   options,
 );
+
+export const imagingOrdersDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({ route: '/home/imaging-orders', title: 'Radiology and Imaging' }),
+  options,
+);
+
 export const homeRoot = getSyncLifecycle(HomeRoot, options);
 export const inpatientDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/bed-admission', title: 'In Patient View', icon: HospitalBed }),
