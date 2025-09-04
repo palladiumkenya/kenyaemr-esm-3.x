@@ -43,8 +43,6 @@ const getGender = (gender: string) => {
   };
 };
 
-
-
 export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPatientInfoProps> = ({
   patient,
   renderedFrom,
@@ -61,7 +59,9 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
   );
 
   const eligibilityTags = useMemo(() => {
-    if (isEligibilityLoading) return [];
+    if (isEligibilityLoading) {
+      return [];
+    }
     return getEligibilityTags(patient, eligibilityData);
   }, [patient, eligibilityData, isEligibilityLoading]);
 

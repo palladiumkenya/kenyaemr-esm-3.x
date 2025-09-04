@@ -1,4 +1,3 @@
-// Complete HIEDisplayCard component with OTP consent verification
 import React, { useState } from 'react';
 import { Button } from '@carbon/react';
 import { TwoFactorAuthentication, ChevronUp, ChevronDown } from '@carbon/react/icons';
@@ -89,11 +88,11 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
       newSet.delete(patientId);
       return newSet;
     });
-
-    console.log(`OTP verified successfully for patient: ${patientId}`);
   };
 
-  if (!bundle.entry || bundle.entry.length === 0) return null;
+  if (!bundle.entry || bundle.entry.length === 0) {
+    return null;
+  }
 
   return (
     <>
@@ -186,14 +185,12 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                   </div>
                 )}
 
-
                 {isVerified && (
                   <Button
                     kind="secondary"
                     size="sm"
                     onClick={async () => {
                       if (hasLocal) {
-                        console.log('Launching start visit for existing patient:', patientUuid);
                         const localPatient = localSearchResults?.find((local) => local.uuid === patientUuid);
                         const localPatientName =
                           localPatient?.person?.personName?.display ||
@@ -209,7 +206,6 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                           }),
                         });
                       } else {
-                        console.log('Registering HIE patient then launching start visit:', patientUuid);
                         try {
                           await createHIEPatient(patient, t);
                         } catch (error) {
@@ -229,13 +225,13 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                       kind="tertiary"
                       size="sm"
                       onClick={() => toggleDependentsVisibility(patientKey)}
-                    renderIcon={showDependents ? ChevronUp : ChevronDown}>
-                    {showDependents ? t('showLess', 'Show less') : t('showDependents', 'Show dependents')}
-                  </Button>
-                </>
-              )}
+                      renderIcon={showDependents ? ChevronUp : ChevronDown}>
+                      {showDependents ? t('showLess', 'Show less') : t('showDependents', 'Show dependents')}
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
 
             {showDependents && (
               <div className={styles.dependentsSection}>

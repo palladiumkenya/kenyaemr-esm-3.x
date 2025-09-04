@@ -48,7 +48,9 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
 
   // Helper function to find HIE patient with matching National ID
   const findHIEPatientByNationalId = (nationalId: string) => {
-    if (!hieSearchResults) return null;
+    if (!hieSearchResults) {
+      return null;
+    }
 
     for (const bundle of hieSearchResults) {
       if (bundle.entry) {
@@ -132,8 +134,6 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
       newSet.delete(patientId);
       return newSet;
     });
-
-    console.log(`OTP verified successfully for local patient: ${patientId}`);
   };
 
   if (!localSearchResults || !Array.isArray(localSearchResults) || localSearchResults.length === 0) {
@@ -246,7 +246,6 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                     kind="secondary"
                     size="sm"
                     onClick={() => {
-                      console.log('Launching start visit for existing local patient:', patientUuid);
                       launchWorkspace('start-visit-workspace-form', {
                         patientUuid: patient.uuid,
                         workspaceTitle: t('startVisitWorkspaceTitle', 'Start Visit for {{patientName}}', {

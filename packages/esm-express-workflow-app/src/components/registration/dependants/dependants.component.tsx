@@ -11,12 +11,13 @@ type DependentProps = {
 };
 
 const DependentsComponent: React.FC<DependentProps> = ({ patient }) => {
-  console.log('Rendering DependentsComponent for patient:', patient);
   const { t } = useTranslation();
   const [submittingStates, setSubmittingStates] = useState<Record<string, boolean>>({});
 
   const getDependentsFromContacts = (patient: fhir.Patient) => {
-    if (!patient?.contact) return [];
+    if (!patient?.contact) {
+      return [];
+    }
 
     return patient.contact.map((contact, index) => {
       const relationship = contact.relationship?.[0]?.coding?.[0]?.display || 'Unknown';
@@ -70,10 +71,7 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient }) => {
 
   const dependents = getDependentsFromContacts(patient);
 
-
   const handleRegisterDependent = async (dependent: any) => {
-    console.log('Registering dependent:', dependent);
-
     setSubmittingStates((prev) => ({ ...prev, [dependent.id]: true }));
 
     try {

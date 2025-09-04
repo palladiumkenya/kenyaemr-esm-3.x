@@ -213,7 +213,7 @@ export interface InputDependent {
   id?: string;
   name: string;
   relationship: string;
-  gender: "male" | "female" | "other";
+  gender: 'male' | 'female' | 'other';
   birthDate?: string;
   nationalId?: string;
   shaNumber?: string;

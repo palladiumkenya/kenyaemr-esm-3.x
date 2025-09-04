@@ -66,7 +66,9 @@ const SearchBar: React.FC = () => {
   const getHiePatientNationalIds = (results: Array<HIEBundleResponse> | null): Set<string> => {
     const nationalIds = new Set<string>();
 
-    if (!results || !Array.isArray(results)) return nationalIds;
+    if (!results || !Array.isArray(results)) {
+      return nationalIds;
+    }
 
     results.forEach((bundle) => {
       bundle.entry?.forEach((entry) => {
@@ -84,7 +86,9 @@ const SearchBar: React.FC = () => {
   const getLocalPatientNationalIds = (results: LocalResponse | null): Set<string> => {
     const nationalIds = new Set<string>();
 
-    if (!results || !Array.isArray(results)) return nationalIds;
+    if (!results || !Array.isArray(results)) {
+      return nationalIds;
+    }
 
     results.forEach((patient) => {
       const fhirPatient = convertLocalPatientToFHIR(patient);
@@ -102,8 +106,12 @@ const SearchBar: React.FC = () => {
     hieResults: Array<HIEBundleResponse> | null,
     localResults: LocalResponse | null,
   ): Array<HIEBundleResponse> | null => {
-    if (!hieResults || !Array.isArray(hieResults)) return hieResults;
-    if (!localResults || !Array.isArray(localResults)) return hieResults;
+    if (!hieResults || !Array.isArray(hieResults)) {
+      return hieResults;
+    }
+    if (!localResults || !Array.isArray(localResults)) {
+      return hieResults;
+    }
 
     const localNationalIds = getLocalPatientNationalIds(localResults);
 
@@ -127,7 +135,9 @@ const SearchBar: React.FC = () => {
   };
 
   const getHiePatientCount = (results: Array<HIEBundleResponse> | null): number => {
-    if (!results || !Array.isArray(results)) return 0;
+    if (!results || !Array.isArray(results)) {
+      return 0;
+    }
     return results.reduce((total, bundle) => {
       return total + (bundle.entry ? bundle.entry.length : 0);
     }, 0);
@@ -147,7 +157,9 @@ const SearchBar: React.FC = () => {
   };
 
   const renderSearchResults = () => {
-    if (!hasSearched) return null;
+    if (!hasSearched) {
+      return null;
+    }
 
     // Filter HIE results to exclude patients that exist locally
     const filteredHieResults = filterHieResults(searchResults, localSearchResults);
@@ -172,16 +184,6 @@ const SearchBar: React.FC = () => {
         </div>
       );
     }
-
-    console.log('Rendering search results:', {
-      hasSearched,
-      hasHieResults,
-      hasLocalResults,
-      filteredHieResults,
-      localSearchResults,
-      hieResultCount: getHiePatientCount(filteredHieResults),
-      localResultCount: localSearchResults?.length || 0,
-    });
 
     return (
       <div className={styles.searchResultsContainer}>
@@ -256,7 +258,6 @@ const SearchBar: React.FC = () => {
       setSearchQuery(identifier.trim());
 
       const [hiePatientData] = await Promise.allSettled([searchPatientFromHIE(identifierType, identifier.trim())]);
-
 
       let normalizedHieResults: Array<HIEBundleResponse> | null = null;
       if (hiePatientData.status === 'fulfilled' && hiePatientData.value) {

@@ -157,7 +157,9 @@ export class OTPManager {
    */
   hasValidOTP(phoneNumber: string): boolean {
     const storedData = this.otpStore.get(phoneNumber);
-    if (!storedData) return false;
+    if (!storedData) {
+      return false;
+    }
 
     return Date.now() - storedData.timestamp <= storedData.expiryTime;
   }
@@ -167,7 +169,9 @@ export class OTPManager {
    */
   getRemainingTimeMinutes(phoneNumber: string): number {
     const storedData = this.otpStore.get(phoneNumber);
-    if (!storedData) return 0;
+    if (!storedData) {
+      return 0;
+    }
 
     const elapsed = Date.now() - storedData.timestamp;
     const remaining = Math.max(0, storedData.expiryTime - elapsed);

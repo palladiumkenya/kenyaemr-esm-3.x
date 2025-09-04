@@ -82,7 +82,9 @@ export const getNationalIdFromPatient = (patient: fhir.Patient): string | null =
  * @returns {number} The total number of patients pulled from the HIE.
  */
 export const getPulledPatientCount = (hieResults: Array<HIEBundleResponse> | null): number => {
-  if (!hieResults || !Array.isArray(hieResults)) return 0;
+  if (!hieResults || !Array.isArray(hieResults)) {
+    return 0;
+  }
   return hieResults.reduce((total, bundle) => total + (bundle?.total || 0), 0);
 };
 
@@ -98,7 +100,9 @@ export function maskName(fullName) {
     .trim()
     .split(' ')
     .map((part) => {
-      if (part.length <= 2) return part;
+      if (part.length <= 2) {
+        return part;
+      }
 
       const firstTwo = part.slice(0, 2);
       const maskLength = part.length - 2;
@@ -130,7 +134,9 @@ export function maskName(fullName) {
  * @returns {Array<{[key: string]: string | undefined}>} The list of dependents.
  */
 export const extractDependentsFromContacts = (patient: fhir.Patient) => {
-  if (!patient?.contact) return [];
+  if (!patient?.contact) {
+    return [];
+  }
 
   return patient.contact.map((contact, index) => {
     const relationship = contact.relationship?.[0]?.coding?.[0]?.display || 'Unknown';

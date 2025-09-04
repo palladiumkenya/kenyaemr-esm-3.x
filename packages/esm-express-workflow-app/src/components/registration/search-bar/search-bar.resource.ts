@@ -39,7 +39,9 @@ export const usePatient = (searchQuery: string) => {
 
 // Search local patient by identifier (National ID, Birth Certificate, SHA, etc.)
 export const searchLocalPatientByIdentifier = async (identifierValue: string, identifierType?: string) => {
-  if (!identifierValue) return null;
+  if (!identifierValue) {
+    return null;
+  }
 
   try {
     const customRepresentation =

@@ -27,7 +27,10 @@ export * from './components/radiology';
 export * from './components/reports';
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
-export const otpVerificationModal = getAsyncLifecycle(() => import('./shared/otp-verification/otp-verification.modal'), options);
+export const otpVerificationModal = getAsyncLifecycle(
+  () => import('./shared/otp-verification/otp-verification.modal'),
+  options,
+);
 
 // t('visitFormBanner', 'Visit Form Banner')
 export const visitFormBanner = getAsyncLifecycle(

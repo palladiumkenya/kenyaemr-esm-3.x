@@ -29,7 +29,9 @@ const OTPCountdown: React.FC<OTPCountdownProps> = ({
   }, [expiryMinutes, resetTrigger]);
 
   useEffect(() => {
-    if (!isActive || isExpired) return;
+    if (!isActive || isExpired) {
+      return;
+    }
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -52,9 +54,15 @@ const OTPCountdown: React.FC<OTPCountdownProps> = ({
   };
 
   const getVariantClass = (): string => {
-    if (isExpired) return styles.expired;
-    if (timeLeft <= 60) return styles.danger;
-    if (timeLeft <= 120) return styles.warning;
+    if (isExpired) {
+      return styles.expired;
+    }
+    if (timeLeft <= 60) {
+      return styles.danger;
+    }
+    if (timeLeft <= 120) {
+      return styles.warning;
+    }
     return styles.default;
   };
 

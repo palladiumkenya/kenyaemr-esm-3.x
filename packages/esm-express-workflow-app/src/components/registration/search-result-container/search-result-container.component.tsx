@@ -4,7 +4,6 @@
 // import LocalPatientCard from './LocalPatientCard';
 // import { type HIEBundleResponse, type LocalResponse } from '../type';
 
-
 // interface SearchResultsProps {
 //   hasSearched: boolean;
 //   searchResults: Array<HIEBundleResponse>;
