@@ -38,7 +38,7 @@
   "filter": "አጣራ",
   "filterBy": "በዚህ አጣራ:",
   "generalInformation": "አጠቃላይ መረጃ",
-  "healthWorkerIdentifier": "",
+  "healthProviderUniqueIdentifier": "",
   "HealthworkerNotFound": "የጤና ሰራተኛ መዝገቦች በጤና ሰራተኛ መመዝገቢያ ውስጥ አልተገኙም፣ አካውንት መፍጠር ለመቀጠል ይፈልጋሉ?",
   "healthWorkerRegistryEmpty": "አካውንት ይፍጠሩ",
   "hieSynchronizationError": "ከHIE ጋር ሲመሳሰል ስህተት ተከስቷል",

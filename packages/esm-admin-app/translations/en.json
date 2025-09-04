@@ -38,7 +38,7 @@
   "filter": "Filter",
   "filterBy": "Filter by:",
   "generalInformation": "General Information",
-  "healthWorkerIdentifier": "",
+  "healthProviderUniqueIdentifier": "",
   "HealthworkerNotFound": "The health worker records could not be found in Health Worker registry, do you want to continue to create an account",
   "healthWorkerRegistryEmpty": "Create an Account",
   "hieSynchronizationError": "An error occurred while synchronizing with HIE",

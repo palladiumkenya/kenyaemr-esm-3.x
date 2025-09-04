@@ -39,7 +39,7 @@ const ProviderBannerTag: React.FC = () => {
   };
 
   const formatDate = (dateString: string): string => {
-    if (!dateString) {
+    if (!dateString || dateString === '000-000-00') {
       return '0000-00-00';
     }
     try {
@@ -62,6 +62,7 @@ const ProviderBannerTag: React.FC = () => {
   const hwi = getAttributeValue(providerAttributes?.attributes, 'Provider unique identifier') || 'NONE';
   const licenseExpiry = getAttributeValue(providerAttributes?.attributes, 'License Expiry Date');
   const formattedExpiry = formatDate(licenseExpiry) || '0000-00-00';
+  const shouldShowLicenseExpiry = !!licenseExpiry;
   const licenseStatus = getLicenseStatus(licenseExpiry);
 
   return (
@@ -69,23 +70,32 @@ const ProviderBannerTag: React.FC = () => {
       <div className={styles.bannerContent}>
         <div className={styles.divider} />
         <div className={styles.infoItem}>
-          <span className={styles.label}>{t('healthWorkerIdentifier', 'Health Worker Identifier' + ':')}</span>
-          <span className={styles.value}>{hwi}</span>
-        </div>
-
-        <div className={styles.divider} />
-
-        <div className={styles.infoItem}>
-          <span className={styles.label}>{t('licenseExpiry', 'License Expiry' + ':')}</span>
-          <span className={styles.value}>{formattedExpiry}</span>
-          <span className={styles.statusIndicator}>
-            <Tag size="md" type={licenseStatus.tagType}>
-              {licenseStatus.message}
-            </Tag>
+          <span className={styles.label}>
+            {t('healthProviderUniqueIdentifier', 'Health Provider unique identifier' + ':')}
           </span>
+          <span className={`${styles.value} ${styles.hwiValue}`}>{hwi}</span>
         </div>
 
         <div className={styles.divider} />
+
+        <>
+          <div className={styles.infoItem}>
+            {shouldShowLicenseExpiry && (
+              <>
+                <span className={styles.label}>{t('licenseExpiry', 'License Expiry' + ':')}</span>
+                <span className={styles.value}>{formattedExpiry}</span>
+              </>
+            )}
+
+            <span className={styles.statusIndicator}>
+              <Tag size="md" type={licenseStatus.tagType}>
+                {licenseStatus.message}
+              </Tag>
+            </span>
+          </div>
+
+          <div className={styles.divider} />
+        </>
 
         <div className={styles.infoItem}>
           <span className={styles.label}>{t('name', 'Name' + ':')}</span>
