@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { DataTable, Table, TableHead, TableBody, TableRow, TableCell, TableHeader, Button, Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace, showSnackbar, showModal } from '@openmrs/esm-framework';
+import { launchWorkspace, showSnackbar, showModal, navigate } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
 import styles from './dependants.scss';
 import { maskName } from '../helper';
@@ -39,7 +39,10 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
 
   const handleQueuePatient = useCallback((activeVisit: any) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
-      closeModal: () => dispose(),
+      closeModal: () => {
+        navigate({ to: `\${openmrsSpaBase}/patient/${patient.id}/chart` });
+        dispose();
+      },
       activeVisit,
     });
   }, []);

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import styles from '../card.scss';
 import { LocalResponse, type HIEBundleResponse, type EligibilityResponse } from '../../type';
-import { launchWorkspace, PatientPhoto, showModal } from '@openmrs/esm-framework';
+import { launchWorkspace, PatientPhoto, showModal, closeWorkspace, navigate } from '@openmrs/esm-framework';
 import { EnhancedPatientBannerPatientInfo } from '../../patient-banner/patient-banner.component';
 import { convertLocalPatientToFHIR, getNationalIdFromPatient, hasDependents } from '../../helper';
 import { launchOtpVerificationModal } from '../../../../shared/otp-verification';
@@ -134,9 +134,12 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
     [activePhoneNumbers, otpExpiryMinutes],
   );
 
-  const handleQueuePatient = useCallback((activeVisit: any) => {
+  const handleQueuePatient = useCallback((activeVisit: any, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
-      closeModal: () => dispose(),
+      closeModal: () => {
+        navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
+        dispose();
+      },
       activeVisit,
     });
   }, []);
@@ -245,6 +248,22 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                             launchWorkspace('start-visit-workspace-form', {
                               patientUuid: patientUuid,
                               workspaceTitle: t('checkInPatientWorkspaceTitle', 'Check in patient'),
+                              closeWorkspace: () => {
+                                closeWorkspace('start-visit-workspace-form', {
+                                  onWorkspaceClose: () => {
+                                    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
+                                  },
+                                  ignoreChanges: true,
+                                });
+                              },
+                              closeWorkspaceWithSavedChanges: () => {
+                                closeWorkspace('start-visit-workspace-form', {
+                                  onWorkspaceClose: () => {
+                                    navigate({ to: `$\{openmrsSpaBase}/patient/${patientUuid}/chart` });
+                                  },
+                                  ignoreChanges: true,
+                                });
+                              },
                             });
                           }}>
                           {t('checkIn', 'Check In')}
@@ -252,7 +271,10 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                       )}
 
                       {hasActiveVisit && (
-                        <Button kind="secondary" size="sm" onClick={() => handleQueuePatient(activeVisit)}>
+                        <Button
+                          kind="secondary"
+                          size="sm"
+                          onClick={() => handleQueuePatient(activeVisit, fhirPatient.id)}>
                           {t('queuePatient', 'Queue Patient')}
                         </Button>
                       )}

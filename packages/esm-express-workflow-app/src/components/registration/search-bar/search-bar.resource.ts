@@ -149,13 +149,6 @@ export const registerOrLaunchHIEPatient = async (hiePatient: any, t: any) => {
         hiePatient.name?.[0]?.text ||
         'Unknown Patient';
 
-      launchWorkspace('start-visit-workspace-form', {
-        patientUuid: existingLocalPatient.uuid,
-        workspaceTitle: t('startVisitWorkspaceTitle', 'Start Visit for {{patientName}}', {
-          patientName: patientName,
-        }),
-      });
-
       return existingLocalPatient;
     } else {
       return await createHIEPatient(hiePatient, t);
