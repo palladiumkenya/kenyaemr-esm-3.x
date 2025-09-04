@@ -1,0 +1,40 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.buttonCol {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.patientInfo {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: layout.$spacing-04;
+  align-items: center;
+}
+.patientAvatar {
+  margin-top: layout.$spacing-06;
+}
+
+.dependentsSection {
+  width: 100%;
+  margin-top: 1rem;
+  border-top: 1px solid colors.$gray-20;
+  padding-top: 1rem;
+}
+
+.noDependents {
+  padding-bottom: 1rem;
+}

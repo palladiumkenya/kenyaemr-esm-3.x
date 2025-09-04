@@ -1,13 +1,18 @@
+// Updated SearchBar component with proper patient rendering logic
 import React, { useState } from 'react';
 import styles from './search.scss';
-import { navigate, showToast, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, launchWorkspace, navigate, showToast, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Search as SearchIcon, Add, CloseLarge } from '@carbon/react/icons';
 import { Button, Column, ComboBox, InlineLoading, Search, Tile } from '@carbon/react';
-import { type EligibilityResponse, type HIEBundleResponse, type IdentifierTypeItem } from '../type';
-import { getNationalIdFromPatient } from '../helper';
-import { searchPatientFromHIE } from './search-bar.resource';
+import { type HIEBundleResponse, type IdentifierTypeItem, type LocalResponse } from '../type';
+import { getNationalIdFromPatient, convertLocalPatientToFHIR } from '../helper';
+import { searchPatientFromHIE, usePatient, useSHAEligibility } from './search-bar.resource';
+import { EmptySvg } from '../empty-svg/empty-svg.component';
+import HIEDisplayCard from '../card/HIE-card/hie-card.component';
 import { ExpressWorkflowConfig } from '../../../config-schema';
+import LocalPatientCard from '../card/Local-card/local-card.component';
+import Metrics from '../metrics/metrics.component';
 
 const SearchBar: React.FC = () => {
   const { t } = useTranslation();
@@ -31,15 +36,21 @@ const SearchBar: React.FC = () => {
   const [identifier, setIdentifier] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<HIEBundleResponse> | null>(null);
+  const [localSearchResults, setLocalSearchResults] = useState<LocalResponse | null>(null);
   const [showDependentsForPatient, setShowDependentsForPatient] = useState<Set<string>>(new Set());
-  const [eligibilityData, setEligibilityData] = useState<EligibilityResponse | null>(null);
-  const [isCheckingEligibility, setIsCheckingEligibility] = useState(false);
   const [searchedNationalId, setSearchedNationalId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [syncedPatients, setSyncedPatients] = useState<Set<string>>(new Set());
 
   const [selectedIdentifierItem, setSelectedIdentifierItem] = useState<IdentifierTypeItem | null>(
     defaultIdentifierType || null,
   );
+
+  // Use the existing hook for eligibility data
+  const { data: eligibilityResponse, isLoading: isEligibilityLoading } = useSHAEligibility(searchedNationalId);
+
+  // Use the existing hook for local patient search
+  const { patient: localPatientData, isLoading: isLocalSearching } = usePatient(searchQuery);
 
   const handleIdentifierTypeChange = (selectedItem: IdentifierTypeItem | null): void => {
     if (selectedItem) {
@@ -49,6 +60,180 @@ const SearchBar: React.FC = () => {
       setIdentifierType('');
       setSelectedIdentifierItem(null);
     }
+  };
+
+  // Helper function to get National IDs from HIE patients for comparison
+  const getHiePatientNationalIds = (results: Array<HIEBundleResponse> | null): Set<string> => {
+    const nationalIds = new Set<string>();
+
+    if (!results || !Array.isArray(results)) {
+      return nationalIds;
+    }
+
+    results.forEach((bundle) => {
+      bundle.entry?.forEach((entry) => {
+        const nationalId = getNationalIdFromPatient(entry.resource);
+        if (nationalId) {
+          nationalIds.add(nationalId);
+        }
+      });
+    });
+
+    return nationalIds;
+  };
+
+  // Helper function to get National IDs from local patients for comparison
+  const getLocalPatientNationalIds = (results: LocalResponse | null): Set<string> => {
+    const nationalIds = new Set<string>();
+
+    if (!results || !Array.isArray(results)) {
+      return nationalIds;
+    }
+
+    results.forEach((patient) => {
+      const fhirPatient = convertLocalPatientToFHIR(patient);
+      const nationalId = getNationalIdFromPatient(fhirPatient);
+      if (nationalId) {
+        nationalIds.add(nationalId);
+      }
+    });
+
+    return nationalIds;
+  };
+
+  // Helper function to filter HIE results that don't exist locally
+  const filterHieResults = (
+    hieResults: Array<HIEBundleResponse> | null,
+    localResults: LocalResponse | null,
+  ): Array<HIEBundleResponse> | null => {
+    if (!hieResults || !Array.isArray(hieResults)) {
+      return hieResults;
+    }
+    if (!localResults || !Array.isArray(localResults)) {
+      return hieResults;
+    }
+
+    const localNationalIds = getLocalPatientNationalIds(localResults);
+
+    const filteredResults = hieResults
+      .map((bundle) => {
+        const filteredEntries =
+          bundle.entry?.filter((entry) => {
+            const nationalId = getNationalIdFromPatient(entry.resource);
+            return nationalId ? !localNationalIds.has(nationalId) : true;
+          }) || [];
+
+        return {
+          ...bundle,
+          entry: filteredEntries,
+          total: filteredEntries.length,
+        };
+      })
+      .filter((bundle) => bundle.entry && bundle.entry.length > 0);
+
+    return filteredResults.length > 0 ? filteredResults : null;
+  };
+
+  const getHiePatientCount = (results: Array<HIEBundleResponse> | null): number => {
+    if (!results || !Array.isArray(results)) {
+      return 0;
+    }
+    return results.reduce((total, bundle) => {
+      return total + (bundle.entry ? bundle.entry.length : 0);
+    }, 0);
+  };
+
+  const clearAll = () => {
+    setIdentifier('');
+    setSearchResults(null);
+    setLocalSearchResults(null);
+    setHasSearched(false);
+    setSyncedPatients(new Set());
+    setSearchedNationalId('');
+    setShowDependentsForPatient(new Set());
+    setSearchQuery('');
+    setSelectedIdentifierItem(defaultIdentifierType || null);
+    setIdentifierType(defaultIdentifierType?.key || '');
+  };
+
+  const renderSearchResults = () => {
+    if (!hasSearched) {
+      return null;
+    }
+
+    // Filter HIE results to exclude patients that exist locally
+    const filteredHieResults = filterHieResults(searchResults, localSearchResults);
+
+    const hasHieResults =
+      filteredHieResults &&
+      Array.isArray(filteredHieResults) &&
+      filteredHieResults.length > 0 &&
+      filteredHieResults.some((bundle) => bundle.total > 0 && bundle.entry && bundle.entry.length > 0);
+
+    const hasLocalResults = localSearchResults && Array.isArray(localSearchResults) && localSearchResults.length > 0;
+
+    // Show empty state if no results found
+    if (!hasHieResults && !hasLocalResults) {
+      return (
+        <div className={styles.emptyStateContainer}>
+          <EmptySvg />
+          <p className={styles.title}>{t('noPatientFound', 'No Patient Found')}</p>
+          <p className={styles.subTitle}>
+            {t('tryDifferentIdentifier', 'Try searching with a different identifier or check the identifier type')}
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.searchResultsContainer}>
+        {/* Render Local Patient Results First - Revisit Patients */}
+        {hasLocalResults && (
+          <div className={styles.localResultsSection}>
+            <div className={styles.resultsHeader}>
+              <span className={styles.identifierTypeHeader}>
+                {t('revisitPatientResults', 'Revisit patient(s) ({{count}})', {
+                  count: localSearchResults?.length || 0,
+                })}
+              </span>
+            </div>
+            <div>
+              <LocalPatientCard
+                localSearchResults={localSearchResults!}
+                syncedPatients={syncedPatients}
+                searchedNationalId={searchedNationalId}
+                otpExpiryMinutes={5}
+                hieSearchResults={searchResults}
+              />
+            </div>
+          </div>
+        )}
+
+        {hasHieResults && (
+          <div className={styles.hieResultsSection}>
+            <div className={styles.resultsHeader}>
+              <span className={styles.identifierTypeHeader}>
+                {t('newPatientResults', 'New patient(s) found ({{count}})', {
+                  count: getHiePatientCount(filteredHieResults),
+                })}
+              </span>
+            </div>
+            <div>
+              {filteredHieResults!.map((bundle, index) => (
+                <HIEDisplayCard
+                  key={`hie-${index}`}
+                  bundle={bundle}
+                  bundleIndex={index}
+                  searchedNationalId={searchedNationalId}
+                  otpExpiryMinutes={5}
+                  localSearchResults={localSearchResults}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const handleSearchPatient = async () => {
@@ -63,28 +248,26 @@ const SearchBar: React.FC = () => {
 
     setIsSearching(true);
     setSearchResults(null);
-    // setLocalSearchResults(null);
+    setLocalSearchResults(null);
     setHasSearched(false);
-    // setSyncedPatients(new Set());
-    setEligibilityData(null);
+    setSyncedPatients(new Set());
     setSearchedNationalId('');
     setShowDependentsForPatient(new Set());
 
     try {
-      const hiePatientData = await searchPatientFromHIE(identifierType, identifier.trim());
+      setSearchQuery(identifier.trim());
+
+      const [hiePatientData] = await Promise.allSettled([searchPatientFromHIE(identifierType, identifier.trim())]);
 
       let normalizedHieResults: Array<HIEBundleResponse> | null = null;
-      if (hiePatientData) {
-        if (Array.isArray(hiePatientData)) {
-          normalizedHieResults = hiePatientData;
+      if (hiePatientData.status === 'fulfilled' && hiePatientData.value) {
+        if (Array.isArray(hiePatientData.value)) {
+          normalizedHieResults = hiePatientData.value;
         } else {
-          normalizedHieResults = [hiePatientData];
+          normalizedHieResults = [hiePatientData.value];
         }
-      }
+        setSearchResults(normalizedHieResults);
 
-      setSearchResults(normalizedHieResults);
-
-      if (normalizedHieResults && normalizedHieResults.length > 0) {
         const firstPatient = normalizedHieResults[0]?.entry?.[0]?.resource;
         if (firstPatient) {
           const nationalId = getNationalIdFromPatient(firstPatient);
@@ -94,7 +277,6 @@ const SearchBar: React.FC = () => {
         }
       }
 
-      setSearchQuery(identifier.trim());
       setHasSearched(true);
     } catch (error: any) {
       setHasSearched(true);
@@ -109,84 +291,98 @@ const SearchBar: React.FC = () => {
   };
 
   return (
-    <Tile className={styles.patientSearchTile}>
-      <span className={styles.formHeaderSection}>{t('clientRegistry', 'Client registry verification')}</span>
-      <div className={styles.searchForm}>
-        <div className={styles.searchRow}>
-          <Column className={styles.identifierTypeColumn}>
-            <ComboBox
-              onChange={({ selectedItem }: { selectedItem: IdentifierTypeItem | null }) =>
-                handleIdentifierTypeChange(selectedItem)
-              }
-              id="formIdentifierType"
-              titleText={t('identificationType', 'Identification Type')}
-              placeholder={t('chooseIdentifierType', 'Choose identifier type')}
-              items={identifierTypeItems}
-              itemToString={(item: IdentifierTypeItem) => (item ? item.name : '')}
-              className={styles.comboBox}
-              selectedItem={selectedIdentifierItem}
-              initialSelectedItem={defaultIdentifierType}
-            />
-          </Column>
-
-          <Column className={styles.identifierNumberColumn}>
-            <span className={styles.identifierTypeHeader}>{t('identifierNumber', 'Identifier number*')}</span>
-            <Search
-              labelText={t('enterIdentifierNumber', 'Enter identifier number')}
-              className={styles.formSearch}
-              value={identifier}
-              placeholder={t('enterIdentifierNumber', 'Enter identifier number')}
-              id="formSearchHealthWorkers"
-              onChange={(value) => setIdentifier(value.target.value)}
-              onKeyPress={(event) => {
-                if (event.key === 'Enter' && !isSearching && identifierType && identifier.trim()) {
-                  handleSearchPatient();
+    <>
+      <Tile className={styles.patientSearchTile}>
+        <span className={styles.formHeaderSection}>{t('clientRegistry', 'Client registry verification')}</span>
+        <div className={styles.searchForm}>
+          <div className={styles.searchRow}>
+            <Column className={styles.identifierTypeColumn}>
+              <ComboBox
+                onChange={({ selectedItem }: { selectedItem: IdentifierTypeItem | null }) =>
+                  handleIdentifierTypeChange(selectedItem)
                 }
-              }}
-            />
-          </Column>
-          <Column>
+                id="formIdentifierType"
+                titleText={t('identificationType', 'Identification Type')}
+                placeholder={t('chooseIdentifierType', 'Choose identifier type')}
+                items={identifierTypeItems}
+                itemToString={(item: IdentifierTypeItem) => (item ? item.name : '')}
+                className={styles.comboBox}
+                selectedItem={selectedIdentifierItem}
+                initialSelectedItem={defaultIdentifierType}
+              />
+            </Column>
+
+            <Column className={styles.identifierNumberColumn}>
+              <span className={styles.identifierTypeHeader}>{t('identifierNumber', 'Identifier number*')}</span>
+              <div className={styles.searchInputContainer}>
+                <Search
+                  labelText={t('enterIdentifierNumber', 'Enter identifier number')}
+                  className={styles.formSearch}
+                  value={identifier}
+                  placeholder={t('enterIdentifierNumber', 'Enter identifier number')}
+                  id="formSearchHealthWorkers"
+                  onChange={(value) => setIdentifier(value.target.value)}
+                  onKeyPress={(event) => {
+                    if (event.key === 'Enter' && !isSearching && identifierType && identifier.trim()) {
+                      handleSearchPatient();
+                    }
+                  }}
+                />
+                <Button
+                  kind="primary"
+                  onClick={handleSearchPatient}
+                  size="md"
+                  renderIcon={isSearching || isLocalSearching ? undefined : SearchIcon}
+                  className={styles.attachedSearchButton}
+                  disabled={isSearching || !identifierType || !identifier.trim()}>
+                  {isSearching || isLocalSearching ? (
+                    <>
+                      <InlineLoading status="active" />
+                      <span className={styles.loadingText}>{t('searching', 'Searching...')}</span>
+                    </>
+                  ) : (
+                    t('searchPatients', 'Search for Patient(s)')
+                  )}
+                </Button>
+              </div>
+            </Column>
+          </div>
+
+          <div className={styles.buttonContainer}>
             <Button
-              kind="primary"
-              onClick={handleSearchPatient}
+              kind="secondary"
+              onClick={addPatient}
               size="md"
-              renderIcon={SearchIcon}
-              disabled={isSearching || !identifierType || !identifier.trim()}
-              className={styles.searchButton}>
-              {isSearching ? (
-                <div style={{ alignItems: 'center' }}>
-                  <InlineLoading status="active" description={t('pullFromHIE', 'Pulling from registry...')} />
-                </div>
-              ) : (
-                t('searchPatients', 'Search for Patient(s)')
-              )}
+              renderIcon={Add}
+              className={styles.clearButton}
+              disabled={isSearching}>
+              {t('emergencyRegistration', 'Emergency registration')}
             </Button>
-          </Column>
-        </div>
 
-        <div className={styles.buttonContainer}>
-          <Button
-            kind="secondary"
-            onClick={addPatient}
-            size="md"
-            renderIcon={Add}
-            className={styles.clearButton}
-            disabled={isSearching}>
-            {t('emergencyRegistration', 'Emergency registration')}
-          </Button>
-
-          <Button
-            kind="danger"
-            onClick={() => {}}
-            size="md"
-            renderIcon={CloseLarge}
-            className={styles.registrationButtons}
-            disabled={isSearching}>
-            {t('clearAll', 'Clear All')}
-          </Button>
+            <Button
+              kind="danger"
+              onClick={clearAll}
+              size="md"
+              renderIcon={CloseLarge}
+              className={styles.registrationButtons}
+              disabled={isSearching}>
+              {t('clearAll', 'Clear All')}
+            </Button>
+          </div>
         </div>
+      </Tile>
+      <div className={styles.searchResults}>
+        {renderSearchResults() ?? (
+          <div className={styles.emptyStateContainer}>
+            <EmptySvg />
+            <p className={styles.title}>{t('searchForAPatient', 'Search for a patient')}</p>
+            <p className={styles.subTitle}>
+              {t('enterPatientIdentifier', 'Enter patient identifier number to search for a patient')}
+            </p>
+          </div>
+        )}
       </div>
-    </Tile>
+    </>
   );
 };
 

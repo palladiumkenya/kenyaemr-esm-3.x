@@ -12,7 +12,6 @@
 
 .buttonSet {
   padding: 0rem;
-  margin-top: layout.$spacing-05;
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -23,7 +22,69 @@
   @include type.type-style('heading-02');
 }
 
-.changeNoBtn {
-  width: 100%;
-  min-height: 100%;
+.otpTriggerContainer {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05;
+  border-radius: 8px;
+}
+
+.phoneNumberDisplay {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-04;
+  border-radius: 6px;
+}
+
+.phoneIcon {
+  flex-shrink: 0;
+}
+
+.phoneNumber {
+  @include type.type-style('body-01');
+  font-weight: 600;
+  flex: 1;
+  letter-spacing: 0.5px;
+}
+
+.editButton {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.otpInputContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-06;
+}
+
+.otpInstruction {
+  @include type.type-style('body-01');
+  text-align: center;
+  margin-bottom: layout.$spacing-03;
+}
+
+.changeNumberLink {
+  margin-top: layout.$spacing-03;
+  @include type.type-style('label-01');
+  text-decoration: underline;
+  opacity: 0.8;
+}
+
+.changeNumberContainer {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-05;
+}
+
+.backButton {
+  align-self: flex-start;
+  @include type.type-style('label-01');
+  text-decoration: underline;
+  opacity: 0.8;
 }

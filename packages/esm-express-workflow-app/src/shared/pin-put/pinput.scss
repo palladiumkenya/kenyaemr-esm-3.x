@@ -31,7 +31,7 @@
   font-size: 1.125rem;
   border: 2px solid colors.$gray-50;
   background-color: colors.$white;
-  color: colors.$gray-100;
+  color: colors.$gray-100; // ← CHANGE THIS LINE
   transition: all 0.2s ease-in-out;
   outline: none;
 
@@ -118,62 +118,4 @@
   @include type.type-style('body-short-01');
   color: colors.$gray-70;
   font-weight: 400;
-}
-
-// Responsive design
-@media (max-width: 768px) {
-  .input {
-    width: 44px;
-    height: 44px;
-    font-size: 1rem;
-  }
-
-  .separator {
-    font-size: 1.125rem;
-    margin: 0 layout.$spacing-01;
-  }
-}
-
-@media (max-width: 480px) {
-  .input {
-    width: 40px;
-    height: 40px;
-    font-size: 0.875rem;
-    padding: layout.$spacing-02;
-  }
-
-  .separator {
-    font-size: 1rem;
-    margin: 0 layout.$spacing-01;
-  }
-}
-
-// High contrast mode support
-@media (prefers-contrast: high) {
-  .input {
-    border-width: 3px;
-
-    &:focus {
-      border-width: 4px;
-    }
-  }
-
-  .inputError {
-    border-width: 3px;
-
-    &:focus {
-      border-width: 4px;
-    }
-  }
-}
-
-// Reduced motion support
-@media (prefers-reduced-motion: reduce) {
-  .input {
-    transition: none;
-
-    &:focus {
-      transform: none;
-    }
-  }
 }

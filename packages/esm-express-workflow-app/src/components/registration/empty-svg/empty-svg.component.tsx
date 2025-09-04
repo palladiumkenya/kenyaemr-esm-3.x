@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './patient-bills-dashboard.scss';
 
 export const EmptySvg: React.FC = () => {
   return (

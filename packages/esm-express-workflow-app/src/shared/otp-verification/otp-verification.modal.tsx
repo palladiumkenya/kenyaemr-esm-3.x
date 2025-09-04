@@ -7,14 +7,15 @@ import {
   ModalFooter,
   ModalHeader,
   TextInput,
-  Tile,
+  IconButton,
 } from '@carbon/react';
 import React, { FC, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './otp-verification.scss';
 import PinPut from '../pin-put/pinput.component';
-import { Phone } from '@carbon/react/icons';
+import { Phone, Edit } from '@carbon/react/icons';
 import { PHONE_NUMBER_REGEX } from '../../constants';
+import OTPCountdown from './pin-counter/pin-counter.component';
 
 type OTPVerificationModalProps = {
   onClose?: () => void;
@@ -24,8 +25,8 @@ type OTPVerificationModalProps = {
   obscureText?: boolean;
   centerBoxes?: boolean;
   phoneNumber: string;
-  renderOtpTrigger: (phoneNumber: string) => React.ReactNode;
   onRequestOtp?: (phoneNumber: string) => Promise<void>;
+  expiryMinutes?: number;
 };
 
 const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
@@ -35,23 +36,28 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
   centerBoxes,
   obscureText,
   phoneNumber,
-  renderOtpTrigger,
   onRequestOtp,
   onVerificationSuccess,
+  expiryMinutes = 5,
 }) => {
   const { t } = useTranslation();
   const [otp, setOtp] = useState('');
-  const [newPhoneNumber, setNewPhoneNumber] = useState('');
+  const [newPhoneNumber, setNewPhoneNumber] = useState(phoneNumber);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<{ type: 'request' | 'verification'; error: Error } | null>(null);
   const [mode, setMode] = useState<'landing' | 'verify-otp' | 'change-number'>('landing');
   const [requestingOtp, setRequestingOtp] = useState(false);
+  const [currentPhoneNumber, setCurrentPhoneNumber] = useState(phoneNumber);
+
+  const [countdownResetTrigger, setCountdownResetTrigger] = useState(0);
+  const [isCountdownActive, setIsCountdownActive] = useState(false);
+
   const handleVerify = async () => {
     setError(null);
     try {
       setIsLoading(true);
       await onVerify?.(otp);
-      onClose();
+      onClose?.();
       onVerificationSuccess?.();
     } catch (error) {
       setError({ type: 'verification', error });
@@ -62,24 +68,46 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
 
   const handleRequestingOtp = async (phone: string) => {
     setError(null);
-
     try {
       setRequestingOtp(true);
-      await onRequestOtp(phone);
+      await onRequestOtp?.(phone);
+
+      setOtp('');
+      setCurrentPhoneNumber(phone);
       setMode('verify-otp');
+
+      setIsCountdownActive(true);
+      setCountdownResetTrigger((prev) => prev + 1);
     } catch (error) {
       setError({ type: 'request', error });
     } finally {
       setRequestingOtp(false);
     }
   };
+
+  const handleUseDifferentNumber = () => {
+    setOtp('');
+    setIsCountdownActive(false);
+    setMode('change-number');
+  };
+
+  const handleCountdownExpired = () => {
+    setError({
+      type: 'verification',
+      error: new Error(t('otpExpiredMessage', 'OTP has expired. Please request a new one.')),
+    });
+    setOtp('');
+    setIsCountdownActive(false);
+    setMode('landing');
+  };
+
   return (
     <React.Fragment>
       <ModalHeader className={styles.sectionHeader} closeModal={onClose}>
         {t('otpVerification', 'OTP Verification')}
       </ModalHeader>
       <ModalBody>
-        {requestingOtp && <InlineLoading />}
+        {requestingOtp && <InlineLoading description={t('requestingOtp', 'Requesting OTP...')} />}
         {!requestingOtp && (
           <div>
             {error && (
@@ -97,38 +125,74 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
               </>
             )}
             {mode === 'landing' ? (
-              <Tile role="button" onClick={() => handleRequestingOtp(phoneNumber)}>
-                {renderOtpTrigger(phoneNumber)}
-              </Tile>
+              <div className={styles.otpTriggerContainer}>
+                <p>{t('confirmationTxt', 'Verify the phone number before OTP')}</p>
+                <div className={styles.phoneNumberDisplay}>
+                  <Phone className={styles.phoneIcon} />
+                  <span className={styles.phoneNumber}>{currentPhoneNumber}</span>
+                  <IconButton
+                    kind="ghost"
+                    size="sm"
+                    label={t('changePhoneNumber', 'Change phone number')}
+                    onClick={handleUseDifferentNumber}
+                    className={styles.editButton}>
+                    <Edit />
+                  </IconButton>
+                </div>
+                <div className={styles.expiryInfo}>
+                  <p className={styles.expiryText}>
+                    {t('otpExpiryInfo', 'The OTP will be valid for {{minutes}} minutes after it is sent.', {
+                      minutes: expiryMinutes,
+                    })}
+                  </p>
+                </div>
+              </div>
             ) : mode === 'verify-otp' ? (
-              <PinPut
-                value={otp}
-                onChange={setOtp}
-                numInputs={otpLength}
-                centerBoxes={centerBoxes}
-                obscureText={obscureText}
-              />
-            ) : null}
-            {mode === 'landing' && (
-              <>
-                <br />
-                <Button
-                  className={styles.changeNoBtn}
-                  size="sm"
-                  onClick={() => setMode('change-number')}
-                  kind="tertiary"
-                  renderIcon={Phone}>
-                  {t('changePhoneNumber', 'Change phone number')}
+              <div className={styles.otpInputContainer}>
+                <div className={styles.otpInstruction}>
+                  {t('enterOtpSentTo', 'Enter the OTP code sent to')} <strong>{currentPhoneNumber}</strong>
+                </div>
+
+                {isCountdownActive && (
+                  <div className={styles.countdownSection}>
+                    <OTPCountdown
+                      expiryMinutes={expiryMinutes}
+                      isActive={isCountdownActive}
+                      resetTrigger={countdownResetTrigger}
+                      onExpired={handleCountdownExpired}
+                      variant="default"
+                      showIcon={true}
+                    />
+                  </div>
+                )}
+
+                <PinPut
+                  value={otp}
+                  onChange={setOtp}
+                  numInputs={otpLength}
+                  centerBoxes={centerBoxes}
+                  obscureText={obscureText}
+                />
+                <Button kind="ghost" size="sm" className={styles.changeNumberLink} onClick={handleUseDifferentNumber}>
+                  {t('useADifferentNumber', 'Use a different number')}
                 </Button>
-              </>
-            )}
+              </div>
+            ) : null}
+
             {mode === 'change-number' && (
-              <TextInput
-                id={'otp-phone-number'}
-                labelText={t('phoneNumber', 'Phone number')}
-                value={newPhoneNumber}
-                onChange={(ev) => setNewPhoneNumber(ev.target.value)}
-              />
+              <div className={styles.changeNumberContainer}>
+                <TextInput
+                  id={'otp-phone-number'}
+                  labelText={t('phoneNumber', 'Phone number')}
+                  value={newPhoneNumber}
+                  onChange={(ev) => setNewPhoneNumber(ev.target.value)}
+                  placeholder={t('enterPhoneNumber', 'Enter phone number')}
+                  className={styles.phoneInput}
+                />
+                <Button kind="ghost" size="sm" onClick={() => setMode('landing')} className={styles.backButton}>
+                  {t('back', 'Back')}
+                </Button>
+              </div>
             )}
           </div>
         )}
@@ -138,7 +202,23 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
           <Button kind="secondary" onClick={onClose} className={styles.button}>
             {t('cancel', 'Cancel')}
           </Button>
-          {mode !== 'change-number' ? (
+
+          {mode === 'landing' && (
+            <Button
+              kind="primary"
+              size="lg"
+              className={styles.sendOtpButton}
+              disabled={requestingOtp}
+              onClick={() => handleRequestingOtp(currentPhoneNumber)}>
+              {requestingOtp ? (
+                <InlineLoading description={t('sendingOtp', 'Sending OTP...')} />
+              ) : (
+                t('sendOtpCode', 'Send OTP Code')
+              )}
+            </Button>
+          )}
+
+          {mode === 'verify-otp' && (
             <Button
               disabled={isLoading || otp.length !== otpLength}
               kind="primary"
@@ -146,10 +226,14 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
               className={styles.button}>
               {isLoading ? <InlineLoading description={t('verifyingOtp', 'Verifying OTP')} /> : t('verify', 'Verify')}
             </Button>
-          ) : (
+          )}
+
+          {mode === 'change-number' && (
             <Button
               disabled={!PHONE_NUMBER_REGEX.test(newPhoneNumber)}
-              onClick={() => handleRequestingOtp(newPhoneNumber)}>
+              kind="primary"
+              onClick={() => handleRequestingOtp(newPhoneNumber)}
+              className={styles.button}>
               {t('sendOtp', 'Send OTP')}
             </Button>
           )}
