@@ -61,6 +61,11 @@
       },
       "slot": "homepage-dashboard-slot"
     },
+      {
+      "component": "imagingOrdersDashboardLink",
+      "name": "kenyaemr-imaging-orders-dashboard-link",
+      "slot": "diagnostics-group-nav-slot"
+    },
     {
       "component": "claimsManagementSideNavGroup",
       "name": "claims-management-dashboard-nav-group",
@@ -130,7 +135,7 @@
       "slot": "homepage-dashboard-slot",
       "name": "billing-dashboard-nav-group",
       "meta": {
-        "name": "Accounting",
+        "name": "billing",
         "title": "Accounting",
         "slot": "billing-dashboard-slot"
       }
