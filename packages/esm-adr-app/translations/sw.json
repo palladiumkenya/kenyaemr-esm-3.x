@@ -1,6 +1,7 @@
 {
   "adrAssessment": "ADR Assessment",
   "adrAssessmentEncounters": "ADR Assessment Encounters",
+  "adrReport": "ADR Report",
   "encounters": "Encounters",
   "endDate": "End date",
   "noAdrEncountersFound": "Adr assessment encounters",

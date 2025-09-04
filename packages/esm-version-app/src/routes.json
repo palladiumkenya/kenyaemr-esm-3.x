@@ -47,8 +47,7 @@
         "name": "linkage-services",
         "title": "Linkage Services",
         "slot": "kenyaemr-home-dashboard-slot"
-      },
-      "slot": "homepage-dashboard-slot"
+      }
     },
     {
       "component": "diagnosticsDashboardNavGroup",

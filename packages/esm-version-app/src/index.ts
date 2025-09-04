@@ -55,11 +55,11 @@ export const linkageServicesDashboardNavGroup = getSyncLifecycle(
   }),
   options,
 );
-// t('Billing module', 'Billing module')
+// t('Accounting', 'Accounting')
 export const billingDashboardNavGroup = getSyncLifecycle(
   createDashboardGroup({
     slotName: 'billing-dashboard-group-nav-slot',
-    title: 'Accounting module',
+    title: 'Accounting',
     icon: Money,
     isExpanded: false,
   }),
