@@ -1,13 +1,13 @@
 {
-  "Billing module": "የክፍያ ሞጁል",
+  "Accounting module": "የሂሳብ አያያዝ ሞጁል",
   "Claims management": "የይገባኛል ጥያቄዎች አስተዳደር",
   "clinicalConsultation": "ክሊኒካዊ ምክክር",
   "Home": "መነሻ",
   "Linkage services": "የማገናኛ አገልግሎቶች",
   "Mortuary": "የሬሳ ክፍል",
-  "Patient services": "የታካሚ አገልግሎቶች",
+  "Queues and Appointment": "ወረፋ እና ቀጠሮ",
   "Referrals": "ሪፈራሎች",
   "Registration": "Registration",
   "systemInfo": "System Info",
-  "Wards": "ዎርዶች"
+  "Admissions": "የታካሚ ክፍል"
 }

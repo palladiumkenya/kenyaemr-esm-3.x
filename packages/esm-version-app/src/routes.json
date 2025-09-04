@@ -35,7 +35,7 @@
       "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "patient-services-dashboard",
-        "title": "Patient Services",
+        "title": "Queues and Appointment",
         "slot": "kenyaemr-home-dashboard-slot"
       }
     },
@@ -88,8 +88,8 @@
       "name": "kenyaemr-wards-dashboard-link",
       "slot": "homepage-dashboard-slot",
       "meta": {
-        "name": "ward",
-        "title": "Ward",
+        "name": "admissions",
+        "title": "Admissions",
         "slot": "ward-dashboard-slot"
       }
     },
@@ -130,8 +130,8 @@
       "slot": "homepage-dashboard-slot",
       "name": "billing-dashboard-nav-group",
       "meta": {
-        "name": "billing",
-        "title": "Billing",
+        "name": "Accounting",
+        "title": "Accounting",
         "slot": "billing-dashboard-slot"
       }
     }
