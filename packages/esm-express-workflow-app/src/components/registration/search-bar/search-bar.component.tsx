@@ -74,7 +74,6 @@ const SearchBar: React.FC = () => {
       setSelectedIdentifierItem(null);
     }
   };
-
   const getLocalPatientNationalIds = (results: LocalResponse | null): Set<string> => {
     const nationalIds = new Set<string>();
 
