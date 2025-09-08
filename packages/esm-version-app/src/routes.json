@@ -97,15 +97,24 @@
       }
     },
     {
+      "name": "kenyaemr-registration-dashboard-link",
       "component": "registrationDashboardLink",
       "order": 0,
-      "name": "kenyaemr-registration-dashboard-link",
       "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "registration",
         "title": "Registration",
-        "slot": "registration-slot"
+        "path": "registration",
+        "slot": "registration-homepage-dashboard-slot"
       }
+    },
+    {
+      "name": "home-page-registration-dashboard",
+      "component": "registration",
+      "slot": "registration-homepage-dashboard-slot",
+      "order": 0,
+      "online": true,
+      "offline": false
     },
     {
       "component": "patientChartClinicalConsultationNavGroup",

@@ -15,6 +15,7 @@ import HomeRoot from './app-navigation/root-overrides.component';
 import { createDashboardGroup, createLeftPanelLink } from './app-navigation/nav-utils';
 import { configSchema } from './config-schema';
 import rootComponent from './root.component';
+import Registration from './registration/overview/registration.component';
 
 const moduleName = '@kenyaemr/esm-version-app';
 
@@ -123,6 +124,7 @@ export const registrationDashboardLink = getSyncLifecycle(
   createLeftPanelLink({ route: '/home/registration', title: 'Registration', icon: UserFollow }),
   options,
 );
+export const registration = getSyncLifecycle(Registration, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
