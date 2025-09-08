@@ -70,9 +70,7 @@ const ProviderBannerTag: React.FC = () => {
       <div className={styles.bannerContent}>
         <div className={styles.divider} />
         <div className={styles.infoItem}>
-          <span className={styles.label}>
-            {t('healthProviderUniqueIdentifier', 'Health Provider unique identifier' + ':')}
-          </span>
+          <span className={styles.label}>{t('identifierProvider', 'Identifier' + ':')}</span>
           <span className={`${styles.value} ${styles.hwiValue}`}>{hwi}</span>
         </div>
 
@@ -80,9 +78,10 @@ const ProviderBannerTag: React.FC = () => {
 
         <>
           <div className={styles.infoItem}>
+            <span className={styles.label}>{t('licenseProvider', 'License' + ':')}</span>
+
             {shouldShowLicenseExpiry && (
               <>
-                <span className={styles.label}>{t('licenseExpiry', 'License Expiry' + ':')}</span>
                 <span className={styles.value}>{formattedExpiry}</span>
               </>
             )}
@@ -98,7 +97,7 @@ const ProviderBannerTag: React.FC = () => {
         </>
 
         <div className={styles.infoItem}>
-          <span className={styles.label}>{t('name', 'Name' + ':')}</span>
+          <span className={styles.label}>{t('nameProvider', 'Name' + ':')}</span>
           <span className={styles.value}>{name}</span>
         </div>
       </div>
