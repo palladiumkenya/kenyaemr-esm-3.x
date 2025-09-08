@@ -19,7 +19,8 @@
   },
   "resolutions": {
     "sass": "^1.54.3",
-    "webpack": "5.99.9"
+    "webpack": "5.99.9",
+    "@types/d3-dispatch": "3.0.6"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix"
@@ -38,7 +39,7 @@
   },
   "devDependencies": {
     "@carbon/pictograms-react": "^11.66.0",
-    "@openmrs/esm-framework": "^7.0.1-pre.3259",
+    "@openmrs/esm-framework": "next",
     "@openmrs/esm-patient-common-lib": "next",
     "@playwright/test": "^1.30.0",
     "@swc/cli": "^0.1.57",

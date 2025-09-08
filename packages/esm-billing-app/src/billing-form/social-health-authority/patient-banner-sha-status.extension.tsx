@@ -57,35 +57,36 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
     );
   }
 
-  const renderStatusTag = (isActiveStatus: boolean) => (
+  const renderStatusTag = (isActiveStatus: boolean, schemeName: string) => (
     <Tag className={classNames(styles.tag, isActiveStatus ? styles.activeTag : styles.inactiveTag)}>
-      {isActiveStatus ? t('active', 'Active') : t('inactive', 'Inactive')}
+      <span className={styles.schemeName}>{schemeName}</span>
+      <span>{isActiveStatus ? t('active', 'Active') : t('inactive', 'Inactive')}</span>
     </Tag>
   );
 
-  const renderCivilServantTag = (isEligible: boolean) => (
+  const renderCivilServantTag = (isEligible: boolean, schemeName: string) => (
     <Tag className={classNames(styles.tag, isEligible ? styles.activeTag : styles.inactiveTag)}>
-      {isEligible ? t('eligible', 'Eligible') : t('notEligible', 'Not Eligible')}
+      <span className={styles.schemeName}>{schemeName}</span>
+      <span>{isEligible ? t('eligible', 'Eligible') : t('notEligible', 'Not Eligible')}</span>
     </Tag>
   );
 
   return (
     <div>
       <span className={styles.separator}>&middot;</span>
-      <span>{t('phc', 'PHC')}</span>
-      {renderStatusTag(isActive || hasCrNumber)}
+
+      {renderStatusTag(isActive || hasCrNumber, t('phc', 'PHC'))}
 
       <span className={styles.separator}>&middot;</span>
-      <span>{t('shif', 'SHIF')}</span>
-      {renderStatusTag(isActive)}
+
+      {renderStatusTag(isActive, t('shif', 'SHIF'))}
 
       <span className={styles.separator}>&middot;</span>
-      <span>{t('eccif', 'ECCIF')}</span>
-      {renderStatusTag(isActive)}
+
+      {renderStatusTag(isActive, t('eccif', 'ECCIF'))}
 
       <span className={styles.separator}>&middot;</span>
-      <span>{t('civilServantScheme', 'CIVIL SERVANT SCHEME')}</span>
-      {renderCivilServantTag(civilServantScheme)}
+      {renderCivilServantTag(civilServantScheme, t('civilServantScheme', 'CIVIL SERVANT SCHEME'))}
     </div>
   );
 };

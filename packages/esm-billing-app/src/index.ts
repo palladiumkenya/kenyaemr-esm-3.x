@@ -184,6 +184,10 @@ export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
 export const billingCheckInForm = getSyncLifecycle(BillingCheckInForm, options);
 export const billingForm = getSyncLifecycle(BillingForm, options);
+export const billingDashboard = getAsyncLifecycle(
+  () => import('./billing-dashboard/billing-dashboard.component'),
+  options,
+);
 
 // Bill Manager Components
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);

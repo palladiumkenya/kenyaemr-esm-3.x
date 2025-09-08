@@ -44,20 +44,20 @@
       "slot": "admissions-dashboard-slot"
     },
     {
-      "component": "consulationLeftPanelLink",
-      "name": "consulation-dashboard-link",
+      "component": "consultationLeftPanelLink",
+      "name": "consultation-dashboard-link",
       "slot": "express-workflow-left-panel-slot",
       "order": 3,
       "meta": {
-        "name": "consulation",
-        "slot": "consulation-dashboard-slot",
-        "title": "Consulation"
+        "name": "consultation",
+        "slot": "consultation-dashboard-slot",
+        "title": "Consultation"
       }
     },
     {
-      "component": "consulationDashboard",
-      "name": "consulation-dashboard",
-      "slot": "consulation-dashboard-slot"
+      "component": "consultationDashboard",
+      "name": "consultation-dashboard",
+      "slot": "consultation-dashboard-slot"
     },
     {
       "component": "facilityLeftPanelLink",
@@ -80,7 +80,7 @@
       "name": "lab-dashboard-link",
       "slot": "express-workflow-left-panel-slot",
       "order": 5,
-      "meta": {
+    "meta": {
         "name": "lab",
         "slot": "lab-dashboard-slot",
         "title": "Lab"
@@ -130,14 +130,14 @@
       "order": 8,
       "meta": {
         "name": "procedures",
-        "slot": "procedures-dashboard-slot",
+        "slot": "root-procedures-dashboard-slot",
         "title": "Procedures"
       }
     },
     {
-      "component": "proceduresDashboard",
+      "component": "proceduresRootDashboard",
       "name": "procedures-dashboard",
-      "slot": "procedures-dashboard-slot"
+      "slot": "root-procedures-dashboard-slot"
     },
     {
       "component": "radiologyLeftPanelLink",
@@ -146,14 +146,14 @@
       "order": 6,
       "meta": {
         "name": "radiology",
-        "slot": "radiology-dashboard-slot",
+        "slot": "root-radiology-dashboard-slot",
         "title": "Radiology"
       }
     },
     {
-      "component": "radiologyDashboard",
+      "component": "radiologyRootDashboard",
       "name": "radiology-dashboard",
-      "slot": "radiology-dashboard-slot"
+      "slot": "root-radiology-dashboard-slot"
     },
     {
       "component": "registrationLeftPanelLink",
@@ -204,5 +204,35 @@
       "slot": "triage-dashboard-slot"
     }
   ],
-  "modals": []
+  "workspaces": [
+    {
+      "name": "express-workflow-workspace",
+      "component": "expressWorkflowWorkspace",
+      "title": "Express Workflow Workspace",
+      "type": "workspace",
+      "canMaximize": true,
+      "canHide": true
+    }
+  ],
+  "modals": [
+    {
+      "component": "otpVerificationModal",
+      "name": "otp-verification-modal"
+    }, {
+      "component": "facilityDashboardAuthorizationModal",
+      "name": "facility-dashboard-authorization-form-modal"
+    }
+  ],
+  "workspaceGroups": [
+    {
+      "name": "express-workflow",
+      "members": [
+        "add-drug-order",
+        "order-basket",
+        "add-lab-order",
+        "express-workflow-workspace",
+        "start-visit-workspace-form"
+      ]
+    }
+  ]
 }

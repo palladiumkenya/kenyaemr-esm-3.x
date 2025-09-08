@@ -1,0 +1,74 @@
+import React, { useMemo } from 'react';
+import useSWR from 'swr';
+import { ErrorState, ExtensionSlot, fetchCurrentPatient, WorkspaceContainer } from '@openmrs/esm-framework';
+import { useParams } from 'react-router-dom';
+import { InlineLoading, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+
+import { useInitialize } from './useInitialize';
+import styles from './patient-chart.scss';
+
+const PatientChart: React.FC = () => {
+  const { t } = useTranslation();
+  const { patientUuid } = useParams<{ patientUuid?: string }>();
+
+  const {
+    data: patient,
+    isLoading,
+    error,
+  } = useSWR(patientUuid ? ['patient', patientUuid] : null, () => fetchCurrentPatient(patientUuid!, {}));
+
+  const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
+
+  useInitialize(patientUuid, state);
+
+  if (isLoading) {
+    return <InlineLoading description={t('loadingPatient', 'Loading patient...')} />;
+  }
+
+  if (error) {
+    return <ErrorState headerTitle={t('errorLoadingPatient', 'Error loading patient')} error={error} />;
+  }
+
+  // TODO: A config to dynamically add tabs through dashboard config
+  const patientChartTabsExtensionSlotConfig = [
+    {
+      title: t('vitalsAndAnthropometric', 'Vitals and Anthropometric'),
+      slotName: 'vitals-and-anthropometric-slot',
+    },
+    {
+      title: t('programManagement', 'Program Management'),
+      slotName: 'program-management-slot',
+    },
+  ];
+
+  return (
+    <div className={styles.patientChart}>
+      {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
+      <div className={styles.tabsContainer}>
+        <Tabs>
+          <TabList contained>
+            {patientChartTabsExtensionSlotConfig.map((tabConfig, index) => (
+              <Tab key={index}>{tabConfig.title}</Tab>
+            ))}
+          </TabList>
+          <TabPanels>
+            {patientChartTabsExtensionSlotConfig.map((tabConfig, index) => (
+              <TabPanel key={index}>
+                <ExtensionSlot className={styles.extensionSlot} name={tabConfig.slotName} state={state} />
+              </TabPanel>
+            ))}
+          </TabPanels>
+        </Tabs>
+        <WorkspaceContainer
+          showSiderailAndBottomNav
+          key="express-workflow"
+          contextKey={`express-workflow/triage/${patientUuid}`}
+          additionalWorkspaceProps={state}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default PatientChart;

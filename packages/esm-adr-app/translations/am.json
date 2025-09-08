@@ -1,10 +1,12 @@
 {
   "adrAssessment": "የኤዲአር ግምገማ",
   "adrAssessmentEncounters": "የኤዲአር ግምገማ ግኝቶች",
+  "adrReport": "ኤዲአር ግምገማ ሪፖርት",
   "encounters": "ግኝቶች",
   "endDate": "የማብቂያ ቀን",
   "noAdrEncountersFound": "ምንም የኤዲአር ግኝቶች አልተገኙም",
   "noEncountersFoundTitle": "ምንም ግኝቶች አልተገኙም",
+  "printReport": "Print Report",
   "review": "ይገምግሙ",
   "startDate": "የመጀመሪያ ቀን",
   "summaryOfAdrAssessmentEncounters": "የኤዲአር ግምገማ ግኝቶች ማጠቃለያ",

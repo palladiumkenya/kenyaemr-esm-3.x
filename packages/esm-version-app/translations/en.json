@@ -1,5 +1,6 @@
 {
-  "Billing module": "Billing module",
+  "Accounting": "Accounting",
+  "Admissions": "Admissions",
   "Claims management": "Claims management",
   "clinicalConsultation": "Clinical consultation",
   "Home": "Home",
@@ -8,6 +9,5 @@
   "Patient services": "Patient services",
   "Referrals": "Referrals",
   "Registration": "Registration",
-  "systemInfo": "System Info",
-  "Wards": "Wards"
+  "systemInfo": "System Info"
 }

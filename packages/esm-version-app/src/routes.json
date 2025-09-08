@@ -35,7 +35,7 @@
       "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "patient-services-dashboard",
-        "title": "Patient Services",
+        "title": "Queues and Appointment",
         "slot": "kenyaemr-home-dashboard-slot"
       }
     },
@@ -47,8 +47,7 @@
         "name": "linkage-services",
         "title": "Linkage Services",
         "slot": "kenyaemr-home-dashboard-slot"
-      },
-      "slot": "homepage-dashboard-slot"
+      }
     },
     {
       "component": "diagnosticsDashboardNavGroup",
@@ -61,6 +60,11 @@
       },
       "slot": "homepage-dashboard-slot"
     },
+      {
+      "component": "imagingOrdersDashboardLink",
+      "name": "kenyaemr-imaging-orders-dashboard-link",
+      "slot": "diagnostics-group-nav-slot"
+    },
     {
       "component": "claimsManagementSideNavGroup",
       "name": "claims-management-dashboard-nav-group",
@@ -69,10 +73,9 @@
         "title": "Claims management Overview",
         "slot": "billing-dashboard-slot"
       },
-      "featureFlag": "healthInformationExchange",
-      "slot": "homepage-dashboard-slot"
+      "featureFlag": "healthInformationExchange"
     },
-    
+
     {
       "component": "referralsDashboardLink",
       "name": "kenyaemr-referrals-dashboard-link",
@@ -81,16 +84,6 @@
         "name": "referrals",
         "title": "Referrals",
         "slot": "referrals-slot"
-      }
-    },
-    {
-      "component": "wardsDashboardLink",
-      "name": "kenyaemr-wards-dashboard-link",
-      "slot": "homepage-dashboard-slot",
-      "meta": {
-        "name": "ward",
-        "title": "Ward",
-        "slot": "ward-dashboard-slot"
       }
     },
     {
@@ -131,7 +124,7 @@
       "name": "billing-dashboard-nav-group",
       "meta": {
         "name": "billing",
-        "title": "Billing",
+        "title": "Accounting",
         "slot": "billing-dashboard-slot"
       }
     }

@@ -90,3 +90,10 @@ export const specialClinicsDashboardMeta = {
   config: {},
   icon: 'omrs-icon-location',
 };
+
+export const dispensingDashboardMeta = {
+  name: 'dispensing',
+  title: 'Pharmacy',
+  path: 'dispensing',
+  icon: 'omrs-icon-image-medical',
+};

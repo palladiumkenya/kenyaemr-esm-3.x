@@ -18,6 +18,7 @@
 .tag {
   margin: layout.$spacing-02 0;
   white-space: nowrap;
+  min-width: fit-content;
 }
 
 .statusTag {
@@ -47,4 +48,15 @@
 
 .statusBackgroundColor {
   background-color: colors.$green-20;
+}
+
+.separator {
+  margin: 0 layout.$spacing-02;
+}
+
+.schemeName {
+  @include type.type-style('label-01');
+  color: colors.$gray-100;
+  font-weight: 600;
+  margin-right: layout.$spacing-02;
 }

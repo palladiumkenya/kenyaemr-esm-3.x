@@ -1,0 +1,15 @@
+@use '@carbon/layout';
+
+.patientChart {
+  margin-right: layout.$layout-04;
+}
+
+.tabsContainer {
+  margin-top: layout.$spacing-05;
+}
+
+.extensionSlot {
+  display: flex;
+  flex-direction: column;
+  row-gap: layout.$spacing-05;
+}

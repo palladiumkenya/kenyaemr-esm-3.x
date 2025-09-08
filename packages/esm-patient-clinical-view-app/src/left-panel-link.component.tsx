@@ -1,15 +1,20 @@
 import React, { useMemo } from 'react';
 import last from 'lodash-es/last';
 import { BrowserRouter, useLocation } from 'react-router-dom';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, MaybeIcon } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+
+import styles from './leftt-panel-link.scss';
 
 export interface LinkConfig {
   name: string;
   title: string;
+  icon?: string;
 }
 
 export function LinkExtension({ config }: { config: LinkConfig }) {
-  const { name, title } = config;
+  const { name, title, icon } = config;
+  const { t } = useTranslation();
   const location = useLocation();
   const spaBasePath = window.getOpenmrsSpaBase() + 'home';
 
@@ -26,9 +31,12 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
 
   return (
     <ConfigurableLink
-      to={spaBasePath + '/' + name}
-      className={`cds--side-nav__link ${name === urlSegment && 'active-left-nav-link'}`}>
-      {title}
+      className={`cds--side-nav__link ${name === urlSegment && 'active-left-nav-link'}`}
+      to={spaBasePath + '/' + name}>
+      <span className={styles.menu}>
+        <MaybeIcon icon={icon} className={styles.icon} size={16} />
+        <span>{t(title)}</span>
+      </span>
     </ConfigurableLink>
   );
 }
