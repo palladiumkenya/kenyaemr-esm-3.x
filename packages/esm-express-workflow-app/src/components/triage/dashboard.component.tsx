@@ -13,7 +13,7 @@ const TriageDashboard: React.FC<TriageDashboardProps> = ({ dashboardTitle }) => 
     <BrowserRouter basename={`${spaBasePath}/triage`}>
       <Routes>
         <Route path="/" element={<Triage dashboardTitle={dashboardTitle} />} />
-        <Route path="/:patientUuid" element={<PatientChart navigationPath='triage'/>} />
+        <Route path="/:patientUuid" element={<PatientChart navigationPath="triage" />} />
       </Routes>
     </BrowserRouter>
   );

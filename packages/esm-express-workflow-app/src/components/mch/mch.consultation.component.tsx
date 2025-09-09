@@ -25,7 +25,7 @@ const MCHConsultation: React.FC = () => {
         <Card title={t('investigationComplete', 'Investigation complete')} value={'7'} />
         <Card title={t('visitComplete', 'Visit complete')} value={'4'} />
       </div>
-      <QueueTab queues={consultationQueues} navigatePath='mch'/>
+      <QueueTab queues={consultationQueues} navigatePath="mch" />
     </div>
   );
 };

@@ -13,7 +13,7 @@ const ConsultationDashboard: React.FC<ConsultationDashboardProps> = ({ dashboard
     <BrowserRouter basename={`${spaBasePath}/consultation`}>
       <Routes>
         <Route path="/" element={<Consultation dashboardTitle={dashboardTitle} />} />
-        <Route path="/:patientUuid" element={<PatientChart navigationPath='consultation'/>} />
+        <Route path="/:patientUuid" element={<PatientChart navigationPath="consultation" />} />
       </Routes>
     </BrowserRouter>
   );

@@ -20,5 +20,4 @@ export const mchLeftPanelLink = getSyncLifecycle(
   options,
 );
 
-
-export const patientchartPartograph = getSyncLifecycle(Partograph, options)
+export const patientchartPartograph = getSyncLifecycle(Partograph, options);

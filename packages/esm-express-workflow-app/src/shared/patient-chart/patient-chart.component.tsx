@@ -35,7 +35,6 @@ const PatientChart: React.FC<PatientChartProps> = ({ navigationPath }) => {
     return <ErrorState headerTitle={t('errorLoadingPatient', 'Error loading patient')} error={error} />;
   }
 
-
   return (
     <div className={styles.patientChart}>
       {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}

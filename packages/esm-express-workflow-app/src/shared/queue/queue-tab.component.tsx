@@ -12,7 +12,7 @@ import styles from './queue-tab.scss';
 type QueueTabProps = {
   queues: Array<Queue>;
   cards?: Array<{ title: string; value: string }>;
-  navigatePath:string
+  navigatePath: string;
 };
 
 const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath }) => {
@@ -79,7 +79,11 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath }) => {
                         <InlineLoading description={t('loadingQueueEntries', 'Loading queue entries...')} />
                       </div>
                     )}
-                    <QueueEntryTable queueEntries={memoizedQueueEntries} key={`table-${queue.uuid}`} navigatePath={navigatePath}/>
+                    <QueueEntryTable
+                      queueEntries={memoizedQueueEntries}
+                      key={`table-${queue.uuid}`}
+                      navigatePath={navigatePath}
+                    />
                   </div>
                 )}
               </TabPanel>
