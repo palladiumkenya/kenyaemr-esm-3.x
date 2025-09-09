@@ -39,7 +39,7 @@ export const usePatientchartTabs = (navigationPath: string) => {
       },
       {
         title: t('partograph', 'Partograph'),
-        slotName: 'patient-chart-partograph-slot',
+        slotName: 'maternal-and-child-health-partograph-slot',
         paths: ['mch'],
         exclude: [],
       },

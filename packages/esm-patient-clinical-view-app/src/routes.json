@@ -91,6 +91,14 @@
       "offline": false
     },
     {
+      "name": "maternal-and-child-health-partograph",
+      "slot": "maternal-and-child-health-partograph-slot",
+      "component": "partograph",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+    {
       "name": "contact-list-dashboard-link",
       "component": "contactListLink",
       "slot": "patient-chart-dashboard-slot",
