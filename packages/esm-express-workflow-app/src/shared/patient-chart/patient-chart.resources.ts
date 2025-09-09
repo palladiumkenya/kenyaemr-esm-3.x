@@ -21,7 +21,7 @@ export const usePatientchartTabs = (navigationPath: string) => {
       },
       {
         title: t('programManagement', 'Program Management'),
-        slotName: 'program-management-slot',
+        slotName: 'patient-chart-care-panel-dashboard-slot',
         paths: '*',
         exclude: ['mch'],
       },
