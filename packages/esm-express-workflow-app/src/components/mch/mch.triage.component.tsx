@@ -25,7 +25,7 @@ const MCHTriage: React.FC = () => {
         <Card title={t('patientInWaiting', 'Patient in waiting')} value={queues.length.toString()} />
         <Card title={t('patientAttended', 'Patient attended')} value={String(10)} />
       </div>
-      <QueueTab queues={triageQueues} />
+      <QueueTab queues={triageQueues} navigatePath='mch'/>
     </div>
   );
 };

@@ -1,9 +1,8 @@
 import React from 'react';
-import styles from './dashboard.scss';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Triage from './triage.component';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { spaBasePath } from '../../constants';
 import PatientChart from '../../shared/patient-chart/patient-chart.component';
+import Triage from './triage.component';
 
 type TriageDashboardProps = {
   dashboardTitle: string;
@@ -14,7 +13,7 @@ const TriageDashboard: React.FC<TriageDashboardProps> = ({ dashboardTitle }) => 
     <BrowserRouter basename={`${spaBasePath}/triage`}>
       <Routes>
         <Route path="/" element={<Triage dashboardTitle={dashboardTitle} />} />
-        <Route path="/:patientUuid" element={<PatientChart />} />
+        <Route path="/:patientUuid" element={<PatientChart navigationPath='triage'/>} />
       </Routes>
     </BrowserRouter>
   );

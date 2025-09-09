@@ -29,7 +29,7 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
   return (
     <div>
       <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-      <QueueTab queues={consultationQueues} cards={cards} />
+      <QueueTab queues={consultationQueues} cards={cards} navigatePath='consultation'/>
     </div>
   );
 };

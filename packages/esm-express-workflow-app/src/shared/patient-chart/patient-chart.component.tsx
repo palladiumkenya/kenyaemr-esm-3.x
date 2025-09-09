@@ -1,14 +1,18 @@
 import React, { useMemo } from 'react';
 import useSWR from 'swr';
 import { ErrorState, ExtensionSlot, fetchCurrentPatient, WorkspaceContainer } from '@openmrs/esm-framework';
-import { useParams } from 'react-router-dom';
+import {  useParams } from 'react-router-dom';
 import { InlineLoading, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 
 import { useInitialize } from './useInitialize';
 import styles from './patient-chart.scss';
 
-const PatientChart: React.FC = () => {
+type PatientChartProps = {
+  navigationPath:string
+}
+
+const PatientChart: React.FC<PatientChartProps> = ({navigationPath}) => {
   const { t } = useTranslation();
   const { patientUuid } = useParams<{ patientUuid?: string }>();
 
@@ -40,6 +44,10 @@ const PatientChart: React.FC = () => {
       title: t('programManagement', 'Program Management'),
       slotName: 'program-management-slot',
     },
+    { // TODO: show only for mch
+      title: t('partograph', 'Partograph'),
+      slotName: 'patient-chart-partograph-slot',
+    },
   ];
 
   return (
@@ -63,7 +71,7 @@ const PatientChart: React.FC = () => {
         <WorkspaceContainer
           showSiderailAndBottomNav
           key="express-workflow"
-          contextKey={`express-workflow/triage/${patientUuid}`}
+          contextKey={`express-workflow/${navigationPath}/${patientUuid}`}
           additionalWorkspaceProps={state}
         />
       </div>

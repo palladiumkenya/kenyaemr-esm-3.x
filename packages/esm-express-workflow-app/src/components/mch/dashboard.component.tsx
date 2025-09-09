@@ -13,7 +13,7 @@ const MCHDashboard: React.FC<MchDashboardProps> = ({ dashboardTitle }) => {
     <BrowserRouter basename={`${spaBasePath}/mch`}>
       <Routes>
         <Route path="/" element={<MCH dashboardTitle={dashboardTitle} />} />
-        <Route path="/:patientUuid" element={<PatientChart />} />
+        <Route path="/:patientUuid" element={<PatientChart navigationPath='mch'/>} />
       </Routes>
     </BrowserRouter>
   );
