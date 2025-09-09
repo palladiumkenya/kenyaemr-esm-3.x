@@ -1,21 +1,22 @@
 import React, { useMemo } from 'react';
 import useSWR from 'swr';
 import { ErrorState, ExtensionSlot, fetchCurrentPatient, WorkspaceContainer } from '@openmrs/esm-framework';
-import {  useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { InlineLoading, Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 
 import { useInitialize } from './useInitialize';
 import styles from './patient-chart.scss';
+import { usePatientchartTabs } from './patient-chart.resources';
 
 type PatientChartProps = {
-  navigationPath:string
-}
+  navigationPath: string;
+};
 
-const PatientChart: React.FC<PatientChartProps> = ({navigationPath}) => {
+const PatientChart: React.FC<PatientChartProps> = ({ navigationPath }) => {
   const { t } = useTranslation();
   const { patientUuid } = useParams<{ patientUuid?: string }>();
-
+  const patientChartTabsExtensionSlotConfig = usePatientchartTabs(navigationPath);
   const {
     data: patient,
     isLoading,
@@ -34,21 +35,6 @@ const PatientChart: React.FC<PatientChartProps> = ({navigationPath}) => {
     return <ErrorState headerTitle={t('errorLoadingPatient', 'Error loading patient')} error={error} />;
   }
 
-  // TODO: A config to dynamically add tabs through dashboard config
-  const patientChartTabsExtensionSlotConfig = [
-    {
-      title: t('vitalsAndAnthropometric', 'Vitals and Anthropometric'),
-      slotName: 'vitals-and-anthropometric-slot',
-    },
-    {
-      title: t('programManagement', 'Program Management'),
-      slotName: 'program-management-slot',
-    },
-    { // TODO: show only for mch
-      title: t('partograph', 'Partograph'),
-      slotName: 'patient-chart-partograph-slot',
-    },
-  ];
 
   return (
     <div className={styles.patientChart}>
