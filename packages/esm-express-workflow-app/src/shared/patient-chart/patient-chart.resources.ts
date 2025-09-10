@@ -1,58 +1,58 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AssignedExtension, useAssignedExtensions, useConfig } from '@openmrs/esm-framework';
+import { ExpressWorkflowConfig } from '../../config-schema';
 
-export const usePatientchartTabs = (navigationPath: string) => {
+export const usePatientchartTabs = (navigationPath: string, patientUuid: string, patient?: fhir.Patient) => {
   const { t } = useTranslation();
-  const tabs = useMemo<
-    Array<{ title: string; slotName: string; paths: string | Array<string>; exclude: Array<string> }>
-  >(
-    () => [
+  const { patientChartConfig } = useConfig<ExpressWorkflowConfig>();
+  const extensions = useAssignedExtensions('patient-chart-dashboard-slot');
+  const tabs = useMemo<Array<AssignedExtension>>(() => {
+    const customeExtenstions: Array<AssignedExtension> = [
       {
-        title: t('patientSummary', 'Patient Summary'),
-        slotName: 'patient-chart-summary-dashboard-slot',
-        paths: '*',
-        exclude: [],
+        id: 'charts-partography-dashboard',
+        name: 'charts-partography-dashboard',
+        moduleName: '@openmrs/esm-express-workflow-app',
+        config: {},
+        meta: {
+          slot: 'maternal-and-child-health-partograph-slot',
+          path: t('partograph', 'Partograph'),
+        },
+        online: true,
+        offline: true,
       },
-      {
-        title: t('vitalsAndAnthropometric', 'Vitals and Anthropometric'),
-        slotName: 'patient-chart-vitals-biometrics-dashboard-slot',
-        paths: '*',
-        exclude: ['mch'],
-      },
-      {
-        title: t('programManagement', 'Program Management'),
-        slotName: 'patient-chart-care-panel-dashboard-slot',
-        paths: '*',
-        exclude: ['mch'],
-      },
-      {
-        title: t('orders', 'Orders'),
-        slotName: 'patient-chart-orders-dashboard-slot',
-        paths: '*',
-        exclude: [],
-      },
-      {
-        title: t('results', 'Results'),
-        slotName: 'patient-chart-test-results-dashboard-slot',
-        paths: '*',
-        exclude: [],
-      },
-      {
-        title: t('partograph', 'Partograph'),
-        slotName: 'maternal-and-child-health-partograph-slot',
-        paths: ['mch'],
-        exclude: [],
-      },
-    ],
-    [t],
-  );
+    ];
+    extensions.push(...customeExtenstions);
+    return extensions;
+  }, [t, extensions]);
 
-  const pathTabs = useMemo(
-    () =>
-      tabs.filter(
-        (tab) => (tab.paths === '*' || tab.paths.includes(navigationPath)) && !tab.exclude.includes(navigationPath),
-      ),
-    [tabs, navigationPath],
-  );
-  return pathTabs;
+  const tabsExtensions = useMemo(() => {
+    const isMchChart = navigationPath === 'mch';
+    if (!patient) return [];
+    return tabs.filter((tab) => {
+      const shouldShowExtensionForFemalePatientsOnly = patientChartConfig.femaleOnlyExtensions.includes(tab.id);
+      const shouldExcludeExtensionInMainChartAndIncludeInMchChart = patientChartConfig.excludeFromMainChart.includes(
+        tab.id,
+      );
+      const shouldShowExtensionOnMchChart = patientChartConfig.includeInMchChart.includes(tab.id);
+      const isCurrentPatientFemale = patient.gender.toLowerCase() === 'female';
+      if (patientChartConfig.excludeExtensions.includes(tab.id)) {
+        return false;
+      }
+      // Exclude if in mchOnlyExtensions and not on MCH chart
+      if (shouldExcludeExtensionInMainChartAndIncludeInMchChart && !isMchChart) {
+        return false;
+      }
+      // Exclude if not in mchExtensions and on MCH chart
+      if (isMchChart && !shouldShowExtensionOnMchChart && !shouldExcludeExtensionInMainChartAndIncludeInMchChart) {
+        return false;
+      }
+      // if femaleOnlyExtensions and patient is not female, exclude
+      if (shouldShowExtensionForFemalePatientsOnly && !isCurrentPatientFemale) {
+        return false;
+      }
+      return true;
+    });
+  }, [tabs, patientChartConfig, patient, navigationPath]);
+  return tabsExtensions;
 };

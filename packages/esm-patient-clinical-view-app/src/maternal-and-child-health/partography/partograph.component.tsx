@@ -13,6 +13,18 @@ import {
   TableRow,
   Tile,
   Button,
+  Checkbox,
+  RadioButton,
+  RadioButtonGroup,
+  Stack,
+  Tab,
+  TabListVertical,
+  TabPanel,
+  TabPanels,
+  TabsVertical,
+  TextInput,
+  Tabs,
+  TabList,
 } from '@carbon/react';
 import { Add, ChartLineSmooth } from '@carbon/react/icons';
 import { EmptyDataIllustration, ErrorState, CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -21,7 +33,7 @@ import styles from './labour-delivery.scss';
 import { usePartograph } from '../../hooks/usePartograph';
 import dayjs from 'dayjs';
 import {
-  CervicalDilation,
+  CervicalDilation as cervicalDilation,
   DeviceRecorded,
   FetalHeartRate,
   PartographEncounterFormUuid,
@@ -29,6 +41,11 @@ import {
   descentOfHeadObj,
 } from '../../utils/constants';
 import PartographChart from './partograph-chart';
+import FoetalHeartRate from './foetal-heart-rate.component';
+import MembraneAmnioticFluidAndMoulding from './membrane-amniotic-fluid-moulding.component';
+import CervicalDilation from './cervical-dilation.component';
+import DescentOfHead from './descent-of-head.component';
+import ContractionLevel from './contraction-level.component';
 
 interface PartographyProps {
   patientUuid: string;
@@ -77,7 +94,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         date: formatDate(parseDate(encounter.obsDatetime.toString()), { mode: 'wide', time: true }),
         timeRecorded: dayjs(new Date(groupmembersObj[DeviceRecorded])).format('HH:mm'),
         fetalHeartRate: groupmembersObj[FetalHeartRate],
-        cervicalDilation: groupmembersObj[CervicalDilation],
+        cervicalDilation: groupmembersObj[cervicalDilation],
         descentOfHead: descentOfHeadObj[groupmembersObj[SurgicalProcedure]],
         contractionFrequency: '--', // TODO: get from obsGroup 163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         contractionDuration: '--', // TODO: get from obsGroup 163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
@@ -96,7 +113,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         id: `${encounter.uuid}`,
         date: encounter.obsDatetime,
         fetalHeartRate: groupmembersObj[FetalHeartRate],
-        cervicalDilation: groupmembersObj[CervicalDilation],
+        cervicalDilation: groupmembersObj[cervicalDilation],
         descentOfHead: descentOfHeadObj[groupmembersObj[SurgicalProcedure]],
       };
     }) ?? [];
@@ -122,22 +139,39 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     return <ErrorState headerTitle={headerTitle} error={error} />;
   }
 
-  if (encounters?.length === 0) {
-    return (
-      <Layer>
-        <Tile className={styles.tile}>
-          <div className={!isDesktop(layout) ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{headerTitle}</h4>
-          </div>
-          <EmptyDataIllustration />
-          <p className={styles.content}>There is no partograph data to display for this patient.</p>
-          <Button onClick={handleAddHistory} renderIcon={Add} kind="ghost">
-            {t('recordLabourDetails', 'Record labour details')}
-          </Button>
-        </Tile>
-      </Layer>
-    );
-  }
+  return (
+    <div className={styles.expandedTabsParentContainer}>
+      <div className={styles.expandedTabsContainer}>
+        <Tabs>
+          <TabList aria-label={t('tabList', 'Tab List')}>
+            <Tab>{t('foetalHeartRate', 'Foetal Heart Rate')}</Tab>
+            <Tab>{t('membraneAmnioticFluidAndMoulding', 'Membrane Amniotic Fluid & Moulding')}</Tab>
+            <Tab>{t('cervicalDilation', 'Cervical Dilation')}</Tab>
+            <Tab>{t('descentOfHead', 'Descent of Head')}</Tab>
+            <Tab>{t('contractionLevel', 'Contraction level')}</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel className={styles.orderTabs}>
+              <FoetalHeartRate />
+            </TabPanel>
+            <TabPanel className={styles.orderTabs}>
+              <MembraneAmnioticFluidAndMoulding />
+            </TabPanel>
+            <TabPanel className={styles.orderTabs}>
+              <CervicalDilation />
+            </TabPanel>
+            <TabPanel className={styles.orderTabs}>
+              <DescentOfHead />
+            </TabPanel>
+            <TabPanel className={styles.orderTabs}>
+              <ContractionLevel />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </div>
+    </div>
+  );
+
   return (
     <>
       {(() => {

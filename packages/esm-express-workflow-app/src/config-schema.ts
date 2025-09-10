@@ -25,6 +25,25 @@ export const configSchema = {
       dashboardId: 'bd7102f9-9291-4a11-9b98-8a17d9142cac',
     },
   },
+  patientChartConfig: {
+    _type: Type.Object,
+    _description: 'Patient chart Tabs config',
+    _default: {
+      femaleOnlyExtensions: ['charts-partography-dashboard'],
+      excludeFromMainChart: ['charts-partography-dashboard'],
+      includeInMchChart: [
+        'charts-partography-dashboard',
+        'charts-summary-dashboard',
+        'care-panel-summary-dashboard-link',
+        'patient-orders-summary-dashboard',
+        'test-results-summary-dashboard',
+        'attachments-results-summary-dashboard',
+        'programs-summary-dashboard',
+        
+      ],
+      excludeExtensions: [],
+    },
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -32,5 +51,11 @@ export type ExpressWorkflowConfig = {
   supersetDashboardConfig: {
     host: string;
     dashboardId: string;
+  };
+  patientChartConfig: {
+    femaleOnlyExtensions: Array<string>;
+    excludeFromMainChart: Array<string>;
+    includeInMchChart: Array<string>;
+    excludeExtensions: Array<string>;
   };
 };

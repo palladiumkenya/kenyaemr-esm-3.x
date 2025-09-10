@@ -207,7 +207,7 @@
   "workspaces": [
     {
       "name": "express-workflow-workspace",
-      "component": "expressWorkflowWorkspace",
+      "component": "expressWorkflowWorkspace", 
       "title": "Express Workflow Workspace",
       "type": "workspace",
       "canMaximize": true,
