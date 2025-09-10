@@ -172,6 +172,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     </div>
   );
 
+  //TODO: Please remove bellow unreachable code after implemntation(Not Removed to help guide In implemntation of above Panels)
   return (
     <>
       {(() => {
