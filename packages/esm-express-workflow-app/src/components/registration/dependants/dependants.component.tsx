@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { DataTable, Table, TableHead, TableBody, TableRow, TableCell, TableHeader, Button, Tag } from '@carbon/react';
+import { TwoFactorAuthentication } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { launchWorkspace, showSnackbar, showModal, navigate } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
@@ -8,17 +9,28 @@ import { maskName } from '../helper';
 import { findExistingLocalPatient, registerOrLaunchDependent } from '../search-bar/search-bar.resource';
 import { getDependentsFromContacts, useMultipleActiveVisits } from './dependants.resource';
 import { HIEBundleResponse, HIEPatient } from '../type';
+import { otpManager } from '../card/HIE-card/hie-card.resource';
+import { launchOtpVerificationModal } from '../../../shared/otp-verification';
 
 type DependentProps = {
   patient: HIEPatient;
   localSearchResults?: any[] | null;
+  otpExpiryMinutes?: number;
 };
 
-const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchResults = null }) => {
+const DependentsComponent: React.FC<DependentProps> = ({
+  patient,
+  localSearchResults = null,
+  otpExpiryMinutes = 5,
+}) => {
   const { t } = useTranslation();
   const [submittingStates, setSubmittingStates] = useState<Record<string, boolean>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
   const [localPatientCache, setLocalPatientCache] = useState<Map<string, any>>(new Map());
+
+  const [verifiedSpouses, setVerifiedSpouses] = useState<Set<string>>(new Set());
+  const [otpRequestedForSpouse, setOtpRequestedForSpouse] = useState<Set<string>>(new Set());
+  const [activePhoneNumbers, setActivePhoneNumbers] = useState<Map<string, string>>(new Map());
 
   const dependents = useMemo(() => {
     try {
@@ -47,9 +59,72 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
     });
   }, []);
 
+  const getDependentPhoneNumber = useCallback(
+    (dependent: any): string => {
+      if (dependent.phoneNumber && dependent.phoneNumber !== 'N/A') {
+        return dependent.phoneNumber;
+      }
+
+      const localPatient = localPatientCache.get(dependent.id);
+      if (localPatient) {
+        const phoneAttribute = localPatient.attributes?.find(
+          (attr: any) =>
+            attr.attributeType?.display?.toLowerCase().includes('phone') ||
+            attr.attributeType?.display?.toLowerCase().includes('mobile') ||
+            attr.attributeType?.display?.toLowerCase().includes('telephone'),
+        );
+        if (phoneAttribute?.value) {
+          return phoneAttribute.value;
+        }
+      }
+
+      return '254700000000';
+    },
+    [localPatientCache],
+  );
+
+  const handleSpouseOTPRequest = useCallback((dependentId: string) => {
+    setOtpRequestedForSpouse((prev) => new Set(prev).add(dependentId));
+  }, []);
+
+  const handleSpouseOTPVerificationSuccess = useCallback((dependentId: string) => {
+    setVerifiedSpouses((prev) => new Set(prev).add(dependentId));
+    setOtpRequestedForSpouse((prev) => {
+      const newSet = new Set(prev);
+      newSet.delete(dependentId);
+      return newSet;
+    });
+    setActivePhoneNumbers((prev) => {
+      const newMap = new Map(prev);
+      newMap.delete(dependentId);
+      return newMap;
+    });
+  }, []);
+
+  const createSpouseOTPHandlers = useCallback(
+    (dependentId: string, dependentName: string, initialPhone: string) => {
+      return {
+        onRequestOtp: async (phoneNumber: string): Promise<void> => {
+          setActivePhoneNumbers((prev) => new Map(prev.set(dependentId, phoneNumber)));
+          await otpManager.requestOTP(phoneNumber, dependentName, otpExpiryMinutes);
+        },
+        onVerify: async (otp: string): Promise<void> => {
+          const activePhone = activePhoneNumbers.get(dependentId) || initialPhone;
+          const isValid = await otpManager.verifyOTP(activePhone, otp);
+          if (!isValid) {
+            throw new Error('OTP verification failed');
+          }
+        },
+      };
+    },
+    [activePhoneNumbers, otpExpiryMinutes],
+  );
+
   const handleDependentAction = useCallback(
     async (dependent: any) => {
       const localPatient = localPatientCache.get(dependent.id);
+      const isSpouse = dependent.relationship.toLowerCase() === 'spouse';
+      const isSpouseVerified = verifiedSpouses.has(dependent.id);
 
       if (localPatient) {
         const localPatientName =
@@ -82,7 +157,7 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
         }
       }
     },
-    [localPatientCache, t],
+    [localPatientCache, verifiedSpouses, t],
   );
 
   const headers = useMemo(
@@ -131,6 +206,10 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
       const isLoadingVisit = visitData.isLoading;
       const hasActiveVisit = !!dependentActiveVisit;
 
+      const isSpouse = dependent.relationship.toLowerCase() === 'spouse';
+      const isSpouseVerified = verifiedSpouses.has(dependent.id);
+      const otpRequestedForThisSpouse = otpRequestedForSpouse.has(dependent.id);
+
       const identifierParts = [];
       if (dependent.nationalId && dependent.nationalId !== 'N/A') {
         identifierParts.push(`ID: ${dependent.nationalId}`);
@@ -143,10 +222,13 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
       }
       const identifiersDisplay = identifierParts.length > 0 ? identifierParts.join(', ') : 'N/A';
 
+      const dependentPhoneNumber = getDependentPhoneNumber(dependent);
+      const { onRequestOtp, onVerify } = createSpouseOTPHandlers(dependent.id, dependent.name, dependentPhoneNumber);
+
       return {
         id: dependent.id,
         name: maskName ? maskName(capitalize(dependent.name.toLowerCase())) : capitalize(dependent.name.toLowerCase()),
-        relationship: capitalize(dependent.relationship.toLowerCase()),
+        relationship: <div>{capitalize(dependent.relationship.toLowerCase())}</div>,
         gender: capitalize(dependent.gender),
         birthDate: dependent.birthDate !== 'Unknown' ? dependent.birthDate : 'N/A',
         status: (
@@ -166,38 +248,83 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
         identifiers: identifiersDisplay,
         actions: (
           <div className={styles.actionButtons}>
-            {!isLocal && (
+            {isSpouse && !isSpouseVerified && !otpRequestedForThisSpouse && (
+              <Button
+                size="sm"
+                kind="primary"
+                renderIcon={TwoFactorAuthentication}
+                onClick={() => {
+                  handleSpouseOTPRequest(dependent.id);
+                  launchOtpVerificationModal({
+                    otpLength: 5,
+                    obscureText: false,
+                    phoneNumber: dependentPhoneNumber,
+                    expiryMinutes: otpExpiryMinutes,
+                    onRequestOtp,
+                    onVerify,
+                    onVerificationSuccess: () => handleSpouseOTPVerificationSuccess(dependent.id),
+                  });
+                }}>
+                {t('sendOtp', 'Send OTP')}
+              </Button>
+            )}
+
+            {isSpouse && !isSpouseVerified && otpRequestedForThisSpouse && (
               <Button
                 size="sm"
                 kind="ghost"
-                onClick={() => handleDependentAction(dependent)}
-                disabled={isSubmitting || isLoading}>
-                {isSubmitting
-                  ? t('processing', 'Processing...')
-                  : isLoading
-                  ? t('searching', 'Searching...')
-                  : t('registerDependent', 'Register Dependent')}
+                renderIcon={TwoFactorAuthentication}
+                onClick={() => {
+                  launchOtpVerificationModal({
+                    otpLength: 5,
+                    obscureText: false,
+                    phoneNumber: dependentPhoneNumber,
+                    expiryMinutes: otpExpiryMinutes,
+                    onRequestOtp,
+                    onVerify,
+                    onVerificationSuccess: () => handleSpouseOTPVerificationSuccess(dependent.id),
+                  });
+                }}>
+                {t('enterOtp', 'Enter OTP')}
               </Button>
             )}
 
-            {isLocal && !hasActiveVisit && (
-              <Button
-                size="sm"
-                kind="secondary"
-                onClick={() => handleDependentAction(dependent)}
-                disabled={isSubmitting || isLoading || isLoadingVisit}>
-                {isLoadingVisit ? t('searching', 'Searching...') : t('checkIn', 'Check In')}
-              </Button>
-            )}
+            {(!isSpouse || isSpouseVerified) && (
+              <>
+                {!isLocal && (
+                  <Button
+                    size="sm"
+                    kind="ghost"
+                    onClick={() => handleDependentAction(dependent)}
+                    disabled={isSubmitting || isLoading}>
+                    {isSubmitting
+                      ? t('processing', 'Processing...')
+                      : isLoading
+                      ? t('searching', 'Searching...')
+                      : t('registerDependent', 'Register Dependent')}
+                  </Button>
+                )}
 
-            {isLocal && hasActiveVisit && (
-              <Button
-                size="sm"
-                kind="secondary"
-                onClick={() => handleQueuePatient(dependentActiveVisit)}
-                disabled={isSubmitting || isLoading || isLoadingVisit}>
-                {t('queuePatient', 'Queue Patient')}
-              </Button>
+                {isLocal && !hasActiveVisit && (
+                  <Button
+                    size="sm"
+                    kind="secondary"
+                    onClick={() => handleDependentAction(dependent)}
+                    disabled={isSubmitting || isLoading || isLoadingVisit}>
+                    {isLoadingVisit ? t('searching', 'Searching...') : t('checkIn', 'Check In')}
+                  </Button>
+                )}
+
+                {isLocal && hasActiveVisit && (
+                  <Button
+                    size="sm"
+                    kind="secondary"
+                    onClick={() => handleQueuePatient(dependentActiveVisit)}
+                    disabled={isSubmitting || isLoading || isLoadingVisit}>
+                    {t('queuePatient', 'Queue Patient')}
+                  </Button>
+                )}
+              </>
             )}
           </div>
         ),
@@ -209,8 +336,15 @@ const DependentsComponent: React.FC<DependentProps> = ({ patient, localSearchRes
     submittingStates,
     loadingStates,
     visits,
+    verifiedSpouses,
+    otpRequestedForSpouse,
+    getDependentPhoneNumber,
+    createSpouseOTPHandlers,
+    handleSpouseOTPRequest,
+    handleSpouseOTPVerificationSuccess,
     handleDependentAction,
     handleQueuePatient,
+    otpExpiryMinutes,
     t,
   ]);
 
