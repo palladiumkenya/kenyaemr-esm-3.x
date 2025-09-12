@@ -188,6 +188,11 @@
       "slot": "reports-dashboard-slot"
     },
     {
+      "component": "mchProgramManagement",
+      "name": "mch-program-management",
+      "slot": "mch-program-management-slot"
+    },
+    {
       "component": "triageLeftPanelLink",
       "name": "triage-dashboard-link",
       "slot": "express-workflow-left-panel-slot",

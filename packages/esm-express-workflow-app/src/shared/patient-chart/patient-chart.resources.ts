@@ -21,6 +21,18 @@ export const usePatientchartTabs = (navigationPath: string, patientUuid: string,
         online: true,
         offline: true,
       },
+      {
+        id: 'charts-mch-program-management-dashboard',
+        name: 'charts-mch-program-management-dashboard',
+        moduleName: '@openmrs/esm-express-workflow-app',
+        config: {},
+        meta: {
+          slot: 'mch-program-management-slot',
+          path: t('programManagement', 'ProgramManagement'),
+        },
+        online: true,
+        offline: true,
+      },
     ];
     extensions.push(...customeExtenstions);
     return extensions;

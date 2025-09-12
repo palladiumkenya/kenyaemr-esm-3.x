@@ -39,9 +39,26 @@ export const configSchema = {
         'test-results-summary-dashboard',
         'attachments-results-summary-dashboard',
         'programs-summary-dashboard',
-        
+        'charts-mch-program-management-dashboard',
       ],
       excludeExtensions: [],
+    },
+  },
+  queueServiceConceptUuids: {
+    _type: Type.Object,
+    _description: 'Concept UUIDs for queue service',
+    _default: {
+      triageService: '167411AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      consultationService: '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  },
+  queuStatusConceptUuids: {
+    _type: Type.Object,
+    _description: 'Concept UUIDs for queue status',
+    _default: {
+      waitingStatus: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      inServiceStatus: '167408AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      finishedStatus: '167409AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
 };
@@ -57,5 +74,14 @@ export type ExpressWorkflowConfig = {
     excludeFromMainChart: Array<string>;
     includeInMchChart: Array<string>;
     excludeExtensions: Array<string>;
+  };
+  queueServiceConceptUuids: {
+    triageService: string;
+    consultationService: string;
+  };
+  queuStatusConceptUuids: {
+    waitingStatus: string;
+    inServiceStatus: string;
+    finishedStatus: string;
   };
 };

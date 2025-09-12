@@ -13,15 +13,17 @@ type QueueTabProps = {
   queues: Array<Queue>;
   cards?: Array<{ title: string; value: string }>;
   navigatePath: string;
+  onTabChanged?: (queue: Queue) => void;
 };
 
-const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath }) => {
+const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged }) => {
   const { t } = useTranslation();
   const [selectedQueue, setSelectedQueue] = useState<Queue | undefined>(() => queues[0]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const { queueEntries, isLoading, error } = useQueueEntries({
     location: selectedQueue?.location?.uuid ? [selectedQueue.location.uuid] : undefined,
+    
   });
 
   useEffect(() => {
@@ -34,6 +36,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath }) => {
 
   const handleQueueSelection = useCallback((queue: Queue) => {
     setSelectedQueue(queue);
+    onTabChanged?.(queue);
   }, []);
 
   if (isInitialLoad && isLoading) {
