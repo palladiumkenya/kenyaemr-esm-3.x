@@ -1,0 +1,9 @@
+// SCSS (chart.scss)
+
+@use '@carbon/colors';
+
+.chart-container {
+  .cds--cc--legend {
+    justify-content: flex-end; // pushes legend items to the right
+  }
+}
