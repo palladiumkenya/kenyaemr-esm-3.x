@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import AntenatalCare from './antenatal-care.component';
 import PostnatalCare from './postnatal-care.component';
 import LabourDelivery from './labour-delivery.component';
-import Partograph from './partography/partograph.component';
-
+import { ExtensionSlot } from '@openmrs/esm-framework';
 type MaternalAndChildDashboardProps = {
   patientUuid: string;
 };
@@ -32,7 +31,7 @@ const MaternalAndChildDashboard: React.FC<MaternalAndChildDashboardProps> = ({ p
             <LabourDelivery patientUuid={patientUuid} />
           </TabPanel>
           <TabPanel>
-            <Partograph patientUuid={patientUuid} />
+            <ExtensionSlot name="maternal-and-child-health-partograph-slot" state={{ patientUuid }} />
           </TabPanel>
         </TabPanels>
       </Tabs>

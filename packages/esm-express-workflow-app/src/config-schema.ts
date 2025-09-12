@@ -25,6 +25,42 @@ export const configSchema = {
       dashboardId: 'bd7102f9-9291-4a11-9b98-8a17d9142cac',
     },
   },
+  patientChartConfig: {
+    _type: Type.Object,
+    _description: 'Patient chart Tabs config',
+    _default: {
+      femaleOnlyExtensions: ['charts-partography-dashboard'],
+      excludeFromMainChart: ['charts-partography-dashboard'],
+      includeInMchChart: [
+        'charts-partography-dashboard',
+        'charts-summary-dashboard',
+        'care-panel-summary-dashboard-link',
+        'patient-orders-summary-dashboard',
+        'test-results-summary-dashboard',
+        'attachments-results-summary-dashboard',
+        'programs-summary-dashboard',
+        'charts-mch-program-management-dashboard',
+      ],
+      excludeExtensions: [],
+    },
+  },
+  queueServiceConceptUuids: {
+    _type: Type.Object,
+    _description: 'Concept UUIDs for queue service',
+    _default: {
+      triageService: '167411AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      consultationService: '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  },
+  queuStatusConceptUuids: {
+    _type: Type.Object,
+    _description: 'Concept UUIDs for queue status',
+    _default: {
+      waitingStatus: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      inServiceStatus: '167408AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      finishedStatus: '167409AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -32,5 +68,20 @@ export type ExpressWorkflowConfig = {
   supersetDashboardConfig: {
     host: string;
     dashboardId: string;
+  };
+  patientChartConfig: {
+    femaleOnlyExtensions: Array<string>;
+    excludeFromMainChart: Array<string>;
+    includeInMchChart: Array<string>;
+    excludeExtensions: Array<string>;
+  };
+  queueServiceConceptUuids: {
+    triageService: string;
+    consultationService: string;
+  };
+  queuStatusConceptUuids: {
+    waitingStatus: string;
+    inServiceStatus: string;
+    finishedStatus: string;
   };
 };
