@@ -1,0 +1,23 @@
+// SCSS (chart.scss)
+
+@use '@carbon/colors';
+ 
+.metricTile {
+  text-align: left;
+  background-color: colors.$white-0;
+  padding: 0.25rem;
+  font-size: 0.75rem !important;
+}
+
+.metricTitle {
+  font-size: 0.75rem !important;
+  font-weight: normal;
+  color: colors.$gray-100;
+}
+
+.metricValue {
+  font-size: 1.25rem !important;
+  font-weight: normal;
+  color: colors.$gray-100;
+  padding-top: 0.5rem;
+}
