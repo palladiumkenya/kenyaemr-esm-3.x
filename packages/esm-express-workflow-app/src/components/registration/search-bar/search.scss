@@ -15,6 +15,13 @@
   margin-bottom: layout.$spacing-04;
   margin: 0 auto layout.$spacing-04 auto;
   gap: layout.$spacing-04;
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    padding: layout.$spacing-03;
+    gap: layout.$spacing-02;
+    grid-template-columns: 1fr;
+    margin-bottom: layout.$spacing-02;
+  }
 }
 
 .patientSearchTile {
@@ -23,11 +30,28 @@
   padding-right: layout.$spacing-09;
   margin-bottom: layout.$spacing-05;
   background-color: colors.$white;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    padding-left: layout.$spacing-05;
+    padding-right: layout.$spacing-05;
+    margin-bottom: layout.$spacing-04;
+  }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    padding-left: layout.$spacing-03;
+    padding-right: layout.$spacing-03;
+    margin-bottom: layout.$spacing-03;
+  }
 }
 
 .clearButton {
   text-align: center;
   display: flex;
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 .searchForm {
@@ -35,35 +59,63 @@
   flex-direction: column;
   gap: layout.$spacing-05;
   margin-top: layout.$spacing-03;
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    gap: layout.$spacing-03;
+    margin-top: layout.$spacing-02;
+  }
 }
 
 .searchRow {
   display: flex;
   gap: layout.$spacing-06;
   align-items: end;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    gap: layout.$spacing-04;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    gap: layout.$spacing-03;
+  }
 }
 
-.identifierTypeColumn {
-  flex: 0 0 auto;
-  min-width: 250px;
-  margin-bottom: 0;
-}
 
 .identifierNumberColumn {
   flex: 1;
   margin-bottom: 0;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    width: 100%;
+  }
 }
 
 .searchInputContainer {
   display: flex;
   align-items: end;
   gap: 0;
+
   .formSearch {
     flex: 1;
     :global(.cds--search-input) {
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
       border-right: none;
+    }
+  }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    flex-direction: column;
+    gap: layout.$spacing-02;
+
+    .formSearch {
+      width: 100%;
+      :global(.cds--search-input) {
+        border-radius: 4px;
+        border-right: 1px solid colors.$gray-40;
+      }
     }
   }
 }
@@ -87,7 +139,19 @@
     width: 1rem;
     height: 1rem;
   }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    width: 100%;
+    margin-left: 0;
+    border-left: none;
+    border-radius: 4px;
+    
+    .loadingText {
+      font-size: 0.75rem;
+    }
+  }
 }
+
 .identifierTypeHeader {
   color: colors.$gray-70;
   display: inline-block;
@@ -95,13 +159,32 @@
   line-height: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;
   vertical-align: baseline;
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    font-size: 0.875rem;
+    margin-bottom: layout.$spacing-02;
+  }
 }
 
 .buttonContainer {
   display: flex;
   justify-content: flex-end;
   margin-top: layout.$spacing-03;
-  gap: layout.$spacing-03;
+  gap: layout.$spacing-01;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    flex-wrap: wrap;
+  }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    flex-direction: column;
+    gap: layout.$spacing-02;
+    margin-top: layout.$spacing-04;
+
+    button {
+      width: 100%;
+    }
+  }
 }
 
 .searchResultsContainer {
@@ -113,6 +196,19 @@
   gap: layout.$spacing-04;
   align-items: center;
   justify-content: flex-start;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    width: 95%;
+    margin-top: layout.$spacing-04;
+    gap: layout.$spacing-03;
+  }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    width: 100%;
+    margin-top: layout.$spacing-03;
+    gap: layout.$spacing-02;
+    padding: 0 layout.$spacing-02;
+  }
 }
 
 .formHeaderSection {
@@ -137,6 +233,17 @@
   & > span {
     @include type.type-style('body-01');
   }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    @include type.type-style('heading-03');
+    margin-bottom: layout.$spacing-04;
+    
+    &::after {
+      width: layout.$spacing-05;
+      border-bottom-width: 0.25rem;
+      bottom: -0.5rem;
+    }
+  }
 }
 
 .searchResults {
@@ -145,6 +252,17 @@
   align-items: flex-start;
   margin-top: layout.$spacing-05;
   margin-left: layout.$spacing-05;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    margin-left: layout.$spacing-03;
+    margin-top: layout.$spacing-04;
+  }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    margin-left: 0;
+    margin-top: layout.$spacing-02;
+    padding: 0 layout.$spacing-02;
+  }
 }
 
 .hieResultsSection,
@@ -158,6 +276,22 @@
   padding-right: 0;
   margin-bottom: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    max-width: 95%;
+    padding: layout.$spacing-03;
+    padding-bottom: 0;
+    padding-right: 0;
+  }
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    max-width: 100%;
+    margin-bottom: layout.$spacing-03;
+    padding: layout.$spacing-02;
+    padding-bottom: 0;
+    padding-right: 0;
+    border-radius: 2px;
+  }
 }
 
 .hieResultsSection {
@@ -173,6 +307,15 @@
   margin-bottom: layout.$spacing-03;
   padding-bottom: layout.$spacing-02;
   border-bottom: 1px solid colors.$gray-20;
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    margin-bottom: layout.$spacing-02;
+    padding-bottom: layout.$spacing-01;
+    
+    .identifierTypeHeader {
+      font-size: 0.875rem;
+    }
+  }
 }
 
 .patientInfo {
@@ -182,6 +325,11 @@
   grid-template-columns: auto 1fr;
   gap: layout.$spacing-04;
   align-items: center;
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    grid-template-columns: 1fr;
+    gap: layout.$spacing-02;
+  }
 }
 
 .buttonCol {
@@ -190,6 +338,14 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    grid-column: 1;
+    grid-row: 2;
+    justify-content: center;
+    margin-top: layout.$spacing-02;
+  }
 }
 
 .actionButtons {
@@ -197,10 +353,28 @@
   flex-direction: row;
   align-items: center;
   gap: layout.$spacing-03;
+
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    flex-direction: column;
+    gap: layout.$spacing-02;
+    width: 100%;
+    
+    button {
+      width: 100%;
+    }
+  }
 }
 
 .patientAvatar {
   margin-top: layout.$spacing-06;
+
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    margin-top: layout.$spacing-03;
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .dependentsSection {
@@ -210,10 +384,21 @@
   margin-top: layout.$spacing-04;
   border-top: 1px solid colors.$gray-20;
   padding-top: layout.$spacing-04;
+
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    margin-top: layout.$spacing-02;
+    padding-top: layout.$spacing-02;
+  }
 }
 
 .noDependents {
   padding-bottom: layout.$spacing-04;
+
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    padding-bottom: layout.$spacing-02;
+  }
 }
 
 .emptyStateContainer {
@@ -244,9 +429,61 @@
     color: colors.$cool-gray-70;
     font-size: layout.$spacing-05;
   }
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    min-height: 250px;
+    row-gap: layout.$spacing-01;
+
+    svg {
+      width: 150px;
+      height: 70px;
+    }
+
+    .title {
+      @include type.type-style('heading-02');
+    }
+
+    .subTitle {
+      font-size: 0.875rem;
+      text-align: center;
+      padding: 0 layout.$spacing-02;
+    }
+  }
+
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    min-height: 200px;
+    padding: layout.$spacing-04;
+
+    svg {
+      width: 120px;
+      height: 60px;
+    }
+
+    .title {
+      @include type.type-style('heading-03');
+      text-align: center;
+    }
+
+    .subTitle {
+      font-size: 0.75rem;
+      line-height: 1.2;
+    }
+  }
 }
 
 .metricsContainer {
   padding-left: layout.$spacing-09;
   padding-right: layout.$spacing-09;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    padding-left: layout.$spacing-05;
+    padding-right: layout.$spacing-05;
+  }
+
+
+  :global(.omrs-breakpoint-lt-tablet) & {
+    padding-left: layout.$spacing-03;
+    padding-right: layout.$spacing-03;
+  }
 }
