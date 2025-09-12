@@ -16,6 +16,10 @@ export function TopDiseasesChart({ data: topDiseases }: TopDiseasesChartProps) {
       left: {
         mapsTo: 'value',
         title: 'No. of Patients',
+        ticks: {
+          // ✅ Always show whole numbers
+          formatter: (tick) => (Number.isInteger(tick) ? tick : null),
+        },
       },
       bottom: {
         mapsTo: 'group',
