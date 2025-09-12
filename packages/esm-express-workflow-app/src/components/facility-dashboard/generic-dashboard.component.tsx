@@ -5,7 +5,7 @@ import { DashboardConfig } from '../../types/index';
 import styles from './generic-dashboard.scss';
 import { DashboardMetric } from './components/dashboardMetric.component';
 import DashboardChart from './components/emergencyOpdLineChart.component';
-import { TopDiseasesChart } from './components/topDiseasesChart.component';
+import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
 import HomeHeader from './components/header/home-header.component';
 import { fetchDashboardData, DashboardData } from './genericDashboard.resource';
 const GenericDashboard: React.FC = () => {
@@ -47,8 +47,13 @@ const GenericDashboard: React.FC = () => {
           <HomeHeader title="Dashboard" onDateChange={handleDateChange} />
 
           <div className={styles.dashboardView}>
-            {/* First Row: 3 Metric Tiles */}
+            {/* First Row: Bar Charts for Top Diseases */}
             <div className={styles.firstRow}>
+              <TopDiseasesBarCharts data={dashboardData?.topDiseases} />
+            </div>
+
+            {/* Second Row: 3 Metric Tiles */}
+            <div className={styles.secondRow}>
               <div className={styles.metricTile}>
                 <DashboardMetric
                   title="General OPD Attendance <5 years"
@@ -66,8 +71,8 @@ const GenericDashboard: React.FC = () => {
               </div>
             </div>
 
-            {/* Second Row: Left Metrics (30%) + Right Charts (70%) */}
-            <div className={styles.secondRow}>
+            {/* Third Row: Left Metrics (30%) + Right Line Chart (70%) */}
+            <div className={styles.thirdRow}>
               <div className={styles.leftSection}>
                 <div className={styles.verticalMetricTile}>
                   <DashboardMetric
@@ -83,13 +88,8 @@ const GenericDashboard: React.FC = () => {
                 </div>
               </div>
               <div className={styles.rightSection}>
-                <TopDiseasesChart data={dashboardData?.topDiseases} />
+                <DashboardChart data={dashboardData?.emergencyOpdData} />
               </div>
-            </div>
-
-            {/* Third Row: Data Table */}
-            <div className={styles.thirdRow}>
-              <DashboardChart data={dashboardData?.emergencyOpdData} />
             </div>
           </div>
         </section>

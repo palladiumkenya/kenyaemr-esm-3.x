@@ -16,10 +16,11 @@ function DashboardChart({ data: emergencyOpdData }: DashboardChartProps) {
     })) ?? [];
 
   const options: LineChartOptions = {
-    title: 'Emergency Cases',
+    title: 'Admitted/OPD',
     axes: {
       left: {
         mapsTo: 'value',
+        title: 'No. of Patients',
       },
       bottom: {
         scaleType: ScaleTypes.TIME,

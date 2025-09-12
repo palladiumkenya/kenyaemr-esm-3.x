@@ -40,8 +40,16 @@
   gap: 1.5rem;
 }
 
-// First Row: 3 Metric Tiles
+// First Row: Bar Charts
 .firstRow {
+  background-color: colors.$white-0;
+  padding: 1rem;
+  border: 1px solid colors.$gray-20;
+  border-radius: 4px;
+}
+
+// Second Row: 3 Metric Tiles
+.secondRow {
   display: flex;
   gap: 1rem;
   width: 100%;
@@ -55,8 +63,8 @@
   border-radius: 2px;
 }
 
-// Second Row: Split Layout
-.secondRow {
+// Third Row: Split Layout
+.thirdRow {
   display: flex;
   gap: 1rem;
   width: 100%;
@@ -79,14 +87,6 @@
 
 .rightSection {
   width: 70%;
-  background-color: colors.$white-0;
-  padding: 1rem;
-  border: 1px solid colors.$gray-20;
-  border-radius: 4px;
-}
-
-// Third Row: Data Table
-.thirdRow {
   background-color: colors.$white-0;
   padding: 1rem;
   border: 1px solid colors.$gray-20;
