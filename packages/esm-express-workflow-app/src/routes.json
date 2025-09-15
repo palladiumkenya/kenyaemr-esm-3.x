@@ -136,6 +136,11 @@
       "slot": "pharmacy-homepage-dashboard-slot",
       "online": true,
       "offline": false
+    },
+    {
+      "name": "patient-summary-dashboard",
+      "component": "patientSummaryDashboard",
+      "slot": "patient-chart-summary-dashboard-slot"
     }
   ],
   "workspaces": [
