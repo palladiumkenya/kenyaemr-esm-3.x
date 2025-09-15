@@ -1,100 +1,121 @@
-import { Button, InlineLoading, Layer, Tile } from '@carbon/react';
-import { ArrowRight, Logout } from '@carbon/react/icons';
-import { HomePictogram, PageHeader, showModal, showSnackbar, useConfig, useSession } from '@openmrs/esm-framework';
-import { embedDashboard } from '@superset-ui/embedded-sdk';
-import React, { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { type ExpressWorkflowConfig } from '../../config-schema';
-import { clearDashboardSession, decodeToken, getToken } from './dashboard.resources';
-import styles from './dashboard.scss';
-import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
-import { ChartBar } from '@carbon/pictograms-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useAssignedExtensions } from '@openmrs/esm-framework';
+
+import HomeHeader from './components/header/home-header.component';
+import DashboardChart from './components/emergencyOpdLineChart.component';
+import { DashboardConfig } from '../../types/index';
+import { DashboardMetric } from './components/dashboardMetric.component';
+import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
+import { fetchDashboardData, DashboardData } from './facility-dashboard.resource';
+import styles from './facility-dashboard.scss';
 
 const FacilityDashboard: React.FC = () => {
-  const { supersetDashboardConfig } = useConfig<ExpressWorkflowConfig>();
-  const [loading, setLoading] = useState(false);
-  const { t } = useTranslation();
-  const { user } = useSession();
-  const handleShowAuthorization = () => {
-    const dispose = showModal('facility-dashboard-authorization-form-modal', { size: 'sm', onClose: () => dispose() });
-  };
-  const { userProperties } = user;
-  const handleClearSesion = async () => {
+  const params = useParams();
+  const assignedExtensions = useAssignedExtensions('express-workflow-left-panel-slot');
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const today = useMemo(() => new Date().toISOString().split('T')[0], []);
+  const [dateRange, setDateRange] = useState({ startDate: today, endDate: today });
+
+  const dashboards = useMemo(() => {
+    const ungrouped = assignedExtensions
+      .map((extension) => extension.meta)
+      .filter((meta) => meta && Object.keys(meta).length > 0);
+    return (ungrouped as Array<DashboardConfig>) || [];
+  }, [assignedExtensions]);
+
+  const activeDashboard = useMemo(() => {
+    if (!dashboards.length) {
+      return undefined;
+    }
+    return dashboards.find((dashboard) => dashboard.name === params?.dashboard) || dashboards[0];
+  }, [dashboards, params?.dashboard]);
+
+  const loadData = useCallback(async (startDate?: string, endDate?: string) => {
+    setIsLoading(true);
     try {
-      setLoading(true);
-      await clearDashboardSession(user);
-      showSnackbar({
-        subtitle: t('sessionEndedSuccessfully', 'Session ended succesfull'),
-        title: t('success', 'Success'),
-        kind: 'success',
-      });
+      const data = await fetchDashboardData(startDate, endDate);
+      setDashboardData(data);
     } catch (error) {
-      showSnackbar({
-        subtitle: error?.message,
-        title: t('error', 'Error'),
-        kind: 'error',
-      });
+      // eslint-disable-next-line no-console
+      console.error('Failed to fetch dashboard data:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  };
+  }, []);
+
   useEffect(() => {
-    if (userProperties.dashboardAccessToken) {
-      const payload = decodeToken(userProperties.dashboardAccessToken);
-      const embed = async () => {
-        await embedDashboard({
-          id: supersetDashboardConfig.dashboardId, // given by the Superset embedding UI
-          supersetDomain: supersetDashboardConfig.host,
-          mountPoint: document.getElementById('superset-container'), // html element in which iframe render
-          fetchGuestToken: () => getToken(payload.username, payload.password, supersetDashboardConfig),
-          dashboardUiConfig: {
-            hideTitle: true,
-            hideChartControls: true,
-            hideTab: true,
-            filters: {
-              expanded: false,
-            },
-          },
-        });
-      };
-      if (document.getElementById('superset-container')) {
-        embed();
-      }
-      const iframe = document.querySelector('iframe');
-      if (iframe) {
-        iframe.style.width = '100%';
-        iframe.style.minHeight = '100vw';
-      }
-    } else {
-      const supersetContainer = document.getElementById('superset-container');
-      if (supersetContainer) {
-        supersetContainer.innerHTML = '';
-      }
-    }
-  }, [supersetDashboardConfig, userProperties]);
+    loadData(dateRange.startDate, dateRange.endDate);
+  }, [dateRange, loadData]);
+
+  const handleDateChange = useCallback((startDate: string, endDate: string) => {
+    setDateRange({ startDate, endDate });
+  }, []);
+
   return (
     <div>
-      <PageHeader className={styles.pageHeader} title={t('dashboard', 'Dashboard')} illustration={<HomePictogram />} />
-      {userProperties.dashboardAccessToken ? (
-        <div className={styles.actions}>
-          <Button size="xs" renderIcon={Logout} onClick={handleClearSesion} disabled={loading}>
-            {loading ? (
-              <InlineLoading description={t('loading', 'Loading') + '...'} />
-            ) : (
-              t('endDashboardsession', 'End Dashboard session')
-            )}
-          </Button>
-        </div>
-      ) : (
-        <Layer className={styles.empty}>
-          <ChartBar />
-          <p>{t('pleaseAuthorizeToViewDashboard', 'Please authorize to view dashboard')}</p>
-          <Button kind="ghost" renderIcon={ArrowRight} onClick={handleShowAuthorization}>
-            {t('authorize', 'Authorize')}
-          </Button>
-        </Layer>
-      )}
-      <div id="superset-container"></div>
+      <div className={styles.homePageWrapper}>
+        <section style={{ width: '100%' }}>
+          <HomeHeader title="Dashboard" onDateChange={handleDateChange} />
+
+          {!dashboards.length ? (
+            <div className={styles.dashboardView}>No dashboards available.</div>
+          ) : isLoading ? (
+            <div className={styles.dashboardView}>Loading...</div>
+          ) : (
+            <div className={styles.dashboardView}>
+              {/* First Row: Bar Charts for Top Diseases */}
+              <div className={styles.firstRow}>
+                <TopDiseasesBarCharts data={dashboardData?.topDiseases} />
+              </div>
+
+              {/* Second Row: 3 Metric Tiles */}
+              <div className={styles.secondRow}>
+                <div className={styles.metricTile}>
+                  <DashboardMetric
+                    title="General OPD Attendance <5 years"
+                    value={dashboardData?.metrics.opdUnder5 ?? 0}
+                  />
+                </div>
+                <div className={styles.metricTile}>
+                  <DashboardMetric
+                    title="General OPD Attendance >5 years"
+                    value={dashboardData?.metrics.opdOver5 ?? 0}
+                  />
+                </div>
+                <div className={styles.metricTile}>
+                  <DashboardMetric
+                    title="Number of Emergency Cases Seen"
+                    value={dashboardData?.metrics.emergencyCases ?? 0}
+                  />
+                </div>
+              </div>
+
+              {/* Third Row: Left Metrics (30%) + Right Line Chart (70%) */}
+              <div className={styles.thirdRow}>
+                <div className={styles.leftSection}>
+                  <div className={styles.verticalMetricTile}>
+                    <DashboardMetric
+                      title="Total Number of Referrals - IN"
+                      value={dashboardData?.metrics.referralsIn ?? 0}
+                    />
+                  </div>
+                  <div className={styles.verticalMetricTile}>
+                    <DashboardMetric
+                      title="Total Number of Referrals - OUT"
+                      value={dashboardData?.metrics.referralsOut ?? 0}
+                    />
+                  </div>
+                </div>
+                <div className={styles.rightSection}>
+                  <DashboardChart data={dashboardData?.emergencyOpdData} />
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 };

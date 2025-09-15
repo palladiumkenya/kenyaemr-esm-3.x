@@ -1,9 +1,8 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import Triage from './triage.component';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import TriageDashboard from './dashboard.component';
+import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
 
 const options = {
   featureName: 'express-workflow',
@@ -13,10 +12,9 @@ const options = {
 export const triageDashboard = getSyncLifecycle(TriageDashboard, options);
 // t('Triage', 'Triage')
 export const triageLeftPanelLink = getSyncLifecycle(
-  createDashboardLink({
+  createLeftPanelLink({
+    name: 'triage',
     title: 'Triage',
-    path: 'triage',
-    icon: 'omrs-icon-activity',
   }),
   options,
 );
