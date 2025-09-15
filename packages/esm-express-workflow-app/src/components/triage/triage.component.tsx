@@ -31,7 +31,7 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   return (
     <div>
       <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-      <QueueTab queues={triageQueues} navigatePath="triage" />
+      <QueueTab queues={triageQueues} navigatePath="triage" usePatientChart />
     </div>
   );
 };

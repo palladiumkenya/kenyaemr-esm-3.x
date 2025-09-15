@@ -17,7 +17,7 @@ type QueueTabProps = {
   usePatientChart?: boolean;
 };
 
-const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged }) => {
+const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged,usePatientChart }) => {
   const { t } = useTranslation();
   const [selectedQueue, setSelectedQueue] = useState<Queue | undefined>(() => queues[0]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
