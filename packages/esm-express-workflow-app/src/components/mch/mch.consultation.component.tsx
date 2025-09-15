@@ -19,13 +19,14 @@ const MCHConsultation: React.FC = () => {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
 
-  if (!consultationQueues.length)
+  if (!consultationQueues.length) {
     return (
       <EmptyState
         headerTitle={t('mchConsultationQueues', 'MCH Consultation Queues')}
         displayText={t('mchConsultationQueues', 'MCH Consultation Queues')}
       />
     );
+  }
   return (
     <QueueTab
       queues={consultationQueues}

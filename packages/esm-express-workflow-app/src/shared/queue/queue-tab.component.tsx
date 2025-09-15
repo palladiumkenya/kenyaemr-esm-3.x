@@ -17,14 +17,13 @@ type QueueTabProps = {
   usePatientChart?: boolean;
 };
 
-const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged,usePatientChart }) => {
+const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged, usePatientChart }) => {
   const { t } = useTranslation();
   const [selectedQueue, setSelectedQueue] = useState<Queue | undefined>(() => queues[0]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const { queueEntries, isLoading, error } = useQueueEntries({
     location: selectedQueue?.location?.uuid ? [selectedQueue.location.uuid] : undefined,
-    
   });
 
   useEffect(() => {
@@ -38,7 +37,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
   const handleQueueSelection = useCallback((queue: Queue) => {
     setSelectedQueue(queue);
     onTabChanged?.(queue);
-  }, []);
+  }, [onTabChanged]);
 
   if (isInitialLoad && isLoading) {
     return <TabsSkeleton />;

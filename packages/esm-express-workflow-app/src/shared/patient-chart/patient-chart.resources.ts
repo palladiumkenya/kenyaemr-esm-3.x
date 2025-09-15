@@ -40,7 +40,9 @@ export const usePatientchartTabs = (navigationPath: string, patientUuid: string,
 
   const tabsExtensions = useMemo(() => {
     const isMchChart = navigationPath === 'mch';
-    if (!patient) return [];
+    if (!patient) {
+      return [];
+    }
     return tabs.filter((tab) => {
       const shouldShowExtensionForFemalePatientsOnly = patientChartConfig.femaleOnlyExtensions.includes(tab.id);
       const shouldExcludeExtensionInMainChartAndIncludeInMchChart = patientChartConfig.excludeFromMainChart.includes(

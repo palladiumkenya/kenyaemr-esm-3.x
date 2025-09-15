@@ -56,7 +56,7 @@ const ProgramForm: FC<ProgramFormProps> = ({ patientUuid, program, enrollment, c
       });
 
       closeWorkspace();
-      onSubmitSuccess?.()
+      onSubmitSuccess?.();
     } catch (e) {
       showSnackbar({ kind: 'error', title: 'Error', subtitle: e?.message });
       console.error(e);

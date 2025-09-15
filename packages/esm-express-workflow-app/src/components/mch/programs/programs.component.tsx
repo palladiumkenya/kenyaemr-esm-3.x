@@ -35,7 +35,7 @@ const Programs: React.FC<ProgramsProps> = ({ patientUuid }) => {
         size: 'sm',
       });
     },
-    [patientUuid, mutate],
+    [patientUuid],
   );
 
   const launchProgramForm = (program: Program, enrollment?: Enrollement) => {
@@ -48,9 +48,15 @@ const Programs: React.FC<ProgramsProps> = ({ patientUuid }) => {
     });
   };
 
-  if (isLoading) return <StructuredListSkeleton rowCount={5} />;
-  if (error) return <ErrorState headerTitle={title} error={error} />;
-  if (!allPrograms.length) return <EmptyState displayText={t('programs', 'Programs')} headerTitle={title} />;
+  if (isLoading) {
+    return <StructuredListSkeleton rowCount={5} />;
+  }
+  if (error) {
+    return <ErrorState headerTitle={title} error={error} />;
+  }
+  if (!allPrograms.length) {
+    return <EmptyState displayText={t('programs', 'Programs')} headerTitle={title} />;
+  }
 
   return (
     <StructuredListWrapper selectedInitialRow="row-2" selection>
