@@ -5,7 +5,7 @@ import { useLeftNav } from '@openmrs/esm-framework';
 import styles from './root.scss';
 import DashboardContainer from './components/dashboard/dashboard-container.component';
 import { spaBasePath } from './constants';
-import GenericDashboard from './components/facility-dashboard/generic-dashboard.component';
+import FacilityDashboard from './components/facility-dashboard/facility-dashboard.component';
 
 const Root: React.FC = () => {
   useLeftNav({ name: 'express-workflow-left-panel-slot', basePath: spaBasePath });
@@ -15,7 +15,7 @@ const Root: React.FC = () => {
       <main className={styles.container}>
         <Routes>
           <Route path="/" element={<DashboardContainer />} />
-          <Route path="/:dashboard/*" element={<GenericDashboard />} />
+          <Route path="/:dashboard/*" element={<FacilityDashboard />} />
         </Routes>
       </main>
     </BrowserRouter>
