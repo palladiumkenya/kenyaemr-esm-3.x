@@ -17,3 +17,9 @@ export const benefitsPackageDashboardMeta = {
   title: 'Insurance benefits',
   path: 'insurance-benefits',
 };
+
+export const accountingDashboardMeta = {
+  name: 'accounting',
+  title: 'Accounting',
+  path: 'accounting',
+};

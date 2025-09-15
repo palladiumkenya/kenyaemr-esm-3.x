@@ -1,8 +1,8 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import MCHDashboard from './dashboard.component';
+import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
 
 const options = {
   featureName: 'express-workflow',
@@ -11,10 +11,9 @@ const options = {
 
 export const mchDashboard = getSyncLifecycle(MCHDashboard, options);
 export const mchLeftPanelLink = getSyncLifecycle(
-  createDashboardLink({
+  createLeftPanelLink({
     title: 'MCH',
-    path: 'mch',
-    icon: 'omrs-icon-pedestrian-family',
+    name: 'mch',
   }),
   options,
 );

@@ -12,9 +12,10 @@ import styles from './queue-tab.scss';
 type QueueTabProps = {
   queues: Array<Queue>;
   cards?: Array<{ title: string; value: string }>;
+  usePatientChart?: boolean;
 };
 
-const QueueTab: React.FC<QueueTabProps> = ({ queues, cards }) => {
+const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, usePatientChart }) => {
   const { t } = useTranslation();
   const [selectedQueue, setSelectedQueue] = useState<Queue | undefined>(() => queues[0]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -78,7 +79,11 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards }) => {
                         <InlineLoading description={t('loadingQueueEntries', 'Loading queue entries...')} />
                       </div>
                     )}
-                    <QueueEntryTable queueEntries={memoizedQueueEntries} key={`table-${queue.uuid}`} />
+                    <QueueEntryTable
+                      usePatientChart={usePatientChart}
+                      queueEntries={memoizedQueueEntries}
+                      key={`table-${queue.uuid}`}
+                    />
                   </div>
                 )}
               </TabPanel>

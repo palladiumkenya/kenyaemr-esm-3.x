@@ -17,9 +17,19 @@
   ],
   "extensions": [
     {
-      "component": "billingDashboard",
+      "component": "accountingDashboardLink",
+      "name": "accounting-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "accounting",
+        "slot": "accounting-dashboard-slot",
+        "title": "Accounting"
+      }
+    },
+    {
       "name": "billing-dashboard",
-      "slot": "accounting-slot"
+      "component": "billingDashboard",
+      "slot": "accounting-dashboard-slot"
     },
     {
       "component": "benefitsPackageDashboardLink",
@@ -79,10 +89,7 @@
       "slot": "extra-visit-attribute-slot",
       "component": "billingCheckInForm"
     },
-    {
-      "name": "require-billing-modal",
-      "component": "requirePaymentModal"
-    },
+    
     {
       "name": "patient-banner-billing-tags",
       "component": "visitAttributeTags",
@@ -141,55 +148,14 @@
       "order": 0
     },
     {
-      "component": "billingOverviewLink",
-      "name": "billing-overview-link",
-      "order": 0,
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
-      "component": "billDepositDashboardLink",
-      "name": "bill-deposit-dashboard-link",
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
-      "component": "paymentHistoryLink",
-      "name": "payment-history-link",
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
-      "component": "paymentPointsLink",
-      "name": "payment-points-link",
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
-      "component": "paymentModesLink",
-      "name": "payment-modes-link",
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
-      "component": "billManagerLink",
-      "name": "bill-manager-link",
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
-      "component": "chargeableItemsLink",
-      "name": "chargeable-items-link",
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
-      "component": "billableExemptionsLink",
-      "name": "billable-exemptions-link",
-      "slot": "billing-dashboard-group-nav-slot"
-    },
-    {
       "component": "claimsManagementOverviewDashboardLink",
       "name": "claims-management-overview-link",
-      "slots": ["claims-management-dashboard-link-slot","billing-dashboard-group-nav-slot"]
+      "slots": ["claims-management-dashboard-link-slot"]
     },
     {
       "component": "preAuthRequestsDashboardLink",
       "name": "preauthrequest-overview-link",
-      "slots": ["claims-management-dashboard-link-slot","billing-dashboard-group-nav-slot"]
+      "slots": ["claims-management-dashboard-link-slot"]
     },
     {
       "component": "claimsOverview",
@@ -340,6 +306,10 @@
     {
       "name": "bill-action-modal",
       "component": "billActionModal"
+    },
+    {
+      "name": "require-billing-modal",
+      "component": "requirePaymentModal"
     }
   ]
 }
