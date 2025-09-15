@@ -34,10 +34,13 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
 
   const memoizedQueueEntries = useMemo(() => queueEntries, [queueEntries]);
 
-  const handleQueueSelection = useCallback((queue: Queue) => {
-    setSelectedQueue(queue);
-    onTabChanged?.(queue);
-  }, [onTabChanged]);
+  const handleQueueSelection = useCallback(
+    (queue: Queue) => {
+      setSelectedQueue(queue);
+      onTabChanged?.(queue);
+    },
+    [onTabChanged],
+  );
 
   if (isInitialLoad && isLoading) {
     return <TabsSkeleton />;
