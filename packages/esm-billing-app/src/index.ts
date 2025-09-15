@@ -2,7 +2,7 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerFeatur
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 import { configSchema } from './config-schema';
-import { benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
+import { accountingDashboardMeta, benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
 const moduleName = '@kenyaemr/esm-billing-app';
 const options = {
   featureName: 'billing',
@@ -81,104 +81,6 @@ import PaymentWorkspace from './invoice/payments/payment-form/payment.workspace'
 // Translation
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-// Dashboard Links
-export const billingSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...dashboardMeta, icon: 'omrs-icon-money', moduleName }),
-  options,
-);
-
-// Navigation Links
-// t('overview', 'Overview')
-export const billingOverviewLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: '',
-    title: 'overview',
-  }),
-  options,
-);
-// t('Exemptions', 'Exemptions')
-export const billableExemptionsLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'billable-exemptions',
-    title: 'Exemptions',
-  }),
-  options,
-);
-// t('Payment History', 'Payment History')
-export const paymentHistoryLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'payment-history',
-    title: 'Payment History',
-  }),
-  options,
-);
-// t('Payment Points', 'Payment Points')
-export const paymentPointsLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'payment-points',
-    title: 'Payment Points',
-  }),
-  options,
-);
-// t('Payment Modes', 'Payment Modes')
-export const paymentModesLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'payment-modes',
-    title: 'Payment Modes',
-  }),
-  options,
-);
-// t('Bill Manager', 'Bill Manager')
-export const billManagerLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'bill-manager',
-    title: 'Bill Manager',
-  }),
-  options,
-);
-// t('Charge Items', 'Charge Items')
-export const chargeableItemsLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'charge-items',
-    title: 'Charge Items',
-  }),
-  options,
-);
-// t('Claims Overview', 'Claims Overview')
-export const claimsManagementOverviewDashboardLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'claims-overview',
-    title: 'Claims Overview',
-  }),
-  options,
-);
-// t('Pre-Auth Requests', 'Pre-Auth Requests')
-export const preAuthRequestsDashboardLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'preauth-requests',
-    title: 'Pre-Auth Requests',
-  }),
-  options,
-);
-
-// t('Bill Deposit', 'Bill Deposit')
-export const billDepositDashboardLink = getSyncLifecycle(
-  createLeftPanelLink({
-    name: 'bill-deposit',
-    title: 'Bill Deposit',
-  }),
-  options,
-);
-// t('Insurance benefits', 'Insurance benefits')
-export const benefitsPackageDashboardLink = getSyncLifecycle(
-  createDashboardLink({
-    ...benefitsPackageDashboardMeta,
-    icon: '',
-    moduleName,
-  }),
-  options,
-);
-
 // Core Components
 export const root = getSyncLifecycle(rootComponent, options);
 export const billingPatientSummary = getSyncLifecycle(BillHistory, options);
@@ -255,6 +157,8 @@ export const patientBannerShaStatus = getAsyncLifecycle(
     moduleName,
   },
 );
+
+export const accountingDashboardLink = getSyncLifecycle(createLeftPanelLink({ ...accountingDashboardMeta }), options);
 
 // App Startup
 export function startupApp() {

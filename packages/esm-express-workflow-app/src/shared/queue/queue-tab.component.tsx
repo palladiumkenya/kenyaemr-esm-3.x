@@ -14,6 +14,7 @@ type QueueTabProps = {
   cards?: Array<{ title: string; value: string }>;
   navigatePath: string;
   onTabChanged?: (queue: Queue) => void;
+  usePatientChart?: boolean;
 };
 
 const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged }) => {
@@ -86,6 +87,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
                       queueEntries={memoizedQueueEntries}
                       key={`table-${queue.uuid}`}
                       navigatePath={navigatePath}
+                      usePatientChart={usePatientChart}
                     />
                   </div>
                 )}

@@ -18,13 +18,9 @@ export * from './components/registration';
 export * from './components/triage';
 export * from './components/accounting';
 export * from './components/consultation';
-export * from './components/admissions';
-export * from './components/lab';
 export * from './components/mch';
-export * from './components/pharmacy';
-export * from './components/procedures';
-export * from './components/radiology';
 export * from './components/reports';
+export * from './components/pharmacy';
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 export const otpVerificationModal = getAsyncLifecycle(

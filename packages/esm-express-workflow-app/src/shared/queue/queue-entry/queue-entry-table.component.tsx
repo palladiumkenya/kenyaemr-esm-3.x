@@ -11,9 +11,14 @@ import { type QueueEntry } from '../../../types/index';
 type QueueEntryTableProps = {
   navigatePath?: string;
   queueEntries: Array<QueueEntry>;
+  usePatientChart?: boolean;
 };
 
-const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triage', queueEntries }) => {
+const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
+  navigatePath = 'triage',
+  queueEntries,
+  usePatientChart,
+}) => {
   const pageSize = 10;
   const { t } = useTranslation();
   const { currentPage, goTo, results } = usePagination(queueEntries, pageSize);
@@ -46,19 +51,26 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({ navigatePath = 'triag
     },
   ];
 
-  const rows = queueEntries.map((queueEntry) => ({
-    id: queueEntry.uuid,
-    visitTime: formatDatetime(parseDate(queueEntry.visit.startDatetime), { mode: 'standard' }),
-    identifier: queueEntry.patient.identifiers?.[0]?.identifier,
-    name: (
-      <ConfigurableLink className={styles.link} to={`${spaBasePath}/${navigatePath}/${queueEntry.patient.uuid}`}>
-        {queueEntry.patient.person.display}
-      </ConfigurableLink>
-    ),
-    gender: queueEntry.patient.person.gender,
-    age: age(queueEntry.patient.person.birthdate),
-    priority: queueEntry.priority.name.display,
-  }));
+  const rows = queueEntries.map((queueEntry) => {
+    const patientChartUrl = usePatientChart
+      ? `${window.spaBase}/patient/${queueEntry.patient.uuid}/chart/Patient Summary`
+      : `${spaBasePath}/${navigatePath}/${queueEntry.patient.uuid}`;
+    {
+      return {
+        id: queueEntry.uuid,
+        visitTime: formatDatetime(parseDate(queueEntry.visit.startDatetime), { mode: 'standard' }),
+        identifier: queueEntry.patient.identifiers?.[0]?.identifier,
+        name: (
+          <ConfigurableLink className={styles.link} to={patientChartUrl}>
+            {queueEntry.patient.person.display}
+          </ConfigurableLink>
+        ),
+        gender: queueEntry.patient.person.gender,
+        age: age(queueEntry.patient.person.birthdate),
+        priority: queueEntry.priority.name.display,
+      };
+    }
+  });
 
   if (queueEntries.length === 0) {
     return <div>{t('noPatientsAwaiting', 'No patients awaiting service')}</div>;
