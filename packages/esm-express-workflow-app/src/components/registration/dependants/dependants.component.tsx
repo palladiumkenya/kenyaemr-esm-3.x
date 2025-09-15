@@ -2,13 +2,13 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { DataTable, Table, TableHead, TableBody, TableRow, TableCell, TableHeader, Button, Tag } from '@carbon/react';
 import { TwoFactorAuthentication } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { launchWorkspace, showSnackbar, showModal, navigate } from '@openmrs/esm-framework';
+import { launchWorkspace, showSnackbar, showModal, navigate, Visit } from '@openmrs/esm-framework';
 import capitalize from 'lodash/capitalize';
 import styles from './dependants.scss';
 import { maskName } from '../helper';
 import { findExistingLocalPatient, registerOrLaunchDependent } from '../search-bar/search-bar.resource';
 import { getDependentsFromContacts, useMultipleActiveVisits } from './dependants.resource';
-import { HIEBundleResponse, HIEPatient } from '../type';
+import { DependentWithPhone, HIEBundleResponse, HIEPatient, LocalPatient } from '../type';
 import { otpManager } from '../card/HIE-card/hie-card.resource';
 import { launchOtpVerificationModal } from '../../../shared/otp-verification';
 
@@ -49,7 +49,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
 
   const visits = useMultipleActiveVisits(dependentUuids);
 
-  const handleQueuePatient = useCallback((activeVisit: any) => {
+  const handleQueuePatient = useCallback((activeVisit: Visit) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
       closeModal: () => {
         navigate({ to: `\${openmrsSpaBase}/patient/${patient.id}/chart` });
@@ -60,29 +60,60 @@ const DependentsComponent: React.FC<DependentProps> = ({
   }, []);
 
   const getDependentPhoneNumber = useCallback(
-    (dependent: any): string => {
-      if (dependent.phoneNumber && dependent.phoneNumber !== 'N/A') {
-        return dependent.phoneNumber;
-      }
+    (dependent: HIEPatient | DependentWithPhone): string | undefined => {
+      if ('contact' in dependent && dependent.contact && Array.isArray(dependent.contact)) {
+        for (const contact of dependent.contact) {
+          if (contact.telecom && Array.isArray(contact.telecom)) {
+            const phoneTelecom = contact.telecom.find(
+              (telecom) =>
+                telecom.system === 'phone' && telecom.value && telecom.value !== 'N/A' && telecom.value.trim() !== '',
+            );
 
-      const localPatient = localPatientCache.get(dependent.id);
-      if (localPatient) {
-        const phoneAttribute = localPatient.attributes?.find(
-          (attr: any) =>
-            attr.attributeType?.display?.toLowerCase().includes('phone') ||
-            attr.attributeType?.display?.toLowerCase().includes('mobile') ||
-            attr.attributeType?.display?.toLowerCase().includes('telephone'),
-        );
-        if (phoneAttribute?.value) {
-          return phoneAttribute.value;
+            if (phoneTelecom) {
+              return phoneTelecom.value.trim();
+            }
+          }
         }
       }
 
-      return '254700000000';
+      const localPatient = localPatientCache.get(dependent.id);
+      if (localPatient?.attributes && Array.isArray(localPatient.attributes)) {
+        const phoneAttribute = localPatient.attributes.find(
+          (attr: { value: string; attributeType: { uuid: string; display: string } }) =>
+            attr.attributeType?.uuid === 'b2c38640-2603-4629-aebd-3b54f33f1e3a' &&
+            attr.value &&
+            attr.value.trim() !== '' &&
+            attr.value.trim().length > 0,
+        );
+
+        if (phoneAttribute?.value) {
+          return phoneAttribute.value.trim();
+        }
+      }
+
+      if ('phoneNumber' in dependent && typeof dependent.phoneNumber === 'string') {
+        const phone = dependent.phoneNumber.trim();
+        if (phone && phone !== 'N/A' && phone.length > 0) {
+          return phone;
+        }
+      }
+
+      if ('contactData' in dependent && dependent.contactData) {
+        if ('telecom' in dependent.contactData && Array.isArray(dependent.contactData.telecom)) {
+          const phoneTelecom = dependent.contactData.telecom.find(
+            (telecom: any) =>
+              telecom.system === 'phone' && telecom.value && telecom.value !== 'N/A' && telecom.value.trim() !== '',
+          );
+          if (phoneTelecom?.value) {
+            return phoneTelecom.value.trim();
+          }
+        }
+      }
+
+      return undefined;
     },
     [localPatientCache],
   );
-
   const handleSpouseOTPRequest = useCallback((dependentId: string) => {
     setOtpRequestedForSpouse((prev) => new Set(prev).add(dependentId));
   }, []);

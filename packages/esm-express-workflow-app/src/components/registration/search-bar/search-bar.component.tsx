@@ -92,8 +92,6 @@ const SearchBar: React.FC = () => {
     return nationalIds;
   };
 
-  // Extract HIE dependents data for local patients
-
   const filterHieResults = (
     hieResults: Array<HIEBundleResponse> | null,
     localResults: LocalResponse | null,
@@ -161,8 +159,6 @@ const SearchBar: React.FC = () => {
       filteredHieResults.length > 0 &&
       filteredHieResults.some((bundle) => bundle.total > 0 && bundle.entry && bundle.entry.length > 0);
     const hasLocalResults = localSearchResults && Array.isArray(localSearchResults) && localSearchResults.length > 0;
-
-    // Get HIE dependents data for local patients
 
     if (!hasHieResults && !hasLocalResults) {
       return (
