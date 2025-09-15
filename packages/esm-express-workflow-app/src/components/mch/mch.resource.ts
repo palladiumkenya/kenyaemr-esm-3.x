@@ -1,6 +1,7 @@
 import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
+import z from 'zod';
 
 export interface Enrollement {
   uuid: string;
@@ -9,7 +10,7 @@ export interface Enrollement {
   dateEnrolled: string;
   dateCompleted?: string;
   location: Location;
-  states: Array<{ uuid: string; retired: boolean; concept: Concept }>;
+  states: Array<ProgramWorkflowState>;
 }
 
 export interface Program {
@@ -34,6 +35,24 @@ export interface Location {
   display: string;
 }
 
+export interface ProgramWorkflowState {
+  state: {
+    uuid: string;
+    concept: Concept;
+  };
+  startDate: string;
+  endDate: string;
+  voided: boolean;
+}
+
+export const ProgramFormSchema = z.object({
+  dateEnrolled: z.date({ coerce: true }),
+  dateCompleted: z.date({ coerce: true }).optional(),
+  location: z.string().nonempty(),
+});
+
+export type ProgramFormData = z.infer<typeof ProgramFormSchema>;
+
 export const usePrograms = () => {
   const rep = 'custom:(uuid,display,name,allWorkflows,concept:(uuid,display))';
   const url = `${restBaseUrl}/program?v=${rep}`;
@@ -47,9 +66,9 @@ export const usePrograms = () => {
 };
 
 export const usePatientEnrolledPrograms = (patientUuid: string) => {
-  const rep =
-    'custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display),states:(startDate,endDate,voided,state:(uuid,concept:(display))))';
-  const url = `${restBaseUrl}/programenrollment?v=${rep}&patient=${patientUuid}`;
+  const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display),states:(startDate,endDate,voided,state:(uuid,concept:(display))))`;
+
+  const url = `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Enrollement> }>>(url, openmrsFetch);
   return {
     isLoading,
@@ -58,6 +77,9 @@ export const usePatientEnrolledPrograms = (patientUuid: string) => {
     mutate,
   };
 };
+
+export const mutateEnrollments = (patientUuid: string) =>
+  mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/programenrollment?patient=${patientUuid}`));
 
 export const usePatientPrograms = (patientUuid: string) => {
   const { error: programsError, isLoading: isLoadingPrograms, programs, mutate: mutatePrograms } = usePrograms();
@@ -85,4 +107,48 @@ export const usePatientPrograms = (patientUuid: string) => {
       mutatePrograms();
     },
   };
+};
+
+export function createProgramEnrollment(
+  program: Program,
+  patientUuid: string,
+  payload: ProgramFormData,
+  abortController: AbortController,
+) {
+  const { dateEnrolled, dateCompleted, location } = payload;
+  return openmrsFetch(`${restBaseUrl}/programenrollment`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: { program, patient: patientUuid, dateEnrolled, dateCompleted, location },
+    signal: abortController.signal,
+  });
+}
+
+export function updateProgramEnrollment(
+  programEnrollmentUuid: string,
+  payload: ProgramFormData,
+  abortController: AbortController,
+) {
+  const { dateEnrolled, dateCompleted, location } = payload;
+  return openmrsFetch(`${restBaseUrl}/programenrollment/${programEnrollmentUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: { dateEnrolled, dateCompleted, location },
+    signal: abortController.signal,
+  });
+}
+
+export const findLastState = (states: ProgramWorkflowState[]): ProgramWorkflowState => {
+  const activeStates = states.filter((state) => !state.voided);
+  const ongoingState = activeStates.find((state) => !state.endDate);
+
+  if (ongoingState) {
+    return ongoingState;
+  }
+
+  return activeStates.sort((a, b) => new Date(b.endDate).getTime() - new Date(a.endDate).getTime())[0];
 };

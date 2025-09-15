@@ -4,6 +4,7 @@ import { moduleName } from '../../constants';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import MCHDashboard from './dashboard.component';
 import Programs from './programs/programs.component';
+import ProgramForm from './programs/program.workspace';
 
 const options = {
   featureName: 'express-workflow',
@@ -21,3 +22,4 @@ export const mchLeftPanelLink = getSyncLifecycle(
 );
 
 export const mchProgramManagement = getSyncLifecycle(Programs, options);
+export const mchProgramForm = getSyncLifecycle(ProgramForm, options);

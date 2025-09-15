@@ -1,21 +1,21 @@
 import {
-    Button,
-    OverflowMenu,
-    OverflowMenuItem,
-    StructuredListBody,
-    StructuredListCell,
-    StructuredListHead,
-    StructuredListRow,
-    StructuredListSkeleton,
-    StructuredListWrapper,
-    Tag,
+  Button,
+  OverflowMenu,
+  OverflowMenuItem,
+  StructuredListBody,
+  StructuredListCell,
+  StructuredListHead,
+  StructuredListRow,
+  StructuredListSkeleton,
+  StructuredListWrapper,
+  Tag,
 } from '@carbon/react';
 import { Add, Checkmark } from '@carbon/react/icons';
-import { ErrorState } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
-import React from 'react';
+import { ErrorState, launchWorkspace, showModal } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePatientPrograms } from '../mch.resource';
+import { Enrollement, Program, usePatientPrograms } from '../mch.resource';
 
 type ProgramsProps = {
   patientUuid: string;
@@ -23,7 +23,30 @@ type ProgramsProps = {
 const Programs: React.FC<ProgramsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const title = t('programManagement', 'Program Management');
-  const { allPrograms, enrolledPrograms, error, isLoading, unenrolledPrograms } = usePatientPrograms(patientUuid);
+  const { allPrograms, enrolledPrograms, error, isLoading, unenrolledPrograms, mutate } =
+    usePatientPrograms(patientUuid);
+
+  const launchDeleteProgramDialog = useCallback(
+    (programEnrollmentId: string) => {
+      const dispose = showModal('program-delete-confirmation-modal', {
+        closeDeleteModal: () => dispose(),
+        programEnrollmentId,
+        patientUuid,
+        size: 'sm',
+      });
+    },
+    [patientUuid, mutate],
+  );
+
+  const launchProgramForm = (program: Program, enrollment?: Enrollement) => {
+    launchWorkspace('mch-program-form-workspace', {
+      workspaceTitle: t('programForm', 'Program Form'),
+      enrollment,
+      patientUuid,
+      program,
+      onSubmitSuccess: () => mutate(),
+    });
+  };
 
   if (isLoading) return <StructuredListSkeleton rowCount={5} />;
   if (error) return <ErrorState headerTitle={title} error={error} />;
@@ -53,8 +76,14 @@ const Programs: React.FC<ProgramsProps> = ({ patientUuid }) => {
                 <OverflowMenuItem
                   itemText={t('launchProgramForm', 'Lauch {{program}} Form', { program: enrollment.program.name })}
                 />
-                <OverflowMenuItem itemText={t('edit', 'Edit')} />
-                <OverflowMenuItem itemText={t('discontinue', 'Discontinue')} />
+                <OverflowMenuItem
+                  itemText={t('edit', 'Edit')}
+                  onClick={() => launchProgramForm(enrollment.program, enrollment)}
+                />
+                <OverflowMenuItem
+                  itemText={t('delete', 'Delete')}
+                  onClick={() => launchDeleteProgramDialog(enrollment.uuid)}
+                />
               </OverflowMenu>
             </StructuredListCell>
           </StructuredListRow>
@@ -65,7 +94,7 @@ const Programs: React.FC<ProgramsProps> = ({ patientUuid }) => {
             <StructuredListCell>{program.name}</StructuredListCell>
             <StructuredListCell></StructuredListCell>
             <StructuredListCell>
-              <Button renderIcon={Add} size="xs" kind="ghost">
+              <Button renderIcon={Add} size="xs" kind="ghost" onClick={() => launchProgramForm(program)}>
                 Enroll
               </Button>
             </StructuredListCell>

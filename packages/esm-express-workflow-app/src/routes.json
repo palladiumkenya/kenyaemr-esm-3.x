@@ -217,6 +217,12 @@
       "type": "workspace",
       "canMaximize": true,
       "canHide": true
+    },
+    {
+      "name": "mch-program-form-workspace",
+      "component": "mchProgramForm", 
+      "title": "Program Form",
+      "type": "workspace"
     }
   ],
   "modals": [
