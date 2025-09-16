@@ -24,6 +24,8 @@ export const UNKNOWN = 'UNKNOWN';
  */
 export const PATIENT_NOT_FOUND = 'PATIENT_NOT_FOUND';
 
+export const HIE_CONFIGURATION_MISSING = 'HIE_CONFIGURATION_MISSING';
+
 export const openmrsId = 'dfacd928-0370-4315-99d7-6ec1c9f7ae76';
 
 export const openmrsIdSource = 'fb034aac-2353-4940-abe2-7bc94e7c1e71';
