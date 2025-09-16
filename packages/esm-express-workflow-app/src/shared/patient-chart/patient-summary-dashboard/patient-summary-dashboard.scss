@@ -1,0 +1,7 @@
+@use '@carbon/layout';
+
+.ewfExtensionSlot {
+  display: flex;
+  flex-direction: column;
+  row-gap: layout.$spacing-05;
+}
