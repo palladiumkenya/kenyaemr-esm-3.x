@@ -34,7 +34,6 @@
     {
       "component": "benefitsPackageDashboardLink",
       "name": "benefits-package-dashboard-link",
-      "slot": "patient-chart-dashboard-slot",
       "meta": {
         "name": "benefits-package",
         "slot": "patient-chart-benefits-dashboard-slot",
@@ -74,7 +73,6 @@
     {
       "name": "billing-summary-dashboard-link",
       "component": "billingSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 11,
       "meta": {
         "columns": 1,
