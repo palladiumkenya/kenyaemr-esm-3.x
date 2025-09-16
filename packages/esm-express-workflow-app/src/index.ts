@@ -1,5 +1,7 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+
+import PatientSummaryDashboard from './shared/patient-chart/patient-summary-dashboard/patient-summary-dashboard.component';
 
 const moduleName = '@kenyaemr/esm-express-workflow-app';
 
@@ -27,3 +29,4 @@ export const otpVerificationModal = getAsyncLifecycle(
   () => import('./shared/otp-verification/otp-verification.modal'),
   options,
 );
+export const patientSummaryDashboard = getSyncLifecycle(PatientSummaryDashboard, options);
