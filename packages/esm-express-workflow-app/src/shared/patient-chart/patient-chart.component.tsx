@@ -7,16 +7,21 @@ import { useTranslation } from 'react-i18next';
 
 import { useInitialize } from './useInitialize';
 import styles from './patient-chart.scss';
+import { usePatientchartTabs } from './patient-chart.resources';
 
-const PatientChart: React.FC = () => {
+type PatientChartProps = {
+  navigationPath: string;
+};
+
+const PatientChart: React.FC<PatientChartProps> = ({ navigationPath }) => {
   const { t } = useTranslation();
   const { patientUuid } = useParams<{ patientUuid?: string }>();
-
   const {
     data: patient,
     isLoading,
     error,
   } = useSWR(patientUuid ? ['patient', patientUuid] : null, () => fetchCurrentPatient(patientUuid!, {}));
+  const patientChartTabsExtensionSlotConfig = usePatientchartTabs(navigationPath, patientUuid, patient);
 
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
@@ -30,18 +35,6 @@ const PatientChart: React.FC = () => {
     return <ErrorState headerTitle={t('errorLoadingPatient', 'Error loading patient')} error={error} />;
   }
 
-  // TODO: A config to dynamically add tabs through dashboard config
-  const patientChartTabsExtensionSlotConfig = [
-    {
-      title: t('vitalsAndAnthropometric', 'Vitals and Anthropometric'),
-      slotName: 'vitals-and-anthropometric-slot',
-    },
-    {
-      title: t('programManagement', 'Program Management'),
-      slotName: 'program-management-slot',
-    },
-  ];
-
   return (
     <div className={styles.patientChart}>
       {patient && patientUuid && <ExtensionSlot name="patient-header-slot" state={{ patient, patientUuid }} />}
@@ -49,21 +42,21 @@ const PatientChart: React.FC = () => {
         <Tabs>
           <TabList contained>
             {patientChartTabsExtensionSlotConfig.map((tabConfig, index) => (
-              <Tab key={index}>{tabConfig.title}</Tab>
+              <Tab key={index}>{tabConfig.meta.title ?? tabConfig.meta.path}</Tab>
             ))}
           </TabList>
           <TabPanels>
             {patientChartTabsExtensionSlotConfig.map((tabConfig, index) => (
               <TabPanel key={index}>
-                <ExtensionSlot className={styles.extensionSlot} name={tabConfig.slotName} state={state} />
+                <ExtensionSlot className={styles.extensionSlot} name={tabConfig.meta.slot} state={state} />
               </TabPanel>
             ))}
           </TabPanels>
         </Tabs>
         <WorkspaceContainer
           showSiderailAndBottomNav
-          key="home"
-          contextKey={`home/triage/${patientUuid}`}
+          key="express-workflow"
+          contextKey={`express-workflow/${navigationPath}/${patientUuid}`}
           additionalWorkspaceProps={state}
         />
       </div>
