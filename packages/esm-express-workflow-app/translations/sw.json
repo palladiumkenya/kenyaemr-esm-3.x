@@ -9,6 +9,7 @@
   "birthDate": "Birth Date",
   "cancel": "Cancel",
   "carePanel": "Care Panel",
+  "caseManagement": "Case Management",
   "changePhoneNumber": "Change phone number",
   "checkedIn": "Checked In",
   "checkIn": "Check In",
@@ -18,6 +19,7 @@
   "chooseIdentifierType": "Choose identifier type",
   "clearAll": "Clear All",
   "clientRegistry": "Client registry verification",
+  "clinicalEncounter": "Clinical Encounter",
   "confirmationTxt": "Verify the phone number before OTP",
   "dependentRegistrationError": "Error registering dependent",
   "dependentRegistrationErrorSubtitle": "Error registering dependent: {{error}}",
@@ -88,6 +90,7 @@
   "sendOtp": "Send OTP",
   "sendOtpCode": "Send OTP Code",
   "showDependents": "Show dependents",
+  "specialClinics": "Special Clinics",
   "startVisitWorkspaceTitle": "Start Visit for {{patientName}}",
   "status": "Status",
   "tryDifferentIdentifier": "Try searching with a different identifier or check the identifier type",
@@ -96,6 +99,7 @@
   "verify": "Verify",
   "verifyingOtp": "Verifying OTP",
   "visitComplete": "Visit complete",
+  "visits": "Visits",
   "visitTime": "Visit Time",
   "vitalsAndAnthropometric": "Vitals and Anthropometric"
 }
