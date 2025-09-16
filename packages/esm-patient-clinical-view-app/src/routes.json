@@ -8,6 +8,7 @@
     {
       "name": "hiv-care-and-treatment-dashboard-link",
       "component": "hivCareAndTreatmentLink",
+      "slot": "patient-chart-dashboard-slot",
       "meta": {
         "columns": 1,
         "columnSpan": 1,

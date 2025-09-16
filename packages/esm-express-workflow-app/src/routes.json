@@ -221,8 +221,54 @@
       "slot": "ewf-patient-chart-procedures-dashboard-slot",
       "online": true,
       "offline": false
+    },
+    {
+      "name": "ewf-pharmacy-dashboard-link",
+      "component": "pharmacyPatientChartDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-pharmacy",
+        "title": "Pharmacy",
+        "path": "pharmacy",
+        "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-pharmacy-dashboard",
+      "component": "pharmacyTabs",
+      "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {"name": "ewf-admissions-dashboard-link",
+      "component": "admissionsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-admissions",
+        "title": "Admissions",
+        "path": "admissions",
+        "slot": "ewf-patient-chart-admissions-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-admissions-dashboard",
+      "component": "admissionsDashboard",
+      "slot": "ewf-patient-chart-admissions-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-homepage-dashboard-link",
+      "component": "homepageDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 0
     }
   ],
+      
   "workspaces": [
     {
       "name": "express-workflow-workspace",
