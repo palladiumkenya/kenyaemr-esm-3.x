@@ -136,6 +136,31 @@
       "slot": "pharmacy-homepage-dashboard-slot",
       "online": true,
       "offline": false
+    },
+    {
+      "name": "patient-summary-dashboard",
+      "component": "patientSummaryDashboard",
+      "slot": "patient-chart-summary-dashboard-slot"
+    },
+    {
+      "name": "ewf-clinical-encounter-link",
+      "component": "clinicalEncounterLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-clinical-encounter",
+        "title": "Clinical Encounter",
+        "slot": "ewf-patient-chart-clinical-encounter-slot",
+        "path": "clinical-encounter",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-clinical-encounter-dashboard",
+      "component": "clinicalEncounter",
+      "slot": "ewf-patient-chart-clinical-encounter-slot",
+      "online": true,
+      "offline": false
     }
   ],
   "workspaces": [

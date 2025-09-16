@@ -2,7 +2,13 @@ import { useMemo } from 'react';
 import { FetchResponse, launchWorkspace, makeUrl, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { type EligibilityResponse, type HIEEligibilityResponse, type LocalPatientApiResponse } from '../type';
-import { PATIENT_API_NO_CREDENTIALS, PATIENT_NOT_FOUND, RESOURCE_NOT_FOUND, UNKNOWN } from '../constant';
+import {
+  HIE_CONFIGURATION_MISSING,
+  PATIENT_API_NO_CREDENTIALS,
+  PATIENT_NOT_FOUND,
+  RESOURCE_NOT_FOUND,
+  UNKNOWN,
+} from '../constant';
 import { createDependentPatient, createHIEPatient } from '../dependants/dependants.resource';
 import { transformToDependentPayload } from '../helper';
 
@@ -20,6 +26,8 @@ export const searchPatientFromHIE = async (identifierType: string, searchQuery: 
     throw new Error(PATIENT_API_NO_CREDENTIALS);
   } else if (response.status === 404) {
     throw new Error(RESOURCE_NOT_FOUND);
+  } else if (response.status === 500) {
+    throw new Error(HIE_CONFIGURATION_MISSING);
   }
   throw new Error(UNKNOWN);
 };

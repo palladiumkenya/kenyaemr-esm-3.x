@@ -17,7 +17,6 @@
         {
             "name": "patient-chart-shr-summary-dashboard-link",
             "component": "shrSummaryDashboardLink",
-            "slot": "patient-chart-dashboard-slot",
             "meta": {
                 "columns": 1,
                 "columnSpan": 1,
@@ -60,7 +59,6 @@
         {
             "name": "referral-view-link",
             "component": "referralLink",
-            "slot": "patient-chart-dashboard-slot",
             "order": 13,
             "meta": {
                 "columns": 1,
