@@ -23,6 +23,9 @@ export * from './components/consultation';
 export * from './components/mch';
 export * from './components/reports';
 export * from './components/pharmacy';
+export * from './components/laboratory';
+export * from './components/radiology-and-imaging';
+export * from './components/procedures';
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 export const otpVerificationModal = getAsyncLifecycle(

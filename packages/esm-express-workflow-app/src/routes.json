@@ -161,6 +161,66 @@
       "slot": "ewf-patient-chart-clinical-encounter-slot",
       "online": true,
       "offline": false
+    },
+    {
+      "name": "ewf-laboratory-dashboard-link",
+      "component": "laboratoryLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-laboratory",
+        "title": "Laboratory",
+        "path": "laboratory",
+        "slot": "ewf-patient-chart-laboratory-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-laboratory-dashboard",
+      "component": "laboratoryDashboard",
+      "slot": "ewf-patient-chart-laboratory-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-radiology-and-imaging-dashboard-link",
+      "component": "radiologyAndImagingLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-radiology-and-imaging",
+        "title": "Radiology and Imaging",
+        "path": "radiology-and-imaging",
+        "slot": "ewf-patient-chart-radiology-and-imaging-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-radiology-and-imaging-dashboard",
+      "component": "radiologyAndImagingDashboard",
+      "slot": "ewf-patient-chart-radiology-and-imaging-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-procedures-dashboard-link",
+      "component": "proceduresLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-procedures",
+        "title": "Procedures",
+        "path": "procedures",
+        "slot": "ewf-patient-chart-procedures-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-procedures-dashboard",
+      "component": "proceduresDashboard",
+      "slot": "ewf-patient-chart-procedures-dashboard-slot",
+      "online": true,
+      "offline": false
     }
   ],
   "workspaces": [
