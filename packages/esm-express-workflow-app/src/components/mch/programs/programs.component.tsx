@@ -80,7 +80,7 @@ const Programs: React.FC<ProgramsProps> = ({ patientUuid }) => {
             <StructuredListCell>
               <OverflowMenu aria-label="overflow-menu">
                 <OverflowMenuItem
-                  itemText={t('launchProgramForm', 'Lauch {{program}} Form', { program: enrollment.program.name })}
+                  itemText={t('launchProgramForm', 'Launch {{program}} Form', { program: enrollment.program.name })}
                 />
                 <OverflowMenuItem
                   itemText={t('edit', 'Edit')}

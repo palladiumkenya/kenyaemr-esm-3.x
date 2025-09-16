@@ -3,10 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../hooks/useServiceQueues';
 import QueueTab from '../../shared/queue/queue-tab.component';
-import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
-type ConsultationProps = {
-  dashboardTitle: string;
-};
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 const MCHConsultation: React.FC = () => {
   const { t } = useTranslation();

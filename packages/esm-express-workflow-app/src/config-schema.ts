@@ -38,7 +38,6 @@ export const configSchema = {
         'patient-orders-summary-dashboard',
         'test-results-summary-dashboard',
         'attachments-results-summary-dashboard',
-        'programs-summary-dashboard',
         'charts-mch-program-management-dashboard',
       ],
       excludeExtensions: [],
