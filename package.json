@@ -13,7 +13,7 @@
     "coverage": "yarn test --coverage",
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
-    "start": "openmrs develop --sources packages/esm-billing-app packages/esm-express-workflow-app packages/esm-version-app packages/esm-patient-clinical-view-app --port 8055 --backend http://192.168.1.104:8080 --config-url  http://192.168.1.104:8080/openmrs/spa/openmrs.config.json http://192.168.1.104:8080/openmrs/spa/kenyaemr.config.json",
+    "start": "openmrs develop",
     "verify": "turbo run lint && turbo run typescript",
     "preinstall": "npx only-allow yarn"
   },
