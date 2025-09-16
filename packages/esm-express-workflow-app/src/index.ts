@@ -1,7 +1,9 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import { Home } from '@carbon/react/icons';
 
 import PatientSummaryDashboard from './shared/patient-chart/patient-summary-dashboard/patient-summary-dashboard.component';
+import { createLeftPanelLink } from './shared/dashboard-link/dashboard-link.component';
 
 const moduleName = '@kenyaemr/esm-express-workflow-app';
 
@@ -23,6 +25,10 @@ export * from './components/consultation';
 export * from './components/mch';
 export * from './components/reports';
 export * from './components/pharmacy';
+export * from './components/laboratory';
+export * from './components/radiology-and-imaging';
+export * from './components/procedures';
+export * from './components/admissions';
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 export const otpVerificationModal = getAsyncLifecycle(
@@ -30,3 +36,12 @@ export const otpVerificationModal = getAsyncLifecycle(
   options,
 );
 export const patientSummaryDashboard = getSyncLifecycle(PatientSummaryDashboard, options);
+
+export const homepageDashboardLink = getSyncLifecycle(
+  createLeftPanelLink({
+    name: `consultation`,
+    title: 'Home',
+    icon: Home,
+  }),
+  options,
+);

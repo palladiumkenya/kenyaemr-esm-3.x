@@ -8,6 +8,7 @@
     {
       "name": "hiv-care-and-treatment-dashboard-link",
       "component": "hivCareAndTreatmentLink",
+      "slot": "patient-chart-dashboard-slot",
       "meta": {
         "columns": 1,
         "columnSpan": 1,
@@ -82,6 +83,14 @@
       "name": "maternal-and-child-health-dashboard",
       "slot": "patient-chart-maternal-and-child-health-slot",
       "component": "maternalAndChildHealthDashboard",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "maternal-and-child-health-partograph",
+      "slot": "maternal-and-child-health-partograph-slot",
+      "component": "partograph",
       "order": 0,
       "online": true,
       "offline": false
