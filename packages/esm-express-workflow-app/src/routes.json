@@ -266,6 +266,12 @@
       "component": "homepageDashboardLink",
       "slot": "patient-chart-dashboard-slot",
       "order": 0
+    }, 
+    {
+      "name": "mch-program-management",
+      "component": "mchProgramManagement",
+      "slot": "mch-program-management-slot",
+      "order": 0
     }
   ],
       
