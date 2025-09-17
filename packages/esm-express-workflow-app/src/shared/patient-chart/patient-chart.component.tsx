@@ -56,7 +56,7 @@ const PatientChart: React.FC<PatientChartProps> = ({ navigationPath }) => {
         <WorkspaceContainer
           showSiderailAndBottomNav
           key="express-workflow"
-          contextKey={`express-workflow/${navigationPath}/${patientUuid}`}
+          contextKey={`home/${navigationPath}/${patientUuid}`}
           additionalWorkspaceProps={state}
         />
       </div>
