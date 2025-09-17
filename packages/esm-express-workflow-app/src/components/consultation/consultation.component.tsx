@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../hooks/useServiceQueues';
 import { InlineLoading } from '@carbon/react';
-import { HomePictogram, PageHeader } from '@openmrs/esm-framework';
+import { ExtensionSlot, HomePictogram, PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
 import styles from './consultation.scss';
 import capitalize from 'lodash-es/capitalize';
 import QueueTab from '../../shared/queue/queue-tab.component';
@@ -29,8 +29,11 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
   return (
-    <div>
-      <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
+    <div className={`omrs-main-content`}>
+      <PageHeader className={styles.pageHeader}>
+        <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
+        <ExtensionSlot name="provider-banner-info-slot" />
+      </PageHeader>
       <QueueTab queues={consultationQueues} cards={cards} usePatientChart={usePatientChart} />
     </div>
   );

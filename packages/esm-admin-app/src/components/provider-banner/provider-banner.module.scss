@@ -28,18 +28,13 @@
   margin-inline-start: layout.$spacing-04;
 }
 .label {
-  color: colors.$white;
-  font-weight: 500;
-  white-space: nowrap;
-
-  &::after {
-    content: '';
-    margin-left: layout.$spacing-01;
-  }
+  color: colors.$gray-60;
+  content: '';
+  margin-left: layout.$spacing-01;
 }
 
 .value {
-  color: colors.$white;
+  color: colors.$gray-60;
   font-weight: 600;
   font-size: 1rem;
   white-space: nowrap;
