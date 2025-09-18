@@ -109,18 +109,18 @@ export function InvoiceActions({ bill, selectedLineItems = [], activeVisit }: In
   };
 
   const handleViewClaims = async () => {
-    if (!isShaFacilityStatusValid) {
-      showToast({
-        critical: true,
-        kind: 'warning',
-        title: t('shaFacilityLicenseNumberRequired', 'Facility license number Required'),
-        description: t(
-          'shaFacilityLicenseNumbernRequiredDescription',
-          'Facility license number is required to process claims. Please update facility license number details.',
-        ),
-      });
-      return;
-    }
+    // if (!isShaFacilityStatusValid) {
+    //   showToast({
+    //     critical: true,
+    //     kind: 'warning',
+    //     title: t('shaFacilityLicenseNumberRequired', 'Facility license number Required'),
+    //     description: t(
+    //       'shaFacilityLicenseNumbernRequiredDescription',
+    //       'Facility license number is required to process claims. Please update facility license number details.',
+    //     ),
+    //   });
+    //   return;
+    // }
 
     if (activeVisit) {
       await handleEndVisit();
