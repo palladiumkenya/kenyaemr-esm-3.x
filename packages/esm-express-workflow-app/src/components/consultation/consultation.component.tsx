@@ -13,7 +13,7 @@ type ConsultationProps = {
 const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
   const { t } = useTranslation();
   const { queues, isLoading, error } = useQueues();
-  const consultationQueues = queues.filter((queue) => queue.name.toLowerCase().includes('consultation'));
+  const consultationQueues = queues.filter((queue) => queue.name.toLowerCase().includes('consultation') && !queue.location.display.toLowerCase().includes('mch'));
   const usePatientChart = true;
 
   // TODO: Add actually get the values from the queues
