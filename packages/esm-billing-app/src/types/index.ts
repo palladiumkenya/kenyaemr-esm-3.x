@@ -631,3 +631,38 @@ export interface ProgressTracker {
 export interface checkSHARegNumResponse {
   registrationNumber: string;
 }
+export type OTPVerificationModalOptions = {
+  otpLength?: number;
+  onVerify?: (otp: string) => Promise<void>;
+  obscureText?: boolean;
+  centerBoxes?: boolean;
+  phoneNumber: string;
+  onRequestOtp?: (phoneNumber: string) => Promise<void>;
+  onVerificationSuccess?: () => void;
+  expiryMinutes?: number;
+};
+
+export interface OtpPayload {
+  otp: string;
+  receiver: string;
+}
+
+export interface OtpContext extends Record<string, string | number> {
+  otp: string;
+  patient_name: string;
+  expiry_time: number;
+}
+
+export interface OtpResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface ClaimSummary {
+  totalAmount: number;
+  facility: string;
+  totalItems: number;
+  services: string;
+  startDate: string;
+  endDate: string;
+}
