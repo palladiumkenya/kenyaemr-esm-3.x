@@ -16,7 +16,7 @@ import { PaymentPoints } from './payment-points/payment-points.component';
 import BillDepositDashboard from './bill-deposit/components/dashboard/bill-deposit-dashboard.component';
 
 const RootComponent: React.FC = () => {
-  const baseName = window.getOpenmrsSpaBase() + 'home/billing';
+  const baseName = window.getOpenmrsSpaBase() + 'home/accounting';
 
   return (
     <BrowserRouter basename={baseName}>
