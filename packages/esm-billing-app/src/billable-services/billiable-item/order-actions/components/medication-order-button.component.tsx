@@ -7,6 +7,7 @@ import { launchPrescriptionEditWorkspace, navigateAndLaunchWorkspace } from '../
 import { useTranslation } from 'react-i18next';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib/src';
 import { Button } from '@carbon/react';
+import styles from './medication-order-button.scss';
 
 export interface MedicationOrderButtonProps {
   medicationRequestBundle?: {
@@ -99,7 +100,7 @@ export const MedicationOrderButton: React.FC<MedicationOrderButtonProps> = ({
   }
 
   return (
-    <div>
+    <div className={styles.buttonContainer}>
       {shouldAllowModify && (
         <ModifyButton currentVisit={!!currentVisit} isLoading={isLoading} order={order} patientUuid={patientUuid} />
       )}
