@@ -170,7 +170,9 @@ const ClaimsSupportingDocumentsInput: FC<{ patientUuid: string }> = ({ patientUu
         kind="tertiary"
         onClick={async () => {
           const valid = await form.trigger(`supportingDocuments`);
-          if (!supportDocs?.length || valid) form.setValue('supportingDocuments', [...supportDocs, {}]);
+          if (!supportDocs?.length || valid) {
+            form.setValue('supportingDocuments', [...supportDocs, {}]);
+          }
         }}>
         {t('addSupportDocs', 'Add support docs')}
       </Button>
