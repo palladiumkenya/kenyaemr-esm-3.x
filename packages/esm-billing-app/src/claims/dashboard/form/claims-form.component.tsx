@@ -2,6 +2,7 @@ import {
   Button,
   ButtonSet,
   Column,
+  ComboBox,
   Form,
   InlineLoading,
   InlineNotification,
@@ -11,11 +12,10 @@ import {
   Stack,
   TextInput,
   TextInputSkeleton,
-  ComboBox,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { navigate, showModal, showSnackbar, toOmrsIsoString, useConfig, useSession } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -25,47 +25,22 @@ import { BillingConfig } from '../../../config-schema';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
 import useProvider from '../../../hooks/useProvider';
+import useProviderList from '../../../hooks/useProviderList';
 import { ClaimSummary, LineItem, MappedBill, OTPVerificationModalOptions } from '../../../types';
 import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
-import { processClaims, SHAPackagesAndInterventionVisitAttribute, useVisit } from './claims-form.resource';
-import useProviderList from '../../../hooks/useProviderList';
+import { ClaimsFormSchema, ClaimsFormSchemaBase, processClaims, useVisit } from './claims-form.resource';
 
-import styles from './claims-form.scss';
 import debounce from 'lodash-es/debounce';
-import { formatDateTime } from '../../utils';
 import { otpManager } from '../../../hooks/useOTP';
 import { usePhoneNumberAttribute } from '../../../hooks/usePhoneNumber';
+import { formatDateTime } from '../../utils';
+import styles from './claims-form.scss';
+import ClaimsSupportingDocumentsInput from './claims-supporting-documents-inputs.form';
 
 type ClaimsFormProps = {
   bill: MappedBill;
   selectedLineItems: LineItem[];
 };
-
-const ClaimsFormSchemaBase = z.object({
-  claimExplanation: z.string(),
-  claimJustification: z.string(),
-  diagnoses: z.array(z.string()),
-  visitType: z.string(),
-  facility: z.string(),
-  treatmentStart: z.string(),
-  treatmentEnd: z.string(),
-  packages: z.array(z.string()),
-  interventions: z.array(z.string()),
-  provider: z.string(),
-});
-
-const ClaimsFormSchema = z.object({
-  claimExplanation: z.string().min(1, { message: 'Claim explanation is required' }),
-  claimJustification: z.string().min(1, { message: 'Claim justification is required' }),
-  diagnoses: z.array(z.string()).min(1, { message: 'At least one diagnosis is required' }),
-  visitType: z.string().min(1, { message: 'Visit type is required' }),
-  facility: z.string().min(1, { message: 'Facility is required' }),
-  treatmentStart: z.string().min(1, { message: 'Treatment start date is required' }),
-  treatmentEnd: z.string().min(1, { message: 'Treatment end date is required' }),
-  packages: z.array(z.string()).min(1, { message: 'At least one package is required' }),
-  interventions: z.array(z.string()).min(1, { message: 'At least one intervention is required' }),
-  provider: z.string().min(1, { message: 'Provider is required' }),
-});
 
 enum OTPState {
   NOT_STARTED = 'not_started',
@@ -302,6 +277,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       billNumber: billUuid,
       packages: data.packages,
       interventions: data.interventions,
+      supportingDocuments: data.supportingDocuments ?? [],
     };
 
     try {
@@ -640,7 +616,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             validationEnabled={validationEnabled}
             onInteraction={() => setValidationEnabled(true)}
           />
-
+          <ClaimsSupportingDocumentsInput patientUuid={patientUuid} />
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={handleDiscardClaim}>
               {t('discardClaim', 'Discard Claim')}
