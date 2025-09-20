@@ -1,17 +1,49 @@
-import { Button, Dropdown, FileUploader, Tag } from '@carbon/react';
-import React from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import z, { isValid } from 'zod';
-import { ClaimsFormSchema, fileToBase64 } from './claims-form.resource';
-import { showSnackbar } from '@openmrs/esm-framework';
-import styles from './claims-form.scss';
+import { Button, Dropdown, FileUploader, InlineLoading, InlineNotification, Tag } from '@carbon/react';
 import { TrashCan } from '@carbon/react/icons';
-const ClaimsSupportingDocumentsInput = () => {
+import { showSnackbar, usePatient } from '@openmrs/esm-framework';
+import React, { FC } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
+import z from 'zod';
+import { ClaimsFormSchema, fileToBase64 } from './claims-form.resource';
+import styles from './claims-form.scss';
+import { InterventionsFilter, useInterventions } from '../../../hooks/useInterventions';
+const ClaimsSupportingDocumentsInput: FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const form = useForm<z.infer<typeof ClaimsFormSchema>>();
+  const form = useFormContext<z.infer<typeof ClaimsFormSchema>>();
+  const { error: patientError, isLoading: isPatientLoading, patient } = usePatient(patientUuid);
+  const categories = form.watch('packages') ?? [];
+  const filters: InterventionsFilter = {
+    package_code: categories.join(','),
+    applicable_gender: patient?.gender === 'male' ? 'MALE' : 'FEMALE',
+  };
+  const { error, interventions, isLoading } = useInterventions(filters);
+
   const supportDocs = form.watch('supportingDocuments') ?? [];
   const selectedInterventionsObservable = form.watch('interventions') ?? [];
+
+  if (isLoading || isPatientLoading) {
+    return (
+      <InlineLoading
+        status="active"
+        iconDescription="Loading"
+        description={t('loadingInterventions', 'Loading interventions') + '...'}
+      />
+    );
+  }
+
+  if (error || patientError) {
+    return (
+      <InlineNotification
+        aria-label="closes notification"
+        kind="error"
+        lowContrast={true}
+        statusIconDescription="notification"
+        title={t('failure', 'Error loading interventions')}
+        subtitle={error?.message ?? patientError?.message}
+      />
+    );
+  }
 
   return (
     <div>
@@ -92,7 +124,7 @@ const ClaimsSupportingDocumentsInput = () => {
                 selectedItem={field.value}
                 onChange={({ selectedItem }) => field.onChange(selectedItem)}
                 items={selectedInterventionsObservable}
-                itemToString={(item) => item}
+                itemToString={(item) => interventions.find((i) => i.interventionCode === item)?.interventionName ?? ''}
                 label={t('intervention', 'Intervention')}
                 titleText={t('intervention', 'Intervention')}
               />

@@ -616,7 +616,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             validationEnabled={validationEnabled}
             onInteraction={() => setValidationEnabled(true)}
           />
-          <ClaimsSupportingDocumentsInput />
+          <ClaimsSupportingDocumentsInput patientUuid={patientUuid} />
           <ButtonSet className={styles.buttonSet}>
             <Button className={styles.button} kind="secondary" onClick={handleDiscardClaim}>
               {t('discardClaim', 'Discard Claim')}
