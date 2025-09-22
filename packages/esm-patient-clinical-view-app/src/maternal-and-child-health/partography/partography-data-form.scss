@@ -1,0 +1,187 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.partographyModal {
+  .cds--modal-container {
+    max-width: 600px;
+    min-height: 400px;
+  }
+
+  .cds--modal-header {
+    background-color: $ui-01;
+    border-bottom: 1px solid $ui-03;
+    padding: spacing.$spacing-05;
+  }
+
+  .cds--modal-header__heading {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+    margin: 0;
+  }
+
+  .cds--modal-header__label {
+    @include type.type-style('body-compact-01');
+    color: $text-02;
+    margin-bottom: spacing.$spacing-02;
+  }
+
+  // Style the built-in modal footer buttons
+  .cds--modal-footer {
+    background-color: $ui-02;
+    border-top: 1px solid $ui-03;
+    padding: spacing.$spacing-05;
+  }
+
+  .cds--btn--secondary {
+    background-color: $ui-03;
+    color: $text-02;
+    border: 1px solid $ui-04;
+
+    &:hover {
+      background-color: $ui-04;
+    }
+  }
+
+  .cds--btn--primary {
+    background-color: colors.$green-60;
+    color: colors.$white;
+    border: 1px solid colors.$green-60;
+
+    &:hover {
+      background-color: colors.$green-70;
+    }
+
+    &:focus {
+      border-color: colors.$green-60;
+      box-shadow: 0 0 0 2px colors.$green-60;
+    }
+  }
+}
+
+.modalContent {
+  padding: spacing.$spacing-05;
+  background-color: $ui-01;
+}
+
+.normalRangeInfo {
+  margin-bottom: spacing.$spacing-04;
+  padding: spacing.$spacing-03;
+  background-color: $ui-02;
+  border-radius: 4px;
+  border: 1px solid $ui-03;
+
+  .cds--tag {
+    margin: 0;
+  }
+}
+
+.dataEntryForm {
+  .cds--grid {
+    margin-bottom: spacing.$spacing-05;
+  }
+
+  .cds--select,
+  .cds--text-area,
+  .cds--text-input,
+  .cds--number-input {
+    margin-bottom: spacing.$spacing-04;
+  }
+
+  .cds--select-input,
+  .cds--text-input,
+  .cds--number-input input {
+    background-color: $ui-01;
+    border: 1px solid $ui-04;
+    color: $text-02;
+  }
+
+  .cds--select-input:focus,
+  .cds--text-input:focus,
+  .cds--number-input input:focus {
+    border-color: colors.$blue-60;
+    box-shadow: 0 0 0 2px colors.$blue-60;
+  }
+
+  .cds--text-area {
+    background-color: $ui-01;
+    border: 1px solid $ui-04;
+    color: $text-02;
+    font-family: inherit;
+    resize: vertical;
+  }
+
+  .cds--text-area:focus {
+    border-color: colors.$blue-60;
+    box-shadow: 0 0 0 2px colors.$blue-60;
+    outline: none;
+  }
+
+  .cds--label {
+    @include type.type-style('label-01');
+    color: $text-02;
+    margin-bottom: spacing.$spacing-02;
+  }
+}
+
+.measurementSection {
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-05;
+
+  .cds--text-area-wrapper {
+    .cds--text-area {
+      min-height: 80px;
+      padding: spacing.$spacing-03;
+    }
+  }
+}
+
+// Time input styles for cervical dilation form
+.timeInputContainer {
+  margin-bottom: spacing.$spacing-04;
+
+  .timeLabel {
+    @include type.type-style('label-01');
+    color: $text-02;
+    margin-bottom: spacing.$spacing-02;
+    display: block;
+  }
+
+  .timeInputGroup {
+    display: flex;
+    align-items: center;
+    gap: spacing.$spacing-02;
+
+    .timeInput {
+      flex: 1;
+      min-width: 80px;
+
+      input {
+        background-color: $ui-01;
+        border: 1px solid $ui-04;
+        color: $text-02;
+
+        &:focus {
+          border-color: colors.$blue-60;
+          box-shadow: 0 0 0 2px colors.$blue-60;
+        }
+      }
+    }
+
+    .timePeriodSelect {
+      min-width: 80px;
+
+      .cds--select-input {
+        background-color: $ui-01;
+        border: 1px solid $ui-04;
+        color: $text-02;
+
+        &:focus {
+          border-color: colors.$blue-60;
+          box-shadow: 0 0 0 2px colors.$blue-60;
+        }
+      }
+    }
+  }
+}
