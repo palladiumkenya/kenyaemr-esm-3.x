@@ -1,0 +1,50 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.modalContent {
+  padding: layout.$spacing-05;
+}
+
+.normalRangeInfo {
+  margin-bottom: layout.$spacing-04;
+  padding: layout.$spacing-03;
+  background-color: colors.$gray-10;
+  border-radius: layout.$spacing-02;
+  border: 1px solid colors.$gray-20;
+}
+
+.dataEntryForm {
+  margin-bottom: layout.$spacing-05;
+}
+
+.measurementSection {
+  margin-top: layout.$spacing-05;
+  margin-bottom: layout.$spacing-05;
+}
+
+.timeInputContainer {
+  margin-bottom: layout.$spacing-04;
+
+  .timeLabel {
+    @include type.type-style('label-01');
+    color: colors.$gray-100;
+    margin-bottom: layout.$spacing-02;
+    display: block;
+  }
+
+  .timeInputGroup {
+    display: flex;
+    align-items: center;
+    gap: layout.$spacing-02;
+
+    .timeInput {
+      flex: 1;
+      min-width: layout.$spacing-10;
+    }
+
+    .timePeriodSelect {
+      min-width: layout.$spacing-10;
+    }
+  }
+}

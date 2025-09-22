@@ -294,6 +294,121 @@ export const configSchema = {
       },
     ],
   },
+
+  partography: {
+    _type: Type.Object,
+    _description: 'Partography module configuration',
+    _default: {
+      conceptMappings: {
+        'fetal-heart-rate': ['1440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        'blood-pressure': ['5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        'maternal-pulse': ['5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        temperature: ['5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        'cervical-dilation': ['162261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        'descent-of-head': ['1810AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        'uterine-contractions': ['163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        'urine-analysis': [
+          '161442AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          '887AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          '165438AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        ],
+        'drugs-fluids': ['1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', '161911AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+        'progress-events': [
+          '162879AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          '1440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          '162261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        ],
+      },
+      stationDisplayMapping: {
+        '160769AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '0/5',
+        '162135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '1/5',
+        '166065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '2/5',
+        '166066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '3/5',
+        '166067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '4/5',
+        '163734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': '5/5',
+      },
+      stationValueMapping: {
+        '160769AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 0,
+        '162135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 1,
+        '166065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 2,
+        '166066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 3,
+        '166067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 4,
+        '163734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 5,
+      },
+      encounterPatterns: [
+        'mch-partograph',
+        'partography',
+        'fetal-monitoring',
+        'maternal-monitoring',
+        'obstetric-vitals',
+        'labor-monitoring',
+        'labour-monitoring',
+      ],
+      fallbackEncounterMapping: {
+        'fetal-heart-rate': ['mch-mother-consultation', 'vitals', 'obstetric', 'maternal', 'consultation', 'clinical'],
+        'cervical-dilation': ['mch-mother-consultation', 'obstetric', 'maternal', 'consultation', 'clinical'],
+        'maternal-pulse': ['vitals', 'maternal', 'consultation', 'clinical'],
+        'blood-pressure': ['vitals', 'maternal', 'consultation', 'clinical'],
+        temperature: ['vitals', 'consultation', 'clinical'],
+        'urine-analysis': ['vitals', 'laboratory', 'consultation', 'clinical'],
+        'drugs-fluids': ['medication', 'treatment', 'consultation', 'clinical'],
+        'progress-events': ['obstetric', 'maternal', 'consultation', 'clinical'],
+      },
+      defaultFallbackSequence: ['consultation', 'clinical'],
+      retryFallbackTypes: ['vitals', 'consultation', 'clinical'],
+      defaultEncounterProviderRole: 'a0b03050-c99b-11e0-9572-0800200c9a66',
+      defaultLocationUuid: '1',
+      storage: {
+        maxLocalEntries: 100,
+        storageKeyPrefix: 'partography_',
+        cacheKeyPrefix: 'partography_encounters_',
+      },
+      timeConfig: {
+        defaultEncounterOffset: 300000,
+        retryEncounterOffset: 3600000,
+        cacheInvalidationDelay: 1000,
+      },
+      progressEventConceptNames: {
+        '1440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+          name: 'Fetal Heart Rate',
+          unit: 'BPM',
+        },
+        '162261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+          name: 'Cervical Dilation',
+          unit: 'cm',
+        },
+        '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': {
+          name: 'Uterine Contractions',
+          unit: 'per 10min',
+        },
+      },
+      graphTypeDisplayNames: {
+        'fetal-heart-rate': 'Fetal Heart Rate',
+        'cervical-dilation': 'Cervical Dilation',
+        'descent-of-head': 'Descent of Head',
+        'uterine-contractions': 'Uterine Contractions',
+        'maternal-pulse': 'Maternal Pulse',
+        'blood-pressure': 'Blood Pressure',
+        temperature: 'Temperature',
+        'urine-analysis': 'Urine Analysis',
+        'drugs-fluids': 'Drugs & Fluids',
+        'progress-events': 'Progress & Events',
+      },
+      testData: {
+        testGraphTypes: ['fetal-heart-rate', 'cervical-dilation', 'maternal-pulse', 'temperature', 'blood-pressure'],
+        sampleDataPoints: [
+          { value: 120, time: '10:00' },
+          { value: 125, time: '11:00' },
+          { value: 130, time: '12:00' },
+          { value: 128, time: '13:00' },
+        ],
+        valueIncrement: 10,
+        bloodPressureDecrement: 40,
+      },
+    },
+  },
 };
 
 export interface ConfigObject {
@@ -357,6 +472,35 @@ export interface ConfigObject {
     display: string;
     category: Array<'sexual' | 'pns' | 'family'>;
   }>;
+  partography: {
+    conceptMappings: Record<string, string[]>;
+    stationDisplayMapping: Record<string, string>;
+    stationValueMapping: Record<string, number>;
+    encounterPatterns: string[];
+    fallbackEncounterMapping: Record<string, string[]>;
+    defaultFallbackSequence: string[];
+    retryFallbackTypes: string[];
+    defaultEncounterProviderRole: string;
+    defaultLocationUuid: string;
+    storage: {
+      maxLocalEntries: number;
+      storageKeyPrefix: string;
+      cacheKeyPrefix: string;
+    };
+    timeConfig: {
+      defaultEncounterOffset: number;
+      retryEncounterOffset: number;
+      cacheInvalidationDelay: number;
+    };
+    progressEventConceptNames: Record<string, { name: string; unit: string }>;
+    graphTypeDisplayNames: Record<string, string>;
+    testData: {
+      testGraphTypes: string[];
+      sampleDataPoints: Array<{ value: number; time: string }>;
+      valueIncrement: number;
+      bloodPressureDecrement: number;
+    };
+  };
 }
 
 export interface PartograpyComponents {
