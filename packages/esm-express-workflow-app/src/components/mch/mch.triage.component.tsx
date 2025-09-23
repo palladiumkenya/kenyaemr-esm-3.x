@@ -37,8 +37,11 @@ const MCHTriage: React.FC = () => {
       queues={triageQueues}
       navigatePath="mch"
       cards={[
-        // { title: t('patientInWaiting', 'Patient in waiting'), value: awaitingCount.toString() },
-        { title: t('patientAttended', 'Patient attended'), value: finishedQueueEntries?.length?.toString() },
+        // { title: t('cilentsPatientInWaiting', 'Cilents/Patient in waiting'), value: awaitingCount.toString() },
+        {
+          title: t('cilentsPatientAttended', 'Cilents/Patient attended to'),
+          value: finishedQueueEntries?.length?.toString(),
+        },
       ]}
       onTabChanged={setCurrentQueue}
     />
