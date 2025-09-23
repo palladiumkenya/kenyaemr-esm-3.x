@@ -5,12 +5,28 @@
   },
   "extensions": [
     {
-      "component": "labManifestSideNavGroup",
-      "name": "lab-manifest-dashboard-link",
+      "name": "lab-manifest-side-nav",
+      "slot": "lab-manifest-side-nav-slot",
+      "component": "labManifestSideNav"
+    },
+    {
+      "name": "lab-manifest-dashboard-db-link",
+      "slot": "lab-manifest-page-dashboard-slot",
+      "component": "labsManifestsDashboardLink",
       "meta": {
         "name": "lab-manifest",
-        "title": "Lab manifest Overview",
-        "slot": "lab-manifest-slot"
+        "title": "Lab manifest",
+        "slot": "labs-manifest-homepage-dashboard-slot"
+      }
+    },
+    {
+      "name": "manifest-overview-dashboard-db-link",
+      "slot": "lab-manifest-page-dashboard-slot",
+      "component": "manifestOverviewDashboardLink",
+      "meta": {
+        "name": "overview",
+        "title": "Manifest Overview",
+        "slot": "labs-overview-homepage-dashboard-slot"
       }
     },
     {
@@ -19,21 +35,14 @@
       "slot": "lab-manifest-slot"
     },
     {
+      "component": "labManifestComponent",
+      "name": "lab-manifest-dashboard",
+      "slot": "labs-manifest-homepage-dashboard-slot"
+    },
+    {
       "component": "labManifestOverview",
       "name": "lab-manifest-overview",
-      "slot": "lab-manifest-overview-slot"
-    },
-    {
-      "component": "manifestOverviewDashboardLink",
-      "name": "manifest-overview-link",
-      "order": 1,
-      "slot": "diagnostics-group-nav-slot"
-    },
-    {
-      "component": "manifestsDashboardLink",
-      "name": "manifests-dashboard-link",
-      "order": 2,
-      "slot": "diagnostics-group-nav-slot"
+      "slot": "labs-overview-homepage-dashboard-slot"
     },
     {
       "name": "lab-manifest-form",
@@ -52,7 +61,7 @@
       "component": "manifestStatusChangeConfirmModal"
     },
     {
-      "name": "lab-manifest-requeue-confirn-modal",
+      "name": "lab-manifest-requeue-confirm-modal",
       "component": "requeueLabManifestConfirmModal"
     }
   ],
@@ -60,10 +69,6 @@
     {
       "component": "root",
       "route": "lab-manifest"
-    },
-    {
-      "component": "labManifestOverview",
-      "route": "lab-manifest-overview"
     }
   ]
 }

@@ -104,7 +104,7 @@ const LabManifestsTable = () => {
   );
 
   const handleViewManifestSamples = (manifestUuid: string) => {
-    navigate({ to: window.getOpenmrsSpaBase() + `home/lab-manifest/${manifestUuid}` });
+    navigate({ to: window.getOpenmrsSpaBase() + `lab-manifest/detail/${manifestUuid}` });
   };
 
   const handleEditManifest = (manifest: MappedLabManifest) => {
@@ -221,53 +221,55 @@ const LabManifestsTable = () => {
   }
   return (
     <div className={styles.widgetContainer}>
-      <LabManifestTableFilterHeader filter={currFilter} onFilterChange={setCurrFilter} title={headerTitle} />
-      <DataTable
-        useZebraStyles
-        size="sm"
-        rows={tableRows ?? []}
-        sortRow={customSortRow}
-        headers={headers}
-        render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
-          <TableContainer {...getTableContainerProps()}>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: true,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => {
-                      const value = cell.value instanceof Date ? formatDate(cell.value) : cell.value;
-                      return <TableCell key={cell.id}>{value}</TableCell>;
-                    })}
+      <main className="omrs-main-content">
+        <LabManifestTableFilterHeader filter={currFilter} onFilterChange={setCurrFilter} title={headerTitle} />
+        <DataTable
+          useZebraStyles
+          size="sm"
+          rows={tableRows ?? []}
+          sortRow={customSortRow}
+          headers={headers}
+          render={({ rows, headers, getHeaderProps, getTableProps, getTableContainerProps }) => (
+            <TableContainer {...getTableContainerProps()}>
+              <Table {...getTableProps()}>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: true,
+                        })}>
+                        {header.header}
+                      </TableHeader>
+                    ))}
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      />
-      <Pagination
-        page={currentPage}
-        pageSize={pageSize}
-        pageSizes={pageSizes}
-        totalItems={manifests.length}
-        onChange={({ page, pageSize }) => {
-          goTo(page);
-          setPageSize(pageSize);
-        }}
-      />
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => {
+                        const value = cell.value instanceof Date ? formatDate(cell.value) : cell.value;
+                        return <TableCell key={cell.id}>{value}</TableCell>;
+                      })}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        />
+        <Pagination
+          page={currentPage}
+          pageSize={pageSize}
+          pageSizes={pageSizes}
+          totalItems={manifests.length}
+          onChange={({ page, pageSize }) => {
+            goTo(page);
+            setPageSize(pageSize);
+          }}
+        />
+      </main>
     </div>
   );
 };
