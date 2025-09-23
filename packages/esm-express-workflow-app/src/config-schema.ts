@@ -25,6 +25,67 @@ export const configSchema = {
       dashboardId: 'bd7102f9-9291-4a11-9b98-8a17d9142cac',
     },
   },
+  patientChartConfig: {
+    _type: Type.Object,
+    _description: 'Patient chart Tabs config',
+    _default: {
+      femaleOnlyExtensions: ['charts-partography-dashboard'],
+      excludeFromMainChart: ['charts-partography-dashboard'],
+      includeInMchChart: [
+        'charts-partography-dashboard',
+        'charts-summary-dashboard',
+        'care-panel-summary-dashboard-link',
+        'patient-orders-summary-dashboard',
+        'test-results-summary-dashboard',
+        'attachments-results-summary-dashboard',
+        'charts-mch-program-management-dashboard',
+      ],
+      excludeExtensions: [],
+    },
+  },
+  queueServiceConceptUuids: {
+    _type: Type.Object,
+    _description: 'Concept UUIDs for queue service',
+    _default: {
+      triageService: '167411AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      consultationService: '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  },
+  queuStatusConceptUuids: {
+    _type: Type.Object,
+    _description: 'Concept UUIDs for queue status',
+    _default: {
+      waitingStatus: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      inServiceStatus: '167408AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      finishedStatus: '167409AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+  },
+  labOrderTypeUuid: {
+    _type: Type.String,
+    _description: 'UUID for lab order type',
+    _default: '52a447d3-a64a-11e3-9aeb-50e549534c5e',
+  },
+  imagingOrderTypeUuid: {
+    _type: Type.String,
+    _description: 'UUID for imaging order type',
+    _default: 'b4a7c280-369e-4d12-9ce8-18e36783fed6',
+  },
+  orderableConceptSets: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['9a6f10d6-7fc5-4fb7-9428-24ef7b8d01f7'],
+    _description: 'UUIDs for orderable concept sets',
+  },
+  imagingOrderableConceptSets: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: ['164068AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+    _description: 'UUIDs for imaging orderable concept sets',
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -33,4 +94,23 @@ export type ExpressWorkflowConfig = {
     host: string;
     dashboardId: string;
   };
+  patientChartConfig: {
+    femaleOnlyExtensions: Array<string>;
+    excludeFromMainChart: Array<string>;
+    includeInMchChart: Array<string>;
+    excludeExtensions: Array<string>;
+  };
+  queueServiceConceptUuids: {
+    triageService: string;
+    consultationService: string;
+  };
+  queuStatusConceptUuids: {
+    waitingStatus: string;
+    inServiceStatus: string;
+    finishedStatus: string;
+  };
+  labOrderTypeUuid: string;
+  orderableConceptSets: Array<string>;
+  imagingOrderTypeUuid: string;
+  imagingOrderableConceptSets: Array<string>;
 };

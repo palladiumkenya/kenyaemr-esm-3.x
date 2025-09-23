@@ -1,20 +1,21 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import Admissions from './admissions.component';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import AdmissionsDashboard from './admissions-dashboard.component';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib/src';
 
 const options = {
   featureName: 'express-workflow',
   moduleName,
 };
 
-export const admissionsDashboard = getSyncLifecycle(Admissions, options);
-export const admissionsLeftPanelLink = getSyncLifecycle(
+export const admissionsDashboard = getSyncLifecycle(AdmissionsDashboard, options);
+// t('Admissions', 'Admissions')
+export const admissionsDashboardLink = getSyncLifecycle(
   createDashboardLink({
-    title: 'Admissions',
     path: 'admissions',
-    icon: 'omrs-icon-list-checked',
+    title: 'Admissions',
+    icon: 'omrs-icon-hospital-bed',
   }),
   options,
 );

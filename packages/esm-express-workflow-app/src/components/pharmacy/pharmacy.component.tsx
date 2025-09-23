@@ -1,10 +1,10 @@
-import { ExtensionSlot } from '@openmrs/esm-framework';
 import React from 'react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
-const Pharmacy: React.FC = () => {
+const Pharmacy = () => {
   return (
     <div>
-      <ExtensionSlot name="express-pharmacy-dashboard-slot" />
+      <ExtensionSlot name="dispensing-dashboard-slot" />
     </div>
   );
 };

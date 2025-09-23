@@ -12,22 +12,6 @@
   ],
   "extensions": [
     {
-      "component": "accountingLeftPanelLink",
-      "name": "accounting-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 10,
-      "meta": {
-        "name": "accounting",
-        "slot": "accounting-dashboard-slot",
-        "title": "Accounting"
-      }
-    },
-    {
-      "component": "accountingDashboard",
-      "name": "accounting-dashboard",
-      "slot": "accounting-dashboard-slot"
-    },
-    {
       "component": "admissionsLeftPanelLink",
       "name": "admissions-dashboard-link",
       "slot": "express-workflow-left-panel-slot",
@@ -46,7 +30,7 @@
     {
       "component": "consultationLeftPanelLink",
       "name": "consultation-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
+      "slot": "homepage-dashboard-slot",
       "order": 3,
       "meta": {
         "name": "consultation",
@@ -62,7 +46,7 @@
     {
       "component": "facilityLeftPanelLink",
       "name": "facility-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
+      "slot": "homepage-dashboard-slot",
       "order": 0,
       "meta": {
         "name": "dashboard",
@@ -76,26 +60,9 @@
       "slot": "facility-dashboard-slot"
     },
     {
-      "component": "laboratoryLeftPanelLink",
-      "name": "lab-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 5,
-    "meta": {
-        "name": "lab",
-        "slot": "lab-dashboard-slot",
-        "title": "Lab"
-      }
-    },
-    {
-      "component": "labDashboard",
-      "name": "lab-dashboard",
-      "slot": "lab-dashboard-slot"
-    },
-    {
       "component": "mchLeftPanelLink",
       "name": "mch-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 4,
+      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "mch",
         "slot": "mch-dashboard-slot",
@@ -108,58 +75,9 @@
       "slot": "mch-dashboard-slot"
     },
     {
-      "component": "pharmacyLeftPanelLink",
-      "name": "pharmacy-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 7,
-      "meta": {
-        "name": "pharmacy",
-        "slot": "pharmacy-dashboard-slot",
-        "title": "Pharmacy"
-      }
-    },
-    {
-      "component": "pharmacyDashboard",
-      "name": "pharmacy-dashboard",
-      "slot": "pharmacy-dashboard-slot"
-    },
-    {
-      "component": "proceduresLeftPanelLink",
-      "name": "procedures-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 8,
-      "meta": {
-        "name": "procedures",
-        "slot": "root-procedures-dashboard-slot",
-        "title": "Procedures"
-      }
-    },
-    {
-      "component": "proceduresRootDashboard",
-      "name": "procedures-dashboard",
-      "slot": "root-procedures-dashboard-slot"
-    },
-    {
-      "component": "radiologyLeftPanelLink",
-      "name": "radiology-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 6,
-      "meta": {
-        "name": "radiology",
-        "slot": "root-radiology-dashboard-slot",
-        "title": "Radiology"
-      }
-    },
-    {
-      "component": "radiologyRootDashboard",
-      "name": "radiology-dashboard",
-      "slot": "root-radiology-dashboard-slot"
-    },
-    {
       "component": "registrationLeftPanelLink",
       "name": "registration-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 1,
+      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "registration",
         "slot": "registration-dashboard-slot",
@@ -172,26 +90,9 @@
       "slot": "registration-dashboard-slot"
     },
     {
-      "component": "reportsLeftPanelLink",
-      "name": "reports-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 11,
-      "meta": {
-        "name": "reports",
-        "slot": "reports-dashboard-slot",
-        "title": "Reports"
-      }
-    },
-    {
-      "component": "reportsDashboard",
-      "name": "reports-dashboard",
-      "slot": "reports-dashboard-slot"
-    },
-    {
       "component": "triageLeftPanelLink",
       "name": "triage-dashboard-link",
-      "slot": "express-workflow-left-panel-slot",
-      "order": 2,
+      "slot": "homepage-dashboard-slot",
       "meta": {
         "name": "triage",
         "slot": "triage-dashboard-slot",
@@ -202,16 +103,192 @@
       "component": "triageDashboard",
       "name": "triage-dashboard",
       "slot": "triage-dashboard-slot"
+    },
+    {
+      "component": "reportsDashboardLink",
+      "name": "reports-homepage-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "reports",
+        "slot": "reports-homepage-dashboard-slot",
+        "title": "Reports"
+      }
+    },
+    {
+      "component": "reportsDashboard",
+      "name": "reports-dashboard",
+      "slot": "reports-homepage-dashboard-slot"
+    },
+    {
+      "name": "pharmacy-homepage-dashboard-link",
+      "component": "pharmacyLink",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "pharmacy",
+        "title": "Pharmacy",
+        "path": "pharmacy",
+        "slot": "pharmacy-homepage-dashboard-slot"
+      }
+    },
+    {
+      "name": "pharmacy-homepage-dashboard",
+      "component": "pharmacy",
+      "slot": "pharmacy-homepage-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "patient-summary-dashboard",
+      "component": "patientSummaryDashboard",
+      "slot": "patient-chart-summary-dashboard-slot"
+    },
+    {
+      "name": "ewf-clinical-encounter-link",
+      "component": "clinicalEncounterLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-clinical-encounter",
+        "title": "Clinical Encounter",
+        "slot": "ewf-patient-chart-clinical-encounter-slot",
+        "path": "clinical-encounter",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-clinical-encounter-dashboard",
+      "component": "clinicalEncounter",
+      "slot": "ewf-patient-chart-clinical-encounter-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-laboratory-dashboard-link",
+      "component": "laboratoryLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-laboratory",
+        "title": "Laboratory",
+        "path": "laboratory",
+        "slot": "ewf-patient-chart-laboratory-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-laboratory-dashboard",
+      "component": "laboratoryDashboard",
+      "slot": "ewf-patient-chart-laboratory-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-radiology-and-imaging-dashboard-link",
+      "component": "radiologyAndImagingLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-radiology-and-imaging",
+        "title": "Radiology and Imaging",
+        "path": "radiology-and-imaging",
+        "slot": "ewf-patient-chart-radiology-and-imaging-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-radiology-and-imaging-dashboard",
+      "component": "radiologyAndImagingDashboard",
+      "slot": "ewf-patient-chart-radiology-and-imaging-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-procedures-dashboard-link",
+      "component": "proceduresLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-procedures",
+        "title": "Procedures",
+        "path": "procedures",
+        "slot": "ewf-patient-chart-procedures-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-procedures-dashboard",
+      "component": "proceduresDashboard",
+      "slot": "ewf-patient-chart-procedures-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-pharmacy-dashboard-link",
+      "component": "pharmacyPatientChartDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-pharmacy",
+        "title": "Pharmacy",
+        "path": "pharmacy",
+        "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-pharmacy-dashboard",
+      "component": "pharmacyTabs",
+      "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {"name": "ewf-admissions-dashboard-link",
+      "component": "admissionsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-admissions",
+        "title": "Admissions",
+        "path": "admissions",
+        "slot": "ewf-patient-chart-admissions-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-admissions-dashboard",
+      "component": "admissionsDashboard",
+      "slot": "ewf-patient-chart-admissions-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-homepage-dashboard-link",
+      "component": "homepageDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 0
+    }, 
+    {
+      "name": "mch-program-management",
+      "component": "mchProgramManagement",
+      "slot": "mch-program-management-slot",
+      "order": 0
     }
   ],
+      
   "workspaces": [
     {
       "name": "express-workflow-workspace",
-      "component": "expressWorkflowWorkspace",
+      "component": "expressWorkflowWorkspace", 
       "title": "Express Workflow Workspace",
       "type": "workspace",
       "canMaximize": true,
       "canHide": true
+    },
+    {
+      "name": "mch-program-form-workspace",
+      "component": "mchProgramForm", 
+      "title": "Program Form",
+      "type": "workspace"
     }
   ],
   "modals": [

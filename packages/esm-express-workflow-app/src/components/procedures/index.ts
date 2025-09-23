@@ -1,20 +1,21 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import Procedures from './procedures.component';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import ProceduresTabs from './procedures-tabs.component';
 
 const options = {
   featureName: 'express-workflow',
   moduleName,
 };
 
-export const proceduresRootDashboard = getSyncLifecycle(Procedures, options);
+export const proceduresDashboard = getSyncLifecycle(ProceduresTabs, options);
+// t('Procedures', 'Procedures')
 export const proceduresLeftPanelLink = getSyncLifecycle(
   createDashboardLink({
-    title: 'Procedures',
     path: 'procedures',
-    icon: 'omrs-icon-syringe',
+    title: 'Procedures',
+    icon: 'omrs-icon-movement',
   }),
   options,
 );

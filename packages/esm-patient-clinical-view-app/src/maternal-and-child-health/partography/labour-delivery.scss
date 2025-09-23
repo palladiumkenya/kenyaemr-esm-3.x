@@ -3,6 +3,59 @@
 @use '@carbon/type';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.expandedTabsParentContainer {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: layout.$spacing-05;
+}
+
+.expandedTabsContainer {
+  display: flex;
+  flex-direction: row;
+
+  :global(.cds--tabs) {
+    margin: layout.$spacing-05 0;
+    width: 20%;
+    max-height: 100% !important;
+  }
+
+  :global(.cds--tab--list) {
+    flex-direction: column !important;
+  }
+
+  :global(.cds--tab-content) {
+    margin: layout.$spacing-05 0;
+    width: 100% !important;
+  }
+
+  :global(.cds--tabs__nav-link) {
+    border-bottom: 0 !important;
+    border-left: 3px solid $ui-03 !important;
+    padding: layout.$spacing-05;
+  }
+
+  :global(.cds--tabs__nav-item--selected) {
+    border-bottom: 0px !important;
+    border-left: 3px solid var(--brand-03) !important;
+  }
+
+  &:global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
+    margin-left: 0 !important;
+  }
+
+  > ul {
+    flex-direction: column !important;
+  }
+
+  > ul > li button {
+    width: 12rem !important;
+  }
+
+  :global(.cds--tabs__nav-link) {
+    max-width: 12rem !important;
+  }
+}
+
 .widgetContainer {
   background-color: colors.$white;
   border: 1px solid #e0e0e0;

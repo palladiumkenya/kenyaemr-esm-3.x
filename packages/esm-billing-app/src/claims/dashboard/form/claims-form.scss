@@ -153,3 +153,9 @@
   padding: layout.$spacing-05;
   gap: layout.$spacing-05;
 }
+.doc{
+  border: 1px solid colors.$gray-40;
+  padding: layout.$spacing-03;
+  margin: layout.$spacing-03 0 layout.$spacing-03 0;
+  position: relative;
+}

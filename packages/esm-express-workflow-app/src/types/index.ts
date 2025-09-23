@@ -65,3 +65,6 @@ export type QueueEntryFilters = {
   endedOn?: string; // ISO date string
   includedVoided?: boolean;
 };
+export * from './order/order';
+export * from './order/order-type';
+export * from './encounter';
