@@ -136,16 +136,159 @@
       "slot": "pharmacy-homepage-dashboard-slot",
       "online": true,
       "offline": false
+    },
+    {
+      "name": "patient-summary-dashboard",
+      "component": "patientSummaryDashboard",
+      "slot": "patient-chart-summary-dashboard-slot"
+    },
+    {
+      "name": "ewf-clinical-encounter-link",
+      "component": "clinicalEncounterLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-clinical-encounter",
+        "title": "Clinical Encounter",
+        "slot": "ewf-patient-chart-clinical-encounter-slot",
+        "path": "clinical-encounter",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-clinical-encounter-dashboard",
+      "component": "clinicalEncounter",
+      "slot": "ewf-patient-chart-clinical-encounter-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-laboratory-dashboard-link",
+      "component": "laboratoryLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-laboratory",
+        "title": "Laboratory",
+        "path": "laboratory",
+        "slot": "ewf-patient-chart-laboratory-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-laboratory-dashboard",
+      "component": "laboratoryDashboard",
+      "slot": "ewf-patient-chart-laboratory-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-radiology-and-imaging-dashboard-link",
+      "component": "radiologyAndImagingLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-radiology-and-imaging",
+        "title": "Radiology and Imaging",
+        "path": "radiology-and-imaging",
+        "slot": "ewf-patient-chart-radiology-and-imaging-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-radiology-and-imaging-dashboard",
+      "component": "radiologyAndImagingDashboard",
+      "slot": "ewf-patient-chart-radiology-and-imaging-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-procedures-dashboard-link",
+      "component": "proceduresLeftPanelLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-procedures",
+        "title": "Procedures",
+        "path": "procedures",
+        "slot": "ewf-patient-chart-procedures-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-procedures-dashboard",
+      "component": "proceduresDashboard",
+      "slot": "ewf-patient-chart-procedures-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-pharmacy-dashboard-link",
+      "component": "pharmacyPatientChartDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-pharmacy",
+        "title": "Pharmacy",
+        "path": "pharmacy",
+        "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-pharmacy-dashboard",
+      "component": "pharmacyTabs",
+      "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {"name": "ewf-admissions-dashboard-link",
+      "component": "admissionsDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "meta": {
+        "name": "ewf-admissions",
+        "title": "Admissions",
+        "path": "admissions",
+        "slot": "ewf-patient-chart-admissions-dashboard-slot",
+        "layoutMode": "anchored",
+        "hideDashboardTitle": true
+      }
+    },
+    {
+      "name": "ewf-admissions-dashboard",
+      "component": "admissionsDashboard",
+      "slot": "ewf-patient-chart-admissions-dashboard-slot",
+      "online": true,
+      "offline": false
+    },
+    {
+      "name": "ewf-homepage-dashboard-link",
+      "component": "homepageDashboardLink",
+      "slot": "patient-chart-dashboard-slot",
+      "order": 0
+    }, 
+    {
+      "name": "mch-program-management",
+      "component": "mchProgramManagement",
+      "slot": "mch-program-management-slot",
+      "order": 0
     }
   ],
+      
   "workspaces": [
     {
       "name": "express-workflow-workspace",
-      "component": "expressWorkflowWorkspace",
+      "component": "expressWorkflowWorkspace", 
       "title": "Express Workflow Workspace",
       "type": "workspace",
       "canMaximize": true,
       "canHide": true
+    },
+    {
+      "name": "mch-program-form-workspace",
+      "component": "mchProgramForm", 
+      "title": "Program Form",
+      "type": "workspace"
     }
   ],
   "modals": [

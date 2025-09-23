@@ -7,8 +7,8 @@
   "extensions": [
     {
       "name": "hiv-care-and-treatment-dashboard-link",
-      "slot": "patient-chart-dashboard-slot",
       "component": "hivCareAndTreatmentLink",
+      "slot": "patient-chart-dashboard-slot",
       "meta": {
         "columns": 1,
         "columnSpan": 1,
@@ -27,7 +27,6 @@
     },
     {
       "name": "relationship-dashboard-link",
-      "slot": "patient-chart-dashboard-slot",
       "component": "relationshipsLink",
       "order": 24,
       "online": true,
@@ -51,7 +50,6 @@
     {
       "name": "clinical-encounter-dashboard-link",
       "component": "clinicalEncounterLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 25,
       "meta": {
         "columns": 1,
@@ -72,7 +70,6 @@
     {
       "name": "maternal-and-child-health-dashboard-link",
       "component": "maternalAndChildHealthDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 26,
       "meta": {
         "columns": 1,
@@ -91,9 +88,16 @@
       "offline": false
     },
     {
+      "name": "maternal-and-child-health-partograph",
+      "slot": "maternal-and-child-health-partograph-slot",
+      "component": "partograph",
+      "order": 0,
+      "online": true,
+      "offline": false
+    },
+    {
       "name": "contact-list-dashboard-link",
       "component": "contactListLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 27,
       "meta": {
         "columns": 1,
@@ -124,7 +128,6 @@
     {
       "name": "in-patient-dashboard-link",
       "component": "inPatientChartLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 7,
       "meta": {
         "slot": "patient-chart-in-patient-dashboard-slot",
@@ -153,7 +156,6 @@
     {
       "name": "case-encounter-link",
       "component": "caseEncounterDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 14,
       "meta": {
         "columns": 1,
@@ -192,7 +194,6 @@
     {
       "name": "special-clinics-dashboard-link",
       "component": "specialClinicsDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 15,
       "meta": {
         "columns": 1,

@@ -34,8 +34,8 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
         <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
 
         <ExtensionSlot name="provider-banner-info-slot" />
-      </PageHeader>{' '}
-      <QueueTab queues={triageQueues} />
+      </PageHeader>
+      <QueueTab queues={triageQueues} navigatePath="triage" usePatientChart />
     </div>
   );
 };

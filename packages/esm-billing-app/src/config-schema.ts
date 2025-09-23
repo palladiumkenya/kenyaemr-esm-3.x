@@ -35,6 +35,7 @@ export interface BillingConfig {
     duration: number;
   };
   localeCurrencyMapping: Record<string, string>;
+  phoneNumberAttributeTypeUUID: string;
 }
 
 export const configSchema: ConfigSchema = {
@@ -67,6 +68,11 @@ export const configSchema: ConfigSchema = {
     _type: Type.String,
     _description: 'The base url that will be used to make any backend calls related to mpesa.',
     _default: 'https://billing.kenyahmis.org',
+  },
+  phoneNumberAttributeTypeUUID: {
+    _type: Type.String,
+    _description: 'The person attribute type uuid for phone number',
+    _default: 'b2c38640-2603-4629-aebd-3b54f33f1e3a',
   },
   hieBaseUrl: {
     _type: Type.String,

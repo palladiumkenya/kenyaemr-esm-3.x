@@ -2,6 +2,7 @@
 @use '@carbon/type';
 @use '@carbon/colors';
 
+
 .pageHeader {
   @include type.type-style('body-compact-02');
   height: layout.$spacing-12;
@@ -10,6 +11,7 @@
   padding: layout.$spacing-05;
   background: colors.$white-0;
   border-bottom: 1px solid colors.$gray-20;
+  margin-bottom: layout.$spacing-05;
 }
 
 .cards {

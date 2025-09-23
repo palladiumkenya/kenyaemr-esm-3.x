@@ -124,9 +124,9 @@ export function InvoiceActions({ bill, selectedLineItems = [], activeVisit }: In
 
     if (activeVisit) {
       await handleEndVisit();
-      navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
+      navigate({ to: `${spaBasePath}/accounting/patient/${patientUuid}/${billUuid}/claims` });
     } else {
-      navigate({ to: `${spaBasePath}/billing/patient/${patientUuid}/${billUuid}/claims` });
+      navigate({ to: `${spaBasePath}/accounting/patient/${patientUuid}/${billUuid}/claims` });
     }
   };
 
