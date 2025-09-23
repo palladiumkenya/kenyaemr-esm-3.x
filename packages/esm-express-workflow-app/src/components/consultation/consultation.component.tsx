@@ -19,7 +19,7 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
   // TODO: Add actually get the values from the queues
   const cards = [
     { title: t('awaitingConsultation', 'Awaiting consultation'), value: '20' },
-    { title: t('awaitingInvestigation', 'Awaiting Investigation'), value: '5' },
+    { title: t('awaitingInvestigation', 'Awaiting Investigation'), value: '15' },
     { title: t('investigationComplete', 'Investigation complete'), value: '7' },
     { title: t('visitComplete', 'Visit complete'), value: '4' },
   ];
@@ -31,8 +31,8 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
     <div className={`omrs-main-content`}>
       <PageHeader className={styles.pageHeader}>
         <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-       <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-       <ExtensionSlot name="provider-banner-info-slot" />
+        <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
+        <ExtensionSlot name="provider-banner-info-slot" />
       </PageHeader>
       <QueueTab
         queues={consultationQueues}
