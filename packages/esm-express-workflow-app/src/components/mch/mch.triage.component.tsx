@@ -39,7 +39,7 @@ const MCHTriage: React.FC = () => {
       cards={[
         // { title: t('cilentsPatientInWaiting', 'Cilents/Patient in waiting'), value: awaitingCount.toString() },
         {
-          title: t('cilentsPatientAttended', 'Cilents/Patient attended to'),
+          title: t('clientsPatientAttended', 'Clients/Patient attended to'),
           value: finishedQueueEntries?.length?.toString(),
         },
       ]}
