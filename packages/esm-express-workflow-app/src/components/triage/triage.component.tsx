@@ -1,7 +1,7 @@
 import React from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
-import { PageHeader, HomePictogram, ErrorState } from '@openmrs/esm-framework';
+import { PageHeader, HomePictogram, ErrorState, PageHeaderContent, ExtensionSlot } from '@openmrs/esm-framework';
 import { InlineLoading } from '@carbon/react';
 
 import { useQueues } from '../../hooks/useServiceQueues';
@@ -29,8 +29,12 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   }
 
   return (
-    <div>
-      <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
+    <div className={`omrs-main-content`}>
+      <PageHeader className={styles.pageHeader}>
+        <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
+
+        <ExtensionSlot name="provider-banner-info-slot" />
+      </PageHeader>
       <QueueTab queues={triageQueues} navigatePath="triage" usePatientChart />
     </div>
   );

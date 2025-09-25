@@ -48,6 +48,8 @@
   "identifier": "Identifier",
   "identifierNumber": "Identifier number*",
   "identifiers": "Identifiers",
+  "invalidPhoneNumber": "Please enter a valid phone number",
+  "investigationComplete": "Investigation complete",
   "immunizations": "Immunizations",
   "invalidPhoneNumber": "Please enter a valid phone number",
   "investigationComplete": "Investigation complete",
