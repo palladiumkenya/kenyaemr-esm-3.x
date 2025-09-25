@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useInitialize } from './useInitialize';
 import styles from './patient-chart.scss';
-import { usePatientchartTabs } from './patient-chart.resources';
+import { usePatientChartTabs } from './patient-chart.resources';
 
 type PatientChartProps = {
   navigationPath: string;
@@ -21,7 +21,7 @@ const PatientChart: React.FC<PatientChartProps> = ({ navigationPath }) => {
     isLoading,
     error,
   } = useSWR(patientUuid ? ['patient', patientUuid] : null, () => fetchCurrentPatient(patientUuid!, {}));
-  const patientChartTabsExtensionSlotConfig = usePatientchartTabs(navigationPath, patientUuid, patient);
+  const patientChartTabsExtensionSlotConfig = usePatientChartTabs(navigationPath, patientUuid, patient);
 
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
@@ -53,12 +53,6 @@ const PatientChart: React.FC<PatientChartProps> = ({ navigationPath }) => {
             ))}
           </TabPanels>
         </Tabs>
-        <WorkspaceContainer
-          showSiderailAndBottomNav
-          key="express-workflow"
-          contextKey={`home/${navigationPath}/${patientUuid}`}
-          additionalWorkspaceProps={state}
-        />
       </div>
     </div>
   );
