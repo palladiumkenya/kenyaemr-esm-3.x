@@ -31,7 +31,6 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
     <div className={`omrs-main-content`}>
       <PageHeader className={styles.pageHeader}>
         <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-        <PageHeader className={styles.pageHeader} title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
         <ExtensionSlot name="provider-banner-info-slot" />
       </PageHeader>
       <QueueTab
