@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location } from '@carbon/react/icons';
-import { useSession, formatDate } from '@openmrs/esm-framework';
+import { useSession, formatDate, ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './referrals-header.scss';
 import ReferralsIllustration from './referrals-illustration.component';
 
@@ -20,13 +20,7 @@ export const ReferralsHeader: React.FC = () => {
         </div>
       </div>
       <div className={styles['right-justified-items']}>
-        <div className={styles['date-and-location']}>
-          <Location size={16} />
-          <span className={styles.value}>{userLocation}</span>
-          <span className={styles.middot}>&middot;</span>
-          <Calendar size={16} />
-          <span className={styles.value}>{formatDate(new Date(), { mode: 'standard' })}</span>
-        </div>
+        <ExtensionSlot name="provider-banner-info-slot" />
       </div>
     </div>
   );
