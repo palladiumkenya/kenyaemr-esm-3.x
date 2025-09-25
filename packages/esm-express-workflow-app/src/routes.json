@@ -137,6 +137,7 @@
       "online": true,
       "offline": false
     },
+
     {
       "name": "patient-summary-dashboard",
       "component": "patientSummaryDashboard",
@@ -266,7 +267,7 @@
       "component": "homepageDashboardLink",
       "slot": "patient-chart-dashboard-slot",
       "order": 0
-    }, 
+    },
     {
       "name": "mch-program-management",
       "component": "mchProgramManagement",
@@ -274,11 +275,11 @@
       "order": 0
     }
   ],
-      
+
   "workspaces": [
     {
       "name": "express-workflow-workspace",
-      "component": "expressWorkflowWorkspace", 
+      "component": "expressWorkflowWorkspace",
       "title": "Express Workflow Workspace",
       "type": "workspace",
       "canMaximize": true,
@@ -286,7 +287,7 @@
     },
     {
       "name": "mch-program-form-workspace",
-      "component": "mchProgramForm", 
+      "component": "mchProgramForm",
       "title": "Program Form",
       "type": "workspace"
     }
