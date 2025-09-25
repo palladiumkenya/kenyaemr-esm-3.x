@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { AssignedExtension, useAssignedExtensions, useConfig } from '@openmrs/esm-framework';
 import { ExpressWorkflowConfig } from '../../config-schema';
 
-export const usePatientchartTabs = (navigationPath: string, patientUuid: string, patient?: fhir.Patient) => {
+export const usePatientChartTabs = (navigationPath: string, patientUuid: string, patient?: fhir.Patient) => {
   const { t } = useTranslation();
   const { patientChartConfig } = useConfig<ExpressWorkflowConfig>();
   const extensions = useAssignedExtensions('patient-chart-dashboard-slot');
