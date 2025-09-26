@@ -1,0 +1,382 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
+@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.partographyContainer {
+  padding: spacing.$spacing-05;
+  background-color: $ui-02;
+  margin: spacing.$spacing-03 0;
+}
+
+.partographyTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-05;
+  display: flex;
+  align-items: center;
+  gap: spacing.$spacing-03;
+}
+
+.titleIcon {
+  color: colors.$blue-60;
+}
+
+.content {
+  padding: spacing.$spacing-04;
+  background-color: $ui-01;
+  border-radius: 4px;
+  border: 1px solid $ui-03;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: spacing.$spacing-05;
+
+  h5 {
+    @include type.type-style('heading-compact-01');
+    margin: 0;
+  }
+}
+
+// Graphs Section
+.graphsSection {
+  margin-bottom: spacing.$spacing-08;
+}
+
+.graphContainer {
+  padding: spacing.$spacing-04;
+  background-color: $ui-02;
+  border-radius: 4px;
+  margin-bottom: spacing.$spacing-04;
+}
+
+.graphHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: spacing.$spacing-03;
+
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin: 0;
+  }
+}
+
+.graphHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: spacing.$spacing-03;
+}
+
+.graphHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: spacing.$spacing-02;
+
+  .viewSwitcher {
+    display: flex;
+    border: 1px solid $ui-04;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: spacing.$spacing-03;
+
+    .viewButton {
+      border-radius: 0;
+      border: none;
+      min-width: 40px;
+      height: 32px;
+
+      &:first-child {
+        border-right: 1px solid $ui-04;
+      }
+
+      &:hover {
+        background-color: $ui-03;
+      }
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  button {
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $ui-03;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.addButton {
+  background-color: colors.$gray-100 !important;
+  color: colors.$white !important;
+  border: 1px solid colors.$gray-100 !important;
+
+  &:hover {
+    background-color: colors.$gray-90 !important;
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    background-color: colors.$gray-90 !important;
+    border-color: colors.$blue-60 !important;
+    box-shadow: 0 0 0 2px colors.$blue-60;
+  }
+}
+
+.graphDescription {
+  @include type.type-style('body-compact-01');
+  color: $text-03;
+  margin-bottom: spacing.$spacing-04;
+}
+
+.chartContainer {
+  background-color: $ui-01;
+  padding: spacing.$spacing-04;
+  border-radius: 4px;
+  border: 1px solid $ui-03;
+  margin-bottom: spacing.$spacing-04;
+}
+
+.chartStats {
+  display: flex;
+  gap: spacing.$spacing-05;
+  padding: spacing.$spacing-03;
+  background-color: $ui-03;
+  border-radius: 4px;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: spacing.$spacing-02;
+}
+
+.statLabel {
+  @include type.type-style('label-01');
+  color: $text-03;
+}
+
+.statValue {
+  @include type.type-style('heading-compact-01');
+  color: $text-02;
+}
+
+.chartPlaceholder {
+  background-color: $ui-01;
+  padding: spacing.$spacing-06;
+  border-radius: 4px;
+  text-align: center;
+  border: 2px dashed $ui-04;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &[data-color='red'] {
+    border-color: colors.$red-40;
+  }
+  &[data-color='blue'] {
+    border-color: colors.$blue-40;
+  }
+  &[data-color='green'] {
+    border-color: colors.$green-40;
+  }
+  &[data-color='purple'] {
+    border-color: colors.$purple-40;
+  }
+  &[data-color='orange'] {
+    border-color: colors.$orange-40;
+  }
+  &[data-color='cyan'] {
+    border-color: colors.$cyan-40;
+  }
+  &[data-color='teal'] {
+    border-color: colors.$teal-40;
+  }
+  &[data-color='yellow'] {
+    border-color: colors.$yellow-40;
+  }
+  &[data-color='magenta'] {
+    border-color: colors.$magenta-40;
+  }
+  &[data-color='gray'] {
+    border-color: colors.$gray-40;
+  }
+}
+
+.chartContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: spacing.$spacing-03;
+
+  p {
+    margin: 0;
+    color: $text-02;
+    @include type.type-style('body-compact-01');
+  }
+}
+
+.yAxisLabel {
+  @include type.type-style('label-01');
+  color: $text-03;
+}
+
+// Data Table Section
+
+.tableContainer {
+  background-color: $ui-01;
+  border-radius: 4px;
+  border: 1px solid $ui-03;
+  margin-bottom: spacing.$spacing-04;
+
+  .cds--data-table-container {
+    background-color: transparent;
+  }
+
+  .cds--data-table {
+    background-color: transparent;
+
+    th,
+    td {
+      border-bottom: 1px solid $ui-03;
+      padding: spacing.$spacing-03 spacing.$spacing-04;
+    }
+
+    th {
+      background-color: $ui-02;
+      @include type.type-style('label-01');
+      color: $text-02;
+    }
+
+    td {
+      @include type.type-style('body-compact-01');
+      color: $text-02;
+    }
+
+    // Alternating row colors - constant, not hover-based
+    tbody tr:nth-child(odd) {
+      background-color: $ui-01; // White
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: $ui-02; // Light grey
+    }
+
+    // Keep hover effect but make it more subtle
+    tbody tr:hover {
+      background-color: $ui-03;
+    }
+  }
+}
+
+.tableStats {
+  padding: spacing.$spacing-03;
+  background-color: $ui-03;
+  border-radius: 0 0 4px 4px;
+  text-align: center;
+}
+
+.recordCount {
+  @include type.type-style('body-compact-01');
+  color: $text-03;
+}
+
+// Value status indicators
+.highValue {
+  color: colors.$red-60;
+  font-weight: 600;
+}
+
+.lowValue {
+  color: colors.$blue-60;
+  font-weight: 600;
+}
+
+.arrow {
+  font-weight: bold;
+  margin-left: spacing.$spacing-02;
+}
+
+.chartSection {
+  margin-bottom: spacing.$spacing-06;
+
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin-bottom: spacing.$spacing-04;
+  }
+}
+
+.tableSection {
+  margin-bottom: spacing.$spacing-06;
+
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin-bottom: spacing.$spacing-04;
+  }
+}
+
+.alertSection {
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin-bottom: spacing.$spacing-04;
+  }
+}
+
+.alertGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: spacing.$spacing-04;
+}
+
+.alertItem {
+  display: flex;
+  align-items: center;
+  gap: spacing.$spacing-03;
+  padding: spacing.$spacing-03;
+  background-color: $ui-02;
+  border-radius: 4px;
+
+  span {
+    @include type.type-style('body-compact-01');
+    color: $text-02;
+  }
+}
+
+// Loading and empty state styles
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: $text-03;
+
+  p {
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  gap: spacing.$spacing-05;
+  color: $text-03;
+  text-align: center;
+
+  p {
+    margin: 0;
+    @include type.type-style('body-compact-01');
+  }
+}

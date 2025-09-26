@@ -24,7 +24,7 @@ import AntenatalCare from './maternal-and-child-health/antenatal-care.component'
 import LabourDelivery from './maternal-and-child-health/labour-delivery.component';
 import PostnatalCare from './maternal-and-child-health/postnatal-care.component';
 import MaternalAndChildDashboard from './maternal-and-child-health/maternal-and-child.component';
-import Partograph from './maternal-and-child-health/partography/partograph.component';
+import Partography from './maternal-and-child-health/partography/partograph.component';
 
 import HivCareAndTreatment from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment.component';
 
@@ -93,7 +93,7 @@ export const maternalAndChildHealthDashboard = getSyncLifecycle(MaternalAndChild
 export const antenatalCare = getSyncLifecycle(AntenatalCare, options);
 export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
-export const partograph = getSyncLifecycle(Partograph, options);
+export const partograph = getSyncLifecycle(Partography, options);
 
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
