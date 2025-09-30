@@ -52,7 +52,7 @@ const ProgramForm: FC<ProgramFormProps> = ({ patientUuid, program, enrollment, c
       showSnackbar({
         kind: 'success',
         title: 'Success',
-        subtitle: t('programEnrollmentSuccessfull', 'Program enrollment successfull'),
+        subtitle: t('programEnrollmentSuccessful', 'Program enrollment successful'),
       });
 
       closeWorkspace();

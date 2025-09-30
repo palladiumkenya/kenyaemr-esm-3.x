@@ -1,6 +1,6 @@
 import React from 'react';
 import Triage from '../triage/triage.component';
-import { HomePictogram, PageHeader } from '@openmrs/esm-framework';
+import { ExtensionSlot, HomePictogram, PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import styles from './mch.scss';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
@@ -16,11 +16,14 @@ const MCH: React.FC<MchProps> = ({ dashboardTitle }) => {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   return (
     <div>
-      <PageHeader
-        className={styles.pageHeader}
-        title={`${toUpper(dashboardTitle)} ${selectedIndex === 0 ? 'Triage' : 'Consultation'}`}
-        illustration={<HomePictogram />}
-      />
+      <PageHeader className={styles.pageHeader}>
+        <PageHeaderContent
+          title={`${toUpper(dashboardTitle)} ${selectedIndex === 0 ? 'Triage' : 'Consultation'}`}
+          illustration={<HomePictogram />}
+        />
+
+        <ExtensionSlot name="provider-banner-info-slot" />
+      </PageHeader>
       <Tabs
         onChange={({ selectedIndex }) => {
           setSelectedIndex(selectedIndex);

@@ -1,0 +1,11 @@
+@use '@carbon/layout';
+
+.buttonContainer {
+  flex-direction: column;
+
+  :global(.omrs-breakpoint-lt-desktop) & {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+}

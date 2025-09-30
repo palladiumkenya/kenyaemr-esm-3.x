@@ -61,7 +61,10 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
   return (
     <div className={styles.queueTab}>
       <div className={styles.cards}>
-        <Card title={t('patientInWaiting', 'Patient in waiting')} value={memoizedQueueEntries.length.toString()} />
+        <Card
+          title={t('clientsPatientInWaiting', 'Clients/Patient in waiting')}
+          value={memoizedQueueEntries.length.toString()}
+        />
         {cards?.map((card) => (
           <Card key={card.title} title={card.title} value={card.value} />
         ))}

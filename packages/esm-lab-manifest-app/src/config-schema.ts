@@ -1,4 +1,4 @@
-import { Type, validator } from '@openmrs/esm-framework';
+import { Type, validator, validators } from '@openmrs/esm-framework';
 
 export const configSchema = {
   labmanifestTypes: {
@@ -39,6 +39,12 @@ export const configSchema = {
       kdodIdentifierType: 'b51ffe55-3e76-44f8-89a2-14f5eaf11079',
     },
   },
+  leftNavMode: {
+    _type: Type.String,
+    _description: 'Sets the left nav mode for the home app.',
+    _validators: [validators.oneOf(['normal', 'collapsed', 'hidden'])],
+    _default: 'normal',
+  },
 };
 export interface LabManifestConfig {
   labmanifestTypes: Array<{ id: number; type: string }>;
@@ -47,4 +53,5 @@ export interface LabManifestConfig {
     cccNumberIdentifierType: string;
     kdodIdentifierType: string;
   };
+  leftNavMode: 'normal' | 'collapsed' | 'hidden';
 }
