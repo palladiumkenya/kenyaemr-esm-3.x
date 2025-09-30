@@ -15,10 +15,13 @@ type TriageProps = {
 const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   const { t } = useTranslation();
   const { queues, isLoading, error } = useQueues();
-  const triageQueues = queues
-    .filter((queue) => queue.name.toLowerCase().includes('triage'))
-    .filter((queue) => !queue.location.display.toLowerCase().includes('mch'))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const triageQueues =
+    queues
+      .filter((queue) => queue.name.toLowerCase().includes('triage'))
+      .filter((queue) => !queue.location.display.toLowerCase().includes('mch'))
+      .sort((a, b) => a.name.localeCompare(b.name)) ?? [];
+
+  const cards = [{ title: t('awaitingTriage', 'Awaiting Triage'), value: triageQueues.length.toString() }];
 
   if (isLoading) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
@@ -29,13 +32,12 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   }
 
   return (
-    <div className={`omrs-main-content`}>
+    <div>
       <PageHeader className={styles.pageHeader}>
         <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-
         <ExtensionSlot name="provider-banner-info-slot" />
       </PageHeader>
-      <QueueTab queues={triageQueues} navigatePath="triage" usePatientChart />
+      <QueueTab queues={triageQueues} navigatePath="triage" usePatientChart cards={cards} />
     </div>
   );
 };

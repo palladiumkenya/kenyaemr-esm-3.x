@@ -7,12 +7,14 @@ import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
 import MCHTriage from './mch.triage.component';
 import MCHConsultation from './mch.consultation.component';
 import toUpper from 'lodash/toUpper';
+import { useTranslation } from 'react-i18next';
 
 type MchProps = {
   dashboardTitle: string;
 };
 
 const MCH: React.FC<MchProps> = ({ dashboardTitle }) => {
+  const { t } = useTranslation();
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   return (
     <div>
@@ -31,8 +33,8 @@ const MCH: React.FC<MchProps> = ({ dashboardTitle }) => {
         selectedIndex={selectedIndex}
         aria-label="Tab navigation">
         <TabList activation="manual">
-          <Tab>Triage</Tab>
-          <Tab>Consultation</Tab>
+          <Tab>{t('triage', 'Triage')}</Tab>
+          <Tab>{t('consultation', 'Consultation')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -43,7 +45,6 @@ const MCH: React.FC<MchProps> = ({ dashboardTitle }) => {
           </TabPanel>
         </TabPanels>
       </Tabs>
-      ;
     </div>
   );
 };

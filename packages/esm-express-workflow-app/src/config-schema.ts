@@ -86,6 +86,11 @@ export const configSchema = {
     _default: ['164068AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     _description: 'UUIDs for imaging orderable concept sets',
   },
+  visitQueueNumberAttributeUuid: {
+    _type: Type.String,
+    _description: 'UUID for visit queue number attribute',
+    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -113,4 +118,5 @@ export type ExpressWorkflowConfig = {
   orderableConceptSets: Array<string>;
   imagingOrderTypeUuid: string;
   imagingOrderableConceptSets: Array<string>;
+  visitQueueNumberAttributeUuid: string;
 };
