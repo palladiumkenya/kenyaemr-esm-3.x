@@ -89,33 +89,6 @@ const VisitAttributesForm: React.FC<VisitAttributesFormProps> = ({ setAttributes
   return (
     <>
       <section>
-        <div className={styles.sectionTitle}>{t('patientCategory', 'Patient category')}</div>
-        <div className={styles.sectionField}>
-          <div className={styles.sectionFieldLayer}>
-            <Controller
-              name="isPatientExempted"
-              control={control}
-              render={({ field }) => (
-                <RadioButtonGroup
-                  onChange={(selected) => {
-                    field.onChange(selected);
-                  }}
-                  orientation="vertical"
-                  name="patientExemption">
-                  <RadioButton
-                    className={styles.radioButtonOption}
-                    labelText={t('walkIn', 'Walk-in')}
-                    value="true"
-                    id="Yes"
-                  />
-                  <RadioButton labelText={t('triage', 'Triage')} value="false" id="No" />
-                </RadioButtonGroup>
-              )}
-            />
-          </div>
-        </div>
-      </section>
-      <section>
         <div className={styles.sectionTitle}>{t('modeOfPayment', 'Mode of payment')}</div>
         <div className={styles.sectionField}>
           <div className={styles.sectionFieldLayer}>

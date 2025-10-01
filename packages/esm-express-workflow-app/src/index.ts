@@ -1,5 +1,6 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import CheckinFormExtraExtension from './components/registration/checkin-form-extra/checkin-form-extra.extension';
 
 const moduleName = '@kenyaemr/esm-express-workflow-app';
 
@@ -31,3 +32,4 @@ export const otpVerificationModal = getAsyncLifecycle(
   () => import('./shared/otp-verification/otp-verification.modal'),
   options,
 );
+export const checkinFormExtraExtension = getSyncLifecycle(CheckinFormExtraExtension, options);
