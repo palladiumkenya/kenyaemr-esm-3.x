@@ -1,4 +1,4 @@
-import { type OpenmrsResource, type OpenmrsResourceStrict } from '@openmrs/esm-framework';
+import { type OpenmrsResource, type OpenmrsResourceStrict, type Visit } from '@openmrs/esm-framework';
 
 export interface DashboardConfig {
   name: string;
@@ -32,7 +32,7 @@ export type QueueEntry = {
       birthdate: string;
     };
   };
-  visit: OpenmrsResource;
+  visit: Visit;
   priority: OpenmrsResource & { name: OpenmrsResourceStrict };
   priorityComment: string | null;
   sortWeight: number;
@@ -65,3 +65,6 @@ export type QueueEntryFilters = {
   endedOn?: string; // ISO date string
   includedVoided?: boolean;
 };
+export * from './order/order';
+export * from './order/order-type';
+export * from './encounter';

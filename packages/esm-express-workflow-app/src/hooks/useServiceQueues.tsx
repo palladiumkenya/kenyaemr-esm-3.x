@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { Queue, QueueEntry, QueueEntryFilters } from '../types/index';
 
 export const useQueues = () => {
@@ -16,15 +16,15 @@ export const useQueues = () => {
 };
 
 export const useQueueEntries = (filters?: QueueEntryFilters) => {
-  const customRepresentation =
-    'custom:(uuid,display,queue:(uuid,display,name,location:(uuid,display),service:(uuid,display),allowedPriorities:(uuid,display),allowedStatuses:(uuid,display)),status,patient:(uuid,display,identifiers:(uuid,identifier,identifierType:(uuid,display)),person:(uuid,display,gender,birthdate)),visit:(uuid,display,startDatetime),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
+  const repString =
+    'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
   // Build query parameters from filters
   const buildQueryParams = (filters?: QueueEntryFilters): string => {
     const params = new URLSearchParams();
 
     // Always add custom representation
-    params.append('v', customRepresentation);
+    params.append('v', repString);
 
     // Add filter parameters if they exist
     if (filters) {
@@ -58,3 +58,20 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
     error,
   };
 };
+
+export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {
+  const abortController = new AbortController();
+
+  return openmrsFetch(`${restBaseUrl}/queueutil/assignticket`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    signal: abortController.signal,
+    body: {
+      servicePointName,
+      ticketNumber,
+      status,
+    },
+  });
+}

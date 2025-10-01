@@ -12,9 +12,12 @@ import styles from './queue-tab.scss';
 type QueueTabProps = {
   queues: Array<Queue>;
   cards?: Array<{ title: string; value: string }>;
+  navigatePath: string;
+  onTabChanged?: (queue: Queue) => void;
+  usePatientChart?: boolean;
 };
 
-const QueueTab: React.FC<QueueTabProps> = ({ queues, cards }) => {
+const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged, usePatientChart }) => {
   const { t } = useTranslation();
   const [selectedQueue, setSelectedQueue] = useState<Queue | undefined>(() => queues[0]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -31,9 +34,13 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards }) => {
 
   const memoizedQueueEntries = useMemo(() => queueEntries, [queueEntries]);
 
-  const handleQueueSelection = useCallback((queue: Queue) => {
-    setSelectedQueue(queue);
-  }, []);
+  const handleQueueSelection = useCallback(
+    (queue: Queue) => {
+      setSelectedQueue(queue);
+      onTabChanged?.(queue);
+    },
+    [onTabChanged],
+  );
 
   if (isInitialLoad && isLoading) {
     return <TabsSkeleton />;
@@ -54,7 +61,6 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards }) => {
   return (
     <div className={styles.queueTab}>
       <div className={styles.cards}>
-        <Card title={t('patientInWaiting', 'Patient in waiting')} value={memoizedQueueEntries.length.toString()} />
         {cards?.map((card) => (
           <Card key={card.title} title={card.title} value={card.value} />
         ))}
@@ -78,7 +84,12 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards }) => {
                         <InlineLoading description={t('loadingQueueEntries', 'Loading queue entries...')} />
                       </div>
                     )}
-                    <QueueEntryTable queueEntries={memoizedQueueEntries} key={`table-${queue.uuid}`} />
+                    <QueueEntryTable
+                      queueEntries={memoizedQueueEntries}
+                      key={`table-${queue.uuid}`}
+                      navigatePath={navigatePath}
+                      usePatientChart={usePatientChart}
+                    />
                   </div>
                 )}
               </TabPanel>

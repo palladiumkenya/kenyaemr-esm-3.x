@@ -2,31 +2,38 @@ import { InlineLoading } from '@carbon/react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueues } from '../../hooks/useServiceQueues';
-import Card from '../../shared/cards/card.component';
 import QueueTab from '../../shared/queue/queue-tab.component';
-import styles from './mch.scss';
-type ConsultationProps = {
-  dashboardTitle: string;
-};
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 const MCHConsultation: React.FC = () => {
   const { t } = useTranslation();
   const { queues, isLoading, error } = useQueues();
-  const consultationQueues = queues.filter((queue) => queue.name.toLowerCase().includes('consultation'));
-
+  const consultationQueues = queues.filter(
+    (queue) =>
+      queue.name.toLowerCase().includes('consultation') && queue.location.display.toLowerCase().includes('mch'),
+  );
   if (isLoading) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
+
+  if (!consultationQueues.length) {
+    return (
+      <EmptyState
+        headerTitle={t('mchConsultationQueues', 'MCH Consultation Queues')}
+        displayText={t('mchConsultationQueues', 'MCH Consultation Queues')}
+      />
+    );
+  }
   return (
-    <div>
-      <div className={styles.cards}>
-        <Card title={t('awaitingConsultation', 'Awaiting consultation')} value={'20'} />
-        <Card title={t('awaitingInvestigation', 'Awaiting Investigation')} value={'5'} />
-        <Card title={t('investigationComplete', 'Investigation complete')} value={'7'} />
-        <Card title={t('visitComplete', 'Visit complete')} value={'4'} />
-      </div>
-      <QueueTab queues={consultationQueues} />
-    </div>
+    <QueueTab
+      queues={consultationQueues}
+      navigatePath="mch"
+      cards={[
+        { title: t('awaitingInvestigation', 'Awaiting Investigation'), value: '12' },
+        { title: t('investigationComplete', 'Investigation complete'), value: '8' },
+        { title: t('visitComplete', 'Visit complete'), value: '5' },
+      ]}
+    />
   );
 };
 

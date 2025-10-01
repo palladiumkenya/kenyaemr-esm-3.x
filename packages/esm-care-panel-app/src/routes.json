@@ -17,7 +17,6 @@
     {
       "name": "care-panel-summary-dashboard-link",
       "component": "carePanelSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 3,
       "meta": {
         "columns": 1,

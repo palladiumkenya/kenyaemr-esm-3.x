@@ -1,7 +1,59 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@openmrs/esm-styleguide/src/vars' as *;
+
+.expandedTabsParentContainer {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: layout.$spacing-05;
+}
+
+.expandedTabsContainer {
+  display: flex;
+  flex-direction: row;
+
+  :global(.cds--tabs) {
+    margin: layout.$spacing-05 0;
+    width: 20%;
+    max-height: 100% !important;
+  }
+
+  :global(.cds--tab--list) {
+    flex-direction: column !important;
+  }
+
+  :global(.cds--tab-content) {
+    margin: layout.$spacing-05 0;
+    width: 100% !important;
+  }
+
+  :global(.cds--tabs__nav-link) {
+    border-bottom: 0 !important;
+    border-left: 3px solid colors.$gray-20 !important;
+    padding: layout.$spacing-05;
+  }
+
+  :global(.cds--tabs__nav-item--selected) {
+    border-bottom: 0px !important;
+    border-left: 3px solid var(--brand-03) !important;
+  }
+
+  &:global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item + .cds--tabs--scrollable__nav-item) {
+    margin-left: 0 !important;
+  }
+
+  > ul {
+    flex-direction: column !important;
+  }
+
+  > ul > li button {
+    width: 12rem !important;
+  }
+
+  :global(.cds--tabs__nav-link) {
+    max-width: 12rem !important;
+  }
+}
 
 .widgetContainer {
   background-color: colors.$white;
@@ -24,7 +76,7 @@
 
 .content {
   @include type.type-style('heading-compact-01');
-  color: $text-02;
+  color: colors.$gray-100;
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;
 }
@@ -36,7 +88,7 @@
 
   h4 {
     @include type.type-style('heading-compact-02');
-    color: $text-02;
+    color: colors.$gray-100;
 
     &:after {
       content: '';
@@ -50,13 +102,13 @@
 }
 .widgetCard {
   background-color: colors.$white;
-  border: 1px solid $ui-03;
+  border: 1px solid colors.$gray-20;
 }
 
 .divider {
   width: 1px;
   height: 1rem;
-  color: $ui-03;
+  color: colors.$gray-20;
   margin: 0rem 0.5rem;
 }
 .toggleButtons {
@@ -97,7 +149,7 @@
 
     &:global(.cds--btn--ghost:hover) {
       color: #000;
-      background-color: $ui-01;
+      background-color: colors.$white;
     }
   }
 }
