@@ -273,6 +273,13 @@
       "component": "mchProgramManagement",
       "slot": "mch-program-management-slot",
       "order": 0
+    },
+    {
+      "name": "ewf-encounter-details-dashboard",
+      "component": "encounterDetails",
+      "slot": "ewf-clinical-encounter-slot",
+      "online": true,
+      "offline": false
     }
   ],
 

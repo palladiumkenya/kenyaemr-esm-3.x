@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer } from '@carbon/react';
 import { Activity, IbmWatsonDiscovery, Account, Stethoscope } from '@carbon/react/icons';
 import ExtensionTabs, { ExtensionTabItem } from '../../../shared/tabs/extension-tabs.component';
+import { usePatientEncounter } from '../../../hooks/usePatientEncounter';
 
 type ClinicalEncounterProps = {
   patientUuid: string;
