@@ -200,5 +200,15 @@
   "viewBeds": "View beds",
   "viewEncounter": "View",
   "visitDate": "Screening Date",
-  "yes": "Yes"
+  "yes": "Yes",
+  "noValidObservations": "No valid observations to save",
+  "noEncounterTypeFound": "No encounter type found for graph: {{graphType}}",
+  "partographyDataSavedFallbackEncounter": "Partography data saved successfully (with fallback encounter type)",
+  "partographyDataSavedWithoutProvider": "Partography data saved successfully (without provider constraints)",
+  "partographyDataSavedAdjustedDatetime": "Partography data saved successfully (with adjusted datetime)",
+  "partographyDataSavedSuccessfully": "Partography data saved successfully",
+  "partographyDataSavedLocalStorage": "Partography data saved to local storage",
+  "failedToSavePartographyData": "Failed to save partography data: {{error}}",
+  "unknown": "Unknown",
+  "progressEvent": "Progress Event"
 }

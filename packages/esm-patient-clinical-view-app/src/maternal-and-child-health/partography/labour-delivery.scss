@@ -1,7 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
 @use '@carbon/type';
-@use '@openmrs/esm-styleguide/src/vars' as *;
 
 .expandedTabsParentContainer {
   display: flex;
@@ -30,7 +29,7 @@
 
   :global(.cds--tabs__nav-link) {
     border-bottom: 0 !important;
-    border-left: 3px solid $ui-03 !important;
+    border-left: 3px solid colors.$gray-20 !important;
     padding: layout.$spacing-05;
   }
 
@@ -77,7 +76,7 @@
 
 .content {
   @include type.type-style('heading-compact-01');
-  color: $text-02;
+  color: colors.$gray-100;
   margin-top: layout.$spacing-05;
   margin-bottom: layout.$spacing-03;
 }
@@ -89,7 +88,7 @@
 
   h4 {
     @include type.type-style('heading-compact-02');
-    color: $text-02;
+    color: colors.$gray-100;
 
     &:after {
       content: '';
@@ -103,13 +102,13 @@
 }
 .widgetCard {
   background-color: colors.$white;
-  border: 1px solid $ui-03;
+  border: 1px solid colors.$gray-20;
 }
 
 .divider {
   width: 1px;
   height: 1rem;
-  color: $ui-03;
+  color: colors.$gray-20;
   margin: 0rem 0.5rem;
 }
 .toggleButtons {
@@ -150,7 +149,7 @@
 
     &:global(.cds--btn--ghost:hover) {
       color: #000;
-      background-color: $ui-01;
+      background-color: colors.$white;
     }
   }
 }
