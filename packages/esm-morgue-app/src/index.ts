@@ -9,6 +9,7 @@ import { configSchema } from './config-schema';
 import { createLeftPanelLink } from './left-panel/morgue-left-panel-link.component';
 import FormEntryWorkspace from './forms/form-entry-workspace/form-entry-workspace.workspace';
 import PrintPostMortemOverflowMenuItem from './extension/overflow-menu-item-postmortem/print-postmorterm-report.component';
+import { mortuaryDashboardMeta } from './dashboard.meta';
 const moduleName = '@kenyaemr/esm-morgue-app';
 
 const options = {
@@ -40,6 +41,7 @@ export const morgueDashboardLink = getSyncLifecycle(
   }),
   options,
 );
+export const mortuaryDashboardLink = getSyncLifecycle(createLeftPanelLink({ ...mortuaryDashboardMeta }), options);
 
 export const actionBarButtons = getAsyncLifecycle(() => import('./extension/actionButton.component'), options);
 export const bannerInfo = getAsyncLifecycle(() => import('./extension/deceasedInfoBanner.component'), options);
@@ -55,6 +57,7 @@ export const dischargeBodyForm = getAsyncLifecycle(
   () => import('./forms/discharge-deceased-person-workspace/discharge-body.workspace'),
   options,
 );
+export const morgueDashboard = getAsyncLifecycle(() => import('./home/home.component'), options);
 export const mortuaryFormEntry = getSyncLifecycle(FormEntryWorkspace, options);
 export const mortuaryChartView = getAsyncLifecycle(() => import('./view-details/main/main.component'), options);
 export const printConfirmationModal = getAsyncLifecycle(
