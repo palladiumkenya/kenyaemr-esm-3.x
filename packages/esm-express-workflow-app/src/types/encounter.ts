@@ -39,7 +39,7 @@ export interface Encounter {
 
 export interface Observation {
   uuid: string;
-  display: string;
+  display?: string;
   concept: {
     uuid: string;
     display: string;
@@ -48,9 +48,9 @@ export interface Observation {
   obsDatetime: string;
   groupMembers?: Array<Observation>;
   value: ObservationValue;
-  location: OpenmrsResource;
-  order: Order;
-  status: string;
+  location?: OpenmrsResource;
+  order?: Order | OpenmrsResource;
+  status?: string;
 }
 
 export interface Diagnosis {
