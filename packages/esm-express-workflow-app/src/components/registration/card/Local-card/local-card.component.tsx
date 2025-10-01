@@ -120,7 +120,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
       return {
         onRequestOtp: async (phoneNumber: string): Promise<void> => {
           setActivePhoneNumbers((prev) => new Map(prev.set(patientUuid, phoneNumber)));
-          await otpManager.requestOTP(phoneNumber, patientName, otpExpiryMinutes);
+          await otpManager.requestOTP(phoneNumber, patientName, otpExpiryMinutes, searchedNationalId);
         },
         onVerify: async (otp: string): Promise<void> => {
           const activePhone = activePhoneNumbers.get(patientUuid) || initialPhone;
@@ -131,7 +131,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
         },
       };
     },
-    [activePhoneNumbers, otpExpiryMinutes],
+    [activePhoneNumbers, otpExpiryMinutes, searchedNationalId],
   );
 
   const handleQueuePatient = useCallback((activeVisit: any, patientUuid: string) => {

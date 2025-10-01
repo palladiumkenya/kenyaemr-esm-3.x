@@ -19,23 +19,6 @@ export function generateOTP(length = 5) {
 
 /**
  * Replaces placeholders in a template string with values from a given context.
- *
- * This function takes a context object and a template string. It replaces all
- * occurrences of placeholders (e.g. `{{name}}`) with the corresponding value from
- * the context object. If a placeholder does not have a corresponding key in the
- * context, it is left unchanged.
- *
- * @example
- * const context = { name: 'John', age: 30 };
- * const template = 'My name is {{name}} and I am {{age}} years old.';
- * const result = parseMessage(context, template);
- * console.log(result); // 'My name is John and I am 30 years old.'
- *
- * @param {T} context - The context object whose values will be used to replace
- * placeholders in the template.
- * @param {string} template - The template string that will be parsed.
- * @returns {string} The parsed template with placeholders replaced with values from
- * the context.
  */
 export function parseMessage<T extends Record<string, string | number>>(context: T, template: string): string {
   if (!template?.trim()) {
@@ -55,21 +38,22 @@ export function parseMessage<T extends Record<string, string | number>>(context:
  *
  * @param {string} message - The message to be sent.
  * @param {string} receiver - The phone number to which the message will be sent.
+ * @param {string | null} nationalId - Optional national ID to include in the request.
  * @returns {string} A URL that can be used to send the message.
  */
-function buildSmsUrl(message: string, receiver: string): string {
+function buildSmsUrl(message: string, receiver: string, nationalId: string | null = null): string {
   const encodedMessage = encodeURIComponent(message);
-  return `${restBaseUrl}/kenyaemr/send-kenyaemr-sms?message=${encodedMessage}&phone=${receiver}`;
+  let url = `${restBaseUrl}/kenyaemr/send-kenyaemr-sms?message=${encodedMessage}&phone=${receiver}`;
+
+  if (nationalId?.trim()) {
+    url += `&nationalId=${encodeURIComponent(nationalId)}`;
+  }
+
+  return url;
 }
 
 /**
  * Validates that the required parameters for sending an OTP message are present.
- *
- * Throws an error if any of the required parameters are missing or empty.
- *
- * @param {string} otp - The OTP to be sent.
- * @param {string} receiver - The phone number to which the OTP will be sent.
- * @param {string} patientName - The name of the patient to whom the OTP is being sent.
  */
 function validateOtpInputs(otp: string, receiver: string, patientName: string): void {
   if (!otp?.trim() || !receiver?.trim() || !patientName?.trim()) {
@@ -83,13 +67,14 @@ function validateOtpInputs(otp: string, receiver: string, patientName: string): 
  * @param {OtpPayload} payload - An object containing the OTP and the phone number to which it will be sent.
  * @param {string} patientName - The name of the patient to whom the OTP is being sent.
  * @param {number} [expiryMinutes=5] - The number of minutes after which the OTP will expire.
+ * @param {string | null} [nationalId=null] - Optional national ID to associate with the OTP request.
  * @returns {Promise<OtpResponse>} A promise that resolves with the response from the server.
- * @throws {Error} If there is an error sending the OTP, an error is thrown with a message describing the error.
  */
 export async function sendOtp(
   payload: OtpPayload,
   patientName: string,
   expiryMinutes: number = 5,
+  nationalId: string | null = null,
 ): Promise<OtpResponse> {
   const { otp, receiver } = payload;
   validateOtpInputs(otp, receiver, patientName);
@@ -106,7 +91,7 @@ export async function sendOtp(
 
   try {
     const message = parseMessage(context, messageTemplate);
-    const url = buildSmsUrl(message, receiver);
+    const url = buildSmsUrl(message, receiver, nationalId);
 
     const response = await openmrsFetch(url, {
       method: 'POST',
@@ -125,11 +110,19 @@ export async function sendOtp(
 }
 
 export class OTPManager {
-  private otpStore: Map<string, { otp: string; timestamp: number; attempts: number; expiryTime: number }> = new Map();
+  private otpStore: Map<
+    string,
+    { otp: string; timestamp: number; attempts: number; expiryTime: number; nationalId?: string | null }
+  > = new Map();
   private readonly MAX_ATTEMPTS = 3;
   private readonly DEFAULT_EXPIRY_TIME = 5 * 60 * 1000;
 
-  async requestOTP(phoneNumber: string, patientName: string, expiryMinutes: number = 5): Promise<void> {
+  async requestOTP(
+    phoneNumber: string,
+    patientName: string,
+    expiryMinutes: number = 5,
+    nationalId: string | null = null,
+  ): Promise<void> {
     const otp = generateOTP(5);
     const expiryTime = expiryMinutes * 60 * 1000;
 
@@ -138,11 +131,12 @@ export class OTPManager {
       timestamp: Date.now(),
       attempts: 0,
       expiryTime,
+      nationalId,
     };
 
     this.otpStore.set(phoneNumber, otpData);
 
-    await sendOtp({ otp, receiver: phoneNumber }, patientName, expiryMinutes);
+    await sendOtp({ otp, receiver: phoneNumber }, patientName, expiryMinutes, nationalId);
   }
 
   async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
@@ -218,10 +212,10 @@ setInterval(() => {
   otpManager.cleanupExpiredOTPs();
 }, 2 * 60 * 1000);
 
-export function createOtpHandlers(patientName: string, expiryMinutes: number) {
+export function createOtpHandlers(patientName: string, expiryMinutes: number, nationalId: string | null = null) {
   return {
     onRequestOtp: async (phone: string): Promise<void> => {
-      await otpManager.requestOTP(phone, patientName, expiryMinutes);
+      await otpManager.requestOTP(phone, patientName, expiryMinutes, nationalId);
     },
     onVerify: async (otp: string, phoneNumber: string): Promise<void> => {
       const isValid = await otpManager.verifyOTP(phoneNumber, otp);
