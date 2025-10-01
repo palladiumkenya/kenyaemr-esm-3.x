@@ -1,5 +1,4 @@
 import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
 import useSWR, { mutate } from 'swr';
 import z from 'zod';
 
@@ -80,34 +79,6 @@ export const usePatientEnrolledPrograms = (patientUuid: string) => {
 
 export const mutateEnrollments = (patientUuid: string) =>
   mutate((key) => typeof key === 'string' && key.startsWith(`${restBaseUrl}/programenrollment?patient=${patientUuid}`));
-
-export const usePatientPrograms = (patientUuid: string) => {
-  const { error: programsError, isLoading: isLoadingPrograms, programs, mutate: mutatePrograms } = usePrograms();
-  const {
-    error: enrollmentError,
-    isLoading: isLoadingEnrollment,
-    enrollments,
-    mutate: mutateEnrollments,
-  } = usePatientEnrolledPrograms(patientUuid);
-
-  const unenrolledPrograms = useMemo(() => {
-    return programs.filter(
-      (program) => enrollments.findIndex((enrollment) => enrollment.program.uuid === program.uuid) === -1,
-    );
-  }, [programs, enrollments]);
-
-  return {
-    isLoading: isLoadingEnrollment || isLoadingPrograms,
-    error: programsError ?? enrollmentError,
-    allPrograms: programs,
-    enrolledPrograms: enrollments,
-    unenrolledPrograms,
-    mutate: () => {
-      mutateEnrollments();
-      mutatePrograms();
-    },
-  };
-};
 
 export function createProgramEnrollment(
   program: Program,
