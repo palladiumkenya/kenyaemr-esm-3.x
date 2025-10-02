@@ -280,12 +280,6 @@
       "order": 0
     },
     {
-      "name": "mch-program-management",
-      "component": "mchProgramManagement",
-      "slot": "mch-program-management-slot",
-      "order": 0
-    },
-    {
       "name": "ewf-encounter-details-dashboard",
       "component": "encounterDetails",
       "slot": "ewf-clinical-encounter-slot",
@@ -302,12 +296,6 @@
       "type": "workspace",
       "canMaximize": true,
       "canHide": true
-    },
-    {
-      "name": "mch-program-form-workspace",
-      "component": "mchProgramForm",
-      "title": "Program Form",
-      "type": "workspace"
     }
   ],
   "modals": [
