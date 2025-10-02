@@ -25,6 +25,28 @@ export const configSchema = {
       dashboardId: 'bd7102f9-9291-4a11-9b98-8a17d9142cac',
     },
   },
+  concepts: {
+    defaultPriorityConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default priority for the queues eg Not urgent.',
+      _default: '80cd8f8c-5d82-4cdc-b96e-a6addeb94b7f',
+    },
+    defaultStatusConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the default status for the queues eg Waiting.',
+      _default: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    emergencyPriorityConceptUuid: {
+      _type: Type.ConceptUuid,
+      _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
+      _default: '037446f4-adfc-40b3-928c-a39a4826b1bf',
+    },
+  },
+  visitQueueNumberAttributeUuid: {
+    _type: Type.String,
+    _description: 'The UUID of the visit attribute that contains the visit queue number.',
+    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+  },
   patientChartConfig: {
     _type: Type.Object,
     _description: 'Patient chart Tabs config',
@@ -86,11 +108,6 @@ export const configSchema = {
     _default: ['164068AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     _description: 'UUIDs for imaging orderable concept sets',
   },
-  visitQueueNumberAttributeUuid: {
-    _type: Type.String,
-    _description: 'UUID for visit queue number attribute',
-    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
-  },
   clinicalEncounter: {
     _type: Type.Object,
     _description: 'Clinical encounter type UUID and form UUID',
@@ -106,6 +123,12 @@ export type ExpressWorkflowConfig = {
   supersetDashboardConfig: {
     host: string;
     dashboardId: string;
+  };
+  visitQueueNumberAttributeUuid: string;
+  concepts: {
+    defaultPriorityConceptUuid: string;
+    defaultStatusConceptUuid: string;
+    emergencyPriorityConceptUuid: string;
   };
   patientChartConfig: {
     femaleOnlyExtensions: Array<string>;
@@ -126,7 +149,6 @@ export type ExpressWorkflowConfig = {
   orderableConceptSets: Array<string>;
   imagingOrderTypeUuid: string;
   imagingOrderableConceptSets: Array<string>;
-  visitQueueNumberAttributeUuid: string;
   clinicalEncounter: {
     encounterTypeUuid: string;
     formUuid: string;

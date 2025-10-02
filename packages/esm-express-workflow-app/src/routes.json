@@ -105,6 +105,11 @@
       "slot": "triage-dashboard-slot"
     },
     {
+            "name": "custom-visit-form-queue-fields",
+      "component": "checkinFormExtraExtension",
+      "slot":"visit-form-bottom-slot"
+    },
+    {
       "component": "reportsDashboardLink",
       "name": "reports-homepage-dashboard-link",
       "slot": "homepage-dashboard-slot",
@@ -237,6 +242,12 @@
       }
     },
     {
+      "component": "triageDashboard",
+      "name": "triage-dashboard",
+      "slot": "triage-dashboard-slot"
+    },
+        {
+
       "name": "ewf-pharmacy-dashboard",
       "component": "pharmacyTabs",
       "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
