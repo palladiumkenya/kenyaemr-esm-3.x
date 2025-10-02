@@ -12,7 +12,6 @@
   border: 1px solid colors.$cool-gray-20;
 }
 
-
 .heading {
   @include type.type-style('heading-compact-01');
   margin: layout.$spacing-05 0 layout.$spacing-05;
