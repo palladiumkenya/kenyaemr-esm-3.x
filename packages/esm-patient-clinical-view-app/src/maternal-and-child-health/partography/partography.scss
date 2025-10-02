@@ -1,0 +1,378 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.partographyContainer {
+  padding: layout.$spacing-05;
+  background-color: colors.$gray-10;
+  margin: layout.$spacing-03 0;
+}
+
+.partographyTitle {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+  margin-bottom: layout.$spacing-05;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.titleIcon {
+  color: colors.$blue-60;
+}
+
+.content {
+  padding: layout.$spacing-04;
+  background-color: colors.$white;
+  border-radius: layout.$spacing-02;
+  border: 1px solid colors.$gray-20;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: layout.$spacing-05;
+
+  h5 {
+    @include type.type-style('heading-compact-01');
+    margin: 0;
+  }
+}
+
+.graphsSection {
+  margin-bottom: layout.$spacing-08;
+}
+
+.graphContainer {
+  padding: layout.$spacing-04;
+  background-color: colors.$gray-10;
+  border-radius: layout.$spacing-02;
+  margin-bottom: layout.$spacing-04;
+}
+
+.graphHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: layout.$spacing-03;
+
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin: 0;
+  }
+}
+
+.graphHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.graphHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+
+  .viewSwitcher {
+    display: flex;
+    border: 1px solid colors.$gray-30;
+    border-radius: layout.$spacing-02;
+    overflow: hidden;
+    margin-right: layout.$spacing-03;
+
+    .viewButton {
+      border-radius: 0;
+      border: none;
+      min-width: layout.$spacing-09;
+      height: layout.$spacing-07;
+
+      &:first-child {
+        border-right: 1px solid colors.$gray-30;
+      }
+
+      &:hover {
+        background-color: colors.$gray-20;
+      }
+
+      svg {
+        width: layout.$spacing-04;
+        height: layout.$spacing-04;
+      }
+    }
+  }
+
+  button {
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: colors.$gray-20;
+      transform: scale(1.05);
+    }
+  }
+}
+
+.addButton {
+  background-color: colors.$gray-100;
+  color: colors.$white;
+  border: 1px solid colors.$gray-100;
+
+  &:hover {
+    background-color: colors.$gray-90;
+    transform: scale(1.05);
+  }
+
+  &:focus {
+    background-color: colors.$gray-90;
+    border-color: colors.$blue-60;
+    box-shadow: 0 0 0 2px colors.$blue-60;
+  }
+}
+
+.graphDescription {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-04;
+}
+
+.chartContainer {
+  background-color: colors.$white;
+  padding: layout.$spacing-04;
+  border-radius: layout.$spacing-02;
+  border: 1px solid colors.$gray-20;
+  margin-bottom: layout.$spacing-04;
+}
+
+.chartStats {
+  display: flex;
+  gap: layout.$spacing-05;
+  padding: layout.$spacing-03;
+  background-color: colors.$gray-20;
+  border-radius: layout.$spacing-02;
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.statLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+.statValue {
+  @include type.type-style('heading-compact-01');
+  color: colors.$gray-100;
+}
+
+.chartPlaceholder {
+  background-color: colors.$white;
+  padding: layout.$spacing-06;
+  border-radius: layout.$spacing-02;
+  text-align: center;
+  border: 2px dashed colors.$gray-30;
+  min-height: layout.$spacing-13;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &[data-color='red'] {
+    border-color: colors.$red-40;
+  }
+  &[data-color='blue'] {
+    border-color: colors.$blue-40;
+  }
+  &[data-color='green'] {
+    border-color: colors.$green-40;
+  }
+  &[data-color='purple'] {
+    border-color: colors.$purple-40;
+  }
+  &[data-color='orange'] {
+    border-color: colors.$orange-40;
+  }
+  &[data-color='cyan'] {
+    border-color: colors.$cyan-40;
+  }
+  &[data-color='teal'] {
+    border-color: colors.$teal-40;
+  }
+  &[data-color='yellow'] {
+    border-color: colors.$yellow-40;
+  }
+  &[data-color='magenta'] {
+    border-color: colors.$magenta-40;
+  }
+  &[data-color='gray'] {
+    border-color: colors.$gray-40;
+  }
+}
+
+.chartContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: layout.$spacing-03;
+
+  p {
+    margin: 0;
+    color: colors.$gray-100;
+    @include type.type-style('body-compact-01');
+  }
+}
+
+.yAxisLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+}
+
+// Data Table Section
+
+.tableContainer {
+  background-color: colors.$white;
+  border-radius: layout.$spacing-02;
+  border: 1px solid colors.$gray-20;
+  margin-bottom: layout.$spacing-04;
+
+  .cds--data-table-container {
+    background-color: transparent;
+  }
+
+  .cds--data-table {
+    background-color: transparent;
+
+    th,
+    td {
+      border-bottom: 1px solid colors.$gray-20;
+      padding: layout.$spacing-03 layout.$spacing-04;
+    }
+
+    th {
+      background-color: colors.$gray-10;
+      @include type.type-style('label-01');
+      color: colors.$gray-100;
+    }
+
+    td {
+      @include type.type-style('body-compact-01');
+      color: colors.$gray-100;
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: colors.$white;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: colors.$gray-10;
+    }
+
+    tbody tr:hover {
+      background-color: colors.$gray-20;
+    }
+  }
+}
+
+.tableStats {
+  padding: layout.$spacing-03;
+  background-color: colors.$gray-20;
+  border-radius: 0 0 layout.$spacing-02 layout.$spacing-02;
+  text-align: center;
+}
+
+.recordCount {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+}
+
+// Value status indicators
+.highValue {
+  color: colors.$red-60;
+  font-weight: 600;
+}
+
+.lowValue {
+  color: colors.$blue-60;
+  font-weight: 600;
+}
+
+.arrow {
+  font-weight: bold;
+  margin-left: layout.$spacing-02;
+}
+
+.chartSection {
+  margin-bottom: layout.$spacing-06;
+
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin-bottom: layout.$spacing-04;
+  }
+}
+
+.tableSection {
+  margin-bottom: layout.$spacing-06;
+
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin-bottom: layout.$spacing-04;
+  }
+}
+
+.alertSection {
+  h6 {
+    @include type.type-style('heading-compact-01');
+    margin-bottom: layout.$spacing-04;
+  }
+}
+
+.alertGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(layout.$spacing-12, 1fr));
+  gap: layout.$spacing-04;
+}
+
+.alertItem {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  background-color: colors.$gray-10;
+  border-radius: layout.$spacing-02;
+
+  span {
+    @include type.type-style('body-compact-01');
+    color: colors.$gray-100;
+  }
+}
+
+// Loading and empty state styles
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: layout.$spacing-11;
+  color: colors.$gray-70;
+
+  p {
+    margin: 0;
+    font-style: italic;
+  }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: layout.$spacing-11;
+  gap: layout.$spacing-05;
+  color: colors.$gray-70;
+  text-align: center;
+
+  p {
+    margin: 0;
+    @include type.type-style('body-compact-01');
+  }
+}

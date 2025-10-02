@@ -37,10 +37,9 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   }
 
   return (
-    <div className={`omrs-main-content`}>
+    <div>
       <PageHeader className={styles.pageHeader}>
         <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-
         <ExtensionSlot name="provider-banner-info-slot" />
       </PageHeader>
       <QueueTab

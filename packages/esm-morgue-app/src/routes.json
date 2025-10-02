@@ -47,6 +47,21 @@
           "o3 : View Mortuary Dashboard"
         ]
       }
+    },
+    {
+      "component": "mortuaryDashboardLink",
+      "name": "mortuary-dashboard-link",
+      "slot": "homepage-dashboard-slot",
+      "meta": {
+        "name": "mortuary",
+        "slot": "mortuary-dashboard-slot",
+        "title": "Mortuary"
+      }
+    },
+    {
+      "name": "morgue-dashboard",
+      "component": "morgueDashboard",
+      "slot": "mortuary-dashboard-slot"
     }
   ],
   "workspaces": [

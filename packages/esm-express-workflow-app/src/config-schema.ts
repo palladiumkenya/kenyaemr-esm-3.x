@@ -86,6 +86,19 @@ export const configSchema = {
     _default: ['164068AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     _description: 'UUIDs for imaging orderable concept sets',
   },
+  visitQueueNumberAttributeUuid: {
+    _type: Type.String,
+    _description: 'UUID for visit queue number attribute',
+    _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
+  },
+  clinicalEncounter: {
+    _type: Type.Object,
+    _description: 'Clinical encounter type UUID and form UUID',
+    _default: {
+      encounterTypeUuid: '465a92f2-baf8-42e9-9612-53064be868e8',
+      formUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
+    },
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -113,4 +126,9 @@ export type ExpressWorkflowConfig = {
   orderableConceptSets: Array<string>;
   imagingOrderTypeUuid: string;
   imagingOrderableConceptSets: Array<string>;
+  visitQueueNumberAttributeUuid: string;
+  clinicalEncounter: {
+    encounterTypeUuid: string;
+    formUuid: string;
+  };
 };
