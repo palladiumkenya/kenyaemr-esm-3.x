@@ -5,6 +5,7 @@ import { moduleName } from '../../constants';
 import ConsultationDashboard from './dashboard.component';
 import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
 import ClinicalEncounter from './clinical-encounter/clinical-encounter.component';
+import EncounterDetails from './clinical-encounter/encounter-details.component';
 
 const options = {
   featureName: 'express-workflow',
@@ -30,3 +31,5 @@ export const clinicalEncounterLink = getSyncLifecycle(
   }),
   options,
 );
+
+export const encounterDetails = getSyncLifecycle(EncounterDetails, options);

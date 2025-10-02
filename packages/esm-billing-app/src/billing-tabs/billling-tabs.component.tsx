@@ -7,6 +7,8 @@ import BillsTable from '../bills-table/bills-table.component';
 import PatientBillsScreen from '../past-patient-bills/patient-bills-dashboard/patient-bills-dashboard';
 import { useClockInStatus } from '../payment-points/use-clock-in-status';
 import styles from './billing-tabs.scss';
+import ClaimsManagementTable from '../claims/claims-management/table/claims-list-table.component';
+import PreauthTableTemporary from '../claims/claims-management/table/preauth-table.tmp.component';
 
 const BillingTabs = () => {
   const { t } = useTranslation();
@@ -31,6 +33,8 @@ const BillingTabs = () => {
           <TabList style={{ paddingLeft: '1rem' }} aria-label="Billing tabs" contained>
             <Tab>{t('todayBills', "Today's bills")}</Tab>
             <Tab>{t('patientBills', 'Patient Bill')}</Tab>
+            <Tab>{t('claims', 'Claims')}</Tab>
+            <Tab>{t('preAuth', 'Pre-Authorization')}</Tab>
           </TabList>
           {isLoading ? (
             <ButtonSkeleton className={styles.clockInSkeleton} />
@@ -52,6 +56,12 @@ const BillingTabs = () => {
           </TabPanel>
           <TabPanel>
             <PatientBillsScreen />
+          </TabPanel>
+          <TabPanel>
+            <ClaimsManagementTable />
+          </TabPanel>
+          <TabPanel>
+            <PreauthTableTemporary />
           </TabPanel>
         </TabPanels>
       </Tabs>
