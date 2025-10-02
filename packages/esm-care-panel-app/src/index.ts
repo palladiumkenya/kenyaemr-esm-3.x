@@ -11,6 +11,7 @@ import PatientSummary from './patient-summary/patient-summary.component';
 import DispensingPatientVitals from './dispensing-patient-details/patient-vitals.component';
 import PatientDischargeSideRailIcon from './patient-discharge/discharge-workspace-siderail.component';
 import PatientDischargeWorkspace from './patient-discharge/patient-discharge.workspace';
+import ProgramForm from './care-programs/program.workspace';
 
 const moduleName = '@kenyaemr/esm-care-panel-app';
 
@@ -52,3 +53,4 @@ export const patientDischargeWorkspace = getAsyncLifecycle(
   () => import('./patient-discharge/patient-discharge.workspace'),
   options,
 );
+export const mchProgramForm = getSyncLifecycle(ProgramForm, options);

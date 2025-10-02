@@ -83,6 +83,13 @@
       "canHide": true,
       "width": "extra-wide",
       "groups": ["ward-patient"]
+    },
+    
+    {
+      "name": "mch-program-form-workspace",
+      "component": "mchProgramForm",
+      "title": "Program Form",
+      "type": "workspace"
     }
   ]
 }

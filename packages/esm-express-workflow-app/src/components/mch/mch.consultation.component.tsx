@@ -33,6 +33,7 @@ const MCHConsultation: React.FC = () => {
         { title: t('investigationComplete', 'Investigation complete'), value: '8' },
         { title: t('visitComplete', 'Visit complete'), value: '5' },
       ]}
+      usePatientChart
     />
   );
 };

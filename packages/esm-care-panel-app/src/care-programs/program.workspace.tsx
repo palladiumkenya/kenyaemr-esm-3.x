@@ -1,28 +1,43 @@
 import React, { FC } from 'react';
+import styles from './care-programs.scss';
 import {
-  Enrollement,
-  Program,
-  ProgramFormData,
-  ProgramFormSchema,
-  createProgramEnrollment,
-  findLastState,
-  updateProgramEnrollment,
-} from '../mch.resource';
-import styles from './program.scss';
-import { Button, ButtonSet, Column, DatePicker, DatePickerInput, FormLabel, Stack, TextInput } from '@carbon/react';
+  Button,
+  ButtonSet,
+  Column,
+  DatePicker,
+  DatePickerInput,
+  FormLabel,
+  InlineLoading,
+  Stack,
+  TextInput,
+} from '@carbon/react';
 import { Controller, useForm } from 'react-hook-form';
-import { DefaultWorkspaceProps, LocationPicker, showSnackbar, useSession } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, ErrorState, LocationPicker, showSnackbar, useSession } from '@openmrs/esm-framework';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
+import {
+  createProgramEnrollment,
+  Enrollement,
+  ProgramFormData,
+  ProgramFormSchema,
+  updateProgramEnrollment,
+  useProgramDetail,
+} from './care-program.resource';
 
 type ProgramFormProps = DefaultWorkspaceProps & {
   enrollment?: Enrollement;
   patientUuid: string;
-  program: Program;
+  programUuid: string;
   onSubmitSuccess?: () => void;
 };
 
-const ProgramForm: FC<ProgramFormProps> = ({ patientUuid, program, enrollment, closeWorkspace, onSubmitSuccess }) => {
+const ProgramForm: FC<ProgramFormProps> = ({
+  patientUuid,
+  programUuid,
+  enrollment,
+  closeWorkspace,
+  onSubmitSuccess,
+}) => {
   const getLocationUuid = () => {
     if (!enrollment?.location?.uuid && session?.sessionLocation?.uuid) {
       return session?.sessionLocation?.uuid;
@@ -32,6 +47,7 @@ const ProgramForm: FC<ProgramFormProps> = ({ patientUuid, program, enrollment, c
 
   const session = useSession();
   const { t } = useTranslation();
+  const { isLoading: isLoadingProgram, error: programError, program } = useProgramDetail(programUuid);
   const form = useForm<ProgramFormData>({
     resolver: zodResolver(ProgramFormSchema),
     values: {
@@ -62,13 +78,19 @@ const ProgramForm: FC<ProgramFormProps> = ({ patientUuid, program, enrollment, c
       console.error(e);
     }
   };
+  if (isLoadingProgram) {
+    return <InlineLoading />;
+  }
+  if (programError) {
+    return <ErrorState headerTitle={t('error', 'Error')} error={programError} />;
+  }
   return (
     <form className={styles.form} onSubmit={form.handleSubmit(onSubmit)}>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <TextInput
             readOnly
-            value={program.name}
+            value={program?.name}
             title={t('program', 'Program')}
             id={'program'}
             labelText={t('program', 'Program')}

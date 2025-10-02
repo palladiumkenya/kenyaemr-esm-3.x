@@ -38,6 +38,7 @@ const MCHTriage: React.FC = () => {
       navigatePath="mch"
       cards={[{ title: t('patientAttended', 'Patient attended'), value: finishedEntries?.length?.toString() }]}
       onTabChanged={setCurrQueue}
+      usePatientChart
     />
   );
 };
