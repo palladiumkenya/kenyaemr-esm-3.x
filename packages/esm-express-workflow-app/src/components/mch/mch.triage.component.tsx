@@ -22,6 +22,7 @@ const MCHTriage: React.FC = () => {
     error: metricsError,
     isLoading: isLoadingMetrics,
     finishedEntries,
+    waitingEntries,
   } = useTriageQueuesMetrics(currQueue ?? triageQueues[0]);
 
   if (isLoading || isLoadingMetrics) {
@@ -36,7 +37,10 @@ const MCHTriage: React.FC = () => {
     <QueueTab
       queues={triageQueues}
       navigatePath="mch"
-      cards={[{ title: t('patientAttended', 'Patient attended'), value: finishedEntries?.length?.toString() }]}
+      cards={[
+        { title: t('patientsAwaiting', 'Patient awaiting'), value: waitingEntries?.length?.toString() },
+        { title: t('patientAttended', 'Patient attended to'), value: finishedEntries?.length?.toString() },
+      ]}
       onTabChanged={setCurrQueue}
       usePatientChart
     />

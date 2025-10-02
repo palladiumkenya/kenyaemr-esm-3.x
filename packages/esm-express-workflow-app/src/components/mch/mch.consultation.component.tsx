@@ -29,9 +29,9 @@ const MCHConsultation: React.FC = () => {
       queues={consultationQueues}
       navigatePath="mch"
       cards={[
-        { title: t('awaitingInvestigation', 'Awaiting Investigation'), value: '12' },
-        { title: t('investigationComplete', 'Investigation complete'), value: '8' },
-        { title: t('visitComplete', 'Visit complete'), value: '5' },
+        { title: t('awaitingInvestigation', 'Awaiting Investigation'), value: '0' },
+        { title: t('investigationComplete', 'Investigation complete'), value: '0' },
+        { title: t('visitComplete', 'Visit complete'), value: '0' },
       ]}
       usePatientChart
     />
