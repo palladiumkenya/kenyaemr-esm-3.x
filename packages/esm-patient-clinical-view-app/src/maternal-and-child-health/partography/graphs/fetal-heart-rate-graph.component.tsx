@@ -1,0 +1,359 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  Tag,
+  Button,
+  DataTable,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableHeader,
+  TableBody,
+  TableCell,
+  Pagination,
+} from '@carbon/react';
+import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
+import { LineChart } from '@carbon/charts-react';
+import styles from '../partography.scss';
+
+enum ScaleTypes {
+  LABELS = 'labels',
+  LINEAR = 'linear',
+}
+
+interface FetalHeartRateGraphProps {
+  data?: Array<{
+    hour: number;
+    value: number;
+    group: string;
+    time?: string;
+    date?: string;
+    id?: string;
+  }>;
+  tableData?: Array<{
+    id: string;
+    date: string;
+    time: string;
+    value: string;
+    hour: string;
+  }>;
+  viewMode?: 'graph' | 'table';
+  currentPage?: number;
+  pageSize?: number;
+  totalItems?: number;
+  controlSize?: 'sm' | 'md';
+  onAddData?: () => void;
+  onViewModeChange?: (mode: 'graph' | 'table') => void;
+  onPageChange?: (page: number) => void;
+  onPageSizeChange?: (size: number) => void;
+  isAddButtonDisabled?: boolean;
+}
+
+const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
+  data = [],
+  tableData = [],
+  viewMode = 'graph',
+  currentPage = 1,
+  pageSize = 5,
+  totalItems = 0,
+  controlSize = 'sm',
+  onAddData,
+  onViewModeChange,
+  onPageChange,
+  onPageSizeChange,
+  isAddButtonDisabled = true,
+}) => {
+  const { t } = useTranslation();
+
+  // Calculate pagination
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex = startIndex + pageSize;
+  const paginatedData = tableData.slice(startIndex, endIndex);
+
+  // Function to get status tag based on fetal heart rate value
+  const getFetalHeartRateStatus = (value: string): { type: string; text: string; color: string } => {
+    const numValue = parseInt(value.replace(' bpm', ''));
+    if (numValue < 100) {
+      return { type: 'warm-gray', text: 'Low', color: '#6f6f6f' };
+    } else if (numValue >= 100 && numValue <= 180) {
+      return { type: 'green', text: 'Normal', color: '#24a148' };
+    } else {
+      return { type: 'red', text: 'High', color: '#da1e28' };
+    }
+  };
+
+  // Table headers for fetal heart rate data
+  const tableHeaders = [
+    { key: 'date', header: t('date', 'Date') },
+    { key: 'time', header: t('time', 'Time') },
+    { key: 'hour', header: t('hour', 'Hour') },
+    { key: 'value', header: t('fetalHeartRate', 'Fetal Heart Rate (bpm)') },
+    { key: 'status', header: t('status', 'Status') },
+  ];
+
+  // Function to get color based on fetal heart rate value
+  const getFetalHeartRateColor = (value: number): string => {
+    if (value < 100) {
+      return '#6f6f6f'; // Gray for low (< 100)
+    } else if (value >= 100 && value <= 180) {
+      return '#24a148'; // Green for normal (100-180)
+    } else {
+      return '#da1e28'; // Red for high (> 180)
+    }
+  };
+
+  // Enhanced chart data with color coding - keep all points in same group for continuous line
+  const enhancedChartData = React.useMemo(() => {
+    if (data && data.length > 0) {
+      return data.map((point) => ({
+        ...point,
+        group: 'Fetal Heart Rate', // Single group for continuous line
+        color: getFetalHeartRateColor(point.value),
+      }));
+    } else {
+      // Placeholder data points to show axis labels
+      return [
+        { hour: 0, value: 140, group: 'Fetal Heart Rate', time: '0', color: '#24a148' },
+        { hour: 10, value: 140, group: 'Fetal Heart Rate', time: '10', color: '#24a148' },
+      ];
+    }
+  }, [data]);
+
+  // Create a stable key for chart re-rendering
+  const chartKey = React.useMemo(() => {
+    return `fetal-heart-rate-chart-${data.length}-${data.map((d) => `${d.hour}-${d.value}`).join(',')}`;
+  }, [data]);
+
+  // Use enhanced data for the chart
+  const chartData = enhancedChartData;
+
+  const chartOptions = {
+    title: '',
+    axes: {
+      bottom: {
+        title: '', // Remove Hours label to match other graphs
+        mapsTo: 'hour',
+        scaleType: ScaleTypes.LINEAR,
+        domain: [0, 10],
+        ticks: {
+          values: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10],
+          formatter: (hour: number) => {
+            // Format as hours with 30-minute intervals
+            if (hour === 0) {
+              return '0';
+            } else if (hour === 0.5) {
+              return '0:30';
+            } else if (hour % 1 === 0) {
+              return `${hour}:00`;
+            } else if (hour % 1 === 0.5) {
+              return `${Math.floor(hour)}:30`;
+            } else {
+              return `${hour}`;
+            }
+          },
+        },
+      },
+      left: {
+        title: 'Fetal Heart Rate (bpm)',
+        mapsTo: 'value',
+        scaleType: ScaleTypes.LINEAR,
+        domain: [80, 200], // Range for fetal heart rate
+        ticks: {
+          values: [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200],
+          formatter: (value: number) => `${value}`,
+        },
+      },
+    },
+    height: '600px', // Increased height to match cervix graph
+    curve: 'curveLinear', // Match other graphs curve
+    points: {
+      enabled: true,
+      radius: 6, // Match other graphs point size
+      filled: true,
+    },
+    grid: {
+      x: {
+        enabled: true,
+      },
+      y: {
+        enabled: true,
+      },
+    },
+    color: {
+      scale:
+        data && data.length > 0
+          ? (datapoint: any) => getFetalHeartRateColor(datapoint.value) // Use function for color based on value
+          : {
+              'Fetal Heart Rate': 'transparent', // Transparent for placeholder
+            },
+    },
+    legend: {
+      enabled: false,
+    },
+    theme: 'white',
+    toolbar: {
+      enabled: false,
+    },
+  };
+
+  return (
+    <div className={styles.fetalHeartRateSection}>
+      <div className={styles.fetalHeartRateContainer}>
+        <div className={styles.fetalHeartRateHeader}>
+          <div className={styles.fetalHeartRateHeaderLeft}>
+            <h3 className={styles.fetalHeartRateTitle}>Fetal Heart Rate</h3>
+            <div className={styles.fetalHeartRateControls}>
+              <Tag type="green" title="Normal Range">
+                Normal (100-180)
+              </Tag>
+              <Tag type="red" title="Abnormal Range">
+                Abnormal (&gt;180)
+              </Tag>
+              <Tag type="warm-gray" title="Low Range">
+                Low (&lt;100)
+              </Tag>
+            </div>
+          </div>
+          <div className={styles.fetalHeartRateHeaderRight}>
+            <div className={styles.fetalHeartRateActions}>
+              <div className={styles.viewSwitcher}>
+                <Button
+                  kind={viewMode === 'graph' ? 'primary' : 'secondary'}
+                  size={controlSize}
+                  hasIconOnly
+                  iconDescription={t('graphView', 'Graph View')}
+                  onClick={() => onViewModeChange?.('graph')}
+                  className={styles.viewButton}>
+                  <ChartColumn />
+                </Button>
+                <Button
+                  kind={viewMode === 'table' ? 'primary' : 'secondary'}
+                  size={controlSize}
+                  hasIconOnly
+                  iconDescription={t('tableView', 'Table View')}
+                  onClick={() => onViewModeChange?.('table')}
+                  className={styles.viewButton}>
+                  <TableIcon />
+                </Button>
+              </div>
+              <Button
+                kind="primary"
+                size={controlSize}
+                renderIcon={Add}
+                iconDescription="Add fetal heart rate data"
+                disabled={isAddButtonDisabled}
+                onClick={onAddData}
+                className={styles.addButton}>
+                Add
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {viewMode === 'graph' ? (
+          <div className={styles.fetalHeartRateChart}>
+            <LineChart data={chartData} options={chartOptions} key={chartKey} />
+          </div>
+        ) : (
+          <div className={styles.tableContainer}>
+            {paginatedData.length > 0 ? (
+              <>
+                <DataTable rows={paginatedData} headers={tableHeaders}>
+                  {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+                    <TableContainer title="" description="">
+                      <Table {...getTableProps()} size="sm">
+                        <TableHead>
+                          <TableRow>
+                            {headers.map((header) => (
+                              <TableHeader {...getHeaderProps({ header })} key={header.key}>
+                                {header.header}
+                              </TableHeader>
+                            ))}
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {rows.map((row) => (
+                            <TableRow {...getRowProps({ row })} key={row.id}>
+                              {row.cells.map((cell) => (
+                                <TableCell key={cell.id}>
+                                  {cell.info.header === 'status'
+                                    ? (() => {
+                                        const status = getFetalHeartRateStatus(
+                                          row.cells.find((c) => c.info.header === 'value')?.value || '0 bpm',
+                                        );
+                                        return (
+                                          <Tag type={status.type as any} title={`Fetal Heart Rate: ${status.text}`}>
+                                            {status.text}
+                                          </Tag>
+                                        );
+                                      })()
+                                    : cell.info.header === 'value'
+                                    ? (() => {
+                                        const numValue = parseInt(cell.value.replace(' bpm', ''));
+
+                                        if (numValue < 100) {
+                                          return (
+                                            <span className={`${styles.fetalHeartRateValue} ${styles.low}`}>
+                                              <span className={styles.arrow}>↓</span>
+                                              {cell.value}
+                                            </span>
+                                          );
+                                        } else if (numValue > 180) {
+                                          return (
+                                            <span className={`${styles.fetalHeartRateValue} ${styles.high}`}>
+                                              <span className={styles.arrow}>↑</span>
+                                              {cell.value}
+                                            </span>
+                                          );
+                                        } else {
+                                          return (
+                                            <span className={`${styles.fetalHeartRateValue} ${styles.normal}`}>
+                                              {cell.value}
+                                            </span>
+                                          );
+                                        }
+                                      })()
+                                    : cell.value}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </DataTable>
+
+                {totalItems > 0 && (
+                  <Pagination
+                    page={currentPage}
+                    totalItems={totalItems}
+                    pageSize={pageSize}
+                    pageSizes={[5, 10, 20, 50]}
+                    onChange={(event) => {
+                      onPageChange?.(event.page);
+                      if (event.pageSize !== pageSize) {
+                        onPageSizeChange?.(event.pageSize);
+                      }
+                    }}
+                    size={controlSize}
+                  />
+                )}
+              </>
+            ) : (
+              <div className={styles.emptyState}>
+                <p>{t('noDataAvailable', 'No data available for fetal heart rate')}</p>
+                <Button kind="primary" size={controlSize} renderIcon={Add} onClick={onAddData}>
+                  {t('addFirstDataPoint', 'Add first data point')}
+                </Button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default FetalHeartRateGraph;

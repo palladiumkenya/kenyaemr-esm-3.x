@@ -1,3 +1,7 @@
+// Drug order type UUID for partography drug orders
+export const DRUG_ORDER_TYPE_UUID = '131168f4-15f5-102d-96e4-000c29c2a5d7';
+// Encounter role for provider in partography encounters
+export const ENCOUNTER_ROLE = '240b26f9-dd88-4172-823d-4a8bfeb7841f';
 import { Type } from '@openmrs/esm-framework';
 import _default from 'react-hook-form/dist/logic/appendErrors';
 
@@ -397,6 +401,19 @@ export const configSchema = {
         'drugs-fluids': 'Drugs & Fluids',
         'progress-events': 'Progress & Events',
       },
+      amnioticFluidMap: {
+        'Membrane intact': '164899AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Clear liquor': '159484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Meconium Stained': '134488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        Absent: '163747AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Blood Stained': '1077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
+      mouldingMap: {
+        '0': '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+': '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '++': '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+++': '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
       testData: {
         testGraphTypes: ['fetal-heart-rate', 'cervical-dilation', 'maternal-pulse', 'temperature', 'blood-pressure'],
         sampleDataPoints: [
@@ -407,6 +424,14 @@ export const configSchema = {
         ],
         valueIncrement: 10,
         bloodPressureDecrement: 40,
+      },
+      descentOfHeadUuidToValue: {
+        '160769AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 0,
+        '162135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 1,
+        '166065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 2,
+        '166066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 3,
+        '166067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 4,
+        '163734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 5,
       },
     },
   },

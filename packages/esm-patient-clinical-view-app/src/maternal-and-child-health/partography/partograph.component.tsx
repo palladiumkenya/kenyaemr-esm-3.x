@@ -1,3 +1,12 @@
+import {
+  CONTRACTION_INTENSITY_OPTIONS,
+  PARTOGRAPHY_CONCEPTS,
+  URINE_LEVEL_OPTIONS,
+  codeToPlus,
+  getTranslatedPartographyGraphs,
+  getPartographyTableHeaders,
+  getColorForGraph,
+} from './types';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -5,11 +14,6 @@ import {
   Grid,
   Column,
   Tag,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
   Button,
   DataTable,
   TableContainer,
@@ -23,44 +27,617 @@ import {
 } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
-import { useSession, useLayoutType } from '@openmrs/esm-framework';
+import { useSession, useLayoutType, openmrsFetch } from '@openmrs/esm-framework';
 import '@carbon/charts/styles.css';
 import styles from './partography.scss';
 import PartographyDataForm from './partography-data-form.component';
 import {
-  usePartographyData,
+  CervixForm,
+  FetalHeartRateForm,
+  CervicalContractionsForm,
+  OxytocinForm,
+  DrugsIVFluidsForm,
+  TemperatureForm,
+  UrineTestForm,
+} from './forms';
+import {
+  FetalHeartRateGraph,
+  MembraneAmnioticFluidGraph,
+  CervicalContractionsGraph,
+  OxytocinGraph,
+  DrugsIVFluidsGraph,
+  PulseBPGraph,
+  TemperatureGraph,
+  UrineTestGraph,
+} from './graphs';
+import MembraneAmnioticFluidForm from './forms/membrane-amniotic-fluid-form.component';
+import {
+  saveMembraneAmnioticFluidData,
   createPartographyEncounter,
   transformEncounterToChartData,
   transformEncounterToTableData,
+  useDrugOrders,
+  useFetalHeartRateData,
+  usePartographyData,
 } from './partography.resource';
-import { getTranslatedPartographyGraphs, getPartographyTableHeaders, getColorForGraph } from './types/index';
+import { saveCervixFormData, useCervixFormData } from './forms/useCervixData';
+import { useOxytocinData, saveOxytocinFormData } from './resources/oxytocin.resource';
+import { useMembraneAmnioticFluidData } from './resources/membrane-amniotic-fluid.resource';
+import { from } from 'rxjs';
 
 enum ScaleTypes {
   LABELS = 'labels',
   LINEAR = 'linear',
 }
 
+type GraphDefinition = {
+  id: string;
+  title: string;
+  color: string;
+  yAxisLabel: string;
+  yMin: number;
+  yMax: number;
+  normalRange: string;
+  description: string;
+};
+
+type ChartDataPoint = {
+  hour: number;
+  time?: string;
+  group: string;
+  value: number;
+};
+
+const CERVIX_CHART_OPTIONS = {
+  axes: {
+    bottom: {
+      title: '',
+      mapsTo: 'hour',
+      scaleType: ScaleTypes.LINEAR,
+      domain: [0, 10],
+      tick: {
+        count: 21,
+        rotation: 0,
+        values: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10],
+        formatter: (hour) => {
+          if (hour === 0) {
+            return '0';
+          } else if (hour === 0.5) {
+            return '0.30';
+          } else if (hour % 1 === 0) {
+            return `${hour}`;
+          } else if (hour % 1 === 0.5) {
+            return `${Math.floor(hour)}.30`;
+          } else {
+            return `${hour}`;
+          }
+        },
+      },
+      grid: {
+        enabled: true,
+        strokeWidth: 1,
+        strokeDasharray: '2,2',
+      },
+    },
+    left: {
+      title: 'Cervical Dilation (cm) / Descent of Head (5=high → 1=descended)',
+      mapsTo: 'value',
+      domain: [0, 10],
+      ticks: {
+        values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        formatter: (value) => {
+          if (value >= 1 && value <= 5) {
+            return `${value}cm / D${value}`;
+          } else if (value === 0) {
+            return '0cm';
+          } else {
+            return `${value}cm`;
+          }
+        },
+      },
+      scaleType: ScaleTypes.LINEAR,
+      grid: {
+        enabled: true,
+        strokeWidth: 1,
+        strokeDasharray: '2,2',
+      },
+    },
+  },
+  points: {
+    enabled: true,
+    radius: 6,
+    strokeWidth: 2,
+    fill: true,
+  },
+  curve: 'curveLinear',
+  height: '500px',
+  grid: {
+    x: {
+      enabled: true,
+      strokeWidth: 1,
+      strokeDasharray: '2,2',
+    },
+    y: {
+      enabled: true,
+      strokeWidth: 1,
+      strokeDasharray: '2,2',
+    },
+  },
+  theme: 'white',
+  toolbar: {
+    enabled: false,
+  },
+  legend: {
+    position: 'top',
+    clickable: false,
+  },
+};
+
 type PartographyProps = {
   patientUuid: string;
+};
+
+const GraphSkeleton: React.FC = () => {
+  const skeletonStyle = {
+    background: 'linear-gradient(90deg, #f4f4f4 25%, #e0e0e0 50%, #f4f4f4 75%)',
+    backgroundSize: '200% 100%',
+    animation: 'skeletonShimmer 1.5s infinite ease-in-out',
+    borderRadius: '4px',
+  };
+
+  React.useEffect(() => {
+    if (!document.querySelector('#skeleton-keyframes')) {
+      const style = document.createElement('style');
+      style.id = 'skeleton-keyframes';
+      style.textContent = `
+        @keyframes skeletonShimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  return (
+    <div
+      style={{
+        padding: '1rem',
+        backgroundColor: '#ffffff',
+        borderRadius: '4px',
+        border: '1px solid #e0e0e0',
+      }}>
+      <div
+        style={{
+          height: '500px',
+          ...skeletonStyle,
+          marginBottom: '1rem',
+        }}
+      />
+      {/* Skeleton for custom time labels (cervix specific) */}
+      <div style={{ marginTop: '1rem', borderTop: '1px solid #e0e0e0', paddingTop: '0.5rem' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.25rem' }}>
+          {Array.from({ length: 11 }).map((_, index) => (
+            <div
+              key={index}
+              style={{
+                width: index === 0 ? '60px' : '60px',
+                height: '20px',
+                flex: index === 0 ? 'none' : '1',
+                ...skeletonStyle,
+              }}
+            />
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {Array.from({ length: 11 }).map((_, index) => (
+            <div
+              key={index}
+              style={{
+                width: index === 0 ? '60px' : '60px',
+                height: '20px',
+                flex: index === 0 ? 'none' : '1',
+                ...skeletonStyle,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: '2rem', marginTop: '1rem' }}>
+        <div style={{ width: '100px', height: '24px', ...skeletonStyle }} />
+        <div style={{ width: '120px', height: '24px', ...skeletonStyle }} />
+      </div>
+    </div>
+  );
+};
+
+const TableSkeleton: React.FC = () => {
+  const skeletonStyle = {
+    background: 'linear-gradient(90deg, #f4f4f4 25%, #e0e0e0 50%, #f4f4f4 75%)',
+    backgroundSize: '200% 100%',
+    animation: 'skeletonShimmer 1.5s infinite ease-in-out',
+    borderRadius: '4px',
+  };
+
+  return (
+    <div
+      style={{
+        padding: '1rem',
+        backgroundColor: '#ffffff',
+        borderRadius: '4px',
+        border: '1px solid #e0e0e0',
+      }}>
+      <div style={{ width: '200px', height: '24px', marginBottom: '1rem', ...skeletonStyle }} />
+      {Array.from({ length: 5 }).map((_, index) => (
+        <div key={index} style={{ display: 'flex', gap: '2rem', marginBottom: '0.5rem' }}>
+          <div style={{ width: '150px', height: '20px', ...skeletonStyle }} />
+          <div style={{ width: '80px', height: '20px', ...skeletonStyle }} />
+          <div style={{ width: '60px', height: '20px', ...skeletonStyle }} />
+        </div>
+      ))}
+      <div style={{ width: '180px', height: '20px', marginTop: '1rem', ...skeletonStyle }} />
+    </div>
+  );
 };
 
 const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
 
+  const ENABLE_DUMMY_DATA = false;
+
+  const [localPartographyData, setLocalPartographyData] = useState<Record<string, any[]>>({});
+
+  const [localFetalHeartRateData, setLocalFetalHeartRateData] = useState<
+    Array<{
+      hour: number;
+      value: number;
+      group: string;
+      time?: string;
+    }>
+  >([]);
+
+  const {
+    membraneAmnioticFluidEntries,
+    isLoading: isMembraneAmnioticFluidLoading,
+    error: membraneAmnioticFluidError,
+    mutate: mutateMembraneAmnioticFluidData,
+  } = useMembraneAmnioticFluidData(patientUuid || '');
+
+  const {
+    data: cervicalContractionsData,
+    isLoading: isCervicalContractionsLoading,
+    mutate: mutateCervicalContractions,
+  } = usePartographyData(patientUuid || '', 'uterine-contractions');
+
+  const {
+    oxytocinData: loadedOxytocinData,
+    existingOxytocinEntries,
+    isLoading: isOxytocinDataLoading,
+    error: oxytocinDataError,
+    mutate: mutateOxytocinData,
+  } = useOxytocinData(patientUuid || '');
+
+  const [localDrugsIVFluidsData, setLocalDrugsIVFluidsData] = useState<
+    Array<{
+      drugName: string;
+      dosage: string;
+      route?: string;
+      frequency?: string;
+      date?: string;
+      id?: string;
+    }>
+  >([]);
+
+  const {
+    data: loadedPulseData,
+    isLoading: isPulseDataLoading,
+    error: pulseDataError,
+    mutate: mutatePulseData,
+  } = usePartographyData(patientUuid || '', 'maternal-pulse');
+  const {
+    data: loadedBPData,
+    isLoading: isBPDataLoading,
+    error: bpDataError,
+    mutate: mutateBPData,
+  } = usePartographyData(patientUuid || '', 'blood-pressure');
+
+  const {
+    data: loadedTemperatureData,
+    isLoading: isTemperatureDataLoading,
+    error: temperatureDataError,
+    mutate: mutateTemperatureData,
+  } = usePartographyData(patientUuid || '', 'temperature');
+
+  const {
+    data: urineTestEncounters = [],
+    isLoading: isUrineTestLoading,
+    error: urineTestError,
+    mutate: mutateUrineTestData,
+  } = usePartographyData(patientUuid || '', 'urine-analysis');
+
+  const urineTestData = useMemo(() => {
+    return (urineTestEncounters || []).map((encounter, index) => {
+      const obs = encounter.obs || [];
+      const getObsValue = (conceptUuid) => {
+        const found = obs.find((o) => o.concept.uuid === conceptUuid);
+        if (!found) {
+          return '';
+        }
+        const v = found.value;
+        if (v && typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'display')) {
+          return (v as any).display ? (v as any).display : '';
+        }
+        return v != null ? String(v) : '';
+      };
+      const getTime = () => {
+        const timeObs = obs.find(
+          (o) =>
+            o.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'] &&
+            typeof o.value === 'string' &&
+            o.value.startsWith('Time:'),
+        );
+        if (timeObs && typeof timeObs.value === 'string') {
+          const match = timeObs.value.match(/Time:\s*(.+)/);
+          if (match) {
+            return match[1].trim();
+          }
+        }
+        return '';
+      };
+      const getTimeSlot = () => {
+        const slotObs = obs.find(
+          (o) =>
+            o.concept.uuid === PARTOGRAPHY_CONCEPTS['time-slot'] ||
+            (typeof o.value === 'string' && o.value.startsWith('TimeSlot:')),
+        );
+        if (slotObs) {
+          if (typeof slotObs.value === 'string') {
+            const match = slotObs.value.match(/TimeSlot:\s*(.+)/);
+            if (match) {
+              return match[1].trim();
+            }
+            return slotObs.value;
+          }
+          return String(slotObs.value);
+        }
+        return '';
+      };
+      const getSampleCollected = () => {
+        const found = obs.find(
+          (o) =>
+            (o.concept.display && o.concept.display.toLowerCase().includes('collected')) ||
+            (o.concept.uuid && o.concept.uuid.toLowerCase().includes('collected')),
+        );
+        if (found) {
+          return found.value != null ? String(found.value) : '';
+        }
+        return '';
+      };
+      const getResultReturned = () => {
+        const found = obs.find(
+          (o) =>
+            (o.concept.display && o.concept.display.toLowerCase().includes('returned')) ||
+            (o.concept.uuid && o.concept.uuid.toLowerCase().includes('returned')),
+        );
+        if (found) {
+          return found.value != null ? String(found.value) : '';
+        }
+        return '';
+      };
+      const getVolume = () => {
+        const found = obs.find(
+          (o) =>
+            (o.concept.uuid && o.concept.uuid.toLowerCase() === '159660aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa') ||
+            (o.concept.uuid && o.concept.uuid.toLowerCase() === PARTOGRAPHY_CONCEPTS['urine-volume'].toLowerCase()) ||
+            (o.concept.display && o.concept.display.toLowerCase().includes('volume')),
+        );
+        if (!found) {
+          return '';
+        }
+        if (typeof found.value === 'number') {
+          return String(found.value);
+        }
+        if (typeof found.value === 'string') {
+          return found.value;
+        }
+        if (
+          found.value &&
+          typeof found.value === 'object' &&
+          'display' in found.value &&
+          typeof (found.value as { display?: unknown }).display === 'string'
+        ) {
+          return (found.value as { display: string }).display ?? '';
+        }
+        return '';
+      };
+      let timeSlot = '';
+      const eventDescObs = obs.find(
+        (o) =>
+          o.concept.uuid === PARTOGRAPHY_CONCEPTS['event-description'] &&
+          typeof o.value === 'string' &&
+          o.value.startsWith('Time Slot: '),
+      );
+      if (eventDescObs && typeof eventDescObs.value === 'string') {
+        const match = eventDescObs.value.match(/Time Slot: (\d{1,2}:\d{2})/);
+        if (match) {
+          timeSlot = match[1];
+        }
+      }
+      let volumeRaw = getVolume();
+      let volume: number | undefined = undefined;
+      if (typeof volumeRaw === 'number') {
+        volume = volumeRaw;
+      } else if (typeof volumeRaw === 'string' && volumeRaw.trim() !== '' && !isNaN(Number(volumeRaw))) {
+        volume = Number(volumeRaw);
+      }
+      const sampleCollected = getSampleCollected();
+      const resultReturned = getResultReturned();
+      return {
+        id: `urine-test-${index}`,
+        date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+        timeSlot,
+        exactTime: getTime(),
+        protein: codeToPlus(getObsValue(PARTOGRAPHY_CONCEPTS['protein-level'])),
+        acetone: codeToPlus(getObsValue(PARTOGRAPHY_CONCEPTS['ketone-level'])),
+        volume,
+        timeSampleCollected: sampleCollected,
+        timeResultsReturned: resultReturned,
+      };
+    });
+  }, [urineTestEncounters]);
+  const generateExtendedDummyData = () => {
+    const baseTime = new Date();
+    baseTime.setHours(8, 0, 0, 0);
+
+    return Array.from({ length: 10 }, (_, i) => {
+      const currentTime = new Date(baseTime);
+      currentTime.setHours(currentTime.getHours() + i);
+
+      const cervicalDilation = Math.min(3 + i * 0.8, 10);
+      const descentOfHead = Math.max(5 - Math.floor(i * 0.5), 1);
+
+      return {
+        hour: i,
+        time: currentTime.toTimeString().slice(0, 5),
+        cervicalDilation: Math.round(cervicalDilation * 10) / 10,
+        descentOfHead,
+        entryDate: currentTime.toLocaleDateString(),
+        entryTime: currentTime.toTimeString(),
+      };
+    });
+  };
+
+  const {
+    cervixData: loadedCervixData,
+    existingTimeEntries,
+    existingCervixData,
+    selectedHours,
+    isLoading: isCervixDataLoading,
+    error: cervixDataError,
+    mutate: mutateCervixData,
+  } = useCervixFormData(patientUuid || '');
+
+  const {
+    fetalHeartRateData: loadedFetalHeartRateData = [],
+    isLoading: isFetalHeartRateLoading = false,
+    error: fetalHeartRateError = null,
+    mutate: mutateFetalHeartRateData = () => {},
+  } = useFetalHeartRateData(patientUuid || '');
+
+  const {
+    drugOrders: loadedDrugOrders = [],
+    isLoading: isDrugOrdersLoading = false,
+    error: drugOrdersError = null,
+    mutate: mutateDrugOrders = () => {},
+  } = useDrugOrders(patientUuid || '');
+
+  useEffect(() => {
+    if (patientUuid) {
+      if (drugOrdersError) {
+        // No-op or handle error if needed
+      }
+    }
+  }, [patientUuid, loadedDrugOrders, isDrugOrdersLoading, drugOrdersError]);
+
   const session = useSession();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const controlSize = isTablet ? 'md' : 'sm';
-  const [selectedTab, setSelectedTab] = useState(0);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isCervixFormOpen, setIsCervixFormOpen] = useState(false);
+  const [isFetalHeartRateFormOpen, setIsFetalHeartRateFormOpen] = useState(false);
+  const [isMembraneAmnioticFluidFormOpen, setIsMembraneAmnioticFluidFormOpen] = useState(false);
+  const [isCervicalContractionsFormOpen, setIsCervicalContractionsFormOpen] = useState(false);
+  const [isOxytocinFormOpen, setIsOxytocinFormOpen] = useState(false);
+  const [isTemperatureFormOpen, setIsTemperatureFormOpen] = useState(false);
+  const [temperatureFormInitialTime, setTemperatureFormInitialTime] = useState<string>('');
+  const [isUrineTestFormOpen, setIsUrineTestFormOpen] = useState(false);
   const [selectedGraphType, setSelectedGraphType] = useState<string>('');
-  const [graphData, setGraphData] = useState<Record<string, any[]>>({});
+  const [graphData, setGraphData] = useState<Record<string, ChartDataPoint[]>>({});
   const [viewMode, setViewMode] = useState<Record<string, 'graph' | 'table'>>({});
+  const [fetalHeartRateViewMode, setFetalHeartRateViewMode] = useState<'graph' | 'table'>('graph');
+  const [membraneAmnioticFluidViewMode, setMembraneAmnioticFluidViewMode] = useState<'graph' | 'table'>('graph');
+  const [cervicalContractionsViewMode, setCervicalContractionsViewMode] = useState<'graph' | 'table'>('graph');
+  const [oxytocinViewMode, setOxytocinViewMode] = useState<'graph' | 'table'>('graph');
+  const [drugsIVFluidsViewMode, setDrugsIVFluidsViewMode] = useState<'graph' | 'table'>('graph');
+  const [pulseBPViewMode, setPulseBPViewMode] = useState<'graph' | 'table'>('graph');
+  const [temperatureViewMode, setTemperatureViewMode] = useState<'graph' | 'table'>('graph');
+  const [urineTestViewMode, setUrineTestViewMode] = useState<'graph' | 'table'>('graph');
+  const [fetalHeartRateCurrentPage, setFetalHeartRateCurrentPage] = useState(1);
+  const [fetalHeartRatePageSize, setFetalHeartRatePageSize] = useState(5);
+  const [membraneAmnioticFluidCurrentPage, setMembraneAmnioticFluidCurrentPage] = useState(1);
+  const [membraneAmnioticFluidPageSize, setMembraneAmnioticFluidPageSize] = useState(5);
+  const [cervicalContractionsCurrentPage, setCervicalContractionsCurrentPage] = useState(1);
+  const [cervicalContractionsPageSize, setCervicalContractionsPageSize] = useState(5);
+  const [oxytocinCurrentPage, setOxytocinCurrentPage] = useState(1);
+  const [oxytocinPageSize, setOxytocinPageSize] = useState(5);
+  const [drugsIVFluidsCurrentPage, setDrugsIVFluidsCurrentPage] = useState(1);
+  const [pulseBPCurrentPage, setPulseBPCurrentPage] = useState(1);
+  const [temperatureCurrentPage, setTemperatureCurrentPage] = useState(1);
+  const [temperaturePageSize, setTemperaturePageSize] = useState(5);
+  const [urineTestCurrentPage, setUrineTestCurrentPage] = useState(1);
+  const [urineTestPageSize, setUrineTestPageSize] = useState(5);
+  const [drugsIVFluidsPageSize, setDrugsIVFluidsPageSize] = useState(5);
+  const [pulseBPPageSize, setPulseBPPageSize] = useState(5);
   const [currentPage, setCurrentPage] = useState<Record<string, number>>({});
   const [pageSize, setPageSize] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
 
-  const partographGraphs = useMemo(() => getTranslatedPartographyGraphs(t), [t]);
+  const cervixFormData = useMemo(() => {
+    const dataToUse = loadedCervixData.length > 0 ? loadedCervixData : [];
+
+    const processedData = dataToUse
+      .map((data) => ({
+        hour: data.hour || 0,
+        time: data.time || '',
+        cervicalDilation: data.cervicalDilation || 0,
+        descentOfHead: data.descentOfHead || 0,
+        entryDate: new Date(data.encounterDatetime).toLocaleDateString(),
+        entryTime: new Date(data.encounterDatetime).toLocaleTimeString(),
+      }))
+      .filter((data) => data.hour > 0 && data.cervicalDilation > 0 && data.descentOfHead > 0);
+
+    return processedData.length > 0 ? processedData : ENABLE_DUMMY_DATA ? generateExtendedDummyData() : [];
+  }, [loadedCervixData, ENABLE_DUMMY_DATA]);
+
+  const computedExistingTimeEntries = useMemo(() => {
+    return existingTimeEntries;
+  }, [existingTimeEntries]);
+
+  const computedFetalHeartRateData = useMemo(() => {
+    const combined = [...localFetalHeartRateData];
+
+    if (loadedFetalHeartRateData?.length > 0) {
+      loadedFetalHeartRateData.forEach((openMrsEntry) => {
+        const exists = combined.find(
+          (localEntry) => localEntry.hour === openMrsEntry.hour && localEntry.time === openMrsEntry.time,
+        );
+
+        if (!exists) {
+          const transformedEntry = {
+            hour: openMrsEntry.hour,
+            value: openMrsEntry.fetalHeartRate,
+            group: 'Fetal Heart Rate',
+            time: openMrsEntry.time,
+          };
+          combined.push(transformedEntry);
+        }
+      });
+    }
+
+    const sorted = combined.sort((a, b) => {
+      if (a.hour !== b.hour) {
+        return a.hour - b.hour;
+      }
+      return a.time.localeCompare(b.time);
+    });
+
+    return sorted;
+  }, [localFetalHeartRateData, loadedFetalHeartRateData]);
+  const partographGraphs: GraphDefinition[] = useMemo(
+    () => getTranslatedPartographyGraphs(t) as GraphDefinition[],
+    [t],
+  );
 
   useEffect(() => {
     const initialViewMode = {};
@@ -86,7 +663,62 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
     useEffect(() => {
       if (!isLoading) {
-        const chartData = transformEncounterToChartData(encounters, graphType);
+        let chartData: ChartDataPoint[] = [];
+
+        if (graphType === 'maternal-pulse' || graphType === 'blood-pressure') {
+          chartData = [];
+          if (Array.isArray(encounters)) {
+            encounters.forEach((encounter) => {
+              if (Array.isArray(encounter.obs)) {
+                const time = new Date(encounter.encounterDatetime).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                });
+                encounter.obs.forEach((obs) => {
+                  if (graphType === 'maternal-pulse' && obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']) {
+                    chartData.push({
+                      hour: 0,
+                      group: 'Maternal Pulse',
+                      time,
+                      value: typeof obs.value === 'number' ? obs.value : parseFloat(obs.value),
+                    });
+                  }
+                  if (graphType === 'blood-pressure') {
+                    if (obs.concept.uuid === PARTOGRAPHY_CONCEPTS['systolic-bp']) {
+                      chartData.push({
+                        hour: 0,
+                        group: 'Systolic',
+                        time,
+                        value: typeof obs.value === 'number' ? obs.value : parseFloat(obs.value),
+                      });
+                    }
+                    if (obs.concept.uuid === PARTOGRAPHY_CONCEPTS['diastolic-bp']) {
+                      chartData.push({
+                        hour: 0,
+                        group: 'Diastolic',
+                        time,
+                        value: typeof obs.value === 'number' ? obs.value : parseFloat(obs.value),
+                      });
+                    }
+                  }
+                });
+              }
+            });
+          }
+        } else if (localPartographyData[graphType] && localPartographyData[graphType].length > 0) {
+          chartData = localPartographyData[graphType].map((item, index) => ({
+            hour: index + 1,
+            group: graphType,
+            time: item.time || `Point ${index + 1}`,
+            value: item.value || item.measurementValue || 0,
+          }));
+        } else {
+          chartData = transformEncounterToChartData(encounters, graphType);
+        }
+
+        if (chartData.length === 0 && ENABLE_DUMMY_DATA) {
+          chartData = generateDummyDataForGraph(graphType);
+        }
 
         setGraphData((prevData) => ({
           ...prevData,
@@ -98,34 +730,156 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           [graphType]: false,
         }));
       }
-    }, [encounters, isLoading, graphType]);
+    }, [encounters, isLoading, graphType, localPartographyData]);
 
     return { encounters, isLoading, mutate };
   };
 
-  const fetalHeartRateData = useGraphData('fetal-heart-rate');
-  const cervicalDilationData = useGraphData('cervical-dilation');
-  const descentOfHeadData = useGraphData('descent-of-head');
-  const uterineContractionsData = useGraphData('uterine-contractions');
-  const maternalPulseData = useGraphData('maternal-pulse');
-  const bloodPressureData = useGraphData('blood-pressure');
-  const temperatureData = useGraphData('temperature');
-  const urineAnalysisData = useGraphData('urine-analysis');
-  const drugsFluidsData = useGraphData('drugs-fluids');
-  const progressEventsData = useGraphData('progress-events');
+  const generateDummyDataForGraph = (graphType: string): ChartDataPoint[] => {
+    const baseTimeEntries = [
+      { hour: 0, time: '08:00' },
+      { hour: 1, time: '09:00' },
+      { hour: 2, time: '10:00' },
+      { hour: 3, time: '11:00' },
+      { hour: 4, time: '12:00' },
+      { hour: 5, time: '13:00' },
+      { hour: 6, time: '14:00' },
+    ];
 
-  const graphDataHooks = {
-    'fetal-heart-rate': fetalHeartRateData,
-    'cervical-dilation': cervicalDilationData,
-    'descent-of-head': descentOfHeadData,
-    'uterine-contractions': uterineContractionsData,
-    'maternal-pulse': maternalPulseData,
-    'blood-pressure': bloodPressureData,
-    temperature: temperatureData,
-    'urine-analysis': urineAnalysisData,
-    'drugs-fluids': drugsFluidsData,
-    'progress-events': progressEventsData,
+    switch (graphType) {
+      case 'fetal-heart-rate':
+        return baseTimeEntries.map((entry) => ({
+          hour: entry.hour,
+          time: entry.time,
+          group: 'Fetal Heart Rate',
+          value: 140 + Math.random() * 20,
+        }));
+
+      case 'maternal-pulse':
+        return baseTimeEntries.map((entry) => ({
+          hour: entry.hour,
+          time: entry.time,
+          group: 'Maternal Pulse',
+          value: 75 + Math.random() * 15,
+        }));
+
+      case 'blood-pressure':
+        return [
+          ...baseTimeEntries.map((entry) => ({
+            hour: entry.hour,
+            time: entry.time,
+            group: 'Systolic',
+            value: 115 + Math.random() * 10,
+          })),
+          ...baseTimeEntries.map((entry) => ({
+            hour: entry.hour,
+            time: entry.time,
+            group: 'Diastolic',
+            value: 75 + Math.random() * 5,
+          })),
+        ];
+
+      case 'temperature':
+        return baseTimeEntries.map((entry) => ({
+          hour: entry.hour,
+          time: entry.time,
+          group: 'Temperature',
+          value: 36.5 + Math.random() * 0.8,
+        }));
+
+      case 'uterine-contractions':
+        return baseTimeEntries.map((entry) => ({
+          hour: entry.hour,
+          time: entry.time,
+          group: 'Contractions per 10 minutes',
+          value: Math.floor(Math.random() * 5) + 2,
+        }));
+
+      default:
+        return [];
+    }
   };
+
+  const cervixData = useGraphData('cervix');
+
+  useEffect(() => {
+    const applyChartStyling = () => {
+      const chartContainer = document.querySelector(`[data-chart-id="cervix"]`);
+      if (chartContainer) {
+        const svgPaths = chartContainer.querySelectorAll('svg path');
+        svgPaths.forEach((path, index) => {
+          const pathElement = path as SVGPathElement;
+          const pathData = pathElement.getAttribute('d');
+          if (pathData) {
+            if (pathData.includes('M0') || pathData.includes('L0')) {
+              pathElement.style.stroke = '#FFD700';
+              pathElement.style.strokeWidth = '3px';
+              pathElement.style.strokeDasharray = '8,4';
+            } else if (pathData.includes('M4') || pathData.includes('L4')) {
+              pathElement.style.stroke = '#FF0000';
+              pathElement.style.strokeWidth = '3px';
+              pathElement.style.strokeDasharray = '8,4';
+            }
+          }
+        });
+
+        const svgCircles = chartContainer.querySelectorAll('svg circle');
+        svgCircles.forEach((circle) => {
+          const circleElement = circle as SVGCircleElement;
+          const parentGroup = circleElement.closest('g');
+          if (parentGroup) {
+            const stroke = circleElement.getAttribute('stroke') || circleElement.style.stroke;
+            const fill = circleElement.getAttribute('fill') || circleElement.style.fill;
+
+            if (stroke === '#22C55E' || fill === '#22C55E') {
+              circleElement.style.display = 'none';
+
+              const cx = parseFloat(circleElement.getAttribute('cx') || '0');
+              const cy = parseFloat(circleElement.getAttribute('cy') || '0');
+              const size = 6;
+
+              const svg = circleElement.ownerSVGElement;
+              if (svg) {
+                const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line1.setAttribute('x1', (cx - size).toString());
+                line1.setAttribute('y1', (cy - size).toString());
+                line1.setAttribute('x2', (cx + size).toString());
+                line1.setAttribute('y2', (cy + size).toString());
+                line1.setAttribute('stroke', '#22C55E');
+                line1.setAttribute('stroke-width', '3');
+                line1.setAttribute('stroke-linecap', 'round');
+
+                const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line2.setAttribute('x1', (cx + size).toString());
+                line2.setAttribute('y1', (cy - size).toString());
+                line2.setAttribute('x2', (cx - size).toString());
+                line2.setAttribute('y2', (cy + size).toString());
+                line2.setAttribute('stroke', '#22C55E');
+                line2.setAttribute('stroke-width', '3');
+                line2.setAttribute('stroke-linecap', 'round');
+
+                parentGroup.appendChild(line1);
+                parentGroup.appendChild(line2);
+              }
+            }
+          }
+        });
+      }
+    };
+
+    const timer = setTimeout(applyChartStyling, 100);
+    return () => clearTimeout(timer);
+  }, [cervixFormData, isLoading, isCervixDataLoading]);
+
+  function openmrsFetchWithLogging(url, options) {
+    return openmrsFetch(url, options)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error;
+      });
+  }
 
   if (!patientUuid) {
     return (
@@ -144,9 +898,16 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     );
   }
 
+  if (cervixDataError) {
+  }
+
   const handleAddDataPoint = (graphId: string) => {
-    setSelectedGraphType(graphId);
-    setIsFormOpen(true);
+    if (graphId === 'cervix') {
+      setIsCervixFormOpen(true);
+    } else {
+      setSelectedGraphType(graphId);
+      setIsFormOpen(true);
+    }
   };
 
   const handleFormSubmit = async (formData: any) => {
@@ -156,32 +917,21 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         [formData.graphType]: true,
       }));
 
-      const encounterResult = await createPartographyEncounter(
-        patientUuid,
-        formData.graphType,
-        formData,
-        session?.sessionLocation?.uuid,
-        session?.user?.uuid,
-        t,
-      );
+      const newEntry = {
+        ...formData,
+        timestamp: new Date(),
+        id: Date.now(),
+      };
 
-      if (!encounterResult.success) {
-        throw new Error(encounterResult.message);
-      }
-
-      const currentHook = graphDataHooks[formData.graphType];
-      if (currentHook?.mutate) {
-        await currentHook.mutate();
-      }
+      setLocalPartographyData((prev) => ({
+        ...prev,
+        [formData.graphType]: [...(prev[formData.graphType] || []), newEntry],
+      }));
 
       setIsFormOpen(false);
       setSelectedGraphType('');
     } catch (error) {
-      setIsLoading((prev) => ({
-        ...prev,
-        [formData.graphType]: false,
-      }));
-      alert(`Failed to save partography data: ${error.message}. Please try again.`);
+      alert(`Failed to add partography data: ${error.message}. Please try again.`);
     } finally {
       setIsLoading((prev) => ({
         ...prev,
@@ -194,6 +944,523 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     setIsFormOpen(false);
     setSelectedGraphType('');
   };
+
+  const handleCervixFormClose = () => {
+    setIsCervixFormOpen(false);
+  };
+
+  const handleCervixFormSubmit = async (formData: {
+    hour: number;
+    time: string;
+    cervicalDilation: number;
+    descentOfHead: number;
+  }) => {
+    if (
+      isNaN(formData.hour) ||
+      isNaN(formData.cervicalDilation) ||
+      isNaN(formData.descentOfHead) ||
+      !formData.time ||
+      formData.time.trim() === ''
+    ) {
+      alert('Invalid data detected. Please ensure all fields are properly filled.');
+      return;
+    }
+
+    if (
+      formData.hour < 0 ||
+      formData.hour > 23 ||
+      formData.cervicalDilation < 0 ||
+      formData.cervicalDilation > 10 ||
+      formData.descentOfHead < 1 ||
+      formData.descentOfHead > 5
+    ) {
+      alert('Values are outside acceptable medical ranges. Please check your inputs.');
+      return;
+    }
+
+    const saveResult = await saveCervixFormData(
+      patientUuid,
+      {
+        hour: String(formData.hour),
+        time: formData.time,
+        cervicalDilation: String(formData.cervicalDilation),
+        descent: String(formData.descentOfHead),
+      },
+      t,
+    );
+
+    if (saveResult.success) {
+      if (typeof mutateCervixData === 'function') {
+        mutateCervixData();
+      }
+      setIsCervixFormOpen(false);
+    } else {
+      alert('Failed to save data: ' + saveResult.message);
+    }
+  };
+
+  const handleCervixDataSaved = () => {
+    mutateCervixData();
+  };
+
+  const handleFetalHeartRateFormSubmit = (formData: { hour: number; time: string; fetalHeartRate: number }) => {
+    if (isNaN(formData.hour) || isNaN(formData.fetalHeartRate) || !formData.time || formData.time.trim() === '') {
+      alert('Invalid data detected. Please ensure all fields are properly filled.');
+      return;
+    }
+
+    if (formData.hour < 0 || formData.hour > 24 || formData.fetalHeartRate < 80 || formData.fetalHeartRate > 200) {
+      alert('Values are outside acceptable medical ranges. Please check your inputs.');
+      return;
+    }
+
+    const newEntry = {
+      hour: formData.hour,
+      value: formData.fetalHeartRate,
+      group: 'Fetal Heart Rate',
+      time: formData.time,
+      date: new Date().toLocaleDateString(),
+      id: `fhr-${Date.now()}`,
+    };
+
+    setLocalFetalHeartRateData((prev) => [...prev, newEntry]);
+    setIsFetalHeartRateFormOpen(false);
+  };
+
+  const handleFetalHeartRateDataSaved = () => {
+    mutateFetalHeartRateData();
+  };
+
+  const handleFetalHeartRateFormClose = () => {
+    setIsFetalHeartRateFormOpen(false);
+  };
+
+  const handleMembraneAmnioticFluidFormSubmit = async (formData: {
+    timeSlot: string;
+    exactTime: string;
+    amnioticFluid: string;
+    moulding: string;
+  }) => {
+    if (
+      !formData.timeSlot ||
+      !formData.exactTime ||
+      !formData.amnioticFluid ||
+      !formData.moulding ||
+      formData.timeSlot.trim() === '' ||
+      formData.exactTime.trim() === '' ||
+      formData.amnioticFluid.trim() === '' ||
+      formData.moulding.trim() === ''
+    ) {
+      alert('Invalid data detected. Please ensure all fields are properly filled.');
+      return;
+    }
+
+    const saveResult = await saveMembraneAmnioticFluidData(
+      patientUuid,
+      {
+        amnioticFluid: formData.amnioticFluid,
+        moulding: formData.moulding,
+        time: formData.exactTime,
+      },
+      t,
+    );
+
+    await mutateMembraneAmnioticFluidData();
+    setIsMembraneAmnioticFluidFormOpen(false);
+  };
+
+  const handleMembraneAmnioticFluidFormClose = () => {
+    setIsMembraneAmnioticFluidFormOpen(false);
+  };
+
+  const handleCervicalContractionsFormSubmit = async (formData: {
+    contractionLevel: string;
+    contractionCount: string;
+    timeSlot: string;
+  }) => {
+    const contractionLevel = formData.contractionLevel || 'none';
+    const contractionLevelObj = CONTRACTION_INTENSITY_OPTIONS.find((opt) => opt.value === contractionLevel);
+    const contractionLevelUuid = contractionLevelObj?.conceptUuid || '';
+    const contractionLevelValue = contractionLevelUuid;
+    const contractionCountConcept = PARTOGRAPHY_CONCEPTS['contraction-count'];
+
+    const contractionCount = parseInt(formData.contractionCount || '1', 10);
+    const timeSlot = formData.timeSlot || new Date().toISOString().substring(11, 16);
+
+    const encounterFormData = {
+      contractionLevelValue,
+      contractionLevelUuid,
+      contractionCount,
+      contractionCountConcept,
+      timeSlot,
+    };
+    try {
+      const saveResult = await createPartographyEncounter(patientUuid, 'uterine-contractions', encounterFormData);
+      if (saveResult.success) {
+        if (typeof mutateCervicalContractions === 'function') {
+          await mutateCervicalContractions();
+        }
+        setIsCervicalContractionsFormOpen(false);
+      }
+    } catch (err) {}
+  };
+
+  const handleCervicalContractionsFormClose = () => {
+    setIsCervicalContractionsFormOpen(false);
+  };
+
+  const handleOxytocinFormSubmit = async (formData: {
+    oxytocinUsed: 'yes' | 'no';
+    dropsPerMinute: number;
+    timeSlot: string;
+  }) => {
+    if (!formData.timeSlot || formData.timeSlot.trim() === '') {
+      alert('Time is required.');
+      return;
+    }
+    if (
+      formData.oxytocinUsed === 'yes' &&
+      (isNaN(formData.dropsPerMinute) || formData.dropsPerMinute < 0 || formData.dropsPerMinute > 60)
+    ) {
+      alert('Drops per minute must be between 0 and 60 when oxytocin is used.');
+      return;
+    }
+
+    if (formData.oxytocinUsed === 'yes') {
+      const saveResult = await saveOxytocinFormData(
+        patientUuid,
+        {
+          time: formData.timeSlot,
+          dropsPerMinute: String(formData.dropsPerMinute),
+        },
+        t,
+      );
+      if (saveResult.success) {
+        if (typeof mutateOxytocinData === 'function') {
+          mutateOxytocinData();
+        }
+        setIsOxytocinFormOpen(false);
+      } else {
+        alert('Failed to save oxytocin data: ' + saveResult.message);
+      }
+    } else {
+      setIsOxytocinFormOpen(false);
+    }
+  };
+
+  const handleOxytocinFormClose = () => {
+    setIsOxytocinFormOpen(false);
+  };
+
+  const handleDrugsIVFluidsFormSubmit = (formData: {
+    drugName: string;
+    dosage: string;
+    route: string;
+    frequency: string;
+  }) => {
+    if (!formData.drugName || !formData.dosage || formData.drugName.trim() === '' || formData.dosage.trim() === '') {
+      alert('Invalid data detected. Please ensure all fields are properly filled.');
+      return;
+    }
+
+    const newEntry = {
+      drugName: formData.drugName,
+      dosage: formData.dosage,
+      route: formData.route,
+      frequency: formData.frequency,
+      date: new Date().toLocaleDateString(),
+      id: `drugs-${Date.now()}`,
+    };
+
+    setLocalDrugsIVFluidsData((prev) => [...prev, newEntry]);
+  };
+
+  const handleDrugOrderDataSaved = () => {
+    mutateDrugOrders();
+
+    setTimeout(() => {
+      mutateDrugOrders();
+    }, 2000);
+  };
+
+  const handlePulseBPFormSubmit = async (formData: { pulse: number; systolicBP: number; diastolicBP: number }) => {
+    if (!formData.pulse || !formData.systolicBP || !formData.diastolicBP) {
+      alert('Invalid data detected. Please ensure all fields are properly filled.');
+      return;
+    }
+    try {
+      await createPartographyEncounter(patientUuid, 'pulse-bp-combined', {
+        pulse: formData.pulse,
+        systolic: formData.systolicBP,
+        diastolic: formData.diastolicBP,
+      });
+      await mutatePulseData();
+      await mutateBPData();
+
+      setPulseBPViewMode((prev) => (prev === 'table' ? 'graph' : 'table'));
+      setTimeout(() => setPulseBPViewMode('graph'), 0);
+    } catch (error) {
+      alert('Failed to save Pulse & BP data.');
+    }
+  };
+
+  const handleTemperatureFormSubmit = async (formData: {
+    timeSlot: string;
+    exactTime: string;
+    temperature: number;
+  }) => {
+    if (!formData.timeSlot || !formData.exactTime || !formData.temperature) {
+      alert('Invalid data detected. Please ensure all fields are properly filled.');
+      return;
+    }
+
+    try {
+      await createPartographyEncounter(patientUuid, 'temperature', {
+        value: formData.temperature,
+        time: formData.exactTime,
+      });
+      await mutateTemperatureData();
+      setIsTemperatureFormOpen(false);
+    } catch (error) {
+      alert('Failed to save temperature data.');
+    }
+  };
+
+  const handleUrineTestFormSubmit = async (formData: {
+    timeSlot: string;
+    exactTime: string;
+    protein: string;
+    acetone: string;
+    volume: number;
+    timeSampleCollected: string;
+    timeResultsReturned: string;
+  }) => {
+    if (
+      !formData.timeSlot ||
+      !formData.exactTime ||
+      !formData.protein ||
+      !formData.acetone ||
+      !formData.volume ||
+      !formData.timeSampleCollected ||
+      !formData.timeResultsReturned
+    ) {
+      alert('Invalid data detected. Please ensure all fields are properly filled.');
+      return;
+    }
+
+    const labelToUuid = (label: string) => {
+      switch (label) {
+        case '0':
+          return PARTOGRAPHY_CONCEPTS['zero'] || '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        case '+':
+          return PARTOGRAPHY_CONCEPTS['one-plus'] || '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        case '++':
+          return PARTOGRAPHY_CONCEPTS['two-plus'] || '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        case '+++':
+          return PARTOGRAPHY_CONCEPTS['three-plus'] || '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+        default:
+          return label;
+      }
+    };
+
+    try {
+      const now = new Date();
+      const pad = (n) => n.toString().padStart(2, '0');
+      const currentTime = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+      await createPartographyEncounter(patientUuid, 'urine-analysis', {
+        proteinLevel: labelToUuid(formData.protein),
+        ketoneLevel: labelToUuid(formData.acetone),
+        volume: formData.volume,
+        timeSampleCollected: formData.timeSampleCollected,
+        timeResultsReturned: formData.timeResultsReturned,
+        eventDescription: `Time Slot: ${currentTime}`,
+      });
+      setIsUrineTestFormOpen(false);
+    } catch (error) {
+      alert('Failed to save urine test data.');
+    }
+  };
+
+  const getMembraneAmnioticFluidTableData = () => {
+    return membraneAmnioticFluidEntries.map((data, index) => ({
+      id: data.id || `maf-${index}`,
+      date: data.date,
+      timeSlot: data.timeSlot || '',
+      exactTime: data.time || '',
+      amnioticFluid: data.amnioticFluid,
+      moulding: data.moulding,
+    }));
+  };
+
+  const getFetalHeartRateTableData = () => {
+    return computedFetalHeartRateData.map((data, index) => {
+      const getStatus = (value: number) => {
+        if (value < 100) {
+          return 'Low';
+        }
+        if (value >= 100 && value <= 180) {
+          return 'Normal';
+        }
+        return 'High';
+      };
+
+      return {
+        id: `fhr-${index}`,
+        date: new Date().toLocaleDateString(),
+        time: data.time || 'N/A',
+        hour: `${data.hour}${data.hour % 1 === 0.5 ? '.5' : ''}hr`,
+        value: `${data.value} bpm`,
+        status: getStatus(data.value),
+      };
+    });
+  };
+
+  const getCervicalContractionsTableData = () => {
+    return cervicalContractionsData.map((encounter, index) => {
+      let timeSlot = '';
+      let contractionCount = '';
+      let contractionLevel = '';
+      if (Array.isArray(encounter.obs)) {
+        for (const obs of encounter.obs) {
+          if (
+            obs.concept.uuid === PARTOGRAPHY_CONCEPTS['event-description'] &&
+            typeof obs.value === 'string' &&
+            obs.value.startsWith('Time:')
+          ) {
+            const match = obs.value.match(/Time:\s*(.+)/);
+            if (match) {
+              timeSlot = match[1].trim();
+            }
+          }
+
+          if (obs.concept.uuid === PARTOGRAPHY_CONCEPTS['contraction-count']) {
+            contractionCount = String(obs.value);
+          }
+
+          const contractionOption = CONTRACTION_INTENSITY_OPTIONS.find((opt) => opt.conceptUuid === obs.concept.uuid);
+          if (contractionOption) {
+            contractionLevel = contractionOption.value;
+          }
+        }
+      }
+      return {
+        id: `cc-${index}`,
+        date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+        timeSlot,
+        contractionCount,
+        contractionLevel,
+      };
+    });
+  };
+
+  const getOxytocinTableData = () => {
+    return loadedOxytocinData.map((data, index) => {
+      return {
+        id: `oxy-${index}`,
+        date: data.encounterDatetime ? new Date(data.encounterDatetime).toLocaleDateString() : '',
+        time: data.time || '',
+        dropsPerMinute:
+          data.dropsPerMinute !== null && data.dropsPerMinute !== undefined
+            ? `${data.dropsPerMinute} drops/min`
+            : 'N/A',
+      };
+    });
+  };
+
+  const getDrugsIVFluidsTableData = () => {
+    const drugOrdersData = loadedDrugOrders.map((order) => ({
+      id: order.id,
+      date: order.date,
+      drugName: order.drugName,
+      dosage: order.dosage,
+      route: order.route,
+      frequency: order.frequency,
+      source: 'order',
+    }));
+
+    const manualEntriesData = localDrugsIVFluidsData.map((data, index) => ({
+      id: `manual-${index}`,
+      date: new Date().toLocaleDateString(),
+      drugName: data.drugName,
+      dosage: data.dosage,
+      route: data.route || '',
+      frequency: data.frequency || '',
+      source: 'manual',
+    }));
+
+    const combinedData = [...drugOrdersData, ...manualEntriesData];
+
+    return combinedData;
+  };
+
+  const getPulseBPTableData = () => {
+    const bpMap = (loadedBPData || []).reduce((acc, encounter) => {
+      const systolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['systolic-bp']);
+      const diastolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['diastolic-bp']);
+      if (systolicObs && diastolicObs) {
+        acc[encounter.encounterDatetime] = {
+          systolicBP: typeof systolicObs.value === 'number' ? systolicObs.value : parseFloat(systolicObs.value),
+          diastolicBP: typeof diastolicObs.value === 'number' ? diastolicObs.value : parseFloat(diastolicObs.value),
+          date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+          time: new Date(encounter.encounterDatetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        };
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    return (loadedPulseData || []).map((encounter, index) => {
+      const pulseObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']);
+      const pulse = pulseObs
+        ? typeof pulseObs.value === 'number'
+          ? pulseObs.value
+          : parseFloat(pulseObs.value)
+        : null;
+      const date = new Date(encounter.encounterDatetime).toLocaleDateString();
+      const time = new Date(encounter.encounterDatetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const bp = bpMap[encounter.encounterDatetime] || {};
+      return {
+        id: `pulse-bp-${index}`,
+        pulse,
+        systolicBP: bp.systolicBP ?? '',
+        diastolicBP: bp.diastolicBP ?? '',
+        date,
+        time,
+      };
+    });
+  };
+
+  const getTemperatureTableData = () => {
+    return loadedTemperatureData.map((encounter, index) => {
+      const tempObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['temperature']);
+      const timeObs = encounter.obs.find(
+        (obs) =>
+          obs.concept.uuid === PARTOGRAPHY_CONCEPTS['event-description'] &&
+          typeof obs.value === 'string' &&
+          obs.value.startsWith('Time:'),
+      );
+      let time = '';
+      if (timeObs && typeof timeObs.value === 'string') {
+        const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
+        if (timeMatch) {
+          time = timeMatch[1].trim();
+        }
+      }
+      let temperature = tempObs?.value ?? null;
+      if (typeof temperature === 'string') {
+        const parsed = parseFloat(temperature);
+        temperature = isNaN(parsed) ? null : parsed;
+      }
+      return {
+        id: `temperature-${index}`,
+        date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+        timeSlot: '',
+        exactTime: time,
+        temperature,
+      };
+    });
+  };
+
+  const getUrineTestTableData = () => urineTestData;
 
   const handleViewModeChange = (graphId: string, mode: 'graph' | 'table') => {
     setViewMode((prev) => ({
@@ -221,15 +1488,122 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   };
 
   const getTableData = (graph) => {
-    const currentHook = graphDataHooks[graph.id];
-
-    if (!currentHook?.encounters) {
-      return [];
+    if (graph.id === 'cervix') {
+      return loadedCervixData
+        .filter((data) => {
+          return (
+            !isNaN(data.hour) &&
+            !isNaN(data.cervicalDilation) &&
+            !isNaN(data.descentOfHead) &&
+            data.time &&
+            data.time.trim() !== ''
+          );
+        })
+        .map((data, index) => ({
+          id: `cervix-${index}`,
+          date: new Date(data.encounterDatetime).toLocaleDateString() || 'N/A',
+          actualTime: new Date(data.encounterDatetime).toLocaleTimeString() || 'N/A',
+          cervicalDilation: `${data.cervicalDilation} cm`,
+          descentOfHead: `${data.descentOfHead}`,
+          hourInput: `${data.hour} hr`,
+          formTime: data.time || 'N/A',
+        }));
     }
 
-    const transformedData = transformEncounterToTableData(currentHook.encounters, graph.id, t);
+    if (graph.id === 'membrane-amniotic-fluid') {
+      return membraneAmnioticFluidEntries.map((data, index) => ({
+        id: data.id || `maf-${index}`,
+        date: data.date,
+        timeSlot: data.timeSlot || '',
+        exactTime: data.time || '',
+        amnioticFluid: data.amnioticFluid,
+        moulding: data.moulding,
+      }));
+    }
 
-    return transformedData;
+    if (localPartographyData[graph.id] && localPartographyData[graph.id].length > 0) {
+      return localPartographyData[graph.id].map((item, index) => ({
+        id: `${graph.id}-${index}`,
+        time: item.time || 'N/A',
+        value: item.value || item.measurementValue || 'N/A',
+        date: new Date(item.timestamp).toLocaleDateString() || 'N/A',
+        ...item,
+      }));
+    }
+
+    return ENABLE_DUMMY_DATA ? generateDummyTableData(graph.id) : [];
+  };
+
+  const generateDummyTableData = (graphId: string) => {
+    const baseEntries = [
+      { time: '08:00', date: new Date().toLocaleDateString() },
+      { time: '09:00', date: new Date().toLocaleDateString() },
+      { time: '10:00', date: new Date().toLocaleDateString() },
+      { time: '11:00', date: new Date().toLocaleDateString() },
+      { time: '12:00', date: new Date().toLocaleDateString() },
+    ];
+
+    switch (graphId) {
+      case 'fetal-heart-rate':
+        return baseEntries.map((entry, index) => ({
+          id: `fhr-${index}`,
+          date: entry.date,
+          time: entry.time,
+          value: `${140 + Math.floor(Math.random() * 20)} bpm`,
+        }));
+
+      case 'maternal-pulse':
+        return baseEntries.map((entry, index) => ({
+          id: `pulse-${index}`,
+          date: entry.date,
+          time: entry.time,
+          value: `${75 + Math.floor(Math.random() * 15)} bpm`,
+        }));
+
+      case 'blood-pressure':
+        return baseEntries.map((entry, index) => ({
+          id: `bp-${index}`,
+          date: entry.date,
+          time: entry.time,
+          systolic: `${115 + Math.floor(Math.random() * 10)} mmHg`,
+          diastolic: `${75 + Math.floor(Math.random() * 5)} mmHg`,
+        }));
+
+      case 'temperature':
+        return baseEntries.map((entry, index) => ({
+          id: `temp-${index}`,
+          date: entry.date,
+          time: entry.time,
+          value: `${(36.5 + Math.random() * 0.8).toFixed(1)} °C`,
+        }));
+
+      case 'uterine-contractions':
+        return baseEntries.map((entry, index) => ({
+          id: `contractions-${index}`,
+          date: entry.date,
+          time: entry.time,
+          value: `${Math.floor(Math.random() * 4) + 2} per 10 min`,
+          duration: `${Math.floor(Math.random() * 20) + 30} sec`,
+        }));
+
+      default:
+        return [];
+    }
+  };
+
+  const getTableHeaders = (graph) => {
+    if (graph.id === 'cervix') {
+      return [
+        { key: 'date', header: t('date', 'Date') },
+        { key: 'actualTime', header: t('actualTime', 'Actual Time') },
+        { key: 'cervicalDilation', header: t('cervicalDilation', 'Cervical Dilation') },
+        { key: 'descentOfHead', header: t('descentOfHead', 'Descent of Head') },
+        { key: 'hourInput', header: t('hourInput', 'Hour Input') },
+        { key: 'formTime', header: t('formTime', 'Form Time') },
+      ];
+    }
+
+    return getPartographyTableHeaders(t);
   };
 
   const getValueStatus = (value: number, graph) => {
@@ -258,8 +1632,8 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     return 'normal';
   };
 
-  const renderGraph = (graph) => {
-    const chartData = graphData[graph.id] || [];
+  const renderGraph = (graph: GraphDefinition, index: number, totalGraphs: number) => {
+    const patientChartData: ChartDataPoint[] = graphData[graph.id] || [];
     const currentViewMode = viewMode[graph.id] || 'graph';
     const tableData = getTableData(graph);
     const currentPageNum = currentPage[graph.id] || 1;
@@ -271,43 +1645,152 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     const endIndex = startIndex + currentPageSize;
     const paginatedData = tableData.slice(startIndex, endIndex);
 
-    const chartOptions = {
+    let finalChartData: ChartDataPoint[] = patientChartData;
+    let zeroTime: Date | undefined;
+    let maxChartTime: Date | undefined;
+
+    let timeLabelsData: { hours: string; time: string; span: number }[] = [];
+
+    let chartOptions: any = {
       title: graph.title,
       axes: {
         bottom: {
           title: t('time', 'Time'),
           mapsTo: 'time',
           scaleType: ScaleTypes.LABELS,
+          grid: {
+            enabled: true,
+            strokeWidth: 1,
+            strokeDasharray: '1,1',
+          },
         },
         left: {
           title: graph.yAxisLabel,
           mapsTo: 'value',
           scaleType: ScaleTypes.LINEAR,
           domain: [graph.yMin, graph.yMax],
+          grid: {
+            enabled: true,
+            strokeWidth: 1,
+            strokeDasharray: '1,1',
+          },
         },
       },
-      curve: 'curveMonotoneX',
+      curve: 'curveLinear',
       height: '500px',
       color: {
         scale: {
-          [chartData[0]?.group]: getColorForGraph(graph.color),
+          [patientChartData[0]?.group || graph.id]: getColorForGraph(graph.color),
           Systolic: '#ff6b6b',
           Diastolic: '#4ecdc4',
         },
       },
       points: {
         enabled: true,
-        radius: 4,
+        radius: 5,
+        strokeWidth: 2,
+        fill: true,
       },
       grid: {
         x: {
           enabled: true,
+          strokeWidth: 1,
+          strokeDasharray: '1,1',
         },
         y: {
           enabled: true,
+          strokeWidth: 1,
+          strokeDasharray: '1,1',
         },
       },
+      legend: {
+        position: 'bottom',
+        clickable: false,
+      },
+      theme: 'white',
+      toolbar: {
+        enabled: false,
+      },
     };
+
+    if (graph.id !== 'cervix') {
+      chartOptions.axes.bottom.title = undefined;
+      chartOptions.axes.bottom.tick = {
+        formatter: () => '',
+      };
+    }
+
+    if (graph.id === 'cervix') {
+      chartOptions = {
+        ...chartOptions,
+        ...CERVIX_CHART_OPTIONS,
+        title: graph.title,
+        color: {
+          scale: {
+            'Alert Line': '#FFD700',
+            'Action Line': '#FF0000',
+            'Cervical Dilation': '#22C55E',
+            'Descent of Head': '#2563EB',
+            [graph.id]: getColorForGraph(graph.color),
+          },
+        },
+        legend: {
+          position: 'top',
+        },
+      };
+
+      const ALERT_START_CM = 4;
+      const CERVIX_DILATION_MAX = 10;
+      const ALERT_ACTION_DIFFERENCE_HOURS = 4;
+      const EXPECTED_LABOR_DURATION_HOURS = 6;
+
+      const staticLinesData: ChartDataPoint[] = [
+        { hour: 0, value: ALERT_START_CM, group: 'Alert Line' },
+        { hour: EXPECTED_LABOR_DURATION_HOURS, value: CERVIX_DILATION_MAX, group: 'Alert Line' },
+
+        { hour: ALERT_ACTION_DIFFERENCE_HOURS, value: ALERT_START_CM, group: 'Action Line' },
+        {
+          hour: ALERT_ACTION_DIFFERENCE_HOURS + EXPECTED_LABOR_DURATION_HOURS,
+          value: CERVIX_DILATION_MAX,
+          group: 'Action Line',
+        },
+      ];
+
+      const cervicalDilationData: ChartDataPoint[] = cervixFormData.map((data) => ({
+        hour: data.hour,
+        value: data.cervicalDilation,
+        group: 'Cervical Dilation',
+        time: data.time,
+      }));
+
+      const descentOfHeadData: ChartDataPoint[] = cervixFormData.map((data) => ({
+        hour: data.hour,
+        value: data.descentOfHead,
+        group: 'Descent of Head',
+        time: data.time,
+      }));
+
+      finalChartData = [...patientChartData, ...staticLinesData, ...cervicalDilationData, ...descentOfHeadData];
+
+      timeLabelsData = [];
+
+      const maxHours = Math.max(10, Math.max(...cervixFormData.map((d) => d.hour), 0) + 1);
+
+      for (let i = 0; i < Math.min(maxHours, 10); i++) {
+        const hourLabel = i === 0 ? '0' : `${i}hr`;
+
+        const formDataForHour = cervixFormData.find((data) => data.hour === i);
+        const timeValue = formDataForHour ? formDataForHour.time : '--:--';
+
+        timeLabelsData.push({
+          hours: hourLabel,
+          time: timeValue,
+          span: 1,
+        });
+      }
+    }
+
+    const shouldRenderChart = finalChartData.length > 0;
 
     return (
       <div className={styles.graphContainer} key={graph.id}>
@@ -346,38 +1829,109 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
         {currentViewMode === 'graph' ? (
           <>
-            <div className={styles.chartContainer}>
+            <div className={styles.chartContainer} data-chart-id={graph.id}>
               {isGraphLoading ? (
-                <div className={styles.loadingContainer}>
-                  <p>{t('loadingData', 'Loading data...')}</p>
-                </div>
-              ) : chartData.length > 0 ? (
-                <LineChart data={chartData} options={chartOptions} />
+                <GraphSkeleton />
               ) : (
-                <div className={styles.emptyState}>
-                  <p>{t('noDataAvailable', 'No data available for this graph')}</p>
-                  <Button
-                    kind="primary"
-                    size={controlSize}
-                    renderIcon={Add}
-                    onClick={() => handleAddDataPoint(graph.id)}>
-                    {t('addFirstDataPoint', 'Add first data point')}
-                  </Button>
-                </div>
+                <>
+                  {shouldRenderChart ? (
+                    <div className={graph.id === 'cervix' ? 'cervix-chart-wrapper' : ''}>
+                      <LineChart data={finalChartData} options={chartOptions} />
+                    </div>
+                  ) : (
+                    <LineChart
+                      data={[{ group: graph.title, time: t('noData', 'No Data'), value: graph.yMin }]}
+                      options={{
+                        ...chartOptions,
+                        axes: {
+                          ...chartOptions.axes,
+                          bottom: {
+                            ...chartOptions.axes.bottom,
+                            mapsTo: 'time',
+                            title: undefined,
+                            tick: {
+                              formatter: () => '',
+                            },
+                          },
+                        },
+                        legend: {
+                          enabled: false,
+                        },
+                        points: {
+                          enabled: false,
+                        },
+                        color: {
+                          scale: {
+                            [graph.title]: '#d0d0d0',
+                          },
+                        },
+                      }}
+                    />
+                  )}
+                </>
               )}
             </div>
-            {chartData.length > 0 && !isGraphLoading && (
+
+            {graph.id === 'cervix' && timeLabelsData.length > 0 && (
+              <div
+                className={styles.customTimeLabelsContainer}
+                style={{ '--visible-columns': Math.min(10, timeLabelsData.length) } as React.CSSProperties}>
+                <div className={styles.customTimeLabelsRow}>
+                  <div className={styles.customTimeLabelHeader}>Hours</div>
+                  {timeLabelsData.map((data, index) => (
+                    <div
+                      key={`hours-${index}`}
+                      className={styles.customTimeLabelCell}
+                      style={{
+                        gridColumnEnd: `span ${data.span}`,
+                        backgroundColor: '#f4f4f4',
+                        fontWeight: 700,
+                      }}>
+                      {data.hours}
+                    </div>
+                  ))}
+                </div>
+
+                <div className={styles.customTimeLabelsRow}>
+                  <div className={styles.customTimeLabelHeader}>Time</div>
+                  {timeLabelsData.map((data, index) => (
+                    <div
+                      key={`time-${index}`}
+                      className={styles.customTimeLabelCell}
+                      style={{ gridColumnEnd: `span ${data.span}` }}>
+                      {data.time}
+                    </div>
+                  ))}
+                </div>
+
+                {timeLabelsData.length > 10 && (
+                  <div
+                    style={{
+                      fontSize: '12px',
+                      color: '#666',
+                      textAlign: 'center',
+                      padding: '4px',
+                      backgroundColor: '#f0f0f0',
+                      borderTop: '1px solid #ddd',
+                    }}>
+                    ← Scroll horizontally to view all {timeLabelsData.length} hours →
+                  </div>
+                )}
+              </div>
+            )}
+
+            {patientChartData.length > 0 && !isGraphLoading && (
               <div className={styles.chartStats}>
                 <div className={styles.statItem}>
                   <span className={styles.statLabel}>{t('latest', 'Latest')}:</span>
                   <span className={styles.statValue}>
-                    {chartData[chartData.length - 1]?.value?.toFixed(1)} {graph.yAxisLabel}
+                    {patientChartData[patientChartData.length - 1]?.value?.toFixed(1)} {graph.yAxisLabel}
                   </span>
                 </div>
                 <div className={styles.statItem}>
                   <span className={styles.statLabel}>{t('average', 'Average')}:</span>
                   <span className={styles.statValue}>
-                    {(chartData.reduce((sum, item) => sum + item.value, 0) / chartData.length).toFixed(1)}{' '}
+                    {(patientChartData.reduce((sum, item) => sum + item.value, 0) / patientChartData.length).toFixed(1)}{' '}
                     {graph.yAxisLabel}
                   </span>
                 </div>
@@ -387,12 +1941,10 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         ) : (
           <div className={styles.tableContainer}>
             {isGraphLoading ? (
-              <div className={styles.loadingContainer}>
-                <p>{t('loadingData', 'Loading data...')}</p>
-              </div>
+              <TableSkeleton />
             ) : paginatedData.length > 0 ? (
               <>
-                <DataTable rows={paginatedData} headers={getPartographyTableHeaders(t)}>
+                <DataTable rows={paginatedData} headers={getTableHeaders(graph)}>
                   {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
                     <TableContainer title="" description="">
                       <Table {...getTableProps()} size="sm">
@@ -411,7 +1963,11 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                               {row.cells.map((cell) => {
                                 let cellContent = cell.value;
 
-                                if (cell.info.header === 'value' && row.cells.find((c) => c.info.header === 'value')) {
+                                if (
+                                  graph.id !== 'cervix' &&
+                                  cell.info.header === 'value' &&
+                                  row.cells.find((c) => c.info.header === 'value')
+                                ) {
                                   const cellValue = cell.value;
                                   const status = getValueStatus(parseFloat(cellValue), graph);
                                   const statusClass =
@@ -480,18 +2036,158 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       <Layer>
         <Grid>
           <Column lg={16} md={8} sm={4}>
-            <Tabs selectedIndex={selectedTab} onChange={(data) => setSelectedTab(data.selectedIndex)}>
-              <TabList className={styles.tabList} aria-label="Partography graphs">
-                {partographGraphs.map((graph) => (
-                  <Tab key={graph.id}>{graph.title}</Tab>
-                ))}
-              </TabList>
-              <TabPanels>
-                {partographGraphs.map((graph) => (
-                  <TabPanel key={graph.id}>{renderGraph(graph)}</TabPanel>
-                ))}
-              </TabPanels>
-            </Tabs>
+            <FetalHeartRateGraph
+              data={computedFetalHeartRateData}
+              tableData={getFetalHeartRateTableData()}
+              viewMode={fetalHeartRateViewMode}
+              currentPage={fetalHeartRateCurrentPage}
+              pageSize={fetalHeartRatePageSize}
+              totalItems={getFetalHeartRateTableData().length}
+              controlSize={controlSize}
+              onAddData={() => setIsFetalHeartRateFormOpen(true)}
+              onViewModeChange={setFetalHeartRateViewMode}
+              onPageChange={setFetalHeartRateCurrentPage}
+              onPageSizeChange={setFetalHeartRatePageSize}
+              isAddButtonDisabled={false}
+            />
+
+            <MembraneAmnioticFluidGraph
+              data={membraneAmnioticFluidEntries}
+              tableData={membraneAmnioticFluidEntries}
+              viewMode={membraneAmnioticFluidViewMode}
+              currentPage={membraneAmnioticFluidCurrentPage}
+              pageSize={membraneAmnioticFluidPageSize}
+              totalItems={membraneAmnioticFluidEntries.length}
+              controlSize={controlSize}
+              onAddData={() => setIsMembraneAmnioticFluidFormOpen(true)}
+              onViewModeChange={setMembraneAmnioticFluidViewMode}
+              onPageChange={setMembraneAmnioticFluidCurrentPage}
+              onPageSizeChange={setMembraneAmnioticFluidPageSize}
+              isAddButtonDisabled={false}
+            />
+
+            <div className={styles.partographyGrid}>
+              {partographGraphs.map((graph, index) => renderGraph(graph, index, partographGraphs.length))}
+            </div>
+
+            <CervicalContractionsGraph
+              data={transformEncounterToTableData(cervicalContractionsData || [], 'uterine-contractions').map(
+                (row, index) => ({
+                  id: row.id || `cc-${index}`,
+                  date: row.dateTime?.split(' — ')[0] || '',
+                  timeSlot: row.timeSlot || '',
+                  contractionCount: row.contractionCount || '',
+                  contractionLevel: row.contractionLevel || 'none',
+                }),
+              )}
+              tableData={transformEncounterToTableData(cervicalContractionsData || [], 'uterine-contractions')}
+              viewMode={cervicalContractionsViewMode}
+              currentPage={cervicalContractionsCurrentPage}
+              pageSize={cervicalContractionsPageSize}
+              totalItems={transformEncounterToTableData(cervicalContractionsData || [], 'uterine-contractions').length}
+              controlSize={controlSize}
+              onAddData={() => setIsCervicalContractionsFormOpen(true)}
+              onViewModeChange={setCervicalContractionsViewMode}
+              onPageChange={setCervicalContractionsCurrentPage}
+              onPageSizeChange={setCervicalContractionsPageSize}
+              isAddButtonDisabled={false}
+            />
+
+            <OxytocinGraph
+              data={loadedOxytocinData.map((item) => ({
+                timeSlot: item.time ?? '',
+                oxytocinUsed: typeof item.dropsPerMinute === 'number' && item.dropsPerMinute > 0 ? 'yes' : 'no',
+                dropsPerMinute: typeof item.dropsPerMinute === 'number' ? item.dropsPerMinute : 0,
+                date: item.encounterDatetime ? new Date(item.encounterDatetime).toLocaleDateString() : '',
+                id: item.uuid || undefined,
+              }))}
+              tableData={loadedOxytocinData.map((item, index) => ({
+                id: item.uuid || `oxy-${index}`,
+                date: item.encounterDatetime ? new Date(item.encounterDatetime).toLocaleDateString() : '',
+                timeSlot: item.time ?? '',
+                oxytocinUsed: typeof item.dropsPerMinute === 'number' && item.dropsPerMinute > 0 ? 'yes' : 'no',
+                dropsPerMinute: typeof item.dropsPerMinute === 'number' ? `${item.dropsPerMinute} drops/min` : 'N/A',
+              }))}
+              viewMode={oxytocinViewMode}
+              currentPage={oxytocinCurrentPage}
+              pageSize={oxytocinPageSize}
+              totalItems={loadedOxytocinData.length}
+              controlSize={controlSize}
+              onAddData={() => setIsOxytocinFormOpen(true)}
+              onViewModeChange={setOxytocinViewMode}
+              onPageChange={setOxytocinCurrentPage}
+              onPageSizeChange={setOxytocinPageSize}
+              isAddButtonDisabled={false}
+            />
+
+            <DrugsIVFluidsGraph
+              data={getDrugsIVFluidsTableData()}
+              tableData={getDrugsIVFluidsTableData()}
+              viewMode={drugsIVFluidsViewMode}
+              currentPage={drugsIVFluidsCurrentPage}
+              pageSize={drugsIVFluidsPageSize}
+              totalItems={getDrugsIVFluidsTableData().length}
+              controlSize={controlSize}
+              onAddData={() => {}}
+              onViewModeChange={setDrugsIVFluidsViewMode}
+              onPageChange={setDrugsIVFluidsCurrentPage}
+              onPageSizeChange={setDrugsIVFluidsPageSize}
+              isAddButtonDisabled={false}
+              onDrugsIVFluidsSubmit={handleDrugsIVFluidsFormSubmit}
+              onDataSaved={handleDrugOrderDataSaved}
+            />
+
+            <PulseBPGraph
+              data={getPulseBPTableData()}
+              tableData={getPulseBPTableData()}
+              viewMode={pulseBPViewMode}
+              currentPage={pulseBPCurrentPage}
+              pageSize={pulseBPPageSize}
+              totalItems={getPulseBPTableData().length}
+              controlSize={controlSize}
+              onAddData={() => {}}
+              onViewModeChange={setPulseBPViewMode}
+              onPageChange={setPulseBPCurrentPage}
+              onPageSizeChange={setPulseBPPageSize}
+              isAddButtonDisabled={false}
+              onPulseBPSubmit={handlePulseBPFormSubmit}
+            />
+
+            <TemperatureGraph
+              data={getTemperatureTableData()}
+              tableData={getTemperatureTableData()}
+              viewMode={temperatureViewMode}
+              currentPage={temperatureCurrentPage}
+              pageSize={temperaturePageSize}
+              totalItems={getTemperatureTableData().length}
+              controlSize={controlSize}
+              onAddData={() => {
+                const now = new Date();
+                const hh = String(now.getHours()).padStart(2, '0');
+                const mm = String(now.getMinutes()).padStart(2, '0');
+                setTemperatureFormInitialTime(`${hh}:${mm}`);
+                setIsTemperatureFormOpen(true);
+              }}
+              onViewModeChange={setTemperatureViewMode}
+              onPageChange={setTemperatureCurrentPage}
+              onPageSizeChange={setTemperaturePageSize}
+              isAddButtonDisabled={false}
+            />
+            <UrineTestGraph
+              data={urineTestData}
+              tableData={urineTestData}
+              viewMode={urineTestViewMode}
+              currentPage={urineTestCurrentPage}
+              pageSize={urineTestPageSize}
+              totalItems={urineTestData.length}
+              controlSize={controlSize}
+              onAddData={() => setIsUrineTestFormOpen(true)}
+              onViewModeChange={setUrineTestViewMode}
+              onPageChange={setUrineTestCurrentPage}
+              onPageSizeChange={setUrineTestPageSize}
+              isAddButtonDisabled={false}
+            />
+
             {isFormOpen && (
               <PartographyDataForm
                 isOpen={isFormOpen}
@@ -499,6 +2195,65 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 onSubmit={handleFormSubmit}
                 graphType={selectedGraphType}
                 graphTitle={partographGraphs.find((g) => g.id === selectedGraphType)?.title || ''}
+              />
+            )}
+            {isCervixFormOpen && (
+              <CervixForm
+                isOpen={isCervixFormOpen}
+                onClose={handleCervixFormClose}
+                onSubmit={handleCervixFormSubmit}
+                onDataSaved={handleCervixDataSaved}
+                selectedHours={selectedHours}
+                existingTimeEntries={computedExistingTimeEntries}
+                existingCervixData={existingCervixData}
+              />
+            )}
+            {isFetalHeartRateFormOpen && (
+              <FetalHeartRateForm
+                isOpen={isFetalHeartRateFormOpen}
+                onClose={handleFetalHeartRateFormClose}
+                onSubmit={handleFetalHeartRateFormSubmit}
+                onDataSaved={handleFetalHeartRateDataSaved}
+                existingTimeEntries={computedExistingTimeEntries}
+              />
+            )}
+            {isMembraneAmnioticFluidFormOpen && (
+              <MembraneAmnioticFluidForm
+                isOpen={isMembraneAmnioticFluidFormOpen}
+                onClose={handleMembraneAmnioticFluidFormClose}
+                onSubmit={handleMembraneAmnioticFluidFormSubmit}
+              />
+            )}
+            {isCervicalContractionsFormOpen && (
+              <CervicalContractionsForm
+                isOpen={isCervicalContractionsFormOpen}
+                onClose={handleCervicalContractionsFormClose}
+                onSubmit={handleCervicalContractionsFormSubmit}
+              />
+            )}
+            {isOxytocinFormOpen && (
+              <OxytocinForm
+                isOpen={isOxytocinFormOpen}
+                onClose={handleOxytocinFormClose}
+                onSubmit={handleOxytocinFormSubmit}
+                existingTimeEntries={existingTimeEntries}
+              />
+            )}
+            {isTemperatureFormOpen && (
+              <TemperatureForm
+                isOpen={isTemperatureFormOpen}
+                onClose={() => setIsTemperatureFormOpen(false)}
+                onSubmit={handleTemperatureFormSubmit}
+                initialTime={temperatureFormInitialTime}
+                existingTimeEntries={existingTimeEntries}
+              />
+            )}
+            {isUrineTestFormOpen && (
+              <UrineTestForm
+                isOpen={isUrineTestFormOpen}
+                onClose={() => setIsUrineTestFormOpen(false)}
+                onSubmit={handleUrineTestFormSubmit}
+                existingTimeEntries={existingTimeEntries}
               />
             )}
           </Column>
