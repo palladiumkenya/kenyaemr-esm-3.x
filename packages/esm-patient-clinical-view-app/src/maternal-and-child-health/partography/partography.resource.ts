@@ -1,9 +1,10 @@
 import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   PARTOGRAPHY_CONCEPTS,
   PARTOGRAPHY_ENCOUNTER_TYPES,
+  MCH_PARTOGRAPHY_ENCOUNTER_UUID,
   getPartographyUnit,
   type OpenMRSResponse,
   type PartographyObservation,
@@ -250,6 +251,102 @@ function loadPartographyData(patientUuid: string, graphType: string): Partograph
   }
 }
 
+export function useMembraneAmnioticFluidData(patientUuid: string) {
+  const fetcher = (url: string) => openmrsFetch(url).then((res) => res.json());
+
+  const { data, error, isLoading, mutate } = useSWR(
+    patientUuid
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${MCH_PARTOGRAPHY_ENCOUNTER_UUID}&v=full&limit=100&order=desc`
+      : null,
+    fetcher,
+    {
+      onError: (error) => {},
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+    },
+  );
+
+  const membraneAmnioticFluidEntries = useMemo(() => {
+    try {
+      if (!data?.results || !Array.isArray(data.results)) {
+        return [];
+      }
+
+      const entries = [];
+      for (const encounter of data.results) {
+        if (!encounter.obs || !Array.isArray(encounter.obs)) {
+          continue;
+        }
+
+        const amnioticFluidObs = encounter.obs.find(
+          (obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['amniotic-fluid'],
+        );
+        const mouldingObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['moulding']);
+        const timeObs = encounter.obs.find(
+          (obs) =>
+            obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'] &&
+            typeof obs.value === 'string' &&
+            obs.value.startsWith('Time:'),
+        );
+
+        let time = '';
+        if (timeObs && typeof timeObs.value === 'string') {
+          const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
+          if (timeMatch) {
+            time = timeMatch[1].trim();
+          }
+        }
+
+        if (amnioticFluidObs || mouldingObs) {
+          entries.push({
+            id: `maf-${encounter.uuid}`,
+            uuid: encounter.uuid,
+            amnioticFluid: amnioticFluidObs?.value?.display || amnioticFluidObs?.value || '',
+            moulding: mouldingObs?.value?.display || mouldingObs?.value || '',
+            time,
+            date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+            encounterDatetime: encounter.encounterDatetime,
+          });
+        }
+      }
+      return entries;
+    } catch (error) {
+      return [];
+    }
+  }, [data]);
+
+  return {
+    membraneAmnioticFluidEntries,
+    isLoading,
+    error,
+    mutate,
+  };
+}
+
+export async function saveMembraneAmnioticFluidData(
+  patientUuid: string,
+  formData: { amnioticFluid: string; moulding: string; time: string },
+  locationUuid?: string,
+  providerUuid?: string,
+) {
+  try {
+    const result = await createPartographyEncounter(
+      patientUuid,
+      'membrane-amniotic-fluid',
+      formData,
+      locationUuid,
+      providerUuid,
+    );
+    if (result?.success && result?.encounter) {
+      return result;
+    } else {
+      throw new Error(result?.message || 'Failed to save membrane amniotic fluid data');
+    }
+  } catch (error) {
+    throw new Error(error?.message || 'Failed to save membrane amniotic fluid data');
+  }
+}
+
 export async function createPartographyEncounter(
   patientUuid: string,
   graphType: string,
@@ -275,7 +372,23 @@ export async function createPartographyEncounter(
       );
     }
 
-    const finalLocationUuid = locationUuid || getDefaultLocationUuid();
+    let finalLocationUuid = locationUuid;
+
+    if (!finalLocationUuid) {
+      try {
+        const sessionResponse = await openmrsFetch(`${restBaseUrl}/session`);
+        if (sessionResponse.ok) {
+          const sessionData = await sessionResponse.json();
+          if (sessionData.sessionLocation?.uuid) {
+            finalLocationUuid = sessionData.sessionLocation.uuid;
+          }
+        }
+      } catch (error) {}
+
+      if (!finalLocationUuid) {
+        finalLocationUuid = getDefaultLocationUuid();
+      }
+    }
 
     const timeConfig = getTimeConfig();
     const encounterDatetime = toOmrsIsoString(new Date(Date.now() - timeConfig.defaultEncounterOffset));
@@ -338,6 +451,20 @@ export async function createPartographyEncounter(
       } catch (validationError) {}
     }
 
+    // Validate required fields before making API call
+    if (!patientUuid) {
+      throw new Error('Patient UUID is required');
+    }
+    if (!finalLocationUuid) {
+      throw new Error('Location UUID is required');
+    }
+    if (!encounterTypeUuid) {
+      throw new Error('Encounter type UUID is required');
+    }
+    if (!observations || observations.length === 0) {
+      throw new Error('At least one observation is required');
+    }
+
     const response = await openmrsFetch(`${restBaseUrl}/encounter`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -346,117 +473,11 @@ export async function createPartographyEncounter(
 
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-
       try {
         const responseText = await response.text();
         if (responseText) {
           try {
             const detailedError = JSON.parse(responseText);
-
-            if (
-              detailedError.error &&
-              detailedError.error.fieldErrors &&
-              detailedError.error.fieldErrors.encounterType
-            ) {
-              const availableTypes = await discoverEncounterTypes();
-              let retryEncounterType = null;
-
-              const retryFallbackTypes = getRetryFallbackTypes();
-              for (const fallback of retryFallbackTypes) {
-                if (availableTypes[fallback]) {
-                  retryEncounterType = availableTypes[fallback];
-                  break;
-                }
-              }
-              if (!retryEncounterType && Object.keys(availableTypes).length > 0) {
-                retryEncounterType = Object.values(availableTypes)[0];
-              }
-
-              if (retryEncounterType) {
-                const retryPayload = { ...encounterPayload, encounterType: retryEncounterType };
-                const retryResponse = await openmrsFetch(`${restBaseUrl}/encounter`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(retryPayload),
-                });
-
-                if (retryResponse.ok) {
-                  const encounter = await retryResponse.json();
-
-                  try {
-                    await saveToLocalStorage(patientUuid, graphType, formData, encounter.uuid);
-                  } catch (localError) {}
-
-                  return {
-                    success: true,
-                    message:
-                      t?.('partographyDataSavedFallbackEncounter', 'Partography data saved successfully') ||
-                      'Partography data saved successfully',
-                    encounter,
-                  };
-                }
-              }
-            }
-
-            const isProviderConstraintError =
-              (detailedError.error.fieldErrors && detailedError.error.fieldErrors.encounterProviders) ||
-              (detailedError.error.message && detailedError.error.message.includes('provider_id'));
-
-            if (isProviderConstraintError) {
-              const retryPayloadWithoutProvider = { ...encounterPayload };
-              delete retryPayloadWithoutProvider.encounterProviders;
-
-              const retryResponse = await openmrsFetch(`${restBaseUrl}/encounter`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(retryPayloadWithoutProvider),
-              });
-
-              if (retryResponse.ok) {
-                const encounter = await retryResponse.json();
-
-                try {
-                  await saveToLocalStorage(patientUuid, graphType, formData, encounter.uuid);
-                } catch (localError) {}
-
-                return {
-                  success: true,
-                  message:
-                    t?.('partographyDataSavedWithoutProvider', 'Partography data saved successfully') ||
-                    'Partography data saved successfully',
-                  encounter,
-                };
-              }
-            }
-
-            if (detailedError.error.fieldErrors && detailedError.error.fieldErrors.encounterDatetime) {
-              const timeConfig = getTimeConfig();
-              const earlierDatetime = toOmrsIsoString(new Date(Date.now() - timeConfig.retryEncounterOffset));
-              const retryPayload = { ...encounterPayload, encounterDatetime: earlierDatetime };
-
-              const retryResponse = await openmrsFetch(`${restBaseUrl}/encounter`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(retryPayload),
-              });
-
-              if (retryResponse.ok) {
-                const encounter = await retryResponse.json();
-
-                try {
-                  await saveToLocalStorage(patientUuid, graphType, formData, encounter.uuid);
-                } catch (localError) {}
-
-                return {
-                  success: true,
-                  message:
-                    t?.('partographyDataSavedAdjustedDatetime', 'Partography data saved successfully') ||
-                    'Partography data saved successfully',
-                  encounter,
-                };
-              }
-            }
-
             if (detailedError.error) {
               if (detailedError.error.message) {
                 errorMessage += ` - ${detailedError.error.message}`;
@@ -470,7 +491,6 @@ export async function createPartographyEncounter(
           }
         }
       } catch (e) {}
-
       throw new Error(errorMessage);
     }
 
@@ -486,10 +506,6 @@ export async function createPartographyEncounter(
       }, timeConfig.cacheInvalidationDelay);
     } catch (mutateError) {}
 
-    try {
-      await saveToLocalStorage(patientUuid, graphType, formData, encounter.uuid);
-    } catch (localError) {}
-
     return {
       success: true,
       message:
@@ -498,24 +514,14 @@ export async function createPartographyEncounter(
       encounter,
     };
   } catch (error) {
-    try {
-      await saveToLocalStorage(patientUuid, graphType, formData);
-      return {
-        success: true,
-        message:
-          t?.('partographyDataSavedLocalStorage', 'Partography data saved to local storage') ||
-          'Partography data saved to local storage',
-      };
-    } catch (localError) {
-      return {
-        success: false,
-        message:
-          t?.('failedToSavePartographyData', 'Failed to save partography data: {{error}}')?.replace(
-            '{{error}}',
-            error.message,
-          ) || `Failed to save partography data: ${error.message}`,
-      };
-    }
+    return {
+      success: false,
+      message:
+        t?.('failedToSavePartographyData', 'Failed to save partography data: {{error}}')?.replace(
+          '{{error}}',
+          error.message,
+        ) || `Failed to save partography data: ${error.message}`,
+    };
   }
 }
 
@@ -555,13 +561,82 @@ function buildObservations(graphType: string, formData: any): any[] {
   const obsDatetime = toOmrsIsoString(new Date(Date.now() - timeConfig.defaultEncounterOffset));
 
   switch (graphType) {
-    case 'fetal-heart-rate':
-      if (formData.value || formData.measurementValue) {
+    case 'membrane-amniotic-fluid':
+      if (formData.time) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['fetal-heart-rate'],
-          value: parseFloat(formData.value || formData.measurementValue),
+          concept: PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'],
+          value: `Time: ${formData.time}`,
           obsDatetime,
         });
+      }
+      const amnioticFluidMap = {
+        'Membrane intact': '164899AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Clear liquor': '159484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Meconium Stained': '134488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        Absent: '163747AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Blood Stained': '1077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      };
+      let amnioticFluidValue = formData.amnioticFluid;
+      if (amnioticFluidValue && amnioticFluidMap[amnioticFluidValue]) {
+        amnioticFluidValue = amnioticFluidMap[amnioticFluidValue];
+      }
+      if (amnioticFluidValue) {
+        observations.push({
+          concept: '162653AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          value: amnioticFluidValue,
+          obsDatetime,
+        });
+      }
+      const mouldingMap = {
+        '0': '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+': '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '++': '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+++': '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      };
+      let mouldingValue = formData.moulding;
+      if (mouldingValue && mouldingMap[mouldingValue]) {
+        mouldingValue = mouldingMap[mouldingValue];
+      }
+      if (mouldingValue) {
+        observations.push({
+          concept: '166527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          value: mouldingValue,
+          obsDatetime,
+        });
+      }
+      break;
+    case 'fetal-heart-rate':
+      if (formData.fetalHeartRate || formData.value || formData.measurementValue) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['fetal-heart-rate'],
+          value: parseFloat(formData.fetalHeartRate || formData.value || formData.measurementValue),
+          obsDatetime,
+        });
+      }
+
+      if (formData.hour !== undefined && formData.hour !== '') {
+        try {
+          const hourValue = parseFloat(formData.hour);
+
+          if (hourValue >= 0 && hourValue <= 24) {
+            const hourText = `Hour: ${hourValue}`;
+            observations.push({
+              concept: PARTOGRAPHY_CONCEPTS['fetal-heart-rate-hour'],
+              value: hourText,
+              obsDatetime,
+            });
+          }
+        } catch (error) {}
+      }
+
+      if (formData.time) {
+        try {
+          observations.push({
+            concept: PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'],
+            value: `Time: ${formData.time}`,
+            obsDatetime,
+          });
+        } catch (error) {}
       }
       break;
 
@@ -679,10 +754,10 @@ function buildObservations(graphType: string, formData: any): any[] {
       break;
 
     case 'drugs-fluids':
-      if (formData.medication) {
+      if (formData.medication || formData.drugName) {
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['medication'],
-          value: formData.medication,
+          value: formData.medication || formData.drugName,
           obsDatetime,
         });
       }
@@ -690,6 +765,20 @@ function buildObservations(graphType: string, formData: any): any[] {
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['dosage'],
           value: formData.dosage,
+          obsDatetime,
+        });
+      }
+      if (formData.route) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['event-description'],
+          value: `Route: ${formData.route}`,
+          obsDatetime,
+        });
+      }
+      if (formData.frequency) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['event-description'],
+          value: `Frequency: ${formData.frequency}`,
           obsDatetime,
         });
       }
@@ -833,11 +922,9 @@ export function transformEncounterToChartData(encounters: PartographyEncounter[]
   });
 
   return chartData.sort((a, b) => {
-    // Parse time strings (HH:MM format) for comparison
     const timeA = a.time.split(':').map(Number);
     const timeB = b.time.split(':').map(Number);
 
-    // Convert to minutes for easy comparison
     const minutesA = timeA[0] * 60 + (timeA[1] || 0);
     const minutesB = timeB[0] * 60 + (timeB[1] || 0);
 
@@ -1021,4 +1108,203 @@ export function transformEncounterToTableData(
   return tableData.sort(
     (a, b) => new Date(a.dateTime.split(' — ')[0]).getTime() - new Date(b.dateTime.split(' — ')[0]).getTime(),
   );
+}
+
+export function useFetalHeartRateData(patientUuid: string) {
+  const fetcher = (url: string) => openmrsFetch(url).then((res) => res.json());
+
+  const { data, error, isLoading, mutate } = useSWR(
+    patientUuid
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${MCH_PARTOGRAPHY_ENCOUNTER_UUID}&v=full&limit=100&order=desc`
+      : null,
+    fetcher,
+    {
+      onError: (error) => {},
+    },
+  );
+
+  const fetalHeartRateData = useMemo(() => {
+    try {
+      if (!data?.results || !Array.isArray(data.results)) {
+        return [];
+      }
+
+      const fetalHeartRateEntries = [];
+
+      for (const encounter of data.results) {
+        if (!encounter.obs || !Array.isArray(encounter.obs)) {
+          continue;
+        }
+
+        const fetalHeartRateObs = encounter.obs.find(
+          (obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate'],
+        );
+
+        if (fetalHeartRateObs) {
+          const encounterDatetime = new Date(encounter.encounterDatetime);
+
+          let hour = 0;
+          let time = '';
+
+          const hourObs = encounter.obs.find(
+            (obs) =>
+              obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-hour'] &&
+              obs.value &&
+              typeof obs.value === 'string' &&
+              obs.value.startsWith('Hour:'),
+          );
+
+          const timeObs = encounter.obs.find(
+            (obs) =>
+              obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'] &&
+              obs.value &&
+              typeof obs.value === 'string' &&
+              obs.value.startsWith('Time:'),
+          );
+
+          if (hourObs && typeof hourObs.value === 'string') {
+            const hourMatch = hourObs.value.match(/Hour:\s*([0-9.]+)/);
+            if (hourMatch) {
+              hour = parseFloat(hourMatch[1]) || 0;
+            }
+          }
+
+          if (timeObs && typeof timeObs.value === 'string') {
+            const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
+            if (timeMatch) {
+              time = timeMatch[1].trim();
+            }
+          }
+
+          const entry = {
+            id: `fhr-${fetalHeartRateObs.uuid}`,
+            uuid: fetalHeartRateObs.uuid,
+            encounterUuid: encounter.uuid,
+            fetalHeartRate: parseFloat(fetalHeartRateObs.value) || 0,
+            hour,
+            time,
+            date: encounterDatetime.toLocaleDateString(),
+            encounterDatetime: encounterDatetime.toISOString(),
+            obsDatetime: fetalHeartRateObs.obsDatetime,
+          };
+
+          fetalHeartRateEntries.push(entry);
+        }
+      }
+
+      const sortedEntries = fetalHeartRateEntries.sort(
+        (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
+      );
+
+      return sortedEntries;
+    } catch (error) {
+      return [];
+    }
+  }, [data]);
+
+  return {
+    fetalHeartRateData,
+    isLoading,
+    error,
+    mutate,
+  };
+}
+
+export async function saveFetalHeartRateData(
+  patientUuid: string,
+  formData: { hour: number; time: string; fetalHeartRate: number },
+  locationUuid?: string,
+  providerUuid?: string,
+) {
+  try {
+    const result = await createPartographyEncounter(
+      patientUuid,
+      'fetal-heart-rate',
+      formData,
+      locationUuid,
+      providerUuid,
+    );
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: error?.message || 'Failed to save fetal heart rate data',
+    };
+  }
+}
+
+export async function saveDrugOrderData(
+  patientUuid: string,
+  formData: {
+    drugName: string;
+    dosage: string;
+    route: string;
+    frequency: string;
+  },
+) {
+  try {
+    const result = await createPartographyEncounter(patientUuid, 'drugs-fluids', formData);
+
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      message: error?.message || 'Failed to save drug order data',
+    };
+  }
+}
+
+export function useDrugOrders(patientUuid: string) {
+  const apiUrl = patientUuid
+    ? `${restBaseUrl}/order?patient=${patientUuid}&orderType=131168f4-15f5-102d-96e4-000c29c2a5d7&v=full&limit=50`
+    : null;
+
+  const { data, error, isLoading, mutate } = useSWR(apiUrl, openmrsFetch);
+
+  const drugOrders = useMemo(() => {
+    const responseData = data?.data as any;
+
+    if (!responseData?.results || !Array.isArray(responseData.results)) {
+      return [];
+    }
+
+    const allOrders = responseData.results;
+    const activeOrders = allOrders
+      .filter((order: any) => order.action === 'NEW' && !order.dateStopped)
+      .sort((a: any, b: any) => {
+        const dateA = a.dateActivated ? new Date(a.dateActivated).getTime() : 0;
+        const dateB = b.dateActivated ? new Date(b.dateActivated).getTime() : 0;
+        return dateB - dateA;
+      });
+
+    const processedOrders = activeOrders.map((order: any) => {
+      const processed = {
+        id: order.uuid,
+        drugName: order.drug?.display || order.drugNonCoded || 'Unknown Drug',
+        dosage: `${order.dose || ''} ${order.doseUnits?.display || ''}`.trim(),
+        route: order.route?.display || '',
+        frequency: order.frequency?.display || '',
+        date: order.dateActivated ? new Date(order.dateActivated).toLocaleDateString() : '',
+        orderNumber: order.orderNumber,
+        display: order.display,
+        quantity: order.quantity,
+        duration: order.duration,
+        durationUnits: order.durationUnits?.display,
+        asNeeded: order.asNeeded,
+        instructions: order.instructions,
+        orderer: order.orderer?.display,
+      };
+      return processed;
+    });
+
+    return processedOrders;
+  }, [data]);
+
+  return {
+    drugOrders,
+    isLoading,
+    error,
+    mutate,
+  };
 }

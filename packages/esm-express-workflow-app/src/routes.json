@@ -241,13 +241,8 @@
         "hideDashboardTitle": true
       }
     },
-    {
-      "component": "triageDashboard",
-      "name": "triage-dashboard",
-      "slot": "triage-dashboard-slot"
-    },
-        {
 
+        {
       "name": "ewf-pharmacy-dashboard",
       "component": "pharmacyTabs",
       "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
