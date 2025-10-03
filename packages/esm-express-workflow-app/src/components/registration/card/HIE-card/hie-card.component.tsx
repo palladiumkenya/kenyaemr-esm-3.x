@@ -166,7 +166,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
     return {
       onRequestOtp: async (phoneNumber: string): Promise<void> => {
         setActivePhoneNumbers((prev) => new Map(prev.set(patientUuid, phoneNumber)));
-        await otpManager.requestOTP(phoneNumber, patientName, otpExpiryMinutes);
+        await otpManager.requestOTP(phoneNumber, patientName, otpExpiryMinutes, searchedNationalId);
       },
       onVerify: async (otp: string): Promise<void> => {
         const activePhone = activePhoneNumbers.get(patientUuid) || initialPhone;
