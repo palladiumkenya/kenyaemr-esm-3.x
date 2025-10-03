@@ -2,40 +2,37 @@
   "name": "@kenyaemr/esm-billing-app",
   "version": "5.4.1",
   "description": "Billing app for KenyaEMR",
-  "browser": "dist/kenyaemr-esm-billing-app.js",
-  "main": "src/index.ts",
-  "source": true,
-  "license": "MPL-2.0",
-  "homepage": "https://github.com/palladiumkenya/kenyaemr-esm-core#readme",
-  "scripts": {
-    "start": "openmrs develop",
-    "serve": "webpack serve --mode=development",
-    "debug": "npm run serve",
-    "build": "webpack --mode production",
-    "analyze": "webpack --mode=production --env.analyze=true",
-    "lint": "eslint src --ext ts,tsx",
-    "typescript": "tsc",
-    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
-    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
-    "coverage": "yarn test --coverage"
-  },
-  "browserslist": [
-    "extends browserslist-config-openmrs"
-  ],
   "keywords": [
     "openmrs"
   ],
-  "publishConfig": {
-    "access": "public"
+  "homepage": "https://github.com/palladiumkenya/kenyaemr-esm-core#readme",
+  "bugs": {
+    "url": "https://github.com/palladiumkenya/kenyaemr-esm-core/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/palladiumkenya/kenyaemr-esm-core#readme"
   },
-  "bugs": {
-    "url": "https://github.com/palladiumkenya/kenyaemr-esm-core/issues"
+  "license": "MPL-2.0",
+  "main": "src/index.ts",
+  "source": true,
+  "browser": "dist/kenyaemr-esm-billing-app.js",
+  "scripts": {
+    "analyze": "rspack --mode=production --env analyze=true",
+    "build": "rspack --mode=production",
+    "coverage": "yarn test --coverage",
+    "debug": "npm run serve",
+    "extract-translations": "i18next 'src/**/*.component.tsx' 'src/index.ts' --config ../../tools/i18next-parser.config.js",
+    "lint": "eslint src --ext ts,tsx",
+    "serve": "rspack serve --mode=development",
+    "start": "openmrs develop",
+    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
+    "test:watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
+    "typescript": "tsc"
   },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
   "dependencies": {
     "lodash-es": "^4.17.15",
     "react-to-print": "2.14.13"
@@ -48,7 +45,7 @@
     "react-router-dom": "6.x",
     "swr": "2.x"
   },
-  "devDependencies": {
-    "webpack": "^5.99.9"
+  "publishConfig": {
+    "access": "public"
   }
 }

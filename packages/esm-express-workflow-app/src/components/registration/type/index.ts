@@ -1,3 +1,5 @@
+import { OpenmrsResource } from '@openmrs/esm-framework';
+
 export interface LocalPatientApiResponse {
   results: LocalResponse;
 }
@@ -255,3 +257,48 @@ export interface OtpResponse {
   success: boolean;
   message: string;
 }
+
+export interface Queue {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+  location: Location;
+  service: Concept;
+  allowedPriorities: Array<Concept>;
+  allowedStatuses: Array<Concept>;
+}
+export interface Concept extends OpenmrsResource {
+  setMembers?: Array<Concept>;
+}
+export type DependentWithPhone =
+  | HIEPatient
+  | {
+      id: string;
+      name: string;
+      relationship: string;
+      phoneNumber?: string;
+      email?: string;
+      gender: string;
+      birthDate: string;
+      shaNumber?: string;
+      nationalId?: string;
+      birthCertificate?: string;
+      contactData?: {
+        id: string;
+        extension?: {
+          url: string;
+          valueString?: string;
+          valueIdentifier?: {
+            use: string;
+            type: { coding: { system: string; code: string; display: string }[] };
+            value: string;
+          };
+        }[];
+        relationship: { coding: { system: string; code: string; display: string }[] }[];
+        name: { text: string; family: string; given: string[] };
+        address: { extension?: { url: string; valueString?: string }[]; city: string; country: string };
+        gender: string;
+        telecom?: { system: string; value: string }[];
+      };
+    };

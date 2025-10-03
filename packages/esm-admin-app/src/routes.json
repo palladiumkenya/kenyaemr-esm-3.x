@@ -32,7 +32,7 @@
     {
       "component": "providerBanner",
       "name": "provider-banner",
-      "slot": "top-nav-info-slot",
+      "slot": "provider-banner-info-slot",
       "order":1
     }
   ],

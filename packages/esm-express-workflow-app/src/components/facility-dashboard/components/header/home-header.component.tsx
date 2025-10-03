@@ -2,7 +2,13 @@ import React, { useCallback, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { MultiSelect } from '@carbon/react';
-import { PageHeader, PageHeaderContent, AppointmentsPictogram, OpenmrsDatePicker } from '@openmrs/esm-framework';
+import {
+  PageHeader,
+  PageHeaderContent,
+  AppointmentsPictogram,
+  OpenmrsDatePicker,
+  ExtensionSlot,
+} from '@openmrs/esm-framework';
 import styles from './home-header.scss';
 
 interface HomeHeaderProps {
@@ -27,8 +33,11 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ title, onDateChange }) => {
   };
 
   return (
-    <PageHeader className={styles.header} data-testid="home-header">
-      <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
+    <>
+      <PageHeader className={styles.header} data-testid="home-header">
+        <PageHeaderContent illustration={<AppointmentsPictogram />} title={title} />
+        <ExtensionSlot name="provider-banner-info-slot" />
+      </PageHeader>
       <div className={styles.dateFilters}>
         <div className={styles.dateInput}>
           <OpenmrsDatePicker
@@ -51,7 +60,7 @@ const HomeHeader: React.FC<HomeHeaderProps> = ({ title, onDateChange }) => {
           />
         </div>
       </div>
-    </PageHeader>
+    </>
   );
 };
 

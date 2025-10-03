@@ -17,7 +17,6 @@
     {
       "name": "care-panel-summary-dashboard-link",
       "component": "carePanelSummaryDashboardLink",
-      "slot": "patient-chart-dashboard-slot",
       "order": 3,
       "meta": {
         "columns": 1,
@@ -84,6 +83,13 @@
       "canHide": true,
       "width": "extra-wide",
       "groups": ["ward-patient"]
+    },
+    
+    {
+      "name": "mch-program-form-workspace",
+      "component": "mchProgramForm",
+      "title": "Program Form",
+      "type": "workspace"
     }
   ]
 }

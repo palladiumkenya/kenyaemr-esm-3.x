@@ -2,6 +2,7 @@ import {
   Button,
   ButtonSet,
   Column,
+  ComboBox,
   Form,
   InlineLoading,
   InlineNotification,
@@ -11,11 +12,10 @@ import {
   Stack,
   TextInput,
   TextInputSkeleton,
-  ComboBox,
 } from '@carbon/react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { navigate, showSnackbar, toOmrsIsoString, useConfig, useSession } from '@openmrs/esm-framework';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { navigate, showModal, showSnackbar, toOmrsIsoString, useConfig, useSession } from '@openmrs/esm-framework';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -25,45 +25,28 @@ import { BillingConfig } from '../../../config-schema';
 import { useSystemSetting } from '../../../hooks/getMflCode';
 import usePatientDiagnosis from '../../../hooks/usePatientDiagnosis';
 import useProvider from '../../../hooks/useProvider';
-import { LineItem, MappedBill } from '../../../types';
-import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
-import { processClaims, SHAPackagesAndInterventionVisitAttribute, useVisit } from './claims-form.resource';
 import useProviderList from '../../../hooks/useProviderList';
+import { ClaimSummary, LineItem, MappedBill, OTPVerificationModalOptions } from '../../../types';
+import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
+import { ClaimsFormSchema, ClaimsFormSchemaBase, processClaims, useVisit } from './claims-form.resource';
 
-import styles from './claims-form.scss';
 import debounce from 'lodash-es/debounce';
+import { otpManager } from '../../../hooks/useOTP';
+import { usePhoneNumberAttribute } from '../../../hooks/usePhoneNumber';
 import { formatDateTime } from '../../utils';
+import styles from './claims-form.scss';
+import ClaimsSupportingDocumentsInput from './claims-supporting-documents-inputs.form';
 
 type ClaimsFormProps = {
   bill: MappedBill;
   selectedLineItems: LineItem[];
 };
 
-const ClaimsFormSchemaBase = z.object({
-  claimExplanation: z.string(),
-  claimJustification: z.string(),
-  diagnoses: z.array(z.string()),
-  visitType: z.string(),
-  facility: z.string(),
-  treatmentStart: z.string(),
-  treatmentEnd: z.string(),
-  packages: z.array(z.string()),
-  interventions: z.array(z.string()),
-  provider: z.string(),
-});
-
-const ClaimsFormSchema = z.object({
-  claimExplanation: z.string().min(1, { message: 'Claim explanation is required' }),
-  claimJustification: z.string().min(1, { message: 'Claim justification is required' }),
-  diagnoses: z.array(z.string()).min(1, { message: 'At least one diagnosis is required' }),
-  visitType: z.string().min(1, { message: 'Visit type is required' }),
-  facility: z.string().min(1, { message: 'Facility is required' }),
-  treatmentStart: z.string().min(1, { message: 'Treatment start date is required' }),
-  treatmentEnd: z.string().min(1, { message: 'Treatment end date is required' }),
-  packages: z.array(z.string()).min(1, { message: 'At least one package is required' }),
-  interventions: z.array(z.string()).min(1, { message: 'At least one intervention is required' }),
-  provider: z.string().min(1, { message: 'Provider is required' }),
-});
+enum OTPState {
+  NOT_STARTED = 'not_started',
+  REQUESTED = 'requested',
+  VERIFIED = 'verified',
+}
 
 const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
@@ -74,33 +57,22 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const {
     currentProvider: { uuid: providerUuid },
   } = useSession();
-  const { providerLoading: providerLoading, provider, error: providerError } = useProvider(providerUuid);
+  const { providerLoading, provider, error: providerError } = useProvider(providerUuid);
   const { visitAttributeTypes } = useConfig<BillingConfig>();
   const { providers, providersLoading } = useProviderList();
+  const { phoneNumber } = usePhoneNumberAttribute(patientUuid);
 
-  const packagesAndinterventions = useMemo(() => {
-    if (recentVisit) {
-      const values = recentVisit.attributes?.find(
-        (attr) => attr.attributeType.uuid === visitAttributeTypes.shaBenefitPackagesAndInterventions,
-      )?.value;
-      if (values) {
-        const payload: SHAPackagesAndInterventionVisitAttribute = JSON.parse(values);
-        return payload;
-      }
-    }
-    return null;
-  }, [recentVisit, visitAttributeTypes]);
-
-  const encounterUuid = recentVisit?.encounters[0]?.uuid;
-  const visitTypeUuid = recentVisit?.visitType.uuid;
-  const [loading, setLoading] = useState(false);
+  const [otpState, setOtpState] = useState<OTPState>(OTPState.NOT_STARTED);
+  const [pendingClaimData, setPendingClaimData] = useState<z.infer<typeof ClaimsFormSchema> | null>(null);
   const [formInitialized, setFormInitialized] = useState(false);
   const [validationEnabled, setValidationEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [currentOtpPhoneNumber, setCurrentOtpPhoneNumber] = useState<string>('');
 
-  const handleNavigateToBillingOptions = () =>
-    navigate({
-      to: window.getOpenmrsSpaBase() + `home/billing/patient/${patientUuid}/${billUuid}`,
-    });
+  const currentPhoneRef = useRef<string>('');
+
+  const patientName = `${bill.patientName}`;
+  const otpExpiryMinutes = 5;
 
   const form = useForm<z.infer<typeof ClaimsFormSchema>>({
     mode: 'onTouched',
@@ -122,17 +94,14 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid, isDirty, touchedFields },
+    formState: { errors, isValid, touchedFields },
     setValue,
-    reset,
     trigger,
     watch,
   } = form;
 
   const packages = watch('packages');
   const interventions = watch('interventions');
-  const claimExplanation = watch('claimExplanation');
-  const claimJustification = watch('claimJustification');
 
   const debouncedValidation = useCallback(
     debounce(() => {
@@ -140,7 +109,6 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         trigger();
       }
     }, 500),
-    // eslint-disable-line react-hooks/exhaustive-deps
     [formInitialized, trigger],
   );
 
@@ -157,8 +125,24 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         facility: `${recentVisit?.location?.display || ''} - ${mflCodeValue || ''}`,
         treatmentStart: formatDateTime(recentVisit?.startDatetime || ''),
         treatmentEnd: formatDateTime(recentVisit?.stopDatetime || ''),
-        packages: packagesAndinterventions?.packages ?? [],
-        interventions: packagesAndinterventions?.interventions ?? [],
+        packages: recentVisit?.attributes?.find(
+          (attr) => attr.attributeType.uuid === visitAttributeTypes.shaBenefitPackagesAndInterventions,
+        )?.value
+          ? JSON.parse(
+              recentVisit.attributes.find(
+                (attr) => attr.attributeType.uuid === visitAttributeTypes.shaBenefitPackagesAndInterventions,
+              ).value,
+            ).packages
+          : [],
+        interventions: recentVisit?.attributes?.find(
+          (attr) => attr.attributeType.uuid === visitAttributeTypes.shaBenefitPackagesAndInterventions,
+        )?.value
+          ? JSON.parse(
+              recentVisit.attributes.find(
+                (attr) => attr.attributeType.uuid === visitAttributeTypes.shaBenefitPackagesAndInterventions,
+              ).value,
+            ).interventions
+          : [],
         provider: providerUuid,
       };
 
@@ -176,21 +160,87 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     mflCodeValue,
     setValue,
     provider,
-    packagesAndinterventions,
     visitLoading,
     diagnosisLoading,
     providerLoading,
     providerUuid,
+    visitAttributeTypes,
   ]);
 
-  const onSubmit = async (data: z.infer<typeof ClaimsFormSchema>) => {
-    setValidationEnabled(true);
-    const isFormValid = await trigger();
-    if (!isFormValid) {
-      return;
-    }
+  const generateClaimSummary = (data: z.infer<typeof ClaimsFormSchema>): ClaimSummary => {
+    const billServiceNames = selectedLineItems.map((item) => item.billableService);
+    const services = billServiceNames.map((service) => service.replace(/^[a-f0-9-]+:/, '').trim());
+    const totalAmount = selectedLineItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
+    return {
+      totalAmount,
+      facility: recentVisit?.location?.display || '',
+      totalItems: selectedLineItems.length,
+      services: services.join(', '),
+      startDate: data.treatmentStart,
+      endDate: data.treatmentEnd,
+    };
+  };
+
+  const createDynamicOTPHandlers = useCallback(
+    (initialPhone: string) => {
+      currentPhoneRef.current = initialPhone;
+
+      return {
+        onRequestOtp: async (phoneNumber: string): Promise<void> => {
+          if (currentPhoneRef.current && currentPhoneRef.current !== phoneNumber) {
+            otpManager.transferOTP(currentPhoneRef.current, phoneNumber);
+          }
+
+          setCurrentOtpPhoneNumber(phoneNumber);
+          currentPhoneRef.current = phoneNumber;
+
+          const currentFormData = form.getValues();
+          if (!currentFormData || !selectedLineItems?.length) {
+            throw new Error('No claim data available for OTP request');
+          }
+
+          const claimSummary = generateClaimSummary(currentFormData);
+          await otpManager.requestOTP(phoneNumber, patientName, claimSummary, otpExpiryMinutes);
+        },
+        onVerify: async (otp: string): Promise<void> => {
+          const phoneForVerification = currentPhoneRef.current;
+
+          if (!phoneForVerification) {
+            throw new Error('No phone number available for verification');
+          }
+
+          const isValid = await otpManager.verifyOTP(phoneForVerification, otp);
+          if (!isValid) {
+            throw new Error('OTP verification failed');
+          }
+        },
+      };
+    },
+    [patientName, form, selectedLineItems, otpExpiryMinutes],
+  );
+
+  const launchOtpVerificationModal = (props: OTPVerificationModalOptions) => {
+    const dispose = showModal('otp-verification-modal', {
+      ...props,
+      onClose: () => {
+        if (otpState === OTPState.REQUESTED) {
+          setOtpState(OTPState.NOT_STARTED);
+        }
+        dispose();
+      },
+      size: 'xs',
+    });
+    return dispose;
+  };
+
+  const handleOTPVerificationSuccess = async (): Promise<void> => {
+    setOtpState(OTPState.VERIFIED);
+  };
+
+  const processClaim = async (data: z.infer<typeof ClaimsFormSchema>) => {
     setLoading(true);
+
     const providedItems = selectedLineItems.reduce((acc, item) => {
       acc[item.uuid] = {
         items: [
@@ -216,35 +266,43 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
       diagnoses: data.diagnoses,
       paidInFacility: true,
       patient: patientUuid,
-      visitType: visitTypeUuid,
+      visitType: recentVisit?.visitType?.uuid,
       guaranteeId: 'G-001',
       claimCode: 'C-001',
       provider: data.provider,
-      visitUuid: recentVisit.uuid,
-      encounterUuid: encounterUuid,
+      visitUuid: recentVisit?.uuid,
+      encounterUuid: recentVisit?.encounters?.[0]?.uuid,
       use: 'claim',
       insurer: 'SHA',
       billNumber: billUuid,
       packages: data.packages,
       interventions: data.interventions,
+      supportingDocuments: data.supportingDocuments ?? [],
     };
 
     try {
       await processClaims(payload);
+
       showSnackbar({
         kind: 'success',
         title: t('processClaim', 'Process Claim'),
-        subtitle: t('sendClaim', 'Claim sent successfully'),
-        timeoutInMs: 3000,
+        subtitle: t('claimProcessedSuccessfully', 'Claim processed and sent successfully'),
+        timeoutInMs: 4000,
         isLowContrast: true,
       });
+
+      setOtpState(OTPState.NOT_STARTED);
+      setPendingClaimData(null);
+      setCurrentOtpPhoneNumber('');
+      currentPhoneRef.current = '';
+      otpManager.clearAllOTPs();
+
       setTimeout(() => {
         navigate({
           to: window.getOpenmrsSpaBase() + 'home/billing/',
         });
       }, 1000);
     } catch (err) {
-      console.error(err);
       showSnackbar({
         kind: 'error',
         title: t('claimError', 'Claim Error'),
@@ -255,6 +313,78 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleInitiateOTPVerification = async (data: z.infer<typeof ClaimsFormSchema>) => {
+    setValidationEnabled(true);
+    const isFormValid = await trigger();
+    if (!isFormValid) {
+      return;
+    }
+
+    if (!phoneNumber) {
+      showSnackbar({
+        kind: 'error',
+        title: t('noPhoneNumber', 'No Phone Number'),
+        subtitle: t(
+          'noPhoneNumberMessage',
+          'No phone number found for this patient. Please update patient information.',
+        ),
+        timeoutInMs: 4000,
+        isLowContrast: false,
+      });
+      return;
+    }
+
+    setPendingClaimData(data);
+    setOtpState(OTPState.REQUESTED);
+    setCurrentOtpPhoneNumber(phoneNumber);
+    currentPhoneRef.current = phoneNumber;
+
+    const dynamicHandlers = createDynamicOTPHandlers(phoneNumber);
+
+    setTimeout(() => {
+      launchOtpVerificationModal({
+        otpLength: 5,
+        obscureText: false,
+        phoneNumber: phoneNumber,
+        expiryMinutes: otpExpiryMinutes,
+        onRequestOtp: dynamicHandlers.onRequestOtp,
+        onVerify: dynamicHandlers.onVerify,
+        onVerificationSuccess: handleOTPVerificationSuccess,
+      });
+    }, 0);
+  };
+
+  const handleProcessVerifiedClaim = async () => {
+    if (pendingClaimData && otpState === OTPState.VERIFIED) {
+      await processClaim(pendingClaimData);
+    }
+  };
+
+  const handleReopenOTPModal = () => {
+    const dynamicHandlers = createDynamicOTPHandlers(phoneNumber);
+
+    launchOtpVerificationModal({
+      otpLength: 5,
+      obscureText: false,
+      phoneNumber: currentOtpPhoneNumber || phoneNumber,
+      expiryMinutes: otpExpiryMinutes,
+      onRequestOtp: dynamicHandlers.onRequestOtp,
+      onVerify: dynamicHandlers.onVerify,
+      onVerificationSuccess: handleOTPVerificationSuccess,
+    });
+  };
+
+  const handleDiscardClaim = () => {
+    setOtpState(OTPState.NOT_STARTED);
+    setPendingClaimData(null);
+    setCurrentOtpPhoneNumber('');
+    currentPhoneRef.current = '';
+    otpManager.clearAllOTPs();
+    navigate({
+      to: window.getOpenmrsSpaBase() + `home/billing/patient/${patientUuid}/${billUuid}`,
+    });
   };
 
   if (visitLoading || diagnosisLoading || providerLoading) {
@@ -288,9 +418,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     return validationEnabled && errors[fieldName] && (touchedFields[fieldName] || formInitialized);
   };
 
+  const isFormValid = isValid && packages?.length > 0 && interventions?.length > 0 && selectedLineItems?.length > 0;
+  const displayPhoneNumber = currentOtpPhoneNumber || phoneNumber;
+
   return (
     <FormProvider {...form}>
-      <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
+      <Form className={styles.form}>
         {!selectedLineItems?.length && (
           <div className={styles.notificationContainer}>
             <InlineNotification
@@ -303,6 +436,49 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             />
           </div>
         )}
+
+        {!displayPhoneNumber && (
+          <div className={styles.notificationContainer}>
+            <InlineNotification
+              kind="warning"
+              title={t('noPhoneNumber', 'No Phone Number')}
+              subtitle={t(
+                'noPhoneNumberFound',
+                'No phone number found for this patient. OTP verification will not be available.',
+              )}
+              hideCloseButton={true}
+              lowContrast={true}
+              className={styles.notification}
+            />
+          </div>
+        )}
+
+        {otpState === OTPState.REQUESTED && (
+          <div className={styles.notificationContainer}>
+            <InlineNotification
+              kind="info"
+              title={t('otpVerificationPending', 'OTP Verification Pending')}
+              subtitle={t('otpVerificationPendingMessage', 'Please complete OTP verification to process the claim')}
+              hideCloseButton={true}
+              lowContrast={true}
+              className={styles.notification}
+            />
+          </div>
+        )}
+
+        {otpState === OTPState.VERIFIED && (
+          <div className={styles.notificationContainer}>
+            <InlineNotification
+              kind="success"
+              title={t('otpVerified', 'OTP Verified')}
+              subtitle={t('otpVerifiedReadyToProcess', 'OTP has been verified. Click "Process Claim" to submit.')}
+              hideCloseButton={true}
+              lowContrast={true}
+              className={styles.notification}
+            />
+          </div>
+        )}
+
         <Stack gap={4} className={styles.grid}>
           <span className={styles.claimFormTitle}>{t('formTitle', 'Fill in the form details')}</span>
           <Row className={styles.formClaimRow}>
@@ -440,27 +616,45 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             validationEnabled={validationEnabled}
             onInteraction={() => setValidationEnabled(true)}
           />
+          <ClaimsSupportingDocumentsInput patientUuid={patientUuid} />
           <ButtonSet className={styles.buttonSet}>
-            <Button className={styles.button} kind="secondary" onClick={handleNavigateToBillingOptions}>
+            <Button className={styles.button} kind="secondary" onClick={handleDiscardClaim}>
               {t('discardClaim', 'Discard Claim')}
             </Button>
-            <Button
-              className={styles.button}
-              kind="primary"
-              type="submit"
-              onClick={() => setValidationEnabled(true)}
-              disabled={
-                loading || !isValid || !packages?.length || !interventions?.length || !selectedLineItems?.length
-              }
-              tooltipPosition="top"
-              tooltipAlignment="center"
-              renderIcon={loading ? InlineLoading : undefined}>
-              {loading ? (
-                <InlineLoading description={t('processing', 'Processing...')} />
-              ) : (
-                <>{t('processClaim', 'Process Claim')}</>
-              )}
-            </Button>
+
+            {otpState === OTPState.NOT_STARTED && (
+              <Button
+                className={styles.button}
+                kind="primary"
+                onClick={handleSubmit(handleInitiateOTPVerification)}
+                disabled={!isFormValid || !displayPhoneNumber}
+                tooltipPosition="top"
+                tooltipAlignment="center">
+                {t('sendOtp', 'Send OTP')}
+              </Button>
+            )}
+
+            {otpState === OTPState.REQUESTED && (
+              <Button className={styles.button} kind="ghost" onClick={handleReopenOTPModal}>
+                {t('enterOtp', 'Enter OTP')}
+              </Button>
+            )}
+
+            {otpState === OTPState.VERIFIED && (
+              <Button
+                className={styles.button}
+                kind="primary"
+                onClick={handleProcessVerifiedClaim}
+                disabled={!pendingClaimData || loading}
+                tooltipPosition="top"
+                tooltipAlignment="center">
+                {loading ? (
+                  <InlineLoading description={t('processing', 'Processing claim...')} />
+                ) : (
+                  t('processClaim', 'Process Claim')
+                )}
+              </Button>
+            )}
           </ButtonSet>
         </Stack>
       </Form>

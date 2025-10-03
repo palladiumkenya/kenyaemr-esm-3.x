@@ -86,7 +86,7 @@ export const useModuleLinks = () => {
     },
     {
       label: t('labManifestApp', 'Lab Manifest App'),
-      url: `${openmrsSpaBase}home/lab-manifest`,
+      url: `${openmrsSpaBase}lab-manifest`,
       icon: <ChemistryReference size={24} />,
       privilege: 'o3: View Lab Manifest',
     },

@@ -14,39 +14,66 @@ export function LinkExtension({ config }: { config: LinkConfig }) {
   const { name, title } = config;
   const nameSegment = name.split('/').at(-1);
   const location = useLocation();
-  const spaBasePath = window.getOpenmrsSpaBase() + 'home/billing';
+  const spaBasePath = window.getOpenmrsSpaBase() + 'home';
 
-  let urlSegment = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
+  let urlSegment = useMemo(() => {
+    const rawSegment = last(location.pathname.split('/'));
+    const decodedSegment = decodeURIComponent(rawSegment);
+    return decodedSegment;
+  }, [location.pathname]);
 
   const isUUID = (value: string) => {
     const regex = /^[0-9a-fA-F]{8}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{4}\b-[0-9a-fA-F]{12}$/;
-    return regex.test(value);
+    const result = regex.test(value);
+    return result;
   };
 
   if (isUUID(urlSegment)) {
     if (location.pathname.includes('payment-points')) {
-      urlSegment = location.pathname.split('/').at(-2);
+      const newSegment = location.pathname.split('/').at(-2);
+      urlSegment = newSegment;
+    } else {
+      const pathParts = location.pathname.split('/');
+      const mainSectionIndex = pathParts.findIndex((part) => part === nameSegment);
+
+      if (mainSectionIndex > -1) {
+        urlSegment = nameSegment;
+      } else {
+        const containsOurSection =
+          location.pathname.includes('/' + nameSegment + '/') || location.pathname.includes('/' + nameSegment);
+        if (containsOurSection) {
+          urlSegment = nameSegment;
+        } else {
+          urlSegment = '';
+        }
+      }
+    }
+  } else if (location.pathname.endsWith('claims') || location.pathname.endsWith('claims/')) {
+    const containsOurSection =
+      location.pathname.includes('/' + nameSegment + '/') || location.pathname.split('/').includes(nameSegment);
+    if (containsOurSection) {
+      urlSegment = nameSegment;
     } else {
       urlSegment = '';
     }
-  } else if (location.pathname.endsWith('claims') || location.pathname.endsWith('claims/')) {
-    // Filling claims form screen
-    urlSegment = '';
   }
 
   const isActive = nameSegment === urlSegment;
+  const finalUrl = spaBasePath + '/' + name;
+
   return (
-    <ConfigurableLink
-      to={spaBasePath + '/' + name}
-      className={`cds--side-nav__link ${isActive && 'active-left-nav-link'}`}>
+    <ConfigurableLink to={finalUrl} className={`cds--side-nav__link ${isActive && 'active-left-nav-link'}`}>
       {t(title)}
     </ConfigurableLink>
   );
 }
 
-export const createLeftPanelLink = (config: LinkConfig) => () =>
-  (
-    <BrowserRouter>
-      <LinkExtension config={config} />
-    </BrowserRouter>
-  );
+export const createLeftPanelLink = (config: LinkConfig) => {
+  return () => {
+    return (
+      <BrowserRouter>
+        <LinkExtension config={config} />
+      </BrowserRouter>
+    );
+  };
+};

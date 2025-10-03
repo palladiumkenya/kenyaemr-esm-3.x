@@ -6,7 +6,6 @@ import {
   caseEncounterDashboardMeta,
   caseManagementDashboardMeta,
   contactListDashboardMeta,
-  dispensingDashboardMeta,
   peerCalendarDashboardMeta,
   relationshipsDashboardMeta,
   specialClinicsDashboardMeta,
@@ -25,7 +24,7 @@ import AntenatalCare from './maternal-and-child-health/antenatal-care.component'
 import LabourDelivery from './maternal-and-child-health/labour-delivery.component';
 import PostnatalCare from './maternal-and-child-health/postnatal-care.component';
 import MaternalAndChildDashboard from './maternal-and-child-health/maternal-and-child.component';
-import Partograph from './maternal-and-child-health/partography/partograph.component';
+import Partography from './maternal-and-child-health/partography/partograph.component';
 
 import HivCareAndTreatment from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment.component';
 
@@ -48,7 +47,6 @@ import { configSchema } from './config-schema';
 import SpecialClinicDashboard from './special-clinics/special-clinic.component';
 import { createDashboardLink as createDashboardLink2 } from './dashboard/createDashboardLink';
 import { createLeftPanelLink } from './left-panel-link.component';
-import Pharmacy from './dispensing/pharmacy.component';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -95,7 +93,7 @@ export const maternalAndChildHealthDashboard = getSyncLifecycle(MaternalAndChild
 export const antenatalCare = getSyncLifecycle(AntenatalCare, options);
 export const postnatalCare = getSyncLifecycle(PostnatalCare, options);
 export const labourAndDelivery = getSyncLifecycle(LabourDelivery, options);
-export const partograph = getSyncLifecycle(Partograph, options);
+export const partograph = getSyncLifecycle(Partography, options);
 
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
@@ -109,9 +107,6 @@ export const inPatientChartDashboard = getSyncLifecycle(InPatient, options);
 
 export const specialClinicsDashboardLink = getSyncLifecycle(createDashboardLink(specialClinicsDashboardMeta), options);
 export const specialClinicsDashboard = getSyncLifecycle(SpecialClinicDashboard, options);
-
-export const pharmacyLink = getSyncLifecycle(createLeftPanelLink(dispensingDashboardMeta), options);
-export const pharmacy = getSyncLifecycle(Pharmacy, options);
 
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
