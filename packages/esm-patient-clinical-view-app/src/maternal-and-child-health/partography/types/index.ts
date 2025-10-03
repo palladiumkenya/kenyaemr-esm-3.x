@@ -1,5 +1,32 @@
+// Utility: Map OpenMRS coded values to +/++/+++ for protein/acetone
+export const codeToPlus = (code: string) => {
+  switch (code) {
+    case '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+    case 'ZERO':
+    case '0':
+      return '0';
+    case '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+    case 'ONE PLUS':
+    case '+':
+      return '+';
+    case '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+    case 'TWO PLUS':
+    case '++':
+      return '++';
+    case '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+    case 'THREE PLUS':
+    case '+++':
+      return '+++';
+    default:
+      return code;
+  }
+};
 export const PARTOGRAPHY_CONCEPTS = {
+  cervix: '162261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'fetal-heart-rate': '1440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  'fetal-heart-rate-hour': '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  'fetal-heart-rate-time': '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+
   'cervical-dilation': '162261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'descent-of-head': '1810AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'uterine-contractions': '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -13,18 +40,21 @@ export const PARTOGRAPHY_CONCEPTS = {
   'glucose-level': '887AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'ketone-level': '165438AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'urine-volume': '159660AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  'contraction-count': '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'urine-characteristics': '56AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   medication: '1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'medication-name': '164231AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'oxytocin-dose': '166531AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'iv-fluids': '161911AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   dosage: '1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  'drug-dose': '162384AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'event-type': '162879AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'event-description': '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'amniotic-fluid': '162653AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   moulding: '166527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'blood-group': '300AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'time-slot': '163286AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  // Use a custom text concept for time slot to ensure string compatibility
+  'time-slot': 'a1b2c3d4-1111-2222-3333-444455556666',
   'labor-pattern': '164135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'hours-since-rupture': '167149AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   'ruptured-membranes': '164900AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -36,21 +66,32 @@ export const PARTOGRAPHY_CONCEPTS = {
 
 export const MCH_PARTOGRAPHY_ENCOUNTER_UUID = '022d62af-e2a5-4282-953b-52dd5cba3296';
 
+// Add 'pulse-bp-combined' as a hidden/utility type for encounter mapping
 export const PARTOGRAPHY_GRAPH_TYPES = [
+  'cervix',
   'fetal-heart-rate',
   'cervical-dilation',
   'descent-of-head',
   'uterine-contractions',
   'maternal-pulse',
   'blood-pressure',
+  'pulse-bp-combined',
   'temperature',
   'urine-analysis',
   'drugs-fluids',
   'progress-events',
 ] as const;
 
+// Map 'pulse-bp-combined' to the same encounter type as 'maternal-pulse' and 'blood-pressure'
 export const PARTOGRAPHY_ENCOUNTER_TYPES = Object.fromEntries(
-  PARTOGRAPHY_GRAPH_TYPES.map((type) => [type, MCH_PARTOGRAPHY_ENCOUNTER_UUID]),
+  PARTOGRAPHY_GRAPH_TYPES.map((type) => [
+    type,
+    type === 'drugs-fluids'
+      ? '39da3525-afe4-45ff-8977-c53b7b359158'
+      : type === 'pulse-bp-combined'
+      ? MCH_PARTOGRAPHY_ENCOUNTER_UUID
+      : MCH_PARTOGRAPHY_ENCOUNTER_UUID,
+  ]),
 ) as Record<(typeof PARTOGRAPHY_GRAPH_TYPES)[number], string>;
 
 export interface OpenMRSResponse<T> {
@@ -100,6 +141,7 @@ export interface PartographyGraph {
 }
 
 export const PARTOGRAPHY_UNITS = {
+  cervix: 'cm',
   'fetal-heart-rate': 'BPM',
   'cervical-dilation': 'cm',
   'descent-of-head': 'Station',
@@ -113,6 +155,7 @@ export const PARTOGRAPHY_UNITS = {
 } as const;
 
 export const PARTOGRAPHY_NORMAL_RANGES = {
+  cervix: '1-10 cm',
   'fetal-heart-rate': '110-160 BPM',
   'cervical-dilation': '0-10 cm',
   'descent-of-head': '-3 to +3',
@@ -126,6 +169,7 @@ export const PARTOGRAPHY_NORMAL_RANGES = {
 } as const;
 
 export const PARTOGRAPHY_COLORS = {
+  cervix: 'blue',
   'fetal-heart-rate': 'red',
   'cervical-dilation': 'blue',
   'descent-of-head': 'green',
@@ -139,6 +183,7 @@ export const PARTOGRAPHY_COLORS = {
 } as const;
 
 export const PARTOGRAPHY_Y_RANGES = {
+  cervix: { min: 1, max: 10 },
   'fetal-heart-rate': { min: 80, max: 200 },
   'cervical-dilation': { min: 0, max: 10 },
   'descent-of-head': { min: -4, max: 4 },
@@ -185,6 +230,18 @@ export const getPartographyYRange = (graphType: PartographyGraphType): { min: nu
 };
 
 export const PARTOGRAPHY_GRAPH_CONFIGS: PartographyGraph[] = [
+  {
+    id: 'cervix',
+    titleKey: 'cervix',
+    titleDefault: 'Cervix',
+    descriptionKey: 'cervixDesc',
+    descriptionDefault: 'Cervical monitoring during labor',
+    yAxisLabel: 'cm',
+    normalRange: '1-10 cm',
+    color: 'blue',
+    yMin: 1,
+    yMax: 10,
+  },
   {
     id: 'fetal-heart-rate',
     titleKey: 'fetalHeartRate',
@@ -308,7 +365,10 @@ export const PARTOGRAPHY_GRAPH_CONFIGS: PartographyGraph[] = [
 ];
 
 export const getTranslatedPartographyGraphs = (t: (key: string, fallback: string) => string) => {
-  return PARTOGRAPHY_GRAPH_CONFIGS.map((config) => ({
+  // For now, only show the cervix graph
+  const cervixOnlyConfigs = PARTOGRAPHY_GRAPH_CONFIGS.filter((config) => config.id === 'cervix');
+
+  return cervixOnlyConfigs.map((config) => ({
     id: config.id,
     title: t(config.titleKey, config.titleDefault),
     description: t(config.descriptionKey, config.descriptionDefault),
@@ -578,6 +638,7 @@ export const getDescentStationMapping = () => {
 
 // Configurable input validation ranges
 export const VALIDATION_RANGES = {
+  CERVIX: { min: 1, max: 10, normal: { min: 1, max: 10 }, step: 0.5 },
   FETAL_HEART_RATE: { min: 80, max: 200, normal: { min: 110, max: 160 }, step: 1 },
   CERVICAL_DILATION: { min: 0, max: 10, normal: { min: 0, max: 10 }, step: 0.5 },
   MATERNAL_PULSE: { min: 40, max: 140, normal: { min: 60, max: 100 }, step: 1 },
@@ -589,6 +650,11 @@ export const VALIDATION_RANGES = {
 
 // Input ranges mapped to graph types
 export const INPUT_RANGES = {
+  cervix: {
+    ...VALIDATION_RANGES.CERVIX,
+    placeholderKey: 'cervixPlaceholder',
+    conceptUuid: PARTOGRAPHY_CONCEPTS['cervix'],
+  },
   'fetal-heart-rate': {
     ...VALIDATION_RANGES.FETAL_HEART_RATE,
     placeholderKey: 'fetalHeartRatePlaceholder',
@@ -692,6 +758,7 @@ export const isValidMeasurement = (graphType: string, value: string): boolean =>
 
 // Measurement label mappings
 export const MEASUREMENT_LABELS = {
+  cervix: { key: 'cervicalDilation', default: 'Cervical Dilation' },
   'fetal-heart-rate': { key: 'fetalHeartRate', default: 'Foetal Heart Rate' },
   'cervical-dilation': { key: 'membraneAmnioticFluidMoulding', default: 'Membrane Amniotic Fluid & Moulding' },
   'descent-of-head': { key: 'descentOfHead', default: 'Descent of Head' },
@@ -978,3 +1045,39 @@ export const getDefaultProcessor = (graphType: string): GraphDataProcessor => ({
 export const getGraphDataProcessor = (graphType: string): GraphDataProcessor => {
   return GRAPH_DATA_PROCESSORS[graphType] || getDefaultProcessor(graphType);
 };
+
+// Add this configuration object, likely near the PARTOGRAPHY_GRAPH_CONFIGS constant.
+
+export const CERVIX_CHART_OPTIONS = {
+  title: 'Cervical Dilation',
+  axes: {
+    bottom: {
+      title: 'Time (Hours)',
+      scaleType: 'time',
+      // The 30-minute grid is controlled by the chart's 'time' scale,
+      // relying on data density and auto-formatting, but we set the time scale.
+    },
+    left: {
+      title: 'Dilation (cm)',
+      mapsTo: 'value',
+      // Enforce domain 0-10 cm (10 total grids)
+      domain: [0, 10],
+      // Explicitly set ticks every 1 unit (1 cm grid line)
+      ticks: {
+        values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      },
+      scaleType: 'linear',
+    },
+  },
+  data: {
+    // Define styles for the two new static line groups
+    groups: {
+      'Alert Line': { stroke: 'orange', dashed: true, line: { strokeDasharray: '4 4' } },
+      'Action Line': { stroke: 'red', dashed: true, line: { strokeDasharray: '4 4' } },
+    },
+  },
+  curve: 'curveLinear', // Ensure the lines are straight
+};
+
+// You should also ensure this constant is exported in './types/index'
+// or directly exported if this is the shared config file.
