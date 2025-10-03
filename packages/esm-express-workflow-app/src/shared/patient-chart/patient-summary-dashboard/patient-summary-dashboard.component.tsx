@@ -8,6 +8,7 @@ import {
   Dashboard,
   Calendar,
   Attachment,
+  GraphicalDataFlow,
 } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './patient-summary-dashboard.scss';
@@ -63,6 +64,12 @@ const PatientSummaryDashboard: React.FC<PatientSummaryDashboardProps> = ({ patie
       label: t('attachments', 'Attachments'),
       icon: Attachment,
       slotName: 'ewf-attachments-slot',
+      slotClassName: styles.ewfExtensionSlot,
+    },
+    {
+      label: t('partograph', 'Partograph'),
+      icon: GraphicalDataFlow,
+      slotName: 'maternal-and-child-health-partograph-slot',
       slotClassName: styles.ewfExtensionSlot,
     },
   ];
