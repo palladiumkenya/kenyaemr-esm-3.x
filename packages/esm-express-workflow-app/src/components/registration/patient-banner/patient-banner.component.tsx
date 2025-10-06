@@ -43,6 +43,19 @@ const getGender = (gender: string) => {
   };
 };
 
+const getSHANumber = (identifiers: fhir.Identifier[] | undefined): string => {
+  if (!identifiers?.length) {
+    return '--';
+  }
+
+  const shaIdentifier = identifiers.find(
+    (identifier) =>
+      identifier.type?.coding?.[0]?.code === 'sha-number' || identifier.type?.coding?.[0]?.display === 'SHA Number',
+  );
+
+  return shaIdentifier?.value || '--';
+};
+
 export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPatientInfoProps> = ({
   patient,
   renderedFrom,
@@ -52,6 +65,7 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
   const { t } = useTranslation();
   const name = getPatientName(patient);
   const genderInfo = patient?.gender && getGender(patient.gender);
+  const shaNumber = useMemo(() => getSHANumber(patient.identifier), [patient.identifier]);
 
   const extensionState = useMemo(
     () => ({ patientUuid: patient.id, patient, renderedFrom }),
@@ -105,9 +119,7 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
           </>
         )}
         <div>
-          <div className={styles.identifiers}>
-            {patient.identifier?.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
-          </div>
+          <div className={styles.identifiers}>{shaNumber}</div>
         </div>
         <ExtensionSlot className={styles.extensionSlot} name="patient-banner-bottom-slot" state={extensionState} />
       </div>
