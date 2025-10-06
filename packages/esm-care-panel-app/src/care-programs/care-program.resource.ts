@@ -174,24 +174,23 @@ const programForms = [
   //     { formName: 'Family Planning Discontinuation', formUuId: 'efc782ea-9a16-4791-824a-18be7417eda4' },
   //   ],
   // },
-  // {
-  //   // TODO Uncomment and add conrect uuids after program is added by the BA
-  //   programName: 'Medical Assited therapy',
-  //   programUuid: '191269d2-9973-4958-9936-f687ed771050',
-  //   forms: [
-  //     {
-  //       formName: 'MAT Enrollment Form',
-  //       formUuId: '',
-  //     }, // TODO:Form not found
-  //     { formName: 'MAT Initial Registration Form', formUuId: '9a9cadd7-fba1-4a24-94aa-43edfbecf8d9' },
-  //     { formName: 'MAT Clinical Encounter Form', formUuId: '5ed937a0-0933-41c3-b638-63d8a4779845' },
-  //     { formName: 'MAT Psycho-social Intake & Follow-up Form', formUuId: 'cfd2109b-63b3-43de-8bb3-682e80c5a965' },
-  //     { formName: 'MAT Psychiatric Intake and Follow up Form', formUuId: 'fdea46a1-9423-4ef9-b780-93b32b48a528' },
-  //     { formName: 'MAT Transit/Referral Form', formUuId: 'b9495048-eceb-4dd2-bfba-330dc4900ee9' },
-  //     { formName: 'MAT Cessation Form', formUuId: 'fa58cbc1-91c8-4920-813b-fde7fd69533b' },
-  //     { formName: 'MAT Discontinuation Form', formUuId: '38d6e116-b96c-4916-a821-b4dc83e2041d' },
-  //   ],
-  // },
+  {
+    programName: 'Medical Assited therapy',
+    programUuid: '4b898e20-9b2d-11ee-b9d1-0242ac120002',
+    forms: [
+      // {
+      //   formName: 'MAT Enrollment Form',
+      //   formUuId: '',
+      // }, // TODO:Form not found
+      { formName: 'MAT Initial Registration Form', formUuId: '9a9cadd7-fba1-4a24-94aa-43edfbecf8d9' },
+      { formName: 'MAT Clinical Encounter Form', formUuId: '5ed937a0-0933-41c3-b638-63d8a4779845' },
+      { formName: 'MAT Psycho-social Intake & Follow-up Form', formUuId: 'cfd2109b-63b3-43de-8bb3-682e80c5a965' },
+      { formName: 'MAT Psychiatric Intake and Follow up Form', formUuId: 'fdea46a1-9423-4ef9-b780-93b32b48a528' },
+      { formName: 'MAT Transit/Referral Form', formUuId: 'b9495048-eceb-4dd2-bfba-330dc4900ee9' },
+      { formName: 'MAT Cessation Form', formUuId: 'fa58cbc1-91c8-4920-813b-fde7fd69533b' },
+      { formName: 'MAT Discontinuation Form', formUuId: '38d6e116-b96c-4916-a821-b4dc83e2041d' },
+    ],
+  },
 ];
 
 export const getProgramForms = (programUuid: string) => {
