@@ -241,7 +241,6 @@ const DependentsComponent: React.FC<DependentProps> = ({
       const isSpouseVerified = verifiedSpouses.has(dependent.id);
       const otpRequestedForThisSpouse = otpRequestedForSpouse.has(dependent.id);
 
-      // Only show SHA number
       const identifiersDisplay =
         dependent.shaNumber && dependent.shaNumber !== 'N/A' ? `SHA: ${dependent.shaNumber}` : 'N/A';
 
