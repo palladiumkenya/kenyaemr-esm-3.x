@@ -1,13 +1,10 @@
-import { openmrsFetch, restBaseUrl, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, restBaseUrl, useConfig, Visit } from '@openmrs/esm-framework';
 import { FulfillerStatus, Order } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { useMemo } from 'react';
 import { QueueEntry } from '../../types';
-
-const LABORATORY_ORDER_TYPE_UUID = '52a447d3-a64a-11e3-9aeb-50e549534c5e';
-const RADIOLOGY_ORDER_TYPE_UUID = 'b4a7c280-369e-4d12-9ce8-18e36783fed6';
-const RADIOLOGY_CONCEPT_CLASS_UUID = '8caa332c-efe4-4025-8b18-3398328e1323';
+import { ExpressWorkflowConfig } from '../../config-schema';
 
 export interface UseLabOrdersParams {
   status?: FulfillerStatus;
@@ -35,10 +32,11 @@ export const useTotalVisits = () => {
 
 export function useLabOrders(params: UseLabOrdersParams = {}) {
   const { status, newOrdersOnly = false, excludeCanceled = true } = params;
+  const { labOrderTypeUuid } = useConfig<ExpressWorkflowConfig>();
 
   const url = useMemo(() => {
     const { start, end } = getTodayRange();
-    let apiUrl = `${restBaseUrl}/order?orderTypes=${LABORATORY_ORDER_TYPE_UUID}&v=custom:(uuid,dateActivated,action,fulfillerStatus,dateStopped)`;
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${labOrderTypeUuid}&v=custom:(uuid,dateActivated,action,fulfillerStatus,dateStopped)`;
 
     if (status) {
       apiUrl += `&fulfillerStatus=${status}`;
@@ -66,9 +64,11 @@ export function useLabOrders(params: UseLabOrdersParams = {}) {
 }
 
 function useRadiologyOrders(fulfillerStatus?: string) {
+  const { imagingOrderTypeUuid, imagingConceptClassUuid } = useConfig<ExpressWorkflowConfig>();
+
   const url = useMemo(() => {
     const { start, end } = getTodayRange();
-    let apiUrl = `${restBaseUrl}/order?orderTypes=${RADIOLOGY_ORDER_TYPE_UUID}&v=custom:(uuid,concept:(conceptClass),action,fulfillerStatus,dateStopped)`;
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${imagingOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,fulfillerStatus,dateStopped)`;
 
     if (fulfillerStatus) {
       apiUrl += `&fulfillerStatus=${fulfillerStatus}`;
@@ -76,7 +76,7 @@ function useRadiologyOrders(fulfillerStatus?: string) {
     apiUrl += `&activatedOnOrAfterDate=${start}&activatedOnOrBeforeDate=${end}`;
 
     return apiUrl;
-  }, [fulfillerStatus]);
+  }, [fulfillerStatus, imagingOrderTypeUuid]);
 
   const { data, isLoading } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
 
@@ -85,13 +85,13 @@ function useRadiologyOrders(fulfillerStatus?: string) {
     return orders.filter(
       (order) =>
         !order.dateStopped &&
-        order.concept.conceptClass.uuid === RADIOLOGY_CONCEPT_CLASS_UUID &&
+        order.concept.conceptClass.uuid === imagingConceptClassUuid &&
         order.action !== 'DISCONTINUE' &&
         (fulfillerStatus
           ? order.fulfillerStatus === fulfillerStatus
           : !order.fulfillerStatus && order.action === 'NEW'),
     ).length;
-  }, [data, fulfillerStatus]);
+  }, [data, fulfillerStatus, imagingConceptClassUuid]);
 
   return { count, isLoading };
 }

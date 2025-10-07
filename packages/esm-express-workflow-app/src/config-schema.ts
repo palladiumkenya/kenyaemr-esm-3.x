@@ -92,6 +92,11 @@ export const configSchema = {
     _description: 'UUID for imaging order type',
     _default: 'b4a7c280-369e-4d12-9ce8-18e36783fed6',
   },
+  imagingConceptClassUuid: {
+    _type: Type.String,
+    _description: 'Concept class UUID for imaging orders',
+    _default: '8caa332c-efe4-4025-8b18-3398328e1323',
+  },
   orderableConceptSets: {
     _type: Type.Array,
     _elements: {
@@ -146,6 +151,7 @@ export type ExpressWorkflowConfig = {
     finishedStatus: string;
   };
   labOrderTypeUuid: string;
+  imagingConceptClassUuid: string;
   orderableConceptSets: Array<string>;
   imagingOrderTypeUuid: string;
   imagingOrderableConceptSets: Array<string>;
