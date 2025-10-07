@@ -32,7 +32,13 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
     }
   }, [isLoading, isInitialLoad]);
 
-  const memoizedQueueEntries = useMemo(() => queueEntries, [queueEntries]);
+  const queueEntriesByService = useMemo(() => {
+    if (!queueEntries?.length || !selectedQueue?.service?.uuid) {
+      return [];
+    }
+
+    return queueEntries.filter((entry) => entry?.queue?.service?.uuid === selectedQueue.service.uuid);
+  }, [queueEntries, selectedQueue?.service?.uuid]);
 
   const handleQueueSelection = useCallback(
     (queue: Queue) => {
@@ -85,7 +91,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
                       </div>
                     )}
                     <QueueEntryTable
-                      queueEntries={memoizedQueueEntries}
+                      queueEntries={queueEntriesByService}
                       key={`table-${queue.uuid}`}
                       navigatePath={navigatePath}
                       usePatientChart={usePatientChart}

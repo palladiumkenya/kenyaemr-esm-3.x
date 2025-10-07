@@ -126,6 +126,12 @@ export const useModuleLinks = () => {
       icon: <IbmCloudGateKeeper size={24} />,
       privilege: 'o3: View Legacy Admin Dashboard',
     },
+    {
+      label: t('serviceQueuesAdmin', 'Service Queues Admin'),
+      url: `${openmrsSpaBase}home/service-queues/admin`,
+      icon: <IbmCloudGateKeeper size={24} />,
+      privilege: 'o3: View Service Queues Admin Dashboard',
+    },
   ];
 
   return moduleLinks.filter((link) => !excludeLinks.some((excludeLink) => excludeLink === link.label));
