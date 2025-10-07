@@ -1,0 +1,141 @@
+import { openmrsFetch, restBaseUrl, Visit } from '@openmrs/esm-framework';
+import { FulfillerStatus, Order } from '@openmrs/esm-patient-common-lib';
+import dayjs from 'dayjs';
+import useSWR from 'swr';
+import { useMemo } from 'react';
+import { QueueEntry } from '../../types';
+
+const LABORATORY_ORDER_TYPE_UUID = '52a447d3-a64a-11e3-9aeb-50e549534c5e';
+const RADIOLOGY_ORDER_TYPE_UUID = 'b4a7c280-369e-4d12-9ce8-18e36783fed6';
+const RADIOLOGY_CONCEPT_CLASS_UUID = '8caa332c-efe4-4025-8b18-3398328e1323';
+
+export interface UseLabOrdersParams {
+  status?: FulfillerStatus;
+  newOrdersOnly?: boolean;
+  excludeCanceled?: boolean;
+}
+
+const getTodayRange = () => ({
+  start: dayjs().startOf('day').toISOString(),
+  end: dayjs().endOf('day').toISOString(),
+});
+
+export const useTotalVisits = () => {
+  const url = `${restBaseUrl}/visit?includeInactive=true&v=custom:(uuid,startDatetime,stopDatetime)&fromStartDate=${dayjs().format(
+    'YYYY-MM-DD',
+  )}`;
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<Visit> } }>(url, openmrsFetch);
+
+  return {
+    data: data?.data?.results,
+    error,
+    isLoading,
+  };
+};
+
+export function useLabOrders(params: UseLabOrdersParams = {}) {
+  const { status, newOrdersOnly = false, excludeCanceled = true } = params;
+
+  const url = useMemo(() => {
+    const { start, end } = getTodayRange();
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${LABORATORY_ORDER_TYPE_UUID}&v=custom:(uuid,dateActivated,action,fulfillerStatus,dateStopped)`;
+
+    if (status) {
+      apiUrl += `&fulfillerStatus=${status}`;
+    }
+    if (excludeCanceled) {
+      apiUrl += `&excludeCanceledAndExpired=true&excludeDiscontinueOrders=true`;
+    }
+    apiUrl += `&activatedOnOrAfterDate=${start}&activatedOnOrBeforeDate=${end}`;
+
+    return apiUrl;
+  }, [status, excludeCanceled]);
+
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<Order> } }>(url, openmrsFetch);
+
+  const filteredOrders = useMemo(() => {
+    const orders = data?.data?.results ?? [];
+    return newOrdersOnly ? orders.filter((order) => order.action === 'NEW' && order.fulfillerStatus === null) : orders;
+  }, [data, newOrdersOnly]);
+
+  return {
+    labOrders: filteredOrders,
+    isLoading,
+    isError: error,
+  };
+}
+
+function useRadiologyOrders(fulfillerStatus?: string) {
+  const url = useMemo(() => {
+    const { start, end } = getTodayRange();
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${RADIOLOGY_ORDER_TYPE_UUID}&v=custom:(uuid,concept:(conceptClass),action,fulfillerStatus,dateStopped)`;
+
+    if (fulfillerStatus) {
+      apiUrl += `&fulfillerStatus=${fulfillerStatus}`;
+    }
+    apiUrl += `&activatedOnOrAfterDate=${start}&activatedOnOrBeforeDate=${end}`;
+
+    return apiUrl;
+  }, [fulfillerStatus]);
+
+  const { data, isLoading } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
+
+  const count = useMemo(() => {
+    const orders = data?.data?.results ?? [];
+    return orders.filter(
+      (order) =>
+        !order.dateStopped &&
+        order.concept.conceptClass.uuid === RADIOLOGY_CONCEPT_CLASS_UUID &&
+        order.action !== 'DISCONTINUE' &&
+        (fulfillerStatus
+          ? order.fulfillerStatus === fulfillerStatus
+          : !order.fulfillerStatus && order.action === 'NEW'),
+    ).length;
+  }, [data, fulfillerStatus]);
+
+  return { count, isLoading };
+}
+
+export const useInvestigationStats = () => {
+  const { labOrders: newLabOrders, isLoading: loadingNewLab } = useLabOrders({ newOrdersOnly: true });
+  const { labOrders: completedLabOrders, isLoading: loadingCompletedLab } = useLabOrders({
+    status: 'COMPLETED',
+    excludeCanceled: false,
+  });
+  const { count: newRadiologyCount, isLoading: loadingNewRadiology } = useRadiologyOrders();
+  const { count: completedRadiologyCount, isLoading: loadingCompletedRadiology } = useRadiologyOrders('COMPLETED');
+
+  const awaitingCount = newLabOrders.length + newRadiologyCount;
+  const completedCount = completedLabOrders.length + completedRadiologyCount;
+
+  return {
+    awaitingCount,
+    completedCount,
+    totalCount: awaitingCount + completedCount,
+    isLoading: loadingNewLab || loadingCompletedLab || loadingNewRadiology || loadingCompletedRadiology,
+  };
+};
+
+export const useQueuePriorityCounts = (queueEntries: Array<QueueEntry>) => {
+  return useMemo(() => {
+    const counts = {
+      emergency: 0,
+      urgent: 0,
+      notUrgent: 0,
+    };
+
+    queueEntries.forEach((entry) => {
+      const priority = entry.priority.display.toLowerCase();
+
+      if (priority === 'emergency') {
+        counts.emergency++;
+      } else if (priority === 'urgent') {
+        counts.urgent++;
+      } else if (priority === 'not urgent') {
+        counts.notUrgent++;
+      }
+    });
+
+    return counts;
+  }, [queueEntries]);
+};

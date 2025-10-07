@@ -4,17 +4,62 @@
 
 .card {
   background-color: colors.$white;
-  padding: layout.$spacing-05;
   border: 1px solid colors.$gray-20;
   width: 100%;
+}
 
-  .title {
-    @include type.type-style('heading-02');
-  }
+.header {
+  padding: layout.$spacing-05;
+}
 
-  .value {
-    @include type.type-style('heading-06');
-    margin-top: layout.$layout-03;
-    color: colors.$gray-70;
-  }
+.title {
+  @include type.type-style('heading-compact-01');
+  font-weight: 600;
+  color: colors.$gray-100;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  padding: layout.$spacing-05;
+  gap: layout.$spacing-07;
+}
+
+.totalSection {
+  flex-shrink: 0;
+}
+
+.total {
+  @include type.type-style('heading-06');
+  font-size: 2rem;
+  font-weight: 400;
+  color: colors.$gray-70;
+  line-height: 1;
+}
+
+.categoriesSection {
+  display: flex;
+  gap: layout.$spacing-06;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.category {
+  text-align: center;
+  min-width: 60px;
+}
+
+.categoryLabel {
+  @include type.type-style('label-01');
+  font-size: 0.75rem;
+  color: colors.$gray-70;
+  margin-bottom: layout.$spacing-02;
+  white-space: nowrap;
+}
+
+.categoryValue {
+  @include type.type-style('heading-04');
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: colors.$gray-100;
 }
