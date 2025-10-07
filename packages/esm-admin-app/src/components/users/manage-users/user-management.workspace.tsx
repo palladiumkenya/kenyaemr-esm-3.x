@@ -46,7 +46,7 @@ import {
 import UserManagementFormSchema from '../userManagementFormSchema';
 import { ChevronLeft, Query, ChevronRight } from '@carbon/react/icons';
 import { useSystemUserRoleConfigSetting } from '../../hook/useSystemRoleSetting';
-import { NonFHIRResponse, type PractitionerResponse, Provider, User } from '../../../types';
+import { type CustomHIEPractitionerResponse, type PractitionerResponse, Provider, User } from '../../../types';
 import { searchHealthCareWork } from '../../hook/searchHealthCareWork';
 import { ROLE_CATEGORIES, SECTIONS, today } from '../../../constants';
 import { ConfigObject } from '../../../config-schema';
@@ -256,10 +256,39 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
     }
   }, [isDirty, promptBeforeClosing]);
 
+  const setPractitionerValues = (healthWorker: CustomHIEPractitionerResponse) => {
+    const { membership, licenses, contacts, identifiers } = healthWorker.message;
+
+    setValue('givenName', membership.first_name || '');
+    setValue('middleName', membership.middle_name || '');
+    setValue('familyName', membership.last_name || '');
+
+    setValue('nationalId', identifiers.identification_number || '');
+    setValue('providerLicense', membership.external_reference_id || '');
+    setValue('registrationNumber', membership.registration_id || '');
+    setValue('providerUniqueIdentifier', membership.id || '');
+
+    setValue('phoneNumber', contacts.phone || '');
+    setValue('email', contacts.email || '');
+
+    setValue('qualification', membership.specialty || '');
+
+    setValue('passportNumber', '');
+
+    const mostRecentLicense = licenses
+      .filter((l) => l.license_end)
+      .sort((a, b) => new Date(b.license_end).getTime() - new Date(a.license_end).getTime())[0];
+
+    setValue(
+      'licenseExpiryDate',
+      mostRecentLicense?.license_end ? parseDate(mostRecentLicense.license_end) : parseDate(t('unknown', 'Unknown')),
+    );
+  };
+
   const handleSearch = async () => {
     try {
       setSearchHWR({ ...searchHWR, isHWRLoading: true });
-      const fetchedHealthWorker: NonFHIRResponse = await searchHealthCareWork(
+      const fetchedHealthWorker: CustomHIEPractitionerResponse = await searchHealthCareWork(
         searchHWR.identifierType,
         searchHWR.identifier,
         searchHWR.regulator,
@@ -274,36 +303,7 @@ const ManageUserWorkspace: React.FC<ManageUserWorkspaceProps> = ({
         healthWorker: fetchedHealthWorker,
         onConfirm: () => {
           dispose();
-
-          const { membership, licenses, contacts, identifiers } = fetchedHealthWorker.message;
-
-          setValue('givenName', membership.first_name || '');
-          setValue('middleName', membership.middle_name || '');
-          setValue('familyName', membership.last_name || '');
-
-          setValue('nationalId', identifiers.identification_number || '');
-          setValue('providerLicense', membership.external_reference_id || '');
-          setValue('registrationNumber', membership.registration_id || '');
-          setValue('providerUniqueIdentifier', membership.id || '');
-
-          setValue('phoneNumber', contacts.phone || '');
-          setValue('email', contacts.email || '');
-
-          setValue('qualification', membership.specialty || '');
-
-          const mostRecentLicense = licenses
-            .filter((l) => l.license_end)
-            .sort((a, b) => new Date(b.license_end).getTime() - new Date(a.license_end).getTime())[0];
-
-          setValue(
-            'licenseExpiryDate',
-            mostRecentLicense?.license_end
-              ? parseDate(mostRecentLicense.license_end)
-              : parseDate(t('unknown', 'Unknown')),
-          );
-
-          setValue('passportNumber', '');
-
+          setPractitionerValues(fetchedHealthWorker);
           setHealthWorker(fetchedHealthWorker);
         },
       });

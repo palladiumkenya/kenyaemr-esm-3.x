@@ -4,7 +4,7 @@ import { Button, Column, Search, ComboBox, InlineLoading } from '@carbon/react';
 import styles from './hwr-sync.modal.scss';
 import { useConfig, showSnackbar, formatDate, parseDate, showToast, restBaseUrl } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
-import { NonFHIRResponse, type PractitionerResponse, type ProviderResponse } from '../../types';
+import { CustomHIEPractitionerResponse, type PractitionerResponse, type ProviderResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import { searchHealthCareWork } from '../hook/searchHealthCareWork';
 import { createProviderAttribute, updateProviderAttributes } from './hwr-sync.resource';
@@ -71,7 +71,7 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
   const handleSync = async () => {
     try {
       setSyncLoading(true);
-      const healthWorker: NonFHIRResponse = await searchHealthCareWork(
+      const healthWorker: CustomHIEPractitionerResponse = await searchHealthCareWork(
         searchHWR.identifierType,
         searchHWR.identifier,
         searchHWR.regulator,

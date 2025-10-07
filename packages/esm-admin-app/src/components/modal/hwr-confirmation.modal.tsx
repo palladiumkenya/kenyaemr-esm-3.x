@@ -3,7 +3,7 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 import capitalize from 'lodash-es/capitalize';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { NonFHIRResponse, type PractitionerResponse } from '../../types';
+import { CustomHIEPractitionerResponse, type PractitionerResponse } from '../../types';
 import styles from './hwr-confirmation.modal.scss';
 import { formatDateTime } from '../../utils/utils';
 
@@ -24,7 +24,7 @@ const HealthWorkerInfo: React.FC<HealthWorkerInfoProps> = ({ label, value }) => 
 interface HWRConfirmModalProps {
   onConfirm: () => void;
   close: () => void;
-  healthWorker: NonFHIRResponse;
+  healthWorker: CustomHIEPractitionerResponse;
 }
 
 const HWRConfirmModal: React.FC<HWRConfirmModalProps> = ({ close, onConfirm, healthWorker }) => {

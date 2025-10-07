@@ -334,7 +334,7 @@ export interface UserResponse {
   }>;
 }
 
-export interface NonFHIRResponse {
+export interface CustomHIEPractitionerResponse {
   message: {
     membership: {
       id: string;
