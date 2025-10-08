@@ -4,7 +4,7 @@ import { Button, Column, Search, ComboBox, InlineLoading } from '@carbon/react';
 import styles from './hwr-sync.modal.scss';
 import { useConfig, showSnackbar, formatDate, parseDate, showToast, restBaseUrl } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
-import { type PractitionerResponse, type ProviderResponse } from '../../types';
+import { CustomHIEPractitionerResponse, type PractitionerResponse, type ProviderResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import { searchHealthCareWork } from '../hook/searchHealthCareWork';
 import { createProviderAttribute, updateProviderAttributes } from './hwr-sync.resource';
@@ -71,48 +71,44 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
   const handleSync = async () => {
     try {
       setSyncLoading(true);
-      const healthWorker: PractitionerResponse = await searchHealthCareWork(
+      const healthWorker: CustomHIEPractitionerResponse = await searchHealthCareWork(
         searchHWR.identifierType,
         searchHWR.identifier,
         searchHWR.regulator,
       );
 
-      const resource = healthWorker.entry[0]?.resource;
+      if (!healthWorker?.message) {
+        throw new Error(t('noResults', 'No results found'));
+      }
+
+      const { membership, licenses, contacts, identifiers } = healthWorker.message;
+
+      const mostRecentLicense = licenses
+        ?.filter((l) => l.license_end)
+        .sort((a, b) => new Date(b.license_end).getTime() - new Date(a.license_end).getTime())[0];
 
       const extractedAttributes = {
-        licenseNumber: resource?.identifier?.find((id) =>
-          id.type?.coding?.some((code) => code.code === 'license-number'),
-        )?.value,
-        regNumber: resource?.identifier?.find((id) =>
-          id.type?.coding?.some((code) => code.code === 'board-registration-number'),
-        )?.value,
-        licenseDate: formatDate(
-          new Date(
-            resource?.identifier?.find((id) =>
-              id.type?.coding?.some((code) => code.code === 'license-number'),
-            )?.period?.end,
-          ),
-        ),
-        phoneNumber: resource?.telecom?.find((contact) => contact.system === 'phone')?.value,
-        email: resource?.telecom?.find((contact) => contact.system === 'email')?.value,
-        qualification:
-          resource?.qualification?.[0]?.code?.coding?.[0]?.display ||
-          resource?.extension?.find((ext) => ext.url === 'https://ts.kenya-hie.health/Codesystem/specialty')
-            ?.valueCodeableConcept?.coding?.[0]?.display,
-        nationalId: resource?.identifier?.find((id) => id.type?.coding?.some((code) => code.code === 'national-id'))
-          ?.value,
-        providerUniqueIdentifier: resource?.id,
+        licenseNumber: membership.external_reference_id,
+        regNumber: membership.registration_id,
+        licenseDate: mostRecentLicense?.license_end ? formatDate(new Date(mostRecentLicense.license_end)) : null,
+        phoneNumber: contacts.phone,
+        email: contacts.email,
+        qualification: membership.specialty,
+        nationalId: identifiers.identification_number,
+        providerUniqueIdentifier: membership.id,
       };
 
       const updatableAttributes = [
         { attributeType: licenseNumberUuid, value: extractedAttributes.licenseNumber },
         { attributeType: licenseBodyUuid, value: extractedAttributes.regNumber },
-        { attributeType: licenseExpiryDateUuid, value: parseDate(extractedAttributes.licenseDate) },
+        {
+          attributeType: licenseExpiryDateUuid,
+          value: extractedAttributes.licenseDate ? parseDate(extractedAttributes.licenseDate) : null,
+        },
         { attributeType: phoneNumberUuid, value: extractedAttributes.phoneNumber },
         { attributeType: qualificationUuid, value: extractedAttributes.qualification },
         {
           attributeType: providerHieFhirReference,
-          // Include regulator info in the health worker reference
           value: JSON.stringify({
             ...healthWorker,
             searchParameters: {
