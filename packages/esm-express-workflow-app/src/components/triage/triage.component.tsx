@@ -26,8 +26,11 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   const {
     error: metricsError,
     isLoading: isLoadingMetrics,
+    waitingEntries,
+    inServiceEntries,
     finishedEntries,
   } = useTriageQueuesMetrics(currQueue ?? triageQueues[0]);
+
   if (isLoading || isLoadingMetrics) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
@@ -36,19 +39,26 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
     return <ErrorState error={error ?? metricsError} headerTitle={t('errorLoadingQueues', 'Error loading queues')} />;
   }
 
+  const attendedToEntries = [...inServiceEntries, ...finishedEntries];
+
+  const cards = [
+    {
+      title: t('CilentsPatientsWaiting', 'Clients/Patients waiting'),
+      value: waitingEntries.length.toString(),
+    },
+    {
+      title: t('CilentsPatientsAttendedTo', 'Clients/Patients attended to'),
+      value: attendedToEntries.length.toString(),
+    },
+  ];
+
   return (
     <div>
       <PageHeader className={styles.pageHeader}>
         <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
         <ExtensionSlot name="provider-banner-info-slot" />
       </PageHeader>
-      <QueueTab
-        queues={triageQueues}
-        navigatePath="triage"
-        usePatientChart
-        cards={[{ title: t('patientsAttendedTo', 'Patients attended to'), value: finishedEntries.length.toString() }]}
-        onTabChanged={setCurrQueue}
-      />
+      <QueueTab queues={triageQueues} navigatePath="triage" usePatientChart cards={cards} onTabChanged={setCurrQueue} />
     </div>
   );
 };
