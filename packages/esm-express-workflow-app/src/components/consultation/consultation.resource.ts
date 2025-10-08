@@ -18,9 +18,10 @@ const getTodayRange = () => ({
 });
 
 export const useTotalVisits = () => {
-  const url = `${restBaseUrl}/visit?includeInactive=true&v=custom:(uuid,startDatetime,stopDatetime)&fromStartDate=${dayjs().format(
+  const url = `${restBaseUrl}/visit?includeInactive=false&v=custom:(uuid)&fromStartDate=${dayjs().format(
     'YYYY-MM-DD',
-  )}`;
+  )}&toStartDate=${dayjs().format('YYYY-MM-DD')}`;
+
   const { data, error, isLoading } = useSWR<{ data: { results: Array<Visit> } }>(url, openmrsFetch);
 
   return {
@@ -31,33 +32,34 @@ export const useTotalVisits = () => {
 };
 
 export function useLabOrders(params: UseLabOrdersParams = {}) {
-  const { status, newOrdersOnly = false, excludeCanceled = true } = params;
+  const { status, excludeCanceled = true } = params;
   const { labOrderTypeUuid } = useConfig<ExpressWorkflowConfig>();
 
   const url = useMemo(() => {
     const { start, end } = getTodayRange();
-    let apiUrl = `${restBaseUrl}/order?orderTypes=${labOrderTypeUuid}&v=custom:(uuid,dateActivated,action,fulfillerStatus,dateStopped)`;
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${labOrderTypeUuid}&v=custom:(uuid)`;
+
+    if (!status) {
+      apiUrl += `&action=NEW`;
+    }
 
     if (status) {
       apiUrl += `&fulfillerStatus=${status}`;
     }
+
     if (excludeCanceled) {
       apiUrl += `&excludeCanceledAndExpired=true&excludeDiscontinueOrders=true`;
     }
+
     apiUrl += `&activatedOnOrAfterDate=${start}&activatedOnOrBeforeDate=${end}`;
 
     return apiUrl;
-  }, [status, excludeCanceled]);
+  }, [status, excludeCanceled, labOrderTypeUuid]);
 
   const { data, error, isLoading } = useSWR<{ data: { results: Array<Order> } }>(url, openmrsFetch);
 
-  const filteredOrders = useMemo(() => {
-    const orders = data?.data?.results ?? [];
-    return newOrdersOnly ? orders.filter((order) => order.action === 'NEW' && order.fulfillerStatus === null) : orders;
-  }, [data, newOrdersOnly]);
-
   return {
-    labOrders: filteredOrders,
+    labOrders: data?.data?.results ?? [],
     isLoading,
     isError: error,
   };
@@ -68,11 +70,16 @@ function useRadiologyOrders(fulfillerStatus?: string) {
 
   const url = useMemo(() => {
     const { start, end } = getTodayRange();
-    let apiUrl = `${restBaseUrl}/order?orderTypes=${imagingOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,fulfillerStatus,dateStopped)`;
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${imagingOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,dateStopped)`;
+
+    if (!fulfillerStatus) {
+      apiUrl += `&action=NEW`;
+    }
 
     if (fulfillerStatus) {
       apiUrl += `&fulfillerStatus=${fulfillerStatus}`;
     }
+
     apiUrl += `&activatedOnOrAfterDate=${start}&activatedOnOrBeforeDate=${end}`;
 
     return apiUrl;
@@ -86,12 +93,9 @@ function useRadiologyOrders(fulfillerStatus?: string) {
       (order) =>
         !order.dateStopped &&
         order.concept.conceptClass.uuid === imagingConceptClassUuid &&
-        order.action !== 'DISCONTINUE' &&
-        (fulfillerStatus
-          ? order.fulfillerStatus === fulfillerStatus
-          : !order.fulfillerStatus && order.action === 'NEW'),
+        order.action !== 'DISCONTINUE',
     ).length;
-  }, [data, fulfillerStatus, imagingConceptClassUuid]);
+  }, [data, imagingConceptClassUuid]);
 
   return { count, isLoading };
 }
@@ -117,6 +121,8 @@ export const useInvestigationStats = () => {
 };
 
 export const useQueuePriorityCounts = (queueEntries: Array<QueueEntry>) => {
+  const { priorities } = useConfig<ExpressWorkflowConfig>();
+
   return useMemo(() => {
     const counts = {
       emergency: 0,
@@ -125,17 +131,17 @@ export const useQueuePriorityCounts = (queueEntries: Array<QueueEntry>) => {
     };
 
     queueEntries.forEach((entry) => {
-      const priority = entry.priority.display.toLowerCase();
+      const priorityUuid = entry.priority.uuid;
 
-      if (priority === 'emergency') {
+      if (priorityUuid === priorities?.emergencyPriorityConceptUuid) {
         counts.emergency++;
-      } else if (priority === 'urgent') {
+      } else if (priorityUuid === priorities?.urgentPriorityConceptUuid) {
         counts.urgent++;
-      } else if (priority === 'not urgent') {
+      } else if (priorityUuid === priorities?.notUrgentPriorityConceptUuid) {
         counts.notUrgent++;
       }
     });
 
     return counts;
-  }, [queueEntries]);
+  }, [queueEntries, priorities]);
 };

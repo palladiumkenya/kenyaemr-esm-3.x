@@ -121,6 +121,11 @@ export const configSchema = {
       formUuid: 'e958f902-64df-4819-afd4-7fb061f59308',
     },
   },
+  priorities: {
+    emergencyPriorityConceptUuid: '037446f4-adfc-40b3-928c-a39a4826b1bf',
+    urgentPriorityConceptUuid: 'ef5718cd-d6d5-4fcf-bb82-cc4afaa90603',
+    notUrgentPriorityConceptUuid: '80cd8f8c-5d82-4cdc-b96e-a6addeb94b7f',
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -158,5 +163,10 @@ export type ExpressWorkflowConfig = {
   clinicalEncounter: {
     encounterTypeUuid: string;
     formUuid: string;
+  };
+  priorities: {
+    emergencyPriorityConceptUuid: string;
+    urgentPriorityConceptUuid: string;
+    notUrgentPriorityConceptUuid: string;
   };
 };
