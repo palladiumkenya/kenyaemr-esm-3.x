@@ -63,6 +63,7 @@ import {
 import { saveCervixFormData, useCervixFormData } from './forms/useCervixData';
 import { useOxytocinData, saveOxytocinFormData } from './resources/oxytocin.resource';
 import { useMembraneAmnioticFluidData } from './resources/membrane-amniotic-fluid.resource';
+import { usePulseBpCombinedData } from './resources/pulse-bp-combined.resource';
 import { from } from 'rxjs';
 
 enum ScaleTypes {
@@ -328,18 +329,14 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     }>
   >([]);
 
+  // Use combined Pulse/BP data for both graphs and tables
   const {
-    data: loadedPulseData,
-    isLoading: isPulseDataLoading,
-    error: pulseDataError,
-    mutate: mutatePulseData,
-  } = usePartographyData(patientUuid || '', 'maternal-pulse');
-  const {
-    data: loadedBPData,
-    isLoading: isBPDataLoading,
-    error: bpDataError,
-    mutate: mutateBPData,
-  } = usePartographyData(patientUuid || '', 'blood-pressure');
+    pulse: loadedPulseData,
+    bp: loadedBPData,
+    isLoading: isPulseBPCombinedLoading,
+    error: pulseBPCombinedError,
+    mutate: mutatePulseBPCombined,
+  } = usePulseBpCombinedData(patientUuid || '');
 
   const {
     data: loadedTemperatureData,
@@ -658,81 +655,83 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     setIsLoading(initialLoading);
   }, [partographGraphs]);
 
+  // Custom hook for graph data, using combined Pulse/BP data for those graphs
   const useGraphData = (graphType: string) => {
-    const { data: encounters, isLoading, mutate } = usePartographyData(patientUuid || '', graphType);
-
-    useEffect(() => {
-      if (!isLoading) {
-        let chartData: ChartDataPoint[] = [];
-
-        if (graphType === 'maternal-pulse' || graphType === 'blood-pressure') {
-          chartData = [];
-          if (Array.isArray(encounters)) {
-            encounters.forEach((encounter) => {
-              if (Array.isArray(encounter.obs)) {
-                const time = new Date(encounter.encounterDatetime).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                });
-                encounter.obs.forEach((obs) => {
-                  if (graphType === 'maternal-pulse' && obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']) {
-                    chartData.push({
-                      hour: 0,
-                      group: 'Maternal Pulse',
-                      time,
-                      value: typeof obs.value === 'number' ? obs.value : parseFloat(obs.value),
-                    });
-                  }
-                  if (graphType === 'blood-pressure') {
-                    if (obs.concept.uuid === PARTOGRAPHY_CONCEPTS['systolic-bp']) {
-                      chartData.push({
-                        hour: 0,
-                        group: 'Systolic',
-                        time,
-                        value: typeof obs.value === 'number' ? obs.value : parseFloat(obs.value),
-                      });
-                    }
-                    if (obs.concept.uuid === PARTOGRAPHY_CONCEPTS['diastolic-bp']) {
-                      chartData.push({
-                        hour: 0,
-                        group: 'Diastolic',
-                        time,
-                        value: typeof obs.value === 'number' ? obs.value : parseFloat(obs.value),
-                      });
-                    }
-                  }
-                });
-              }
+    if (graphType === 'maternal-pulse' || graphType === 'blood-pressure') {
+      // Use combined data for both
+      const pulseData = loadedPulseData && Array.isArray(loadedPulseData.data) ? loadedPulseData.data : [];
+      const bpData = loadedBPData && Array.isArray(loadedBPData.data) ? loadedBPData.data : [];
+      let chartData: ChartDataPoint[] = [];
+      if (graphType === 'maternal-pulse') {
+        chartData = pulseData.map((encounter, index) => {
+          const pulseObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']);
+          return {
+            hour: 0,
+            group: 'Maternal Pulse',
+            time: new Date(encounter.encounterDatetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            value: pulseObs ? (typeof pulseObs.value === 'number' ? pulseObs.value : parseFloat(pulseObs.value)) : 0,
+          };
+        });
+      } else if (graphType === 'blood-pressure') {
+        chartData = [];
+        bpData.forEach((encounter) => {
+          const time = new Date(encounter.encounterDatetime).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit',
+          });
+          const systolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['systolic-bp']);
+          const diastolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['diastolic-bp']);
+          if (systolicObs) {
+            chartData.push({
+              hour: 0,
+              group: 'Systolic',
+              time,
+              value: typeof systolicObs.value === 'number' ? systolicObs.value : parseFloat(systolicObs.value),
             });
           }
-        } else if (localPartographyData[graphType] && localPartographyData[graphType].length > 0) {
-          chartData = localPartographyData[graphType].map((item, index) => ({
-            hour: index + 1,
-            group: graphType,
-            time: item.time || `Point ${index + 1}`,
-            value: item.value || item.measurementValue || 0,
-          }));
-        } else {
-          chartData = transformEncounterToChartData(encounters, graphType);
-        }
-
-        if (chartData.length === 0 && ENABLE_DUMMY_DATA) {
-          chartData = generateDummyDataForGraph(graphType);
-        }
-
-        setGraphData((prevData) => ({
-          ...prevData,
-          [graphType]: chartData,
-        }));
-
-        setIsLoading((prevLoading) => ({
-          ...prevLoading,
-          [graphType]: false,
-        }));
+          if (diastolicObs) {
+            chartData.push({
+              hour: 0,
+              group: 'Diastolic',
+              time,
+              value: typeof diastolicObs.value === 'number' ? diastolicObs.value : parseFloat(diastolicObs.value),
+            });
+          }
+        });
       }
-    }, [encounters, isLoading, graphType, localPartographyData]);
-
-    return { encounters, isLoading, mutate };
+      useEffect(() => {
+        setGraphData((prevData) => ({ ...prevData, [graphType]: chartData }));
+        setIsLoading((prevLoading) => ({ ...prevLoading, [graphType]: isPulseBPCombinedLoading }));
+      }, [graphType, pulseData, bpData, isPulseBPCombinedLoading]);
+      return {
+        encounters: graphType === 'maternal-pulse' ? pulseData : bpData,
+        isLoading: isPulseBPCombinedLoading,
+        mutate: mutatePulseBPCombined,
+      };
+    } else {
+      const { data: encounters, isLoading, mutate } = usePartographyData(patientUuid || '', graphType);
+      useEffect(() => {
+        let chartData: ChartDataPoint[] = [];
+        if (!isLoading) {
+          if (localPartographyData[graphType] && localPartographyData[graphType].length > 0) {
+            chartData = localPartographyData[graphType].map((item, index) => ({
+              hour: index + 1,
+              group: graphType,
+              time: item.time || `Point ${index + 1}`,
+              value: item.value || item.measurementValue || 0,
+            }));
+          } else {
+            chartData = transformEncounterToChartData(encounters, graphType);
+          }
+          if (chartData.length === 0 && ENABLE_DUMMY_DATA) {
+            chartData = generateDummyDataForGraph(graphType);
+          }
+        }
+        setGraphData((prevData) => ({ ...prevData, [graphType]: chartData }));
+        setIsLoading((prevLoading) => ({ ...prevLoading, [graphType]: isLoading }));
+      }, [encounters, isLoading, graphType, localPartographyData]);
+      return { encounters, isLoading, mutate };
+    }
   };
 
   const generateDummyDataForGraph = (graphType: string): ChartDataPoint[] => {
@@ -1194,8 +1193,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         systolic: formData.systolicBP,
         diastolic: formData.diastolicBP,
       });
-      await mutatePulseData();
-      await mutateBPData();
+      await mutatePulseBPCombined();
 
       setPulseBPViewMode((prev) => (prev === 'table' ? 'graph' : 'table'));
       setTimeout(() => setPulseBPViewMode('graph'), 0);
@@ -1394,7 +1392,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   };
 
   const getPulseBPTableData = () => {
-    const bpMap = (loadedBPData || []).reduce((acc, encounter) => {
+    const bpEncounters = loadedBPData && Array.isArray(loadedBPData.data) ? loadedBPData.data : [];
+    const pulseEncounters = loadedPulseData && Array.isArray(loadedPulseData.data) ? loadedPulseData.data : [];
+    const bpMap = bpEncounters.reduce((acc, encounter) => {
       const systolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['systolic-bp']);
       const diastolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['diastolic-bp']);
       if (systolicObs && diastolicObs) {
@@ -1408,7 +1408,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       return acc;
     }, {} as Record<string, any>);
 
-    return (loadedPulseData || []).map((encounter, index) => {
+    return pulseEncounters.map((encounter, index) => {
       const pulseObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']);
       const pulse = pulseObs
         ? typeof pulseObs.value === 'number'

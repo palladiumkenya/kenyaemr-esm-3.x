@@ -544,14 +544,12 @@ function buildObservations(graphType: string, formData: any): any[] {
       }
       break;
 
-    case 'descent-of-head':
+    case 'descent-of-head': {
       if (formData.value || formData.measurementValue) {
         let conceptValue = formData.value || formData.measurementValue;
-
         if (formData.conceptUuid) {
           conceptValue = formData.conceptUuid;
         }
-
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['descent-of-head'],
           value: conceptValue,
@@ -559,19 +557,26 @@ function buildObservations(graphType: string, formData: any): any[] {
         });
       }
       break;
-
-    case 'uterine-contractions':
+    }
+    case 'pulse-bp-combined': {
+      // Save both maternal pulse and blood pressure observations
+      const pulseObs = buildMaternalPulseObservation({ value: formData.pulse });
+      const bpObs = buildBloodPressureObservation({ systolic: formData.systolic, diastolic: formData.diastolic });
+      return [...pulseObs, ...bpObs];
+    }
+    case 'uterine-contractions': {
       return buildUterineContractionsObservation(formData);
-
-    case 'maternal-pulse':
+    }
+    case 'maternal-pulse': {
       return [];
-    case 'blood-pressure':
+    }
+    case 'blood-pressure': {
       return [];
-
-    case 'temperature':
+    }
+    case 'temperature': {
       return buildTemperatureObservation(formData);
-
-    case 'urine-analysis':
+    }
+    case 'urine-analysis': {
       if (formData.proteinLevel) {
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['protein-level'],
@@ -594,6 +599,7 @@ function buildObservations(graphType: string, formData: any): any[] {
         });
       }
       break;
+    }
 
     case 'drugs-fluids':
       if (formData.medication || formData.drugName) {
