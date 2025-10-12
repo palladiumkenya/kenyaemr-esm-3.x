@@ -14,6 +14,7 @@ import {
 } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import styles from '../partography.scss';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 interface MembraneAmnioticFluidData {
   timeSlot: string;
@@ -62,12 +63,16 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Calculate pagination
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    Math.ceil(totalItems / pageSize),
+    currentPage,
+    totalItems,
+  );
 
-  // Table headers for membrane amniotic fluid data (remove timeSlot)
   const tableHeaders = [
     { key: 'date', header: t('date', 'Date') },
     { key: 'exactTime', header: t('exactTime', 'Exact Time') },
@@ -75,32 +80,21 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
     { key: 'moulding', header: t('moulding', 'Moulding') },
   ];
 
-  // Generate time columns - always show at least 13 empty grids
   const getTimeColumns = () => {
-    // Create 13 empty columns by default
     const emptyColumns = Array.from({ length: 13 }, (_, i) => `grid-${i + 1}`);
-
     if (data.length === 0) {
-      // Return 13 empty grids when no data
       return emptyColumns;
     }
-
-    // Use exactTime (or index if missing) for each entry; do not filter or deduplicate
     const dataTimes = data.map((item, idx) => item.exactTime || String(idx));
-
-    // If data columns are less than 13, fill remaining with empty grids
     if (dataTimes.length <= 13) {
       const remainingEmpty = Array.from({ length: 13 - dataTimes.length }, (_, i) => `empty-${i + 1}`);
       return [...dataTimes, ...remainingEmpty];
     }
-
-    // If more than 13, just return the data columns (scrollable)
     return dataTimes;
   };
 
   const timeColumns = getTimeColumns();
 
-  // Function to get amniotic fluid display value for graph (initials)
   const getAmnioticFluidInitials = (value: string): string => {
     const amnioticFluidMap: Record<string, string> = {
       'Membrane intact': 'M',
@@ -119,7 +113,6 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
     return amnioticFluidMap[value] || value.charAt(0).toUpperCase();
   };
 
-  // Function to get amniotic fluid display value for table (full label)
   const getAmnioticFluidLabel = (value: string): string => {
     const amnioticFluidLabelMap: Record<string, string> = {
       M: 'Membrane intact',
@@ -131,7 +124,6 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
     return amnioticFluidLabelMap[value] || value;
   };
 
-  // Function to get moulding display value for graph (++ etc)
   const getMouldingSymbol = (value: string): string => {
     const mouldingMap: Record<string, string> = {
       '0': '0',
@@ -146,7 +138,6 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
     return mouldingMap[value] || value;
   };
 
-  // Create grid data for graph view using time as key
   const createGridData = () => {
     const gridData: Record<string, { amnioticFluid: string; moulding: string }> = {};
     data.forEach((item, idx) => {
@@ -211,10 +202,6 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
         {viewMode === 'graph' ? (
           <div className={styles.membraneGrid}>
             <div className={styles.gridContainer}>
-              {/* No header row for time columns as requested */}
-              {/* (Removed time row above graph) */}
-
-              {/* Amniotic Fluid row */}
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('amnioticFluid', 'Amniotic Fluid')}</div>
                 {timeColumns.map((timeColumn) => {
@@ -227,7 +214,6 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
                 })}
               </div>
 
-              {/* Moulding row */}
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('moulding', 'Moulding')}</div>
                 {timeColumns.map((timeColumn) => {
@@ -284,7 +270,7 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
                     page={currentPage}
                     totalItems={totalItems}
                     pageSize={pageSize}
-                    pageSizes={[5, 10, 20, 50]}
+                    pageSizes={calculatedPageSizes}
                     onChange={(event) => {
                       onPageChange?.(event.page);
                       if (event.pageSize !== pageSize) {
@@ -294,6 +280,7 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
                     size={controlSize}
                   />
                 )}
+                {totalItems > 0 && <div className={styles.paginationInfo}>{itemsDisplayed}</div>}
               </>
             ) : (
               <div className={styles.emptyState}>

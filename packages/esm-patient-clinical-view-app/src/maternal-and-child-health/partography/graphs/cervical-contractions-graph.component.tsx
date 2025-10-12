@@ -3,6 +3,7 @@ import { Pagination, Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import styles from '../partography.scss';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 interface CervicalContractionsData {
   timeSlot: string;
@@ -60,13 +61,11 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Pagination logic for table view
   const paginatedTableData =
     viewMode === 'table' && tableData && tableData.length > 0
       ? tableData.slice((currentPage - 1) * pageSize, currentPage * pageSize)
       : tableData;
 
-  // Date formatting helper
   const formatDate = (dateStr: string) => {
     if (!dateStr) {
       return '';
@@ -81,10 +80,7 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
       year: 'numeric',
     });
   };
-
-  // Y-axis labels for contractions per 10 min (from 5 down to 1)
   const yAxisLabels = ['5', '4', '3', '2', '1'];
-
   return (
     <div className={styles.fetalHeartRateSection}>
       <div className={styles.fetalHeartRateContainer}>
@@ -138,7 +134,6 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
             <div
               className={styles.contractionsContainer}
               style={{ minWidth: Math.max(1100, 70 * Math.max(13, data.length) + 60) }}>
-              {/* Header row with time slots */}
               <div className={styles.contractionsTimeHeaders} style={{ display: 'flex' }}>
                 <div className={styles.contractionsYAxisLabel} style={{ minWidth: 60, fontWeight: 600 }}>
                   {t('time', 'Time')}
@@ -152,8 +147,6 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
                   </div>
                 ))}
               </div>
-
-              {/* Grid Rows with Y-axis labels */}
               {yAxisLabels.map((label, rowIndex) => (
                 <div key={label} className={styles.contractionsGridRow} style={{ display: 'flex' }}>
                   <div className={styles.contractionsYAxisLabel} style={{ minWidth: 60 }}>
@@ -200,8 +193,6 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
                   })}
                 </div>
               ))}
-
-              {/* Y-Axis Title */}
               <div className={styles.contractionsYAxisTitle}>
                 <span>{t('contractionsPerTenMin', 'Contractions per 10 min')}</span>
               </div>
@@ -233,18 +224,35 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
                     </tbody>
                   </table>
                 </div>
-                <Pagination
-                  page={currentPage}
-                  pageSize={pageSize}
-                  totalItems={totalItems}
-                  pageSizes={[5, 10, 20, 50]}
-                  onChange={({ page, pageSize }) => {
-                    onPageChange?.(page);
-                    onPageSizeChange?.(pageSize);
-                  }}
-                  size={controlSize}
-                  className={styles.pagination}
-                />
+                {(() => {
+                  const totalPages = Math.ceil((totalItems || 0) / (pageSize || 1)) || 1;
+                  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+                    pageSize,
+                    totalPages,
+                    currentPage,
+                    totalItems || 0,
+                  );
+
+                  return (
+                    <>
+                      <Pagination
+                        page={currentPage}
+                        pageSize={pageSize}
+                        totalItems={totalItems}
+                        pageSizes={calculatedPageSizes}
+                        onChange={({ page, pageSize: newSize }) => {
+                          onPageChange?.(page);
+                          onPageSizeChange?.(newSize);
+                        }}
+                        size={controlSize}
+                        className={styles.pagination}
+                      />
+                      <div className={styles.tableStats}>
+                        <span className={styles.recordCount}>{itemsDisplayed}</span>
+                      </div>
+                    </>
+                  );
+                })()}
               </>
             ) : (
               <div className={styles.emptyState}>

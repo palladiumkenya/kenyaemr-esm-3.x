@@ -101,8 +101,6 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
       return;
     }
 
-    // Submit the form data (using timeSampleCollected as the main time reference)
-    // Add the correct concept UUID for urine volume in the payload for backend compatibility
     onSubmit({
       timeSlot: data.timeSampleCollected,
       exactTime: data.timeSampleCollected,
@@ -113,12 +111,10 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
       timeResultsReturned: data.timeResultsReturned,
     });
 
-    // Call the onDataSaved callback if provided
     if (onDataSaved) {
       onDataSaved();
     }
 
-    // Reset the form
     reset();
   };
 
@@ -127,7 +123,6 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
     onClose();
   };
 
-  // Protein and Acetone options based on the provided data
   const proteinOptions = [
     { value: '0', label: '0' },
     { value: '+', label: '+' },
@@ -154,7 +149,6 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
       className={styles.modal}>
       <form>
         <Grid>
-          {/* First Row: Protein and Time Sample Collected */}
           <Column lg={8} md={4} sm={4}>
             <Controller
               name="protein"
@@ -194,7 +188,6 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
             />
           </Column>
 
-          {/* Second Row: Acetone (spanning full width) */}
           <Column lg={16} md={8} sm={4}>
             <Controller
               name="acetone"
@@ -216,7 +209,6 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
             />
           </Column>
 
-          {/* Third Row: Volume and Time Results Returned */}
           <Column lg={8} md={4} sm={4}>
             <Controller
               name="volume"

@@ -45,14 +45,12 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
 
   const watchOxytocinUsed = watch('oxytocinUsed');
 
-  // Oxytocin usage options
   const oxytocinOptions = [
     { id: 'yes', text: t('yes', 'Yes') },
     { id: 'no', text: t('no', 'No') },
   ];
 
   const onSubmitForm = async (data: OxytocinFormData) => {
-    // Check for empty fields first
     if (!data.time || data.time === '') {
       setError('time', {
         type: 'manual',
@@ -60,7 +58,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
       });
       return;
     }
-
     if (!data.oxytocinUsed || data.oxytocinUsed === '') {
       setError('oxytocinUsed', {
         type: 'manual',
@@ -68,8 +65,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
       });
       return;
     }
-
-    // Validate drops per minute if oxytocin is used
     if (data.oxytocinUsed === 'yes' && (!data.dropsPerMinute || data.dropsPerMinute === '')) {
       setError('dropsPerMinute', {
         type: 'manual',
@@ -77,8 +72,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
       });
       return;
     }
-
-    // Parse values and check for NaN
     const dropsPerMinute = data.oxytocinUsed === 'yes' ? parseInt(data.dropsPerMinute) : 0;
 
     if (data.oxytocinUsed === 'yes' && isNaN(dropsPerMinute)) {
@@ -88,8 +81,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
       });
       return;
     }
-
-    // Validate drops per minute range
     if (data.oxytocinUsed === 'yes' && (dropsPerMinute < 0 || dropsPerMinute > 60)) {
       setError('dropsPerMinute', {
         type: 'manual',
@@ -97,14 +88,8 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
       });
       return;
     }
-
-    // Clear any previous errors
     clearErrors();
-
-    // Use the time directly as the time slot
     const timeSlot = data.time;
-
-    // Call the onSubmit callback with the form data
     onSubmit({
       oxytocinUsed: data.oxytocinUsed as 'yes' | 'no',
       dropsPerMinute: dropsPerMinute,
@@ -135,7 +120,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
       size="md">
       <div className={styles.modalContent}>
         <Grid>
-          {/* Time Selection Row */}
           <Column sm={4} md={8} lg={16}>
             <Controller
               name="time"
@@ -156,8 +140,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
               )}
             />
           </Column>
-
-          {/* Oxytocin Usage Row */}
           <Column sm={4} md={8} lg={16}>
             <Controller
               name="oxytocinUsed"
@@ -180,8 +162,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
               )}
             />
           </Column>
-
-          {/* Drops per Minute Row (only show if oxytocin is used) */}
           {watchOxytocinUsed === 'yes' && (
             <Column sm={4} md={8} lg={16}>
               <Controller

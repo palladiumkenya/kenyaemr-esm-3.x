@@ -2,8 +2,12 @@
   "actions": "እርምጃዎች",
   "activeMedications": "አሁን ያሉ መድኃኒቶች",
   "add": "አክል",
+<<<<<<< HEAD
   "addedPatientToQueue": "ሕመምተኛ በጥበቃ መስመር ተጨምሯል",
   "Admitted/OPD": "የተኝተው/የውጪ ሕመምተኛ ጉብኝቶች",
+=======
+  "addedPatientToQueue": "Added patient to queue",
+>>>>>>> 41ea4cb (Remove the comments)
   "appointments": "ቀጠሮዎች",
   "attachments": "አባሪዎች",
   "awaiting": "እየጠበቀ",
@@ -26,9 +30,14 @@
   "clientsPatientsWaiting": "የሚጠብቁ ደንበኞች/ሕመምተኞች",
   "clinicalEncounter": "ክሊኒካዊ ግንኙነት/ምርመራ",
   "comingFrom": "የመጡበት ቦታ",
+<<<<<<< HEAD
   "completed": "ተጠናቋል",
   "configureQueueLocations": "እባክዎ ለመቀጠል የጥበቃ መስመር ቦታዎችን ያዋቅሩ።",
   "configureServices": "እባክዎ ለመቀጠል አገልግሎቶችን ያዋቅሩ።",
+=======
+  "configureQueueLocations": "Please configure queue locations to continue.",
+  "configureServices": "Please configure services to continue.",
+>>>>>>> 41ea4cb (Remove the comments)
   "confirmationTxt": "ከኦቲፒ በፊት የስልክ ቁጥሩን ያረጋግጡ",
   "consultation": "ምክር (ምክክር)",
   "continueWithCare": "እንክብካቤውን ይቀጥሉ",
@@ -72,10 +81,17 @@
   "noDependentsFound": "ለዚህ ሕመምተኛ ምንም ጥገኞች አልተገኙም",
   "noPatientFound": "ምንም ሕመምተኛ አልተገኘም",
   "noPatientsAwaiting": "አገልግሎት የሚጠብቁ ሕሙማን የሉም",
+<<<<<<< HEAD
   "noQueueLocationsConfigured": "ምንም የጥበቃ መስመር ቦታዎች አልተዋቀሩም",
   "noQueuesAvailable": "ምንም የጥበቃ መስመሮች የሉም",
   "noQueueSelected": "እባክዎ የጥበቃ መስመር ይምረጡ",
   "noServicesConfigured": "ምንም አገልግሎቶች አልተዋቀሩም",
+=======
+  "noQueueLocationsConfigured": "No queue locations configured",
+  "noQueuesAvailable": "ምንም የጥበቃ መስመሮች የሉም",
+  "noQueueSelected": "እባክዎ የጥበቃ መስመር ይምረጡ",
+  "noServicesConfigured": "No services configured",
+>>>>>>> 41ea4cb (Remove the comments)
   "notCheckedIn": "አልተመዘገበም",
   "notUrgent": "አስቸኳይ አይደለም",
   "numberofEmergencyCasesSeen": "የተታዩ የድንገተኛ ሁኔታ ሕመምተኞች ቁጥር",
@@ -88,6 +104,7 @@
   "otpTimeRemaining": "የቀረው ጊዜ",
   "otpVerification": "ኦቲፒ ማረጋገጫ",
   "otpVerificationError": "ኦቲፒ በማረጋገጥ ላይ ስህተት",
+<<<<<<< HEAD
   "partograph": "ፓርቶግራፍ",
   "pastMedications": "ያለፉ መድኃኒቶች",
   "patientAttended": "ሕመምተኛ ተንከባክቧል",
@@ -96,6 +113,17 @@
   "patientHistory": "የሕመምተኛ ታሪክ",
   "patientManagement": "የሕመምተኛ አስተዳደር",
   "patientsAwaiting": "የሚጠብቅ ሕመምተኛ",
+=======
+  "partograph": "Partograph",
+  "pastMedications": "ያለፉ መድኃኒቶች",
+  "patientAttended": "Patient attended",
+  "patientCategory": "Patient Category",
+  "patientExamination": "የሕመምተኛ ምርመራ",
+  "patientHistory": "የሕመምተኛ ታሪክ",
+  "patientManagement": "የሕመምተኛ አስተዳደር",
+  "patientsAttendedTo": "Patients attended to",
+  "patientsAwaiting": "Patient awaiting",
+>>>>>>> 41ea4cb (Remove the comments)
   "patientSummary": "የሕመምተኛ ማጠቃለያ",
   "phoneNumber": "ስልክ ቁጥር",
   "previousPage": "የቀደመ ገጽ",
@@ -103,8 +131,13 @@
   "proceduresOrders": "የሂደቶች ትዕዛዞች",
   "processing": "እየተሰራ ነው...",
   "queue": "የጥበቃ መስመር",
+<<<<<<< HEAD
   "queueEntryAddedSuccessfully": "የጥበቃ መስመር ግቤት በተሳካ ሁኔታ ተጨምሯል",
   "queueEntryError": "ሕመምተኛን በጥበቃ መስመር በመጨመር ላይ ስህተት",
+=======
+  "queueEntryAddedSuccessfully": "Queue entry added successfully",
+  "queueEntryError": "Error adding patient to the queue",
+>>>>>>> 41ea4cb (Remove the comments)
   "queueNumber": "የጥበቃ ቁጥር",
   "queuePatient": "ሕመምተኛን በጥበቃ መስመር አስገባ",
   "radiologyAndImagingOrders": "ራዲዮሎጂ እና ኢሜጂንግ ትዕዛዞች",
@@ -121,9 +154,15 @@
   "searching": "እየተፈለገ ነው...",
   "searchPatients": "ሕመምተኛ(ዎችን) ይፈልጉ",
   "selectIdentifierAndNumber": "እባክዎ መለያ ዓይነት ይምረጡ እና መለያ ቁጥር ያስገቡ",
+<<<<<<< HEAD
   "selectQueueService": "የጥበቃ መስመር አገልግሎት ይምረጡ",
   "selectTriageService": "የምደባ አገልግሎት ይምረጡ",
   "selectWalkInService": "የቀጥታ መጪ አገልግሎት ይምረጡ",
+=======
+  "selectQueueService": "Select a queue service",
+  "selectTriageService": "Select a triage service",
+  "selectWalkInService": "Select a walk-in service",
+>>>>>>> 41ea4cb (Remove the comments)
   "sendingOtp": "ኦቲፒ እየተላከ ነው...",
   "sendOtp": "ኦቲፒ ይላኩ",
   "sendOtpCode": "የኦቲፒ ኮድ ይላኩ",

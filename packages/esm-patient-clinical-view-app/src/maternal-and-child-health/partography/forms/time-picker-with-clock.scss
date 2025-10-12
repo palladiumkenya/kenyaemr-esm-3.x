@@ -11,8 +11,6 @@
 .inputWrapper {
   position: relative;
   cursor: pointer;
-
-  // Make input clickable but read-only
   input {
     cursor: pointer;
     caret-color: transparent;
@@ -132,7 +130,6 @@
   }
 }
 
-// Responsive adjustments
 @media (max-width: 672px) {
   .clockDropdown {
     position: fixed;
@@ -158,7 +155,6 @@
   }
 }
 
-// Dark theme support
 @media (prefers-color-scheme: dark) {
   .clockDropdown {
     background: $ui-02;

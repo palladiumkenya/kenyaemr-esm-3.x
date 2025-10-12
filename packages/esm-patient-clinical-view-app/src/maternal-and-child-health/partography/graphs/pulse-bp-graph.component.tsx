@@ -37,7 +37,7 @@ const PULSE_BP_CHART_OPTIONS = {
       domain: [0, 12],
       ticks: {
         values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        formatter: (index: number) => '', // Remove x-axis labels
+        formatter: (index: number) => '',
       },
     },
     left: {
@@ -86,71 +86,50 @@ const PULSE_BP_CHART_OPTIONS = {
 const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
   const { t } = useTranslation();
 
-  // Helper function to format date/time for display
   const formatDateTime = (item: PulseBPData, index: number): string => {
-    // If we have a timestamp, use it
     if (item.timestamp) {
       return item.timestamp.toLocaleDateString() + ' ' + item.timestamp.toLocaleTimeString();
     }
-
-    // If we have separate date and time, combine them
     if (item.date && item.time) {
       return `${item.date} ${item.time}`;
     }
-
-    // If we only have date
     if (item.date) {
       return item.date;
     }
-
-    // If we only have time
     if (item.time) {
       return item.time;
     }
-
-    // Fallback to current date/time for new entries
     const now = new Date();
     return now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
   };
 
-  // Use actual data from props, no sample data
   const actualData: PulseBPData[] = data.length > 0 ? data : [];
 
-  // Always show the chart, even if empty
-  // Transform pulse data for chart - start from y-axis intersection like cervix graph
   const pulseChartData: ChartDataPoint[] = [];
 
-  // If we have data, add starting point at y-axis and then actual data points
   if (actualData.length > 0) {
-    // Add starting point at y-axis (index 0) using first pulse value
     pulseChartData.push({ index: 0, value: actualData[0].pulse, group: 'Pulse' });
-
-    // Add all actual data points
     actualData.forEach((item, index) => {
       pulseChartData.push({
-        index: index + 1, // Start from position 1, 2, 3, etc.
+        index: index + 1,
         value: item.pulse,
         group: 'Pulse',
       });
     });
   } else {
-    // For empty chart, add a minimal invisible data point to ensure chart renders with proper structure
     pulseChartData.push({ index: 0, value: 120, group: 'Pulse' });
   }
 
-  // Use pulse data for the chart line (will show grid even if empty)
   const finalChartData = [...pulseChartData];
 
-  // Chart options similar to cervix graph
   const chartOptions = {
     ...PULSE_BP_CHART_OPTIONS,
     title: 'Pulse and Blood Pressure Monitoring',
     color: {
       scale: {
-        Pulse: actualData.length > 0 ? '#0F62FE' : 'transparent', // Hide line if no real data
+        Pulse: actualData.length > 0 ? '#0F62FE' : 'transparent',
       },
     },
-    // Hide points if no real data
     points: {
       enabled: actualData.length > 0,
       radius: 4,
@@ -164,7 +143,6 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
         <div style={{ position: 'relative' }}>
           <LineChart data={finalChartData} options={chartOptions} />
 
-          {/* Single SVG overlay for all arrows and lines - only show if we have actual data */}
           {actualData.length > 0 && (
             <svg
               style={{
@@ -177,35 +155,26 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                 zIndex: 5,
               }}>
               {actualData.map((item, index) => {
-                // More precise positioning to match Carbon Chart's actual rendering
-                // Fine-tuned margins to match Carbon Charts internal layout exactly
-                const chartMarginTop = 20; // Increased for title and legend space
-                const chartMarginBottom = 10; // Bottom margin for x-axis
-                const chartMarginLeft = 12; // Adjusted for y-axis labels (more precise)
-                const chartMarginRight = 5; // Right margin
+                const chartMarginTop = 20;
+                const chartMarginBottom = 10;
+                const chartMarginLeft = 12;
+                const chartMarginRight = 5;
 
-                // Calculate chart area dimensions
                 const chartWidth = 100 - chartMarginLeft - chartMarginRight;
                 const chartHeight = 100 - chartMarginTop - chartMarginBottom;
 
-                // X position: Since we start from index 1 in chart data,
-                // we need to position our SVG overlay at the same x-coordinate as the actual chart points
-                const dataPointIndex = index + 1; // This matches the chart data index
+                const dataPointIndex = index + 1;
                 const xPosition = chartMarginLeft + (dataPointIndex / 12) * chartWidth;
 
-                // For BP arrows, offset them slightly to align on same vertical axis as pulse
-                // Using x-1 approach: move BP indicators one grid unit to the left
-                const gridUnit = chartWidth / 12; // Size of one grid unit
+                const gridUnit = chartWidth / 12;
                 const bpXPosition = chartMarginLeft + ((dataPointIndex - 1) / 12) * chartWidth;
 
-                // Y positions based on value mapping to chart scale (60-180 range)
                 const pulseYPosition = chartMarginTop + ((180 - item.pulse) / (180 - 60)) * chartHeight;
                 const systolicYPosition = chartMarginTop + ((180 - item.systolicBP) / (180 - 60)) * chartHeight;
                 const diastolicYPosition = chartMarginTop + ((180 - item.diastolicBP) / (180 - 60)) * chartHeight;
 
                 return (
                   <g key={index}>
-                    {/* Arrow definitions - fixed orientation */}
                     <defs>
                       <marker
                         id={`systolic-arrow-${index}`}
@@ -229,7 +198,6 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       </marker>
                     </defs>
 
-                    {/* Systolic arrow line - ALWAYS points upward from pulse to systolic value */}
                     <line
                       x1={`${bpXPosition}%`}
                       y1={`${pulseYPosition}%`}
@@ -240,7 +208,6 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       markerEnd={`url(#systolic-arrow-${index})`}
                     />
 
-                    {/* Diastolic arrow line - ALWAYS points downward from pulse to diastolic value */}
                     <line
                       x1={`${bpXPosition}%`}
                       y1={`${pulseYPosition}%`}
@@ -251,7 +218,6 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       markerEnd={`url(#diastolic-arrow-${index})`}
                     />
 
-                    {/* Marker circles at exact BP values for precise indication */}
                     <circle cx={`${bpXPosition}%`} cy={`${systolicYPosition}%`} r="3" fill="#DA1E28" opacity="0.8">
                       <title>
                         {formatDateTime(item, index)} - Systolic BP: {item.systolicBP} mmHg
@@ -264,7 +230,6 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       </title>
                     </circle>
 
-                    {/* Pulse point indicator - aligned with BP arrows for neat vertical layout */}
                     <circle
                       cx={`${bpXPosition}%`}
                       cy={`${pulseYPosition}%`}

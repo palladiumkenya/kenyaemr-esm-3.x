@@ -1,3 +1,4 @@
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   CONTRACTION_INTENSITY_OPTIONS,
   PARTOGRAPHY_CONCEPTS,
@@ -657,13 +658,16 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
   // Custom hook for graph data, using combined Pulse/BP data for those graphs
   const useGraphData = (graphType: string) => {
-    if (graphType === 'maternal-pulse' || graphType === 'blood-pressure') {
-      // Use combined data for both
-      const pulseData = loadedPulseData && Array.isArray(loadedPulseData.data) ? loadedPulseData.data : [];
-      const bpData = loadedBPData && Array.isArray(loadedBPData.data) ? loadedBPData.data : [];
+    // Always call hooks unconditionally
+    const pulseData = loadedPulseData && Array.isArray(loadedPulseData.data) ? loadedPulseData.data : [];
+    const bpData = loadedBPData && Array.isArray(loadedBPData.data) ? loadedBPData.data : [];
+    const { data: encounters, isLoading, mutate } = usePartographyData(patientUuid || '', graphType);
+
+    useEffect(() => {
       let chartData: ChartDataPoint[] = [];
+      let loading = false;
       if (graphType === 'maternal-pulse') {
-        chartData = pulseData.map((encounter, index) => {
+        chartData = pulseData.map((encounter) => {
           const pulseObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']);
           return {
             hour: 0,
@@ -672,6 +676,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             value: pulseObs ? (typeof pulseObs.value === 'number' ? pulseObs.value : parseFloat(pulseObs.value)) : 0,
           };
         });
+        loading = isPulseBPCombinedLoading;
       } else if (graphType === 'blood-pressure') {
         chartData = [];
         bpData.forEach((encounter) => {
@@ -698,20 +703,8 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             });
           }
         });
-      }
-      useEffect(() => {
-        setGraphData((prevData) => ({ ...prevData, [graphType]: chartData }));
-        setIsLoading((prevLoading) => ({ ...prevLoading, [graphType]: isPulseBPCombinedLoading }));
-      }, [graphType, pulseData, bpData, isPulseBPCombinedLoading]);
-      return {
-        encounters: graphType === 'maternal-pulse' ? pulseData : bpData,
-        isLoading: isPulseBPCombinedLoading,
-        mutate: mutatePulseBPCombined,
-      };
-    } else {
-      const { data: encounters, isLoading, mutate } = usePartographyData(patientUuid || '', graphType);
-      useEffect(() => {
-        let chartData: ChartDataPoint[] = [];
+        loading = isPulseBPCombinedLoading;
+      } else {
         if (!isLoading) {
           if (localPartographyData[graphType] && localPartographyData[graphType].length > 0) {
             chartData = localPartographyData[graphType].map((item, index) => ({
@@ -727,9 +720,26 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             chartData = generateDummyDataForGraph(graphType);
           }
         }
-        setGraphData((prevData) => ({ ...prevData, [graphType]: chartData }));
-        setIsLoading((prevLoading) => ({ ...prevLoading, [graphType]: isLoading }));
-      }, [encounters, isLoading, graphType, localPartographyData]);
+        loading = isLoading;
+      }
+      setGraphData((prevData) => ({ ...prevData, [graphType]: chartData }));
+      setIsLoading((prevLoading) => ({ ...prevLoading, [graphType]: loading }));
+    }, [
+      graphType,
+      pulseData,
+      bpData,
+      isPulseBPCombinedLoading,
+      encounters,
+      isLoading,
+      localPartographyData,
+      ENABLE_DUMMY_DATA,
+    ]);
+
+    if (graphType === 'maternal-pulse') {
+      return { encounters: pulseData, isLoading: isPulseBPCombinedLoading, mutate: mutatePulseBPCombined };
+    } else if (graphType === 'blood-pressure') {
+      return { encounters: bpData, isLoading: isPulseBPCombinedLoading, mutate: mutatePulseBPCombined };
+    } else {
       return { encounters, isLoading, mutate };
     }
   };
@@ -1992,30 +2002,40 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 </DataTable>
 
                 {totalItems > 0 && (
-                  <Pagination
-                    page={currentPageNum}
-                    totalItems={totalItems}
-                    pageSize={currentPageSize}
-                    pageSizes={[5, 10, 20, 50]}
-                    onChange={(event) => {
-                      handlePageChange(graph.id, event.page);
-                      if (event.pageSize !== currentPageSize) {
-                        handlePageSizeChange(graph.id, event.pageSize);
-                      }
-                    }}
-                    size={controlSize}
-                  />
+                  <>
+                    {/* compute dynamic page sizes and a human friendly items string */}
+                    {(() => {
+                      const totalPages = Math.ceil(totalItems / currentPageSize) || 1;
+                      const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+                        currentPageSize,
+                        totalPages,
+                        currentPageNum,
+                        totalItems,
+                      );
+
+                      return (
+                        <>
+                          <Pagination
+                            page={currentPageNum}
+                            totalItems={totalItems}
+                            pageSize={currentPageSize}
+                            pageSizes={calculatedPageSizes}
+                            onChange={(event) => {
+                              handlePageChange(graph.id, event.page);
+                              if (event.pageSize !== currentPageSize) {
+                                handlePageSizeChange(graph.id, event.pageSize);
+                              }
+                            }}
+                            size={controlSize}
+                          />
+                          <div className={styles.tableStats}>
+                            <span className={styles.recordCount}>{itemsDisplayed}</span>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </>
                 )}
-                <div className={styles.tableStats}>
-                  <span className={styles.recordCount}>
-                    {t('showingResults', 'Showing {{start}}-{{end}} of {{total}} {{itemType}}', {
-                      start: totalItems === 0 ? 0 : startIndex + 1,
-                      end: Math.min(endIndex, totalItems),
-                      total: totalItems,
-                      itemType: totalItems === 1 ? t('record', 'record') : t('records', 'records'),
-                    })}
-                  </span>
-                </div>
               </>
             ) : (
               <div className={styles.emptyState}>

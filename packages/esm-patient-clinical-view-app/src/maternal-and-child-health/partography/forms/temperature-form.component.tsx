@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Modal, Grid, Column, NumberInput } from '@carbon/react';
+import { Modal, Grid, Column, NumberInput } from '@carbon/react';
 import TimePickerDropdown from './time-picker-dropdown.component';
 import styles from '../partography-data-form.scss';
 
@@ -32,7 +32,6 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
   onDataSaved,
   existingTimeEntries = [],
   patient,
-  // Remove initialTime, always blank
 }) => {
   const { t } = useTranslation();
 
@@ -55,10 +54,8 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
   const onSubmitForm = async (data: TemperatureFormData) => {
     const temperatureValue = parseFloat(data.temperature);
 
-    // Clear any existing errors first
     clearErrors();
 
-    // Validate time
     if (!data.time) {
       setError('time', {
         type: 'manual',
@@ -67,7 +64,6 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
       return;
     }
 
-    // Validate temperature
     if (!data.temperature || isNaN(temperatureValue) || temperatureValue < 30 || temperatureValue > 45) {
       setError('temperature', {
         type: 'manual',
@@ -76,7 +72,6 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
       return;
     }
 
-    // Check for duplicate time entries
     const isDuplicateTime = existingTimeEntries.some((entry) => entry.time === data.time);
 
     if (isDuplicateTime) {
@@ -87,19 +82,16 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
       return;
     }
 
-    // Submit the form data with both timeSlot and exactTime as the same value
     onSubmit({
       timeSlot: data.time,
       exactTime: data.time,
       temperature: temperatureValue,
     });
 
-    // Call the onDataSaved callback if provided
     if (onDataSaved) {
       onDataSaved();
     }
 
-    // Reset the form
     reset();
     onClose();
   };
@@ -110,7 +102,6 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
     onClose();
   };
 
-  // Helper function to get temperature status and advice
   const getTemperatureAdvice = (temp: string): { status: string; color: string; advice: string } => {
     const temperature = parseFloat(temp);
     if (isNaN(temperature)) {
@@ -191,7 +182,6 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
             />
           </Column>
 
-          {/* Temperature status indicator */}
           {temperatureAdvice.status && (
             <Column lg={16} md={8} sm={4}>
               <div className={styles.temperatureStatus}>

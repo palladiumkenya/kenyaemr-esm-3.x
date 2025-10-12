@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Modal, Grid, Column, NumberInput } from '@carbon/react';
+import { Modal, Grid, Column, NumberInput } from '@carbon/react';
 import styles from '../partography-data-form.scss';
 
 type PulseBPFormData = {
@@ -46,10 +46,8 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
     const systolicValue = parseInt(data.systolicBP);
     const diastolicValue = parseInt(data.diastolicBP);
 
-    // Clear any existing errors first
     clearErrors();
 
-    // Validate pulse
     if (!data.pulse || isNaN(pulseValue) || pulseValue < 30 || pulseValue > 200) {
       setError('pulse', {
         type: 'manual',
@@ -58,7 +56,6 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
       return;
     }
 
-    // Validate systolic BP
     if (!data.systolicBP || isNaN(systolicValue) || systolicValue < 60 || systolicValue > 250) {
       setError('systolicBP', {
         type: 'manual',
@@ -67,7 +64,6 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
       return;
     }
 
-    // Validate diastolic BP
     if (!data.diastolicBP || isNaN(diastolicValue) || diastolicValue < 40 || diastolicValue > 150) {
       setError('diastolicBP', {
         type: 'manual',
@@ -76,7 +72,6 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
       return;
     }
 
-    // Check if systolic is higher than diastolic
     if (systolicValue <= diastolicValue) {
       setError('systolicBP', {
         type: 'manual',
@@ -85,14 +80,12 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
       return;
     }
 
-    // Submit the form data
     onSubmit({
       pulse: pulseValue,
       systolicBP: systolicValue,
       diastolicBP: diastolicValue,
     });
 
-    // Reset the form
     reset();
     onClose();
   };

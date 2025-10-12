@@ -1,4 +1,5 @@
 import React from 'react';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   TableContainer,
@@ -38,10 +39,16 @@ const TemperatureTable: React.FC<TemperatureTableProps> = ({
   onPageChange,
   onPageSizeChange,
 }) => {
-  // Calculate pagination
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
+  const totalPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    totalPages,
+    currentPage,
+    tableData.length,
+  );
 
   const tableHeaders = [
     { key: 'date', header: 'Date' },
@@ -78,19 +85,23 @@ const TemperatureTable: React.FC<TemperatureTableProps> = ({
         )}
       </DataTable>
       {totalItems > 0 && (
-        <Pagination
-          page={currentPage}
-          totalItems={totalItems}
-          pageSize={pageSize}
-          pageSizes={[5, 10, 20, 50]}
-          onChange={(event) => {
-            onPageChange(event.page);
-            if (event.pageSize !== pageSize) {
-              onPageSizeChange(event.pageSize);
-            }
-          }}
-          size={controlSize}
-        />
+        <>
+          <Pagination
+            page={currentPage}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            pageSizes={calculatedPageSizes}
+            onChange={(event) => {
+              onPageChange(event.page);
+              if (event.pageSize !== pageSize) {
+                onPageSizeChange(event.pageSize);
+              }
+            }}
+            size={controlSize}
+          />
+          {/* Human-readable items range, e.g. "1-5 / 20 items" */}
+          <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#444' }}>{itemsDisplayed}</div>
+        </>
       )}
     </div>
   );

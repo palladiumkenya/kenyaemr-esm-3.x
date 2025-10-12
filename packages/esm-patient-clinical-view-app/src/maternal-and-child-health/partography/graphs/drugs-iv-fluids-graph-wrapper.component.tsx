@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-} from '@carbon/react';
+import { Button } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import DrugsIVFluidsGraph, { DrugsIVFluidsData } from './drugs-iv-fluids-graph.component';
 import DrugsIVFluidsForm from '../forms/drugs-iv-fluids-form.component';
@@ -50,14 +40,9 @@ const DrugsIVFluidsGraphWrapper: React.FC<DrugsIVFluidsGraphWrapperProps> = ({
   data = [],
   tableData = [],
   viewMode = 'graph',
-  currentPage = 1,
-  pageSize = 5,
-  totalItems = 0,
   controlSize = 'sm',
   onAddData,
   onViewModeChange,
-  onPageChange,
-  onPageSizeChange,
   isAddButtonDisabled = false,
   patient,
   onDrugsIVFluidsSubmit,
@@ -164,8 +149,6 @@ const DrugsIVFluidsGraphWrapper: React.FC<DrugsIVFluidsGraphWrapperProps> = ({
           </div>
         )}
       </div>
-
-      {/* Drugs and IV Fluids Form */}
       <DrugsIVFluidsForm
         isOpen={isFormOpen}
         onClose={handleFormClose}

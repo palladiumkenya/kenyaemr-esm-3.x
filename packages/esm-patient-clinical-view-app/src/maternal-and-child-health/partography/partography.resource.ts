@@ -4,11 +4,9 @@ import { buildMaternalPulseObservation } from './resources/maternal-pulse.resour
 import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   PARTOGRAPHY_CONCEPTS,
   PARTOGRAPHY_ENCOUNTER_TYPES,
-  MCH_PARTOGRAPHY_ENCOUNTER_UUID,
   getPartographyUnit,
   type OpenMRSResponse,
   type PartographyObservation,
@@ -19,7 +17,6 @@ import { configSchema, type ConfigObject } from '../../config-schema';
 import {
   buildTemperatureObservation,
   transformTemperatureEncounterToChartData,
-  transformTemperatureEncounterToTableData,
 } from './resources/temperature.resource';
 
 export type { PartographyObservation, PartographyEncounter };

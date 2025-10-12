@@ -49,26 +49,22 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
     },
   });
 
-  // Handle launching the drug order workspace (like greencard)
   const handleLaunchDrugOrderWorkspace = useCallback(() => {
     if (patient?.uuid) {
       launchWorkspace('add-drug-order', {
         patientUuid: patient.uuid,
         workspaceTitle: 'Add Drug Order',
         onOrderSaved: (savedOrder) => {
-          // Callback when drug order is saved successfully
-          // console.log('Drug order saved:', savedOrder);
           if (onDataSaved) {
             onDataSaved();
           }
-          // Close the modal since the order was placed through the workspace
+
           onClose();
         },
       });
     }
   }, [patient?.uuid, onDataSaved, onClose]);
 
-  // Route options for drug administration
   const routeOptions = [
     { id: 'oral', text: 'Oral' },
     { id: 'iv', text: 'Intravenous (IV)' },
@@ -78,8 +74,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
     { id: 'inhalation', text: 'Inhalation' },
     { id: 'other', text: 'Other' },
   ];
-
-  // Frequency options for drug administration
   const frequencyOptions = [
     { id: 'stat', text: 'STAT (immediately)' },
     { id: 'od', text: 'Once daily (OD)' },
@@ -95,12 +89,10 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
   ];
 
   const onSubmitForm = async (data: DrugsIVFluidsFormData) => {
-    // Clear any previous errors
     clearErrors();
     setSaveError(null);
     setSaveSuccess(false);
 
-    // Validate required fields
     if (!data.drugName || data.drugName === '') {
       setError('drugName', {
         type: 'manual',
@@ -133,7 +125,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
       return;
     }
 
-    // Save to OpenMRS if patient UUID is available
     if (patient?.uuid) {
       setIsSaving(true);
       try {
@@ -150,20 +141,20 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
 
         if (result.success) {
           setSaveSuccess(true);
-          // Call the onDataSaved callback to refresh data
+
           if (onDataSaved) {
             onDataSaved();
           }
-          // Call the original onSubmit for local state updates
+
           onSubmit({
             drugName: data.drugName,
             dosage: data.dosage,
             route: data.route,
             frequency: data.frequency,
           });
-          // Reset the form after successful save
+
           reset();
-          // Close the modal after a brief delay to show success message
+
           setTimeout(() => {
             setSaveSuccess(false);
             onClose();
@@ -183,7 +174,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
         setIsSaving(false);
       }
     } else {
-      // Fallback to local submission if no patient UUID
       onSubmit({
         drugName: data.drugName,
         dosage: data.dosage,
@@ -217,7 +207,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
       onRequestSubmit={handleSubmit(onSubmitForm)}
       onSecondarySubmit={handleClose}
       size="md">
-      {/* Success notification */}
       {saveSuccess && (
         <InlineNotification
           kind="success"
@@ -227,7 +216,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
         />
       )}
 
-      {/* Error notification */}
       {saveError && (
         <InlineNotification
           kind="error"
@@ -239,7 +227,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
 
       <div className={styles.modalContent}>
         <Grid>
-          {/* Drug Order Workspace Launcher - Like greencard */}
           <Column sm={4} md={8} lg={16}>
             <div className={styles.workspaceLauncherSection}>
               <h4>{t('selectFromDrugList', 'Select from Drug List')}</h4>
@@ -260,7 +247,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
             </div>
           </Column>
 
-          {/* Manual Entry Section */}
           <Column sm={4} md={8} lg={16}>
             <div className={styles.manualEntrySection}>
               <h4>{t('manualEntry', 'Manual Entry')}</h4>
@@ -270,7 +256,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
             </div>
           </Column>
 
-          {/* Drug Name */}
           <Column sm={4} md={8} lg={16}>
             <Controller
               name="drugName"
@@ -289,7 +274,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
             />
           </Column>
 
-          {/* Dosage */}
           <Column sm={4} md={4} lg={8}>
             <Controller
               name="dosage"
@@ -308,7 +292,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
             />
           </Column>
 
-          {/* Route */}
           <Column sm={4} md={4} lg={8}>
             <Controller
               name="route"
@@ -329,7 +312,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
             />
           </Column>
 
-          {/* Frequency */}
           <Column sm={4} md={8} lg={16}>
             <Controller
               name="frequency"

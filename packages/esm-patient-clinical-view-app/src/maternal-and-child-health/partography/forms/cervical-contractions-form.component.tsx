@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Modal, Grid, Column, Dropdown } from '@carbon/react';
-import styles from '../partography.scss'; // Use main partography styles for horizontal buttons
+import styles from '../partography.scss';
+import { CONTRACTION_STRONG_UUID } from '../types';
 
 type CervicalContractionsFormData = {
   contractionLevel: string;
@@ -45,7 +46,6 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
     },
   });
 
-  // Contraction level options with correct concept UUIDs and visual representations
   const contractionLevelOptions = [
     {
       value: 'none',
@@ -74,7 +74,7 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
     {
       value: 'strong',
       label: t('strongContractions', 'Strong Contractions'),
-      concept: '4b90b73a-ad11-4650-91b0-baea131974e0', // Strong concept from user
+      concept: CONTRACTION_STRONG_UUID,
       visual: '3',
       visualClass: 'strong',
       title: 'Strong',
@@ -82,12 +82,10 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
   ];
 
   const handleFormSubmit = (data: CervicalContractionsFormData) => {
-    // Clear any existing errors first
     clearErrors();
 
     let hasErrors = false;
 
-    // Validation - check both contraction level and count
     if (!data.contractionLevel || data.contractionLevel.trim() === '') {
       setError('contractionLevel', {
         type: 'manual',
@@ -104,13 +102,11 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
       hasErrors = true;
     }
 
-    // If there are errors, don't submit and show alert
     if (hasErrors) {
       alert(t('formValidationError', 'Please select both contraction level and count before submitting.'));
       return;
     }
 
-    // Submit the form data with current time
     const currentTime = new Date().toLocaleTimeString('en-GB', {
       hour: '2-digit',
       minute: '2-digit',
@@ -122,7 +118,6 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
       timeSlot: currentTime, // Auto-generate current time
     });
 
-    // Reset the form
     reset();
   };
 
@@ -144,7 +139,6 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
       size="lg">
       <div className={styles.contractionsFormContainer}>
         <div className={styles.formMainSection}>
-          {/* Left side - Contraction Level Buttons */}
           <div className={styles.formSectionLeft}>
             <h3 className={styles.sectionTitle}>{t('cervicalContractionsData', 'Cervical Contractions')}</h3>
             <h4 className={styles.sectionTitle}>{t('contractionLevel', 'Select Contraction Level')}</h4>
@@ -189,7 +183,6 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
             />
           </div>
 
-          {/* Right side - Number of Contractions Dropdown */}
           <div className={styles.formSectionRight}>
             <Controller
               name="contractionCount"

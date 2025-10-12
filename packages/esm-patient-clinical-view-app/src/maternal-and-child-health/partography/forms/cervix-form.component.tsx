@@ -16,10 +16,10 @@ type CervixFormProps = {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: { hour: number; time: string; cervicalDilation: number; descentOfHead: number }) => void;
-  onDataSaved?: () => void; // Callback for when data is saved to refresh parent component
-  selectedHours?: number[]; // Array of already selected hours
-  existingTimeEntries?: Array<{ hour: number; time: string }>; // Array of existing time entries
-  existingCervixData?: Array<{ cervicalDilation: number; descentOfHead: number }>; // Array of existing cervix measurements
+  onDataSaved?: () => void;
+  selectedHours?: number[];
+  existingTimeEntries?: Array<{ hour: number; time: string }>;
+  existingCervixData?: Array<{ cervicalDilation: number; descentOfHead: number }>;
   patient?: {
     uuid: string;
     name: string;
@@ -45,36 +45,34 @@ const CervixForm: React.FC<CervixFormProps> = ({
       hour: '',
       time: '',
       cervicalDilation: '',
-      descent: '5', // Always default to 5 (high position)
+      descent: '5',
     },
   });
 
-  // Calculate validation limits based on previous entries
   const getValidationLimits = () => {
     if (existingCervixData.length === 0) {
       return {
         cervicalDilationMin: 0,
-        descentOfHeadMax: 5, // For descent: start at 5 (high), can only go down to lower numbers
+        descentOfHeadMax: 5,
       };
     }
 
     const maxCervicalDilation = Math.max(...existingCervixData.map((data) => data.cervicalDilation));
-    const minDescentOfHead = Math.min(...existingCervixData.map((data) => data.descentOfHead)); // Min = most descended
+    const minDescentOfHead = Math.min(...existingCervixData.map((data) => data.descentOfHead));
 
     return {
       cervicalDilationMin: maxCervicalDilation,
-      descentOfHeadMax: minDescentOfHead, // Maximum allowed value (can't go back up)
+      descentOfHeadMax: minDescentOfHead,
     };
   };
 
   const validationLimits = getValidationLimits();
 
-  // Create hour options with disabled logic
   const maxSelectedHour = selectedHours.length > 0 ? Math.max(...selectedHours) : -1;
 
   const hourOptions = Array.from({ length: 24 }, (_, i) => {
     const hourValue = String(i).padStart(2, '0');
-    const isDisabled = i <= maxSelectedHour; // Disable current hour and all previous hours
+    const isDisabled = i <= maxSelectedHour;
     const displayText = isDisabled ? `${hourValue} (used)` : hourValue;
 
     return {
@@ -85,7 +83,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
   });
 
   const onSubmitForm = async (data: CervixFormData) => {
-    // Check for empty fields first
     if (!data.hour || data.hour === '') {
       setError('hour', {
         type: 'manual',
@@ -118,7 +115,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
       return;
     }
 
-    // Parse values and check for NaN
     const hourValue = parseInt(data.hour);
     const cervicalDilation = parseFloat(data.cervicalDilation);
     const descentOfHead = parseInt(data.descent);
@@ -147,7 +143,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
       return;
     }
 
-    // Validate cervical dilation
     if (cervicalDilation < validationLimits.cervicalDilationMin) {
       setError('cervicalDilation', {
         type: 'manual',
@@ -179,10 +174,8 @@ const CervixForm: React.FC<CervixFormProps> = ({
       return;
     }
 
-    // Clear any previous errors
     clearErrors();
 
-    // Just call the onSubmit callback with the form data - no saving to OpenMRS
     onSubmit({
       hour: hourValue,
       time: data.time,
@@ -217,7 +210,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
           <p>* All fields are required</p>
         </div>
         <Grid>
-          {/* Hour and Time Row */}
           <Column sm={4} md={4} lg={8}>
             <Controller
               name="hour"
@@ -262,7 +254,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
             />
           </Column>
 
-          {/* Cervical Dilation Row */}
           <Column sm={4} md={8} lg={16}>
             <Controller
               name="cervicalDilation"
@@ -308,7 +299,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
             />
           </Column>
 
-          {/* Descent Row */}
           <Column sm={4} md={8} lg={16}>
             <Controller
               name="descent"

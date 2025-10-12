@@ -16,6 +16,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 enum ScaleTypes {
   LABELS = 'labels',
@@ -80,17 +81,22 @@ const PartographGraph: React.FC<PartographGraphProps> = ({
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    Math.ceil(totalItems / pageSize),
+    currentPage,
+    totalItems,
+  );
 
-  // Chart options
   const chartOptions = {
     title: graph.title,
     axes: {
       bottom: {
-        title: undefined, // Hide title for consistency
+        title: undefined,
         mapsTo: 'time',
         scaleType: ScaleTypes.LABELS,
         tick: {
-          formatter: () => '', // Hide tick labels
+          formatter: () => '',
         },
       },
       left: {
@@ -230,7 +236,7 @@ const PartographGraph: React.FC<PartographGraphProps> = ({
                   page={currentPage}
                   totalItems={totalItems}
                   pageSize={pageSize}
-                  pageSizes={[5, 10, 20, 50]}
+                  pageSizes={calculatedPageSizes}
                   onChange={(event) => {
                     onPageChange(event.page);
                     if (event.pageSize !== pageSize) {
@@ -240,6 +246,7 @@ const PartographGraph: React.FC<PartographGraphProps> = ({
                   size={controlSize}
                 />
               )}
+              {totalItems > 0 && <div className={styles.paginationInfo}>{itemsDisplayed}</div>}
             </>
           ) : (
             <div className={styles.emptyState}>

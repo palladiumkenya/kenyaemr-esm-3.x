@@ -16,6 +16,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 enum ScaleTypes {
   LABELS = 'labels',
@@ -65,13 +66,15 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
   isAddButtonDisabled = true,
 }) => {
   const { t } = useTranslation();
-
-  // Calculate pagination
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
-
-  // Function to get status tag based on fetal heart rate value
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    Math.ceil(totalItems / pageSize),
+    currentPage,
+    totalItems,
+  );
   const getFetalHeartRateStatus = (value: string): { type: string; text: string; color: string } => {
     const numValue = parseInt(value.replace(' bpm', ''));
     if (numValue < 100) {
@@ -82,8 +85,6 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
       return { type: 'red', text: 'High', color: '#da1e28' };
     }
   };
-
-  // Table headers for fetal heart rate data
   const tableHeaders = [
     { key: 'date', header: t('date', 'Date') },
     { key: 'time', header: t('time', 'Time') },
@@ -91,55 +92,46 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
     { key: 'value', header: t('fetalHeartRate', 'Fetal Heart Rate (bpm)') },
     { key: 'status', header: t('status', 'Status') },
   ];
-
-  // Function to get color based on fetal heart rate value
   const getFetalHeartRateColor = (value: number): string => {
     if (value < 100) {
-      return '#6f6f6f'; // Gray for low (< 100)
+      return '#6f6f6f';
     } else if (value >= 100 && value <= 180) {
-      return '#24a148'; // Green for normal (100-180)
+      return '#24a148';
     } else {
-      return '#da1e28'; // Red for high (> 180)
+      return '#da1e28';
     }
   };
 
-  // Enhanced chart data with color coding - keep all points in same group for continuous line
   const enhancedChartData = React.useMemo(() => {
     if (data && data.length > 0) {
       return data.map((point) => ({
         ...point,
-        group: 'Fetal Heart Rate', // Single group for continuous line
+        group: 'Fetal Heart Rate',
         color: getFetalHeartRateColor(point.value),
       }));
     } else {
-      // Placeholder data points to show axis labels
       return [
         { hour: 0, value: 140, group: 'Fetal Heart Rate', time: '0', color: '#24a148' },
         { hour: 10, value: 140, group: 'Fetal Heart Rate', time: '10', color: '#24a148' },
       ];
     }
   }, [data]);
-
-  // Create a stable key for chart re-rendering
   const chartKey = React.useMemo(() => {
     return `fetal-heart-rate-chart-${data.length}-${data.map((d) => `${d.hour}-${d.value}`).join(',')}`;
   }, [data]);
-
-  // Use enhanced data for the chart
   const chartData = enhancedChartData;
 
   const chartOptions = {
     title: '',
     axes: {
       bottom: {
-        title: '', // Remove Hours label to match other graphs
+        title: '',
         mapsTo: 'hour',
         scaleType: ScaleTypes.LINEAR,
         domain: [0, 10],
         ticks: {
           values: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10],
           formatter: (hour: number) => {
-            // Format as hours with 30-minute intervals
             if (hour === 0) {
               return '0';
             } else if (hour === 0.5) {
@@ -158,18 +150,18 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
         title: 'Fetal Heart Rate (bpm)',
         mapsTo: 'value',
         scaleType: ScaleTypes.LINEAR,
-        domain: [80, 200], // Range for fetal heart rate
+        domain: [80, 200],
         ticks: {
           values: [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200],
           formatter: (value: number) => `${value}`,
         },
       },
     },
-    height: '600px', // Increased height to match cervix graph
-    curve: 'curveLinear', // Match other graphs curve
+    height: '600px',
+    curve: 'curveLinear',
     points: {
       enabled: true,
-      radius: 6, // Match other graphs point size
+      radius: 6,
       filled: true,
     },
     grid: {
@@ -183,9 +175,9 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
     color: {
       scale:
         data && data.length > 0
-          ? (datapoint: any) => getFetalHeartRateColor(datapoint.value) // Use function for color based on value
+          ? (datapoint: any) => getFetalHeartRateColor(datapoint.value)
           : {
-              'Fetal Heart Rate': 'transparent', // Transparent for placeholder
+              'Fetal Heart Rate': 'transparent',
             },
     },
     legend: {
@@ -330,7 +322,7 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
                     page={currentPage}
                     totalItems={totalItems}
                     pageSize={pageSize}
-                    pageSizes={[5, 10, 20, 50]}
+                    pageSizes={calculatedPageSizes}
                     onChange={(event) => {
                       onPageChange?.(event.page);
                       if (event.pageSize !== pageSize) {
@@ -340,6 +332,7 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
                     size={controlSize}
                   />
                 )}
+                {totalItems > 0 && <div className={styles.paginationInfo}>{itemsDisplayed}</div>}
               </>
             ) : (
               <div className={styles.emptyState}>

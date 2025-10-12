@@ -28,7 +28,6 @@ const TimePickerWithClock: React.FC<TimePickerWithClockProps> = ({
   const clockRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Parse current value to set initial clock state
   useEffect(() => {
     if (value && value.includes(':')) {
       const [hours, minutes] = value.split(':').map(Number);
@@ -39,18 +38,15 @@ const TimePickerWithClock: React.FC<TimePickerWithClockProps> = ({
     }
   }, [value]);
 
-  // Close clock when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (clockRef.current && !clockRef.current.contains(event.target as Node)) {
         setIsClockOpen(false);
       }
     };
-
     if (isClockOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
-
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
@@ -85,7 +81,6 @@ const TimePickerWithClock: React.FC<TimePickerWithClockProps> = ({
 
   const renderClockFace = () => {
     if (selectedHour === null) {
-      // Show hours
       return (
         <div className={styles.clockFace}>
           <div className={styles.clockTitle}>Select Hour</div>
@@ -106,7 +101,6 @@ const TimePickerWithClock: React.FC<TimePickerWithClockProps> = ({
         </div>
       );
     } else {
-      // Show minutes
       return (
         <div className={styles.clockFace}>
           <div className={styles.clockTitle}>

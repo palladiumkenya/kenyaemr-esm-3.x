@@ -14,6 +14,7 @@ import {
   Pagination,
 } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
 
@@ -54,7 +55,6 @@ interface CervixGraphProps {
   getTableHeaders: () => Array<{ key: string; header: string }>;
 }
 
-// Cervix Chart Options - Medical Partograph Styling
 const CERVIX_CHART_OPTIONS = {
   axes: {
     bottom: {
@@ -135,18 +135,14 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
-
-  // Generate chart data
   const ALERT_START_CM = 4;
   const CERVIX_DILATION_MAX = 10;
   const ALERT_ACTION_DIFFERENCE_HOURS = 4;
   const EXPECTED_LABOR_DURATION_HOURS = 6;
 
   const staticLinesData: ChartDataPoint[] = [
-    // Alert Line
     { hour: 0, value: ALERT_START_CM, group: 'Alert Line' },
     { hour: EXPECTED_LABOR_DURATION_HOURS, value: CERVIX_DILATION_MAX, group: 'Alert Line' },
-    // Action Line
     { hour: ALERT_ACTION_DIFFERENCE_HOURS, value: ALERT_START_CM, group: 'Action Line' },
     {
       hour: ALERT_ACTION_DIFFERENCE_HOURS + EXPECTED_LABOR_DURATION_HOURS,
@@ -170,8 +166,6 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
   }));
 
   const finalChartData = [...staticLinesData, ...cervicalDilationData, ...descentOfHeadData];
-
-  // Chart options
   const chartOptions = {
     ...CERVIX_CHART_OPTIONS,
     title: 'Cervical Dilation and Descent of Head',
@@ -184,8 +178,6 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
       },
     },
   };
-
-  // Generate time labels
   const timeLabelsData = [];
   const maxHours = Math.max(10, Math.max(...cervixFormData.map((d) => d.hour), 0) + 1);
 
@@ -200,13 +192,10 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
       span: 1,
     });
   }
-
-  // Apply custom styling for cervix chart lines after render
   useEffect(() => {
     const applyChartStyling = () => {
       const chartContainer = document.querySelector(`[data-chart-id="cervix"]`);
       if (chartContainer) {
-        // Style alert and action lines
         const svgPaths = chartContainer.querySelectorAll('svg path');
         svgPaths.forEach((path) => {
           const pathElement = path as SVGPathElement;
@@ -223,8 +212,6 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
             }
           }
         });
-
-        // Style cervical dilation points as X marks
         const svgCircles = chartContainer.querySelectorAll('svg circle');
         svgCircles.forEach((circle) => {
           const circleElement = circle as SVGCircleElement;
@@ -331,8 +318,6 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
               />
             )}
           </div>
-
-          {/* Custom Time Labels Display */}
           {timeLabelsData.length > 0 && (
             <div
               className={styles.customTimeLabelsContainer}
@@ -397,21 +382,37 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
                 )}
               </DataTable>
 
-              {totalItems > 0 && (
-                <Pagination
-                  page={currentPage}
-                  totalItems={totalItems}
-                  pageSize={pageSize}
-                  pageSizes={[5, 10, 20, 50]}
-                  onChange={(event) => {
-                    onPageChange(event.page);
-                    if (event.pageSize !== pageSize) {
-                      onPageSizeChange(event.pageSize);
-                    }
-                  }}
-                  size={controlSize}
-                />
-              )}
+              {totalItems > 0 &&
+                (() => {
+                  const totalPages = Math.ceil(totalItems / (pageSize || 1)) || 1;
+                  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+                    pageSize,
+                    totalPages,
+                    currentPage,
+                    totalItems,
+                  );
+
+                  return (
+                    <>
+                      <Pagination
+                        page={currentPage}
+                        totalItems={totalItems}
+                        pageSize={pageSize}
+                        pageSizes={calculatedPageSizes}
+                        onChange={(event) => {
+                          onPageChange(event.page);
+                          if (event.pageSize !== pageSize) {
+                            onPageSizeChange(event.pageSize);
+                          }
+                        }}
+                        size={controlSize}
+                      />
+                      <div className={styles.tableStats}>
+                        <span className={styles.recordCount}>{itemsDisplayed}</span>
+                      </div>
+                    </>
+                  );
+                })()}
             </>
           ) : (
             <div className={styles.emptyState}>

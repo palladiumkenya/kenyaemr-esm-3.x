@@ -113,7 +113,6 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
       return;
     }
 
-    // Save to OpenMRS if patient UUID is available
     if (patient?.uuid) {
       setIsSaving(true);
       try {
@@ -151,7 +150,6 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
         setIsSaving(false);
       }
     } else {
-      // Fallback to local submission if no patient UUID
       onSubmit({
         hour: hourValue,
         time: data.time,
@@ -182,7 +180,6 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
       onSecondarySubmit={handleClose}
       className={styles.cervixModal}
       size="md">
-      {/* Success notification */}
       {saveSuccess && (
         <InlineNotification
           kind="success"
@@ -192,7 +189,6 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
         />
       )}
 
-      {/* Error notification */}
       {saveError && (
         <InlineNotification
           kind="error"

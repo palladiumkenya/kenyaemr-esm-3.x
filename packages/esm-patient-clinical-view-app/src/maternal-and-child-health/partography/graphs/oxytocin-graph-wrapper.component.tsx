@@ -16,6 +16,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import styles from '../partography.scss';
 import OxytocinGraphComponent from './oxytocin-graph.component';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 export interface OxytocinData {
   timeSlot: string;
@@ -59,6 +60,12 @@ const OxytocinGraph: React.FC<OxytocinGraphProps> = ({
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    Math.ceil(totalItems / pageSize),
+    currentPage,
+    totalItems,
+  );
 
   const tableHeaders = [
     { key: 'date', header: t('date', 'Date') },
@@ -144,7 +151,7 @@ const OxytocinGraph: React.FC<OxytocinGraphProps> = ({
                   page={currentPage}
                   totalItems={totalItems}
                   pageSize={pageSize}
-                  pageSizes={[5, 10, 20, 50]}
+                  pageSizes={calculatedPageSizes}
                   onChange={(event) => {
                     onPageChange(event.page);
                     if (event.pageSize !== pageSize) {
@@ -154,6 +161,7 @@ const OxytocinGraph: React.FC<OxytocinGraphProps> = ({
                   size={controlSize as 'sm' | 'md' | 'lg'}
                 />
               )}
+              {totalItems > 0 && <div className={styles.paginationInfo}>{itemsDisplayed}</div>}
               <div className={styles.tableStats}>
                 <span className={styles.recordCount}>
                   {t('showingResults', 'Showing {{start}}-{{end}} of {{total}} {{itemType}}', {

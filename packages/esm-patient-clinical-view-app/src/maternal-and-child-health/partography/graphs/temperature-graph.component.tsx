@@ -14,6 +14,7 @@ import {
 } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import styles from '../partography.scss';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 interface TemperatureData {
   timeSlot: string;
@@ -60,49 +61,47 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Calculate pagination
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    Math.ceil(totalItems / pageSize),
+    currentPage,
+    totalItems,
+  );
 
-  // Table headers for temperature data
   const tableHeaders = [
     { key: 'date', header: t('date', 'Date') },
     { key: 'exactTime', header: t('exactTime', 'Time') },
     { key: 'temperature', header: t('temperature', 'Temperature (°C)') },
   ];
 
-  // Show all temperature entries in the graph, no filtering by date or time
-  // timeColumns: only time values
   const timeColumns = data.map((item, idx) =>
     item.exactTime || item.timeSlot ? item.exactTime || item.timeSlot : '--',
   );
 
-  // Function to get temperature status color
   const getTemperatureStatus = (temperature: number): string => {
     if (temperature < 36.1) {
       return styles.temperatureLow;
-    } // Low temperature
+    }
     if (temperature >= 36.1 && temperature <= 37.2) {
       return styles.temperatureNormal;
-    } // Normal temperature
+    }
     if (temperature > 37.2) {
       return styles.temperatureHigh;
-    } // High temperature (fever)
+    }
     return '';
   };
 
-  // Create grid data for graph view
   const createGridData = () => {
     const gridData: Record<string, { temperature: number }> = {};
-
     data.forEach((item) => {
-      const key = item.timeSlot; // Use time slot as the key
+      const key = item.timeSlot;
       gridData[key] = {
         temperature: item.temperature,
       };
     });
-
     return gridData;
   };
   const gridData = createGridData();
@@ -156,7 +155,6 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
         {viewMode === 'graph' ? (
           <div className={styles.membraneGrid}>
             <div className={styles.gridContainer}>
-              {/* Header row with time columns */}
               <div className={styles.gridHeader}>
                 <div className={styles.gridCell}>{t('time', 'Time')}</div>
                 {timeColumns.map((timeColumn) => (
@@ -166,7 +164,6 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
                 ))}
               </div>
 
-              {/* Temperature row */}
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('temperature', 'Temp °C')}</div>
                 {data.map((item, idx) => (
@@ -215,7 +212,7 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
                     page={currentPage}
                     totalItems={totalItems}
                     pageSize={pageSize}
-                    pageSizes={[5, 10, 20, 50]}
+                    pageSizes={calculatedPageSizes}
                     onChange={(event) => {
                       onPageChange?.(event.page);
                       if (event.pageSize !== pageSize) {
@@ -225,6 +222,7 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
                     size={controlSize}
                   />
                 )}
+                {totalItems > 0 && <div className={styles.paginationInfo}>{itemsDisplayed}</div>}
               </>
             ) : (
               <div className={styles.emptyState}>

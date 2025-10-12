@@ -14,6 +14,7 @@ import {
 } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import styles from '../partography.scss';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 interface UrineTestData {
   timeSlot: string;
@@ -68,16 +69,19 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Calculate pagination
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const paginatedData = tableData.slice(startIndex, endIndex);
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    Math.ceil(totalItems / pageSize),
+    currentPage,
+    totalItems,
+  );
 
-  // Table headers for urine test data (remove 'Time' row if not needed)
   const tableHeaders = [
     { key: 'date', header: t('date', 'Date') },
     { key: 'timeSlot', header: t('timeSlot', 'Time Slot') },
-    // { key: 'exactTime', header: t('time', 'Time') }, // Removed
     { key: 'protein', header: t('protein', 'Protein') },
     { key: 'acetone', header: t('acetone', 'Acetone') },
     { key: 'volume', header: t('volume', 'Volume (ml)') },
@@ -85,13 +89,11 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
     { key: 'timeResultsReturned', header: t('timeResultsReturned', 'Results Returned') },
   ];
 
-  // Use the same time column logic as cervical contractions: always show 13 columns, each is a real data entry (by index) or blank
   const timeColumns = Array.from(
     { length: Math.max(13, data.length) },
     (_, colIndex) => data[colIndex]?.timeSlot || '',
   );
 
-  // Create grid data for graph view, by index
   const gridData = data;
 
   return (
@@ -143,7 +145,6 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
         {viewMode === 'graph' ? (
           <div className={styles.membraneGrid}>
             <div className={styles.gridContainer}>
-              {/* Protein row */}
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('protein', 'Protein')}</div>
                 {timeColumns.map((_, colIndex) => {
@@ -155,7 +156,6 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
                   );
                 })}
               </div>
-              {/* Acetone row */}
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('acetone', 'Acetone')}</div>
                 {timeColumns.map((_, colIndex) => {
@@ -167,7 +167,6 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
                   );
                 })}
               </div>
-              {/* Volume row */}
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('volume', 'Volume')}</div>
                 {timeColumns.map((_, colIndex) => {
@@ -217,7 +216,7 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
                     page={currentPage}
                     totalItems={totalItems}
                     pageSize={pageSize}
-                    pageSizes={[5, 10, 20, 50]}
+                    pageSizes={calculatedPageSizes}
                     onChange={(event) => {
                       onPageChange?.(event.page);
                       if (event.pageSize !== pageSize) {
@@ -227,6 +226,7 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
                     size={controlSize}
                   />
                 )}
+                {totalItems > 0 && <div className={styles.paginationInfo}>{itemsDisplayed}</div>}
               </>
             ) : (
               <div className={styles.emptyState}>

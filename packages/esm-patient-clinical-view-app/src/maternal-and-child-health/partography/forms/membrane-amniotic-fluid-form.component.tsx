@@ -52,7 +52,6 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     },
   });
 
-  // Time slot options (hourly intervals)
   const timeSlotOptions = [
     { value: '16:00', label: '16:00' },
     { value: '17:00', label: '17:00' },
@@ -70,20 +69,17 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     { value: '05:00', label: '05:00' },
   ];
 
-  // Get the latest used time slot to disable earlier slots
   const getLatestUsedTimeSlot = () => {
     if (existingTimeEntries.length === 0) {
       return null;
     }
 
-    // Sort existing time slots and get the latest one
     const sortedTimeSlots = existingTimeEntries
       .map((entry) => entry.timeSlot)
       .sort((a, b) => {
-        // Convert time to minutes for proper sorting (handle midnight crossover)
         const getMinutes = (time: string) => {
           const [hours, minutes] = time.split(':').map(Number);
-          // Treat hours 0-5 as next day (add 24 hours)
+
           const adjustedHours = hours <= 5 ? hours + 24 : hours;
           return adjustedHours * 60 + minutes;
         };
@@ -95,7 +91,6 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
 
   const latestUsedTimeSlot = getLatestUsedTimeSlot();
 
-  // Check if a time slot should be disabled
   const isTimeSlotDisabled = (timeSlot: string) => {
     if (!latestUsedTimeSlot) {
       return false;
@@ -103,7 +98,7 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
 
     const getMinutes = (time: string) => {
       const [hours, minutes] = time.split(':').map(Number);
-      // Treat hours 0-5 as next day (add 24 hours)
+
       const adjustedHours = hours <= 5 ? hours + 24 : hours;
       return adjustedHours * 60 + minutes;
     };
@@ -111,7 +106,6 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     return getMinutes(timeSlot) <= getMinutes(latestUsedTimeSlot);
   };
 
-  // Amniotic fluid options
   const amnioticFluidOptions = [
     {
       value: 'Membrane intact',
@@ -132,7 +126,6 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     },
   ];
 
-  // Moulding options
   const mouldingOptions = [
     { value: '0', label: '0', concept: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
     { value: '+', label: '+', concept: '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -141,12 +134,10 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
   ];
 
   const handleFormSubmit = (data: MembraneAmnioticFluidFormData) => {
-    // Clear any existing errors first
     clearErrors();
 
     let hasErrors = false;
 
-    // Validation with custom error messages
     if (!data.timeSlot || data.timeSlot.trim() === '') {
       setError('timeSlot', { type: 'manual', message: t('timeSlotRequired', 'Please select a time slot') });
       hasErrors = true;
@@ -173,14 +164,11 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
       hasErrors = true;
     }
 
-    // If there are errors, don't submit and show alert
     if (hasErrors) {
-      // Show alert for empty fields
       alert(t('formValidationError', 'Please fill in all required fields before submitting.'));
       return;
     }
 
-    // Additional validation: Check if selected time slot is not disabled
     if (isTimeSlotDisabled(data.timeSlot)) {
       setError('timeSlot', {
         type: 'manual',
@@ -190,7 +178,6 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
       return;
     }
 
-    // Submit the form data
     onSubmit({
       timeSlot: data.timeSlot,
       exactTime: data.exactTime,
@@ -198,7 +185,6 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
       moulding: data.moulding,
     });
 
-    // Reset the form
     reset();
   };
 
@@ -281,7 +267,7 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
                     labelText=""
                     value={field.value}
                     onChange={field.onChange}
-                    existingTimeEntries={[]} // For now, use empty array - will integrate properly later
+                    existingTimeEntries={[]}
                     invalid={!!fieldState.error}
                     invalidText={fieldState.error?.message}
                   />
