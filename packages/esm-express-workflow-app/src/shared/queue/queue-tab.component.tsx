@@ -11,7 +11,7 @@ import styles from './queue-tab.scss';
 
 type QueueTabProps = {
   queues: Array<Queue>;
-  cards?: Array<{ title: string; value: string }>;
+  cards?: Array<{ title: string; value: string; categories?: Array<{ label: string; value: number }> }>;
   navigatePath: string;
   onTabChanged?: (queue: Queue) => void;
   usePatientChart?: boolean;
@@ -32,7 +32,13 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
     }
   }, [isLoading, isInitialLoad]);
 
-  const memoizedQueueEntries = useMemo(() => queueEntries, [queueEntries]);
+  const queueEntriesByService = useMemo(() => {
+    if (!queueEntries?.length || !selectedQueue?.service?.uuid) {
+      return [];
+    }
+
+    return queueEntries.filter((entry) => entry?.queue?.service?.uuid === selectedQueue.service.uuid);
+  }, [queueEntries, selectedQueue?.service?.uuid]);
 
   const handleQueueSelection = useCallback(
     (queue: Queue) => {
@@ -62,7 +68,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
     <div className={styles.queueTab}>
       <div className={styles.cards}>
         {cards?.map((card) => (
-          <Card key={card.title} title={card.title} value={card.value} />
+          <Card key={card.title} title={card.title} total={card.value} categories={card.categories} />
         ))}
       </div>
       <div className={styles.tabsContainer}>
@@ -85,7 +91,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
                       </div>
                     )}
                     <QueueEntryTable
-                      queueEntries={memoizedQueueEntries}
+                      queueEntries={queueEntriesByService}
                       key={`table-${queue.uuid}`}
                       navigatePath={navigatePath}
                       usePatientChart={usePatientChart}

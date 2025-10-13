@@ -18,6 +18,7 @@ const HivCareAndTreatment = ({ patientUuid }: HivCareAndTreatmentProps) => {
           <Tab>{t('defaulterTracing', 'Defaulter Tracing')}</Tab>
           <Tab>{t('hts', 'HIV Testing Services')}</Tab>
           <Tab>{t('hivPatientSummary', 'HIV Patient Summary')}</Tab>
+          <Tab>{t('caseManagement', 'Case Management')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -28,6 +29,9 @@ const HivCareAndTreatment = ({ patientUuid }: HivCareAndTreatmentProps) => {
           </TabPanel>
           <TabPanel>
             <ExtensionSlot name="hiv-patient-summary-slot" state={{ patientUuid }} />
+          </TabPanel>
+          <TabPanel>
+            <ExtensionSlot name="ewf-case-management-slot" state={{ patientUuid }} />
           </TabPanel>
         </TabPanels>
       </Tabs>

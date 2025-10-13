@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { Queue, QueueEntry, QueueEntryFilters } from '../types/index';
+import { useMemo } from 'react';
 
 export const useQueues = () => {
   const { data, isLoading, error } = useSWR<{ data: { results: Array<Queue> } }>(
@@ -19,14 +20,10 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
   const repString =
     'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
-  // Build query parameters from filters
   const buildQueryParams = (filters?: QueueEntryFilters): string => {
     const params = new URLSearchParams();
-
-    // Always add custom representation
     params.append('v', repString);
 
-    // Add filter parameters if they exist
     if (filters) {
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -39,7 +36,6 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
       });
     }
 
-    // Default to non-ended entries if not specified
     if (!filters || filters.isEnded === undefined || filters.isEnded === null) {
       params.append('isEnded', 'false');
     }
@@ -50,15 +46,24 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
   const queryString = buildQueryParams(filters);
   const url = `/ws/rest/v1/queue-entry${queryString ? `?${queryString}` : ''}`;
 
-  const { data, isLoading, error } = useSWR<{ data: { results: Array<QueueEntry> } }>(url, openmrsFetch);
+  const { data, isLoading, error } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
+
+  const filteredResults = useMemo(() => {
+    const results = data?.data?.results ?? [];
+
+    if (filters?.statuses && filters.statuses.length > 0) {
+      return results.filter((entry) => filters.statuses.includes(entry.status?.uuid));
+    }
+
+    return results;
+  }, [data?.data?.results, filters?.statuses]);
 
   return {
-    queueEntries: data?.data?.results ?? [],
+    queueEntries: filteredResults,
     isLoading,
     error,
   };
 };
-
 export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {
   const abortController = new AbortController();
 
