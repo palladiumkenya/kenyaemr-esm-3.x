@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAssignedExtensions } from '@openmrs/esm-framework';
 
 import HomeHeader from './components/header/home-header.component';
-import DashboardChart from './components/emergencyOpdLineChart.component';
+import DashboardChart from './components/admittedOPDLineChart';
 import { DashboardConfig } from '../../types/index';
 import { DashboardMetric } from './components/dashboardMetric.component';
 import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
@@ -109,7 +109,7 @@ const FacilityDashboard: React.FC = () => {
                   </div>
                 </div>
                 <div className={styles.rightSection}>
-                  <DashboardChart data={dashboardData?.emergencyOpdData} />
+                  <DashboardChart opd={dashboardData?.generalOpdData} />
                 </div>
               </div>
             </div>

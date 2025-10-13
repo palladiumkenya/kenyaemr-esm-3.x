@@ -11,11 +11,15 @@ export function TopDiseasesBarCharts({ data: topDiseases }: TopDiseasesBarCharts
   const under5Data =
     topDiseases
       ?.filter((item) => item.ageGroup === 'under5')
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10)
       .map((item) => ({ group: item.group, value: item.value })) ?? [];
 
   const over5Data =
     topDiseases
       ?.filter((item) => item.ageGroup === 'over5')
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10)
       .map((item) => ({ group: item.group, value: item.value })) ?? [];
 
   const chartOptions = {

@@ -14,7 +14,11 @@ export interface DashboardData {
     value: number;
     ageGroup: 'under5' | 'over5';
   }>;
-  emergencyOpdData: Array<{
+  generalOpdData: {
+    childrenUnder5: Array<{ day: string; value: number }>;
+    over5YearsOld: Array<{ day: string; value: number }>;
+  };
+  admissionCases: Array<{
     day: string;
     value: number;
   }>;
@@ -59,7 +63,11 @@ export async function fetchDashboardData(startDate?: string, endDate?: string): 
       })),
       ...repsonse.indicators.topTenDiseases.over5YearsOld.data.map((item) => ({ ...item, ageGroup: 'over5' as const })),
     ],
-    emergencyOpdData: repsonse.indicators.emergencyCases.data,
+    generalOpdData: {
+      childrenUnder5: repsonse.indicators.generalOutpatientVisits.childrenUnder5.data,
+      over5YearsOld: repsonse.indicators.generalOutpatientVisits.over5YearsOld.data,
+    },
+    admissionCases: repsonse.indicators.admissionCases.data,
   };
 
   return dashboardData;

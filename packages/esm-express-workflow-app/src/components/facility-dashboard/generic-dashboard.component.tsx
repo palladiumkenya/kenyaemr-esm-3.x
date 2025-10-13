@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 import { DashboardConfig } from '../../types/index';
 import styles from './generic-dashboard.scss';
 import { DashboardMetric } from './components/dashboardMetric.component';
-import DashboardChart from './components/emergencyOpdLineChart.component';
+import AdmittedOPDLineChart from './components/admittedOPDLineChart';
 import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
 import HomeHeader from './components/header/home-header.component';
 import { fetchDashboardData, DashboardData } from './genericDashboard.resource';
@@ -88,7 +88,7 @@ const GenericDashboard: React.FC = () => {
                 </div>
               </div>
               <div className={styles.rightSection}>
-                <DashboardChart data={dashboardData?.emergencyOpdData} />
+                <AdmittedOPDLineChart opd={dashboardData?.generalOpdData} />
               </div>
             </div>
           </div>
