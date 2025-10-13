@@ -43,11 +43,11 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
 
   const cards = [
     {
-      title: t('CilentsPatientsWaiting', 'Clients/Patients waiting'),
+      title: t('clientsPatientsWaiting', 'Clients/Patients waiting'),
       value: waitingEntries.length.toString(),
     },
     {
-      title: t('CilentsPatientsAttendedTo', 'Clients/Patients attended to'),
+      title: t('clientsPatientsAttendedTo', 'Clients/Patients attended to'),
       value: attendedToEntries.length.toString(),
     },
   ];
