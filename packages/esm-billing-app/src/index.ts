@@ -159,6 +159,7 @@ export const patientBannerShaStatus = getAsyncLifecycle(
 );
 
 export const accountingDashboardLink = getSyncLifecycle(createLeftPanelLink({ ...accountingDashboardMeta }), options);
+export * from './bill-administration/index';
 
 // App Startup
 export function startupApp() {

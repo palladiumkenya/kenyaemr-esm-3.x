@@ -13,6 +13,10 @@
       "routeRegex": "^patient\/.+\/chart",
       "online": true,
       "offline": false
+    },
+    {
+      "component": "billingAdmin",
+      "route": "billing-admin"
     }
   ],
   "extensions": [

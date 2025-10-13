@@ -1,6 +1,7 @@
 export const PENDING_PAYMENT_STATUS = 'PENDING';
 export const EXEMPTED_PAYMENT_STATUS = 'EXEMPTED';
 export const spaBasePath = `${window.spaBase}/home`;
+export const billingAdminBasePath = `${window.spaBase}/billing-admin`;
 
 export const colorsArray = [
   'red',
