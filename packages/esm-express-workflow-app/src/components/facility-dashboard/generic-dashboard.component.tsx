@@ -3,9 +3,8 @@ import { useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 
 import { useAssignedExtensions, ExtensionSlot } from '@openmrs/esm-framework';
-
-import { DashboardConfig } from '../../types';
-
+import { useTranslation } from 'react-i18next';
+import { InlineLoading, InlineNotification } from '@carbon/react';
 import HomeHeader from './components/header/home-header.component';
 import { DashboardMetric } from './components/dashboardMetric.component';
 import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
@@ -15,24 +14,56 @@ import styles from './generic-dashboard.scss';
 import { useFacilityDashboardData } from './hooks/useFacilityDashboardData';
 
 const GenericDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const params = useParams();
   const assignedExtensions = useAssignedExtensions('express-workflow-left-panel-slot');
   const today = dayjs().format('YYYY-MM-DD');
   const [dateRange, setDateRange] = useState({ startDate: today, endDate: today });
   const { data: dashboardData, error, isLoading } = useFacilityDashboardData(dateRange.startDate, dateRange.endDate);
 
-  const ungroupedDashboards = assignedExtensions.map((e) => e.meta).filter((e) => Object.keys(e).length) || [];
-  const dashboards = ungroupedDashboards as Array<DashboardConfig>;
-  const activeDashboard = dashboards.find((dashboard) => dashboard.name === params?.dashboard) || dashboards[0];
-
   const handleDateChange = (startDate: string, endDate: string) => {
     setDateRange({ startDate, endDate });
   };
 
+  if (isLoading) {
+    return (
+      <div>
+        <div className={styles.homePageWrapper}>
+          <section>
+            <HomeHeader title="Dashboard" onDateChange={handleDateChange} />
+            <div className={styles.dashboardView}>
+              <InlineLoading description={t('loadingDashboard', 'Loading dashboard data...')} />
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div>
+        <div className={styles.homePageWrapper}>
+          <section>
+            <HomeHeader title="Dashboard" onDateChange={handleDateChange} />
+            <div className={styles.dashboardView}>
+              <InlineNotification
+                kind="error"
+                title={t('errorLoadingDashboard', 'Error loading dashboard')}
+                subtitle={t('dashboardErrorMessage', 'Unable to load dashboard data. Please try again.')}
+                lowContrast
+              />
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className={styles.homePageWrapper}>
-        <section style={{ width: '100%' }}>
+        <section>
           <HomeHeader title="Dashboard" onDateChange={handleDateChange} />
 
           <div className={styles.dashboardView}>
@@ -45,16 +76,19 @@ const GenericDashboard: React.FC = () => {
             <div className={styles.secondRow}>
               <div className={styles.metricTile}>
                 <DashboardMetric
-                  title="General OPD Attendance <5 years"
+                  title={t('GeneralOPDAttendance<5years', 'General OPD Attendance <5 years')}
                   value={dashboardData?.metrics.opdUnder5 ?? 0}
                 />
               </div>
               <div className={styles.metricTile}>
-                <DashboardMetric title="General OPD Attendance >5 years" value={dashboardData?.metrics.opdOver5 ?? 0} />
+                <DashboardMetric
+                  title={t('GeneralOPDAttendance>5years', 'General OPD Attendance >5 years')}
+                  value={dashboardData?.metrics.opdOver5 ?? 0}
+                />
               </div>
               <div className={styles.metricTile}>
                 <DashboardMetric
-                  title="Number of Emergency Cases Seen"
+                  title={t('NumberofEmergencyCasesSeen', 'Number of Emergency Cases Seen')}
                   value={dashboardData?.metrics.emergencyCases ?? 0}
                 />
               </div>
@@ -65,13 +99,13 @@ const GenericDashboard: React.FC = () => {
               <div className={styles.leftSection}>
                 <div className={styles.verticalMetricTile}>
                   <DashboardMetric
-                    title="Total Number of Referrals - IN"
+                    title={t('TotalNumberofReferrals-IN', 'Total Number of Referrals - IN')}
                     value={dashboardData?.metrics.referralsIn ?? 0}
                   />
                 </div>
                 <div className={styles.verticalMetricTile}>
                   <DashboardMetric
-                    title="Total Number of Referrals - OUT"
+                    title={t('TotalNumberofReferrals-OUT', 'Total Number of Referrals - OUT')}
                     value={dashboardData?.metrics.referralsOut ?? 0}
                   />
                 </div>

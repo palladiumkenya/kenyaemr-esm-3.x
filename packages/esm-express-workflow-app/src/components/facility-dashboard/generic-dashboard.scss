@@ -1,4 +1,5 @@
 @use '@carbon/colors';
+@use '@carbon/layout';
 
 .homePageWrapper {
   display: flex;
@@ -10,8 +11,8 @@
   flex-grow: 1;
   flex-direction: column;
   margin: 0;
-  height: calc(100vh - 3rem);
-  width: calc(100% - 16rem);
+  height: calc(100vh - layout.$spacing-09);
+  width: calc(100% - layout.$spacing-13);
   background-color: colors.$gray-10;
 
   & a {
@@ -19,7 +20,7 @@
   }
 
   &.hasLeftNav {
-    margin-inline-start: 16rem;
+    margin-inline-start: layout.$spacing-13;
   }
 }
 
@@ -34,24 +35,24 @@
 
 .dashboardView {
   background-color: colors.$white-0;
-  padding: 1rem;
+  padding: layout.$spacing-05;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: layout.$spacing-06;
 }
 
 // First Row: Bar Charts
 .firstRow {
   background-color: colors.$white-0;
-  padding: 1rem;
+  padding: layout.$spacing-05;
   border: 1px solid colors.$gray-20;
-  border-radius: 4px;
+  border-radius: layout.$spacing-02;
 }
 
 // Second Row: 3 Metric Tiles
 .secondRow {
   display: flex;
-  gap: 1rem;
+  gap: layout.$spacing-05;
   width: 100%;
 
   @media (max-width: 1056px) {
@@ -62,15 +63,15 @@
 .metricTile {
   flex: 1;
   background-color: colors.$white-0;
-  padding: 1rem;
+  padding: layout.$spacing-05;
   border: 1px solid colors.$gray-20;
-  border-radius: 2px;
+  border-radius: layout.$spacing-01;
 }
 
 // Third Row: Split Layout
 .thirdRow {
   display: flex;
-  gap: 1rem;
+  gap: layout.$spacing-05;
   width: 100%;
 
   @media (max-width: 1056px) {
@@ -82,7 +83,7 @@
   width: 30%;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: layout.$spacing-05;
 
   @media (max-width: 1056px) {
     width: 100%;
@@ -92,18 +93,18 @@
 
 .verticalMetricTile {
   background-color: colors.$white-0;
-  padding: 1rem;
+  padding: layout.$spacing-05;
   border: 1px solid colors.$gray-20;
-  border-radius: 4px;
+  border-radius: layout.$spacing-02;
   flex: 1;
 }
 
 .rightSection {
   width: 70%;
   background-color: colors.$white-0;
-  padding: 1rem;
+  padding: layout.$spacing-05;
   border: 1px solid colors.$gray-20;
-  border-radius: 4px;
+  border-radius: layout.$spacing-02;
 
   @media (max-width: 1056px) {
     width: 100%;
