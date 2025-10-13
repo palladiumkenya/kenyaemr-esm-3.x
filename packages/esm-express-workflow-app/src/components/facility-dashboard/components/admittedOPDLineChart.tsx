@@ -23,19 +23,23 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
     opdByDay.set(item.day, (opdByDay.get(item.day) || 0) + item.value);
   });
 
-  const opdData = Array.from(opdByDay.entries()).map(([day, value]) => ({
-    group: 'OPD Visits',
-    key: day,
-    value,
-  }));
+  const opdData = Array.from(opdByDay.entries())
+    .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
+    .map(([day, value]) => ({
+      group: 'OPD Visits',
+      key: day,
+      value,
+    }));
 
   // Admissions data
   const admitted =
-    admissions?.map((item) => ({
-      group: 'Admissions',
-      key: item.day,
-      value: item.value,
-    })) ?? [];
+    admissions
+      ?.sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime())
+      ?.map((item) => ({
+        group: 'Admissions',
+        key: item.day,
+        value: item.value,
+      })) ?? [];
 
   // Merge both OPD and Admissions datasets
   const data = [...opdData, ...admitted];
@@ -60,6 +64,12 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
     },
     toolbar: {
       enabled: false,
+    },
+    color: {
+      scale: {
+        Admissions: '#da1e28',
+        'OPD Visits': '#0f62fe',
+      },
     },
     height: '200px',
   };
