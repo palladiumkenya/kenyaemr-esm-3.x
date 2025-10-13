@@ -2,6 +2,7 @@ import React from 'react';
 import { LegendPositions, LineChart, type LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
 import { useTranslation } from 'react-i18next';
+import { red60, blue60 } from '@carbon/colors';
 
 interface DashboardChartProps {
   opd?: {
@@ -70,8 +71,8 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
     },
     color: {
       scale: {
-        Admissions: '#da1e28',
-        'OPD Visits': '#0f62fe',
+        Admissions: red60, // Red for critical/urgent admissions
+        'OPD Visits': blue60, // Blue for regular outpatient visits
       },
     },
     height: '200px',
