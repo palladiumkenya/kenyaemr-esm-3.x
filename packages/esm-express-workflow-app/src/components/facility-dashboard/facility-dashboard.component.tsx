@@ -1,22 +1,20 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useAssignedExtensions } from '@openmrs/esm-framework';
-
 import HomeHeader from './components/header/home-header.component';
-import { DashboardConfig } from '../../types/index';
 import { DashboardMetric } from './components/dashboardMetric.component';
 import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
-import { fetchDashboardData, DashboardData } from './facility-dashboard.resource';
+import AdmittedOPDLineChart from './components/admitted-opd-line-chart.component';
+import { DashboardConfig } from '../../types/index';
+import { useFacilityDashboardData } from './useFacilityDashboardData';
 import styles from './facility-dashboard.scss';
-import AdmittedOPDLineChart from './components/admittedOPDLineChart';
 
 const FacilityDashboard: React.FC = () => {
   const params = useParams();
   const assignedExtensions = useAssignedExtensions('express-workflow-left-panel-slot');
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   const [dateRange, setDateRange] = useState({ startDate: today, endDate: today });
+  const { data: dashboardData, error, isLoading } = useFacilityDashboardData(dateRange.startDate, dateRange.endDate);
 
   const dashboards = useMemo(() => {
     const ungrouped = assignedExtensions
@@ -32,23 +30,6 @@ const FacilityDashboard: React.FC = () => {
     return dashboards.find((dashboard) => dashboard.name === params?.dashboard) || dashboards[0];
   }, [dashboards, params?.dashboard]);
 
-  const loadData = useCallback(async (startDate?: string, endDate?: string) => {
-    setIsLoading(true);
-    try {
-      const data = await fetchDashboardData(startDate, endDate);
-      setDashboardData(data);
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to fetch dashboard data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadData(dateRange.startDate, dateRange.endDate);
-  }, [dateRange, loadData]);
-
   const handleDateChange = useCallback((startDate: string, endDate: string) => {
     setDateRange({ startDate, endDate });
   }, []);
@@ -63,6 +44,8 @@ const FacilityDashboard: React.FC = () => {
             <div className={styles.dashboardView}>No dashboards available.</div>
           ) : isLoading ? (
             <div className={styles.dashboardView}>Loading...</div>
+          ) : error ? (
+            <div className={styles.dashboardView}>Error loading dashboard data</div>
           ) : (
             <div className={styles.dashboardView}>
               {/* First Row: Bar Charts for Top Diseases */}

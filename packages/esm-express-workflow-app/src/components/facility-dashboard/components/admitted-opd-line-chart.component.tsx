@@ -1,7 +1,7 @@
 import React from 'react';
 import { LegendPositions, LineChart, type LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
-import './admittedOPDLineChart.scss';
+import { useTranslation } from 'react-i18next';
 
 interface DashboardChartProps {
   opd?: {
@@ -12,6 +12,7 @@ interface DashboardChartProps {
 }
 
 function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
+  const { t } = useTranslation();
   // Aggregate OPD data by day (sum childrenUnder5 + over5YearsOld)
   const opdByDay = new Map<string, number>();
 
@@ -44,7 +45,7 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
   // Merge both OPD and Admissions datasets
   const data = [...opdData, ...admitted];
   const options: LineChartOptions = {
-    title: 'Admitted/OPD',
+    title: t('Admitted/OPD Visits'),
     axes: {
       left: {
         mapsTo: 'value',
@@ -77,7 +78,7 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
   };
 
   return (
-    <div className="chartContainer">
+    <div>
       <LineChart data={data} options={options} />
     </div>
   );

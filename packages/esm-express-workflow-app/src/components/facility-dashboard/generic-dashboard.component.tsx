@@ -1,19 +1,25 @@
-import { useAssignedExtensions, ExtensionSlot } from '@openmrs/esm-framework';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { DashboardConfig } from '../../types/index';
-import styles from './generic-dashboard.scss';
-import { DashboardMetric } from './components/dashboardMetric.component';
-import AdmittedOPDLineChart from './components/admittedOPDLineChart';
-import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
-import HomeHeader from './components/header/home-header.component';
+import dayjs from 'dayjs';
+
+import { useAssignedExtensions, ExtensionSlot } from '@openmrs/esm-framework';
+
+import { DashboardConfig } from '../../types';
 import { fetchDashboardData, DashboardData } from './genericDashboard.resource';
+
+import HomeHeader from './components/header/home-header.component';
+import { DashboardMetric } from './components/dashboardMetric.component';
+import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
+import AdmittedOPDLineChart from './components/admitted-opd-line-chart.component';
+
+import styles from './generic-dashboard.scss';
+
 const GenericDashboard: React.FC = () => {
   const params = useParams();
   const assignedExtensions = useAssignedExtensions('express-workflow-left-panel-slot');
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const today = new Date().toISOString().split('T')[0];
+  const today = dayjs().format('YYYY-MM-DD');
   const [dateRange, setDateRange] = useState({ startDate: today, endDate: today });
 
   const ungroupedDashboards = assignedExtensions.map((e) => e.meta).filter((e) => Object.keys(e).length) || [];
