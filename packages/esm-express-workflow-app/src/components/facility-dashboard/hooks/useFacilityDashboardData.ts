@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fetchDashboardData, DashboardData } from './facility-dashboard.resource';
+import { fetchDashboardData, DashboardData } from '../facility-dashboard.resource';
 
 export function useFacilityDashboardData(startDate?: string, endDate?: string) {
   const { data, error, isLoading } = useSWR<DashboardData>(

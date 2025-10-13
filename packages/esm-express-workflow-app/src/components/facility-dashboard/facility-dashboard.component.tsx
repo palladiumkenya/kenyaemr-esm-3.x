@@ -6,7 +6,7 @@ import { DashboardMetric } from './components/dashboardMetric.component';
 import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
 import AdmittedOPDLineChart from './components/admitted-opd-line-chart.component';
 import { DashboardConfig } from '../../types/index';
-import { useFacilityDashboardData } from './useFacilityDashboardData';
+import { useFacilityDashboardData } from './hooks/useFacilityDashboardData';
 import styles from './facility-dashboard.scss';
 
 const FacilityDashboard: React.FC = () => {

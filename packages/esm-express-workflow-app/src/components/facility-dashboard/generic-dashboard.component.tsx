@@ -5,7 +5,6 @@ import dayjs from 'dayjs';
 import { useAssignedExtensions, ExtensionSlot } from '@openmrs/esm-framework';
 
 import { DashboardConfig } from '../../types';
-import { fetchDashboardData, DashboardData } from './genericDashboard.resource';
 
 import HomeHeader from './components/header/home-header.component';
 import { DashboardMetric } from './components/dashboardMetric.component';
@@ -13,34 +12,18 @@ import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.componen
 import AdmittedOPDLineChart from './components/admitted-opd-line-chart.component';
 
 import styles from './generic-dashboard.scss';
+import { useFacilityDashboardData } from './hooks/useFacilityDashboardData';
 
 const GenericDashboard: React.FC = () => {
   const params = useParams();
   const assignedExtensions = useAssignedExtensions('express-workflow-left-panel-slot');
-  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const today = dayjs().format('YYYY-MM-DD');
   const [dateRange, setDateRange] = useState({ startDate: today, endDate: today });
+  const { data: dashboardData, error, isLoading } = useFacilityDashboardData(dateRange.startDate, dateRange.endDate);
 
   const ungroupedDashboards = assignedExtensions.map((e) => e.meta).filter((e) => Object.keys(e).length) || [];
   const dashboards = ungroupedDashboards as Array<DashboardConfig>;
   const activeDashboard = dashboards.find((dashboard) => dashboard.name === params?.dashboard) || dashboards[0];
-
-  const loadData = async (startDate?: string, endDate?: string) => {
-    setIsLoading(true);
-    try {
-      const data = await fetchDashboardData(startDate, endDate);
-      setDashboardData(data);
-    } catch (error) {
-      console.error('Failed to fetch dashboard data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadData(dateRange.startDate, dateRange.endDate);
-  }, [dateRange]);
 
   const handleDateChange = (startDate: string, endDate: string) => {
     setDateRange({ startDate, endDate });

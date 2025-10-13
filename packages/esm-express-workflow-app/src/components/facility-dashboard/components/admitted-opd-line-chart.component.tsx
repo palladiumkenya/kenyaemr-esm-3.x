@@ -46,7 +46,7 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
   // Merge both OPD and Admissions datasets
   const data = [...opdData, ...admitted];
   const options: LineChartOptions = {
-    title: t('Admitted/OPD Visits'),
+    title: t('Admitted/OPD', 'Admitted/OPD Visits'),
     axes: {
       left: {
         mapsTo: 'value',
