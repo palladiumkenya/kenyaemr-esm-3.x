@@ -1,7 +1,7 @@
 import React from 'react';
 import { LegendPositions, LineChart, type LineChartOptions, ScaleTypes } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
-import styles from './admittedOPDLineChart.scss';
+import './admittedOPDLineChart.scss';
 
 interface DashboardChartProps {
   opd?: {
@@ -61,7 +61,9 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
     legend: {
       clickable: false,
       position: LegendPositions.TOP,
+      alignment: 'right',
     },
+
     toolbar: {
       enabled: false,
     },
@@ -75,7 +77,7 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
   };
 
   return (
-    <div className={styles.chartContainer}>
+    <div className="chartContainer">
       <LineChart data={data} options={options} />
     </div>
   );

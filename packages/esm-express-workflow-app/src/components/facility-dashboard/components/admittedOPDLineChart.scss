@@ -2,8 +2,25 @@
 
 @use '@carbon/colors';
 
-.chart-container {
+.chartContainer {
   .cds--cc--legend {
     justify-content: flex-end; // pushes legend items to the right
+    margin-bottom: 0 !important;
+    margin-top: 0 !important;
+  }
+  .cds--cc--chart-wrapper {
+    padding-top: 0 !important;
+  }
+
+  .cds--cc--chart-svg {
+    margin-top: -8px !important; /* fine-tune */
+  }
+
+  .cds--cc--spacer {
+    height: 0 !important;
+    width: 0 !important; 
+    padding: 0 !important; 
+    margin: 0 !important; 
+    visibility: hidden; 
   }
 }
