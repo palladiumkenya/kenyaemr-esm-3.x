@@ -76,19 +76,19 @@ const GenericDashboard: React.FC = () => {
             <div className={styles.secondRow}>
               <div className={styles.metricTile}>
                 <DashboardMetric
-                  title={t('GeneralOPDAttendance<5years', 'General OPD Attendance <5 years')}
+                  title={t('generalOPDAttendance<5years', 'General OPD Attendance <5 years')}
                   value={dashboardData?.metrics.opdUnder5 ?? 0}
                 />
               </div>
               <div className={styles.metricTile}>
                 <DashboardMetric
-                  title={t('GeneralOPDAttendance>5years', 'General OPD Attendance >5 years')}
+                  title={t('generalOPDAttendance>5years', 'General OPD Attendance >5 years')}
                   value={dashboardData?.metrics.opdOver5 ?? 0}
                 />
               </div>
               <div className={styles.metricTile}>
                 <DashboardMetric
-                  title={t('NumberofEmergencyCasesSeen', 'Number of Emergency Cases Seen')}
+                  title={t('numberofEmergencyCasesSeen', 'Number of Emergency Cases Seen')}
                   value={dashboardData?.metrics.emergencyCases ?? 0}
                 />
               </div>
@@ -99,13 +99,13 @@ const GenericDashboard: React.FC = () => {
               <div className={styles.leftSection}>
                 <div className={styles.verticalMetricTile}>
                   <DashboardMetric
-                    title={t('TotalNumberofReferrals-IN', 'Total Number of Referrals - IN')}
+                    title={t('totalNumberofReferrals-IN', 'Total Number of Referrals - IN')}
                     value={dashboardData?.metrics.referralsIn ?? 0}
                   />
                 </div>
                 <div className={styles.verticalMetricTile}>
                   <DashboardMetric
-                    title={t('TotalNumberofReferrals-OUT', 'Total Number of Referrals - OUT')}
+                    title={t('totalNumberofReferrals-OUT', 'Total Number of Referrals - OUT')}
                     value={dashboardData?.metrics.referralsOut ?? 0}
                   />
                 </div>
