@@ -3,12 +3,12 @@ import { useParams } from 'react-router-dom';
 import { useAssignedExtensions } from '@openmrs/esm-framework';
 
 import HomeHeader from './components/header/home-header.component';
-import DashboardChart from './components/admittedOPDLineChart';
 import { DashboardConfig } from '../../types/index';
 import { DashboardMetric } from './components/dashboardMetric.component';
 import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
 import { fetchDashboardData, DashboardData } from './facility-dashboard.resource';
 import styles from './facility-dashboard.scss';
+import AdmittedOPDLineChart from './components/admittedOPDLineChart';
 
 const FacilityDashboard: React.FC = () => {
   const params = useParams();
@@ -109,7 +109,7 @@ const FacilityDashboard: React.FC = () => {
                   </div>
                 </div>
                 <div className={styles.rightSection}>
-                  <DashboardChart opd={dashboardData?.generalOpdData} />
+                  <AdmittedOPDLineChart opd={dashboardData?.generalOpdData} admissions={dashboardData.admissionCases} />
                 </div>
               </div>
             </div>

@@ -12,11 +12,21 @@ interface DashboardChartProps {
 }
 
 function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
-  // Combine under5 and over5 into one data array
-  const opdData = [...(opd?.childrenUnder5 ?? []), ...(opd?.over5YearsOld ?? [])].map((item) => ({
+  // Aggregate OPD data by day (sum childrenUnder5 + over5YearsOld)
+  const opdByDay = new Map<string, number>();
+
+  opd?.childrenUnder5?.forEach((item) => {
+    opdByDay.set(item.day, (opdByDay.get(item.day) || 0) + item.value);
+  });
+
+  opd?.over5YearsOld?.forEach((item) => {
+    opdByDay.set(item.day, (opdByDay.get(item.day) || 0) + item.value);
+  });
+
+  const opdData = Array.from(opdByDay.entries()).map(([day, value]) => ({
     group: 'OPD Visits',
-    key: item.day,
-    value: item.value,
+    key: day,
+    value,
   }));
 
   // Admissions data
@@ -29,7 +39,6 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
 
   // Merge both OPD and Admissions datasets
   const data = [...opdData, ...admitted];
-
   const options: LineChartOptions = {
     title: 'Admitted/OPD',
     axes: {

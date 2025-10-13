@@ -88,7 +88,7 @@ const GenericDashboard: React.FC = () => {
                 </div>
               </div>
               <div className={styles.rightSection}>
-                <AdmittedOPDLineChart opd={dashboardData?.generalOpdData} />
+                <AdmittedOPDLineChart opd={dashboardData?.generalOpdData} admissions={dashboardData.admissionCases} />
               </div>
             </div>
           </div>
