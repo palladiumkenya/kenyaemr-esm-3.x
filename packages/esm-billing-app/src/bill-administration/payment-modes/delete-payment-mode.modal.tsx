@@ -1,7 +1,7 @@
 import React from 'react';
 import { ModalBody, ModalFooter, Button, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { PaymentMode } from '../types';
+import { PaymentMode } from '../../types';
 import { deletePaymentMode, handleMutation } from './payment-mode.resource';
 import { restBaseUrl, showSnackbar } from '@openmrs/esm-framework';
 import styles from './delete-payment-mode.modal.scss';

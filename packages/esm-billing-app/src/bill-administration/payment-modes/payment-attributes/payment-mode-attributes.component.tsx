@@ -4,7 +4,7 @@ import { Controller, Control, useFormContext } from 'react-hook-form';
 import { ResponsiveWrapper } from '@openmrs/esm-framework';
 import { TextInput, Button, Dropdown, Toggle } from '@carbon/react';
 import styles from './payment-mode-attributes.scss';
-import { PAYMENT_MODE_ATTRIBUTE_FORMATS } from '../../constants';
+import { PAYMENT_MODE_ATTRIBUTE_FORMATS } from '../../../constants';
 
 type PaymentModeAttributeFields = {
   field: Record<string, any>;

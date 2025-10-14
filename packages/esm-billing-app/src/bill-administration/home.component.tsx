@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLeftNav } from '@openmrs/esm-framework';
+import { useLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { billingAdminBasePath } from '../constants';
@@ -18,6 +18,7 @@ const BillingAdminHome: React.FC = () => {
           <Route path="/:dashboard/*" element={<DashboardContainer />} />
         </Routes>
       </main>
+      <WorkspaceContainer key="billing-admin" contextKey="billing-admin" />
     </BrowserRouter>
   );
 };

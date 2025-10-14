@@ -1,7 +1,7 @@
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import { type BillDeposit, type CreateDepositPayload } from '../types/bill-deposit.types';
 import { MAX_REFERENCE_NUMBER_COUNTER } from '../constants/bill-deposit.constants';
-import { formatCurrencySimple } from '../../helpers/currency';
+import { formatCurrencySimple } from '../../../helpers/currency';
 
 /**
  * Generates a unique reference number for bill deposits

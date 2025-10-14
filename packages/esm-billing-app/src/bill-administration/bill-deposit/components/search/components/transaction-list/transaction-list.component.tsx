@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ContainedList, ContainedListItem, OverflowMenu, OverflowMenuItem, InlineNotification } from '@carbon/react';
 import { BillDepositTransaction } from '../../../../types/bill-deposit.types';
 import { formatDate, parseDate, showModal } from '@openmrs/esm-framework';
-import { convertToCurrency } from '../../../../../helpers';
+import { convertToCurrency } from '../../../../../../helpers';
 import styles from './transaction-list.scss';
 
 type TransactionListProps = {

@@ -1,5 +1,5 @@
 import useSWR, { mutate } from 'swr';
-import { PaymentMode } from '../types';
+import { PaymentMode } from '../../types';
 import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 
 // TODO: Consolidate this hook here from

@@ -5,10 +5,10 @@ import { Button, InlineLoading } from '@carbon/react';
 import styles from './bill-deposit-search.scss';
 import { useTranslation } from 'react-i18next';
 import { Add } from '@carbon/react/icons';
-import EmptyPatientBill from '../../../past-patient-bills/patient-bills-dashboard/empty-patient-bill.component';
 import PatientSearch from './components/patient-search';
 import PatientInfo from './components/patient-info';
 import DepositTable from './components/deposit-table';
+import EmptyPatientBill from '../../../../past-patient-bills/patient-bills-dashboard/empty-patient-bill.component';
 
 const BillDepositSearch: React.FC = () => {
   const { t } = useTranslation();

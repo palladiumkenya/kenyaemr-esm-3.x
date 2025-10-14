@@ -23,7 +23,7 @@
     {
       "component": "accountingDashboardLink",
       "name": "accounting-dashboard-link",
-      "slot": "homepage-dashboard-slot",
+      "slots": ["homepage-dashboard-slot"],
       "meta": {
         "name": "accounting",
         "slot": "accounting-dashboard-slot",
@@ -193,6 +193,51 @@
       "name": "patient-info-sha-status",
       "component": "patientBannerShaStatus",
       "slot": "patient-banner-tags-slot"
+    },
+    {
+      "name": "payment-mode-dashboard-link",
+      "component": "paymentModeLink",
+      "slot": "billing-admin-dashboard-slot",
+      "meta": {
+        "name": "payment-mode",
+        "title": "Payment Mode",
+        "slot": "payment-mode-dashboard-slot"
+      }
+    },
+    {
+      "name": "payment-mode-dashboard",
+      "component": "paymentModeDashboard",
+      "slot": "payment-mode-dashboard-slot"
+    },
+    {
+      "name": "bill-deposit-dashboard-link",
+      "component": "billDepositDashboardLink",
+      "slot": "billing-admin-dashboard-slot",
+      "meta": {
+        "name": "bill-deposit",
+        "title": "Bill Deposit",
+        "slot": "billing-deposit-dashboard-slot"
+      }
+    },
+    {
+      "name": "bill-deposit-dashboard",
+      "component": "billDepositDashboard",
+      "slot": "billing-deposit-dashboard-slot"
+    },
+    {
+      "name": "billable-exemptions-dashboard-link",
+      "component": "billableExemptionsLink",
+      "slot": "billing-admin-dashboard-slot",
+      "meta": {
+        "name": "billable-exemptions",
+        "title": "Billable Exemptions",
+        "slot": "billing-exemptions-dashboard-slot"
+      }
+    },
+    {
+      "name": "billable-exemptions-dashboard",
+      "component": "billableExemptions",
+      "slot": "billing-exemptions-dashboard-slot"
     }
   ],
   "workspaces": [

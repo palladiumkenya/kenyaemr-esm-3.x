@@ -1,7 +1,7 @@
 import React from 'react';
-import BillingHeader from '../billing-header/billing-header.component';
+import BillingHeader from '../../billing-header/billing-header.component';
 import { useTranslation } from 'react-i18next';
-import PaymentModeDashboard from './payment-mode-dashboard.compont';
+import PaymentModeDashboard from './payment-mode-dashboard.component';
 
 type PaymentModeHomeProps = {};
 

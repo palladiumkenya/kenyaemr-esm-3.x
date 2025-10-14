@@ -14,7 +14,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import classNames from 'classnames';
 import { createPaymentMode, handleMutation } from './payment-mode.resource';
-import { PaymentMode } from '../types';
+import { PaymentMode } from '../../types';
 import usePaymentModeFormSchema from './usePaymentModeFormSchema';
 import PaymentModeAttributeFields from './payment-attributes/payment-mode-attributes.component';
 import { Add } from '@carbon/react/icons';

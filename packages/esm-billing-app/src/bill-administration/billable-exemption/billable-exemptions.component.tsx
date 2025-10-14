@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import BillingHeader from '../billing-header/billing-header.component';
-import { BillableExemptionsViewer } from '../billable-services/billable-exemptions/billable-exemptions-viewer.component';
+import BillingHeader from '../../billing-header/billing-header.component';
+import { BillableExemptionsViewer } from '../../billable-services/billable-exemptions/billable-exemptions-viewer.component';
 
-export const BillableExemptions = () => {
+const BillableExemptions = () => {
   const { t } = useTranslation();
   return (
     <div>
@@ -12,3 +12,5 @@ export const BillableExemptions = () => {
     </div>
   );
 };
+
+export default BillableExemptions;

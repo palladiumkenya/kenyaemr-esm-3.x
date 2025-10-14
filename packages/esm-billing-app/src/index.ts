@@ -1,8 +1,7 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerFeatureFlag } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 import { configSchema } from './config-schema';
-import { accountingDashboardMeta, benefitsPackageDashboardMeta, dashboardMeta } from './dashboard.meta';
+import { accountingDashboardMeta } from './dashboard.meta';
 const moduleName = '@kenyaemr/esm-billing-app';
 const options = {
   featureName: 'billing',
@@ -58,21 +57,14 @@ import ClaimsManagementOverview from './claims/claims-management/main/claims-ove
 import { ManageClaimRequest } from './claims/claims-management/table/manage-claim-request.modal';
 import InitiatePaymentDialog from './invoice/payments/initiate-payment/initiate-payment.component';
 import VisitAttributeTags from './invoice/payments/visit-tags/visit-attribute.component';
-import DeletePaymentModeModal from './payment-modes/delete-payment-mode.modal';
-import PaymentModeWorkspace from './payment-modes/payment-mode.workspace';
+import DeletePaymentModeModal from './bill-administration/payment-modes/delete-payment-mode.modal';
+import PaymentModeWorkspace from './bill-administration/payment-modes/payment-mode.workspace';
 import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
 
 // Payment Points Components
 import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
 import { ClockIn } from './payment-points/payment-point/clock-in.modal';
 import { ClockOut } from './payment-points/payment-point/clock-out.modal';
-
-// Bill Deposit Components
-import BillDepositSearch from './bill-deposit/components/search/bill-deposit-search.component';
-import AddDepositWorkspace from './bill-deposit/components/forms/add-deposit.workspace';
-import DeleteDepositModal from './bill-deposit/components/modal/delete-deposit.modal';
-import ReverseTransactionModal from './bill-deposit/components/modal/reverse-transaction.modal';
-import DepositTransactionWorkspace from './bill-deposit/components/forms/deposit-transactions/deposit-transaction.workspace';
 
 // Print Preview Components
 import PrintPreviewModal from './print-preview/print-preview.modal';
@@ -140,13 +132,6 @@ export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillab
 // Claims Management Components
 export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 export const manageClaimRequestModal = getSyncLifecycle(ManageClaimRequest, options);
-
-// Bill Deposit Components
-export const billDepositSearch = getSyncLifecycle(BillDepositSearch, options);
-export const addDepositWorkspace = getSyncLifecycle(AddDepositWorkspace, options);
-export const deleteDepositModal = getSyncLifecycle(DeleteDepositModal, options);
-export const depositTransactionWorkspace = getSyncLifecycle(DepositTransactionWorkspace, options);
-export const reverseTransactionModal = getSyncLifecycle(ReverseTransactionModal, options);
 
 // Print Preview Components
 export const printPreviewModal = getSyncLifecycle(PrintPreviewModal, options);

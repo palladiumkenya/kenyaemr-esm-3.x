@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { usePaymentModes } from '../billing.resource';
+import { usePaymentModes } from '../../billing.resource';
 import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import {
@@ -23,7 +23,7 @@ import {
 
 import styles from './payment-mode-dashboard.scss';
 import { formatDate, launchWorkspace, showModal, useDebounce, useLayoutType } from '@openmrs/esm-framework';
-import { PaymentMode } from '../types';
+import { PaymentMode } from '../../types';
 import startCase from 'lodash/startCase';
 
 type PaymentModeDashboardProps = {};

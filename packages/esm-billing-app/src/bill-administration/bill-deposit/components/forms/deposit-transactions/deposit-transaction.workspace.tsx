@@ -7,20 +7,20 @@ import {
   showSnackbar,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { usePatientBills } from '../../../../prompt-payment/prompt-payment.resource';
-import { type LineItem, PaymentStatus } from '../../../../types';
 import { ButtonSet, Button, InlineLoading, ComboBox, NumberInput, TextInput, InlineNotification } from '@carbon/react';
 import { useForm, Controller } from 'react-hook-form';
 import styles from './deposit-transaction.workspace.scss';
 import classNames from 'classnames';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { convertToCurrency, extractString } from '../../../../helpers';
 import uniqBy from 'lodash-es/uniqBy';
 import { mutate } from 'swr';
 import { BILL_DEPOSIT_TRANSACTION_TYPES } from '../../../constants/bill-deposit.constants';
 import { type FormattedDeposit } from '../../../types/bill-deposit.types';
 import { addDepositTransaction } from '../../../utils/bill-deposit.utils';
+import { usePatientBills } from '../../../../../prompt-payment/prompt-payment.resource';
+import { LineItem, PaymentStatus } from '../../../../../types';
+import { extractString, convertToCurrency } from '../../../../../helpers';
 
 type DepositTransactionWorkspaceProps = DefaultWorkspaceProps & {
   deposit: FormattedDeposit;
