@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Layer,
   DataTable,
   TableContainer,
   Table,

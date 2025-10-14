@@ -1,7 +1,7 @@
-import { Concept, OpenmrsResource, openmrsFetch } from '@openmrs/esm-framework';
+import { Concept, openmrsFetch } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { ServiceConcept, ServiceTypesResponse } from '../types';
-import { type ChargeAble } from './billables/charge-summary.resource';
+import { ServiceConcept, ServiceTypesResponse } from '../../types';
+import { type ChargeAble } from './charge-summary.resource';
 
 type ExtendedResponseObject = ChargeAble & {
   concept: Concept;

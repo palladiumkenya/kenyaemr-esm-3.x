@@ -40,17 +40,17 @@ import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive
 import CreateBillWorkspace from './billable-services/bill-manager/workspaces/create-bill/create-bill.workspace';
 
 // Billable Services Components
-import CommodityForm from './billable-services/billables/commodity/commodity-form.workspace';
-import AddServiceForm from './billable-services/billables/services/service-form.workspace';
-import { BulkImportBillableServices } from './billable-services/bulk-import-billable-service.modal';
+import AddServiceForm from './bill-administration/service-catalog/commodity/commodity-form.workspace';
+import CommodityForm from './bill-administration/service-catalog/commodity/commodity-form.workspace';
+import BulkImportBillableServices from './bill-administration/service-catalog/bulk-import-billable-service.modal';
 
 // Order Components
-import DrugOrder from './billable-services/billiable-item/drug-order/drug-order.component';
-import ImagingOrder from './billable-services/billiable-item/test-order/imaging-order.component';
-import LabOrder from './billable-services/billiable-item/test-order/lab-order.component';
-import PriceInfoOrder from './billable-services/billiable-item/test-order/price-info-order.componet';
-import ProcedureOrder from './billable-services/billiable-item/test-order/procedure-order.component';
-import OrderActionButton from './billable-services/billiable-item/order-actions/components/order-action-button.component';
+import DrugOrder from './billable-services/billable-orders/drug-order/drug-order.component';
+import ImagingOrder from './billable-services/billable-orders/test-order/imaging-order.component';
+import LabOrder from './billable-services/billable-orders/test-order/lab-order.component';
+import PriceInfoOrder from './billable-services/billable-orders/test-order/price-info-order.componet';
+import ProcedureOrder from './billable-services/billable-orders/test-order/procedure-order.component';
+import OrderActionButton from './billable-services/billable-orders/order-actions/components/order-action-button.component';
 
 // Claims Management Components
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';

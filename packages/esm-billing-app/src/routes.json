@@ -238,6 +238,36 @@
       "name": "billable-exemptions-dashboard",
       "component": "billableExemptions",
       "slot": "billing-exemptions-dashboard-slot"
+    },
+    {
+      "name": "clinical-charges-dashboard-link",
+      "component": "clinicalChargesLink",
+      "slot": "billing-admin-dashboard-slot",
+      "meta": {
+        "name": "clinical-charges",
+        "title": "Clinical Charges",
+        "slot": "clinical-charges-dashboard-slot"
+      }
+    },
+    {
+      "name": "clinical-charges-dashboard",
+      "component": "clinicalCharges",
+      "slot": "clinical-charges-dashboard-slot"
+    },
+    {
+      "name": "payment-history-dashboard-link",
+      "component": "paymentHistoryLink",
+      "slot": "billing-admin-dashboard-slot",
+      "meta": {
+        "name": "payment-history",
+        "title": "Payment History",
+        "slot": "payment-history-dashboard-slot"
+      }
+    },
+    {
+      "name": "payment-history-dashboard",
+      "component": "paymentHistoryDashboard",
+      "slot": "payment-history-dashboard-slot"
     }
   ],
   "workspaces": [

@@ -13,8 +13,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import PriceField from '../services/price.component';
 import { billableFormSchema, BillableFormSchema } from '../form-schemas';
 import { formatBillableServicePayloadForSubmission, mapInputToPayloadSchema } from '../form-helper';
-import { createBillableService } from '../../billable-service.resource';
-import { handleMutate } from '../../utils';
+import { createBillableService } from '../billable-service.resource';
+import { handleMutate } from '../../../billable-services/utils';
 
 type CommodityFormProps = DefaultPatientWorkspaceProps & {
   initialValues?: BillableFormSchema;

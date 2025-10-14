@@ -3,16 +3,16 @@ import { DocumentAttachment, Download } from '@carbon/react/icons';
 import { showSnackbar } from '@openmrs/esm-framework';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePaymentModes } from '../billing.resource';
-import { MAX_ALLOWED_FILE_SIZE } from '../constants';
-import { ExcelFileRow } from '../types';
+import { usePaymentModes } from '../../billing.resource';
+import { MAX_ALLOWED_FILE_SIZE } from '../../constants';
+import { ExcelFileRow } from '../../types';
 import { createBillableService, useServiceTypes } from './billable-service.resource';
-import { useChargeSummaries } from './billables/charge-summary.resource';
-import { BillableServicePayload, getBulkUploadPayloadFromExcelFile } from './billables/form-helper';
+import { useChargeSummaries } from './charge-summary.resource';
+import { BillableServicePayload, getBulkUploadPayloadFromExcelFile } from './form-helper';
 import styles from './clinical-charges.scss';
-import { createAndDownloadFailedUploadsExcelFile, createAndDownloadFilteredRowsFile } from './utils';
+import { createAndDownloadFailedUploadsExcelFile, createAndDownloadFilteredRowsFile } from '../../billable-services/utils';
 
-export const BulkImportBillableServices = ({ closeModal }) => {
+const BulkImportBillableServices = ({ closeModal }) => {
   const [isImporting, setIsImporting] = useState(false);
   const { t } = useTranslation();
   const inputFileRef = useRef<HTMLInputElement>();
@@ -187,3 +187,5 @@ export const BulkImportBillableServices = ({ closeModal }) => {
     </React.Fragment>
   );
 };
+
+export default BulkImportBillableServices;

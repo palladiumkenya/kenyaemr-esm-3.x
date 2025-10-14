@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { ActionableNotification, Link } from '@carbon/react';
 import { ChevronRight, ChevronLeft } from '@carbon/react/icons';
 import styles from './schema-editor.scss';
-import { useStandardSchema } from '../../../hooks/useExemptionSchema';
+import { useStandardSchema } from '../../../../hooks/useExemptionSchema';
 
 interface MarkerProps extends IMarker {
   text: string;

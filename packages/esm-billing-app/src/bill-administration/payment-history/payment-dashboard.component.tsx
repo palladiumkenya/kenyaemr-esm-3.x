@@ -8,7 +8,7 @@ import { FilterDashboard } from './filters/filter-dashboard';
 import { PaymentHistoryViewer } from './payment-history-viewer.component';
 import PaymentMethodDistribution from './payment-method-distribution.component';
 
-export const PaymentDashboard = () => {
+const PaymentDashboard = () => {
   const { t } = useTranslation();
 
   return (
@@ -33,3 +33,5 @@ export const PaymentDashboard = () => {
     </PaymentFilterProvider>
   );
 };
+
+export default PaymentDashboard;

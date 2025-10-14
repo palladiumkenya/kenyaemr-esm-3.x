@@ -3,7 +3,7 @@ import { ModalHeader, ModalBody, ModalFooter, Button, Loading } from '@carbon/re
 import styles from './cancel-bill.scss';
 import { useTranslation } from 'react-i18next';
 import { OpenmrsResource, showSnackbar } from '@openmrs/esm-framework';
-import { deleteBillableService } from '../../billable-service.resource';
+import { deleteBillableService } from '../../../bill-administration/service-catalog/billable-service.resource';
 
 export const DeleteBillableServiceModal: React.FC<{
   onClose: () => void;

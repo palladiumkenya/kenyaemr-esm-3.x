@@ -1,6 +1,12 @@
 import { getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import { billableExemptionsDashboardMeta, billDepositDashboardMeta, paymentModeDashboardMeta } from './dashboard.meta';
+import {
+  billableExemptionsDashboardMeta,
+  billDepositDashboardMeta,
+  clinicalChargesDashboardMeta,
+  paymentHistoryDashboardMeta,
+  paymentModeDashboardMeta,
+} from './dashboard.meta';
 
 const options = {
   featureName: 'billing-admin',
@@ -43,8 +49,15 @@ export const paymentModeDashboard = getAsyncLifecycle(
   options,
 );
 
+export const clinicalCharges = getAsyncLifecycle(() => import('./service-catalog/clinical-charges.component'), options);
+export const paymentHistoryDashboard = getAsyncLifecycle(
+  () => import('./payment-history/payment-dashboard.component'),
+  options,
+);
 export const billingAdmin = getAsyncLifecycle(() => import('./home.component'), options);
 
 export const billDepositDashboardLink = getSyncLifecycle(createDashboardLink(billDepositDashboardMeta), options);
 export const billableExemptionsLink = getSyncLifecycle(createDashboardLink(billableExemptionsDashboardMeta), options);
 export const paymentModeLink = getSyncLifecycle(createDashboardLink(paymentModeDashboardMeta), options);
+export const clinicalChargesLink = getSyncLifecycle(createDashboardLink(clinicalChargesDashboardMeta), options);
+export const paymentHistoryLink = getSyncLifecycle(createDashboardLink(paymentHistoryDashboardMeta), options);

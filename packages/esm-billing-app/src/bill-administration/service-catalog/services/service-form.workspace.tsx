@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useLayoutType, useDebounce, ResponsiveWrapper, showSnackbar, restBaseUrl } from '@openmrs/esm-framework';
 import { DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-import { createBillableService, useConceptsSearch, useServiceTypes } from '../../billable-service.resource';
+import { createBillableService, useConceptsSearch, useServiceTypes } from '../billable-service.resource';
 import PriceField from './price.component';
 import { billableFormSchema, BillableFormSchema } from '../form-schemas';
 
@@ -25,7 +25,7 @@ import classNames from 'classnames';
 import styles from './service-form.scss';
 import { formatBillableServicePayloadForSubmission, mapInputToPayloadSchema } from '../form-helper';
 import ConceptSearch from './concept-search.component';
-import { handleMutate } from '../../utils';
+import { handleMutate } from '../../../billable-services/utils';
 
 interface AddServiceFormProps extends DefaultPatientWorkspaceProps {
   initialValues?: BillableFormSchema;

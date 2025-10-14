@@ -5,7 +5,7 @@ import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type Order, type OrderAction } from '@openmrs/esm-patient-common-lib';
 import { processBillItems } from '../../../../billing.resource';
 import CreateBillWorkspace from './create-bill.workspace';
-import { useBillableItem } from '../../../billiable-item/useBillableItem';
+import { useBillableItem } from '../../../billable-orders/useBillableItem';
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -26,7 +26,7 @@ jest.mock('@openmrs/esm-framework', () => ({
   restBaseUrl: '/openmrs/ws/rest/v1',
 }));
 
-jest.mock('../../../billiable-item/useBillableItem', () => ({
+jest.mock('../../../billable-orders/useBillableItem', () => ({
   useBillableItem: jest.fn(),
 }));
 

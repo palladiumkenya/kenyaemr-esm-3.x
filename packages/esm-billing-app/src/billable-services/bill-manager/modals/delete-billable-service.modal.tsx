@@ -1,8 +1,8 @@
 import React from 'react';
 import { ModalBody, ModalFooter, Button, InlineLoading, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { type ChargeAble } from '../../billables/charge-summary.resource';
-import { deleteBillableService } from '../../billable-service.resource';
+import { type ChargeAble } from '../../../bill-administration/service-catalog/charge-summary.resource';
+import { deleteBillableService } from '../../../bill-administration/service-catalog/billable-service.resource';
 import { showSnackbar, restBaseUrl } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
 

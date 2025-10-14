@@ -1,8 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import BillManager from './billable-services/bill-manager/bill-manager.component';
-import { ChargeItemsDashboard } from './billable-services/dashboard/dashboard.component';
-import { PaymentHistory } from './billable-services/payment-history/payment-history.component';
 import BillingDashboard from './billing-dashboard/billing-dashboard.component';
 import ClaimsManagementOverview from './claims/claims-management/main/claims-overview-main.component';
 import ClaimsManagementPreAuthRequest from './claims/claims-management/main/claims-pre-auth-main.component';
@@ -37,11 +35,9 @@ const RootComponent: React.FC = () => {
             </ClockInBoundary>
           }
         />
-        <Route path="/payment-history" element={<PaymentHistory />} />
         <Route path="/payment-points" element={<PaymentPoints />} />
         <Route path="/payment-points/:paymentPointUUID" element={<PaymentPoint />} />
         <Route path="/bill-manager" element={<BillManager />} />
-        <Route path="/charge-items" element={<ChargeItemsDashboard />} />
       </Routes>
     </BrowserRouter>
   );

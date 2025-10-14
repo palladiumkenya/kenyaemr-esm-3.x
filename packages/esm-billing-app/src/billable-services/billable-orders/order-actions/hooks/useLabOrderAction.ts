@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Order } from '@openmrs/esm-patient-common-lib';
 import { useBillStatus } from './useBillStatus';
-import { useBillableServices } from '../../../billable-service.resource';
+import { useBillableServices } from '../../../../bill-administration/service-catalog/billable-service.resource';
 
 export enum FulfillerStatus {
   IN_PROGRESS = 'IN_PROGRESS',

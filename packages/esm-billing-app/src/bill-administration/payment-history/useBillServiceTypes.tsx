@@ -1,5 +1,5 @@
 import { MappedBill } from '../../types';
-import { useServiceTypes } from '../billable-service.resource';
+import { useServiceTypes } from '../service-catalog/billable-service.resource';
 
 export const useBillsServiceTypes = (bills: MappedBill[]) => {
   const { serviceTypes, isLoading } = useServiceTypes();

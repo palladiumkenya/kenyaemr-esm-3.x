@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useStockItemQuantity } from '../../useBillableItem';
-import { useBillableServices } from '../../../billable-service.resource';
+import { useBillableServices } from '../../../../bill-administration/service-catalog/billable-service.resource';
 
 import { useBillStatus } from './useBillStatus';
 import { createMedicationDispenseProps } from '../../test-order/dispense.resource';

@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import DeleteBillableServiceModal from './delete-billable-service.modal';
 import { deleteBillableService } from '../../billable-service.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
-import type { ChargeAble } from '../../billables/charge-summary.resource';
+import type { ChargeAble } from '../../service-catalog/charge-summary.resource';
 
 jest.mock('../../billable-service.resource', () => ({
   deleteBillableService: jest.fn(),
