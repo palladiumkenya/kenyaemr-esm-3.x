@@ -21,7 +21,7 @@ const LabTable: React.FC<LabTableProps> = ({ orders }) => {
     return (
       <Layer>
         <EmptyState
-          displayText={t('noOrders', 'No orders')}
+          displayText={t('anOrders', 'an orders')}
           headerTitle={t('laboratoryOrders', 'Laboratory Orders')}
           launchForm={() => launchAddLabOrder({ orderTypeUuid: labOrderTypeUuid, orderableConceptSets })}
         />
