@@ -1,8 +1,8 @@
 import flatMapDeep from 'lodash-es/flatMapDeep';
 import { useLocation, useParams } from 'react-router-dom';
-import { useBillsServiceTypes } from '../billable-services/payment-history/useBillServiceTypes';
 import { usePaymentModes } from '../billing.resource';
 import { MappedBill, Timesheet } from '../types';
+import { useBillsServiceTypes } from '../bill-administration/payment-history/useBillServiceTypes';
 
 const getAllValues = (obj: Object): Array<any> => {
   return flatMapDeep(obj, (value) => {

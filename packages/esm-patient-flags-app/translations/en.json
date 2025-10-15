@@ -2,7 +2,7 @@
   "administration": "Administration",
   "adrAssessment": "ADR Assessment",
   "bedManagement": "Bed Management",
-  "billing": "Billing",
+  "billingAdmin": "Billing Admin",
   "clearCache": "Clear Cache",
   "clearSearch": "Clear search",
   "crossBorder": "Cross Border",
@@ -19,6 +19,7 @@
   "manageStocks": "Manage Stocks",
   "reports": "Reports",
   "search": "Search for a module",
+  "serviceQueuesAdmin": "Service Queues Admin",
   "suppliesDispensing": "Supplies Dispensing",
   "systemInfo": "System Info"
 }

@@ -6,7 +6,7 @@ import { processBillPayment, usePaymentModes } from '../billing.resource';
 import { BillingConfig } from '../config-schema';
 import { extractServiceIdentifier } from '../invoice/payments/utils';
 import { getErrorMessage, getRequestStatus, readableStatusMap } from '../m-pesa/mpesa-resource';
-import { useClockInStatus } from '../payment-points/use-clock-in-status';
+import { useClockInStatus } from '../bill-administration/payment-points/use-clock-in-status';
 import { LineItem, MappedBill, PaymentStatus, RequestStatus, Timesheet } from '../types';
 import { extractErrorMessagesFromResponse, waitForASecond } from '../utils';
 

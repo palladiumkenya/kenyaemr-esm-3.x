@@ -1,7 +1,7 @@
 import { mutate } from 'swr';
 import * as XLSX from 'xlsx';
 import { ExcelFileRow } from '../types';
-import { BillableServicePayload } from './billables/form-helper';
+import { BillableServicePayload } from '../bill-administration/service-catalog/form-helper';
 
 export const handleMutate = (url: string) => {
   mutate((key) => typeof key === 'string' && key.startsWith(url), undefined, {
@@ -9,7 +9,7 @@ export const handleMutate = (url: string) => {
   });
 };
 
-export const createAndDownloadFailedUploadsExcelFile = (data: BillableServicePayload[]) => {
+export const createAndDownloadFailedUploadsExcelFile = (data: Array<BillableServicePayload>) => {
   const worksheetData = data.map((item) => ({
     name: item.name,
     concept_id: item.concept,

@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import BillsTable from '../bills-table/bills-table.component';
 import PatientBillsScreen from '../past-patient-bills/patient-bills-dashboard/patient-bills-dashboard';
-import { useClockInStatus } from '../payment-points/use-clock-in-status';
+import { useClockInStatus } from '../bill-administration/payment-points/use-clock-in-status';
 import styles from './billing-tabs.scss';
 import ClaimsManagementTable from '../claims/claims-management/table/claims-list-table.component';
 import PreauthTableTemporary from '../claims/claims-management/table/preauth-table.tmp.component';

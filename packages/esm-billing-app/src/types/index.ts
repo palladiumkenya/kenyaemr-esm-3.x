@@ -666,3 +666,9 @@ export interface ClaimSummary {
   startDate: string;
   endDate: string;
 }
+
+export interface DashboardConfig {
+  name: string;
+  slot: string;
+  title: string;
+}
