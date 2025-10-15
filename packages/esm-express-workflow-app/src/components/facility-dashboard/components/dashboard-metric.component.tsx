@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './metrics.scss';
+import styles from './dashboard-metric.scss';
 import { Tile, Grid, Column } from '@carbon/react';
 
 interface DashboardMetricProps {

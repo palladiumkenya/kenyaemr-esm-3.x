@@ -6,8 +6,8 @@ import { useAssignedExtensions, ExtensionSlot } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, InlineNotification } from '@carbon/react';
 import HomeHeader from './components/header/home-header.component';
-import { DashboardMetric } from './components/dashboardMetric.component';
-import { TopDiseasesBarCharts } from './components/topDiseasesBarCharts.component';
+import { DashboardMetric } from './components/dashboard-metric.component';
+import { TopDiseasesBarCharts } from './components/top-diseases-barcharts.component';
 import AdmittedOPDLineChart from './components/admitted-opd-line-chart.component';
 
 import styles from './generic-dashboard.scss';
