@@ -1,21 +1,30 @@
 import React from 'react';
 import { ScaleTypes, SimpleBarChart } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
-import './dataTable.scss';
+import './top-diseases-barcharts.scss';
 
 interface TopDiseasesBarChartsProps {
   data?: Array<{ day: string; group: string; value: number; ageGroup: 'under5' | 'over5' }>;
 }
 
+const AGE_GROUPS = {
+  UNDER_5: 'under5',
+  OVER_5: 'over5',
+} as const;
+
 export function TopDiseasesBarCharts({ data: topDiseases }: TopDiseasesBarChartsProps) {
   const under5Data =
     topDiseases
-      ?.filter((item) => item.ageGroup === 'under5')
+      ?.filter((item) => item.ageGroup === AGE_GROUPS.UNDER_5)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10)
       .map((item) => ({ group: item.group, value: item.value })) ?? [];
 
   const over5Data =
     topDiseases
-      ?.filter((item) => item.ageGroup === 'over5')
+      ?.filter((item) => item.ageGroup === AGE_GROUPS.OVER_5)
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 10)
       .map((item) => ({ group: item.group, value: item.value })) ?? [];
 
   const chartOptions = {

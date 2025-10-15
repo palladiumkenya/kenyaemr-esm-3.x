@@ -1,0 +1,113 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/breakpoints' as breakpoints;
+
+.homePageWrapper {
+  display: flex;
+  width: 100%;
+}
+
+.dashboardContainer {
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  margin: 0;
+  height: calc(100vh - layout.$spacing-09);
+  width: calc(100% - layout.$spacing-13);
+  background-color: colors.$gray-10;
+
+  & a {
+    width: 100%;
+  }
+
+  &.hasLeftNav {
+    margin-inline-start: layout.$spacing-13;
+  }
+}
+
+.dashboardContainerTablet {
+  flex-grow: 1;
+}
+
+.logoSection {
+  display: flex;
+  justify-content: center;
+}
+
+.dashboardView {
+  background-color: colors.$white-0;
+  padding: layout.$spacing-05;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-06;
+}
+
+// First Row: Bar Charts
+.firstRow {
+  background-color: colors.$white-0;
+  padding: layout.$spacing-05;
+  border: 1px solid colors.$gray-20;
+  border-radius: layout.$spacing-02;
+}
+
+// Second Row: 3 Metric Tiles
+.secondRow {
+  display: flex;
+  gap: layout.$spacing-05;
+  width: 100%;
+
+  @include breakpoints.tablet {
+    flex-direction: column;
+  }
+}
+
+.metricTile {
+  flex: 1;
+  background-color: colors.$white-0;
+  padding: layout.$spacing-05;
+  border: 1px solid colors.$gray-20;
+  border-radius: layout.$spacing-01;
+}
+
+// Third Row: Split Layout
+.thirdRow {
+  display: flex;
+  gap: layout.$spacing-05;
+  width: 100%;
+
+  @include breakpoints.tablet {
+    flex-direction: column;
+  }
+}
+
+.leftSection {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-05;
+
+  @include breakpoints.tablet {
+    width: 100%;
+    flex-direction: row;
+  }
+}
+
+.verticalMetricTile {
+  background-color: colors.$white-0;
+  padding: layout.$spacing-05;
+  border: 1px solid colors.$gray-20;
+  border-radius: layout.$spacing-02;
+  flex: 1;
+}
+
+.rightSection {
+  width: 70%;
+  background-color: colors.$white-0;
+  padding: layout.$spacing-05;
+  border: 1px solid colors.$gray-20;
+  border-radius: layout.$spacing-02;
+
+  @include breakpoints.tablet {
+    width: 100%;
+  }
+}
