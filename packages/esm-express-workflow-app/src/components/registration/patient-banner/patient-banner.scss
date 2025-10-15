@@ -114,6 +114,14 @@
   font-size: inherit !important;
   margin: 0 !important;
 }
+.eligibilityTags {
+  @include type.type-style('body-compact-02');
+  color: $text-02;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
 
 .tooltipPadding {
   padding: layout.$spacing-02;
