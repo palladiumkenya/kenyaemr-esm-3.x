@@ -2950,7 +2950,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -2965,7 +2965,7 @@ __metadata:
     lodash-es: "npm:^4.17.15"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -2981,7 +2981,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -2997,7 +2997,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3013,7 +3013,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3034,7 +3034,7 @@ __metadata:
     react-otp-input: "npm:^3.1.1"
     zod: "npm:^3.24.1"
   peerDependencies:
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     dayjs: 1.x
     react: 18.x
     react-i18next: 11.x
@@ -3051,7 +3051,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3067,7 +3067,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3083,7 +3083,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3100,7 +3100,7 @@ __metadata:
     lodash-es: "npm:^4.17.21"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3114,7 +3114,7 @@ __metadata:
     lodash-es: "npm:^4.17.15"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3129,7 +3129,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3145,7 +3145,7 @@ __metadata:
     react-to-print: "npm:2.14.13"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -3161,7 +3161,7 @@ __metadata:
     webpack: "npm:^5.99.9"
   peerDependencies:
     "@carbon/react": 1.x
-    "@openmrs/esm-framework": 7.x
+    "@openmrs/esm-framework": 8.x
     react: ^18.1.0
     react-i18next: 11.x
     react-router-dom: 6.x

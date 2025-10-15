@@ -67,10 +67,10 @@ export const useModuleLinks = () => {
       privilege: 'o3: Manage Stocks',
     },
     {
-      label: t('billing', 'Billing'),
-      url: `${openmrsSpaBase}home/billing`,
+      label: t('billingAdmin', 'Billing Admin'),
+      url: `${openmrsSpaBase}billing-admin`,
       icon: <Receipt size={24} />,
-      privilege: 'o3: View Bill Payment Dashboard',
+      privilege: 'o3: View Billing Admin Dashboard',
     },
     {
       label: t('dispensingApp', 'Dispensing App'),

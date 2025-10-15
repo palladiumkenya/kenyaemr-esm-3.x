@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Location, UserFollow } from '@carbon/react/icons';
-import { ExtensionSlot, formatDate, useSession } from '@openmrs/esm-framework';
+import { ExtensionSlot, formatDate, useSession, Pictogram } from '@openmrs/esm-framework';
 import BillingIllustration from './billing-illustration.component';
 import styles from './billing-header.scss';
 
