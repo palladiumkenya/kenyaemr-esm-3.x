@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { processBillPayment, usePaymentModes } from '../../billing.resource';
 import { BillingConfig } from '../../config-schema';
-import { useClockInStatus } from '../../payment-points/use-clock-in-status';
+import { useClockInStatus } from '../../bill-administration/payment-points/use-clock-in-status';
 import { LineItem, MappedBill } from '../../types';
 import { checkPaymentStatus } from './payments.resource';
 import styles from './payments.scss';

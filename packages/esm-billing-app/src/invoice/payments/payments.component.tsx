@@ -9,7 +9,7 @@ import { mutate } from 'swr';
 import { z } from 'zod';
 import { processBillPayment } from '../../billing.resource';
 import { convertToCurrency } from '../../helpers';
-import { useClockInStatus } from '../../payment-points/use-clock-in-status';
+import { useClockInStatus } from '../../bill-administration/payment-points/use-clock-in-status';
 import { LineItem, PaymentFormValue, PaymentStatus, type MappedBill } from '../../types';
 import { computeWaivedAmount, extractErrorMessagesFromResponse } from '../../utils';
 import { InvoiceBreakDown } from './invoice-breakdown/invoice-breakdown.component';
