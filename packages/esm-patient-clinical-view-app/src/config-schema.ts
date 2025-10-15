@@ -52,6 +52,7 @@ export const configSchema = {
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
       autopsyFormUuid: '2b61a73-4971-4fc0-b20b-9a30176317e2',
       htsClientTracingFormUuid: '15ed03d2-c972-11e9-a32f-2a2ae2dbcce4',
+      admissionRequestFormUuid: '0bae7646-b079-4cbb-8130-b24274fc16f7',
     },
   },
   htsClientTracingConceptsUuids: {
@@ -447,6 +448,7 @@ export interface ConfigObject {
     peerCalendarOutreactForm: string;
     autopsyFormUuid: string;
     htsClientTracingFormUuid: string;
+    admissionRequestFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
   autopsyEncounterFormUuid: string;
