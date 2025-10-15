@@ -1,5 +1,9 @@
-import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
+import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
+import { ConfigObject } from '../../config-schema';
+import dayjs from 'dayjs';
 
 export interface ChartConfig {
   freeTextFieldConceptUuid: string;
@@ -101,3 +105,45 @@ export function deleteEncounter(encounterUuid: string, abortController: AbortCon
     signal: abortController.signal,
   });
 }
+
+type Relationship = {
+  display: string;
+  uuid: string;
+  personA: {
+    uuid: string;
+    display: string;
+  };
+  personB: {
+    uuid: string;
+    display: string;
+  };
+  startDate: string;
+  endDate: string;
+  relationshipType: {
+    uuid: string;
+    display: string;
+  };
+};
+
+export const usePatientActiveCases = (patientUuid: string) => {
+  const { caseManagerRelationshipType } = useConfig<ConfigObject>();
+  const rep =
+    'custom:(display,uuid,personA:(uuid,display),personB:(uuid,display),startDate,endDate,relationshipType:(uuid,display))';
+  const url = `${restBaseUrl}/relationship?person=${patientUuid}&v=${rep}`;
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Relationship> }>>(url, openmrsFetch);
+  const activeCases = useMemo(
+    () =>
+      (data?.data?.results ?? []).filter(
+        (rel) =>
+          rel.relationshipType.uuid === caseManagerRelationshipType &&
+          (!rel.endDate || dayjs(rel.endDate).isAfter(dayjs())),
+      ),
+    [data, caseManagerRelationshipType],
+  );
+  return {
+    activeCases,
+    isLoading,
+    mutate,
+    error,
+  };
+};

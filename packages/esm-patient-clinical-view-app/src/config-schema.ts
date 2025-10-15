@@ -409,6 +409,11 @@ export const configSchema = {
       },
     },
   },
+  caseManagerRelationshipType: {
+    _type: Type.UUID,
+    _description: 'Case manager/Client relationship type UUID',
+    _default: '9065e3c6-b2f5-4f99-9cbf-f67fd9f82ec5',
+  },
 };
 
 export interface ConfigObject {
@@ -501,6 +506,7 @@ export interface ConfigObject {
       bloodPressureDecrement: number;
     };
   };
+  caseManagerRelationshipType: string;
 }
 
 export interface PartograpyComponents {

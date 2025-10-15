@@ -47,6 +47,7 @@ import { configSchema } from './config-schema';
 import SpecialClinicDashboard from './special-clinics/special-clinic.component';
 import { createDashboardLink as createDashboardLink2 } from './dashboard/createDashboardLink';
 import { createLeftPanelLink } from './left-panel-link.component';
+import PatientCaseForm from './case-management/encounters/patient-case.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -98,6 +99,7 @@ export const partograph = getSyncLifecycle(Partography, options);
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
+export const addPatientCaseForm = getSyncLifecycle(PatientCaseForm, options);
 export const caseEncounterDashboardLink = getSyncLifecycle(createDashboardLink(caseEncounterDashboardMeta), options);
 export const caseEncounterTable = getSyncLifecycle(CaseEncounterOverviewComponent, options);
 export const endRelationshipWorkspace = getSyncLifecycle(EndRelationshipWorkspace, options);

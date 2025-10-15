@@ -240,6 +240,12 @@
       "type": "form"
     },
     {
+      "name": "add-patient-case-form",
+      "component": "addPatientCaseForm",
+      "title": "Add patient case Form",
+      "type": "form"
+    },
+    {
       "name": "family-relationship-form",
       "component": "familyRelationshipForm",
       "title": "Family Relationship Form",
