@@ -43,6 +43,20 @@ const getGender = (gender: string) => {
   };
 };
 
+const getSHANumber = (identifiers: fhir.Identifier[] | undefined): string => {
+  if (!identifiers?.length) {
+    return '--';
+  }
+
+  const shaIdentifier = identifiers.find((identifier) => {
+    const code = identifier.type?.coding?.[0]?.code;
+    const display = identifier.type?.coding?.[0]?.display;
+    return code === 'sha-number' || display === 'SHA Number';
+  });
+
+  return shaIdentifier?.value || '--';
+};
+
 export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPatientInfoProps> = ({
   patient,
   renderedFrom,
@@ -52,11 +66,11 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
   const { t } = useTranslation();
   const name = getPatientName(patient);
   const genderInfo = patient?.gender && getGender(patient.gender);
+  const shaNumber = useMemo(() => {
+    return getSHANumber(patient.identifier);
+  }, [patient.identifier]);
 
-  const extensionState = useMemo(
-    () => ({ patientUuid: patient.id, patient, renderedFrom }),
-    [patient.id, patient, renderedFrom],
-  );
+  const extensionState = useMemo(() => ({ patientUuid: patient.id, patient, renderedFrom }), [patient, renderedFrom]);
 
   const eligibilityTags = useMemo(() => {
     if (isEligibilityLoading) {
@@ -79,20 +93,6 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
           )}
 
           <ExtensionSlot className={styles.tagsSlot} name="patient-banner-tags-slot" state={extensionState} />
-
-          <div className={styles.eligibilityTags}>
-            {isEligibilityLoading ? (
-              <Tag type="blue" size="md">
-                {t('checkingEligibility', 'Checking eligibility' + '...')}
-              </Tag>
-            ) : (
-              eligibilityTags.map((tag, index) => (
-                <Tag key={index} type={tag.type} size="md" title={tag.text}>
-                  {tag.text}
-                </Tag>
-              ))
-            )}
-          </div>
         </div>
       </div>
       <div className={styles.demographics}>
@@ -104,10 +104,24 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
             <span className={styles.separator}>&middot;</span>
           </>
         )}
-        <div>
-          <div className={styles.identifiers}>
-            {patient.identifier?.length ? patient.identifier.map((identifier) => identifier.value).join(', ') : '--'}
-          </div>
+        <div className={styles.identifiers}>
+          <span>SHA: {shaNumber}</span>
+        </div>
+        {(shaNumber !== '--' || eligibilityTags.length > 0 || isEligibilityLoading) && (
+          <span className={styles.separator}>&middot;</span>
+        )}
+        <div className={styles.eligibilityTags}>
+          {isEligibilityLoading ? (
+            <Tag type="blue" size="md">
+              {t('checkingEligibility', 'Checking eligibility' + '...')}
+            </Tag>
+          ) : (
+            eligibilityTags.map((tag, index) => (
+              <Tag key={index} type={tag.type} size="md" title={tag.text}>
+                {tag.text}
+              </Tag>
+            ))
+          )}
         </div>
         <ExtensionSlot className={styles.extensionSlot} name="patient-banner-bottom-slot" state={extensionState} />
       </div>
