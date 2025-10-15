@@ -23,7 +23,7 @@ const ProceduresTable: React.FC<ProceduresTableProps> = ({ orders }) => {
     return (
       <Layer>
         <EmptyState
-          displayText={t('anOrder', 'an order')}
+          displayText={t('orders', 'orders')}
           headerTitle={t('proceduresOrders', 'Procedures Orders')}
           launchForm={() =>
             launchAddLabOrder({
