@@ -11,6 +11,7 @@ import OrderTable from '../../shared/orders/OrderTable';
 type LabTableProps = {
   orders: Order[];
 };
+
 const LabTable: React.FC<LabTableProps> = ({ orders }) => {
   const { t } = useTranslation();
   const { labOrderTypeUuid, orderableConceptSets } = useConfig<ExpressWorkflowConfig>();
@@ -21,7 +22,7 @@ const LabTable: React.FC<LabTableProps> = ({ orders }) => {
     return (
       <Layer>
         <EmptyState
-          displayText={t('noOrders', 'No orders')}
+          displayText={t('orders', 'orders')}
           headerTitle={t('laboratoryOrders', 'Laboratory Orders')}
           launchForm={() => launchAddLabOrder({ orderTypeUuid: labOrderTypeUuid, orderableConceptSets })}
         />

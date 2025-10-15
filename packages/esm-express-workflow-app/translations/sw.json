@@ -70,7 +70,6 @@
   "newPatientResults_other": "New patient(s) found ({{count}})",
   "nextPage": "Next page",
   "noDependentsFound": "No dependents found for this patient",
-  "noOrders": "No orders",
   "noPatientFound": "No Patient Found",
   "noPatientsAwaiting": "No patients awaiting service",
   "noQueueLocationsConfigured": "No queue locations configured",
