@@ -97,7 +97,7 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
     );
 
     const patientChartUrl = usePatientChart
-      ? `${window.spaBase}/patient/${queueEntry.patient.uuid}/chart/Patient Summary`
+      ? `${window.spaBase}/patient/${queueEntry.patient.uuid}/chart/Patient Summary?path=${navigatePath}`
       : `${spaBasePath}/${navigatePath}/${queueEntry.patient.uuid}`;
     {
       return {
