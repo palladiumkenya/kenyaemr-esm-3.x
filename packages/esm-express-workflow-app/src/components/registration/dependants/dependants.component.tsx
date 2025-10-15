@@ -241,17 +241,8 @@ const DependentsComponent: React.FC<DependentProps> = ({
       const isSpouseVerified = verifiedSpouses.has(dependent.id);
       const otpRequestedForThisSpouse = otpRequestedForSpouse.has(dependent.id);
 
-      const identifierParts = [];
-      if (dependent.nationalId && dependent.nationalId !== 'N/A') {
-        identifierParts.push(`ID: ${dependent.nationalId}`);
-      }
-      if (dependent.shaNumber && dependent.shaNumber !== 'N/A') {
-        identifierParts.push(`SHA: ${dependent.shaNumber}`);
-      }
-      if (dependent.birthCertificate && dependent.birthCertificate !== 'N/A') {
-        identifierParts.push(`BC: ${dependent.birthCertificate}`);
-      }
-      const identifiersDisplay = identifierParts.length > 0 ? identifierParts.join(', ') : 'N/A';
+      const identifiersDisplay =
+        dependent.shaNumber && dependent.shaNumber !== 'N/A' ? `SHA: ${dependent.shaNumber}` : 'N/A';
 
       const dependentPhoneNumber = getDependentPhoneNumber(dependent);
       const { onRequestOtp, onVerify } = createSpouseOTPHandlers(dependent.id, dependent.name, dependentPhoneNumber);
