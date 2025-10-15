@@ -1,5 +1,6 @@
 @use '@carbon/colors';
 @use '@carbon/layout';
+@use '@openmrs/esm-styleguide/src/breakpoints' as breakpoints;
 
 .homePageWrapper {
   display: flex;
@@ -55,7 +56,7 @@
   gap: layout.$spacing-05;
   width: 100%;
 
-  @media (max-width: 1056px) {
+  @include breakpoints.tablet {
     flex-direction: column;
   }
 }
@@ -74,7 +75,7 @@
   gap: layout.$spacing-05;
   width: 100%;
 
-  @media (max-width: 1056px) {
+  @include breakpoints.tablet {
     flex-direction: column;
   }
 }
@@ -85,7 +86,7 @@
   flex-direction: column;
   gap: layout.$spacing-05;
 
-  @media (max-width: 1056px) {
+  @include breakpoints.tablet {
     width: 100%;
     flex-direction: row;
   }
@@ -106,7 +107,7 @@
   border: 1px solid colors.$gray-20;
   border-radius: layout.$spacing-02;
 
-  @media (max-width: 1056px) {
+  @include breakpoints.tablet {
     width: 100%;
   }
 }
