@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Scalpel } from '@carbon/react/icons';
-import { MappedBill, PaymentStatus } from '../../../types';
 import { launchWorkspace } from '@openmrs/esm-framework';
+import { Scalpel } from '@carbon/react/icons';
+
+import { MappedBill, PaymentStatus } from '../../../types';
 
 type WaiveBillActionButtonProps = {
   bill: MappedBill;

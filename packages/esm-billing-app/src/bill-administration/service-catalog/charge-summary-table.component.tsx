@@ -127,7 +127,7 @@ const ChargeSummaryTable: React.FC = () => {
 
   return (
     <>
-      <DataTable size={size} useZebraStyles rows={rows} headers={headers}>
+      <DataTable size={layout === 'tablet' ? 'md' : 'sm'} useZebraStyles rows={rows} headers={headers}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, getTableContainerProps }) => (
           <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
             <TableToolbar {...getToolbarProps()} aria-label="data table toolbar">
@@ -187,7 +187,7 @@ const ChargeSummaryTable: React.FC = () => {
                       <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}
                     <TableCell className="cds--table-column-menu">
-                      <OverflowMenu size={size} flipped>
+                      <OverflowMenu size="sm" flipped>
                         <OverflowMenuItem
                           itemText={t('editChargeItem', 'Edit charge item')}
                           onClick={() => handleEdit(results[index])}

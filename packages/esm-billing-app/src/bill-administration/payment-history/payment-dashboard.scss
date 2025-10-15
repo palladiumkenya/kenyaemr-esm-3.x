@@ -1,6 +1,8 @@
 @use '@carbon/layout';
+@use '@carbon/colors';
 
 .paymentDashboard {
   margin-inline: layout.$spacing-05;
   margin-block: layout.$spacing-05;
+  border: 1px solid colors.$gray-20;
 }

@@ -22,7 +22,7 @@ import {
   showSnackbar,
 } from '@openmrs/esm-framework';
 import { type Order } from '@openmrs/esm-patient-common-lib';
-import { useBillableItem } from '../../../billable-orders/useBillableItem';
+import { useBillableItem } from '../../../../billable-services/billable-orders/useBillableItem';
 import styles from './create-bill.style.scss';
 import { convertToCurrency } from '../../../../helpers';
 import { BillingConfig } from '../../../../config-schema';

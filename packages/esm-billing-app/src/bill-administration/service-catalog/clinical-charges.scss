@@ -3,6 +3,10 @@
 @use '@carbon/styles/scss/spacing';
 @use '@openmrs/esm-styleguide/src/vars' as *;
 
+.clinicalChargesContainer {
+  margin: layout.$spacing-05;
+}
+
 .container {
   margin: 2rem 0;
 }

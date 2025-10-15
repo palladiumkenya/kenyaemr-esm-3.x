@@ -195,11 +195,26 @@
       "slot": "patient-banner-tags-slot"
     },
     {
+      "name": "payments-points-dashboard-link",
+      "component": "paymentPointDashboardLink",
+      "slot": "billing-admin-dashboard-slot",
+      "meta": {
+        "name": "cashier-points",
+        "title": "Payment Point",
+        "slot": "payment-point-dashboard-slot"
+      }
+    },
+    {
+      "name": "payment-points-dashboard",
+      "component": "paymentPoints",
+      "slot": "payment-point-dashboard-slot"
+    },
+    {
       "name": "payment-mode-dashboard-link",
       "component": "paymentModeLink",
       "slot": "billing-admin-dashboard-slot",
       "meta": {
-        "name": "payment-mode",
+        "name": "payment-modes",
         "title": "Payment Mode",
         "slot": "payment-mode-dashboard-slot"
       }
@@ -268,6 +283,21 @@
       "name": "payment-history-dashboard",
       "component": "paymentHistoryDashboard",
       "slot": "payment-history-dashboard-slot"
+    },
+    {
+      "name": "patient-billing-dashboard-link",
+      "component": "patientBillingLink",
+      "slot": "billing-admin-dashboard-slot",
+      "meta": {
+        "name": "patient-billing",
+        "title": "Patient Billing",
+        "slot": "patient-billing-dashboard-slot"
+      }
+    },
+    {
+      "name": "patient-billing-dashboard",
+      "component": "patientBilling",
+      "slot": "patient-billing-dashboard-slot"
     }
   ],
   "workspaces": [

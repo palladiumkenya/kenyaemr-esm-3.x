@@ -10,7 +10,10 @@ import { createBillableService, useServiceTypes } from './billable-service.resou
 import { useChargeSummaries } from './charge-summary.resource';
 import { BillableServicePayload, getBulkUploadPayloadFromExcelFile } from './form-helper';
 import styles from './clinical-charges.scss';
-import { createAndDownloadFailedUploadsExcelFile, createAndDownloadFilteredRowsFile } from '../../billable-services/utils';
+import {
+  createAndDownloadFailedUploadsExcelFile,
+  createAndDownloadFilteredRowsFile,
+} from '../../billable-services/utils';
 
 const BulkImportBillableServices = ({ closeModal }) => {
   const [isImporting, setIsImporting] = useState(false);

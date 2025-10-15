@@ -1,15 +1,16 @@
 import React from 'react';
 import { ExtensionSlot, UserHasAccess, WorkspaceContainer } from '@openmrs/esm-framework';
 import PatientBills from './patient-bills.component';
-import styles from './bill-manager.scss';
+import styles from './patient-billing.scss';
 import billTableStyles from '../../bills-table/bills-table.scss';
 import { DataTableSkeleton } from '@carbon/react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import BillingHeader from '../../billing-header/billing-header.component';
 import { usePatientBills } from '../../prompt-payment/prompt-payment.resource';
+import EmptyPatientBill from '../../past-patient-bills/patient-bills-dashboard/empty-patient-bill.component';
 
-type BillManagerProps = {};
+type PatientBillingProps = {};
 
 const headers = [
   { header: 'Date', key: 'date' },
@@ -17,7 +18,7 @@ const headers = [
   { header: 'Total Amount', key: 'totalAmount' },
 ];
 
-const BillManager: React.FC<BillManagerProps> = () => {
+const PatientBilling: React.FC<PatientBillingProps> = () => {
   const [patientUuid, setPatientUuid] = React.useState<string>(undefined);
   const { t } = useTranslation();
   const { patientBills: bills, isLoading } = usePatientBills(patientUuid);
@@ -25,23 +26,20 @@ const BillManager: React.FC<BillManagerProps> = () => {
 
   return (
     <>
-      <BillingHeader title={t('billManager', 'Bill Manager')} />
-      <div className={styles.billManagerContainer}>
+      <BillingHeader title={t('patientBilling', 'Patient Billing')} />
+      <div className={styles.patientBillingContainer}>
         <ExtensionSlot
           name="patient-search-bar-slot"
           state={{
             selectPatientAction: (patientUuid: string) => setPatientUuid(patientUuid),
             buttonProps: {
-              kind: 'primary',
+              kind: 'secondary',
             },
           }}
         />
         {!patientUuid ? (
           <div className={billTableStyles.emptyStateContainer}>
-            <EmptyState
-              displayText={t('notSearchedState', 'Please search for a patient in the input above')}
-              headerTitle="Not Searched"
-            />
+            <EmptyPatientBill />
           </div>
         ) : isLoading ? (
           <DataTableSkeleton
@@ -58,9 +56,9 @@ const BillManager: React.FC<BillManagerProps> = () => {
           bills && <PatientBills bills={filteredBills} />
         )}
       </div>
-      <WorkspaceContainer overlay contextKey="bill-manager" />
+      <WorkspaceContainer overlay contextKey="patient-billing" />
     </>
   );
 };
 
-export default BillManager;
+export default PatientBilling;

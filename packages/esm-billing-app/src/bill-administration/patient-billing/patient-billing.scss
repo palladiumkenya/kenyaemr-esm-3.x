@@ -1,9 +1,13 @@
 @use '@carbon/layout';
 @use '@carbon/colors';
 
-.billManagerContainer {
+.patientBillingContainer {
   margin: layout.$layout-01;
   row-gap: layout.$layout-01;
+
+  & form {
+    border: none;
+  }
 }
 
 .billListContainer {

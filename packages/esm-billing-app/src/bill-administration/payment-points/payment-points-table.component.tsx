@@ -10,23 +10,22 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  Button,
+  OverflowMenu,
+  OverflowMenuItem,
 } from '@carbon/react';
-import { ErrorState } from '@openmrs/esm-framework';
+import { ErrorState, navigate, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { useNavigate } from 'react-router-dom';
 
 const headers = [
   { header: 'Name', key: 'name' },
   { header: 'Description', key: 'description' },
-  { header: 'Action', key: 'action' },
 ];
 
 export const PaymentPointsTable = () => {
   const { paymentPoints, error, isLoading } = usePaymentPoints();
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const layout = useLayoutType();
 
   if (isLoading) {
     return (
@@ -55,7 +54,7 @@ export const PaymentPointsTable = () => {
   }
 
   return (
-    <DataTable rows={paymentPoints} headers={headers}>
+    <DataTable rows={paymentPoints} size={layout === 'tablet' ? 'md' : 'sm'} headers={headers}>
       {({ getTableProps, getHeaderProps, rows, getRowProps }) => (
         <TableContainer>
           <Table {...getTableProps()}>
@@ -70,6 +69,7 @@ export const PaymentPointsTable = () => {
                     {header.header}
                   </TableHeader>
                 ))}
+                <TableHeader aria-label={t('overflowMenu', 'Overflow menu')} />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -80,16 +80,16 @@ export const PaymentPointsTable = () => {
                     row,
                   })}>
                   {row.cells.map((cell) => (
-                    <TableCell key={cell.id}>
-                      {cell.info.header === 'action' ? (
-                        <Button onClick={() => navigate(`/payment-points/${row.id}`)} kind="tertiary">
-                          View
-                        </Button>
-                      ) : (
-                        cell.value
-                      )}
-                    </TableCell>
+                    <TableCell key={cell.id}>{cell.value}</TableCell>
                   ))}
+                  <TableCell className="cds--table-column-menu">
+                    <OverflowMenu size="sm" flipped>
+                      <OverflowMenuItem
+                        itemText={t('view', 'View')}
+                        onClick={() => navigate({ to: `\${openmrsSpaBase}/payment-points/${row.id}` })}
+                      />
+                    </OverflowMenu>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

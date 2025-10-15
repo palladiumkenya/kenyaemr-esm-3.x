@@ -11,7 +11,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { convertToCurrency, extractString } from '../../helpers';
 import { LineItem, MappedBill, PaymentStatus } from '../../types';
-import styles from './bill-manager.scss';
+import styles from './patient-billing.scss';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {

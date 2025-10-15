@@ -25,6 +25,7 @@ import styles from './payment-mode-dashboard.scss';
 import { formatDate, launchWorkspace, showModal, useDebounce, useLayoutType } from '@openmrs/esm-framework';
 import { PaymentMode } from '../../types';
 import startCase from 'lodash/startCase';
+import BillingHeader from '../../billing-header/billing-header.component';
 
 type PaymentModeDashboardProps = {};
 
@@ -104,6 +105,7 @@ const PaymentModeDashboard: React.FC<PaymentModeDashboardProps> = () => {
 
   return (
     <div>
+      <BillingHeader title={t('paymentModes', 'Payment Modes')} />
       <CardHeader title={t('paymentModes', 'Payment Modes')}>
         <Button
           onClick={() =>

@@ -7,12 +7,14 @@ import { PaymentFilterProvider } from './usePaymentFilterContext';
 import { FilterDashboard } from './filters/filter-dashboard';
 import { PaymentHistoryViewer } from './payment-history-viewer.component';
 import PaymentMethodDistribution from './payment-method-distribution.component';
+import BillingHeader from '../../billing-header/billing-header.component';
 
 const PaymentDashboard = () => {
   const { t } = useTranslation();
 
   return (
     <PaymentFilterProvider>
+      <BillingHeader title={t('paymentHistory', 'Payment History')} />
       <FilterDashboard />
       <Layer className={styles.paymentDashboard}>
         <Tabs>

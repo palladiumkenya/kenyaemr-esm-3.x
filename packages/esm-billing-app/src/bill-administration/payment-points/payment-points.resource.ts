@@ -1,6 +1,6 @@
 import { FetchResponse, openmrsFetch, useSession } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { PaymentPoint, Timesheet } from '../types';
+import { PaymentPoint, Timesheet } from '../../types';
 
 export const usePaymentPoints = () => {
   const url = `/ws/rest/v1/cashier/cashPoint`;

@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { PaymentPoint } from '../../types';
+import { PaymentPoint } from '../../../types';
 import { clockIn, clockOut, useActiveSheet, usePaymentPoints } from '../payment-points.resource';
 import { useClockInStatus } from '../use-clock-in-status';
 import styles from './clock-in.scss';

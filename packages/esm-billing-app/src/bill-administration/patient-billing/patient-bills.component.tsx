@@ -19,6 +19,7 @@ import { MappedBill, PaymentStatus } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
 import { ExtensionSlot } from '@openmrs/esm-framework';
+import EmptyPatientBill from '../../past-patient-bills/patient-bills-dashboard/empty-patient-bill.component';
 
 type PatientBillsProps = {
   bills: Array<MappedBill>;
@@ -61,9 +62,9 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   if (bills.length === 0) {
     return (
       <div style={{ marginTop: '1rem' }}>
-        <EmptyState
-          displayText={t('noBillDisplay', 'There are no bills to display for this patient')}
-          headerTitle="No bills"
+        <EmptyPatientBill
+          title={t('noBillsFound', 'No bills found')}
+          subTitle={t('noBillsFoundDescription', 'No bills found for this patient')}
         />
       </div>
     );

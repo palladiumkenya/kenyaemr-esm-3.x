@@ -3,7 +3,6 @@ import { launchWorkspace } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { OverflowMenuItem } from '@carbon/react';
 import { LineItem, MappedBill, PaymentStatus } from '../../../types';
-import Payments from '../../../invoice/payments/payments.component';
 
 type CancelLineItemProps = {
   lineItem: LineItem;

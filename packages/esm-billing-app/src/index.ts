@@ -24,24 +24,23 @@ import BenefitsPackage from './benefits-package/benefits-package.component';
 import Benefits from './benefits-package/benefits/benefits.component';
 import BenefitPreAuthForm from './benefits-package/forms/benefit-pre-auth-form.workspace';
 
-// Bill Manager Components
-import CancelLineItem from './billable-services/bill-manager/bill-actions/cancel-line-item.component';
-import DeleteBillActionButton from './billable-services/bill-manager/bill-actions/delete-bill-action-button.component';
-import EditLineItem from './billable-services/bill-manager/bill-actions/edit-line-item.component';
-import RefundLineItem from './billable-services/bill-manager/bill-actions/refund-line-item.component';
-import WaiveBillActionButton from './billable-services/bill-manager/bill-actions/waive-bill-action-button.component';
-import { DeleteBillModal } from './billable-services/bill-manager/modals/delete-bill.modal';
-import { RefundBillModal } from './billable-services/bill-manager/modals/refund-bill.modal';
+// Patient Billing Components
+import CancelLineItem from './bill-administration/patient-billing/bill-actions/cancel-line-item.component';
+import DeleteBillActionButton from './bill-administration/patient-billing/bill-actions/delete-bill-action-button.component';
+import EditLineItem from './bill-administration/patient-billing/bill-actions/edit-line-item.component';
+import RefundLineItem from './bill-administration/patient-billing/bill-actions/refund-line-item.component';
+import WaiveBillActionButton from './bill-administration/patient-billing/bill-actions/waive-bill-action-button.component';
+import { DeleteBillModal } from './bill-administration/patient-billing/modals/delete-bill.modal';
+import { RefundBillModal } from './bill-administration/patient-billing/modals/refund-bill.modal';
 import BillActionModal from './modal/bill-action.modal';
-import DeleteBillableServiceModal from './billable-services/bill-manager/modals/delete-billable-service.modal';
-import CancelBillWorkspace from './billable-services/bill-manager/workspaces/cancel-bill/cancel-bill.workspace';
-import { EditBillForm } from './billable-services/bill-manager/workspaces/edit-bill/edit-bill-form.workspace';
-import { WaiveBillForm } from './billable-services/bill-manager/workspaces/waive-bill/waive-bill-form.workspace';
-import CreateBillWorkspace from './billable-services/bill-manager/workspaces/create-bill/create-bill.workspace';
+import DeleteBillableServiceModal from './bill-administration/patient-billing/modals/delete-billable-service.modal';
+import CancelBillWorkspace from './bill-administration/patient-billing/workspaces/cancel-bill/cancel-bill.workspace';
+import { EditBillForm } from './bill-administration/patient-billing/workspaces/edit-bill/edit-bill-form.workspace';
+import { WaiveBillForm } from './bill-administration/patient-billing/workspaces/waive-bill/waive-bill-form.workspace';
+import CreateBillWorkspace from './bill-administration/patient-billing/workspaces/create-bill/create-bill.workspace';
 
 // Billable Services Components
 import AddServiceForm from './bill-administration/service-catalog/commodity/commodity-form.workspace';
-import CommodityForm from './bill-administration/service-catalog/commodity/commodity-form.workspace';
 import BulkImportBillableServices from './bill-administration/service-catalog/bulk-import-billable-service.modal';
 
 // Order Components
@@ -62,9 +61,9 @@ import PaymentModeWorkspace from './bill-administration/payment-modes/payment-mo
 import RequirePaymentModal from './prompt-payment/prompt-payment-modal.component';
 
 // Payment Points Components
-import { CreatePaymentPoint } from './payment-points/create-payment-point.component';
-import { ClockIn } from './payment-points/payment-point/clock-in.modal';
-import { ClockOut } from './payment-points/payment-point/clock-out.modal';
+import { CreatePaymentPoint } from './bill-administration/payment-points/create-payment-point.component';
+import { ClockIn } from './bill-administration/payment-points/payment-point/clock-in.modal';
+import { ClockOut } from './bill-administration/payment-points/payment-point/clock-out.modal';
 
 // Print Preview Components
 import PrintPreviewModal from './print-preview/print-preview.modal';
@@ -83,7 +82,7 @@ export const billingDashboard = getAsyncLifecycle(
   options,
 );
 
-// Bill Manager Components
+// Patient Billing Components
 export const deleteBillableServiceModal = getSyncLifecycle(DeleteBillableServiceModal, options);
 export const createBillWorkspace = getSyncLifecycle(CreateBillWorkspace, options);
 export const deleteBillModal = getSyncLifecycle(DeleteBillModal, options);
@@ -126,7 +125,6 @@ export const clockOut = getSyncLifecycle(ClockOut, options);
 
 // Service Management Components
 export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
-export const addCommodityForm = getSyncLifecycle(CommodityForm, options);
 export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);
 
 // Claims Management Components
