@@ -1,5 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 
 export type PatientCarePrograms = {
   uuid: string;
@@ -20,8 +21,18 @@ export const useCarePrograms = (patientUuid: string) => {
     mutate: mutateEligiblePrograms,
   } = useSWR<{ data: Array<PatientCarePrograms> }>(url, openmrsFetch);
 
+  const eligibleCarePrograms = useMemo(
+    () => data?.data?.filter((careProgram) => careProgram.enrollmentStatus !== 'active') ?? [],
+    [data],
+  );
+
+  const activeCarePrograms = useMemo(
+    () => data?.data?.filter((careProgram) => careProgram.enrollmentStatus !== 'active') ?? [],
+    [data],
+  );
   return {
-    carePrograms: data?.data?.filter((careProgram) => careProgram.enrollmentStatus !== 'active') ?? [],
+    eligibleCarePrograms,
+    activeCarePrograms,
     error,
     isLoading,
     isValidating,

@@ -105,6 +105,11 @@
       "slot": "triage-dashboard-slot"
     },
     {
+            "name": "custom-visit-form-queue-fields",
+      "component": "checkinFormExtraExtension",
+      "slot":"visit-form-bottom-slot"
+    },
+    {
       "component": "reportsDashboardLink",
       "name": "reports-homepage-dashboard-link",
       "slot": "homepage-dashboard-slot",
@@ -236,7 +241,8 @@
         "hideDashboardTitle": true
       }
     },
-    {
+
+        {
       "name": "ewf-pharmacy-dashboard",
       "component": "pharmacyTabs",
       "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
@@ -269,12 +275,6 @@
       "order": 0
     },
     {
-      "name": "mch-program-management",
-      "component": "mchProgramManagement",
-      "slot": "mch-program-management-slot",
-      "order": 0
-    },
-    {
       "name": "ewf-encounter-details-dashboard",
       "component": "encounterDetails",
       "slot": "ewf-clinical-encounter-slot",
@@ -291,12 +291,6 @@
       "type": "workspace",
       "canMaximize": true,
       "canHide": true
-    },
-    {
-      "name": "mch-program-form-workspace",
-      "component": "mchProgramForm",
-      "title": "Program Form",
-      "type": "workspace"
     }
   ],
   "modals": [

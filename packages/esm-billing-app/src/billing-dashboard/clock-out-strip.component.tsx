@@ -4,7 +4,7 @@ import { showModal } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useClockInStatus } from '../payment-points/use-clock-in-status';
+import { useClockInStatus } from '../bill-administration/payment-points/use-clock-in-status';
 import styles from './billing-dashboard.scss';
 
 export const ClockOutStrip = () => {

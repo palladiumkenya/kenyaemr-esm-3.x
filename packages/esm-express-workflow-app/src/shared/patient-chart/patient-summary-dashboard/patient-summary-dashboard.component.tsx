@@ -8,10 +8,12 @@ import {
   Dashboard,
   Calendar,
   Attachment,
+  GraphicalDataFlow,
 } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import styles from './patient-summary-dashboard.scss';
 import ExtensionTabs, { ExtensionTabItem } from '../../tabs/extension-tabs.component';
+import { useSearchParams } from 'react-router-dom';
 
 type PatientSummaryDashboardProps = {
   patientUuid: string;
@@ -20,8 +22,8 @@ type PatientSummaryDashboardProps = {
 
 const PatientSummaryDashboard: React.FC<PatientSummaryDashboardProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-
   const state = useMemo(() => ({ patientUuid, patient }), [patientUuid, patient]);
+  const isCurrentPatientFemale = patient?.gender?.toLowerCase() === 'female';
   const items: Array<ExtensionTabItem> = [
     {
       label: t('patientSummary', 'Patient Summary'),
@@ -66,6 +68,14 @@ const PatientSummaryDashboard: React.FC<PatientSummaryDashboardProps> = ({ patie
       slotClassName: styles.ewfExtensionSlot,
     },
   ];
+  if (isCurrentPatientFemale) {
+    items.push({
+      label: t('partograph', 'Partograph'),
+      icon: GraphicalDataFlow,
+      slotName: 'maternal-and-child-health-partograph-slot',
+      slotClassName: styles.ewfExtensionSlot,
+    });
+  }
 
   return (
     <Layer>

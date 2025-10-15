@@ -1,5 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import CheckinFormExtraExtension from './components/registration/checkin-form-extra/checkin-form-extra.extension';
 import { Home } from '@carbon/react/icons';
 
 import PatientSummaryDashboard from './shared/patient-chart/patient-summary-dashboard/patient-summary-dashboard.component';
@@ -35,6 +36,7 @@ export const otpVerificationModal = getAsyncLifecycle(
   () => import('./shared/otp-verification/otp-verification.modal'),
   options,
 );
+export const checkinFormExtraExtension = getSyncLifecycle(CheckinFormExtraExtension, options);
 export const patientSummaryDashboard = getSyncLifecycle(PatientSummaryDashboard, options);
 
 export const homepageDashboardLink = getSyncLifecycle(

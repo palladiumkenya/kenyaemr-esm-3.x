@@ -67,10 +67,10 @@ export const useModuleLinks = () => {
       privilege: 'o3: Manage Stocks',
     },
     {
-      label: t('billing', 'Billing'),
-      url: `${openmrsSpaBase}home/billing`,
+      label: t('billingAdmin', 'Billing Admin'),
+      url: `${openmrsSpaBase}billing-admin`,
       icon: <Receipt size={24} />,
-      privilege: 'o3: View Bill Payment Dashboard',
+      privilege: 'o3: View Billing Admin Dashboard',
     },
     {
       label: t('dispensingApp', 'Dispensing App'),
@@ -125,6 +125,12 @@ export const useModuleLinks = () => {
       url: `/openmrs/admin`,
       icon: <IbmCloudGateKeeper size={24} />,
       privilege: 'o3: View Legacy Admin Dashboard',
+    },
+    {
+      label: t('serviceQueuesAdmin', 'Service Queues Admin'),
+      url: `${openmrsSpaBase}home/service-queues/admin`,
+      icon: <IbmCloudGateKeeper size={24} />,
+      privilege: 'o3: View Service Queues Admin Dashboard',
     },
   ];
 
