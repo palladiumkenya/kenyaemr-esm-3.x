@@ -24,7 +24,7 @@ export const adrPrintPreviewModal = getSyncLifecycle(AdrPrintPreviewModal, optio
 
 // Dashboard link for the search page
 export const overviewDashboardLink = getSyncLifecycle(
-  createDashboardLink({ moduleName, path: 'overview', title: 'Overview', icon: '' }),
+  createDashboardLink({ moduleName, path: 'overview', title: 'Overview', icon: 'omrs-icon-group-access' }),
   options,
 );
 

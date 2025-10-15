@@ -1,5 +1,5 @@
 import { getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from './dashboard-link.component';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import {
   billableExemptionsDashboardMeta,
   billDepositDashboardMeta,

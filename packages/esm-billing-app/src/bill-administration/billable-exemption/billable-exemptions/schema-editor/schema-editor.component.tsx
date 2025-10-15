@@ -47,7 +47,7 @@ const SchemaEditor: React.FC<SchemaEditorProps> = ({
         return;
       }
 
-      const ajv = new Ajv({ allErrors: true, jsPropertySyntax: true, strict: false });
+      const ajv = new Ajv({ allErrors: true });
       const validate = ajv.compile(schema);
       const parsedContent = JSON.parse(content);
       const isValid = validate(parsedContent);
