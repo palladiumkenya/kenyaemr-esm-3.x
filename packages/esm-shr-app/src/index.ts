@@ -42,7 +42,7 @@ export const ReferralsDashboardLink = getSyncLifecycle(
 );
 
 export const shrSummaryDashboardLink = getSyncLifecycle(
-  createDashboardLink({ ...shrSummaryDashboardMeta, icon: '', moduleName }),
+  createDashboardLink({ ...shrSummaryDashboardMeta, icon: 'omrs-icon-activity', moduleName }),
   options,
 );
 
