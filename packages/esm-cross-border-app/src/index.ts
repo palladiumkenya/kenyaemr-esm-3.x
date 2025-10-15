@@ -28,7 +28,7 @@ export const crossBorderPatientSearch = getSyncLifecycle(PatientSearch, options)
 
 // Dashboard link for the search page
 export const overviewDashboardLink = getSyncLifecycle(
-  createDashboardLink({ moduleName, path: 'overview', title: 'Overview', icon: '' }),
+  createDashboardLink({ moduleName, path: 'overview', title: 'Overview', icon: 'omrs-icon-inventory-management' }),
   options,
 );
 
