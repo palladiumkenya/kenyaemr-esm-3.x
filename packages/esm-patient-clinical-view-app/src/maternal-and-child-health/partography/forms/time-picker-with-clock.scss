@@ -1,0 +1,182 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
+
+.timePickerContainer {
+  position: relative;
+  width: 100%;
+}
+
+.inputWrapper {
+  position: relative;
+  cursor: pointer;
+
+  // Make input clickable but read-only
+  input {
+    cursor: pointer;
+    caret-color: transparent;
+  }
+}
+
+.clockIcon {
+  position: absolute;
+  right: spacing.$spacing-05;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: $text-02;
+  z-index: 1;
+}
+
+.clockDropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: $ui-background;
+  border: 1px solid $ui-03;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  padding: spacing.$spacing-05;
+  margin-top: spacing.$spacing-02;
+  min-height: 240px;
+}
+
+.clockFace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.clockTitle {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: spacing.$spacing-05;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: spacing.$spacing-03;
+}
+
+.backButton {
+  @include type.type-style('body-compact-01');
+  background: none;
+  border: none;
+  color: colors.$blue-60;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+
+  &:hover {
+    color: colors.$blue-70;
+  }
+}
+
+.clockNumbers {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 2px solid $ui-03;
+  background: $ui-background;
+}
+
+.clockNumber {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: 0 0;
+  width: 32px;
+  height: 32px;
+  border: 1px solid $ui-03;
+  border-radius: 50%;
+  background: $ui-background;
+  color: $text-02;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  @include type.type-style('body-compact-01');
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: $ui-02;
+    border-color: colors.$blue-60;
+    transform: scale(1.1);
+  }
+
+  &:active {
+    background: colors.$blue-60;
+    color: colors.$white;
+  }
+}
+
+.hourNumber {
+  font-weight: 600;
+
+  &:hover {
+    background: colors.$green-50;
+    color: colors.$white;
+  }
+}
+
+.minuteNumber {
+  background: $ui-02;
+
+  &:hover {
+    background: colors.$purple-60;
+    color: colors.$white;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 672px) {
+  .clockDropdown {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    transform: translate(-50%, -50%);
+    width: 90vw;
+    max-width: 300px;
+    border-radius: 8px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .clockNumbers {
+    width: 160px;
+    height: 160px;
+  }
+
+  .clockNumber {
+    width: 28px;
+    height: 28px;
+    @include type.type-style('body-compact-01');
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .clockDropdown {
+    background: $ui-02;
+    border-color: $ui-04;
+  }
+
+  .clockNumbers {
+    border-color: $ui-04;
+    background: $ui-background;
+  }
+
+  .clockNumber {
+    background: $ui-02;
+    border-color: $ui-04;
+    color: $text-02;
+
+    &:hover {
+      background: $ui-03;
+    }
+  }
+}

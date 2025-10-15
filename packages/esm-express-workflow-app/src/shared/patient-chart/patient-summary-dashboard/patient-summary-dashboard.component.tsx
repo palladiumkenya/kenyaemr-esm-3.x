@@ -67,6 +67,12 @@ const PatientSummaryDashboard: React.FC<PatientSummaryDashboardProps> = ({ patie
       slotName: 'ewf-attachments-slot',
       slotClassName: styles.ewfExtensionSlot,
     },
+    {
+      label: t('partograph', 'Partograph'),
+      icon: GraphicalDataFlow,
+      slotName: 'maternal-and-child-health-partograph-slot',
+      slotClassName: styles.ewfExtensionSlot,
+    },
   ];
   if (isCurrentPatientFemale) {
     items.push({
