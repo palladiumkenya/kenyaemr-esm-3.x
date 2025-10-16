@@ -68,36 +68,44 @@ const SHABenefitPackagesAndInterventions: React.FC<Props> = ({ patientUuid }) =>
         <Controller
           control={form.control}
           name="packages"
-          render={({ field }) => (
-            <MultiSelect
-              ref={field.ref}
-              invalid={!!form.formState.errors[field.name]?.message}
-              invalidText={form.formState.errors[field.name]?.message}
-              id="packages"
-              titleText={t('package', 'Packages')}
-              onChange={(e) => {
-                field.onChange(e.selectedItems);
-              }}
-              selectedItems={field.value}
-              label={t('choosePackage', 'Choose package')}
-              items={packages.map((r) => r.uuid)}
-              itemToString={(item) => {
-                const _package = packages.find((r) => r.uuid === item);
-                if (!_package) {
-                  return '';
-                }
-                return `${_package.packageCode}-${_package.packageName}`;
-              }}
-            />
-          )}
+          render={({ field }) => {
+            return (
+              <MultiSelect
+                ref={field.ref}
+                invalid={!!form.formState.errors[field.name]?.message}
+                invalidText={form.formState.errors[field.name]?.message}
+                id="packages"
+                titleText={t('package', 'Packages')}
+                onChange={(e) => {
+                  field.onChange(e.selectedItems);
+                }}
+                selectedItems={field.value}
+                label={t('choosePackage', 'Choose package')}
+                items={packages.map((r) => r.uuid)}
+                itemToString={(item) => {
+                  const _package = packages.find((r) => r.uuid === item);
+                  if (!_package) {
+                    return '';
+                  }
+                  const displayName = `${_package.packageCode}-${_package.packageName}`;
+                  return displayName;
+                }}
+              />
+            );
+          }}
         />
       </Column>
       <Column>
         <PackageInterventions
           categories={
             packages
-              .filter((packages_) => selectedPackageObservable.includes(packages_.uuid))
-              ?.map((p) => p.packageCode) ?? []
+              .filter((packages_) => {
+                const isSelected = selectedPackageObservable.includes(packages_.uuid);
+                return isSelected;
+              })
+              ?.map((p) => {
+                return p.packageCode;
+              }) ?? []
           }
           patientUuid={patientUuid}
         />

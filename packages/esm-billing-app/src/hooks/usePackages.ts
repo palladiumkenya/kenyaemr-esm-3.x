@@ -20,20 +20,23 @@ const usePackages = (filters?: PackagesFilter) => {
 
   const url = `${restBaseUrl}/insclaims/packages?${params.toString()}`;
 
-  const { data, isLoading, error } = useSWR<
-    FetchResponse<{ result: Array<{ benefitCode: string; benefitName: string; description?: string }> }>
-  >(url, openmrsFetch);
+  const { data, isLoading, error } = useSWR<FetchResponse<Array<{ code: string; name: string; description?: string }>>>(
+    url,
+    openmrsFetch,
+  );
+
+  const packages = (data?.data ?? []).map((category) => {
+    const pkg = {
+      uuid: `${category.code}`,
+      packageCode: category.code,
+      packageName: category.name,
+    } as Package;
+    return pkg;
+  });
 
   return {
     isLoading,
-    packages: (data?.data.result ?? []).map(
-      (category) =>
-        ({
-          uuid: `${category.benefitCode}`,
-          packageCode: category.benefitCode,
-          packageName: category.benefitName,
-        } as Package),
-    ),
+    packages,
     error,
   };
 };

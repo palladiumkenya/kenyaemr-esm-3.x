@@ -9,7 +9,10 @@ export interface InterventionsFilter {
 interface Intervention {
   interventionCode: string;
   interventionName: string;
-  description?: string;
+  interventionPackage: string;
+  interventionSubPackage: string;
+  interventionDescription?: string;
+  insuranceSchemes?: string;
 }
 
 /**
@@ -30,17 +33,19 @@ export const useInterventions = (filters?: InterventionsFilter) => {
 
   const url = `${restBaseUrl}/insclaims/interventions?${params.toString()}`;
 
-  // Fetch all interventions without filters for reference
   const allInterventionsUrl = `${restBaseUrl}/insclaims/interventions`;
 
-  const { data, isLoading, error } = useSWR<FetchResponse<{ result: Array<Intervention> }>>(url, openmrsFetch);
+  const { data, isLoading, error } = useSWR<FetchResponse<{ data: Array<Intervention> }>>(url, openmrsFetch);
 
-  const { data: allData } = useSWR<FetchResponse<{ result: Array<Intervention> }>>(allInterventionsUrl, openmrsFetch);
+  const { data: allData } = useSWR<FetchResponse<{ data: Array<Intervention> }>>(allInterventionsUrl, openmrsFetch);
+
+  const interventions = data?.data?.data ?? [];
+  const allInterventions = allData?.data?.data ?? [];
 
   return {
     isLoading,
-    interventions: data?.data.result ?? [],
-    allInterventions: allData?.data.result ?? [],
+    interventions,
+    allInterventions,
     error,
   };
 };
