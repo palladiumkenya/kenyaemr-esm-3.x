@@ -8,6 +8,11 @@
     {
       "component": "root",
       "route": "express-workflow"
+    },
+    {
+      "component": "queuesAdminHome",
+      "route": "queues-admin"
+
     }
   ],
   "extensions": [
