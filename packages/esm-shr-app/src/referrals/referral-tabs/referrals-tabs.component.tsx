@@ -3,7 +3,7 @@ import { mutate } from 'swr';
 import useSWRMutation from 'swr/mutation';
 import { useTranslation } from 'react-i18next';
 import { Tab, TabList, Tabs, Button, TabPanel, TabPanels, InlineLoading } from '@carbon/react';
-import { isDesktop, launchWorkspace, useLayoutType, showSnackbar } from '@openmrs/esm-framework';
+import { isDesktop, launchWorkspace, useLayoutType, showSnackbar, restBaseUrl } from '@openmrs/esm-framework';
 import { AirlineManageGates, UpdateNow } from '@carbon/react/icons';
 
 import ReferralTable from '../referrals.component';
@@ -17,14 +17,15 @@ const ReferralTabs: React.FC = () => {
   const [activeTabIndex, setActiveTabIndex] = React.useState<number>(0);
 
   const { trigger: pullReferrals, isMutating: isLoadingFacilityReferrals } = useSWRMutation(
-    '/ws/rest/v1/kenyaemril/pullFacilityReferrals',
+    `${restBaseUrl}/kenyaemril/pullFacilityReferrals`,
     async () => {
       return await pullFacilityReferrals();
     },
     {
       onSuccess: () => {
         mutate(
-          (key) => typeof key === 'string' && key.startsWith('/ws/rest/v1/kenyaemril/communityReferrals?status=active'),
+          (key) =>
+            typeof key === 'string' && key.startsWith(`${restBaseUrl}/kenyaemril/communityReferrals?status=active`),
         );
         showSnackbar({
           title: t('success', 'Success'),
@@ -46,7 +47,7 @@ const ReferralTabs: React.FC = () => {
 
   const handleReferral = () => {
     launchWorkspace('facility-referral-form', {
-      workspaceTitle: 'Referral Form',
+      workspaceTitle: t('referralForm', 'Referral Form'),
     });
   };
 
@@ -74,7 +75,7 @@ const ReferralTabs: React.FC = () => {
             size={responsiveSize}
             disabled={isLoadingFacilityReferrals}>
             {isLoadingFacilityReferrals ? (
-              <InlineLoading description="Pulling referrals..." status="active" />
+              <InlineLoading description={t('pullingReferrals', 'Pulling referrals...')} status="active" />
             ) : (
               t('pullReferrals', 'Pull Referrals')
             )}
