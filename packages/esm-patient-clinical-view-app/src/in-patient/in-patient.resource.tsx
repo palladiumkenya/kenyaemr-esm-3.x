@@ -1,7 +1,7 @@
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { type Encounter, openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
-import { Encounter } from './encounter-observations/visit.resource';
 import { BedManagementConfig } from '../config-schema';
+import { AdmissionRequest } from '../types';
 
 export const usePatientEncounters = (patientUuid: string) => {
   const { inPatientForms } = useConfig<BedManagementConfig>();
@@ -22,5 +22,35 @@ export const usePatientEncounters = (patientUuid: string) => {
     isLoading,
     error,
     mutate,
+  };
+};
+
+const defaultRep =
+  'custom:(' +
+  'dispositionLocation,' +
+  'dispositionType,' +
+  'disposition,' +
+  'dispositionEncounter:full,' +
+  'patient:(uuid,identifiers,voided,' +
+  'person:(uuid,display,gender,age,birthdate,birthtime,preferredName,preferredAddress,dead,deathDate)),' +
+  'dispositionObsGroup,' +
+  'visit)';
+
+export const useAdmissionRequest = (patientUuid: string) => {
+  const patientUuids = [patientUuid];
+  const searchParams = new URLSearchParams();
+  searchParams.set('dispositionType', 'ADMIT');
+  searchParams.set('patients', patientUuids.join(','));
+  searchParams.set('v', defaultRep);
+
+  const url = `${restBaseUrl}/emrapi/inpatient/request?${searchParams.toString()}`;
+
+  const { data, isLoading, error, mutate } = useSWR<{ data: { results: Array<AdmissionRequest> } }>(url, openmrsFetch);
+
+  return {
+    admissionRequest: data?.data?.results ?? [],
+    isLoading: isLoading,
+    error: error,
+    mutate: mutate,
   };
 };

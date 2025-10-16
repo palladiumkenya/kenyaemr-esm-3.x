@@ -1,4 +1,5 @@
-import { OpenmrsResource } from '@openmrs/esm-framework';
+import { AuditInfo, EncounterType, type Obs, type OpenmrsResource } from '@openmrs/esm-framework';
+import { type Form } from '@openmrs/esm-patient-common-lib';
 export interface OpenmrsEncounter extends OpenmrsResource {
   encounterDatetime: string;
   encounterType: {
@@ -261,4 +262,30 @@ export interface ContactAttributeData {
   preferedPNSAproach?: string;
   livingWithClient?: string;
   ipvOutCome?: string;
+}
+
+interface DispositionEncounter extends OpenmrsResource {
+  encounterDatetime: string;
+  patient: OpenmrsResource;
+  location: OpenmrsResource;
+  form: Form;
+  encounterType: EncounterType;
+  obs: Obs[];
+  orders: any[];
+  voided: boolean;
+  auditInfo: AuditInfo;
+  visit: Visit;
+  encounterProviders: any[];
+  diagnoses: any[];
+  resourceVersion: string;
+}
+
+export interface AdmissionRequest {
+  dispositionLocation: OpenmrsResource;
+  dispositionType: string;
+  disposition: Concept;
+  dispositionEncounter: DispositionEncounter;
+  patient: Patient;
+  dispositionObsGroup: Obs;
+  visit: Visit;
 }
