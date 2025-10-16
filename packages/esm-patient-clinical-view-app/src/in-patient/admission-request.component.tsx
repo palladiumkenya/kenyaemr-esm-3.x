@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { formatDatetime, launchWorkspace, useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, isDesktop, launchWorkspace, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 import { useAdmissionRequest } from './in-patient.resource';
@@ -24,6 +24,8 @@ type AdmissionRequestProps = {
 
 const AdmissionRequest: React.FC<AdmissionRequestProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const controlSize = isDesktop(layout) ? 'sm' : 'md';
   const {
     formsList: { admissionRequestFormUuid },
   } = useConfig<ConfigObject>();
@@ -86,7 +88,7 @@ const AdmissionRequest: React.FC<AdmissionRequestProps> = ({ patientUuid }) => {
           {t('add', 'Add')}
         </Button>
       </CardHeader>
-      <DataTable size="sm" rows={rows} headers={headers}>
+      <DataTable size={controlSize} rows={rows} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getCellProps }) => (
           <Table {...getTableProps()}>
             <TableHead>
