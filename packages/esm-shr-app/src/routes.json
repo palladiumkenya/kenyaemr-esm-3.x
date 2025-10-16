@@ -5,7 +5,7 @@
     },
     "pages": [
         {
-            "component": "shrRoot",
+            "component": "shrHome",
             "route": "referrals"
         }
     ],
@@ -36,7 +36,7 @@
         {
             "name": "referrals",
             "slot": "referrals-slot",
-            "component": "shrRoot"
+            "component": "referralWrap"
         },
         {
             "name": "referrals-link",

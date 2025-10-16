@@ -321,3 +321,9 @@ export interface ReferralError extends Error {
   statusText?: string;
   responseBody?: string;
 }
+
+export interface DashboardConfig {
+  name: string;
+  slot: string;
+  title: string;
+}

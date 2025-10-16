@@ -1,6 +1,7 @@
 import {
   ChartColumn,
   ChemistryReference,
+  DashboardReference,
   DocumentAdd,
   Home,
   HospitalBed,
@@ -131,6 +132,18 @@ export const useModuleLinks = () => {
       url: `${openmrsSpaBase}home/service-queues/admin`,
       icon: <IbmCloudGateKeeper size={24} />,
       privilege: 'o3: View Service Queues Admin Dashboard',
+    },
+    {
+      label: t('serviceQueuesAdmin', 'Service Queues Admin'),
+      url: `${openmrsSpaBase}home/service-queues/admin`,
+      icon: <IbmCloudGateKeeper size={24} />,
+      privilege: 'o3: View Service Queues Admin Dashboard',
+    },
+    {
+      label: t('referrals', 'Referrals'),
+      url: `${openmrsSpaBase}referrals`,
+      icon: <DashboardReference size={24} />,
+      privilege: 'o3: View Referrals Dashboard',
     },
   ];
 

@@ -16,9 +16,6 @@
   background-color: $ui-02;
   border: 1px solid $ui-03;
   width: 100%;
-  margin: 0 auto;
-  max-width: 95vw;
-  padding-bottom: 0;
 
   :has(.filterEmptyState) {
     border-bottom: none;
@@ -193,6 +190,10 @@
   display: flex;
   gap: 0.5rem;
   margin-right: layout.$spacing-05;
+
+  :global(.cds--inline-loading) {
+    min-height: spacing.$spacing-05;
+  }
 }
 
 .mainSection {
@@ -204,5 +205,5 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 1rem;
+  margin: 0 layout.$spacing-05;
 }
