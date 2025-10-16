@@ -16,7 +16,7 @@ import { ConfigObject } from '../../config-schema';
 import GenericTable from '../../specialized-clinics/generic-nav-links/generic-table.component';
 import styles from './case-encounter-header.scss';
 import { deleteEncounter, useInfiniteVisits } from './case-encounter-table.resource';
-import PatientHasActiveCase from './PatientHasActiveCase';
+import PatientHasActiveCase from './patient-has-active-case.component.tsx';
 
 interface CaseEncounterProps {
   mutate: KeyedMutator<any>;
