@@ -41,7 +41,6 @@ export const useInterventions = (filters?: InterventionsFilter) => {
 
   const interventions = data?.data?.data ?? [];
   const allInterventions = allData?.data?.data ?? [];
-
   return {
     isLoading,
     interventions,
