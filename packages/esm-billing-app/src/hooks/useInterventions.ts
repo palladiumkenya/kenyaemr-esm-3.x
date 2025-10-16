@@ -1,173 +1,46 @@
 import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
 import useSWR from 'swr';
-import useFacilityLevel from './useFacilityLevel';
-import { SHAIntervention } from '../types';
 
-export type InterventionsFilter = {
+export interface InterventionsFilter {
   package_code?: string;
-  scheme_code?: string;
   applicable_gender?: 'MALE' | 'FEMALE';
-};
+}
 
 interface Intervention {
-  id: number;
-  isMultisession: boolean;
-  fund: string;
-  supportedScheme: string;
-  parentBenefitName: string;
-  parentBenefitCode: string;
-  benefitCode: string;
-  benefitName: string;
-  guid: string;
-  created: string;
-  updated: string;
-  replicated: string;
-  owner: number;
-  needsPreauth: boolean;
-  levelsApplicable: string[];
-  paymentMechanism: string;
-  coverageLevel: string;
-  annualQuantityLimit: number;
-  annualQuantityLimitChoice: string;
-  annualQuantityLimitType: string;
-  overallTariff: string;
-  overallTariffHasLimit: boolean;
-  annualLimitValue: string;
-  usageFrequencyLimit: string;
-  usageFrequencyType: string;
-  status: string;
-  needsManualPreauthApproval: boolean;
-  needsDoctorAuthorization: boolean;
-  numberOfDoctorsRequired: string;
-  needsMemberAuthorization: boolean;
-  accessPoint: string;
-  name: string;
-  code: string;
-  active: boolean;
-  activeForUhc: boolean;
-  diagnosisBlock: string[];
-  diagnosisList: string[];
-  applicableGender: string;
-  applicableFacilityOwnership: string;
-  upperAgeLimit: string;
-  lowerAgeLimit: string;
-  investigationTariff: string;
-  investigationTariffHasLimit: boolean;
-  managementTariff: string;
-  managementTariffHasLimit: boolean;
-  isIntraMetro: boolean;
-  tariffPerAdditionalKilometer: string;
-  needApprovalBeforeClaimSubmission: boolean;
-  needsProtocols: boolean;
-  level_2_tariff: string;
-  level_3_tariff: string;
-  level_4_tariff: string;
-  level_5_tariff: string;
-  level_6_tariff: string;
-  protocolUsed: string;
-  tariffLimitPerIndividual: string;
-  complexity: string;
-  comment: string;
-  retiredOn: string;
-  requiresSurgicalPreauth: boolean;
-  requiresRenalPreauth: boolean;
-  requiresOncologyPreauth: boolean;
-  requiresRadiologyPreauth: boolean;
-  requiresOpticalPreauth: boolean;
-  applicableSchemes: string[];
-  benefit: number;
+  interventionCode: string;
+  interventionName: string;
+  description?: string;
 }
 
 /**
- * Hook to fetch and filter interventions based on provided filters
- * @param filters Object containing filtering criteria
- * @returns Object with loading state, filtered interventions, all interventions, and any errors
+ * Hook that returns a list of interventions based on filters
+ * @param filters - Filters for interventions (package_code, applicable_gender)
+ * @returns
  */
-export const useInterventions = (filters: InterventionsFilter) => {
-  const { error: facilityLevelError, isLoading: isLoadingFacilityLevel, level } = useFacilityLevel();
+export const useInterventions = (filters?: InterventionsFilter) => {
+  const params = new URLSearchParams();
 
-  // Build URL parameters for the API call
-  const urlParams = new URLSearchParams({
-    ...(filters || {}),
-    synchronize: 'false',
-  });
+  if (filters?.package_code) {
+    params.append('package_code', filters.package_code);
+  }
 
-  const url = `${restBaseUrl}/kenyaemr/sha-interventions?${urlParams.toString()}`;
-  const { isLoading, error, data } = useSWR<FetchResponse<{ results: Array<Intervention> }>>(url, openmrsFetch);
+  if (filters?.applicable_gender) {
+    params.append('applicable_gender', filters.applicable_gender.toLowerCase());
+  }
 
-  // Mapper function to transform intervention data
-  const mapper = ({ code, name, parentBenefitCode }: Intervention): SHAIntervention => ({
-    interventionCode: code,
-    interventionName: name,
-    interventionPackage: parentBenefitCode,
-    ...({} as any),
-  });
+  const url = `${restBaseUrl}/insclaims/interventions?${params.toString()}`;
 
-  // Filter and map interventions
-  const interventions = useMemo(() => {
-    if (!data?.data?.results) {
-      return [];
-    }
+  // Fetch all interventions without filters for reference
+  const allInterventionsUrl = `${restBaseUrl}/insclaims/interventions`;
 
-    const packageCodes = filters.package_code?.split(',').filter(Boolean) || [];
+  const { data, isLoading, error } = useSWR<FetchResponse<{ result: Array<Intervention> }>>(url, openmrsFetch);
 
-    const filteredResults = data.data.results.filter((intervention, i) => {
-      // Filter by package code (only if defined)
-
-      if (packageCodes.length > 0 && !packageCodes.includes(intervention.parentBenefitCode)) {
-        return false;
-      }
-
-      // Filter by applicable gender (only if defined)
-      if (
-        filters.applicable_gender &&
-        intervention.applicableGender &&
-        !['ALL', filters.applicable_gender].includes(intervention.applicableGender)
-      ) {
-        return false;
-      }
-
-      // // Filter by facility level
-      if (level && intervention.levelsApplicable && Array.isArray(intervention.levelsApplicable)) {
-        // Check if level starts with any of the intervention.levelsApplicable values
-        const levelMatched = intervention.levelsApplicable.some((appLevel) => level.startsWith(appLevel));
-
-        if (!levelMatched) {
-          return false;
-        }
-      }
-
-      return true; // Keep item if it passes all filters
-    });
-
-    // Map to the required format and ensure uniqueness by interventionCode
-    const mappedInterventions = filteredResults.map(mapper);
-
-    return mappedInterventions;
-  }, [data, filters, level]);
-
-  // Map all interventions without filtering
-  const allInterventions = useMemo(() => {
-    if (!data?.data?.results) {
-      return [];
-    }
-
-    // Map to the required format and ensure uniqueness
-    const mappedInterventions = data.data.results.map(mapper);
-
-    // Remove duplicates based on interventionCode
-    const uniqueInterventions = Array.from(
-      new Map(mappedInterventions.map((item) => [item.interventionCode, item])),
-    ).map(([, value]) => value);
-
-    return uniqueInterventions;
-  }, [data]);
+  const { data: allData } = useSWR<FetchResponse<{ result: Array<Intervention> }>>(allInterventionsUrl, openmrsFetch);
 
   return {
-    isLoading: isLoading || isLoadingFacilityLevel,
-    interventions: interventions as Array<SHAIntervention>,
-    allInterventions: allInterventions as Array<SHAIntervention>,
-    error: error || facilityLevelError,
+    isLoading,
+    interventions: data?.data.result ?? [],
+    allInterventions: allData?.data.result ?? [],
+    error,
   };
 };

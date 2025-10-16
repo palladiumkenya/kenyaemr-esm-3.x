@@ -2,12 +2,23 @@ import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework
 import useSWR from 'swr';
 import { Package } from '../types';
 
+interface PackagesFilter {
+  applicable_gender?: 'male' | 'female';
+}
+
 /**
- * Hook that return a list of sha benefits category/packages
+ * Hook that returns a list of SHA benefits category/packages
+ * @param filters - Optional filters for packages
  * @returns
  */
-const usePackages = () => {
-  const url = `${restBaseUrl}/kenyaemr/sha-benefits-package?synchronize=false`;
+const usePackages = (filters?: PackagesFilter) => {
+  const params = new URLSearchParams();
+
+  if (filters?.applicable_gender) {
+    params.append('applicable_gender', filters.applicable_gender);
+  }
+
+  const url = `${restBaseUrl}/insclaims/packages?${params.toString()}`;
 
   const { data, isLoading, error } = useSWR<
     FetchResponse<{ result: Array<{ benefitCode: string; benefitName: string; description?: string }> }>
