@@ -16,6 +16,7 @@ import { ConfigObject } from '../../config-schema';
 import GenericTable from '../../specialized-clinics/generic-nav-links/generic-table.component';
 import styles from './case-encounter-header.scss';
 import { deleteEncounter, useInfiniteVisits } from './case-encounter-table.resource';
+import PatientHasActiveCase from './patient-has-active-case.component.tsx';
 
 interface CaseEncounterProps {
   mutate: KeyedMutator<any>;
@@ -198,7 +199,7 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
   }
 
   return (
-    <>
+    <PatientHasActiveCase patientUuid={patientUuid}>
       <CaseEncounterHeader patientUuid={patientUuid} mutate={mutateVisits} onFilterChange={setFilterFormUuid} />
       {filteredEncounters.length === 0 ? (
         <Layer>
@@ -230,7 +231,7 @@ const CaseEncounterOverviewComponent = ({ patientUuid }: CaseEncounterOverviewCo
           />
         </div>
       )}
-    </>
+    </PatientHasActiveCase>
   );
 };
 
