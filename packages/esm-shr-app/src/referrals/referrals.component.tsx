@@ -18,25 +18,27 @@ import {
   Link,
 } from '@carbon/react';
 import { useLayoutType, isDesktop, usePagination, navigate } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from '../referrals/referral-tabs/referrals-tabs.scss';
 import { useTranslation } from 'react-i18next';
 import { useCommunityReferrals } from './refferals.resource';
 import CommunityReferralActions from './referrals-actions.component';
 import { ReferralReasonsProps } from '../types';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib/src';
 
 type ReferralProps = {
   status: string;
 };
 
-const ReferralTable: React.FC<ReferralProps> = (data) => {
+const DEFAULT_PAGE_SIZE = 10;
+
+const ReferralTable: React.FC<ReferralProps> = ({ status }) => {
   const { t } = useTranslation();
-  const { referrals, isLoading, isValidating } = useCommunityReferrals(data.status);
+  const { referrals, isLoading, isValidating } = useCommunityReferrals(status);
   const layout = useLayoutType();
   const [searchString, setSearchString] = useState('');
   const responsiveSize = isDesktop(layout) ? 'lg' : 'sm';
-  const pageSizes = [10, 20, 30, 40, 50];
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const { pageSizes } = usePaginationInfo(pageSize, referrals?.length, 1, referrals?.length);
 
   const setName = (record: any) => {
     return record.givenName + ' ' + record.middleName + ' ' + record.familyName;
@@ -107,7 +109,7 @@ const ReferralTable: React.FC<ReferralProps> = (data) => {
         uuid: record.uuid,
         nupi: record.nupi,
         name:
-          data.status === 'active' ? (
+          status === 'active' ? (
             setName(record)
           ) : (
             <Link
@@ -122,7 +124,7 @@ const ReferralTable: React.FC<ReferralProps> = (data) => {
         dateReferred: record.dateReferred,
         referredFrom: record.referredFrom,
         referralService: record.referralReasons?.category,
-        actions: <CommunityReferralActions status={data.status} referralData={referralReasonsx} />,
+        actions: <CommunityReferralActions status={status} referralData={referralReasonsx} />,
       };
       rowData.push(s);
     });
@@ -136,9 +138,11 @@ const ReferralTable: React.FC<ReferralProps> = (data) => {
     [goTo, setSearchString],
   );
 
-  return isLoading ? (
-    <DataTableSkeleton />
-  ) : (
+  if (isLoading) {
+    return <DataTableSkeleton headers={headerData} columnCount={headerData.length} />;
+  }
+
+  return (
     <div className={styles.serviceContainer}>
       <FilterableTableHeader
         handleSearch={handleSearch}
