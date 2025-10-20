@@ -11,12 +11,22 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { formatDatetime, isDesktop, launchWorkspace, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import {
+  formatDatetime,
+  isDesktop,
+  launchWorkspace,
+  useConfig,
+  useEmrConfiguration,
+  useLayoutType,
+  usePatient,
+  useVisit,
+} from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 import { useAdmissionRequest } from './in-patient.resource';
 import { ConfigObject } from '../config-schema';
 import { Add } from '@carbon/react/icons';
+import InpatientForms from './inpatient-forms.component';
 
 type AdmissionRequestProps = {
   patientUuid: string;
@@ -30,7 +40,9 @@ const AdmissionRequest: React.FC<AdmissionRequestProps> = ({ patientUuid }) => {
     formsList: { admissionRequestFormUuid },
   } = useConfig<ConfigObject>();
   const { admissionRequest, isLoading, error, mutate } = useAdmissionRequest(patientUuid);
-
+  const { isLoading: isLoadingActiveVisit } = useVisit(patientUuid);
+  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
+  const { isLoadingEmrConfiguration, emrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
   const rows = useMemo(() => {
     return admissionRequest.map((admissionRequest) => ({
       id: admissionRequest.patient.uuid,
@@ -63,26 +75,38 @@ const AdmissionRequest: React.FC<AdmissionRequestProps> = ({ patientUuid }) => {
     });
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingActiveVisit || isLoadingPatient || isLoadingEmrConfiguration) {
     return <DataTableSkeleton />;
   }
 
-  if (error) {
-    return <ErrorState error={error} headerTitle={t('admissionRequest', 'Admission Request')} />;
+  if (error || errorFetchingEmrConfiguration) {
+    return (
+      <div>
+        <InpatientForms patientUuid={patientUuid} patient={patient} emrConfiguration={emrConfiguration} />
+        <ErrorState
+          error={error ?? errorFetchingEmrConfiguration}
+          headerTitle={t('admissionRequest', 'Admission Request')}
+        />
+      </div>
+    );
   }
 
   if (admissionRequest.length === 0) {
     return (
-      <EmptyState
-        displayText={t('admissionRequests', 'admission requests')}
-        headerTitle={t('admissionRequest', 'Admission Request')}
-        launchForm={handleLaunchAdmissionRequestForm}
-      />
+      <div>
+        <InpatientForms patientUuid={patientUuid} patient={patient} emrConfiguration={emrConfiguration} />
+        <EmptyState
+          displayText={t('admissionRequests', 'admission requests')}
+          headerTitle={t('admissionRequest', 'Admission Request')}
+          launchForm={handleLaunchAdmissionRequestForm}
+        />
+      </div>
     );
   }
 
   return (
     <div>
+      <InpatientForms patientUuid={patientUuid} patient={patient} emrConfiguration={emrConfiguration} />
       <CardHeader title={t('admissionRequest', 'Admission Request')}>
         <Button renderIcon={Add} onClick={handleLaunchAdmissionRequestForm} kind="ghost">
           {t('add', 'Add')}

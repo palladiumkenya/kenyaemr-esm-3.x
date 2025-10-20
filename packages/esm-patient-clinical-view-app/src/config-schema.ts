@@ -290,8 +290,32 @@ export const configSchema = {
       },
       {
         label: 'Partograph Form',
-        uuid: '3791e5b7-2cdc-44fc-982b-a81135367c96',
+        uuid: '022d62af-e2a5-4282-953b-52dd5cba3296',
         hideExpression: 'age >= 10 && gender === "female"',
+      },
+      {
+        uuid: '87379b0a-738b-4799-9736-cdac614cee2a',
+        label: 'Doctors Note',
+      },
+      {
+        uuid: '43dacebf-2412-44b6-b55a-63aff5b02fcd',
+        label: 'Post Delivery',
+      },
+      {
+        uuid: 'ac043326-c5f0-4d11-9e6f-f7266b3f3859',
+        label: 'Post Operation',
+      },
+      {
+        uuid: 'a14824ca-29af-4d37-b9da-6bdee39f8808',
+        label: 'Pre-Operation Checklist',
+      },
+      {
+        uuid: 'b4bfa7a3-f6ed-4339-a4ec-b076463c0696',
+        label: 'Fluid Intake',
+      },
+      {
+        uuid: 'cd65f1dd-0047-4449-9c38-0710a7214c52',
+        label: 'Initial Nursing Cardex',
       },
     ],
   },
