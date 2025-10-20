@@ -62,7 +62,7 @@ const AdmissionRequest: React.FC<AdmissionRequestProps> = ({ patientUuid }) => {
       { key: 'admissionType', header: t('admissionType', 'Admission Type') },
       { key: 'disposition', header: t('disposition', 'Disposition') },
     ];
-  }, []);
+  }, [t]);
 
   const handleLaunchAdmissionRequestForm = () => {
     launchWorkspace('patient-form-entry-workspace', {
@@ -81,13 +81,10 @@ const AdmissionRequest: React.FC<AdmissionRequestProps> = ({ patientUuid }) => {
 
   if (error || errorFetchingEmrConfiguration) {
     return (
-      <div>
-        <InpatientForms patientUuid={patientUuid} patient={patient} emrConfiguration={emrConfiguration} />
-        <ErrorState
-          error={error ?? errorFetchingEmrConfiguration}
-          headerTitle={t('admissionRequest', 'Admission Request')}
-        />
-      </div>
+      <ErrorState
+        error={error ?? errorFetchingEmrConfiguration}
+        headerTitle={t('admissionRequest', 'Admission Request')}
+      />
     );
   }
 
