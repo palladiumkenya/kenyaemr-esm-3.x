@@ -101,28 +101,41 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
             <div className={styles.careProgramButtonContainer}>
               <Tag type="green">Enrolled</Tag>
               <OverflowMenu aria-label="overflow-menu" flipped>
-                {forms.map((form) => (
-                  <OverflowMenuItem
-                    key={form.formUuId}
-                    itemText={form.formName}
-                    onClick={() => {
-                      currentVisit
-                        ? launchWorkspace('patient-form-entry-workspace', {
+                {forms.map((form) => {
+                  const formEncounter = currentVisit?.encounters?.find((en) => en.form?.uuid === form.formUuId);
+                  const areAllDependancyFormsFilled = form.dependancies.every((formUuid) =>
+                    currentVisit?.encounters?.some((en) => en?.form?.uuid === formUuid),
+                  );
+                  const showForm = !form?.dependancies?.length || areAllDependancyFormsFilled;
+
+                  if (!showForm) {
+                    return null;
+                  }
+
+                  return (
+                    <OverflowMenuItem
+                      key={form.formUuId}
+                      itemText={form.formName}
+                      onClick={() => {
+                        if (currentVisit) {
+                          return launchWorkspace('patient-form-entry-workspace', {
                             workspaceTitle: form.formName,
                             mutateForm: () => {
                               mutateEnrollments();
                               mutateEligiblePrograms();
                             },
                             formInfo: {
-                              encounterUuid: '',
+                              encounterUuid: formEncounter?.uuid ?? '',
                               formUuid: form.formUuId,
                               // additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails ?? {} },
                             },
-                          })
-                        : launchStartVisitPrompt();
-                    }}
-                  />
-                ))}
+                          });
+                        }
+                        launchStartVisitPrompt();
+                      }}
+                    />
+                  );
+                })}
                 <OverflowMenuItem
                   itemText={t('edit', 'Edit')}
                   onClick={() =>
