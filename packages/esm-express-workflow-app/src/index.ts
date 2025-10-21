@@ -39,6 +39,7 @@ export const otpVerificationModal = getAsyncLifecycle(
 export const checkinFormExtraExtension = getSyncLifecycle(CheckinFormExtraExtension, options);
 export const patientSummaryDashboard = getSyncLifecycle(PatientSummaryDashboard, options);
 
+export const queuesAdminHome = getAsyncLifecycle(() => import('./shared/queue/queues-home.component'), options);
 export const homepageDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: `consultation`,
