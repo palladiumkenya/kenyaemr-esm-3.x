@@ -60,6 +60,7 @@
   "invalidPhoneNumber": "Please enter a valid phone number",
   "investigationStatus": "Investigation Status",
   "laboratoryOrders": "Laboratory Orders",
+  "labResults": "Lab Results",
   "loadingDashboard": "Loading dashboard data...",
   "loadingPatient": "Loading patient...",
   "loadingQueueEntries": "Loading queue entries...",
