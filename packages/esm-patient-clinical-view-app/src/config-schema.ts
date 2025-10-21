@@ -52,7 +52,6 @@ export const configSchema = {
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
       autopsyFormUuid: '2b61a73-4971-4fc0-b20b-9a30176317e2',
       htsClientTracingFormUuid: '15ed03d2-c972-11e9-a32f-2a2ae2dbcce4',
-      admissionRequestFormUuid: '0bae7646-b079-4cbb-8130-b24274fc16f7',
     },
   },
   htsClientTracingConceptsUuids: {
@@ -250,17 +249,6 @@ export const configSchema = {
     _description: 'Peer Educator Relationship type',
     _default: '96adecc2-e7cd-41d0-b577-08eb4834abcb',
   },
-  admissionLocationTagUuid: {
-    _type: Type.UUID,
-    _description:
-      'UUID for the location tag of the `Admission Location`. Patients may only be admitted to inpatient care in a location with this tag',
-    _default: '233de33e-2778-4f9a-a398-fa09da9daa14',
-  },
-  inpatientVisitUuid: {
-    _type: Type.UUID,
-    _description: 'UUID for the inpatient visit',
-    _default: 'a73e2ac6-263b-47fc-99fc-e0f2c09fc914',
-  },
   morgueVisitTypeUuid: {
     _type: Type.String,
     _description: ' UUID for morgue visit',
@@ -270,54 +258,6 @@ export const configSchema = {
     _type: Type.String,
     _description: ' UUID for morgue discharge encounter uuid',
     _default: '3d618f40b-b5a3-4f17-81c8-2f04e2aad58e',
-  },
-  inPatientForms: {
-    _type: Type.Array,
-    _description: 'List of forms that can be filled out for in-patients',
-    _default: [
-      {
-        label: 'Cardex Nursing Plan',
-        uuid: '1f81d5e2-3569-40cf-bbb9-361a53ba409b',
-      },
-      {
-        label: 'IPD Procedure Form',
-        uuid: '2b9c2b94-0b03-416a-b312-eef49b42f72c',
-      },
-      {
-        label: 'Newborn Unit Admission ',
-        uuid: '5b0a08f5-87c1-40cc-8c09-09c33b44523d',
-        hideExpression: 'ageInDays < 28',
-      },
-      {
-        label: 'Partograph Form',
-        uuid: '022d62af-e2a5-4282-953b-52dd5cba3296',
-        hideExpression: 'age >= 10 && gender === "female"',
-      },
-      {
-        uuid: '87379b0a-738b-4799-9736-cdac614cee2a',
-        label: 'Doctors Note',
-      },
-      {
-        uuid: '43dacebf-2412-44b6-b55a-63aff5b02fcd',
-        label: 'Post Delivery',
-      },
-      {
-        uuid: 'ac043326-c5f0-4d11-9e6f-f7266b3f3859',
-        label: 'Post Operation',
-      },
-      {
-        uuid: 'a14824ca-29af-4d37-b9da-6bdee39f8808',
-        label: 'Pre-Operation Checklist',
-      },
-      {
-        uuid: 'b4bfa7a3-f6ed-4339-a4ec-b076463c0696',
-        label: 'Fluid Intake',
-      },
-      {
-        uuid: 'cd65f1dd-0047-4449-9c38-0710a7214c52',
-        label: 'Initial Nursing Cardex',
-      },
-    ],
   },
 
   partography: {
@@ -472,7 +412,6 @@ export interface ConfigObject {
     peerCalendarOutreactForm: string;
     autopsyFormUuid: string;
     htsClientTracingFormUuid: string;
-    admissionRequestFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
   autopsyEncounterFormUuid: string;
@@ -551,11 +490,3 @@ export interface ConfigPartographyObject {
     descentOfHead: string;
   };
 }
-
-export type BedManagementConfig = {
-  admissionLocationTagUuid: string;
-  inpatientVisitUuid: string;
-  restrictWardAdministrationToLoginLocation: boolean;
-  patientListForAdmissionUrl: string;
-  inPatientForms: Array<{ label: string; uuid: string; hideExpression: string }>;
-};
