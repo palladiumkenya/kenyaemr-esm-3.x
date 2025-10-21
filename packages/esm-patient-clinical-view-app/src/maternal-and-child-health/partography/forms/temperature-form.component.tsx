@@ -186,19 +186,17 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
             <Column lg={16} md={8} sm={4}>
               <div className={styles.temperatureStatus}>
                 <div
-                  className={styles.statusIndicator}
-                  style={{
-                    backgroundColor: temperatureAdvice.color,
-                    color: 'white',
-                    padding: '8px 12px',
-                    borderRadius: '4px',
-                    marginTop: '8px',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                  }}>
+                  className={
+                    styles.statusIndicator +
+                    ' ' +
+                    (temperatureAdvice.status === 'Low'
+                      ? styles['statusIndicator--low']
+                      : temperatureAdvice.status === 'Normal'
+                      ? styles['statusIndicator--normal']
+                      : styles['statusIndicator--high'])
+                  }>
                   <strong>{temperatureAdvice.status}</strong>
-                  <br />
-                  <span style={{ fontSize: '12px', opacity: '0.9' }}>{temperatureAdvice.advice}</span>
+                  <span className={styles.statusAdvice}>{temperatureAdvice.advice}</span>
                 </div>
               </div>
             </Column>

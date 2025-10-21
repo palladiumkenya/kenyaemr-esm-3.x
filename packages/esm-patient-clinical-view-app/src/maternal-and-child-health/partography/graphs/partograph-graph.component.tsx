@@ -16,6 +16,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
+import { getColorForGraph } from '../types';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 enum ScaleTypes {
@@ -111,8 +112,8 @@ const PartographGraph: React.FC<PartographGraphProps> = ({
     color: {
       scale: {
         [data[0]?.group || graph.id]: getColorForGraph(graph.color),
-        Systolic: '#ff6b6b',
-        Diastolic: '#4ecdc4',
+        Systolic: getColorForGraph('red'),
+        Diastolic: getColorForGraph('green'),
       },
     },
     points: {
@@ -178,7 +179,7 @@ const PartographGraph: React.FC<PartographGraphProps> = ({
                 ...chartOptions,
                 legend: { enabled: false },
                 points: { enabled: false },
-                color: { scale: { [graph.title]: '#d0d0d0' } },
+                color: { scale: { [graph.title]: getColorForGraph('gray') } },
               }}
             />
           )}

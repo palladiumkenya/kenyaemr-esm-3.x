@@ -1,10 +1,9 @@
 import { openmrsFetch, restBaseUrl, toOmrsIsoString } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
-
-import { OXYTOCIN_FORM_CONCEPTS } from './types';
 import { MCH_PARTOGRAPHY_ENCOUNTER_UUID } from '../forms/useCervixData';
 import { ENCOUNTER_ROLE } from '../../../config-schema';
+import { OXYTOCIN_FORM_CONCEPTS } from '../types';
 
 export interface OxytocinFormData {
   time: string;

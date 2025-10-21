@@ -4,6 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { Button, Modal, Grid, Column, Dropdown } from '@carbon/react';
 import styles from '../partography.scss';
 import { CONTRACTION_STRONG_UUID } from '../types';
+import { MOULDING_NONE_CONCEPT, MOULDING_SLIGHT_CONCEPT, MOULDING_MODERATE_CONCEPT } from '../../../config-schema';
 
 type CervicalContractionsFormData = {
   contractionLevel: string;
@@ -50,7 +51,7 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
     {
       value: 'none',
       label: t('noContractions', 'No Contractions'),
-      concept: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // None concept
+      concept: MOULDING_NONE_CONCEPT,
       visual: '0',
       visualClass: 'none',
       title: t('none', 'None'),
@@ -58,7 +59,7 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
     {
       value: 'mild',
       label: t('mildContractions', 'Mild Contractions'),
-      concept: '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // Mild concept from user
+      concept: MOULDING_SLIGHT_CONCEPT,
       visual: '1',
       visualClass: 'mild',
       title: t('mild', 'Mild'),
@@ -66,7 +67,7 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
     {
       value: 'moderate',
       label: t('moderateContractions', 'Moderate Contractions'),
-      concept: '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', // Moderate concept from user
+      concept: MOULDING_MODERATE_CONCEPT,
       visual: '2',
       visualClass: 'moderate',
       title: t('moderate', 'Moderate'),
@@ -82,31 +83,6 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
   ];
 
   const handleFormSubmit = (data: CervicalContractionsFormData) => {
-    clearErrors();
-
-    let hasErrors = false;
-
-    if (!data.contractionLevel || data.contractionLevel.trim() === '') {
-      setError('contractionLevel', {
-        type: 'manual',
-        message: t('contractionLevelRequired', 'Please select contraction level'),
-      });
-      hasErrors = true;
-    }
-
-    if (!data.contractionCount || data.contractionCount.trim() === '') {
-      setError('contractionCount', {
-        type: 'manual',
-        message: t('contractionCountRequired', 'Please select number of contractions'),
-      });
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      alert(t('formValidationError', 'Please select both contraction level and count before submitting.'));
-      return;
-    }
-
     const currentTime = new Date().toLocaleTimeString('en-GB', {
       hour: '2-digit',
       minute: '2-digit',
@@ -115,7 +91,7 @@ const CervicalContractionsForm: React.FC<CervicalContractionsFormProps> = ({
     onSubmit({
       contractionLevel: data.contractionLevel,
       contractionCount: data.contractionCount,
-      timeSlot: currentTime, // Auto-generate current time
+      timeSlot: currentTime,
     });
 
     reset();

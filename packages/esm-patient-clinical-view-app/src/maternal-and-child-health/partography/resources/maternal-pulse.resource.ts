@@ -65,5 +65,13 @@ export function buildMaternalPulseObservation(formData: any): any[] {
       obsDatetime,
     });
   }
+  // Optional time slot observation for pulse/BP graph (if provided by the form)
+  if (formData.time || formData.timeSlot) {
+    observations.push({
+      concept: PARTOGRAPHY_CONCEPTS['pulse-time-slot'] || PARTOGRAPHY_CONCEPTS['time-slot'],
+      value: formData.time || formData.timeSlot,
+      obsDatetime,
+    });
+  }
   return observations;
 }

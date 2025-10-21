@@ -2,10 +2,8 @@ import { openmrsFetch, restBaseUrl, toOmrsIsoString } from '@openmrs/esm-framewo
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
 export { MCH_PARTOGRAPHY_ENCOUNTER_UUID } from '../types';
-import { MCH_PARTOGRAPHY_ENCOUNTER_UUID } from '../types';
+import { CERVIX_FORM_CONCEPTS, MCH_PARTOGRAPHY_ENCOUNTER_UUID } from '../types';
 import { ENCOUNTER_ROLE } from '../../../config-schema';
-export { CERVIX_FORM_CONCEPTS } from './types';
-import { CERVIX_FORM_CONCEPTS } from './types';
 
 export interface CervixFormData {
   hour: string;

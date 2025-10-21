@@ -4,9 +4,11 @@ import { buildMaternalPulseObservation } from './resources/maternal-pulse.resour
 import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   PARTOGRAPHY_CONCEPTS,
   PARTOGRAPHY_ENCOUNTER_TYPES,
+  MCH_PARTOGRAPHY_ENCOUNTER_UUID,
   getPartographyUnit,
   type OpenMRSResponse,
   type PartographyObservation,
@@ -17,6 +19,7 @@ import { configSchema, type ConfigObject } from '../../config-schema';
 import {
   buildTemperatureObservation,
   transformTemperatureEncounterToChartData,
+  transformTemperatureEncounterToTableData,
 } from './resources/temperature.resource';
 
 export type { PartographyObservation, PartographyEncounter };
@@ -615,15 +618,15 @@ function buildObservations(graphType: string, formData: any): any[] {
       }
       if (formData.route) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['event-description'],
-          value: `Route: ${formData.route}`,
+          concept: PARTOGRAPHY_CONCEPTS['route'] || PARTOGRAPHY_CONCEPTS['event-description'],
+          value: formData.route,
           obsDatetime,
         });
       }
       if (formData.frequency) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['event-description'],
-          value: `Frequency: ${formData.frequency}`,
+          concept: PARTOGRAPHY_CONCEPTS['frequency'] || PARTOGRAPHY_CONCEPTS['event-description'],
+          value: formData.frequency,
           obsDatetime,
         });
       }

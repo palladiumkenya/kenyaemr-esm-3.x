@@ -12,6 +12,8 @@ import {
   UTERINE_CONTRACTION_FREQUENCY_CONCEPT,
   UTERINE_CONTRACTION_DURATION_CONCEPT,
   MATERNAL_PULSE_CONCEPT,
+  ROUTE_CONCEPT,
+  FREQUENCY_CONCEPT,
   SYSTOLIC_BP_CONCEPT,
   DIASTOLIC_BP_CONCEPT,
   TEMPERATURE_CONCEPT,
@@ -50,6 +52,8 @@ import {
   STATION_3_CONCEPT,
   STATION_4_CONCEPT,
   STATION_5_CONCEPT,
+  PULSE_BP_TIME_CONCEPT,
+  FETAL_HEART_RATE_TIME_CONCEPT,
 } from '../../../config-schema';
 
 const _CODE_TO_PLUS_MAP: Record<string, string> = {
@@ -73,7 +77,7 @@ export const PARTOGRAPHY_CONCEPTS = {
   cervix: _partoConcepts.cervix ?? CERVIX_CONCEPT,
   'fetal-heart-rate': _partoConcepts['fetal-heart-rate'] ?? FETAL_HEART_RATE_CONCEPT,
   'fetal-heart-rate-hour': _partoConcepts['fetal-heart-rate-hour'] ?? FETAL_HEART_RATE_HOUR_CONCEPT,
-  'fetal-heart-rate-time': _partoConcepts['fetal-heart-rate-time'] ?? FETAL_HEART_RATE_HOUR_CONCEPT,
+  'fetal-heart-rate-time': _partoConcepts['fetal-heart-rate-time'] ?? FETAL_HEART_RATE_TIME_CONCEPT,
 
   'cervical-dilation': _partoConcepts['cervical-dilation'] ?? CERVIX_CONCEPT,
   'descent-of-head': _partoConcepts['descent-of-head'] ?? DESCENT_OF_HEAD_CONCEPT,
@@ -97,6 +101,8 @@ export const PARTOGRAPHY_CONCEPTS = {
   'oxytocin-dose': _partoConcepts['oxytocin-dose'] ?? OXYTOCIN_DOSE_CONCEPT,
   'iv-fluids': _partoConcepts['iv-fluids'] ?? IV_FLUIDS_CONCEPT,
   dosage: _partoConcepts.dosage ?? DOSAGE_CONCEPT,
+  route: _partoConcepts.route ?? ROUTE_CONCEPT,
+  frequency: _partoConcepts.frequency ?? FREQUENCY_CONCEPT,
   'drug-dose': _partoConcepts['drug-dose'] ?? DRUG_DOSE_CONCEPT,
   'event-type': _partoConcepts['event-type'] ?? EVENT_TYPE_CONCEPT,
   'event-description': _partoConcepts['event-description'] ?? EVENT_DESCRIPTION_CONCEPT,
@@ -104,6 +110,7 @@ export const PARTOGRAPHY_CONCEPTS = {
   moulding: _partoConcepts.moulding ?? MOULDING_CONCEPT,
   'blood-group': _partoConcepts['blood-group'] ?? BLOOD_GROUP_CONCEPT,
   'time-slot': _partoConcepts['time-slot'] ?? TIME_SLOT_CONCEPT,
+  'pulse-time-slot': _partoConcepts['pulse-time-slot'] ?? PULSE_BP_TIME_CONCEPT,
   'labor-pattern': _partoConcepts['labor-pattern'] ?? LABOR_PATTERN_CONCEPT,
   'hours-since-rupture': _partoConcepts['hours-since-rupture'] ?? HOURS_SINCE_RUPTURE_CONCEPT,
   'ruptured-membranes': _partoConcepts['ruptured-membranes'] ?? RUPTURED_MEMBRANES_CONCEPT,
@@ -559,6 +566,30 @@ export const MOULDING_OPTIONS = [
   },
 ] as const;
 
+export const ROUTE_OPTIONS = [
+  { id: 'oral', text: 'Oral' },
+  { id: 'iv', text: 'Intravenous (IV)' },
+  { id: 'im', text: 'Intramuscular (IM)' },
+  { id: 'sc', text: 'Subcutaneous (SC)' },
+  { id: 'topical', text: 'Topical' },
+  { id: 'inhalation', text: 'Inhalation' },
+  { id: 'other', text: 'Other' },
+] as const;
+
+export const FREQUENCY_OPTIONS = [
+  { id: 'stat', text: 'STAT (immediately)' },
+  { id: 'od', text: 'Once daily (OD)' },
+  { id: 'bd', text: 'Twice daily (BD)' },
+  { id: 'tds', text: 'Three times daily (TDS)' },
+  { id: 'qds', text: 'Four times daily (QDS)' },
+  { id: 'q4h', text: 'Every 4 hours' },
+  { id: 'q6h', text: 'Every 6 hours' },
+  { id: 'q8h', text: 'Every 8 hours' },
+  { id: 'q12h', text: 'Every 12 hours' },
+  { id: 'prn', text: 'As needed (PRN)' },
+  { id: 'other', text: 'Other' },
+] as const;
+
 export const DESCENT_OF_HEAD_OPTIONS = [
   { value: '', text: 'selectStation', stationValue: 0, conceptUuid: '' },
   {
@@ -656,6 +687,23 @@ export const TIME_SLOT_OPTIONS = [
   { value: 'afternoon', text: 'afternoon', conceptUuid: PARTOGRAPHY_CONCEPTS['time-slot'] },
   { value: 'evening', text: 'evening', conceptUuid: PARTOGRAPHY_CONCEPTS['time-slot'] },
   { value: 'night', text: 'night', conceptUuid: PARTOGRAPHY_CONCEPTS['time-slot'] },
+] as const;
+
+export const MEMBRANE_TIME_SLOT_OPTIONS = [
+  { value: '16:00', label: '16:00' },
+  { value: '17:00', label: '17:00' },
+  { value: '18:00', label: '18:00' },
+  { value: '19:00', label: '19:00' },
+  { value: '20:00', label: '20:00' },
+  { value: '21:00', label: '21:00' },
+  { value: '22:00', label: '22:00' },
+  { value: '23:00', label: '23:00' },
+  { value: '00:00', label: '00:00' },
+  { value: '01:00', label: '01:00' },
+  { value: '02:00', label: '02:00' },
+  { value: '03:00', label: '03:00' },
+  { value: '04:00', label: '04:00' },
+  { value: '05:00', label: '05:00' },
 ] as const;
 
 export const EVENT_TYPE_OPTIONS = [
@@ -1089,3 +1137,59 @@ export const CERVIX_CHART_OPTIONS = {
   },
   curve: 'curveLinear',
 };
+
+export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg' as const;
+
+export const generateRange = (start: number, end: number, step = 1): number[] => {
+  const result: number[] = [];
+  const precision = Math.max(0, (step.toString().split('.')[1] || '').length);
+  for (let v = start; v <= end + Number.EPSILON; v = +(v + step).toFixed(precision)) {
+    result.push(Number(v.toFixed(precision)));
+  }
+  return result;
+};
+
+export const AMNIOTIC_FLUID_INITIALS_MAP: Record<string, string> = {
+  'Membrane intact': 'M',
+  'Clear liquor': 'C',
+  Clear: 'C',
+  'Meconium Stained': 'MS',
+  'Meconium staining': 'MS',
+  Absent: 'A',
+  'Blood Stained': 'B',
+  'Blood stained': 'B',
+  A: 'A',
+  C: 'C',
+  MS: 'MS',
+  B: 'B',
+};
+
+export const AMNIOTIC_FLUID_LABEL_MAP: Record<string, string> = {
+  M: 'Membrane intact',
+  C: 'Clear liquor',
+  MS: 'Meconium Stained',
+  A: 'Absent',
+  B: 'Blood Stained',
+};
+
+export const MOULDING_SYMBOL_MAP: Record<string, string> = {
+  '0': '0',
+  '+': '+',
+  '++': '++',
+  '+++': '+++',
+  None: '0',
+  'ONE PLUS': '+',
+  'TWO PLUS': '++',
+  'THREE PLUS': '+++',
+};
+
+export const OXYTOCIN_FORM_CONCEPTS = {
+  time: FETAL_HEART_RATE_HOUR_CONCEPT,
+  oxytocinDropsPerMinute: OXYTOCIN_DOSE_CONCEPT,
+} as const;
+export const CERVIX_FORM_CONCEPTS = {
+  hour: FETAL_HEART_RATE_HOUR_CONCEPT,
+  time: FETAL_HEART_RATE_TIME_CONCEPT,
+  cervicalDilation: CERVIX_CONCEPT,
+  descentOfHead: DESCENT_OF_HEAD_CONCEPT,
+} as const;

@@ -17,6 +17,7 @@ import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
+import { SVG_NAMESPACE, getColorForGraph } from '../types';
 
 enum ScaleTypes {
   LABELS = 'labels',
@@ -171,10 +172,10 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
     title: 'Cervical Dilation and Descent of Head',
     color: {
       scale: {
-        'Alert Line': '#FFD700',
-        'Action Line': '#FF0000',
-        'Cervical Dilation': '#22C55E',
-        'Descent of Head': '#2563EB',
+        'Alert Line': getColorForGraph('yellow'),
+        'Action Line': getColorForGraph('red'),
+        'Cervical Dilation': getColorForGraph('green'),
+        'Descent of Head': getColorForGraph('blue'),
       },
     },
   };
@@ -202,11 +203,11 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
           const pathData = pathElement.getAttribute('d');
           if (pathData) {
             if (pathData.includes('M0') || pathData.includes('L0')) {
-              pathElement.style.stroke = '#FFD700';
+              pathElement.style.stroke = getColorForGraph('yellow');
               pathElement.style.strokeWidth = '3px';
               pathElement.style.strokeDasharray = '8,4';
             } else if (pathData.includes('M4') || pathData.includes('L4')) {
-              pathElement.style.stroke = '#FF0000';
+              pathElement.style.stroke = getColorForGraph('red');
               pathElement.style.strokeWidth = '3px';
               pathElement.style.strokeDasharray = '8,4';
             }
@@ -220,7 +221,7 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
             const stroke = circleElement.getAttribute('stroke') || circleElement.style.stroke;
             const fill = circleElement.getAttribute('fill') || circleElement.style.fill;
 
-            if (stroke === '#22C55E' || fill === '#22C55E') {
+            if (stroke === getColorForGraph('green') || fill === getColorForGraph('green')) {
               circleElement.style.display = 'none';
 
               const cx = parseFloat(circleElement.getAttribute('cx') || '0');
@@ -229,21 +230,21 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
 
               const svg = circleElement.ownerSVGElement;
               if (svg) {
-                const line1 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                const line1 = document.createElementNS(SVG_NAMESPACE, 'line');
                 line1.setAttribute('x1', (cx - size).toString());
                 line1.setAttribute('y1', (cy - size).toString());
                 line1.setAttribute('x2', (cx + size).toString());
                 line1.setAttribute('y2', (cy + size).toString());
-                line1.setAttribute('stroke', '#22C55E');
+                line1.setAttribute('stroke', getColorForGraph('green'));
                 line1.setAttribute('stroke-width', '3');
                 line1.setAttribute('stroke-linecap', 'round');
 
-                const line2 = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                const line2 = document.createElementNS(SVG_NAMESPACE, 'line');
                 line2.setAttribute('x1', (cx + size).toString());
                 line2.setAttribute('y1', (cy - size).toString());
                 line2.setAttribute('x2', (cx - size).toString());
                 line2.setAttribute('y2', (cy + size).toString());
-                line2.setAttribute('stroke', '#22C55E');
+                line2.setAttribute('stroke', getColorForGraph('green'));
                 line2.setAttribute('stroke-width', '3');
                 line2.setAttribute('stroke-linecap', 'round');
 
@@ -261,6 +262,14 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
   }, [cervixFormData, isLoading]);
 
   const shouldRenderChart = finalChartData.length > 0;
+
+  const totalPages = Math.ceil(totalItems / (pageSize || 1)) || 1;
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    totalPages,
+    currentPage,
+    totalItems,
+  );
 
   return (
     <div className={styles.graphContainer}>
@@ -382,37 +391,26 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
                 )}
               </DataTable>
 
-              {totalItems > 0 &&
-                (() => {
-                  const totalPages = Math.ceil(totalItems / (pageSize || 1)) || 1;
-                  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
-                    pageSize,
-                    totalPages,
-                    currentPage,
-                    totalItems,
-                  );
-
-                  return (
-                    <>
-                      <Pagination
-                        page={currentPage}
-                        totalItems={totalItems}
-                        pageSize={pageSize}
-                        pageSizes={calculatedPageSizes}
-                        onChange={(event) => {
-                          onPageChange(event.page);
-                          if (event.pageSize !== pageSize) {
-                            onPageSizeChange(event.pageSize);
-                          }
-                        }}
-                        size={controlSize}
-                      />
-                      <div className={styles.tableStats}>
-                        <span className={styles.recordCount}>{itemsDisplayed}</span>
-                      </div>
-                    </>
-                  );
-                })()}
+              {totalItems > 0 && (
+                <>
+                  <Pagination
+                    page={currentPage}
+                    totalItems={totalItems}
+                    pageSize={pageSize}
+                    pageSizes={calculatedPageSizes}
+                    onChange={(event) => {
+                      onPageChange(event.page);
+                      if (event.pageSize !== pageSize) {
+                        onPageSizeChange(event.pageSize);
+                      }
+                    }}
+                    size={controlSize}
+                  />
+                  <div className={styles.tableStats}>
+                    <span className={styles.recordCount}>{itemsDisplayed}</span>
+                  </div>
+                </>
+              )}
             </>
           ) : (
             <div className={styles.emptyState}>

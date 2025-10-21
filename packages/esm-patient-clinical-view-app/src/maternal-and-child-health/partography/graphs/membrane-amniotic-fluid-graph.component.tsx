@@ -15,6 +15,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import styles from '../partography.scss';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { AMNIOTIC_FLUID_INITIALS_MAP, AMNIOTIC_FLUID_LABEL_MAP, MOULDING_SYMBOL_MAP } from '../types';
 
 interface MembraneAmnioticFluidData {
   timeSlot: string;
@@ -96,47 +97,12 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
   const timeColumns = getTimeColumns();
 
   const getAmnioticFluidInitials = (value: string): string => {
-    const amnioticFluidMap: Record<string, string> = {
-      'Membrane intact': 'M',
-      'Clear liquor': 'C',
-      Clear: 'C',
-      'Meconium Stained': 'MS',
-      'Meconium staining': 'MS',
-      Absent: 'A',
-      'Blood Stained': 'B',
-      'Blood stained': 'B',
-      A: 'A',
-      C: 'C',
-      MS: 'MS',
-      B: 'B',
-    };
-    return amnioticFluidMap[value] || value.charAt(0).toUpperCase();
+    return AMNIOTIC_FLUID_INITIALS_MAP[value] || value.charAt(0).toUpperCase();
   };
 
-  const getAmnioticFluidLabel = (value: string): string => {
-    const amnioticFluidLabelMap: Record<string, string> = {
-      M: 'Membrane intact',
-      C: 'Clear liquor',
-      MS: 'Meconium Stained',
-      A: 'Absent',
-      B: 'Blood Stained',
-    };
-    return amnioticFluidLabelMap[value] || value;
-  };
+  const getAmnioticFluidLabel = (value: string): string => AMNIOTIC_FLUID_LABEL_MAP[value] || value;
 
-  const getMouldingSymbol = (value: string): string => {
-    const mouldingMap: Record<string, string> = {
-      '0': '0',
-      '+': '+',
-      '++': '++',
-      '+++': '+++',
-      None: '0',
-      'ONE PLUS': '+',
-      'TWO PLUS': '++',
-      'THREE PLUS': '+++',
-    };
-    return mouldingMap[value] || value;
-  };
+  const getMouldingSymbol = (value: string): string => MOULDING_SYMBOL_MAP[value] || value;
 
   const createGridData = () => {
     const gridData: Record<string, { amnioticFluid: string; moulding: string }> = {};

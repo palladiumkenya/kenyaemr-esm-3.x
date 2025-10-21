@@ -4,6 +4,18 @@ import { useForm, Controller } from 'react-hook-form';
 import { Button, Modal, Grid, Column, Select, SelectItem, TimePicker } from '@carbon/react';
 import TimePickerDropdown from './time-picker-dropdown.component';
 import styles from '../partography-data-form.scss';
+import { MEMBRANE_TIME_SLOT_OPTIONS } from '../types';
+import {
+  AMNIOTIC_MEMBRANE_INTACT_CONCEPT,
+  AMNIOTIC_CLEAR_LIQUOR_CONCEPT,
+  AMNIOTIC_MECONIUM_STAINED_CONCEPT,
+  AMNIOTIC_ABSENT_CONCEPT,
+  AMNIOTIC_BLOOD_STAINED_CONCEPT,
+  MOULDING_NONE_CONCEPT,
+  MOULDING_SLIGHT_CONCEPT,
+  MOULDING_MODERATE_CONCEPT,
+  MOULDING_SEVERE_CONCEPT,
+} from '../../../config-schema';
 
 type MembraneAmnioticFluidFormData = {
   timeSlot: string;
@@ -52,22 +64,7 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     },
   });
 
-  const timeSlotOptions = [
-    { value: '16:00', label: '16:00' },
-    { value: '17:00', label: '17:00' },
-    { value: '18:00', label: '18:00' },
-    { value: '19:00', label: '19:00' },
-    { value: '20:00', label: '20:00' },
-    { value: '21:00', label: '21:00' },
-    { value: '22:00', label: '22:00' },
-    { value: '23:00', label: '23:00' },
-    { value: '00:00', label: '00:00' },
-    { value: '01:00', label: '01:00' },
-    { value: '02:00', label: '02:00' },
-    { value: '03:00', label: '03:00' },
-    { value: '04:00', label: '04:00' },
-    { value: '05:00', label: '05:00' },
-  ];
+  const timeSlotOptions = MEMBRANE_TIME_SLOT_OPTIONS as unknown as { value: string; label: string }[];
 
   const getLatestUsedTimeSlot = () => {
     if (existingTimeEntries.length === 0) {
@@ -110,27 +107,27 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     {
       value: 'Membrane intact',
       label: t('membraneIntact', 'Membrane intact'),
-      concept: '164899AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      concept: AMNIOTIC_MEMBRANE_INTACT_CONCEPT,
     },
-    { value: 'Clear liquor', label: t('clearLiquor', 'Clear liquor'), concept: '159484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+    { value: 'Clear liquor', label: t('clearLiquor', 'Clear liquor'), concept: AMNIOTIC_CLEAR_LIQUOR_CONCEPT },
     {
       value: 'Meconium Stained',
       label: t('meconiumStained', 'Meconium Stained'),
-      concept: '134488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      concept: AMNIOTIC_MECONIUM_STAINED_CONCEPT,
     },
-    { value: 'Absent', label: t('absent', 'Absent'), concept: '163747AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+    { value: 'Absent', label: t('absent', 'Absent'), concept: AMNIOTIC_ABSENT_CONCEPT },
     {
       value: 'Blood Stained',
       label: t('bloodStained', 'Blood Stained'),
-      concept: '1077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      concept: AMNIOTIC_BLOOD_STAINED_CONCEPT,
     },
   ];
 
   const mouldingOptions = [
-    { value: '0', label: '0', concept: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-    { value: '+', label: '+', concept: '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-    { value: '++', label: '++', concept: '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
-    { value: '+++', label: '+++', concept: '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
+    { value: '0', label: '0', concept: MOULDING_NONE_CONCEPT },
+    { value: '+', label: '+', concept: MOULDING_SLIGHT_CONCEPT },
+    { value: '++', label: '++', concept: MOULDING_MODERATE_CONCEPT },
+    { value: '+++', label: '+++', concept: MOULDING_SEVERE_CONCEPT },
   ];
 
   const handleFormSubmit = (data: MembraneAmnioticFluidFormData) => {
@@ -235,15 +232,7 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
                         value={option.value}
                         text={option.label}
                         disabled={isDisabled}
-                        style={
-                          isDisabled
-                            ? {
-                                color: '#8d8d8d',
-                                backgroundColor: '#f4f4f4',
-                                cursor: 'not-allowed',
-                              }
-                            : {}
-                        }
+                        className={isDisabled ? styles.disabledOption : undefined}
                       />
                     );
                   })}

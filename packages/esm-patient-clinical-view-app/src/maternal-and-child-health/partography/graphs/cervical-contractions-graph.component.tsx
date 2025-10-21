@@ -81,6 +81,13 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
     });
   };
   const yAxisLabels = ['5', '4', '3', '2', '1'];
+  const totalPages = Math.ceil((totalItems || 0) / (pageSize || 1)) || 1;
+  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
+    pageSize,
+    totalPages,
+    currentPage,
+    totalItems || 0,
+  );
   return (
     <div className={styles.fetalHeartRateSection}>
       <div className={styles.fetalHeartRateContainer}>
@@ -224,35 +231,25 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
                     </tbody>
                   </table>
                 </div>
-                {(() => {
-                  const totalPages = Math.ceil((totalItems || 0) / (pageSize || 1)) || 1;
-                  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
-                    pageSize,
-                    totalPages,
-                    currentPage,
-                    totalItems || 0,
-                  );
-
-                  return (
-                    <>
-                      <Pagination
-                        page={currentPage}
-                        pageSize={pageSize}
-                        totalItems={totalItems}
-                        pageSizes={calculatedPageSizes}
-                        onChange={({ page, pageSize: newSize }) => {
-                          onPageChange?.(page);
-                          onPageSizeChange?.(newSize);
-                        }}
-                        size={controlSize}
-                        className={styles.pagination}
-                      />
-                      <div className={styles.tableStats}>
-                        <span className={styles.recordCount}>{itemsDisplayed}</span>
-                      </div>
-                    </>
-                  );
-                })()}
+                {totalItems > 0 && (
+                  <>
+                    <Pagination
+                      page={currentPage}
+                      pageSize={pageSize}
+                      totalItems={totalItems}
+                      pageSizes={calculatedPageSizes}
+                      onChange={({ page, pageSize: newSize }) => {
+                        onPageChange?.(page);
+                        onPageSizeChange?.(newSize);
+                      }}
+                      size={controlSize}
+                      className={styles.pagination}
+                    />
+                    <div className={styles.tableStats}>
+                      <span className={styles.recordCount}>{itemsDisplayed}</span>
+                    </div>
+                  </>
+                )}
               </>
             ) : (
               <div className={styles.emptyState}>

@@ -1,4 +1,15 @@
 import { PARTOGRAPHY_CONCEPTS } from '../types';
+import {
+  CONTRACTION_LEVEL_MILD_CONCEPT,
+  CONTRACTION_LEVEL_MODERATE_CONCEPT,
+  CONTRACTION_LEVEL_STRONG_CONCEPT,
+  MOULDING_NONE_CONCEPT,
+  MOULDING_SLIGHT_CONCEPT,
+  MOULDING_MODERATE_CONCEPT,
+  MOULDING_SEVERE_CONCEPT,
+  CONTRACTION_COUNT_CONCEPT,
+  URINE_VOLUME_CONCEPT,
+} from '../../../config-schema';
 import { toOmrsIsoString } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
@@ -51,16 +62,16 @@ export function transformUterineContractionsEncounterToTableData(
     if (!code) {
       return '';
     }
-    if (code === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || code === '0' || code === 0) {
+    if (code === MOULDING_NONE_CONCEPT || code === '0' || code === 0) {
       return '0';
     }
-    if (code === '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || code === '+' || code === 1) {
+    if (code === MOULDING_SLIGHT_CONCEPT || code === '+' || code === 1) {
       return '+';
     }
-    if (code === '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || code === '++' || code === 2) {
+    if (code === MOULDING_MODERATE_CONCEPT || code === '++' || code === 2) {
       return '++';
     }
-    if (code === '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || code === '+++' || code === 3) {
+    if (code === MOULDING_SEVERE_CONCEPT || code === '+++' || code === 3) {
       return '+++';
     }
     return String(code);
@@ -96,26 +107,26 @@ export function transformUterineContractionsEncounterToTableData(
           }
         }
         // Contraction count
-        if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+        if (obs.concept.uuid === CONTRACTION_COUNT_CONCEPT) {
           contractionCount = String(obs.value);
         }
         // Contraction level (none, mild, moderate, strong)
         if (
-          obs.concept.uuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || // none
-          obs.concept.uuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || // mild
-          obs.concept.uuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || // moderate
-          obs.concept.uuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' // strong
+          obs.concept.uuid === MOULDING_NONE_CONCEPT || // none
+          obs.concept.uuid === CONTRACTION_LEVEL_MILD_CONCEPT || // mild
+          obs.concept.uuid === CONTRACTION_LEVEL_MODERATE_CONCEPT || // moderate
+          obs.concept.uuid === CONTRACTION_LEVEL_STRONG_CONCEPT // strong
         ) {
-          if (obs.concept.uuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+          if (obs.concept.uuid === MOULDING_NONE_CONCEPT) {
             contractionLevel = 'none';
           }
-          if (obs.concept.uuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+          if (obs.concept.uuid === CONTRACTION_LEVEL_MILD_CONCEPT) {
             contractionLevel = 'mild';
           }
-          if (obs.concept.uuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+          if (obs.concept.uuid === CONTRACTION_LEVEL_MODERATE_CONCEPT) {
             contractionLevel = 'moderate';
           }
-          if (obs.concept.uuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+          if (obs.concept.uuid === CONTRACTION_LEVEL_STRONG_CONCEPT) {
             contractionLevel = 'strong';
           }
         }
@@ -128,10 +139,7 @@ export function transformUterineContractionsEncounterToTableData(
           acetone = codeToPlus(obs.value);
         }
         // Volume
-        if (
-          obs.concept.uuid === PARTOGRAPHY_CONCEPTS['urine-volume'] ||
-          obs.concept.uuid === '159660AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-        ) {
+        if (obs.concept.uuid === PARTOGRAPHY_CONCEPTS['urine-volume'] || obs.concept.uuid === URINE_VOLUME_CONCEPT) {
           volume = String(obs.value);
         }
       }

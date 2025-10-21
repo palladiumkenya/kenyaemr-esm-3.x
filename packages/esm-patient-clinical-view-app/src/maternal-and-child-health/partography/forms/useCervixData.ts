@@ -12,6 +12,5 @@ export type {
 export {
   saveCervixFormData,
   deleteCervixEncounter,
-  CERVIX_FORM_CONCEPTS,
   MCH_PARTOGRAPHY_ENCOUNTER_UUID,
 } from '../resources/cervix.resource';

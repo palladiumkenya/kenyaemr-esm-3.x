@@ -1,5 +1,4 @@
 import React from 'react';
-import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import {
   DataTable,
   Table,
@@ -42,14 +41,6 @@ const UterineContractionsTable: React.FC<UterineContractionsTableProps> = ({
   onPageChange,
   onPageSizeChange,
 }) => {
-  const totalPages = pageSize > 0 ? Math.ceil(totalItems / pageSize) : 0;
-  const { pageSizes: calculatedPageSizes, itemsDisplayed } = usePaginationInfo(
-    pageSize,
-    totalPages,
-    currentPage,
-    tableData.length,
-  );
-
   return (
     <TableContainer>
       <Table size={controlSize} useZebraStyles>
@@ -82,13 +73,12 @@ const UterineContractionsTable: React.FC<UterineContractionsTableProps> = ({
         page={currentPage}
         pageSize={pageSize}
         totalItems={totalItems}
-        pageSizes={calculatedPageSizes}
+        pageSizes={[5, 10, 20, 50]}
         onChange={({ page, pageSize }) => {
           onPageChange(page);
           onPageSizeChange(pageSize);
         }}
       />
-      <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: '#444' }}>{itemsDisplayed}</div>
     </TableContainer>
   );
 };

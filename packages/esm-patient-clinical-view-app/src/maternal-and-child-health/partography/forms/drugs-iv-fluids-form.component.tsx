@@ -6,6 +6,7 @@ import { Add } from '@carbon/react/icons';
 import { launchWorkspace } from '@openmrs/esm-framework';
 import { saveDrugOrderData } from '../partography.resource';
 import styles from '../partography-data-form.scss';
+import { ROUTE_OPTIONS, FREQUENCY_OPTIONS } from '../types';
 
 type DrugsIVFluidsFormData = {
   drugName: string;
@@ -65,28 +66,8 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
     }
   }, [patient?.uuid, onDataSaved, onClose]);
 
-  const routeOptions = [
-    { id: 'oral', text: 'Oral' },
-    { id: 'iv', text: 'Intravenous (IV)' },
-    { id: 'im', text: 'Intramuscular (IM)' },
-    { id: 'sc', text: 'Subcutaneous (SC)' },
-    { id: 'topical', text: 'Topical' },
-    { id: 'inhalation', text: 'Inhalation' },
-    { id: 'other', text: 'Other' },
-  ];
-  const frequencyOptions = [
-    { id: 'stat', text: 'STAT (immediately)' },
-    { id: 'od', text: 'Once daily (OD)' },
-    { id: 'bd', text: 'Twice daily (BD)' },
-    { id: 'tds', text: 'Three times daily (TDS)' },
-    { id: 'qds', text: 'Four times daily (QDS)' },
-    { id: 'q4h', text: 'Every 4 hours' },
-    { id: 'q6h', text: 'Every 6 hours' },
-    { id: 'q8h', text: 'Every 8 hours' },
-    { id: 'q12h', text: 'Every 12 hours' },
-    { id: 'prn', text: 'As needed (PRN)' },
-    { id: 'other', text: 'Other' },
-  ];
+  const routeOptions = ROUTE_OPTIONS as unknown as { id: string; text: string }[];
+  const frequencyOptions = FREQUENCY_OPTIONS as unknown as { id: string; text: string }[];
 
   const onSubmitForm = async (data: DrugsIVFluidsFormData) => {
     clearErrors();

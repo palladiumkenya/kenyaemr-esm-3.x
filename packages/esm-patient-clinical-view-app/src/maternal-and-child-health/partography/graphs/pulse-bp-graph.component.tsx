@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
+import { getColorForGraph } from '../types';
 
 export interface PulseBPData {
   pulse: number;
@@ -127,7 +128,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
     title: 'Pulse and Blood Pressure Monitoring',
     color: {
       scale: {
-        Pulse: actualData.length > 0 ? '#0F62FE' : 'transparent',
+        Pulse: actualData.length > 0 ? getColorForGraph('blue') : 'transparent',
       },
     },
     points: {
@@ -184,7 +185,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                         refY="5"
                         orient="auto"
                         markerUnits="strokeWidth">
-                        <polygon points="0,0 10,5 0,10 3,5" fill="#DA1E28" />
+                        <polygon points="0,0 10,5 0,10 3,5" fill={getColorForGraph('red')} />
                       </marker>
                       <marker
                         id={`diastolic-arrow-${index}`}
@@ -194,7 +195,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                         refY="5"
                         orient="auto"
                         markerUnits="strokeWidth">
-                        <polygon points="0,0 10,5 0,10 3,5" fill="#198038" />
+                        <polygon points="0,0 10,5 0,10 3,5" fill={getColorForGraph('green')} />
                       </marker>
                     </defs>
 
@@ -203,7 +204,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       y1={`${pulseYPosition}%`}
                       x2={`${bpXPosition}%`}
                       y2={`${systolicYPosition}%`}
-                      stroke="#DA1E28"
+                      stroke={getColorForGraph('red')}
                       strokeWidth="2"
                       markerEnd={`url(#systolic-arrow-${index})`}
                     />
@@ -213,18 +214,28 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       y1={`${pulseYPosition}%`}
                       x2={`${bpXPosition}%`}
                       y2={`${diastolicYPosition}%`}
-                      stroke="#198038"
+                      stroke={getColorForGraph('green')}
                       strokeWidth="2"
                       markerEnd={`url(#diastolic-arrow-${index})`}
                     />
 
-                    <circle cx={`${bpXPosition}%`} cy={`${systolicYPosition}%`} r="3" fill="#DA1E28" opacity="0.8">
+                    <circle
+                      cx={`${bpXPosition}%`}
+                      cy={`${systolicYPosition}%`}
+                      r="3"
+                      fill={getColorForGraph('red')}
+                      opacity="0.8">
                       <title>
                         {formatDateTime(item, index)} - Systolic BP: {item.systolicBP} mmHg
                       </title>
                     </circle>
 
-                    <circle cx={`${bpXPosition}%`} cy={`${diastolicYPosition}%`} r="3" fill="#198038" opacity="0.8">
+                    <circle
+                      cx={`${bpXPosition}%`}
+                      cy={`${diastolicYPosition}%`}
+                      r="3"
+                      fill={getColorForGraph('green')}
+                      opacity="0.8">
                       <title>
                         {formatDateTime(item, index)} - Diastolic BP: {item.diastolicBP} mmHg
                       </title>
@@ -234,7 +245,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       cx={`${bpXPosition}%`}
                       cy={`${pulseYPosition}%`}
                       r="4"
-                      fill="#0F62FE"
+                      fill={getColorForGraph('blue')}
                       stroke="#fff"
                       strokeWidth="1"
                       opacity="0.9">

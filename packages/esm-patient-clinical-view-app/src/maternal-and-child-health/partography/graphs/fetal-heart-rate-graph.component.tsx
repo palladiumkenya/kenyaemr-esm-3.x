@@ -16,6 +16,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
+import { getColorForGraph, generateRange } from '../types';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 enum ScaleTypes {
@@ -78,11 +79,11 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
   const getFetalHeartRateStatus = (value: string): { type: string; text: string; color: string } => {
     const numValue = parseInt(value.replace(' bpm', ''));
     if (numValue < 100) {
-      return { type: 'warm-gray', text: 'Low', color: '#6f6f6f' };
+      return { type: 'warm-gray', text: 'Low', color: getColorForGraph('gray') };
     } else if (numValue >= 100 && numValue <= 180) {
-      return { type: 'green', text: 'Normal', color: '#24a148' };
+      return { type: 'green', text: 'Normal', color: getColorForGraph('green') };
     } else {
-      return { type: 'red', text: 'High', color: '#da1e28' };
+      return { type: 'red', text: 'High', color: getColorForGraph('red') };
     }
   };
   const tableHeaders = [
@@ -94,11 +95,11 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
   ];
   const getFetalHeartRateColor = (value: number): string => {
     if (value < 100) {
-      return '#6f6f6f';
+      return getColorForGraph('gray');
     } else if (value >= 100 && value <= 180) {
-      return '#24a148';
+      return getColorForGraph('green');
     } else {
-      return '#da1e28';
+      return getColorForGraph('red');
     }
   };
 
@@ -109,17 +110,21 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
         group: 'Fetal Heart Rate',
         color: getFetalHeartRateColor(point.value),
       }));
-    } else {
-      return [
-        { hour: 0, value: 140, group: 'Fetal Heart Rate', time: '0', color: '#24a148' },
-        { hour: 10, value: 140, group: 'Fetal Heart Rate', time: '10', color: '#24a148' },
-      ];
     }
+
+    return [
+      { hour: 0, value: 140, group: 'Fetal Heart Rate', time: '0', color: getColorForGraph('green') },
+      { hour: 10, value: 140, group: 'Fetal Heart Rate', time: '10', color: getColorForGraph('green') },
+      { hour: 20, value: 140, group: 'Fetal Heart Rate', time: '20', color: getColorForGraph('green') },
+      { hour: 30, value: 140, group: 'Fetal Heart Rate', time: '30', color: getColorForGraph('green') },
+      { hour: 40, value: 140, group: 'Fetal Heart Rate', time: '40', color: getColorForGraph('green') },
+      { hour: 50, value: 140, group: 'Fetal Heart Rate', time: '50', color: getColorForGraph('green') },
+      { hour: 60, value: 140, group: 'Fetal Heart Rate', time: '60', color: getColorForGraph('green') },
+    ];
   }, [data]);
-  const chartKey = React.useMemo(() => {
-    return `fetal-heart-rate-chart-${data.length}-${data.map((d) => `${d.hour}-${d.value}`).join(',')}`;
-  }, [data]);
+
   const chartData = enhancedChartData;
+  const chartKey = React.useMemo(() => JSON.stringify(enhancedChartData), [enhancedChartData]);
 
   const chartOptions = {
     title: '',
@@ -130,19 +135,21 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
         scaleType: ScaleTypes.LINEAR,
         domain: [0, 10],
         ticks: {
-          values: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10],
+          values: React.useMemo(() => generateRange(0, 10, 0.5), []),
           formatter: (hour: number) => {
             if (hour === 0) {
               return '0';
-            } else if (hour === 0.5) {
-              return '0:30';
-            } else if (hour % 1 === 0) {
-              return `${hour}:00`;
-            } else if (hour % 1 === 0.5) {
-              return `${Math.floor(hour)}:30`;
-            } else {
-              return `${hour}`;
             }
+            if (hour === 0.5) {
+              return '0:30';
+            }
+            if (hour % 1 === 0) {
+              return `${hour}:00`;
+            }
+            if (hour % 1 === 0.5) {
+              return `${Math.floor(hour)}:30`;
+            }
+            return `${hour}`;
           },
         },
       },
@@ -152,7 +159,7 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
         scaleType: ScaleTypes.LINEAR,
         domain: [80, 200],
         ticks: {
-          values: [80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200],
+          values: React.useMemo(() => generateRange(80, 200, 10), []),
           formatter: (value: number) => `${value}`,
         },
       },

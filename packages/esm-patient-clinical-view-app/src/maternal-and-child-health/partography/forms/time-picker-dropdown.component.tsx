@@ -147,16 +147,7 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
                   value={option.disabled ? '' : option.value}
                   text={option.text}
                   disabled={option.disabled}
-                  style={
-                    option.disabled
-                      ? {
-                          backgroundColor: '#f4f4f4',
-                          color: '#8d8d8d',
-                          fontStyle: 'italic',
-                          cursor: 'not-allowed',
-                        }
-                      : undefined
-                  }
+                  className={option.disabled ? styles.disabledOption : undefined}
                 />
               ))}
             </Select>
