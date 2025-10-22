@@ -126,26 +126,6 @@
       }
     },
     {
-      "name": "in-patient-dashboard-link",
-      "component": "inPatientChartLink",
-      "order": 7,
-      "meta": {
-        "slot": "patient-chart-in-patient-dashboard-slot",
-        "path": "in-patient",
-        "layoutMode": "anchored",
-        "columns": 1,
-        "columnSpan": 1
-      }
-    },
-    {
-      "name": "in-patient-dashboard",
-      "slot": "patient-chart-in-patient-dashboard-slot",
-      "component": "inPatientChartDashboard",
-      "meta": {
-        "fullWidth": false
-      }
-    },
-    {
       "name": "wrap-component-view",
       "slot": "case-management-dashboard-slot",
       "component": "wrapComponent",
@@ -237,6 +217,12 @@
       "name": "case-management-form",
       "component": "caseManagementForm",
       "title": "Case Management Form",
+      "type": "form"
+    },
+    {
+      "name": "add-patient-case-form",
+      "component": "addPatientCaseForm",
+      "title": "Add patient case Form",
       "type": "form"
     },
     {

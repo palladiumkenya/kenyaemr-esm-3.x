@@ -12,7 +12,6 @@ import {
 } from './dashboard/dashboard.meta';
 import { maternalAndChildHealthDashboardMeta } from './maternal-and-child-health/mch-dashboard.meta';
 import { hivCareAndTreatmentDashboardMeta } from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
-import { inPatientMeta } from './in-patient/in-patient.meta';
 
 import ClinicalEncounterDashboard from './clinical-encounter/dashboard/clinical-encounter-dashboard.component';
 import BirthDateCalculator from './relationships/modals/birthdate-calculator.modal';
@@ -37,8 +36,6 @@ import CaseManagementForm from './case-management/workspace/case-management.work
 import CaseEncounterOverviewComponent from './case-management/encounters/case-encounter-overview.component';
 import EndRelationshipWorkspace from './case-management/workspace/case-management-workspace.component';
 
-import InPatient from './in-patient/in-patient.component';
-
 import PeerCalendar from './peer-calendar/peer-calendar.component';
 import PeerForm from './peer-calendar/forms/peer-form.workspace';
 import FormEntryWorkspace from './peer-calendar/forms/form-entry.workspace';
@@ -47,6 +44,7 @@ import { configSchema } from './config-schema';
 import SpecialClinicDashboard from './special-clinics/special-clinic.component';
 import { createDashboardLink as createDashboardLink2 } from './dashboard/createDashboardLink';
 import { createLeftPanelLink } from './left-panel-link.component';
+import PatientCaseForm from './case-management/encounters/patient-case.workspace';
 
 const moduleName = '@kenyaemr/esm-patient-clinical-view-app';
 
@@ -104,18 +102,13 @@ export const partograph = getSyncLifecycle(Partography, options);
 export const caseManagementDashboardLink = getSyncLifecycle(createLeftPanelLink(caseManagementDashboardMeta), options);
 export const wrapComponent = getSyncLifecycle(WrapComponent, options);
 export const caseManagementForm = getSyncLifecycle(CaseManagementForm, options);
+export const addPatientCaseForm = getSyncLifecycle(PatientCaseForm, options);
 export const caseEncounterDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...caseEncounterDashboardMeta, icon: 'omrs-icon-add' }),
   options,
 );
 export const caseEncounterTable = getSyncLifecycle(CaseEncounterOverviewComponent, options);
 export const endRelationshipWorkspace = getSyncLifecycle(EndRelationshipWorkspace, options);
-
-export const inPatientChartLink = getSyncLifecycle(
-  createDashboardLink({ ...inPatientMeta, icon: 'omrs-icon-activity' }),
-  options,
-);
-export const inPatientChartDashboard = getSyncLifecycle(InPatient, options);
 
 export const specialClinicsDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...specialClinicsDashboardMeta, icon: 'omrs-icon-activity' }),

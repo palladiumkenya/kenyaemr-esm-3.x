@@ -17,9 +17,10 @@
   "labManifestApp": "የላብራቶሪ ማኒፌስት መተግበሪያ",
   "legacyAdmin": "Legacy Admin",
   "manageStocks": "አክሲዮኖችን አስተዳድር",
+  "referrals": "ሪፈራሎች",
   "reports": "ሪፖርቶች",
   "search": "ሞጁል ፈልግ",
-  "serviceQueuesAdmin": "Service Queues Admin",
+  "serviceQueuesAdmin": "የመምሪያ ዘዴዎች አስተዳደር",
   "suppliesDispensing": "አቅርቦቶች ማከፋፈል",
   "systemInfo": "የስርዓት መረጃ"
 }
