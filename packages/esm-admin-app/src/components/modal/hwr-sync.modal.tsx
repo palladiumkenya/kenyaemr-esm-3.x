@@ -6,7 +6,7 @@ import { useConfig, showSnackbar, formatDate, parseDate, showToast, restBaseUrl 
 import { mutate } from 'swr';
 import { CustomHIEPractitionerResponse, type PractitionerResponse, type ProviderResponse } from '../../types';
 import { ConfigObject } from '../../config-schema';
-import { searchHealthCareWork } from '../hook/searchHealthCareWork';
+import { searchHealthCareWork, HealthWorkerAdapter } from '../hook/healthWorkerAdapter';
 import { createProviderAttribute, updateProviderAttributes } from './hwr-sync.resource';
 
 interface HWRSyncModalProps {
@@ -71,57 +71,43 @@ const HWRSyncModal: React.FC<HWRSyncModalProps> = ({ close, provider }) => {
   const handleSync = async () => {
     try {
       setSyncLoading(true);
-      const healthWorker: CustomHIEPractitionerResponse = await searchHealthCareWork(
+      const unifiedResponse = await searchHealthCareWork(
         searchHWR.identifierType,
         searchHWR.identifier,
         searchHWR.regulator,
       );
 
-      if (!healthWorker?.message) {
+      const normalizedData = HealthWorkerAdapter.normalize(unifiedResponse);
+
+      if (!normalizedData) {
         throw new Error(t('noResults', 'No results found'));
       }
 
-      const { membership, licenses, contacts, identifiers } = healthWorker.message;
-
-      const mostRecentLicense = licenses
-        ?.filter((l) => l.license_end)
-        .sort((a, b) => new Date(b.license_end).getTime() - new Date(a.license_end).getTime())[0];
-
-      const extractedAttributes = {
-        licenseNumber: membership.external_reference_id,
-        regNumber: membership.registration_id,
-        licenseDate: mostRecentLicense?.license_end ? formatDate(new Date(mostRecentLicense.license_end)) : null,
-        phoneNumber: contacts.phone,
-        email: contacts.email,
-        qualification: membership.specialty,
-        nationalId: identifiers.identification_number,
-        providerUniqueIdentifier: membership.id,
-      };
-
       const updatableAttributes = [
-        { attributeType: licenseNumberUuid, value: extractedAttributes.licenseNumber },
-        { attributeType: licenseBodyUuid, value: extractedAttributes.regNumber },
+        { attributeType: licenseNumberUuid, value: normalizedData.licenseNumber },
+        { attributeType: licenseBodyUuid, value: normalizedData.registrationId },
         {
           attributeType: licenseExpiryDateUuid,
-          value: extractedAttributes.licenseDate ? parseDate(extractedAttributes.licenseDate) : null,
+          value: normalizedData.licenseEndDate ? parseDate(normalizedData.licenseEndDate) : null,
         },
-        { attributeType: phoneNumberUuid, value: extractedAttributes.phoneNumber },
-        { attributeType: qualificationUuid, value: extractedAttributes.qualification },
+        { attributeType: phoneNumberUuid, value: normalizedData.phoneNumber },
+        { attributeType: qualificationUuid, value: normalizedData.qualification },
         {
           attributeType: providerHieFhirReference,
           value: JSON.stringify({
-            ...healthWorker,
+            ...unifiedResponse.data,
+            fhirFormat: unifiedResponse.fhirFormat,
             searchParameters: {
               regulator: searchHWR.regulator,
               identifierType: searchHWR.identifierType,
             },
           }),
         },
-        { attributeType: providerAddressUuid, value: extractedAttributes.email },
-        { attributeType: providerNationalIdUuid, value: extractedAttributes.nationalId },
+        { attributeType: providerAddressUuid, value: normalizedData.email },
+        { attributeType: providerNationalIdUuid, value: normalizedData.nationalId },
         {
           attributeType: providerUniqueIdentifierAttributeTypeUuid,
-          value: extractedAttributes.providerUniqueIdentifier,
+          value: normalizedData.providerUniqueIdentifier,
         },
       ].filter((attr) => attr.value !== undefined && attr.value !== null && attr.value !== '');
 
