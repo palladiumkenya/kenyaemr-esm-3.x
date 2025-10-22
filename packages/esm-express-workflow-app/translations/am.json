@@ -60,6 +60,7 @@
   "invalidPhoneNumber": "እባክዎ ትክክለኛ የስልክ ቁጥር ያስገቡ",
   "investigationStatus": "የምርመራ ሁኔታ",
   "laboratoryOrders": "የላቦራቶሪ ትዕዛዞች",
+  "labResults": "የላብራቶሪ ውጤቶች",
   "loadingDashboard": "የዳሽቦርድ መረጃ እየተጫነ ነው...",
   "loadingPatient": "ሕመምተኛ እየተጫነ ነው...",
   "loadingQueueEntries": "የጥበቃ ዝርዝር እየተጫነ ነው...",
