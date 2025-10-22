@@ -1,9 +1,17 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatDatetime, parseDate, useConfig, ErrorState } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig, ErrorState, ExtensionSlot } from '@openmrs/esm-framework';
 import { CardHeader, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import { Tabs, TabList, Tab, TabPanels, TabPanel, Button, TabsSkeleton } from '@carbon/react';
-import { CloudMonitoring, IbmWatsonDiscovery, Dashboard, Stethoscope, Add, Edit } from '@carbon/react/icons';
+import {
+  CloudMonitoring,
+  IbmWatsonDiscovery,
+  Dashboard,
+  Stethoscope,
+  Add,
+  Edit,
+  DocumentMultiple_02,
+} from '@carbon/react/icons';
 
 import { extractValueFromObs, useClinicalEncounterForm, usePatientEncounter } from '../../../hooks/usePatientEncounter';
 import styles from './encounter-details.scss';
@@ -12,10 +20,12 @@ import { ExpressWorkflowConfig } from '../../../config-schema';
 
 type EncounterDetailsProps = {
   patientUuid: string;
+  patient?: fhir.Patient;
 };
 
-const EncounterDetails: React.FC<EncounterDetailsProps> = ({ patientUuid }) => {
+const EncounterDetails: React.FC<EncounterDetailsProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
+  const state = useMemo(() => ({ patientUuid, patient, basePath: 'clinical-encounter' }), [patientUuid, patient]);
   const {
     clinicalEncounter: { encounterTypeUuid },
   } = useConfig<ExpressWorkflowConfig>();
@@ -73,6 +83,7 @@ const EncounterDetails: React.FC<EncounterDetailsProps> = ({ patientUuid }) => {
           <Tab renderIcon={CloudMonitoring}>{t('patientHistory', 'Patient History')}</Tab>
           <Tab renderIcon={Stethoscope}>{t('patientExamination', 'Patient Examination')}</Tab>
           <Tab renderIcon={IbmWatsonDiscovery}>{t('patientManagement', 'Patient Management')}</Tab>
+          <Tab renderIcon={DocumentMultiple_02}>{t('labResults', 'Lab Results')}</Tab>
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -118,6 +129,9 @@ const EncounterDetails: React.FC<EncounterDetailsProps> = ({ patientUuid }) => {
               title={t('patientManagement', 'Patient Management')}
               cardItems={observationsBySection['Patient Management'] || []}
             />
+          </TabPanel>
+          <TabPanel>
+            <ExtensionSlot name="ewf-clinical-encounter-lab-results-slot" state={state} />
           </TabPanel>
         </TabPanels>
       </Tabs>
