@@ -12,7 +12,6 @@ import {
 } from './dashboard/dashboard.meta';
 import { maternalAndChildHealthDashboardMeta } from './maternal-and-child-health/mch-dashboard.meta';
 import { hivCareAndTreatmentDashboardMeta } from './specialized-clinics/hiv-care-and-treatment-services/hiv-care-and-treatment-dashboard.meta';
-import { inPatientMeta } from './in-patient/in-patient.meta';
 
 import ClinicalEncounterDashboard from './clinical-encounter/dashboard/clinical-encounter-dashboard.component';
 import BirthDateCalculator from './relationships/modals/birthdate-calculator.modal';
@@ -36,8 +35,6 @@ import WrapComponent from './case-management/wrap/wrap.component';
 import CaseManagementForm from './case-management/workspace/case-management.workspace';
 import CaseEncounterOverviewComponent from './case-management/encounters/case-encounter-overview.component';
 import EndRelationshipWorkspace from './case-management/workspace/case-management-workspace.component';
-
-import InPatient from './in-patient/in-patient.component';
 
 import PeerCalendar from './peer-calendar/peer-calendar.component';
 import PeerForm from './peer-calendar/forms/peer-form.workspace';
@@ -112,12 +109,6 @@ export const caseEncounterDashboardLink = getSyncLifecycle(
 );
 export const caseEncounterTable = getSyncLifecycle(CaseEncounterOverviewComponent, options);
 export const endRelationshipWorkspace = getSyncLifecycle(EndRelationshipWorkspace, options);
-
-export const inPatientChartLink = getSyncLifecycle(
-  createDashboardLink({ ...inPatientMeta, icon: 'omrs-icon-activity' }),
-  options,
-);
-export const inPatientChartDashboard = getSyncLifecycle(InPatient, options);
 
 export const specialClinicsDashboardLink = getSyncLifecycle(
   createDashboardLink({ ...specialClinicsDashboardMeta, icon: 'omrs-icon-activity' }),
