@@ -30,6 +30,7 @@ export * from './components/laboratory';
 export * from './components/radiology-and-imaging';
 export * from './components/procedures';
 export * from './components/admissions';
+export * from './components/appointments';
 
 export const root = getAsyncLifecycle(() => import('./root.component'), options);
 export const otpVerificationModal = getAsyncLifecycle(

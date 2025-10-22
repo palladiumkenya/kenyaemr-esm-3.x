@@ -1,8 +1,10 @@
 {
   "administration": "አስተዳደር",
   "adrAssessment": "የኤዲአር ግምገማ",
+  "appointments": "Appointments",
   "bedManagement": "የአልጋ አስተዳደር",
   "billingAdmin": "Billing Admin",
+  "caseManagement": "Case Management",
   "clearCache": "መሸጎጫ አጽዳ",
   "clearSearch": "ፍለጋ አጽዳ",
   "crossBorder": "ድንበር ተሻጋሪ",
