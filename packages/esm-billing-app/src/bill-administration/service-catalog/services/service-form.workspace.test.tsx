@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ServiceForm from './service-form.workspace';
-import { createBillableService, useConceptsSearch, useServiceTypes } from '../../billable-service.resource';
+import { createBillableService, useConceptsSearch, useServiceTypes } from '../billable-service.resource';
 import { usePaymentModes } from '../../../billing.resource';
 
 const mockUseConceptsSearch = useConceptsSearch as jest.MockedFunction<typeof useConceptsSearch>;
@@ -137,7 +137,7 @@ const mockPaymentModes = {
   mutate: jest.fn(),
 };
 
-jest.mock('../../billable-service.resource', () => ({
+jest.mock('../billable-service.resource', () => ({
   useConceptsSearch: jest.fn(),
   useServiceTypes: jest.fn(),
   createBillableService: jest.fn(),
