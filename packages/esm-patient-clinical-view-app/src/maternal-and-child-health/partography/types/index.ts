@@ -1,48 +1,145 @@
+import {
+  configSchema,
+  MOULDING_NONE_CONCEPT,
+  MOULDING_SLIGHT_CONCEPT,
+  MOULDING_MODERATE_CONCEPT,
+  MOULDING_SEVERE_CONCEPT,
+  CERVIX_CONCEPT,
+  FETAL_HEART_RATE_CONCEPT,
+  FETAL_HEART_RATE_HOUR_CONCEPT,
+  DESCENT_OF_HEAD_CONCEPT,
+  UTERINE_CONTRACTIONS_CONCEPT,
+  UTERINE_CONTRACTION_FREQUENCY_CONCEPT,
+  UTERINE_CONTRACTION_DURATION_CONCEPT,
+  MATERNAL_PULSE_CONCEPT,
+  ROUTE_CONCEPT,
+  FREQUENCY_CONCEPT,
+  SYSTOLIC_BP_CONCEPT,
+  DIASTOLIC_BP_CONCEPT,
+  TEMPERATURE_CONCEPT,
+  PROTEIN_LEVEL_CONCEPT,
+  GLUCOSE_LEVEL_CONCEPT,
+  KETONE_LEVEL_CONCEPT,
+  URINE_VOLUME_CONCEPT,
+  CONTRACTION_COUNT_CONCEPT,
+  URINE_CHARACTERISTICS_CONCEPT,
+  MEDICATION_CONCEPT,
+  MEDICATION_NAME_CONCEPT,
+  OXYTOCIN_DOSE_CONCEPT,
+  IV_FLUIDS_CONCEPT,
+  DOSAGE_CONCEPT,
+  DRUG_DOSE_CONCEPT,
+  EVENT_TYPE_CONCEPT,
+  EVENT_DESCRIPTION_CONCEPT,
+  AMNIOTIC_FLUID_CONCEPT,
+  MOULDING_CONCEPT,
+  BLOOD_GROUP_CONCEPT,
+  TIME_SLOT_CONCEPT,
+  LABOR_PATTERN_CONCEPT,
+  HOURS_SINCE_RUPTURE_CONCEPT,
+  RUPTURED_MEMBRANES_CONCEPT,
+  DATE_OF_ADMISSION_CONCEPT,
+  GESTATION_WEEKS_CONCEPT,
+  ESTIMATED_DELIVERY_DATE_CONCEPT,
+  LAST_MENSTRUAL_PERIOD_CONCEPT,
+  AMNIOTIC_CLEAR_LIQUOR_CONCEPT,
+  AMNIOTIC_MECONIUM_STAINED_CONCEPT,
+  AMNIOTIC_ABSENT_CONCEPT,
+  AMNIOTIC_BLOOD_STAINED_CONCEPT,
+  STATION_0_CONCEPT,
+  STATION_1_CONCEPT,
+  STATION_2_CONCEPT,
+  STATION_3_CONCEPT,
+  STATION_4_CONCEPT,
+  STATION_5_CONCEPT,
+  PULSE_BP_TIME_CONCEPT,
+  FETAL_HEART_RATE_TIME_CONCEPT,
+  CONTRACTION_LEVEL_MILD_CONCEPT,
+  CONTRACTION_LEVEL_MODERATE_CONCEPT,
+  CONTRACTION_LEVEL_STRONG_CONCEPT,
+} from '../../../config-schema';
+
+const _CODE_TO_PLUS_MAP: Record<string, string> = {
+  [MOULDING_NONE_CONCEPT]: '0',
+  '0': '0',
+  [MOULDING_SLIGHT_CONCEPT]: '+',
+  '+': '+',
+  [MOULDING_MODERATE_CONCEPT]: '++',
+  '++': '++',
+  [MOULDING_SEVERE_CONCEPT]: '+++',
+  '+++': '+++',
+};
+
+export const codeToPlus = (raw?: string): string => {
+  const key = (raw ?? '').toString().trim();
+  return _CODE_TO_PLUS_MAP[key] ?? raw ?? '';
+};
+const _partoConcepts = (configSchema as any)?.partography?._default?.conceptUuids ?? {};
+
 export const PARTOGRAPHY_CONCEPTS = {
-  'fetal-heart-rate': '1440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'cervical-dilation': '162261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'descent-of-head': '1810AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'uterine-contractions': '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'uterine-contraction-frequency': '166529AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'uterine-contraction-duration': '159368AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'maternal-pulse': '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'systolic-bp': '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'diastolic-bp': '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  temperature: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'protein-level': '161442AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'glucose-level': '887AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'ketone-level': '165438AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'urine-volume': '159660AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'urine-characteristics': '56AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  medication: '1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'medication-name': '164231AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'oxytocin-dose': '166531AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'iv-fluids': '161911AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  dosage: '1443AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'event-type': '162879AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'event-description': '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'amniotic-fluid': '162653AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  moulding: '166527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'blood-group': '300AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'time-slot': '163286AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'labor-pattern': '164135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'hours-since-rupture': '167149AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'ruptured-membranes': '164900AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'date-of-admission': '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'gestation-weeks': '1789AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'estimated-delivery-date': '5596AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-  'last-menstrual-period': '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  cervix: _partoConcepts.cervix ?? CERVIX_CONCEPT,
+  'fetal-heart-rate': _partoConcepts['fetal-heart-rate'] ?? FETAL_HEART_RATE_CONCEPT,
+  'fetal-heart-rate-hour': _partoConcepts['fetal-heart-rate-hour'] ?? FETAL_HEART_RATE_HOUR_CONCEPT,
+  'fetal-heart-rate-time': _partoConcepts['fetal-heart-rate-time'] ?? FETAL_HEART_RATE_TIME_CONCEPT,
+
+  'cervical-dilation': _partoConcepts['cervical-dilation'] ?? CERVIX_CONCEPT,
+  'descent-of-head': _partoConcepts['descent-of-head'] ?? DESCENT_OF_HEAD_CONCEPT,
+  'uterine-contractions': _partoConcepts['uterine-contractions'] ?? UTERINE_CONTRACTIONS_CONCEPT,
+  'uterine-contraction-frequency':
+    _partoConcepts['uterine-contraction-frequency'] ?? UTERINE_CONTRACTION_FREQUENCY_CONCEPT,
+  'uterine-contraction-duration':
+    _partoConcepts['uterine-contraction-duration'] ?? UTERINE_CONTRACTION_DURATION_CONCEPT,
+  'maternal-pulse': _partoConcepts['maternal-pulse'] ?? MATERNAL_PULSE_CONCEPT,
+  'systolic-bp': _partoConcepts['systolic-bp'] ?? SYSTOLIC_BP_CONCEPT,
+  'diastolic-bp': _partoConcepts['diastolic-bp'] ?? DIASTOLIC_BP_CONCEPT,
+  temperature: _partoConcepts.temperature ?? TEMPERATURE_CONCEPT,
+  'protein-level': _partoConcepts['protein-level'] ?? PROTEIN_LEVEL_CONCEPT,
+  'glucose-level': _partoConcepts['glucose-level'] ?? GLUCOSE_LEVEL_CONCEPT,
+  'ketone-level': _partoConcepts['ketone-level'] ?? KETONE_LEVEL_CONCEPT,
+  'urine-volume': _partoConcepts['urine-volume'] ?? URINE_VOLUME_CONCEPT,
+  'contraction-count': _partoConcepts['contraction-count'] ?? CONTRACTION_COUNT_CONCEPT,
+  'urine-characteristics': _partoConcepts['urine-characteristics'] ?? URINE_CHARACTERISTICS_CONCEPT,
+  medication: _partoConcepts.medication ?? MEDICATION_CONCEPT,
+  'medication-name': _partoConcepts['medication-name'] ?? MEDICATION_NAME_CONCEPT,
+  'oxytocin-dose': _partoConcepts['oxytocin-dose'] ?? OXYTOCIN_DOSE_CONCEPT,
+  'iv-fluids': _partoConcepts['iv-fluids'] ?? IV_FLUIDS_CONCEPT,
+  dosage: _partoConcepts.dosage ?? DOSAGE_CONCEPT,
+  route: _partoConcepts.route ?? ROUTE_CONCEPT,
+  frequency: _partoConcepts.frequency ?? FREQUENCY_CONCEPT,
+  'drug-dose': _partoConcepts['drug-dose'] ?? DRUG_DOSE_CONCEPT,
+  'event-type': _partoConcepts['event-type'] ?? EVENT_TYPE_CONCEPT,
+  'event-description': _partoConcepts['event-description'] ?? EVENT_DESCRIPTION_CONCEPT,
+  'amniotic-fluid': _partoConcepts['amniotic-fluid'] ?? AMNIOTIC_FLUID_CONCEPT,
+  moulding: _partoConcepts.moulding ?? MOULDING_CONCEPT,
+  'blood-group': _partoConcepts['blood-group'] ?? BLOOD_GROUP_CONCEPT,
+  'time-slot': _partoConcepts['time-slot'] ?? TIME_SLOT_CONCEPT,
+  'pulse-time-slot': _partoConcepts['pulse-time-slot'] ?? PULSE_BP_TIME_CONCEPT,
+  'labor-pattern': _partoConcepts['labor-pattern'] ?? LABOR_PATTERN_CONCEPT,
+  'hours-since-rupture': _partoConcepts['hours-since-rupture'] ?? HOURS_SINCE_RUPTURE_CONCEPT,
+  'ruptured-membranes': _partoConcepts['ruptured-membranes'] ?? RUPTURED_MEMBRANES_CONCEPT,
+  'date-of-admission': _partoConcepts['date-of-admission'] ?? DATE_OF_ADMISSION_CONCEPT,
+  'gestation-weeks': _partoConcepts['gestation-weeks'] ?? GESTATION_WEEKS_CONCEPT,
+  'estimated-delivery-date': _partoConcepts['estimated-delivery-date'] ?? ESTIMATED_DELIVERY_DATE_CONCEPT,
+  'last-menstrual-period': _partoConcepts['last-menstrual-period'] ?? LAST_MENSTRUAL_PERIOD_CONCEPT,
 } as const;
 
-export const MCH_PARTOGRAPHY_ENCOUNTER_UUID = '022d62af-e2a5-4282-953b-52dd5cba3296';
+const _partoUuids = (configSchema as any)?.partography?._default?.uuids ?? {};
+
+export const MCH_PARTOGRAPHY_ENCOUNTER_UUID =
+  _partoUuids.mchPartographyEncounterUuid ?? '022d62af-e2a5-4282-953b-52dd5cba3296';
+
+export const CONTRACTION_STRONG_UUID =
+  _partoUuids.contractionStrongConceptUuid ?? '4b90b73a-ad11-4650-91b0-baea131974e0';
 
 export const PARTOGRAPHY_GRAPH_TYPES = [
+  'cervix',
   'fetal-heart-rate',
   'cervical-dilation',
   'descent-of-head',
   'uterine-contractions',
   'maternal-pulse',
   'blood-pressure',
+  'pulse-bp-combined',
   'temperature',
   'urine-analysis',
   'drugs-fluids',
@@ -50,7 +147,14 @@ export const PARTOGRAPHY_GRAPH_TYPES = [
 ] as const;
 
 export const PARTOGRAPHY_ENCOUNTER_TYPES = Object.fromEntries(
-  PARTOGRAPHY_GRAPH_TYPES.map((type) => [type, MCH_PARTOGRAPHY_ENCOUNTER_UUID]),
+  PARTOGRAPHY_GRAPH_TYPES.map((type) => [
+    type,
+    type === 'drugs-fluids'
+      ? _partoUuids.drugsFluidsEncounterUuid ?? '39da3525-afe4-45ff-8977-c53b7b359158'
+      : type === 'pulse-bp-combined'
+      ? MCH_PARTOGRAPHY_ENCOUNTER_UUID
+      : MCH_PARTOGRAPHY_ENCOUNTER_UUID,
+  ]),
 ) as Record<(typeof PARTOGRAPHY_GRAPH_TYPES)[number], string>;
 
 export interface OpenMRSResponse<T> {
@@ -100,6 +204,7 @@ export interface PartographyGraph {
 }
 
 export const PARTOGRAPHY_UNITS = {
+  cervix: 'cm',
   'fetal-heart-rate': 'BPM',
   'cervical-dilation': 'cm',
   'descent-of-head': 'Station',
@@ -113,6 +218,7 @@ export const PARTOGRAPHY_UNITS = {
 } as const;
 
 export const PARTOGRAPHY_NORMAL_RANGES = {
+  cervix: '1-10 cm',
   'fetal-heart-rate': '110-160 BPM',
   'cervical-dilation': '0-10 cm',
   'descent-of-head': '-3 to +3',
@@ -126,6 +232,7 @@ export const PARTOGRAPHY_NORMAL_RANGES = {
 } as const;
 
 export const PARTOGRAPHY_COLORS = {
+  cervix: 'blue',
   'fetal-heart-rate': 'red',
   'cervical-dilation': 'blue',
   'descent-of-head': 'green',
@@ -139,6 +246,7 @@ export const PARTOGRAPHY_COLORS = {
 } as const;
 
 export const PARTOGRAPHY_Y_RANGES = {
+  cervix: { min: 1, max: 10 },
   'fetal-heart-rate': { min: 80, max: 200 },
   'cervical-dilation': { min: 0, max: 10 },
   'descent-of-head': { min: -4, max: 4 },
@@ -185,6 +293,18 @@ export const getPartographyYRange = (graphType: PartographyGraphType): { min: nu
 };
 
 export const PARTOGRAPHY_GRAPH_CONFIGS: PartographyGraph[] = [
+  {
+    id: 'cervix',
+    titleKey: 'cervix',
+    titleDefault: 'Cervix',
+    descriptionKey: 'cervixDesc',
+    descriptionDefault: 'Cervical monitoring during labor',
+    yAxisLabel: 'cm',
+    normalRange: '1-10 cm',
+    color: 'blue',
+    yMin: 1,
+    yMax: 10,
+  },
   {
     id: 'fetal-heart-rate',
     titleKey: 'fetalHeartRate',
@@ -308,7 +428,9 @@ export const PARTOGRAPHY_GRAPH_CONFIGS: PartographyGraph[] = [
 ];
 
 export const getTranslatedPartographyGraphs = (t: (key: string, fallback: string) => string) => {
-  return PARTOGRAPHY_GRAPH_CONFIGS.map((config) => ({
+  const cervixOnlyConfigs = PARTOGRAPHY_GRAPH_CONFIGS.filter((config) => config.id === 'cervix');
+
+  return cervixOnlyConfigs.map((config) => ({
     id: config.id,
     title: t(config.titleKey, config.titleDefault),
     description: t(config.descriptionKey, config.descriptionDefault),
@@ -330,54 +452,55 @@ export const getColorForGraph = (colorName: string): string => {
   return PARTOGRAPHY_COLOR_MAPPINGS[colorName as keyof typeof PARTOGRAPHY_COLOR_MAPPINGS] || '#525252';
 };
 
-// Concept UUID mappings for form options
 export const FORM_OPTION_CONCEPTS = {
-  // Amniotic fluid concepts
   AMNIOTIC_FLUID: {
-    MEMBRANE_INTACT: PARTOGRAPHY_CONCEPTS['amniotic-fluid'], // '162653AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
-    CLEAR_LIQUOR: '159484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    MECONIUM_STAINED: '134488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    ABSENT: '163747AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    BLOOD_STAINED: '1077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    MEMBRANE_INTACT: PARTOGRAPHY_CONCEPTS['amniotic-fluid'],
+    CLEAR_LIQUOR:
+      (configSchema as any)?.partography?._default?.conceptUuids?.['amniotic-clear-liquor'] ??
+      AMNIOTIC_CLEAR_LIQUOR_CONCEPT,
+    MECONIUM_STAINED:
+      (configSchema as any)?.partography?._default?.conceptUuids?.['amniotic-meconium-stained'] ??
+      AMNIOTIC_MECONIUM_STAINED_CONCEPT,
+    ABSENT: (configSchema as any)?.partography?._default?.conceptUuids?.['amniotic-absent'] ?? AMNIOTIC_ABSENT_CONCEPT,
+    BLOOD_STAINED:
+      (configSchema as any)?.partography?._default?.conceptUuids?.['amniotic-blood-stained'] ??
+      AMNIOTIC_BLOOD_STAINED_CONCEPT,
   },
 
-  // Moulding concepts
   MOULDING: {
-    NONE: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    SLIGHT: '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    MODERATE: '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    SEVERE: '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    NONE: (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-none'] ?? MOULDING_NONE_CONCEPT,
+    SLIGHT: (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-slight'] ?? MOULDING_SLIGHT_CONCEPT,
+    MODERATE:
+      (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-moderate'] ?? MOULDING_MODERATE_CONCEPT,
+    SEVERE: (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-severe'] ?? MOULDING_SEVERE_CONCEPT,
   },
 
-  // Descent of head station concepts
   DESCENT_STATION: {
-    ZERO_FIFTHS: '160769AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    ONE_FIFTH: '162135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    TWO_FIFTHS: '166065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    THREE_FIFTHS: '166066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    FOUR_FIFTHS: '166067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    FIVE_FIFTHS: '163734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    ZERO_FIFTHS: (configSchema as any)?.partography?._default?.conceptUuids?.['station-0'] ?? STATION_0_CONCEPT,
+    ONE_FIFTH: (configSchema as any)?.partography?._default?.conceptUuids?.['station-1'] ?? STATION_1_CONCEPT,
+    TWO_FIFTHS: (configSchema as any)?.partography?._default?.conceptUuids?.['station-2'] ?? STATION_2_CONCEPT,
+    THREE_FIFTHS: (configSchema as any)?.partography?._default?.conceptUuids?.['station-3'] ?? STATION_3_CONCEPT,
+    FOUR_FIFTHS: (configSchema as any)?.partography?._default?.conceptUuids?.['station-4'] ?? STATION_4_CONCEPT,
+    FIVE_FIFTHS: (configSchema as any)?.partography?._default?.conceptUuids?.['station-5'] ?? STATION_5_CONCEPT,
   },
 
-  // Contraction intensity concepts
   CONTRACTION_INTENSITY: {
-    MILD: PARTOGRAPHY_CONCEPTS['uterine-contractions'],
-    MODERATE: PARTOGRAPHY_CONCEPTS['uterine-contractions'],
-    STRONG: PARTOGRAPHY_CONCEPTS['uterine-contractions'],
+    MILD: CONTRACTION_LEVEL_MILD_CONCEPT,
+    MODERATE: CONTRACTION_LEVEL_MODERATE_CONCEPT,
+    STRONG: CONTRACTION_LEVEL_STRONG_CONCEPT,
   },
 
-  // Urine analysis level concepts
   URINE_LEVELS: {
-    NEGATIVE: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    TRACE: '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    POSITIVE_PLUS: '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    POSITIVE_PLUS_PLUS: '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    NEGATIVE: (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-none'] ?? MOULDING_NONE_CONCEPT,
+    TRACE: (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-slight'] ?? MOULDING_SLIGHT_CONCEPT,
+    POSITIVE_PLUS:
+      (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-moderate'] ?? MOULDING_MODERATE_CONCEPT,
+    POSITIVE_PLUS_PLUS:
+      (configSchema as any)?.partography?._default?.conceptUuids?.['moulding-severe'] ?? MOULDING_SEVERE_CONCEPT,
   },
 
-  // Blood group concept (single concept, different values)
   BLOOD_GROUP: PARTOGRAPHY_CONCEPTS['blood-group'],
 
-  // Event type concepts
   EVENT_TYPES: {
     MEMBRANE_RUPTURE: PARTOGRAPHY_CONCEPTS['event-type'],
     LABOR_ONSET: PARTOGRAPHY_CONCEPTS['event-type'],
@@ -389,7 +512,6 @@ export const FORM_OPTION_CONCEPTS = {
   },
 } as const;
 
-// Form option configurations using concepts
 export const AMNIOTIC_FLUID_OPTIONS = [
   { value: '', text: 'chooseAnOption', conceptUuid: '' },
   {
@@ -445,6 +567,30 @@ export const MOULDING_OPTIONS = [
     display: '+++',
     conceptUuid: FORM_OPTION_CONCEPTS.MOULDING.SEVERE,
   },
+] as const;
+
+export const ROUTE_OPTIONS = [
+  { id: 'oral', text: 'Oral' },
+  { id: 'iv', text: 'Intravenous (IV)' },
+  { id: 'im', text: 'Intramuscular (IM)' },
+  { id: 'sc', text: 'Subcutaneous (SC)' },
+  { id: 'topical', text: 'Topical' },
+  { id: 'inhalation', text: 'Inhalation' },
+  { id: 'other', text: 'Other' },
+] as const;
+
+export const FREQUENCY_OPTIONS = [
+  { id: 'stat', text: 'STAT (immediately)' },
+  { id: 'od', text: 'Once daily (OD)' },
+  { id: 'bd', text: 'Twice daily (BD)' },
+  { id: 'tds', text: 'Three times daily (TDS)' },
+  { id: 'qds', text: 'Four times daily (QDS)' },
+  { id: 'q4h', text: 'Every 4 hours' },
+  { id: 'q6h', text: 'Every 6 hours' },
+  { id: 'q8h', text: 'Every 8 hours' },
+  { id: 'q12h', text: 'Every 12 hours' },
+  { id: 'prn', text: 'As needed (PRN)' },
+  { id: 'other', text: 'Other' },
 ] as const;
 
 export const DESCENT_OF_HEAD_OPTIONS = [
@@ -546,6 +692,23 @@ export const TIME_SLOT_OPTIONS = [
   { value: 'night', text: 'night', conceptUuid: PARTOGRAPHY_CONCEPTS['time-slot'] },
 ] as const;
 
+export const MEMBRANE_TIME_SLOT_OPTIONS = [
+  { value: '16:00', label: '16:00' },
+  { value: '17:00', label: '17:00' },
+  { value: '18:00', label: '18:00' },
+  { value: '19:00', label: '19:00' },
+  { value: '20:00', label: '20:00' },
+  { value: '21:00', label: '21:00' },
+  { value: '22:00', label: '22:00' },
+  { value: '23:00', label: '23:00' },
+  { value: '00:00', label: '00:00' },
+  { value: '01:00', label: '01:00' },
+  { value: '02:00', label: '02:00' },
+  { value: '03:00', label: '03:00' },
+  { value: '04:00', label: '04:00' },
+  { value: '05:00', label: '05:00' },
+] as const;
+
 export const EVENT_TYPE_OPTIONS = [
   { value: '', text: 'selectEventType', conceptUuid: '' },
   {
@@ -565,7 +728,6 @@ export const EVENT_TYPE_OPTIONS = [
   { value: 'other', text: 'other', conceptUuid: FORM_OPTION_CONCEPTS.EVENT_TYPES.OTHER },
 ] as const;
 
-// Mapping functions
 export const getDescentStationMapping = () => {
   const mapping: Record<string, number> = {};
   DESCENT_OF_HEAD_OPTIONS.forEach((option) => {
@@ -576,8 +738,8 @@ export const getDescentStationMapping = () => {
   return mapping;
 };
 
-// Configurable input validation ranges
 export const VALIDATION_RANGES = {
+  CERVIX: { min: 1, max: 10, normal: { min: 1, max: 10 }, step: 0.5 },
   FETAL_HEART_RATE: { min: 80, max: 200, normal: { min: 110, max: 160 }, step: 1 },
   CERVICAL_DILATION: { min: 0, max: 10, normal: { min: 0, max: 10 }, step: 0.5 },
   MATERNAL_PULSE: { min: 40, max: 140, normal: { min: 60, max: 100 }, step: 1 },
@@ -587,8 +749,12 @@ export const VALIDATION_RANGES = {
   UTERINE_CONTRACTIONS: { min: 0, max: 10, normal: { min: 2, max: 5 }, step: 1 },
 } as const;
 
-// Input ranges mapped to graph types
 export const INPUT_RANGES = {
+  cervix: {
+    ...VALIDATION_RANGES.CERVIX,
+    placeholderKey: 'cervixPlaceholder',
+    conceptUuid: PARTOGRAPHY_CONCEPTS['cervix'],
+  },
   'fetal-heart-rate': {
     ...VALIDATION_RANGES.FETAL_HEART_RATE,
     placeholderKey: 'fetalHeartRatePlaceholder',
@@ -626,7 +792,6 @@ export const INPUT_RANGES = {
   },
 } as const;
 
-// Configurable form validation helpers
 export const createRangeValidator = (rangeName: keyof typeof VALIDATION_RANGES) => {
   const range = VALIDATION_RANGES[rangeName];
   return (value: string | number): boolean => {
@@ -689,9 +854,8 @@ export const isValidMeasurement = (graphType: string, value: string): boolean =>
       return value.trim() !== '';
   }
 };
-
-// Measurement label mappings
 export const MEASUREMENT_LABELS = {
+  cervix: { key: 'cervicalDilation', default: 'Cervical Dilation' },
   'fetal-heart-rate': { key: 'fetalHeartRate', default: 'Foetal Heart Rate' },
   'cervical-dilation': { key: 'membraneAmnioticFluidMoulding', default: 'Membrane Amniotic Fluid & Moulding' },
   'descent-of-head': { key: 'descentOfHead', default: 'Descent of Head' },
@@ -704,10 +868,7 @@ export const MEASUREMENT_LABELS = {
   'progress-events': { key: 'progressEvents', default: 'Progress & Events' },
 } as const;
 
-// Get measurement label function
-// Field label mappings for all form inputs
 export const FIELD_LABELS = {
-  // Number input labels
   fetalHeartRate: { key: 'fetalHeartRate', default: 'Fetal Heart Rate (BPM)' },
   cervicalDilation: { key: 'cervicalDilation', default: 'Cervical Dilation (cm)' },
   maternalPulse: { key: 'maternalPulse', default: 'Maternal Pulse (BPM)' },
@@ -715,8 +876,6 @@ export const FIELD_LABELS = {
   diastolic: { key: 'diastolic', default: 'Diastolic (mmHg)' },
   temperature: { key: 'temperature', default: 'Temperature (°C)' },
   frequency: { key: 'frequency', default: 'Frequency (per 10min)' },
-
-  // Select field labels
   amnioticFluid: { key: 'amnioticFluid', default: 'Amniotic Fluid' },
   moulding: { key: 'moulding', default: 'Moulding' },
   descentOfHead: { key: 'descentOfHead', default: 'Descent of Head (Station)' },
@@ -725,21 +884,14 @@ export const FIELD_LABELS = {
   glucoseLevel: { key: 'glucoseLevel', default: 'Glucose Level' },
   ketoneLevel: { key: 'ketoneLevel', default: 'Ketone Level' },
   eventType: { key: 'eventType', default: 'Event Type' },
-
-  // Text input labels
   medication: { key: 'medication', default: 'Medication/Fluid' },
   dosageRate: { key: 'dosageRate', default: 'Dosage/Rate' },
   eventDescription: { key: 'eventDescription', default: 'Event Description' },
-
-  // Common labels
   admission: { key: 'admission', default: 'Admission' },
   bg: { key: 'bg', default: 'BG' },
   am: { key: 'am', default: 'AM' },
 } as const;
-
-// Placeholder mappings for inputs - all translatable
 export const FIELD_PLACEHOLDERS = {
-  // Number input placeholders
   fetalHeartRatePlaceholder: { key: 'enterFetalHeartRate', default: 'Enter fetal heart rate (110-160 BPM)' },
   cervicalDilationPlaceholder: { key: 'enterCervicalDilation', default: 'Enter cervical dilation (0-10 cm)' },
   maternalPulsePlaceholder: { key: 'enterMaternalPulse', default: 'Enter maternal pulse (60-100 BPM)' },
@@ -749,23 +901,17 @@ export const FIELD_PLACEHOLDERS = {
   contractionFrequencyPlaceholder: { key: 'enterContractionFrequency', default: 'Enter contractions per 10 minutes' },
   contractionIntensityPlaceholder: { key: 'selectContractionIntensity', default: 'Select contraction intensity' },
   descentOfHeadPlaceholder: { key: 'selectDescentStation', default: 'Select descent station (0/5 - 5/5)' },
-
-  // Select placeholders
   amnioticFluidPlaceholder: { key: 'selectAmnioticFluid', default: 'Select amniotic fluid status' },
   mouldingPlaceholder: { key: 'selectMoulding', default: 'Select moulding status' },
   proteinLevelPlaceholder: { key: 'selectProteinLevel', default: 'Select protein level' },
   glucoseLevelPlaceholder: { key: 'selectGlucoseLevel', default: 'Select glucose level' },
   ketoneLevelPlaceholder: { key: 'selectKetoneLevel', default: 'Select ketone level' },
   eventTypePlaceholder: { key: 'selectEventType', default: 'Select event type' },
-
-  // Text input placeholders
   medicationType: { key: 'enterMedicationOrFluidType', default: 'Enter medication or fluid type' },
   dosageRate: { key: 'enterDosageOrFlowRate', default: 'Enter dosage or flow rate' },
   eventDescription: { key: 'describeEventOrMilestone', default: 'Describe the event or milestone' },
   generalMeasurement: { key: 'enterMeasurementValue', default: 'Enter measurement value' },
 } as const;
-
-// Get measurement label function
 export const getMeasurementLabel = (
   graphType: string,
   t: (key: string, fallback: string) => string,
@@ -777,8 +923,6 @@ export const getMeasurementLabel = (
   }
   return fallbackTitle || graphType;
 };
-
-// Get field label function
 export const getFieldLabel = (
   fieldKey: keyof typeof FIELD_LABELS,
   t: (key: string, fallback: string) => string,
@@ -787,7 +931,6 @@ export const getFieldLabel = (
   return t(labelConfig.key, labelConfig.default);
 };
 
-// Get field placeholder function
 export const getFieldPlaceholder = (
   fieldKey: keyof typeof FIELD_PLACEHOLDERS,
   t: (key: string, fallback: string) => string,
@@ -796,7 +939,6 @@ export const getFieldPlaceholder = (
   return t(placeholderConfig.key, placeholderConfig.default);
 };
 
-// Get dynamic placeholder for input ranges
 export const getInputRangePlaceholder = (
   graphType: keyof typeof INPUT_RANGES,
   t: (key: string, fallback: string) => string,
@@ -808,7 +950,6 @@ export const getInputRangePlaceholder = (
   return t('enterMeasurementValue', 'Enter measurement value');
 };
 
-// Get concept UUID for form option
 export const getConceptUuid = (optionType: string, optionValue: string): string => {
   switch (optionType) {
     case 'amnioticFluid':
@@ -834,10 +975,8 @@ export const getConceptUuid = (optionType: string, optionValue: string): string 
   }
 };
 
-// Validate if measurement is within normal range
 export const isWithinNormalRange = (graphType: string, value: number): boolean => {
   const range = Object.values(VALIDATION_RANGES).find((r) => {
-    // Match range based on graph type
     switch (graphType) {
       case 'fetal-heart-rate':
         return r === VALIDATION_RANGES.FETAL_HEART_RATE;
@@ -860,7 +999,6 @@ export const isWithinNormalRange = (graphType: string, value: number): boolean =
   return value >= range.normal.min && value <= range.normal.max;
 };
 
-// Configurable data processing for different graph types
 export interface GraphDataProcessor {
   validate: (formData: any) => boolean;
   getValue: (formData: any) => number;
@@ -965,7 +1103,6 @@ export const GRAPH_DATA_PROCESSORS: Record<string, GraphDataProcessor> = {
   },
 };
 
-// Generic processor for unmapped graph types
 export const getDefaultProcessor = (graphType: string): GraphDataProcessor => ({
   validate: (formData) => isValidMeasurement(graphType, formData.measurementValue),
   getValue: (formData) => parseFloat(formData.measurementValue) || 0,
@@ -974,7 +1111,88 @@ export const getDefaultProcessor = (graphType: string): GraphDataProcessor => ({
   }),
 });
 
-// Get processor for a specific graph type
 export const getGraphDataProcessor = (graphType: string): GraphDataProcessor => {
   return GRAPH_DATA_PROCESSORS[graphType] || getDefaultProcessor(graphType);
 };
+
+export const CERVIX_CHART_OPTIONS = {
+  title: 'Cervical Dilation',
+  axes: {
+    bottom: {
+      title: 'Time (Hours)',
+      scaleType: 'time',
+    },
+    left: {
+      title: 'Dilation (cm)',
+      mapsTo: 'value',
+      domain: [0, 10],
+      ticks: {
+        values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      },
+      scaleType: 'linear',
+    },
+  },
+  data: {
+    groups: {
+      'Alert Line': { stroke: 'orange', dashed: true, line: { strokeDasharray: '4 4' } },
+      'Action Line': { stroke: 'red', dashed: true, line: { strokeDasharray: '4 4' } },
+    },
+  },
+  curve: 'curveLinear',
+};
+
+export const SVG_NAMESPACE = 'http://www.w3.org/2000/svg' as const;
+
+export const generateRange = (start: number, end: number, step = 1): number[] => {
+  const result: number[] = [];
+  const precision = Math.max(0, (step.toString().split('.')[1] || '').length);
+  for (let v = start; v <= end + Number.EPSILON; v = +(v + step).toFixed(precision)) {
+    result.push(Number(v.toFixed(precision)));
+  }
+  return result;
+};
+
+export const AMNIOTIC_FLUID_INITIALS_MAP: Record<string, string> = {
+  'Membrane intact': 'M',
+  'Clear liquor': 'C',
+  Clear: 'C',
+  'Meconium Stained': 'MS',
+  'Meconium staining': 'MS',
+  Absent: 'A',
+  'Blood Stained': 'B',
+  'Blood stained': 'B',
+  A: 'A',
+  C: 'C',
+  MS: 'MS',
+  B: 'B',
+};
+
+export const AMNIOTIC_FLUID_LABEL_MAP: Record<string, string> = {
+  M: 'Membrane intact',
+  C: 'Clear liquor',
+  MS: 'Meconium Stained',
+  A: 'Absent',
+  B: 'Blood Stained',
+};
+
+export const MOULDING_SYMBOL_MAP: Record<string, string> = {
+  '0': '0',
+  '+': '+',
+  '++': '++',
+  '+++': '+++',
+  None: '0',
+  'ONE PLUS': '+',
+  'TWO PLUS': '++',
+  'THREE PLUS': '+++',
+};
+
+export const OXYTOCIN_FORM_CONCEPTS = {
+  time: FETAL_HEART_RATE_HOUR_CONCEPT,
+  oxytocinDropsPerMinute: OXYTOCIN_DOSE_CONCEPT,
+} as const;
+export const CERVIX_FORM_CONCEPTS = {
+  hour: FETAL_HEART_RATE_HOUR_CONCEPT,
+  time: FETAL_HEART_RATE_TIME_CONCEPT,
+  cervicalDilation: CERVIX_CONCEPT,
+  descentOfHead: DESCENT_OF_HEAD_CONCEPT,
+} as const;
