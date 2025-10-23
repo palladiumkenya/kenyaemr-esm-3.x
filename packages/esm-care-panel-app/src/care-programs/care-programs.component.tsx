@@ -24,13 +24,9 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
 
-import {
-  getProgramForms,
-  launchDeleteProgramDialog,
-  launchProgramForm,
-  usePatientEnrolledPrograms,
-} from './care-program.resource';
+import { launchDeleteProgramDialog, launchProgramForm, usePatientEnrolledPrograms } from './care-program.resource';
 import styles from './care-programs.scss';
+import useCareProgramForms from './useCareProgramForms';
 
 type CareProgramsProps = {
   patientUuid: string;
@@ -38,6 +34,7 @@ type CareProgramsProps = {
 
 const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { getProgramForms } = useCareProgramForms();
   const { currentVisit } = useVisit(patientUuid);
   const { eligibleCarePrograms, isLoading, isValidating, error, mutateEligiblePrograms } = useCarePrograms(patientUuid);
   const {
@@ -101,28 +98,41 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
             <div className={styles.careProgramButtonContainer}>
               <Tag type="green">Enrolled</Tag>
               <OverflowMenu aria-label="overflow-menu" flipped>
-                {forms.map((form) => (
-                  <OverflowMenuItem
-                    key={form.formUuId}
-                    itemText={form.formName}
-                    onClick={() => {
-                      currentVisit
-                        ? launchWorkspace('patient-form-entry-workspace', {
+                {forms.map((form) => {
+                  const formEncounter = currentVisit?.encounters?.find((en) => en.form?.uuid === form.formUuId);
+                  const areAllDependancyFormsFilled = form.dependancies.every((formUuid) =>
+                    currentVisit?.encounters?.some((en) => en?.form?.uuid === formUuid),
+                  );
+                  const showForm = !form?.dependancies?.length || areAllDependancyFormsFilled;
+
+                  if (!showForm) {
+                    return null;
+                  }
+
+                  return (
+                    <OverflowMenuItem
+                      key={form.formUuId}
+                      itemText={form.formName}
+                      onClick={() => {
+                        if (currentVisit) {
+                          return launchWorkspace('patient-form-entry-workspace', {
                             workspaceTitle: form.formName,
                             mutateForm: () => {
                               mutateEnrollments();
                               mutateEligiblePrograms();
                             },
                             formInfo: {
-                              encounterUuid: '',
+                              encounterUuid: formEncounter?.uuid ?? '',
                               formUuid: form.formUuId,
                               // additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails ?? {} },
                             },
-                          })
-                        : launchStartVisitPrompt();
-                    }}
-                  />
-                ))}
+                          });
+                        }
+                        launchStartVisitPrompt();
+                      }}
+                    />
+                  );
+                })}
                 <OverflowMenuItem
                   itemText={t('edit', 'Edit')}
                   onClick={() =>
@@ -173,7 +183,16 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
         };
       }),
     ],
-    [enrollments, eligibleCarePrograms, t, currentVisit, mutateEnrollments, patientUuid, mutateEligiblePrograms],
+    [
+      enrollments,
+      eligibleCarePrograms,
+      getProgramForms,
+      t,
+      currentVisit,
+      mutateEnrollments,
+      mutateEligiblePrograms,
+      patientUuid,
+    ],
   );
 
   const headers = [

@@ -5,7 +5,7 @@ import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { type Order, type OrderAction } from '@openmrs/esm-patient-common-lib';
 import { processBillItems } from '../../../../billing.resource';
 import CreateBillWorkspace from './create-bill.workspace';
-import { useBillableItem } from '../../../billable-orders/useBillableItem';
+import { useBillableItem } from '../../../../billable-services/billable-orders/useBillableItem';
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
@@ -26,7 +26,7 @@ jest.mock('@openmrs/esm-framework', () => ({
   restBaseUrl: '/openmrs/ws/rest/v1',
 }));
 
-jest.mock('../../../billable-orders/useBillableItem', () => ({
+jest.mock('../../../../billable-services/billable-orders/useBillableItem', () => ({
   useBillableItem: jest.fn(),
 }));
 
@@ -202,7 +202,7 @@ describe('CreateBillWorkspace', () => {
 
     // Since Carbon dropdown items might be rendered in a portal or with complex structure,
     // we need to find them by their text content regardless of their exact structure
-    const dropdownItem = await screen.findByText(/Cash - Ksh 100.00/);
+    const dropdownItem = await screen.findByText(/Cash - KES 100.00/);
     await user.click(dropdownItem);
 
     // Submit form
@@ -245,7 +245,7 @@ describe('CreateBillWorkspace', () => {
     await user.type(quantityInput, '2');
 
     await user.click(priceDropdown);
-    const dropdownItem = await screen.findByText(/Cash - Ksh 100.00/);
+    const dropdownItem = await screen.findByText(/Cash - KES 100.00/);
     await user.click(dropdownItem);
 
     // Submit form

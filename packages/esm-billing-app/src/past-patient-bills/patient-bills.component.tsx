@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useMemo } from 'react';
 import {
   DataTable,
   TableContainer,
@@ -11,14 +11,17 @@ import {
   Button,
   InlineLoading,
 } from '@carbon/react';
-import { Close } from '@carbon/react/icons';
-import { convertToCurrency, extractString } from '../helpers';
+import { Add, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { MappedBill } from '../types';
-import styles from './patient-bills.scss';
-import { ConfigurableLink, getPatientName, usePatient } from '@openmrs/esm-framework';
+import { ConfigurableLink, getPatientName, usePatient, setCurrentVisit } from '@openmrs/esm-framework';
+import { getPatientChartStore, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import capitalize from 'lodash/capitalize';
+
+import { convertToCurrency } from '../helpers';
+import { type MappedBill } from '../types';
 import EmptyPatientBill from './patient-bills-dashboard/empty-patient-bill.component';
+
+import styles from './patient-bills.scss';
 
 type PatientBillsProps = {
   patientUuid: string;
@@ -40,7 +43,7 @@ export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, pat
     return <InlineLoading status="active" description={t('loading', 'Loading...')} />;
   }
 
-  const billingUrl = '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${uuid}';
+  const billingUrl = '${openmrsSpaBase}/home/accounting/patient/${patientUuid}/${uuid}';
 
   if (bills.length === 0) {
     return (
@@ -125,6 +128,20 @@ export const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, onCancel 
   const { t } = useTranslation();
   const patientName = getPatientName(patient);
   const identifier = patient?.identifier[0]?.value ?? '--';
+  const state = useMemo(() => ({ patient, patientUuid: patient.id }), [patient]);
+  const launchPatientWorkspace = useLaunchWorkspaceRequiringVisit('billing-form');
+
+  const handleAddNewBill = () => {
+    setCurrentVisit(patient.id, null);
+    launchPatientWorkspace({ workspaceTitle: t('billingForm', 'Billing Form'), patientUuid: patient.id, patient });
+  };
+
+  useEffect(() => {
+    getPatientChartStore().setState({ ...state });
+    return () => {
+      getPatientChartStore().setState({});
+    };
+  }, [state]);
 
   return (
     <div className={styles.patientHeaderContainer}>
@@ -136,6 +153,9 @@ export const PatientHeader: React.FC<PatientHeaderProps> = ({ patient, onCancel 
       <div className={styles.headerActions}>
         <Button kind="ghost" onClick={() => onCancel('')} renderIcon={Close}>
           {t('close', 'Close')}
+        </Button>
+        <Button kind="ghost" onClick={handleAddNewBill} renderIcon={Add}>
+          {t('addNewBillItem', 'Add New Bill Item')}
         </Button>
       </div>
     </div>

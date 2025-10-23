@@ -2,11 +2,11 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import DeleteBillableServiceModal from './delete-billable-service.modal';
-import { deleteBillableService } from '../../billable-service.resource';
+import { deleteBillableService } from '../../service-catalog/billable-service.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import type { ChargeAble } from '../../service-catalog/charge-summary.resource';
 
-jest.mock('../../billable-service.resource', () => ({
+jest.mock('../../service-catalog/billable-service.resource', () => ({
   deleteBillableService: jest.fn(),
 }));
 jest.mock('@openmrs/esm-framework', () => ({

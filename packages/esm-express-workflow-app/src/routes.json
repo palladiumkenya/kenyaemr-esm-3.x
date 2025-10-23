@@ -12,10 +12,23 @@
     {
       "component": "queuesAdminHome",
       "route": "queues-admin"
-
+    },
+    {
+      "component": "appointmentsDashboard",
+      "route": "appointments"
     }
   ],
   "extensions": [
+    {
+      "component": "appointmentsDashboardLink",
+      "name": "appointments-dashboard-link",
+      "slot": "appointments-left-panel-slot",
+      "meta": {
+        "name": "appointments",
+        "slot": "appointments-dashboard-slot",
+        "title": "Appointments"
+      }
+    },
     {
       "component": "admissionsLeftPanelLink",
       "name": "admissions-dashboard-link",

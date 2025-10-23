@@ -14,7 +14,7 @@ import {
   VolumeFileStorage,
   WatsonHealthCrossReference,
 } from '@carbon/react/icons';
-import { useConfig } from '@openmrs/esm-framework';
+import { CalendarIcon, useConfig } from '@openmrs/esm-framework';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
@@ -138,6 +138,18 @@ export const useModuleLinks = () => {
       url: `${openmrsSpaBase}referrals`,
       icon: <DashboardReference size={24} />,
       privilege: 'o3: View Referrals Dashboard',
+    },
+    {
+      label: t('appointments', 'Appointments'),
+      url: `${openmrsSpaBase}appointments`,
+      icon: <CalendarIcon size={24} />,
+      privilege: 'o3: View Appointments Dashboard',
+    },
+    {
+      label: t('caseManagement', 'Case Management'),
+      url: `${openmrsSpaBase}case-management`,
+      icon: <DashboardReference size={24} />,
+      privilege: 'o3: View Case Management Dashboard',
     },
   ];
 

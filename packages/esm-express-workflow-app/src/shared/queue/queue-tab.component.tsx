@@ -2,7 +2,6 @@ import { Tabs, TabList, Tab, TabPanels, TabPanel, InlineLoading, TabsSkeleton } 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import startCase from 'lodash-es/startCase';
-
 import Card from '../cards/card.component';
 import { Queue } from '../../types/index';
 import QueueEntryTable from './queue-entry/queue-entry-table.component';
@@ -19,8 +18,15 @@ type QueueTabProps = {
 
 const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged, usePatientChart }) => {
   const { t } = useTranslation();
-  const [selectedQueue, setSelectedQueue] = useState<Queue | undefined>(() => queues[0]);
+
+  // Filter queues with rooms first
+  const validQueues = useMemo(() => queues.filter((queue) => queue?.queueRooms?.length > 0), [queues]);
+
+  // Set initial selected queue to first valid queue
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  const selectedQueue = validQueues[selectedTabIndex];
 
   const { queueEntries, isLoading, error } = useQueueEntries({
     location: selectedQueue?.location?.uuid ? [selectedQueue.location.uuid] : undefined,
@@ -33,19 +39,23 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
   }, [isLoading, isInitialLoad]);
 
   const queueEntriesByService = useMemo(() => {
-    if (!queueEntries?.length || !selectedQueue?.service?.uuid) {
+    if (!queueEntries?.length || !selectedQueue?.uuid) {
       return [];
     }
 
-    return queueEntries.filter((entry) => entry?.queue?.service?.uuid === selectedQueue.service.uuid);
-  }, [queueEntries, selectedQueue?.service?.uuid]);
+    const filtered = queueEntries.filter((entry) => entry?.queue?.uuid === selectedQueue.uuid);
+    return filtered;
+  }, [queueEntries, selectedQueue?.uuid]);
 
-  const handleQueueSelection = useCallback(
-    (queue: Queue) => {
-      setSelectedQueue(queue);
-      onTabChanged?.(queue);
+  const handleTabChange = useCallback(
+    (evt: { selectedIndex: number }) => {
+      setSelectedTabIndex(evt.selectedIndex);
+      const newQueue = validQueues[evt.selectedIndex];
+      if (newQueue) {
+        onTabChanged?.(newQueue);
+      }
     },
-    [onTabChanged],
+    [validQueues, onTabChanged],
   );
 
   if (isInitialLoad && isLoading) {
@@ -56,12 +66,20 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
     return <div>{t('noQueuesAvailable', 'No queues available')}</div>;
   }
 
+  if (validQueues.length === 0) {
+    return <div>{t('noQueueRooms', 'No queue rooms configured')}</div>;
+  }
+
   if (!selectedQueue) {
     return <div>{t('noQueueSelected', 'Please select a queue')}</div>;
   }
 
   if (error) {
-    return <div>{t('errorLoadingQueueEntries', 'Error loading queue entries')}</div>;
+    return (
+      <div>
+        {t('errorLoadingQueueEntries', 'Error loading queue entries')}: {error.message}
+      </div>
+    );
   }
 
   return (
@@ -72,32 +90,25 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
         ))}
       </div>
       <div className={styles.tabsContainer}>
-        <Tabs>
+        <Tabs selectedIndex={selectedTabIndex} onChange={handleTabChange}>
           <TabList contained>
-            {queues.map((queue) => (
-              <Tab key={queue.uuid} onClick={() => handleQueueSelection(queue)}>
-                {startCase(queue.location.display)}
-              </Tab>
+            {validQueues.map((queue) => (
+              <Tab key={queue?.uuid}>{startCase(queue?.queueRooms[0]?.display)}</Tab>
             ))}
           </TabList>
           <TabPanels>
-            {queues.map((queue) => (
-              <TabPanel key={queue.uuid}>
-                {selectedQueue?.uuid === queue.uuid && (
-                  <div key={`${queue.uuid}-${isLoading}`}>
-                    {isLoading && !isInitialLoad && (
-                      <div className={styles.loadingOverlay}>
-                        <InlineLoading description={t('loadingQueueEntries', 'Loading queue entries...')} />
-                      </div>
-                    )}
-                    <QueueEntryTable
-                      queueEntries={queueEntriesByService}
-                      key={`table-${queue.uuid}`}
-                      navigatePath={navigatePath}
-                      usePatientChart={usePatientChart}
-                    />
+            {validQueues.map((queue, index) => (
+              <TabPanel key={queue?.uuid}>
+                {isLoading && !isInitialLoad && (
+                  <div className={styles.loadingOverlay}>
+                    <InlineLoading description={t('loadingQueueEntries', 'Loading queue entries...')} />
                   </div>
                 )}
+                <QueueEntryTable
+                  queueEntries={queueEntriesByService}
+                  navigatePath={navigatePath}
+                  usePatientChart={usePatientChart}
+                />
               </TabPanel>
             ))}
           </TabPanels>

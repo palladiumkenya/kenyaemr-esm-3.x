@@ -119,7 +119,7 @@ describe('ChargeSummaryTable', () => {
 
     render(<ChargeSummaryTable />);
     expect(screen.getByText('There are no {{displayText}} to display for this patient')).toBeInTheDocument();
-    const launchFormButton = screen.getByRole('button', { name: /Record Charge Items/i });
+    const launchFormButton = screen.getByRole('button', { name: /Record/i });
     expect(launchFormButton).toBeInTheDocument();
     await user.click(launchFormButton);
     expect(mockLaunchWorkspace).toHaveBeenCalledWith('billable-service-form');

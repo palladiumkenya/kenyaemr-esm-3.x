@@ -29,7 +29,8 @@
 .clockOutStrip {
   display: flex;
   justify-content: space-between;
-  padding: layout.$spacing-05 layout.$spacing-05 0 layout.$spacing-05;
+  padding: layout.$spacing-03 layout.$spacing-05;
+  border-bottom: 1px solid colors.$gray-20;
 }
 
 .clockOutInfo {
@@ -47,8 +48,25 @@
     color: colors.$gray-60;
   }
 
+  .clockInTime {
+    @include type.type-style('body-01');
+    color: colors.$gray-90;
+  }
+
   .cashPointName {
     font-size: smaller;
     color: colors.$gray-60;
   }
+}
+
+.clockInSkeleton,
+.clockIn {
+  margin-right: layout.$spacing-05;
+}
+
+.clockInContainer {
+  display: flex;
+  justify-content: flex-end;
+  padding: layout.$spacing-03;
+  border-bottom: 1px solid colors.$gray-20;
 }
