@@ -24,13 +24,9 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
 
-import {
-  getProgramForms,
-  launchDeleteProgramDialog,
-  launchProgramForm,
-  usePatientEnrolledPrograms,
-} from './care-program.resource';
+import { launchDeleteProgramDialog, launchProgramForm, usePatientEnrolledPrograms } from './care-program.resource';
 import styles from './care-programs.scss';
+import useCareProgramForms from './useCareProgramForms';
 
 type CareProgramsProps = {
   patientUuid: string;
@@ -38,6 +34,7 @@ type CareProgramsProps = {
 
 const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { getProgramForms } = useCareProgramForms();
   const { currentVisit } = useVisit(patientUuid);
   const { eligibleCarePrograms, isLoading, isValidating, error, mutateEligiblePrograms } = useCarePrograms(patientUuid);
   const {
