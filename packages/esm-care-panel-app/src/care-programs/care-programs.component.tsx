@@ -183,7 +183,16 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
         };
       }),
     ],
-    [enrollments, eligibleCarePrograms, t, currentVisit, mutateEnrollments, patientUuid, mutateEligiblePrograms],
+    [
+      enrollments,
+      eligibleCarePrograms,
+      getProgramForms,
+      t,
+      currentVisit,
+      mutateEnrollments,
+      mutateEligiblePrograms,
+      patientUuid,
+    ],
   );
 
   const headers = [
