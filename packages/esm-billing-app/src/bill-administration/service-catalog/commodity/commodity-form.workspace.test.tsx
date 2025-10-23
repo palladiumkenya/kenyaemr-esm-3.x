@@ -4,9 +4,9 @@ import CommodityForm from './commodity-form.workspace';
 import userEvent from '@testing-library/user-event';
 import { useCommodityItem } from './useCommodityItem';
 import { usePaymentModes } from '../../../billing.resource';
-import { createBillableService } from '../../billable-service.resource';
+import { createBillableService } from '../billable-service.resource';
 
-jest.mock('../../billable-service.resource', () => ({
+jest.mock('../billable-service.resource', () => ({
   createBillableService: jest.fn(),
 }));
 

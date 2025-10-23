@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { mockBill, mockedActiveSheet, mockLineItems, mockPaymentModes } from '../../../../../__mocks__/bills.mock';
 import { processBillPayment, usePaymentModes } from '../../billing.resource';
-import { useClockInStatus } from '../../payment-points/use-clock-in-status';
+import { useClockInStatus } from '../../bill-administration/payment-points/use-clock-in-status';
 import Payments from './payments.component';
 import { LineItem, PaymentMethod } from '../../types';
 
@@ -17,7 +17,7 @@ jest.mock('../../billing.resource', () => ({
   usePaymentModes: jest.fn(),
 }));
 
-jest.mock('../../payment-points/use-clock-in-status');
+jest.mock('../../bill-administration/payment-points/use-clock-in-status');
 const mockedUseClockInStatus = useClockInStatus as jest.Mock;
 
 const updatedMockPaymentModes: PaymentMethod[] = mockPaymentModes.map((mode) => {

@@ -12,7 +12,7 @@ import {
   InlineLoading,
 } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
-import { convertToCurrency, extractString } from '../helpers';
+import { convertToCurrency } from '../helpers';
 import { useTranslation } from 'react-i18next';
 import { MappedBill } from '../types';
 import styles from './patient-bills.scss';
@@ -40,7 +40,7 @@ export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, pat
     return <InlineLoading status="active" description={t('loading', 'Loading...')} />;
   }
 
-  const billingUrl = '${openmrsSpaBase}/home/billing/patient/${patientUuid}/${uuid}';
+  const billingUrl = '${openmrsSpaBase}/home/accounting/patient/${patientUuid}/${uuid}';
 
   if (bills.length === 0) {
     return (
