@@ -13,6 +13,7 @@ export type Queue = {
   service: OpenmrsResource;
   allowedPriorities: Array<OpenmrsResource>;
   allowedStatuses: Array<OpenmrsResource>;
+  queueRooms: Array<OpenmrsResource>;
 };
 
 export type QueueEntry = {
