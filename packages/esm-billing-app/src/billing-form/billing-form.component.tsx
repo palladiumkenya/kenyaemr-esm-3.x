@@ -1,3 +1,7 @@
+import React, { useState } from 'react';
+import { mutate } from 'swr';
+import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
+import { type DefaultWorkspaceProps, showSnackbar, useConfig } from '@openmrs/esm-framework';
 import {
   Button,
   ButtonSet,
@@ -12,34 +16,31 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
-import React, { useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
-import { Autosuggest } from '../autosuggest/autosuggest.component';
-import { billingFormSchema, processBillItems } from '../billing.resource';
-import useBillableServices from '../hooks/useBillableServices';
-import { BillingService } from '../types';
-import styles from './billing-form.scss';
-import { mutate } from 'swr';
-import { showSnackbar, useConfig } from '@openmrs/esm-framework';
-import { BillingConfig } from '../config-schema';
 import { TrashCan } from '@carbon/react/icons';
+import { useTranslation } from 'react-i18next';
+import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 
-type BillingFormProps = {
+import { Autosuggest } from '../autosuggest/autosuggest.component';
+import useBillableServices from '../hooks/useBillableServices';
+import { billingFormSchema, processBillItems } from '../billing.resource';
+import { type BillingService } from '../types';
+import { type BillingConfig } from '../config-schema';
+
+import styles from './billing-form.scss';
+
+type BillingFormProps = DefaultWorkspaceProps & {
   patientUuid: string;
-  closeWorkspace: () => void;
 };
 
 type FormType = z.infer<typeof billingFormSchema>;
 
-const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
+const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace, patientUuid: patientUuidProp }) => {
   const { t } = useTranslation();
-  const patientUuid = getPatientUuidFromStore();
+  const patientUuid = patientUuidProp || getPatientUuidFromStore();
   const { billableServices, error, isLoading } = useBillableServices();
-  const [searchVal, setsearchVal] = useState('');
+  const [searchTermValue, setSearchTermValue] = useState('');
   const { cashPointUuid, cashierUuid } = useConfig<BillingConfig>();
 
   const form = useForm<FormType>({
@@ -73,42 +74,49 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
   };
 
   const handleSearch = async (searchText: string) => {
-    setsearchVal(searchText);
+    setSearchTermValue(searchText);
     return billableServices.filter(
       (service) =>
         service?.name.toLocaleLowerCase().includes(searchText.toLocaleLowerCase()) &&
-        lineItemsOnservable.findIndex((item) => item.billableService === service?.uuid) === -1,
+        lineItemsToWatch.findIndex((item) => item.billableService === service?.uuid) === -1,
     );
   };
 
-  const lineItemsOnservable = form.watch('lineItems');
+  const lineItemsToWatch = form.watch('lineItems');
+
+  const handleSuggestionSelected = (field: string, value: string) => {
+    if (value) {
+      form.setValue('lineItems', [
+        ...lineItemsToWatch,
+        {
+          billableService: value,
+          lineItemOrder: 0,
+          quantity: 1,
+          price: 0,
+          paymentStatus: 'PENDING',
+          priceName: 'Default',
+        },
+      ]);
+    }
+    setSearchTermValue('');
+  };
+
+  const handleError = (errors: any) => {
+    console.error('errors', errors);
+    showSnackbar({ title: t('error', 'Error'), kind: 'error', subtitle: JSON.stringify(errors) });
+  };
 
   return (
-    <Form onSubmit={form.handleSubmit(onSubmit)}>
+    <Form onSubmit={form.handleSubmit(onSubmit, handleError)}>
       <Stack gap={4} className={styles.grid}>
         <Column>
           <Autosuggest
-            value={searchVal}
-            onClear={() => setsearchVal('')}
+            value={searchTermValue}
+            onClear={() => setSearchTermValue('')}
             getDisplayValue={(item: BillingService) => item.name}
             getFieldValue={(item: BillingService) => item.uuid}
             getSearchResults={handleSearch}
-            onSuggestionSelected={(field, value) => {
-              if (value) {
-                form.setValue('lineItems', [
-                  ...lineItemsOnservable,
-                  {
-                    billableService: value,
-                    lineItemOrder: 0,
-                    quantity: 1,
-                    price: 0,
-                    paymentStatus: 'PENDING',
-                    priceName: 'Default',
-                  },
-                ]);
-              }
-              setsearchVal('');
-            }}
+            onSuggestionSelected={handleSuggestionSelected}
             labelText={t('search', 'Search')}
             placeholder={t('searchPlaceHolder', 'Find your billables here...')}
           />
@@ -117,16 +125,16 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
           <Table aria-label="sample table">
             <TableHead>
               <TableRow>
-                <TableHeader>Item</TableHeader>
-                <TableHeader>Quantity</TableHeader>
-                <TableHeader>PaymentMethod</TableHeader>
-                <TableHeader>Price</TableHeader>
-                <TableHeader>Total</TableHeader>
+                <TableHeader>{t('item', 'Item')}</TableHeader>
+                <TableHeader>{t('quantity', 'Quantity')}</TableHeader>
+                <TableHeader>{t('paymentMethod', 'Payment Method')}</TableHeader>
+                <TableHeader>{t('price', 'Price')}</TableHeader>
+                <TableHeader>{t('total', 'Total')}</TableHeader>
                 <TableHeader></TableHeader>
               </TableRow>
             </TableHead>
             <TableBody>
-              {lineItemsOnservable.map(({ billableService, quantity, price }, index) => {
+              {lineItemsToWatch.map(({ billableService, quantity, price }, index) => {
                 const service = billableServices.find((serv) => serv.uuid === billableService);
                 return (
                   <TableRow key={billableService}>
@@ -180,12 +188,13 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                     <TableCell id={service?.name + 'Delete'}>
                       <Button
                         renderIcon={TrashCan}
+                        iconDescription={t('delete', 'Delete')}
                         kind="danger"
                         hasIconOnly
                         onClick={() => {
                           form.setValue(
                             'lineItems',
-                            lineItemsOnservable.filter((item) => item.billableService !== billableService),
+                            lineItemsToWatch.filter((item) => item.billableService !== billableService),
                           );
                         }}
                       />
@@ -198,11 +207,11 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
                 <TableCell></TableCell>
                 <TableCell></TableCell>
 
-                <TableCell style={{ fontWeight: 'bold' }}>Grand Total:</TableCell>
+                <TableCell style={{ fontWeight: 'bold' }}>{t('grandTotal', 'Grand Total')}:</TableCell>
                 <TableCell id="GrandTotalSum">
-                  {lineItemsOnservable.reduce((prev, curr) => {
-                    const totoal = curr.quantity * curr.price;
-                    return prev + totoal;
+                  {lineItemsToWatch.reduce((prev, curr) => {
+                    const total = curr.quantity * curr.price;
+                    return prev + total;
                   }, 0)}
                 </TableCell>
                 <TableCell></TableCell>
@@ -213,7 +222,7 @@ const BillingForm: React.FC<BillingFormProps> = ({ closeWorkspace }) => {
       </Stack>
 
       <ButtonSet className={styles.buttonSet}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}
         </Button>
         <Button className={styles.button} kind="primary" type="submit" disabled={form.formState.isSubmitting}>
