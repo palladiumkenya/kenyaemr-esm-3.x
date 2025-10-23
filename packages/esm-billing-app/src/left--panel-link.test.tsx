@@ -6,6 +6,12 @@ import userEvent from '@testing-library/user-event';
 
 window.getOpenmrsSpaBase = () => '/openmrs/spa/';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => key,
+  }),
+}));
+
 describe('LinkExtension Component', () => {
   const renderWithRouter = (component, { route = '/' } = {}) => {
     window.history.pushState({}, 'Test page', route);
