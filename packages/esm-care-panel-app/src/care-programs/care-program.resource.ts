@@ -303,14 +303,18 @@ const programForms: Array<{
       },
     ],
   },
-  // { // TODO Uncomment and add conrect uuids after program is added by the BA
-  //   programName: 'Pre-Conception care program',
-  //   programUuid: '191269d2-9973-4958-9936-f687ed771050',
-  //   forms: [
-  //     { formName: 'Family Planning Form', formUuId: 'a52c57d4-110f-4879-82ae-907b0d90add6' },
-  //     { formName: 'Family Planning Discontinuation', formUuId: 'efc782ea-9a16-4791-824a-18be7417eda4' },
-  //   ],
-  // },
+  {
+    programName: 'Pre-Conception care program',
+    programUuid: 'fd549de0-2e6d-4e76-a2c1-64df26351bdd',
+    forms: [
+      { formName: 'Pre- Conception Care', formUuId: '2cf38f9a-f910-492b-a055-e29924e513f8', dependancies: [] },
+      {
+        formName: 'Pre-Conception Discontinuation',
+        formUuId: 'a9128c54-3a05-4d66-ba50-149565eadfd7',
+        dependancies: [],
+      },
+    ],
+  },
   {
     programName: 'Medical Assited therapy',
     programUuid: '4b898e20-9b2d-11ee-b9d1-0242ac120002',
