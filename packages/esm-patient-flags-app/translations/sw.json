@@ -1,8 +1,10 @@
 {
   "administration": "Administration",
   "adrAssessment": "ADR Assessment",
+  "appointments": "Appointments",
   "bedManagement": "Bed Management",
   "billingAdmin": "Billing Admin",
+  "caseManagement": "Case Management",
   "clearCache": "Clear Cache",
   "clearSearch": "Clear search",
   "crossBorder": "Cross Border",

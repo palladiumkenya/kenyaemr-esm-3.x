@@ -1,6 +1,8 @@
+@use '@carbon/colors';
 @use '@carbon/layout';
 
-.clockInSkeleton,
-.clockIn {
-  margin-right: layout.$spacing-05;
+.tabsContainer {
+  border: 1px solid colors.$gray-20;
+  margin: layout.$spacing-05;
+  padding-top: layout.$spacing-05;
 }

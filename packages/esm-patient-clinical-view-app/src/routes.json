@@ -3,7 +3,12 @@
   "backendDependencies": {
     "kenyaemr": "^19.0.0"
   },
-  "pages": [],
+  "pages": [
+  {
+    "component": "wrapComponent",
+    "route": "case-management"
+  }
+  ],
   "extensions": [
     {
       "name": "hiv-care-and-treatment-dashboard-link",

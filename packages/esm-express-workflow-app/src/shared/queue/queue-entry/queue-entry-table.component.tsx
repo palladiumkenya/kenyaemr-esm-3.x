@@ -91,34 +91,33 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
     }
   };
 
-  const rows = queueEntries.map((queueEntry) => {
-    const visitNumber = queueEntry.visit.attributes?.filter(
-      (attr) => attr['attributeType']?.uuid === visitQueueNumberAttributeUuid,
+  const rows = queueEntries?.map((queueEntry) => {
+    const visitNumber = queueEntry?.visit?.attributes?.find(
+      (attr) => attr?.attributeType?.uuid === visitQueueNumberAttributeUuid,
     );
 
     const patientChartUrl = usePatientChart
       ? `${window.spaBase}/patient/${queueEntry.patient.uuid}/chart/Patient Summary?path=${navigatePath}`
       : `${spaBasePath}/${navigatePath}/${queueEntry.patient.uuid}`;
-    {
-      return {
-        id: queueEntry.uuid,
-        queueNumber: visitNumber[0]?.value ?? '--',
-        previousQueue: startCase(queueEntry.previousQueueEntry?.queue?.display?.toLowerCase() ?? '--'),
-        patientName: (
-          <ConfigurableLink className={styles.link} to={patientChartUrl}>
-            {startCase(queueEntry.patient.person.display.toLowerCase())}
-          </ConfigurableLink>
-        ),
-        priority: (
-          <div className={styles.priorityPill} data-priority={lowerCase(queueEntry.priority.display)}>
-            {t(queueEntry.priority.display, capitalize(queueEntry.priority.display.replace('_', ' ')))}
-          </div>
-        ),
-        status: queueEntry?.status?.display,
-        queue: startCase(queueEntry?.queue?.display?.toLowerCase()),
-        waitTime: dayjs(queueEntry.startedAt).fromNow(),
-      };
-    }
+
+    return {
+      id: queueEntry.uuid,
+      queueNumber: visitNumber?.value ?? '--',
+      previousQueue: startCase(queueEntry.previousQueueEntry?.queue?.display?.toLowerCase() ?? '--'),
+      patientName: (
+        <ConfigurableLink className={styles.link} to={patientChartUrl}>
+          {startCase(queueEntry.patient.person.display.toLowerCase())}
+        </ConfigurableLink>
+      ),
+      priority: (
+        <div className={styles.priorityPill} data-priority={lowerCase(queueEntry.priority.display)}>
+          {t(queueEntry.priority.display, capitalize(queueEntry.priority.display.replace('_', ' ')))}
+        </div>
+      ),
+      status: queueEntry?.status?.display ?? '--',
+      queue: startCase(queueEntry?.queue?.display?.toLowerCase() ?? '--'),
+      waitTime: dayjs(queueEntry.startedAt).fromNow(),
+    };
   });
 
   if (queueEntries.length === 0) {
