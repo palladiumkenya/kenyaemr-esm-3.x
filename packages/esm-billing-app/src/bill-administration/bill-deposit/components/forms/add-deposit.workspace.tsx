@@ -116,7 +116,7 @@ const AddDepositWorkspace: React.FC<AddDepositWorkspaceProps> = ({
 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit, handleError)} className={styles.form}>

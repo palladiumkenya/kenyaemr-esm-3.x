@@ -128,7 +128,7 @@ const DepositTransactionWorkspace: React.FC<DepositTransactionWorkspaceProps> = 
   useEffect(() => {
     promptBeforeClosing(() => isDirty);
     // eslint-disable-line react-hooks/exhaustive-deps
-  }, [isDirty]);
+  }, [isDirty, promptBeforeClosing]);
 
   if (error) {
     return (
