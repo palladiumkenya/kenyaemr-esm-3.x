@@ -1,66 +1,64 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { LineChart } from '@carbon/charts-react';
+import '@carbon/charts/styles.css';
 import {
-  Layer,
-  Grid,
-  Column,
-  Tag,
   Button,
+  Column,
   DataTable,
-  TableContainer,
+  Grid,
+  Layer,
+  Pagination,
   Table,
-  TableHead,
-  TableRow,
-  TableHeader,
   TableBody,
   TableCell,
-  Pagination,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tag,
 } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
-import { LineChart } from '@carbon/charts-react';
-import { useSession, useLayoutType, openmrsFetch } from '@openmrs/esm-framework';
-import '@carbon/charts/styles.css';
-import styles from './partography.scss';
-import PartographyDataForm from './partography-data-form.component';
+import { openmrsFetch, useLayoutType, useSession } from '@openmrs/esm-framework';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
+  CervicalContractionsForm,
   CervixForm,
   FetalHeartRateForm,
-  CervicalContractionsForm,
   OxytocinForm,
-  DrugsIVFluidsForm,
   TemperatureForm,
   UrineTestForm,
 } from './forms';
+import MembraneAmnioticFluidForm from './forms/membrane-amniotic-fluid-form.component';
+import { saveCervixFormData, useCervixFormData } from './forms/useCervixData';
 import {
+  CervicalContractionsGraph,
+  DrugsIVFluidsGraph,
   FetalHeartRateGraph,
   MembraneAmnioticFluidGraph,
-  CervicalContractionsGraph,
   OxytocinGraph,
-  DrugsIVFluidsGraph,
   PulseBPGraph,
   TemperatureGraph,
   UrineTestGraph,
 } from './graphs';
-import MembraneAmnioticFluidForm from './forms/membrane-amniotic-fluid-form.component';
+import PartographyDataForm from './partography-data-form.component';
 import {
-  saveMembraneAmnioticFluidData,
   createPartographyEncounter,
+  saveMembraneAmnioticFluidData,
   transformEncounterToChartData,
   transformEncounterToTableData,
   useDrugOrders,
   useFetalHeartRateData,
   usePartographyData,
 } from './partography.resource';
-import { saveCervixFormData, useCervixFormData } from './forms/useCervixData';
-import {
-  getTranslatedPartographyGraphs,
-  getPartographyTableHeaders,
-  getColorForGraph,
-  PARTOGRAPHY_CONCEPTS,
-  URINE_LEVEL_OPTIONS,
-} from './types/index';
-import { useOxytocinData, saveOxytocinFormData } from './resources/oxytocin.resource';
+import styles from './partography.scss';
 import { useMembraneAmnioticFluidData } from './resources/membrane-amniotic-fluid.resource';
+import { saveOxytocinFormData, useOxytocinData } from './resources/oxytocin.resource';
+import {
+  getColorForGraph,
+  getPartographyTableHeaders,
+  getTranslatedPartographyGraphs,
+  PARTOGRAPHY_CONCEPTS,
+} from './types/index';
 
 enum ScaleTypes {
   LABELS = 'labels',
@@ -401,7 +399,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       // Helper to get obs value by concept
       const getObsValue = (conceptUuid) => {
         const found = obs.find((o) => o.concept.uuid === conceptUuid);
-        if (!found) return '';
+        if (!found) {
+          return '';
+        }
         const v = found.value;
         if (v && typeof v === 'object' && Object.prototype.hasOwnProperty.call(v, 'display')) {
           // @ts-ignore
@@ -419,7 +419,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         );
         if (timeObs && typeof timeObs.value === 'string') {
           const match = timeObs.value.match(/Time:\s*(.+)/);
-          if (match) return match[1].trim();
+          if (match) {
+            return match[1].trim();
+          }
         }
         return '';
       };
@@ -434,7 +436,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         if (slotObs) {
           if (typeof slotObs.value === 'string') {
             const match = slotObs.value.match(/TimeSlot:\s*(.+)/);
-            if (match) return match[1].trim();
+            if (match) {
+              return match[1].trim();
+            }
             return slotObs.value;
           }
           return String(slotObs.value);
@@ -500,14 +504,18 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       );
       if (eventDescObs && typeof eventDescObs.value === 'string') {
         const match = eventDescObs.value.match(/Time Slot: (\d{1,2}:\d{2})/);
-        if (match) timeSlot = match[1];
+        if (match) {
+          timeSlot = match[1];
+        }
       }
       // Ensure volume is a number if present, otherwise undefined
       let volumeRaw = getVolume();
       let volume: number | undefined = undefined;
-      if (typeof volumeRaw === 'number') volume = volumeRaw;
-      else if (typeof volumeRaw === 'string' && volumeRaw.trim() !== '' && !isNaN(Number(volumeRaw)))
+      if (typeof volumeRaw === 'number') {
+        volume = volumeRaw;
+      } else if (typeof volumeRaw === 'string' && volumeRaw.trim() !== '' && !isNaN(Number(volumeRaw))) {
         volume = Number(volumeRaw);
+      }
       const sampleCollected = getSampleCollected();
       const resultReturned = getResultReturned();
       // final row prepared
@@ -789,7 +797,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           [graphType]: false,
         }));
       }
-    }, [encounters, isLoading, graphType, localPartographyData]);
+    }, [encounters, isLoading, graphType]);
 
     return { encounters, isLoading, mutate };
   };
@@ -1250,7 +1258,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         );
 
         if (saveResult.success) {
-          if (typeof mutateOxytocinData === 'function') mutateOxytocinData();
+          if (typeof mutateOxytocinData === 'function') {
+            mutateOxytocinData();
+          }
           setIsOxytocinFormOpen(false);
         } else {
           alert('Failed to save oxytocin data: ' + saveResult.message);
@@ -1461,7 +1471,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             obs.value.startsWith('Time:')
           ) {
             const match = obs.value.match(/Time:\s*(.+)/);
-            if (match) timeSlot = match[1].trim();
+            if (match) {
+              timeSlot = match[1].trim();
+            }
           }
           // Contraction count concept
           if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
@@ -1475,10 +1487,18 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             obs.concept.uuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' // strong
           ) {
             // Map UUID to label
-            if (obs.concept.uuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') contractionLevel = 'none';
-            if (obs.concept.uuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') contractionLevel = 'mild';
-            if (obs.concept.uuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') contractionLevel = 'moderate';
-            if (obs.concept.uuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') contractionLevel = 'strong';
+            if (obs.concept.uuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'none';
+            }
+            if (obs.concept.uuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'mild';
+            }
+            if (obs.concept.uuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'moderate';
+            }
+            if (obs.concept.uuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'strong';
+            }
           }
         }
       }
