@@ -8,6 +8,21 @@
   margin: layout.$spacing-03 0;
 }
 
+.partographyGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: layout.$spacing-05;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: layout.$spacing-04;
+  }
+}
+
 .partographyTitle {
   @include type.type-style('heading-compact-02');
   color: colors.$gray-100;
@@ -46,9 +61,30 @@
 
 .graphContainer {
   padding: layout.$spacing-04;
-  background-color: colors.$gray-10;
+  background-color: colors.$white;
   border-radius: layout.$spacing-02;
   margin-bottom: layout.$spacing-04;
+  border: 2px solid colors.$gray-40;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  }
+
+  // Medical chart styling
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, colors.$blue-60, colors.$green-50, colors.$blue-60);
+    border-radius: layout.$spacing-02 layout.$spacing-02 0 0;
+  }
+
+  position: relative;
 }
 
 .graphHeader {
@@ -79,7 +115,6 @@
     border: 1px solid colors.$gray-30;
     border-radius: layout.$spacing-02;
     overflow: hidden;
-    margin-right: layout.$spacing-03;
 
     .viewButton {
       border-radius: 0;
@@ -139,8 +174,79 @@
   background-color: colors.$white;
   padding: layout.$spacing-04;
   border-radius: layout.$spacing-02;
-  border: 1px solid colors.$gray-20;
+  border: 2px solid colors.$gray-40;
   margin-bottom: layout.$spacing-04;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  // Medical chart styling
+  .cds--chart-wrapper {
+    border: 1px solid colors.$gray-30;
+    border-radius: layout.$spacing-02;
+    overflow: hidden;
+
+    // Enhanced grid lines for medical chart appearance
+    .cds--chart {
+      background-color: colors.$white;
+      background-image: linear-gradient(colors.$gray-20 1px, transparent 1px),
+        linear-gradient(90deg, colors.$gray-20 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    // Ensure axis lines are visible and properly styled
+    .cds--axis {
+      stroke: colors.$gray-60;
+      stroke-width: 2px;
+    }
+
+    // Style grid lines to be more prominent
+    .cds--grid-line {
+      stroke: colors.$gray-30;
+      stroke-width: 1px;
+      stroke-dasharray: 2, 2;
+    }
+
+    // Enhanced axis labels
+    .cds--axis-label {
+      fill: colors.$gray-90;
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    // Style chart title
+    .cds--chart-title {
+      fill: colors.$gray-100;
+      font-weight: 700;
+      font-size: 16px;
+    }
+  }
+}
+
+.emptyChartContainer {
+  position: relative;
+  height: 500px;
+  background-color: colors.$white;
+}
+
+.emptyChartOverlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: layout.$spacing-04;
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: layout.$spacing-05;
+  border-radius: layout.$spacing-02;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+
+  p {
+    margin: 0;
+    @include type.type-style('body-compact-01');
+    color: colors.$gray-70;
+  }
 }
 
 .chartStats {
@@ -361,6 +467,89 @@
   }
 }
 
+// Skeleton loading styles
+.skeletonContainer {
+  padding: layout.$spacing-04;
+  background-color: colors.$white;
+  border-radius: layout.$spacing-02;
+  border: 1px solid colors.$gray-20;
+}
+
+.graphSkeleton {
+  .skeletonChart {
+    height: 500px;
+    background: linear-gradient(90deg, colors.$gray-20 25%, colors.$gray-10 50%, colors.$gray-20 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    border-radius: layout.$spacing-02;
+    margin-bottom: layout.$spacing-04;
+  }
+
+  .skeletonStats {
+    display: flex;
+    gap: layout.$spacing-05;
+    margin-top: layout.$spacing-04;
+  }
+
+  .skeletonStat {
+    background: linear-gradient(90deg, colors.$gray-20 25%, colors.$gray-10 50%, colors.$gray-20 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    height: layout.$spacing-05;
+    border-radius: layout.$spacing-02;
+  }
+}
+
+.tableSkeleton {
+  .skeletonHeader {
+    background: linear-gradient(90deg, colors.$gray-20 25%, colors.$gray-10 50%, colors.$gray-20 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    height: layout.$spacing-05;
+    border-radius: layout.$spacing-02;
+    margin-bottom: layout.$spacing-04;
+  }
+
+  .skeletonRow {
+    display: flex;
+    gap: layout.$spacing-05;
+    margin-bottom: layout.$spacing-03;
+
+    .skeletonCell {
+      background: linear-gradient(90deg, colors.$gray-20 25%, colors.$gray-10 50%, colors.$gray-20 75%);
+      background-size: 200% 100%;
+      animation: skeletonLoading 1.5s infinite;
+      height: layout.$spacing-04;
+      border-radius: layout.$spacing-02;
+    }
+  }
+
+  .skeletonFooter {
+    background: linear-gradient(90deg, colors.$gray-20 25%, colors.$gray-10 50%, colors.$gray-20 75%);
+    background-size: 200% 100%;
+    animation: skeletonLoading 1.5s infinite;
+    height: layout.$spacing-04;
+    border-radius: layout.$spacing-02;
+    margin-top: layout.$spacing-04;
+  }
+}
+
+@keyframes skeletonLoading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Global skeleton animation (in case CSS modules scoping is an issue)
+:global(.skeleton-loading) {
+  background: linear-gradient(90deg, #f4f4f4 25%, #e0e0e0 50%, #f4f4f4 75%);
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s infinite;
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;
@@ -374,5 +563,1154 @@
   p {
     margin: 0;
     @include type.type-style('body-compact-01');
+  }
+}
+// partography.scss
+
+.customTimeLabelsContainer {
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid colors.$gray-40;
+  border-left: 2px solid colors.$gray-40;
+  border-right: 2px solid colors.$gray-40;
+  border-bottom: 2px solid colors.$gray-40;
+  margin-top: 0;
+  background-color: colors.$white;
+  border-radius: 0;
+
+  // Perfect alignment with chart's plot area
+  margin-left: 70px;
+  margin-right: 30px;
+  width: auto;
+
+  // Enable horizontal scrolling for dynamic content
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.customTimeLabelsRow {
+  display: grid;
+  grid-template-columns: 80px repeat(var(--visible-columns, 10), minmax(60px, 1fr)); // Fixed header + dynamic columns
+  border-bottom: 1px solid colors.$gray-40;
+  min-height: 40px;
+  min-width: max-content; // Ensure content doesn't get compressed
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:first-child {
+    background-color: colors.$gray-10;
+  }
+}
+
+.customTimeLabelHeader {
+  grid-column: 1 / 2; // First column for header
+  font-weight: 700;
+  padding: layout.$spacing-03;
+  border-right: 1px solid colors.$gray-40;
+  text-align: center;
+  background-color: colors.$gray-20;
+  color: colors.$gray-100;
+  @include type.type-style('label-01');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky; // Keep header visible during scroll
+  left: 0;
+  z-index: 1;
+}
+
+.customTimeLabelCell {
+  padding: layout.$spacing-03;
+  text-align: center;
+  border-right: 1px solid colors.$gray-40;
+  font-weight: 600;
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-100;
+  background-color: colors.$white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px; // Minimum column width
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+}
+
+// Optional: Adjust chart's axis label styling if needed to make space or match font
+.cds--chart-wrapper {
+  // You might need to add specific CSS here to the Carbon Chart itself
+  // to fine-tune the bottom axis's appearance or padding if it overlaps
+  // or leaves too much space. This can be complex due to shadow DOM.
+  // E.g., .cds--chart-wrapper .cds--bottom-axis .cds--axis-labels { display: none; }
+  // or .cds--chart-wrapper .cds--bottom-axis .cds--axis-title { padding-bottom: 0; }
+
+  .cds--bottom-axis .cds--axis-title {
+    padding-bottom: 0;
+  }
+
+  // Override line colors for Alert and Action lines
+  .cds--line-path {
+    // Alert Line - Yellow dotted line
+    &[data-group-id='Alert Line'],
+    &[aria-label*='Alert Line'] {
+      stroke: #ffd700 !important;
+      stroke-width: 3px !important;
+      stroke-dasharray: 8, 4 !important;
+    }
+
+    // Action Line - Red dotted line
+    &[data-group-id='Action Line'],
+    &[aria-label*='Action Line'] {
+      stroke: #ff0000 !important;
+      stroke-width: 3px !important;
+      stroke-dasharray: 8, 4 !important;
+    }
+  }
+
+  // Alternative selector for different Carbon Charts versions
+  svg path {
+    &[data-name='Alert Line'] {
+      stroke: #ffd700 !important;
+      stroke-width: 3px !important;
+      stroke-dasharray: 8, 4 !important;
+    }
+
+    &[data-name='Action Line'] {
+      stroke: #ff0000 !important;
+      stroke-width: 3px !important;
+      stroke-dasharray: 8, 4 !important;
+    }
+  }
+
+  // Generic line overrides for Alert/Action
+  .alert-line {
+    stroke: #ffd700 !important;
+    stroke-width: 3px !important;
+    stroke-dasharray: 8, 4 !important;
+  }
+
+  .action-line {
+    stroke: #ff0000 !important;
+    stroke-width: 3px !important;
+    stroke-dasharray: 8, 4 !important;
+  }
+
+  // More specific targeting for cervix chart lines
+  &[data-chart-id='cervix'] {
+    svg path {
+      // Target Alert Line specifically
+      &:nth-last-child(2) {
+        stroke: #ffd700 !important;
+        stroke-width: 3px !important;
+        stroke-dasharray: 8, 4 !important;
+      }
+
+      // Target Action Line specifically
+      &:last-child {
+        stroke: #ff0000 !important;
+        stroke-width: 3px !important;
+        stroke-dasharray: 8, 4 !important;
+      }
+    }
+
+    // Try targeting by legend item or class
+    .line {
+      &:nth-last-child(2) {
+        stroke: #ffd700 !important;
+        stroke-width: 3px !important;
+        stroke-dasharray: 8, 4 !important;
+      }
+
+      &:last-child {
+        stroke: #ff0000 !important;
+        stroke-width: 3px !important;
+        stroke-dasharray: 8, 4 !important;
+      }
+    }
+
+    // Alternative broader targeting
+    svg g[class*='line'] {
+      path {
+        &:nth-last-child(2) {
+          stroke: #ffd700 !important;
+          stroke-width: 3px !important;
+          stroke-dasharray: 8, 4 !important;
+        }
+
+        &:last-child {
+          stroke: #ff0000 !important;
+          stroke-width: 3px !important;
+          stroke-dasharray: 8, 4 !important;
+        }
+      }
+    }
+  }
+}
+
+// Global overrides for Alert and Action lines (outside any wrapper)
+:global {
+  // Try to target lines by data attributes
+  [data-group='Alert Line'] {
+    stroke: #ffd700 !important;
+    stroke-width: 3px !important;
+    stroke-dasharray: 8, 4 !important;
+  }
+
+  [data-group='Action Line'] {
+    stroke: #ff0000 !important;
+    stroke-width: 3px !important;
+    stroke-dasharray: 8, 4 !important;
+  }
+
+  // Try broad SVG path targeting in cervix chart
+  [data-chart-id='cervix'] svg path {
+    // If there are 3 or more lines (cervix data + alert + action)
+    // Target the last two as Alert and Action lines
+    &:nth-last-child(2) {
+      stroke: #ffd700 !important;
+      stroke-width: 3px !important;
+      stroke-dasharray: 8, 4 !important;
+    }
+
+    &:last-child {
+      stroke: #ff0000 !important;
+      stroke-width: 3px !important;
+      stroke-dasharray: 8, 4 !important;
+    }
+  }
+}
+
+// Optional: Adjust the height of the chart if the new labels cause overflow
+.chartContainer {
+  height: 500px; // Keep this consistent
+  // If the new labels cause overlap, you might need to make the chart slightly shorter
+  // e.g., height: 450px; and then adjust overall graphContainer height.
+}
+
+/* Fetal Heart Rate Section Styles */
+.fetalHeartRateSection {
+  margin-bottom: layout.$spacing-07;
+  width: 100%;
+}
+
+.fetalHeartRateContainer {
+  background-color: colors.$white;
+  border-radius: layout.$spacing-03;
+  border: 2px solid colors.$gray-20;
+  padding: layout.$spacing-06;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  margin-bottom: layout.$spacing-06;
+}
+
+.fetalHeartRateHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: layout.$spacing-05;
+  border-bottom: 1px solid colors.$gray-20;
+  padding-bottom: layout.$spacing-04;
+  gap: layout.$spacing-04;
+}
+
+.fetalHeartRateHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: layout.$spacing-03;
+  flex: 1;
+}
+
+.fetalHeartRateHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+  flex-shrink: 0;
+}
+
+.fetalHeartRateActions {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-03;
+}
+
+.fetalHeartRateTitle {
+  @include type.type-style('heading-compact-02');
+  color: colors.$gray-100;
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.125rem; // Slightly larger title
+  margin-bottom: layout.$spacing-02;
+}
+
+.fetalHeartRateControls {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  flex-wrap: wrap;
+}
+
+.fetalHeartRateChart {
+  min-height: 600px; // Increased height to match cervix graph
+  width: 100%;
+  margin-top: layout.$spacing-04;
+
+  // Override Carbon chart styles for this specific chart
+  :global(.cds--cc--chart-svg) {
+    border: 1px solid colors.$gray-30;
+    border-radius: layout.$spacing-02;
+    min-height: 600px; // Ensure minimum height
+  }
+
+  // Chart wrapper to ensure proper sizing
+  :global(.cds--cc--chart-wrapper) {
+    min-height: 600px;
+    padding-bottom: layout.$spacing-06; // Extra space for x-axis labels
+  }
+
+  // Grid line styling to match cervix graph
+  :global(.cds--cc--grid-line) {
+    stroke: colors.$gray-30;
+    stroke-opacity: 0.3;
+  }
+
+  // Ensure x-axis labels have proper spacing and are horizontal
+  :global(.cds--cc--axis-tick-label) {
+    font-size: 12px;
+    fill: colors.$gray-70;
+  }
+
+  // X-axis label positioning - ensure they are horizontal
+  :global(.cds--cc--axis.cds--cc--axis--bottom .cds--cc--axis-tick-label) {
+    text-anchor: middle;
+    transform: none !important; // Force no rotation
+  }
+
+  // Y-axis styling
+  :global(.cds--cc--axis.cds--cc--axis--left .cds--cc--axis-tick-label) {
+    text-anchor: end;
+  }
+
+  // Ensure chart container has enough bottom padding for labels
+  :global(.cds--cc--chart-holder) {
+    padding-bottom: layout.$spacing-08 !important;
+  }
+
+  // Disable any text rotation on bottom axis
+  :global(.cds--cc--axis--bottom text) {
+    transform: rotate(0deg) !important;
+  }
+
+  // Axis styling
+  :global(.cds--cc--axis) {
+    .tick text {
+      font-size: 12px;
+      fill: colors.$gray-70;
+    }
+
+    .domain {
+      stroke: colors.$gray-50;
+    }
+  }
+}
+
+// Fetal Heart Rate Table Value Styling
+.fetalHeartRateValue {
+  display: inline-flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+
+  &.low {
+    color: colors.$gray-70;
+
+    .arrow {
+      color: colors.$gray-70;
+      font-size: 1.4em;
+      font-weight: bold;
+      margin-right: layout.$spacing-02;
+    }
+  }
+
+  &.normal {
+    color: colors.$green-50;
+    font-weight: 500;
+  }
+
+  &.high {
+    color: colors.$red-50;
+    font-weight: 600;
+
+    .arrow {
+      color: colors.$red-50;
+      font-size: 1.4em;
+      font-weight: bold;
+      margin-right: layout.$spacing-02;
+    }
+  }
+}
+
+/* Membrane Amniotic Fluid Grid Styles */
+.membraneGrid {
+  width: 100%;
+  margin-top: layout.$spacing-04;
+  background: colors.$white;
+  border: 1px solid colors.$gray-30;
+  border-radius: layout.$spacing-02;
+  overflow-x: auto;
+  max-height: 300px; // Set a reasonable height
+  max-width: 1050px; // Show approximately 13 grids (140px label + 70px * 13 columns = 1050px)
+}
+
+.gridContainer {
+  display: flex;
+  flex-direction: column;
+  min-width: fit-content; // Allow natural width based on content
+}
+
+.gridHeader {
+  display: flex;
+  background: colors.$gray-10;
+  border-bottom: 2px solid colors.$gray-30;
+  font-weight: 600;
+}
+
+.gridRow {
+  display: flex;
+  border-bottom: 1px solid colors.$gray-20;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.gridCell {
+  flex: 0 0 70px; // Fixed width for time columns for consistent layout
+  min-width: 70px;
+  padding: layout.$spacing-03;
+  border-right: 1px solid colors.$gray-20;
+  text-align: center;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:first-child {
+    flex: 0 0 140px;
+    min-width: 140px;
+    background: colors.$gray-10;
+    font-weight: 600;
+    text-align: left;
+    justify-content: flex-start;
+  }
+}
+
+.gridRowLabel {
+  flex: 0 0 140px;
+  padding: layout.$spacing-03;
+  background: colors.$gray-10;
+  border-right: 2px solid colors.$gray-30;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  text-align: left;
+}
+
+.legendText {
+  font-size: 0.75rem;
+  color: colors.$gray-70;
+  font-style: italic;
+}
+
+// Contraction Level Selector - Simple colored buttons
+.contractionLevelSelector {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-02;
+  padding: layout.$spacing-02;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background-color: colors.$gray-10;
+  border-radius: layout.$spacing-02;
+  border: 1px solid colors.$gray-30;
+  margin: layout.$spacing-02 0;
+  flex-wrap: wrap;
+  max-width: fit-content;
+}
+
+.contractionLevelOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: layout.$spacing-01;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  padding: layout.$spacing-01;
+  border-radius: layout.$spacing-02;
+
+  &:hover {
+    transform: translateY(-2px);
+
+    .contractionLevelButton {
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  &.contractionLevelSelected {
+    background-color: colors.$blue-10;
+    border: 2px solid colors.$blue-60;
+
+    .contractionLevelButton {
+      border: 3px solid colors.$blue-60;
+      box-shadow: 0 6px 20px rgba(13, 90, 170, 0.25);
+    }
+  }
+}
+
+.contractionLevelTitle {
+  @include type.type-style('label-01');
+  color: colors.$gray-100;
+  font-weight: 600;
+  margin-bottom: layout.$spacing-02;
+  text-align: center;
+  min-height: 16px;
+  font-size: 12px;
+}
+
+.contractionLevelButton {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid colors.$gray-40;
+  border-radius: layout.$spacing-02;
+  font-size: 28px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+
+  // None - Light gray background
+  &.none {
+    background-color: colors.$gray-30;
+    color: colors.$gray-100;
+    border-color: colors.$gray-50;
+  }
+
+  // Mild - Light blue background
+  &.mild {
+    background-color: colors.$blue-30;
+    color: colors.$blue-80;
+    border-color: colors.$blue-50;
+  }
+
+  // Moderate - Orange background
+  &.moderate {
+    background-color: colors.$orange-40;
+    color: colors.$orange-90;
+    border-color: colors.$orange-60;
+  }
+
+  // Strong - Dark red background
+  &.strong {
+    background-color: colors.$red-60;
+    color: colors.$white;
+    border-color: colors.$red-70;
+  }
+}
+
+.errorMessage {
+  @include type.type-style('label-01');
+  color: colors.$red-60;
+  margin-top: layout.$spacing-02;
+  grid-column: 1 / -1;
+  text-align: center;
+}
+
+// Contractions Form Container
+.contractionsFormContainer {
+  padding: layout.$spacing-03 layout.$spacing-03;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.formMainSection {
+  display: flex;
+  flex-direction: row;
+  gap: layout.$spacing-03;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+.formSectionLeft {
+  flex: 0 0 auto;
+  min-width: 380px;
+  max-width: 420px;
+}
+
+.formSectionRight {
+  flex: 0 0 auto;
+  min-width: 200px;
+  max-width: 220px;
+  padding-top: layout.$spacing-02;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: layout.$spacing-03;
+}
+
+.formSection {
+  margin-bottom: layout.$spacing-02;
+}
+
+.sectionTitle {
+  @include type.type-style('heading-04');
+  color: colors.$gray-100;
+  margin-bottom: layout.$spacing-01;
+  text-align: left;
+  font-weight: 600;
+}
+
+.sectionDescription {
+  @include type.type-style('body-compact-01');
+  color: colors.$gray-70;
+  text-align: left;
+  margin-bottom: layout.$spacing-02;
+  font-style: italic;
+  line-height: 1.3;
+}
+
+// Contraction Count Dropdown
+.contractionCountDropdown {
+  width: 100%;
+  max-width: 280px;
+
+  .cds--dropdown {
+    background-color: colors.$white;
+    border: 2px solid colors.$gray-30;
+    border-radius: layout.$spacing-02;
+
+    &:hover {
+      border-color: colors.$blue-40;
+    }
+
+    &:focus {
+      border-color: colors.$blue-60;
+      box-shadow: 0 0 0 2px rgba(13, 90, 170, 0.2);
+    }
+  }
+
+  .cds--list-box__field {
+    height: 48px;
+    padding: layout.$spacing-03 layout.$spacing-04;
+  }
+
+  .cds--list-box__menu-item {
+    &:hover {
+      background-color: colors.$blue-10;
+    }
+
+    &[aria-selected='true'] {
+      background-color: colors.$blue-20;
+      color: colors.$blue-80;
+    }
+  }
+}
+
+// Detailed Cervical Contractions Grid - Partograph Format
+.contractionsContainer {
+  display: flex;
+  flex-direction: column;
+  border: 2px solid colors.$gray-80;
+  background-color: colors.$white;
+  position: relative;
+  min-height: 300px;
+  overflow-x: auto;
+}
+
+.contractionsTimeHeaders {
+  display: grid;
+  grid-template-columns: 60px repeat(13, minmax(50px, 1fr));
+  border-bottom: 2px solid colors.$gray-80;
+  background-color: colors.$gray-10;
+  min-height: 35px;
+}
+
+.contractionsTimeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid colors.$gray-60;
+  padding: layout.$spacing-02;
+  font-weight: 600;
+  @include type.type-style('label-01');
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.contractionsTimeSubHeaders {
+  display: grid;
+  grid-template-columns: 60px repeat(13, minmax(50px, 1fr));
+  border-bottom: 1px solid colors.$gray-60;
+  background-color: colors.$gray-10;
+  min-height: 30px;
+}
+
+.contractionsTimeSubHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid colors.$gray-40;
+  padding: layout.$spacing-01;
+  @include type.type-style('caption-01');
+  color: colors.$gray-70;
+
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.contractionsYAxisSpacer {
+  border-right: 2px solid colors.$gray-80;
+  background-color: colors.$gray-10;
+}
+
+.contractionsGridRow {
+  display: grid;
+  grid-template-columns: 80px repeat(13, minmax(50px, 1fr));
+  border-bottom: 1px solid colors.$gray-40;
+  min-height: 45px;
+
+  &:last-child {
+    border-bottom: 2px solid colors.$gray-80;
+  }
+}
+
+.contractionsYAxisLabel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 2px solid colors.$gray-80;
+  background-color: colors.$gray-10;
+  font-weight: 600;
+  @include type.type-style('label-01');
+  min-width: 50px;
+  padding: layout.$spacing-02;
+  font-size: 16px;
+  color: colors.$gray-100;
+  position: relative;
+
+  // Ensure the numbers are clearly visible
+  &::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+    z-index: 2;
+  }
+}
+
+.contractionsGridCell {
+  border-right: 1px solid colors.$gray-40;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 2px;
+  background-color: colors.$white;
+  transition: background-color 0.2s ease;
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &:hover {
+    background-color: colors.$blue-10;
+  }
+
+  // Bar visualization styles
+  &[data-contraction-level='0'] {
+    background-color: colors.$white;
+  }
+
+  &[data-contraction-level='mild'] {
+    background-image: radial-gradient(circle at 50% 50%, colors.$green-60 1px, transparent 1px);
+    background-size: 6px 6px;
+    background-color: colors.$green-10;
+  }
+
+  &[data-contraction-level='moderate'] {
+    background: repeating-linear-gradient(
+      45deg,
+      colors.$yellow-10,
+      colors.$yellow-10 3px,
+      colors.$yellow-60 3px,
+      colors.$yellow-60 4px
+    );
+  }
+
+  &[data-contraction-level='strong'] {
+    background-color: colors.$red-60;
+    color: colors.$white;
+    font-weight: bold;
+
+    &::after {
+      content: '3';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 18px;
+    }
+  }
+}
+
+// Contraction Bar Visual Indicators
+.contractionBar {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 2px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.contractionBarNone {
+  background-color: transparent;
+}
+
+.contractionBarMild {
+  background-color: colors.$blue-40;
+  border: 2px solid colors.$blue-60;
+  box-shadow: inset 0 0 4px rgba(13, 90, 170, 0.3);
+}
+
+.contractionBarModerate {
+  background-color: colors.$orange-50;
+  border: 2px solid colors.$orange-70;
+  box-shadow: inset 0 0 4px rgba(255, 131, 28, 0.3);
+}
+
+.contractionBarStrong {
+  background-color: colors.$red-60;
+  border: 2px solid colors.$red-80;
+  box-shadow: inset 0 0 4px rgba(218, 30, 40, 0.3);
+}
+
+// Oxytocin Bar Visual Indicators
+.oxytocinBarLow {
+  background-color: colors.$green-40;
+  border: 2px solid colors.$green-60;
+  box-shadow: inset 0 0 4px rgba(66, 190, 101, 0.3);
+}
+
+.oxytocinBarMedium {
+  background-color: colors.$yellow-40;
+  border: 2px solid colors.$yellow-60;
+  box-shadow: inset 0 0 4px rgba(255, 194, 7, 0.3);
+}
+
+.oxytocinBarHigh {
+  background-color: colors.$red-50;
+  border: 2px solid colors.$red-70;
+  box-shadow: inset 0 0 4px rgba(218, 30, 40, 0.3);
+}
+
+// Grid cell states for filled contractions
+.contractionsGridCell {
+  // ...existing styles...
+
+  &.contractionBarMild {
+    background-color: colors.$blue-10;
+    border: 1px solid colors.$blue-30;
+  }
+
+  &.contractionBarModerate {
+    background-color: colors.$orange-10;
+    border: 1px solid colors.$orange-30;
+  }
+
+  &.contractionBarStrong {
+    background-color: colors.$red-10;
+    border: 1px solid colors.$red-30;
+  }
+
+  // Add visual feedback for filled cells
+  &[data-filled='true'] {
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      right: 2px;
+      bottom: 2px;
+      border-radius: 1px;
+      background: inherit;
+      z-index: 1;
+    }
+  }
+}
+
+.contractionsYAxisTitle {
+  position: absolute;
+  left: -45px;
+  top: 50%;
+  transform: translateY(-50%) rotate(-90deg);
+  transform-origin: center;
+  white-space: nowrap;
+  @include type.type-style('label-01');
+  font-weight: 600;
+  color: colors.$gray-80;
+}
+
+// Grid container for cervical contractions
+.contractionsGrid {
+  position: relative;
+  margin: layout.$spacing-04 0;
+}
+
+// Table view styles for cervical contractions
+.contractionsTable {
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-30;
+  border-radius: layout.$spacing-02;
+  overflow: hidden;
+}
+
+.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background-color: colors.$gray-10;
+    padding: layout.$spacing-03;
+    text-align: left;
+    border-bottom: 2px solid colors.$gray-40;
+    @include type.type-style('label-01');
+    font-weight: 600;
+  }
+
+  td {
+    padding: layout.$spacing-03;
+    border-bottom: 1px solid colors.$gray-20;
+    @include type.type-style('body-compact-01');
+  }
+
+  tbody tr:hover {
+    background-color: colors.$gray-10;
+  }
+}
+
+.contractionLevelBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: layout.$spacing-01 layout.$spacing-02;
+  border-radius: layout.$spacing-01;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+
+  &.none {
+    background-color: colors.$gray-20;
+    color: colors.$gray-80;
+  }
+
+  &.mild {
+    background-color: colors.$blue-20;
+    color: colors.$blue-80;
+  }
+
+  &.moderate {
+    background-color: colors.$orange-20;
+    color: colors.$orange-80;
+  }
+
+  &.strong {
+    background-color: colors.$red-20;
+    color: colors.$red-80;
+  }
+}
+
+// ===== DRUGS AND IV FLUIDS GRAPH STYLES =====
+.drugsIVFluidsGraph {
+  width: 100%;
+  margin: layout.$spacing-05 0;
+}
+
+.drugsCell {
+  position: relative;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-30;
+  padding: layout.$spacing-02;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.2;
+
+  &:hover {
+    background-color: colors.$gray-10;
+  }
+}
+
+.drugInfo {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-01;
+}
+
+.drugName {
+  font-weight: 600;
+  color: colors.$gray-100;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.drugDosage {
+  font-weight: 400;
+  color: colors.$gray-70;
+  font-size: 10px;
+  line-height: 1.1;
+}
+
+// Pulse and BP Graph Styling
+.pulseBPGraph {
+  width: 100%;
+  margin: layout.$spacing-05 0;
+
+  .chartContainer {
+    background-color: colors.$white;
+    padding: layout.$spacing-04;
+    border-radius: layout.$spacing-02;
+    border: 2px solid colors.$gray-40;
+    margin-bottom: layout.$spacing-04;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: 400px;
+
+    // Medical chart styling
+    :global(.cds--chart-wrapper) {
+      border: 1px solid colors.$gray-30;
+      border-radius: layout.$spacing-02;
+      overflow: hidden;
+
+      // Enhanced grid lines for medical chart appearance
+      :global(.cds--chart) {
+        background-color: colors.$white;
+
+        // Grid styling for medical charts
+        :global(.cds--chart-grid-line) {
+          stroke: colors.$gray-30;
+          stroke-width: 1;
+        }
+
+        :global(.cds--chart-axis) {
+          stroke: colors.$gray-50;
+        }
+
+        :global(.cds--chart-axis text) {
+          fill: colors.$gray-90;
+          font-size: 12px;
+        }
+      }
+    }
+
+    .emptyChartMessage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 350px;
+      color: colors.$gray-60;
+      font-style: italic;
+    }
+  }
+
+  .timeLabelsContainer {
+    margin-top: layout.$spacing-03;
+  }
+
+  .timeLabelsGrid {
+    display: grid;
+    grid-template-columns: 80px repeat(10, 1fr);
+    gap: 1px;
+    background-color: colors.$gray-30;
+    border: 1px solid colors.$gray-30;
+    border-radius: layout.$spacing-02;
+  }
+
+  .hoursRow,
+  .timeRow {
+    display: contents;
+  }
+
+  .timeLabel {
+    background-color: colors.$gray-10;
+    padding: layout.$spacing-02;
+    font-weight: 600;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid colors.$gray-30;
+  }
+
+  .timeCell {
+    background-color: colors.$white;
+    padding: layout.$spacing-02;
+    font-size: 11px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    border-right: 1px solid colors.$gray-20;
+
+    &:last-child {
+      border-right: none;
+    }
+  }
+}
+
+.pulseBPCell {
+  position: relative;
+  background-color: colors.$white;
+  border: 1px solid colors.$gray-30;
+  padding: layout.$spacing-02;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 600;
+
+  &:hover {
+    background-color: colors.$gray-10;
   }
 }
