@@ -167,20 +167,23 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     visitAttributeTypes,
   ]);
 
-  const generateClaimSummary = (data: z.infer<typeof ClaimsFormSchema>): ClaimSummary => {
-    const billServiceNames = selectedLineItems.map((item) => item.billableService);
-    const services = billServiceNames.map((service) => service.replace(/^[a-f0-9-]+:/, '').trim());
-    const totalAmount = selectedLineItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const generateClaimSummary = useCallback(
+    (data: z.infer<typeof ClaimsFormSchema>): ClaimSummary => {
+      const billServiceNames = selectedLineItems.map((item) => item.billableService);
+      const services = billServiceNames.map((service) => service.replace(/^[a-f0-9-]+:/, '').trim());
+      const totalAmount = selectedLineItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-    return {
-      totalAmount,
-      facility: recentVisit?.location?.display || '',
-      totalItems: selectedLineItems.length,
-      services: services.join(', '),
-      startDate: data.treatmentStart,
-      endDate: data.treatmentEnd,
-    };
-  };
+      return {
+        totalAmount,
+        facility: recentVisit?.location?.display || '',
+        totalItems: selectedLineItems.length,
+        services: services.join(', '),
+        startDate: data.treatmentStart,
+        endDate: data.treatmentEnd,
+      };
+    },
+    [recentVisit?.location?.display, selectedLineItems],
+  );
 
   const createDynamicOTPHandlers = useCallback(
     (initialPhone: string) => {
@@ -217,7 +220,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
         },
       };
     },
-    [patientName, form, selectedLineItems, otpExpiryMinutes],
+    [form, selectedLineItems?.length, generateClaimSummary, patientName],
   );
 
   const launchOtpVerificationModal = (props: OTPVerificationModalOptions) => {

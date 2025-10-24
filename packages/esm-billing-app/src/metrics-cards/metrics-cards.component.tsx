@@ -19,7 +19,7 @@ export default function MetricsCards() {
       { title: t('todayPendingBills', "Today's Pending Bills"), count: pendingBills },
       { title: t('todayExemptedBills', "Today's Exempted Bills"), count: exemptedBills },
     ],
-    [totalBills, paidBills, pendingBills, exemptedBills],
+    [t, totalBills, paidBills, pendingBills, exemptedBills],
   );
 
   if (isLoading) {

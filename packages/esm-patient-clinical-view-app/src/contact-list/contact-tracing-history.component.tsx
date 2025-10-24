@@ -13,7 +13,7 @@ import {
 import { Edit } from '@carbon/react/icons';
 import { launchWorkspace, useConfig, usePagination } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { ConfigObject } from '../config-schema';
@@ -33,19 +33,22 @@ const ContactTracingHistory: React.FC<ContactTracingHistoryProps> = ({ patientUu
     formsList: { htsClientTracingFormUuid },
   } = useConfig<ConfigObject>();
 
-  const handleLaunchContactTracingForm = (encounterUuid: string) => {
-    launchWorkspace('kenyaemr-cusom-form-entry-workspace', {
-      workspaceTitle: t('contactTracingForm', 'Contact tracing form'),
-      formUuid: htsClientTracingFormUuid,
-      patientUuid,
-      encounterUuid,
-      mutateForm: () => {
-        mutate((key) => true, undefined, {
-          revalidate: true,
-        });
-      },
-    });
-  };
+  const handleLaunchContactTracingForm = useCallback(
+    (encounterUuid: string) => {
+      launchWorkspace('kenyaemr-cusom-form-entry-workspace', {
+        workspaceTitle: t('contactTracingForm', 'Contact tracing form'),
+        formUuid: htsClientTracingFormUuid,
+        patientUuid,
+        encounterUuid,
+        mutateForm: () => {
+          mutate((key) => true, undefined, {
+            revalidate: true,
+          });
+        },
+      });
+    },
+    [htsClientTracingFormUuid, patientUuid, t],
+  );
 
   const headers = [
     {
@@ -94,7 +97,7 @@ const ContactTracingHistory: React.FC<ContactTracingHistoryProps> = ({ patientUu
           />
         ),
       })),
-    [results, t],
+    [handleLaunchContactTracingForm, results, t],
   );
 
   if (contactTracesHistory.length === 0) {
