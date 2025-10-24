@@ -18,6 +18,9 @@ export interface CarePanelConfig {
       dependancies: string[];
     }[];
   }>;
+  peerEducatorRelationshipType: string;
+  peerCalendarOutreactForm: string;
+  hideFilledProgramForm: boolean;
 }
 
 export const configSchema = {
@@ -42,6 +45,21 @@ export const configSchema = {
         uuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       },
     ],
+  },
+  peerEducatorRelationshipType: {
+    _type: Type.UUID,
+    _description: 'Case Manager/Client Relationship type Uuid',
+    _default: '9065e3c6-b2f5-4f99-9cbf-f67fd9f82ec5',
+  },
+  peerCalendarOutreactForm: {
+    _type: Type.UUID,
+    _description: 'Peer Calendar Outreach form UUID',
+    _default: '7492cffe-5874-4144-a1e6-c9e455472a35',
+  },
+  hideFilledProgramForm: {
+    _type: Type.Boolean,
+    _description: 'Hide already filled program forms in care panel',
+    _default: true,
   },
   careProgramForms: {
     _type: Type.Array,
@@ -261,6 +279,11 @@ export const configSchema = {
         programName: 'KVP',
         programUuid: '7447305a-18a7-11e9-ab14-d663bd873d93',
         forms: [
+          {
+            formName: 'KVP Peer Educator Outreach Calendar',
+            formUuId: '7492cffe-5874-4144-a1e6-c9e455472a35',
+            dependancies: [],
+          },
           { formName: 'KVP Contact Form', formUuId: '185dec84-df6f-4fc7-a370-15aa8be531ec', dependancies: [] },
           {
             formName: 'KVP Clinical Enrollment',

@@ -12,6 +12,7 @@ import DispensingPatientVitals from './dispensing-patient-details/patient-vitals
 import PatientDischargeSideRailIcon from './patient-discharge/discharge-workspace-siderail.component';
 import PatientDischargeWorkspace from './patient-discharge/patient-discharge.workspace';
 import ProgramForm from './care-programs/program.workspace';
+import KvpPeerLinkageForm from './care-programs/kvp-peer-linkage-form.workspace';
 
 const moduleName = '@kenyaemr/esm-care-panel-app';
 
@@ -54,3 +55,4 @@ export const patientDischargeWorkspace = getAsyncLifecycle(
   options,
 );
 export const mchProgramForm = getSyncLifecycle(ProgramForm, options);
+export const kvpPeerLinkageForm = getSyncLifecycle(KvpPeerLinkageForm, options);

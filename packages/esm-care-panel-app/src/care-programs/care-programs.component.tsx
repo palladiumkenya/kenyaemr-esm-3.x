@@ -16,7 +16,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Close, DocumentAdd } from '@carbon/react/icons';
-import { formatDate, launchWorkspace, restBaseUrl, useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, restBaseUrl, useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import capitalize from 'lodash/capitalize';
 import React, { useCallback, useMemo } from 'react';
@@ -27,6 +27,8 @@ import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
 import { launchDeleteProgramDialog, launchProgramForm, usePatientEnrolledPrograms } from './care-program.resource';
 import styles from './care-programs.scss';
 import useCareProgramForms from './useCareProgramForms';
+import { CarePanelConfig } from '../config-schema';
+import KvpLinkPatientToPeerEducator from './link-patient-to-peer-action.component';
 
 type CareProgramsProps = {
   patientUuid: string;
@@ -34,8 +36,9 @@ type CareProgramsProps = {
 
 const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { peerCalendarOutreactForm } = useConfig<CarePanelConfig>();
   const { getProgramForms } = useCareProgramForms();
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit, mutate: mutateVisit } = useVisit(patientUuid);
   const { eligibleCarePrograms, isLoading, isValidating, error, mutateEligiblePrograms } = useCarePrograms(patientUuid);
   const {
     enrollments,
@@ -43,6 +46,8 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
     error: enrollmentsError,
     mutate: mutateEnrollments,
   } = usePatientEnrolledPrograms(patientUuid);
+  const { hideFilledProgramForm } = useConfig<CarePanelConfig>();
+
   const isTablet = useLayoutType() === 'tablet';
 
   const handleMutations = useCallback(() => {
@@ -58,7 +63,9 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       undefined,
       { revalidate: true },
     );
-  }, [mutateEligiblePrograms, patientUuid]);
+    mutateVisit();
+    mutateEnrollments();
+  }, [mutateEligiblePrograms, mutateEnrollments, mutateVisit, patientUuid]);
 
   const handleCareProgramClick = useCallback(
     (careProgram: PatientCarePrograms) => {
@@ -72,9 +79,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       currentVisit
         ? launchWorkspace('patient-form-entry-workspace', {
             workspaceTitle: workspaceTitle,
-            mutateForm: () => {
-              handleMutations();
-            },
+            mutateForm: handleMutations,
             formInfo: {
               encounterUuid: '',
               formUuid,
@@ -109,6 +114,21 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
                     return null;
                   }
 
+                  if (form.formUuId === peerCalendarOutreactForm) {
+                    return (
+                      <KvpLinkPatientToPeerEducator
+                        form={form}
+                        patientUuid={patientUuid}
+                        visit={currentVisit}
+                        mutate={handleMutations}
+                      />
+                    );
+                  }
+
+                  if (hideFilledProgramForm && formEncounter) {
+                    return null;
+                  }
+
                   return (
                     <OverflowMenuItem
                       key={form.formUuId}
@@ -117,10 +137,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
                         if (currentVisit) {
                           return launchWorkspace('patient-form-entry-workspace', {
                             workspaceTitle: form.formName,
-                            mutateForm: () => {
-                              mutateEnrollments();
-                              mutateEligiblePrograms();
-                            },
+                            mutateForm: handleMutations,
                             formInfo: {
                               encounterUuid: formEncounter?.uuid ?? '',
                               formUuid: form.formUuId,
@@ -189,9 +206,11 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       getProgramForms,
       t,
       currentVisit,
+      peerCalendarOutreactForm,
+      patientUuid,
+      handleMutations,
       mutateEnrollments,
       mutateEligiblePrograms,
-      patientUuid,
     ],
   );
 
