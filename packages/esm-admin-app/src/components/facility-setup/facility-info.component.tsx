@@ -116,7 +116,7 @@ const FacilityInfo: React.FC = () => {
         <Column sm={4} md={4} lg={8}>
           <Layer>
             <Tile className={styles.card}>
-              <h3 className={styles.cardTitle}>{t('shaInformation', 'SHA Information')}</h3>
+              <h3 className={styles.cardTitle}>{t('facilityInformation', 'Facility Information')}</h3>
               <hr className={styles.cardDivider} />
               <div className={styles.cardContent}>
                 <Card
@@ -129,7 +129,7 @@ const FacilityInfo: React.FC = () => {
                 />
                 <Card label={t('shaStatus', 'SHA Status')} value={shaStatus} />
                 <Card label={t('shaContracted', 'SHA Contracted')} value={shaFacility?.approved} />
-                <Card label={t('shaExpiry', 'SHA Expiry Date')} value={shaExpiry} />
+                <Card label={t('shaContractExpiry', 'SHA Contract Expiry Date')} value={shaExpiry} />
               </div>
             </Tile>
           </Layer>
