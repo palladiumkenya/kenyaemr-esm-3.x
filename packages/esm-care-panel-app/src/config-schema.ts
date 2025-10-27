@@ -282,7 +282,7 @@ export const configSchema = {
           {
             formName: 'KVP Peer Educator Outreach Calendar',
             formUuId: '7492cffe-5874-4144-a1e6-c9e455472a35',
-            dependancies: [],
+            dependancies: ['185dec84-df6f-4fc7-a370-15aa8be531ec'],
           },
           { formName: 'KVP Contact Form', formUuId: '185dec84-df6f-4fc7-a370-15aa8be531ec', dependancies: [] },
           {
