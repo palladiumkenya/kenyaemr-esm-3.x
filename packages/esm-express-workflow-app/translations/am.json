@@ -74,6 +74,7 @@
   "noPatientFound": "ምንም ሕመምተኛ አልተገኘም",
   "noPatientsAwaiting": "አገልግሎት የሚጠብቁ ሕሙማን የሉም",
   "noQueueLocationsConfigured": "ምንም የጥበቃ መስመር ቦታዎች አልተዋቀሩም",
+  "noQueueRooms": "No queue rooms configured",
   "noQueuesAvailable": "ምንም የጥበቃ መስመሮች የሉም",
   "noQueueSelected": "እባክዎ የጥበቃ መስመር ይምረጡ",
   "noServicesConfigured": "ምንም አገልግሎቶች አልተዋቀሩም",
