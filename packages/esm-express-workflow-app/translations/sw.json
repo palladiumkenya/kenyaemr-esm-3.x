@@ -74,6 +74,7 @@
   "noPatientFound": "No Patient Found",
   "noPatientsAwaiting": "No patients awaiting service",
   "noQueueLocationsConfigured": "No queue locations configured",
+  "noQueueRooms": "No queue rooms configured",
   "noQueuesAvailable": "No queues available",
   "noQueueSelected": "Please select a queue",
   "noServicesConfigured": "No services configured",
