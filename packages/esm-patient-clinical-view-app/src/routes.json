@@ -195,6 +195,14 @@
       "order": 0,
       "online": true,
       "offline": false
+    },
+    {
+      "name": "patient-complaints",
+      "slot": "ewf-patient-summary-slot",
+      "component": "patientComplaints",
+      "order": 0,
+      "online": true,
+      "offline": false
     }
   ],
   "modals": [
