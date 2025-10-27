@@ -1,4 +1,4 @@
-import { defineConfigSchema, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 import { inPatientClinicalEncounterDashboardMeta } from './clinical-encounter/clinical-encounter-dashboard-meta';
@@ -116,6 +116,7 @@ export const specialClinicsDashboardLink = getSyncLifecycle(
 );
 export const specialClinicsDashboard = getSyncLifecycle(SpecialClinicDashboard, options);
 
+export const patientComplaints = getAsyncLifecycle(() => import('./complaints/patient-complaints.component'), options);
 export function startupApp() {
   defineConfigSchema(moduleName, configSchema);
 }

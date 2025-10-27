@@ -1,0 +1,11 @@
+@use '@carbon/colors';
+@use '@carbon/layout';
+@use '@carbon/type';
+
+.patientComplaintsContainer {
+  border: 1px solid colors.$gray-20;
+}
+
+.pagination {
+  border-top: none;
+}
