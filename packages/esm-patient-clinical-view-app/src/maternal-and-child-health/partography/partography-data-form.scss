@@ -48,3 +48,166 @@
     }
   }
 }
+
+/* ===== Merged from cervix-form.scss ===== */
+
+.formGrid {
+  gap: 1rem;
+}
+
+.fieldRow {
+  margin-bottom: 1rem;
+}
+
+.formField {
+  margin-bottom: 1rem;
+}
+
+.fieldLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-100;
+  margin-bottom: layout.$spacing-02;
+  display: block;
+}
+
+/* Ensure number inputs have proper styling */
+.cds--number input {
+  text-align: left;
+}
+
+/* Modal specific styling */
+.modal {
+  .cds--modal-content {
+    padding: 0;
+  }
+
+  .cds--modal-container {
+    max-width: 600px;
+  }
+}
+
+.cervixModal {
+  .cds--modal-content {
+    padding: 0;
+  }
+
+  .cds--modal-container {
+    max-width: 600px;
+  }
+}
+
+/* Form field spacing */
+.cds--form-item {
+  margin-bottom: 1rem;
+}
+
+/* Number input stepper buttons */
+.cds--number__controls {
+  display: flex;
+  flex-direction: column;
+}
+
+.cds--number__control-btn {
+  height: 1.5rem;
+  width: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Validation hints */
+.validationHint {
+  font-size: 0.75rem;
+  color: #6f6f6f;
+  margin-top: 0.25rem;
+  font-style: italic;
+  background-color: #f4f4f4;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #0f62fe;
+}
+
+/* Required fields note */
+.requiredFieldsNote {
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  background-color: #e8f4fd;
+  border-left: 4px solid #0f62fe;
+  border-radius: 4px;
+
+  p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #161616;
+    font-weight: 500;
+  }
+}
+
+/* Drug Order Workspace Launcher Styles */
+.workspaceLauncherSection {
+  margin-bottom: layout.$spacing-06;
+  padding: layout.$spacing-05;
+  background-color: colors.$blue-10;
+  border-radius: layout.$spacing-03;
+  border: 1px solid colors.$blue-20;
+
+  h4 {
+    @include type.type-style('heading-03');
+    color: colors.$gray-100;
+    margin-bottom: layout.$spacing-03;
+  }
+
+  .helperText {
+    @include type.type-style('body-01');
+    color: colors.$gray-70;
+    margin-bottom: layout.$spacing-04;
+  }
+
+  .workspaceLauncherButton {
+    min-height: layout.$spacing-09;
+  }
+}
+
+/* Manual Entry Section Styles */
+.manualEntrySection {
+  background-color: var(--cds-layer-01);
+  border: 1px solid var(--cds-border-subtle-01);
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  h4 {
+    margin-bottom: 0.5rem;
+    color: var(--cds-text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  .helperText {
+    color: var(--cds-text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+  }
+}
+
+// Source indicators for drug orders vs manual entries
+.orderSource {
+  background-color: var(--cds-support-success);
+  color: var(--cds-text-on-color);
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.manualSource {
+  background-color: var(--cds-support-info);
+  color: var(--cds-text-on-color);
+  padding: 0.125rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}

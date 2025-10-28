@@ -122,9 +122,23 @@ export const configSchema = {
     },
   },
   priorities: {
-    emergencyPriorityConceptUuid: '037446f4-adfc-40b3-928c-a39a4826b1bf',
-    urgentPriorityConceptUuid: 'ef5718cd-d6d5-4fcf-bb82-cc4afaa90603',
-    notUrgentPriorityConceptUuid: '80cd8f8c-5d82-4cdc-b96e-a6addeb94b7f',
+    _type: Type.Object,
+    _description: 'Queue priority concept uuids',
+    _default: {
+      emergencyPriorityConceptUuid: '037446f4-adfc-40b3-928c-a39a4826b1bf',
+      urgentPriorityConceptUuid: 'ef5718cd-d6d5-4fcf-bb82-cc4afaa90603',
+      notUrgentPriorityConceptUuid: '80cd8f8c-5d82-4cdc-b96e-a6addeb94b7f',
+    },
+  },
+  otpExpirationDurationInminutes: {
+    _type: Type.Number,
+    _description: 'OTP Number Expiration dutration in minutes',
+    _default: 1,
+  },
+  proceduresConceptClassUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'Concept class UUID for procedures orders',
+    _default: '8d490bf4-c2cc-11de-8d13-0010c6dffd0f',
   },
 };
 
@@ -169,4 +183,6 @@ export type ExpressWorkflowConfig = {
     urgentPriorityConceptUuid: string;
     notUrgentPriorityConceptUuid: string;
   };
+  otpExpirationDurationInminutes: number;
+  proceduresConceptClassUuid: string;
 };

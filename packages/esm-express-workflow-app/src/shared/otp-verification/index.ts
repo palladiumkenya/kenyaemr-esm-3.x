@@ -1,5 +1,6 @@
 import { showModal } from '@openmrs/esm-framework';
 import { default as otpVerificationModal } from './otp-verification.modal';
+import { type ModalSize } from '@carbon/react/lib/components/Modal/Modal';
 
 /**
  * Options for configuring the OTP Verification modal.
@@ -46,6 +47,7 @@ export type OTPVerificationModalOptions = {
   onRequestOtp?: (phoneNumber: string) => Promise<void>;
   onVerificationSuccess?: () => void;
   expiryMinutes?: number;
+  size?: ModalSize;
 };
 
 /**
@@ -57,8 +59,8 @@ export type OTPVerificationModalOptions = {
 export const launchOtpVerificationModal = (props: OTPVerificationModalOptions) => {
   const dispose = showModal('otp-verification-modal', {
     onClose: () => dispose(),
-    size: 'xs',
     ...props,
+    centerBoxes: props?.centerBoxes ?? true,
   });
 
   return dispose;

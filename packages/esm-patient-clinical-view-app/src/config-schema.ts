@@ -2,6 +2,21 @@ import { Type } from '@openmrs/esm-framework';
 import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
+  complaintsConceptUuids: {
+    _type: Type.Array,
+    _description: 'List of complaint concept UUIDs',
+    _default: ['160531AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+  },
+  complaints: {
+    _type: Type.Object,
+    _description: 'Complaints configuration',
+    _default: {
+      chiefComplaintConceptUuid: '160531AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      complaintMemberConceptUuid: '5219AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      durationConceptUuid: '159368AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      onsetConceptUuid: 'd7a3441d-6aeb-49be-b7d6-b2a3bb39e78d',
+    },
+  },
   requireMaritalStatusOnAgeGreaterThanOrEqualTo: {
     _type: Type.Number,
     _description: 'Age in years',
@@ -15,6 +30,7 @@ export const configSchema = {
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
       kpPeerCalender: 'c4f9db39-2c18-49a6-bf9b-b243d673c64d',
       htsEcounterUuid: '9c0a7a57-62ff-4f75-babe-5835b0e921b7', // Used with Contact tracing
+      triage: 'd1059fb9-a079-4feb-a749-eedd709ae542',
     },
   },
   caseManagementForms: {
@@ -42,6 +58,7 @@ export const configSchema = {
       antenatal: 'e8f98494-af35-4bb8-9fc7-c409c8fed843',
       postNatal: '72aa78e0-ee4b-47c3-9073-26f3b9ecc4a7',
       labourAndDelivery: '496c7cc3-0eea-4e84-a04c-2292949e2f7f',
+      admissionRequestFormUuid: '',
       defaulterTracingFormUuid: 'a1a62d1e-2def-11e9-b210-d663bd873d93',
       htsScreening: '04295648-7606-11e8-adc0-fa7ae01bbebc',
       htsInitialTest: '402dc5d7-46da-42d4-b2be-f43ea4ad87b0',
@@ -52,6 +69,7 @@ export const configSchema = {
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
       autopsyFormUuid: '2b61a73-4971-4fc0-b20b-9a30176317e2',
       htsClientTracingFormUuid: '15ed03d2-c972-11e9-a32f-2a2ae2dbcce4',
+      complaintsFormUuid: '37f6bd8d-586a-4169-95fa-5781f987fe62',
     },
   },
   htsClientTracingConceptsUuids: {
@@ -349,6 +367,13 @@ export const configSchema = {
           unit: 'per 10min',
         },
       },
+
+      uuids: {
+        timeSlot: 'a1b2c3d4-1111-2222-3333-444455556666',
+        mchPartographyEncounterUuid: '022d62af-e2a5-4282-953b-52dd5cba3296',
+        drugsFluidsEncounterUuid: '39da3525-afe4-45ff-8977-c53b7b359158',
+        contractionStrongConceptUuid: '4b90b73a-ad11-4650-91b0-baea131974e0',
+      },
       graphTypeDisplayNames: {
         'fetal-heart-rate': 'Fetal Heart Rate',
         'cervical-dilation': 'Cervical Dilation',
@@ -361,6 +386,19 @@ export const configSchema = {
         'drugs-fluids': 'Drugs & Fluids',
         'progress-events': 'Progress & Events',
       },
+      amnioticFluidMap: {
+        'Membrane intact': '164899AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Clear liquor': '159484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Meconium Stained': '134488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        Absent: '163747AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Blood Stained': '1077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
+      mouldingMap: {
+        '0': '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+': '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '++': '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+++': '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      },
       testData: {
         testGraphTypes: ['fetal-heart-rate', 'cervical-dilation', 'maternal-pulse', 'temperature', 'blood-pressure'],
         sampleDataPoints: [
@@ -372,14 +410,83 @@ export const configSchema = {
         valueIncrement: 10,
         bloodPressureDecrement: 40,
       },
+      descentOfHeadUuidToValue: {
+        '160769AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 0,
+        '162135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 1,
+        '166065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 2,
+        '166066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 3,
+        '166067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 4,
+        '163734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 5,
+      },
     },
   },
+
   caseManagerRelationshipType: {
     _type: Type.UUID,
     _description: 'Case manager/Client relationship type UUID',
     _default: '9065e3c6-b2f5-4f99-9cbf-f67fd9f82ec5',
   },
 };
+export const DRUG_ORDER_TYPE_UUID = '131168f4-15f5-102d-96e4-000c29c2a5d7';
+export const ENCOUNTER_ROLE = '240b26f9-dd88-4172-823d-4a8bfeb7841f';
+export const MOULDING_NONE_CONCEPT = '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MOULDING_SLIGHT_CONCEPT = '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MOULDING_MODERATE_CONCEPT = '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MOULDING_SEVERE_CONCEPT = '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const CONTRACTION_LEVEL_MILD_CONCEPT = '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const CONTRACTION_LEVEL_MODERATE_CONCEPT = '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const CONTRACTION_LEVEL_STRONG_CONCEPT = '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const CERVIX_CONCEPT = '162261AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const FETAL_HEART_RATE_CONCEPT = '1440AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const FETAL_HEART_RATE_HOUR_CONCEPT = '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const FETAL_HEART_RATE_TIME_CONCEPT = '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const DESCENT_OF_HEAD_CONCEPT = '1810AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const UTERINE_CONTRACTIONS_CONCEPT = '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const UTERINE_CONTRACTION_FREQUENCY_CONCEPT = '166529AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const UTERINE_CONTRACTION_DURATION_CONCEPT = '159368AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MATERNAL_PULSE_CONCEPT = '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const SYSTOLIC_BP_CONCEPT = '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const DIASTOLIC_BP_CONCEPT = '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const TEMPERATURE_CONCEPT = '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const GLUCOSE_LEVEL_CONCEPT = '887AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const PROTEIN_LEVEL_CONCEPT = '161442AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const KETONE_LEVEL_CONCEPT = '165438AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const URINE_VOLUME_CONCEPT = '159660AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const CONTRACTION_COUNT_CONCEPT = '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const URINE_CHARACTERISTICS_CONCEPT = '56AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MEDICATION_CONCEPT = '1282AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MEDICATION_NAME_CONCEPT = '164231AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const OXYTOCIN_DOSE_CONCEPT = '81369AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const ROUTE_CONCEPT = '8878f9c0-a1ce-47ec-a88f-69ef0f6576ba';
+export const FREQUENCY_CONCEPT = 'fd9f82fd-f327-4502-ac8e-5d9144dbd504';
+export const IV_FLUIDS_CONCEPT = '161911AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const DOSAGE_CONCEPT = 'b71ddb80-2d7f-4bde-a44b-236e62d4c1b6';
+export const DRUG_DOSE_CONCEPT = '162384AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const EVENT_TYPE_CONCEPT = '162879AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const EVENT_DESCRIPTION_CONCEPT = '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const AMNIOTIC_FLUID_CONCEPT = '162653AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const MOULDING_CONCEPT = '166527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const BLOOD_GROUP_CONCEPT = '300AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const TIME_SLOT_CONCEPT = '163286AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const PULSE_BP_TIME_CONCEPT = 'bb3724c9-fbcc-49c5-9702-6cde0be325ca';
+export const LABOR_PATTERN_CONCEPT = '164135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const HOURS_SINCE_RUPTURE_CONCEPT = '167149AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const RUPTURED_MEMBRANES_CONCEPT = '164900AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const DATE_OF_ADMISSION_CONCEPT = '1640AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const GESTATION_WEEKS_CONCEPT = '1789AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const ESTIMATED_DELIVERY_DATE_CONCEPT = '5596AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const LAST_MENSTRUAL_PERIOD_CONCEPT = '1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const AMNIOTIC_CLEAR_LIQUOR_CONCEPT = '159484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const AMNIOTIC_MECONIUM_STAINED_CONCEPT = '134488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const AMNIOTIC_ABSENT_CONCEPT = '163747AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const AMNIOTIC_BLOOD_STAINED_CONCEPT = '1077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const AMNIOTIC_MEMBRANE_INTACT_CONCEPT = 'd1787a76-7310-4223-a645-9fd410d418c1';
+export const STATION_0_CONCEPT = '160769AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const STATION_1_CONCEPT = '162135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const STATION_2_CONCEPT = '166065AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const STATION_3_CONCEPT = '166066AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const STATION_4_CONCEPT = '166067AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+export const STATION_5_CONCEPT = '163734AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 export interface ConfigObject {
   requireMaritalStatusOnAgeGreaterThanOrEqualTo: number;
@@ -399,11 +506,13 @@ export interface ConfigObject {
     hivTestingServices: string;
     kpPeerCalender: string;
     htsEcounterUuid: string;
+    triage: string;
   };
   formsList: {
     labourAndDelivery: string;
     antenatal: string;
     postnatal: string;
+    admissionRequestFormUuid: string;
     htsScreening: string;
     htsInitialTest: string;
     htsRetest: string;
@@ -412,6 +521,7 @@ export interface ConfigObject {
     peerCalendarOutreactForm: string;
     autopsyFormUuid: string;
     htsClientTracingFormUuid: string;
+    complaintsFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
   autopsyEncounterFormUuid: string;
@@ -470,8 +580,21 @@ export interface ConfigObject {
       valueIncrement: number;
       bloodPressureDecrement: number;
     };
+    uuids?: {
+      timeSlot: string;
+      mchPartographyEncounterUuid: string;
+      drugsFluidsEncounterUuid: string;
+      contractionStrongConceptUuid: string;
+    };
   };
   caseManagerRelationshipType: string;
+  complaintsConceptUuids: Array<string>;
+  complaints: {
+    chiefComplaintConceptUuid: string;
+    complaintMemberConceptUuid: string;
+    durationConceptUuid: string;
+    onsetConceptUuid: string;
+  };
 }
 
 export interface PartograpyComponents {

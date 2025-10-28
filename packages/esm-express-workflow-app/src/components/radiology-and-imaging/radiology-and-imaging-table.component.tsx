@@ -23,7 +23,7 @@ const RadiologyAndImagingTable: React.FC<RadiologyAndImagingTableProps> = ({ ord
     return (
       <Layer>
         <EmptyState
-          displayText={t('orders', 'orders')}
+          displayText={t('orders', 'Orders')}
           headerTitle={t('radiologyAndImagingOrders', 'Radiology and Imaging Orders')}
           launchForm={() =>
             launchAddLabOrder({

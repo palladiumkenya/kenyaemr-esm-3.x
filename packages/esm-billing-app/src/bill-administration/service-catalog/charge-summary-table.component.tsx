@@ -144,12 +144,20 @@ const ChargeSummaryTable: React.FC = () => {
                 <ComboButton tooltipAlignment="left" label={t('actions', 'Action')}>
                   <MenuItem
                     renderIcon={CategoryAdd}
-                    onClick={() => launchWorkspace('billable-service-form')}
+                    onClick={() =>
+                      launchWorkspace('billable-service-form', {
+                        workspaceTitle: t('chargeServiceForm', 'Charge Service Form'),
+                      })
+                    }
                     label={t('addServiceChargeItem', 'Add charge service')}
                   />
                   <MenuItem
                     renderIcon={WatsonHealthScalpelSelect}
-                    onClick={() => launchWorkspace('commodity-form')}
+                    onClick={() =>
+                      launchWorkspace('commodity-form', {
+                        workspaceTitle: t('chargeCommodityForm', 'Charge Commodity Form'),
+                      })
+                    }
                     label={t('addCommodityChargeItem', 'Add charge item')}
                   />
                   <MenuItem onClick={openBulkUploadModal} label={t('bulkUpload', 'Bulk Upload')} renderIcon={Upload} />
