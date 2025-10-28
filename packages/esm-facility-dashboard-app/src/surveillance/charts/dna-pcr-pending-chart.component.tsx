@@ -66,8 +66,8 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
         ) : lineGraphData.length > 0 ? (
           <BaseIndicatorTrendChart
             data={lineGraphData}
-            title={t('dnapcrPending', 'HEI (6-8 weeks) without DNA-PCR results')}
-            yAxisTitle={t('percentageOfPendingPCRDNAResults', '% HEI (6-8 weeks) without DNA-PCR results')}
+            title={t('dnapcrPending', 'HEI (8 weeks) without DNA-PCR results')}
+            yAxisTitle={t('percentageOfPendingPCRDNAResults', '% HEI (8 weeks) without DNA-PCR results')}
           />
         ) : (
           <EmptyState subTitle={t('noPendingPCRDNAResults', 'No pending PCR DNA results data to display')} />
@@ -78,7 +78,7 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
           <BaseProgressTrackingChart
             data={thirtyDaysrunningData}
             stackTitle={t('progressInAddressingHEIPCRResults ', 'Progress in addressing  HEI PCR results')}
-            leftAxiTtitle={t('percentageHEIPCRResults', '% HEI (6-8 weeks) PCR result')}
+            leftAxiTtitle={t('percentageHEIPCRResults', '% HEI (8 weeks) PCR result')}
           />
         ) : (
           <EmptyState subTitle={t('noPendingPCRDNAResults', 'No pending PCR DNA results data to display')} />
@@ -94,7 +94,7 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
           </div>
         ) : (
           <EmptyState
-            subTitle={t('noCumulativeDnapcrPending', 'No cumulative HEI (6-8 weeks) without DNA-PCR data to display')}
+            subTitle={t('noCumulativeDnapcrPending', 'No cumulative HEI (8 weeks) without DNA-PCR data to display')}
           />
         )}
       </div>
