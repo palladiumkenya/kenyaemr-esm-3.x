@@ -1,6 +1,6 @@
 import { showModal } from '@openmrs/esm-framework';
 import { default as otpVerificationModal } from './otp-verification.modal';
-import { ModalSize } from '@carbon/react/lib/components/Modal/Modal';
+import { type ModalSize } from '@carbon/react/lib/components/Modal/Modal';
 
 /**
  * Options for configuring the OTP Verification modal.
