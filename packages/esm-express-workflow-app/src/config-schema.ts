@@ -135,6 +135,11 @@ export const configSchema = {
     _description: 'OTP Number Expiration dutration in minutes',
     _default: 1,
   },
+  proceduresConceptClassUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'Concept class UUID for procedures orders',
+    _default: '8d490bf4-c2cc-11de-8d13-0010c6dffd0f',
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -179,4 +184,5 @@ export type ExpressWorkflowConfig = {
     notUrgentPriorityConceptUuid: string;
   };
   otpExpirationDurationInminutes: number;
+  proceduresConceptClassUuid: string;
 };
