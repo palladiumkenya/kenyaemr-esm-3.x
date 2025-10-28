@@ -14,10 +14,9 @@ import LocalPatientCard from '../card/Local-card/local-card.component';
 
 const SearchBar: React.FC = () => {
   const { t } = useTranslation();
-
   const addPatient = React.useCallback(() => navigate({ to: '${openmrsSpaBase}/patient-registration' }), []);
 
-  const { identifierTypes } = useConfig<ExpressWorkflowConfig>();
+  const { identifierTypes, otpExpirationDurationInminutes } = useConfig<ExpressWorkflowConfig>();
 
   const identifierTypeItems: Array<IdentifierTypeItem> = identifierTypes.map((item) => ({
     id: item.identifierValue,
@@ -188,7 +187,7 @@ const SearchBar: React.FC = () => {
                 localSearchResults={localSearchResults!}
                 syncedPatients={syncedPatients}
                 searchedNationalId={searchedNationalId}
-                otpExpiryMinutes={5}
+                otpExpiryMinutes={otpExpirationDurationInminutes}
                 hieSearchResults={searchResults}
                 eligibilityResponse={eligibilityResponse}
               />
@@ -212,7 +211,7 @@ const SearchBar: React.FC = () => {
                   bundle={bundle}
                   bundleIndex={index}
                   searchedNationalId={searchedNationalId}
-                  otpExpiryMinutes={5}
+                  otpExpiryMinutes={otpExpirationDurationInminutes}
                   localSearchResults={localSearchResults}
                   eligibilityResponse={eligibilityResponse}
                 />
