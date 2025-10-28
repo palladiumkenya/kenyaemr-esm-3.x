@@ -36,6 +36,7 @@ export interface BillingConfig {
   };
   localeCurrencyMapping: Record<string, string>;
   phoneNumberAttributeTypeUUID: string;
+  nationalIdIdentifierTypeUUID: string;
 }
 
 export const configSchema: ConfigSchema = {
@@ -73,6 +74,11 @@ export const configSchema: ConfigSchema = {
     _type: Type.String,
     _description: 'The person attribute type uuid for phone number',
     _default: 'b2c38640-2603-4629-aebd-3b54f33f1e3a',
+  },
+  nationalIdIdentifierTypeUUID: {
+    _type: Type.String,
+    _description: 'The person attribute type uuid for national id',
+    _default: '49af6cdc-7968-4abb-bf46-de10d7f4859f',
   },
   hieBaseUrl: {
     _type: Type.String,
