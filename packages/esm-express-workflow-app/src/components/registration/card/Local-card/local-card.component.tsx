@@ -12,6 +12,7 @@ import { launchOtpVerificationModal } from '../../../../shared/otp-verification'
 import DependentsComponent from '../../dependants/dependants.component';
 import { useMultipleActiveVisits } from '../../dependants/dependants.resource';
 import { otpManager } from '../HIE-card/hie-card.resource';
+import { sanitizePhoneNumber } from '../../../../shared/utils';
 
 interface LocalPatientCardProps {
   localSearchResults: LocalResponse;
@@ -115,24 +116,29 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
     });
   }, []);
 
-  const createDynamicOTPHandlers = useCallback(
-    (patientUuid: string, patientName: string, initialPhone: string) => {
-      return {
-        onRequestOtp: async (phoneNumber: string): Promise<void> => {
-          setActivePhoneNumbers((prev) => new Map(prev.set(patientUuid, phoneNumber)));
-          await otpManager.requestOTP(phoneNumber, patientName, otpExpiryMinutes, searchedNationalId);
-        },
-        onVerify: async (otp: string): Promise<void> => {
-          const activePhone = activePhoneNumbers.get(patientUuid) || initialPhone;
-          const isValid = await otpManager.verifyOTP(activePhone, otp);
+  const createDynamicOTPHandlers = (patientUuid: string, patientName: string, phoneNumber: string) => {
+    return {
+      onRequestOtp: async (phone: string): Promise<void> => {
+        const sanitizedPhone = sanitizePhoneNumber(phone);
+        try {
+          await otpManager.requestOTP(sanitizedPhone, patientName, otpExpiryMinutes, searchedNationalId);
+        } catch (error) {
+          throw error;
+        }
+      },
+      onVerify: async (otp: string, _phoneNumber?: string): Promise<void> => {
+        const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
+        try {
+          const isValid = await otpManager.verifyOTP(sanitizedPhone, otp);
           if (!isValid) {
             throw new Error('OTP verification failed');
           }
-        },
-      };
-    },
-    [activePhoneNumbers, otpExpiryMinutes, searchedNationalId],
-  );
+        } catch (error) {
+          throw error;
+        }
+      },
+    };
+  };
 
   const handleQueuePatient = useCallback((activeVisit: any, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
