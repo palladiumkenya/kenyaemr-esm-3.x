@@ -106,7 +106,6 @@ export async function requestOtpFromServer(
 ): Promise<{ id: string; message: string }> {
   validateOtpInputs(receiver, patientName);
 
-  // Format phone number before processing
   const formattedPhone = formatKenyanPhoneNumber(receiver);
 
   const context = {
@@ -344,10 +343,6 @@ export class OTPManager {
 
     return true;
   }
-
-  /**
-   * Public method to format phone numbers - useful for external callers
-   */
   formatPhone(phoneNumber: string): string {
     return formatKenyanPhoneNumber(phoneNumber);
   }
