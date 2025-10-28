@@ -30,27 +30,27 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
       {
         group: 'Completed',
         value: getCompletedPercentage(
-          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults,
-          surveillanceSummary.getHeiSixToEightWeeksOld,
+          surveillanceSummary?.getHeiEightWeeksWithoutPCRResults,
+          surveillanceSummary.getHeiEightWeeksOld,
         ),
       },
       {
         group: 'Pending',
         value: getPendingPercentage(
-          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults,
-          surveillanceSummary.getHeiSixToEightWeeksOld,
+          surveillanceSummary?.getHeiEightWeeksWithoutPCRResults,
+          surveillanceSummary.getHeiEightWeeksOld,
         ),
       },
     ],
   };
 
   const thirtyDaysrunningData = getThirtydaysRunninPercentage(
-    surveillanceSummary?.getMonthlyHeiSixToEightWeeksOld.data,
+    surveillanceSummary?.getMonthlyHeiEightWeeksOld.data,
     surveillanceSummary?.getMonthlyHeiDNAPCRPending.data,
   );
 
   const lineGraphData = getThirtydaysRunninPendingPercentage(
-    surveillanceSummary?.getMonthlyHeiSixToEightWeeksOld.data,
+    surveillanceSummary?.getMonthlyHeiEightWeeksOld.data,
     surveillanceSummary?.getMonthlyHeiDNAPCRPending.data,
   );
 
@@ -85,7 +85,7 @@ const DNAPCRPendingCharts: React.FC<DNAPCRPendingChartsProps> = ({ startDate, en
         )}
       </div>
       <div className={styles.chart}>
-        {surveillanceSummary?.getHeiSixToEightWeeksOld > 0 ? (
+        {surveillanceSummary?.getHeiEightWeeksOld > 0 ? (
           <div className={styles.cumulativeChart}>
             <BaseCumulativeProgressTrackingChart
               data={cumulativeDnapcrPendingData}
