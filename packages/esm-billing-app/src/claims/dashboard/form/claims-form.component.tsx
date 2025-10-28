@@ -386,7 +386,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
     currentPhoneRef.current = '';
     otpManager.clearAllOTPs();
     navigate({
-      to: window.getOpenmrsSpaBase() + `home/billing/patient/${patientUuid}/${billUuid}`,
+      to: window.getOpenmrsSpaBase() + `home/accounting/patient/${patientUuid}/${billUuid}`,
     });
   };
 
