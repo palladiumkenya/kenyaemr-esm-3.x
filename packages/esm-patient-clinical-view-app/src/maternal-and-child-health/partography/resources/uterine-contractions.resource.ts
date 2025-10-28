@@ -14,16 +14,44 @@ import { toOmrsIsoString } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
 export function buildUterineContractionsObservation(formData: any): any[] {
-  const timeConfig = { defaultEncounterOffset: 0 };
-  const obsDatetime = toOmrsIsoString(new Date(Date.now() - timeConfig.defaultEncounterOffset));
+  const obsDatetime = toOmrsIsoString(new Date());
   const observations = [];
-  if (formData.value || formData.measurementValue) {
+  if (formData.contractionCount) {
     observations.push({
-      concept: PARTOGRAPHY_CONCEPTS['uterine-contractions'],
-      value: parseFloat(formData.value || formData.measurementValue),
+      concept: '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: parseFloat(formData.contractionCount),
       obsDatetime,
     });
   }
+
+  if (formData.contractionLevel) {
+    const contractionLevelMap = {
+      none: 0,
+      mild: 1,
+      moderate: 2,
+      strong: 3,
+      '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 0, // none
+      '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 1, // mild
+      '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 2, // moderate
+      '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 3, // strong
+    };
+    const contractionLevelValue = contractionLevelMap[formData.contractionLevel] ?? 0;
+    observations.push({
+      concept: '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: contractionLevelValue,
+      obsDatetime,
+    });
+  }
+
+  // 3. Time slot (string, 'Time: HH:mm')
+  if (formData.timeSlot) {
+    observations.push({
+      concept: '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: `Time: ${formData.timeSlot}`,
+      obsDatetime,
+    });
+  }
+
   return observations;
 }
 
@@ -56,9 +84,7 @@ export function transformUterineContractionsEncounterToTableData(
   t: (key: string, defaultValue?: string, options?: any) => string,
 ): any[] {
   const tableData = [];
-  // Helper to map protein/acetone values to display string
   const codeToPlus = (code) => {
-    // Accept both string and number
     if (!code) {
       return '';
     }
@@ -80,7 +106,6 @@ export function transformUterineContractionsEncounterToTableData(
   encounters.forEach((encounter, index) => {
     const encounterDate = new Date(encounter.encounterDatetime);
     const date = encounterDate.toLocaleDateString();
-    // Find all relevant obs for this encounter
     let timeSlot = '';
     let contractionCount = '';
     let contractionLevel = '';
@@ -90,7 +115,6 @@ export function transformUterineContractionsEncounterToTableData(
 
     if (Array.isArray(encounter.obs)) {
       for (const obs of encounter.obs) {
-        // Time Slot: use concept or value string
         if (
           obs.concept.uuid === PARTOGRAPHY_CONCEPTS['time-slot'] ||
           (typeof obs.value === 'string' && obs.value.startsWith('TimeSlot:'))
@@ -106,11 +130,9 @@ export function transformUterineContractionsEncounterToTableData(
             timeSlot = String(obs.value);
           }
         }
-        // Contraction count
         if (obs.concept.uuid === CONTRACTION_COUNT_CONCEPT) {
           contractionCount = String(obs.value);
         }
-        // Contraction level (none, mild, moderate, strong)
         if (
           obs.concept.uuid === MOULDING_NONE_CONCEPT || // none
           obs.concept.uuid === CONTRACTION_LEVEL_MILD_CONCEPT || // mild
@@ -144,7 +166,6 @@ export function transformUterineContractionsEncounterToTableData(
         }
       }
     }
-    // Show row if date is present (do not require timeSlot/volume)
     if (date) {
       tableData.push({
         id: `uterine-contractions-${index}`,

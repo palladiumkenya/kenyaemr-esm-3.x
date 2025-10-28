@@ -97,13 +97,13 @@ const SurveillanceSummaryCards: React.FC<SurveillanceSummaryCardsProps> = ({ sta
       <SummaryCard
         header={t('dnapcrPending', 'Pending DNA-PCR Results')}
         title={t('heiWithoutDNAPCR', 'HEI (6-8 WEEKS) without DNA PCR Results')}
-        value={`${surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults}/${surveillanceSummary.getHeiSixToEightWeeksOld}`}
+        value={`${surveillanceSummary?.getHeiEightWeeksWithoutPCRResults}/${surveillanceSummary.getHeiEightWeeksOld}`}
         percentage={getPercentage(
-          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults,
-          surveillanceSummary.getHeiSixToEightWeeksOld,
+          surveillanceSummary?.getHeiEightWeeksWithoutPCRResults,
+          surveillanceSummary.getHeiEightWeeksOld,
         )}
         mode={
-          surveillanceSummary?.getHeiSixToEightWeeksWithoutPCRResults >= surveillanceSummary?.heiClinicalActionThreshold
+          surveillanceSummary?.getHeiEightWeeksWithoutPCRResults >= surveillanceSummary?.heiClinicalActionThreshold
             ? 'increasing'
             : 'decreasing'
         }

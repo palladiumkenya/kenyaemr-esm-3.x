@@ -1,3 +1,86 @@
+// Utility: Map contraction level UUID to label
+export function contractionLevelUuidToLabel(uuid: string): string {
+  switch (uuid) {
+    case '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+      return 'none';
+    case '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+      return 'mild';
+    case '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+      return 'moderate';
+    case '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
+      return 'strong';
+    default:
+      return uuid;
+  }
+}
+// Utility: Map urine test label/plus to UUID
+export function labelToUuid(label: string): string {
+  switch (label) {
+    case '0':
+      return '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    case '+':
+      return '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    case '++':
+      return '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    case '+++':
+      return '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+    default:
+      return label;
+  }
+}
+// Uterine Contraction Level UUID Map (for forms and lookups)
+export const contractionLevelUuidMap: Record<string, string> = {
+  none: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  mild: '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  moderate: '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  strong: '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+};
+// Utility: Map urine test code/label to plus notation
+// Default Fetal Heart Rate Chart Data
+// ...existing code...
+// ...existing code...
+// Uterine Contraction Level Options (for Cervical Contractions Form)
+export const contractionLevelOptions = [
+  {
+    value: 'none',
+    labelKey: 'noContractions',
+    defaultLabel: 'No Contractions',
+    concept: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    visual: '0',
+    visualClass: 'none',
+    titleKey: 'none',
+    defaultTitle: 'None',
+  },
+  {
+    value: 'mild',
+    labelKey: 'mildContractions',
+    defaultLabel: 'Mild Contractions',
+    concept: '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    visual: '1',
+    visualClass: 'mild',
+    titleKey: 'mild',
+    defaultTitle: 'Mild',
+  },
+  {
+    value: 'moderate',
+    labelKey: 'moderateContractions',
+    defaultLabel: 'Moderate Contractions',
+    concept: '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    visual: '2',
+    visualClass: 'moderate',
+    titleKey: 'moderate',
+    defaultTitle: 'Moderate',
+  },
+  {
+    value: 'strong',
+    labelKey: 'strongContractions',
+    defaultLabel: 'Strong Contractions',
+    concept: '4b90b73a-ad11-4650-91b0-baea131974e0',
+    visual: '3',
+    visualClass: 'strong',
+    title: 'Strong',
+  },
+];
 import {
   configSchema,
   MOULDING_NONE_CONCEPT,
@@ -451,6 +534,17 @@ export const getPartographyTableHeaders = (t: (key: string, fallback: string) =>
 export const getColorForGraph = (colorName: string): string => {
   return PARTOGRAPHY_COLOR_MAPPINGS[colorName as keyof typeof PARTOGRAPHY_COLOR_MAPPINGS] || '#525252';
 };
+
+// Default Fetal Heart Rate Chart Data
+export const defaultFetalHeartRateChartData = [
+  { hour: 0, value: 140, group: 'Fetal Heart Rate', time: '0', color: getColorForGraph('green') },
+  { hour: 10, value: 140, group: 'Fetal Heart Rate', time: '10', color: getColorForGraph('green') },
+  { hour: 20, value: 140, group: 'Fetal Heart Rate', time: '20', color: getColorForGraph('green') },
+  { hour: 30, value: 140, group: 'Fetal Heart Rate', time: '30', color: getColorForGraph('green') },
+  { hour: 40, value: 140, group: 'Fetal Heart Rate', time: '40', color: getColorForGraph('green') },
+  { hour: 50, value: 140, group: 'Fetal Heart Rate', time: '50', color: getColorForGraph('green') },
+  { hour: 60, value: 140, group: 'Fetal Heart Rate', time: '60', color: getColorForGraph('green') },
+];
 
 export const FORM_OPTION_CONCEPTS = {
   AMNIOTIC_FLUID: {

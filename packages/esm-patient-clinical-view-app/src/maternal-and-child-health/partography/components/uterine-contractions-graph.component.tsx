@@ -47,12 +47,10 @@ const UterineContractionsGraph: React.FC<UterineContractionsGraphProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Only show rows with both date and timeSlot
   const filteredTableData = tableData.filter((item) => item.date && item.timeSlot);
   const timeColumns = filteredTableData.map((item) => item.timeSlot || '--');
   const yAxisLabels = ['5', '4', '3', '2', '1'];
 
-  // Carbon skeleton for loading state
   const renderSkeleton = () => (
     <div className={styles.membraneGrid}>
       <div className={styles.gridContainer}>
@@ -165,7 +163,6 @@ const UterineContractionsGraph: React.FC<UterineContractionsGraphProps> = ({
           ) : (
             <div className={styles.membraneGrid}>
               <div className={styles.gridContainer}>
-                {/* Header row with time columns */}
                 <div className={styles.gridHeader}>
                   <div className={styles.gridCell}>{t('time', 'Time')}</div>
                   {timeColumns.map((timeColumn, idx) => (
@@ -174,16 +171,32 @@ const UterineContractionsGraph: React.FC<UterineContractionsGraphProps> = ({
                     </div>
                   ))}
                 </div>
-                {/* Contractions row */}
                 <div className={styles.gridRow}>
                   <div className={styles.gridRowLabel}>{t('contractions', 'Contractions')}</div>
-                  {filteredTableData.map((item, idx) => (
-                    <div key={`contraction-${idx}`} className={styles.gridCell}>
-                      {item.contractionCount !== undefined && item.contractionCount !== null
-                        ? item.contractionCount
-                        : '--'}
-                    </div>
-                  ))}
+                  {filteredTableData.map((item, idx) => {
+                    let contractionLevel = (item.contractionLevel || '').toLowerCase();
+                    if (contractionLevel === '0' || contractionLevel === 'none') {
+                      contractionLevel = 'none';
+                    } else if (contractionLevel === '1' || contractionLevel === 'mild') {
+                      contractionLevel = 'mild';
+                    } else if (contractionLevel === '2' || contractionLevel === 'moderate') {
+                      contractionLevel = 'moderate';
+                    } else if (contractionLevel === '3' || contractionLevel === '5' || contractionLevel === 'strong') {
+                      contractionLevel = 'strong';
+                    } else {
+                      contractionLevel = 'none';
+                    }
+                    return (
+                      <div
+                        key={`contraction-${idx}`}
+                        className={`${styles.gridCell} contractionsGridCell`}
+                        data-contraction-level={contractionLevel}>
+                        {item.contractionCount !== undefined && item.contractionCount !== null
+                          ? item.contractionCount
+                          : '--'}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

@@ -20,7 +20,7 @@ const SurveillanceFilters: React.FC<Props> = ({ filters, onFiltersChange, tabSel
     { key: 'getPregnantPostpartumNotInPrep', label: 'High risk -ve PBFW not enrolled to PrEP' },
     { key: 'getEligibleForVlSampleNotTaken', label: 'Delayed EAC' },
     { key: 'getVirallyUnsuppressedWithoutEAC', label: 'Missed opportunity VL' },
-    { key: 'getHeiSixToEightWeeksWithoutPCRResults', label: 'DNA-PCR Pending' },
+    { key: 'getHeiEightWeeksWithoutPCRResults', label: 'DNA-PCR Pending' },
     { key: 'getHei24MonthsWithoutDocumentedOutcome', label: 'HEI Final Outcomes' },
   ];
   return (

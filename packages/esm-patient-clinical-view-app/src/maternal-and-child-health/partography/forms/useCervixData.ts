@@ -1,5 +1,5 @@
-import { useCervixData } from '../resources/cervix.resource';
-export function useCervixFormData(patientUuid: string) {
+import { useCervixData, UseCervixDataResult } from '../resources/cervix.resource';
+export function useCervixFormData(patientUuid: string): UseCervixDataResult {
   return useCervixData(patientUuid);
 }
 export type {

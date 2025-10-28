@@ -7,8 +7,8 @@ export type SurveillanceSummary = {
   getEligibleForVlSampleNotTaken: number;
   getVirallyUnsuppressed: number;
   getVirallyUnsuppressedWithoutEAC: number;
-  getHeiSixToEightWeeksOld: number;
-  getHeiSixToEightWeeksWithoutPCRResults: number;
+  getHeiEightWeeksOld: number;
+  getHeiEightWeeksWithoutPCRResults: number;
   getHei24MonthsOld: number;
   getHei24MonthsWithoutDocumentedOutcome: number;
   clinicalActionThreshold: number;
@@ -23,7 +23,7 @@ export type SurveillanceSummary = {
   getMonthlyVirallyUnsuppressedWithoutEAC: HivPositiveNotLinkedData;
   getMonthlyPatientsTestedHivPositive: HivPositiveNotLinkedData;
   getMonthlyPregnantOrPostpartumClients: HivPositiveNotLinkedData;
-  getMonthlyHeiSixToEightWeeksOld: HivPositiveNotLinkedData;
+  getMonthlyHeiEightWeeksOld: HivPositiveNotLinkedData;
   getMonthlyEligibleForVl: HivPositiveNotLinkedData;
   getMonthlyHei24MonthsOld: HivPositiveNotLinkedData;
   getMonthlyVirallyUnsuppressed: HivPositiveNotLinkedData;

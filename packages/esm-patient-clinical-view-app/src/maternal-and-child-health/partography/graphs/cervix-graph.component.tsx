@@ -194,6 +194,7 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
     });
   }
   useEffect(() => {
+    let observer: MutationObserver | null = null;
     const applyChartStyling = () => {
       const chartContainer = document.querySelector(`[data-chart-id="cervix"]`);
       if (chartContainer) {
@@ -217,36 +218,60 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
         svgCircles.forEach((circle) => {
           const circleElement = circle as SVGCircleElement;
           const parentGroup = circleElement.closest('g');
-          if (parentGroup) {
-            const stroke = circleElement.getAttribute('stroke') || circleElement.style.stroke;
-            const fill = circleElement.getAttribute('fill') || circleElement.style.fill;
-
-            if (stroke === getColorForGraph('green') || fill === getColorForGraph('green')) {
-              circleElement.style.display = 'none';
-
-              const cx = parseFloat(circleElement.getAttribute('cx') || '0');
-              const cy = parseFloat(circleElement.getAttribute('cy') || '0');
-              const size = 6;
-
-              const svg = circleElement.ownerSVGElement;
-              if (svg) {
+          let isCervicalDilation = false;
+          if (circleElement.hasAttribute('data-group')) {
+            isCervicalDilation = circleElement.getAttribute('data-group')?.toLowerCase().includes('cervical dilation');
+          }
+          if (!isCervicalDilation && parentGroup) {
+            const groupLabel = parentGroup.getAttribute('aria-label') || parentGroup.getAttribute('data-name') || '';
+            if (groupLabel.toLowerCase().includes('cervical dilation')) {
+              isCervicalDilation = true;
+            }
+          }
+          if (!isCervicalDilation) {
+            const stroke = (circleElement.getAttribute('stroke') || circleElement.style.stroke || '').toLowerCase();
+            const fill = (circleElement.getAttribute('fill') || circleElement.style.fill || '').toLowerCase();
+            isCervicalDilation =
+              stroke.includes('green') ||
+              fill.includes('green') ||
+              stroke.includes('#42be65') ||
+              fill.includes('#42be65') ||
+              stroke.includes('#24a148') ||
+              fill.includes('#24a148') ||
+              stroke.includes('rgb(36, 161, 72)') ||
+              fill.includes('rgb(36, 161, 72)') ||
+              stroke.includes('rgb(66, 190, 101)') ||
+              fill.includes('rgb(66, 190, 101)');
+          }
+          if (isCervicalDilation && parentGroup) {
+            circleElement.style.display = 'none';
+            const cx = parseFloat(circleElement.getAttribute('cx') || '0');
+            const cy = parseFloat(circleElement.getAttribute('cy') || '0');
+            const size = 12;
+            const xColor = '#8a3ffc';
+            const svg = circleElement.ownerSVGElement;
+            if (svg) {
+              // Prevent duplicate Xs
+              if (!parentGroup.querySelector('line[data-x-marker]')) {
                 const line1 = document.createElementNS(SVG_NAMESPACE, 'line');
                 line1.setAttribute('x1', (cx - size).toString());
                 line1.setAttribute('y1', (cy - size).toString());
                 line1.setAttribute('x2', (cx + size).toString());
                 line1.setAttribute('y2', (cy + size).toString());
-                line1.setAttribute('stroke', getColorForGraph('green'));
-                line1.setAttribute('stroke-width', '3');
+                line1.setAttribute('stroke', xColor);
+                line1.setAttribute('stroke-width', '5');
                 line1.setAttribute('stroke-linecap', 'round');
+                line1.setAttribute('data-x-marker', 'true');
 
                 const line2 = document.createElementNS(SVG_NAMESPACE, 'line');
                 line2.setAttribute('x1', (cx + size).toString());
                 line2.setAttribute('y1', (cy - size).toString());
                 line2.setAttribute('x2', (cx - size).toString());
                 line2.setAttribute('y2', (cy + size).toString());
-                line2.setAttribute('stroke', getColorForGraph('green'));
-                line2.setAttribute('stroke-width', '3');
+                line2.setAttribute('stroke', xColor);
+                line2.setAttribute('stroke-width', '5');
                 line2.setAttribute('stroke-linecap', 'round');
+                line2.setAttribute('data-x-marker', 'true');
 
                 parentGroup.appendChild(line1);
                 parentGroup.appendChild(line2);
@@ -258,7 +283,20 @@ const CervixGraph: React.FC<CervixGraphProps> = ({
     };
 
     const timer = setTimeout(applyChartStyling, 100);
-    return () => clearTimeout(timer);
+    const chartContainer = document.querySelector(`[data-chart-id="cervix"]`);
+    if (chartContainer && window.MutationObserver) {
+      observer = new MutationObserver(() => {
+        applyChartStyling();
+      });
+      observer.observe(chartContainer, { childList: true, subtree: true });
+    }
+
+    return () => {
+      clearTimeout(timer);
+      if (observer) {
+        observer.disconnect();
+      }
+    };
   }, [cervixFormData, isLoading]);
 
   const shouldRenderChart = finalChartData.length > 0;
