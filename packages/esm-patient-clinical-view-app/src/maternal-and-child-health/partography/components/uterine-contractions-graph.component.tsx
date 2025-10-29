@@ -174,18 +174,26 @@ const UterineContractionsGraph: React.FC<UterineContractionsGraphProps> = ({
                 <div className={styles.gridRow}>
                   <div className={styles.gridRowLabel}>{t('contractions', 'Contractions')}</div>
                   {filteredTableData.map((item, idx) => {
-                    let contractionLevel = (item.contractionLevel || '').toLowerCase();
-                    if (contractionLevel === '0' || contractionLevel === 'none') {
-                      contractionLevel = 'none';
-                    } else if (contractionLevel === '1' || contractionLevel === 'mild') {
-                      contractionLevel = 'mild';
-                    } else if (contractionLevel === '2' || contractionLevel === 'moderate') {
-                      contractionLevel = 'moderate';
-                    } else if (contractionLevel === '3' || contractionLevel === '5' || contractionLevel === 'strong') {
-                      contractionLevel = 'strong';
-                    } else {
-                      contractionLevel = 'none';
-                    }
+                    const rawLevel = (item.contractionLevel || '').toLowerCase();
+
+                    const getContractionLevel = (level) => {
+                      if (level === '0' || level === 'none') {
+                        return 'none';
+                      }
+                      if (level === '1' || level === 'mild') {
+                        return 'mild';
+                      }
+                      if (level === '2' || level === 'moderate') {
+                        return 'moderate';
+                      }
+                      if (level === '3' || level === '5' || level === 'strong') {
+                        return 'strong';
+                      }
+                      return 'none';
+                    };
+
+                    const contractionLevel = getContractionLevel(rawLevel);
+
                     return (
                       <div
                         key={`contraction-${idx}`}
