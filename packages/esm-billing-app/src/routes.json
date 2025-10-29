@@ -327,8 +327,8 @@
     },
     {
       "name": "commodity-form",
-      "component": "addCommodityForm",
-      "title": "Create Charge Item Form",
+      "component": "commodityForm",
+      "title": "Charge Commodity Form",
       "type": "other-form"
     },
     {

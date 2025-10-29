@@ -2,6 +2,21 @@ import { Type } from '@openmrs/esm-framework';
 import _default from 'react-hook-form/dist/logic/appendErrors';
 
 export const configSchema = {
+  complaintsConceptUuids: {
+    _type: Type.Array,
+    _description: 'List of complaint concept UUIDs',
+    _default: ['160531AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
+  },
+  complaints: {
+    _type: Type.Object,
+    _description: 'Complaints configuration',
+    _default: {
+      chiefComplaintConceptUuid: '160531AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      complaintMemberConceptUuid: '5219AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      durationConceptUuid: '159368AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      onsetConceptUuid: 'd7a3441d-6aeb-49be-b7d6-b2a3bb39e78d',
+    },
+  },
   requireMaritalStatusOnAgeGreaterThanOrEqualTo: {
     _type: Type.Number,
     _description: 'Age in years',
@@ -15,6 +30,7 @@ export const configSchema = {
       hivTestingServices: '9c0a7a57-62ff-4f75-babe-5835b0e921b7',
       kpPeerCalender: 'c4f9db39-2c18-49a6-bf9b-b243d673c64d',
       htsEcounterUuid: '9c0a7a57-62ff-4f75-babe-5835b0e921b7', // Used with Contact tracing
+      triage: 'd1059fb9-a079-4feb-a749-eedd709ae542',
     },
   },
   caseManagementForms: {
@@ -53,6 +69,7 @@ export const configSchema = {
       peerCalendarOutreactForm: '7492cffe-5874-4144-a1e6-c9e455472a35',
       autopsyFormUuid: '2b61a73-4971-4fc0-b20b-9a30176317e2',
       htsClientTracingFormUuid: '15ed03d2-c972-11e9-a32f-2a2ae2dbcce4',
+      complaintsFormUuid: '37f6bd8d-586a-4169-95fa-5781f987fe62',
     },
   },
   htsClientTracingConceptsUuids: {
@@ -489,6 +506,7 @@ export interface ConfigObject {
     hivTestingServices: string;
     kpPeerCalender: string;
     htsEcounterUuid: string;
+    triage: string;
   };
   formsList: {
     labourAndDelivery: string;
@@ -503,6 +521,7 @@ export interface ConfigObject {
     peerCalendarOutreactForm: string;
     autopsyFormUuid: string;
     htsClientTracingFormUuid: string;
+    complaintsFormUuid: string;
   };
   defaulterTracingEncounterUuid: string;
   autopsyEncounterFormUuid: string;
@@ -569,6 +588,13 @@ export interface ConfigObject {
     };
   };
   caseManagerRelationshipType: string;
+  complaintsConceptUuids: Array<string>;
+  complaints: {
+    chiefComplaintConceptUuid: string;
+    complaintMemberConceptUuid: string;
+    durationConceptUuid: string;
+    onsetConceptUuid: string;
+  };
 }
 
 export interface PartograpyComponents {

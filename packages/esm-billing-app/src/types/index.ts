@@ -672,3 +672,20 @@ export interface DashboardConfig {
   slot: string;
   title: string;
 }
+
+interface IdentifierType {
+  uuid: string;
+  required: boolean;
+  name: string;
+}
+
+interface PatientIdentifier {
+  uuid: string;
+  identifier: string;
+  identifierType: IdentifierType;
+  preferred: boolean;
+}
+
+export interface PatientIdentifierResponse {
+  results: Array<PatientIdentifier>;
+}

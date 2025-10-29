@@ -40,7 +40,8 @@ import { WaiveBillForm } from './bill-administration/patient-billing/workspaces/
 import CreateBillWorkspace from './bill-administration/patient-billing/workspaces/create-bill/create-bill.workspace';
 
 // Billable Services Components
-import AddServiceForm from './bill-administration/service-catalog/commodity/commodity-form.workspace';
+import AddServiceForm from './bill-administration/service-catalog/services/service-form.workspace';
+import CommodityForm from './bill-administration/service-catalog/commodity/commodity-form.workspace';
 import BulkImportBillableServices from './bill-administration/service-catalog/bulk-import-billable-service.modal';
 
 // Order Components
@@ -125,6 +126,7 @@ export const clockOut = getSyncLifecycle(ClockOut, options);
 
 // Service Management Components
 export const addServiceForm = getSyncLifecycle(AddServiceForm, options);
+export const commodityForm = getSyncLifecycle(CommodityForm, options);
 export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillableServices, options);
 
 // Claims Management Components

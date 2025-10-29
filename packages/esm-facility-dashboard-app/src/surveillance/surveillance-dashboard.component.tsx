@@ -54,7 +54,7 @@ const SurveillancelanceDashboard = () => {
               {currFilters.indicator === 'getVirallyUnsuppressedWithoutEAC' && (
                 <MissedOpportunityChart startDate={defaultStartDate} endDate={defaultEndDate} />
               )}
-              {currFilters.indicator === 'getHeiSixToEightWeeksWithoutPCRResults' && (
+              {currFilters.indicator === 'getHeiEightWeeksWithoutPCRResults' && (
                 <DNAPCRPendingCharts startDate={defaultStartDate} endDate={defaultEndDate} />
               )}
               {currFilters.indicator === 'getHei24MonthsWithoutDocumentedOutcome' && (

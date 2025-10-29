@@ -22,7 +22,7 @@ const LabTable: React.FC<LabTableProps> = ({ orders }) => {
     return (
       <Layer>
         <EmptyState
-          displayText={t('orders', 'orders')}
+          displayText={t('orders', 'Orders')}
           headerTitle={t('laboratoryOrders', 'Laboratory Orders')}
           launchForm={() => launchAddLabOrder({ orderTypeUuid: labOrderTypeUuid, orderableConceptSets })}
         />
