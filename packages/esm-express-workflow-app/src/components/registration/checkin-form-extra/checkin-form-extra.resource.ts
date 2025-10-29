@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { fhirBaseUrl, getLocale, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
-import { Queue } from '../type';
+import { Queue, QueueRoom } from '../type';
 import { useSWRConfig } from 'swr/_internal';
+import useSWR from 'swr';
 
 interface FHIRResponse {
   entry: Array<{ resource: fhir.Location }>;
@@ -118,5 +119,22 @@ export function useMutateQueueEntries() {
         window.dispatchEvent(new CustomEvent('queue-entry-updated'));
       });
     },
+  };
+}
+
+export function useQueueRooms() {
+  const customRepresentation = 'custom:(uuid,display,name,description,queue:(uuid,display))';
+  const apiUrl = `${restBaseUrl}/queue-room?v=${customRepresentation}`;
+
+  const { data, ...rest } = useSWR<{ data: { results: Array<QueueRoom> } }, Error>(apiUrl, openmrsFetch);
+
+  const queueRooms = useMemo(
+    () => data?.data?.results.sort((a, b) => a.display.localeCompare(b.display, getLocale())) ?? [],
+    [data?.data?.results],
+  );
+
+  return {
+    queueRooms,
+    ...rest,
   };
 }

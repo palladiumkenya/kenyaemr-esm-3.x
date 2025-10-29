@@ -8,83 +8,96 @@ import {
   SelectSkeleton,
 } from '@carbon/react';
 import { ResponsiveWrapper, showSnackbar, useConfig, useSession, type Visit } from '@openmrs/esm-framework';
-import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './queue-fields.scss';
-import { postQueueEntry, useMutateQueueEntries, useQueueLocations, useQueues } from './checkin-form-extra.resource';
+import { postQueueEntry, useMutateQueueEntries, useQueueRooms } from './checkin-form-extra.resource';
 import { ExpressWorkflowConfig } from '../../../config-schema';
 
 export interface QueueFieldsProps {
   setOnSubmit(onSubmit: (visit: Visit) => Promise<any>);
 }
 
+const PATIENT_CATEGORIES = [
+  { id: 'triage', name: 'Triage' },
+  { id: 'walk-in', name: 'Walk-in' },
+];
+
 /**
  * This component contains form fields for starting a patient's queue entry.
  */
 const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
   const { t } = useTranslation();
-  const { queueLocations, isLoading: isLoadingQueueLocations } = useQueueLocations();
+  const { queueRooms, isLoading: isLoadingQueueRooms } = useQueueRooms();
   const { sessionLocation } = useSession();
 
-  const filteredQueueLocations = queueLocations.filter((location) => {
-    const locationName = location.name.toLowerCase();
-    return (
-      locationName.includes('walkin') ||
-      locationName.includes('triage') ||
-      locationName.includes('walk-in') ||
-      locationName.includes('walk in')
-    );
-  });
   const {
     visitQueueNumberAttributeUuid,
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
   } = useConfig<ExpressWorkflowConfig>();
 
-  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
-  const { queues, isLoading: isLoadingQueues } = useQueues(selectedQueueLocation);
-  const [selectedService, setSelectedService] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('triage');
+  const [selectedQueueRoom, setSelectedQueueRoom] = useState('');
   const [priority, setPriority] = useState(defaultPriorityConceptUuid);
   const { mutateQueueEntries } = useMutateQueueEntries();
   const memoMutateQueueEntries = useCallback(mutateQueueEntries, [mutateQueueEntries]);
 
   const sortWeight = priority === emergencyPriorityConceptUuid ? 1 : 0;
 
-  const selectedLocationName = useMemo(() => {
-    return filteredQueueLocations.find((loc) => loc.id === selectedQueueLocation)?.name?.toLowerCase() || '';
-  }, [filteredQueueLocations, selectedQueueLocation]);
-
-  const locationType = useMemo(() => {
-    if (selectedLocationName.includes('triage')) {
-      return 'triage';
-    } else if (
-      selectedLocationName.includes('walkin') ||
-      selectedLocationName.includes('walk-in') ||
-      selectedLocationName.includes('walk in')
-    ) {
-      return 'walk-in';
+  const filteredQueueRooms = useMemo(() => {
+    if (!queueRooms || queueRooms.length === 0) {
+      return [];
     }
-    return 'triage';
-  }, [selectedLocationName]);
+
+    return queueRooms.filter((room) => {
+      const roomName = room.name.toLowerCase();
+      const queueName = room.queue?.display?.toLowerCase() || '';
+      const serviceName = room.queue?.service?.display?.toLowerCase() || '';
+
+      if (selectedCategory === 'triage') {
+        return roomName.includes('triage') || queueName.includes('triage') || serviceName.includes('triage');
+      } else if (selectedCategory === 'walk-in') {
+        const isTriageRoom =
+          roomName.includes('triage') || queueName.includes('triage') || serviceName.includes('triage');
+
+        return !isTriageRoom;
+      }
+      return false;
+    });
+  }, [queueRooms, selectedCategory]);
 
   const serviceLabel = useMemo(() => {
-    if (locationType === 'triage') {
-      return t('selectTriageService', 'Select a triage service');
+    if (selectedCategory === 'triage') {
+      return t('selectTriageRoom', 'Select a triage room');
     } else {
-      return t('selectWalkInService', 'Select a walk-in service');
+      return t('selectWalkInRoom', 'Select a walk-in room');
     }
-  }, [locationType, t]);
+  }, [selectedCategory, t]);
 
   const onSubmit = useCallback(
     (visit: Visit) => {
-      if (selectedQueueLocation && selectedService && priority) {
+      if (selectedQueueRoom && priority) {
+        const selectedRoom = filteredQueueRooms.find((room) => room.uuid === selectedQueueRoom);
+        const queueUuid = selectedRoom?.queue?.uuid;
+
+        if (!queueUuid) {
+          showSnackbar({
+            title: t('queueEntryError', 'Error adding patient to the queue'),
+            kind: 'error',
+            isLowContrast: false,
+            subtitle: t('noQueueAssociated', 'No queue associated with selected room'),
+          });
+          return Promise.reject(new Error('No queue associated with selected room'));
+        }
+
         return postQueueEntry(
           visit.uuid,
-          selectedService,
+          queueUuid,
           visit.patient.uuid,
           priority,
           defaultStatusConceptUuid,
           sortWeight,
-          selectedQueueLocation,
+          sessionLocation.uuid,
           visitQueueNumberAttributeUuid,
         )
           .then(() => {
@@ -110,13 +123,14 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
       }
     },
     [
-      selectedQueueLocation,
-      selectedService,
+      selectedQueueRoom,
       priority,
       sortWeight,
       defaultStatusConceptUuid,
       visitQueueNumberAttributeUuid,
       memoMutateQueueEntries,
+      sessionLocation.uuid,
+      filteredQueueRooms,
       t,
     ],
   );
@@ -124,84 +138,65 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
   useEffect(() => {
     setOnSubmit?.(onSubmit);
   }, [onSubmit, setOnSubmit]);
-  useEffect(() => {
-    if (filteredQueueLocations.length > 0 && !selectedQueueLocation) {
-      const triageLocation = filteredQueueLocations.find((location) => location.name.toLowerCase().includes('triage'));
-      const defaultLocation = triageLocation?.id || filteredQueueLocations[0]?.id;
-      setSelectedQueueLocation(defaultLocation);
-    }
-  }, [filteredQueueLocations, selectedQueueLocation]);
 
   useEffect(() => {
-    if (filteredQueueLocations.map((l) => l.id).includes(sessionLocation.uuid)) {
-      setSelectedQueueLocation(sessionLocation.uuid);
+    setSelectedQueueRoom('');
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    if (filteredQueueRooms.length > 0 && !selectedQueueRoom) {
+      setSelectedQueueRoom(filteredQueueRooms[0].uuid);
     }
-  }, [filteredQueueLocations, sessionLocation.uuid]);
+  }, [filteredQueueRooms, selectedQueueRoom]);
 
   return (
     <div>
       <section className={styles.section}>
         <div className={styles.sectionTitle}>{t('patientCategory', 'Patient Category')}</div>
         <ResponsiveWrapper>
-          {isLoadingQueueLocations ? (
-            <RadioButtonGroup name={'queueLocation'} orientation="vertical">
-              <RadioButtonSkeleton />
-              <RadioButtonSkeleton />
-              <RadioButtonSkeleton />
-            </RadioButtonGroup>
-          ) : filteredQueueLocations?.length > 0 ? (
-            <RadioButtonGroup
-              className={styles.radioButtonWrapper}
-              name="queueLocation"
-              id="queueLocation"
-              orientation="vertical"
-              valueSelected={selectedQueueLocation}
-              onChange={(value) => setSelectedQueueLocation(String(value))}>
-              {filteredQueueLocations.map((location) => (
-                <RadioButton
-                  key={location.id}
-                  className={styles.radioButtonOption}
-                  labelText={location.name}
-                  value={location.id}
-                />
-              ))}
-            </RadioButtonGroup>
-          ) : (
-            <InlineNotification
-              className={styles.inlineNotification}
-              kind={'error'}
-              lowContrast
-              subtitle={t('configureQueueLocations', 'Please configure queue locations to continue.')}
-              title={t('noQueueLocationsConfigured', 'No queue locations configured')}
-            />
-          )}
+          <RadioButtonGroup
+            className={styles.radioButtonWrapper}
+            name="patientCategory"
+            id="patientCategory"
+            orientation="vertical"
+            valueSelected={selectedCategory}
+            onChange={(value) => setSelectedCategory(String(value))}>
+            {PATIENT_CATEGORIES.map((category) => (
+              <RadioButton
+                key={category.id}
+                className={styles.radioButtonOption}
+                labelText={category.name}
+                value={category.id}
+              />
+            ))}
+          </RadioButtonGroup>
         </ResponsiveWrapper>
       </section>
 
       <section className={styles.section}>
-        {isLoadingQueues ? (
+        {isLoadingQueueRooms ? (
           <SelectSkeleton />
-        ) : !queues?.length ? (
+        ) : !filteredQueueRooms?.length ? (
           <InlineNotification
             className={styles.inlineNotification}
             kind={'error'}
             lowContrast
-            subtitle={t('configureServices', 'Please configure services to continue.')}
-            title={t('noServicesConfigured', 'No services configured')}
+            subtitle={t('configureQueueRooms', `Please configure ${selectedCategory} queue rooms to continue.`)}
+            title={t('noQueueRoomsConfigured', 'No queue rooms configured')}
           />
         ) : (
           <Select
             labelText={serviceLabel}
-            id="service"
-            name="service"
+            id="queueRoom"
+            name="queueRoom"
             invalidText="Required"
-            value={selectedService}
-            onChange={(event) => setSelectedService(event.target.value)}>
-            {!selectedService ? <SelectItem text={t('selectQueueService', 'Select a queue service')} value="" /> : null}
-            {queues?.length > 0 &&
-              queues.map((service) => (
-                <SelectItem key={service.uuid} text={service.name} value={service.uuid}>
-                  {service.name}
+            value={selectedQueueRoom}
+            onChange={(event) => setSelectedQueueRoom(event.target.value)}>
+            {!selectedQueueRoom ? <SelectItem text={t('selectQueueRoom', 'Select a queue room')} value="" /> : null}
+            {filteredQueueRooms?.length > 0 &&
+              filteredQueueRooms.map((room) => (
+                <SelectItem key={room.uuid} text={room.name} value={room.uuid}>
+                  {room.name}
                 </SelectItem>
               ))}
           </Select>
