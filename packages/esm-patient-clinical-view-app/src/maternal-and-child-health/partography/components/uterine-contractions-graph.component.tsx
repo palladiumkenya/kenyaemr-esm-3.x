@@ -116,6 +116,7 @@ const UterineContractionsGraph: React.FC<UterineContractionsGraphProps> = ({
             <h3 className={styles.fetalHeartRateTitle}>Uterine Contractions</h3>
             <div className={styles.fetalHeartRateControls}>
               <span className={styles.legendText}>
+                {}
                 Contractions per 10 min | Bar Heights: 0=None, 2=Mild, 3=Moderate, 5=Strong
               </span>
             </div>
