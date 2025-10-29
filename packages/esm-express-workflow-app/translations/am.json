@@ -32,6 +32,7 @@
   "confirmationTxt": "ከኦቲፒ በፊት የስልክ ቁጥሩን ያረጋግጡ",
   "consultation": "ምክር (ምክክር)",
   "continueWithCare": "እንክብካቤውን ይቀጥሉ",
+  "CRNumber": "CR Number",
   "dashboardErrorMessage": "የዳሽቦርድ መረጃ መጫን አልተቻለም። እባክዎ እንደገና ይሞክሩ።",
   "dependentRegistrationError": "ጥገኛን በመመዝገብ ላይ ስህተት",
   "dependentRegistrationErrorSubtitle": "ጥገኛን በመመዝገብ ላይ ስህተት: {{error}}",

@@ -32,6 +32,7 @@
   "confirmationTxt": "Verify the phone number before OTP",
   "consultation": "Consultation",
   "continueWithCare": "Continue with care",
+  "CRNumber": "CR Number",
   "dashboardErrorMessage": "Unable to load dashboard data. Please try again.",
   "dependentRegistrationError": "Error registering dependent",
   "dependentRegistrationErrorSubtitle": "Error registering dependent: {{error}}",
