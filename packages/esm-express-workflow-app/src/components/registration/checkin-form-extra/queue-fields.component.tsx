@@ -33,6 +33,7 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
 
   const {
     visitQueueNumberAttributeUuid,
+    triageServiceConceptUuid,
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
   } = useConfig<ExpressWorkflowConfig>();
 
@@ -50,21 +51,17 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
     }
 
     return queueRooms.filter((room) => {
-      const roomName = room.name.toLowerCase();
-      const queueName = room.queue?.display?.toLowerCase() || '';
-      const serviceName = room.queue?.service?.display?.toLowerCase() || '';
+      const serviceUuid = room.queue?.service?.uuid;
 
       if (selectedCategory === 'triage') {
-        return roomName.includes('triage') || queueName.includes('triage') || serviceName.includes('triage');
+        return serviceUuid === triageServiceConceptUuid;
       } else if (selectedCategory === 'walk-in') {
-        const isTriageRoom =
-          roomName.includes('triage') || queueName.includes('triage') || serviceName.includes('triage');
-
-        return !isTriageRoom;
+        return serviceUuid !== triageServiceConceptUuid;
       }
+
       return false;
     });
-  }, [queueRooms, selectedCategory]);
+  }, [queueRooms, selectedCategory, triageServiceConceptUuid]);
 
   const serviceLabel = useMemo(() => {
     if (selectedCategory === 'triage') {
@@ -194,11 +191,15 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
             onChange={(event) => setSelectedQueueRoom(event.target.value)}>
             {!selectedQueueRoom ? <SelectItem text={t('selectQueueRoom', 'Select a queue room')} value="" /> : null}
             {filteredQueueRooms?.length > 0 &&
-              filteredQueueRooms.map((room) => (
-                <SelectItem key={room.uuid} text={room.name} value={room.uuid}>
-                  {room.name}
-                </SelectItem>
-              ))}
+              filteredQueueRooms.map((room) => {
+                const locationSuffix = room.queue?.location?.display ? ` - ${room.queue.location.display}` : '';
+                return (
+                  <SelectItem key={room.uuid} text={`${room.name}${locationSuffix}`} value={room.uuid}>
+                    {room.name}
+                    {locationSuffix}
+                  </SelectItem>
+                );
+              })}
           </Select>
         )}
       </section>

@@ -314,5 +314,9 @@ export interface QueueRoom {
       uuid: string;
       display: string;
     };
+    location: {
+      uuid: string;
+      display: string;
+    };
   };
 }

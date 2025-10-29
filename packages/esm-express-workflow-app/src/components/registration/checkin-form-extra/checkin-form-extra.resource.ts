@@ -105,6 +105,7 @@ export function useQueues(locationUuid?: string) {
     ...rest,
   };
 }
+
 export function useMutateQueueEntries() {
   const { mutate } = useSWRConfig();
 
@@ -123,7 +124,8 @@ export function useMutateQueueEntries() {
 }
 
 export function useQueueRooms() {
-  const customRepresentation = 'custom:(uuid,display,name,description,queue:(uuid,display,service:(uuid,display)))';
+  const customRepresentation =
+    'custom:(uuid,display,name,description,queue:(uuid,display,location:(uuid,display),service:(uuid,display)))';
   const apiUrl = `${restBaseUrl}/queue-room?v=${customRepresentation}`;
 
   const { data, ...rest } = useSWR<{ data: { results: Array<QueueRoom> } }, Error>(apiUrl, openmrsFetch);
