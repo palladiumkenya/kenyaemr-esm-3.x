@@ -222,8 +222,8 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                 <div className={styles.patientAvatar} role="img">
                   <PatientPhoto patientUuid={patientUuid} patientName={patientName} />
                 </div>
-
                 <EnhancedPatientBannerPatientInfo
+                  crNumber={patient?.id}
                   patient={patient}
                   renderedFrom="hie-search"
                   eligibilityData={eligibilityResponse}

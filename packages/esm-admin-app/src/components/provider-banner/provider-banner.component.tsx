@@ -78,6 +78,11 @@ const ProviderBannerTag: React.FC = () => {
 
         <>
           <div className={styles.infoItem}>
+            <span className={styles.label}>{t('nameProvider', 'Name:')}</span>
+            <span className={styles.value}>{name}</span>
+          </div>
+          <div className={styles.divider} />
+          <div className={styles.infoItem}>
             <span className={styles.label}>{t('licenseProvider', 'License:')}</span>
 
             {shouldShowLicenseExpiry && (
@@ -92,14 +97,7 @@ const ProviderBannerTag: React.FC = () => {
               </Tag>
             </span>
           </div>
-
-          <div className={styles.divider} />
         </>
-
-        <div className={styles.infoItem}>
-          <span className={styles.label}>{t('nameProvider', 'Name:')}</span>
-          <span className={styles.value}>{name}</span>
-        </div>
       </div>
     </div>
   );
