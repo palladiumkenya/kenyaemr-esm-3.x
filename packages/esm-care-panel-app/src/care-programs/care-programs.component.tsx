@@ -207,6 +207,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       t,
       currentVisit,
       peerCalendarOutreactForm,
+      hideFilledProgramForm,
       patientUuid,
       handleMutations,
       mutateEnrollments,
