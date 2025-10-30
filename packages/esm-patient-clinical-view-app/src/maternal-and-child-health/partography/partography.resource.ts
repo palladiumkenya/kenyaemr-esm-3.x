@@ -1,25 +1,119 @@
-import { buildUterineContractionsObservation } from './resources/uterine-contractions.resource';
-import { buildBloodPressureObservation } from './resources/blood-pressure.resource';
-import { buildMaternalPulseObservation } from './resources/maternal-pulse.resource';
+// Hook to fetch and manage membrane amniotic fluid and moulding data from OpenMRS
+export function useMembraneAmnioticFluidData(patientUuid: string) {
+  const fetcher = (url: string) => openmrsFetch(url).then((res) => res.json());
+
+  const { data, error, isLoading, mutate } = useSWR(
+    patientUuid
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${MCH_PARTOGRAPHY_ENCOUNTER_UUID}&v=full&limit=100&order=desc`
+      : null,
+    fetcher,
+    {
+      onError: (error) => {
+        console.error('Error fetching membrane amniotic fluid data:', error);
+      },
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+    },
+  );
+
+  const membraneAmnioticFluidEntries = useMemo(() => {
+    try {
+      if (!data?.results || !Array.isArray(data.results)) {
+        return [];
+      }
+
+      const entries = [];
+      for (const encounter of data.results) {
+        if (!encounter.obs || !Array.isArray(encounter.obs)) {
+          continue;
+        }
+
+        const amnioticFluidObs = encounter.obs.find(
+          (obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['amniotic-fluid'],
+        );
+        const mouldingObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['moulding']);
+        const timeObs = encounter.obs.find(
+          (obs) =>
+            obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'] &&
+            typeof obs.value === 'string' &&
+            obs.value.startsWith('Time:'),
+        );
+
+        let time = '';
+        if (timeObs && typeof timeObs.value === 'string') {
+          const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
+          if (timeMatch) {
+            time = timeMatch[1].trim();
+          }
+        }
+
+        if (amnioticFluidObs || mouldingObs) {
+          entries.push({
+            id: `maf-${encounter.uuid}`,
+            uuid: encounter.uuid,
+            amnioticFluid: amnioticFluidObs?.value?.display || amnioticFluidObs?.value || '',
+            moulding: mouldingObs?.value?.display || mouldingObs?.value || '',
+            time,
+            date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+            encounterDatetime: encounter.encounterDatetime,
+          });
+        }
+      }
+      return entries;
+    } catch (error) {
+      console.error('Error processing membrane amniotic fluid data:', error);
+      return [];
+    }
+  }, [data]);
+
+  return {
+    membraneAmnioticFluidEntries,
+    isLoading,
+    error,
+    mutate,
+  };
+}
+
+// Function to save membrane amniotic fluid and moulding data to OpenMRS
+export async function saveMembraneAmnioticFluidData(
+  patientUuid: string,
+  formData: { amnioticFluid: string; moulding: string; time: string },
+  t: unknown,
+  locationUuid?: string,
+  providerUuid?: string,
+) {
+  try {
+    const result = await createPartographyEncounter(
+      patientUuid,
+      'membrane-amniotic-fluid',
+      formData,
+      locationUuid,
+      providerUuid,
+    );
+    if (result?.success && result?.encounter) {
+      return result;
+    } else {
+      throw new Error(result?.message || 'Failed to save membrane amniotic fluid data');
+    }
+  } catch (error) {
+    console.error('Error saving membrane amniotic fluid data:', error);
+    throw new Error(error?.message || 'Failed to save membrane amniotic fluid data');
+  }
+}
 import { openmrsFetch, restBaseUrl, toOmrsIsoString, useConfig } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import React, { useState, useEffect, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import {
   PARTOGRAPHY_CONCEPTS,
   PARTOGRAPHY_ENCOUNTER_TYPES,
+  MCH_PARTOGRAPHY_ENCOUNTER_UUID,
   getPartographyUnit,
   type OpenMRSResponse,
   type PartographyObservation,
   type PartographyEncounter,
   type PartographyGraphType,
-  CONTRACTION_INTENSITY_OPTIONS,
 } from './types';
 import { configSchema, type ConfigObject } from '../../config-schema';
-import {
-  buildTemperatureObservation,
-  transformTemperatureEncounterToChartData,
-} from './resources/temperature.resource';
 
 export type { PartographyObservation, PartographyEncounter };
 const defaultPartographyConfig = configSchema.partography._default;
@@ -201,12 +295,8 @@ export function usePartographyEncounters(patientUuid: string, graphType: string)
 export function usePartographyData(patientUuid: string, graphType: string) {
   const { encounters, isLoading, error, mutate } = usePartographyEncounters(patientUuid, graphType);
 
-  const shouldUseLocalFallback = graphType !== 'fetal-heart-rate';
-
   const localDataFallback = useSWR(
-    !isLoading && encounters.length === 0 && shouldUseLocalFallback
-      ? `partography_local_${patientUuid}_${graphType}`
-      : null,
+    !isLoading && encounters.length === 0 ? `partography_local_${patientUuid}_${graphType}` : null,
     () => {
       const localData = loadPartographyData(patientUuid, graphType);
       return localData;
@@ -232,6 +322,7 @@ function loadPartographyData(patientUuid: string, graphType: string): Partograph
   try {
     const storageKey = generateStorageKey(patientUuid, graphType);
     const localData = JSON.parse(localStorage.getItem(storageKey) || '[]');
+
     const localEncounters = localData.map((item) => ({
       uuid: item.id,
       encounterDatetime: item.timestamp,
@@ -253,10 +344,11 @@ function loadPartographyData(patientUuid: string, graphType: string): Partograph
         },
       ],
     }));
+
     return localEncounters.sort(
       (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
     );
-  } catch {
+  } catch (e) {
     return [];
   }
 }
@@ -269,17 +361,26 @@ export async function createPartographyEncounter(
   providerUuid?: string,
   t?: (key: string, fallback?: string) => string,
 ): Promise<{ success: boolean; message: string; encounter?: PartographyEncounter }> {
-  const translate = t || ((key, fallback) => fallback || key);
   try {
     const observations = buildObservations(graphType, formData);
+
     if (observations.length === 0) {
-      throw new Error(translate('noValidObservations', 'No valid observations to save'));
+      throw new Error(t?.('noValidObservations', 'No valid observations to save') || 'No valid observations to save');
     }
+
     const encounterTypeUuid = await getEncounterTypeForGraph(graphType);
     if (!encounterTypeUuid) {
-      throw new Error(translate('noEncounterTypeFound', `No encounter type found for graph: ${graphType}`));
+      throw new Error(
+        t?.('noEncounterTypeFound', 'No encounter type found for graph: {{graphType}}')?.replace(
+          '{{graphType}}',
+          graphType,
+        ) || `No encounter type found for graph: ${graphType}`,
+      );
     }
+
     let finalLocationUuid = locationUuid;
+
+    // If no location provided, try to get from session or use default
     if (!finalLocationUuid) {
       try {
         const sessionResponse = await openmrsFetch(`${restBaseUrl}/session`);
@@ -289,13 +390,19 @@ export async function createPartographyEncounter(
             finalLocationUuid = sessionData.sessionLocation.uuid;
           }
         }
-      } catch {}
+      } catch (error) {
+        console.warn('Could not get session location:', error);
+      }
+
+      // Fallback to default if still no location
       if (!finalLocationUuid) {
         finalLocationUuid = getDefaultLocationUuid();
       }
     }
+
     const timeConfig = getTimeConfig();
     const encounterDatetime = toOmrsIsoString(new Date(Date.now() - timeConfig.defaultEncounterOffset));
+
     const encounterPayload: any = {
       patient: patientUuid,
       location: finalLocationUuid,
@@ -303,7 +410,9 @@ export async function createPartographyEncounter(
       obs: observations,
       encounterType: encounterTypeUuid,
     };
+
     let finalProviderUuid = providerUuid;
+
     if (!finalProviderUuid) {
       try {
         const sessionResponse = await openmrsFetch(`${restBaseUrl}/session`);
@@ -322,7 +431,8 @@ export async function createPartographyEncounter(
             }
           }
         }
-      } catch {}
+      } catch (error) {}
+
       if (!finalProviderUuid) {
         try {
           const anyProviderResponse = await openmrsFetch(`${restBaseUrl}/provider?v=default&limit=1`);
@@ -332,9 +442,10 @@ export async function createPartographyEncounter(
               finalProviderUuid = anyProviderData.results[0].uuid;
             }
           }
-        } catch {}
+        } catch (error) {}
       }
     }
+
     if (finalProviderUuid) {
       try {
         const providerValidationResponse = await openmrsFetch(`${restBaseUrl}/provider/${finalProviderUuid}?v=default`);
@@ -347,25 +458,32 @@ export async function createPartographyEncounter(
             },
           ];
         }
-      } catch {}
+      } catch (validationError) {}
     }
+
+    // Validate required fields before making API call
     if (!patientUuid) {
-      throw new Error(translate('Patient UUID is required'));
+      throw new Error('Patient UUID is required');
     }
     if (!finalLocationUuid) {
-      throw new Error(translate('Location UUID is required'));
+      throw new Error('Location UUID is required');
     }
     if (!encounterTypeUuid) {
-      throw new Error(translate('Encounter type UUID is required'));
+      throw new Error('Encounter type UUID is required');
     }
     if (!observations || observations.length === 0) {
-      throw new Error(translate('At least one observation is required'));
+      throw new Error('At least one observation is required');
     }
+
+    // Add debugging to see what payload is being sent
+    // Debug: encounterPayload being sent
+
     const response = await openmrsFetch(`${restBaseUrl}/encounter`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(encounterPayload),
     });
+
     if (!response.ok) {
       let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
       try {
@@ -381,26 +499,16 @@ export async function createPartographyEncounter(
                 errorMessage += ` (${detailedError.error.detail})`;
               }
             }
-          } catch {
+          } catch (parseError) {
             errorMessage += ` - Raw Response: ${responseText}`;
           }
         }
-      } catch {}
-      // eslint-disable-next-line no-console
-      console.error('Encounter POST failed', { status: response.status, statusText: response.statusText });
-      try {
-        const raw = await response.text();
-        // eslint-disable-next-line no-console
-        console.error('Encounter POST response body:', raw);
-        if (raw) {
-          errorMessage += ` - Response Body: ${raw}`;
-        }
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
       throw new Error(errorMessage);
     }
+
     const encounter = await response.json();
+
     const cacheKey = generateCacheKey(patientUuid, graphType);
     try {
       const { mutate: globalMutate } = await import('swr');
@@ -409,22 +517,23 @@ export async function createPartographyEncounter(
       setTimeout(async () => {
         await globalMutate(cacheKey);
       }, timeConfig.cacheInvalidationDelay);
-    } catch {}
+    } catch (mutateError) {}
+
     return {
       success: true,
-      message: translate('partographyDataSavedSuccessfully', 'Partography data saved successfully'),
+      message:
+        t?.('partographyDataSavedSuccessfully', 'Partography data saved successfully') ||
+        'Partography data saved successfully',
       encounter,
     };
-  } catch (error: any) {
-    // Log error details for debugging
-    // eslint-disable-next-line no-console
-    console.error('createPartographyEncounter error:', error);
+  } catch (error) {
     return {
       success: false,
-      message: translate(
-        'failedToSavePartographyData',
-        `Failed to save partography data: ${error && error.message ? error.message : String(error)}`,
-      ),
+      message:
+        t?.('failedToSavePartographyData', 'Failed to save partography data: {{error}}')?.replace(
+          '{{error}}',
+          error.message,
+        ) || `Failed to save partography data: ${error.message}`,
     };
   }
 }
@@ -465,6 +574,29 @@ function buildObservations(graphType: string, formData: any): any[] {
   const obsDatetime = toOmrsIsoString(new Date(Date.now() - timeConfig.defaultEncounterOffset));
 
   switch (graphType) {
+    case 'pulse-bp-combined':
+      if (formData.pulse) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['maternal-pulse'],
+          value: parseFloat(formData.pulse),
+          obsDatetime,
+        });
+      }
+      if (formData.systolic) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['systolic-bp'],
+          value: parseFloat(formData.systolic),
+          obsDatetime,
+        });
+      }
+      if (formData.diastolic) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['diastolic-bp'],
+          value: parseFloat(formData.diastolic),
+          obsDatetime,
+        });
+      }
+      break;
     case 'membrane-amniotic-fluid':
       if (formData.time) {
         observations.push({
@@ -473,26 +605,38 @@ function buildObservations(graphType: string, formData: any): any[] {
           obsDatetime,
         });
       }
-      const amnioticFluidMap = defaultPartographyConfig.amnioticFluidMap;
+
+      const amnioticFluidMap = {
+        'Membrane intact': '164899AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Clear liquor': '159484AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Meconium Stained': '134488AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        Absent: '163747AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        'Blood Stained': '1077AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      };
       let amnioticFluidValue = formData.amnioticFluid;
       if (amnioticFluidValue && amnioticFluidMap[amnioticFluidValue]) {
         amnioticFluidValue = amnioticFluidMap[amnioticFluidValue];
       }
       if (amnioticFluidValue) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['amniotic-fluid'],
+          concept: '162653AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
           value: amnioticFluidValue,
           obsDatetime,
         });
       }
-      const mouldingMap = defaultPartographyConfig.mouldingMap;
+      const mouldingMap = {
+        '0': '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+': '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '++': '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        '+++': '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      };
       let mouldingValue = formData.moulding;
       if (mouldingValue && mouldingMap[mouldingValue]) {
         mouldingValue = mouldingMap[mouldingValue];
       }
       if (mouldingValue) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['moulding'],
+          concept: '166527AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
           value: mouldingValue,
           obsDatetime,
         });
@@ -507,21 +651,23 @@ function buildObservations(graphType: string, formData: any): any[] {
         });
       }
 
+      // Save hour as a number (not string)
       if (formData.hour !== undefined && formData.hour !== '') {
         try {
           const hourValue = parseFloat(formData.hour);
-
           if (hourValue >= 0 && hourValue <= 24) {
-            const hourText = `Hour: ${hourValue}`;
             observations.push({
               concept: PARTOGRAPHY_CONCEPTS['fetal-heart-rate-hour'],
-              value: hourText,
+              value: hourValue,
               obsDatetime,
             });
           }
-        } catch (error) {}
+        } catch (error) {
+          console.warn('Skipping hour observation due to validation error:', error);
+        }
       }
 
+      // Using text concept for time (should work fine)
       if (formData.time) {
         try {
           observations.push({
@@ -529,7 +675,9 @@ function buildObservations(graphType: string, formData: any): any[] {
             value: `Time: ${formData.time}`,
             obsDatetime,
           });
-        } catch (error) {}
+        } catch (error) {
+          console.warn('Skipping time observation due to validation error:', error);
+        }
       }
       break;
 
@@ -559,12 +707,14 @@ function buildObservations(graphType: string, formData: any): any[] {
       }
       break;
 
-    case 'descent-of-head': {
+    case 'descent-of-head':
       if (formData.value || formData.measurementValue) {
         let conceptValue = formData.value || formData.measurementValue;
+
         if (formData.conceptUuid) {
           conceptValue = formData.conceptUuid;
         }
+
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['descent-of-head'],
           value: conceptValue,
@@ -572,86 +722,77 @@ function buildObservations(graphType: string, formData: any): any[] {
         });
       }
       break;
-    }
-    case 'pulse-bp-combined': {
-      // Save both maternal pulse and blood pressure observations
-      const pulseObs = buildMaternalPulseObservation({ value: formData.pulse });
-      const bpObs = buildBloodPressureObservation({ systolic: formData.systolic, diastolic: formData.diastolic });
-      return [...pulseObs, ...bpObs];
-    }
-    case 'uterine-contractions': {
-      // Build the primary numeric observation for uterine contractions
-      const uterineObs = buildUterineContractionsObservation(formData) || [];
-      // Allow additional related observations: contraction count, intensity, and time-slot
-      const extra: any[] = [];
 
-      if (formData.contractionCount !== undefined && formData.contractionCount !== null) {
-        extra.push({
-          concept: PARTOGRAPHY_CONCEPTS['contraction-count'],
-          value: formData.contractionCount,
+    case 'uterine-contractions':
+      if (formData.contractionCount !== undefined) {
+        observations.push({
+          concept: '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          value: parseInt(formData.contractionCount, 10),
           obsDatetime,
         });
       }
-      // Defensive normalization: sometimes the UI mistakenly provides the
-      // question concept UUID (uterine-contractions) instead of the answer
-      // concept UUID. Try to map common shapes to a valid answer UUID and
-      // only send the coded obs when we have a reasonable answer UUID.
-      if (formData.contractionLevelUuid) {
-        let intensityUuid = String(formData.contractionLevelUuid);
-
-        // If the provided value equals the question concept UUID, attempt to
-        // resolve the intended answer using other form fields (value/label).
-        if (intensityUuid === PARTOGRAPHY_CONCEPTS['uterine-contractions']) {
-          // Try mapping from any provided label or option value
-          const candidate =
-            CONTRACTION_INTENSITY_OPTIONS.find((opt) => opt.value === String(formData.contractionLevelValue)) ||
-            CONTRACTION_INTENSITY_OPTIONS.find((opt) => opt.conceptUuid === String(formData.contractionLevelValue));
-          if (candidate && candidate.conceptUuid) {
-            intensityUuid = candidate.conceptUuid;
-          }
-        }
-
-        // If intensityUuid still looks like the question UUID or is empty,
-        // skip sending it to avoid server conversion errors.
-        if (intensityUuid && intensityUuid !== PARTOGRAPHY_CONCEPTS['uterine-contractions']) {
-          // Send coded obs as the answer UUID string. Some OpenMRS instances
-          // accept either a plain UUID string or an object; prefer string to
-          // avoid server-side conversion issues seen in some deployments.
-          extra.push({
-            concept:
-              PARTOGRAPHY_CONCEPTS['uterine-contraction-duration'] || PARTOGRAPHY_CONCEPTS['uterine-contractions'],
-            value: intensityUuid,
-            obsDatetime,
-          });
-        } else {
-          // eslint-disable-next-line no-console
-          console.warn(
-            'Skipping contraction intensity obs due to invalid/mismatched UUID',
-            formData.contractionLevelUuid,
-          );
-        }
+      if (formData.contractionLevel) {
+        observations.push({
+          concept: '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          value: formData.contractionLevel, // UUID string for coded value
+          obsDatetime,
+        });
       }
-
       if (formData.timeSlot) {
-        extra.push({
-          concept: PARTOGRAPHY_CONCEPTS['time-slot'] || PARTOGRAPHY_CONCEPTS['event-description'],
-          value: `TimeSlot: ${formData.timeSlot}`,
+        observations.push({
+          concept: '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          value: `Time: ${formData.timeSlot}`,
           obsDatetime,
         });
       }
+      break;
 
-      return [...uterineObs, ...extra];
-    }
-    case 'maternal-pulse': {
-      return [];
-    }
-    case 'blood-pressure': {
-      return [];
-    }
-    case 'temperature': {
-      return buildTemperatureObservation(formData);
-    }
-    case 'urine-analysis': {
+    case 'maternal-pulse':
+      if (formData.value || formData.measurementValue) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['maternal-pulse'],
+          value: parseFloat(formData.value || formData.measurementValue),
+          obsDatetime,
+        });
+      }
+      break;
+
+    case 'blood-pressure':
+      if (formData.systolic) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['systolic-bp'],
+          value: parseFloat(formData.systolic),
+          obsDatetime,
+        });
+      }
+      if (formData.diastolic) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['diastolic-bp'],
+          value: parseFloat(formData.diastolic),
+          obsDatetime,
+        });
+      }
+      break;
+
+    case 'temperature':
+      if (formData.value || formData.measurementValue) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['temperature'],
+          value: parseFloat(formData.value || formData.measurementValue),
+          obsDatetime,
+        });
+      }
+      // Save time observation if provided
+      if (formData.time) {
+        observations.push({
+          concept: '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          value: `Time: ${formData.time}`,
+          obsDatetime,
+        });
+      }
+      break;
+
+    case 'urine-analysis':
       if (formData.proteinLevel) {
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['protein-level'],
@@ -673,8 +814,29 @@ function buildObservations(graphType: string, formData: any): any[] {
           obsDatetime,
         });
       }
+      if (formData.volume !== undefined && formData.volume !== null && formData.volume !== '') {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['urine-volume'],
+          value: formData.volume,
+          obsDatetime,
+        });
+      }
+      // Remove time-slot obs to avoid OpenMRS errors
+      if (formData.eventDescription) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['event-description'],
+          value: formData.eventDescription,
+          obsDatetime,
+        });
+      }
+      if (formData.timeResultsReturned) {
+        observations.push({
+          concept: PARTOGRAPHY_CONCEPTS['event-description'],
+          value: `Results Returned: ${formData.timeResultsReturned}`,
+          obsDatetime,
+        });
+      }
       break;
-    }
 
     case 'drugs-fluids':
       if (formData.medication || formData.drugName) {
@@ -691,17 +853,18 @@ function buildObservations(graphType: string, formData: any): any[] {
           obsDatetime,
         });
       }
+      // Add route and frequency as event descriptions
       if (formData.route) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['route'] || PARTOGRAPHY_CONCEPTS['event-description'],
-          value: formData.route,
+          concept: PARTOGRAPHY_CONCEPTS['event-description'],
+          value: `Route: ${formData.route}`,
           obsDatetime,
         });
       }
       if (formData.frequency) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['frequency'] || PARTOGRAPHY_CONCEPTS['event-description'],
-          value: formData.frequency,
+          concept: PARTOGRAPHY_CONCEPTS['event-description'],
+          value: `Frequency: ${formData.frequency}`,
           obsDatetime,
         });
       }
@@ -741,11 +904,137 @@ function buildObservations(graphType: string, formData: any): any[] {
   return observations;
 }
 
-export function transformEncounterToChartData(encounters: any[], graphType: string): any[] {
-  if (graphType === 'temperature') {
-    return transformTemperatureEncounterToChartData(encounters);
-  }
-  return [];
+export function transformEncounterToChartData(encounters: PartographyEncounter[], graphType: string): any[] {
+  const chartData = [];
+
+  encounters.forEach((encounter) => {
+    const encounterTime = new Date(encounter.encounterDatetime).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+
+    encounter.obs?.forEach((obs) => {
+      try {
+        if (typeof obs.value === 'string' && obs.value.startsWith('{')) {
+          const parsedData = JSON.parse(obs.value);
+          if (parsedData.graphType === graphType && parsedData.data) {
+            const formData = parsedData.data;
+            const value = formData.value || formData.measurementValue;
+            if (value) {
+              const dataPoint = {
+                group: getGraphTypeDisplayName(graphType),
+                time: formData.time || encounterTime,
+                value: parseFloat(value),
+              };
+              chartData.push(dataPoint);
+            }
+          }
+        } else {
+          const conceptUuid = obs.concept.uuid;
+          let value = null;
+          let groupName = '';
+          // Robustly handle uterine contractions: both numeric and coded contraction level
+          if (graphType === 'uterine-contractions') {
+            // Numeric value for graphing
+            if (conceptUuid === PARTOGRAPHY_CONCEPTS['uterine-contractions']) {
+              value = parseFloat(obs.value as string);
+              groupName = getGraphTypeDisplayName('uterine-contractions');
+            }
+            // Coded contraction level (none, mild, moderate, strong)
+            const contractionLevelMap: Record<string, string> = {
+              '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'none',
+              '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'mild',
+              '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'moderate',
+              '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'strong',
+            };
+            if (contractionLevelMap[conceptUuid]) {
+              // For charting, you may want to assign a numeric value for each level
+              const contractionLevelValueMap: Record<string, number> = {
+                none: 0,
+                mild: 1,
+                moderate: 2,
+                strong: 3,
+              };
+              value = contractionLevelValueMap[contractionLevelMap[conceptUuid]];
+              groupName = contractionLevelMap[conceptUuid];
+            }
+          } else {
+            switch (conceptUuid) {
+              case PARTOGRAPHY_CONCEPTS['fetal-heart-rate']:
+                if (graphType === 'fetal-heart-rate') {
+                  value = parseFloat(obs.value as string);
+                  groupName = getGraphTypeDisplayName('fetal-heart-rate');
+                }
+                break;
+              case PARTOGRAPHY_CONCEPTS['cervical-dilation']:
+                if (graphType === 'cervical-dilation') {
+                  value = parseFloat(obs.value as string);
+                  groupName = getGraphTypeDisplayName('cervical-dilation');
+                }
+                break;
+              case PARTOGRAPHY_CONCEPTS['descent-of-head']:
+                if (graphType === 'descent-of-head') {
+                  value = getStationValue(obs.value as string) ?? parseFloat(obs.value as string);
+                  groupName = getGraphTypeDisplayName('descent-of-head');
+                }
+                break;
+              case PARTOGRAPHY_CONCEPTS['maternal-pulse']:
+                if (graphType === 'maternal-pulse') {
+                  value = parseFloat(obs.value as string);
+                  groupName = getGraphTypeDisplayName('maternal-pulse');
+                }
+                break;
+              case PARTOGRAPHY_CONCEPTS['systolic-bp']:
+                if (graphType === 'blood-pressure') {
+                  value = parseFloat(obs.value as string);
+                  groupName = 'Systolic';
+                }
+                break;
+              case PARTOGRAPHY_CONCEPTS['diastolic-bp']:
+                if (graphType === 'blood-pressure') {
+                  value = parseFloat(obs.value as string);
+                  groupName = 'Diastolic';
+                }
+                break;
+              case PARTOGRAPHY_CONCEPTS['temperature']:
+                if (graphType === 'temperature') {
+                  value = parseFloat(obs.value as string);
+                  groupName = getGraphTypeDisplayName('temperature');
+                }
+                break;
+              default:
+                if (typeof obs.value === 'number' || !isNaN(parseFloat(obs.value as string))) {
+                  value = parseFloat(obs.value as string);
+                  groupName = getGraphTypeDisplayName(graphType);
+                }
+                break;
+            }
+          }
+          if (value !== null && groupName) {
+            const dataPoint = {
+              group: groupName,
+              time: encounterTime,
+              value: value,
+            };
+            chartData.push(dataPoint);
+          }
+        }
+      } catch (e) {}
+    });
+  });
+
+  return chartData.sort((a, b) => {
+    // Parse time strings (HH:MM format) for comparison
+    const timeA = a.time.split(':').map(Number);
+    const timeB = b.time.split(':').map(Number);
+
+    // Convert to minutes for easy comparison
+    const minutesA = timeA[0] * 60 + (timeA[1] || 0);
+    const minutesB = timeB[0] * 60 + (timeB[1] || 0);
+
+    return minutesA - minutesB;
+  });
 }
 
 function getGroupNameForGraph(graphType: string): string {
@@ -814,111 +1103,162 @@ export function transformEncounterToTableData(
       hour12: false,
     })}`;
 
-    encounter.obs.forEach((obs, obsIndex) => {
-      try {
-        if (typeof obs.value === 'string') {
-          const parsedData = JSON.parse(obs.value);
-
-          if (parsedData.graphType === graphType && parsedData.data) {
-            const formData = parsedData.data;
-            let value = formData.value || formData.measurementValue;
-
-            if (graphType === 'descent-of-head' && formData.conceptUuid) {
-              value = formData.conceptUuid;
+    if (graphType === 'uterine-contractions') {
+      // Group obs by time for uterine contractions
+      let timeSlot = '';
+      let contractionCount = '';
+      let contractionLevel = 'none';
+      if (Array.isArray(encounter.obs)) {
+        // Always use the last seen contraction level in the encounter (in case order is not guaranteed)
+        for (const obs of encounter.obs) {
+          // Time slot
+          if (
+            obs.concept.uuid === '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' &&
+            typeof obs.value === 'string' &&
+            obs.value.startsWith('Time:')
+          ) {
+            const match = obs.value.match(/Time:\s*(.+)/);
+            if (match) {
+              timeSlot = match[1].trim();
             }
-
-            if (value) {
-              let displayValue;
-
-              if (graphType === 'descent-of-head') {
-                let valueToMap;
-                if (typeof value === 'object' && value !== null) {
-                  const valueObj = value as any;
-                  if (valueObj.conceptUuid) {
-                    valueToMap = valueObj.conceptUuid;
-                  } else if (valueObj.value) {
-                    valueToMap = valueObj.value;
+          }
+          // Contraction count (numeric)
+          if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+            contractionCount = String(obs.value);
+          }
+        }
+        // Now, after looping, get the latest contraction level (if any)
+        for (const obs of encounter.obs) {
+          if (obs.concept.uuid === '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+            let levelUuid = '';
+            if (typeof obs.value === 'string') {
+              levelUuid = obs.value;
+            } else if (obs.value != null && typeof obs.value === 'object' && (obs.value as any)?.uuid) {
+              levelUuid = (obs.value as any).uuid;
+            }
+            if (levelUuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'none';
+            }
+            if (levelUuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'mild';
+            }
+            if (levelUuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'moderate';
+            }
+            if (levelUuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionLevel = 'strong';
+            }
+          }
+        }
+      }
+      if (contractionCount || contractionLevel !== 'none') {
+        tableData.push({
+          id: `${graphType}-${index}`,
+          dateTime,
+          timeSlot,
+          contractionCount,
+          contractionLevel,
+          unit: getUnitForGraphType(graphType),
+        });
+      }
+    } else {
+      // ...existing code for other graph types...
+      encounter.obs.forEach((obs, obsIndex) => {
+        try {
+          if (typeof obs.value === 'string') {
+            const parsedData = JSON.parse(obs.value);
+            if (parsedData.graphType === graphType && parsedData.data) {
+              const formData = parsedData.data;
+              let value = formData.value || formData.measurementValue;
+              if (graphType === 'descent-of-head' && formData.conceptUuid) {
+                value = formData.conceptUuid;
+              }
+              if (value) {
+                let displayValue;
+                if (graphType === 'descent-of-head') {
+                  let valueToMap;
+                  if (typeof value === 'object' && value !== null) {
+                    const valueObj = value as any;
+                    if (valueObj.conceptUuid) {
+                      valueToMap = valueObj.conceptUuid;
+                    } else if (valueObj.value) {
+                      valueToMap = valueObj.value;
+                    } else {
+                      valueToMap = String(value);
+                    }
                   } else {
                     valueToMap = String(value);
                   }
+                  displayValue = getStationDisplay(valueToMap);
                 } else {
-                  valueToMap = String(value);
+                  const numericValue = parseFloat(String(value));
+                  if (!isNaN(numericValue)) {
+                    displayValue = numericValue.toFixed(1);
+                  } else {
+                    displayValue = String(value);
+                  }
                 }
-
-                displayValue = getStationDisplay(valueToMap);
-              } else {
-                const numericValue = parseFloat(String(value));
-                if (!isNaN(numericValue)) {
-                  displayValue = numericValue.toFixed(1);
-                } else {
-                  displayValue = String(value);
-                }
+                const rowData = {
+                  id: `${graphType}-${index}-${obsIndex}`,
+                  dateTime,
+                  value: displayValue,
+                  unit: getUnitForGraphType(graphType),
+                };
+                tableData.push(rowData);
               }
-
-              const rowData = {
-                id: `${graphType}-${index}-${obsIndex}`,
-                dateTime,
-                value: displayValue,
-                unit: getUnitForGraphType(graphType),
-              };
-              tableData.push(rowData);
             }
+          } else {
+            throw new Error('Not a JSON string');
           }
-        } else {
-          throw new Error('Not a JSON string');
-        }
-      } catch (e) {
-        if (mapObservationToGraphType(obs, graphType)) {
-          let conceptName = obs.concept?.display || t?.('unknown', 'Unknown') || 'Unknown';
-          let unit = getUnitForGraphType(graphType);
-
-          if (graphType === 'progress-events') {
-            const eventInfo = getProgressEventInfo(obs.concept?.uuid || '');
-            if (eventInfo) {
-              conceptName = eventInfo.name;
-              unit = eventInfo.unit;
-            } else {
-              conceptName = obs.concept?.display || t?.('progressEvent', 'Progress Event') || 'Progress Event';
+        } catch (e) {
+          if (mapObservationToGraphType(obs, graphType)) {
+            let conceptName = obs.concept?.display || t?.('unknown', 'Unknown') || 'Unknown';
+            let unit = getUnitForGraphType(graphType);
+            if (graphType === 'progress-events') {
+              const eventInfo = getProgressEventInfo(obs.concept?.uuid || '');
+              if (eventInfo) {
+                conceptName = eventInfo.name;
+                unit = eventInfo.unit;
+              } else {
+                conceptName = obs.concept?.display || t?.('progressEvent', 'Progress Event') || 'Progress Event';
+              }
             }
-          }
-
-          let displayValue;
-          if (graphType === 'descent-of-head') {
-            let valueToMap;
-            if (typeof obs.value === 'object' && obs.value !== null) {
-              const valueObj = obs.value as any;
-              if (valueObj.conceptUuid) {
-                valueToMap = valueObj.conceptUuid;
-              } else if (valueObj.value) {
-                valueToMap = valueObj.value;
+            let displayValue;
+            if (graphType === 'descent-of-head') {
+              let valueToMap;
+              if (typeof obs.value === 'object' && obs.value !== null) {
+                const valueObj = obs.value as any;
+                if (valueObj.conceptUuid) {
+                  valueToMap = valueObj.conceptUuid;
+                } else if (valueObj.value) {
+                  valueToMap = valueObj.value;
+                } else {
+                  valueToMap = String(obs.value);
+                }
               } else {
                 valueToMap = String(obs.value);
               }
+              displayValue = getStationDisplay(valueToMap);
             } else {
-              valueToMap = String(obs.value);
+              const numericValue = parseFloat(String(obs.value));
+              if (!isNaN(numericValue)) {
+                displayValue = numericValue.toFixed(1);
+              } else {
+                displayValue = String(obs.value);
+              }
             }
-
-            displayValue = getStationDisplay(valueToMap);
-          } else {
-            const numericValue = parseFloat(String(obs.value));
-            if (!isNaN(numericValue)) {
-              displayValue = numericValue.toFixed(1);
-            } else {
-              displayValue = String(obs.value);
-            }
+            const rowData = {
+              id: `${graphType}-${index}-${obsIndex}`,
+              dateTime,
+              measurement: conceptName,
+              value: displayValue,
+              unit: unit,
+            };
+            tableData.push(rowData);
           }
-
-          const rowData = {
-            id: `${graphType}-${index}-${obsIndex}`,
-            dateTime,
-            measurement: conceptName,
-            value: displayValue,
-            unit: unit,
-          };
-          tableData.push(rowData);
         }
-      }
-    });
+      });
+    }
   });
 
   return tableData.sort(
@@ -926,6 +1266,224 @@ export function transformEncounterToTableData(
   );
 }
 
-export { useFetalHeartRateData } from './resources/fetal-heart-rate.resource';
-export { useDrugOrders, saveDrugOrderData } from './resources/drugs-fluids.resource';
-export { saveMembraneAmnioticFluidData } from './resources/membrane-amniotic-fluid.resource';
+// Hook to fetch and manage fetal heart rate data from OpenMRS
+export function useFetalHeartRateData(patientUuid: string) {
+  const fetcher = (url: string) => openmrsFetch(url).then((res) => res.json());
+
+  // Fetch encounters instead of just observations to get all related data
+  const { data, error, isLoading, mutate } = useSWR(
+    patientUuid
+      ? `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${MCH_PARTOGRAPHY_ENCOUNTER_UUID}&v=full&limit=100&order=desc`
+      : null,
+    fetcher,
+    {
+      onError: (error) => {
+        console.error('Error fetching fetal heart rate data:', error);
+      },
+    },
+  );
+
+  const fetalHeartRateData = useMemo(() => {
+    try {
+      if (!data?.results || !Array.isArray(data.results)) {
+        return [];
+      }
+
+      const fetalHeartRateEntries = [];
+
+      for (const encounter of data.results) {
+        if (!encounter.obs || !Array.isArray(encounter.obs)) {
+          continue;
+        }
+
+        // Look for fetal heart rate observations in this encounter
+        const fetalHeartRateObs = encounter.obs.find(
+          (obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate'],
+        );
+
+        if (fetalHeartRateObs) {
+          const encounterDatetime = new Date(encounter.encounterDatetime);
+
+          // Look for hour and time observations with text format
+          let hour = 0;
+          let time = '';
+
+          // Find hour observation (saved as "Hour: X.X")
+          const hourObs = encounter.obs.find(
+            (obs) =>
+              obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-hour'] &&
+              obs.value &&
+              typeof obs.value === 'string' &&
+              obs.value.startsWith('Hour:'),
+          );
+
+          // Find time observation (saved as "Time: XX:XX")
+          const timeObs = encounter.obs.find(
+            (obs) =>
+              obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'] &&
+              obs.value &&
+              typeof obs.value === 'string' &&
+              obs.value.startsWith('Time:'),
+          );
+
+          // Parse hour from text format "Hour: 2.5"
+          if (hourObs && typeof hourObs.value === 'string') {
+            const hourMatch = hourObs.value.match(/Hour:\s*([0-9.]+)/);
+            if (hourMatch) {
+              hour = parseFloat(hourMatch[1]) || 0;
+            }
+          }
+
+          // Parse time from text format "Time: 03:15"
+          if (timeObs && typeof timeObs.value === 'string') {
+            const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
+            if (timeMatch) {
+              time = timeMatch[1].trim();
+            }
+          }
+
+          const entry = {
+            id: `fhr-${fetalHeartRateObs.uuid}`,
+            uuid: fetalHeartRateObs.uuid,
+            encounterUuid: encounter.uuid,
+            fetalHeartRate: parseFloat(fetalHeartRateObs.value) || 0,
+            hour,
+            time,
+            date: encounterDatetime.toLocaleDateString(),
+            encounterDatetime: encounterDatetime.toISOString(),
+            obsDatetime: fetalHeartRateObs.obsDatetime,
+          };
+
+          fetalHeartRateEntries.push(entry);
+        }
+      }
+
+      const sortedEntries = fetalHeartRateEntries.sort(
+        (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
+      );
+
+      return sortedEntries;
+    } catch (error) {
+      console.error('Error processing fetal heart rate data:', error);
+      return [];
+    }
+  }, [data]);
+
+  return {
+    fetalHeartRateData,
+    isLoading,
+    error,
+    mutate,
+  };
+}
+
+// Function to save fetal heart rate data to OpenMRS
+export async function saveFetalHeartRateData(
+  patientUuid: string,
+  formData: { hour: number; time: string; fetalHeartRate: number },
+  locationUuid?: string,
+  providerUuid?: string,
+) {
+  try {
+    const result = await createPartographyEncounter(
+      patientUuid,
+      'fetal-heart-rate',
+      formData,
+      locationUuid,
+      providerUuid,
+    );
+
+    return result;
+  } catch (error) {
+    console.error('Error saving fetal heart rate data:', error);
+    return {
+      success: false,
+      message: error?.message || 'Failed to save fetal heart rate data',
+    };
+  }
+}
+
+// Function to save drug order data to OpenMRS
+export async function saveDrugOrderData(
+  patientUuid: string,
+  formData: {
+    drugName: string;
+    dosage: string;
+    route: string;
+    frequency: string;
+  },
+) {
+  try {
+    // Use the existing createPartographyEncounter function with drugs-fluids graph type
+    const result = await createPartographyEncounter(patientUuid, 'drugs-fluids', formData);
+
+    return result;
+  } catch (error) {
+    console.error('Error saving drug order data:', error);
+    return {
+      success: false,
+      message: error?.message || 'Failed to save drug order data',
+    };
+  }
+}
+
+// Function to fetch drug orders for a patient
+export function useDrugOrders(patientUuid: string) {
+  // Remove the problematic sort parameter that's causing 500 error
+  const apiUrl = patientUuid
+    ? `${restBaseUrl}/order?patient=${patientUuid}&orderType=131168f4-15f5-102d-96e4-000c29c2a5d7&v=full&limit=50`
+    : null;
+
+  const { data, error, isLoading, mutate } = useSWR(apiUrl, openmrsFetch);
+
+  const drugOrders = useMemo(() => {
+    const responseData = data?.data as any;
+
+    if (!responseData?.results || !Array.isArray(responseData.results)) {
+      // console.log('Drug Orders: No results found');
+      return [];
+    }
+
+    const allOrders = responseData.results;
+    // Filter for active orders and manually sort by dateActivated (newest first)
+    const activeOrders = allOrders
+      .filter((order: any) => order.action === 'NEW' && !order.dateStopped)
+      .sort((a: any, b: any) => {
+        // Manual sorting by dateActivated, handling null values
+        const dateA = a.dateActivated ? new Date(a.dateActivated).getTime() : 0;
+        const dateB = b.dateActivated ? new Date(b.dateActivated).getTime() : 0;
+        return dateB - dateA; // Descending order (newest first)
+      });
+
+    // console.log(`Drug Orders: Found ${allOrders.length} total orders, ${activeOrders.length} active orders`);
+
+    const processedOrders = activeOrders.map((order: any) => {
+      const processed = {
+        id: order.uuid,
+        drugName: order.drug?.display || order.drugNonCoded || 'Unknown Drug',
+        dosage: `${order.dose || ''} ${order.doseUnits?.display || ''}`.trim(),
+        route: order.route?.display || '',
+        frequency: order.frequency?.display || '',
+        date: order.dateActivated ? new Date(order.dateActivated).toLocaleDateString() : '',
+        orderNumber: order.orderNumber,
+        display: order.display,
+        quantity: order.quantity,
+        duration: order.duration,
+        durationUnits: order.durationUnits?.display,
+        asNeeded: order.asNeeded,
+        instructions: order.instructions,
+        orderer: order.orderer?.display,
+      };
+      return processed;
+    });
+
+    return processedOrders;
+  }, [data]);
+
+  return {
+    drugOrders,
+    isLoading,
+    error,
+    mutate,
+  };
+}

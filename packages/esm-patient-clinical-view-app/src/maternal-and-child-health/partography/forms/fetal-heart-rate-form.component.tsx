@@ -57,22 +57,35 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
   });
   const generateHourOptions = () => {
     const options = [];
-    for (let i = 0; i <= 24; i++) {
-      if (i === 0) {
-        options.push({ value: '0.5', label: '30min' });
-      } else {
-        options.push({ value: i.toString(), label: `${i}hr` });
-      }
+    options.push({ value: '0', label: '00' });
+    options.push({ value: '0.5', label: '30min' });
+    for (let i = 1; i <= 24; i++) {
+      options.push({ value: i.toString(), label: `${i}hr` });
       if (i < 24) {
-        const halfHourValue = (i + 0.5).toString();
-        const halfHourLabel = i === 0 ? '1hr' : `${i}hr 30min`;
-        options.push({ value: halfHourValue, label: halfHourLabel });
+        options.push({ value: (i + 0.5).toString(), label: `${i}hr 30min` });
       }
     }
     return options;
   };
 
-  const hourOptions = generateHourOptions();
+  const latestHour = React.useMemo(() => {
+    if (!existingTimeEntries || existingTimeEntries.length === 0) {
+      return null;
+    }
+    // Find the max hour value from existingTimeEntries (hour is already a number)
+    return Math.max(...existingTimeEntries.map((e) => e.hour));
+  }, [existingTimeEntries]);
+
+  // Generate hour options, disabling those before the latest entered hour (float comparison)
+  const hourOptionsWithDisabled = React.useMemo(() => {
+    return generateHourOptions().map((option) => {
+      const hourValue = parseFloat(option.value);
+      return {
+        ...option,
+        disabled: latestHour !== null && hourValue <= latestHour,
+      };
+    });
+  }, [latestHour]);
 
   const handleFormSubmit = async (data: FetalHeartRateFormData) => {
     const hourValue = parseFloat(data.hour);
@@ -213,8 +226,13 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
                   value={field.value}
                   onChange={(e) => field.onChange(e.target.value)}>
                   <SelectItem value="" text={t('admissionTime', 'Admission')} />
-                  {hourOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value} text={option.label} />
+                  {hourOptionsWithDisabled.map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value}
+                      text={option.label}
+                      disabled={option.disabled}
+                    />
                   ))}
                 </Select>
               )}
@@ -258,10 +276,15 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
                   max={200}
                   step={1}
                   value={field.value}
-                  onChange={(_, state) => field.onChange(state.value)}
+                  onChange={(e) => {
+                    let val = (e.target as HTMLInputElement).value;
+                    val = val.replace(/[^\d]/g, '');
+                    field.onChange(val);
+                  }}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
                   size="lg"
+                  allowEmpty
                 />
               )}
             />

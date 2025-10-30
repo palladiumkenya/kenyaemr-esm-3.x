@@ -1,3 +1,4 @@
+export type UseCervixDataResult = ReturnType<typeof useCervixData>;
 import { openmrsFetch, restBaseUrl, toOmrsIsoString } from '@openmrs/esm-framework';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
@@ -81,7 +82,7 @@ export async function saveCervixFormData(
       return { success: false, message: t('Location information is required'), error: 'NO_LOCATION' };
     }
     const now = new Date();
-    now.setMinutes(now.getMinutes() - 1);
+    now.setMinutes(now.getMinutes() - 3);
     const encounterPayload = {
       patient: patientUuid,
       encounterType: MCH_PARTOGRAPHY_ENCOUNTER_UUID,
@@ -125,14 +126,18 @@ export async function saveCervixFormData(
 function buildCervixObservations(formData: CervixFormData): any[] {
   const observations = [];
   const obsDatetime = toOmrsIsoString(new Date());
+  // Save hour as a number (not string)
   if (formData.hour && formData.hour !== '') {
     const hourValue = parseFloat(formData.hour);
     if (!isNaN(hourValue)) {
       observations.push({ concept: CERVIX_FORM_CONCEPTS.hour, value: hourValue, obsDatetime });
     }
   }
+  // Always save time as 'Time: HH:mm' string
   if (formData.time && formData.time !== '') {
-    observations.push({ concept: CERVIX_FORM_CONCEPTS.time, value: formData.time, obsDatetime });
+    // If already prefixed, don't double-prefix
+    const timeValue = formData.time.startsWith('Time:') ? formData.time : `Time: ${formData.time}`;
+    observations.push({ concept: CERVIX_FORM_CONCEPTS.time, value: timeValue, obsDatetime });
   }
   if (formData.cervicalDilation && formData.cervicalDilation !== '') {
     const dilationValue = parseFloat(formData.cervicalDilation);
@@ -143,11 +148,6 @@ function buildCervixObservations(formData: CervixFormData): any[] {
   if (formData.descent && formData.descent !== '') {
     const descentValue = parseFloat(formData.descent);
     if (!isNaN(descentValue)) {
-      // The descent of head is represented in the system as a coded concept
-      // where each station (1..5) maps to an answer concept UUID. The UI
-      // currently provides numeric station values (1..5), so convert that
-      // into the appropriate concept UUID before sending the obs. If we
-      // can't find a mapping, fall back to sending the numeric value.
       const matchingOption = DESCENT_OF_HEAD_OPTIONS.find((opt) => opt.stationValue === descentValue);
       if (matchingOption && matchingOption.value) {
         observations.push({ concept: CERVIX_FORM_CONCEPTS.descentOfHead, value: matchingOption.value, obsDatetime });
@@ -189,86 +189,88 @@ export function useCervixData(patientUuid: string) {
   const transformedData = sortedEncounters.map((encounter) => {
     const observations = encounter.obs || [];
 
-    // Helper: try exact concept match first
-    const byConcept = (uuid: string) => observations.find((obs) => obs.concept?.uuid === uuid);
-
-    let hourObs = byConcept(CERVIX_FORM_CONCEPTS.hour);
-    let timeObs = byConcept(CERVIX_FORM_CONCEPTS.time);
-    let cervicalDilationObs = byConcept(CERVIX_FORM_CONCEPTS.cervicalDilation);
-    let descentObs = byConcept(CERVIX_FORM_CONCEPTS.descentOfHead);
-
-    // If any primary obs were not found, attempt heuristics based on value shapes
-    const unused = new Set(observations);
+    // Fix: extract hour and time from all obs with the same concept UUID by value prefix
+    let hourObs = observations.find(
+      (obs) =>
+        obs.concept?.uuid === CERVIX_FORM_CONCEPTS.hour &&
+        typeof obs.value === 'string' &&
+        obs.value.startsWith('Hour:'),
+    );
+    let timeObs = observations.find(
+      (obs) =>
+        obs.concept?.uuid === CERVIX_FORM_CONCEPTS.time &&
+        typeof obs.value === 'string' &&
+        obs.value.startsWith('Time:'),
+    );
+    // fallback: if not found by prefix, just get the first for each
     if (!hourObs) {
-      hourObs = observations.find((o) => {
-        const v = o.value;
-        if (typeof v === 'number') {
-          return v >= 0 && v <= 23;
-        }
-        if (typeof v === 'string' && /^\d{1,2}$/.test(v)) {
-          return Number(v) >= 0 && Number(v) <= 23;
-        }
-        return false;
-      });
+      hourObs = observations.find((obs) => obs.concept?.uuid === CERVIX_FORM_CONCEPTS.hour);
     }
-
     if (!timeObs) {
-      timeObs = observations.find((o) => typeof o.value === 'string' && /^\d{1,2}:\d{2}$/.test(o.value));
+      timeObs = observations.find((obs) => obs.concept?.uuid === CERVIX_FORM_CONCEPTS.time);
     }
 
-    if (!cervicalDilationObs) {
-      cervicalDilationObs = observations.find((o) => {
-        const v = o.value;
-        if (typeof v === 'number') {
-          return v >= 0 && v <= 10;
+    let cervicalDilationObs = observations.find((obs) => obs.concept?.uuid === CERVIX_FORM_CONCEPTS.cervicalDilation);
+    let descentObs = observations.find((obs) => obs.concept?.uuid === CERVIX_FORM_CONCEPTS.descentOfHead);
+
+    let hour: number | null = null;
+    if (hourObs && hourObs.value !== undefined && hourObs.value !== null) {
+      if (typeof hourObs.value === 'string') {
+        const match = hourObs.value.match(/Hour:\s*([0-9]+(?:\.[0-9]+)?)/);
+        if (match) {
+          hour = Number(match[1]);
+        } else if (/^\d{1,2}(?:\.\d+)?$/.test(hourObs.value)) {
+          hour = Number(hourObs.value);
         }
-        if (typeof v === 'string' && !/^\d{1,2}:\d{2}$/.test(v)) {
-          const parsed = Number(v);
-          return !isNaN(parsed) && parsed >= 0 && parsed <= 10;
-        }
-        return false;
-      });
+      } else if (typeof hourObs.value === 'number') {
+        hour = hourObs.value;
+      }
     }
 
-    if (!descentObs) {
-      // descent might be numeric 1-5, a numeric string, or a coded answer (uuid string)
-      descentObs = observations.find((o) => {
-        const v = o.value;
-        if (typeof v === 'number') {
-          return v >= 1 && v <= 5;
+    // Parse time from 'Time: HH:mm' or fallback to string
+    let time = null;
+    if (timeObs && timeObs.value !== undefined && timeObs.value !== null) {
+      if (typeof timeObs.value === 'string') {
+        const match = timeObs.value.match(/Time:\s*([0-9]{2}:[0-9]{2})/);
+        if (match) {
+          time = match[1];
+        } else if (/^\d{1,2}:\d{2}$/.test(timeObs.value)) {
+          time = timeObs.value;
         }
-        if (typeof v === 'string') {
-          if (/^\d{1,2}$/.test(v)) {
-            return Number(v) >= 1 && Number(v) <= 5;
-          }
-          // likely a UUID (coded answer)
-          if (/^[0-9a-fA-F-]{8,}$/.test(v)) {
-            return true;
-          }
-        }
-        if (typeof v === 'object' && v !== null && ((v as any).uuid || (v as any).display)) {
-          return true;
-        }
-        return false;
-      });
+      } else {
+        time = String(timeObs.value);
+      }
     }
 
-    // Normalize descentOfHead to numeric station where possible
+    // Cervical dilation
+    let cervicalDilation = null;
+    if (cervicalDilationObs && cervicalDilationObs.value !== undefined && cervicalDilationObs.value !== null) {
+      if (typeof cervicalDilationObs.value === 'string') {
+        const parsed = Number(cervicalDilationObs.value);
+        cervicalDilation = !isNaN(parsed) ? parsed : null;
+      } else if (typeof cervicalDilationObs.value === 'number') {
+        cervicalDilation = cervicalDilationObs.value;
+      }
+    }
+
+    // Descent of head (existing logic)
     let descentOfHead = null;
     if (descentObs?.value !== undefined && descentObs?.value !== null) {
       const val = descentObs.value;
       if (typeof val === 'number') {
         descentOfHead = val;
       } else if (typeof val === 'string') {
-        // If the server returned a coded answer (concept UUID) for descent
-        // map it back to the numeric station value using DESCENT_OF_HEAD_OPTIONS.
         const match = DESCENT_OF_HEAD_OPTIONS.find((opt) => opt.value === val || opt.conceptUuid === val);
         if (match && typeof match.stationValue === 'number') {
           descentOfHead = match.stationValue;
         } else {
-          // Fallback: try parsing numeric string
           const parsed = Number(val);
-          descentOfHead = isNaN(parsed) ? null : parsed;
+          if (!isNaN(parsed)) {
+            descentOfHead = parsed;
+          } else {
+            console.warn('[Cervix] descentOfHead unmapped value:', val, '-> fallback to 5');
+            descentOfHead = 5;
+          }
         }
       } else if (typeof val === 'object' && val !== null) {
         const uuid = (val as any).uuid || (val as any).value || null;
@@ -276,14 +278,19 @@ export function useCervixData(patientUuid: string) {
           const match = DESCENT_OF_HEAD_OPTIONS.find((opt) => opt.value === uuid || opt.conceptUuid === uuid);
           if (match && typeof match.stationValue === 'number') {
             descentOfHead = match.stationValue;
+          } else {
+            console.warn('[Cervix] descentOfHead unmapped object value:', uuid, '-> fallback to 5');
+            descentOfHead = 5;
           }
         }
       }
     }
+    if (descentOfHead === null || isNaN(descentOfHead)) {
+      console.warn('[Cervix] descentOfHead was null/NaN after all mapping, fallback to 5');
+      descentOfHead = 5;
+    }
 
-    // Also compute a human-friendly label for descent (when server returns
-    // a coded answer UUID we map it to the option's text). Keep numeric
-    // `descentOfHead` for charting but expose `descentLabel` for tables/UI.
+    // Human-friendly label for descent
     let descentLabel: string | null = null;
     if (descentObs && descentObs.value !== undefined && descentObs.value !== null) {
       const val = descentObs.value;
@@ -293,7 +300,6 @@ export function useCervixData(patientUuid: string) {
           descentLabel = match.text;
         }
       }
-      // if no label found and we have a numeric station, use that
       if (!descentLabel && typeof descentOfHead === 'number') {
         descentLabel = String(descentOfHead);
       }
@@ -302,15 +308,12 @@ export function useCervixData(patientUuid: string) {
     return {
       uuid: encounter.uuid,
       encounterDatetime: encounter.encounterDatetime,
-      hour: hourObs?.value !== undefined && hourObs?.value !== null ? Number(hourObs.value) : null,
-      time: timeObs?.value !== undefined && timeObs?.value !== null ? String(timeObs.value) : null,
-      cervicalDilation:
-        cervicalDilationObs?.value !== undefined && cervicalDilationObs?.value !== null
-          ? Number(cervicalDilationObs.value)
-          : null,
+      hour,
+      time,
+      cervicalDilation,
       descentOfHead,
       descentLabel,
-      timeDisplay: timeObs?.value ? `${hourObs?.value || '??'}:${timeObs.value}` : null,
+      timeDisplay: time ? `${hour !== null ? hour : '??'}:${time}` : null,
     };
   });
   const existingTimeEntries = transformedData

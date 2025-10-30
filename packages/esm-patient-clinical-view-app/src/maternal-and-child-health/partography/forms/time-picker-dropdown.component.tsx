@@ -22,8 +22,6 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
   existingTimeEntries = [],
 }) => {
   const [hours, minutes] = value && value.includes(':') ? value.split(':') : ['', ''];
-
-  // Memoize sorted entries and latest entry to avoid re-sorting on every render
   const latestEntry = useMemo(() => {
     if (!existingTimeEntries || existingTimeEntries.length === 0) {
       return null;
@@ -50,18 +48,24 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
     return currentTimeInMinutes <= latestTimeInMinutes;
   };
 
-  // Memoize options generation so we don't recreate arrays on every render
   const hourOptions = useMemo(() => {
+    if (!latestEntry) {
+      return Array.from({ length: 24 }, (_, i) => {
+        const hour = i.toString().padStart(2, '0');
+        return { value: hour, text: hour, disabled: false, reason: '' };
+      });
+    }
+    const [latestHour, latestMinute] = latestEntry.time.split(':').map(Number);
     return Array.from({ length: 24 }, (_, i) => {
       const hour = i.toString().padStart(2, '0');
       let isDisabled = false;
       let disableReason = '';
-      if (existingTimeEntries && existingTimeEntries.length > 0 && latestEntry) {
-        const [latestHour] = latestEntry.time.split(':').map(Number);
-        if (i < latestHour) {
-          isDisabled = true;
-          disableReason = 'before latest entry';
-        }
+      if (i < latestHour) {
+        isDisabled = true;
+        disableReason = 'before latest entry';
+      } else if (i === latestHour && latestMinute >= 55) {
+        isDisabled = true;
+        disableReason = 'latest entry full hour';
       }
       const displayText = isDisabled ? `${hour} ${disableReason}` : hour;
       return {
@@ -74,18 +78,24 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
   }, [existingTimeEntries, latestEntry]);
 
   const minuteOptions = useMemo(() => {
+    if (!latestEntry || !hours) {
+      return Array.from({ length: 12 }, (_, i) => {
+        const minute = (i * 5).toString().padStart(2, '0');
+        return { value: minute, text: minute, disabled: false };
+      });
+    }
+    const [latestHour, latestMinute] = latestEntry.time.split(':').map(Number);
+    const currentHour = parseInt(hours);
     return Array.from({ length: 12 }, (_, i) => {
       const minute = (i * 5).toString().padStart(2, '0');
       let isDisabled = false;
       let disableReason = '';
-      if (hours && existingTimeEntries.length > 0 && latestEntry) {
-        const currentHour = parseInt(hours);
-        const currentMinute = i * 5;
-        const [latestHour, latestMinute] = latestEntry.time.split(':').map(Number);
-        if (currentHour === latestHour && currentMinute <= latestMinute) {
-          isDisabled = true;
-          disableReason = `≤ ${latestMinute} min`;
-        }
+      if (currentHour < latestHour) {
+        isDisabled = true;
+        disableReason = 'before latest entry';
+      } else if (currentHour === latestHour && i * 5 <= latestMinute) {
+        isDisabled = true;
+        disableReason = `≤ ${latestMinute} min`;
       }
       const displayText = isDisabled ? `${minute} ${disableReason}` : minute;
       return { value: minute, text: displayText, disabled: isDisabled };
@@ -181,35 +191,6 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
         </div>
 
         {invalid && invalidText && <div className={styles.errorText}>{invalidText}</div>}
-
-        {latestEntry && (
-          <div className={styles.timeConstraint}>
-            Latest entry: <strong>{latestEntry.time}</strong> - Next measurement must be after this time
-          </div>
-        )}
-
-        {existingTimeEntries.length > 0 && (
-          <div className={styles.usedTimesIndicator}>
-            <strong>Time Restrictions:</strong>
-            <br />
-            <strong>Used Times:</strong> {existingTimeEntries.map((entry) => entry.time).join(', ')}
-            <br />
-            <strong>Blocked Hours:</strong>{' '}
-            {hourOptions
-              .filter((opt) => opt.disabled)
-              .map((opt) => opt.value)
-              .join(', ')}{' '}
-            (grayed out)
-            <br />
-            <small>You can only select times after the latest entry</small>
-          </div>
-        )}
-
-        {value && (
-          <div className={styles.timePreview}>
-            Selected Time: <strong>{value}</strong>
-          </div>
-        )}
       </FormGroup>
     </div>
   );

@@ -2,6 +2,38 @@
 @use '@carbon/type';
 @use '@carbon/colors';
 
+[data-chart-id='cervix'] svg .axis path,
+[data-chart-id='cervix'] svg .axis line {
+  stroke: #111 !important;
+  stroke-width: 2px !important;
+  stroke-dasharray: none !important;
+}
+[data-chart-id='cervix'] svg .axis text {
+  fill: #111 !important;
+}
+
+.contractionsGridCell[data-contraction-level='strong'] {
+  background-color: #111 !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+}
+
+.contractionsGridCell[data-contraction-level='moderate'] {
+  background-color: #fff !important;
+  color: #111 !important;
+  font-weight: 700 !important;
+  background-image: repeating-linear-gradient(45deg, #111 0 2px, transparent 2px 8px) !important;
+  background-size: 12px 12px !important;
+}
+
+.contractionsGridCell[data-contraction-level='mild'] {
+  background-color: #fff !important;
+  color: #111 !important;
+  font-weight: 700 !important;
+  background-image: radial-gradient(#111 2.5px, transparent 2.5px) !important;
+  background-size: 10px 10px !important;
+}
+
 .partographyContainer {
   padding: layout.$spacing-05;
   background-color: colors.$gray-10;
@@ -927,10 +959,10 @@
   gap: layout.$spacing-02;
 
   &.low {
-    color: colors.$gray-70;
+    color: colors.$red-50;
 
     .arrow {
-      color: colors.$gray-70;
+      color: colors.$red-50;
       font-size: 1.4em;
       font-weight: bold;
       margin-right: layout.$spacing-02;
@@ -1109,25 +1141,29 @@
     border-color: colors.$gray-50;
   }
 
-  // Mild - Light blue background
+  // Mild - Black dots pattern
   &.mild {
-    background-color: colors.$blue-30;
-    color: colors.$blue-80;
-    border-color: colors.$blue-50;
+    background-color: #fff;
+    color: #111;
+    border-color: colors.$gray-50;
+    background-image: radial-gradient(#111 3px, transparent 3px);
+    background-size: 12px 12px;
   }
 
-  // Moderate - Orange background
+  // Moderate - Diagonal black lines pattern (tuned)
   &.moderate {
-    background-color: colors.$orange-40;
-    color: colors.$orange-90;
-    border-color: colors.$orange-60;
+    background-color: #fff;
+    color: #111;
+    border-color: colors.$gray-50;
+    background-image: repeating-linear-gradient(135deg, #111 0 4px, transparent 4px 12px);
+    background-size: 16px 16px;
   }
 
-  // Strong - Dark red background
+  // Strong - Solid black
   &.strong {
-    background-color: colors.$red-60;
-    color: colors.$white;
-    border-color: colors.$red-70;
+    background-color: #111;
+    color: #fff;
+    border-color: #111;
   }
 }
 
@@ -1402,21 +1438,25 @@
 }
 
 .contractionBarMild {
-  background-color: colors.$blue-40;
-  border: 2px solid colors.$blue-60;
-  box-shadow: inset 0 0 4px rgba(13, 90, 170, 0.3);
+  background-color: #fff;
+  border: 2px solid #111;
+  background-image: radial-gradient(#111 3px, transparent 3px);
+  background-size: 12px 12px;
+  box-shadow: none;
 }
 
 .contractionBarModerate {
-  background-color: colors.$orange-50;
-  border: 2px solid colors.$orange-70;
-  box-shadow: inset 0 0 4px rgba(255, 131, 28, 0.3);
+  background-color: #fff;
+  border: 2px solid #111;
+  background-image: repeating-linear-gradient(135deg, #111 0 4px, transparent 4px 12px);
+  background-size: 16px 16px;
+  box-shadow: none;
 }
 
 .contractionBarStrong {
-  background-color: colors.$red-60;
-  border: 2px solid colors.$red-80;
-  box-shadow: inset 0 0 4px rgba(218, 30, 40, 0.3);
+  background-color: #111;
+  border: 2px solid #111;
+  box-shadow: none;
 }
 
 // Oxytocin Bar Visual Indicators
@@ -1438,26 +1478,14 @@
   box-shadow: inset 0 0 4px rgba(218, 30, 40, 0.3);
 }
 
-// Grid cell states for filled contractions
 .contractionsGridCell {
-  // ...existing styles...
-
-  &.contractionBarMild {
-    background-color: colors.$blue-10;
-    border: 1px solid colors.$blue-30;
-  }
-
-  &.contractionBarModerate {
-    background-color: colors.$orange-10;
-    border: 1px solid colors.$orange-30;
-  }
-
+  &.contractionBarMild,
+  &.contractionBarModerate,
   &.contractionBarStrong {
-    background-color: colors.$red-10;
-    border: 1px solid colors.$red-30;
+    background-color: transparent;
+    border: none;
   }
 
-  // Add visual feedback for filled cells
   &[data-filled='true'] {
     position: relative;
 
@@ -1611,7 +1639,7 @@
     border: 2px solid colors.$gray-40;
     margin-bottom: layout.$spacing-04;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    min-height: 400px;
+    min-height: 650px; // Match or exceed chart height
 
     // Medical chart styling
     :global(.cds--chart-wrapper) {

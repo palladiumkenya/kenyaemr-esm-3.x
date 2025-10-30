@@ -109,16 +109,12 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
     if (patient?.uuid) {
       setIsSaving(true);
       try {
-        const result = await saveDrugOrderData(
-          patient.uuid,
-          {
-            drugName: data.drugName,
-            dosage: data.dosage,
-            route: data.route,
-            frequency: data.frequency,
-          },
-          t,
-        );
+        const result = await saveDrugOrderData(patient.uuid, {
+          drugName: data.drugName,
+          dosage: data.dosage,
+          route: data.route,
+          frequency: data.frequency,
+        });
 
         if (result.success) {
           setSaveSuccess(true);
