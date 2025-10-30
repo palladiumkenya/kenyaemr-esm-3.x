@@ -302,3 +302,21 @@ export type DependentWithPhone =
         telecom?: { system: string; value: string }[];
       };
     };
+export interface QueueRoom {
+  uuid: string;
+  display: string;
+  name: string;
+  description: string;
+  queue: {
+    uuid: string;
+    display: string;
+    service: {
+      uuid: string;
+      display: string;
+    };
+    location: {
+      uuid: string;
+      display: string;
+    };
+  };
+}
