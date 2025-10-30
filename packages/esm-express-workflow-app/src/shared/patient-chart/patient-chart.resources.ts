@@ -132,7 +132,7 @@ type Tag = { uuid: string; display: string; name: string; description: string };
 
 const useAdmissionLocationTags = (locationUuid?: string) => {
   const rep = 'custom:(tags:(uuid,display,name,description))';
-  const url = `${restBaseUrl}/location/ce15c4f1-dd12-4d0b-8d7c-4b97e95cfbaf?v=${rep}`;
+  const url = `${restBaseUrl}/location/${locationUuid}?v=${rep}`;
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ tags: Array<Tag> }>>(
     locationUuid ? url : null,
     openmrsFetch,
