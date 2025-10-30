@@ -79,19 +79,15 @@ const ClaimsTable: React.FC<TableProps> = ({
 
     const patientName = claim.patientName?.toLowerCase();
     const providerName = claim.providerName?.toLowerCase();
-    const timeStamp = new Date(claim.dateFrom);
+    const claimDate = new Date(claim.dateFrom);
     const preauthStatus = claim.status;
 
-    // Check status (allow 'all' to bypass the filter)
     const statusMatch = status === 'all' || preauthStatus === status;
 
-    // Check search filter (patient name or provider name contains the search term)
     const searchMatch = !search || patientName?.includes(search) || providerName?.includes(search);
 
-    // Check date range filter (timestamp is between fromDate and toDate if provided)
-    const dateMatch = (!fromDate || timeStamp >= fromDate) && (!toDate || timeStamp <= toDate);
+    const dateMatch = (!fromDate || claimDate >= fromDate) && (!toDate || claimDate <= toDate);
 
-    // Return true if all conditions match
     return statusMatch && searchMatch && dateMatch;
   };
 
@@ -180,7 +176,7 @@ const ClaimsTable: React.FC<TableProps> = ({
   };
 
   const renderDateFromCell = (cellValue: string) => {
-    return formatDate(parseDate(cellValue));
+    return formatDate(parseDate(cellValue), { time: true, noToday: true });
   };
 
   const renderApprovedTotalCell = (row: DataTableRow, rowStatus: string, cellValue: any) => {
