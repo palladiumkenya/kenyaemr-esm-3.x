@@ -1,7 +1,19 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AssignedExtension, useAssignedExtensions, useConfig } from '@openmrs/esm-framework';
+import {
+  AssignedExtension,
+  FetchResponse,
+  type Location,
+  openmrsFetch,
+  restBaseUrl,
+  useAssignedExtensions,
+  useConfig,
+  useEmrConfiguration,
+  usePatient,
+  useVisit,
+} from '@openmrs/esm-framework';
 import { ExpressWorkflowConfig } from '../../config-schema';
+import useSWR from 'swr';
 
 export const usePatientChartTabs = (navigationPath: string, patientUuid: string, patient?: fhir.Patient) => {
   const { t } = useTranslation();
@@ -69,4 +81,66 @@ export const usePatientChartTabs = (navigationPath: string, patientUuid: string,
     });
   }, [tabs, patientChartConfig, patient, navigationPath]);
   return tabsExtensions;
+};
+
+/**
+ * Show partography component when patient is a female patient, admitted to labour ward
+ * @param patientUuid string
+ */
+export const useShowPatography = (patientUuid: string) => {
+  const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
+  const isFemale = patient?.gender?.toLowerCase() === 'female';
+  const { inPatientVisitTypeUuid } = useConfig<{ inPatientVisitTypeUuid: string }>({
+    externalModuleName: '@kenyaemr/esm-ward-app',
+  });
+  const { currentVisit, error: visitError, isLoading: isLoadingVisit } = useVisit(patientUuid);
+  const { emrConfiguration, errorFetchingEmrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
+  const { isAdmitted, admissionLocation } = useMemo<{ isAdmitted: boolean; admissionLocation?: Location }>(() => {
+    const isInPatientVisit = currentVisit?.visitType?.uuid === inPatientVisitTypeUuid;
+    const admissionEncounter = currentVisit?.encounters?.find(
+      (en) => en.encounterType.uuid === emrConfiguration?.admissionEncounterType?.uuid,
+    );
+    const dischargeEncounter = currentVisit?.encounters?.find(
+      (en) => en.encounterType.uuid === emrConfiguration?.exitFromInpatientEncounterType?.uuid,
+    );
+
+    return {
+      isAdmitted: currentVisit && isInPatientVisit && admissionEncounter && !dischargeEncounter,
+      admissionLocation: admissionEncounter?.location,
+    };
+  }, [
+    currentVisit,
+    emrConfiguration?.admissionEncounterType?.uuid,
+    emrConfiguration?.exitFromInpatientEncounterType.uuid,
+    inPatientVisitTypeUuid,
+  ]);
+  const { error: tagsError, isLoading: isloadingTags, tags } = useAdmissionLocationTags(admissionLocation?.uuid);
+  const { inpatientLocationTags } = useConfig<ExpressWorkflowConfig>();
+  const admissionLocationIsLabourWard = useMemo(
+    () => Object.values(inpatientLocationTags).every((tag) => tags.some((t) => t.uuid === tag)),
+    [inpatientLocationTags, tags],
+  );
+
+  return {
+    isLoading: isLoadingPatient || isLoadingPatient || isLoadingEmrConfiguration || isloadingTags,
+    error: patientError ?? visitError ?? errorFetchingEmrConfiguration ?? tagsError,
+    showPartography: isFemale && isAdmitted && admissionLocationIsLabourWard,
+  };
+};
+
+type Tag = { uuid: string; display: string; name: string; description: string };
+
+const useAdmissionLocationTags = (locationUuid?: string) => {
+  const rep = 'custom:(tags:(uuid,display,name,description))';
+  const url = `${restBaseUrl}/location/${locationUuid}?v=${rep}`;
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ tags: Array<Tag> }>>(
+    locationUuid ? url : null,
+    openmrsFetch,
+  );
+  return {
+    tags: data?.data?.tags ?? [],
+    isLoading,
+    error,
+    mutate,
+  };
 };

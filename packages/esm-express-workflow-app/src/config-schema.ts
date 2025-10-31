@@ -145,6 +145,12 @@ export const configSchema = {
     _description: 'Concept UUID for triage service',
     _default: '167411AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  inpatientLocationTags: {
+    _default: {
+      maternityWard: 'b95dd376-fa35-40a6-b140-d144c5f22f62',
+      labourWard: '7680b7ee-6880-450c-8b7e-2a748b6f9dc7',
+    },
+  },
 };
 
 export type ExpressWorkflowConfig = {
@@ -191,4 +197,8 @@ export type ExpressWorkflowConfig = {
   otpExpirationDurationInminutes: number;
   proceduresConceptClassUuid: string;
   triageServiceConceptUuid: string;
+  inpatientLocationTags: {
+    maternityWard: string;
+    labourWard: string;
+  };
 };
