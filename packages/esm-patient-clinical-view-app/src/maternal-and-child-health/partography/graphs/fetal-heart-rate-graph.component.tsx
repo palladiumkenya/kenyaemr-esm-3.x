@@ -16,7 +16,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
-import { getColorForGraph, generateRange } from '../types';
+import { getColorForGraph, generateRange, defaultFetalHeartRateChartData } from '../types';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 enum ScaleTypes {
@@ -78,9 +78,9 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
   );
   const getFetalHeartRateStatus = (value: string): { type: string; text: string; color: string } => {
     const numValue = parseInt(value.replace(' bpm', ''));
-    if (numValue < 100) {
-      return { type: 'warm-gray', text: 'Low', color: getColorForGraph('gray') };
-    } else if (numValue >= 100 && numValue <= 180) {
+    if (numValue < 110) {
+      return { type: 'red', text: 'Low', color: getColorForGraph('red') };
+    } else if (numValue >= 110 && numValue <= 160) {
       return { type: 'green', text: 'Normal', color: getColorForGraph('green') };
     } else {
       return { type: 'red', text: 'High', color: getColorForGraph('red') };
@@ -94,9 +94,9 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
     { key: 'status', header: t('status', 'Status') },
   ];
   const getFetalHeartRateColor = (value: number): string => {
-    if (value < 100) {
-      return getColorForGraph('gray');
-    } else if (value >= 100 && value <= 180) {
+    if (value < 110) {
+      return getColorForGraph('red');
+    } else if (value >= 110 && value <= 160) {
       return getColorForGraph('green');
     } else {
       return getColorForGraph('red');
@@ -112,15 +112,7 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
       }));
     }
 
-    return [
-      { hour: 0, value: 140, group: 'Fetal Heart Rate', time: '0', color: getColorForGraph('green') },
-      { hour: 10, value: 140, group: 'Fetal Heart Rate', time: '10', color: getColorForGraph('green') },
-      { hour: 20, value: 140, group: 'Fetal Heart Rate', time: '20', color: getColorForGraph('green') },
-      { hour: 30, value: 140, group: 'Fetal Heart Rate', time: '30', color: getColorForGraph('green') },
-      { hour: 40, value: 140, group: 'Fetal Heart Rate', time: '40', color: getColorForGraph('green') },
-      { hour: 50, value: 140, group: 'Fetal Heart Rate', time: '50', color: getColorForGraph('green') },
-      { hour: 60, value: 140, group: 'Fetal Heart Rate', time: '60', color: getColorForGraph('green') },
-    ];
+    return defaultFetalHeartRateChartData;
   }, [data]);
 
   const chartData = enhancedChartData;
@@ -179,6 +171,28 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
         enabled: true,
       },
     },
+    referenceLines: [
+      {
+        axis: 'left',
+        value: 110,
+        style: {
+          stroke: '#111',
+          strokeWidth: 4,
+          strokeDasharray: '0',
+        },
+        label: '110',
+      },
+      {
+        axis: 'left',
+        value: 160,
+        style: {
+          stroke: '#111',
+          strokeWidth: 4,
+          strokeDasharray: '0',
+        },
+        label: '160',
+      },
+    ],
     color: {
       scale:
         data && data.length > 0
@@ -204,13 +218,13 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
             <h3 className={styles.fetalHeartRateTitle}>Fetal Heart Rate</h3>
             <div className={styles.fetalHeartRateControls}>
               <Tag type="green" title="Normal Range">
-                Normal (100-180)
+                Normal (110-160)
               </Tag>
               <Tag type="red" title="Abnormal Range">
-                Abnormal (&gt;180)
+                Abnormal (&gt;160)
               </Tag>
-              <Tag type="warm-gray" title="Low Range">
-                Low (&lt;100)
+              <Tag type="red" title="Low Range">
+                Low (&lt;110)
               </Tag>
             </div>
           </div>
@@ -290,15 +304,14 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
                                     : cell.info.header === 'value'
                                     ? (() => {
                                         const numValue = parseInt(cell.value.replace(' bpm', ''));
-
-                                        if (numValue < 100) {
+                                        if (numValue < 110) {
                                           return (
                                             <span className={`${styles.fetalHeartRateValue} ${styles.low}`}>
                                               <span className={styles.arrow}>↓</span>
                                               {cell.value}
                                             </span>
                                           );
-                                        } else if (numValue > 180) {
+                                        } else if (numValue > 160) {
                                           return (
                                             <span className={`${styles.fetalHeartRateValue} ${styles.high}`}>
                                               <span className={styles.arrow}>↑</span>

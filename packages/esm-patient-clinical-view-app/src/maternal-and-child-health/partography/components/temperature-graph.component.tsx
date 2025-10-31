@@ -43,8 +43,6 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
   isLoading = false,
 }) => {
   const { t } = useTranslation();
-
-  // Only show rows with both date and a time (exactTime or timeSlot)
   const filteredTableData = tableData.filter((item) => item.date && (item.exactTime || item.timeSlot));
   const timeColumns = filteredTableData.map((item) => item.exactTime || item.timeSlot || '--');
 
@@ -60,8 +58,6 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
     }
     return '';
   };
-
-  // Carbon skeleton for loading state
   const renderSkeleton = () => (
     <div className={styles.membraneGrid}>
       <div className={styles.gridContainer}>

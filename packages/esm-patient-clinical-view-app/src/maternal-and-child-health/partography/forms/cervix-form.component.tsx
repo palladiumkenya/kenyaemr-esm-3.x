@@ -45,7 +45,7 @@ const CervixForm: React.FC<CervixFormProps> = ({
       hour: '',
       time: '',
       cervicalDilation: '',
-      descent: '5',
+      descent: '',
     },
   });
 
@@ -66,24 +66,25 @@ const CervixForm: React.FC<CervixFormProps> = ({
     };
   }, [existingCervixData]);
 
-  const maxSelectedHour = useMemo(
-    () => (selectedHours && selectedHours.length > 0 ? Math.max(...selectedHours) : -1),
-    [selectedHours],
-  );
+  const usedHours = useMemo(() => {
+    if (!selectedHours || selectedHours.length === 0) {
+      return [];
+    }
+    return selectedHours;
+  }, [selectedHours]);
 
   const hourOptions = useMemo(() => {
     return Array.from({ length: 24 }, (_, i) => {
       const hourValue = String(i).padStart(2, '0');
-      const isDisabled = i <= maxSelectedHour;
+      const isDisabled = usedHours.includes(i);
       const displayText = isDisabled ? `${hourValue} (used)` : hourValue;
-
       return {
         value: hourValue,
         text: displayText,
         disabled: isDisabled,
       };
     });
-  }, [maxSelectedHour]);
+  }, [usedHours]);
 
   const onSubmitForm = async (data: CervixFormData) => {
     if (!data.hour || data.hour === '') {
@@ -99,6 +100,7 @@ const CervixForm: React.FC<CervixFormProps> = ({
         type: 'manual',
         message: 'Time selection is required',
       });
+      console.warn('[CervixForm] Attempted to submit with empty time value:', data);
       return;
     }
 
@@ -178,7 +180,10 @@ const CervixForm: React.FC<CervixFormProps> = ({
     }
 
     clearErrors();
-
+    if (!data.time || data.time.trim() === '') {
+      alert('Time cannot be empty. Please select a valid time.');
+      return;
+    }
     onSubmit({
       hour: hourValue,
       time: data.time,
@@ -286,12 +291,16 @@ const CervixForm: React.FC<CervixFormProps> = ({
                   <NumberInput
                     id="cervical-dilation-input"
                     label="Cervical Dilation (cm) *"
-                    placeholder={`Enter dilation (min: ${validationLimits.cervicalDilationMin}cm, max: 10cm)`}
+                    placeholder="Enter dilation (min: 4cm, max: 10cm)"
                     value={field.value || ''}
-                    onChange={(e, { value }) => field.onChange(String(value))}
-                    min={validationLimits.cervicalDilationMin}
+                    onChange={(e, { value }) => {
+                      // Only allow whole numbers
+                      const intValue = String(value).replace(/[^\d]/g, '');
+                      field.onChange(intValue);
+                    }}
+                    min={4}
                     max={10}
-                    step={0.5}
+                    step={1}
                     invalid={!!fieldState.error}
                     invalidText={fieldState.error?.message}
                   />
@@ -333,7 +342,7 @@ const CervixForm: React.FC<CervixFormProps> = ({
                         ? `Default: 5 (high position), can decrement to lower values`
                         : `Enter descent (1=most descended, 5=high position)`
                     }
-                    value={field.value || '5'}
+                    value={field.value || ''}
                     onChange={(e, { value }) => field.onChange(String(value))}
                     min={1}
                     max={5}

@@ -21,6 +21,7 @@ import { findExistingLocalPatient, registerOrLaunchHIEPatient } from '../../sear
 import { launchOtpVerificationModal } from '../../../../shared/otp-verification';
 import { otpManager } from './hie-card.resource';
 import { useMultipleActiveVisits } from '../../dependants/dependants.resource';
+import { sanitizePhoneNumber } from '../../../../shared/utils';
 
 interface HIEDisplayCardProps {
   bundle: HIEBundleResponse;
@@ -45,7 +46,6 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
   const [otpRequestedFor, setOtpRequestedFor] = useState<Set<string>>(new Set());
   const [localPatientCache, setLocalPatientCache] = useState<Map<string, any>>(new Map());
   const [loadingLocalPatients, setLoadingLocalPatients] = useState<Set<string>>(new Set());
-  const [activePhoneNumbers, setActivePhoneNumbers] = useState<Map<string, string>>(new Map());
 
   const patientUuids = useMemo(() => {
     return (
@@ -80,7 +80,6 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
           const existingPatient = await findExistingLocalPatient(patient, false);
           setLocalPatientCache((prev) => new Map(prev.set(patientUuid, existingPatient)));
         } catch (error) {
-          console.warn(`Error searching for HIE patient ${patientUuid}:`, error);
           setLocalPatientCache((prev) => new Map(prev.set(patientUuid, null)));
         } finally {
           setLoadingLocalPatients((prev) => {
@@ -115,7 +114,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
     );
 
     if (phoneContact?.value) {
-      return phoneContact.value;
+      return sanitizePhoneNumber(phoneContact.value);
     }
 
     const localPatient = localPatientCache.get(patient.id);
@@ -127,7 +126,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
           attr.attributeType?.display?.toLowerCase().includes('telephone'),
       );
       if (phoneAttribute?.value) {
-        return phoneAttribute.value;
+        return sanitizePhoneNumber(phoneAttribute.value);
       }
     }
 
@@ -145,11 +144,6 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
       newSet.delete(patientId);
       return newSet;
     });
-    setActivePhoneNumbers((prev) => {
-      const newMap = new Map(prev);
-      newMap.delete(patientId);
-      return newMap;
-    });
   };
 
   const handleQueuePatient = (activeVisit: any, patientUuid: string) => {
@@ -162,18 +156,25 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
     });
   };
 
-  const createDynamicOTPHandlers = (patientUuid: string, patientName: string, initialPhone: string) => {
+  const createDynamicOTPHandlers = (patientUuid: string, patientName: string, phoneNumber: string) => {
     return {
-      onRequestOtp: async (phoneNumber: string): Promise<void> => {
-        setActivePhoneNumbers((prev) => new Map(prev.set(patientUuid, phoneNumber)));
-        await otpManager.requestOTP(phoneNumber, patientName, otpExpiryMinutes);
+      onRequestOtp: async (phone: string): Promise<void> => {
+        const sanitizedPhone = sanitizePhoneNumber(phone);
+        try {
+          await otpManager.requestOTP(sanitizedPhone, patientName, otpExpiryMinutes, searchedNationalId);
+        } catch (error) {
+          throw error;
+        }
       },
-      onVerify: async (otp: string): Promise<void> => {
-        const activePhone = activePhoneNumbers.get(patientUuid) || initialPhone;
-
-        const isValid = await otpManager.verifyOTP(activePhone, otp);
-        if (!isValid) {
-          throw new Error('OTP verification failed');
+      onVerify: async (otp: string, _phoneNumber?: string): Promise<void> => {
+        const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
+        try {
+          const isValid = await otpManager.verifyOTP(sanitizedPhone, otp);
+          if (!isValid) {
+            throw new Error('OTP verification failed');
+          }
+        } catch (error) {
+          throw error;
         }
       },
     };
@@ -325,7 +326,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                               closeWorkspaceWithSavedChanges: () => {
                                 closeWorkspace('start-visit-workspace-form', {
                                   onWorkspaceClose: () => {
-                                    navigate({ to: `$\{openmrsSpaBase}/patient/${localPatient.uuid}/chart` });
+                                    navigate({ to: `\${openmrsSpaBase}/patient/${localPatient.uuid}/chart` });
                                   },
                                   ignoreChanges: true,
                                 });

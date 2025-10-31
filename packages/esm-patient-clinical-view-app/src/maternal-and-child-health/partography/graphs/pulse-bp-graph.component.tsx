@@ -58,7 +58,7 @@ const PULSE_BP_CHART_OPTIONS = {
     filled: true,
   },
   curve: 'curveLinear',
-  height: '400px',
+  height: '600px',
   theme: 'white',
   toolbar: {
     enabled: false,
@@ -74,7 +74,7 @@ const PULSE_BP_CHART_OPTIONS = {
     },
     y: {
       enabled: true,
-      numberOfTicks: 13,
+      numberOfTicks: 7, // Fewer ticks for larger row spacing
     },
   },
   zoomBar: {
@@ -174,6 +174,9 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                 const systolicYPosition = chartMarginTop + ((180 - item.systolicBP) / (180 - 60)) * chartHeight;
                 const diastolicYPosition = chartMarginTop + ((180 - item.diastolicBP) / (180 - 60)) * chartHeight;
 
+                const greenArrowStartY = Math.min(pulseYPosition, diastolicYPosition);
+                const greenArrowEndY = Math.max(pulseYPosition, diastolicYPosition);
+
                 return (
                   <g key={index}>
                     <defs>
@@ -195,7 +198,8 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                         refY="5"
                         orient="auto"
                         markerUnits="strokeWidth">
-                        <polygon points="0,0 10,5 0,10 3,5" fill={getColorForGraph('green')} />
+                        {/* Downward arrow for green (diastolic) */}
+                        <polygon points="0,10 10,5 0,0 3,5" fill={getColorForGraph('green')} />
                       </marker>
                     </defs>
 
@@ -209,11 +213,12 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       markerEnd={`url(#systolic-arrow-${index})`}
                     />
 
+                    {/* Always draw green arrow down, regardless of value */}
                     <line
                       x1={`${bpXPosition}%`}
-                      y1={`${pulseYPosition}%`}
+                      y1={`${greenArrowStartY}%`}
                       x2={`${bpXPosition}%`}
-                      y2={`${diastolicYPosition}%`}
+                      y2={`${greenArrowEndY}%`}
                       stroke={getColorForGraph('green')}
                       strokeWidth="2"
                       markerEnd={`url(#diastolic-arrow-${index})`}

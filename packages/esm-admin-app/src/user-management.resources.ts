@@ -168,7 +168,7 @@ export function useStockOperationTypes() {
 }
 
 export function useStockTagLocations() {
-  const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=main store,main pharmacy,dispensary `;
+  const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=main store,main pharmacy,dispensary,sub store `;
   const { data, error, isLoading } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
   const stockLocations = useMemo(
     () => data?.data?.entry?.map((response) => response.resource) ?? [],

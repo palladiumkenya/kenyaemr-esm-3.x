@@ -19,6 +19,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { openmrsFetch, useLayoutType, useSession } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo, useState } from 'react';
+import { codeToPlus, contractionLevelUuidMap, labelToUuid, contractionLevelUuidToLabel } from './types';
 import { useTranslation } from 'react-i18next';
 import {
   CervicalContractionsForm,
@@ -65,7 +66,6 @@ enum ScaleTypes {
   LINEAR = 'linear',
 }
 
-// --- INLINE TYPE DEFINITIONS ADDED FOR CONTEXT ---
 type GraphDefinition = {
   id: string;
   title: string;
@@ -83,22 +83,19 @@ type ChartDataPoint = {
   group: string;
   value: number;
 };
-// --- END INLINE TYPE DEFINITIONS ---
 
-// --- CERVIX CHART OPTIONS: MEDICAL PARTOGRAPH STYLING ---
 const CERVIX_CHART_OPTIONS = {
   axes: {
     bottom: {
-      title: '', // Remove Hours label completely
+      title: '',
       mapsTo: 'hour',
       scaleType: ScaleTypes.LINEAR,
       domain: [0, 10],
       tick: {
-        count: 21, // Force exactly 21 ticks for all 30-min intervals
+        count: 21,
         rotation: 0,
-        values: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10], // Explicit 30-min intervals
+        values: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10],
         formatter: (hour) => {
-          // Format as hours with 30-minute intervals
           if (hour === 0) {
             return '0';
           } else if (hour === 0.5) {
@@ -125,8 +122,6 @@ const CERVIX_CHART_OPTIONS = {
       ticks: {
         values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         formatter: (value) => {
-          // Show both cervical dilation and descent of head values
-          // Direct mapping: 5=high position, 1=most descended
           if (value >= 1 && value <= 5) {
             return `${value}cm / D${value}`;
           } else if (value === 0) {
@@ -173,13 +168,11 @@ const CERVIX_CHART_OPTIONS = {
     clickable: false,
   },
 };
-// --- END CERVIX CHART OPTIONS ---
 
 type PartographyProps = {
   patientUuid: string;
 };
 
-// Skeleton Components for Loading States with inline animation
 const GraphSkeleton: React.FC = () => {
   const skeletonStyle = {
     background: 'linear-gradient(90deg, #f4f4f4 25%, #e0e0e0 50%, #f4f4f4 75%)',
@@ -188,7 +181,6 @@ const GraphSkeleton: React.FC = () => {
     borderRadius: '4px',
   };
 
-  // Add keyframes to head if not already added
   React.useEffect(() => {
     if (!document.querySelector('#skeleton-keyframes')) {
       const style = document.createElement('style');
@@ -218,7 +210,6 @@ const GraphSkeleton: React.FC = () => {
           marginBottom: '1rem',
         }}
       />
-      {/* Skeleton for custom time labels (cervix specific) */}
       <div style={{ marginTop: '1rem', borderTop: '1px solid #e0e0e0', paddingTop: '0.5rem' }}>
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.25rem' }}>
           {Array.from({ length: 11 }).map((_, index) => (
@@ -287,13 +278,10 @@ const TableSkeleton: React.FC = () => {
 const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
 
-  // Development flag to enable dummy data (set to false for production)
   const ENABLE_DUMMY_DATA = false;
 
-  // Local state for regular partography data (not saved to OpenMRS yet)
   const [localPartographyData, setLocalPartographyData] = useState<Record<string, any[]>>({});
 
-  // Local state for fetal heart rate data
   const [localFetalHeartRateData, setLocalFetalHeartRateData] = useState<
     Array<{
       hour: number;
@@ -303,7 +291,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     }>
   >([]);
 
-  // Backend membrane amniotic fluid data
   const {
     membraneAmnioticFluidEntries,
     isLoading: isMembraneAmnioticFluidLoading,
@@ -339,7 +326,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     }>
   >([]);
 
-  // Pulse and BP backend data
   const {
     data: loadedPulseData,
     isLoading: isPulseDataLoading,
@@ -353,7 +339,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateBPData,
   } = usePartographyData(patientUuid || '', 'blood-pressure');
 
-  // Temperature backend data
   const {
     data: loadedTemperatureData,
     isLoading: isTemperatureDataLoading,
@@ -361,7 +346,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateTemperatureData,
   } = usePartographyData(patientUuid || '', 'temperature');
 
-  // Urine Test backend data
   const {
     data: urineTestEncounters = [],
     isLoading: isUrineTestLoading,
@@ -369,34 +353,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateUrineTestData,
   } = usePartographyData(patientUuid || '', 'urine-analysis');
 
-  // Transform backend urine test data to UrineTestData[]
   const urineTestData = useMemo(() => {
-    // Map coded values to +/++/+++ for protein/acetone
-    const codeToPlus = (code) => {
-      switch (code) {
-        case '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
-        case 'ZERO':
-        case '0':
-          return '0';
-        case '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
-        case 'ONE PLUS':
-        case '+':
-          return '+';
-        case '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
-        case 'TWO PLUS':
-        case '++':
-          return '++';
-        case '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA':
-        case 'THREE PLUS':
-        case '+++':
-          return '+++';
-        default:
-          return code;
-      }
-    };
     return (urineTestEncounters || []).map((encounter, index) => {
       const obs = encounter.obs || [];
-      // Helper to get obs value by concept
       const getObsValue = (conceptUuid) => {
         const found = obs.find((o) => o.concept.uuid === conceptUuid);
         if (!found) {
@@ -409,7 +368,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         }
         return v != null ? String(v) : '';
       };
-      // Helper to get time from description obs
+
       const getTime = () => {
         const timeObs = obs.find(
           (o) =>
@@ -425,9 +384,8 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         }
         return '';
       };
-      // Helper to get timeSlot from obs (look for concept with 'time-slot' or value with 'TimeSlot:')
+
       const getTimeSlot = () => {
-        // Try concept for time-slot
         const slotObs = obs.find(
           (o) =>
             o.concept.uuid === PARTOGRAPHY_CONCEPTS['time-slot'] ||
@@ -445,7 +403,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         }
         return '';
       };
-      // Sample Collected and Result Returned: try to find obs with concept display or uuid containing 'collected' or 'returned'
+
       const getSampleCollected = () => {
         const found = obs.find(
           (o) =>
@@ -468,7 +426,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         }
         return '';
       };
-      // Get urine volume as string (not code), handle case-insensitive concept id
+
       const getVolume = () => {
         const found = obs.find(
           (o) =>
@@ -494,7 +452,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         }
         return '';
       };
-      // Extract 'Time Slot: HH:mm' from event-description obs
+
       let timeSlot = '';
       const eventDescObs = obs.find(
         (o) =>
@@ -508,7 +466,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           timeSlot = match[1];
         }
       }
-      // Ensure volume is a number if present, otherwise undefined
+
       let volumeRaw = getVolume();
       let volume: number | undefined = undefined;
       if (typeof volumeRaw === 'number') {
@@ -518,7 +476,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       }
       const sampleCollected = getSampleCollected();
       const resultReturned = getResultReturned();
-      // final row prepared
+
       return {
         id: `urine-test-${index}`,
         date: new Date(encounter.encounterDatetime).toLocaleDateString(),
@@ -556,7 +514,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     });
   };
 
-  // Load cervix data from OpenMRS
   const {
     cervixData: loadedCervixData,
     existingTimeEntries,
@@ -567,7 +524,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateCervixData,
   } = useCervixFormData(patientUuid || '');
 
-  // Load fetal heart rate data from OpenMRS with null safety
   const {
     fetalHeartRateData: loadedFetalHeartRateData = [],
     isLoading: isFetalHeartRateLoading = false,
@@ -575,7 +531,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateFetalHeartRateData = () => {},
   } = useFetalHeartRateData(patientUuid || '');
 
-  // Fetch actual drug orders from OpenMRS
   const {
     drugOrders: loadedDrugOrders = [],
     isLoading: isDrugOrdersLoading = false,
@@ -583,11 +538,8 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateDrugOrders = () => {},
   } = useDrugOrders(patientUuid || '');
 
-  // Debug: Log drug orders data
   useEffect(() => {
     if (patientUuid) {
-      // Drug orders status logged in development only
-
       if (drugOrdersError) {
         console.error('Drug Orders Error:', drugOrdersError);
       }
@@ -618,57 +570,93 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   const [pulseBPViewMode, setPulseBPViewMode] = useState<'graph' | 'table'>('graph');
   const [temperatureViewMode, setTemperatureViewMode] = useState<'graph' | 'table'>('graph');
   const [urineTestViewMode, setUrineTestViewMode] = useState<'graph' | 'table'>('graph');
+  function getInitialPageSize(key, fallback = 10) {
+    if (typeof window !== 'undefined') {
+      const stored = window.localStorage.getItem(key);
+      if (stored && !isNaN(Number(stored))) {
+        return Number(stored);
+      }
+    }
+    return fallback;
+  }
   const [fetalHeartRateCurrentPage, setFetalHeartRateCurrentPage] = useState(1);
-  const [fetalHeartRatePageSize, setFetalHeartRatePageSize] = useState(5);
+  const [fetalHeartRatePageSize, setFetalHeartRatePageSize] = useState(() =>
+    getInitialPageSize('fetalHeartRatePageSize'),
+  );
   const [membraneAmnioticFluidCurrentPage, setMembraneAmnioticFluidCurrentPage] = useState(1);
-  const [membraneAmnioticFluidPageSize, setMembraneAmnioticFluidPageSize] = useState(5);
+  const [membraneAmnioticFluidPageSize, setMembraneAmnioticFluidPageSize] = useState(() =>
+    getInitialPageSize('membraneAmnioticFluidPageSize'),
+  );
   const [cervicalContractionsCurrentPage, setCervicalContractionsCurrentPage] = useState(1);
-  const [cervicalContractionsPageSize, setCervicalContractionsPageSize] = useState(5);
+  const [cervicalContractionsPageSize, setCervicalContractionsPageSize] = useState(() =>
+    getInitialPageSize('cervicalContractionsPageSize'),
+  );
   const [oxytocinCurrentPage, setOxytocinCurrentPage] = useState(1);
-  const [oxytocinPageSize, setOxytocinPageSize] = useState(5);
+  const [oxytocinPageSize, setOxytocinPageSize] = useState(() => getInitialPageSize('oxytocinPageSize'));
   const [drugsIVFluidsCurrentPage, setDrugsIVFluidsCurrentPage] = useState(1);
+  const [drugsIVFluidsPageSize, setDrugsIVFluidsPageSize] = useState(() => getInitialPageSize('drugsIVFluidsPageSize'));
   const [pulseBPCurrentPage, setPulseBPCurrentPage] = useState(1);
+  const [pulseBPPageSize, setPulseBPPageSize] = useState(() => getInitialPageSize('pulseBPPageSize'));
   const [temperatureCurrentPage, setTemperatureCurrentPage] = useState(1);
-  const [temperaturePageSize, setTemperaturePageSize] = useState(5);
+  const [temperaturePageSize, setTemperaturePageSize] = useState(() => getInitialPageSize('temperaturePageSize'));
   const [urineTestCurrentPage, setUrineTestCurrentPage] = useState(1);
-  const [urineTestPageSize, setUrineTestPageSize] = useState(5);
-  const [drugsIVFluidsPageSize, setDrugsIVFluidsPageSize] = useState(5);
-  const [pulseBPPageSize, setPulseBPPageSize] = useState(5);
+  const [urineTestPageSize, setUrineTestPageSize] = useState(() => getInitialPageSize('urineTestPageSize'));
+
+  // Persist page size changes
+  function persistPageSize(key, value) {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(key, String(value));
+    }
+  }
   const [currentPage, setCurrentPage] = useState<Record<string, number>>({});
   const [pageSize, setPageSize] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState<Record<string, boolean>>({});
 
-  // Transform cervix data to match the existing format expected by the chart
   const cervixFormData = useMemo(() => {
-    // Use OpenMRS data if available
     const dataToUse = loadedCervixData.length > 0 ? loadedCervixData : [];
 
-    const processedData = dataToUse
-      .map((data) => ({
-        hour: data.hour || 0,
-        time: data.time || '',
-        cervicalDilation: data.cervicalDilation || 0,
-        descentOfHead: data.descentOfHead || 0,
+    // If all hours are the same, fallback to using the row index as the hour
+    let processedData = dataToUse
+      .filter((data) => {
+        const hasHour = data.hour !== null && data.hour !== undefined && !isNaN(data.hour);
+        // Accept empty time, but always show fallback in table
+        return (
+          hasHour &&
+          data.cervicalDilation !== null &&
+          !isNaN(data.cervicalDilation) &&
+          data.descentOfHead !== null &&
+          !isNaN(data.descentOfHead)
+        );
+      })
+      .map((data, idx, arr) => ({
+        hour: data.hour,
+        time: data.time && data.time.trim() !== '' ? data.time : '--:--',
+        cervicalDilation: data.cervicalDilation,
+        descentOfHead: data.descentOfHead,
         entryDate: new Date(data.encounterDatetime).toLocaleDateString(),
         entryTime: new Date(data.encounterDatetime).toLocaleTimeString(),
-      }))
-      .filter((data) => data.hour > 0 && data.cervicalDilation > 0 && data.descentOfHead > 0);
+        _originalHour: data.hour,
+        _rowIndex: idx,
+      }));
 
-    // Return dummy data if no processed data and dummy data is enabled, otherwise return processed data
+    // If all non-null hours are the same, override hour with row index
+    const uniqueHours = Array.from(
+      new Set(processedData.map((d) => d.hour).filter((h) => h !== null && h !== undefined)),
+    );
+    if (uniqueHours.length === 1 && processedData.length > 1) {
+      processedData = processedData.map((d, idx) => ({ ...d, hour: idx }));
+    }
+
     return processedData.length > 0 ? processedData : ENABLE_DUMMY_DATA ? generateExtendedDummyData() : [];
   }, [loadedCervixData, ENABLE_DUMMY_DATA]);
 
-  // Compute existingTimeEntries from both local and OpenMRS data
   const computedExistingTimeEntries = useMemo(() => {
-    // Use the existing time entries from OpenMRS only
     return existingTimeEntries;
   }, [existingTimeEntries]);
 
-  // Compute combined fetal heart rate data from both local and OpenMRS sources
   const computedFetalHeartRateData = useMemo(() => {
     const combined = [...localFetalHeartRateData];
 
-    // Add OpenMRS data if available and not already in local data
     if (loadedFetalHeartRateData?.length > 0) {
       loadedFetalHeartRateData.forEach((openMrsEntry) => {
         const exists = combined.find(
@@ -676,10 +664,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         );
 
         if (!exists) {
-          // Transform OpenMRS data to match local data structure
           const transformedEntry = {
             hour: openMrsEntry.hour,
-            value: openMrsEntry.fetalHeartRate, // Map fetalHeartRate to value
+            value: openMrsEntry.fetalHeartRate,
             group: 'Fetal Heart Rate',
             time: openMrsEntry.time,
           };
@@ -688,7 +675,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       });
     }
 
-    // Sort by hour and time
     const sorted = combined.sort((a, b) => {
       if (a.hour !== b.hour) {
         return a.hour - b.hour;
@@ -729,9 +715,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       if (!isLoading) {
         let chartData: ChartDataPoint[] = [];
 
-        // Special handling for pulse and BP combined encounters
         if (graphType === 'maternal-pulse' || graphType === 'blood-pressure') {
-          // Collect all obs for pulse and BP from all encounters
           chartData = [];
           if (Array.isArray(encounters)) {
             encounters.forEach((encounter) => {
@@ -772,7 +756,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             });
           }
         } else if (localPartographyData[graphType] && localPartographyData[graphType].length > 0) {
-          // Transform local data to chart format
           chartData = localPartographyData[graphType].map((item, index) => ({
             hour: index + 1, // Use index as hour for now
             group: graphType,
@@ -802,7 +785,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     return { encounters, isLoading, mutate };
   };
 
-  // Function to generate dummy data for different graph types
   const generateDummyDataForGraph = (graphType: string): ChartDataPoint[] => {
     const baseTimeEntries = [
       { hour: 0, time: '08:00' },
@@ -820,7 +802,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           hour: entry.hour,
           time: entry.time,
           group: 'Fetal Heart Rate',
-          value: 140 + Math.random() * 20, // Normal range 120-160
+          value: 140 + Math.random() * 20,
         }));
 
       case 'maternal-pulse':
@@ -828,7 +810,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           hour: entry.hour,
           time: entry.time,
           group: 'Maternal Pulse',
-          value: 75 + Math.random() * 15, // Normal range 60-100
+          value: 75 + Math.random() * 15,
         }));
 
       case 'blood-pressure':
@@ -837,13 +819,13 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             hour: entry.hour,
             time: entry.time,
             group: 'Systolic',
-            value: 115 + Math.random() * 10, // Normal systolic
+            value: 115 + Math.random() * 10,
           })),
           ...baseTimeEntries.map((entry) => ({
             hour: entry.hour,
             time: entry.time,
             group: 'Diastolic',
-            value: 75 + Math.random() * 5, // Normal diastolic
+            value: 75 + Math.random() * 5,
           })),
         ];
 
@@ -1181,31 +1163,16 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     contractionCount: string;
     timeSlot: string;
   }) => {
-    const contractionLevelUuidMap: Record<string, string> = {
-      none: '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      mild: '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      moderate: '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      strong: '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    };
     const contractionLevel = formData.contractionLevel || 'none';
     const contractionLevelValue = contractionLevelUuidMap[contractionLevel];
-    const contractionLevelUuid = contractionLevelValue; // For coded obs, concept and value are the same
-    const contractionCountConcept = '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-    // Always send contractionCount as a number
     const contractionCount = parseInt(formData.contractionCount || '1', 10);
     const timeSlot = formData.timeSlot || new Date().toISOString().substring(11, 16);
 
-    // Debug info removed for linting
-
-    // Always send both obs: count (numeric) and level (coded)
     const encounterFormData = {
-      contractionLevelValue, // UUID for level (none, mild, moderate, strong)
-      contractionLevelUuid,
       contractionCount,
-      contractionCountConcept,
+      contractionLevel: contractionLevelValue,
       timeSlot,
     };
-    // Payload prepared for submission
     try {
       const saveResult = await createPartographyEncounter(patientUuid, 'uterine-contractions', encounterFormData);
       if (saveResult.success) {
@@ -1370,7 +1337,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     timeSampleCollected: string;
     timeResultsReturned: string;
   }) => {
-    // Validate data before adding
     if (
       !formData.timeSlot ||
       !formData.exactTime ||
@@ -1384,24 +1350,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       return;
     }
 
-    // Map label to UUID for protein and acetone/ketone
-    const labelToUuid = (label: string) => {
-      switch (label) {
-        case '0':
-          return '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-        case '+':
-          return '1362AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-        case '++':
-          return '1363AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-        case '+++':
-          return '1364AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-        default:
-          return label;
-      }
-    };
-
     try {
-      // Get current time in HH:mm format
       const now = new Date();
       const pad = (n) => n.toString().padStart(2, '0');
       const currentTime = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
@@ -1419,7 +1368,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     }
   };
 
-  // Generate table data for membrane amniotic fluid from backend only
   const getMembraneAmnioticFluidTableData = () => {
     return membraneAmnioticFluidEntries.map((data, index) => ({
       id: data.id || `maf-${index}`,
@@ -1479,26 +1427,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
             contractionCount = String(obs.value);
           }
-          // Contraction level concepts (none, mild, moderate, strong)
-          if (
-            obs.concept.uuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || // none
-            obs.concept.uuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || // mild
-            obs.concept.uuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' || // moderate
-            obs.concept.uuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' // strong
-          ) {
-            // Map UUID to label
-            if (obs.concept.uuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
-              contractionLevel = 'none';
-            }
-            if (obs.concept.uuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
-              contractionLevel = 'mild';
-            }
-            if (obs.concept.uuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
-              contractionLevel = 'moderate';
-            }
-            if (obs.concept.uuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
-              contractionLevel = 'strong';
-            }
+          const contractionLabel = contractionLevelUuidToLabel(obs.concept.uuid);
+          if (contractionLabel !== obs.concept.uuid) {
+            contractionLevel = contractionLabel;
           }
         }
       }
@@ -1512,12 +1443,8 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     });
   };
 
-  // Generate table data for oxytocin (use backend data only)
   const getOxytocinTableData = () => {
-    // Only map oxytocin-specific fields, do not include any event-description or urine test fields
     return loadedOxytocinData.map((data, index) => {
-      // Defensive: Only use fields that are expected for oxytocin
-      // If backend returns extra obs, ignore them
       return {
         id: `oxy-${index}`,
         date: data.encounterDatetime ? new Date(data.encounterDatetime).toLocaleDateString() : '',
@@ -1560,22 +1487,23 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
   // Generate table data for pulse and BP from backend
   const getPulseBPTableData = () => {
-    // Map encounters to a combined row by encounterDatetime
-    const bpMap = (loadedBPData || []).reduce((acc, encounter) => {
-      const systolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['systolic-bp']);
-      const diastolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['diastolic-bp']);
-      if (systolicObs && diastolicObs) {
-        acc[encounter.encounterDatetime] = {
-          systolicBP: typeof systolicObs.value === 'number' ? systolicObs.value : parseFloat(systolicObs.value),
-          diastolicBP: typeof diastolicObs.value === 'number' ? diastolicObs.value : parseFloat(diastolicObs.value),
-          date: new Date(encounter.encounterDatetime).toLocaleDateString(),
-          time: new Date(encounter.encounterDatetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        };
-      }
-      return acc;
-    }, {} as Record<string, any>);
+    // Prepare BP data as array of {datetime, systolic, diastolic}
+    const bpEntries = (loadedBPData || [])
+      .map((encounter) => {
+        const systolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['systolic-bp']);
+        const diastolicObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['diastolic-bp']);
+        if (systolicObs && diastolicObs) {
+          return {
+            datetime: new Date(encounter.encounterDatetime),
+            systolicBP: typeof systolicObs.value === 'number' ? systolicObs.value : parseFloat(systolicObs.value),
+            diastolicBP: typeof diastolicObs.value === 'number' ? diastolicObs.value : parseFloat(diastolicObs.value),
+          };
+        }
+        return null;
+      })
+      .filter(Boolean);
 
-    // For each pulse, try to find matching BP by encounterDatetime
+    // For each pulse, find the closest BP entry in time (within 1 hour)
     return (loadedPulseData || []).map((encounter, index) => {
       const pulseObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']);
       const pulse = pulseObs
@@ -1583,14 +1511,26 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           ? pulseObs.value
           : parseFloat(pulseObs.value)
         : null;
-      const date = new Date(encounter.encounterDatetime).toLocaleDateString();
-      const time = new Date(encounter.encounterDatetime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const bp = bpMap[encounter.encounterDatetime] || {};
+      const pulseDate = new Date(encounter.encounterDatetime);
+      const date = pulseDate.toLocaleDateString();
+      const time = pulseDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Find closest BP entry within 1 hour
+      let closestBP = null;
+      let minDiff = 60 * 60 * 1000; // 1 hour in ms
+      for (const bp of bpEntries) {
+        const diff = Math.abs(bp.datetime.getTime() - pulseDate.getTime());
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestBP = bp;
+        }
+      }
+
       return {
         id: `pulse-bp-${index}`,
         pulse,
-        systolicBP: bp.systolicBP ?? '',
-        diastolicBP: bp.diastolicBP ?? '',
+        systolicBP: closestBP ? closestBP.systolicBP : '',
+        diastolicBP: closestBP ? closestBP.diastolicBP : '',
         date,
         time,
       };
@@ -1661,24 +1601,25 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     if (graph.id === 'cervix') {
       return loadedCervixData
         .filter((data) => {
-          // Filter out any data with NaN values
-          return (
-            !isNaN(data.hour) &&
-            !isNaN(data.cervicalDilation) &&
-            !isNaN(data.descentOfHead) &&
-            data.time &&
-            data.time.trim() !== ''
-          );
+          // Include if either hour or time is present, and cervicalDilation is valid
+          const hasHour = data.hour !== null && data.hour !== undefined && !isNaN(data.hour);
+          const hasTime = data.time && data.time.trim() !== '';
+          return (hasHour || hasTime) && data.cervicalDilation !== null && !isNaN(data.cervicalDilation);
         })
-        .map((data, index) => ({
-          id: `cervix-${index}`,
-          date: new Date(data.encounterDatetime).toLocaleDateString() || 'N/A',
-          actualTime: new Date(data.encounterDatetime).toLocaleTimeString() || 'N/A',
-          cervicalDilation: `${data.cervicalDilation} cm`,
-          descentOfHead: `${data.descentOfHead}`,
-          hourInput: `${data.hour} hr`,
-          formTime: data.time || 'N/A',
-        }));
+        .map((data, index) => {
+          let hourInput = data.hour !== null && data.hour !== undefined && !isNaN(data.hour) ? `${data.hour} hr` : '';
+          // Always show the form time if available
+          let formTime = data.time && data.time.trim() !== '' ? data.time : data.timeDisplay || '';
+          return {
+            id: `cervix-${index}`,
+            date: new Date(data.encounterDatetime).toLocaleDateString() || 'N/A',
+            actualTime: new Date(data.encounterDatetime).toLocaleTimeString() || 'N/A',
+            cervicalDilation: `${data.cervicalDilation} cm`,
+            descentOfHead: `${data.descentLabel || data.descentOfHead || ''}`,
+            hourInput,
+            formTime: formTime || 'N/A',
+          };
+        });
     }
 
     // Membrane amniotic fluid: use backend data only
@@ -1822,15 +1763,12 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     const endIndex = startIndex + currentPageSize;
     const paginatedData = tableData.slice(startIndex, endIndex);
 
-    // Default chart data - declare once here
     let finalChartData: ChartDataPoint[] = patientChartData;
     let zeroTime: Date | undefined;
     let maxChartTime: Date | undefined;
 
-    // --- Data for custom time labels ---
     let timeLabelsData: { hours: string; time: string; span: number }[] = [];
 
-    // Default chart options with medical partograph styling
     let chartOptions: any = {
       title: graph.title,
       axes: {
@@ -1893,47 +1831,40 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       },
     };
 
-    // Hide X-axis title and labels for non-cervix graphs only
     if (graph.id !== 'cervix') {
       chartOptions.axes.bottom.title = undefined;
       chartOptions.axes.bottom.tick = {
-        formatter: () => '', // Hide tick labels for non-cervix graphs
+        formatter: () => '',
       };
     }
 
-    // --- START LOGIC FOR CERVIX GRAPH ---
     if (graph.id === 'cervix') {
-      // 1. Apply custom axis and styling options
       chartOptions = {
         ...chartOptions,
         ...CERVIX_CHART_OPTIONS,
         title: graph.title,
         color: {
           scale: {
-            'Alert Line': '#FFD700', // Yellow for alert line
-            'Action Line': '#FF0000', // Red for action line
-            'Cervical Dilation': '#22C55E', // Green for cervical dilation
-            'Descent of Head': '#2563EB', // Blue for descent of head
+            'Alert Line': '#FFD700',
+            'Action Line': '#FF0000',
+            'Cervical Dilation': '#22C55E',
+            'Descent of Head': '#2563EB',
             [graph.id]: getColorForGraph(graph.color),
           },
         },
         legend: {
-          position: 'top', // Move legend to the top for Cervix graph
+          position: 'top',
         },
       };
 
-      // 2. Calculate Alert and Action Lines Data Points (using hour scale)
-      const ALERT_START_CM = 4; // Changed from 5cm to 4cm as requested
+      const ALERT_START_CM = 4;
       const CERVIX_DILATION_MAX = 10;
-      const ALERT_ACTION_DIFFERENCE_HOURS = 4; // 4 hours difference
-      const EXPECTED_LABOR_DURATION_HOURS = 6; // 6 hours progression from 4cm to 10cm
+      const ALERT_ACTION_DIFFERENCE_HOURS = 4;
+      const EXPECTED_LABOR_DURATION_HOURS = 6;
 
       const staticLinesData: ChartDataPoint[] = [
-        // Alert Line Points: (Hour 0, 4cm) -> (Hour 6, 10cm)
         { hour: 0, value: ALERT_START_CM, group: 'Alert Line' },
         { hour: EXPECTED_LABOR_DURATION_HOURS, value: CERVIX_DILATION_MAX, group: 'Alert Line' },
-
-        // Action Line Points: (Hour 4, 4cm) -> (Hour 10, 10cm)
         { hour: ALERT_ACTION_DIFFERENCE_HOURS, value: ALERT_START_CM, group: 'Action Line' },
         {
           hour: ALERT_ACTION_DIFFERENCE_HOURS + EXPECTED_LABOR_DURATION_HOURS,
@@ -1942,7 +1873,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         },
       ];
 
-      // 3. Add Cervical Dilation data points from form inputs
       const cervicalDilationData: ChartDataPoint[] = cervixFormData.map((data) => ({
         hour: data.hour,
         value: data.cervicalDilation,
@@ -1950,40 +1880,86 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         time: data.time,
       }));
 
-      // 4. Add Descent of Head data points from form inputs
-      // Medical reality: 5=high position → 4 → 3 → 2 → 1=most descended (head coming down)
-      // Chart display: Show medical values directly (5 at top, 1 at bottom)
       const descentOfHeadData: ChartDataPoint[] = cervixFormData.map((data) => ({
         hour: data.hour,
-        value: data.descentOfHead, // Direct mapping: medical 5→chart 5 (high), medical 1→chart 1 (low)
+        value: data.descentOfHead,
         group: 'Descent of Head',
         time: data.time,
       }));
 
-      // 5. Combine all data - Alert/Action lines + patient data + form data
       finalChartData = [...patientChartData, ...staticLinesData, ...cervicalDilationData, ...descentOfHeadData];
 
-      // 6. Generate dynamic time labels for the custom footer (from form data)
       timeLabelsData = [];
 
-      // Create time labels based on form submissions or default to 10 columns if no data
-      const maxHours = Math.max(10, Math.max(...cervixFormData.map((d) => d.hour), 0) + 1);
+      const allHours = [...cervixFormData.map((d) => d.hour), ...loadedCervixData.map((d) => d.hour)]
+        .filter((h) => h !== null && h !== undefined && !isNaN(h))
+        .map(Number);
+      const uniqueSortedHours = Array.from(new Set(allHours)).sort((a, b) => a - b);
 
-      for (let i = 0; i < Math.min(maxHours, 10); i++) {
-        const hourLabel = i === 0 ? '0' : `${i}hr`;
+      const usedTimeEntries: string[] = [];
 
-        // Find corresponding form data for this hour
-        const formDataForHour = cervixFormData.find((data) => data.hour === i);
-        const timeValue = formDataForHour ? formDataForHour.time : '--:--';
+      uniqueSortedHours.forEach((hourVal) => {
+        const hourLabel = `${hourVal}`;
+        let timeValue = '--:--';
+        const formEntry = (cervixFormData as Array<{ hour: number; time: string /* etc. */ }>).find(
+          (d) => d.hour === hourVal && typeof d.time === 'string' && d.time.trim() !== '',
+        );
+
+        if (formEntry) {
+          timeValue = formEntry.time;
+        } else {
+          const backendEntry = loadedCervixData.find(
+            (d) =>
+              d.hour === hourVal &&
+              ((d.time && d.time.trim() !== '') || (typeof d.timeDisplay === 'string' && d.timeDisplay.trim() !== '')),
+          );
+          if (backendEntry) {
+            if (backendEntry.time && backendEntry.time.trim() !== '') {
+              timeValue = backendEntry.time;
+            } else if (typeof backendEntry.timeDisplay === 'string' && backendEntry.timeDisplay.trim() !== '') {
+              timeValue = backendEntry.timeDisplay;
+            }
+          } else {
+            const cervixFormArray = Array.isArray(cervixFormData) ? cervixFormData : [];
+            const loadedCervixArray = Array.isArray(loadedCervixData) ? loadedCervixData : [];
+
+            const cervixFormFiltered = (cervixFormArray as Array<{ hour: number | null; time: string }>).filter(
+              (d) => d.hour == null && d.time && d.time.trim() !== '' && !usedTimeEntries.includes(d.time),
+            );
+
+            const loadedCervixFiltered = loadedCervixArray.filter(
+              (d) =>
+                d.hour == null &&
+                ((d.time && d.time.trim() !== '') ||
+                  (typeof d.timeDisplay === 'string' && d.timeDisplay.trim() !== '')) &&
+                !usedTimeEntries.includes(d.time || d.timeDisplay),
+            );
+            const allTimeEntries = [...cervixFormFiltered, ...loadedCervixFiltered];
+            if (allTimeEntries.length > 0) {
+              const nextTimeEntry = allTimeEntries[0];
+              if (nextTimeEntry.time && nextTimeEntry.time.trim() !== '') {
+                timeValue = nextTimeEntry.time;
+              } else if (
+                'timeDisplay' in nextTimeEntry &&
+                typeof nextTimeEntry.timeDisplay === 'string' &&
+                nextTimeEntry.timeDisplay.trim() !== ''
+              ) {
+                timeValue = nextTimeEntry.timeDisplay;
+              } else {
+                timeValue = '--:--';
+              }
+              usedTimeEntries.push(timeValue);
+            }
+          }
+        }
 
         timeLabelsData.push({
           hours: hourLabel,
           time: timeValue,
           span: 1,
         });
-      }
+      });
     }
-    // --- END LOGIC FOR CERVIX GRAPH ---
 
     const shouldRenderChart = finalChartData.length > 0;
 
@@ -2066,41 +2042,53 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 </>
               )}
             </div>
-            {/* --- Custom Time Labels Display for Cervix Graph only --- */}
-            {graph.id === 'cervix' && timeLabelsData.length > 0 && (
+            {graph.id === 'cervix' && (
               <div
                 className={styles.customTimeLabelsContainer}
-                style={{ '--visible-columns': Math.min(10, timeLabelsData.length) } as React.CSSProperties}>
-                {/* Hours Row */}
-                <div className={styles.customTimeLabelsRow}>
-                  <div className={styles.customTimeLabelHeader}>Hours</div>
-                  {timeLabelsData.map((data, index) => (
-                    <div
-                      key={`hours-${index}`}
-                      className={styles.customTimeLabelCell}
-                      style={{
-                        gridColumnEnd: `span ${data.span}`,
-                        backgroundColor: '#f4f4f4',
-                        fontWeight: 700,
-                      }}>
-                      {data.hours}
-                    </div>
-                  ))}
-                </div>
-                {/* Time Row */}
-                <div className={styles.customTimeLabelsRow}>
-                  <div className={styles.customTimeLabelHeader}>Time</div>
-                  {timeLabelsData.map((data, index) => (
-                    <div
-                      key={`time-${index}`}
-                      className={styles.customTimeLabelCell}
-                      style={{ gridColumnEnd: `span ${data.span}` }}>
-                      {data.time}
-                    </div>
-                  ))}
-                </div>
-                {/* Scroll indicator if content overflows */}
-                {timeLabelsData.length > 10 && (
+                style={{
+                  overflowX: timeLabelsData.length > 14 ? 'auto' : 'hidden',
+                  width: 'fit-content',
+                  maxWidth: '100%',
+                  margin: '1rem auto',
+                  WebkitOverflowScrolling: 'touch',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '4px',
+                  background: '#fff',
+                  padding: 0,
+                  display: 'block',
+                }}>
+                <table
+                  style={{
+                    borderCollapse: 'collapse',
+                    width: '100%',
+                    minWidth:
+                      timeLabelsData.length > 14 ? `${100 * (Math.max(6, timeLabelsData.length) + 1)}px` : '100%',
+                    tableLayout: 'fixed',
+                  }}>
+                  <thead>
+                    <tr style={{ background: '#f4f4f4', fontWeight: 700 }}>
+                      <th style={{ width: 100, border: '1px solid #e0e0e0', padding: 8, textAlign: 'left' }}>Hour</th>
+                      {Array.from({ length: Math.max(6, timeLabelsData.length) }).map((_, idx) => (
+                        <th
+                          key={`hour-col-${idx}`}
+                          style={{ width: 100, border: '1px solid #e0e0e0', padding: 8, textAlign: 'left' }}>
+                          {timeLabelsData[idx]?.hours || ''}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ background: '#fafafa' }}>
+                      <td style={{ width: 100, border: '1px solid #e0e0e0', padding: 8 }}>Time</td>
+                      {Array.from({ length: Math.max(6, timeLabelsData.length) }).map((_, idx) => (
+                        <td key={`time-col-${idx}`} style={{ width: 100, border: '1px solid #e0e0e0', padding: 8 }}>
+                          {timeLabelsData[idx]?.time || ''}
+                        </td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+                {timeLabelsData.length > 14 && (
                   <div
                     style={{
                       fontSize: '12px',
@@ -2115,7 +2103,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 )}
               </div>
             )}
-            {/* --- END Custom Time Labels --- */}
 
             {patientChartData.length > 0 && !isGraphLoading && (
               <div className={styles.chartStats}>
@@ -2139,7 +2126,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           <div className={styles.tableContainer}>
             {isGraphLoading ? (
               <TableSkeleton />
-            ) : paginatedData.length > 0 ? (
+            ) : (
               <>
                 <DataTable rows={paginatedData} headers={getTableHeaders(graph)}>
                   {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -2155,34 +2142,43 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {rows.map((row) => (
-                            <TableRow {...getRowProps({ row })} key={row.id}>
-                              {row.cells.map((cell) => {
-                                let cellContent = cell.value;
+                          {rows.length > 0 ? (
+                            rows.map((row) => (
+                              <TableRow {...getRowProps({ row })} key={row.id}>
+                                {row.cells.map((cell) => {
+                                  let cellContent = cell.value;
 
-                                // Only apply value status logic for non-cervix graphs
-                                if (
-                                  graph.id !== 'cervix' &&
-                                  cell.info.header === 'value' &&
-                                  row.cells.find((c) => c.info.header === 'value')
-                                ) {
-                                  const cellValue = cell.value;
-                                  const status = getValueStatus(parseFloat(cellValue), graph);
-                                  const statusClass =
-                                    status === 'high' ? styles.highValue : status === 'low' ? styles.lowValue : '';
-                                  cellContent = (
-                                    <span className={statusClass}>
-                                      {cellValue}
-                                      {status === 'high' && <span className={styles.arrow}> ↑</span>}
-                                      {status === 'low' && <span className={styles.arrow}> ↓</span>}
-                                    </span>
-                                  );
-                                }
+                                  // Only apply value status logic for non-cervix graphs
+                                  if (
+                                    graph.id !== 'cervix' &&
+                                    cell.info.header === 'value' &&
+                                    row.cells.find((c) => c.info.header === 'value')
+                                  ) {
+                                    const cellValue = cell.value;
+                                    const status = getValueStatus(parseFloat(cellValue), graph);
+                                    const statusClass =
+                                      status === 'high' ? styles.highValue : status === 'low' ? styles.lowValue : '';
+                                    cellContent = (
+                                      <span className={statusClass}>
+                                        {cellValue}
+                                        {status === 'high' && <span className={styles.arrow}> ↑</span>}
+                                        {status === 'low' && <span className={styles.arrow}> ↓</span>}
+                                      </span>
+                                    );
+                                  }
 
-                                return <TableCell key={cell.id}>{cellContent}</TableCell>;
-                              })}
+                                  return <TableCell key={cell.id}>{cellContent}</TableCell>;
+                                })}
+                              </TableRow>
+                            ))
+                          ) : // Always render an empty row for cervix table if no data
+                          graph.id === 'cervix' ? (
+                            <TableRow>
+                              {getTableHeaders(graph).map((header) => (
+                                <TableCell key={header.key}>&nbsp;</TableCell>
+                              ))}
                             </TableRow>
-                          ))}
+                          ) : null}
                         </TableBody>
                       </Table>
                     </TableContainer>
@@ -2215,13 +2211,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                   </span>
                 </div>
               </>
-            ) : (
-              <div className={styles.emptyState}>
-                <p>{t('noDataAvailable', 'No data available for this graph')}</p>
-                <Button kind="primary" size={controlSize} renderIcon={Add} onClick={() => handleAddDataPoint(graph.id)}>
-                  {t('addFirstDataPoint', 'Add first data point')}
-                </Button>
-              </div>
             )}
           </div>
         )}
@@ -2234,7 +2223,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       <Layer>
         <Grid>
           <Column lg={16} md={8} sm={4}>
-            {/* Fetal Heart Rate Graph - Standalone */}
             <FetalHeartRateGraph
               data={computedFetalHeartRateData}
               tableData={getFetalHeartRateTableData()}
@@ -2246,11 +2234,13 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               onAddData={() => setIsFetalHeartRateFormOpen(true)}
               onViewModeChange={setFetalHeartRateViewMode}
               onPageChange={setFetalHeartRateCurrentPage}
-              onPageSizeChange={setFetalHeartRatePageSize}
+              onPageSizeChange={(size) => {
+                setFetalHeartRatePageSize(size);
+                persistPageSize('fetalHeartRatePageSize', size);
+              }}
               isAddButtonDisabled={false}
             />
 
-            {/* Membrane Amniotic Fluid Graph - Standalone */}
             <MembraneAmnioticFluidGraph
               data={membraneAmnioticFluidEntries}
               tableData={membraneAmnioticFluidEntries}
@@ -2262,16 +2252,17 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               onAddData={() => setIsMembraneAmnioticFluidFormOpen(true)}
               onViewModeChange={setMembraneAmnioticFluidViewMode}
               onPageChange={setMembraneAmnioticFluidCurrentPage}
-              onPageSizeChange={setMembraneAmnioticFluidPageSize}
+              onPageSizeChange={(size) => {
+                setMembraneAmnioticFluidPageSize(size);
+                persistPageSize('membraneAmnioticFluidPageSize', size);
+              }}
               isAddButtonDisabled={false}
             />
 
-            {/* Existing Partography Graphs - Contains Cervix Graph */}
             <div className={styles.partographyGrid}>
               {partographGraphs.map((graph, index) => renderGraph(graph, index, partographGraphs.length))}
             </div>
 
-            {/* Cervical Contractions Graph - Positioned below Cervix graph */}
             <CervicalContractionsGraph
               data={transformEncounterToTableData(cervicalContractionsData || [], 'uterine-contractions').map(
                 (row, index) => ({
@@ -2291,17 +2282,13 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               onAddData={() => setIsCervicalContractionsFormOpen(true)}
               onViewModeChange={setCervicalContractionsViewMode}
               onPageChange={setCervicalContractionsCurrentPage}
-              onPageSizeChange={setCervicalContractionsPageSize}
-              isAddButtonDisabled={false}
-              patient={{
-                uuid: patientUuid,
-                name: 'Patient Name',
-                gender: 'F',
-                age: '28',
+              onPageSizeChange={(size) => {
+                setCervicalContractionsPageSize(size);
+                persistPageSize('cervicalContractionsPageSize', size);
               }}
+              isAddButtonDisabled={false}
             />
 
-            {/* Oxytocin Graph - Positioned below Cervical Contractions */}
             <OxytocinGraph
               data={loadedOxytocinData.map((item) => ({
                 timeSlot: item.time ?? '',
@@ -2325,11 +2312,13 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               onAddData={() => setIsOxytocinFormOpen(true)}
               onViewModeChange={setOxytocinViewMode}
               onPageChange={setOxytocinCurrentPage}
-              onPageSizeChange={setOxytocinPageSize}
+              onPageSizeChange={(size) => {
+                setOxytocinPageSize(size);
+                persistPageSize('oxytocinPageSize', size);
+              }}
               isAddButtonDisabled={false}
             />
 
-            {/* Drugs and IV Fluids Graph - Positioned below Oxytocin */}
             <DrugsIVFluidsGraph
               data={getDrugsIVFluidsTableData()}
               tableData={getDrugsIVFluidsTableData()}
@@ -2338,22 +2327,18 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               pageSize={drugsIVFluidsPageSize}
               totalItems={getDrugsIVFluidsTableData().length}
               controlSize={controlSize}
-              onAddData={() => {}} // Form handling is done by the wrapper component
+              onAddData={() => {}}
               onViewModeChange={setDrugsIVFluidsViewMode}
               onPageChange={setDrugsIVFluidsCurrentPage}
-              onPageSizeChange={setDrugsIVFluidsPageSize}
-              isAddButtonDisabled={false}
-              patient={{
-                uuid: patientUuid,
-                name: 'Patient Name',
-                gender: 'F',
-                age: '28',
+              onPageSizeChange={(size) => {
+                setDrugsIVFluidsPageSize(size);
+                persistPageSize('drugsIVFluidsPageSize', size);
               }}
+              isAddButtonDisabled={false}
               onDrugsIVFluidsSubmit={handleDrugsIVFluidsFormSubmit}
               onDataSaved={handleDrugOrderDataSaved}
             />
 
-            {/* Pulse and BP Graph - Positioned below Drugs and IV Fluids */}
             <PulseBPGraph
               data={getPulseBPTableData()}
               tableData={getPulseBPTableData()}
@@ -2365,18 +2350,14 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               onAddData={() => {}}
               onViewModeChange={setPulseBPViewMode}
               onPageChange={setPulseBPCurrentPage}
-              onPageSizeChange={setPulseBPPageSize}
-              isAddButtonDisabled={false}
-              patient={{
-                uuid: patientUuid,
-                name: 'Patient Name',
-                gender: 'F',
-                age: '28',
+              onPageSizeChange={(size) => {
+                setPulseBPPageSize(size);
+                persistPageSize('pulseBPPageSize', size);
               }}
+              isAddButtonDisabled={false}
               onPulseBPSubmit={handlePulseBPFormSubmit}
             />
 
-            {/* Temperature Graph - Positioned below Pulse and BP */}
             <TemperatureGraph
               data={getTemperatureTableData()}
               tableData={getTemperatureTableData()}
@@ -2394,11 +2375,13 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               }}
               onViewModeChange={setTemperatureViewMode}
               onPageChange={setTemperatureCurrentPage}
-              onPageSizeChange={setTemperaturePageSize}
+              onPageSizeChange={(size) => {
+                setTemperaturePageSize(size);
+                persistPageSize('temperaturePageSize', size);
+              }}
               isAddButtonDisabled={false}
             />
 
-            {/* Urine Test Graph - Now using backend data */}
             <UrineTestGraph
               data={urineTestData}
               tableData={urineTestData}
@@ -2410,7 +2393,10 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               onAddData={() => setIsUrineTestFormOpen(true)}
               onViewModeChange={setUrineTestViewMode}
               onPageChange={setUrineTestCurrentPage}
-              onPageSizeChange={setUrineTestPageSize}
+              onPageSizeChange={(size) => {
+                setUrineTestPageSize(size);
+                persistPageSize('urineTestPageSize', size);
+              }}
               isAddButtonDisabled={false}
             />
 
@@ -2432,12 +2418,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 selectedHours={selectedHours}
                 existingTimeEntries={computedExistingTimeEntries}
                 existingCervixData={existingCervixData}
-                patient={{
-                  uuid: patientUuid,
-                  name: 'Patient',
-                  gender: 'Female',
-                  age: '40 Years',
-                }}
               />
             )}
             {isFetalHeartRateFormOpen && (
@@ -2447,12 +2427,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 onSubmit={handleFetalHeartRateFormSubmit}
                 onDataSaved={handleFetalHeartRateDataSaved}
                 existingTimeEntries={computedExistingTimeEntries}
-                patient={{
-                  uuid: patientUuid,
-                  name: 'Patient',
-                  gender: 'Female',
-                  age: '40 Years',
-                }}
               />
             )}
             {isMembraneAmnioticFluidFormOpen && (
@@ -2460,12 +2434,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 isOpen={isMembraneAmnioticFluidFormOpen}
                 onClose={handleMembraneAmnioticFluidFormClose}
                 onSubmit={handleMembraneAmnioticFluidFormSubmit}
-                patient={{
-                  uuid: patientUuid,
-                  name: 'Patient',
-                  gender: 'Female',
-                  age: '40 Years',
-                }}
               />
             )}
             {isCervicalContractionsFormOpen && (
@@ -2473,12 +2441,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 isOpen={isCervicalContractionsFormOpen}
                 onClose={handleCervicalContractionsFormClose}
                 onSubmit={handleCervicalContractionsFormSubmit}
-                patient={{
-                  uuid: patientUuid,
-                  name: 'Patient',
-                  gender: 'Female',
-                  age: '40 Years',
-                }}
               />
             )}
             {isOxytocinFormOpen && (
@@ -2487,12 +2449,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 onClose={handleOxytocinFormClose}
                 onSubmit={handleOxytocinFormSubmit}
                 existingTimeEntries={existingTimeEntries}
-                patient={{
-                  uuid: patientUuid,
-                  name: 'Patient',
-                  gender: 'F',
-                  age: '28',
-                }}
               />
             )}
             {isTemperatureFormOpen && (
@@ -2502,12 +2458,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 onSubmit={handleTemperatureFormSubmit}
                 initialTime={temperatureFormInitialTime}
                 existingTimeEntries={existingTimeEntries}
-                patient={{
-                  uuid: patientUuid,
-                  name: 'Patient',
-                  gender: 'F',
-                  age: '28',
-                }}
               />
             )}
             {isUrineTestFormOpen && (
@@ -2516,12 +2466,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 onClose={() => setIsUrineTestFormOpen(false)}
                 onSubmit={handleUrineTestFormSubmit}
                 existingTimeEntries={existingTimeEntries}
-                patient={{
-                  uuid: patientUuid,
-                  name: 'Patient',
-                  gender: 'F',
-                  age: '28',
-                }}
               />
             )}
           </Column>

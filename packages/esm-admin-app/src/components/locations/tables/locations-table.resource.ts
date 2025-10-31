@@ -1,41 +1,26 @@
-import { FetchResponse, fhirBaseUrl, openmrsFetch, useFhirFetchAll } from '@openmrs/esm-framework';
-import { type FHIRBundle, FHIRLocation, LocationTagsResponse } from '../types';
-import useSWR from 'swr';
+import { useFhirFetchAll } from '@openmrs/esm-framework';
+import { type FHIRLocation, type LocationTagsResponse } from '../types';
 
 /**
- * Fetches facilities that are tagged with any of the specified location tags.
+ * Custom hook that fetches all facilities with specified location tags.
+ * Uses the framework's useFhirFetchAll hook which handles pagination automatically.
  *
- * @param locationTags The location tags to filter facilities by
- * @returns A promise that resolves to the data object containing the matching FHIR locations
- * @throws {Error} If the API request fails
+ * @param locationTags The location tags response containing tags to filter by
+ * @returns Object containing loading state, error, and the list of facilities
  */
-export async function getFacilitiesByLocationTags(
-  locationTags: LocationTagsResponse,
-): Promise<{ results: Array<FHIRLocation> }> {
-  const tagNames = locationTags.results
-    .map((tag) => encodeURIComponent(tag.name || tag.display))
-    .filter(Boolean)
-    .join(',');
-
-  const url = `${useFhirFetchAll}/Location?_summary=data&_tag=${tagNames}`;
-  const response = await openmrsFetch<FHIRBundle>(url);
-
-  const locations = response.data?.entry?.map((entry) => entry.resource) ?? [];
-
-  return { results: locations };
-}
-
 export const useFacilitiesTagged = (locationTags: LocationTagsResponse) => {
-  const tagNames = locationTags.results
-    .map((tag) => encodeURIComponent(tag.name || tag.display))
+  const tagNames = locationTags?.results
+    ?.map((tag) => encodeURIComponent(tag.name || tag.display))
     .filter(Boolean)
     .join(',');
-  const url = `${fhirBaseUrl}/Location?_summary=data&_tag=${tagNames}`;
-  const { isLoading, error, data } = useSWR<FetchResponse<FHIRBundle>>(url, openmrsFetch);
+
+  const url = tagNames ? `ws/fhir2/R4/Location?_summary=data&_tag=${tagNames}` : null;
+
+  const { data, isLoading, error } = useFhirFetchAll<FHIRLocation>(url);
 
   return {
     isLoading,
     error,
-    facilityList: data?.data?.entry || [],
+    facilityList: data?.map((resource) => ({ resource })) || [],
   };
 };

@@ -18,11 +18,13 @@ const getTodayRange = () => ({
 });
 
 export const useTotalVisits = () => {
-  const url = `${restBaseUrl}/visit?includeInactive=false&v=custom:(uuid)&fromStartDate=${dayjs().format(
-    'YYYY-MM-DD',
-  )}&toStartDate=${dayjs().format('YYYY-MM-DD')}`;
+  const customRepresentation = 'custom:(uuid,startDatetime,stopDatetime)';
 
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<Visit> } }>(url, openmrsFetch);
+  const visitsUrl = `${restBaseUrl}/visit?includeInactive=true&v=${customRepresentation}&fromStartDate=${dayjs().format(
+    'YYYY-MM-DD',
+  )}`;
+
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<Visit> } }>(visitsUrl, openmrsFetch);
 
   return {
     data: data?.data?.results,
