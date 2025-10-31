@@ -16,6 +16,7 @@ export interface CarePanelConfig {
       formName: string;
       formUuId: string;
       dependancies: string[];
+      isEnrollment: boolean;
     }[];
   }>;
   peerEducatorRelationshipType: string;
@@ -69,11 +70,23 @@ export const configSchema = {
         programName: 'PNC',
         programUuid: '286598d5-1886-4f0d-9e5f-fa5473399cee',
         forms: [
-          { formName: 'MCH Postnatal Visit Form', formUuId: '72aa78e0-ee4b-47c3-9073-26f3b9ecc4a7', dependancies: [] },
+          {
+            formName: 'Postnatal Care (PNC) Enrollment Form',
+            formUuId: '286598d5-1886-4f0d-9e5f-fa5473399cee',
+            dependancies: [],
+            isEnrollment: true,
+          },
+          {
+            formName: 'MCH Postnatal Visit Form',
+            formUuId: '72aa78e0-ee4b-47c3-9073-26f3b9ecc4a7',
+            dependancies: ['286598d5-1886-4f0d-9e5f-fa5473399cee'],
+            isEnrollment: false,
+          },
           {
             formName: 'PNC Services Discontinuation',
             formUuId: '30db888b-d6d3-47fb-b0c9-dbdf10a57ff5',
-            dependancies: [],
+            dependancies: ['286598d5-1886-4f0d-9e5f-fa5473399cee'],
+            isEnrollment: false,
           },
         ],
       },
@@ -81,16 +94,29 @@ export const configSchema = {
         programName: 'ANC',
         programUuid: '72635673-0613-4259-916e-e0d5d5ef8f66',
         forms: [
-          { formName: 'MCH Antenatal Visit', formUuId: 'e8f98494-af35-4bb8-9fc7-c409c8fed843', dependancies: [] },
+          {
+            formName: 'Antenatal Care (ANC) Enrollment Form',
+            formUuId: 'b287050b-f9a5-4929-96b0-31ac602384e1',
+            dependancies: [],
+            isEnrollment: true,
+          },
+          {
+            formName: 'MCH Antenatal Visit',
+            formUuId: 'e8f98494-af35-4bb8-9fc7-c409c8fed843',
+            dependancies: ['b287050b-f9a5-4929-96b0-31ac602384e1'],
+            isEnrollment: false,
+          },
           {
             formName: 'ANC Follow Up form',
             formUuId: '6fb1a39b-0a57-4239-afd7-a5490d281cb9',
-            dependancies: ['e8f98494-af35-4bb8-9fc7-c409c8fed843'],
+            dependancies: ['b287050b-f9a5-4929-96b0-31ac602384e1', 'e8f98494-af35-4bb8-9fc7-c409c8fed843'],
+            isEnrollment: false,
           },
           {
             formName: 'Antenatal Care (ANC) Discontinuation',
             formUuId: '38885518-c71a-4661-8edf-3db67707e1d1',
-            dependancies: ['e8f98494-af35-4bb8-9fc7-c409c8fed843'],
+            dependancies: ['b287050b-f9a5-4929-96b0-31ac602384e1', 'e8f98494-af35-4bb8-9fc7-c409c8fed843'],
+            isEnrollment: false,
           },
         ],
       },
@@ -98,11 +124,23 @@ export const configSchema = {
         programName: 'MCH - Child Services', // cwc
         programUuid: 'c2ecdf11-97cd-432a-a971-cfd9bd296b83',
         forms: [
-          { formName: 'Child welfare clinic form', formUuId: '755b59e6-acbb-4853-abaf-be302039f902', dependancies: [] }, // CWC followup
+          {
+            formName: 'CWC Enrolment Form',
+            formUuId: '8553d869-bdc8-4287-8505-910c7c998aff',
+            dependancies: [],
+            isEnrollment: true,
+          }, // mch child enrollment
+          {
+            formName: 'Child welfare clinic form',
+            formUuId: '755b59e6-acbb-4853-abaf-be302039f902',
+            dependancies: ['8553d869-bdc8-4287-8505-910c7c998aff'],
+            isEnrollment: false,
+          }, // CWC followup
           {
             formName: 'Child Welfare Services Discontinuation',
             formUuId: '1dd02c43-904b-4206-8378-7b1a8414c326',
-            dependancies: [],
+            dependancies: ['8553d869-bdc8-4287-8505-910c7c998aff'],
+            isEnrollment: false,
           },
         ],
       },
@@ -110,11 +148,23 @@ export const configSchema = {
         programName: 'Nutrition',
         programUuid: '504f179b-4a13-4790-9ecd-ca4963448af8',
         forms: [
-          { formName: 'Nutrition form', formUuId: 'b8357314-0f6a-4fc9-a5b7-339f47095d62', dependancies: [] },
+          {
+            formName: 'Nutrition Enrollment Form',
+            formUuId: '849e88cc-6a78-463a-a4d2-e4e8c2f795bc',
+            dependancies: [],
+            isEnrollment: true,
+          },
+          {
+            formName: 'Nutrition form',
+            formUuId: 'b8357314-0f6a-4fc9-a5b7-339f47095d62',
+            dependancies: ['849e88cc-6a78-463a-a4d2-e4e8c2f795bc'],
+            isEnrollment: false,
+          },
           {
             formName: 'Nutrition Services Discontinuation',
             formUuId: '0648a046-f404-4246-806f-c9ee78232d6d',
-            dependancies: [],
+            dependancies: ['849e88cc-6a78-463a-a4d2-e4e8c2f795bc'],
+            isEnrollment: false,
           },
         ],
       },
@@ -122,11 +172,23 @@ export const configSchema = {
         programName: 'Family Planning',
         programUuid: '191269d2-9973-4958-9936-f687ed771050',
         forms: [
-          { formName: 'Family Planning Form', formUuId: 'a52c57d4-110f-4879-82ae-907b0d90add6', dependancies: [] },
+          {
+            formName: 'Family Planning Enrollment Form',
+            formUuId: '5a07d260-77d7-477d-8ae5-f5bc2fb4a1e5',
+            dependancies: [],
+            isEnrollment: true,
+          },
+          {
+            formName: 'Family Planning Form',
+            formUuId: 'a52c57d4-110f-4879-82ae-907b0d90add6',
+            dependancies: ['5a07d260-77d7-477d-8ae5-f5bc2fb4a1e5'],
+            isEnrollment: false,
+          },
           {
             formName: 'Family Planning Discontinuation',
             formUuId: 'efc782ea-9a16-4791-824a-18be7417eda4',
-            dependancies: [],
+            dependancies: ['5a07d260-77d7-477d-8ae5-f5bc2fb4a1e5'],
+            isEnrollment: false,
           },
         ],
       },
@@ -143,7 +205,7 @@ export const configSchema = {
           {
             formName: 'TB Initial',
             formUuId: '6a4f7090-f496-46d2-b582-5ac7e71a16e4',
-            dependancies: [],
+            dependancies: ['89994550-9939-40f3-afa6-173bce445c79'],
             isEnrollment: false,
           },
           {
@@ -173,13 +235,13 @@ export const configSchema = {
           {
             formName: 'Violence Initial Form',
             formUuId: 'e182d25f-d824-4cc7-8e0c-188519c300aa',
-            dependancies: [],
+            dependancies: ['9ba1d4aa-57d7-48f9-a635-a23508e8136c'],
             isEnrollment: false,
           },
           {
             formName: 'Violence Screening',
             formUuId: '03767614-1384-4ce3-aea9-27e2f4e67d01',
-            dependancies: [],
+            dependancies: ['9ba1d4aa-57d7-48f9-a635-a23508e8136c'],
             isEnrollment: false,
           },
           {
@@ -307,7 +369,7 @@ export const configSchema = {
           {
             formName: 'TPT Initial',
             formUuId: '9d75d6c7-2db8-44ba-8068-f1b3601a1cb9',
-            dependancies: [],
+            dependancies: ['61ea2a72-b0f9-47cf-ae86-443f88656acc'],
             isEnrollment: false,
           },
           {
@@ -337,7 +399,7 @@ export const configSchema = {
           {
             formName: 'PrEP Initial Enrollment Form',
             formUuId: 'd63eb2ee-d5e8-4ea4-b5ea-ea3670af03ac',
-            dependancies: [],
+            dependancies: ['d5ca78be-654e-4d23-836e-a934739be555'],
             isEnrollment: false,
           },
           {
@@ -364,16 +426,23 @@ export const configSchema = {
         programName: 'NCD',
         programUuid: 'ffee43c4-9ccd-4e55-8a70-93194e7fafc6',
         forms: [
-          { formName: 'NCD Initial Form', formUuId: 'c4994dd7-f2b6-4c28-bdc7-8b1d9d2a6a97', dependancies: [] },
+          {
+            formName: 'NCD Initial Form',
+            formUuId: 'c4994dd7-f2b6-4c28-bdc7-8b1d9d2a6a97',
+            dependancies: [],
+            isEnrollment: true,
+          },
           {
             formName: 'NCD Follow Up',
             formUuId: '3e1057da-f130-44d9-b2bb-53e039b953c6',
             dependancies: ['c4994dd7-f2b6-4c28-bdc7-8b1d9d2a6a97'],
+            isEnrollment: false,
           },
           {
             formName: 'NCD Discontinuation',
             formUuId: '63182d28-a23f-4d14-b48e-38077bbd8ed2',
             dependancies: ['c4994dd7-f2b6-4c28-bdc7-8b1d9d2a6a97'],
+            isEnrollment: false,
           },
         ],
       },
@@ -390,8 +459,8 @@ export const configSchema = {
           {
             formName: 'KVP Initial Form',
             formUuId: 'ead9e306-f1e5-4ed8-aa7d-be9a55309b3c',
-            dependancies: [],
-            isEnrollment: true,
+            dependancies: ['185dec84-df6f-4fc7-a370-15aa8be531ec'],
+            isEnrollment: false,
           },
           {
             formName: 'KVP Clinical Enrollment',
@@ -467,11 +536,23 @@ export const configSchema = {
         programName: 'Pre-Conception care program',
         programUuid: 'fd549de0-2e6d-4e76-a2c1-64df26351bdd',
         forms: [
-          { formName: 'Pre- Conception Care', formUuId: '2cf38f9a-f910-492b-a055-e29924e513f8', dependancies: [] },
+          {
+            formName: 'Pre-Conception Care Enrollment Form',
+            formUuId: '236161a4-29ad-4282-9829-6684aab85daa',
+            dependancies: [],
+            isEnrollment: true,
+          },
+          {
+            formName: 'Pre-Conception Care',
+            formUuId: '2cf38f9a-f910-492b-a055-e29924e513f8',
+            dependancies: ['236161a4-29ad-4282-9829-6684aab85daa'],
+            isEnrollment: false,
+          },
           {
             formName: 'Pre-Conception Discontinuation',
             formUuId: 'a9128c54-3a05-4d66-ba50-149565eadfd7',
-            dependancies: [],
+            dependancies: ['236161a4-29ad-4282-9829-6684aab85daa'],
+            isEnrollment: false,
           },
         ],
       },
@@ -483,36 +564,43 @@ export const configSchema = {
             formName: 'MAT Initial Registration Form',
             formUuId: '9a9cadd7-fba1-4a24-94aa-43edfbecf8d9',
             dependancies: [],
+            isEnrollment: true,
           },
           {
             formName: 'MAT Clinical Encounter Form',
             formUuId: '5ed937a0-0933-41c3-b638-63d8a4779845',
             dependancies: ['9a9cadd7-fba1-4a24-94aa-43edfbecf8d9'],
+            isEnrollment: false,
           },
           {
             formName: 'MAT Psycho-social Intake & Follow-up Form',
             formUuId: 'cfd2109b-63b3-43de-8bb3-682e80c5a965',
             dependancies: ['9a9cadd7-fba1-4a24-94aa-43edfbecf8d9'],
+            isEnrollment: false,
           },
           {
             formName: 'MAT Psychiatric Intake and Follow up Form',
             formUuId: 'fdea46a1-9423-4ef9-b780-93b32b48a528',
             dependancies: ['9a9cadd7-fba1-4a24-94aa-43edfbecf8d9'],
+            isEnrollment: false,
           },
           {
             formName: 'MAT Transit/Referral Form',
             formUuId: 'b9495048-eceb-4dd2-bfba-330dc4900ee9',
             dependancies: ['9a9cadd7-fba1-4a24-94aa-43edfbecf8d9'],
+            isEnrollment: false,
           },
           {
             formName: 'MAT Cessation Form',
             formUuId: 'fa58cbc1-91c8-4920-813b-fde7fd69533b',
             dependancies: ['9a9cadd7-fba1-4a24-94aa-43edfbecf8d9'],
+            isEnrollment: false,
           },
           {
             formName: 'MAT Discontinuation Form',
             formUuId: '38d6e116-b96c-4916-a821-b4dc83e2041d',
             dependancies: ['9a9cadd7-fba1-4a24-94aa-43edfbecf8d9'],
+            isEnrollment: false,
           },
         ],
       },

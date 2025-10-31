@@ -37,7 +37,7 @@ type CareProgramsProps = {
 const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { peerCalendarOutreactForm } = useConfig<CarePanelConfig>();
-  const { getProgramForms } = useCareProgramForms();
+  const { getProgramForms, getProgramEnrollmentForm } = useCareProgramForms();
   const { currentVisit, mutate: mutateVisit } = useVisit(patientUuid);
   const { eligibleCarePrograms, isLoading, isValidating, error, mutateEligiblePrograms } = useCarePrograms(patientUuid);
   const {
@@ -94,8 +94,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const rows = useMemo(
     () => [
       ...enrollments.map((enrollment) => {
-        const forms = getProgramForms(enrollment.program.uuid);
-
+        const forms = getProgramForms(enrollment.program.uuid).filter((form) => !form.isEnrollment);
         return {
           id: enrollment.program.uuid,
           programName: enrollment.program.name,
@@ -166,6 +165,8 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
         };
       }),
       ...eligibleCarePrograms.map((careProgram) => {
+        const enrollmentForm = getProgramEnrollmentForm(careProgram.uuid);
+
         return {
           id: `${careProgram.uuid}`,
           programName: careProgram.display,
@@ -186,12 +187,28 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
                 kind={careProgram.enrollmentStatus == 'active' ? 'danger--ghost' : 'ghost'}
                 iconDescription="Dismiss"
                 // onClick={() => handleCareProgramClick(careProgram)}
-                onClick={() =>
-                  launchProgramForm(careProgram.uuid, patientUuid, undefined, () => {
-                    mutateEnrollments();
-                    mutateEligiblePrograms();
-                  })
-                }
+                onClick={() => {
+                  if (!enrollmentForm) {
+                    return launchProgramForm(careProgram.uuid, patientUuid, undefined, () => {
+                      mutateEnrollments();
+                      mutateEligiblePrograms();
+                    });
+                  }
+                  if (currentVisit) {
+                    if (enrollmentForm) {
+                      return launchWorkspace('patient-form-entry-workspace', {
+                        workspaceTitle: enrollmentForm.formName,
+                        mutateForm: handleMutations,
+                        formInfo: {
+                          encounterUuid: '',
+                          formUuid: enrollmentForm.formUuId,
+                          // additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails ?? {} },
+                        },
+                      });
+                    }
+                  }
+                  launchStartVisitPrompt();
+                }}
                 renderIcon={careProgram.enrollmentStatus == 'active' ? Close : DocumentAdd}>
                 {careProgram.enrollmentStatus == 'active' ? 'Discontinue' : 'Enroll'}
               </Button>
@@ -211,6 +228,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       patientUuid,
       handleMutations,
       mutateEnrollments,
+      getProgramEnrollmentForm,
       mutateEligiblePrograms,
     ],
   );
