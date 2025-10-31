@@ -81,6 +81,58 @@ export const useProgramDetail = (programId: string) => {
   };
 };
 
+type FormEncounter = {
+  encounter: {
+    encounterDatetime: string;
+    uuid: string;
+    id: number;
+    encounterType: string;
+    dateCreated: string;
+  };
+  form: {
+    uuid: string;
+    name: string;
+  };
+};
+
+export const usePatientFormEncounter = (patientUuid: string, formUuid: string) => {
+  const url = `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuid}`;
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<FormEncounter> }>>(
+    url,
+    openmrsFetch,
+  );
+  return {
+    formEncounters: data?.data?.results ?? [],
+    error,
+    isLoading,
+    mutate,
+  };
+};
+
+export const useFormsFilled = (patientUuid: string, formUuids: Array<string> = []) => {
+  const url = `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuids.join(
+    ',',
+  )}`;
+
+  const { data, error, mutate, isLoading } = useSWR(url, async (uri) => {
+    const tasks = await Promise.allSettled(
+      formUuids.map((formUuid) =>
+        openmrsFetch<{ results: Array<FormEncounter> }>(
+          `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuid}`,
+        ),
+      ),
+    );
+    // Return true if all tasks are fullfilled and have related encounter (visit doesnt matter)
+    return tasks.every((task) => task.status === 'fulfilled' && task.value.data?.results?.length);
+  });
+  return {
+    formsFilled: data,
+    isLoading,
+    mutate,
+    error,
+  };
+};
+
 export const ProgramFormSchema = z.object({
   dateEnrolled: z.date({ coerce: true }),
   dateCompleted: z.date({ coerce: true }).optional(),

@@ -29,6 +29,7 @@ import styles from './care-programs.scss';
 import useCareProgramForms from './useCareProgramForms';
 import { CarePanelConfig } from '../config-schema';
 import KvpLinkPatientToPeerEducator from './link-patient-to-peer-action.component';
+import ProgramFormOverflowMenuItem from './program-form-overflow-menu-item.component';
 
 type CareProgramsProps = {
   patientUuid: string;
@@ -103,49 +104,12 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
               <Tag type="green">Enrolled</Tag>
               <OverflowMenu aria-label="overflow-menu" flipped>
                 {forms.map((form) => {
-                  const formEncounter = currentVisit?.encounters?.find((en) => en.form?.uuid === form.formUuId);
-                  const areAllDependancyFormsFilled = form.dependancies.every((formUuid) =>
-                    currentVisit?.encounters?.some((en) => en?.form?.uuid === formUuid),
-                  );
-                  const showForm = !form?.dependancies?.length || areAllDependancyFormsFilled;
-
-                  if (!showForm) {
-                    return null;
-                  }
-
-                  if (form.formUuId === peerCalendarOutreactForm) {
-                    return (
-                      <KvpLinkPatientToPeerEducator
-                        form={form}
-                        patientUuid={patientUuid}
-                        visit={currentVisit}
-                        mutate={handleMutations}
-                      />
-                    );
-                  }
-
-                  if (hideFilledProgramForm && formEncounter) {
-                    return null;
-                  }
-
                   return (
-                    <OverflowMenuItem
-                      key={form.formUuId}
-                      itemText={form.formName}
-                      onClick={() => {
-                        if (currentVisit) {
-                          return launchWorkspace('patient-form-entry-workspace', {
-                            workspaceTitle: form.formName,
-                            mutateForm: handleMutations,
-                            formInfo: {
-                              encounterUuid: formEncounter?.uuid ?? '',
-                              formUuid: form.formUuId,
-                              // additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails ?? {} },
-                            },
-                          });
-                        }
-                        launchStartVisitPrompt();
-                      }}
+                    <ProgramFormOverflowMenuItem
+                      form={form}
+                      visit={currentVisit}
+                      patientUuid={patientUuid}
+                      mutate={handleMutations}
                     />
                   );
                 })}
