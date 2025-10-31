@@ -84,7 +84,7 @@ export const usePatientChartTabs = (navigationPath: string, patientUuid: string,
 };
 
 /**
- * Show partography component when patient is a femail patient, admitted to labour ward
+ * Show partography component when patient is a female patient, admitted to labour ward
  * @param patientUuid string
  */
 export const useShowPatography = (patientUuid: string) => {
