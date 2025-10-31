@@ -239,11 +239,18 @@ export const usePaymentModes = (excludeWaiver: boolean = true) => {
 };
 
 export const useBillableItems = () => {
-  const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(display),servicePrices:(uuid,name,price,paymentMode))`;
+  const {
+    concepts: { consultationServiceType, registrationServiceType },
+  } = useConfig<BillingConfig>();
+  const url = `${restBaseUrl}/cashier/billableService?v=custom:(uuid,name,shortName,serviceStatus,serviceType:(uuid,display),servicePrices:(uuid,name,price,paymentMode))`;
   const { data, isLoading, error } = useSWR<{ data: { results: Array<OpenmrsResource> } }>(url, openmrsFetch);
   const [searchTerm, setSearchTerm] = useState('');
   const filteredItems =
-    data?.data?.results?.filter((item) => item.name.toLowerCase().includes(searchTerm.toLowerCase())) ?? [];
+    data?.data?.results?.filter(
+      (item) =>
+        (item.serviceType?.uuid === consultationServiceType || item.serviceType?.uuid === registrationServiceType) &&
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    ) ?? [];
   return {
     lineItems: filteredItems,
     isLoading,
