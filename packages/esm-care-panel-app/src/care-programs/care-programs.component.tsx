@@ -24,12 +24,11 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
 
+import { CarePanelConfig } from '../config-schema';
 import { launchDeleteProgramDialog, launchProgramForm, usePatientEnrolledPrograms } from './care-program.resource';
 import styles from './care-programs.scss';
-import useCareProgramForms from './useCareProgramForms';
-import { CarePanelConfig } from '../config-schema';
-import KvpLinkPatientToPeerEducator from './link-patient-to-peer-action.component';
 import ProgramFormOverflowMenuItem from './program-form-overflow-menu-item.component';
+import useCareProgramForms from './useCareProgramForms';
 
 type CareProgramsProps = {
   patientUuid: string;
@@ -47,7 +46,6 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
     error: enrollmentsError,
     mutate: mutateEnrollments,
   } = usePatientEnrolledPrograms(patientUuid);
-  const { hideFilledProgramForm } = useConfig<CarePanelConfig>();
 
   const isTablet = useLayoutType() === 'tablet';
 
@@ -187,8 +185,6 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       getProgramForms,
       t,
       currentVisit,
-      peerCalendarOutreactForm,
-      hideFilledProgramForm,
       patientUuid,
       handleMutations,
       mutateEnrollments,

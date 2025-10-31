@@ -1,4 +1,12 @@
-import { FetchResponse, launchWorkspace, openmrsFetch, restBaseUrl, showModal } from '@openmrs/esm-framework';
+import {
+  FetchResponse,
+  launchWorkspace,
+  openmrsFetch,
+  parseDate,
+  restBaseUrl,
+  showModal,
+} from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 import useSWR, { mutate } from 'swr';
 import z from 'zod';
 
@@ -102,7 +110,15 @@ export const usePatientFormEncounter = (patientUuid: string, formUuid: string) =
     openmrsFetch,
   );
   return {
-    formEncounters: data?.data?.results ?? [],
+    formEncounters: (data?.data?.results ?? [])
+      .map((data) => ({
+        ...data,
+        encounter: {
+          ...data.encounter,
+          encounterDatetime: parseDate(data.encounter.encounterDatetime),
+        },
+      }))
+      .sort((a, b) => dayjs(b.encounter.encounterDatetime).diff(dayjs(a.encounter.encounterDatetime))),
     error,
     isLoading,
     mutate,
