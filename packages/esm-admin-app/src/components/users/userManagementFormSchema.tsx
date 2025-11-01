@@ -24,7 +24,7 @@ const UserManagementFormSchema = (existingUsernames: Array<string>, isEdit?: boo
       }),
     password: z.string().optional(),
     confirmPassword: z.string().optional(),
-    forcePasswordChange: z.boolean().optional(),
+    forcePasswordChange: z.boolean().optional().default(false),
     roles: z
       .array(
         z.object({
