@@ -16,7 +16,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Close, DocumentAdd } from '@carbon/react/icons';
-import { formatDate, launchWorkspace, restBaseUrl, useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { formatDate, launchWorkspace, restBaseUrl, useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import capitalize from 'lodash/capitalize';
 import React, { useCallback, useMemo } from 'react';
@@ -24,8 +24,10 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { PatientCarePrograms, useCarePrograms } from '../hooks/useCarePrograms';
 
+import { CarePanelConfig } from '../config-schema';
 import { launchDeleteProgramDialog, launchProgramForm, usePatientEnrolledPrograms } from './care-program.resource';
 import styles from './care-programs.scss';
+import ProgramFormOverflowMenuItem from './program-form-overflow-menu-item.component';
 import useCareProgramForms from './useCareProgramForms';
 
 type CareProgramsProps = {
@@ -34,8 +36,9 @@ type CareProgramsProps = {
 
 const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { getProgramForms } = useCareProgramForms();
-  const { currentVisit } = useVisit(patientUuid);
+  const { peerCalendarOutreactForm } = useConfig<CarePanelConfig>();
+  const { getProgramForms, getProgramEnrollmentForm } = useCareProgramForms();
+  const { currentVisit, mutate: mutateVisit } = useVisit(patientUuid);
   const { eligibleCarePrograms, isLoading, isValidating, error, mutateEligiblePrograms } = useCarePrograms(patientUuid);
   const {
     enrollments,
@@ -43,6 +46,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
     error: enrollmentsError,
     mutate: mutateEnrollments,
   } = usePatientEnrolledPrograms(patientUuid);
+
   const isTablet = useLayoutType() === 'tablet';
 
   const handleMutations = useCallback(() => {
@@ -58,7 +62,9 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       undefined,
       { revalidate: true },
     );
-  }, [mutateEligiblePrograms, patientUuid]);
+    mutateVisit();
+    mutateEnrollments();
+  }, [mutateEligiblePrograms, mutateEnrollments, mutateVisit, patientUuid]);
 
   const handleCareProgramClick = useCallback(
     (careProgram: PatientCarePrograms) => {
@@ -72,9 +78,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       currentVisit
         ? launchWorkspace('patient-form-entry-workspace', {
             workspaceTitle: workspaceTitle,
-            mutateForm: () => {
-              handleMutations();
-            },
+            mutateForm: handleMutations,
             formInfo: {
               encounterUuid: '',
               formUuid,
@@ -89,8 +93,7 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const rows = useMemo(
     () => [
       ...enrollments.map((enrollment) => {
-        const forms = getProgramForms(enrollment.program.uuid);
-
+        const forms = getProgramForms(enrollment.program.uuid).filter((form) => !form.isEnrollment);
         return {
           id: enrollment.program.uuid,
           programName: enrollment.program.name,
@@ -99,37 +102,12 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
               <Tag type="green">Enrolled</Tag>
               <OverflowMenu aria-label="overflow-menu" flipped>
                 {forms.map((form) => {
-                  const formEncounter = currentVisit?.encounters?.find((en) => en.form?.uuid === form.formUuId);
-                  const areAllDependancyFormsFilled = form.dependancies.every((formUuid) =>
-                    currentVisit?.encounters?.some((en) => en?.form?.uuid === formUuid),
-                  );
-                  const showForm = !form?.dependancies?.length || areAllDependancyFormsFilled;
-
-                  if (!showForm) {
-                    return null;
-                  }
-
                   return (
-                    <OverflowMenuItem
-                      key={form.formUuId}
-                      itemText={form.formName}
-                      onClick={() => {
-                        if (currentVisit) {
-                          return launchWorkspace('patient-form-entry-workspace', {
-                            workspaceTitle: form.formName,
-                            mutateForm: () => {
-                              mutateEnrollments();
-                              mutateEligiblePrograms();
-                            },
-                            formInfo: {
-                              encounterUuid: formEncounter?.uuid ?? '',
-                              formUuid: form.formUuId,
-                              // additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails ?? {} },
-                            },
-                          });
-                        }
-                        launchStartVisitPrompt();
-                      }}
+                    <ProgramFormOverflowMenuItem
+                      form={form}
+                      visit={currentVisit}
+                      patientUuid={patientUuid}
+                      mutate={handleMutations}
                     />
                   );
                 })}
@@ -149,6 +127,8 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
         };
       }),
       ...eligibleCarePrograms.map((careProgram) => {
+        const enrollmentForm = getProgramEnrollmentForm(careProgram.uuid);
+
         return {
           id: `${careProgram.uuid}`,
           programName: careProgram.display,
@@ -169,12 +149,28 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
                 kind={careProgram.enrollmentStatus == 'active' ? 'danger--ghost' : 'ghost'}
                 iconDescription="Dismiss"
                 // onClick={() => handleCareProgramClick(careProgram)}
-                onClick={() =>
-                  launchProgramForm(careProgram.uuid, patientUuid, undefined, () => {
-                    mutateEnrollments();
-                    mutateEligiblePrograms();
-                  })
-                }
+                onClick={() => {
+                  if (!enrollmentForm) {
+                    return launchProgramForm(careProgram.uuid, patientUuid, undefined, () => {
+                      mutateEnrollments();
+                      mutateEligiblePrograms();
+                    });
+                  }
+                  if (currentVisit) {
+                    if (enrollmentForm) {
+                      return launchWorkspace('patient-form-entry-workspace', {
+                        workspaceTitle: enrollmentForm.formName,
+                        mutateForm: handleMutations,
+                        formInfo: {
+                          encounterUuid: '',
+                          formUuid: enrollmentForm.formUuId,
+                          // additionalProps: { enrollmenrDetails: careProgram.enrollmentDetails ?? {} },
+                        },
+                      });
+                    }
+                  }
+                  launchStartVisitPrompt();
+                }}
                 renderIcon={careProgram.enrollmentStatus == 'active' ? Close : DocumentAdd}>
                 {careProgram.enrollmentStatus == 'active' ? 'Discontinue' : 'Enroll'}
               </Button>
@@ -189,9 +185,11 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
       getProgramForms,
       t,
       currentVisit,
-      mutateEnrollments,
-      mutateEligiblePrograms,
       patientUuid,
+      handleMutations,
+      mutateEnrollments,
+      getProgramEnrollmentForm,
+      mutateEligiblePrograms,
     ],
   );
 

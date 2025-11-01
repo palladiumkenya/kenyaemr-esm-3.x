@@ -84,10 +84,16 @@
       "width": "extra-wide",
       "groups": ["ward-patient"]
     },
-    
+
     {
       "name": "mch-program-form-workspace",
       "component": "mchProgramForm",
+      "title": "Program Form",
+      "type": "workspace"
+    },
+    {
+      "name": "kvp-peer-linkage-form-workspace",
+      "component": "kvpPeerLinkageForm",
       "title": "Program Form",
       "type": "workspace"
     }
