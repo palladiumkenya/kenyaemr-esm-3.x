@@ -160,7 +160,13 @@
       "online": true,
       "offline": false
     },
-
+    {
+      "name": "ewf-pharmacy-orders-dashboard",
+      "component": "pharmacyOrders",
+      "slot": "ewf-orders-slot",
+      "online": true,
+      "offline": false
+    },
     {
       "name": "patient-summary-dashboard",
       "component": "patientSummaryDashboard",

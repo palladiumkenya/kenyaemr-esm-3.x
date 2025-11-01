@@ -1,0 +1,14 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+
+.pharmacyOrdersContainer {
+  border: 1px solid colors.$gray-20;
+
+  :global(.cds--table-toolbar) {
+    position: relative;
+  }
+  :global(.cds--data-table-header) {
+    padding-bottom: 0;
+  }
+}

@@ -173,11 +173,12 @@ describe('EncounterDetails', () => {
       render(<EncounterDetails patientUuid={patientUuid} />);
 
       const tabs = screen.getAllByRole('tab');
-      expect(tabs).toHaveLength(4);
+      expect(tabs).toHaveLength(5);
       expect(screen.getAllByText('Visit Details').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Patient History').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Patient Examination').length).toBeGreaterThan(0);
       expect(screen.getAllByText('Patient Management').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Lab Results').length).toBeGreaterThan(0);
     });
 
     it('renders with correct patient UUID prop', () => {
@@ -464,7 +465,7 @@ describe('EncounterDetails', () => {
 
       // Component should render tabs
       const tabs = screen.getAllByRole('tab');
-      expect(tabs).toHaveLength(4);
+      expect(tabs).toHaveLength(5);
 
       // Check Patient History section
       const historyTab = tabs[1];
@@ -519,7 +520,7 @@ describe('EncounterDetails', () => {
       render(<EncounterDetails patientUuid={patientUuid} />);
 
       const tabs = screen.getAllByRole('tab');
-      expect(tabs).toHaveLength(4);
+      expect(tabs).toHaveLength(5);
 
       // All tabs should be accessible
       tabs.forEach((tab) => {
