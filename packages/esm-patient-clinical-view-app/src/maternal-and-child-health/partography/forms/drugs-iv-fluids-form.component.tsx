@@ -1,9 +1,8 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Modal, Grid, Column, Dropdown, InlineNotification, TextInput, ButtonSkeleton } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { launchWorkspace } from '@openmrs/esm-framework';
+import { Button, Modal, Grid, Column, Dropdown, TextInput, ButtonSkeleton } from '@carbon/react';
+import { launchWorkspace, useSession, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { saveDrugOrderData } from '../partography.resource';
 import styles from '../partography-data-form.scss';
 import { ROUTE_OPTIONS, FREQUENCY_OPTIONS } from '../types';
@@ -30,9 +29,27 @@ type DrugsIVFluidsFormProps = {
 
 const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, onSubmit, onDataSaved, patient }) => {
   const { t } = useTranslation();
+  const session = useSession();
   const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [providerUuid, setProviderUuid] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    const fetchProviderData = async () => {
+      if (session?.user?.person?.uuid && !providerUuid) {
+        try {
+          const providerResp = await openmrsFetch(`/ws/rest/v1/provider?person=${session.user.person.uuid}&v=default`);
+          const providerData = await providerResp.json();
+          if (providerData.results && providerData.results.length > 0) {
+            setProviderUuid(providerData.results[0].uuid);
+          }
+        } catch (e) {
+          console.warn('Failed to fetch provider data:', e);
+        }
+      }
+    };
+
+    fetchProviderData();
+  }, [session?.user?.person?.uuid, providerUuid]);
 
   const {
     control,
@@ -71,8 +88,6 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
 
   const onSubmitForm = async (data: DrugsIVFluidsFormData) => {
     clearErrors();
-    setSaveError(null);
-    setSaveSuccess(false);
 
     if (!data.drugName || data.drugName === '') {
       setError('drugName', {
@@ -106,67 +121,109 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
       return;
     }
 
-    if (patient?.uuid) {
-      setIsSaving(true);
-      try {
-        const result = await saveDrugOrderData(patient.uuid, {
+    if (!patient) {
+      showSnackbar({
+        title: t('validationError', 'Validation Error'),
+        subtitle: t('noPatientSelected', 'No patient selected'),
+        kind: 'error',
+      });
+      return;
+    }
+    if (!patient.uuid) {
+      showSnackbar({
+        title: t('validationError', 'Validation Error'),
+        subtitle: t('patientMissingUuid', 'Patient is missing a UUID'),
+        kind: 'error',
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    const abortController = new AbortController();
+
+    const timeoutId = setTimeout(() => {
+      abortController.abort();
+    }, 30000);
+    try {
+      const locationUuid = session?.sessionLocation?.uuid;
+
+      const result = await saveDrugOrderData(
+        patient.uuid,
+        {
+          drugName: data.drugName,
+          dosage: data.dosage,
+          route: data.route,
+          frequency: data.frequency,
+        },
+        locationUuid,
+        providerUuid,
+        abortController.signal,
+      );
+
+      clearTimeout(timeoutId);
+
+      if (result.success) {
+        // Show success notification
+        showSnackbar({
+          title: t('drugOrderSaved', 'Drug order saved'),
+          subtitle: t('drugOrderSavedSuccessfully', 'Drug order has been saved successfully'),
+          kind: 'success',
+          isLowContrast: true,
+        });
+
+        // Call callbacks
+        if (onDataSaved) {
+          onDataSaved();
+        }
+        onSubmit({
           drugName: data.drugName,
           dosage: data.dosage,
           route: data.route,
           frequency: data.frequency,
         });
 
-        if (result.success) {
-          setSaveSuccess(true);
-
-          if (onDataSaved) {
-            onDataSaved();
-          }
-
-          onSubmit({
-            drugName: data.drugName,
-            dosage: data.dosage,
-            route: data.route,
-            frequency: data.frequency,
-          });
-
-          reset();
-
-          setTimeout(() => {
-            setSaveSuccess(false);
-            onClose();
-          }, 1500);
-        } else {
-          setSaveError(result.message || t('saveError', 'Failed to save data'));
-        }
-      } catch (error) {
-        console.error('Save error details:', error);
-        setSaveError(
-          error?.message ||
-            error?.responseBody?.error?.message ||
-            error?.response?.data?.error?.message ||
-            t('saveError', 'Failed to save data'),
-        );
-      } finally {
-        setIsSaving(false);
+        // Reset form and close modal
+        reset();
+        onClose();
+      } else {
+        showSnackbar({
+          title: t('errorSavingDrugOrder', 'Error saving drug order'),
+          subtitle: result.message || t('saveError', 'Failed to save data'),
+          kind: 'error',
+        });
       }
-    } else {
-      onSubmit({
-        drugName: data.drugName,
-        dosage: data.dosage,
-        route: data.route,
-        frequency: data.frequency,
+    } catch (error) {
+      clearTimeout(timeoutId);
+
+      // Handle request cancellation (timeout or manual abort)
+      if (error.name === 'AbortError') {
+        showSnackbar({
+          title: t('requestCancelled', 'Request cancelled'),
+          subtitle: t('saveTimeout', 'Request was cancelled due to timeout. Please try again.'),
+          kind: 'warning',
+        });
+        return;
+      }
+
+      // Handle other errors
+      showSnackbar({
+        title: t('errorSavingDrugOrder', 'Error saving drug order'),
+        subtitle:
+          error?.message ||
+          error?.responseBody?.error?.message ||
+          error?.response?.data?.error?.message ||
+          t('saveError', 'Failed to save data'),
+        kind: 'error',
       });
-      reset();
-      onClose();
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleClose = () => {
     reset();
     clearErrors();
-    setSaveError(null);
-    setSaveSuccess(false);
     onClose();
   };
 
@@ -184,55 +241,8 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
       onRequestSubmit={handleSubmit(onSubmitForm)}
       onSecondarySubmit={handleClose}
       size="md">
-      {saveSuccess && (
-        <InlineNotification
-          kind="success"
-          title={t('saveSuccess', 'Data saved successfully')}
-          subtitle={t('drugOrderDataSaved', 'Drug order data has been saved to OpenMRS')}
-          hideCloseButton
-        />
-      )}
-
-      {saveError && (
-        <InlineNotification
-          kind="error"
-          title={t('saveError', 'Error saving data')}
-          subtitle={saveError}
-          onCloseButtonClick={() => setSaveError(null)}
-        />
-      )}
-
       <div className={styles.modalContent}>
         <Grid>
-          <Column sm={4} md={8} lg={16}>
-            <div className={styles.workspaceLauncherSection}>
-              <h4>{t('selectFromDrugList', 'Select from Drug List')}</h4>
-              <p className={styles.helperText}>
-                {t(
-                  'drugOrderDescription',
-                  'Use the drug order workspace to select from the complete list of available drugs with proper dosing and administration details.',
-                )}
-              </p>
-              <Button
-                kind="tertiary"
-                renderIcon={Add}
-                onClick={handleLaunchDrugOrderWorkspace}
-                disabled={!patient?.uuid}
-                className={styles.workspaceLauncherButton}>
-                {t('addDrugOrder', 'Add drug order')}
-              </Button>
-            </div>
-          </Column>
-
-          <Column sm={4} md={8} lg={16}>
-            <div className={styles.manualEntrySection}>
-              <h4>{t('manualEntry', 'Manual Entry')}</h4>
-              <p className={styles.helperText}>
-                {t('manualEntryDescription', 'Or enter drug information manually for quick documentation.')}
-              </p>
-            </div>
-          </Column>
-
           <Column sm={4} md={8} lg={16}>
             <Controller
               name="drugName"

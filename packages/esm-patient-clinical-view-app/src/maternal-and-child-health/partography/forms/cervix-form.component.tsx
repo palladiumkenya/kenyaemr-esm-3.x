@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Modal, Grid, Column, NumberInput, Select, SelectItem } from '@carbon/react';
@@ -40,7 +40,14 @@ const CervixForm: React.FC<CervixFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const { control, handleSubmit, reset, setError, clearErrors } = useForm<CervixFormData>({
+  const {
+    control,
+    handleSubmit,
+    reset,
+    setError,
+    clearErrors,
+    formState: { errors },
+  } = useForm<CervixFormData>({
     defaultValues: {
       hour: '',
       time: '',
@@ -86,37 +93,39 @@ const CervixForm: React.FC<CervixFormProps> = ({
     });
   }, [usedHours]);
 
-  const onSubmitForm = async (data: CervixFormData) => {
-    if (!data.hour || data.hour === '') {
-      setError('hour', {
-        type: 'manual',
-        message: 'Hour selection is required',
+  // Clear any errors when form opens
+  useEffect(() => {
+    if (isOpen) {
+      reset({
+        hour: '',
+        time: '',
+        cervicalDilation: '',
+        descent: '',
       });
+      clearErrors();
+    }
+  }, [isOpen, clearErrors, reset]);
+  const onSubmitForm = async (data: CervixFormData) => {
+    clearErrors();
+
+    // Basic validation
+    if (!data.hour || data.hour === '') {
+      setError('hour', { type: 'manual', message: 'Hour selection is required' });
       return;
     }
 
     if (!data.time || data.time === '') {
-      setError('time', {
-        type: 'manual',
-        message: 'Time selection is required',
-      });
-      console.warn('[CervixForm] Attempted to submit with empty time value:', data);
+      setError('time', { type: 'manual', message: 'Time selection is required' });
       return;
     }
 
     if (!data.cervicalDilation || data.cervicalDilation === '') {
-      setError('cervicalDilation', {
-        type: 'manual',
-        message: 'Cervical dilation is required',
-      });
+      setError('cervicalDilation', { type: 'manual', message: 'Cervical dilation is required' });
       return;
     }
 
     if (!data.descent || data.descent === '') {
-      setError('descent', {
-        type: 'manual',
-        message: 'Descent of head is required',
-      });
+      setError('descent', { type: 'manual', message: 'Descent of head is required' });
       return;
     }
 
@@ -125,26 +134,17 @@ const CervixForm: React.FC<CervixFormProps> = ({
     const descentOfHead = parseInt(data.descent);
 
     if (isNaN(hourValue)) {
-      setError('hour', {
-        type: 'manual',
-        message: 'Invalid hour value',
-      });
+      setError('hour', { type: 'manual', message: 'Invalid hour value' });
       return;
     }
 
     if (isNaN(cervicalDilation)) {
-      setError('cervicalDilation', {
-        type: 'manual',
-        message: 'Invalid cervical dilation value',
-      });
+      setError('cervicalDilation', { type: 'manual', message: 'Invalid cervical dilation value' });
       return;
     }
 
     if (isNaN(descentOfHead)) {
-      setError('descent', {
-        type: 'manual',
-        message: 'Invalid descent of head value',
-      });
+      setError('descent', { type: 'manual', message: 'Invalid descent of head value' });
       return;
     }
 
@@ -157,33 +157,21 @@ const CervixForm: React.FC<CervixFormProps> = ({
     }
 
     if (cervicalDilation > 10) {
-      setError('cervicalDilation', {
-        type: 'manual',
-        message: 'Cervical dilation cannot exceed 10cm',
-      });
+      setError('cervicalDilation', { type: 'manual', message: 'Cervical dilation cannot exceed 10cm' });
       return;
     }
 
     if (descentOfHead < 1) {
-      setError('descent', {
-        type: 'manual',
-        message: 'Descent of head cannot be less than 1 (most descended)',
-      });
-      return;
-    }
-    if (descentOfHead > 5) {
-      setError('descent', {
-        type: 'manual',
-        message: 'Descent of head cannot exceed 5',
-      });
+      setError('descent', { type: 'manual', message: 'Descent of head cannot be less than 1 (most descended)' });
       return;
     }
 
-    clearErrors();
-    if (!data.time || data.time.trim() === '') {
-      alert('Time cannot be empty. Please select a valid time.');
+    if (descentOfHead > 5) {
+      setError('descent', { type: 'manual', message: 'Descent of head cannot exceed 5' });
       return;
     }
+
+    // All validation passed, submit the form
     onSubmit({
       hour: hourValue,
       time: data.time,
@@ -197,6 +185,7 @@ const CervixForm: React.FC<CervixFormProps> = ({
 
   const handleClose = () => {
     reset();
+    clearErrors();
     onClose();
   };
 
@@ -225,9 +214,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
             <Controller
               name="hour"
               control={control}
-              rules={{
-                required: 'Hour selection is required',
-              }}
               render={({ field, fieldState }) => (
                 <Select
                   id="hour-select"
@@ -248,9 +234,6 @@ const CervixForm: React.FC<CervixFormProps> = ({
             <Controller
               name="time"
               control={control}
-              rules={{
-                required: 'Time selection is required',
-              }}
               render={({ field, fieldState }) => (
                 <TimePickerDropdown
                   id="time-input"
@@ -269,40 +252,20 @@ const CervixForm: React.FC<CervixFormProps> = ({
             <Controller
               name="cervicalDilation"
               control={control}
-              rules={{
-                required: 'Cervical dilation is required',
-                validate: {
-                  isNumber: (value) => !isNaN(parseFloat(value)) || 'Must be a valid number',
-                  minValue: (value) => {
-                    const numValue = parseFloat(value);
-                    return (
-                      numValue >= validationLimits.cervicalDilationMin ||
-                      `Cannot be less than previous measurement (${validationLimits.cervicalDilationMin}cm)`
-                    );
-                  },
-                  maxValue: (value) => {
-                    const numValue = parseFloat(value);
-                    return numValue <= 10 || 'Cannot exceed 10cm';
-                  },
-                },
-              }}
               render={({ field, fieldState }) => (
                 <>
                   <NumberInput
                     id="cervical-dilation-input"
                     label="Cervical Dilation (cm) *"
                     placeholder="Enter dilation (min: 4cm, max: 10cm)"
-                    value={field.value || ''}
-                    onChange={(e, { value }) => {
-                      // Only allow whole numbers
-                      const intValue = String(value).replace(/[^\d]/g, '');
-                      field.onChange(intValue);
-                    }}
                     min={4}
                     max={10}
                     step={1}
+                    value={field.value || ''}
+                    onChange={(e, { value }) => field.onChange(String(value))}
                     invalid={!!fieldState.error}
                     invalidText={fieldState.error?.message}
+                    allowEmpty
                   />
                   {existingCervixData.length > 0 && (
                     <div className={styles.validationHint}>
@@ -313,46 +276,27 @@ const CervixForm: React.FC<CervixFormProps> = ({
               )}
             />
           </Column>
-
           <Column sm={4} md={8} lg={16}>
-            <Controller
-              name="descent"
-              control={control}
-              rules={{
-                required: 'Descent of head is required',
-                validate: {
-                  isNumber: (value) => !isNaN(parseInt(value)) || 'Must be a valid number',
-                  minValue: (value) => {
-                    const numValue = parseInt(value);
-                    return numValue >= 1 || 'Descent of head cannot be less than 1 (most descended)';
-                  },
-                  maxValue: (value) => {
-                    const numValue = parseInt(value);
-                    return numValue <= 5 || 'Descent of head cannot exceed 5';
-                  },
-                },
-              }}
-              render={({ field, fieldState }) => (
-                <>
+            <div className={styles.formField}>
+              <Controller
+                name="descent"
+                control={control}
+                render={({ field, fieldState }) => (
                   <NumberInput
                     id="descent-input"
                     label="Descent of Head *"
-                    placeholder={
-                      existingCervixData.length === 0
-                        ? `Default: 5 (high position), can decrement to lower values`
-                        : `Enter descent (1=most descended, 5=high position)`
-                    }
-                    value={field.value || ''}
-                    onChange={(e, { value }) => field.onChange(String(value))}
-                    min={1}
+                    min={0}
                     max={5}
                     step={1}
+                    value={field.value || ''}
+                    onChange={(e, { value }) => field.onChange(String(value))}
                     invalid={!!fieldState.error}
                     invalidText={fieldState.error?.message}
+                    allowEmpty
                   />
-                </>
-              )}
-            />
+                )}
+              />
+            </div>
           </Column>
         </Grid>
       </div>

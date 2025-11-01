@@ -75,32 +75,32 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
         reason: disableReason,
       };
     });
-  }, [existingTimeEntries, latestEntry]);
+  }, [latestEntry]);
 
   const minuteOptions = useMemo(() => {
     if (!latestEntry || !hours) {
-      return Array.from({ length: 12 }, (_, i) => {
-        const minute = (i * 5).toString().padStart(2, '0');
+      return Array.from({ length: 60 }, (_, i) => {
+        const minute = i.toString().padStart(2, '0');
         return { value: minute, text: minute, disabled: false };
       });
     }
     const [latestHour, latestMinute] = latestEntry.time.split(':').map(Number);
     const currentHour = parseInt(hours);
-    return Array.from({ length: 12 }, (_, i) => {
-      const minute = (i * 5).toString().padStart(2, '0');
+    return Array.from({ length: 60 }, (_, i) => {
+      const minute = i.toString().padStart(2, '0');
       let isDisabled = false;
       let disableReason = '';
       if (currentHour < latestHour) {
         isDisabled = true;
         disableReason = 'before latest entry';
-      } else if (currentHour === latestHour && i * 5 <= latestMinute) {
+      } else if (currentHour === latestHour && i <= latestMinute) {
         isDisabled = true;
         disableReason = `≤ ${latestMinute} min`;
       }
       const displayText = isDisabled ? `${minute} ${disableReason}` : minute;
       return { value: minute, text: displayText, disabled: isDisabled };
     });
-  }, [hours, existingTimeEntries, latestEntry]);
+  }, [hours, latestEntry]);
 
   const handleHourChange = (selectedHour: string) => {
     if (!selectedHour || selectedHour === '') {
@@ -145,7 +145,7 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
 
   return (
     <div className={styles.timePickerContainer}>
-      <FormGroup legendText={labelText} invalid={invalid}>
+      <FormGroup legendText={labelText} invalid={invalid === true}>
         <div className={styles.timeInputsWrapper}>
           <div className={styles.timeInput}>
             <Select
@@ -153,7 +153,7 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
               labelText="Hours (HH)"
               value={hours}
               onChange={(e) => handleHourChange((e.target as HTMLSelectElement).value)}
-              invalid={invalid}>
+              invalid={invalid === true}>
               <SelectItem value="" text="HH" />
               {hourOptions.map((option) => (
                 <SelectItem
@@ -175,7 +175,7 @@ const TimePickerDropdown: React.FC<TimePickerDropdownProps> = ({
               labelText="Minutes (MM)"
               value={minutes}
               onChange={(e) => handleMinuteChange((e.target as HTMLSelectElement).value)}
-              invalid={invalid}>
+              invalid={invalid === true}>
               <SelectItem value="" text="MM" />
               {minuteOptions.map((option) => (
                 <SelectItem

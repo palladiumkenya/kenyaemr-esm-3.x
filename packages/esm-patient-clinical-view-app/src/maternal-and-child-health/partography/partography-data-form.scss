@@ -211,3 +211,26 @@
   font-weight: 500;
   text-transform: uppercase;
 }
+
+/* Override validation styling when not needed */
+.noValidation {
+  .cds--select__invalid-icon,
+  .cds--number__invalid-icon {
+    display: none !important;
+  }
+
+  .cds--select--invalid,
+  .cds--number--invalid {
+    border-bottom-color: var(--cds-border-strong-01) !important;
+  }
+
+  .cds--select--invalid .cds--select-input,
+  .cds--number--invalid .cds--number input {
+    border-bottom-color: var(--cds-border-strong-01) !important;
+    background-color: var(--cds-field-01) !important;
+  }
+
+  .cds--form-requirement {
+    display: none !important;
+  }
+}

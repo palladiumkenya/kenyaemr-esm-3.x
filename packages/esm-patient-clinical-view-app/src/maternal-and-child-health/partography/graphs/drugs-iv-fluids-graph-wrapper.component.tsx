@@ -120,7 +120,6 @@ const DrugsIVFluidsGraphWrapper: React.FC<DrugsIVFluidsGraphWrapperProps> = ({
                       <th>{t('dosage', 'Dosage')}</th>
                       <th>{t('route', 'Route')}</th>
                       <th>{t('frequency', 'Frequency')}</th>
-                      <th>{t('source', 'Source')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -131,11 +130,6 @@ const DrugsIVFluidsGraphWrapper: React.FC<DrugsIVFluidsGraphWrapperProps> = ({
                         <td>{item.dosage}</td>
                         <td>{item.route || '-'}</td>
                         <td>{item.frequency || '-'}</td>
-                        <td>
-                          <span className={item.source === 'order' ? styles.orderSource : styles.manualSource}>
-                            {item.source === 'order' ? t('drugOrder', 'Drug Order') : t('manual', 'Manual')}
-                          </span>
-                        </td>
                       </tr>
                     ))}
                   </tbody>

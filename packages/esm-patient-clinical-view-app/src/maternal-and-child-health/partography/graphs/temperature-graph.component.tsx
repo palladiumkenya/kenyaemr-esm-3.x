@@ -77,8 +77,9 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
     { key: 'temperature', header: t('temperature', 'Temperature (°C)') },
   ];
 
-  const timeColumns = data.map((item, idx) =>
-    item.exactTime || item.timeSlot ? item.exactTime || item.timeSlot : '--',
+  const timeColumns = Array.from(
+    { length: Math.max(20, data.length) },
+    (_, colIndex) => data[colIndex]?.timeSlot || '',
   );
 
   const getTemperatureStatus = (temperature: number): string => {
@@ -93,18 +94,6 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
     }
     return '';
   };
-
-  const createGridData = () => {
-    const gridData: Record<string, { temperature: number }> = {};
-    data.forEach((item) => {
-      const key = item.timeSlot;
-      gridData[key] = {
-        temperature: item.temperature,
-      };
-    });
-    return gridData;
-  };
-  const gridData = createGridData();
 
   return (
     <div className={styles.fetalHeartRateSection}>
@@ -157,22 +146,30 @@ const TemperatureGraph: React.FC<TemperatureGraphProps> = ({
             <div className={styles.gridContainer}>
               <div className={styles.gridHeader}>
                 <div className={styles.gridCell}>{t('time', 'Time')}</div>
-                {timeColumns.map((timeColumn) => (
-                  <div key={timeColumn} className={styles.gridCell}>
-                    {timeColumn}
-                  </div>
-                ))}
+                {timeColumns.map((_, colIndex) => {
+                  const item = data[colIndex];
+                  return (
+                    <div key={`time-${colIndex}`} className={styles.gridCell}>
+                      {item?.exactTime || item?.timeSlot || ''}
+                    </div>
+                  );
+                })}
               </div>
 
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('temperature', 'Temp °C')}</div>
-                {data.map((item, idx) => (
-                  <div
-                    key={`temp-${idx}`}
-                    className={`${styles.gridCell} ${item.temperature ? getTemperatureStatus(item.temperature) : ''}`}>
-                    {item.temperature !== undefined && item.temperature !== null ? item.temperature : '--'}
-                  </div>
-                ))}
+                {timeColumns.map((_, colIndex) => {
+                  const item = data[colIndex];
+                  return (
+                    <div
+                      key={`temp-${colIndex}`}
+                      className={`${styles.gridCell} ${
+                        item?.temperature ? getTemperatureStatus(item.temperature) : ''
+                      }`}>
+                      {item?.temperature !== undefined && item?.temperature !== null ? item.temperature : ''}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>

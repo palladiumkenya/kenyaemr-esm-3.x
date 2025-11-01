@@ -107,13 +107,26 @@ import {
   PARTOGRAPHY_CONCEPTS,
   PARTOGRAPHY_ENCOUNTER_TYPES,
   MCH_PARTOGRAPHY_ENCOUNTER_UUID,
+  URINE_TEST_TIME_SLOT_CONCEPT,
   getPartographyUnit,
   type OpenMRSResponse,
   type PartographyObservation,
   type PartographyEncounter,
   type PartographyGraphType,
 } from './types';
-import { configSchema, type ConfigObject } from '../../config-schema';
+import {
+  configSchema,
+  type ConfigObject,
+  TIME_RESULTS_RETURNED,
+  TIME_SAMPLE_COLLECTED,
+  EVENT_DESCRIPTION_CONCEPT,
+  CONTRACTION_COUNT_CONCEPT,
+  UTERINE_CONTRACTIONS_CONCEPT,
+  CONTRACTION_LEVEL_MILD_CONCEPT,
+  CONTRACTION_LEVEL_MODERATE_CONCEPT,
+  CONTRACTION_LEVEL_STRONG_CONCEPT,
+  MOULDING_NONE_CONCEPT,
+} from '../../config-schema';
 
 export type { PartographyObservation, PartographyEncounter };
 const defaultPartographyConfig = configSchema.partography._default;
@@ -359,6 +372,7 @@ export async function createPartographyEncounter(
   formData: any,
   locationUuid?: string,
   providerUuid?: string,
+  signal?: AbortSignal,
   t?: (key: string, fallback?: string) => string,
 ): Promise<{ success: boolean; message: string; encounter?: PartographyEncounter }> {
   try {
@@ -408,7 +422,7 @@ export async function createPartographyEncounter(
       location: finalLocationUuid,
       encounterDatetime: encounterDatetime,
       obs: observations,
-      encounterType: encounterTypeUuid,
+      encounterType: { uuid: encounterTypeUuid },
     };
 
     let finalProviderUuid = providerUuid;
@@ -475,13 +489,12 @@ export async function createPartographyEncounter(
       throw new Error('At least one observation is required');
     }
 
-    // Add debugging to see what payload is being sent
-    // Debug: encounterPayload being sent
-
-    const response = await openmrsFetch(`${restBaseUrl}/encounter`, {
+    const encounterUrl = `${restBaseUrl}/encounter`;
+    const response = await openmrsFetch(encounterUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(encounterPayload),
+      signal: signal, // Add abort signal support
     });
 
     if (!response.ok) {
@@ -651,14 +664,14 @@ function buildObservations(graphType: string, formData: any): any[] {
         });
       }
 
-      // Save hour as a number (not string)
+      // Save hour as a string in the format 'Hour: X' to match backend expectations
       if (formData.hour !== undefined && formData.hour !== '') {
         try {
           const hourValue = parseFloat(formData.hour);
-          if (hourValue >= 0 && hourValue <= 24) {
+          if (!isNaN(hourValue) && hourValue >= 0 && hourValue <= 24) {
             observations.push({
               concept: PARTOGRAPHY_CONCEPTS['fetal-heart-rate-hour'],
-              value: hourValue,
+              value: `Hour: ${hourValue}`,
               obsDatetime,
             });
           }
@@ -740,7 +753,7 @@ function buildObservations(graphType: string, formData: any): any[] {
       }
       if (formData.timeSlot) {
         observations.push({
-          concept: '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          concept: URINE_TEST_TIME_SLOT_CONCEPT,
           value: `Time: ${formData.timeSlot}`,
           obsDatetime,
         });
@@ -821,7 +834,22 @@ function buildObservations(graphType: string, formData: any): any[] {
           obsDatetime,
         });
       }
-      // Remove time-slot obs to avoid OpenMRS errors
+
+      if (formData.timeSlot) {
+        observations.push({
+          concept: URINE_TEST_TIME_SLOT_CONCEPT,
+          value: `Time: ${formData.timeSlot}`,
+          obsDatetime,
+        });
+      }
+
+      if (formData.timeSampleCollected) {
+        observations.push({
+          concept: TIME_SAMPLE_COLLECTED,
+          value: formData.timeSampleCollected,
+          obsDatetime,
+        });
+      }
       if (formData.eventDescription) {
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['event-description'],
@@ -829,10 +857,11 @@ function buildObservations(graphType: string, formData: any): any[] {
           obsDatetime,
         });
       }
+
       if (formData.timeResultsReturned) {
         observations.push({
-          concept: PARTOGRAPHY_CONCEPTS['event-description'],
-          value: `Results Returned: ${formData.timeResultsReturned}`,
+          concept: TIME_RESULTS_RETURNED,
+          value: formData.timeResultsReturned,
           obsDatetime,
         });
       }
@@ -853,7 +882,7 @@ function buildObservations(graphType: string, formData: any): any[] {
           obsDatetime,
         });
       }
-      // Add route and frequency as event descriptions
+
       if (formData.route) {
         observations.push({
           concept: PARTOGRAPHY_CONCEPTS['event-description'],
@@ -934,22 +963,20 @@ export function transformEncounterToChartData(encounters: PartographyEncounter[]
           const conceptUuid = obs.concept.uuid;
           let value = null;
           let groupName = '';
-          // Robustly handle uterine contractions: both numeric and coded contraction level
+
           if (graphType === 'uterine-contractions') {
-            // Numeric value for graphing
             if (conceptUuid === PARTOGRAPHY_CONCEPTS['uterine-contractions']) {
               value = parseFloat(obs.value as string);
               groupName = getGraphTypeDisplayName('uterine-contractions');
             }
-            // Coded contraction level (none, mild, moderate, strong)
+
             const contractionLevelMap: Record<string, string> = {
-              '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'none',
-              '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'mild',
-              '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'moderate',
-              '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA': 'strong',
+              MOULDING_NONE_CONCEPT: 'none',
+              CONTRACTION_LEVEL_MILD_CONCEPT: 'mild',
+              CONTRACTION_LEVEL_MODERATE_CONCEPT: 'moderate',
+              CONTRACTION_LEVEL_STRONG_CONCEPT: 'strong',
             };
             if (contractionLevelMap[conceptUuid]) {
-              // For charting, you may want to assign a numeric value for each level
               const contractionLevelValueMap: Record<string, number> = {
                 none: 0,
                 mild: 1,
@@ -1025,11 +1052,8 @@ export function transformEncounterToChartData(encounters: PartographyEncounter[]
   });
 
   return chartData.sort((a, b) => {
-    // Parse time strings (HH:MM format) for comparison
     const timeA = a.time.split(':').map(Number);
     const timeB = b.time.split(':').map(Number);
-
-    // Convert to minutes for easy comparison
     const minutesA = timeA[0] * 60 + (timeA[1] || 0);
     const minutesB = timeB[0] * 60 + (timeB[1] || 0);
 
@@ -1104,16 +1128,14 @@ export function transformEncounterToTableData(
     })}`;
 
     if (graphType === 'uterine-contractions') {
-      // Group obs by time for uterine contractions
       let timeSlot = '';
       let contractionCount = '';
       let contractionLevel = 'none';
       if (Array.isArray(encounter.obs)) {
-        // Always use the last seen contraction level in the encounter (in case order is not guaranteed)
         for (const obs of encounter.obs) {
           // Time slot
           if (
-            obs.concept.uuid === '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' &&
+            obs.concept.uuid === EVENT_DESCRIPTION_CONCEPT &&
             typeof obs.value === 'string' &&
             obs.value.startsWith('Time:')
           ) {
@@ -1122,30 +1144,30 @@ export function transformEncounterToTableData(
               timeSlot = match[1].trim();
             }
           }
-          // Contraction count (numeric)
-          if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+
+          if (obs.concept.uuid === CONTRACTION_COUNT_CONCEPT) {
             contractionCount = String(obs.value);
           }
         }
-        // Now, after looping, get the latest contraction level (if any)
+
         for (const obs of encounter.obs) {
-          if (obs.concept.uuid === '163750AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+          if (obs.concept.uuid === UTERINE_CONTRACTIONS_CONCEPT) {
             let levelUuid = '';
             if (typeof obs.value === 'string') {
               levelUuid = obs.value;
             } else if (obs.value != null && typeof obs.value === 'object' && (obs.value as any)?.uuid) {
               levelUuid = (obs.value as any).uuid;
             }
-            if (levelUuid === '1107AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+            if (levelUuid === MOULDING_NONE_CONCEPT) {
               contractionLevel = 'none';
             }
-            if (levelUuid === '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+            if (levelUuid === CONTRACTION_LEVEL_MILD_CONCEPT) {
               contractionLevel = 'mild';
             }
-            if (levelUuid === '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+            if (levelUuid === CONTRACTION_LEVEL_MODERATE_CONCEPT) {
               contractionLevel = 'moderate';
             }
-            if (levelUuid === '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+            if (levelUuid === CONTRACTION_LEVEL_STRONG_CONCEPT) {
               contractionLevel = 'strong';
             }
           }
@@ -1162,7 +1184,6 @@ export function transformEncounterToTableData(
         });
       }
     } else {
-      // ...existing code for other graph types...
       encounter.obs.forEach((obs, obsIndex) => {
         try {
           if (typeof obs.value === 'string') {
@@ -1266,11 +1287,9 @@ export function transformEncounterToTableData(
   );
 }
 
-// Hook to fetch and manage fetal heart rate data from OpenMRS
 export function useFetalHeartRateData(patientUuid: string) {
   const fetcher = (url: string) => openmrsFetch(url).then((res) => res.json());
 
-  // Fetch encounters instead of just observations to get all related data
   const { data, error, isLoading, mutate } = useSWR(
     patientUuid
       ? `${restBaseUrl}/encounter?patient=${patientUuid}&encounterType=${MCH_PARTOGRAPHY_ENCOUNTER_UUID}&v=full&limit=100&order=desc`
@@ -1296,7 +1315,6 @@ export function useFetalHeartRateData(patientUuid: string) {
           continue;
         }
 
-        // Look for fetal heart rate observations in this encounter
         const fetalHeartRateObs = encounter.obs.find(
           (obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate'],
         );
@@ -1304,11 +1322,9 @@ export function useFetalHeartRateData(patientUuid: string) {
         if (fetalHeartRateObs) {
           const encounterDatetime = new Date(encounter.encounterDatetime);
 
-          // Look for hour and time observations with text format
           let hour = 0;
           let time = '';
 
-          // Find hour observation (saved as "Hour: X.X")
           const hourObs = encounter.obs.find(
             (obs) =>
               obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-hour'] &&
@@ -1317,7 +1333,6 @@ export function useFetalHeartRateData(patientUuid: string) {
               obs.value.startsWith('Hour:'),
           );
 
-          // Find time observation (saved as "Time: XX:XX")
           const timeObs = encounter.obs.find(
             (obs) =>
               obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-time'] &&
@@ -1326,7 +1341,6 @@ export function useFetalHeartRateData(patientUuid: string) {
               obs.value.startsWith('Time:'),
           );
 
-          // Parse hour from text format "Hour: 2.5"
           if (hourObs && typeof hourObs.value === 'string') {
             const hourMatch = hourObs.value.match(/Hour:\s*([0-9.]+)/);
             if (hourMatch) {
@@ -1334,7 +1348,6 @@ export function useFetalHeartRateData(patientUuid: string) {
             }
           }
 
-          // Parse time from text format "Time: 03:15"
           if (timeObs && typeof timeObs.value === 'string') {
             const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
             if (timeMatch) {
@@ -1412,11 +1425,19 @@ export async function saveDrugOrderData(
     route: string;
     frequency: string;
   },
+  locationUuid?: string,
+  providerUuid?: string,
+  signal?: AbortSignal,
 ) {
   try {
-    // Use the existing createPartographyEncounter function with drugs-fluids graph type
-    const result = await createPartographyEncounter(patientUuid, 'drugs-fluids', formData);
-
+    const result = await createPartographyEncounter(
+      patientUuid,
+      'drugs-fluids',
+      formData,
+      locationUuid,
+      providerUuid,
+      signal,
+    );
     return result;
   } catch (error) {
     console.error('Error saving drug order data:', error);
@@ -1427,9 +1448,7 @@ export async function saveDrugOrderData(
   }
 }
 
-// Function to fetch drug orders for a patient
 export function useDrugOrders(patientUuid: string) {
-  // Remove the problematic sort parameter that's causing 500 error
   const apiUrl = patientUuid
     ? `${restBaseUrl}/order?patient=${patientUuid}&orderType=131168f4-15f5-102d-96e4-000c29c2a5d7&v=full&limit=50`
     : null;
@@ -1440,22 +1459,17 @@ export function useDrugOrders(patientUuid: string) {
     const responseData = data?.data as any;
 
     if (!responseData?.results || !Array.isArray(responseData.results)) {
-      // console.log('Drug Orders: No results found');
       return [];
     }
 
     const allOrders = responseData.results;
-    // Filter for active orders and manually sort by dateActivated (newest first)
     const activeOrders = allOrders
       .filter((order: any) => order.action === 'NEW' && !order.dateStopped)
       .sort((a: any, b: any) => {
-        // Manual sorting by dateActivated, handling null values
         const dateA = a.dateActivated ? new Date(a.dateActivated).getTime() : 0;
         const dateB = b.dateActivated ? new Date(b.dateActivated).getTime() : 0;
-        return dateB - dateA; // Descending order (newest first)
+        return dateB - dateA;
       });
-
-    // console.log(`Drug Orders: Found ${allOrders.length} total orders, ${activeOrders.length} active orders`);
 
     const processedOrders = activeOrders.map((order: any) => {
       const processed = {

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Modal, Grid, Column, NumberInput, Dropdown } from '@carbon/react';
+import { Button, Modal, Grid, Column, NumberInput, Select, SelectItem } from '@carbon/react';
 import TimePickerDropdown from './time-picker-dropdown.component';
 import styles from '../partography-data-form.scss';
 
@@ -44,11 +44,6 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
   });
 
   const watchOxytocinUsed = watch('oxytocinUsed');
-
-  const oxytocinOptions = [
-    { id: 'yes', text: t('yes', 'Yes') },
-    { id: 'no', text: t('no', 'No') },
-  ];
 
   const onSubmitForm = async (data: OxytocinFormData) => {
     if (!data.time || data.time === '') {
@@ -148,17 +143,17 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
                 required: 'Oxytocin usage selection is required',
               }}
               render={({ field, fieldState }) => (
-                <Dropdown
-                  id="oxytocin-usage-dropdown"
-                  titleText={t('oxytocin', 'Oxytocin')}
-                  label="Select if oxytocin is used"
-                  items={oxytocinOptions}
-                  itemToString={(item) => (item ? item.text : '')}
-                  selectedItem={field.value ? oxytocinOptions.find((opt) => opt.id === field.value) : null}
-                  onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')}
+                <Select
+                  id="oxytocin-usage-select"
+                  labelText={t('oxytocin', 'Oxytocin')}
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}
                   invalid={!!fieldState.error}
-                  invalidText={fieldState.error?.message}
-                />
+                  invalidText={fieldState.error?.message}>
+                  <SelectItem value="" text={t('selectIfOxytocinIsUsed', 'Select if oxytocin is used')} />
+                  <SelectItem value="yes" text={t('yes', 'Yes')} />
+                  <SelectItem value="no" text={t('no', 'No')} />
+                </Select>
               )}
             />
           </Column>
@@ -185,14 +180,14 @@ const OxytocinForm: React.FC<OxytocinFormProps> = ({
                   <NumberInput
                     id="drops-per-minute-input"
                     label={t('dropsPerMinute', 'Drops per minute')}
-                    placeholder="Enter drops per minute"
-                    value={field.value || ''}
-                    onChange={(e, { value }) => field.onChange(String(value))}
                     min={0}
                     max={60}
                     step={1}
+                    value={field.value || ''}
+                    onChange={(e, { value }) => field.onChange(String(value))}
                     invalid={!!fieldState.error}
                     invalidText={fieldState.error?.message}
+                    allowEmpty
                   />
                 )}
               />

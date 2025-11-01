@@ -333,7 +333,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                               },
                             });
                           }}>
-                          {t('register', 'Register')}
+                          {t('checkIn', 'Check In')}
                         </Button>
                       )}
 
