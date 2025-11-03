@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   main:
@@ -15,40 +16,75 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Copy test environment variables
+      - name: 🚀 Setup local cache server for Turborepo
+        uses: felixmosh/turborepo-gh-artifacts@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ env.TURBO_TOKEN }}
+
+      - name: Prepare test environment variables
         run: |
           cp example.env .env
-          sed -i 's/8080/8180/g' .env
+          sed -i 's#https://dev.kenyahmis.org/openmrs#http://localhost/openmrs#g' .env
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
+          cache: yarn
+          cache-dependency-path: yarn.lock
 
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
-      
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
         run: yarn install --immutable
 
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
 
+      - name: Start KenyaEMR backend stack
+        run: bash e2e/support/github/run-e2e-docker-env.sh
+
+      - name: Wait for OpenMRS to be ready
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://localhost/openmrs/ws/rest/v1/session > /dev/null; then
+              echo "OpenMRS is ready"
+              exit 0
+            fi
+            echo "Waiting for OpenMRS to be ready ($i/30)..."
+            sleep 10
+          done
+          echo "OpenMRS failed to start in time"
+          docker compose -f e2e/support/github/docker-compose.yml ps
+          docker compose -f e2e/support/github/docker-compose.yml logs
+          exit 1
+
       - name: Run dev server
-        run: yarn start --sources 'packages/esm-*-app/' --port 8180 & # Refer to O3-1994
+        run: yarn start --sources 'packages/esm-*-app/' --port 8180 --backend http://localhost --config-url http://localhost/openmrs/spa/config/configs/kenyahmis-package/openmrs.config.json http://localhost/openmrs/spa/config/configs/kenyahmis-package/kenyaemr.config.json http://localhost/openmrs/spa/config/configs/kenyahmis-package/translations/translations.json # Refer to O3-1994
+
+      - name: Wait for dev server
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://localhost:8180/spa/ > /dev/null; then
+              echo "Dev server is ready"
+              exit 0
+            fi
+            echo "Waiting for dev server to be ready ($i/30)..."
+            sleep 10
+          done
+          echo "Dev server failed to start in time"
+          exit 1
 
       - name: Run E2E tests
-        run: yarn playwright test
+        run: yarn test-e2e
 
       - name: Upload Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
           path: playwright-report/
           retention-days: 30
+
+      - name: Teardown KenyaEMR backend stack
+        if: always()
+        run: docker compose -f e2e/support/github/docker-compose.yml down

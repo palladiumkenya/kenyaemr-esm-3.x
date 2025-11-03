@@ -1,2 +1,1 @@
-export * from './home-page';
-export * from './billing-page';
+export { PaymentPointPage } from './payment-point-page';
