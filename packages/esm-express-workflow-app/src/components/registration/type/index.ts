@@ -320,3 +320,6 @@ export interface QueueRoom {
     };
   };
 }
+export interface OTPSource {
+  otpSource?: string;
+}

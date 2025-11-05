@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Button } from '@carbon/react';
 import { TwoFactorAuthentication, ChevronUp, ChevronDown } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ import { convertLocalPatientToFHIR, getNationalIdFromPatient, hasDependents } fr
 import { launchOtpVerificationModal } from '../../../../shared/otp-verification';
 import DependentsComponent from '../../dependants/dependants.component';
 import { useMultipleActiveVisits } from '../../dependants/dependants.resource';
-import { otpManager } from '../HIE-card/hie-card.resource';
+import { otpManager, useOtpSource } from '../HIE-card/hie-card.resource';
 import { sanitizePhoneNumber } from '../../../../shared/utils';
 
 interface LocalPatientCardProps {
@@ -36,6 +36,13 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
   const [otpRequestedFor, setOtpRequestedFor] = useState<Set<string>>(new Set());
   const [activePhoneNumbers, setActivePhoneNumbers] = useState<Map<string, string>>(new Map());
   const [showDependentsForPatient, setShowDependentsForPatient] = useState<Set<string>>(new Set());
+  const { otpSource, isLoading: isLoadingOtpSource } = useOtpSource();
+
+  useEffect(() => {
+    if (otpSource) {
+      otpManager.setOtpSource(otpSource);
+    }
+  }, [otpSource]);
 
   const patientUuids = useMemo(() => {
     return localSearchResults?.map((patient) => patient.uuid) || [];
@@ -92,7 +99,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
     );
 
     if (phoneAttribute?.value) {
-      return phoneAttribute.value;
+      return sanitizePhoneNumber(phoneAttribute.value);
     }
 
     return '254700000000';
@@ -116,29 +123,32 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
     });
   }, []);
 
-  const createDynamicOTPHandlers = (patientUuid: string, patientName: string, phoneNumber: string) => {
-    return {
-      onRequestOtp: async (phone: string): Promise<void> => {
-        const sanitizedPhone = sanitizePhoneNumber(phone);
-        try {
-          await otpManager.requestOTP(sanitizedPhone, patientName, otpExpiryMinutes, searchedNationalId);
-        } catch (error) {
-          throw error;
-        }
-      },
-      onVerify: async (otp: string, _phoneNumber?: string): Promise<void> => {
-        const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
-        try {
-          const isValid = await otpManager.verifyOTP(sanitizedPhone, otp);
-          if (!isValid) {
-            throw new Error('OTP verification failed');
+  const createDynamicOTPHandlers = useCallback(
+    (patientUuid: string, patientName: string, phoneNumber: string) => {
+      return {
+        onRequestOtp: async (phone: string): Promise<void> => {
+          const sanitizedPhone = sanitizePhoneNumber(phone);
+          try {
+            await otpManager.requestOTP(sanitizedPhone, patientName, otpExpiryMinutes, searchedNationalId);
+          } catch (error) {
+            throw error;
           }
-        } catch (error) {
-          throw error;
-        }
-      },
-    };
-  };
+        },
+        onVerify: async (otp: string, _phoneNumber?: string): Promise<void> => {
+          const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
+          try {
+            const isValid = await otpManager.verifyOTP(sanitizedPhone, otp);
+            if (!isValid) {
+              throw new Error('OTP verification failed');
+            }
+          } catch (error) {
+            throw error;
+          }
+        },
+      };
+    },
+    [otpExpiryMinutes, searchedNationalId],
+  );
 
   const handleQueuePatient = useCallback((activeVisit: any, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
@@ -209,6 +219,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                       kind="primary"
                       size="sm"
                       renderIcon={TwoFactorAuthentication}
+                      disabled={isLoadingOtpSource}
                       onClick={() => {
                         handleOTPRequest(patientUuid);
                         launchOtpVerificationModal({
@@ -265,7 +276,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                               closeWorkspaceWithSavedChanges: () => {
                                 closeWorkspace('start-visit-workspace-form', {
                                   onWorkspaceClose: () => {
-                                    navigate({ to: `$\{openmrsSpaBase}/patient/${patientUuid}/chart` });
+                                    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
                                   },
                                   ignoreChanges: true,
                                 });
