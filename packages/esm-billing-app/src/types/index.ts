@@ -689,3 +689,7 @@ interface PatientIdentifier {
 export interface PatientIdentifierResponse {
   results: Array<PatientIdentifier>;
 }
+
+export interface OTPSource {
+  otpSource?: string;
+}
