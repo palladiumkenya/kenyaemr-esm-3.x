@@ -69,3 +69,23 @@ export type QueueEntryFilters = {
 export * from './order/order';
 export * from './order/order-type';
 export * from './encounter';
+
+type EncountersWithMedicationRequestsResource = fhir.Encounter | fhir.MedicationRequest | fhir.MedicationDispense;
+
+export interface EncountersWithMedicationRequestsResponse {
+  resourceType: 'Bundle';
+  type: 'searchset';
+  total?: number;
+  link?: fhir.BundleLink[];
+  entry?: Array<{
+    fullUrl: string;
+    resource: EncountersWithMedicationRequestsResource;
+    search?: {
+      mode?: 'match' | 'include' | 'outcome';
+      score?: number;
+    };
+  }>;
+}
+
+// API actually returns an array of resources directly
+export type EncountersWithMedicationRequestsArray = Array<EncountersWithMedicationRequestsResource>;

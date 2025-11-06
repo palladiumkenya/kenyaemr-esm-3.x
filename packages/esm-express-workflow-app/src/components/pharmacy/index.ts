@@ -1,10 +1,10 @@
-import { getSyncLifecycle } from '@openmrs/esm-framework';
+import { getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 
 import Pharmacy from './pharmacy.component';
 import { moduleName } from '../../constants';
 import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
 import PharmacyTabs from './pharmacy-tabs.component';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib/src';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 const options = {
   featureName: 'express-workflow',
@@ -28,3 +28,4 @@ export const pharmacyPatientChartDashboardLink = getSyncLifecycle(
   }),
   options,
 );
+export const pharmacyOrders = getAsyncLifecycle(() => import('./orders/pharmacy-orders.component'), options);

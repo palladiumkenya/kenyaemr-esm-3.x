@@ -17,7 +17,7 @@ const swrWrapper = ({ children }) => {
 export const renderWithSwr = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
 
 export function waitForLoadingToFinish() {
-  return waitForElementToBeRemoved(() => [...screen.queryAllByRole(/progressbar/i)], {
+  return waitForElementToBeRemoved(() => [...screen.queryAllByRole('progressbar')], {
     timeout: 4000,
   });
 }

@@ -1,4 +1,12 @@
-import { FetchResponse, launchWorkspace, openmrsFetch, restBaseUrl, showModal } from '@openmrs/esm-framework';
+import {
+  FetchResponse,
+  launchWorkspace,
+  openmrsFetch,
+  parseDate,
+  restBaseUrl,
+  showModal,
+} from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 import useSWR, { mutate } from 'swr';
 import z from 'zod';
 
@@ -78,6 +86,66 @@ export const useProgramDetail = (programId: string) => {
     error,
     program: data?.data,
     mutate,
+  };
+};
+
+type FormEncounter = {
+  encounter: {
+    encounterDatetime: string;
+    uuid: string;
+    id: number;
+    encounterType: string;
+    dateCreated: string;
+  };
+  form: {
+    uuid: string;
+    name: string;
+  };
+};
+
+export const usePatientFormEncounter = (patientUuid: string, formUuid: string) => {
+  const url = `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuid}`;
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<FormEncounter> }>>(
+    url,
+    openmrsFetch,
+  );
+  return {
+    formEncounters: (data?.data?.results ?? [])
+      .map((data) => ({
+        ...data,
+        encounter: {
+          ...data.encounter,
+          encounterDatetime: parseDate(data.encounter.encounterDatetime),
+        },
+      }))
+      .sort((a, b) => dayjs(b.encounter.encounterDatetime).diff(dayjs(a.encounter.encounterDatetime))),
+    error,
+    isLoading,
+    mutate,
+  };
+};
+
+export const useFormsFilled = (patientUuid: string, formUuids: Array<string> = []) => {
+  const url = `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuids.join(
+    ',',
+  )}`;
+
+  const { data, error, mutate, isLoading } = useSWR(url, async (uri) => {
+    const tasks = await Promise.allSettled(
+      formUuids.map((formUuid) =>
+        openmrsFetch<{ results: Array<FormEncounter> }>(
+          `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuid}`,
+        ),
+      ),
+    );
+    // Return true if all tasks are fullfilled and have related encounter (visit doesnt matter)
+    return tasks.every((task) => task.status === 'fulfilled' && task.value.data?.results?.length);
+  });
+  return {
+    formsFilled: data,
+    isLoading,
+    mutate,
+    error,
   };
 };
 

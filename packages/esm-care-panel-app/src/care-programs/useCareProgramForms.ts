@@ -14,7 +14,15 @@ const useCareProgramForms = () => {
     },
     [careProgramForms],
   );
-  return { careProgramForms, getProgramForms };
+
+  const getProgramEnrollmentForm = useCallback(
+    (programUuid: string) => {
+      const forms = getProgramForms(programUuid);
+      return forms.find((form) => form.isEnrollment);
+    },
+    [getProgramForms],
+  );
+  return { careProgramForms, getProgramForms, getProgramEnrollmentForm };
 };
 
 export default useCareProgramForms;
