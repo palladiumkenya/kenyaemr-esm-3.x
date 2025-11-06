@@ -69,38 +69,93 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     [],
   );
 
-  const latestUsedTimeSlot = React.useMemo(() => {
+  // Calculate the latest used hour from existing entries (similar to fetal heart rate form)
+  const latestUsedHour = React.useMemo(() => {
     if (!existingTimeEntries || existingTimeEntries.length === 0) {
       return null;
     }
-    const sortedTimeSlots = existingTimeEntries
-      .map((entry) => entry.timeSlot)
-      .slice()
-      .sort((a, b) => {
-        const getMinutes = (time: string) => {
-          const [hours, minutes] = time.split(':').map(Number);
+    // Convert timeSlot values to numeric hours and find the maximum
+    const hours = existingTimeEntries.map((entry) => parseFloat(entry.timeSlot || '0')).filter((hour) => !isNaN(hour)); // Filter out invalid values
 
-          const adjustedHours = hours <= 5 ? hours + 24 : hours;
-          return adjustedHours * 60 + minutes;
-        };
-        return getMinutes(a) - getMinutes(b);
-      });
-    return sortedTimeSlots[sortedTimeSlots.length - 1];
+    return hours.length > 0 ? Math.max(...hours) : null;
   }, [existingTimeEntries]);
 
-  const isTimeSlotDisabled = (timeSlot: string) => {
-    if (!latestUsedTimeSlot) {
-      return false;
+  // Generate time slot options with disabled state (similar to fetal heart rate form)
+  const timeSlotOptionsWithDisabled = React.useMemo(() => {
+    return timeSlotOptions.map((option) => {
+      const hourValue = parseFloat(option.value);
+      const isDisabled = latestUsedHour !== null && hourValue <= latestUsedHour;
+
+      return {
+        ...option,
+        disabled: isDisabled,
+      };
+    });
+  }, [timeSlotOptions, latestUsedHour]);
+
+  const handleFormSubmit = (data: MembraneAmnioticFluidFormData) => {
+    clearErrors();
+
+    let hasErrors = false;
+
+    // Validate time slot selection
+    if (!data.timeSlot || data.timeSlot.trim() === '') {
+      setError('timeSlot', { type: 'manual', message: t('timeSlotRequired', 'Please select a time slot') });
+      hasErrors = true;
     }
 
-    const getMinutes = (time: string) => {
-      const [hours, minutes] = time.split(':').map(Number);
+    // Validate exact time
+    if (!data.exactTime || data.exactTime.trim() === '') {
+      setError('exactTime', { type: 'manual', message: t('exactTimeRequired', 'Exact time is required') });
+      hasErrors = true;
+    }
 
-      const adjustedHours = hours <= 5 ? hours + 24 : hours;
-      return adjustedHours * 60 + minutes;
-    };
+    // Validate amniotic fluid selection
+    if (!data.amnioticFluid || data.amnioticFluid.trim() === '') {
+      setError('amnioticFluid', {
+        type: 'manual',
+        message: t('amnioticFluidRequired', 'Please select amniotic fluid status'),
+      });
+      hasErrors = true;
+    }
 
-    return getMinutes(timeSlot) <= getMinutes(latestUsedTimeSlot);
+    // Validate moulding selection
+    if (!data.moulding || data.moulding.trim() === '') {
+      setError('moulding', {
+        type: 'manual',
+        message: t('mouldingRequired', 'Please select moulding status'),
+      });
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      alert(t('formValidationError', 'Please fill in all required fields before submitting.'));
+      return;
+    }
+
+    // Progressive validation - prevent selecting hours before the latest entered hour
+    const selectedHour = parseFloat(data.timeSlot);
+
+    if (latestUsedHour !== null && selectedHour <= latestUsedHour) {
+      setError('timeSlot', {
+        type: 'manual',
+        message: t(
+          'timeSlotDisabled',
+          `Cannot select ${data.timeSlot}hr. Please select a time after ${latestUsedHour}hr.`,
+        ),
+      });
+      alert(t('timeSlotValidationError', 'Please select a valid time slot that comes after the previous entry.'));
+      return;
+    }
+
+    onSubmit({
+      timeSlot: data.timeSlot,
+      exactTime: data.exactTime,
+      amnioticFluid: data.amnioticFluid,
+      moulding: data.moulding,
+    });
+
+    reset();
   };
 
   const amnioticFluidOptions = useMemo(
@@ -136,61 +191,6 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     [],
   );
 
-  const handleFormSubmit = (data: MembraneAmnioticFluidFormData) => {
-    clearErrors();
-
-    let hasErrors = false;
-
-    if (!data.timeSlot || data.timeSlot.trim() === '') {
-      setError('timeSlot', { type: 'manual', message: t('timeSlotRequired', 'Please select a time slot') });
-      hasErrors = true;
-    }
-
-    if (!data.exactTime || data.exactTime.trim() === '') {
-      setError('exactTime', { type: 'manual', message: t('exactTimeRequired', 'Exact time is required') });
-      hasErrors = true;
-    }
-
-    if (!data.amnioticFluid || data.amnioticFluid.trim() === '') {
-      setError('amnioticFluid', {
-        type: 'manual',
-        message: t('amnioticFluidRequired', 'Please select amniotic fluid status'),
-      });
-      hasErrors = true;
-    }
-
-    if (!data.moulding || data.moulding.trim() === '') {
-      setError('moulding', {
-        type: 'manual',
-        message: t('mouldingRequired', 'Please select moulding status'),
-      });
-      hasErrors = true;
-    }
-
-    if (hasErrors) {
-      alert(t('formValidationError', 'Please fill in all required fields before submitting.'));
-      return;
-    }
-
-    if (isTimeSlotDisabled(data.timeSlot)) {
-      setError('timeSlot', {
-        type: 'manual',
-        message: t('timeSlotDisabled', 'Selected time slot is not available. Please select a later time.'),
-      });
-      alert(t('timeSlotValidationError', 'Please select a valid time slot that comes after the previous entry.'));
-      return;
-    }
-
-    onSubmit({
-      timeSlot: data.timeSlot,
-      exactTime: data.exactTime,
-      amnioticFluid: data.amnioticFluid,
-      moulding: data.moulding,
-    });
-
-    reset();
-  };
-
   const handleClose = () => {
     reset();
     clearErrors();
@@ -223,25 +223,22 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
                   helperText={
-                    latestUsedTimeSlot
-                      ? t('timeSlotInfo', `Select a time after ${latestUsedTimeSlot}`)
+                    latestUsedHour !== null
+                      ? t('timeSlotInfo', `Select a time after ${latestUsedHour}hr`)
                       : t('timeSlotInfoInitial', 'Select a time slot')
                   }
                   value={field.value}
                   onChange={(e) => field.onChange(e.target.value)}>
                   <SelectItem value="" text={t('chooseAnOption', 'Choose an option')} />
-                  {timeSlotOptions.map((option) => {
-                    const isDisabled = isTimeSlotDisabled(option.value);
-                    return (
-                      <SelectItem
-                        key={option.value}
-                        value={option.value}
-                        text={option.label}
-                        disabled={isDisabled}
-                        className={isDisabled ? styles.disabledOption : undefined}
-                      />
-                    );
-                  })}
+                  {timeSlotOptionsWithDisabled.map((option) => (
+                    <SelectItem
+                      key={option.value}
+                      value={option.value}
+                      text={option.label}
+                      disabled={option.disabled}
+                      className={option.disabled ? styles.disabledOption : undefined}
+                    />
+                  ))}
                 </Select>
               )}
             />

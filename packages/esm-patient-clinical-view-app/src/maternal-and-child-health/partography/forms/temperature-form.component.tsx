@@ -64,10 +64,10 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
       return;
     }
 
-    if (!data.temperature || isNaN(temperatureValue) || temperatureValue < 30 || temperatureValue > 45) {
+    if (!data.temperature || isNaN(temperatureValue) || temperatureValue < 25 || temperatureValue > 43) {
       setError('temperature', {
         type: 'manual',
-        message: t('temperatureValidation', 'Please enter a valid temperature (30-45°C)'),
+        message: t('temperatureValidation', 'Please enter a valid temperature (25-43°C)'),
       });
       return;
     }
@@ -165,18 +165,19 @@ const TemperatureForm: React.FC<TemperatureFormProps> = ({
             <Controller
               name="temperature"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <NumberInput
                   id="temperature"
                   label={t('temperature', 'Temperature')}
                   helperText="Normal: 36.1-37.2°C"
-                  min={30}
-                  max={45}
+                  min={25}
+                  max={43}
                   step={0.1}
-                  value={field.value}
-                  onChange={(e, { value }) => field.onChange(value)}
-                  invalid={!!errors.temperature}
-                  invalidText={errors.temperature?.message}
+                  value={field.value || ''}
+                  onChange={(e, { value }) => field.onChange(String(value))}
+                  invalid={!!fieldState.error}
+                  invalidText={fieldState.error?.message}
+                  allowEmpty
                 />
               )}
             />

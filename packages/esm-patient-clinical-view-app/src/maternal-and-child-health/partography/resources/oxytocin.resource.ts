@@ -96,13 +96,15 @@ export async function saveOxytocinFormData(
   if (!finalLocationUuid) {
     return { success: false, message: t('Location information is required'), error: 'NO_LOCATION' };
   }
-  const now = new Date();
-  now.setMinutes(now.getMinutes() - 1);
+  // Use utility to ensure encounterDatetime is always in the past
+  // Import getValidEncounterDatetime from types/index if not already imported
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  const { getValidEncounterDatetime } = require('../types');
   const encounterPayload = {
     patient: patientUuid,
     encounterType: MCH_PARTOGRAPHY_ENCOUNTER_UUID,
     location: finalLocationUuid,
-    encounterDatetime: toOmrsIsoString(now),
+    encounterDatetime: getValidEncounterDatetime(),
     obs: observations,
     encounterProviders: [
       {

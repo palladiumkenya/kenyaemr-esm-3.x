@@ -16,16 +16,15 @@ const OxytocinGraph: React.FC<OxytocinGraphProps> = ({ data }) => {
   const { t } = useTranslation();
 
   const getTimeColumns = () => {
-    const emptyColumns = Array.from({ length: 13 }, (_, i) => `grid-${i + 1}`);
-    if (data.length === 0) {
-      return emptyColumns;
+    const emptyColumns = Array.from({ length: 20 }, (_, i) => `grid-${i + 1}`);
+
+    if (data && data.length > 0) {
+      const dataSlots = data.map((item, i) => `data-${i + 1}`);
+      const remainingEmpty = Array.from({ length: 20 - data.length }, (_, i) => `empty-${i + 1}`);
+      return [...dataSlots, ...remainingEmpty];
     }
-    const dataTimeSlots = [...new Set(data.map((item) => item.timeSlot))].sort();
-    if (dataTimeSlots.length <= 13) {
-      const remainingEmpty = Array.from({ length: 13 - dataTimeSlots.length }, (_, i) => `empty-${i + 1}`);
-      return [...dataTimeSlots, ...remainingEmpty];
-    }
-    return dataTimeSlots;
+
+    return emptyColumns;
   };
 
   const timeColumns = getTimeColumns();
@@ -79,19 +78,12 @@ const OxytocinGraph: React.FC<OxytocinGraphProps> = ({ data }) => {
   };
 
   return (
-    <div className={styles.membraneGrid}>
-      <div className={styles.gridContainer}>
-        <div className={styles.gridHeader}>
-          <div className={styles.gridCell}>{t('time', 'Time')}</div>
-          {timeColumns.map((timeColumn) => (
-            <div key={timeColumn} className={styles.gridCell}>
-              {timeColumn.startsWith('grid-') || timeColumn.startsWith('empty-') ? '' : timeColumn}
-            </div>
-          ))}
-        </div>
-
+    <div
+      className={styles.membraneGrid}
+      style={{ marginTop: 0, maxHeight: 'fit-content', minHeight: 'auto', marginBottom: 0 }}>
+      <div className={styles.gridContainer} style={{ padding: '0' }}>
         {rows.map((row) => (
-          <div key={row.id} className={styles.gridRow}>
+          <div key={row.id} className={styles.gridRow} style={{ minHeight: 40 }}>
             <div className={styles.gridRowLabel}>{row.label}</div>
             {timeColumns.map((timeColumn) => {
               const content = getCellContent(row.id, timeColumn);
@@ -102,7 +94,14 @@ const OxytocinGraph: React.FC<OxytocinGraphProps> = ({ data }) => {
                   className={`${styles.gridCell} ${cellClass}`}
                   data-time-slot={timeColumn}
                   data-row={row.id}
-                  title={`${timeColumn}: ${content || 'No data'}`}>
+                  title={`${timeColumn}: ${content || 'No data'}`}
+                  style={{
+                    minHeight: 40,
+                    padding: '8px 4px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
                   {content && (
                     <span
                       style={{
