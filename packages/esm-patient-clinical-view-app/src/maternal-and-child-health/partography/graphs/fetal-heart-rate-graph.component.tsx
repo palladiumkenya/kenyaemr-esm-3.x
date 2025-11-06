@@ -16,7 +16,7 @@ import {
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
-import { getColorForGraph, generateRange, defaultFetalHeartRateChartData } from '../types';
+import { getColorForGraph, generateRange } from '../types';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 enum ScaleTypes {
@@ -78,12 +78,12 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
   );
   const getFetalHeartRateStatus = (value: string): { type: string; text: string; color: string } => {
     const numValue = parseInt(value.replace(' bpm', ''));
-    if (numValue < 110) {
-      return { type: 'red', text: 'Low', color: getColorForGraph('red') };
-    } else if (numValue >= 110 && numValue <= 160) {
-      return { type: 'green', text: 'Normal', color: getColorForGraph('green') };
+    if (numValue < 100) {
+      return { type: 'orange', text: t('low', 'Low'), color: getColorForGraph('orange') };
+    } else if (numValue >= 100 && numValue <= 180) {
+      return { type: 'green', text: t('normal', 'Normal'), color: getColorForGraph('green') };
     } else {
-      return { type: 'red', text: 'High', color: getColorForGraph('red') };
+      return { type: 'red', text: t('abnormal', 'Abnormal'), color: getColorForGraph('red') };
     }
   };
   const tableHeaders = [
@@ -94,9 +94,9 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
     { key: 'status', header: t('status', 'Status') },
   ];
   const getFetalHeartRateColor = (value: number): string => {
-    if (value < 110) {
-      return getColorForGraph('red');
-    } else if (value >= 110 && value <= 160) {
+    if (value < 100) {
+      return getColorForGraph('orange');
+    } else if (value >= 100 && value <= 180) {
       return getColorForGraph('green');
     } else {
       return getColorForGraph('red');
@@ -107,13 +107,13 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
     if (data && data.length > 0) {
       return data.map((point) => ({
         ...point,
-        group: 'Fetal Heart Rate',
+        group: t('fetalHeartRate', 'Fetal Heart Rate'),
         color: getFetalHeartRateColor(point.value),
       }));
     }
 
-    return defaultFetalHeartRateChartData;
-  }, [data]);
+    return [];
+  }, [data, t]);
 
   const chartData = enhancedChartData;
   const chartKey = React.useMemo(() => JSON.stringify(enhancedChartData), [enhancedChartData]);
@@ -146,7 +146,7 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
         },
       },
       left: {
-        title: 'Fetal Heart Rate (bpm)',
+        title: t('fetalHeartRateBpm', 'Fetal Heart Rate (bpm)'),
         mapsTo: 'value',
         scaleType: ScaleTypes.LINEAR,
         domain: [80, 200],
@@ -198,7 +198,7 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
         data && data.length > 0
           ? (datapoint: any) => getFetalHeartRateColor(datapoint.value)
           : {
-              'Fetal Heart Rate': 'transparent',
+              [t('fetalHeartRate', 'Fetal Heart Rate')]: 'transparent', // Hide empty data lines
             },
     },
     legend: {
@@ -215,16 +215,16 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
       <div className={styles.fetalHeartRateContainer}>
         <div className={styles.fetalHeartRateHeader}>
           <div className={styles.fetalHeartRateHeaderLeft}>
-            <h3 className={styles.fetalHeartRateTitle}>Fetal Heart Rate</h3>
+            <h3 className={styles.fetalHeartRateTitle}>{t('fetalHeartRate', 'Fetal Heart Rate')}</h3>
             <div className={styles.fetalHeartRateControls}>
-              <Tag type="green" title="Normal Range">
-                Normal (110-160)
+              <Tag type="green" title={t('normalRange', 'Normal Range')}>
+                {t('normalRange100180', 'Normal (100-180)')}
               </Tag>
-              <Tag type="red" title="Abnormal Range">
-                Abnormal (&gt;160)
+              <Tag type="red" title={t('abnormalRange', 'Abnormal Range')}>
+                {t('abnormalRangeGreater180', 'Abnormal (>180)')}
               </Tag>
-              <Tag type="red" title="Low Range">
-                Low (&lt;110)
+              <Tag type="gray" title={t('lowRange', 'Low Range')} className={styles.tagLowRange}>
+                {t('lowRangeLess100', 'Low (<100)')}
               </Tag>
             </div>
           </div>
@@ -254,11 +254,11 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
                 kind="primary"
                 size={controlSize}
                 renderIcon={Add}
-                iconDescription="Add fetal heart rate data"
+                iconDescription={t('addFetalHeartRateData', 'Add fetal heart rate data')}
                 disabled={isAddButtonDisabled}
                 onClick={onAddData}
                 className={styles.addButton}>
-                Add
+                {t('add', 'Add')}
               </Button>
             </div>
           </div>
@@ -266,7 +266,20 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
 
         {viewMode === 'graph' ? (
           <div className={styles.fetalHeartRateChart}>
-            <LineChart data={chartData} options={chartOptions} key={chartKey} />
+            {chartData.length > 0 ? (
+              <LineChart data={chartData} options={chartOptions} key={chartKey} />
+            ) : (
+              <LineChart
+                data={[{ hour: 0, value: 140, group: 'No Data', time: '0:00' }]}
+                options={{
+                  ...chartOptions,
+                  legend: { enabled: false },
+                  points: { enabled: false },
+                  color: { scale: { 'No Data': 'transparent' } },
+                }}
+                key="empty-chart"
+              />
+            )}
           </div>
         ) : (
           <div className={styles.tableContainer}>
@@ -296,7 +309,11 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
                                           row.cells.find((c) => c.info.header === 'value')?.value || '0 bpm',
                                         );
                                         return (
-                                          <Tag type={status.type as any} title={`Fetal Heart Rate: ${status.text}`}>
+                                          <Tag
+                                            type={status.type as any}
+                                            title={t('fetalHeartRateStatus', 'Fetal Heart Rate: {{status}}', {
+                                              status: status.text,
+                                            })}>
                                             {status.text}
                                           </Tag>
                                         );
@@ -304,23 +321,29 @@ const FetalHeartRateGraph: React.FC<FetalHeartRateGraphProps> = ({
                                     : cell.info.header === 'value'
                                     ? (() => {
                                         const numValue = parseInt(cell.value.replace(' bpm', ''));
-                                        if (numValue < 110) {
+                                        if (numValue < 100) {
                                           return (
-                                            <span className={`${styles.fetalHeartRateValue} ${styles.low}`}>
+                                            <span
+                                              className={`${styles.fetalHeartRateValue} ${styles.low}`}
+                                              style={{ color: getColorForGraph('orange') }}>
                                               <span className={styles.arrow}>↓</span>
                                               {cell.value}
                                             </span>
                                           );
-                                        } else if (numValue > 160) {
+                                        } else if (numValue > 180) {
                                           return (
-                                            <span className={`${styles.fetalHeartRateValue} ${styles.high}`}>
+                                            <span
+                                              className={`${styles.fetalHeartRateValue} ${styles.high}`}
+                                              style={{ color: getColorForGraph('red') }}>
                                               <span className={styles.arrow}>↑</span>
                                               {cell.value}
                                             </span>
                                           );
                                         } else {
                                           return (
-                                            <span className={`${styles.fetalHeartRateValue} ${styles.normal}`}>
+                                            <span
+                                              className={`${styles.fetalHeartRateValue} ${styles.normal}`}
+                                              style={{ color: getColorForGraph('green') }}>
                                               {cell.value}
                                             </span>
                                           );

@@ -93,7 +93,7 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
       <div className={styles.fetalHeartRateContainer}>
         <div className={styles.fetalHeartRateHeader}>
           <div className={styles.fetalHeartRateHeaderLeft}>
-            <h3 className={styles.fetalHeartRateTitle}>Cervical Contractions</h3>
+            <h3 className={styles.fetalHeartRateTitle}>Contractions</h3>
             <div className={styles.fetalHeartRateControls}>
               <span className={styles.legendText}>
                 Contractions per 10 min | Bar Heights: 0=None, 2=Mild, 3=Moderate, 5=Strong
@@ -126,7 +126,7 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
                 kind="primary"
                 size={controlSize}
                 renderIcon={Add}
-                iconDescription="Add cervical contractions data"
+                iconDescription="Add contractions data"
                 disabled={isAddButtonDisabled}
                 onClick={() => onAddData?.()}
                 className={styles.addButton}>
@@ -141,68 +141,58 @@ const CervicalContractionsGraph: React.FC<CervicalContractionsGraphProps> = ({
             <div
               className={styles.contractionsContainer}
               style={{ minWidth: Math.max(1100, 70 * Math.max(13, data.length) + 60) }}>
-              <div className={styles.contractionsTimeHeaders} style={{ display: 'flex' }}>
-                <div className={styles.contractionsYAxisLabel} style={{ minWidth: 60, fontWeight: 600 }}>
-                  {t('time', 'Time')}
-                </div>
-                {Array.from({ length: Math.max(13, data.length) }, (_, colIndex) => (
-                  <div
-                    key={`header-${colIndex}`}
-                    className={styles.contractionsTimeHeader}
-                    style={{ minWidth: 70, textAlign: 'center', fontWeight: 600 }}>
-                    {data[colIndex]?.timeSlot || ''}
+              {yAxisLabels.map((label, rowIndex) => {
+                if (!label) {
+                  return null;
+                }
+                return (
+                  <div key={label} className={styles.contractionsGridRow} style={{ display: 'flex' }}>
+                    <div className={styles.contractionsYAxisLabel} style={{ minWidth: 60 }}>
+                      {label}
+                    </div>
+                    {Array.from({ length: Math.max(20, data.length) }, (_, colIndex) => {
+                      const dataForTimeSlot = data?.[colIndex];
+                      const yPosition = parseInt(label);
+                      const contractionCount = dataForTimeSlot ? parseInt(dataForTimeSlot.contractionCount) : 0;
+                      const contractionLevel = dataForTimeSlot?.contractionLevel || 'none';
+
+                      const shouldFill = contractionCount > 0 && yPosition <= contractionCount;
+
+                      const getColorClass = (level: string) => {
+                        switch (level) {
+                          case 'mild':
+                            return 'contractionBarMild';
+                          case 'moderate':
+                            return 'contractionBarModerate';
+                          case 'strong':
+                            return 'contractionBarStrong';
+                          default:
+                            return 'contractionBarNone';
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={`${label}-${colIndex}`}
+                          className={`${styles.contractionsGridCell} ${
+                            shouldFill ? styles[getColorClass(contractionLevel)] : ''
+                          }`}
+                          data-y={label}
+                          data-x={colIndex}
+                          data-filled={shouldFill}
+                          data-count={contractionCount}
+                          data-level={contractionLevel}
+                          style={{ minWidth: 70 }}>
+                          {shouldFill && (
+                            <div className={`${styles.contractionBar} ${styles[getColorClass(contractionLevel)]}`} />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
-              {yAxisLabels.map((label, rowIndex) => (
-                <div key={label} className={styles.contractionsGridRow} style={{ display: 'flex' }}>
-                  <div className={styles.contractionsYAxisLabel} style={{ minWidth: 60 }}>
-                    {label}
-                  </div>
-                  {Array.from({ length: Math.max(13, data.length) }, (_, colIndex) => {
-                    const dataForTimeSlot = data?.[colIndex];
-                    const yPosition = parseInt(label);
-                    const contractionCount = dataForTimeSlot ? parseInt(dataForTimeSlot.contractionCount) : 0;
-                    const contractionLevel = dataForTimeSlot?.contractionLevel || 'none';
-
-                    const shouldFill = contractionCount > 0 && yPosition <= contractionCount;
-
-                    const getColorClass = (level: string) => {
-                      switch (level) {
-                        case 'mild':
-                          return 'contractionBarMild';
-                        case 'moderate':
-                          return 'contractionBarModerate';
-                        case 'strong':
-                          return 'contractionBarStrong';
-                        default:
-                          return 'contractionBarNone';
-                      }
-                    };
-
-                    return (
-                      <div
-                        key={`${label}-${colIndex}`}
-                        className={`${styles.contractionsGridCell} ${
-                          shouldFill ? styles[getColorClass(contractionLevel)] : ''
-                        }`}
-                        data-y={label}
-                        data-x={colIndex}
-                        data-filled={shouldFill}
-                        data-count={contractionCount}
-                        data-level={contractionLevel}
-                        style={{ minWidth: 70 }}>
-                        {shouldFill && (
-                          <div className={`${styles.contractionBar} ${styles[getColorClass(contractionLevel)]}`} />
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-              <div className={styles.contractionsYAxisTitle}>
-                <span>{t('contractionsPerTenMin', 'Contractions per 10 min')}</span>
-              </div>
+                );
+              })}
+              {/* Y-axis title removed to prevent overlap with numbers */}
             </div>
           </div>
         ) : (

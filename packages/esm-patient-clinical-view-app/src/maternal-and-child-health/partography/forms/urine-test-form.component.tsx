@@ -213,17 +213,18 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
             <Controller
               name="volume"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <NumberInput
                   id="volume"
                   label={t('volume', 'Volume Produced ml')}
-                  helperText={t('volumeHelper', 'Enter the Dilation')}
+                  helperText={t('volumeHelper', 'Enter the Exact Volume Produced in ml')}
                   min={0}
                   step={1}
-                  value={field.value}
-                  onChange={(e, { value }) => field.onChange(value)}
-                  invalid={!!errors.volume}
-                  invalidText={errors.volume?.message}
+                  value={field.value || ''}
+                  onChange={(e, { value }) => field.onChange(String(value))}
+                  invalid={!!fieldState.error}
+                  invalidText={fieldState.error?.message}
+                  allowEmpty
                 />
               )}
             />

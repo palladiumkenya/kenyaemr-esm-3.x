@@ -90,7 +90,7 @@ const UrineTestGraph: React.FC<UrineTestGraphProps> = ({
   ];
 
   const timeColumns = Array.from(
-    { length: Math.max(13, data.length) },
+    { length: Math.max(20, data.length) },
     (_, colIndex) => data[colIndex]?.timeSlot || '',
   );
 

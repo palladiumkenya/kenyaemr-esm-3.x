@@ -57,13 +57,13 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
   });
   const generateHourOptions = () => {
     const options = [];
-    options.push({ value: '0', label: '00' });
-    options.push({ value: '0.5', label: '30min' });
-    for (let i = 1; i <= 24; i++) {
-      options.push({ value: i.toString(), label: `${i}hr` });
-      if (i < 24) {
-        options.push({ value: (i + 0.5).toString(), label: `${i}hr 30min` });
-      }
+    // Add 00 hour option first
+    options.push({ value: '0', label: '0hr' });
+    // Start from 0.5hr, then 1hr, 1.5hr, ... up to 24hr (in 0.5 increments)
+    for (let i = 1; i <= 48; i++) {
+      const value = (i * 0.5).toString();
+      const label = i % 2 === 0 ? `${i / 2}hr` : `${i * 0.5}hr`;
+      options.push({ value, label });
     }
     return options;
   };

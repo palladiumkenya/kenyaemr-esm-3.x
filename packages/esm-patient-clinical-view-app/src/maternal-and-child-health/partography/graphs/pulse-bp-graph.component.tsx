@@ -44,9 +44,9 @@ const PULSE_BP_CHART_OPTIONS = {
     left: {
       title: 'Pulse',
       mapsTo: 'value',
-      domain: [60, 180],
+      domain: [0, 260],
       ticks: {
-        values: [60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180],
+        values: [0, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260],
         formatter: (value: number) => `${value}`,
       },
       scaleType: ScaleTypes.LINEAR,
@@ -74,7 +74,7 @@ const PULSE_BP_CHART_OPTIONS = {
     },
     y: {
       enabled: true,
-      numberOfTicks: 7, // Fewer ticks for larger row spacing
+      numberOfTicks: 14,
     },
   },
   zoomBar: {
@@ -109,10 +109,9 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
   const pulseChartData: ChartDataPoint[] = [];
 
   if (actualData.length > 0) {
-    pulseChartData.push({ index: 0, value: actualData[0].pulse, group: 'Pulse' });
     actualData.forEach((item, index) => {
       pulseChartData.push({
-        index: index + 1,
+        index: index,
         value: item.pulse,
         group: 'Pulse',
       });
@@ -156,23 +155,23 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                 zIndex: 5,
               }}>
               {actualData.map((item, index) => {
-                const chartMarginTop = 20;
-                const chartMarginBottom = 10;
-                const chartMarginLeft = 12;
-                const chartMarginRight = 5;
-
+                const chartMarginTop = 5;
+                const chartMarginBottom = 8;
+                const chartMarginLeft = 3.59;
+                const chartMarginRight = 8;
                 const chartWidth = 100 - chartMarginLeft - chartMarginRight;
                 const chartHeight = 100 - chartMarginTop - chartMarginBottom;
-
-                const dataPointIndex = index + 1;
-                const xPosition = chartMarginLeft + (dataPointIndex / 12) * chartWidth;
-
-                const gridUnit = chartWidth / 12;
-                const bpXPosition = chartMarginLeft + ((dataPointIndex - 1) / 12) * chartWidth;
-
-                const pulseYPosition = chartMarginTop + ((180 - item.pulse) / (180 - 60)) * chartHeight;
-                const systolicYPosition = chartMarginTop + ((180 - item.systolicBP) / (180 - 60)) * chartHeight;
-                const diastolicYPosition = chartMarginTop + ((180 - item.diastolicBP) / (180 - 60)) * chartHeight;
+                const dataPointIndex = index;
+                const bpXPosition = chartMarginLeft + ((dataPointIndex + 0) / 12) * chartWidth;
+                const yOffset = 23;
+                const yOffsetDiastolic = 40;
+                const pulseYPosition = chartMarginTop + yOffset + ((260 - item.pulse) / 260) * (chartHeight - yOffset);
+                const systolicYPosition =
+                  chartMarginTop + yOffset + ((260 - item.systolicBP) / 260) * (chartHeight - yOffset);
+                const diastolicYPosition =
+                  chartMarginTop +
+                  yOffsetDiastolic +
+                  ((260 - item.diastolicBP) / 260) * (chartHeight - yOffsetDiastolic);
 
                 const greenArrowStartY = Math.min(pulseYPosition, diastolicYPosition);
                 const greenArrowEndY = Math.max(pulseYPosition, diastolicYPosition);
@@ -198,7 +197,6 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                         refY="5"
                         orient="auto"
                         markerUnits="strokeWidth">
-                        {/* Downward arrow for green (diastolic) */}
                         <polygon points="0,10 10,5 0,0 3,5" fill={getColorForGraph('green')} />
                       </marker>
                     </defs>
@@ -213,12 +211,11 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
                       markerEnd={`url(#systolic-arrow-${index})`}
                     />
 
-                    {/* Always draw green arrow down, regardless of value */}
                     <line
                       x1={`${bpXPosition}%`}
-                      y1={`${greenArrowStartY}%`}
+                      y1={`${pulseYPosition}%`}
                       x2={`${bpXPosition}%`}
-                      y2={`${greenArrowEndY}%`}
+                      y2={`${diastolicYPosition}%`}
                       stroke={getColorForGraph('green')}
                       strokeWidth="2"
                       markerEnd={`url(#diastolic-arrow-${index})`}
