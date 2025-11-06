@@ -2,6 +2,8 @@ import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework
 import useSWR from 'swr';
 import { ClaimSummary, OTPSource } from '../types';
 import { formatKenyanPhoneNumber } from '../invoice/payments/utils';
+import { TFunction } from 'i18next';
+import { getCurrencyForLocale } from '../helpers/currency';
 
 /**
  * Generates a random OTP of a specified length.
@@ -81,12 +83,16 @@ async function sendOtpKehmis(
   claimSummary: ClaimSummary,
   expiryMinutes: number = 5,
   nationalId: string | null = null,
+  t: TFunction,
 ): Promise<void> {
   validateOtpInputs(receiver, patientName);
 
+  // Get currency based on current locale
+  const currency = getCurrencyForLocale();
+
   const context = {
     patientName: patientName,
-    claimAmount: `KES ${claimSummary.totalAmount.toLocaleString()}`,
+    claimAmount: `${currency} ${claimSummary.totalAmount.toLocaleString()}`,
     servicesSummary:
       claimSummary.services.length > 100 ? claimSummary.services.substring(0, 97) + '...' : claimSummary.services,
     startDate: claimSummary.startDate,
@@ -116,7 +122,10 @@ async function sendOtpKehmis(
       throw new Error(`HTTP error! status: ${response.status}`);
     }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : t?.('unknownErrorOccurred', 'Unknown error occurred') || 'Unknown error occurred';
     throw new Error(`Failed to send OTP: ${errorMessage}`);
   }
 }
@@ -134,6 +143,7 @@ class KehmisOTPManager {
     claimSummary: ClaimSummary,
     expiryMinutes: number = 5,
     nationalId: string | null = null,
+    t: TFunction,
   ): Promise<void> {
     const otp = generateOTP(5);
     const expiryTime = expiryMinutes * 60 * 1000;
@@ -149,7 +159,7 @@ class KehmisOTPManager {
 
     this.otpStore.set(formattedPhone, otpData);
 
-    await sendOtpKehmis(otp, formattedPhone, patientName, claimSummary, expiryMinutes, nationalId);
+    await sendOtpKehmis(otp, formattedPhone, patientName, claimSummary, expiryMinutes, nationalId, t);
   }
 
   async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
@@ -270,9 +280,12 @@ async function requestOtpFromServer(
 
   const formattedPhone = formatKenyanPhoneNumber(receiver);
 
+  // Get currency based on current locale
+  const currency = getCurrencyForLocale();
+
   const context = {
     patientName: patientName,
-    claimAmount: `KES ${claimSummary.totalAmount.toLocaleString()}`,
+    claimAmount: `${currency} ${claimSummary.totalAmount.toLocaleString()}`,
     servicesSummary:
       claimSummary.services.length > 100 ? claimSummary.services.substring(0, 97) + '...' : claimSummary.services,
     startDate: claimSummary.startDate,
@@ -572,6 +585,7 @@ interface IOTPManager {
     claimSummary: ClaimSummary,
     expiryMinutes?: number,
     nationalId?: string | null,
+    t?: TFunction,
   ): Promise<void>;
   verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean>;
   clearOTP(phoneNumber: string): void;
@@ -609,8 +623,9 @@ class OTPManagerAdapter implements IOTPManager {
     claimSummary: ClaimSummary,
     expiryMinutes: number = 5,
     nationalId: string | null = null,
+    t: TFunction,
   ): Promise<void> {
-    return this.getManager().requestOTP(phoneNumber, patientName, claimSummary, expiryMinutes, nationalId);
+    return this.getManager().requestOTP(phoneNumber, patientName, claimSummary, expiryMinutes, nationalId, t);
   }
 
   async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {

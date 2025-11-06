@@ -213,7 +213,14 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             throw new Error('No claim data available for OTP request');
           }
 
-          await otpManager.requestOTP(phoneNumber, patientName, currentSummary, otpExpiryMinutes, nationalId || null);
+          await otpManager.requestOTP(
+            phoneNumber,
+            patientName,
+            currentSummary,
+            otpExpiryMinutes,
+            nationalId || null,
+            t,
+          );
         },
         onVerify: async (otp: string): Promise<void> => {
           const phoneForVerification = currentPhoneRef.current;
