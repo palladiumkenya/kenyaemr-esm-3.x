@@ -11,7 +11,7 @@ import { launchWorkspace, PatientPhoto, showModal, navigate, closeWorkspace } fr
 import { EnhancedPatientBannerPatientInfo } from '../../patient-banner/patient-banner.component';
 import { findExistingLocalPatient, registerOrLaunchHIEPatient } from '../../search-bar/search-bar.resource';
 import { launchOtpVerificationModal } from '../../../../shared/otp-verification';
-import { otpManager, useOtpSource } from './hie-card.resource';
+import { otpManager, useOtpSource, cleanupAllOTPs } from './hie-card.resource';
 import { useMultipleActiveVisits } from '../../dependants/dependants.resource';
 import { sanitizePhoneNumber } from '../../../../shared/utils';
 
@@ -45,6 +45,12 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
       otpManager.setOtpSource(otpSource);
     }
   }, [otpSource]);
+
+  useEffect(() => {
+    return () => {
+      cleanupAllOTPs();
+    };
+  }, []);
 
   const patientUuids = useMemo(() => {
     return (
@@ -176,6 +182,9 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
           throw error;
         }
       },
+      cleanup: (): void => {
+        otpManager.cleanupExpiredOTPs();
+      },
     };
   };
 
@@ -208,7 +217,11 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
 
         const patientPhoneNumber = getPatientPhoneNumber(patient);
 
-        const { onRequestOtp, onVerify } = createDynamicOTPHandlers(patientUuid, patientName, patientPhoneNumber);
+        const { onRequestOtp, onVerify, cleanup } = createDynamicOTPHandlers(
+          patientUuid,
+          patientName,
+          patientPhoneNumber,
+        );
 
         return (
           <React.Fragment key={patientKey}>
@@ -249,6 +262,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                           onRequestOtp,
                           onVerify,
                           onVerificationSuccess: () => handleOTPVerificationSuccess(patientUuid),
+                          onCleanup: cleanup,
                         });
                       }}>
                       {isSearchingLocal ? t('checking', 'Checking...') : t('sendOtp', 'Send OTP')}
@@ -268,6 +282,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                           onRequestOtp,
                           onVerify,
                           onVerificationSuccess: () => handleOTPVerificationSuccess(patientUuid),
+                          onCleanup: cleanup,
                         });
                       }}>
                       {t('enterOtp', 'Enter OTP')}
@@ -359,7 +374,11 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
             {isVerified && showDependents && patientHasDependents && (
               <div className={styles.dependentsSection}>
                 <div className={styles.dependentsContainer}>
-                  <DependentsComponent patient={patient} localSearchResults={localSearchResults} />
+                  <DependentsComponent
+                    patient={patient}
+                    localSearchResults={localSearchResults}
+                    otpExpiryMinutes={otpExpiryMinutes}
+                  />
                 </div>
               </div>
             )}

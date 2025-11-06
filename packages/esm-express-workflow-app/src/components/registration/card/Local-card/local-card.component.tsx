@@ -11,7 +11,7 @@ import { convertLocalPatientToFHIR, getNationalIdFromPatient, hasDependents } fr
 import { launchOtpVerificationModal } from '../../../../shared/otp-verification';
 import DependentsComponent from '../../dependants/dependants.component';
 import { useMultipleActiveVisits } from '../../dependants/dependants.resource';
-import { otpManager, useOtpSource } from '../HIE-card/hie-card.resource';
+import { otpManager, useOtpSource, cleanupAllOTPs } from '../HIE-card/hie-card.resource';
 import { sanitizePhoneNumber } from '../../../../shared/utils';
 
 interface LocalPatientCardProps {
@@ -43,6 +43,13 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
       otpManager.setOtpSource(otpSource);
     }
   }, [otpSource]);
+
+  // Clean up OTPs when component unmounts
+  useEffect(() => {
+    return () => {
+      cleanupAllOTPs();
+    };
+  }, []);
 
   const patientUuids = useMemo(() => {
     return localSearchResults?.map((patient) => patient.uuid) || [];
@@ -145,6 +152,9 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
             throw error;
           }
         },
+        cleanup: (): void => {
+          otpManager.cleanupExpiredOTPs();
+        },
       };
     },
     [otpExpiryMinutes, searchedNationalId],
@@ -189,7 +199,11 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
         const showDependents: boolean = showDependentsForPatient.has(patientUuid);
 
         const patientPhoneNumber = getPatientPhoneNumber(localPatient);
-        const { onRequestOtp, onVerify } = createDynamicOTPHandlers(patientUuid, patientName, patientPhoneNumber);
+        const { onRequestOtp, onVerify, cleanup } = createDynamicOTPHandlers(
+          patientUuid,
+          patientName,
+          patientPhoneNumber,
+        );
 
         return (
           <React.Fragment key={patientKey}>
@@ -230,6 +244,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                           onRequestOtp,
                           onVerify,
                           onVerificationSuccess: () => handleOTPVerificationSuccess(patientUuid),
+                          onCleanup: cleanup,
                         });
                       }}>
                       {t('sendOtp', 'Send OTP')}
@@ -249,6 +264,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                           onRequestOtp,
                           onVerify,
                           onVerificationSuccess: () => handleOTPVerificationSuccess(patientUuid),
+                          onCleanup: cleanup,
                         });
                       }}>
                       {t('enterOtp', 'Enter OTP')}
@@ -317,7 +333,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
             {isVerified && showDependents && hiePatientData && (
               <div className={styles.dependentsSection}>
                 <div className={styles.dependentsContainer}>
-                  <DependentsComponent patient={hiePatientData} />
+                  <DependentsComponent patient={hiePatientData} otpExpiryMinutes={otpExpiryMinutes} />
                 </div>
               </div>
             )}

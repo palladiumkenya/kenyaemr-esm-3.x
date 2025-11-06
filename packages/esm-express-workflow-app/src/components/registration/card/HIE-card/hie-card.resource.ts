@@ -119,6 +119,8 @@ class KehmisOTPManager {
     expiryMinutes: number = 5,
     nationalId: string | null = null,
   ): Promise<void> {
+    this.cleanupExpiredOTPs();
+
     const otp = generateOTP(5);
     const expiryTime = expiryMinutes * 60 * 1000;
 
@@ -135,6 +137,8 @@ class KehmisOTPManager {
   }
 
   async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
+    this.cleanupExpiredOTPs();
+
     const storedData = this.otpStore.get(phoneNumber);
 
     if (!storedData) {
@@ -195,6 +199,10 @@ class KehmisOTPManager {
       return 0;
     }
     return Math.max(0, this.MAX_ATTEMPTS - storedData.attempts);
+  }
+
+  hasActiveOTPs(): boolean {
+    return this.otpStore.size > 0;
   }
 }
 
@@ -345,6 +353,8 @@ class HieOTPManager {
     expiryMinutes: number = 5,
     nationalId: string | null = null,
   ): Promise<void> {
+    this.cleanupExpiredOTPs();
+
     const expiryTime = expiryMinutes * 60 * 1000;
 
     try {
@@ -366,6 +376,9 @@ class HieOTPManager {
   }
 
   async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
+    // Clean up expired sessions before verification
+    this.cleanupExpiredOTPs();
+
     const sessionData = this.otpSessions.get(phoneNumber);
 
     if (!sessionData) {
@@ -443,6 +456,10 @@ class HieOTPManager {
     }
     return Math.max(0, this.MAX_ATTEMPTS - sessionData.attempts);
   }
+
+  hasActiveOTPs(): boolean {
+    return this.otpSessions.size > 0;
+  }
 }
 
 interface IOTPManager {
@@ -457,6 +474,7 @@ interface IOTPManager {
   hasValidOTP(phoneNumber: string): boolean;
   getRemainingTimeMinutes(phoneNumber: string): number;
   getRemainingAttempts(phoneNumber: string): number;
+  hasActiveOTPs(): boolean;
 }
 
 class OTPManagerAdapter implements IOTPManager {
@@ -484,10 +502,12 @@ class OTPManagerAdapter implements IOTPManager {
     expiryMinutes: number = 5,
     nationalId: string | null = null,
   ): Promise<void> {
+    this.cleanupExpiredOTPs();
     return this.getManager().requestOTP(phoneNumber, patientName, expiryMinutes, nationalId);
   }
 
   async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
+    this.cleanupExpiredOTPs();
     return this.getManager().verifyOTP(phoneNumber, inputOtp);
   }
 
@@ -507,13 +527,17 @@ class OTPManagerAdapter implements IOTPManager {
   getRemainingAttempts(phoneNumber: string): number {
     return this.getManager().getRemainingAttempts(phoneNumber);
   }
+
+  hasActiveOTPs(): boolean {
+    return this.kehmisManager.hasActiveOTPs() || this.hieManager.hasActiveOTPs();
+  }
 }
 
 export const otpManager = new OTPManagerAdapter();
 
-setInterval(() => {
+export const cleanupAllOTPs = (): void => {
   otpManager.cleanupExpiredOTPs();
-}, 2 * 60 * 1000);
+};
 
 /**
  * Create OTP handlers with dynamic source detection
@@ -546,6 +570,9 @@ export function createOtpHandlers(
     },
     getRemainingAttempts: (phone: string): number => {
       return otpManager.getRemainingAttempts(phone);
+    },
+    cleanup: (): void => {
+      otpManager.cleanupExpiredOTPs();
     },
   };
 }
