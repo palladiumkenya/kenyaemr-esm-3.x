@@ -9,7 +9,7 @@ import { maskName } from '../helper';
 import { findExistingLocalPatient, registerOrLaunchDependent } from '../search-bar/search-bar.resource';
 import { getDependentsFromContacts, useMultipleActiveVisits } from './dependants.resource';
 import { DependentWithPhone, HIEBundleResponse, HIEPatient, LocalPatient } from '../type';
-import { otpManager } from '../card/HIE-card/hie-card.resource';
+import { otpManager, cleanupAllOTPs } from '../card/HIE-card/hie-card.resource';
 import { launchOtpVerificationModal } from '../../../shared/otp-verification';
 
 type DependentProps = {
@@ -31,6 +31,12 @@ const DependentsComponent: React.FC<DependentProps> = ({
   const [verifiedSpouses, setVerifiedSpouses] = useState<Set<string>>(new Set());
   const [otpRequestedForSpouse, setOtpRequestedForSpouse] = useState<Set<string>>(new Set());
   const [activePhoneNumbers, setActivePhoneNumbers] = useState<Map<string, string>>(new Map());
+
+  useEffect(() => {
+    return () => {
+      cleanupAllOTPs();
+    };
+  }, []);
 
   const dependents = useMemo(() => {
     try {
@@ -114,6 +120,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
     },
     [localPatientCache],
   );
+
   const handleSpouseOTPRequest = useCallback((dependentId: string) => {
     setOtpRequestedForSpouse((prev) => new Set(prev).add(dependentId));
   }, []);
@@ -145,6 +152,9 @@ const DependentsComponent: React.FC<DependentProps> = ({
           if (!isValid) {
             throw new Error('OTP verification failed');
           }
+        },
+        cleanup: (): void => {
+          otpManager.cleanupExpiredOTPs();
         },
       };
     },
@@ -245,7 +255,11 @@ const DependentsComponent: React.FC<DependentProps> = ({
         dependent.shaNumber && dependent.shaNumber !== 'N/A' ? `SHA: ${dependent.shaNumber}` : 'N/A';
 
       const dependentPhoneNumber = getDependentPhoneNumber(dependent);
-      const { onRequestOtp, onVerify } = createSpouseOTPHandlers(dependent.id, dependent.name, dependentPhoneNumber);
+      const { onRequestOtp, onVerify, cleanup } = createSpouseOTPHandlers(
+        dependent.id,
+        dependent.name,
+        dependentPhoneNumber,
+      );
 
       return {
         id: dependent.id,
@@ -285,6 +299,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                     onRequestOtp,
                     onVerify,
                     onVerificationSuccess: () => handleSpouseOTPVerificationSuccess(dependent.id),
+                    onCleanup: cleanup,
                   });
                 }}>
                 {t('sendOtp', 'Send OTP')}
@@ -305,6 +320,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                     onRequestOtp,
                     onVerify,
                     onVerificationSuccess: () => handleSpouseOTPVerificationSuccess(dependent.id),
+                    onCleanup: cleanup,
                   });
                 }}>
                 {t('enterOtp', 'Enter OTP')}

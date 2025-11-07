@@ -1,5 +1,19 @@
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { OtpContext, OtpPayload, OtpResponse } from '../../type';
+import { FetchResponse, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { OtpContext, OtpPayload, OtpResponse, type OTPSource } from '../../type';
+import useSWR from 'swr';
+
+/**
+ * Generates a random OTP of a specified length.
+ */
+export function generateOTP(length = 5) {
+  let otpNumbers = '0123456789';
+  let OTP = '';
+  const len = otpNumbers.length;
+  for (let i = 0; i < length; i++) {
+    OTP += otpNumbers[Math.floor(Math.random() * len)];
+  }
+  return OTP;
+}
 
 /**
  * Replaces placeholders in a template string with values from a given context.
@@ -18,7 +32,7 @@ export function parseMessage<T extends Record<string, string | number>>(context:
 }
 
 /**
- * Builds a URL for sending an SMS message using the KenyaEMR SMS API.
+ * Builds a URL for sending an SMS message.
  */
 function buildSmsUrl(message: string, receiver: string, nationalId: string | null = null): string {
   const encodedMessage = encodeURIComponent(message);
@@ -31,7 +45,7 @@ function buildSmsUrl(message: string, receiver: string, nationalId: string | nul
 }
 
 /**
- * Validates that the required parameters for sending an OTP message are present.
+ * Validates required parameters.
  */
 function validateOtpInputs(receiver: string, patientName: string): void {
   if (!receiver?.trim() || !patientName?.trim()) {
@@ -40,62 +54,162 @@ function validateOtpInputs(receiver: string, patientName: string): void {
 }
 
 /**
- * Verifies the OTP by calling the server's validation endpoint.
+ * Hook to get OTP source configuration
  */
-export async function verifyOtpWithServer(otpId: string, otp: string): Promise<boolean> {
+export const useOtpSource = () => {
+  const url = `${restBaseUrl}/kenyaemr/checkotpsource`;
+
+  const { data, error, isLoading } = useSWR<FetchResponse<OTPSource>>(url, openmrsFetch);
+
+  return {
+    otpSource: data?.data?.otpSource,
+    data,
+    error,
+    isLoading,
+  };
+};
+
+/**
+ * Sends OTP via SMS for KEHMIS workflow (client generates OTP)
+ */
+async function sendOtpKehmis(
+  otp: string,
+  receiver: string,
+  patientName: string,
+  expiryMinutes: number = 5,
+  nationalId: string | null = null,
+): Promise<void> {
+  validateOtpInputs(receiver, patientName);
+
+  const context: OtpContext = {
+    otp,
+    patient_name: patientName,
+    expiry_time: expiryMinutes,
+  };
+
+  const messageTemplate =
+    'Dear {{patient_name}}, Your OTP to access your Shared Health Records is {{otp}}.' +
+    ' By entering this code, you consent to accessing your records. Valid for {{expiry_time}} minutes.';
+
   try {
-    const url = `${restBaseUrl}/kenyaemr/validate-otp`;
+    const message = parseMessage(context, messageTemplate);
+    const url = buildSmsUrl(message, receiver, nationalId);
 
     const response = await openmrsFetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        id: otpId,
-        otp: otp.trim(),
-      }),
+      redirect: 'follow',
     });
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    throw new Error(`Failed to send OTP: ${errorMessage}`);
+  }
+}
 
-    const rawText = await response.text();
+class KehmisOTPManager {
+  private otpStore: Map<string, { otp: string; timestamp: number; attempts: number; expiryTime: number }> = new Map();
+  private readonly MAX_ATTEMPTS = 3;
 
-    let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(rawText);
-    } catch (e) {
-      throw new Error('Invalid response from server');
+  async requestOTP(
+    phoneNumber: string,
+    patientName: string,
+    expiryMinutes: number = 5,
+    nationalId: string | null = null,
+  ): Promise<void> {
+    this.cleanupExpiredOTPs();
+
+    const otp = generateOTP(5);
+    const expiryTime = expiryMinutes * 60 * 1000;
+
+    const otpData = {
+      otp,
+      timestamp: Date.now(),
+      attempts: 0,
+      expiryTime,
+    };
+
+    this.otpStore.set(phoneNumber, otpData);
+
+    await sendOtpKehmis(otp, phoneNumber, patientName, expiryMinutes, nationalId);
+  }
+
+  async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
+    this.cleanupExpiredOTPs();
+
+    const storedData = this.otpStore.get(phoneNumber);
+
+    if (!storedData) {
+      throw new Error('No OTP found for this phone number. Please request a new OTP.');
     }
 
-    let data = parsedResponse;
-    if (parsedResponse.response && typeof parsedResponse.response === 'string') {
-      try {
-        data = JSON.parse(parsedResponse.response);
-      } catch (e) {
-        throw new Error('Invalid nested response from server');
-      }
+    if (Date.now() - storedData.timestamp > storedData.expiryTime) {
+      this.otpStore.delete(phoneNumber);
+      throw new Error('OTP has expired. Please request a new OTP.');
     }
 
-    if (data.status === 'success' || data.valid === true) {
+    storedData.attempts++;
+
+    if (storedData.attempts > this.MAX_ATTEMPTS) {
+      this.otpStore.delete(phoneNumber);
+      throw new Error('Maximum OTP attempts exceeded. Please request a new OTP.');
+    }
+
+    if (storedData.otp === inputOtp.trim()) {
+      this.otpStore.delete(phoneNumber);
       return true;
     } else {
-      const errorMessage = data.message || 'Invalid OTP';
-      throw new Error(errorMessage);
+      this.otpStore.set(phoneNumber, storedData);
+      throw new Error(`Invalid OTP. ${this.MAX_ATTEMPTS - storedData.attempts} attempts remaining.`);
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'OTP verification failed';
-    throw new Error(errorMessage);
+  }
+
+  cleanupExpiredOTPs(): void {
+    const now = Date.now();
+    for (const [phoneNumber, data] of this.otpStore.entries()) {
+      if (now - data.timestamp > data.expiryTime) {
+        this.otpStore.delete(phoneNumber);
+      }
+    }
+  }
+
+  hasValidOTP(phoneNumber: string): boolean {
+    const storedData = this.otpStore.get(phoneNumber);
+    if (!storedData) {
+      return false;
+    }
+    return Date.now() - storedData.timestamp <= storedData.expiryTime;
+  }
+
+  getRemainingTimeMinutes(phoneNumber: string): number {
+    const storedData = this.otpStore.get(phoneNumber);
+    if (!storedData) {
+      return 0;
+    }
+    const elapsed = Date.now() - storedData.timestamp;
+    const remaining = Math.max(0, storedData.expiryTime - elapsed);
+    return Math.ceil(remaining / (60 * 1000));
+  }
+
+  getRemainingAttempts(phoneNumber: string): number {
+    const storedData = this.otpStore.get(phoneNumber);
+    if (!storedData) {
+      return 0;
+    }
+    return Math.max(0, this.MAX_ATTEMPTS - storedData.attempts);
+  }
+
+  hasActiveOTPs(): boolean {
+    return this.otpStore.size > 0;
   }
 }
 
 /**
- * Sends an OTP request to the server which generates and sends the OTP via SMS.
- * Returns the OTP session ID needed for verification.
+ * Requests OTP from server (server generates and sends OTP)
  */
-export async function requestOtpFromServer(
+async function requestOtpFromServer(
   receiver: string,
   patientName: string,
   expiryMinutes: number = 5,
@@ -163,12 +277,63 @@ export async function requestOtpFromServer(
       }
       throw new Error(`Failed to send OTP: ${error.message}`);
     }
-
     throw new Error('Failed to send OTP: Unknown error occurred');
   }
 }
 
-export class OTPManager {
+/**
+ * Verifies OTP with server
+ */
+async function verifyOtpWithServer(otpId: string, otp: string): Promise<boolean> {
+  try {
+    const url = `${restBaseUrl}/kenyaemr/validate-otp`;
+
+    const response = await openmrsFetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: otpId,
+        otp: otp.trim(),
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const rawText = await response.text();
+
+    let parsedResponse;
+    try {
+      parsedResponse = JSON.parse(rawText);
+    } catch (e) {
+      throw new Error('Invalid response from server');
+    }
+
+    let data = parsedResponse;
+    if (parsedResponse.response && typeof parsedResponse.response === 'string') {
+      try {
+        data = JSON.parse(parsedResponse.response);
+      } catch (e) {
+        throw new Error('Invalid nested response from server');
+      }
+    }
+
+    if (data.status === 'success' || data.valid === true) {
+      return true;
+    } else {
+      const errorMessage = data.message || 'Invalid OTP';
+      throw new Error(errorMessage);
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'OTP verification failed';
+    throw new Error(errorMessage);
+  }
+}
+
+class HieOTPManager {
   private otpSessions: Map<
     string,
     {
@@ -188,6 +353,8 @@ export class OTPManager {
     expiryMinutes: number = 5,
     nationalId: string | null = null,
   ): Promise<void> {
+    this.cleanupExpiredOTPs();
+
     const expiryTime = expiryMinutes * 60 * 1000;
 
     try {
@@ -209,6 +376,9 @@ export class OTPManager {
   }
 
   async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
+    // Clean up expired sessions before verification
+    this.cleanupExpiredOTPs();
+
     const sessionData = this.otpSessions.get(phoneNumber);
 
     if (!sessionData) {
@@ -266,7 +436,6 @@ export class OTPManager {
     if (!sessionData) {
       return false;
     }
-
     return Date.now() - sessionData.timestamp <= sessionData.expiryTime;
   }
 
@@ -275,7 +444,6 @@ export class OTPManager {
     if (!sessionData) {
       return 0;
     }
-
     const elapsed = Date.now() - sessionData.timestamp;
     const remaining = Math.max(0, sessionData.expiryTime - elapsed);
     return Math.ceil(remaining / (60 * 1000));
@@ -286,18 +454,104 @@ export class OTPManager {
     if (!sessionData) {
       return 0;
     }
-
     return Math.max(0, this.MAX_ATTEMPTS - sessionData.attempts);
+  }
+
+  hasActiveOTPs(): boolean {
+    return this.otpSessions.size > 0;
   }
 }
 
-export const otpManager = new OTPManager();
+interface IOTPManager {
+  requestOTP(
+    phoneNumber: string,
+    patientName: string,
+    expiryMinutes?: number,
+    nationalId?: string | null,
+  ): Promise<void>;
+  verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean>;
+  cleanupExpiredOTPs(): void;
+  hasValidOTP(phoneNumber: string): boolean;
+  getRemainingTimeMinutes(phoneNumber: string): number;
+  getRemainingAttempts(phoneNumber: string): number;
+  hasActiveOTPs(): boolean;
+}
 
-setInterval(() => {
+class OTPManagerAdapter implements IOTPManager {
+  private kehmisManager: KehmisOTPManager;
+  private hieManager: HieOTPManager;
+  private currentSource: string;
+
+  constructor(otpSource: string = 'kehmis') {
+    this.kehmisManager = new KehmisOTPManager();
+    this.hieManager = new HieOTPManager();
+    this.currentSource = otpSource;
+  }
+
+  setOtpSource(source: string) {
+    this.currentSource = source;
+  }
+
+  private getManager(): IOTPManager {
+    return this.currentSource === 'hie' ? this.hieManager : this.kehmisManager;
+  }
+
+  async requestOTP(
+    phoneNumber: string,
+    patientName: string,
+    expiryMinutes: number = 5,
+    nationalId: string | null = null,
+  ): Promise<void> {
+    this.cleanupExpiredOTPs();
+    return this.getManager().requestOTP(phoneNumber, patientName, expiryMinutes, nationalId);
+  }
+
+  async verifyOTP(phoneNumber: string, inputOtp: string): Promise<boolean> {
+    this.cleanupExpiredOTPs();
+    return this.getManager().verifyOTP(phoneNumber, inputOtp);
+  }
+
+  cleanupExpiredOTPs(): void {
+    this.kehmisManager.cleanupExpiredOTPs();
+    this.hieManager.cleanupExpiredOTPs();
+  }
+
+  hasValidOTP(phoneNumber: string): boolean {
+    return this.getManager().hasValidOTP(phoneNumber);
+  }
+
+  getRemainingTimeMinutes(phoneNumber: string): number {
+    return this.getManager().getRemainingTimeMinutes(phoneNumber);
+  }
+
+  getRemainingAttempts(phoneNumber: string): number {
+    return this.getManager().getRemainingAttempts(phoneNumber);
+  }
+
+  hasActiveOTPs(): boolean {
+    return this.kehmisManager.hasActiveOTPs() || this.hieManager.hasActiveOTPs();
+  }
+}
+
+export const otpManager = new OTPManagerAdapter();
+
+export const cleanupAllOTPs = (): void => {
   otpManager.cleanupExpiredOTPs();
-}, 2 * 60 * 1000);
+};
 
-export function createOtpHandlers(patientName: string, expiryMinutes: number, nationalId: string | null = null) {
+/**
+ * Create OTP handlers with dynamic source detection
+ */
+export function createOtpHandlers(
+  patientName: string,
+  expiryMinutes: number,
+  nationalId: string | null = null,
+  otpSource?: string,
+) {
+  if (otpSource) {
+    otpManager.setOtpSource(otpSource);
+  }
+
   return {
     onRequestOtp: async (phone: string): Promise<void> => {
       await otpManager.requestOTP(phone, patientName, expiryMinutes, nationalId);
@@ -316,6 +570,9 @@ export function createOtpHandlers(patientName: string, expiryMinutes: number, na
     },
     getRemainingAttempts: (phone: string): number => {
       return otpManager.getRemainingAttempts(phone);
+    },
+    cleanup: (): void => {
+      otpManager.cleanupExpiredOTPs();
     },
   };
 }

@@ -9,7 +9,7 @@ import {
   TextInput,
   IconButton,
 } from '@carbon/react';
-import React, { FC, useState } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './otp-verification.scss';
 import PinPut from '../pin-put/pinput.component';
@@ -27,6 +27,7 @@ type OTPVerificationModalProps = {
   phoneNumber: string;
   onRequestOtp?: (phoneNumber: string) => Promise<void>;
   expiryMinutes?: number;
+  onCleanup?: () => void;
 };
 
 const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
@@ -39,6 +40,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
   onRequestOtp,
   onVerificationSuccess,
   expiryMinutes = 5,
+  onCleanup,
 }) => {
   const { t } = useTranslation();
   const [otp, setOtp] = useState('');
@@ -52,13 +54,26 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
   const [countdownResetTrigger, setCountdownResetTrigger] = useState(0);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
 
+  useEffect(() => {
+    return () => {
+      onCleanup?.();
+    };
+  }, [onCleanup]);
+
+  const handleClose = () => {
+    onCleanup?.();
+    onClose?.();
+  };
+
   const handleVerify = async () => {
     setError(null);
     try {
       setIsLoading(true);
       await onVerify?.(otp);
-      onClose?.();
       onVerificationSuccess?.();
+      setTimeout(() => {
+        handleClose();
+      }, 1000);
     } catch (error) {
       setError({ type: 'verification', error: error as Error });
     } finally {
@@ -105,6 +120,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
     setOtp('');
     setIsCountdownActive(false);
     setMode('landing');
+    onCleanup?.();
   };
 
   const isValidPhoneNumber = (phone: string) => {
@@ -113,7 +129,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
 
   return (
     <React.Fragment>
-      <ModalHeader className={styles.sectionHeader} closeModal={onClose}>
+      <ModalHeader className={styles.sectionHeader} closeModal={handleClose}>
         {t('otpVerification', 'OTP Verification')}
       </ModalHeader>
       <ModalBody>
@@ -209,7 +225,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
       </ModalBody>
       <ModalFooter>
         <ButtonSet className={styles.buttonSet}>
-          <Button kind="secondary" onClick={onClose} className={styles.button}>
+          <Button kind="secondary" onClick={handleClose} className={styles.button}>
             {t('cancel', 'Cancel')}
           </Button>
 

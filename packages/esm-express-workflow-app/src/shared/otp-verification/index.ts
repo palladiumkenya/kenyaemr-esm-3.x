@@ -13,6 +13,7 @@ import { type ModalSize } from '@carbon/react/lib/components/Modal/Modal';
  * @property {(phoneNumber: string) => Promise<void>} [onRequestOtp] - Callback invoked to request a new OTP for the given phone number. Should return a promise.
  * @property {() => void} [onVerificationSuccess] - Callback invoked when OTP verification succeeds.
  * @property {number} [expiryMinutes] - The number of minutes after which the OTP expires. Defaults to 5 minutes. This is displayed to the user for clarity.
+ * @property {() => void} [onCleanup] - Callback invoked when the modal closes to clean up OTP resources.
  *
  * @example
  * <Button
@@ -32,6 +33,10 @@ import { type ModalSize } from '@carbon/react/lib/components/Modal/Modal';
  *           const success = true;
  *           setTimeout(() => (success ? resolve() : reject(new Error('Some error'))), 3000);
  *         }),
+ *       onCleanup: () => {
+ *         // Clean up OTP resources
+ *         otpManager.cleanupExpiredOTPs();
+ *       },
  *     })
  *   }
  * >
@@ -48,6 +53,7 @@ export type OTPVerificationModalOptions = {
   onVerificationSuccess?: () => void;
   expiryMinutes?: number;
   size?: ModalSize;
+  onCleanup?: () => void;
 };
 
 /**
@@ -57,10 +63,15 @@ export type OTPVerificationModalOptions = {
  * @returns A dispose function to close the modal programmatically
  */
 export const launchOtpVerificationModal = (props: OTPVerificationModalOptions) => {
+  const { onCleanup, ...modalProps } = props;
+
   const dispose = showModal('otp-verification-modal', {
-    onClose: () => dispose(),
-    ...props,
-    centerBoxes: props?.centerBoxes ?? true,
+    onClose: () => {
+      onCleanup?.();
+      dispose();
+    },
+    ...modalProps,
+    centerBoxes: modalProps?.centerBoxes ?? true,
   });
 
   return dispose;
