@@ -20,6 +20,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { z } from 'zod';
+import debounce from 'lodash-es/debounce';
 import SHABenefitPackangesAndInterventions from '../../../benefits-package/forms/packages-and-interventions-form.component';
 import { BillingConfig } from '../../../config-schema';
 import { useSystemSetting } from '../../../hooks/getMflCode';
@@ -29,9 +30,7 @@ import useProviderList from '../../../hooks/useProviderList';
 import { ClaimSummary, LineItem, MappedBill, OTPVerificationModalOptions } from '../../../types';
 import ClaimExplanationAndJusificationInput from './claims-explanation-and-justification-form-input.component';
 import { ClaimsFormSchema, ClaimsFormSchemaBase, processClaims, useVisit } from './claims-form.resource';
-
-import debounce from 'lodash-es/debounce';
-import { otpManager } from '../../../hooks/useOTP';
+import { otpManager, useOtpSource } from '../../../hooks/useOTP';
 import { usePhoneNumberAttribute } from '../../../hooks/usePhoneNumber';
 import { formatDateTime } from '../../utils';
 import styles from './claims-form.scss';
@@ -63,6 +62,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
   const { providers, providersLoading } = useProviderList();
   const { phoneNumber } = usePhoneNumberAttribute(patientUuid);
   const { nationalId, isLoading: isLoadingNationalId, error: errorNationalId } = usePatientIdentifier(patientUuid);
+  const { otpSource, isLoading: isLoadingOtpSource } = useOtpSource();
 
   const [otpState, setOtpState] = useState<OTPState>(OTPState.NOT_STARTED);
   const [pendingClaimData, setPendingClaimData] = useState<z.infer<typeof ClaimsFormSchema> | null>(null);
@@ -76,6 +76,12 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
 
   const patientName = `${bill.patientName}`;
   const otpExpiryMinutes = 5;
+
+  useEffect(() => {
+    if (otpSource) {
+      otpManager.setOtpSource(otpSource);
+    }
+  }, [otpSource]);
 
   const form = useForm<z.infer<typeof ClaimsFormSchema>>({
     mode: 'onTouched',
@@ -207,7 +213,14 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
             throw new Error('No claim data available for OTP request');
           }
 
-          await otpManager.requestOTP(phoneNumber, patientName, currentSummary, otpExpiryMinutes, nationalId || null);
+          await otpManager.requestOTP(
+            phoneNumber,
+            patientName,
+            currentSummary,
+            otpExpiryMinutes,
+            nationalId || null,
+            t,
+          );
         },
         onVerify: async (otp: string): Promise<void> => {
           const phoneForVerification = currentPhoneRef.current;
@@ -444,6 +457,7 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
 
   const isFormValid = isValid && packages?.length > 0 && interventions?.length > 0 && selectedLineItems?.length > 0;
   const displayPhoneNumber = currentOtpPhoneNumber || phoneNumber;
+  const isOtpDisabled = !isFormValid || !displayPhoneNumber || isLoadingOtpSource;
 
   return (
     <FormProvider {...form}>
@@ -667,10 +681,10 @@ const ClaimsForm: React.FC<ClaimsFormProps> = ({ bill, selectedLineItems }) => {
                 className={styles.button}
                 kind="primary"
                 onClick={handleSubmit(handleInitiateOTPVerification)}
-                disabled={!isFormValid || !displayPhoneNumber}
+                disabled={isOtpDisabled}
                 tooltipPosition="top"
                 tooltipAlignment="center">
-                {t('sendOtp', 'Send OTP')}
+                {isLoadingOtpSource ? t('loading', 'Loading...') : t('sendOtp', 'Send OTP')}
               </Button>
             )}
 
