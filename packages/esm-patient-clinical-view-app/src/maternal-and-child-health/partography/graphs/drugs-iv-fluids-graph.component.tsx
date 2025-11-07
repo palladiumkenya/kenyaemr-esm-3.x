@@ -14,14 +14,14 @@ interface DrugsIVFluidsGraphProps {
 const DrugsIVFluidsGraph: React.FC<DrugsIVFluidsGraphProps> = ({ data }) => {
   const { t } = useTranslation();
   const getColumns = () => {
-    const emptyColumns = Array.from({ length: 13 }, (_, i) => `grid-${i + 1}`);
+    const emptyColumns = Array.from({ length: 20 }, (_, i) => `grid-${i + 1}`);
 
     if (data.length === 0) {
       return emptyColumns;
     }
-    if (data.length <= 13) {
+    if (data.length <= 20) {
       const dataColumns = data.map((_, index) => `data-${index}`);
-      const remainingEmpty = Array.from({ length: 13 - data.length }, (_, i) => `empty-${i + 1}`);
+      const remainingEmpty = Array.from({ length: 20 - data.length }, (_, i) => `empty-${i + 1}`);
       return [...dataColumns, ...remainingEmpty];
     }
     return data.map((_, index) => `data-${index}`);

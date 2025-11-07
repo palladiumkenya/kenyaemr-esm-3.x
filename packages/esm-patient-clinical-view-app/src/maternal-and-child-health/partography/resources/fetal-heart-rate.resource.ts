@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { MCH_PARTOGRAPHY_ENCOUNTER_UUID, PARTOGRAPHY_CONCEPTS } from '../types';
 import { createPartographyEncounter } from '../partography.resource';
 import { useTranslation } from 'react-i18next';
+import { FETAL_HEART_RATE_HOUR_CONCEPT } from '../../../config-schema';
 
 export interface FetalHeartRateEntry {
   id: string;
@@ -42,12 +43,9 @@ export function useFetalHeartRateData(patientUuid: string) {
         const encounterDatetime = new Date(encounter.encounterDatetime);
         let hour = 0;
         let time = '';
+        // Find hour obs by concept and use its value as number
         const hourObs = encounter.obs.find(
-          (obs) =>
-            obs.concept.uuid === PARTOGRAPHY_CONCEPTS['fetal-heart-rate-hour'] &&
-            obs.value &&
-            typeof obs.value === 'string' &&
-            obs.value.startsWith('Hour:'),
+          (obs) => obs.concept.uuid === FETAL_HEART_RATE_HOUR_CONCEPT && typeof obs.value === 'number',
         );
         const timeObs = encounter.obs.find(
           (obs) =>
@@ -56,11 +54,8 @@ export function useFetalHeartRateData(patientUuid: string) {
             typeof obs.value === 'string' &&
             obs.value.startsWith('Time:'),
         );
-        if (hourObs && typeof hourObs.value === 'string') {
-          const hourMatch = hourObs.value.match(/Hour:\s*([0-9.]+)/);
-          if (hourMatch) {
-            hour = parseFloat(hourMatch[1]) || 0;
-          }
+        if (hourObs && typeof hourObs.value === 'number') {
+          hour = hourObs.value;
         }
         if (timeObs && typeof timeObs.value === 'string') {
           const timeMatch = timeObs.value.match(/Time:\s*(.+)/);

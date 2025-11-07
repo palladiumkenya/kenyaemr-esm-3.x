@@ -204,10 +204,10 @@
 
 .chartContainer {
   background-color: colors.$white;
-  padding: layout.$spacing-04;
+  padding: 0;
   border-radius: layout.$spacing-02;
   border: 2px solid colors.$gray-40;
-  margin-bottom: layout.$spacing-04;
+  margin-bottom: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   // Medical chart styling
@@ -888,6 +888,13 @@
   flex-wrap: wrap;
 }
 
+// Orange tag style for low range
+.tagLowRange {
+  background-color: #ff9800 !important;
+  color: #fff !important;
+  border-color: #ff9800 !important;
+}
+
 .fetalHeartRateChart {
   min-height: 600px; // Increased height to match cervix graph
   width: 100%;
@@ -996,7 +1003,7 @@
   border-radius: layout.$spacing-02;
   overflow-x: auto;
   max-height: 300px; // Set a reasonable height
-  max-width: 1050px; // Show approximately 13 grids (140px label + 70px * 13 columns = 1050px)
+  max-width: 1540px; // Show approximately 20 grids (140px label + 70px * 20 columns = 1540px)
 }
 
 .gridContainer {
@@ -1265,7 +1272,7 @@
   }
 }
 
-// Detailed Cervical Contractions Grid - Partograph Format
+// Detailed Contractions Grid - Partograph Format
 .contractionsContainer {
   display: flex;
   flex-direction: column;
@@ -1515,13 +1522,13 @@
   color: colors.$gray-80;
 }
 
-// Grid container for cervical contractions
+// Grid container for contractions
 .contractionsGrid {
   position: relative;
   margin: layout.$spacing-04 0;
 }
 
-// Table view styles for cervical contractions
+// Table view styles for contractions
 .contractionsTable {
   background-color: colors.$white;
   border: 1px solid colors.$gray-30;
@@ -1587,6 +1594,58 @@
 .drugsIVFluidsGraph {
   width: 100%;
   margin: layout.$spacing-05 0;
+}
+
+.oxytocinGraph {
+  width: 100%;
+  margin: 0;
+
+  .membraneGrid {
+    max-height: fit-content;
+    min-height: auto;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .gridContainer {
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  .gridRow {
+    min-height: 50px;
+    margin-bottom: 0;
+
+    &:last-child {
+      border-bottom: 1px solid colors.$gray-20;
+    }
+  }
+
+  .gridCell {
+    border: 1px solid colors.$gray-30;
+    min-height: 50px;
+  }
+}
+
+// Oxytocin specific styling when inside fetalHeartRateContainer
+.fetalHeartRateContainer {
+  .membraneGrid {
+    margin: 0;
+    padding: 0;
+    max-height: fit-content;
+    min-height: auto;
+  }
+
+  .gridContainer {
+    padding: 0;
+    margin: 0;
+  }
+
+  .gridRow {
+    margin: 0;
+    min-height: 50px;
+  }
 }
 
 .drugsCell {

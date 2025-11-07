@@ -48,26 +48,26 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
 
     clearErrors();
 
-    if (!data.pulse || isNaN(pulseValue) || pulseValue < 30 || pulseValue > 200) {
+    if (!data.pulse || isNaN(pulseValue) || pulseValue < 0 || pulseValue > 230) {
       setError('pulse', {
         type: 'manual',
-        message: 'Please enter a valid pulse rate (30-200 bpm)',
+        message: 'Please enter a valid pulse rate (0-230 bpm)',
       });
       return;
     }
 
-    if (!data.systolicBP || isNaN(systolicValue) || systolicValue < 60 || systolicValue > 250) {
+    if (!data.systolicBP || isNaN(systolicValue) || systolicValue < 0 || systolicValue > 250) {
       setError('systolicBP', {
         type: 'manual',
-        message: 'Please enter a valid systolic BP (60-250 mmHg)',
+        message: 'Please enter a valid systolic BP (0-250 mmHg)',
       });
       return;
     }
 
-    if (!data.diastolicBP || isNaN(diastolicValue) || diastolicValue < 40 || diastolicValue > 150) {
+    if (!data.diastolicBP || isNaN(diastolicValue) || diastolicValue < 0 || diastolicValue > 150) {
       setError('diastolicBP', {
         type: 'manual',
-        message: 'Please enter a valid diastolic BP (40-150 mmHg)',
+        message: 'Please enter a valid diastolic BP (0-150 mmHg)',
       });
       return;
     }
@@ -112,17 +112,19 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
             <Controller
               name="pulse"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <NumberInput
                   id="pulse"
                   label={t('pulse', 'Pulse Rate')}
-                  helperText="Normal: 60-100 bpm"
-                  min={30}
-                  max={200}
-                  value={field.value}
-                  onChange={(e, { value }) => field.onChange(value)}
-                  invalid={!!errors.pulse}
-                  invalidText={errors.pulse?.message}
+                  helperText="Normal: 0-230 bpm"
+                  min={0}
+                  max={230}
+                  step={1}
+                  value={field.value || ''}
+                  onChange={(e, { value }) => field.onChange(String(value))}
+                  invalid={!!fieldState.error}
+                  invalidText={fieldState.error?.message}
+                  allowEmpty
                 />
               )}
             />
@@ -131,17 +133,19 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
             <Controller
               name="systolicBP"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <NumberInput
                   id="systolicBP"
                   label={t('systolicBP', 'BP Systolic')}
-                  helperText="Normal: 90-149 mmHg"
-                  min={60}
+                  helperText="Normal: 0-250 mmHg"
+                  min={0}
                   max={250}
-                  value={field.value}
-                  onChange={(e, { value }) => field.onChange(value)}
-                  invalid={!!errors.systolicBP}
-                  invalidText={errors.systolicBP?.message}
+                  step={1}
+                  value={field.value || ''}
+                  onChange={(e, { value }) => field.onChange(String(value))}
+                  invalid={!!fieldState.error}
+                  invalidText={fieldState.error?.message}
+                  allowEmpty
                 />
               )}
             />
@@ -150,17 +154,19 @@ const PulseBPForm: React.FC<PulseBPFormProps> = ({ isOpen, onClose, onSubmit, on
             <Controller
               name="diastolicBP"
               control={control}
-              render={({ field }) => (
+              render={({ field, fieldState }) => (
                 <NumberInput
                   id="diastolicBP"
                   label={t('diastolicBP', 'BP Diastolic')}
-                  helperText="Normal: 60-80 mmHg"
-                  min={40}
+                  helperText="Normal: 0-150 mmHg"
+                  min={0}
                   max={150}
-                  value={field.value}
-                  onChange={(e, { value }) => field.onChange(value)}
-                  invalid={!!errors.diastolicBP}
-                  invalidText={errors.diastolicBP?.message}
+                  step={1}
+                  value={field.value || ''}
+                  onChange={(e, { value }) => field.onChange(String(value))}
+                  invalid={!!fieldState.error}
+                  invalidText={fieldState.error?.message}
+                  allowEmpty
                 />
               )}
             />

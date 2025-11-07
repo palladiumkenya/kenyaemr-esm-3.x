@@ -22,6 +22,7 @@ interface MembraneAmnioticFluidData {
   exactTime: string;
   amnioticFluid: string;
   moulding: string;
+  time?: string;
   date?: string;
   id?: string;
 }
@@ -82,13 +83,13 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
   ];
 
   const getTimeColumns = () => {
-    const emptyColumns = Array.from({ length: 13 }, (_, i) => `grid-${i + 1}`);
+    const emptyColumns = Array.from({ length: 20 }, (_, i) => `grid-${i + 1}`);
     if (data.length === 0) {
       return emptyColumns;
     }
     const dataTimes = data.map((item, idx) => item.exactTime || String(idx));
-    if (dataTimes.length <= 13) {
-      const remainingEmpty = Array.from({ length: 13 - dataTimes.length }, (_, i) => `empty-${i + 1}`);
+    if (dataTimes.length <= 20) {
+      const remainingEmpty = Array.from({ length: 20 - dataTimes.length }, (_, i) => `empty-${i + 1}`);
       return [...dataTimes, ...remainingEmpty];
     }
     return dataTimes;
@@ -168,6 +169,27 @@ const MembraneAmnioticFluidGraph: React.FC<MembraneAmnioticFluidGraphProps> = ({
         {viewMode === 'graph' ? (
           <div className={styles.membraneGrid}>
             <div className={styles.gridContainer}>
+              <div className={styles.gridRow}>
+                <div className={styles.gridRowLabel} style={{ fontWeight: 600 }}>
+                  {t('time', 'Time')}
+                </div>
+                {timeColumns.map((timeColumn, idx) => {
+                  const item = data[idx];
+                  let timeValue = '';
+                  if (item) {
+                    timeValue = item.time || item.timeSlot || item.exactTime || '';
+                  }
+                  return (
+                    <div
+                      key={`time-${idx}`}
+                      className={styles.gridCell}
+                      style={{ textAlign: 'center', fontWeight: 600 }}>
+                      {timeValue}
+                    </div>
+                  );
+                })}
+              </div>
+
               <div className={styles.gridRow}>
                 <div className={styles.gridRowLabel}>{t('amnioticFluid', 'Amniotic Fluid')}</div>
                 {timeColumns.map((timeColumn) => {

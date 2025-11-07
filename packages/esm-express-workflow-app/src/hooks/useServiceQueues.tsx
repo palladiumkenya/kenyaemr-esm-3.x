@@ -64,7 +64,7 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
     error,
   };
 };
-export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string) {
+export function serveQueueEntry(servicePointName: string, ticketNumber: string, status: string, locationUuid?: string) {
   const abortController = new AbortController();
 
   return openmrsFetch(`${restBaseUrl}/queueutil/assignticket`, {
@@ -77,6 +77,7 @@ export function serveQueueEntry(servicePointName: string, ticketNumber: string, 
       servicePointName,
       ticketNumber,
       status,
+      locationUuid: locationUuid,
     },
   });
 }

@@ -81,7 +81,12 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
     const queueNumber = queueEntry.visit.attributes?.filter(
       (attr) => attr['attributeType']?.uuid === visitQueueNumberAttributeUuid,
     )?.[0];
-    const response = await serveQueueEntry(queueEntry.queue.name, queueNumber.value, 'calling');
+    const response = await serveQueueEntry(
+      queueEntry.queue.name,
+      queueNumber.value,
+      'calling',
+      queueEntry?.queue?.location?.uuid,
+    );
     if (response.ok) {
       const dispose = showModal('call-queue-entry-modal', {
         closeModal: () => dispose(),

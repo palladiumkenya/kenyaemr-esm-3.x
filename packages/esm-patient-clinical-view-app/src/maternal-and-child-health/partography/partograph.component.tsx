@@ -17,7 +17,7 @@ import {
   Tag,
 } from '@carbon/react';
 import { Add, ChartColumn, Table as TableIcon } from '@carbon/react/icons';
-import { openmrsFetch, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { openmrsFetch, useLayoutType, useSession, usePatient } from '@openmrs/esm-framework';
 import React, { useEffect, useMemo, useState } from 'react';
 import { codeToPlus, contractionLevelUuidMap, labelToUuid, contractionLevelUuidToLabel } from './types';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +50,7 @@ import {
   useDrugOrders,
   useFetalHeartRateData,
   usePartographyData,
+  saveFetalHeartRateData,
 } from './partography.resource';
 import styles from './partography.scss';
 import { useMembraneAmnioticFluidData } from './resources/membrane-amniotic-fluid.resource';
@@ -276,6 +277,37 @@ const TableSkeleton: React.FC = () => {
 };
 
 const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
+  // Fetch patient demographics for drugs IV fluids form
+  // Always call usePatient hook at the top level to comply with React rules of hooks
+  const { patient: patientData } = usePatient(patientUuid);
+  // Compute age from birthDate
+  function calculateAgeFromBirthDate(birthDateStr?: string): string {
+    if (!birthDateStr) {
+      return '';
+    }
+    const today = new Date();
+    const birthDate = new Date(birthDateStr);
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+    if (months < 0 || (months === 0 && days < 0)) {
+      years--;
+      months += 12;
+    }
+    return String(years);
+  }
+  const patientProp = patientData
+    ? {
+        uuid: patientData.id,
+        name:
+          patientData.name && patientData.name.length > 0
+            ? (patientData.name[0].given ? patientData.name[0].given.join(' ') + ' ' : '') +
+              (patientData.name[0].family || '')
+            : '',
+        gender: patientData.gender || '',
+        age: calculateAgeFromBirthDate(patientData.birthDate),
+      }
+    : undefined;
   const { t } = useTranslation();
 
   const ENABLE_DUMMY_DATA = false;
@@ -298,7 +330,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateMembraneAmnioticFluidData,
   } = useMembraneAmnioticFluidData(patientUuid || '');
 
-  // Cervical contractions backend data
+  //Contractions backend data
   const {
     data: cervicalContractionsData,
     isLoading: isCervicalContractionsLoading,
@@ -538,11 +570,19 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateDrugOrders = () => {},
   } = useDrugOrders(patientUuid || '');
 
+  // Fetch backend drugs/IV fluids data (partography encounters)
+  const {
+    data: loadedDrugsIVFluidsData = [],
+    isLoading: isDrugsIVFluidsLoading,
+    error: drugsIVFluidsError,
+    mutate: mutateDrugsIVFluidsData,
+  } = usePartographyData(patientUuid || '', 'drugs-fluids');
+
   useEffect(() => {
     if (patientUuid) {
-      if (drugOrdersError) {
-        console.error('Drug Orders Error:', drugOrdersError);
-      }
+      // if (drugOrdersError) {
+      //   console.error('Drug Orders Error:', drugOrdersError);
+      // }
     }
   }, [patientUuid, loadedDrugOrders, isDrugOrdersLoading, drugOrdersError]);
 
@@ -969,10 +1009,10 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   }
 
   // Show error if cervix data failed to load
-  if (cervixDataError) {
-    console.error('Error loading cervix data:', cervixDataError);
-    // Continue rendering but show warning - don't block the entire UI
-  }
+  // if (cervixDataError) {
+  //   console.error('Error loading cervix data:', cervixDataError);
+  //   // Continue rendering but show warning - don't block the entire UI
+  // }
 
   const handleAddDataPoint = (graphId: string) => {
     if (graphId === 'cervix') {
@@ -1095,18 +1135,28 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       return;
     }
 
-    // Add to local state for immediate UI update
-    const newEntry = {
-      hour: formData.hour,
-      value: formData.fetalHeartRate,
-      group: 'Fetal Heart Rate',
-      time: formData.time,
-      date: new Date().toLocaleDateString(),
-      id: `fhr-${Date.now()}`,
-    };
-
-    setLocalFetalHeartRateData((prev) => [...prev, newEntry]);
-    setIsFetalHeartRateFormOpen(false);
+    (async () => {
+      try {
+        const result = await saveFetalHeartRateData(
+          patientUuid,
+          {
+            hour: formData.hour,
+            time: formData.time,
+            fetalHeartRate: formData.fetalHeartRate,
+          },
+          session?.sessionLocation?.uuid,
+          session?.currentProvider?.uuid,
+        );
+        if (result.success) {
+          await mutateFetalHeartRateData();
+          setIsFetalHeartRateFormOpen(false);
+        } else {
+          alert(result.message || 'Failed to save fetal heart rate data.');
+        }
+      } catch (error) {
+        alert(error?.message || 'Failed to save fetal heart rate data.');
+      }
+    })();
   };
 
   // Callback for when fetal heart rate data is saved to OpenMRS
@@ -1181,10 +1231,10 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         }
         setIsCervicalContractionsFormOpen(false);
       } else {
-        console.error('Failed to save cervical contractions:', saveResult.message);
+        alert('Failed to save contractions data: ' + saveResult.message);
       }
     } catch (err) {
-      console.error('Error during cervical contractions save:', err);
+      alert('Failed to save contractions data.');
     }
   };
 
@@ -1233,7 +1283,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
           alert('Failed to save oxytocin data: ' + saveResult.message);
         }
       } catch (err) {
-        console.error('Error saving oxytocin data:', err);
+        // console.error('Error saving oxytocin data:', err);
         alert('Failed to save oxytocin data.');
       }
     } else {
@@ -1369,96 +1419,173 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   };
 
   const getMembraneAmnioticFluidTableData = () => {
-    return membraneAmnioticFluidEntries.map((data, index) => ({
-      id: data.id || `maf-${index}`,
-      date: data.date,
-      timeSlot: data.timeSlot || '',
-      exactTime: data.time || '',
-      amnioticFluid: data.amnioticFluid,
-      moulding: data.moulding,
-    }));
+    return membraneAmnioticFluidEntries
+      .filter((data) => data.amnioticFluid !== undefined && data.amnioticFluid !== null && data.amnioticFluid !== '')
+      .map((data, index) => ({
+        id: data.id || `maf-${index}`,
+        date: data.date,
+        timeSlot: data.timeSlot || '',
+        exactTime: data.time || '',
+        amnioticFluid: data.amnioticFluid,
+        moulding: data.moulding,
+      }));
   };
 
   // Generate table data for fetal heart rate
   const getFetalHeartRateTableData = () => {
-    return computedFetalHeartRateData.map((data, index) => {
-      const getStatus = (value: number) => {
-        if (value < 100) {
-          return 'Low';
-        }
-        if (value >= 100 && value <= 180) {
-          return 'Normal';
-        }
-        return 'High';
-      };
+    return computedFetalHeartRateData
+      .filter((data) => data.value !== undefined && data.value !== null)
+      .map((data, index) => {
+        const getStatus = (value: number) => {
+          if (value < 100) {
+            return 'Low';
+          }
+          if (value >= 100 && value <= 180) {
+            return 'Normal';
+          }
+          return 'High';
+        };
 
-      return {
-        id: `fhr-${index}`,
-        date: new Date().toLocaleDateString(),
-        time: data.time || 'N/A',
-        hour: `${data.hour}${data.hour % 1 === 0.5 ? '.5' : ''}hr`,
-        value: `${data.value} bpm`,
-        status: getStatus(data.value),
-      };
-    });
+        return {
+          id: `fhr-${index}`,
+          date: new Date().toLocaleDateString(),
+          time: data.time || 'N/A',
+          hour: `${data.hour}${data.hour % 1 === 0.5 ? '.5' : ''}hr`,
+          value: `${data.value} bpm`,
+          status: getStatus(data.value),
+        };
+      });
   };
 
-  // Generate table data for cervical contractions
   const getCervicalContractionsTableData = () => {
-    return cervicalContractionsData.map((encounter, index) => {
-      // Find relevant obs for timeSlot, contractionCount, contractionLevel
-      let timeSlot = '';
-      let contractionCount = '';
-      let contractionLevel = '';
-      if (Array.isArray(encounter.obs)) {
-        for (const obs of encounter.obs) {
-          // TimeSlot is stored as a string value starting with 'Time:'
-          if (
-            obs.concept.uuid === '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' &&
-            typeof obs.value === 'string' &&
-            obs.value.startsWith('Time:')
-          ) {
-            const match = obs.value.match(/Time:\s*(.+)/);
-            if (match) {
-              timeSlot = match[1].trim();
+    return cervicalContractionsData
+      .filter((encounter) => {
+        // Only include if contractionCount or contractionLevel is present
+        let contractionCount = '';
+        let contractionLevel = '';
+        if (Array.isArray(encounter.obs)) {
+          for (const obs of encounter.obs) {
+            if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionCount = String(obs.value);
+            }
+            const contractionLabel = contractionLevelUuidToLabel(obs.concept.uuid);
+            if (contractionLabel !== obs.concept.uuid) {
+              contractionLevel = contractionLabel;
             }
           }
-          // Contraction count concept
-          if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
-            contractionCount = String(obs.value);
-          }
-          const contractionLabel = contractionLevelUuidToLabel(obs.concept.uuid);
-          if (contractionLabel !== obs.concept.uuid) {
-            contractionLevel = contractionLabel;
+        }
+        return contractionCount !== '' || contractionLevel !== '';
+      })
+      .map((encounter, index) => {
+        let timeSlot = '';
+        let contractionCount = '';
+        let contractionLevel = '';
+        if (Array.isArray(encounter.obs)) {
+          for (const obs of encounter.obs) {
+            if (
+              obs.concept.uuid === '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' &&
+              typeof obs.value === 'string' &&
+              obs.value.startsWith('Time:')
+            ) {
+              const match = obs.value.match(/Time:\s*(.+)/);
+              if (match) {
+                timeSlot = match[1].trim();
+              }
+            }
+            // Contraction count concept
+            if (obs.concept.uuid === '159682AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA') {
+              contractionCount = String(obs.value);
+            }
+            const contractionLabel = contractionLevelUuidToLabel(obs.concept.uuid);
+            if (contractionLabel !== obs.concept.uuid) {
+              contractionLevel = contractionLabel;
+            }
           }
         }
-      }
-      return {
-        id: `cc-${index}`,
-        date: new Date(encounter.encounterDatetime).toLocaleDateString(),
-        timeSlot,
-        contractionCount,
-        contractionLevel,
-      };
-    });
+        return {
+          id: `cc-${index}`,
+          date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+          timeSlot,
+          contractionCount,
+          contractionLevel,
+        };
+      });
   };
 
   const getOxytocinTableData = () => {
-    return loadedOxytocinData.map((data, index) => {
-      return {
-        id: `oxy-${index}`,
-        date: data.encounterDatetime ? new Date(data.encounterDatetime).toLocaleDateString() : '',
-        time: data.time || '',
-        dropsPerMinute:
-          data.dropsPerMinute !== null && data.dropsPerMinute !== undefined
-            ? `${data.dropsPerMinute} drops/min`
-            : 'N/A',
-      };
-    });
+    return loadedOxytocinData
+      .filter((data) => data.dropsPerMinute !== undefined && data.dropsPerMinute !== null)
+      .map((data, index) => {
+        return {
+          id: `oxy-${index}`,
+          date: data.encounterDatetime ? new Date(data.encounterDatetime).toLocaleDateString() : '',
+          time: data.time || '',
+          dropsPerMinute:
+            data.dropsPerMinute !== null && data.dropsPerMinute !== undefined
+              ? `${data.dropsPerMinute} drops/min`
+              : 'N/A',
+        };
+      });
   };
 
   // Generate table data for drugs and IV fluids
   const getDrugsIVFluidsTableData = () => {
+    // Map backend (saved) drugs/IV fluids data
+    const backendData = (loadedDrugsIVFluidsData || [])
+      .filter((encounter) => {
+        const obs = encounter.obs || [];
+        // UUIDs from payload
+        const DRUG_NAME_UUID = 'c3082af8-f935-40c5-aa5b-74c684e81aea';
+        const DOSAGE_UUID = 'b71ddb80-2d7f-4bde-a44b-236e62d4c1b6';
+        // Only include if drugName or dosage is present
+        const drugName = obs.find((o) => o.concept.uuid === DRUG_NAME_UUID)?.value;
+        const dosage = obs.find((o) => o.concept.uuid === DOSAGE_UUID)?.value;
+        return (
+          (drugName !== undefined && drugName !== null && drugName !== '') ||
+          (dosage !== undefined && dosage !== null && dosage !== '')
+        );
+      })
+      .map((encounter, index) => {
+        // Find relevant obs for drug name, dosage, route, frequency using concept UUIDs
+        const obs = encounter.obs || [];
+        // UUIDs from payload
+        const DRUG_NAME_UUID = 'c3082af8-f935-40c5-aa5b-74c684e81aea';
+        const DOSAGE_UUID = 'b71ddb80-2d7f-4bde-a44b-236e62d4c1b6';
+        const ROUTE_FREQ_UUID = '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
+
+        const getObsValueByUuid = (uuid) => {
+          const found = obs.find((o) => o.concept.uuid === uuid);
+          if (!found) {
+            return '';
+          }
+          return found.value != null ? String(found.value) : '';
+        };
+
+        let route = '';
+        let frequency = '';
+        obs
+          .filter((o) => o.concept.uuid === ROUTE_FREQ_UUID)
+          .forEach((o) => {
+            if (typeof o.value === 'string') {
+              if (o.value.startsWith('Route:')) {
+                route = o.value.replace('Route:', '').trim();
+              } else if (o.value.startsWith('Frequency:')) {
+                frequency = o.value.replace('Frequency:', '').trim();
+              }
+            }
+          });
+
+        return {
+          id: encounter.uuid,
+          date: encounter.encounterDatetime ? new Date(encounter.encounterDatetime).toLocaleDateString() : '',
+          drugName: getObsValueByUuid(DRUG_NAME_UUID),
+          dosage: getObsValueByUuid(DOSAGE_UUID),
+          route,
+          frequency,
+          source: 'backend',
+        };
+      });
+
     // Combine loaded drug orders with local manual entries
     const drugOrdersData = loadedDrugOrders.map((order) => ({
       id: order.id,
@@ -1480,8 +1607,8 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       source: 'manual', // Mark as manual entry
     }));
 
-    const combinedData = [...drugOrdersData, ...manualEntriesData];
-
+    // Show backend data first, then orders, then manual
+    const combinedData = [...backendData, ...drugOrdersData, ...manualEntriesData];
     return combinedData;
   };
 
@@ -1504,72 +1631,92 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       .filter(Boolean);
 
     // For each pulse, find the closest BP entry in time (within 1 hour)
-    return (loadedPulseData || []).map((encounter, index) => {
-      const pulseObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']);
-      const pulse = pulseObs
-        ? typeof pulseObs.value === 'number'
-          ? pulseObs.value
-          : parseFloat(pulseObs.value)
-        : null;
-      const pulseDate = new Date(encounter.encounterDatetime);
-      const date = pulseDate.toLocaleDateString();
-      const time = pulseDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return (loadedPulseData || [])
+      .map((encounter, index) => {
+        const pulseObs = encounter.obs.find((obs) => obs.concept.uuid === PARTOGRAPHY_CONCEPTS['maternal-pulse']);
+        const pulse = pulseObs
+          ? typeof pulseObs.value === 'number'
+            ? pulseObs.value
+            : parseFloat(pulseObs.value)
+          : null;
+        const pulseDate = new Date(encounter.encounterDatetime);
+        const date = pulseDate.toLocaleDateString();
+        const time = pulseDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      // Find closest BP entry within 1 hour
-      let closestBP = null;
-      let minDiff = 60 * 60 * 1000; // 1 hour in ms
-      for (const bp of bpEntries) {
-        const diff = Math.abs(bp.datetime.getTime() - pulseDate.getTime());
-        if (diff < minDiff) {
-          minDiff = diff;
-          closestBP = bp;
+        // Find closest BP entry within 1 hour
+        let closestBP = null;
+        let minDiff = 60 * 60 * 1000; // 1 hour in ms
+        for (const bp of bpEntries) {
+          const diff = Math.abs(bp.datetime.getTime() - pulseDate.getTime());
+          if (diff < minDiff) {
+            minDiff = diff;
+            closestBP = bp;
+          }
         }
-      }
 
-      return {
-        id: `pulse-bp-${index}`,
-        pulse,
-        systolicBP: closestBP ? closestBP.systolicBP : '',
-        diastolicBP: closestBP ? closestBP.diastolicBP : '',
-        date,
-        time,
-      };
-    });
+        return {
+          id: `pulse-bp-${index}`,
+          pulse,
+          systolicBP: closestBP ? closestBP.systolicBP : '',
+          diastolicBP: closestBP ? closestBP.diastolicBP : '',
+          date,
+          time,
+        };
+      })
+      .filter(
+        (row) =>
+          row.pulse !== null &&
+          row.pulse !== undefined &&
+          !isNaN(row.pulse) &&
+          ((typeof row.systolicBP === 'number' && !isNaN(row.systolicBP)) ||
+            (typeof row.diastolicBP === 'number' && !isNaN(row.diastolicBP))),
+      );
   };
 
   // Generate table data for temperature from backend only
   const getTemperatureTableData = () => {
-    return loadedTemperatureData.map((encounter, index) => {
-      const tempObs = encounter.obs.find((obs) => obs.concept.uuid === '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
-      const timeObs = encounter.obs.find(
-        (obs) =>
-          obs.concept.uuid === '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' &&
-          typeof obs.value === 'string' &&
-          obs.value.startsWith('Time:'),
-      );
-      let time = '';
-      if (timeObs && typeof timeObs.value === 'string') {
-        const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
-        if (timeMatch) {
-          time = timeMatch[1].trim();
+    return loadedTemperatureData
+      .map((encounter, index) => {
+        const tempObs = encounter.obs.find((obs) => obs.concept.uuid === '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA');
+        const timeObs = encounter.obs.find(
+          (obs) =>
+            obs.concept.uuid === '160632AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' &&
+            typeof obs.value === 'string' &&
+            obs.value.startsWith('Time:'),
+        );
+        let time = '';
+        if (timeObs && typeof timeObs.value === 'string') {
+          const timeMatch = timeObs.value.match(/Time:\s*(.+)/);
+          if (timeMatch) {
+            time = timeMatch[1].trim();
+          }
         }
-      }
-      let temperature = tempObs?.value ?? null;
-      if (typeof temperature === 'string') {
-        const parsed = parseFloat(temperature);
-        temperature = isNaN(parsed) ? null : parsed;
-      }
-      return {
-        id: `temperature-${index}`,
-        date: new Date(encounter.encounterDatetime).toLocaleDateString(),
-        timeSlot: '',
-        exactTime: time,
-        temperature,
-      };
-    });
+        let temperature = tempObs?.value ?? null;
+        if (typeof temperature === 'string') {
+          const parsed = parseFloat(temperature);
+          temperature = isNaN(parsed) ? null : parsed;
+        }
+        return {
+          id: `temperature-${index}`,
+          date: new Date(encounter.encounterDatetime).toLocaleDateString(),
+          timeSlot: '',
+          exactTime: time,
+          temperature,
+        };
+      })
+      .filter((row) => row.temperature != null);
   };
 
   const getUrineTestTableData = () => urineTestData;
+  // Only include urine test rows with at least one non-empty value (protein, acetone, volume)
+  const getFilteredUrineTestTableData = () =>
+    (urineTestData || []).filter(
+      (row) =>
+        row &&
+        ((row.protein !== undefined && row.protein !== null && row.protein !== '') ||
+          (row.acetone !== undefined && row.acetone !== null && row.acetone !== '') ||
+          (row.volume !== undefined && row.volume !== null)),
+    );
 
   const handleViewModeChange = (graphId: string, mode: 'graph' | 'table') => {
     setViewMode((prev) => ({
@@ -1624,25 +1771,29 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
     // Membrane amniotic fluid: use backend data only
     if (graph.id === 'membrane-amniotic-fluid') {
-      return membraneAmnioticFluidEntries.map((data, index) => ({
-        id: data.id || `maf-${index}`,
-        date: data.date,
-        timeSlot: data.timeSlot || '',
-        exactTime: data.time || '',
-        amnioticFluid: data.amnioticFluid,
-        moulding: data.moulding,
-      }));
+      return membraneAmnioticFluidEntries
+        .filter((data) => data.amnioticFluid !== undefined && data.amnioticFluid !== null && data.amnioticFluid !== '')
+        .map((data, index) => ({
+          id: data.id || `maf-${index}`,
+          date: data.date,
+          timeSlot: data.timeSlot || '',
+          exactTime: data.time || '',
+          amnioticFluid: data.amnioticFluid,
+          moulding: data.moulding,
+        }));
     }
 
     // Fallback for other graphs: use local state if available
     if (localPartographyData[graph.id] && localPartographyData[graph.id].length > 0) {
-      return localPartographyData[graph.id].map((item, index) => ({
-        id: `${graph.id}-${index}`,
-        time: item.time || 'N/A',
-        value: item.value || item.measurementValue || 'N/A',
-        date: new Date(item.timestamp).toLocaleDateString() || 'N/A',
-        ...item, // Include any additional fields
-      }));
+      return localPartographyData[graph.id]
+        .filter((item) => item.value !== undefined && item.value !== null && item.value !== '')
+        .map((item, index) => ({
+          id: `${graph.id}-${index}`,
+          time: item.time || 'N/A',
+          value: item.value || item.measurementValue || 'N/A',
+          date: new Date(item.timestamp).toLocaleDateString() || 'N/A',
+          ...item, // Include any additional fields
+        }));
     }
 
     // Otherwise, return empty or dummy data
@@ -2337,6 +2488,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               isAddButtonDisabled={false}
               onDrugsIVFluidsSubmit={handleDrugsIVFluidsFormSubmit}
               onDataSaved={handleDrugOrderDataSaved}
+              patient={patientProp}
             />
 
             <PulseBPGraph
@@ -2383,12 +2535,12 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
             />
 
             <UrineTestGraph
-              data={urineTestData}
-              tableData={urineTestData}
+              data={getFilteredUrineTestTableData()}
+              tableData={getFilteredUrineTestTableData()}
               viewMode={urineTestViewMode}
               currentPage={urineTestCurrentPage}
               pageSize={urineTestPageSize}
-              totalItems={urineTestData.length}
+              totalItems={getFilteredUrineTestTableData().length}
               controlSize={controlSize}
               onAddData={() => setIsUrineTestFormOpen(true)}
               onViewModeChange={setUrineTestViewMode}

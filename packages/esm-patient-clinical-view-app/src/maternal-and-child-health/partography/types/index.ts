@@ -35,11 +35,13 @@ export const contractionLevelUuidMap: Record<string, string> = {
   moderate: '1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   strong: '166788AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
 };
-// Utility: Map urine test code/label to plus notation
-// Default Fetal Heart Rate Chart Data
-// ...existing code...
-// ...existing code...
-// Uterine Contraction Level Options (for Cervical Contractions Form)
+export function getValidEncounterDatetime(): string {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - 4);
+  return now.toISOString();
+}
+export const URINE_TEST_TIME_SLOT_CONCEPT = 'bb3724c9-fbcc-49c5-9702-6cde0be325ca';
+
 export const contractionLevelOptions = [
   {
     value: 'none',
@@ -140,6 +142,8 @@ import {
   CONTRACTION_LEVEL_MILD_CONCEPT,
   CONTRACTION_LEVEL_MODERATE_CONCEPT,
   CONTRACTION_LEVEL_STRONG_CONCEPT,
+  OXYTOCIN_DROPS_PER_MINUTE_CONCEPT,
+  OXYTOCIN_TIME_CONCEPT,
 } from '../../../config-schema';
 
 const _CODE_TO_PLUS_MAP: Record<string, string> = {
@@ -151,10 +155,20 @@ const _CODE_TO_PLUS_MAP: Record<string, string> = {
   '++': '++',
   [MOULDING_SEVERE_CONCEPT]: '+++',
   '+++': '+++',
+  NEGATIVE: '0',
+  ZERO: '0',
+  'ONE PLUS': '+',
+  '1+': '+',
+  'TWO PLUS': '++',
+  '2+': '++',
+  'THREE PLUS': '+++',
+  '3+': '+++',
+  TRACE: '+/-',
+  '+/-': '+/-',
 };
 
 export const codeToPlus = (raw?: string): string => {
-  const key = (raw ?? '').toString().trim();
+  const key = (raw ?? '').toString().trim().toUpperCase();
   return _CODE_TO_PLUS_MAP[key] ?? raw ?? '';
 };
 const _partoConcepts = (configSchema as any)?.partography?._default?.conceptUuids ?? {};
@@ -232,11 +246,8 @@ export const PARTOGRAPHY_GRAPH_TYPES = [
 export const PARTOGRAPHY_ENCOUNTER_TYPES = Object.fromEntries(
   PARTOGRAPHY_GRAPH_TYPES.map((type) => [
     type,
-    type === 'drugs-fluids'
-      ? _partoUuids.drugsFluidsEncounterUuid ?? '39da3525-afe4-45ff-8977-c53b7b359158'
-      : type === 'pulse-bp-combined'
-      ? MCH_PARTOGRAPHY_ENCOUNTER_UUID
-      : MCH_PARTOGRAPHY_ENCOUNTER_UUID,
+    /* For testing: set drugs-fluids to use the same encounter type as temperature/others */
+    MCH_PARTOGRAPHY_ENCOUNTER_UUID,
   ]),
 ) as Record<(typeof PARTOGRAPHY_GRAPH_TYPES)[number], string>;
 
@@ -535,16 +546,14 @@ export const getColorForGraph = (colorName: string): string => {
   return PARTOGRAPHY_COLOR_MAPPINGS[colorName as keyof typeof PARTOGRAPHY_COLOR_MAPPINGS] || '#525252';
 };
 
-// Default Fetal Heart Rate Chart Data
-export const defaultFetalHeartRateChartData = [
-  { hour: 0, value: 140, group: 'Fetal Heart Rate', time: '0', color: getColorForGraph('green') },
-  { hour: 10, value: 140, group: 'Fetal Heart Rate', time: '10', color: getColorForGraph('green') },
-  { hour: 20, value: 140, group: 'Fetal Heart Rate', time: '20', color: getColorForGraph('green') },
-  { hour: 30, value: 140, group: 'Fetal Heart Rate', time: '30', color: getColorForGraph('green') },
-  { hour: 40, value: 140, group: 'Fetal Heart Rate', time: '40', color: getColorForGraph('green') },
-  { hour: 50, value: 140, group: 'Fetal Heart Rate', time: '50', color: getColorForGraph('green') },
-  { hour: 60, value: 140, group: 'Fetal Heart Rate', time: '60', color: getColorForGraph('green') },
-];
+// Default Fetal Heart Rate Chart Data - Empty for no data state
+export const defaultFetalHeartRateChartData: Array<{
+  hour: number;
+  value: number;
+  group: string;
+  time: string;
+  color: string;
+}> = [];
 
 export const FORM_OPTION_CONCEPTS = {
   AMNIOTIC_FLUID: {
@@ -787,20 +796,14 @@ export const TIME_SLOT_OPTIONS = [
 ] as const;
 
 export const MEMBRANE_TIME_SLOT_OPTIONS = [
-  { value: '16:00', label: '16:00' },
-  { value: '17:00', label: '17:00' },
-  { value: '18:00', label: '18:00' },
-  { value: '19:00', label: '19:00' },
-  { value: '20:00', label: '20:00' },
-  { value: '21:00', label: '21:00' },
-  { value: '22:00', label: '22:00' },
-  { value: '23:00', label: '23:00' },
-  { value: '00:00', label: '00:00' },
-  { value: '01:00', label: '01:00' },
-  { value: '02:00', label: '02:00' },
-  { value: '03:00', label: '03:00' },
-  { value: '04:00', label: '04:00' },
-  { value: '05:00', label: '05:00' },
+  // Add 0hr option first
+  { value: '0', label: '0hr' },
+  // Then add the existing 0.5hr increments
+  ...Array.from({ length: 48 }, (_, i) => {
+    const value = ((i + 1) * 0.5).toString();
+    const label = i % 2 === 1 ? `${(i + 1) * 0.5}hr` : `${(i + 1) / 2}hr`;
+    return { value, label };
+  }),
 ] as const;
 
 export const EVENT_TYPE_OPTIONS = [
@@ -1281,8 +1284,8 @@ export const MOULDING_SYMBOL_MAP: Record<string, string> = {
 };
 
 export const OXYTOCIN_FORM_CONCEPTS = {
-  time: FETAL_HEART_RATE_HOUR_CONCEPT,
-  oxytocinDropsPerMinute: OXYTOCIN_DOSE_CONCEPT,
+  time: OXYTOCIN_TIME_CONCEPT,
+  oxytocinDropsPerMinute: OXYTOCIN_DROPS_PER_MINUTE_CONCEPT,
 } as const;
 export const CERVIX_FORM_CONCEPTS = {
   hour: FETAL_HEART_RATE_HOUR_CONCEPT,
