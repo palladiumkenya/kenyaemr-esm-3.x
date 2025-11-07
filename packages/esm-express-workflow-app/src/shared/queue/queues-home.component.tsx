@@ -2,6 +2,7 @@ import React from 'react';
 import { useLeftNav, WorkspaceContainer } from '@openmrs/esm-framework';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import QueuesAdminPage from './queue-admin-page.component';
+import QueueScreen from './queue-screen.component';
 
 const QueuesAdminHome: React.FC = () => {
   const queuesBasePath = window.getOpenmrsSpaBase() + 'queues-admin';
@@ -12,6 +13,7 @@ const QueuesAdminHome: React.FC = () => {
       <main>
         <Routes>
           <Route path="/" element={<QueuesAdminPage />} />
+          <Route path="/screen" element={<QueueScreen />} />
         </Routes>
       </main>
     </BrowserRouter>

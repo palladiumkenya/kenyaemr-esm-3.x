@@ -151,6 +151,12 @@ export const useModuleLinks = () => {
       icon: <DashboardReference size={24} />,
       privilege: 'o3: View Case Management Dashboard',
     },
+    {
+      label: t('queueScreen', 'Queue Screen'),
+      url: `${openmrsSpaBase}queues-admin/screen`,
+      icon: <IbmCloudGateKeeper size={24} />,
+      privilege: 'o3: View Queue Screen Dashboard',
+    },
   ];
 
   return moduleLinks.filter((link) => !excludeLinks.some((excludeLink) => excludeLink === link.label));
