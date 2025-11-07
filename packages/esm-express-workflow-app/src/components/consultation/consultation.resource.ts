@@ -102,6 +102,48 @@ function useRadiologyOrders(fulfillerStatus?: string) {
   return { count, isLoading };
 }
 
+function useProcedureOrders(fulfillerStatus?: string) {
+  const { proceduresOrderTypeUuid, proceduresConceptClassUuid } = useConfig<ExpressWorkflowConfig>();
+
+  const url = useMemo(() => {
+    const { start, end } = getTodayRange();
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${proceduresOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,dateStopped,fulfillerStatus)&isStopped=false`;
+
+    apiUrl += `&activatedOnOrAfterDate=${start}&activatedOnOrBeforeDate=${end}`;
+
+    if (fulfillerStatus) {
+      apiUrl += `&fulfillerStatus=${fulfillerStatus}`;
+    }
+
+    return apiUrl;
+  }, [fulfillerStatus, proceduresOrderTypeUuid]);
+
+  const { data, isLoading } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
+
+  const count = useMemo(() => {
+    const orders = data?.data?.results ?? [];
+    return orders.filter((order) => {
+      const isProcedureOrder = order.concept.conceptClass.uuid === proceduresConceptClassUuid;
+      const isNotDiscontinued = order.action !== 'DISCONTINUE';
+      const isNotStopped = !order.dateStopped;
+
+      if (!fulfillerStatus) {
+        return (
+          isProcedureOrder &&
+          isNotDiscontinued &&
+          isNotStopped &&
+          order.fulfillerStatus === null &&
+          order.action === 'NEW'
+        );
+      } else {
+        return isProcedureOrder && isNotDiscontinued && isNotStopped && order.fulfillerStatus === fulfillerStatus;
+      }
+    }).length;
+  }, [data, proceduresConceptClassUuid, fulfillerStatus]);
+
+  return { count, isLoading };
+}
+
 export const useInvestigationStats = () => {
   const { labOrders: newLabOrders, isLoading: loadingNewLab } = useLabOrders({ newOrdersOnly: true });
   const { labOrders: completedLabOrders, isLoading: loadingCompletedLab } = useLabOrders({
@@ -110,15 +152,35 @@ export const useInvestigationStats = () => {
   });
   const { count: newRadiologyCount, isLoading: loadingNewRadiology } = useRadiologyOrders();
   const { count: completedRadiologyCount, isLoading: loadingCompletedRadiology } = useRadiologyOrders('COMPLETED');
+  const { count: newProcedureCount, isLoading: loadingNewProcedures } = useProcedureOrders();
+  const { count: completedProcedureCount, isLoading: loadingCompletedProcedures } = useProcedureOrders('COMPLETED');
 
-  const awaitingCount = newLabOrders.length + newRadiologyCount;
-  const completedCount = completedLabOrders.length + completedRadiologyCount;
+  const awaitingCount = newLabOrders.length + newRadiologyCount + newProcedureCount;
+  const completedCount = completedLabOrders.length + completedRadiologyCount + completedProcedureCount;
 
   return {
     awaitingCount,
     completedCount,
     totalCount: awaitingCount + completedCount,
-    isLoading: loadingNewLab || loadingCompletedLab || loadingNewRadiology || loadingCompletedRadiology,
+    lab: {
+      awaiting: newLabOrders.length,
+      completed: completedLabOrders.length,
+    },
+    radiology: {
+      awaiting: newRadiologyCount,
+      completed: completedRadiologyCount,
+    },
+    procedures: {
+      awaiting: newProcedureCount,
+      completed: completedProcedureCount,
+    },
+    isLoading:
+      loadingNewLab ||
+      loadingCompletedLab ||
+      loadingNewRadiology ||
+      loadingCompletedRadiology ||
+      loadingNewProcedures ||
+      loadingCompletedProcedures,
   };
 };
 

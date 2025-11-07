@@ -23,7 +23,15 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
   const usePatientChart = true;
 
   const { data: totalVisits, isLoading: isLoadingTotalVisits } = useTotalVisits();
-  const { awaitingCount, completedCount, totalCount, isLoading: isLoadingInvestigations } = useInvestigationStats();
+  const {
+    awaitingCount,
+    completedCount,
+    totalCount,
+    lab,
+    radiology,
+    procedures,
+    isLoading: isLoadingInvestigations,
+  } = useInvestigationStats();
 
   const consultationLocations = useMemo(
     () => consultationQueues.map((queue) => queue.location.uuid),
@@ -56,11 +64,21 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
       ],
     },
     {
-      title: t('investigationStatus', 'Investigation Status'),
-      value: totalCount.toString(),
+      title: t('investigationAwaiting', 'Investigation Awaiting'),
+      value: awaitingCount.toString(),
       categories: [
-        { label: t('awaiting', 'Awaiting'), value: awaitingCount },
-        { label: t('completed', 'Completed'), value: completedCount },
+        { label: t('lab', 'Lab'), value: lab.awaiting },
+        { label: t('radiology', 'Radiology'), value: radiology.awaiting },
+        { label: t('procedures', 'Procedures'), value: procedures.awaiting },
+      ],
+    },
+    {
+      title: t('investigationCompleted', 'Investigation Completed'),
+      value: completedCount.toString(),
+      categories: [
+        { label: t('lab', 'Lab'), value: lab.completed },
+        { label: t('radiology', 'Radiology'), value: radiology.completed },
+        { label: t('procedures', 'Procedures'), value: procedures.completed },
       ],
     },
     {
