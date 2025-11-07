@@ -258,7 +258,7 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "name": "ewf-pharmacy",
-        "title": "Pharmacy",
+        "title": "Prescription",
         "path": "pharmacy",
         "slot": "ewf-patient-chart-pharmacy-dashboard-slot",
         "layoutMode": "anchored",
