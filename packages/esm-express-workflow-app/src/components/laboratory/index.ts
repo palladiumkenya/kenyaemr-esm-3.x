@@ -2,7 +2,7 @@ import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
 import LaboratoryTabs from './laboratory-tabs.component';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib/src';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 
 const options = {
   featureName: 'express-workflow',
@@ -10,11 +10,11 @@ const options = {
 };
 
 export const laboratoryDashboard = getSyncLifecycle(LaboratoryTabs, options);
-// t('Laboratory', 'Laboratory')
+// t('labOrders', 'Lab Orders')
 export const laboratoryLeftPanelLink = getSyncLifecycle(
   createDashboardLink({
     path: 'laboratory',
-    title: 'Laboratory',
+    title: 'Lab Orders',
     icon: 'omrs-icon-microscope',
   }),
   options,
