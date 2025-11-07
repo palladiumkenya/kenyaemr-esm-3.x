@@ -10,11 +10,11 @@ const options = {
 };
 
 export const admissionsDashboard = getSyncLifecycle(AdmissionsDashboard, options);
-// t('Admissions', 'Admissions')
+// t('scheduleAdmission', 'Schedule Admission')
 export const admissionsDashboardLink = getSyncLifecycle(
   createDashboardLink({
     path: 'admissions',
-    title: 'Admissions',
+    title: 'Schedule Admission',
     icon: 'omrs-icon-hospital-bed',
   }),
   options,

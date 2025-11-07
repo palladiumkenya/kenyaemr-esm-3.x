@@ -278,7 +278,7 @@
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "name": "ewf-admissions",
-        "title": "Admissions",
+        "title": "Schedule Admission",
         "path": "admissions",
         "slot": "ewf-patient-chart-admissions-dashboard-slot",
         "layoutMode": "anchored",
