@@ -16,6 +16,7 @@ import PinPut from '../pin-put/pinput.component';
 import { Phone, Edit } from '@carbon/react/icons';
 import { PHONE_NUMBER_REGEX } from '../../constants';
 import OTPCountdown from './pin-counter/pin-counter.component';
+import { maskPhoneNumber } from '../utils';
 
 type OTPVerificationModalProps = {
   onClose?: () => void;
@@ -155,7 +156,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
                 <p>{t('confirmationTxt', 'Verify the phone number before OTP')}</p>
                 <div className={styles.phoneNumberDisplay}>
                   <Phone className={styles.phoneIcon} />
-                  <span className={styles.phoneNumber}>{currentPhoneNumber}</span>
+                  <span className={styles.phoneNumber}>{maskPhoneNumber(currentPhoneNumber)}</span>
                   <IconButton
                     kind="ghost"
                     size="sm"
@@ -176,7 +177,8 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
             ) : mode === 'verify-otp' ? (
               <div className={styles.otpInputContainer}>
                 <div className={styles.otpInstruction}>
-                  {t('enterOtpSentTo', 'Enter the OTP code sent to')} <strong>{currentPhoneNumber}</strong>
+                  {t('enterOtpSentTo', 'Enter the OTP code sent to')}{' '}
+                  <strong>{maskPhoneNumber(currentPhoneNumber)}</strong>
                 </div>
 
                 {isCountdownActive && (
