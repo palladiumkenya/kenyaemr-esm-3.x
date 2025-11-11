@@ -153,6 +153,13 @@ const ClaimsTable: React.FC<TableProps> = ({
     });
   };
 
+  const handleViewSummary = (claimId: string) => {
+    const dispose = showModal('claim-summary-modal', {
+      closeModal: () => dispose(),
+      claimId,
+    });
+  };
+
   // Cell rendering functions
   const renderStatusCell = (row: DataTableRow) => {
     return <ClaimStatus row={row} />;
@@ -161,6 +168,7 @@ const ClaimsTable: React.FC<TableProps> = ({
   const renderActionCell = (row: DataTableRow, rowStatus: string, size: 'lg' | 'md' | 'sm') => {
     return (
       <OverflowMenu size={size} flipped>
+        <OverflowMenuItem itemText={t('viewSummary', 'View Summary')} onClick={() => handleViewSummary(row.id)} />
         {['ENTERED', 'ERRORED'].includes(rowStatus) && (
           <OverflowMenuItem
             itemText={t('retryRequest', 'Retry request')}

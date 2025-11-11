@@ -391,6 +391,10 @@
       "component": "manageClaimRequestModal"
     },
     {
+      "name": "claim-summary-modal",
+      "component": "claimSummaryModal"
+    },
+    {
       "name": "clock-in-modal",
       "component": "clockIn"
     },
