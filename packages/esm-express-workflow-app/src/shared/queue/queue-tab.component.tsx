@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import startCase from 'lodash-es/startCase';
 import Card from '../cards/card.component';
-import { Queue } from '../../types/index';
+import { Queue, QueueFilter } from '../../types/index';
 import QueueEntryTable from './queue-entry/queue-entry-table.component';
 import { useQueueEntries } from '../../hooks/useServiceQueues';
 import styles from './queue-tab.scss';
@@ -20,9 +20,19 @@ type QueueTabProps = {
   navigatePath: string;
   onTabChanged?: (queue: Queue) => void;
   usePatientChart?: boolean;
+  filters?: Array<QueueFilter>;
+  onFiltersChanged?: (filters: Array<QueueFilter>) => void;
 };
 
-const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabChanged, usePatientChart }) => {
+const QueueTab: React.FC<QueueTabProps> = ({
+  queues,
+  cards,
+  navigatePath,
+  onTabChanged,
+  usePatientChart,
+  filters,
+  onFiltersChanged,
+}) => {
   const { t } = useTranslation();
 
   // Filter queues with rooms first
@@ -36,6 +46,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
 
   const { queueEntries, isLoading, error } = useQueueEntries({
     location: selectedQueue?.location?.uuid ? [selectedQueue.location.uuid] : undefined,
+    statuses: filters?.filter((filter) => filter.key === 'status')?.map((filter) => filter.value),
   });
 
   useEffect(() => {
@@ -101,7 +112,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
           />
         ))}
       </div>
-      <FiltersHeader />
+      <FiltersHeader filters={filters} onFiltersChanged={onFiltersChanged} />
       <div className={styles.tabsContainer}>
         <Tabs selectedIndex={selectedTabIndex} onChange={handleTabChange}>
           <TabList contained>

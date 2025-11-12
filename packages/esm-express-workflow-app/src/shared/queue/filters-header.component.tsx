@@ -22,7 +22,7 @@ const FiltersHeader: React.FC<FiltersHeaderProps> = ({ filters = [], onFiltersCh
       ))}
       {filters.length === 0 && <Tag>{t('noFilters', 'No filters')}</Tag>}
       {filters.length > 0 && (
-        <DismissibleTag text={t('clearFilters', 'Clear filters')} onClick={() => onFiltersChanged?.([])} type="red" />
+        <DismissibleTag text={t('clearFilters', 'Clear filters')} onClose={() => onFiltersChanged?.([])} type="red" />
       )}
     </div>
   );
