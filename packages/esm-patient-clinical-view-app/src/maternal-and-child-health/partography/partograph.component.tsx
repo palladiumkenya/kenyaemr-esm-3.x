@@ -1492,11 +1492,10 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         eventDescription: `Time Slot: ${currentTime}`,
       });
       await mutateUrineTestData();
-      alert('✅ Urine test data saved successfully! Tables and graphs updated.');
 
       setIsUrineTestFormOpen(false);
     } catch (error) {
-      alert('❌ Failed to save urine test data: ' + (error?.message || 'Unknown error'));
+      alert('Failed to save data.');
     }
   };
 

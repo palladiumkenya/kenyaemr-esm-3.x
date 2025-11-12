@@ -174,7 +174,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
   useEffect(() => {
     let observer: MutationObserver | null = null;
     const addXMarker = (svg: SVGElement, cx: number, cy: number) => {
-      const size = 4;
+      const size = 3;
       const systolicColor = '#da1e28';
       const line1 = document.createElementNS(SVG_NAMESPACE, 'line');
       line1.setAttribute('x1', (cx - size).toString());
@@ -201,7 +201,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
     };
 
     const addVMarker = (svg: SVGElement, cx: number, cy: number) => {
-      const size = 4;
+      const size = 3;
       const vColor = '#24a148';
 
       const line1 = document.createElementNS(SVG_NAMESPACE, 'line');
