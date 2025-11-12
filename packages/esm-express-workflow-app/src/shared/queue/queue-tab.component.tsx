@@ -10,7 +10,12 @@ import styles from './queue-tab.scss';
 
 type QueueTabProps = {
   queues: Array<Queue>;
-  cards?: Array<{ title: string; value: string; categories?: Array<{ label: string; value: number }> }>;
+  cards?: Array<{
+    title: string;
+    value: string;
+    categories?: Array<{ label: string; value: number; onClick?: () => void }>;
+    onClick?: () => void;
+  }>;
   navigatePath: string;
   onTabChanged?: (queue: Queue) => void;
   usePatientChart?: boolean;
@@ -86,7 +91,13 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
     <div className={styles.queueTab}>
       <div className={styles.cards}>
         {cards?.map((card) => (
-          <Card key={card.title} title={card.title} total={card.value} categories={card.categories} />
+          <Card
+            key={card.title}
+            title={card.title}
+            total={card.value}
+            categories={card.categories}
+            onClick={card.onClick}
+          />
         ))}
       </div>
       <div className={styles.tabsContainer}>

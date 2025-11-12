@@ -45,10 +45,12 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
     {
       title: t('clientsPatientsWaiting', 'Clients/Patients waiting'),
       value: waitingEntries.length.toString(),
+      onClick: () => {},
     },
     {
       title: t('clientsPatientsAttendedTo', 'Clients/Patients attended to'),
       value: attendedToEntries.length.toString(),
+      onClick: () => {},
     },
   ];
 
