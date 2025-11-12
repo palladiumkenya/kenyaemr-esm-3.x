@@ -17,6 +17,38 @@ export interface SaveOxytocinDataResponse {
   error?: string;
 }
 
+/**
+ * Helper function to extract time from oxytocin observation value
+ */
+function extractTimeFromOxytocinObs(obsValue: any): string {
+  if (!obsValue) {
+    return '';
+  }
+
+  if (typeof obsValue === 'string') {
+    // Handle "Time: HH:MM" format
+    if (obsValue.startsWith('Time:')) {
+      const match = obsValue.match(/Time:\s*(.+)/);
+      if (match) {
+        const time = match[1].trim();
+        // Validate HH:MM format
+        if (time.match(/^\d{1,2}:\d{2}$/)) {
+          return time;
+        }
+      }
+    }
+    // Handle direct HH:MM format
+    if (obsValue.match(/^\d{1,2}:\d{2}$/)) {
+      return obsValue;
+    }
+  } else if (typeof obsValue === 'object' && obsValue && 'display' in obsValue) {
+    // Handle concept object with display property
+    return extractTimeFromOxytocinObs(obsValue.display);
+  }
+
+  return '';
+}
+
 export function useOxytocinData(patientUuid: string) {
   const { t } = useTranslation();
   const encounterRepresentation =
@@ -34,31 +66,72 @@ export function useOxytocinData(patientUuid: string) {
   const sortedEncounters = oxytocinData.sort(
     (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
   );
-  const transformedData = sortedEncounters.map((encounter) => {
-    const observations = encounter.obs || [];
-    const timeObs = observations.find((obs) => obs.concept.uuid === OXYTOCIN_FORM_CONCEPTS.time);
-    const dropsObs = observations.find((obs) => obs.concept.uuid === OXYTOCIN_FORM_CONCEPTS.oxytocinDropsPerMinute);
-    return {
-      uuid: encounter.uuid,
-      encounterDatetime: encounter.encounterDatetime,
-      time: timeObs?.value ? String(timeObs.value) : null,
-      dropsPerMinute: dropsObs?.value ? Number(dropsObs.value) : null,
-      timeDisplay: timeObs?.value ? `${timeObs.value}` : null,
-    };
-  });
-  const existingOxytocinEntries = transformedData
-    .filter((data) => data.time !== null && data.dropsPerMinute !== null)
-    .map((data) => ({ time: data.time!, dropsPerMinute: data.dropsPerMinute! }));
+  const transformedData = sortedEncounters
+    .map((encounter) => {
+      const observations = encounter.obs || [];
+      const timeObs = observations.find((obs) => obs.concept.uuid === OXYTOCIN_FORM_CONCEPTS.time);
+      const dropsObs = observations.find((obs) => obs.concept.uuid === OXYTOCIN_FORM_CONCEPTS.oxytocinDropsPerMinute);
+
+      // Only include encounters that have both time and drops data (indicating genuine oxytocin form submissions)
+      if (!timeObs?.value || !dropsObs?.value) {
+        return null;
+      }
+
+      const timeValue = String(timeObs.value);
+      const dropsValue = Number(dropsObs.value);
+
+      // Additional validation: ensure the time value looks like oxytocin form data
+      const extractedTime = extractTimeFromOxytocinObs(timeValue);
+      if (!extractedTime || !extractedTime.match(/^\d{1,2}:\d{2}$/)) {
+        return null;
+      }
+
+      // Ensure drops per minute is a valid number
+      if (isNaN(dropsValue) || dropsValue < 0) {
+        return null;
+      }
+
+      return {
+        uuid: encounter.uuid,
+        encounterDatetime: encounter.encounterDatetime,
+        time: timeValue,
+        dropsPerMinute: dropsValue,
+        timeDisplay: extractedTime,
+      };
+    })
+    .filter(Boolean) as Array<{
+    uuid: string;
+    encounterDatetime: string;
+    time: string;
+    dropsPerMinute: number;
+    timeDisplay: string;
+  }>;
+
+  const existingOxytocinEntries = transformedData.map((data) => ({
+    time: data.time,
+    dropsPerMinute: data.dropsPerMinute,
+  }));
 
   let localizedError = error;
   if (error) {
     localizedError = t('Failed to load oxytocin data');
   }
 
+  // Transform data for TimePickerDropdown component (format: Array<{ hour: number; time: string }>)
+  const existingTimeEntries = transformedData.map((data) => {
+    const timeStr = data.timeDisplay; // Already extracted and validated above
+    const [hours] = timeStr.split(':').map(Number);
+    return {
+      hour: hours,
+      time: timeStr,
+    };
+  });
+
   return {
     encounters: sortedEncounters,
     oxytocinData: transformedData,
     existingOxytocinEntries,
+    existingTimeEntries, // For TimePickerDropdown component
     isLoading,
     error: localizedError,
     mutate,
