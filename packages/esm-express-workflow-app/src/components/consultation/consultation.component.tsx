@@ -17,7 +17,9 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
   const { queues, isLoading, error } = useQueues();
   const consultationQueues = queues.filter(
     (queue) =>
-      queue.name.toLowerCase().includes('consultation') && !queue.location.display.toLowerCase().includes('mch'),
+      queue.name.toLowerCase().includes('consultation') &&
+      !queue.location.display.toLowerCase().includes('mch') &&
+      queue?.queueRooms?.length > 0,
   );
 
   const usePatientChart = true;

@@ -15,7 +15,10 @@ const MCHTriage: React.FC = () => {
 
   const triageQueues = queues
     .filter(
-      (queue) => queue.name.toLowerCase().includes('triage') && queue.location.display.toLowerCase().includes('mch'),
+      (queue) =>
+        queue.name.toLowerCase().includes('triage') &&
+        queue.location.display.toLowerCase().includes('mch') &&
+        queue?.queueRooms?.length > 0,
     )
     .sort((a, b) => a.name.localeCompare(b.name));
   const {

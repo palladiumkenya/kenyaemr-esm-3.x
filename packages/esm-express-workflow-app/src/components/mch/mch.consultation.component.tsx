@@ -11,7 +11,9 @@ const MCHConsultation: React.FC = () => {
   const { queues, isLoading, error } = useQueues();
   const consultationQueues = queues.filter(
     (queue) =>
-      queue.name.toLowerCase().includes('consultation') && queue.location.display.toLowerCase().includes('mch'),
+      queue.name.toLowerCase().includes('consultation') &&
+      queue.location.display.toLowerCase().includes('mch') &&
+      queue?.queueRooms?.length > 0,
   );
 
   const { data: totalVisits, isLoading: isLoadingTotalVisits } = useTotalVisits();
