@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
 import { Button, Modal, Grid, Column, Select, SelectItem, NumberInput } from '@carbon/react';
+import { type OpenmrsResource } from '@openmrs/esm-framework';
 import TimePickerDropdown from './time-picker-dropdown.component';
 import styles from '../partography-data-form.scss';
 
@@ -26,13 +27,18 @@ type UrineTestFormProps = {
     timeResultsReturned: string;
   }) => void;
   onDataSaved?: () => void;
-  existingTimeEntries?: Array<{ hour: number; time: string }>;
+  encounters: OpenmrsResource[];
+  isLoading?: boolean;
+  error?: Error | null;
   patient?: {
     uuid: string;
     name: string;
     gender: string;
     age: string;
   };
+  // Add time arrays for progressive validation
+  sampleCollectedTimes: string[];
+  resultsReturnedTimes: string[];
 };
 
 const UrineTestForm: React.FC<UrineTestFormProps> = ({
@@ -40,10 +46,16 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
   onClose,
   onSubmit,
   onDataSaved,
-  existingTimeEntries = [],
+  encounters,
+  isLoading = false,
+  error = null,
   patient,
+  sampleCollectedTimes,
+  resultsReturnedTimes,
 }) => {
   const { t } = useTranslation();
+
+  // Time arrays are now passed as props from parent component
 
   const {
     control,
@@ -51,6 +63,7 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
     reset,
     setError,
     clearErrors,
+    watch,
     formState: { errors },
   } = useForm<UrineTestFormData>({
     defaultValues: {
@@ -62,9 +75,42 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
     },
   });
 
+  // Watch both time fields for cross-validation
+  const watchedTimeSampleCollected = watch('timeSampleCollected');
+  const watchedTimeResultsReturned = watch('timeResultsReturned');
+
+  // Generate SEPARATE time entries for each field's independent progressive validation
+  const sampleCollectedTimeEntries = useMemo(() => {
+    return sampleCollectedTimes.map((time) => {
+      const [hours] = time.split(':').map(Number);
+      return {
+        hour: hours,
+        time: time,
+      };
+    });
+  }, [sampleCollectedTimes]);
+
+  const resultsReturnedTimeEntries = useMemo(() => {
+    return resultsReturnedTimes.map((time) => {
+      const [hours] = time.split(':').map(Number);
+      return {
+        hour: hours,
+        time: time,
+      };
+    });
+  }, [resultsReturnedTimes]);
+
+  // Helper function to convert time string to minutes for comparison
+  const timeToMinutes = (timeString: string): number => {
+    const [hours, minutes] = timeString.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
   const onSubmitForm = async (data: UrineTestFormData) => {
     const volumeValue = parseFloat(data.volume);
     clearErrors();
+
+    // Basic field validation
     if (!data.protein) {
       setError('protein', {
         type: 'manual',
@@ -97,6 +143,18 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
       setError('timeResultsReturned', {
         type: 'manual',
         message: t('timeResultsReturnedRequired', 'Please enter results return time'),
+      });
+      return;
+    }
+
+    // Cross-validation: Results time must be >= sample collection time
+    const sampleTime = timeToMinutes(data.timeSampleCollected);
+    const resultsTime = timeToMinutes(data.timeResultsReturned);
+
+    if (resultsTime < sampleTime) {
+      setError('timeResultsReturned', {
+        type: 'manual',
+        message: t('timeResultsInvalid', 'Results return time must be after or equal to sample collection time'),
       });
       return;
     }
@@ -182,7 +240,7 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
                   onChange={field.onChange}
                   invalid={!!errors.timeSampleCollected}
                   invalidText={errors.timeSampleCollected?.message}
-                  existingTimeEntries={existingTimeEntries}
+                  existingTimeEntries={sampleCollectedTimeEntries}
                 />
               )}
             />
@@ -200,7 +258,6 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
                   onChange={(e) => field.onChange(e.target.value)}
                   invalid={!!errors.acetone}
                   invalidText={errors.acetone?.message}>
-                  <SelectItem value="" text={t('selectAcetone', 'Pull from Lab module')} />
                   {acetoneOptions.map((option) => (
                     <SelectItem key={option.value} value={option.value} text={option.label} />
                   ))}
@@ -242,7 +299,7 @@ const UrineTestForm: React.FC<UrineTestFormProps> = ({
                   onChange={field.onChange}
                   invalid={!!errors.timeResultsReturned}
                   invalidText={errors.timeResultsReturned?.message}
-                  existingTimeEntries={existingTimeEntries}
+                  existingTimeEntries={resultsReturnedTimeEntries}
                 />
               )}
             />

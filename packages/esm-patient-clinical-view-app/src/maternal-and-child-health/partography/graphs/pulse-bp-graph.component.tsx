@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LineChart } from '@carbon/charts-react';
 import styles from '../partography.scss';
-import { getColorForGraph } from '../types';
+import { getColorForGraph, SVG_NAMESPACE } from '../types';
 
 export interface PulseBPData {
   pulse: number;
@@ -35,9 +35,9 @@ const PULSE_BP_CHART_OPTIONS = {
       title: '',
       mapsTo: 'index',
       scaleType: ScaleTypes.LINEAR,
-      domain: [0, 12],
+      domain: [0, 20],
       ticks: {
-        values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+        values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
         formatter: (index: number) => '',
       },
     },
@@ -70,7 +70,7 @@ const PULSE_BP_CHART_OPTIONS = {
   grid: {
     x: {
       enabled: true,
-      numberOfTicks: 13,
+      numberOfTicks: 21,
     },
     y: {
       enabled: true,
@@ -104,7 +104,7 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
     return now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
   };
 
-  const actualData: PulseBPData[] = data.length > 0 ? data : [];
+  const actualData: PulseBPData[] = React.useMemo(() => (data.length > 0 ? data : []), [data]);
 
   const pulseChartData: ChartDataPoint[] = [];
 
@@ -113,154 +113,252 @@ const PulseBPGraph: React.FC<PulseBPGraphProps> = ({ data }) => {
       pulseChartData.push({
         index: index,
         value: item.pulse,
-        group: 'Pulse',
+        group: 'Pulse-Line',
+      });
+    });
+    actualData.forEach((item, index) => {
+      pulseChartData.push({
+        index: index,
+        value: item.systolicBP,
+        group: 'Systolic-Points',
+      });
+      pulseChartData.push({
+        index: index,
+        value: item.diastolicBP,
+        group: 'Diastolic-Points',
       });
     });
   } else {
-    pulseChartData.push({ index: 0, value: 120, group: 'Pulse' });
+    pulseChartData.push({ index: 0, value: 120, group: 'Pulse-Line' });
   }
 
   const finalChartData = [...pulseChartData];
+  const colorScale: { [key: string]: string } = {
+    'Pulse-Line': actualData.length > 0 ? getColorForGraph('blue') : 'transparent',
+    'Systolic-Points': 'transparent',
+    'Diastolic-Points': 'transparent',
+  };
 
   const chartOptions = {
     ...PULSE_BP_CHART_OPTIONS,
     title: 'Pulse and Blood Pressure Monitoring',
     color: {
-      scale: {
-        Pulse: actualData.length > 0 ? getColorForGraph('blue') : 'transparent',
-      },
+      scale: colorScale,
     },
     points: {
       enabled: actualData.length > 0,
-      radius: 4,
+      radius: 5,
       filled: true,
+      strokeWidth: 2,
+    },
+    legend: {
+      position: 'top',
+      clickable: false,
+      enabled: false,
+    },
+    tooltip: {
+      showTotal: false,
+      customHTML: (data: any) => {
+        if (data && data.length > 0) {
+          const point = data[0];
+          // Just return the value - clean and simple
+          return `<div style="background: #333; color: white; padding: 8px; border-radius: 4px; font-size: 14px; border: none;">
+            ${point.value}
+          </div>`;
+        }
+        return '';
+      },
     },
   };
+
+  useEffect(() => {
+    let observer: MutationObserver | null = null;
+    const addXMarker = (svg: SVGElement, cx: number, cy: number) => {
+      const size = 4;
+      const systolicColor = '#da1e28';
+      const line1 = document.createElementNS(SVG_NAMESPACE, 'line');
+      line1.setAttribute('x1', (cx - size).toString());
+      line1.setAttribute('y1', (cy + size).toString());
+      line1.setAttribute('x2', cx.toString());
+      line1.setAttribute('y2', (cy - size).toString());
+      line1.setAttribute('stroke', systolicColor);
+      line1.setAttribute('stroke-width', '3');
+      line1.setAttribute('stroke-linecap', 'round');
+      line1.setAttribute('data-custom-marker', 'systolic-inverted-v');
+
+      const line2 = document.createElementNS(SVG_NAMESPACE, 'line');
+      line2.setAttribute('x1', cx.toString());
+      line2.setAttribute('y1', (cy - size).toString());
+      line2.setAttribute('x2', (cx + size).toString());
+      line2.setAttribute('y2', (cy + size).toString());
+      line2.setAttribute('stroke', systolicColor);
+      line2.setAttribute('stroke-width', '3');
+      line2.setAttribute('stroke-linecap', 'round');
+      line2.setAttribute('data-custom-marker', 'systolic-inverted-v');
+
+      svg.appendChild(line1);
+      svg.appendChild(line2);
+    };
+
+    const addVMarker = (svg: SVGElement, cx: number, cy: number) => {
+      const size = 4;
+      const vColor = '#24a148';
+
+      const line1 = document.createElementNS(SVG_NAMESPACE, 'line');
+      line1.setAttribute('x1', (cx - size).toString());
+      line1.setAttribute('y1', (cy - size).toString());
+      line1.setAttribute('x2', cx.toString());
+      line1.setAttribute('y2', (cy + size).toString());
+      line1.setAttribute('stroke', vColor);
+      line1.setAttribute('stroke-width', '3');
+      line1.setAttribute('stroke-linecap', 'round');
+      line1.setAttribute('data-custom-marker', 'diastolic-v');
+
+      const line2 = document.createElementNS(SVG_NAMESPACE, 'line');
+      line2.setAttribute('x1', cx.toString());
+      line2.setAttribute('y1', (cy + size).toString());
+      line2.setAttribute('x2', (cx + size).toString());
+      line2.setAttribute('y2', (cy - size).toString());
+      line2.setAttribute('stroke', vColor);
+      line2.setAttribute('stroke-width', '3');
+      line2.setAttribute('stroke-linecap', 'round');
+      line2.setAttribute('data-custom-marker', 'diastolic-v');
+
+      svg.appendChild(line1);
+      svg.appendChild(line2);
+    };
+
+    const addVerticalConnector = (svg: SVGElement, x: number, y1: number, y2: number, color: string) => {
+      const line = document.createElementNS(SVG_NAMESPACE, 'line');
+      line.setAttribute('x1', x.toString());
+      line.setAttribute('y1', y1.toString());
+      line.setAttribute('x2', x.toString());
+      line.setAttribute('y2', y2.toString());
+      line.setAttribute('stroke', color);
+      line.setAttribute('stroke-width', '2');
+      line.setAttribute('data-custom-marker', 'vertical-connector');
+
+      svg.appendChild(line);
+    };
+
+    const addCustomMarkers = () => {
+      const chartContainer = document.querySelector(`[data-chart-id="pulse-bp"]`);
+      if (chartContainer && actualData.length > 0) {
+        const svg = chartContainer.querySelector('svg');
+        if (!svg) {
+          return;
+        }
+
+        svg.querySelectorAll('[data-custom-marker]').forEach((marker) => marker.remove());
+
+        const circles = svg.querySelectorAll('circle');
+
+        circles.forEach((circle, index) => {
+          const cx = parseFloat(circle.getAttribute('cx') || '0');
+          const cy = parseFloat(circle.getAttribute('cy') || '0');
+          const fill = circle.getAttribute('fill') || circle.style.fill || '';
+          const stroke = circle.getAttribute('stroke') || circle.style.stroke || '';
+          const className = circle.getAttribute('class') || '';
+        });
+
+        const allXPositions = Array.from(circles)
+          .map((circle) => {
+            return parseFloat(circle.getAttribute('cx') || '0');
+          })
+          .filter((x) => x > 0)
+          .sort((a, b) => a - b);
+
+        const uniqueXPositions: number[] = [];
+        allXPositions.forEach((x) => {
+          if (uniqueXPositions.length === 0 || Math.abs(x - uniqueXPositions[uniqueXPositions.length - 1]) > 20) {
+            uniqueXPositions.push(x);
+          }
+        });
+
+        uniqueXPositions.forEach((xPos, timeIndex) => {
+          const circlesAtThisX = Array.from(circles).filter((circle) => {
+            const cx = parseFloat(circle.getAttribute('cx') || '0');
+            return Math.abs(cx - xPos) < 15;
+          });
+          if (circlesAtThisX.length === 0) {
+            return;
+          }
+          circlesAtThisX.sort((a, b) => {
+            const aY = parseFloat(a.getAttribute('cy') || '0');
+            const bY = parseFloat(b.getAttribute('cy') || '0');
+            return aY - bY;
+          });
+
+          circlesAtThisX.forEach((circle, idx) => {
+            const cx = parseFloat(circle.getAttribute('cx') || '0');
+            const cy = parseFloat(circle.getAttribute('cy') || '0');
+          });
+          let pulseY: number | null = null;
+          let systolicY: number | null = null;
+          let diastolicY: number | null = null;
+
+          circlesAtThisX.forEach((circle, circleIndex) => {
+            const cx = parseFloat(circle.getAttribute('cx') || '0');
+            const cy = parseFloat(circle.getAttribute('cy') || '0');
+            if (circlesAtThisX.length >= 3) {
+              if (circleIndex === 0) {
+                systolicY = cy;
+                addXMarker(svg, cx, cy);
+                circle.style.opacity = '0';
+              } else if (circleIndex === circlesAtThisX.length - 1) {
+                diastolicY = cy;
+                addVMarker(svg, cx, cy);
+                circle.style.opacity = '0';
+              } else {
+                pulseY = cy;
+              }
+            } else if (circlesAtThisX.length === 2) {
+              if (circleIndex === 0) {
+                pulseY = cy;
+              } else {
+                diastolicY = cy;
+                addVMarker(svg, cx, cy);
+                circle.style.opacity = '0';
+              }
+            } else if (circlesAtThisX.length === 1) {
+              pulseY = cy;
+            }
+          });
+          const currentX = circlesAtThisX[0] ? parseFloat(circlesAtThisX[0].getAttribute('cx') || '0') : 0;
+
+          if (pulseY !== null && systolicY !== null) {
+            addVerticalConnector(svg, currentX, pulseY, systolicY, '#da1e28'); // Red line to systolic
+          }
+
+          if (pulseY !== null && diastolicY !== null) {
+            addVerticalConnector(svg, currentX, pulseY, diastolicY, '#24a148'); // Green line to diastolic
+          }
+        });
+      }
+    };
+    const timer = setTimeout(addCustomMarkers, 500);
+    const timer2 = setTimeout(addCustomMarkers, 1000);
+    const chartContainer = document.querySelector(`[data-chart-id="pulse-bp"]`);
+    if (chartContainer && window.MutationObserver) {
+      observer = new MutationObserver(() => {
+        setTimeout(addCustomMarkers, 100);
+      });
+      observer.observe(chartContainer, { childList: true, subtree: true });
+    }
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(timer2);
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [actualData]);
 
   return (
     <div className={styles.pulseBPGraph}>
       <div className={styles.chartContainer} data-chart-id="pulse-bp">
-        <div style={{ position: 'relative' }}>
-          <LineChart data={finalChartData} options={chartOptions} />
-
-          {actualData.length > 0 && (
-            <svg
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                pointerEvents: 'none',
-                zIndex: 5,
-              }}>
-              {actualData.map((item, index) => {
-                const chartMarginTop = 5;
-                const chartMarginBottom = 8;
-                const chartMarginLeft = 3.59;
-                const chartMarginRight = 8;
-                const chartWidth = 100 - chartMarginLeft - chartMarginRight;
-                const chartHeight = 100 - chartMarginTop - chartMarginBottom;
-                const dataPointIndex = index;
-                const bpXPosition = chartMarginLeft + ((dataPointIndex + 0) / 12) * chartWidth;
-                const yOffset = 23;
-                const yOffsetDiastolic = 40;
-                const pulseYPosition = chartMarginTop + yOffset + ((260 - item.pulse) / 260) * (chartHeight - yOffset);
-                const systolicYPosition =
-                  chartMarginTop + yOffset + ((260 - item.systolicBP) / 260) * (chartHeight - yOffset);
-                const diastolicYPosition =
-                  chartMarginTop +
-                  yOffsetDiastolic +
-                  ((260 - item.diastolicBP) / 260) * (chartHeight - yOffsetDiastolic);
-
-                const greenArrowStartY = Math.min(pulseYPosition, diastolicYPosition);
-                const greenArrowEndY = Math.max(pulseYPosition, diastolicYPosition);
-
-                return (
-                  <g key={index}>
-                    <defs>
-                      <marker
-                        id={`systolic-arrow-${index}`}
-                        markerWidth="10"
-                        markerHeight="10"
-                        refX="5"
-                        refY="5"
-                        orient="auto"
-                        markerUnits="strokeWidth">
-                        <polygon points="0,0 10,5 0,10 3,5" fill={getColorForGraph('red')} />
-                      </marker>
-                      <marker
-                        id={`diastolic-arrow-${index}`}
-                        markerWidth="10"
-                        markerHeight="10"
-                        refX="5"
-                        refY="5"
-                        orient="auto"
-                        markerUnits="strokeWidth">
-                        <polygon points="0,10 10,5 0,0 3,5" fill={getColorForGraph('green')} />
-                      </marker>
-                    </defs>
-
-                    <line
-                      x1={`${bpXPosition}%`}
-                      y1={`${pulseYPosition}%`}
-                      x2={`${bpXPosition}%`}
-                      y2={`${systolicYPosition}%`}
-                      stroke={getColorForGraph('red')}
-                      strokeWidth="2"
-                      markerEnd={`url(#systolic-arrow-${index})`}
-                    />
-
-                    <line
-                      x1={`${bpXPosition}%`}
-                      y1={`${pulseYPosition}%`}
-                      x2={`${bpXPosition}%`}
-                      y2={`${diastolicYPosition}%`}
-                      stroke={getColorForGraph('green')}
-                      strokeWidth="2"
-                      markerEnd={`url(#diastolic-arrow-${index})`}
-                    />
-
-                    <circle
-                      cx={`${bpXPosition}%`}
-                      cy={`${systolicYPosition}%`}
-                      r="3"
-                      fill={getColorForGraph('red')}
-                      opacity="0.8">
-                      <title>
-                        {formatDateTime(item, index)} - Systolic BP: {item.systolicBP} mmHg
-                      </title>
-                    </circle>
-
-                    <circle
-                      cx={`${bpXPosition}%`}
-                      cy={`${diastolicYPosition}%`}
-                      r="3"
-                      fill={getColorForGraph('green')}
-                      opacity="0.8">
-                      <title>
-                        {formatDateTime(item, index)} - Diastolic BP: {item.diastolicBP} mmHg
-                      </title>
-                    </circle>
-
-                    <circle
-                      cx={`${bpXPosition}%`}
-                      cy={`${pulseYPosition}%`}
-                      r="4"
-                      fill={getColorForGraph('blue')}
-                      stroke="#fff"
-                      strokeWidth="1"
-                      opacity="0.9">
-                      <title>
-                        {formatDateTime(item, index)} - Pulse: {item.pulse} bpm
-                      </title>
-                    </circle>
-                  </g>
-                );
-              })}
-            </svg>
-          )}
-        </div>
+        <LineChart data={finalChartData} options={chartOptions} />
       </div>
     </div>
   );
