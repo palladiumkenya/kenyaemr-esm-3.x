@@ -40,10 +40,14 @@ const Card: React.FC<CardProps> = ({ title, total, categories, onClick }) => {
               ))}
             </>
           ) : (
-            <span className={styles.link} role="button" tabIndex={0} onClick={onClick}>
-              {t('view', 'View')}
-              <ArrowRight size={10} />
-            </span>
+            <>
+              {typeof onClick === 'function' && (
+                <span className={styles.link} role="button" tabIndex={0} onClick={onClick}>
+                  {t('view', 'View')}
+                  <ArrowRight size={10} />
+                </span>
+              )}
+            </>
           )}
         </div>
       </div>

@@ -7,6 +7,7 @@ import { Queue } from '../../types/index';
 import QueueEntryTable from './queue-entry/queue-entry-table.component';
 import { useQueueEntries } from '../../hooks/useServiceQueues';
 import styles from './queue-tab.scss';
+import FiltersHeader from './filters-header.component';
 
 type QueueTabProps = {
   queues: Array<Queue>;
@@ -100,6 +101,7 @@ const QueueTab: React.FC<QueueTabProps> = ({ queues, cards, navigatePath, onTabC
           />
         ))}
       </div>
+      <FiltersHeader />
       <div className={styles.tabsContainer}>
         <Tabs selectedIndex={selectedTabIndex} onChange={handleTabChange}>
           <TabList contained>
