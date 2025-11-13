@@ -55,21 +55,30 @@ const MCHConsultation: React.FC = () => {
           label: t('emergency', 'Emergency'),
           value: priorityCounts.emergency,
           onClick: () => {
-            setFilters([{ key: 'priority', value: emergencyPriorityConceptUuid, label: t('emergency', 'Emergency') }]);
+            setFilters((prevFilters) => [
+              ...prevFilters.filter((f) => f.key !== 'priority'),
+              { key: 'priority', value: emergencyPriorityConceptUuid, label: t('emergency', 'Emergency') },
+            ]);
           },
         },
         {
           label: t('urgent', 'Urgent'),
           value: priorityCounts.urgent,
           onClick: () => {
-            setFilters([{ key: 'priority', value: urgentPriorityConceptUuid, label: t('urgent', 'Urgent') }]);
+            setFilters((prevFilters) => [
+              ...prevFilters.filter((f) => f.key !== 'priority'),
+              { key: 'priority', value: urgentPriorityConceptUuid, label: t('urgent', 'Urgent') },
+            ]);
           },
         },
         {
           label: t('notUrgent', 'Not Urgent'),
           value: priorityCounts.notUrgent,
           onClick: () => {
-            setFilters([{ key: 'priority', value: notUrgentPriorityConceptUuid, label: t('notUrgent', 'Not Urgent') }]);
+            setFilters((prevFilters) => [
+              ...prevFilters.filter((f) => f.key !== 'priority'),
+              { key: 'priority', value: notUrgentPriorityConceptUuid, label: t('notUrgent', 'Not Urgent') },
+            ]);
           },
         },
       ],

@@ -49,14 +49,20 @@ const MCHTriage: React.FC = () => {
           title: t('patientsAwaiting', 'Patient awaiting'),
           value: waitingEntries?.length?.toString(),
           onClick: () => {
-            setFilters([{ key: 'status', value: waitingStatus, label: t('waiting', 'Waiting') }]);
+            setFilters((prevFilters) => [
+              ...prevFilters.filter((f) => f.key !== 'status'),
+              { key: 'status', value: waitingStatus, label: t('waiting', 'Waiting') },
+            ]);
           },
         },
         {
           title: t('patientAttended', 'Patient attended to'),
           value: finishedEntries?.length?.toString(),
           onClick: () => {
-            setFilters([{ key: 'status', value: finishedStatus, label: t('finished', 'Finished') }]);
+            setFilters((prevFilters) => [
+              ...prevFilters.filter((f) => f.key !== 'status'),
+              { key: 'status', value: finishedStatus, label: t('finished', 'Finished') },
+            ]);
           },
         },
       ]}

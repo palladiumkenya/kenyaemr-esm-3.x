@@ -25,8 +25,9 @@ type TriageProps = {
 const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   const { t } = useTranslation();
   const [currQueue, setCurrQueue] = useState<Queue>();
-  const [filters, setFilters] = useState<Array<QueueFilter>>([]);
   const { queues, isLoading, error } = useQueues();
+  const [filters, setFilters] = useState<Array<QueueFilter>>([]);
+
   const triageQueues = queues
     .filter(
       (queue) =>
@@ -60,14 +61,20 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
       title: t('clientsPatientsWaiting', 'Clients/Patients waiting'),
       value: waitingEntries.length.toString(),
       onClick: () => {
-        setFilters([{ key: 'status', value: waitingStatus, label: t('waiting', 'Waiting') }]);
+        setFilters((prevFilters) => [
+          ...prevFilters.filter((f) => f.key !== 'status'),
+          { key: 'status', value: waitingStatus, label: t('waiting', 'Waiting') },
+        ]);
       },
     },
     {
       title: t('clientsPatientsAttendedTo', 'Clients/Patients attended to'),
       value: attendedToEntries.length.toString(),
       onClick: () => {
-        setFilters([{ key: 'status', value: finishedStatus, label: t('finished', 'Finished') }]);
+        setFilters((prevFilters) => [
+          ...prevFilters.filter((f) => f.key !== 'status'),
+          { key: 'status', value: finishedStatus, label: t('finished', 'Finished') },
+        ]);
       },
     },
   ];
