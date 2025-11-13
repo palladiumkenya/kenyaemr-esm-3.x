@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
   Table,
@@ -10,9 +10,10 @@ import {
   Pagination,
   OverflowMenu,
   OverflowMenuItem,
+  Search,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { ConfigurableLink, showModal, useConfig, usePagination } from '@openmrs/esm-framework';
+import { ConfigurableLink, showModal, useConfig, useDebounce, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -41,9 +42,16 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
   usePatientChart,
 }) => {
   const { visitQueueNumberAttributeUuid } = useConfig<ExpressWorkflowConfig>();
+  const [searchString, setSearchString] = useState('');
   const pageSize = 10;
   const { t } = useTranslation();
-  const { currentPage, goTo, results } = usePagination(queueEntries, pageSize);
+  const debouncedSearchString = useDebounce(searchString, 500);
+  const { currentPage, goTo, results } = usePagination(
+    queueEntries.filter((queueEntry) => {
+      return queueEntry.patient.person.display.toLowerCase().includes(debouncedSearchString.toLowerCase());
+    }),
+    pageSize,
+  );
   const { pageSizes } = usePaginationInfo(pageSize, queueEntries.length, currentPage, results.length);
 
   const headers = [
@@ -96,7 +104,7 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
     }
   };
 
-  const rows = queueEntries?.map((queueEntry) => {
+  const rows = results?.map((queueEntry) => {
     const visitNumber = queueEntry?.visit?.attributes?.find(
       (attr) => attr?.attributeType?.uuid === visitQueueNumberAttributeUuid,
     );
@@ -131,6 +139,14 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
 
   return (
     <div className={styles.table}>
+      <Search
+        labelText={t('search', 'Search')}
+        placeholder={t('search', 'Search')}
+        value={searchString}
+        onChange={({ target: { value } }) => {
+          setSearchString(value);
+        }}
+      />
       <DataTable size="sm" useZebraStyles rows={rows} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps, getCellProps }) => (
           <Table {...getTableProps()}>

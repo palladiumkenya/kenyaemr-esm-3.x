@@ -69,6 +69,7 @@ import { ClockOut } from './bill-administration/payment-points/payment-point/clo
 // Print Preview Components
 import PrintPreviewModal from './print-preview/print-preview.modal';
 import PaymentWorkspace from './invoice/payments/payment-form/payment.workspace';
+import { ClaimSummaryModal } from './claims/claims-management/table/claim-summary-modal/claim-summary.modal';
 
 // Translation
 export const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -132,6 +133,7 @@ export const bulkImportBillableServicesModal = getSyncLifecycle(BulkImportBillab
 // Claims Management Components
 export const claimsOverview = getSyncLifecycle(ClaimsManagementOverview, options);
 export const manageClaimRequestModal = getSyncLifecycle(ManageClaimRequest, options);
+export const claimSummaryModal = getSyncLifecycle(ClaimSummaryModal, options);
 
 // Print Preview Components
 export const printPreviewModal = getSyncLifecycle(PrintPreviewModal, options);
