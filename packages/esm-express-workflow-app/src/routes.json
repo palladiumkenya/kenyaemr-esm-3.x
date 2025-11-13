@@ -192,13 +192,13 @@
       "online": true,
       "offline": false
     },
-    {
+     {
       "name": "ewf-laboratory-dashboard-link",
       "component": "laboratoryLeftPanelLink",
       "slot": "patient-chart-dashboard-slot",
       "meta": {
         "name": "ewf-laboratory",
-        "title": "Laboratory",
+        "title": "Lab Orders",
         "path": "laboratory",
         "slot": "ewf-patient-chart-laboratory-dashboard-slot",
         "layoutMode": "anchored",
