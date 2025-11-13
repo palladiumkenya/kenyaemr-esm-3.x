@@ -12,9 +12,9 @@ import {
 } from '@carbon/react';
 import { DocumentAttachment } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, showSnackbar, useSession } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, Patient, Person, showSnackbar, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
@@ -27,16 +27,18 @@ import { PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-pre-auth-form.scss';
 import SHABenefitPackangesAndInterventions from './packages-and-interventions-form.component';
+import { Autosuggest } from '../../autosuggest/autosuggest.component';
+import PatientSearchInfo from '../../autosuggest/patient-search-info.component';
+import SearchEmptyState from '../../autosuggest/search-empty-state.component';
+import { searchPatient } from './preauth.resources';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
 
-interface BenefitPreAuthFormProps extends DefaultWorkspaceProps {
+interface BenefitPreAuthFormProps extends Pick<DefaultWorkspaceProps, 'closeWorkspace'> {
   patientUuid: string;
-  benefit: PatientBenefit;
-  onSuccess: (benefits: Array<PatientBenefit>) => void;
 }
 
-const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid }) => {
+const FormFields: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const { visits: recentVisit, isLoading, error: visitError } = useVisit(patientUuid);
   const { isLoading: diagnosesLoading, diagnoses } = usePatientDiagnosis(patientUuid);
@@ -248,6 +250,39 @@ const BenefitPreAuthForm: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace,
         </div>
       </Form>
     </FormProvider>
+  );
+};
+
+const BenefitPreAuthForm: FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
+  const { t } = useTranslation();
+  const [patientUuid, setPatientUuid] = useState<string | null>(null);
+
+  return (
+    <>
+      {patientUuid ? (
+        <FormFields patientUuid={patientUuid} closeWorkspace={closeWorkspace} />
+      ) : (
+        <div className={styles.input}>
+          <Autosuggest
+            labelText={t('patient', 'Patient')}
+            placeholder={t('patientPlaceHolder', 'Search patient')}
+            getDisplayValue={(item: Patient) => item.person.display}
+            renderSuggestionItem={(item: Patient) => <PatientSearchInfo patient={item} />}
+            getFieldValue={(item: Patient) => item.uuid}
+            getSearchResults={searchPatient}
+            renderEmptyState={(value) => (
+              <SearchEmptyState searchValue={value} message={t('patientNotFound', 'Patient Not Found')} />
+            )}
+            onClear={() => setPatientUuid(null)}
+            onSuggestionSelected={(_, value) => {
+              if (value) {
+                setPatientUuid(value);
+              }
+            }}
+          />
+        </div>
+      )}
+    </>
   );
 };
 
