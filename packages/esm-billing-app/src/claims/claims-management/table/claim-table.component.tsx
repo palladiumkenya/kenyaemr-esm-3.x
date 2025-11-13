@@ -45,6 +45,7 @@ const ClaimsTable: React.FC<TableProps> = ({
   emptyStateHeader,
   includeClaimCode = false,
   use = 'claim',
+  renderActionButton,
 }) => {
   const { claims, isLoading } = useFacilityClaims();
   const { t } = useTranslation();
@@ -140,6 +141,7 @@ const ClaimsTable: React.FC<TableProps> = ({
   if (claimsByUse.length === 0) {
     return (
       <div className={styles.claimsTable}>
+        <div className={styles.actionsContainer}>{renderActionButton && renderActionButton()}</div>
         <EmptyState displayText={t(emptyStateText)} headerTitle={t(emptyStateHeader)} />
       </div>
     );
@@ -219,6 +221,7 @@ const ClaimsTable: React.FC<TableProps> = ({
 
   return (
     <div className={styles.dataTableSkeleton}>
+      <div className={styles.actionsContainer}>{renderActionButton && renderActionButton()}</div>
       <div className={styles.tableHeader}>
         <CardHeader title={t(title)}>{''}</CardHeader>
         <ClaimsFilterHeader
