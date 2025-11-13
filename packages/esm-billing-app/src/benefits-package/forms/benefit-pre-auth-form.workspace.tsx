@@ -12,25 +12,25 @@ import {
 } from '@carbon/react';
 import { DocumentAttachment } from '@carbon/react/icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { DefaultWorkspaceProps, Patient, Person, showSnackbar, useSession } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, Patient, restBaseUrl, showSnackbar, useSession } from '@openmrs/esm-framework';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import React, { FC, useEffect, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+import { Autosuggest } from '../../autosuggest/autosuggest.component';
+import PatientSearchInfo from '../../autosuggest/patient-search-info.component';
+import SearchEmptyState from '../../autosuggest/search-empty-state.component';
 import { useVisit } from '../../claims/dashboard/form/claims-form.resource';
 import { MAX_ALLOWED_FILE_SIZE } from '../../constants';
 import { useSystemSetting } from '../../hooks/getMflCode';
 import usePatientDiagnosis from '../../hooks/usePatientDiagnosis';
 import useProvider from '../../hooks/useProvider';
-import { PatientBenefit } from '../../types';
 import { preAuthenticateBenefit, preauthSchema } from '../benefits-package.resources';
 import styles from './benefits-pre-auth-form.scss';
 import SHABenefitPackangesAndInterventions from './packages-and-interventions-form.component';
-import { Autosuggest } from '../../autosuggest/autosuggest.component';
-import PatientSearchInfo from '../../autosuggest/patient-search-info.component';
-import SearchEmptyState from '../../autosuggest/search-empty-state.component';
 import { searchPatient } from './preauth.resources';
+import { mutate } from 'swr';
 
 type BenefitsPreAuth = z.infer<typeof preauthSchema>;
 
@@ -95,6 +95,9 @@ const FormFields: React.FC<BenefitPreAuthFormProps> = ({ closeWorkspace, patient
     try {
       await preAuthenticateBenefit(values, recentVisit, mflCodeValue);
       showSnackbar({ title: 'Success', kind: 'success', subtitle: 'Preauth Approved succesfully' });
+      mutate((key) => {
+        return typeof key === 'string' && key.startsWith(`${restBaseUrl}/claim`);
+      });
       closeWorkspace();
     } catch (error) {
       showSnackbar({ title: 'Failure', kind: 'error', subtitle: 'Error requesting Eligibility' });
