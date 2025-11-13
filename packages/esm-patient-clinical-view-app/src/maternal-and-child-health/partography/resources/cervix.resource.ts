@@ -183,7 +183,21 @@ export function useCervixData(patientUuid: string) {
     openmrsFetch,
   );
   const cervixData = data?.data?.results || [];
-  const sortedEncounters = cervixData.sort(
+
+  // Filter encounters to only include those with cervix-specific concepts
+  const cervixSpecificEncounters = cervixData.filter((encounter) => {
+    if (!encounter.obs || !Array.isArray(encounter.obs)) {
+      return false;
+    }
+    // An encounter is cervix-specific if it contains cervical dilation OR descent of head concepts
+    return encounter.obs.some(
+      (obs) =>
+        obs.concept?.uuid === CERVIX_FORM_CONCEPTS.cervicalDilation ||
+        obs.concept?.uuid === CERVIX_FORM_CONCEPTS.descentOfHead,
+    );
+  });
+
+  const sortedEncounters = cervixSpecificEncounters.sort(
     (a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime(),
   );
   const transformedData = sortedEncounters.map((encounter) => {

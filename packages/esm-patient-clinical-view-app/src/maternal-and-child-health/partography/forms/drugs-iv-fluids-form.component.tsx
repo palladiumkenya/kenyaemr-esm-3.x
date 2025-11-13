@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm, Controller } from 'react-hook-form';
-import { Button, Modal, Grid, Column, Dropdown, TextInput, ButtonSkeleton } from '@carbon/react';
+import { Button, Modal, Grid, Column, Dropdown, TextInput, ButtonSkeleton, Select, SelectItem } from '@carbon/react';
 import { launchWorkspace, useSession, openmrsFetch, showSnackbar } from '@openmrs/esm-framework';
 import { saveDrugOrderData } from '../partography.resource';
 import styles from '../partography-data-form.scss';
@@ -283,18 +283,20 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
             <Controller
               name="route"
               control={control}
+              rules={{ required: t('routeRequired', 'Please select route') }}
               render={({ field, fieldState }) => (
-                <Dropdown
+                <Select
                   id="route-dropdown"
-                  titleText={t('route', 'Route')}
-                  label={t('selectRoute', 'Select route')}
-                  items={routeOptions}
-                  itemToString={(item) => (item ? item.text : '')}
-                  selectedItem={field.value ? routeOptions.find((opt) => opt.id === field.value) : null}
-                  onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')}
+                  labelText={t('route', 'Route')}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
-                />
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}>
+                  <SelectItem value="" text={t('chooseAnOption', 'Choose an option')} />
+                  {routeOptions.map((option) => (
+                    <SelectItem key={option.id} value={option.id} text={option.text} />
+                  ))}
+                </Select>
               )}
             />
           </Column>
@@ -303,18 +305,20 @@ const DrugsIVFluidsForm: React.FC<DrugsIVFluidsFormProps> = ({ isOpen, onClose, 
             <Controller
               name="frequency"
               control={control}
+              rules={{ required: t('frequencyRequired', 'Please select frequency') }}
               render={({ field, fieldState }) => (
-                <Dropdown
+                <Select
                   id="frequency-dropdown"
-                  titleText={t('frequency', 'Frequency')}
-                  label={t('selectFrequency', 'Select frequency')}
-                  items={frequencyOptions}
-                  itemToString={(item) => (item ? item.text : '')}
-                  selectedItem={field.value ? frequencyOptions.find((opt) => opt.id === field.value) : null}
-                  onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')}
+                  labelText={t('frequency', 'Frequency')}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
-                />
+                  value={field.value}
+                  onChange={(e) => field.onChange(e.target.value)}>
+                  <SelectItem value="" text={t('chooseAnOption', 'Choose an option')} />
+                  {frequencyOptions.map((option) => (
+                    <SelectItem key={option.id} value={option.id} text={option.text} />
+                  ))}
+                </Select>
               )}
             />
           </Column>

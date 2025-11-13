@@ -142,3 +142,24 @@ export function sanitizePhoneNumber(phoneNumber: string): string {
   }
   return phoneNumber.startsWith('+') ? phoneNumber.substring(1) : phoneNumber;
 }
+
+/**
+ * Masks a phone number by replacing all digits except the first two and the last two with asterisks (*)
+ * @example
+ * maskPhoneNumber('254712345678') // returns '25471******78'
+ * @param phoneNumber - The phone number to be masked
+ * @returns The masked phone number
+ */
+export const maskPhoneNumber = (phoneNumber: string): string => {
+  const digits = phoneNumber.replace(/\D/g, '');
+
+  if (digits.length < 8) {
+    return phoneNumber;
+  }
+
+  const firstPart = digits.slice(0, -6);
+  const maskedPart = '*'.repeat(4);
+  const lastPart = digits.slice(-2);
+
+  return `${firstPart}${maskedPart}${lastPart}`;
+};

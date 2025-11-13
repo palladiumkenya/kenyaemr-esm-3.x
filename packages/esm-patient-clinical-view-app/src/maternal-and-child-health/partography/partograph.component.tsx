@@ -53,14 +53,19 @@ import {
   saveFetalHeartRateData,
 } from './partography.resource';
 import styles from './partography.scss';
-import { useMembraneAmnioticFluidData } from './resources/membrane-amniotic-fluid.resource';
+import {
+  useMembraneAmnioticFluidData,
+  useMembraneAmnioticFluidFormData,
+} from './resources/membrane-amniotic-fluid.resource';
 import { saveOxytocinFormData, useOxytocinData } from './resources/oxytocin.resource';
+import { useTemperatureFormData } from './resources/temperature.resource';
 import {
   getColorForGraph,
   getPartographyTableHeaders,
   getTranslatedPartographyGraphs,
   PARTOGRAPHY_CONCEPTS,
 } from './types/index';
+import { TIME_SAMPLE_COLLECTED, TIME_RESULTS_RETURNED } from '../../config-schema';
 
 enum ScaleTypes {
   LABELS = 'labels',
@@ -330,6 +335,15 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     mutate: mutateMembraneAmnioticFluidData,
   } = useMembraneAmnioticFluidData(patientUuid || '');
 
+  // Membrane amniotic fluid form-specific data for isolated validation
+  const {
+    membraneAmnioticFluidData: isolatedMembraneData,
+    membraneAmnioticFluidTimeEntries,
+    isLoading: isMembraneFormDataLoading,
+    error: membraneFormDataError,
+    mutate: mutateMembraneFormData,
+  } = useMembraneAmnioticFluidFormData(patientUuid || '');
+
   //Contractions backend data
   const {
     data: cervicalContractionsData,
@@ -341,6 +355,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   const {
     oxytocinData: loadedOxytocinData,
     existingOxytocinEntries,
+    existingTimeEntries: oxytocinExistingTimeEntries,
     isLoading: isOxytocinDataLoading,
     error: oxytocinDataError,
     mutate: mutateOxytocinData,
@@ -377,6 +392,15 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
     error: temperatureDataError,
     mutate: mutateTemperatureData,
   } = usePartographyData(patientUuid || '', 'temperature');
+
+  // Temperature form-specific data for isolated validation
+  const {
+    temperatureData: isolatedTemperatureData,
+    temperatureTimeEntries,
+    isLoading: isTemperatureFormDataLoading,
+    error: temperatureFormDataError,
+    mutate: mutateTemperatureFormData,
+  } = useTemperatureFormData(patientUuid || '');
 
   const {
     data: urineTestEncounters = [],
@@ -437,22 +461,45 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       };
 
       const getSampleCollected = () => {
-        const found = obs.find(
-          (o) =>
-            (o.concept.display && o.concept.display.toLowerCase().includes('collected')) ||
-            (o.concept.uuid && o.concept.uuid.toLowerCase().includes('collected')),
-        );
+        // Try specific TIME_SAMPLE_COLLECTED concept first
+        let found = obs.find((o) => {
+          // Handle both obs.concept.uuid and obs.concept cases
+          const conceptUuid = o.concept?.uuid || o.concept;
+          return conceptUuid === TIME_SAMPLE_COLLECTED;
+        });
+
+        // Fallback to display name search
+        if (!found) {
+          found = obs.find(
+            (o) =>
+              (o.concept.display && o.concept.display.toLowerCase().includes('collected')) ||
+              (o.concept.uuid && o.concept.uuid.toLowerCase().includes('collected')),
+          );
+        }
+
         if (found) {
           return found.value != null ? String(found.value) : '';
         }
         return '';
       };
+
       const getResultReturned = () => {
-        const found = obs.find(
-          (o) =>
-            (o.concept.display && o.concept.display.toLowerCase().includes('returned')) ||
-            (o.concept.uuid && o.concept.uuid.toLowerCase().includes('returned')),
-        );
+        // Try specific TIME_RESULTS_RETURNED concept first
+        let found = obs.find((o) => {
+          // Handle both obs.concept.uuid and obs.concept cases
+          const conceptUuid = o.concept?.uuid || o.concept;
+          return conceptUuid === TIME_RESULTS_RETURNED;
+        });
+
+        // Fallback to display name search
+        if (!found) {
+          found = obs.find(
+            (o) =>
+              (o.concept.display && o.concept.display.toLowerCase().includes('returned')) ||
+              (o.concept.uuid && o.concept.uuid.toLowerCase().includes('returned')),
+          );
+        }
+
         if (found) {
           return found.value != null ? String(found.value) : '';
         }
@@ -522,6 +569,37 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       };
     });
   }, [urineTestEncounters]);
+
+  // Extract dual time arrays for independent progressive validation
+  const urineTestTimeArrays = useMemo(() => {
+    const sampleCollectedTimes: string[] = [];
+    const resultsReturnedTimes: string[] = [];
+
+    urineTestData.forEach((entry) => {
+      if (entry.timeSampleCollected && entry.timeSampleCollected.trim() !== '') {
+        sampleCollectedTimes.push(entry.timeSampleCollected.trim());
+      }
+      if (entry.timeResultsReturned && entry.timeResultsReturned.trim() !== '') {
+        resultsReturnedTimes.push(entry.timeResultsReturned.trim());
+      }
+    });
+
+    // Sort times chronologically for progressive validation
+    const sortTimeArray = (times: string[]) => {
+      return times.sort((a, b) => {
+        const timeA = a.split(':').map(Number);
+        const timeB = b.split(':').map(Number);
+        const minutesA = timeA[0] * 60 + timeA[1];
+        const minutesB = timeB[0] * 60 + timeB[1];
+        return minutesA - minutesB;
+      });
+    };
+
+    return {
+      sampleCollectedTimes: sortTimeArray([...sampleCollectedTimes]),
+      resultsReturnedTimes: sortTimeArray([...resultsReturnedTimes]),
+    };
+  }, [urineTestData]);
 
   const generateExtendedDummyData = () => {
     const baseTime = new Date();
@@ -724,6 +802,15 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
     return sorted;
   }, [localFetalHeartRateData, loadedFetalHeartRateData]);
+
+  // Create fetal heart rate specific existing time entries for proper validation
+  const fetalHeartRateExistingEntries = useMemo(() => {
+    return computedFetalHeartRateData.map((entry) => ({
+      hour: entry.hour,
+      time: entry.time || '',
+    }));
+  }, [computedFetalHeartRateData]);
+
   const partographGraphs: GraphDefinition[] = useMemo(
     () => getTranslatedPartographyGraphs(t) as GraphDefinition[],
     [t],
@@ -1200,7 +1287,9 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       session?.sessionLocation?.uuid,
       session?.currentProvider?.uuid,
     );
+    // Refresh both general membrane data and form-specific data
     await mutateMembraneAmnioticFluidData();
+    await mutateMembraneFormData();
     setIsMembraneAmnioticFluidFormOpen(false);
   };
 
@@ -1322,24 +1411,17 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
   };
 
   const handleDrugOrderDataSaved = () => {
-    // Drug order data saved, refreshing drug orders...
-    // Force refresh the drug orders data from OpenMRS
     mutateDrugOrders();
-    // Also trigger a revalidation after a short delay
     setTimeout(() => {
-      // Triggering second refresh...
       mutateDrugOrders();
     }, 2000);
   };
-
-  // Pulse and BP handlers
   const handlePulseBPFormSubmit = async (formData: { pulse: number; systolicBP: number; diastolicBP: number }) => {
     if (!formData.pulse || !formData.systolicBP || !formData.diastolicBP) {
       alert('Invalid data detected. Please ensure all fields are properly filled.');
       return;
     }
     try {
-      // Save both pulse and BP in a single encounter
       await createPartographyEncounter(patientUuid, 'pulse-bp-combined', {
         pulse: formData.pulse,
         systolic: formData.systolicBP,
@@ -1347,15 +1429,12 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       });
       await mutatePulseData();
       await mutateBPData();
-      // Force refresh of graph/table by toggling view mode
       setPulseBPViewMode((prev) => (prev === 'table' ? 'graph' : 'table'));
       setTimeout(() => setPulseBPViewMode('graph'), 0);
     } catch (error) {
       alert('Failed to save Pulse & BP data.');
     }
   };
-
-  // Temperature backend save handler
   const handleTemperatureFormSubmit = async (formData: {
     timeSlot: string;
     exactTime: string;
@@ -1365,13 +1444,13 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       alert('Invalid data detected. Please ensure all fields are properly filled.');
       return;
     }
-    // Save to backend
     try {
       await createPartographyEncounter(patientUuid, 'temperature', {
         value: formData.temperature,
         time: formData.exactTime,
       });
       await mutateTemperatureData();
+      await mutateTemperatureFormData();
       setIsTemperatureFormOpen(false);
     } catch (error) {
       alert('Failed to save temperature data.');
@@ -1412,9 +1491,11 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
         timeResultsReturned: formData.timeResultsReturned,
         eventDescription: `Time Slot: ${currentTime}`,
       });
+      await mutateUrineTestData();
+
       setIsUrineTestFormOpen(false);
     } catch (error) {
-      alert('Failed to save urine test data.');
+      alert('Failed to save data.');
     }
   };
 
@@ -1431,7 +1512,6 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
       }));
   };
 
-  // Generate table data for fetal heart rate
   const getFetalHeartRateTableData = () => {
     return computedFetalHeartRateData
       .filter((data) => data.value !== undefined && data.value !== null)
@@ -2442,7 +2522,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
 
             <OxytocinGraph
               data={loadedOxytocinData.map((item) => ({
-                timeSlot: item.time ?? '',
+                timeSlot: item.timeDisplay ?? item.time ?? '',
                 oxytocinUsed: typeof item.dropsPerMinute === 'number' && item.dropsPerMinute > 0 ? 'yes' : 'no',
                 dropsPerMinute: typeof item.dropsPerMinute === 'number' ? item.dropsPerMinute : 0,
                 date: item.encounterDatetime ? new Date(item.encounterDatetime).toLocaleDateString() : '',
@@ -2451,7 +2531,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
               tableData={loadedOxytocinData.map((item, index) => ({
                 id: item.uuid || `oxy-${index}`,
                 date: item.encounterDatetime ? new Date(item.encounterDatetime).toLocaleDateString() : '',
-                timeSlot: item.time ?? '',
+                timeSlot: item.timeDisplay ?? item.time ?? '',
                 oxytocinUsed: typeof item.dropsPerMinute === 'number' && item.dropsPerMinute > 0 ? 'yes' : 'no',
                 dropsPerMinute: typeof item.dropsPerMinute === 'number' ? `${item.dropsPerMinute} drops/min` : 'N/A',
               }))}
@@ -2578,7 +2658,7 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 onClose={handleFetalHeartRateFormClose}
                 onSubmit={handleFetalHeartRateFormSubmit}
                 onDataSaved={handleFetalHeartRateDataSaved}
-                existingTimeEntries={computedExistingTimeEntries}
+                existingTimeEntries={fetalHeartRateExistingEntries}
               />
             )}
             {isMembraneAmnioticFluidFormOpen && (
@@ -2586,6 +2666,15 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 isOpen={isMembraneAmnioticFluidFormOpen}
                 onClose={handleMembraneAmnioticFluidFormClose}
                 onSubmit={handleMembraneAmnioticFluidFormSubmit}
+                existingTimeEntries={membraneAmnioticFluidTimeEntries.map((entry) => ({
+                  timeSlot: entry.timeSlot,
+                  exactTime: entry.time,
+                }))}
+                patient={patientProp}
+                onDataSaved={() => {
+                  mutateMembraneFormData();
+                  mutateMembraneAmnioticFluidData();
+                }}
               />
             )}
             {isCervicalContractionsFormOpen && (
@@ -2600,7 +2689,19 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 isOpen={isOxytocinFormOpen}
                 onClose={handleOxytocinFormClose}
                 onSubmit={handleOxytocinFormSubmit}
-                existingTimeEntries={existingTimeEntries}
+                existingTimeEntries={oxytocinExistingTimeEntries}
+                patient={{
+                  uuid: patientUuid || '',
+                  name:
+                    patientData?.name && patientData.name.length > 0
+                      ? (patientData.name[0].given ? patientData.name[0].given.join(' ') + ' ' : '') +
+                        (patientData.name[0].family || '')
+                      : '',
+                  gender: patientData?.gender || '',
+                  age: patientData?.birthDate
+                    ? new Date().getFullYear() - new Date(patientData.birthDate).getFullYear() + ''
+                    : '',
+                }}
               />
             )}
             {isTemperatureFormOpen && (
@@ -2609,7 +2710,12 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 onClose={() => setIsTemperatureFormOpen(false)}
                 onSubmit={handleTemperatureFormSubmit}
                 initialTime={temperatureFormInitialTime}
-                existingTimeEntries={existingTimeEntries}
+                existingTimeEntries={temperatureTimeEntries}
+                patient={patientProp}
+                onDataSaved={() => {
+                  mutateTemperatureFormData();
+                  mutateTemperatureData();
+                }}
               />
             )}
             {isUrineTestFormOpen && (
@@ -2617,7 +2723,12 @@ const Partograph: React.FC<PartographyProps> = ({ patientUuid }) => {
                 isOpen={isUrineTestFormOpen}
                 onClose={() => setIsUrineTestFormOpen(false)}
                 onSubmit={handleUrineTestFormSubmit}
-                existingTimeEntries={existingTimeEntries}
+                encounters={urineTestEncounters}
+                isLoading={isUrineTestLoading}
+                error={urineTestError}
+                patient={patientProp}
+                sampleCollectedTimes={urineTestTimeArrays.sampleCollectedTimes}
+                resultsReturnedTimes={urineTestTimeArrays.resultsReturnedTimes}
               />
             )}
           </Column>

@@ -19,7 +19,8 @@ const OxytocinGraph: React.FC<OxytocinGraphProps> = ({ data }) => {
     const emptyColumns = Array.from({ length: 20 }, (_, i) => `grid-${i + 1}`);
 
     if (data && data.length > 0) {
-      const dataSlots = data.map((item, i) => `data-${i + 1}`);
+      // Use actual time slots from data instead of generic data-1, data-2
+      const dataSlots = data.map((item) => item.timeSlot);
       const remainingEmpty = Array.from({ length: 20 - data.length }, (_, i) => `empty-${i + 1}`);
       return [...dataSlots, ...remainingEmpty];
     }
