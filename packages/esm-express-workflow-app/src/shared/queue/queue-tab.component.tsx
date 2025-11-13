@@ -59,10 +59,14 @@ const QueueTab: React.FC<QueueTabProps> = ({
     if (!queueEntries?.length || !selectedQueue?.uuid) {
       return [];
     }
+    const priorityFilter = filters?.find((filter) => filter.key === 'priority')?.value;
 
-    const filtered = queueEntries.filter((entry) => entry?.queue?.uuid === selectedQueue.uuid);
+    const filtered = queueEntries.filter(
+      (entry) =>
+        entry?.queue?.uuid === selectedQueue.uuid && (priorityFilter ? entry?.priority?.uuid === priorityFilter : true),
+    );
     return filtered;
-  }, [queueEntries, selectedQueue?.uuid]);
+  }, [filters, queueEntries, selectedQueue.uuid]);
 
   const handleTabChange = useCallback(
     (evt: { selectedIndex: number }) => {

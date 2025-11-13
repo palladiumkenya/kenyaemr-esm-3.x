@@ -1,12 +1,14 @@
 import { InlineLoading } from '@carbon/react';
-import { ExtensionSlot, HomePictogram, PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
+import { ExtensionSlot, HomePictogram, PageHeader, PageHeaderContent, useConfig } from '@openmrs/esm-framework';
 import styles from './consultation.scss';
 import capitalize from 'lodash-es/capitalize';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueues, useQueueEntries } from '../../hooks/useServiceQueues';
 import QueueTab from '../../shared/queue/queue-tab.component';
 import { useInvestigationStats, useTotalVisits, useQueuePriorityCounts } from './consultation.resource';
+import { QueueFilter } from '../../types';
+import { ExpressWorkflowConfig } from '../../config-schema';
 
 type ConsultationProps = {
   dashboardTitle: string;
@@ -26,7 +28,10 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
 
   const { data: totalVisits, isLoading: isLoadingTotalVisits } = useTotalVisits();
   const { awaitingCount, completedCount, totalCount, isLoading: isLoadingInvestigations } = useInvestigationStats();
-
+  const [filters, setFilters] = useState<Array<QueueFilter>>([]);
+  const {
+    priorities: { emergencyPriorityConceptUuid, urgentPriorityConceptUuid, notUrgentPriorityConceptUuid },
+  } = useConfig<ExpressWorkflowConfig>();
   const consultationLocations = useMemo(
     () => consultationQueues.map((queue) => queue.location.uuid),
     [consultationQueues],
@@ -52,9 +57,27 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
       title: t('awaitingConsultation', 'Awaiting consultation'),
       value: consultationQueueEntries.length.toString(),
       categories: [
-        { label: t('emergency', 'Emergency'), value: priorityCounts.emergency },
-        { label: t('urgent', 'Urgent'), value: priorityCounts.urgent },
-        { label: t('notUrgent', 'Not Urgent'), value: priorityCounts.notUrgent },
+        {
+          label: t('emergency', 'Emergency'),
+          value: priorityCounts.emergency,
+          onClick: () => {
+            setFilters([{ key: 'priority', value: emergencyPriorityConceptUuid, label: t('emergency', 'Emergency') }]);
+          },
+        },
+        {
+          label: t('urgent', 'Urgent'),
+          value: priorityCounts.urgent,
+          onClick: () => {
+            setFilters([{ key: 'priority', value: urgentPriorityConceptUuid, label: t('urgent', 'Urgent') }]);
+          },
+        },
+        {
+          label: t('notUrgent', 'Not Urgent'),
+          value: priorityCounts.notUrgent,
+          onClick: () => {
+            setFilters([{ key: 'priority', value: notUrgentPriorityConceptUuid, label: t('notUrgent', 'Not Urgent') }]);
+          },
+        },
       ],
     },
     {
@@ -86,6 +109,8 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
         cards={cards}
         navigatePath="consultation"
         usePatientChart={usePatientChart}
+        filters={filters}
+        onFiltersChanged={setFilters}
       />
     </div>
   );

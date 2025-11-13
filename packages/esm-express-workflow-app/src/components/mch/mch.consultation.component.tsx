@@ -1,10 +1,13 @@
 import { InlineLoading } from '@carbon/react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueueEntries, useQueues } from '../../hooks/useServiceQueues';
 import QueueTab from '../../shared/queue/queue-tab.component';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useInvestigationStats, useQueuePriorityCounts, useTotalVisits } from '../consultation/consultation.resource';
+import { ExpressWorkflowConfig } from '../../config-schema';
+import { useConfig } from '@openmrs/esm-framework';
+import { QueueFilter } from '../../types';
 
 const MCHConsultation: React.FC = () => {
   const { t } = useTranslation();
@@ -15,7 +18,11 @@ const MCHConsultation: React.FC = () => {
       queue.location.display.toLowerCase().includes('mch') &&
       queue?.queueRooms?.length > 0,
   );
+  const [filters, setFilters] = useState<Array<QueueFilter>>([]);
 
+  const {
+    priorities: { emergencyPriorityConceptUuid, urgentPriorityConceptUuid, notUrgentPriorityConceptUuid },
+  } = useConfig<ExpressWorkflowConfig>();
   const { data: totalVisits, isLoading: isLoadingTotalVisits } = useTotalVisits();
   const { awaitingCount, completedCount, totalCount, isLoading: isLoadingInvestigations } = useInvestigationStats();
 
@@ -44,9 +51,27 @@ const MCHConsultation: React.FC = () => {
       title: t('awaitingConsultation', 'Awaiting consultation'),
       value: consultationQueueEntries.length.toString(),
       categories: [
-        { label: t('emergency', 'Emergency'), value: priorityCounts.emergency },
-        { label: t('urgent', 'Urgent'), value: priorityCounts.urgent },
-        { label: t('notUrgent', 'Not Urgent'), value: priorityCounts.notUrgent },
+        {
+          label: t('emergency', 'Emergency'),
+          value: priorityCounts.emergency,
+          onClick: () => {
+            setFilters([{ key: 'priority', value: emergencyPriorityConceptUuid, label: t('emergency', 'Emergency') }]);
+          },
+        },
+        {
+          label: t('urgent', 'Urgent'),
+          value: priorityCounts.urgent,
+          onClick: () => {
+            setFilters([{ key: 'priority', value: urgentPriorityConceptUuid, label: t('urgent', 'Urgent') }]);
+          },
+        },
+        {
+          label: t('notUrgent', 'Not Urgent'),
+          value: priorityCounts.notUrgent,
+          onClick: () => {
+            setFilters([{ key: 'priority', value: notUrgentPriorityConceptUuid, label: t('notUrgent', 'Not Urgent') }]);
+          },
+        },
       ],
     },
     {
@@ -75,7 +100,16 @@ const MCHConsultation: React.FC = () => {
       />
     );
   }
-  return <QueueTab queues={consultationQueues} navigatePath="mch" cards={cards} usePatientChart />;
+  return (
+    <QueueTab
+      queues={consultationQueues}
+      navigatePath="mch"
+      cards={cards}
+      usePatientChart
+      filters={filters}
+      onFiltersChanged={setFilters}
+    />
+  );
 };
 
 export default MCHConsultation;
