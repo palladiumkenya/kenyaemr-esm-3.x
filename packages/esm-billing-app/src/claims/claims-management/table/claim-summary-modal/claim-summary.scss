@@ -1,54 +1,252 @@
 @use '@carbon/layout';
 @use '@carbon/type';
 @use '@carbon/colors';
-.container {
+
+.invoiceContainer {
   padding: layout.$spacing-05;
+  background-color: colors.$white;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.section {
-  margin-top: layout.$spacing-06;
-  background-color: colors.$white;
-  padding: layout.$spacing-05;
+.invoiceHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: layout.$spacing-05;
+  border-bottom: 2px solid colors.$gray-20;
   margin-bottom: layout.$spacing-06;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: layout.$spacing-05;
-  margin-bottom: layout.$spacing-05;
+.invoiceTitle {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-04;
+
+  h3 {
+    @include type.type-style('heading-03');
+    font-weight: 600;
+    color: colors.$gray-100;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
 }
 
-.field {
+.claimNumber {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: layout.$spacing-02;
+}
+
+.claimNumberLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.claimNumberValue {
+  @include type.type-style('heading-compact-02');
+  color: colors.$blue-60;
+  font-weight: 600;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: layout.$spacing-06;
+  margin-bottom: layout.$spacing-06;
+}
+
+.infoBlock {
+  padding: layout.$spacing-04;
+  border-radius: 4px;
+}
+
+.blockTitle {
+  @include type.type-style('label-02');
+  color: colors.$gray-100;
+  text-transform: uppercase;
+  margin: 0 0 layout.$spacing-04 0;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.infoContent {
   display: flex;
   flex-direction: column;
   gap: layout.$spacing-02;
 }
 
-.label {
-  @include type.type-style('label-01');
+.primaryInfo {
+  @include type.type-style('body-short-02');
   font-weight: 600;
-  text-transform: uppercase;
+  color: colors.$gray-70;
+  margin: 0;
+  padding-bottom: layout.$spacing-02;
 }
 
-.value {
+.secondaryInfo {
   @include type.type-style('body-short-01');
+  color: colors.$gray-70;
+  margin: 0;
+  padding-bottom: layout.$spacing-02;
 }
 
-.totalContainer {
+.visitSection {
+  margin-bottom: layout.$spacing-06;
+}
+
+.sectionTitle {
+  @include type.type-style('label-02');
+  font-weight: 600;
+  color: colors.$gray-70;
+  text-transform: uppercase;
+  margin: 0 0 layout.$spacing-04 0;
+  padding-bottom: layout.$spacing-03;
+  border-bottom: 1px solid colors.$gray-20;
+  letter-spacing: 0.5px;
+}
+
+.visitGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: layout.$spacing-05;
+  margin-top: layout.$spacing-04;
+}
+
+.visitField {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+}
+
+.visitLabel {
+  @include type.type-style('label-01');
+  color: colors.$gray-70;
+  font-weight: 600;
+}
+
+.visitValue {
+  @include type.type-style('body-short-01');
+  color: colors.$gray-100;
+}
+
+.diagnosesSection {
+  margin-bottom: layout.$spacing-06;
+}
+
+.diagnosesList {
+  list-style: none;
+  padding: 0;
+  margin: layout.$spacing-04 0 0 0;
+}
+
+.diagnosisItem {
+  @include type.type-style('body-short-01');
+  padding: layout.$spacing-03;
+  margin-bottom: layout.$spacing-02;
+  color: colors.$gray-100;
+}
+
+.lineItemsSection {
+  margin-bottom: layout.$spacing-06;
+
+  :global(.cds--data-table) {
+    margin-top: layout.$spacing-04;
+  }
+
+  :global(.cds--table-header-label) {
+    @include type.type-style('label-01');
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  :global(.cds--data-table td) {
+    @include type.type-style('body-short-01');
+  }
+}
+
+.noItems {
+  @include type.type-style('body-short-01');
+  color: colors.$gray-70;
+  font-style: italic;
+  margin-top: layout.$spacing-04;
+  text-align: center;
+  padding: layout.$spacing-05;
+  background-color: colors.$gray-10;
+  border-radius: 4px;
+}
+
+.financialSummary {
+  margin-top: layout.$spacing-06;
+  padding: layout.$spacing-05;
+  background-color: colors.$gray-10;
+  border-radius: 4px;
+  border: 1px solid colors.$gray-20;
+}
+
+.summaryRow {
   display: flex;
   justify-content: space-between;
-  padding: layout.$spacing-05;
-  border-radius: layout.$spacing-02;
+  align-items: center;
+  padding: layout.$spacing-03 0;
+  border-bottom: 1px solid colors.$gray-20;
+}
+
+.summaryLabel {
+  @include type.type-style('body-short-01');
+  color: colors.$gray-70;
+}
+
+.summaryValue {
+  @include type.type-style('body-short-01');
+  font-weight: 600;
+  color: colors.$gray-100;
+}
+
+.totalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: layout.$spacing-04;
   margin-top: layout.$spacing-03;
+  border-top: 2px solid colors.$gray-70;
 }
 
 .totalLabel {
-  @include type.type-style('body-short-01');
+  @include type.type-style('heading-compact-01');
   font-weight: 600;
+  color: colors.$gray-100;
+  text-transform: uppercase;
 }
 
 .totalValue {
-  @include type.type-style('heading-compact-01');
+  @include type.type-style('heading-03');
+  font-weight: 700;
+  color: colors.$blue-60;
+}
+
+.billReference {
+  margin-top: layout.$spacing-05;
+  padding: layout.$spacing-03;
+  background-color: colors.$blue-10;
+  border-radius: 4px;
+  border-left: 3px solid colors.$blue-60;
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+}
+
+.referenceLabel {
+  @include type.type-style('label-01');
+  font-weight: 600;
+  color: colors.$gray-70;
+}
+
+.referenceValue {
+  @include type.type-style('code-01');
+  color: colors.$blue-60;
   font-weight: 600;
 }
