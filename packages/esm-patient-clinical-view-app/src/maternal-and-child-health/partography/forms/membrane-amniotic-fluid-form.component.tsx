@@ -74,8 +74,17 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     if (!existingTimeEntries || existingTimeEntries.length === 0) {
       return null;
     }
-    // Convert timeSlot values to numeric hours and find the maximum
-    const hours = existingTimeEntries.map((entry) => parseFloat(entry.timeSlot || '0')).filter((hour) => !isNaN(hour)); // Filter out invalid values
+    // Convert exactTime values to decimal hours and find the maximum
+    const hours = existingTimeEntries
+      .map((entry) => {
+        const time = entry.exactTime || '00:00';
+        if (time.match(/^\d{1,2}:\d{2}$/)) {
+          const [hours, minutes] = time.split(':').map(Number);
+          return hours + minutes / 60; // Convert to decimal hour
+        }
+        return 0;
+      })
+      .filter((hour) => hour > 0); // Filter out invalid values
 
     return hours.length > 0 ? Math.max(...hours) : null;
   }, [existingTimeEntries]);
@@ -108,6 +117,12 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     if (!data.exactTime || data.exactTime.trim() === '') {
       setError('exactTime', { type: 'manual', message: t('exactTimeRequired', 'Exact time is required') });
       hasErrors = true;
+    } else if (!data.exactTime.match(/^\d{1,2}:\d{2}$/)) {
+      setError('exactTime', {
+        type: 'manual',
+        message: t('exactTimeFormat', 'Time must be in HH:MM format (e.g., 14:30)'),
+      });
+      hasErrors = true;
     }
 
     // Validate amniotic fluid selection
@@ -137,11 +152,12 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
     const selectedHour = parseFloat(data.timeSlot);
 
     if (latestUsedHour !== null && selectedHour <= latestUsedHour) {
+      const nextValidHour = latestUsedHour + 0.5;
       setError('timeSlot', {
         type: 'manual',
         message: t(
           'timeSlotDisabled',
-          `Cannot select ${data.timeSlot}hr. Please select a time after ${latestUsedHour}hr.`,
+          `Cannot select ${data.timeSlot}hr. Please select ${nextValidHour}hr or later (latest entry: ${latestUsedHour}hr).`,
         ),
       });
       alert(t('timeSlotValidationError', 'Please select a valid time slot that comes after the previous entry.'));
@@ -259,10 +275,17 @@ const MembraneAmnioticFluidForm: React.FC<MembraneAmnioticFluidFormProps> = ({
                     labelText=""
                     value={field.value}
                     onChange={field.onChange}
-                    existingTimeEntries={existingTimeEntries.map((e) => ({
-                      hour: parseInt((e.exactTime || '00:00').split(':')[0] || '0', 10) || 0,
-                      time: e.exactTime || '',
-                    }))}
+                    existingTimeEntries={existingTimeEntries.map((e) => {
+                      // Convert exactTime to proper hour and time format for TimePickerDropdown
+                      const time = e.exactTime || '00:00';
+                      const [hours, minutes] = time.split(':').map(Number);
+                      const hourValue = hours + minutes / 60; // Convert to decimal hour
+
+                      return {
+                        hour: hourValue,
+                        time: time,
+                      };
+                    })}
                     invalid={!!fieldState.error}
                     invalidText={fieldState.error?.message}
                   />

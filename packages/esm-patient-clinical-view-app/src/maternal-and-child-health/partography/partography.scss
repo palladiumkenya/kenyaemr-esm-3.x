@@ -80,18 +80,13 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: layout.$spacing-05;
-
-  h5 {
-    @include type.type-style('heading-compact-01');
-    margin: 0;
-  }
-}
-
-.graphsSection {
-  margin-bottom: layout.$spacing-08;
-}
-
-.graphContainer {
+  /* Allow cell to expand and wrap text */
+  width: auto;
+  min-width: 0;
+  max-width: none;
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
   padding: layout.$spacing-04;
   background-color: colors.$white;
   border-radius: layout.$spacing-02;
@@ -664,7 +659,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 60px; // Minimum column width
+  min-width: 60px;
 
   &:last-child {
     border-right: none;
@@ -675,21 +670,12 @@
   }
 }
 
-// Optional: Adjust chart's axis label styling if needed to make space or match font
 .cds--chart-wrapper {
-  // You might need to add specific CSS here to the Carbon Chart itself
-  // to fine-tune the bottom axis's appearance or padding if it overlaps
-  // or leaves too much space. This can be complex due to shadow DOM.
-  // E.g., .cds--chart-wrapper .cds--bottom-axis .cds--axis-labels { display: none; }
-  // or .cds--chart-wrapper .cds--bottom-axis .cds--axis-title { padding-bottom: 0; }
-
   .cds--bottom-axis .cds--axis-title {
     padding-bottom: 0;
   }
 
-  // Override line colors for Alert and Action lines
   .cds--line-path {
-    // Alert Line - Yellow dotted line
     &[data-group-id='Alert Line'],
     &[aria-label*='Alert Line'] {
       stroke: #ffd700 !important;
@@ -697,7 +683,6 @@
       stroke-dasharray: 8, 4 !important;
     }
 
-    // Action Line - Red dotted line
     &[data-group-id='Action Line'],
     &[aria-label*='Action Line'] {
       stroke: #ff0000 !important;
@@ -706,7 +691,6 @@
     }
   }
 
-  // Alternative selector for different Carbon Charts versions
   svg path {
     &[data-name='Alert Line'] {
       stroke: #ffd700 !important;
@@ -786,9 +770,7 @@
   }
 }
 
-// Global overrides for Alert and Action lines (outside any wrapper)
 :global {
-  // Try to target lines by data attributes
   [data-group='Alert Line'] {
     stroke: #ffd700 !important;
     stroke-width: 3px !important;
@@ -801,10 +783,7 @@
     stroke-dasharray: 8, 4 !important;
   }
 
-  // Try broad SVG path targeting in cervix chart
   [data-chart-id='cervix'] svg path {
-    // If there are 3 or more lines (cervix data + alert + action)
-    // Target the last two as Alert and Action lines
     &:nth-last-child(2) {
       stroke: #ffd700 !important;
       stroke-width: 3px !important;
@@ -819,14 +798,10 @@
   }
 }
 
-// Optional: Adjust the height of the chart if the new labels cause overflow
 .chartContainer {
-  height: 500px; // Keep this consistent
-  // If the new labels cause overlap, you might need to make the chart slightly shorter
-  // e.g., height: 450px; and then adjust overall graphContainer height.
+  height: 500px;
 }
 
-/* Fetal Heart Rate Section Styles */
 .fetalHeartRateSection {
   margin-bottom: layout.$spacing-07;
   width: 100%;
@@ -888,7 +863,6 @@
   flex-wrap: wrap;
 }
 
-// Orange tag style for low range
 .tagLowRange {
   background-color: #ff9800 !important;
   color: #fff !important;
@@ -896,57 +870,46 @@
 }
 
 .fetalHeartRateChart {
-  min-height: 600px; // Increased height to match cervix graph
+  min-height: 600px;
   width: 100%;
   margin-top: layout.$spacing-04;
 
-  // Override Carbon chart styles for this specific chart
   :global(.cds--cc--chart-svg) {
     border: 1px solid colors.$gray-30;
     border-radius: layout.$spacing-02;
-    min-height: 600px; // Ensure minimum height
+    min-height: 600px;
   }
 
-  // Chart wrapper to ensure proper sizing
   :global(.cds--cc--chart-wrapper) {
     min-height: 600px;
-    padding-bottom: layout.$spacing-06; // Extra space for x-axis labels
+    padding-bottom: layout.$spacing-06;
   }
-
-  // Grid line styling to match cervix graph
   :global(.cds--cc--grid-line) {
     stroke: colors.$gray-30;
     stroke-opacity: 0.3;
   }
-
-  // Ensure x-axis labels have proper spacing and are horizontal
   :global(.cds--cc--axis-tick-label) {
     font-size: 12px;
     fill: colors.$gray-70;
   }
 
-  // X-axis label positioning - ensure they are horizontal
   :global(.cds--cc--axis.cds--cc--axis--bottom .cds--cc--axis-tick-label) {
     text-anchor: middle;
-    transform: none !important; // Force no rotation
+    transform: none !important;
   }
 
-  // Y-axis styling
   :global(.cds--cc--axis.cds--cc--axis--left .cds--cc--axis-tick-label) {
     text-anchor: end;
   }
 
-  // Ensure chart container has enough bottom padding for labels
   :global(.cds--cc--chart-holder) {
     padding-bottom: layout.$spacing-08 !important;
   }
 
-  // Disable any text rotation on bottom axis
   :global(.cds--cc--axis--bottom text) {
     transform: rotate(0deg) !important;
   }
 
-  // Axis styling
   :global(.cds--cc--axis) {
     .tick text {
       font-size: 12px;
@@ -959,7 +922,6 @@
   }
 }
 
-// Fetal Heart Rate Table Value Styling
 .fetalHeartRateValue {
   display: inline-flex;
   align-items: center;
@@ -994,7 +956,6 @@
   }
 }
 
-/* Membrane Amniotic Fluid Grid Styles */
 .membraneGrid {
   width: 100%;
   margin-top: layout.$spacing-04;
@@ -1002,14 +963,16 @@
   border: 1px solid colors.$gray-30;
   border-radius: layout.$spacing-02;
   overflow-x: auto;
-  max-height: 300px; // Set a reasonable height
-  max-width: 1540px; // Show approximately 20 grids (140px label + 70px * 20 columns = 1540px)
+  max-height: 300px;
+  max-width: 1540px;
 }
 
 .gridContainer {
   display: flex;
   flex-direction: column;
-  min-width: fit-content; // Allow natural width based on content
+  min-width: 0;
+  width: auto;
+  max-width: 100%;
 }
 
 .gridHeader {
@@ -1029,7 +992,7 @@
 }
 
 .gridCell {
-  flex: 0 0 70px; // Fixed width for time columns for consistent layout
+  flex: 0 0 70px;
   min-width: 70px;
   padding: layout.$spacing-03;
   border-right: 1px solid colors.$gray-20;
@@ -1071,7 +1034,6 @@
   font-style: italic;
 }
 
-// Contraction Level Selector - Simple colored buttons
 .contractionLevelSelector {
   display: flex;
   flex-direction: row;
@@ -1141,14 +1103,12 @@
   cursor: pointer;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
 
-  // None - Light gray background
   &.none {
     background-color: colors.$gray-30;
     color: colors.$gray-100;
     border-color: colors.$gray-50;
   }
 
-  // Mild - Black dots pattern
   &.mild {
     background-color: #fff;
     color: #111;
@@ -1157,7 +1117,6 @@
     background-size: 12px 12px;
   }
 
-  // Moderate - Diagonal black lines pattern (tuned)
   &.moderate {
     background-color: #fff;
     color: #111;
@@ -1166,7 +1125,6 @@
     background-size: 16px 16px;
   }
 
-  // Strong - Solid black
   &.strong {
     background-color: #111;
     color: #fff;
@@ -1182,7 +1140,6 @@
   text-align: center;
 }
 
-// Contractions Form Container
 .contractionsFormContainer {
   padding: layout.$spacing-03 layout.$spacing-03;
   max-width: 700px;
@@ -1272,7 +1229,6 @@
   }
 }
 
-// Detailed Contractions Grid - Partograph Format
 .contractionsContainer {
   display: flex;
   flex-direction: column;
@@ -1357,7 +1313,6 @@
   color: colors.$gray-100;
   position: relative;
 
-  // Ensure the numbers are clearly visible
   &::before {
     content: attr(data-label);
     position: absolute;
@@ -1424,7 +1379,6 @@
   }
 }
 
-// Contraction Bar Visual Indicators
 .contractionBar {
   width: 100%;
   height: 100%;
@@ -1466,7 +1420,6 @@
   box-shadow: none;
 }
 
-// Oxytocin Bar Visual Indicators
 .oxytocinBarLow {
   background-color: colors.$green-40;
   border: 2px solid colors.$green-60;
@@ -1522,13 +1475,11 @@
   color: colors.$gray-80;
 }
 
-// Grid container for contractions
 .contractionsGrid {
   position: relative;
   margin: layout.$spacing-04 0;
 }
 
-// Table view styles for contractions
 .contractionsTable {
   background-color: colors.$white;
   border: 1px solid colors.$gray-30;
@@ -1590,7 +1541,6 @@
   }
 }
 
-// ===== DRUGS AND IV FLUIDS GRAPH STYLES =====
 .drugsIVFluidsGraph {
   width: 100%;
   margin: layout.$spacing-05 0;
@@ -1628,7 +1578,6 @@
   }
 }
 
-// Oxytocin specific styling when inside fetalHeartRateContainer
 .fetalHeartRateContainer {
   .membraneGrid {
     margin: 0;
@@ -1660,12 +1609,13 @@
   text-align: center;
   font-size: 12px;
   line-height: 1.2;
+  white-space: normal;
+  word-break: break-word;
 
   &:hover {
     background-color: colors.$gray-10;
   }
 }
-
 .drugInfo {
   display: flex;
   flex-direction: column;
@@ -1677,16 +1627,10 @@
   color: colors.$gray-100;
   font-size: 11px;
   line-height: 1.2;
-}
-
-.drugDosage {
-  font-weight: 400;
-  color: colors.$gray-70;
   font-size: 10px;
   line-height: 1.1;
 }
 
-// Pulse and BP Graph Styling
 .pulseBPGraph {
   width: 100%;
   margin: layout.$spacing-05 0;
@@ -1698,28 +1642,20 @@
     border: 2px solid colors.$gray-40;
     margin-bottom: layout.$spacing-04;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    min-height: 650px; // Match or exceed chart height
-
-    // Medical chart styling
+    min-height: 650px;
     :global(.cds--chart-wrapper) {
       border: 1px solid colors.$gray-30;
       border-radius: layout.$spacing-02;
       overflow: hidden;
-
-      // Enhanced grid lines for medical chart appearance
       :global(.cds--chart) {
         background-color: colors.$white;
-
-        // Grid styling for medical charts
         :global(.cds--chart-grid-line) {
           stroke: colors.$gray-30;
           stroke-width: 1;
         }
-
         :global(.cds--chart-axis) {
           stroke: colors.$gray-50;
         }
-
         :global(.cds--chart-axis text) {
           fill: colors.$gray-90;
           font-size: 12px;

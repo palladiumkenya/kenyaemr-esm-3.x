@@ -563,6 +563,7 @@ export type FacilityClaim = {
   externalId: string;
   responseUUID: string;
   insurer?: string;
+  visitType?: { uuid: string; display: string };
 };
 export type BillingPromptType = 'patient-chart' | 'billing-orders';
 
