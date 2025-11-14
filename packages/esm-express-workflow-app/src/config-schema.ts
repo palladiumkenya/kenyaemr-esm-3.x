@@ -140,6 +140,11 @@ export const configSchema = {
     _description: 'Concept class UUID for procedures orders',
     _default: '8d490bf4-c2cc-11de-8d13-0010c6dffd0f',
   },
+  proceduresOrderTypeUuid: {
+    _type: Type.String,
+    _description: 'Procedure Order type UUID',
+    _default: 'b4a7c280-369e-4d12-9ce8-18e36783fed6',
+  },
   triageServiceConceptUuid: {
     _type: Type.ConceptUuid,
     _description: 'Concept UUID for triage service',
@@ -184,6 +189,7 @@ export type ExpressWorkflowConfig = {
   imagingConceptClassUuid: string;
   orderableConceptSets: Array<string>;
   imagingOrderTypeUuid: string;
+  proceduresOrderTypeUuid: string;
   imagingOrderableConceptSets: Array<string>;
   clinicalEncounter: {
     encounterTypeUuid: string;
