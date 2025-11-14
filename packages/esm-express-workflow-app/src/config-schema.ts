@@ -29,7 +29,7 @@ export const configSchema = {
     defaultPriorityConceptUuid: {
       _type: Type.ConceptUuid,
       _description: 'The UUID of the default priority for the queues eg Not urgent.',
-      _default: '80cd8f8c-5d82-4cdc-b96e-a6addeb94b7f',
+      _default: '',
     },
     defaultStatusConceptUuid: {
       _type: Type.ConceptUuid,
