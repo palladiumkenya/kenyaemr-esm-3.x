@@ -4,7 +4,7 @@ import { FacilityClaim } from '../../../types';
 
 export const useFacilityClaims = () => {
   const customPresentation =
-    'custom:(uuid,claimCode,use,dateFrom,dateTo,claimedTotal,approvedTotal,status,externalId,responseUUID,provider:(person:(display),display),patient:(uuid,display,person:(display,gender,age,birthdate)),visitType:(uuid,display))';
+    'custom:(uuid,claimCode,use,dateFrom,dateTo,claimedTotal,approvedTotal,status,externalId,responseUUID,provider:(person:(display),display),patient:(uuid,display,person:(display,gender,age,birthdate)),visitType:(uuid,display),visit:(uuid,display,startDatetime,stopDatetime,encounters:(diagnoses:(uuid,diagnosis))),bill:(uuid))';
   const url = `${restBaseUrl}/claim?v=${customPresentation}`;
 
   const { data, error, isLoading, mutate, isValidating } = useSWR<FetchResponse<{ results: Array<FacilityClaim> }>>(
@@ -23,7 +23,7 @@ export const useFacilityClaims = () => {
   } => ({
     ...claim,
     id: claim.uuid,
-    providerName: claim.provider?.person?.display || claim.provider?.display || '',
+    providerName: claim.provider?.person?.display || '',
     approvedTotal: claim.approvedTotal ?? 0,
     status: claim.status,
     patientName: claim.patient?.display || '',
