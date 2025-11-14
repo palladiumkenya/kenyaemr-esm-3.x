@@ -89,3 +89,9 @@ export interface EncountersWithMedicationRequestsResponse {
 
 // API actually returns an array of resources directly
 export type EncountersWithMedicationRequestsArray = Array<EncountersWithMedicationRequestsResource>;
+
+export type QueueFilter = {
+  key: 'status' | 'priority';
+  value: string;
+  label: string;
+};

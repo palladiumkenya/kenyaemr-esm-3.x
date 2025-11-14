@@ -2,6 +2,7 @@ import { useConfig } from '@openmrs/esm-framework';
 import { ExpressWorkflowConfig } from '../../config-schema';
 import { useQueueEntries } from '../../hooks/useServiceQueues';
 import { Queue } from '../../types';
+import { useMemo } from 'react';
 
 export const useTriageQueuesMetrics = (queue?: Queue) => {
   const { queueServiceConceptUuids, queuStatusConceptUuids } = useConfig<ExpressWorkflowConfig>();
@@ -35,9 +36,18 @@ export const useTriageQueuesMetrics = (queue?: Queue) => {
 
   return {
     isLoading: isLoadingFinished || isLoadingInService || isLoadingWaiting,
-    waitingEntries,
-    inServiceEntries,
-    finishedEntries,
+    waitingEntries: useMemo(
+      () => waitingEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
+      [waitingEntries, queue],
+    ),
+    inServiceEntries: useMemo(
+      () => inServiceEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
+      [inServiceEntries, queue],
+    ),
+    finishedEntries: useMemo(
+      () => finishedEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
+      [finishedEntries, queue],
+    ),
     error: finishedError ?? inServiceError ?? waitingError,
   };
 };
