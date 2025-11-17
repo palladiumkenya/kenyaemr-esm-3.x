@@ -19,7 +19,7 @@ import { useFacilityClaims } from '../use-facility-claims';
 import styles from './claim-summary.scss';
 import upperCase from 'lodash-es/upperCase';
 import Capitalize from 'lodash-es/capitalize';
-import { useBills } from '../../../../billing.resource';
+import { useCurrencyFormatting } from '../../../../helpers/currency';
 
 type ProvidedItem = {
   uuid: string;
@@ -79,6 +79,7 @@ type ExtendedClaim = FacilityClaim & {
 export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => void; claimId: string }) => {
   const { t } = useTranslation();
   const { claims } = useFacilityClaims();
+  const { format: formatCurrency } = useCurrencyFormatting();
 
   const claim = claims.find((claim) => claim.id === claimId) as ExtendedClaim | undefined;
 
@@ -141,8 +142,8 @@ export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => v
           id: `${index}`,
           item: item.item?.display || '-',
           quantity: item.numberOfConsumptions || 1,
-          unitPrice: `KES ${(item.price || 0).toLocaleString()}`,
-          total: `KES ${((item.price || 0) * (item.numberOfConsumptions || 1)).toLocaleString()}`,
+          unitPrice: formatCurrency(item.price || 0),
+          total: formatCurrency((item.price || 0) * (item.numberOfConsumptions || 1)),
         }))
       : [];
 
@@ -233,7 +234,7 @@ export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => v
           <div className={styles.lineItemsSection}>
             <h4 className={styles.sectionTitle}>{t('servicesProvided', 'SERVICES PROVIDED')}</h4>
             {providedItems.length === 0 ? (
-              <p>{t('loadingBillDetails', 'Loading bill details...')}</p>
+              <p className={styles.noItems}>{t('noLineItems', 'No line items available')}</p>
             ) : lineItemsRows.length > 0 ? (
               <DataTable rows={lineItemsRows} headers={lineItemsHeaders}>
                 {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -268,7 +269,7 @@ export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => v
             <h4 className={styles.sectionTitle}>{t('total', 'TOTAL')}</h4>
             <div className={styles.summaryRow}>
               <span className={styles.summaryLabel}>{t('claimedAmount', 'Claimed Amount')}</span>
-              <span className={styles.summaryValue}>KES {displayTotal.toLocaleString()}</span>
+              <span className={styles.summaryValue}>{formatCurrency(displayTotal)}</span>
             </div>
           </div>
         </div>
