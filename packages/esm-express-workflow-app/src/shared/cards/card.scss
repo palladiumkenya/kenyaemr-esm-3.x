@@ -41,7 +41,7 @@
     height: 2rem;
     width: 2rem;
     color: colors.$blue-60;
-    
+
     &:hover {
       background-color: colors.$gray-10;
     }
@@ -116,14 +116,4 @@
   color: colors.$blue-60;
   cursor: pointer;
   font-size: small;
-  
-  &:hover {
-    color: colors.$blue-70;
-    text-decoration: underline;
-  }
-
-  &:focus {
-    outline: 2px solid colors.$blue-60;
-    outline-offset: 2px;
-  }
 }
