@@ -26,6 +26,14 @@
   padding: layout.$spacing-05;
 }
 
+.actionsContainer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: layout.$spacing-05;
+  margin-bottom: layout.$spacing-03;
+}
+
 .claimStatus {
   display: flex;
   align-items: center;
