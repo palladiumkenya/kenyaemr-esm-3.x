@@ -1,6 +1,6 @@
-import React, { type HTMLAttributes, useEffect, useRef, useState } from 'react';
 import { Layer, Search } from '@carbon/react';
 import classNames from 'classnames';
+import React, { type HTMLAttributes, ReactNode, useEffect, useRef, useState } from 'react';
 import styles from './autosuggest.scss';
 
 // FIXME Temporarily included types from Carbon
@@ -104,6 +104,8 @@ interface AutosuggestProps extends SearchProps {
   onSuggestionSelected: (field: string, value: string) => void;
   invalid?: boolean | undefined;
   invalidText?: string | undefined;
+  renderEmptyState?: (searchValue: string) => ReactNode;
+  renderSuggestionItem?: (item: any) => ReactNode;
 }
 
 export const Autosuggest: React.FC<AutosuggestProps> = ({
@@ -113,9 +115,12 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   onSuggestionSelected,
   invalid,
   invalidText,
+  renderEmptyState,
+  renderSuggestionItem,
   ...searchProps
 }) => {
   const [suggestions, setSuggestions] = useState([]);
+  const [showEmptyState, setShowEmptyState] = useState(false);
   const searchBox = useRef(null);
   const wrapper = useRef(null);
   const { id: name, labelText } = searchProps;
@@ -131,6 +136,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
   const handleClickOutsideComponent = (e) => {
     if (wrapper.current && !wrapper.current.contains(e.target)) {
       setSuggestions([]);
+      setShowEmptyState(false);
     }
   };
 
@@ -140,6 +146,7 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
 
     if (query) {
       getSearchResults(query).then((suggestions) => {
+        setShowEmptyState(suggestions.length < 1);
         setSuggestions(suggestions);
       });
     } else {
@@ -175,11 +182,20 @@ export const Autosuggest: React.FC<AutosuggestProps> = ({
       {suggestions.length > 0 && (
         <ul className={styles.suggestions}>
           {suggestions.map((suggestion, index) => (
-            <li key={index} onClick={(e) => handleClick(index)} role="presentation">
-              {getDisplayValue(suggestion)}
+            <li
+              key={index}
+              onClick={(e) => handleClick(index)}
+              role="presentation"
+              className={typeof renderSuggestionItem !== 'function' && styles.displayText}>
+              {typeof renderSuggestionItem === 'function'
+                ? renderSuggestionItem(suggestion)
+                : getDisplayValue(suggestion)}
             </li>
           ))}
         </ul>
+      )}
+      {showEmptyState && searchBox.current?.value?.length >= 3 && typeof renderEmptyState === 'function' && (
+        <span className={styles.suggestions}>{renderEmptyState(searchBox.current?.value)}</span>
       )}
       {invalid ? <label className={classNames(styles.invalidMsg)}>{invalidText}</label> : <></>}
     </div>

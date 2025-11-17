@@ -55,6 +55,21 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
       fetalHeartRate: '',
     },
   });
+
+  // Reset form when it opens
+  React.useEffect(() => {
+    if (isOpen) {
+      reset({
+        hour: '',
+        time: '',
+        fetalHeartRate: '',
+      });
+      clearErrors();
+      setSaveError(null);
+      setSaveSuccess(false);
+    }
+  }, [isOpen, reset, clearErrors]);
+
   const generateHourOptions = () => {
     const options = [];
     // Add 00 hour option first
@@ -73,19 +88,40 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
       return null;
     }
     // Find the max hour value from existingTimeEntries (hour is already a number)
-    return Math.max(...existingTimeEntries.map((e) => e.hour));
+    const hours = existingTimeEntries.map((e) => {
+      // Ensure we're working with numbers, not strings
+      const hourNum = typeof e.hour === 'number' ? e.hour : parseFloat(e.hour);
+      return isNaN(hourNum) ? 0 : hourNum;
+    });
+
+    const maxHour = Math.max(...hours);
+    return maxHour;
   }, [existingTimeEntries]);
 
   // Generate hour options, disabling those before the latest entered hour (float comparison)
   const hourOptionsWithDisabled = React.useMemo(() => {
     return generateHourOptions().map((option) => {
       const hourValue = parseFloat(option.value);
+
+      // More precise comparison - disable if hour is less than or equal to latest hour
+      // Use small epsilon to handle floating point precision issues
+      const isDisabled = latestHour !== null && hourValue <= latestHour + 0.001;
+
       return {
         ...option,
-        disabled: latestHour !== null && hourValue <= latestHour,
+        disabled: isDisabled,
+        displayLabel: isDisabled ? `${option.label} (used)` : option.label,
       };
     });
   }, [latestHour]);
+
+  // Helper text for user guidance
+  const getHourSelectionHelperText = () => {
+    if (latestHour === null) {
+      return t('firstEntryHelp', 'Select the hour for this first measurement');
+    }
+    return t('progressiveEntryHelp', `Select an hour after ${latestHour}hr (latest entry)`);
+  };
 
   const handleFormSubmit = async (data: FetalHeartRateFormData) => {
     const hourValue = parseFloat(data.hour);
@@ -97,6 +133,32 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
 
     if (!data.hour || isNaN(hourValue) || hourValue < 0 || hourValue > 24) {
       setError('hour', { type: 'manual', message: t('hourRequired', 'Please select a valid hour') });
+      return;
+    }
+
+    // Prevent selection of hours before or equal to the latest entry
+    if (latestHour !== null && hourValue <= latestHour) {
+      const nextValidHour = latestHour + 0.5;
+      setError('hour', {
+        type: 'manual',
+        message: t(
+          'hourMustBeAfterLatest',
+          `Hour must be after ${latestHour}hr (latest entry). Please select ${nextValidHour}hr or later.`,
+        ),
+      });
+      return;
+    }
+
+    // Check for exact duplicate hours
+    const isDuplicateHour = existingTimeEntries.some(
+      (entry) => Math.abs(entry.hour - hourValue) < 0.001, // Handle floating point precision
+    );
+
+    if (isDuplicateHour) {
+      setError('hour', {
+        type: 'manual',
+        message: t('duplicateHour', `${hourValue}hr has already been used. Please select a different hour.`),
+      });
       return;
     }
     if (!data.time || data.time.trim() === '') {
@@ -220,18 +282,20 @@ const FetalHeartRateForm: React.FC<FetalHeartRateFormProps> = ({
               render={({ field, fieldState }) => (
                 <Select
                   id="hour-select"
-                  labelText={t('hour', 'Hour')}
+                  labelText={t('hour', 'Hour *')}
+                  helperText={getHourSelectionHelperText()}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}
                   value={field.value}
                   onChange={(e) => field.onChange(e.target.value)}>
-                  <SelectItem value="" text={t('admissionTime', 'Admission')} />
+                  <SelectItem value="" text={t('selectHour', 'Select hour')} />
                   {hourOptionsWithDisabled.map((option) => (
                     <SelectItem
                       key={option.value}
-                      value={option.value}
-                      text={option.label}
+                      value={option.disabled ? '' : option.value}
+                      text={option.displayLabel}
                       disabled={option.disabled}
+                      className={option.disabled ? styles.disabledHourOption : ''}
                     />
                   ))}
                 </Select>

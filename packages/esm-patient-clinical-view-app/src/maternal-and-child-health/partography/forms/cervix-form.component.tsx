@@ -73,25 +73,49 @@ const CervixForm: React.FC<CervixFormProps> = ({
     };
   }, [existingCervixData]);
 
-  const usedHours = useMemo(() => {
-    if (!selectedHours || selectedHours.length === 0) {
-      return [];
+  // Calculate the latest hour for progressive validation
+  const latestHour = useMemo(() => {
+    if (!existingTimeEntries || existingTimeEntries.length === 0) {
+      return null;
     }
-    return selectedHours;
-  }, [selectedHours]);
+    // Find the maximum hour from existing entries
+    const hours = existingTimeEntries.map((entry) => entry.hour);
+    return Math.max(...hours);
+  }, [existingTimeEntries]);
 
+  // Generate hour options with progressive validation
   const hourOptions = useMemo(() => {
     return Array.from({ length: 24 }, (_, i) => {
       const hourValue = String(i).padStart(2, '0');
-      const isDisabled = usedHours.includes(i);
-      const displayText = isDisabled ? `${hourValue} (used)` : hourValue;
+
+      // Progressive validation: disable if hour is less than or equal to latest hour
+      const isUsed = selectedHours.includes(i);
+      const isBeforeLatest = latestHour !== null && i <= latestHour;
+      const isDisabled = isUsed || isBeforeLatest;
+
+      let displayText = hourValue;
+      if (isUsed) {
+        displayText = `${hourValue} (used)`;
+      } else if (isBeforeLatest) {
+        displayText = `${hourValue} (unavailable)`;
+      }
+
       return {
         value: hourValue,
         text: displayText,
         disabled: isDisabled,
       };
     });
-  }, [usedHours]);
+  }, [selectedHours, latestHour]);
+
+  // Helper text for user guidance
+  const getHourSelectionHelperText = () => {
+    if (latestHour === null) {
+      return t('firstEntryHelp', 'Select the hour for this first cervical measurement');
+    }
+    const nextHour = latestHour + 1;
+    return t('progressiveEntryHelp', `Select hour ${nextHour} or later (latest entry: ${latestHour})`);
+  };
 
   // Clear any errors when form opens
   useEffect(() => {
@@ -111,6 +135,26 @@ const CervixForm: React.FC<CervixFormProps> = ({
     // Basic validation
     if (!data.hour || data.hour === '') {
       setError('hour', { type: 'manual', message: 'Hour selection is required' });
+      return;
+    }
+
+    // Progressive validation: prevent selection of hours before or equal to latest
+    const selectedHour = parseInt(data.hour);
+    if (latestHour !== null && selectedHour <= latestHour) {
+      const nextValidHour = latestHour + 1;
+      setError('hour', {
+        type: 'manual',
+        message: `Please select hour ${nextValidHour} or later. Latest entry was at hour ${latestHour}.`,
+      });
+      return;
+    }
+
+    // Duplicate hour validation
+    if (existingTimeEntries.some((entry) => entry.hour === selectedHour)) {
+      setError('hour', {
+        type: 'manual',
+        message: `Hour ${selectedHour} has already been used. Please select a different hour.`,
+      });
       return;
     }
 
@@ -218,13 +262,20 @@ const CervixForm: React.FC<CervixFormProps> = ({
                 <Select
                   id="hour-select"
                   labelText="Hour *"
+                  helperText={getHourSelectionHelperText()}
                   value={field.value}
                   onChange={(e) => field.onChange((e.target as HTMLSelectElement).value)}
                   invalid={!!fieldState.error}
                   invalidText={fieldState.error?.message}>
                   <SelectItem value="" text="Select hour" />
                   {hourOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value} text={option.text} disabled={option.disabled} />
+                    <SelectItem
+                      key={option.value}
+                      value={option.disabled ? '' : option.value}
+                      text={option.text}
+                      disabled={option.disabled}
+                      className={option.disabled ? styles.disabledHourOption : ''}
+                    />
                   ))}
                 </Select>
               )}

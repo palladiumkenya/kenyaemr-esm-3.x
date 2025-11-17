@@ -1,0 +1,18 @@
+@use '@carbon/layout';
+@use '@carbon/colors';
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: layout.$spacing-01;
+  font-size: xx-small;
+  background-color: colors.$white;
+  border: solid 1px colors.$gray-30;
+  color: colors.$gray-50;
+}
+
+.emptyIllustration {
+  color: colors.$teal-70;
+}

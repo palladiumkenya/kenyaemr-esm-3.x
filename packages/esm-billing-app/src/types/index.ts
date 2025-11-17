@@ -563,6 +563,7 @@ export type FacilityClaim = {
   externalId: string;
   responseUUID: string;
   insurer?: string;
+  visitType?: { uuid: string; display: string };
 };
 export type BillingPromptType = 'patient-chart' | 'billing-orders';
 
@@ -620,6 +621,7 @@ export interface TableProps {
   emptyStateHeader: string;
   includeClaimCode?: boolean;
   use?: string;
+  renderActionButton?: () => React.ReactNode;
 }
 
 export interface ProgressTracker {

@@ -20,10 +20,12 @@ export const pharmacyLink = getSyncLifecycle(
 );
 export const pharmacy = getSyncLifecycle(Pharmacy, options);
 export const pharmacyTabs = getSyncLifecycle(PharmacyTabs, options);
+
+// t('precription', 'Prescription')
 export const pharmacyPatientChartDashboardLink = getSyncLifecycle(
   createDashboardLink({
     path: 'pharmacy',
-    title: 'Pharmacy',
+    title: 'Prescription',
     icon: 'omrs-icon-medication',
   }),
   options,

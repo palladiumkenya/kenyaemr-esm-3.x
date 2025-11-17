@@ -49,8 +49,6 @@
   }
 }
 
-/* ===== Merged from cervix-form.scss ===== */
-
 .formGrid {
   gap: 1rem;
 }
@@ -62,6 +60,19 @@
 .formField {
   margin-bottom: 1rem;
 }
+// Ensure Carbon dropdown menus overlap modal buttons
+:global(.cds--list-box__menu) {
+  z-index: 9999 !important;
+  position: absolute !important;
+  overflow: visible !important;
+}
+// Prevent parent overflow from hiding dropdowns
+.modalContent,
+.cds--modal-content,
+.cds--modal-container {
+  overflow: visible !important;
+  z-index: 1 !important;
+}
 
 .fieldLabel {
   @include type.type-style('label-01');
@@ -70,12 +81,10 @@
   display: block;
 }
 
-/* Ensure number inputs have proper styling */
 .cds--number input {
   text-align: left;
 }
 
-/* Modal specific styling */
 .modal {
   .cds--modal-content {
     padding: 0;
@@ -96,12 +105,10 @@
   }
 }
 
-/* Form field spacing */
 .cds--form-item {
   margin-bottom: 1rem;
 }
 
-/* Number input stepper buttons */
 .cds--number__controls {
   display: flex;
   flex-direction: column;
@@ -115,7 +122,6 @@
   justify-content: center;
 }
 
-/* Validation hints */
 .validationHint {
   font-size: 0.75rem;
   color: #6f6f6f;
@@ -127,7 +133,6 @@
   border-left: 3px solid #0f62fe;
 }
 
-/* Required fields note */
 .requiredFieldsNote {
   margin-bottom: 1rem;
   padding: 0.5rem;
@@ -143,7 +148,6 @@
   }
 }
 
-/* Drug Order Workspace Launcher Styles */
 .workspaceLauncherSection {
   margin-bottom: layout.$spacing-06;
   padding: layout.$spacing-05;
@@ -168,7 +172,6 @@
   }
 }
 
-/* Manual Entry Section Styles */
 .manualEntrySection {
   background-color: var(--cds-layer-01);
   border: 1px solid var(--cds-border-subtle-01);
@@ -191,7 +194,6 @@
   }
 }
 
-// Source indicators for drug orders vs manual entries
 .orderSource {
   background-color: var(--cds-support-success);
   color: var(--cds-text-on-color);
@@ -212,7 +214,6 @@
   text-transform: uppercase;
 }
 
-/* Override validation styling when not needed */
 .noValidation {
   .cds--select__invalid-icon,
   .cds--number__invalid-icon {
@@ -233,4 +234,22 @@
   .cds--form-requirement {
     display: none !important;
   }
+}
+
+.disabledHourOption {
+  color: colors.$gray-40 !important;
+  background-color: colors.$gray-10 !important;
+  opacity: 0.6 !important;
+  font-style: italic;
+
+  &:hover {
+    background-color: colors.$gray-10 !important;
+    color: colors.$gray-40 !important;
+  }
+}
+
+.hourSelectionHelper {
+  @include type.type-style('helper-text-01');
+  color: colors.$blue-60;
+  margin-top: layout.$spacing-02;
 }

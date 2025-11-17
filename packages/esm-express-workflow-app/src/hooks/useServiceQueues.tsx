@@ -20,7 +20,7 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
   const repString =
     'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
-  const buildQueryParams = (filters?: QueueEntryFilters): string => {
+  const buildQueryParams = (filters?: QueueEntryFilters & { status: string[] }): string => {
     const params = new URLSearchParams();
     params.append('v', repString);
 
@@ -43,23 +43,13 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
     return params.toString();
   };
 
-  const queryString = buildQueryParams(filters);
+  const queryString = buildQueryParams({ ...filters, status: filters?.statuses ?? [], statuses: [] });
   const url = `/ws/rest/v1/queue-entry${queryString ? `?${queryString}` : ''}`;
 
-  const { data, isLoading, error } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
-
-  const filteredResults = useMemo(() => {
-    const results = data?.data?.results ?? [];
-
-    if (filters?.statuses && filters.statuses.length > 0) {
-      return results.filter((entry) => filters.statuses.includes(entry.status?.uuid));
-    }
-
-    return results;
-  }, [data?.data?.results, filters?.statuses]);
+  const { data, isLoading, error } = useSWR<{ data: { results: Array<QueueEntry> } }>(url, openmrsFetch);
 
   return {
-    queueEntries: filteredResults,
+    queueEntries: data?.data?.results ?? [],
     isLoading,
     error,
   };
