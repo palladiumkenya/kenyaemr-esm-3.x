@@ -21,6 +21,19 @@ import upperCase from 'lodash-es/upperCase';
 import Capitalize from 'lodash-es/capitalize';
 import { useBills } from '../../../../billing.resource';
 
+type ProvidedItem = {
+  uuid: string;
+  originUuid: string;
+  price: number;
+  dateOfServed: string | null;
+  status: string;
+  numberOfConsumptions: number;
+  item: {
+    uuid: string;
+    display: string;
+  };
+};
+
 type ExtendedClaim = FacilityClaim & {
   id: string;
   providerName: string;
@@ -59,6 +72,7 @@ type ExtendedClaim = FacilityClaim & {
   };
   bill: {
     uuid: string;
+    providedItems?: Array<ProvidedItem>;
   };
 };
 
@@ -67,22 +81,6 @@ export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => v
   const { claims } = useFacilityClaims();
 
   const claim = claims.find((claim) => claim.id === claimId) as ExtendedClaim | undefined;
-
-  const startDate = claim?.visit?.startDatetime
-    ? new Date(claim.visit.startDatetime)
-    : claim?.dateFrom
-    ? new Date(claim.dateFrom)
-    : new Date();
-
-  const endDate = claim?.visit?.stopDatetime
-    ? new Date(claim.visit.stopDatetime)
-    : claim?.dateTo
-    ? new Date(claim.dateTo)
-    : new Date();
-
-  const { bills, isLoading: isBillLoading } = useBills(claim?.patient?.uuid, 'PAID', startDate, endDate);
-
-  const bill = bills?.[0];
 
   if (!claim) {
     return (
@@ -135,14 +133,24 @@ export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => v
     { key: 'total', header: t('total', 'Total') },
   ];
 
+  const providedItems = claim.bill?.providedItems || [];
+
   const lineItemsRows =
-    bill?.lineItems?.map((item, index) => ({
-      id: `${index}`,
-      item: item.item || item.billableService || '-',
-      quantity: item.quantity || 1,
-      unitPrice: `KES ${(item.price || 0).toLocaleString()}`,
-      total: `KES ${((item.price || 0) * (item.quantity || 1)).toLocaleString()}`,
-    })) || [];
+    providedItems.length > 0
+      ? providedItems.map((item, index) => ({
+          id: `${index}`,
+          item: item.item?.display || '-',
+          quantity: item.numberOfConsumptions || 1,
+          unitPrice: `KES ${(item.price || 0).toLocaleString()}`,
+          total: `KES ${((item.price || 0) * (item.numberOfConsumptions || 1)).toLocaleString()}`,
+        }))
+      : [];
+
+  const calculatedTotal = providedItems.reduce((sum, item) => {
+    return sum + (item.price || 0) * (item.numberOfConsumptions || 1);
+  }, 0);
+
+  const displayTotal = calculatedTotal > 0 ? calculatedTotal : claim.claimedTotal || 0;
 
   return (
     <React.Fragment>
@@ -224,7 +232,7 @@ export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => v
 
           <div className={styles.lineItemsSection}>
             <h4 className={styles.sectionTitle}>{t('servicesProvided', 'SERVICES PROVIDED')}</h4>
-            {isBillLoading ? (
+            {providedItems.length === 0 ? (
               <p>{t('loadingBillDetails', 'Loading bill details...')}</p>
             ) : lineItemsRows.length > 0 ? (
               <DataTable rows={lineItemsRows} headers={lineItemsHeaders}>
@@ -260,18 +268,9 @@ export const ClaimSummaryModal = ({ closeModal, claimId }: { closeModal: () => v
             <h4 className={styles.sectionTitle}>{t('total', 'TOTAL')}</h4>
             <div className={styles.summaryRow}>
               <span className={styles.summaryLabel}>{t('claimedAmount', 'Claimed Amount')}</span>
-              <span className={styles.summaryValue}>
-                {claim.claimedTotal ? `KES ${claim.claimedTotal.toLocaleString()}` : 'KES 0'}
-              </span>
+              <span className={styles.summaryValue}>KES {displayTotal.toLocaleString()}</span>
             </div>
           </div>
-
-          {bill?.uuid && (
-            <div className={styles.billReference}>
-              <span className={styles.referenceLabel}>{t('billReference', 'Bill Reference')}: </span>
-              <span className={styles.referenceValue}>{bill.uuid}</span>
-            </div>
-          )}
         </div>
       </ModalBody>
       <ModalFooter>
