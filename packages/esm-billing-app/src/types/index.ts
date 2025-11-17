@@ -621,6 +621,7 @@ export interface TableProps {
   emptyStateHeader: string;
   includeClaimCode?: boolean;
   use?: string;
+  renderActionButton?: () => React.ReactNode;
 }
 
 export interface ProgressTracker {
