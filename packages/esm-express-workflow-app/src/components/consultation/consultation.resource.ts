@@ -2,7 +2,7 @@ import { openmrsFetch, restBaseUrl, useConfig, Visit } from '@openmrs/esm-framew
 import { FulfillerStatus, Order } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 import { QueueEntry } from '../../types';
 import { ExpressWorkflowConfig } from '../../config-schema';
 
@@ -17,19 +17,36 @@ const getTodayRange = () => ({
   end: dayjs().endOf('day').toISOString(),
 });
 
+// Helper function to filter orders by visit type (OPD only)
+const filterOrdersByVisitType = (orders: Array<any>, outpatientVisitTypeUuid?: string) => {
+  if (!outpatientVisitTypeUuid) {
+    return orders;
+  }
+
+  return orders.filter((order) => {
+    const visitTypeUuid = order?.encounter?.visit?.visitType?.uuid;
+    return visitTypeUuid === outpatientVisitTypeUuid;
+  });
+};
+
 export const useTotalVisits = () => {
-  const customRepresentation = 'custom:(uuid,startDatetime,stopDatetime)';
+  const customRepresentation = 'custom:(uuid,startDatetime,stopDatetime,visitType:(uuid,display))';
 
   const visitsUrl = `${restBaseUrl}/visit?includeInactive=true&v=${customRepresentation}&fromStartDate=${dayjs().format(
     'YYYY-MM-DD',
   )}`;
 
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<Visit> } }>(visitsUrl, openmrsFetch);
+  const { data, error, isLoading, mutate } = useSWR<{ data: { results: Array<Visit> } }>(visitsUrl, openmrsFetch, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 60000,
+  });
 
   return {
     data: data?.data?.results,
     error,
     isLoading,
+    mutate,
   };
 };
 
@@ -39,7 +56,7 @@ export function useLabOrders(params: UseLabOrdersParams = {}) {
 
   const url = useMemo(() => {
     const { start, end } = getTodayRange();
-    let apiUrl = `${restBaseUrl}/order?orderTypes=${labOrderTypeUuid}&v=custom:(uuid)`;
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${labOrderTypeUuid}&v=custom:(uuid,encounter:(visit:(uuid,visitType:(uuid))))`;
 
     if (!status) {
       apiUrl += `&action=NEW`;
@@ -58,12 +75,17 @@ export function useLabOrders(params: UseLabOrdersParams = {}) {
     return apiUrl;
   }, [status, excludeCanceled, labOrderTypeUuid]);
 
-  const { data, error, isLoading } = useSWR<{ data: { results: Array<Order> } }>(url, openmrsFetch);
+  const { data, error, isLoading, mutate } = useSWR<{ data: { results: Array<Order> } }>(url, openmrsFetch, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 60000,
+  });
 
   return {
     labOrders: data?.data?.results ?? [],
     isLoading,
     isError: error,
+    mutate,
   };
 }
 
@@ -72,7 +94,7 @@ function useRadiologyOrders(fulfillerStatus?: string) {
 
   const url = useMemo(() => {
     const { start, end } = getTodayRange();
-    let apiUrl = `${restBaseUrl}/order?orderTypes=${imagingOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,dateStopped)`;
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${imagingOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,dateStopped,encounter:(visit:(uuid,visitType:(uuid))))`;
 
     if (!fulfillerStatus) {
       apiUrl += `&action=NEW`;
@@ -87,19 +109,23 @@ function useRadiologyOrders(fulfillerStatus?: string) {
     return apiUrl;
   }, [fulfillerStatus, imagingOrderTypeUuid]);
 
-  const { data, isLoading } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
+  const { data, isLoading, mutate } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 60000,
+  });
+
+  const { imagingConceptClassUuid: conceptClassUuid } = useConfig<ExpressWorkflowConfig>();
 
   const count = useMemo(() => {
     const orders = data?.data?.results ?? [];
     return orders.filter(
       (order) =>
-        !order.dateStopped &&
-        order.concept.conceptClass.uuid === imagingConceptClassUuid &&
-        order.action !== 'DISCONTINUE',
+        !order.dateStopped && order.concept.conceptClass.uuid === conceptClassUuid && order.action !== 'DISCONTINUE',
     ).length;
-  }, [data, imagingConceptClassUuid]);
+  }, [data, conceptClassUuid]);
 
-  return { count, isLoading };
+  return { count, isLoading, mutate, orders: data?.data?.results ?? [] };
 }
 
 function useProcedureOrders(fulfillerStatus?: string) {
@@ -107,7 +133,7 @@ function useProcedureOrders(fulfillerStatus?: string) {
 
   const url = useMemo(() => {
     const { start, end } = getTodayRange();
-    let apiUrl = `${restBaseUrl}/order?orderTypes=${proceduresOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,dateStopped,fulfillerStatus)&isStopped=false`;
+    let apiUrl = `${restBaseUrl}/order?orderTypes=${proceduresOrderTypeUuid}&v=custom:(uuid,concept:(conceptClass),action,dateStopped,fulfillerStatus,encounter:(visit:(uuid,visitType:(uuid))))&isStopped=false`;
 
     apiUrl += `&activatedOnOrAfterDate=${start}&activatedOnOrBeforeDate=${end}`;
 
@@ -118,7 +144,11 @@ function useProcedureOrders(fulfillerStatus?: string) {
     return apiUrl;
   }, [fulfillerStatus, proceduresOrderTypeUuid]);
 
-  const { data, isLoading } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch);
+  const { data, isLoading, mutate } = useSWR<{ data: { results: Array<any> } }>(url, openmrsFetch, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    dedupingInterval: 60000,
+  });
 
   const count = useMemo(() => {
     const orders = data?.data?.results ?? [];
@@ -141,46 +171,139 @@ function useProcedureOrders(fulfillerStatus?: string) {
     }).length;
   }, [data, proceduresConceptClassUuid, fulfillerStatus]);
 
-  return { count, isLoading };
+  return { count, isLoading, mutate, orders: data?.data?.results ?? [] };
 }
 
 export const useInvestigationStats = () => {
-  const { labOrders: newLabOrders, isLoading: loadingNewLab } = useLabOrders({ newOrdersOnly: true });
-  const { labOrders: completedLabOrders, isLoading: loadingCompletedLab } = useLabOrders({
+  const { outpatientVisitTypeUuid } = useConfig<ExpressWorkflowConfig>();
+
+  // Fetch all investigation orders
+  const {
+    labOrders: newLabOrders,
+    isLoading: loadingNewLab,
+    mutate: mutateNewLab,
+  } = useLabOrders({
+    newOrdersOnly: true,
+  });
+
+  const {
+    labOrders: completedLabOrders,
+    isLoading: loadingCompletedLab,
+    mutate: mutateCompletedLab,
+  } = useLabOrders({
     status: 'COMPLETED',
     excludeCanceled: false,
   });
-  const { count: newRadiologyCount, isLoading: loadingNewRadiology } = useRadiologyOrders();
-  const { count: completedRadiologyCount, isLoading: loadingCompletedRadiology } = useRadiologyOrders('COMPLETED');
-  const { count: newProcedureCount, isLoading: loadingNewProcedures } = useProcedureOrders();
-  const { count: completedProcedureCount, isLoading: loadingCompletedProcedures } = useProcedureOrders('COMPLETED');
 
-  const awaitingCount = newLabOrders.length + newRadiologyCount + newProcedureCount;
-  const completedCount = completedLabOrders.length + completedRadiologyCount + completedProcedureCount;
+  const {
+    orders: newRadiologyOrders,
+    isLoading: loadingNewRadiology,
+    mutate: mutateNewRadiology,
+  } = useRadiologyOrders();
+
+  const {
+    orders: completedRadiologyOrders,
+    isLoading: loadingCompletedRadiology,
+    mutate: mutateCompletedRadiology,
+  } = useRadiologyOrders('COMPLETED');
+
+  const {
+    orders: newProcedureOrders,
+    isLoading: loadingNewProcedures,
+    mutate: mutateNewProcedures,
+  } = useProcedureOrders();
+
+  const {
+    orders: completedProcedureOrders,
+    isLoading: loadingCompletedProcedures,
+    mutate: mutateCompletedProcedures,
+  } = useProcedureOrders('COMPLETED');
+
+  // Filter all orders by outpatient visit type
+  const filteredNewLabOrders = useMemo(
+    () => filterOrdersByVisitType(newLabOrders, outpatientVisitTypeUuid),
+    [newLabOrders, outpatientVisitTypeUuid],
+  );
+
+  const filteredCompletedLabOrders = useMemo(
+    () => filterOrdersByVisitType(completedLabOrders, outpatientVisitTypeUuid),
+    [completedLabOrders, outpatientVisitTypeUuid],
+  );
+
+  const filteredNewRadiologyOrders = useMemo(
+    () => filterOrdersByVisitType(newRadiologyOrders, outpatientVisitTypeUuid),
+    [newRadiologyOrders, outpatientVisitTypeUuid],
+  );
+
+  const filteredCompletedRadiologyOrders = useMemo(
+    () => filterOrdersByVisitType(completedRadiologyOrders, outpatientVisitTypeUuid),
+    [completedRadiologyOrders, outpatientVisitTypeUuid],
+  );
+
+  const filteredNewProcedureOrders = useMemo(
+    () => filterOrdersByVisitType(newProcedureOrders, outpatientVisitTypeUuid),
+    [newProcedureOrders, outpatientVisitTypeUuid],
+  );
+
+  const filteredCompletedProcedureOrders = useMemo(
+    () => filterOrdersByVisitType(completedProcedureOrders, outpatientVisitTypeUuid),
+    [completedProcedureOrders, outpatientVisitTypeUuid],
+  );
+
+  // Calculate counts from filtered orders
+  const awaitingCount =
+    filteredNewLabOrders.length + filteredNewRadiologyOrders.length + filteredNewProcedureOrders.length;
+
+  const completedCount =
+    filteredCompletedLabOrders.length +
+    filteredCompletedRadiologyOrders.length +
+    filteredCompletedProcedureOrders.length;
+
+  // Single refresh function for all investigations
+  const refresh = useCallback(async () => {
+    await Promise.all([
+      mutateNewLab(),
+      mutateCompletedLab(),
+      mutateNewRadiology(),
+      mutateCompletedRadiology(),
+      mutateNewProcedures(),
+      mutateCompletedProcedures(),
+    ]);
+  }, [
+    mutateNewLab,
+    mutateCompletedLab,
+    mutateNewRadiology,
+    mutateCompletedRadiology,
+    mutateNewProcedures,
+    mutateCompletedProcedures,
+  ]);
+
+  const isLoading =
+    loadingNewLab ||
+    loadingCompletedLab ||
+    loadingNewRadiology ||
+    loadingCompletedRadiology ||
+    loadingNewProcedures ||
+    loadingCompletedProcedures;
 
   return {
     awaitingCount,
     completedCount,
     totalCount: awaitingCount + completedCount,
     lab: {
-      awaiting: newLabOrders.length,
-      completed: completedLabOrders.length,
+      awaiting: filteredNewLabOrders.length,
+      completed: filteredCompletedLabOrders.length,
     },
     radiology: {
-      awaiting: newRadiologyCount,
-      completed: completedRadiologyCount,
+      awaiting: filteredNewRadiologyOrders.length,
+      completed: filteredCompletedRadiologyOrders.length,
     },
     procedures: {
-      awaiting: newProcedureCount,
-      completed: completedProcedureCount,
+      awaiting: filteredNewProcedureOrders.length,
+      completed: filteredCompletedProcedureOrders.length,
     },
-    isLoading:
-      loadingNewLab ||
-      loadingCompletedLab ||
-      loadingNewRadiology ||
-      loadingCompletedRadiology ||
-      loadingNewProcedures ||
-      loadingCompletedProcedures,
+    isLoading,
+    refresh,
   };
 };
 

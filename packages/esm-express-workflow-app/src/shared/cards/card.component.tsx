@@ -6,39 +6,28 @@ import { ArrowRight } from '@carbon/react/icons';
 import classNames from 'classnames';
 
 type CardProps = {
-  title: string;
+  title: string | React.ReactNode;
   total: number | string;
   onClick?: () => void;
   categories?: Array<{ label: string; value: number; onClick?: () => void }>;
+  refreshButton?: React.ReactNode;
 };
 
-const Card: React.FC<CardProps> = ({ title, total, categories, onClick }) => {
+const Card: React.FC<CardProps> = ({ title, total, categories, onClick, refreshButton }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.card}>
-      <div className={styles.cardInner}>
-        <div className={styles.header}>
-          <h3 className={styles.title}>{title}</h3>
+      <div className={styles.header}>
+        <div className={styles.title}>{title}</div>
+        {refreshButton && <div className={styles.refreshButton}>{refreshButton}</div>}
+      </div>
+      <div className={styles.content}>
+        <div className={styles.totalSection}>
+          <div className={styles.total}>{total}</div>
         </div>
-        <div className={styles.content}>
-          <div className={styles.totalSection}>
-            <div className={styles.totalLabel}>Total</div>
-            <div className={styles.total}>{total}</div>
-          </div>
-          {categories && categories.length > 0 && <div className={styles.divider} />}
-          {categories && categories.length > 0 && (
-            <div className={styles.categoriesSection}>
-              {categories.map((category, index) => (
-                <div key={index} className={styles.category}>
-                  <div className={styles.categoryValue}>{category.value}</div>
-                  <div className={styles.categoryLabel}>{category.label}</div>
-                </div>
-              ))}
-            </div>
         <div className={styles.categoriesSection}>
-          {categories?.length ? (
-            <>
-              {categories?.map((category, index) => (
+          {categories?.length
+            ? categories.map((category, index) => (
                 <div key={index} className={styles.category}>
                   <div
                     className={classNames(styles.categoryLabel, styles.link)}
@@ -49,18 +38,13 @@ const Card: React.FC<CardProps> = ({ title, total, categories, onClick }) => {
                   </div>
                   <div className={styles.categoryValue}>{category.value}</div>
                 </div>
-              ))}
-            </>
-          ) : (
-            <>
-              {typeof onClick === 'function' && (
+              ))
+            : typeof onClick === 'function' && (
                 <span className={styles.link} role="button" tabIndex={0} onClick={onClick}>
                   {t('view', 'View')}
                   <ArrowRight size={10} />
                 </span>
               )}
-            </>
-          )}
         </div>
       </div>
     </div>
