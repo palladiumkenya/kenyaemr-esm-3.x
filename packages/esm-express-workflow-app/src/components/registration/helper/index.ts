@@ -7,7 +7,7 @@ import {
   DependentPayload,
   HIEPatient,
 } from '../type';
-import { birthCertificateUuid, nationalIdUuid, passportUuid, shaNumberUuid } from '../constant';
+import { birthCertificateUuid, nationalIdUuid, passportUuid, shaNumberUuid, shaIdNumberUuid } from '../constant';
 
 /**
  * Extracts eligibility data from the EligibilityResponse structure.
@@ -162,6 +162,9 @@ export const extractDependentsFromContacts = (patient: fhir.Patient) => {
     const identifierExtensions = contact.extension?.filter((ext) => ext.url === 'identifiers') || [];
     const shaNumber = identifierExtensions.find((ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'sha-number')
       ?.valueIdentifier?.value;
+    const shaIdNumber = identifierExtensions.find(
+      (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'sha-id-number',
+    )?.valueIdentifier?.value;
 
     const nationalId = identifierExtensions.find(
       (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'national-id',
@@ -183,6 +186,7 @@ export const extractDependentsFromContacts = (patient: fhir.Patient) => {
       nationalId,
       birthCertificate,
       contactData: contact,
+      shaIdNumber,
     };
   });
 };
@@ -243,6 +247,24 @@ export const transformToDependentPayload = (dependent: InputDependent, parentId?
           ],
         },
         value: dependent.shaNumber,
+      },
+    });
+  }
+  if (dependent.shaIdNumber) {
+    extensions.push({
+      url: 'identifiers',
+      valueIdentifier: {
+        use: 'official',
+        type: {
+          coding: [
+            {
+              system: 'https://ts.kenya-hie.health/Codesystem/identifier-types',
+              code: 'sha-id-number',
+              display: 'CR Number',
+            },
+          ],
+        },
+        value: dependent.shaIdNumber,
       },
     });
   }
@@ -475,6 +497,7 @@ export function getIdentifierTypeUUID(code: string): string {
     'national-id': nationalIdUuid,
     'passport-number': passportUuid,
     'birth-certificate-number': birthCertificateUuid,
+    'sha-id-number': shaIdNumberUuid,
   };
 
   return identifierTypeMap[code] || '';
