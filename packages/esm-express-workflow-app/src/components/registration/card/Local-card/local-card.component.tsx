@@ -223,6 +223,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                   renderedFrom="local-search"
                   eligibilityData={eligibilityResponse}
                   isEligibilityLoading={false}
+                  crNumber={hiePatientData?.id}
                 />
               </div>
 

@@ -37,6 +37,13 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
             preferred: false,
           }))
           .filter((identifier) => identifier.identifierType) || [];
+      const crIdentifier = {
+        identifier: hiePatient?.id,
+        identifierType: getIdentifierTypeUUID('sha-id-number'),
+        location: locationUuid,
+        preferred: false,
+      };
+      identifiers.push(crIdentifier);
 
       const patientName = hiePatient.name?.[0];
       if (patientName) {
@@ -78,6 +85,13 @@ export async function createPatient(payload: PatientRegistrationPayload, t: any)
             preferred: false,
           }))
           .filter((identifier: any) => identifier.identifierType) || [];
+      const crIdentifier = {
+        identifier: dependentInfo?.id,
+        identifierType: getIdentifierTypeUUID('sha-id-number'),
+        location: locationUuid,
+        preferred: false,
+      };
+      identifiers.push(crIdentifier);
 
       const birthdate = dependentInfo.extension?.find(
         (ext: any) => ext.url === 'https://ts.kenya-hie.health/fhir/StructureDefinition/date_of_birth',

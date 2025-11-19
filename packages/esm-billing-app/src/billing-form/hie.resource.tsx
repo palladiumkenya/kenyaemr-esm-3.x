@@ -48,10 +48,9 @@ type HIEEligibilityResponse = {
 export const useSHAEligibility = (patientUuid: string, shaIdentificationNumber?: fhir.Identifier[]) => {
   const { patient } = usePatient(patientUuid);
   const { nationalIdUUID } = useConfig<BillingConfig>();
-
   const nationalId = patient?.identifier
     ?.filter((identifier) => identifier)
-    .filter((identifier) => identifier.type.coding.some((coding) => coding.code === nationalIdUUID))
+    .filter((identifier) => identifier?.type?.coding?.some((coding) => coding?.code === nationalIdUUID))
     ?.at(0)?.value;
 
   const url =
@@ -61,10 +60,9 @@ export const useSHAEligibility = (patientUuid: string, shaIdentificationNumber?:
   const { data, error, isLoading, mutate } = useSWR<{ data: Array<HIEEligibilityResponse> }>(url, openmrsFetch, {
     errorRetryCount: 0,
   });
-
   return {
-    data: data
-      ? { ...(JSON.parse(data?.data.at(0)?.eligibility_response as unknown as string) as EligibilityResponse) }
+    data: data?.data?.[0]?.eligibility_response
+      ? { ...(JSON.parse(data.data[0].eligibility_response as unknown as string) as EligibilityResponse) }
       : undefined,
     isLoading,
     error,
