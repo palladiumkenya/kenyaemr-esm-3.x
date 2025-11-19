@@ -304,6 +304,9 @@ export const getDependentsFromContacts = (patient: HIEPatient) => {
     const identifierExtensions = contact.extension?.filter((ext) => ext.url === 'identifiers') || [];
     const shaNumber = identifierExtensions.find((ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'sha-number')
       ?.valueIdentifier?.value;
+    const shaIdNumber = identifierExtensions.find(
+      (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'sha-id-number',
+    )?.valueIdentifier?.value;
 
     const nationalId = identifierExtensions.find(
       (ext) => ext.valueIdentifier?.type?.coding?.[0]?.code === 'national-id',
@@ -325,6 +328,7 @@ export const getDependentsFromContacts = (patient: HIEPatient) => {
       nationalId,
       birthCertificate,
       contactData: contact,
+      shaIdNumber,
     };
   });
 };

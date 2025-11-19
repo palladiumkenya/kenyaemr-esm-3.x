@@ -198,10 +198,11 @@ export async function createDependentPatient(dependent: DependentPayload, patien
 // Helper function to map identifier codes to OpenMRS UUIDs
 function getIdentifierTypeUUID(code: string): string {
   const identifierTypeMap = {
-    'sha-number': '24aedd37-b5be-4e08-8311-3721b8d5100d',
+    'sha-number': '52c3c0c3-05b8-4b26-930e-2a6a54e14c90',
     'national-id': '49af6cdc-7968-4abb-bf46-de10d7f4859f',
     'passport-number': 'be9beef6-aacc-4e1f-ac4e-5babeaa1e303',
     'birth-certificate-number': '68449e5a-8829-44dd-bfef-c9c8cf2cb9b2',
+    'sha-id-number': '24aedd37-b5be-4e08-8311-3721b8d5100d',
   };
 
   return identifierTypeMap[code] || '';
