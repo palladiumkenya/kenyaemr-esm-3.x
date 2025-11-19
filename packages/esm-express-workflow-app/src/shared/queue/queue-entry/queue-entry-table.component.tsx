@@ -72,6 +72,10 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
       key: 'priority',
     },
     {
+      header: t('priorityComment', 'Priority Comment'),
+      key: 'priorityComment',
+    },
+    {
       header: t('status', 'status'),
       key: 'status',
     },
@@ -127,6 +131,7 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
           {t(queueEntry.priority.display, capitalize(queueEntry.priority.display.replace('_', ' ')))}
         </div>
       ),
+      priorityComment: startCase(queueEntry.priorityComment?.toLowerCase() ?? '--'),
       status: queueEntry?.status?.display ?? '--',
       queue: startCase(queueEntry?.queue?.display?.toLowerCase() ?? '--'),
       waitTime: dayjs(queueEntry.startedAt).fromNow(),
