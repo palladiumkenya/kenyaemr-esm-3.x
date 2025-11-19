@@ -3,8 +3,7 @@ import useSWR from 'swr';
 import { FacilityClaim } from '../../../types';
 
 export const useFacilityClaims = () => {
-  const customPresentation =
-    'custom:(uuid,claimCode,use,dateFrom,dateTo,claimedTotal,approvedTotal,status,externalId,responseUUID,provider:(person:(display),display),patient:(uuid,display,person:(display,gender,age,birthdate)),visitType:(uuid,display),visit:(uuid,display,startDatetime,stopDatetime,encounters:(diagnoses:(uuid,diagnosis))),bill:(uuid))';
+  const customPresentation = 'default';
   const url = `${restBaseUrl}/claim?v=${customPresentation}`;
 
   const { data, error, isLoading, mutate, isValidating } = useSWR<FetchResponse<{ results: Array<FacilityClaim> }>>(
