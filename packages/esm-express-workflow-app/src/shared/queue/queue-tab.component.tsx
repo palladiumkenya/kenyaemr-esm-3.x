@@ -16,6 +16,7 @@ type QueueTabProps = {
     value: string;
     categories?: Array<{ label: string; value: number; onClick?: () => void }>;
     onClick?: () => void;
+    refreshButton?: React.ReactNode; // Add this property
   }>;
   navigatePath: string;
   onTabChanged?: (queue: Queue) => void;
@@ -113,6 +114,7 @@ const QueueTab: React.FC<QueueTabProps> = ({
             total={card.value}
             categories={card.categories}
             onClick={card.onClick}
+            refreshButton={card.refreshButton}
           />
         ))}
       </div>

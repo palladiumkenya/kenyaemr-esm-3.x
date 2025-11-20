@@ -140,6 +140,11 @@ export const configSchema = {
     _description: 'Concept class UUID for procedures orders',
     _default: '8d490bf4-c2cc-11de-8d13-0010c6dffd0f',
   },
+  proceduresOrderTypeUuid: {
+    _type: Type.String,
+    _description: 'Procedure Order type UUID',
+    _default: 'b4a7c280-369e-4d12-9ce8-18e36783fed6',
+  },
   triageServiceConceptUuid: {
     _type: Type.ConceptUuid,
     _description: 'Concept UUID for triage service',
@@ -150,6 +155,11 @@ export const configSchema = {
       maternityWard: 'b95dd376-fa35-40a6-b140-d144c5f22f62',
       labourWard: '7680b7ee-6880-450c-8b7e-2a748b6f9dc7',
     },
+  },
+  outpatientVisitTypeUuid: {
+    _type: Type.String,
+    _description: 'The UUID of the outpatient visit type.',
+    _default: '3371a4d4-f66f-4454-a86d-92c7b3da990c',
   },
 };
 
@@ -184,6 +194,7 @@ export type ExpressWorkflowConfig = {
   imagingConceptClassUuid: string;
   orderableConceptSets: Array<string>;
   imagingOrderTypeUuid: string;
+  proceduresOrderTypeUuid: string;
   imagingOrderableConceptSets: Array<string>;
   clinicalEncounter: {
     encounterTypeUuid: string;
@@ -201,4 +212,5 @@ export type ExpressWorkflowConfig = {
     maternityWard: string;
     labourWard: string;
   };
+  outpatientVisitTypeUuid: string;
 };

@@ -13,12 +13,53 @@
 
 .header {
   padding: layout.$spacing-05;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: layout.$spacing-03;
 }
 
 .title {
   @include type.type-style('heading-compact-01');
   font-weight: 600;
   color: colors.$gray-100;
+  flex: 1;
+}
+
+.refreshButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  height: 2rem;
+  min-width: 2rem;
+
+  :global(.cds--btn--ghost) {
+    padding: layout.$spacing-02;
+    min-height: 2rem;
+    height: 2rem;
+    width: 2rem;
+    color: colors.$blue-60;
+
+    &:hover {
+      background-color: colors.$gray-10;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  :global(.cds--inline-loading) {
+    min-height: 2rem;
+    justify-content: center;
+  }
+
+  :global(.cds--inline-loading__text) {
+    display: none;
+  }
 }
 
 .content {
@@ -30,7 +71,7 @@
 }
 
 .totalSection {
-flex: 1;
+  flex: 1;
 }
 
 .total {
@@ -67,7 +108,6 @@ flex: 1;
   color: colors.$gray-100;
 }
 
-
 .link {
   text-decoration: none;
   display: flex;
@@ -77,4 +117,3 @@ flex: 1;
   cursor: pointer;
   font-size: small;
 }
-

@@ -6,18 +6,20 @@ import { ArrowRight } from '@carbon/react/icons';
 import classNames from 'classnames';
 
 type CardProps = {
-  title: string;
+  title: string | React.ReactNode;
   total: number | string;
   onClick?: () => void;
   categories?: Array<{ label: string; value: number; onClick?: () => void }>;
+  refreshButton?: React.ReactNode;
 };
 
-const Card: React.FC<CardProps> = ({ title, total, categories, onClick }) => {
+const Card: React.FC<CardProps> = ({ title, total, categories, onClick, refreshButton }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.card}>
       <div className={styles.header}>
         <div className={styles.title}>{title}</div>
+        {refreshButton && <div className={styles.refreshButton}>{refreshButton}</div>}
       </div>
       <div className={styles.content}>
         <div className={styles.totalSection}>
