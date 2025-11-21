@@ -73,7 +73,7 @@ export const configSchema = {
       consultationService: '167410AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
-  queuStatusConceptUuids: {
+  queueStatusConceptUuids: {
     _type: Type.Object,
     _description: 'Concept UUIDs for queue status',
     _default: {
@@ -185,7 +185,7 @@ export type ExpressWorkflowConfig = {
     triageService: string;
     consultationService: string;
   };
-  queuStatusConceptUuids: {
+  queueStatusConceptUuids: {
     waitingStatus: string;
     inServiceStatus: string;
     finishedStatus: string;

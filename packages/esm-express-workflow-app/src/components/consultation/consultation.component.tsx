@@ -17,12 +17,17 @@ type ConsultationProps = {
 
 const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
   const { t } = useTranslation();
+  const {
+    priorities: { emergencyPriorityConceptUuid, urgentPriorityConceptUuid, notUrgentPriorityConceptUuid },
+    queueServiceConceptUuids,
+  } = useConfig<ExpressWorkflowConfig>();
+
   const { queues, isLoading, error } = useQueues();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const consultationQueues = queues.filter(
     (queue) =>
-      queue.name.toLowerCase().includes('consultation') &&
+      queue.service.uuid === queueServiceConceptUuids.consultationService &&
       !queue.location.display.toLowerCase().includes('mch') &&
       queue?.queueRooms?.length > 0,
   );
@@ -44,9 +49,6 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
   } = useInvestigationStats();
 
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
-  const {
-    priorities: { emergencyPriorityConceptUuid, urgentPriorityConceptUuid, notUrgentPriorityConceptUuid },
-  } = useConfig<ExpressWorkflowConfig>();
 
   const consultationLocations = useMemo(
     () => consultationQueues.map((queue) => queue.location.uuid),
