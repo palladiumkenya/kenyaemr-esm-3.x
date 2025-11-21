@@ -27,11 +27,15 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   const [currQueue, setCurrQueue] = useState<Queue>();
   const { queues, isLoading, error } = useQueues();
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
+  const {
+    queueStatusConceptUuids: { finishedStatus, waitingStatus },
+    queueServiceConceptUuids,
+  } = useConfig<ExpressWorkflowConfig>();
 
   const triageQueues = queues
     .filter(
       (queue) =>
-        queue.name.toLowerCase().includes('triage') &&
+        queue.service.uuid === queueServiceConceptUuids.triageService &&
         !queue.location.display.toLowerCase().includes('mch') &&
         queue?.queueRooms?.length > 0,
     )
@@ -43,9 +47,7 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
     inServiceEntries,
     finishedEntries,
   } = useTriageQueuesMetrics(currQueue ?? triageQueues[0]);
-  const {
-    queuStatusConceptUuids: { finishedStatus, waitingStatus },
-  } = useConfig<ExpressWorkflowConfig>();
+
   if (isLoading || isLoadingMetrics) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }

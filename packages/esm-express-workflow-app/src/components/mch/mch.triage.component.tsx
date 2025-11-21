@@ -15,12 +15,13 @@ const MCHTriage: React.FC = () => {
   const [currQueue, setCurrQueue] = useState<Queue>();
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
   const {
-    queuStatusConceptUuids: { finishedStatus, waitingStatus },
+    queueStatusConceptUuids: { finishedStatus, waitingStatus },
+    queueServiceConceptUuids,
   } = useConfig<ExpressWorkflowConfig>();
   const triageQueues = queues
     .filter(
       (queue) =>
-        queue.name.toLowerCase().includes('triage') &&
+        queue.service.uuid === queueServiceConceptUuids.triageService &&
         queue.location.display.toLowerCase().includes('mch') &&
         queue?.queueRooms?.length > 0,
     )

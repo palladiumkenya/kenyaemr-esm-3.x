@@ -5,14 +5,14 @@ import { Queue } from '../../types';
 import { useMemo } from 'react';
 
 export const useTriageQueuesMetrics = (queue?: Queue) => {
-  const { queueServiceConceptUuids, queuStatusConceptUuids } = useConfig<ExpressWorkflowConfig>();
+  const { queueServiceConceptUuids, queueStatusConceptUuids } = useConfig<ExpressWorkflowConfig>();
   const {
     queueEntries: waitingEntries,
     isLoading: isLoadingWaiting,
     error: waitingError,
   } = useQueueEntries({
     service: [queueServiceConceptUuids.triageService],
-    statuses: [queuStatusConceptUuids.waitingStatus],
+    statuses: [queueStatusConceptUuids.waitingStatus],
     location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
   });
   const {
@@ -21,7 +21,7 @@ export const useTriageQueuesMetrics = (queue?: Queue) => {
     error: inServiceError,
   } = useQueueEntries({
     service: [queueServiceConceptUuids.triageService],
-    statuses: [queuStatusConceptUuids.inServiceStatus],
+    statuses: [queueStatusConceptUuids.inServiceStatus],
     location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
   });
   const {
@@ -30,7 +30,7 @@ export const useTriageQueuesMetrics = (queue?: Queue) => {
     error: finishedError,
   } = useQueueEntries({
     service: [queueServiceConceptUuids.triageService],
-    statuses: [queuStatusConceptUuids.finishedStatus],
+    statuses: [queueStatusConceptUuids.finishedStatus],
     location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
   });
 

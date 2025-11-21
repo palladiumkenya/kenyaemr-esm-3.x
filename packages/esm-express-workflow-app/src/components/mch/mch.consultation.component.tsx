@@ -12,19 +12,21 @@ import { QueueFilter } from '../../types';
 const MCHConsultation: React.FC = () => {
   const { t } = useTranslation();
   const { queues, isLoading, error } = useQueues();
-  const consultationQueues = queues.filter(
-    (queue) =>
-      queue.name.toLowerCase().includes('consultation') &&
-      queue.location.display.toLowerCase().includes('mch') &&
-      queue?.queueRooms?.length > 0,
-  );
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
 
   const {
     priorities: { emergencyPriorityConceptUuid, urgentPriorityConceptUuid, notUrgentPriorityConceptUuid },
+    queueServiceConceptUuids,
   } = useConfig<ExpressWorkflowConfig>();
   const { data: totalVisits, isLoading: isLoadingTotalVisits } = useTotalVisits();
   const { awaitingCount, completedCount, totalCount, isLoading: isLoadingInvestigations } = useInvestigationStats();
+
+  const consultationQueues = queues.filter(
+    (queue) =>
+      queue.service.uuid === queueServiceConceptUuids.consultationService &&
+      queue.location.display.toLowerCase().includes('mch') &&
+      queue?.queueRooms?.length > 0,
+  );
 
   const consultationLocations = useMemo(
     () => consultationQueues.map((queue) => queue.location.uuid),
