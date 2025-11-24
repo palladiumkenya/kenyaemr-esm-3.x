@@ -509,7 +509,7 @@ export const configSchema = {
           {
             formName: 'HIV Initial form',
             formUuId: '592fd92c-35f6-4dd8-8f0d-a401c1e5b2e2',
-            dependancies: ['e4b506c1-7379-42b6-a374-284469cba8da', '592fd92c-35f6-4dd8-8f0d-a401c1e5b2e2'],
+            dependancies: ['e4b506c1-7379-42b6-a374-284469cba8da'],
             isEnrollment: false,
           },
           {
