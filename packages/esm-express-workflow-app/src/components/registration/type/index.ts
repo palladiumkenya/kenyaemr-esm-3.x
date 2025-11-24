@@ -219,6 +219,7 @@ export interface InputDependent {
   birthDate?: string;
   nationalId?: string;
   shaNumber?: string;
+  shaIdNumber?: string;
   birthCertificate?: string;
   householdNumber?: string;
   phoneNumber?: string;
