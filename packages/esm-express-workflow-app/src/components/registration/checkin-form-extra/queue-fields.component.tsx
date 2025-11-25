@@ -73,7 +73,7 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
 
   const onSubmit = useCallback(
     (visit: Visit) => {
-      if (selectedQueueRoom && priority) {
+      if (selectedQueueRoom) {
         const selectedRoom = filteredQueueRooms.find((room) => room.uuid === selectedQueueRoom);
         const queueUuid = selectedRoom?.queue?.uuid;
 
