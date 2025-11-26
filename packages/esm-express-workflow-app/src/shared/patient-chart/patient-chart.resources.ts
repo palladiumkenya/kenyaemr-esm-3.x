@@ -84,37 +84,75 @@ export const usePatientChartTabs = (navigationPath: string, patientUuid: string,
 };
 
 /**
+ * fetches the latest admission encounter for the current patient, could be an admission encounter or a transfer encounter
+ * Since the patient can be transferred to multiple locations, we need to fetch the latest admission encounter for the current patient
+ * The visit encounters are sorted by encounter datetime in descending order, so the latest admission encounter is the first one
+ * @param patientUuid
+ * @returns {
+ *   admissionEncounter: the latest admission encounter
+ *   isLoading: whether the admission encounter is loading
+ *   error: the error fetching the admission encounter
+ *   mutate: mutate the admission encounter
+ *   currentVisit: the current visit
+ *   dischargeEncounter: the discharge encounter
+ *   isPatientAdmitted: whether the patient is admitted
+ * }
+ */
+export const useCurrentPatientAdmissionEncounter = (patientUuid: string) => {
+  const { currentVisit, error: visitError, isLoading: isLoadingVisit, mutate: mutateVisit } = useVisit(patientUuid);
+  const { emrConfiguration, isLoadingEmrConfiguration, errorFetchingEmrConfiguration } = useEmrConfiguration();
+  const { inPatientVisitTypeUuid } = useConfig<{ inPatientVisitTypeUuid: string }>({
+    externalModuleName: '@kenyaemr/esm-ward-app',
+  });
+  // Admission or Tranfer encounter depending on wether patient was transfered or admitted directly
+  const latestAdmisionEncounter = useMemo(() => {
+    return currentVisit?.encounters?.find(
+      (encounter) =>
+        encounter.encounterType.uuid === emrConfiguration?.admissionEncounterType?.uuid ||
+        encounter.encounterType.uuid === emrConfiguration?.transferWithinHospitalEncounterType?.uuid,
+    );
+  }, [currentVisit, emrConfiguration]);
+
+  const dischargeEncounter = useMemo(() => {
+    return currentVisit?.encounters?.find(
+      (encounter) => encounter.encounterType.uuid === emrConfiguration?.exitFromInpatientEncounterType?.uuid,
+    );
+  }, [currentVisit, emrConfiguration]);
+
+  const isPatientAdmitted = useMemo(() => {
+    return latestAdmisionEncounter && !dischargeEncounter;
+  }, [latestAdmisionEncounter, dischargeEncounter]);
+
+  return {
+    admissionEncounter: latestAdmisionEncounter,
+    isLoading: isLoadingVisit || isLoadingEmrConfiguration,
+    error: visitError || errorFetchingEmrConfiguration,
+    mutate: mutateVisit,
+    currentVisit,
+    dischargeEncounter,
+    isPatientAdmitted: isPatientAdmitted && currentVisit?.visitType.uuid === inPatientVisitTypeUuid,
+  };
+};
+
+/**
  * Show partography component when patient is a female patient, admitted to labour ward
  * @param patientUuid string
  */
 export const useShowPatography = (patientUuid: string) => {
   const { patient, isLoading: isLoadingPatient, error: patientError } = usePatient(patientUuid);
   const isFemale = patient?.gender?.toLowerCase() === 'female';
-  const { inPatientVisitTypeUuid } = useConfig<{ inPatientVisitTypeUuid: string }>({
-    externalModuleName: '@kenyaemr/esm-ward-app',
-  });
-  const { currentVisit, error: visitError, isLoading: isLoadingVisit } = useVisit(patientUuid);
-  const { emrConfiguration, errorFetchingEmrConfiguration, isLoadingEmrConfiguration } = useEmrConfiguration();
-  const { isAdmitted, admissionLocation } = useMemo<{ isAdmitted: boolean; admissionLocation?: Location }>(() => {
-    const isInPatientVisit = currentVisit?.visitType?.uuid === inPatientVisitTypeUuid;
-    const admissionEncounter = currentVisit?.encounters?.find(
-      (en) => en.encounterType.uuid === emrConfiguration?.admissionEncounterType?.uuid,
-    );
-    const dischargeEncounter = currentVisit?.encounters?.find(
-      (en) => en.encounterType.uuid === emrConfiguration?.exitFromInpatientEncounterType?.uuid,
-    );
 
-    return {
-      isAdmitted: currentVisit && isInPatientVisit && admissionEncounter && !dischargeEncounter,
-      admissionLocation: admissionEncounter?.location,
-    };
-  }, [
-    currentVisit,
-    emrConfiguration?.admissionEncounterType?.uuid,
-    emrConfiguration?.exitFromInpatientEncounterType.uuid,
-    inPatientVisitTypeUuid,
-  ]);
-  const { error: tagsError, isLoading: isloadingTags, tags } = useAdmissionLocationTags(admissionLocation?.uuid);
+  const {
+    admissionEncounter,
+    error: admissionError,
+    isLoading: isloadingAdmission,
+    isPatientAdmitted,
+  } = useCurrentPatientAdmissionEncounter(patientUuid);
+  const {
+    error: tagsError,
+    isLoading: isloadingTags,
+    tags,
+  } = useAdmissionLocationTags(admissionEncounter?.location?.uuid);
   const { inpatientLocationTags } = useConfig<ExpressWorkflowConfig>();
   const admissionLocationIsLabourWard = useMemo(
     () => Object.values(inpatientLocationTags).every((tag) => tags.some((t) => t.uuid === tag)),
@@ -122,9 +160,9 @@ export const useShowPatography = (patientUuid: string) => {
   );
 
   return {
-    isLoading: isLoadingPatient || isLoadingPatient || isLoadingEmrConfiguration || isloadingTags,
-    error: patientError ?? visitError ?? errorFetchingEmrConfiguration ?? tagsError,
-    showPartography: isFemale && isAdmitted && admissionLocationIsLabourWard,
+    isLoading: isLoadingPatient || isLoadingPatient || isloadingAdmission || isloadingTags,
+    error: patientError ?? admissionError ?? tagsError,
+    showPartography: isFemale && isPatientAdmitted && admissionLocationIsLabourWard,
   };
 };
 
