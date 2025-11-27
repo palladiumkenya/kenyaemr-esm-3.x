@@ -29,7 +29,8 @@ export const ManageClaimRequest = ({
   const claim = claims.find((claim) => claim.id === claimId);
 
   const handleRetryClaim = () => {
-    retryClaim(claim.externalId)
+    setIsSubmitting(true);
+    retryClaim(claim.uuid)
       .then(() => {
         mutate();
         showSnackbar({
@@ -55,7 +56,7 @@ export const ManageClaimRequest = ({
 
   const handleUpdateStatus = () => {
     setIsSubmitting(true);
-    updateClaimStatus(claim.responseUUID)
+    updateClaimStatus(claim.uuid)
       .then(() => {
         mutate();
         showSnackbar({
