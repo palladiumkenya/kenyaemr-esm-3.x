@@ -150,6 +150,21 @@ export const configSchema = {
     _description: 'Concept UUID for triage service',
     _default: '167411AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  labServiceConceptUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'Concept UUID for lab service',
+    _default: 'c9604249-db0a-4d03-b074-fc6bc2fa13e6',
+  },
+  pharmacyServiceConceptUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'Concept UUID for pharmacy service',
+    _default: 'b75e466f-a6f5-4d5e-849a-84424d3c85cd',
+  },
+  radiologyServiceConceptUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'Concept UUID for radiology service',
+    _default: '160463AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
   inpatientLocationTags: {
     _default: {
       maternityWard: 'b95dd376-fa35-40a6-b140-d144c5f22f62',
@@ -208,6 +223,9 @@ export type ExpressWorkflowConfig = {
   otpExpirationDurationInminutes: number;
   proceduresConceptClassUuid: string;
   triageServiceConceptUuid: string;
+  labServiceConceptUuid: string;
+  pharmacyServiceConceptUuid: string;
+  radiologyServiceConceptUuid: string;
   inpatientLocationTags: {
     maternityWard: string;
     labourWard: string;

@@ -34,6 +34,9 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
   const {
     visitQueueNumberAttributeUuid,
     triageServiceConceptUuid,
+    labServiceConceptUuid,
+    pharmacyServiceConceptUuid,
+    radiologyServiceConceptUuid,
     concepts: { defaultStatusConceptUuid, defaultPriorityConceptUuid, emergencyPriorityConceptUuid },
   } = useConfig<ExpressWorkflowConfig>();
 
@@ -49,6 +52,7 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
     if (!queueRooms || queueRooms.length === 0) {
       return [];
     }
+    const allowedWalkInServices = [labServiceConceptUuid, pharmacyServiceConceptUuid, radiologyServiceConceptUuid];
 
     return queueRooms.filter((room) => {
       const serviceUuid = room.queue?.service?.uuid;
@@ -56,12 +60,19 @@ const QueueFields: React.FC<QueueFieldsProps> = ({ setOnSubmit }) => {
       if (selectedCategory === 'triage') {
         return serviceUuid === triageServiceConceptUuid;
       } else if (selectedCategory === 'walk-in') {
-        return serviceUuid !== triageServiceConceptUuid;
+        return allowedWalkInServices.includes(serviceUuid);
       }
 
       return false;
     });
-  }, [queueRooms, selectedCategory, triageServiceConceptUuid]);
+  }, [
+    queueRooms,
+    selectedCategory,
+    triageServiceConceptUuid,
+    labServiceConceptUuid,
+    pharmacyServiceConceptUuid,
+    radiologyServiceConceptUuid,
+  ]);
 
   const serviceLabel = useMemo(() => {
     if (selectedCategory === 'triage') {
