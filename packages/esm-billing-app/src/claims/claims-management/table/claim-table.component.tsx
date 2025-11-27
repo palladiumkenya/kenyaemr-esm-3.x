@@ -216,10 +216,6 @@ const ClaimsTable: React.FC<TableProps> = ({
       return renderApprovedTotalCell(row, rowStatus, cell.value);
     }
 
-    if (header === 'patientName') {
-      return cell.value?.split('-')?.[1]?.trim();
-    }
-
     return cell.value;
   };
 
