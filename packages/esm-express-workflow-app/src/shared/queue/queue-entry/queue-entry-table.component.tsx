@@ -123,8 +123,8 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
         </ConfigurableLink>
       ),
       priority: (
-        <div className={styles.priorityPill} data-priority={lowerCase(queueEntry.priority.display)}>
-          {t(queueEntry.priority.display, capitalize(queueEntry.priority.display.replace('_', ' ')))}
+        <div className={styles.priorityPill} data-priority={lowerCase(queueEntry?.priority?.display)}>
+          {t(queueEntry?.priority?.display, capitalize(queueEntry?.priority?.display.replace('_', ' ')))}
         </div>
       ),
       status: queueEntry?.status?.display ?? '--',
