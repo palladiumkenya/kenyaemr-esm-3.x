@@ -33,6 +33,11 @@ export const useTriageQueuesMetrics = (queue?: Queue) => {
     statuses: [queueStatusConceptUuids.finishedStatus],
     location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
   });
+  const { queueEntries: attendedtoEntries } = useQueueEntries({
+    service: [queueServiceConceptUuids.triageService],
+    statuses: [queueStatusConceptUuids.inServiceStatus, queueStatusConceptUuids.finishedStatus],
+    location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
+  });
 
   return {
     isLoading: isLoadingFinished || isLoadingInService || isLoadingWaiting,
@@ -47,6 +52,10 @@ export const useTriageQueuesMetrics = (queue?: Queue) => {
     finishedEntries: useMemo(
       () => finishedEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
       [finishedEntries, queue],
+    ),
+    attendedtoEntries: useMemo(
+      () => attendedtoEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
+      [attendedtoEntries, queue],
     ),
     error: finishedError ?? inServiceError ?? waitingError,
   };
