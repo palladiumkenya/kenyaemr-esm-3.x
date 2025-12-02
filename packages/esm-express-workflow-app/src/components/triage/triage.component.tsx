@@ -28,7 +28,7 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   const { queues, isLoading, error } = useQueues();
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
   const {
-    queueStatusConceptUuids: { finishedStatus, waitingStatus },
+    queueStatusConceptUuids: { finishedStatus, waitingStatus, inServiceStatus },
     queueServiceConceptUuids,
   } = useConfig<ExpressWorkflowConfig>();
 
@@ -44,8 +44,7 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
     error: metricsError,
     isLoading: isLoadingMetrics,
     waitingEntries,
-    inServiceEntries,
-    finishedEntries,
+    attendedtoEntries,
   } = useTriageQueuesMetrics(currQueue ?? triageQueues[0]);
 
   if (isLoading || isLoadingMetrics) {
@@ -55,8 +54,6 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   if (error || metricsError) {
     return <ErrorState error={error ?? metricsError} headerTitle={t('errorLoadingQueues', 'Error loading queues')} />;
   }
-
-  const attendedToEntries = [...inServiceEntries, ...finishedEntries];
 
   const cards = [
     {
@@ -71,11 +68,11 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
     },
     {
       title: t('clientsPatientsAttendedTo', 'Clients/Patients attended to'),
-      value: attendedToEntries.length.toString(),
+      value: attendedtoEntries.length.toString(),
       onClick: () => {
         setFilters((prevFilters) => [
           ...prevFilters.filter((f) => f.key !== 'status'),
-          { key: 'status', value: finishedStatus, label: t('finished', 'Finished') },
+          { key: 'status', value: `${finishedStatus},${inServiceStatus}`, label: t('attendedTo', 'Attended to') },
         ]);
       },
     },

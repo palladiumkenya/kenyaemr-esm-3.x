@@ -47,7 +47,7 @@ const QueueTab: React.FC<QueueTabProps> = ({
 
   const { queueEntries, isLoading, error } = useQueueEntries({
     location: selectedQueue?.location?.uuid ? [selectedQueue.location.uuid] : undefined,
-    statuses: filters?.filter((filter) => filter.key === 'status')?.map((filter) => filter.value),
+    statuses: filters?.filter((filter) => filter.key === 'status')?.flatMap((filter) => filter.value.split(',')),
   });
 
   useEffect(() => {

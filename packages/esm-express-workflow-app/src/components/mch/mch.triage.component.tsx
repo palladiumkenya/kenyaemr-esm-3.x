@@ -15,7 +15,7 @@ const MCHTriage: React.FC = () => {
   const [currQueue, setCurrQueue] = useState<Queue>();
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
   const {
-    queueStatusConceptUuids: { finishedStatus, waitingStatus },
+    queueStatusConceptUuids: { finishedStatus, waitingStatus, inServiceStatus },
     queueServiceConceptUuids,
   } = useConfig<ExpressWorkflowConfig>();
   const triageQueues = queues
@@ -29,7 +29,7 @@ const MCHTriage: React.FC = () => {
   const {
     error: metricsError,
     isLoading: isLoadingMetrics,
-    finishedEntries,
+    attendedtoEntries,
     waitingEntries,
   } = useTriageQueuesMetrics(currQueue ?? triageQueues[0]);
 
@@ -58,11 +58,11 @@ const MCHTriage: React.FC = () => {
         },
         {
           title: t('patientAttended', 'Patient attended to'),
-          value: finishedEntries?.length?.toString(),
+          value: attendedtoEntries?.length?.toString(),
           onClick: () => {
             setFilters((prevFilters) => [
               ...prevFilters.filter((f) => f.key !== 'status'),
-              { key: 'status', value: finishedStatus, label: t('finished', 'Finished') },
+              { key: 'status', value: `${finishedStatus},${inServiceStatus}`, label: t('attendedTo', 'Attended to') },
             ]);
           },
         },
