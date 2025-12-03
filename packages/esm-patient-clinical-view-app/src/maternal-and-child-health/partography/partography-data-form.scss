@@ -61,11 +61,11 @@
   margin-bottom: 1rem;
 }
 // Ensure Carbon dropdown menus overlap modal buttons
-:global(.cds--list-box__menu) {
-  z-index: 9999 !important;
-  position: absolute !important;
-  overflow: visible !important;
-}
+// :global(.cds--list-box__menu) {
+//   z-index: 9999 !important;
+//   position: absolute !important;
+//   overflow: visible !important;
+// }
 // Prevent parent overflow from hiding dropdowns
 .modalContent,
 .cds--modal-content,
