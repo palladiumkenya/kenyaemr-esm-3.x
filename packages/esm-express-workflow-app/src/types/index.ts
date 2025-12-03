@@ -91,7 +91,7 @@ export interface EncountersWithMedicationRequestsResponse {
 export type EncountersWithMedicationRequestsArray = Array<EncountersWithMedicationRequestsResource>;
 
 export type QueueFilter = {
-  key: 'status' | 'priority';
+  key: 'status' | 'priority' | 'service';
   value: string;
   label: string;
 };

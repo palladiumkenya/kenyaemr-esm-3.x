@@ -7,8 +7,8 @@ import React, { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueues, useQueueEntries } from '../../hooks/useServiceQueues';
 import QueueTab from '../../shared/queue/queue-tab.component';
-import { useInvestigationStats, useTotalVisits, useQueuePriorityCounts } from './consultation.resource';
-import { QueueFilter } from '../../types';
+import { useInvestigationStats, useTotalVisits, useConsultationQueueMetrics } from './consultation.resource';
+import { Queue, QueueFilter } from '../../types';
 import { ExpressWorkflowConfig } from '../../config-schema';
 
 type ConsultationProps = {
@@ -21,7 +21,7 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
     priorities: { emergencyPriorityConceptUuid, urgentPriorityConceptUuid, notUrgentPriorityConceptUuid },
     queueServiceConceptUuids,
   } = useConfig<ExpressWorkflowConfig>();
-
+  const [currQueue, setCurrQueue] = useState<Queue>();
   const { queues, isLoading, error } = useQueues();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -31,9 +31,15 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
       !queue.location.display.toLowerCase().includes('mch') &&
       queue?.queueRooms?.length > 0,
   );
-
-  const usePatientChart = true;
-
+  const activeQueue = useMemo(() => currQueue ?? consultationQueues[0], [currQueue, consultationQueues]);
+  const {
+    waitingEntries,
+    isLoading: isLoadingQueuemetrics,
+    error: waitingError,
+    emergencyEntries,
+    urgentEntries,
+    notUrgentEntries,
+  } = useConsultationQueueMetrics(activeQueue);
   const { data: totalVisits, isLoading: isLoadingTotalVisits } = useTotalVisits();
 
   // Use the updated investigation stats hook with single refresh function
@@ -47,29 +53,7 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
     isLoading: isLoadingInvestigations,
     refresh: refreshInvestigations,
   } = useInvestigationStats();
-
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
-
-  const consultationLocations = useMemo(
-    () => consultationQueues.map((queue) => queue.location.uuid),
-    [consultationQueues],
-  );
-
-  const { queueEntries, isLoading: isLoadingQueueEntries } = useQueueEntries({
-    location: consultationLocations,
-  });
-
-  const consultationQueueEntries = useMemo(() => {
-    if (!queueEntries?.length || !consultationQueues.length) {
-      return [];
-    }
-
-    const serviceUuids = consultationQueues.map((q) => q.service?.uuid).filter(Boolean);
-    return queueEntries.filter((entry) => serviceUuids.includes(entry?.queue?.service?.uuid));
-  }, [queueEntries, consultationQueues]);
-
-  const priorityCounts = useQueuePriorityCounts(consultationQueueEntries);
-
   // Single refresh handler for all investigations
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -86,11 +70,11 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
     () => [
       {
         title: t('awaitingConsultation', 'Awaiting consultation'),
-        value: consultationQueueEntries.length.toString(),
+        value: waitingEntries.length.toString(),
         categories: [
           {
             label: t('emergency', 'Emergency'),
-            value: priorityCounts.emergency,
+            value: emergencyEntries.length,
             onClick: () => {
               setFilters((prevFilters) => [
                 ...prevFilters.filter((f) => f.key !== 'priority'),
@@ -100,7 +84,7 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
           },
           {
             label: t('urgent', 'Urgent'),
-            value: priorityCounts.urgent,
+            value: urgentEntries.length,
             onClick: () => {
               setFilters((prevFilters) => [
                 ...prevFilters.filter((f) => f.key !== 'priority'),
@@ -110,7 +94,7 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
           },
           {
             label: t('notUrgent', 'Not Urgent'),
-            value: priorityCounts.notUrgent,
+            value: notUrgentEntries.length,
             onClick: () => {
               setFilters((prevFilters) => [
                 ...prevFilters.filter((f) => f.key !== 'priority'),
@@ -124,7 +108,16 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
         title: t('investigationAwaiting', 'Investigation Awaiting'),
         value: awaitingCount.toString(),
         categories: [
-          { label: t('lab', 'Lab'), value: lab.awaiting },
+          {
+            label: t('lab', 'Lab'),
+            value: lab.awaiting,
+            onClick: () => {
+              setFilters((prevFilters) => [
+                ...prevFilters.filter((f) => f.key !== 'service'),
+                { key: 'service', value: queueServiceConceptUuids.triageService, label: t('lab', 'Lab') },
+              ]);
+            },
+          },
           { label: t('radiology', 'Radiology'), value: radiology.awaiting },
           { label: t('procedures', 'Procedures'), value: procedures.awaiting },
         ],
@@ -158,24 +151,30 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
     ],
     [
       t,
-      consultationQueueEntries.length,
-      priorityCounts,
+      waitingEntries.length,
+      emergencyEntries.length,
+      urgentEntries.length,
+      notUrgentEntries.length,
+      awaitingCount,
+      lab.awaiting,
+      lab.completed,
+      radiology.awaiting,
+      radiology.completed,
+      procedures.awaiting,
+      procedures.completed,
+      isRefreshing,
+      isLoadingInvestigations,
+      handleRefresh,
+      completedCount,
+      totalVisits?.length,
       emergencyPriorityConceptUuid,
       urgentPriorityConceptUuid,
       notUrgentPriorityConceptUuid,
-      awaitingCount,
-      lab,
-      radiology,
-      procedures,
-      handleRefresh,
-      isRefreshing,
-      isLoadingInvestigations,
-      completedCount,
-      totalVisits,
+      queueServiceConceptUuids.triageService,
     ],
   );
 
-  if (isLoading || isLoadingTotalVisits || isLoadingInvestigations || isLoadingQueueEntries) {
+  if (isLoading || isLoadingTotalVisits || isLoadingInvestigations || isLoadingQueuemetrics) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
 
@@ -189,9 +188,10 @@ const Consultation: React.FC<ConsultationProps> = ({ dashboardTitle }) => {
         queues={consultationQueues}
         cards={cards}
         navigatePath="consultation"
-        usePatientChart={usePatientChart}
+        usePatientChart
         filters={filters}
         onFiltersChanged={setFilters}
+        onTabChanged={setCurrQueue}
       />
     </div>
   );

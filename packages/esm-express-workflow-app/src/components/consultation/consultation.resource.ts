@@ -3,8 +3,9 @@ import { FulfillerStatus, Order } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { useMemo, useCallback } from 'react';
-import { QueueEntry } from '../../types';
+import { Queue, QueueEntry } from '../../types';
 import { ExpressWorkflowConfig } from '../../config-schema';
+import { useQueueEntries } from '../../hooks/useServiceQueues';
 
 export interface UseLabOrdersParams {
   status?: FulfillerStatus;
@@ -307,28 +308,37 @@ export const useInvestigationStats = () => {
   };
 };
 
-export const useQueuePriorityCounts = (queueEntries: Array<QueueEntry>) => {
-  const { priorities } = useConfig<ExpressWorkflowConfig>();
+export const useConsultationQueueMetrics = (queue?: Queue) => {
+  const { queueServiceConceptUuids, queueStatusConceptUuids, priorities } = useConfig<ExpressWorkflowConfig>();
+  const {
+    queueEntries: waitingEntries,
+    isLoading: isLoadingWaiting,
+    error: waitingError,
+  } = useQueueEntries({
+    service: [queueServiceConceptUuids.consultationService],
+    statuses: [queueStatusConceptUuids.waitingStatus, queueStatusConceptUuids.inServiceStatus],
+    location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
+  });
 
-  return useMemo(() => {
-    const counts = {
-      emergency: 0,
-      urgent: 0,
-      notUrgent: 0,
-    };
-
-    queueEntries.forEach((entry) => {
-      const priorityUuid = entry.priority.uuid;
-
-      if (priorityUuid === priorities?.emergencyPriorityConceptUuid) {
-        counts.emergency++;
-      } else if (priorityUuid === priorities?.urgentPriorityConceptUuid) {
-        counts.urgent++;
-      } else if (priorityUuid === priorities?.notUrgentPriorityConceptUuid) {
-        counts.notUrgent++;
-      }
-    });
-
-    return counts;
-  }, [queueEntries, priorities]);
+  const _waitingEntries = useMemo(
+    () => waitingEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
+    [waitingEntries, queue],
+  );
+  return {
+    isLoading: isLoadingWaiting,
+    error: waitingError,
+    waitingEntries: _waitingEntries,
+    emergencyEntries: useMemo(
+      () => _waitingEntries.filter((entry) => entry.priority.uuid === priorities?.emergencyPriorityConceptUuid),
+      [_waitingEntries, priorities?.emergencyPriorityConceptUuid],
+    ),
+    urgentEntries: useMemo(
+      () => _waitingEntries.filter((entry) => entry.priority.uuid === priorities?.urgentPriorityConceptUuid),
+      [_waitingEntries, priorities?.urgentPriorityConceptUuid],
+    ),
+    notUrgentEntries: useMemo(
+      () => _waitingEntries.filter((entry) => entry.priority.uuid === priorities?.notUrgentPriorityConceptUuid),
+      [_waitingEntries, priorities?.notUrgentPriorityConceptUuid],
+    ),
+  };
 };

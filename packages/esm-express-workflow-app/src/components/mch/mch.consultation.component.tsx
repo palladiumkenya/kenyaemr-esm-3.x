@@ -4,14 +4,19 @@ import { useTranslation } from 'react-i18next';
 import { useQueueEntries, useQueues } from '../../hooks/useServiceQueues';
 import QueueTab from '../../shared/queue/queue-tab.component';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { useInvestigationStats, useQueuePriorityCounts, useTotalVisits } from '../consultation/consultation.resource';
+import {
+  useConsultationQueueMetrics,
+  useInvestigationStats,
+  useTotalVisits,
+} from '../consultation/consultation.resource';
 import { ExpressWorkflowConfig } from '../../config-schema';
 import { useConfig } from '@openmrs/esm-framework';
-import { QueueFilter } from '../../types';
+import { Queue, QueueFilter } from '../../types';
 
 const MCHConsultation: React.FC = () => {
   const { t } = useTranslation();
   const { queues, isLoading, error } = useQueues();
+  const [currQueue, setCurrQueue] = useState<Queue>();
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
 
   const {
@@ -27,35 +32,25 @@ const MCHConsultation: React.FC = () => {
       queue.location.display.toLowerCase().includes('mch') &&
       queue?.queueRooms?.length > 0,
   );
+  const activeQueue = useMemo(() => currQueue ?? consultationQueues[0], [currQueue, consultationQueues]);
 
-  const consultationLocations = useMemo(
-    () => consultationQueues.map((queue) => queue.location.uuid),
-    [consultationQueues],
-  );
-
-  const { queueEntries, isLoading: isLoadingQueueEntries } = useQueueEntries({
-    location: consultationLocations,
-  });
-
-  const consultationQueueEntries = useMemo(() => {
-    if (!queueEntries?.length || !consultationQueues.length) {
-      return [];
-    }
-
-    const serviceUuids = consultationQueues.map((q) => q.service?.uuid).filter(Boolean);
-    return queueEntries.filter((entry) => serviceUuids.includes(entry?.queue?.service?.uuid));
-  }, [queueEntries, consultationQueues]);
-
-  const priorityCounts = useQueuePriorityCounts(consultationQueueEntries);
+  const {
+    waitingEntries,
+    isLoading: isLoadingQueueMetrics,
+    error: waitingError,
+    emergencyEntries,
+    urgentEntries,
+    notUrgentEntries,
+  } = useConsultationQueueMetrics(activeQueue);
 
   const cards = [
     {
       title: t('awaitingConsultation', 'Awaiting consultation'),
-      value: consultationQueueEntries.length.toString(),
+      value: waitingEntries.length.toString(),
       categories: [
         {
           label: t('emergency', 'Emergency'),
-          value: priorityCounts.emergency,
+          value: emergencyEntries.length,
           onClick: () => {
             setFilters((prevFilters) => [
               ...prevFilters.filter((f) => f.key !== 'priority'),
@@ -65,7 +60,7 @@ const MCHConsultation: React.FC = () => {
         },
         {
           label: t('urgent', 'Urgent'),
-          value: priorityCounts.urgent,
+          value: urgentEntries.length,
           onClick: () => {
             setFilters((prevFilters) => [
               ...prevFilters.filter((f) => f.key !== 'priority'),
@@ -75,7 +70,7 @@ const MCHConsultation: React.FC = () => {
         },
         {
           label: t('notUrgent', 'Not Urgent'),
-          value: priorityCounts.notUrgent,
+          value: notUrgentEntries.length,
           onClick: () => {
             setFilters((prevFilters) => [
               ...prevFilters.filter((f) => f.key !== 'priority'),
@@ -99,7 +94,7 @@ const MCHConsultation: React.FC = () => {
     },
   ];
 
-  if (isLoading || isLoadingTotalVisits || isLoadingInvestigations || isLoadingQueueEntries) {
+  if (isLoading || isLoadingTotalVisits || isLoadingInvestigations || isLoadingQueueMetrics) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
 
