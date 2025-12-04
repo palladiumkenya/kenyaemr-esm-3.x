@@ -27,11 +27,11 @@ export const OrdersTabs: React.FC<OrdersTabsProps> = ({
 }) => {
   const { t } = useTranslation();
   const state = useMemo(() => ({ patientUuid, patient, basePath }), [patientUuid, patient, basePath]);
-  const { data: orders, isLoading: isLoadingOrders } = usePatientOrders(patientUuid, undefined, orderTypeUuid);
+  const { data: orders, isLoading, error } = usePatientOrders(patientUuid, 'any', orderTypeUuid, undefined, undefined);
 
   const filteredOrders = useMemo(() => (filter ? orders?.filter(filter) ?? [] : orders ?? []), [filter, orders]);
 
-  if (isLoadingOrders) {
+  if (isLoading) {
     return <TabsSkeleton contained />;
   }
 
