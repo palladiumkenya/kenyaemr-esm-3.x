@@ -11,6 +11,7 @@ type LaboratoryTabsProps = {
 const LaboratoryTabs: React.FC<LaboratoryTabsProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
   const testOrderTypeUuid = '52a447d3-a64a-11e3-9aeb-50e549534c5e';
+
   return (
     <OrdersTabs
       patientUuid={patientUuid}
@@ -18,7 +19,9 @@ const LaboratoryTabs: React.FC<LaboratoryTabsProps> = ({ patientUuid, patient })
       basePath="laboratory"
       resultsSlotName="ewf-laboratory-results-slot"
       orderTypeUuid={testOrderTypeUuid}
-      Table={({ orders }) => <LabTable orders={orders} />}
+      Table={({ orders }) => {
+        return <LabTable orders={orders} />;
+      }}
     />
   );
 };
