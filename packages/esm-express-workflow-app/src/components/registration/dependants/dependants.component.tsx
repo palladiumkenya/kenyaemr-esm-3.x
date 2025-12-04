@@ -55,10 +55,10 @@ const DependentsComponent: React.FC<DependentProps> = ({
 
   const visits = useMultipleActiveVisits(dependentUuids);
 
-  const handleQueuePatient = useCallback((activeVisit: Visit) => {
+  const handleQueuePatient = useCallback((activeVisit: Visit, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
       closeModal: () => {
-        navigate({ to: `\${openmrsSpaBase}/patient/${patient.id}/chart` });
+        navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
         dispose();
       },
       activeVisit,
@@ -367,7 +367,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                   <Button
                     size="sm"
                     kind="secondary"
-                    onClick={() => handleQueuePatient(dependentActiveVisit)}
+                    onClick={() => handleQueuePatient(dependentActiveVisit, localPatient.uuid)}
                     disabled={isSubmitting || isLoading || isLoadingVisit}>
                     {t('queuePatient', 'Queue Patient')}
                   </Button>
