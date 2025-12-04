@@ -315,7 +315,10 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                       )}
 
                       {hasLocal && hasActiveVisit && (
-                        <Button kind="secondary" size="sm" onClick={() => handleQueuePatient(activeVisit, patientUuid)}>
+                        <Button
+                          kind="secondary"
+                          size="sm"
+                          onClick={() => handleQueuePatient(activeVisit, localPatient.uuid)}>
                           {t('queuePatient', 'Queue Patient')}
                         </Button>
                       )}

@@ -305,10 +305,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                       )}
 
                       {hasActiveVisit && (
-                        <Button
-                          kind="secondary"
-                          size="sm"
-                          onClick={() => handleQueuePatient(activeVisit, fhirPatient.id)}>
+                        <Button kind="secondary" size="sm" onClick={() => handleQueuePatient(activeVisit, patientUuid)}>
                           {t('queuePatient', 'Queue Patient')}
                         </Button>
                       )}
