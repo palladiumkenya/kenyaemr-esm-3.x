@@ -167,6 +167,16 @@ const DependentsComponent: React.FC<DependentProps> = ({
       const isSpouse = dependent.relationship.toLowerCase() === 'spouse';
       const isSpouseVerified = verifiedSpouses.has(dependent.id);
 
+      if (isSpouse && !isSpouseVerified && !localPatient) {
+        showSnackbar({
+          title: t('verificationRequired', 'Verification Required'),
+          subtitle: t('spouseVerificationRequired', 'Please verify the spouse with OTP before registering'),
+          kind: 'warning',
+          isLowContrast: false,
+        });
+        return;
+      }
+
       if (localPatient) {
         const localPatientName =
           localPatient.person?.personName?.display ||
@@ -339,7 +349,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                       ? t('processing', 'Processing...')
                       : isLoading
                       ? t('searching', 'Searching...')
-                      : t('registerDependent', 'Register Dependent')}
+                      : t('checkIn', 'Check In Dependent')}
                   </Button>
                 )}
 
