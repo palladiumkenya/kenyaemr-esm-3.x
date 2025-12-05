@@ -55,10 +55,10 @@ const DependentsComponent: React.FC<DependentProps> = ({
 
   const visits = useMultipleActiveVisits(dependentUuids);
 
-  const handleQueuePatient = useCallback((activeVisit: Visit) => {
+  const handleQueuePatient = useCallback((activeVisit: Visit, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
       closeModal: () => {
-        navigate({ to: `\${openmrsSpaBase}/patient/${patient.id}/chart` });
+        navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
         dispose();
       },
       activeVisit,
@@ -166,6 +166,16 @@ const DependentsComponent: React.FC<DependentProps> = ({
       const localPatient = localPatientCache.get(dependent.id);
       const isSpouse = dependent.relationship.toLowerCase() === 'spouse';
       const isSpouseVerified = verifiedSpouses.has(dependent.id);
+
+      if (isSpouse && !isSpouseVerified && !localPatient) {
+        showSnackbar({
+          title: t('verificationRequired', 'Verification Required'),
+          subtitle: t('spouseVerificationRequired', 'Please verify the spouse with OTP before registering'),
+          kind: 'warning',
+          isLowContrast: false,
+        });
+        return;
+      }
 
       if (localPatient) {
         const localPatientName =
@@ -339,7 +349,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                       ? t('processing', 'Processing...')
                       : isLoading
                       ? t('searching', 'Searching...')
-                      : t('registerDependent', 'Register Dependent')}
+                      : t('checkIn', 'Check In Dependent')}
                   </Button>
                 )}
 
@@ -357,7 +367,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                   <Button
                     size="sm"
                     kind="secondary"
-                    onClick={() => handleQueuePatient(dependentActiveVisit)}
+                    onClick={() => handleQueuePatient(dependentActiveVisit, localPatient.uuid)}
                     disabled={isSubmitting || isLoading || isLoadingVisit}>
                     {t('queuePatient', 'Queue Patient')}
                   </Button>
