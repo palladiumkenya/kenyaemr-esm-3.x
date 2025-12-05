@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import {
@@ -40,12 +40,14 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
         queue?.queueRooms?.length > 0,
     )
     .sort((a, b) => a.name.localeCompare(b.name));
+  const activeQueue = useMemo(() => currQueue ?? triageQueues[0], [currQueue, triageQueues]);
+
   const {
     error: metricsError,
     isLoading: isLoadingMetrics,
     waitingEntries,
     attendedtoEntries,
-  } = useTriageQueuesMetrics(currQueue ?? triageQueues[0]);
+  } = useTriageQueuesMetrics(activeQueue);
 
   if (isLoading || isLoadingMetrics) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
