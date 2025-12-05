@@ -1,8 +1,8 @@
 import { useConfig } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 import { ExpressWorkflowConfig } from '../../config-schema';
 import { useQueueEntries } from '../../hooks/useServiceQueues';
 import { Queue } from '../../types';
-import { useMemo } from 'react';
 
 export const useTriageQueuesMetrics = (queue?: Queue) => {
   const { queueServiceConceptUuids, queueStatusConceptUuids } = useConfig<ExpressWorkflowConfig>();

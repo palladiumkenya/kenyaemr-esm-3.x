@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
 import {
   DataTable,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-  Pagination,
   OverflowMenu,
   OverflowMenuItem,
+  Pagination,
   Search,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
 import { ConfigurableLink, showModal, useConfig, useDebounce, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import startCase from 'lodash-es/startCase';
+import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-import styles from './queue-entry-table.scss';
-import { spaBasePath } from '../../../constants';
-import { type QueueEntry } from '../../../types/index';
-import { serveQueueEntry } from '../../../hooks/useServiceQueues';
-import lowerCase from 'lodash-es/lowerCase';
 import capitalize from 'lodash-es/capitalize';
+import lowerCase from 'lodash-es/lowerCase';
 import { type ExpressWorkflowConfig } from '../../../config-schema';
+import { spaBasePath } from '../../../constants';
+import { serveQueueEntry } from '../../../hooks/useServiceQueues';
+import { type QueueEntry } from '../../../types/index';
+import styles from './queue-entry-table.scss';
 
 // Extend dayjs with the relativeTime plugin
 dayjs.extend(relativeTime);
@@ -46,12 +46,12 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
   const pageSize = 10;
   const { t } = useTranslation();
   const debouncedSearchString = useDebounce(searchString, 500);
-  const { currentPage, goTo, results } = usePagination(
-    queueEntries.filter((queueEntry) => {
+  const filteredQueueEntries = useMemo(() => {
+    return queueEntries.filter((queueEntry) => {
       return queueEntry.patient.person.display.toLowerCase().includes(debouncedSearchString.toLowerCase());
-    }),
-    pageSize,
-  );
+    });
+  }, [queueEntries, debouncedSearchString]);
+  const { currentPage, goTo, results } = usePagination(filteredQueueEntries, pageSize);
   const { pageSizes } = usePaginationInfo(pageSize, queueEntries.length, currentPage, results.length);
 
   const headers = [
@@ -189,7 +189,7 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
         backwardText={t('previousPage', 'Previous page')}
         page={currentPage}
         pageSize={pageSize}
-        totalItems={queueEntries.length}
+        totalItems={filteredQueueEntries.length}
         onChange={({ page }) => {
           goTo(page);
         }}
