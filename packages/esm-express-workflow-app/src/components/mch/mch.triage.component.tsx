@@ -1,5 +1,5 @@
 import { InlineLoading } from '@carbon/react';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { ErrorState, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
@@ -26,12 +26,14 @@ const MCHTriage: React.FC = () => {
         queue?.queueRooms?.length > 0,
     )
     .sort((a, b) => a.name.localeCompare(b.name));
+  const activeQueue = useMemo(() => currQueue ?? triageQueues[0], [currQueue, triageQueues]);
+
   const {
     error: metricsError,
     isLoading: isLoadingMetrics,
     attendedtoEntries,
     waitingEntries,
-  } = useTriageQueuesMetrics(currQueue ?? triageQueues[0]);
+  } = useTriageQueuesMetrics(activeQueue);
 
   if (isLoading || isLoadingMetrics) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;

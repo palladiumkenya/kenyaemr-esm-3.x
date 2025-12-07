@@ -61,11 +61,17 @@ const QueueTab: React.FC<QueueTabProps> = ({
       return [];
     }
     const priorityFilter = filters?.find((filter) => filter.key === 'priority')?.value;
-
-    const filtered = queueEntries.filter(
-      (entry) =>
-        entry?.queue?.uuid === selectedQueue.uuid && (priorityFilter ? entry?.priority?.uuid === priorityFilter : true),
-    );
+    const serviceAwaitingFilter = filters?.find((filter) => filter.key === 'service_awaiting')?.value?.split(',') ?? []; // Patient UUIDs
+    const serviceCompletedFilter =
+      filters?.find((filter) => filter.key === 'service_completed')?.value?.split(',') ?? []; // Patient UUIDs
+    const filtered = queueEntries.filter((entry) => {
+      return (
+        entry?.queue?.uuid === selectedQueue.uuid &&
+        (priorityFilter ? entry?.priority?.uuid === priorityFilter : true) &&
+        (serviceAwaitingFilter.length > 0 ? serviceAwaitingFilter.includes(entry?.patient?.uuid) : true) &&
+        (serviceCompletedFilter.length > 0 ? serviceCompletedFilter.includes(entry?.patient?.uuid) : true)
+      );
+    });
     return filtered;
   }, [filters, queueEntries, selectedQueue.uuid]);
 

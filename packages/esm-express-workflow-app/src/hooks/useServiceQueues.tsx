@@ -1,7 +1,9 @@
-import useSWR from 'swr';
-import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
-import { Queue, QueueEntry, QueueEntryFilters } from '../types/index';
+import { openmrsFetch, restBaseUrl, useConfig } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 import { useMemo } from 'react';
+import useSWR from 'swr';
+import { ExpressWorkflowConfig } from '../config-schema';
+import { Queue, QueueEntry, QueueEntryFilters } from '../types/index';
 
 export const useQueues = () => {
   const { data, isLoading, error } = useSWR<{ data: { results: Array<Queue> } }>(
@@ -17,8 +19,9 @@ export const useQueues = () => {
 };
 
 export const useQueueEntries = (filters?: QueueEntryFilters) => {
+  const { outpatientVisitTypeUuid } = useConfig<ExpressWorkflowConfig>();
   const repString =
-    'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
+    'custom:(uuid,display,queue,status,patient:(uuid,display,person,identifiers:(uuid,display,identifier,identifierType)),visit:(uuid,display,startDatetime,visitType:(uuid,display),encounters:(uuid,display,diagnoses,encounterDatetime,encounterType,obs,encounterProviders,voided),attributes:(uuid,display,value,attributeType)),priority,priorityComment,sortWeight,startedAt,endedAt,locationWaitingFor,queueComingFrom,providerWaitingFor,previousQueueEntry)';
 
   const buildQueryParams = (filters?: QueueEntryFilters & { status: string[] }): string => {
     const params = new URLSearchParams();
@@ -47,9 +50,17 @@ export const useQueueEntries = (filters?: QueueEntryFilters) => {
   const url = `/ws/rest/v1/queue-entry${queryString ? `?${queryString}` : ''}`;
 
   const { data, isLoading, error } = useSWR<{ data: { results: Array<QueueEntry> } }>(url, openmrsFetch);
+  const queueEntries = useMemo(() => {
+    return (data?.data?.results ?? [])?.filter((entry) => {
+      return (
+        dayjs(entry.startedAt).isAfter(dayjs().subtract(24, 'hour')) &&
+        entry?.visit?.visitType?.uuid === outpatientVisitTypeUuid
+      );
+    });
+  }, [data?.data?.results, outpatientVisitTypeUuid]);
 
   return {
-    queueEntries: data?.data?.results ?? [],
+    queueEntries,
     isLoading,
     error,
   };
