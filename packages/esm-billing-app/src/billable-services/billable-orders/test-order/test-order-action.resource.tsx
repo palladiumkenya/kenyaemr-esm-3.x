@@ -21,8 +21,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
     if (isLoading || isLoadingQueue) {
       return { hasPendingPayment: false, isLoading: true };
     }
-
-    if (currentVisit?.visitType?.uuid === config?.inPatientVisitTypeUuid || isEmergencyPatient) {
+    if (activeVisit?.visitType?.uuid === config?.inPatientVisitTypeUuid || isEmergencyPatient) {
       return { hasPendingPayment: false, isLoading: false };
     }
 
@@ -34,7 +33,7 @@ export const useTestOrderBillStatus = (orderUuid: string, patientUuid: string) =
   }, [
     isLoadingQueue,
     isLoading,
-    currentVisit?.visitType?.uuid,
+    activeVisit?.visitType?.uuid,
     config?.inPatientVisitTypeUuid,
     isExcludedPaymentMethod,
     isEmergencyPatient,
