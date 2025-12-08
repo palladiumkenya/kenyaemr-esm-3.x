@@ -154,7 +154,6 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
   const handleQueuePatient = (activeVisit: any, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
       closeModal: () => {
-        navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
         dispose();
       },
       activeVisit,

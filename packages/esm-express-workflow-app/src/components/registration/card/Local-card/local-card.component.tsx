@@ -163,7 +163,6 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
   const handleQueuePatient = useCallback((activeVisit: any, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
       closeModal: () => {
-        navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
         dispose();
       },
       activeVisit,
@@ -284,17 +283,11 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                               workspaceTitle: t('checkInPatientWorkspaceTitle', 'Check in patient'),
                               closeWorkspace: () => {
                                 closeWorkspace('start-visit-workspace-form', {
-                                  onWorkspaceClose: () => {
-                                    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
-                                  },
                                   ignoreChanges: true,
                                 });
                               },
                               closeWorkspaceWithSavedChanges: () => {
                                 closeWorkspace('start-visit-workspace-form', {
-                                  onWorkspaceClose: () => {
-                                    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
-                                  },
                                   ignoreChanges: true,
                                 });
                               },
