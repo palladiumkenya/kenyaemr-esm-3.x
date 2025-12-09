@@ -58,7 +58,6 @@ const DependentsComponent: React.FC<DependentProps> = ({
   const handleQueuePatient = useCallback((activeVisit: Visit, patientUuid: string) => {
     const dispose = showModal('transition-patient-to-latest-queue-modal', {
       closeModal: () => {
-        navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
         dispose();
       },
       activeVisit,
