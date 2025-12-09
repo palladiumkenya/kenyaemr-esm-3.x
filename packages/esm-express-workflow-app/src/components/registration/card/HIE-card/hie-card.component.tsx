@@ -38,7 +38,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
   const [otpRequestedFor, setOtpRequestedFor] = useState<Set<string>>(new Set());
   const [localPatientCache, setLocalPatientCache] = useState<Map<string, any>>(new Map());
   const [loadingLocalPatients, setLoadingLocalPatients] = useState<Set<string>>(new Set());
-  const { otpSource, isLoading: isLoadingOtpSource } = useOtpSource();
+  const { otpSource, isLoading: isLoadingOtpSource, error: otpSourceError } = useOtpSource();
 
   useEffect(() => {
     if (otpSource) {
@@ -165,7 +165,13 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
       onRequestOtp: async (phone: string): Promise<void> => {
         const sanitizedPhone = sanitizePhoneNumber(phone);
         try {
-          await otpManager.requestOTP(sanitizedPhone, patientName, otpExpiryMinutes, searchedNationalId);
+          if (!otpSource) {
+            throw new Error('OTP source not configured. Please contact your administrator.');
+          }
+
+          otpManager.setOtpSource(otpSource);
+
+          await otpManager.requestOTP(sanitizedPhone, patientName, otpExpiryMinutes, searchedNationalId, patientUuid);
         } catch (error) {
           throw error;
         }
@@ -173,7 +179,13 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
       onVerify: async (otp: string, _phoneNumber?: string): Promise<void> => {
         const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
         try {
-          const isValid = await otpManager.verifyOTP(sanitizedPhone, otp);
+          if (!otpSource) {
+            throw new Error('OTP source not configured. Please contact your administrator.');
+          }
+
+          otpManager.setOtpSource(otpSource);
+
+          const isValid = await otpManager.verifyOTP(sanitizedPhone, otp, patientUuid);
           if (!isValid) {
             throw new Error('OTP verification failed');
           }
@@ -250,7 +262,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                       kind="primary"
                       size="sm"
                       renderIcon={TwoFactorAuthentication}
-                      disabled={isSearchingLocal || isLoadingOtpSource}
+                      disabled={isSearchingLocal || isLoadingOtpSource || !otpSource}
                       onClick={() => {
                         handleOTPRequest(patientUuid);
                         launchOtpVerificationModal({
@@ -264,7 +276,11 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                           onCleanup: cleanup,
                         });
                       }}>
-                      {isSearchingLocal ? t('checking', 'Checking...') : t('sendOtp', 'Send OTP')}
+                      {isSearchingLocal
+                        ? t('checking', 'Checking...')
+                        : isLoadingOtpSource
+                        ? t('loadingOtpConfig', 'Loading...')
+                        : t('sendOtp', 'Send OTP')}
                     </Button>
                   )}
 
