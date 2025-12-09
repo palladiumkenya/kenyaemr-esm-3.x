@@ -136,15 +136,12 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
         onRequestOtp: async (phone: string): Promise<void> => {
           const sanitizedPhone = sanitizePhoneNumber(phone);
           try {
-            // Ensure OTP source is set and validated before making request
             if (!otpSource) {
               throw new Error('OTP source not configured. Please contact your administrator.');
             }
 
-            // Set the OTP source to ensure we're using the correct manager
             otpManager.setOtpSource(otpSource);
 
-            // Pass patientUuid to isolate OTP sessions per patient
             await otpManager.requestOTP(sanitizedPhone, patientName, otpExpiryMinutes, searchedNationalId, patientUuid);
           } catch (error) {
             throw error;
@@ -153,15 +150,12 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
         onVerify: async (otp: string, _phoneNumber?: string): Promise<void> => {
           const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
           try {
-            // Ensure OTP source is set and validated before verification
             if (!otpSource) {
               throw new Error('OTP source not configured. Please contact your administrator.');
             }
 
-            // Set the OTP source to ensure we're using the correct manager
             otpManager.setOtpSource(otpSource);
 
-            // Pass patientUuid to verify correct OTP session
             const isValid = await otpManager.verifyOTP(sanitizedPhone, otp, patientUuid);
             if (!isValid) {
               throw new Error('OTP verification failed');
