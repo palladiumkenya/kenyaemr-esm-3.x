@@ -70,6 +70,7 @@
   "laboratoryOrders": "Laboratory Orders",
   "labResults": "Lab Results",
   "loadingDashboard": "Loading dashboard data...",
+  "loadingOtpConfig": "Loading...",
   "loadingPatient": "Loading patient...",
   "loadingQueueEntries": "Loading queue entries...",
   "loadingQueues": "Loading queues...",

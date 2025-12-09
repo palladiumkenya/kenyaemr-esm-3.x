@@ -124,7 +124,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
         }
       }
 
-      return '254700000000'; // Default fallback
+      return '254700000000';
     },
     [localPatientCache],
   );
@@ -169,18 +169,15 @@ const DependentsComponent: React.FC<DependentProps> = ({
         },
         onVerify: async (otp: string): Promise<void> => {
           try {
-            // Ensure OTP source is set and validated before verification
             if (!otpSource) {
               throw new Error('OTP source not configured. Please contact your administrator.');
             }
 
-            // Set the OTP source to ensure we're using the correct manager
             otpManager.setOtpSource(otpSource);
 
             const activePhone = activePhoneNumbers.get(dependentId) || initialPhone;
             const sanitizedPhone = sanitizePhoneNumber(activePhone);
 
-            // Pass dependentId to verify correct OTP session
             const isValid = await otpManager.verifyOTP(sanitizedPhone, otp, dependentId);
             if (!isValid) {
               throw new Error('OTP verification failed');
@@ -297,7 +294,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
       const isSpouseVerified = verifiedSpouses.has(dependent.id);
       const otpRequestedForThisSpouse = otpRequestedForSpouse.has(dependent.id);
 
-      const identifiersDisplay = dependent.id && dependent.id !== 'N/A' ? `CR: ${dependent.id}` : 'N/A';
+      const identifiersDisplay = dependent.id && dependent.id !== 'N/A' ? `CR Number: ${dependent.id}` : 'N/A';
 
       const dependentPhoneNumber = getDependentPhoneNumber(dependent);
       const { onRequestOtp, onVerify, cleanup } = createSpouseOTPHandlers(

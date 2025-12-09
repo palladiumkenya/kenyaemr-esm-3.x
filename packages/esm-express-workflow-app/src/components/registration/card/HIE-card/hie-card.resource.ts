@@ -52,7 +52,6 @@ export function parseMessage<T extends Record<string, string | number>>(context:
     return trimmedKey in context ? String(context[trimmedKey]) : match;
   });
 }
-
 function buildSmsUrl(message: string, receiver: string, nationalId: string | null = null): string {
   const encodedMessage = encodeURIComponent(message);
   let url = `${restBaseUrl}/kenyaemr/send-kenyaemr-sms?message=${encodedMessage}&phone=${receiver}`;
@@ -73,7 +72,6 @@ function validateOtpInputs(receiver: string, patientName: string): void {
     throw new OTPValidationError('Invalid phone number format');
   }
 }
-
 export const useOtpSource = () => {
   const url = `${restBaseUrl}/kenyaemr/checkotpsource`;
 
