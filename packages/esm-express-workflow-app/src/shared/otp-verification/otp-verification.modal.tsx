@@ -240,6 +240,8 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
               onClick={() => handleRequestingOtp(currentPhoneNumber)}>
               {requestingOtp ? (
                 <InlineLoading description={t('sendingOtp', 'Sending OTP...')} />
+              ) : error?.type === 'request' ? (
+                t('resendOtp', 'Resend OTP')
               ) : (
                 t('sendOtpCode', 'Send OTP Code')
               )}
@@ -247,13 +249,15 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
           )}
 
           {mode === 'verify-otp' && (
-            <Button
-              disabled={isLoading || otp.length !== otpLength}
-              kind="primary"
-              onClick={handleVerify}
-              className={styles.button}>
-              {isLoading ? <InlineLoading description={t('verifyingOtp', 'Verifying OTP')} /> : t('verify', 'Verify')}
-            </Button>
+            <>
+              <Button
+                disabled={isLoading || otp.length !== otpLength}
+                kind="primary"
+                onClick={handleVerify}
+                className={styles.button}>
+                {isLoading ? <InlineLoading description={t('verifyingOtp', 'Verifying OTP')} /> : t('verify', 'Verify')}
+              </Button>
+            </>
           )}
 
           {mode === 'change-number' && (
@@ -263,7 +267,7 @@ const OTPVerificationModal: FC<OTPVerificationModalProps> = ({
               onClick={() => handleRequestingOtp(newPhoneNumber)}
               className={styles.button}>
               {requestingOtp ? (
-                <InlineLoading description={t('sendingOtp', 'Sending OTP...')} />
+                <InlineLoading description={t('reSendingOtp', 'Resending OTP...')} />
               ) : (
                 t('sendOtp', 'Send OTP')
               )}

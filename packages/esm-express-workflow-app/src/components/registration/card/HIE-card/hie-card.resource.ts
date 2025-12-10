@@ -52,6 +52,10 @@ export function parseMessage<T extends Record<string, string | number>>(context:
     return trimmedKey in context ? String(context[trimmedKey]) : match;
   });
 }
+
+/**
+ * Builds a URL for sending an SMS message.
+ */
 function buildSmsUrl(message: string, receiver: string, nationalId: string | null = null): string {
   const encodedMessage = encodeURIComponent(message);
   let url = `${restBaseUrl}/kenyaemr/send-kenyaemr-sms?message=${encodedMessage}&phone=${receiver}`;
@@ -62,16 +66,24 @@ function buildSmsUrl(message: string, receiver: string, nationalId: string | nul
   return url;
 }
 
+/**
+ * Validates required parameters.
+ */
 function validateOtpInputs(receiver: string, patientName: string): void {
   if (!receiver?.trim() || !patientName?.trim()) {
     throw new OTPValidationError('Missing required parameters: receiver or patientName');
   }
 
+  // Basic phone number validation
   const phoneRegex = /^[0-9+]{10,15}$/;
   if (!phoneRegex.test(receiver.replace(/\s/g, ''))) {
     throw new OTPValidationError('Invalid phone number format');
   }
 }
+
+/**
+ * Hook to get OTP source configuration
+ */
 export const useOtpSource = () => {
   const url = `${restBaseUrl}/kenyaemr/checkotpsource`;
 
@@ -85,6 +97,9 @@ export const useOtpSource = () => {
   };
 };
 
+/**
+ * Sends OTP via SMS for KEHMIS workflow (client generates OTP)
+ */
 async function sendOtpKehmis(
   otp: string,
   receiver: string,
@@ -132,6 +147,10 @@ async function sendOtpKehmis(
   }
 }
 
+/**
+ * Requests OTP from server (server generates and sends OTP)
+ * Enhanced with comprehensive error handling
+ */
 async function requestOtpFromServer(
   receiver: string,
   patientName: string,
@@ -209,10 +228,11 @@ async function requestOtpFromServer(
       }
     }
 
+    // Read response text with error handling
     try {
       responseText = await response.text();
     } catch (textError) {
-      throw new OTPParseError('Failed to send sms. Please try again.');
+      throw new OTPParseError('Unable to read server response. Please try again.');
     }
 
     if (!responseText || responseText.trim() === '') {
@@ -227,19 +247,42 @@ async function requestOtpFromServer(
       unwrappedText = responseText;
     }
 
+    // Check if response contains common error patterns before trying to parse JSON
+    const lowerText = unwrappedText.toLowerCase();
+    if (
+      lowerText.includes('failed to send sms') ||
+      lowerText.includes('sms sending failed') ||
+      lowerText.includes('sms delivery failed') ||
+      (lowerText.includes('error') && !lowerText.includes('{'))
+    ) {
+      // Extract and return the actual error message from the backend
+      const cleanMessage = unwrappedText.trim().replace(/^["']|["']$/g, '');
+      throw new OTPServerError(
+        cleanMessage.substring(0, 200) || 'Failed to send SMS. Please try again.',
+        unwrappedText,
+        true,
+      );
+    }
+
     const jsonMatch = unwrappedText.match(/\{.*\}/s);
     if (!jsonMatch) {
-      throw new OTPParseError(
-        'Invalid response format from server. Please contact support.',
-        unwrappedText.substring(0, 200),
-      );
+      // If no JSON found but response exists, treat entire response as error message
+      if (unwrappedText && unwrappedText.trim().length > 0) {
+        const cleanMessage = unwrappedText.trim().replace(/^["']|["']$/g, '');
+        throw new OTPServerError(
+          cleanMessage.substring(0, 200) || 'Failed to send SMS. Please try again.',
+          unwrappedText,
+          true,
+        );
+      }
+      throw new OTPParseError('Failed to send SMS. Please try again.', unwrappedText.substring(0, 200));
     }
 
     let data: any;
     try {
       data = JSON.parse(jsonMatch[0]);
     } catch (parseError) {
-      throw new OTPParseError('Failed to send sms. Please try again.', jsonMatch[0].substring(0, 200));
+      throw new OTPParseError('Unable to parse server response. Please try again.', jsonMatch[0].substring(0, 200));
     }
 
     if (!data || typeof data !== 'object') {
@@ -266,6 +309,7 @@ async function requestOtpFromServer(
 
     throw new OTPServerError('OTP request failed', data, true);
   } catch (error) {
+    // Re-throw custom errors as-is
     if (
       error instanceof OTPNetworkError ||
       error instanceof OTPServerError ||
@@ -319,6 +363,7 @@ async function verifyOtpWithServer(otpId: string, otp: string): Promise<boolean>
       }),
     });
 
+    // Handle HTTP errors
     if (!response.ok) {
       if (response.status === 400) {
         throw new OTPValidationError('Invalid verification request. Please request a new OTP.');
@@ -335,6 +380,7 @@ async function verifyOtpWithServer(otpId: string, otp: string): Promise<boolean>
       }
     }
 
+    // Parse response
     const rawText = await response.text();
 
     let parsedResponse: any;
@@ -393,6 +439,7 @@ class KehmisOTPManager {
   private readonly MAX_ATTEMPTS = 3;
 
   private createSessionKey(phoneNumber: string, patientId?: string): string {
+    // Create a composite key to allow multiple OTP sessions for the same phone number
     return patientId ? `${phoneNumber}::${patientId}` : phoneNumber;
   }
 
@@ -422,6 +469,7 @@ class KehmisOTPManager {
     try {
       await sendOtpKehmis(otp, phoneNumber, patientName, expiryMinutes, nationalId);
     } catch (error) {
+      // Clean up on failure
       this.otpStore.delete(sessionKey);
       throw error;
     }
@@ -729,6 +777,7 @@ class OTPManagerAdapter implements IOTPManager {
   ): Promise<void> {
     this.cleanupExpiredOTPs();
 
+    // Validate OTP source is set
     if (!this.currentSource) {
       throw new Error('OTP source not configured. Please contact your administrator.');
     }
@@ -739,6 +788,7 @@ class OTPManagerAdapter implements IOTPManager {
   async verifyOTP(phoneNumber: string, inputOtp: string, patientId?: string): Promise<boolean> {
     this.cleanupExpiredOTPs();
 
+    // Validate OTP source is set
     if (!this.currentSource) {
       throw new Error('OTP source not configured. Please contact your administrator.');
     }
