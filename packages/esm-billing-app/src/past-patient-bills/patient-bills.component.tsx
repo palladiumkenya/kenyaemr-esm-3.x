@@ -17,11 +17,11 @@ import { ConfigurableLink, getPatientName, usePatient, setCurrentVisit } from '@
 import { getPatientChartStore, useLaunchWorkspaceRequiringVisit } from '@openmrs/esm-patient-common-lib';
 import capitalize from 'lodash/capitalize';
 
-import { convertToCurrency } from '../helpers';
 import { type MappedBill } from '../types';
 import EmptyPatientBill from './patient-bills-dashboard/empty-patient-bill.component';
 
 import styles from './patient-bills.scss';
+import { useCurrencyFormatting } from '../helpers/currency';
 
 type PatientBillsProps = {
   patientUuid: string;
@@ -38,6 +38,8 @@ export const patientBillsHeaders = [
 
 export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, patientUuid }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const { patient, isLoading, error } = usePatient(patientUuid);
   if (isLoading) {
     return <InlineLoading status="active" description={t('loading', 'Loading...')} />;
@@ -68,7 +70,7 @@ export const PatientBills: React.FC<PatientBillsProps> = ({ bills, onCancel, pat
         {bill.lineItems.map((item) => item?.billableService?.split(':')[1]).join(', ')}
       </ConfigurableLink>
     ),
-    totalAmount: convertToCurrency(bill.totalAmount),
+    totalAmount: formatCurrency(bill.totalAmount),
     status: bill.status,
   }));
 

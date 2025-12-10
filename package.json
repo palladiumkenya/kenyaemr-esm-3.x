@@ -13,7 +13,7 @@
     "postinstall": "husky install",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
     "release": "yarn workspaces foreach --all --topological version",
-    "start": "openmrs develop --sources packages/esm-billing-app --port 8095 --backend http://localhost --config-url http://localhost//openmrs/spa/config/configs/kenyahmis-package/openmrs.config.json http://localhost//openmrs/spa/config/configs/kenyahmis-package/kenyaemr.config.json",
+    "start": "openmrs develop",
     "test-e2e": "playwright test",
     "verify": "turbo run lint && turbo run typescript"
   },

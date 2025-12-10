@@ -14,10 +14,10 @@ import { Form, Button, ButtonSet, InlineLoading, TextArea, InlineNotification } 
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { convertToCurrency } from '../../../../helpers';
 import { createCancelBillPayload } from './cance-bill.resource';
 import { processBillPayment } from '../../../../billing.resource';
 import { mutate } from 'swr';
+import { useCurrencyFormatting } from '../../../../helpers/currency';
 
 type CancelBillWorkspaceProps = DefaultWorkspaceProps & {
   patientUuid: string;
@@ -33,6 +33,8 @@ const CancelBillWorkspace: React.FC<CancelBillWorkspaceProps> = ({
   closeWorkspaceWithSavedChanges,
 }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const isTablet = useLayoutType() === 'tablet';
 
   const cancelSchema = z.object({
@@ -81,7 +83,7 @@ const CancelBillWorkspace: React.FC<CancelBillWorkspaceProps> = ({
   const subtitleText = `${t('currentPriceAndQuantity', 'Current price and quantity')}: ${t(
     'price',
     'Price',
-  )}: ${convertToCurrency(lineItem?.price)} ${t('quantity', 'Quantity')}: ${lineItem?.quantity}`;
+  )}: ${formatCurrency(lineItem?.price)} ${t('quantity', 'Quantity')}: ${lineItem?.quantity}`;
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit(onSubmit)}>

@@ -9,10 +9,11 @@ import {
   OverflowMenu,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { convertToCurrency, extractString } from '../../helpers';
+import { extractString } from '../../helpers';
 import { LineItem, MappedBill, PaymentStatus } from '../../types';
 import styles from './patient-billing.scss';
 import { ExtensionSlot } from '@openmrs/esm-framework';
+import { useCurrencyFormatting } from '../../helpers/currency';
 
 const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
   const { t } = useTranslation();
@@ -42,6 +43,8 @@ const BillLineItems: React.FC<{ bill: MappedBill }> = ({ bill }) => {
 
 const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const refundedLineItemUUIDs = bill.lineItems.filter((li) => Math.sign(li.price) === -1).map((li) => li.uuid);
   const isRefundedLineItem = refundedLineItemUUIDs.includes(lineItem.uuid);
 
@@ -61,8 +64,8 @@ const LineItemRow = ({ lineItem, bill }: { lineItem: LineItem; bill: MappedBill 
         {lineItem.item === '' ? lineItem.billableService.split(':')[1] : extractString(lineItem.item)}
       </StructuredListCell>
       <StructuredListCell>{lineItem.quantity}</StructuredListCell>
-      <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
-      <StructuredListCell>{convertToCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
+      <StructuredListCell>{formatCurrency(lineItem.price)}</StructuredListCell>
+      <StructuredListCell>{formatCurrency(lineItem.price * lineItem.quantity)}</StructuredListCell>
       <StructuredListCell>{lineItem.paymentStatus}</StructuredListCell>
 
       <StructuredListCell>

@@ -2,8 +2,8 @@ import React from 'react';
 import { DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
 import { MappedBill } from '../../../types';
 import { formatDate } from '@openmrs/esm-framework';
-import { convertToCurrency } from '../../../helpers';
 import { useTranslation } from 'react-i18next';
+import { useCurrencyFormatting } from '../../../helpers/currency';
 
 type PaymentHistoryProps = {
   bill: MappedBill;
@@ -11,6 +11,8 @@ type PaymentHistoryProps = {
 
 const PaymentHistory: React.FC<PaymentHistoryProps> = ({ bill }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const headers = [
     {
       key: 'dateCreated',
@@ -28,8 +30,8 @@ const PaymentHistory: React.FC<PaymentHistoryProps> = ({ bill }) => {
   const rows = bill?.payments?.map((payment) => ({
     id: `${payment.uuid}`,
     dateCreated: formatDate(new Date(payment.dateCreated)),
-    amountTendered: convertToCurrency(payment.amountTendered),
-    amount: convertToCurrency(payment.amount),
+    amountTendered: formatCurrency(payment.amountTendered),
+    amount: formatCurrency(payment.amount),
     paymentMethod: payment.instanceType.name,
   }));
 

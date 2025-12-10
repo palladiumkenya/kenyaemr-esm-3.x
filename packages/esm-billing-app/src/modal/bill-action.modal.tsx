@@ -2,7 +2,6 @@ import React from 'react';
 import { ModalBody, ModalFooter, ModalHeader, Button, TextArea } from '@carbon/react';
 import { type MappedBill } from '../types';
 import { useTranslation } from 'react-i18next';
-import { convertToCurrency } from '../helpers';
 import { reOpenOrCloseBill } from '../invoice/invoice.resource';
 import { showSnackbar } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
@@ -10,6 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import styles from './bill-action.modal.scss';
+import { useCurrencyFormatting } from '../helpers/currency';
 
 type BillActionModalProps = {
   closeModal: () => void;
@@ -26,6 +26,8 @@ type FormData = z.infer<typeof formSchema>;
 const BillActionModal: React.FC<BillActionModalProps> = (props) => {
   const { closeModal, bill, action } = props;
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const formMethod = useForm({
     defaultValues: {
       reason: '',
@@ -80,7 +82,7 @@ const BillActionModal: React.FC<BillActionModalProps> = (props) => {
           action: action === 'close' ? t('close', 'Close') : t('reopen', 'Reopen'),
           receiptNumber: bill?.receiptNumber,
           status: bill?.status,
-          amount: bill?.totalAmount ? `${convertToCurrency(bill?.totalAmount)}` : 'N/A',
+          amount: bill?.totalAmount ? `${formatCurrency(bill?.totalAmount)}` : 'N/A',
         })}
         title={t('billAction', '{{action}} Bill', {
           action: action === 'close' ? t('close', 'Close') : t('reopen', 'Reopen'),

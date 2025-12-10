@@ -24,10 +24,10 @@ import {
 import { type Order } from '@openmrs/esm-patient-common-lib';
 import { useBillableItem } from '../../../../billable-services/billable-orders/useBillableItem';
 import styles from './create-bill.style.scss';
-import { convertToCurrency } from '../../../../helpers';
 import { BillingConfig } from '../../../../config-schema';
 import { processBillItems } from '../../../../billing.resource';
 import { mutate } from 'swr';
+import { useCurrencyFormatting } from '../../../../helpers/currency';
 
 type CreateBillWorkspaceProps = DefaultWorkspaceProps & {
   patientUuid: string;
@@ -75,6 +75,7 @@ const BillForm: React.FC<BillFormProps> = ({
   comboBoxItems,
 }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
 
   return (
     <Stack gap={4}>
@@ -128,7 +129,7 @@ const BillForm: React.FC<BillFormProps> = ({
       <Column>
         <div className={styles.formField}>
           <label className={styles.label}>{t('total', 'Total')}</label>
-          <div className={styles.value}>{convertToCurrency(calculateTotal())}</div>
+          <div className={styles.value}>{formatCurrency(calculateTotal())}</div>
         </div>
       </Column>
     </Stack>
@@ -153,6 +154,7 @@ const CreateBillWorkspace: React.FC<CreateBillWorkspaceProps> = ({
   medicationRequestBundle,
 }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
   const defaultPaymentStatus = 'PENDING';
   const isTablet = useLayoutType() === 'tablet';
   const { cashPointUuid, cashierUuid } = useConfig<BillingConfig>();
@@ -162,7 +164,7 @@ const CreateBillWorkspace: React.FC<CreateBillWorkspaceProps> = ({
   const comboBoxItems =
     billableItem?.servicePrices?.map((item) => ({
       id: item.uuid,
-      text: `${item.paymentMode.name} - ${convertToCurrency(item.price)}`,
+      text: `${item.paymentMode.name} - ${formatCurrency(item.price)}`,
       unitPrice: item.price,
     })) ?? [];
 

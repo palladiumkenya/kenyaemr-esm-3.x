@@ -23,15 +23,17 @@ import { ErrorState, launchWorkspace, showModal, useLayoutType, usePagination } 
 import { EmptyState, usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 import React, { ChangeEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { convertToCurrency } from '../../helpers';
 import styles from './charge-summary-table.scss';
 import { type ChargeAble, useChargeSummaries } from './charge-summary.resource';
 import { downloadExcelTemplateFile, searchTableData } from './form-helper';
+import { useCurrencyFormatting } from '../../helpers/currency';
 
 const defaultPageSize = 10;
 
 const ChargeSummaryTable: React.FC = () => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const layout = useLayoutType();
   const size = layout === 'tablet' ? 'lg' : 'md';
   const { isLoading, isValidating, error, mutate, chargeSummaryItems } = useChargeSummaries();
@@ -76,9 +78,7 @@ const ChargeSummaryTable: React.FC = () => {
       shortName: service.shortName,
       serviceStatus: service.serviceStatus,
       serviceType: service?.serviceType?.display ?? t('stockItem', 'Stock Item'),
-      servicePrices: service.servicePrices
-        .map((price) => `${price.name} : ${convertToCurrency(price.price)}`)
-        .join(', '),
+      servicePrices: service.servicePrices.map((price) => `${price.name} : ${formatCurrency(price.price)}`).join(', '),
     };
   });
 

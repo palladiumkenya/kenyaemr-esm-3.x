@@ -14,16 +14,19 @@ import {
   Heading,
 } from '@carbon/react';
 import styles from './prompt-payment.scss';
-import { convertToCurrency, extractString } from '../helpers';
+import { extractString } from '../helpers';
 import { navigate, useConfig } from '@openmrs/esm-framework';
 import { BillingConfig } from '../config-schema';
 import { getPatientUuidFromStore } from '@openmrs/esm-patient-common-lib';
 import { useBillingPrompt } from './prompt-payment.resource';
+import { useCurrencyFormatting } from '../helpers/currency';
 
 type PromptPaymentModalProps = {};
 
 const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const patientUuid = getPatientUuidFromStore();
   const { shouldShowBillingPrompt, isLoading, bills } = useBillingPrompt(patientUuid, 'patient-chart');
   const [showModal, setShowModal] = useState({ loadingModal: true, billingModal: true });
@@ -82,9 +85,9 @@ const PromptPaymentModal: React.FC<PromptPaymentModalProps> = () => {
                   <StructuredListRow key={lineItem.uuid}>
                     <StructuredListCell>{extractString(lineItem.billableService || lineItem.item)}</StructuredListCell>
                     <StructuredListCell>{lineItem.quantity}</StructuredListCell>
-                    <StructuredListCell>{convertToCurrency(lineItem.price)}</StructuredListCell>
+                    <StructuredListCell>{formatCurrency(lineItem.price)}</StructuredListCell>
                     <StructuredListCell>{lineItem.paymentStatus}</StructuredListCell>
-                    <StructuredListCell>{convertToCurrency(lineItem.quantity * lineItem.price)}</StructuredListCell>
+                    <StructuredListCell>{formatCurrency(lineItem.quantity * lineItem.price)}</StructuredListCell>
                   </StructuredListRow>
                 );
               })}
