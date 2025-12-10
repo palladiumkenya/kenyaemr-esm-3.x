@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useBill } from '../billing.resource';
-import { convertToCurrency } from '../helpers';
 import { usePaymentsReconciler } from '../hooks/use-payments-reconciler';
 import { LineItem, MappedBill } from '../types';
 import InvoiceTable from './invoice-table.component';
@@ -13,6 +12,7 @@ import styles from './invoice.scss';
 import Payments from './payments/payments.component';
 import capitalize from 'lodash-es/capitalize';
 import { InvoiceActions } from './invoice-actions.component';
+import { useCurrencyFormatting } from '../helpers/currency';
 
 const Invoice: React.FC = () => {
   const { t } = useTranslation();
@@ -79,6 +79,7 @@ export function InvoiceSummary({
   readonly activeVisit?: any;
 }) {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
 
   return (
     <>
@@ -99,20 +100,20 @@ export function InvoiceSummary({
         </div>
         <div className={styles.divider} />
         <div className={styles.invoiceCard}>
-          <InvoiceSummaryItem label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill?.totalAmount)} />
+          <InvoiceSummaryItem label={t('totalAmount', 'Total Amount')} value={formatCurrency(bill?.totalAmount)} />
           <InvoiceSummaryItem
             label={t('totalExempted', 'Total Exempted')}
-            value={convertToCurrency(bill?.totalExempted)}
+            value={formatCurrency(bill?.totalExempted)}
           />
           <InvoiceSummaryItem
             label={t('totalPayments', 'Total Payments')}
-            value={convertToCurrency(bill?.totalPayments)}
+            value={formatCurrency(bill?.totalPayments)}
           />
           <InvoiceSummaryItem
             label={t('totalDeposits', 'Total Deposits')}
-            value={convertToCurrency(bill?.totalDeposits)}
+            value={formatCurrency(bill?.totalDeposits)}
           />
-          <InvoiceSummaryItem label={t('balance', 'Balance')} value={convertToCurrency(bill?.balance)} />
+          <InvoiceSummaryItem label={t('balance', 'Balance')} value={formatCurrency(bill?.balance)} />
         </div>
       </div>
     </>

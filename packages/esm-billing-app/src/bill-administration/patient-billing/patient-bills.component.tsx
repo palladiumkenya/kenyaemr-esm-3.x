@@ -12,14 +12,13 @@ import {
   TableCell,
   TableExpandedRow,
 } from '@carbon/react';
-import { convertToCurrency } from '../../helpers';
 import { useTranslation } from 'react-i18next';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedBill, PaymentStatus } from '../../types';
 import styles from '../../bills-table/bills-table.scss';
 import BillLineItems from './bill-line-items.component';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import EmptyPatientBill from '../../past-patient-bills/patient-bills-dashboard/empty-patient-bill.component';
+import { useCurrencyFormatting } from '../../helpers/currency';
 
 type PatientBillsProps = {
   bills: Array<MappedBill>;
@@ -27,6 +26,7 @@ type PatientBillsProps = {
 
 const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
 
   const hasRefundedItems = bills.some((bill) => bill.lineItems.some((li) => Math.sign(li.price) === -1));
 
@@ -44,16 +44,16 @@ const PatientBills: React.FC<PatientBillsProps> = ({ bills }) => {
   const tableRows = bills.map((bill) => ({
     id: `${bill.uuid}`,
     date: bill.dateCreated,
-    totalAmount: convertToCurrency(bill.totalAmount),
+    totalAmount: formatCurrency(bill.totalAmount),
     status:
       bill.totalAmount === bill.tenderedAmount
         ? PaymentStatus.PAID
         : bill.tenderedAmount === 0
         ? PaymentStatus.PENDING
         : PaymentStatus.POSTED,
-    amountPaid: convertToCurrency(bill.tenderedAmount),
+    amountPaid: formatCurrency(bill.tenderedAmount),
     ...(hasRefundedItems && {
-      creditAmount: convertToCurrency(
+      creditAmount: formatCurrency(
         bill.lineItems.filter((li) => Math.sign(li.price) === -1).reduce((acc, curr) => acc + Math.abs(curr.price), 0),
       ),
     }),

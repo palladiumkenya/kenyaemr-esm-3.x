@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import { z } from 'zod';
 import { processBillPayment } from '../../billing.resource';
-import { convertToCurrency } from '../../helpers';
 import { useClockInStatus } from '../../bill-administration/payment-points/use-clock-in-status';
 import { LineItem, PaymentFormValue, PaymentStatus, type MappedBill } from '../../types';
 import { computeWaivedAmount, extractErrorMessagesFromResponse } from '../../utils';
@@ -18,6 +17,7 @@ import PaymentHistory from './payment-history/payment-history.component';
 import styles from './payments.scss';
 import { createPaymentPayload } from './utils';
 import { usePaymentSchema } from '../../hooks/usePaymentSchema';
+import { useCurrencyFormatting } from '../../helpers/currency';
 
 type PaymentProps = {
   bill: MappedBill;
@@ -26,6 +26,8 @@ type PaymentProps = {
 
 const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const paymentSchema = usePaymentSchema(bill);
   const { globalActiveSheet } = useClockInStatus();
 
@@ -118,7 +120,7 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
                   'incompletePaymentSubtitle',
                   'Please ensure all selected line items are fully paid, Total amount expected is {{selectedLineItemsAmountDue}}',
                   {
-                    selectedLineItemsAmountDue: convertToCurrency(selectedLineItemsAmountDue),
+                    selectedLineItemsAmountDue: formatCurrency(selectedLineItemsAmountDue),
                   },
                 )}
                 lowContrast
@@ -133,8 +135,8 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
                   'overPaymentSubtitle',
                   'Amount paid {{totalAmountTendered}} should not be greater than amount due {{selectedLineItemsAmountDue}} for selected line items',
                   {
-                    totalAmountTendered: convertToCurrency(totalAmountTendered),
-                    selectedLineItemsAmountDue: convertToCurrency(selectedLineItemsAmountDue),
+                    totalAmountTendered: formatCurrency(totalAmountTendered),
+                    selectedLineItemsAmountDue: formatCurrency(selectedLineItemsAmountDue),
                   },
                 )}
                 lowContrast
@@ -147,20 +149,17 @@ const Payments: React.FC<PaymentProps> = ({ bill, selectedLineItems }) => {
         </div>
         <div className={styles.divider} />
         <div className={styles.paymentTotals}>
-          <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={convertToCurrency(bill.totalAmount)} />
-          <InvoiceBreakDown
-            label={t('totalDeposits', 'Total Deposits')}
-            value={convertToCurrency(bill.totalDeposits)}
-          />
+          <InvoiceBreakDown label={t('totalAmount', 'Total Amount')} value={formatCurrency(bill.totalAmount)} />
+          <InvoiceBreakDown label={t('totalDeposits', 'Total Deposits')} value={formatCurrency(bill.totalDeposits)} />
           <InvoiceBreakDown
             label={t('totalTendered', 'Total Tendered')}
-            value={convertToCurrency(bill.tenderedAmount + totalAmountTendered)}
+            value={formatCurrency(bill.tenderedAmount + totalAmountTendered)}
           />
           <InvoiceBreakDown label={t('discount', 'Discount')} value={'--'} />
           <InvoiceBreakDown
             hasBalance={amountDue < 0}
             label={amountDueDisplay(amountDue)}
-            value={convertToCurrency(amountDue)}
+            value={formatCurrency(amountDue)}
           />
           <div className={styles.processPayments}>
             <Button onClick={handleNavigateToBillingDashboard} kind="secondary">

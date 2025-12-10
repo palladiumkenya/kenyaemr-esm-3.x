@@ -20,7 +20,8 @@ import { type FormattedDeposit } from '../../../types/bill-deposit.types';
 import { addDepositTransaction } from '../../../utils/bill-deposit.utils';
 import { usePatientBills } from '../../../../../prompt-payment/prompt-payment.resource';
 import { LineItem, PaymentStatus } from '../../../../../types';
-import { extractString, convertToCurrency } from '../../../../../helpers';
+import { extractString } from '../../../../../helpers';
+import { useCurrencyFormatting } from '../../../../../helpers/currency';
 
 type DepositTransactionWorkspaceProps = DefaultWorkspaceProps & {
   deposit: FormattedDeposit;
@@ -35,6 +36,8 @@ const DepositTransactionWorkspace: React.FC<DepositTransactionWorkspaceProps> = 
   promptBeforeClosing,
 }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const isTablet = useLayoutType() === 'tablet';
   const { isLoading, patientBills, error } = usePatientBills(patientUuid);
   const pendingLineItems: Array<LineItem> = uniqBy(
@@ -162,7 +165,7 @@ const DepositTransactionWorkspace: React.FC<DepositTransactionWorkspaceProps> = 
               <ComboBox
                 id="billLineItem"
                 itemToString={(item: LineItem) =>
-                  item ? `${extractString(item.billableService)} - ${convertToCurrency(item.price)}` : ''
+                  item ? `${extractString(item.billableService)} - ${formatCurrency(item.price)}` : ''
                 }
                 items={pendingLineItems ?? []}
                 onChange={({ selectedItem }) => field.onChange(selectedItem?.uuid)}

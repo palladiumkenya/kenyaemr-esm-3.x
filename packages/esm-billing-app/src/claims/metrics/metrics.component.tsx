@@ -5,7 +5,8 @@ import MetricsHeader from './metrics-header.component';
 import MetricsCard from './metrics-card.component';
 import { computeTotalPrice } from '../../utils';
 import { LineItem, MappedBill } from '../../types';
-import { convertToCurrency, formatDate } from '../../helpers';
+import { formatDate } from '../../helpers';
+import { useCurrencyFormatting } from '../../helpers/currency';
 
 interface MainMetricsProps {
   selectedLineItems: LineItem[];
@@ -14,6 +15,7 @@ interface MainMetricsProps {
 
 const MainMetrics: React.FC<MainMetricsProps> = ({ selectedLineItems, bill }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
 
   const numberOfLineItems = selectedLineItems.length;
 
@@ -26,7 +28,7 @@ const MainMetrics: React.FC<MainMetricsProps> = ({ selectedLineItems, bill }) =>
       <div className={styles.cardContainer} data-testid="claims-metrics">
         <MetricsCard
           label={t('total', 'Amount')}
-          value={convertToCurrency(computedTotal)}
+          value={formatCurrency(computedTotal)}
           headerLabel={t('totalAmount', 'Total Amount')}
         />
         <MetricsCard

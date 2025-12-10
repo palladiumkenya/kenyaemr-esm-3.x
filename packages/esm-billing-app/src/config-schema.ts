@@ -230,6 +230,7 @@ export const configSchema: ConfigSchema = {
       'en-KE': 'KES',
       'sw-KE': 'KES',
       'am-ET': 'ETB',
+      'en-GB': 'KES',
     },
   },
 };

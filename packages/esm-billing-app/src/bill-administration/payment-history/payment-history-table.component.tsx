@@ -17,10 +17,10 @@ import { Download } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useDebounce, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
-import { convertToCurrency } from '../../helpers/functions';
 import { DataTableRow, MappedBill } from '../../types';
 import { exportToExcel } from '../../helpers/excelExport';
 import dayjs from 'dayjs';
+import { useCurrencyFormatting } from '../../helpers/currency';
 
 export const PaymentHistoryTable = ({
   headers,
@@ -30,6 +30,8 @@ export const PaymentHistoryTable = ({
   rows: Array<MappedBill>;
 }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const [pageSize, setPageSize] = useState(10);
   const responsiveSize = useLayoutType() !== 'tablet' ? 'sm' : 'md';
   const [searchString, setSearchString] = useState('');
@@ -61,7 +63,7 @@ export const PaymentHistoryTable = ({
       ...row,
       id: `${row.id}`,
       billingService: row.lineItems.map((item) => item.billableService).join(', '),
-      totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
+      totalAmount: formatCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
       referenceCodes: row.payments
         .map(({ attributes }) => attributes.map(({ value }) => value).join(', '))
         .filter((code) => code !== '')
@@ -73,7 +75,7 @@ export const PaymentHistoryTable = ({
     const dataForExport = rows.map((row) => {
       return {
         ...row,
-        totalAmount: convertToCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
+        totalAmount: formatCurrency(row.payments.reduce((acc, payment) => acc + payment.amountTendered, 0)),
       };
     });
     const data = dataForExport.map((row) => {

@@ -18,12 +18,12 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { mutate } from 'swr';
-import { convertToCurrency } from '../helpers';
 import { MappedBill, LineItem } from '../types';
 import { spaBasePath } from '../constants';
 import { useCheckShareGnum } from './invoice.resource';
 import styles from './invoice.scss';
 import startCase from 'lodash-es/startCase';
+import { useCurrencyFormatting } from '../helpers/currency';
 
 interface InvoiceActionsProps {
   readonly bill: MappedBill;
@@ -33,6 +33,8 @@ interface InvoiceActionsProps {
 
 export function InvoiceActions({ bill, selectedLineItems = [], activeVisit }: InvoiceActionsProps) {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const [isOpen, setIsOpen] = useState(false);
   const { billUuid, patientUuid } = useParams();
   const { checkSHARegNum } = useCheckShareGnum();
@@ -222,7 +224,7 @@ export function InvoiceActions({ bill, selectedLineItems = [], activeVisit }: In
           launchWorkspace('payment-workspace', {
             bill,
             workspaceTitle: t('additionalPayment', 'Additional Payment (Balance {{billBalance}})', {
-              billBalance: convertToCurrency(bill.balance),
+              billBalance: formatCurrency(bill.balance),
             }),
           })
         }>

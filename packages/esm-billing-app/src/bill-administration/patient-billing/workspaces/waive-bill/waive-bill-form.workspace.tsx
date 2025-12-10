@@ -14,7 +14,6 @@ import { useTranslation } from 'react-i18next';
 import styles from './waive-bill-form.scss';
 import { MappedBill } from '../../../../types';
 import { createBillWaiverPayload, extractErrorMessagesFromResponse } from '../../../../utils';
-import { convertToCurrency, extractString } from '../../../../helpers';
 import { processBillPayment, usePaymentModes } from '../../../../billing.resource';
 import { restBaseUrl, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import { mutate } from 'swr';
@@ -24,6 +23,8 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import first from 'lodash-es/first';
 import classNames from 'classnames';
+import { useCurrencyFormatting } from '../../../../helpers/currency';
+import { extractString } from '../../../../helpers';
 
 type BillWaiverFormProps = DefaultPatientWorkspaceProps & {
   bill: MappedBill;
@@ -39,6 +40,7 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({
   const isTablet = useLayoutType() === 'tablet';
 
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
 
   const totalAmount = lineItems.reduce((acc, curr) => acc + curr.price * curr.quantity, 0);
   const { isLoading, paymentModes = [] } = usePaymentModes(false);
@@ -167,12 +169,12 @@ export const WaiveBillForm: React.FC<BillWaiverFormProps> = ({
           </section>
           <section className={styles.billWaiverDescription}>
             <label className={styles.label}>{t('billTotal', 'Bill total')}</label>
-            <p className={styles.value}>{convertToCurrency(totalAmount)}</p>
+            <p className={styles.value}>{formatCurrency(totalAmount)}</p>
           </section>
           {amountAlreadyWaivedOrPaid > 0 && (
             <section className={styles.billWaiverDescription}>
               <label className={styles.label}>{t('amountAlreadyWaivedOrPaid', 'Total paid / waived')}</label>
-              <p className={styles.value}>{convertToCurrency(amountAlreadyWaivedOrPaid)}</p>
+              <p className={styles.value}>{formatCurrency(amountAlreadyWaivedOrPaid)}</p>
             </section>
           )}
           <Controller

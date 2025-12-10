@@ -4,7 +4,7 @@ import { DosingUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from '
 import { useBillableItem, useSockItemInventory } from '../useBillableItem';
 import { useTranslation } from 'react-i18next';
 import styles from './drug-order.scss';
-import { convertToCurrency } from '../../../helpers';
+import { useCurrencyFormatting } from '../../../helpers/currency';
 
 type DrugOrderProps = {
   order: {
@@ -23,6 +23,8 @@ type DrugOrderProps = {
 
 const DrugOrder: React.FC<DrugOrderProps> = ({ order }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const { stockItem, isLoading: isLoadingInventory } = useSockItemInventory(order?.drug?.uuid);
   const { billableItem, isLoading } = useBillableItem(order?.drug.concept.uuid, order?.drug.uuid);
   if (isLoading || isLoadingInventory) {
@@ -52,7 +54,7 @@ const DrugOrder: React.FC<DrugOrderProps> = ({ order }) => {
           billableItem?.servicePrices.map((item) => (
             <div key={item.uuid} className={styles.itemContainer}>
               <span className={styles.bold}>{item.paymentMode.name}</span>
-              <span>{convertToCurrency(item.price)}</span>
+              <span>{formatCurrency(item.price)}</span>
             </div>
           ))}
       </div>

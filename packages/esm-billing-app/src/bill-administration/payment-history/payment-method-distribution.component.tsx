@@ -11,15 +11,17 @@ import {
   DataTableSkeleton,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { convertToCurrency } from '../../helpers';
 import { usePaymentModeGroupTotals } from './usePaymentModeGroupTotals';
 import { usePaymentFilterContext } from './usePaymentFilterContext';
 import EmptyPatientBill from '../../past-patient-bills/patient-bills-dashboard/empty-patient-bill.component';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { usePaymentTransactionHistory } from './usePaymentTransactionHistory';
+import { useCurrencyFormatting } from '../../helpers/currency';
 
 const PaymentMethodDistribution = () => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   const responsiveSize = useLayoutType() !== 'tablet' ? 'sm' : 'md';
   const { filters } = usePaymentFilterContext();
   const { bills: filteredBills, isLoading } = usePaymentTransactionHistory(filters);
@@ -28,7 +30,7 @@ const PaymentMethodDistribution = () => {
   const rows = paymentModesGroupTotals.map((total, index) => ({
     id: index.toString(),
     paymentMode: total?.type,
-    total: convertToCurrency(total?.total as number),
+    total: formatCurrency(total?.total as number),
   }));
 
   const headers = [

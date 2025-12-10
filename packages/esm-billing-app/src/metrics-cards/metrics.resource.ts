@@ -1,4 +1,4 @@
-import { convertToCurrency } from '../helpers';
+import { useCurrencyFormatting } from '../helpers/currency';
 import { MappedBill, PaymentStatus } from '../types';
 
 /**
@@ -20,11 +20,13 @@ export const useBillMetrics = (
   exemptedBills: string;
 } => {
   const { paidTotal, pendingTotal, cumulativeTotal, exemptedTotal } = calculateBillTotals(bills);
+  const { format: formatCurrency } = useCurrencyFormatting();
+
   return {
-    totalBills: convertToCurrency(cumulativeTotal),
-    pendingBills: convertToCurrency(pendingTotal),
-    paidBills: convertToCurrency(paidTotal),
-    exemptedBills: convertToCurrency(exemptedTotal),
+    totalBills: formatCurrency(cumulativeTotal),
+    pendingBills: formatCurrency(pendingTotal),
+    paidBills: formatCurrency(paidTotal),
+    exemptedBills: formatCurrency(exemptedTotal),
   };
 };
 

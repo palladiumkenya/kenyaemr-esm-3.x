@@ -1,5 +1,4 @@
 import React from 'react';
-import { convertToCurrency } from '../../../helpers';
 import { useTranslation } from 'react-i18next';
 import styles from './price-info-order.scss';
 import {
@@ -11,6 +10,7 @@ import {
   Tile,
   InlineNotification,
 } from '@carbon/react';
+import { useCurrencyFormatting } from '../../../helpers/currency';
 
 type PriceInfoOrderProps = {
   billableItem: any;
@@ -19,6 +19,7 @@ type PriceInfoOrderProps = {
 
 const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error }) => {
   const { t } = useTranslation();
+  const { format: formatCurrency } = useCurrencyFormatting();
 
   const hasPrice = billableItem?.servicePrices?.length > 0;
 
@@ -46,7 +47,7 @@ const PriceInfoOrder: React.FC<PriceInfoOrderProps> = ({ billableItem, error }) 
             {billableItem.servicePrices.map((priceItem: any) => (
               <StructuredListRow key={priceItem.uuid}>
                 <StructuredListCell className={styles.cell}>{priceItem.paymentMode.name}</StructuredListCell>
-                <StructuredListCell className={styles.cell}>{convertToCurrency(priceItem.price)}</StructuredListCell>
+                <StructuredListCell className={styles.cell}>{formatCurrency(priceItem.price)}</StructuredListCell>
               </StructuredListRow>
             ))}
           </StructuredListBody>

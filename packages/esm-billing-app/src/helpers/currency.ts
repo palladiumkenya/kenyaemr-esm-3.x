@@ -119,7 +119,6 @@ export const useCurrencyFormatting = () => {
   const formatSimple = (amount: number, options: Intl.NumberFormatOptions = {}) => {
     const currentLocale = getLocale();
     const currency = getCurrency();
-
     const formatter = new Intl.NumberFormat(currentLocale, {
       style: 'currency',
       currency: currency,
