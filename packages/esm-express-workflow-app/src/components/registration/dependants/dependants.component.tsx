@@ -9,8 +9,9 @@ import { maskName } from '../helper';
 import { findExistingLocalPatient, registerOrLaunchDependent } from '../search-bar/search-bar.resource';
 import { getDependentsFromContacts, useMultipleActiveVisits } from './dependants.resource';
 import { DependentWithPhone, HIEBundleResponse, HIEPatient, LocalPatient } from '../type';
-import { otpManager, cleanupAllOTPs } from '../card/HIE-card/hie-card.resource';
+import { otpManager, useOtpSource, cleanupAllOTPs } from '../card/HIE-card/hie-card.resource';
 import { launchOtpVerificationModal } from '../../../shared/otp-verification';
+import { sanitizePhoneNumber } from '../../../shared/utils';
 
 type DependentProps = {
   patient: HIEPatient;
@@ -31,6 +32,14 @@ const DependentsComponent: React.FC<DependentProps> = ({
   const [verifiedSpouses, setVerifiedSpouses] = useState<Set<string>>(new Set());
   const [otpRequestedForSpouse, setOtpRequestedForSpouse] = useState<Set<string>>(new Set());
   const [activePhoneNumbers, setActivePhoneNumbers] = useState<Map<string, string>>(new Map());
+
+  const { otpSource, isLoading: isLoadingOtpSource, error: otpSourceError } = useOtpSource();
+
+  useEffect(() => {
+    if (otpSource) {
+      otpManager.setOtpSource(otpSource);
+    }
+  }, [otpSource]);
 
   useEffect(() => {
     return () => {
@@ -75,7 +84,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
             );
 
             if (phoneTelecom) {
-              return phoneTelecom.value.trim();
+              return sanitizePhoneNumber(phoneTelecom.value);
             }
           }
         }
@@ -92,14 +101,14 @@ const DependentsComponent: React.FC<DependentProps> = ({
         );
 
         if (phoneAttribute?.value) {
-          return phoneAttribute.value.trim();
+          return sanitizePhoneNumber(phoneAttribute.value);
         }
       }
 
       if ('phoneNumber' in dependent && typeof dependent.phoneNumber === 'string') {
         const phone = dependent.phoneNumber.trim();
         if (phone && phone !== 'N/A' && phone.length > 0) {
-          return phone;
+          return sanitizePhoneNumber(phone);
         }
       }
 
@@ -110,12 +119,12 @@ const DependentsComponent: React.FC<DependentProps> = ({
               telecom.system === 'phone' && telecom.value && telecom.value !== 'N/A' && telecom.value.trim() !== '',
           );
           if (phoneTelecom?.value) {
-            return phoneTelecom.value.trim();
+            return sanitizePhoneNumber(phoneTelecom.value);
           }
         }
       }
 
-      return undefined;
+      return '254700000000';
     },
     [localPatientCache],
   );
@@ -142,14 +151,39 @@ const DependentsComponent: React.FC<DependentProps> = ({
     (dependentId: string, dependentName: string, initialPhone: string) => {
       return {
         onRequestOtp: async (phoneNumber: string): Promise<void> => {
-          setActivePhoneNumbers((prev) => new Map(prev.set(dependentId, phoneNumber)));
-          await otpManager.requestOTP(phoneNumber, dependentName, otpExpiryMinutes);
+          const sanitizedPhone = sanitizePhoneNumber(phoneNumber);
+
+          try {
+            if (!otpSource) {
+              throw new Error('OTP source not configured. Please contact your administrator.');
+            }
+
+            otpManager.setOtpSource(otpSource);
+
+            setActivePhoneNumbers((prev) => new Map(prev.set(dependentId, sanitizedPhone)));
+
+            await otpManager.requestOTP(sanitizedPhone, dependentName, otpExpiryMinutes, null, dependentId);
+          } catch (error) {
+            throw error;
+          }
         },
         onVerify: async (otp: string): Promise<void> => {
-          const activePhone = activePhoneNumbers.get(dependentId) || initialPhone;
-          const isValid = await otpManager.verifyOTP(activePhone, otp);
-          if (!isValid) {
-            throw new Error('OTP verification failed');
+          try {
+            if (!otpSource) {
+              throw new Error('OTP source not configured. Please contact your administrator.');
+            }
+
+            otpManager.setOtpSource(otpSource);
+
+            const activePhone = activePhoneNumbers.get(dependentId) || initialPhone;
+            const sanitizedPhone = sanitizePhoneNumber(activePhone);
+
+            const isValid = await otpManager.verifyOTP(sanitizedPhone, otp, dependentId);
+            if (!isValid) {
+              throw new Error('OTP verification failed');
+            }
+          } catch (error) {
+            throw error;
           }
         },
         cleanup: (): void => {
@@ -157,7 +191,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
         },
       };
     },
-    [activePhoneNumbers, otpExpiryMinutes],
+    [activePhoneNumbers, otpExpiryMinutes, otpSource],
   );
 
   const handleDependentAction = useCallback(
@@ -260,8 +294,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
       const isSpouseVerified = verifiedSpouses.has(dependent.id);
       const otpRequestedForThisSpouse = otpRequestedForSpouse.has(dependent.id);
 
-      const identifiersDisplay =
-        dependent.shaNumber && dependent.shaNumber !== 'N/A' ? `SHA: ${dependent.shaNumber}` : 'N/A';
+      const identifiersDisplay = dependent.id && dependent.id !== 'N/A' ? `CR Number: ${dependent.id}` : 'N/A';
 
       const dependentPhoneNumber = getDependentPhoneNumber(dependent);
       const { onRequestOtp, onVerify, cleanup } = createSpouseOTPHandlers(
@@ -298,6 +331,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                 size="sm"
                 kind="primary"
                 renderIcon={TwoFactorAuthentication}
+                disabled={isLoadingOtpSource || !otpSource}
                 onClick={() => {
                   handleSpouseOTPRequest(dependent.id);
                   launchOtpVerificationModal({
@@ -311,7 +345,7 @@ const DependentsComponent: React.FC<DependentProps> = ({
                     onCleanup: cleanup,
                   });
                 }}>
-                {t('sendOtp', 'Send OTP')}
+                {isLoadingOtpSource ? t('loadingOtpConfig', 'Loading...') : t('sendOtp', 'Send OTP')}
               </Button>
             )}
 
@@ -385,6 +419,8 @@ const DependentsComponent: React.FC<DependentProps> = ({
     visits,
     verifiedSpouses,
     otpRequestedForSpouse,
+    isLoadingOtpSource,
+    otpSource,
     getDependentPhoneNumber,
     createSpouseOTPHandlers,
     handleSpouseOTPRequest,
