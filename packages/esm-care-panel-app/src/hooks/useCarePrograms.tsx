@@ -1,6 +1,7 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
+import { CarePanelConfig } from '../config-schema';
 
 export type PatientCarePrograms = {
   uuid: string;
@@ -20,15 +21,22 @@ export const useCarePrograms = (patientUuid: string) => {
     isValidating,
     mutate: mutateEligiblePrograms,
   } = useSWR<{ data: Array<PatientCarePrograms> }>(url, openmrsFetch);
+  const { excludedCarePrograms } = useConfig<CarePanelConfig>();
 
   const eligibleCarePrograms = useMemo(
-    () => data?.data?.filter((careProgram) => careProgram.enrollmentStatus !== 'active') ?? [],
-    [data],
+    () =>
+      data?.data?.filter(
+        (careProgram) => careProgram.enrollmentStatus !== 'active' && !excludedCarePrograms.includes(careProgram.uuid),
+      ) ?? [],
+    [data, excludedCarePrograms],
   );
 
   const activeCarePrograms = useMemo(
-    () => data?.data?.filter((careProgram) => careProgram.enrollmentStatus !== 'active') ?? [],
-    [data],
+    () =>
+      data?.data?.filter(
+        (careProgram) => careProgram.enrollmentStatus !== 'active' && !excludedCarePrograms.includes(careProgram.uuid),
+      ) ?? [],
+    [data?.data, excludedCarePrograms],
   );
   return {
     eligibleCarePrograms,
