@@ -22,6 +22,7 @@ export interface CarePanelConfig {
   peerEducatorRelationshipType: string;
   peerCalendarOutreactForm: string;
   hideFilledProgramForm: boolean;
+  excludedCarePrograms: string[];
 }
 
 export const configSchema = {
@@ -604,6 +605,13 @@ export const configSchema = {
           },
         ],
       },
+    ],
+  },
+  excludedCarePrograms: {
+    _type: Type.Array,
+    _description: 'List of care program UUIDs to be excluded from the care panel',
+    _default: [
+      'b5d9e05f-f5ab-4612-98dd-adb75438ed34', // MCH Mother services
     ],
   },
 };
