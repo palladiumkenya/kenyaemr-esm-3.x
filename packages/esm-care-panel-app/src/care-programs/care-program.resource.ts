@@ -5,10 +5,13 @@ import {
   parseDate,
   restBaseUrl,
   showModal,
+  useConfig,
 } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR, { mutate } from 'swr';
 import z from 'zod';
+import { CarePanelConfig } from '../config-schema';
+import { useMemo } from 'react';
 
 export interface Enrollement {
   uuid: string;
@@ -66,13 +69,17 @@ export const usePrograms = () => {
 
 export const usePatientEnrolledPrograms = (patientUuid: string) => {
   const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display),states:(startDate,endDate,voided,state:(uuid,concept:(display))))`;
-
+  const { excludedCarePrograms } = useConfig<CarePanelConfig>();
   const url = `${restBaseUrl}/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Enrollement> }>>(url, openmrsFetch);
+  const enrollments = useMemo(() => {
+    const allEnrollments = data?.data?.results ?? [];
+    return allEnrollments.filter((enrollment) => !excludedCarePrograms.includes(enrollment.program.uuid));
+  }, [data, excludedCarePrograms]);
   return {
     isLoading,
     error,
-    enrollments: data?.data?.results ?? [],
+    enrollments,
     mutate,
   };
 };
