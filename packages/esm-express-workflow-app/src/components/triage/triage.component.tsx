@@ -23,6 +23,20 @@ type TriageProps = {
 };
 
 const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
+  return (
+    <div>
+      <PageHeader className={styles.pageHeader}>
+        <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
+        <ExtensionSlot name="provider-banner-info-slot" />
+      </PageHeader>
+      <TriageQueueTab />
+    </div>
+  );
+};
+
+export default Triage;
+
+const TriageQueueTab: React.FC = () => {
   const { t } = useTranslation();
   const [currQueue, setCurrQueue] = useState<Queue>();
   const { queues, isLoading, error } = useQueues();
@@ -49,14 +63,13 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
     attendedtoEntries,
   } = useTriageQueuesMetrics(activeQueue);
 
-  if (isLoading || isLoadingMetrics) {
+  if (isLoadingMetrics) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
 
-  if (error || metricsError) {
-    return <ErrorState error={error ?? metricsError} headerTitle={t('errorLoadingQueues', 'Error loading queues')} />;
+  if (metricsError) {
+    return <ErrorState error={metricsError} headerTitle={t('errorLoadingQueues', 'Error loading queues')} />;
   }
-
   const cards = [
     {
       title: t('clientsPatientsWaiting', 'Clients/Patients waiting'),
@@ -81,22 +94,14 @@ const Triage: React.FC<TriageProps> = ({ dashboardTitle }) => {
   ];
 
   return (
-    <div>
-      <PageHeader className={styles.pageHeader}>
-        <PageHeaderContent title={capitalize(dashboardTitle)} illustration={<HomePictogram />} />
-        <ExtensionSlot name="provider-banner-info-slot" />
-      </PageHeader>
-      <QueueTab
-        queues={triageQueues}
-        navigatePath="triage"
-        usePatientChart
-        cards={cards}
-        onTabChanged={setCurrQueue}
-        filters={filters}
-        onFiltersChanged={setFilters}
-      />
-    </div>
+    <QueueTab
+      queues={triageQueues}
+      navigatePath="triage"
+      usePatientChart
+      cards={cards}
+      onTabChanged={setCurrQueue}
+      filters={filters}
+      onFiltersChanged={setFilters}
+    />
   );
 };
-
-export default Triage;
