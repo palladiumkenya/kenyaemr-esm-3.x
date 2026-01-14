@@ -89,14 +89,22 @@ export const useMortuaryDischargeEncounter = (
 
 export const usePatients = (uuids: string[]) => {
   const customRepresentation =
-    'custom:(uuid,display,identifiers:(uuid,display),person:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,))))';
+    'custom:(uuid,display,identifiers:(uuid,display),person:(uuid,display,gender,birthdate,dead,age,deathDate,causeOfDeath:(uuid,display),attributes:(uuid,display,value,attributeType:(uuid,display,name))))';
+
   const urls = uuids.map((uuid) => `${restBaseUrl}/patient/${uuid}?v=${customRepresentation}`);
 
-  const { data, error, isLoading, mutate } = useSWR<FetchResponse<Patient>[]>(urls, (urls) =>
+  const { data, error, isLoading, mutate } = useSWR<FetchResponse<Patient>[]>(uuids.length > 0 ? urls : null, (urls) =>
     Promise.all(urls.map((url) => openmrsFetch<Patient>(url))),
   );
 
-  const deceasedPatients = data?.map((response) => response.data)?.filter((patient) => patient?.person?.dead === true);
+  const deceasedPatients = useMemo(() => {
+    if (!data) {
+      return [];
+    }
+
+    const patients = data?.map((response) => response.data);
+    return patients?.filter((patient) => patient?.person?.dead === true);
+  }, [data]);
 
   return {
     isLoading,
