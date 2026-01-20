@@ -40,7 +40,7 @@ const LabManifestDetailHeader: React.FC<LabManifestDetailHeaderProps> = ({ manif
   };
 
   const handleLaunchRequeueConfirmModal = () => {
-    const dispose = showModal('lab-manifest-requeue-confirn-modal', {
+    const dispose = showModal('lab-manifest-requeue-confirm-modal', {
       labManifest: manifest,
       onClose: () => {
         dispose();

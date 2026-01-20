@@ -124,7 +124,7 @@ const LabManifestsTable = () => {
 
   const handleLaunchRequeueConfirmModal = useCallback(
     (labManifest: MappedLabManifest) => {
-      const dispose = showModal('lab-manifest-requeue-confirn-modal', {
+      const dispose = showModal('lab-manifest-requeue-confirm-modal', {
         labManifest,
         onClose: () => dispose(),
         filter: currFilter,
