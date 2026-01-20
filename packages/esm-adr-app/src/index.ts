@@ -5,6 +5,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import SideMenu from './components/side-menu/side-menu.component';
 import Summary from './components/summary/summary.component';
 import AdrPrintPreviewModal from './components/print-preview/print-preview.modal';
+import ADREmailModal from './components/print-preview/email.modal';
 
 const moduleName = '@kenyaemr/esm-adr-app';
 
@@ -21,6 +22,7 @@ export const adrAssessmentSummary = getSyncLifecycle(Summary, options);
 export const patientAdrWorkspace = getAsyncLifecycle(() => import('./components/patient-adr.workspace'), options);
 // Print Preview Components
 export const adrPrintPreviewModal = getSyncLifecycle(AdrPrintPreviewModal, options);
+export const adrEmailModal = getSyncLifecycle(ADREmailModal, options);
 
 // Dashboard link for the search page
 export const overviewDashboardLink = getSyncLifecycle(

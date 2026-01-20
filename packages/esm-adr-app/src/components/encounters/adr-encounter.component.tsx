@@ -29,7 +29,7 @@ import {
 } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { MappedAdrEncounter } from '../../types';
-import { Printer, TaskView } from '@carbon/react/icons';
+import { Email, Printer, TaskView } from '@carbon/react/icons';
 type adrEncounterProps = {
   encounters: Array<MappedAdrEncounter>;
 };
@@ -59,6 +59,16 @@ const AdrEncounter: React.FC<adrEncounterProps> = ({ encounters }) => {
   const handler = (encounter) => {
     launchWorkspace('patient-adr-workspace', { encounter: encounter });
   };
+  const handleSendEmail = (encounter) => {
+    const dispose = showModal('adr-email-modal', {
+      onClose: () => dispose(),
+      encounter,
+      onEmailSent: () => {
+        // checkEmailStatus();
+        dispose();
+      },
+    });
+  };
 
   const tableRows = sortedEncounters.map((encounter) => ({
     encounterDatetime: encounter?.encounterDatetime
@@ -86,6 +96,14 @@ const AdrEncounter: React.FC<adrEncounterProps> = ({ encounters }) => {
           }}
           renderIcon={Printer}>
           {t('printReport', 'Print Report')}
+        </Button>
+        <Button
+          kind="ghost"
+          size="sm"
+          onClick={() => handleSendEmail(encounter)}
+          renderIcon={Email}
+          title={t('sendEmail', 'Send Email')}>
+          {t('sendEmail', 'Send Email')}
         </Button>
       </>
     ),

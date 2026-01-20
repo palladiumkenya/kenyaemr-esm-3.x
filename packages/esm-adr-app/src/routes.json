@@ -48,6 +48,10 @@
     {
       "name": "adr-print-preview-modal",
       "component": "adrPrintPreviewModal"
+    },
+    {
+      "name": "adr-email-modal",
+      "component": "adrEmailModal"
     }
   ]
 }
