@@ -59,7 +59,7 @@ const BedLayout: React.FC<BedLayoutProps> = ({
         },
       });
     }
-    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patientUuid}`;
+    const base = `${window.getOpenmrsSpaBase()}home/mortuary/patient/${patientUuid}`;
     const to = hasBedInfo
       ? `${base}/compartment/${bedInfo.bedNumber}/${bedInfo.bedId}/mortuary-chart`
       : `${base}/mortuary-chart`;
@@ -95,7 +95,7 @@ const BedLayout: React.FC<BedLayoutProps> = ({
 
   const handleViewDetails = (patientUuid: string, bedInfo?: { bedNumber: string; bedId: number }) => {
     const hasBedInfo = bedInfo?.bedNumber && bedInfo?.bedId;
-    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patientUuid}`;
+    const base = `${window.getOpenmrsSpaBase()}home/mortuary/patient/${patientUuid}`;
     const to = hasBedInfo
       ? `${base}/compartment/${bedInfo.bedNumber}/${bedInfo.bedId}/mortuary-chart`
       : `${base}/mortuary-chart`;

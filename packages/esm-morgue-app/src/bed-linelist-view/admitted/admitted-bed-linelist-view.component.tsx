@@ -106,7 +106,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
         },
       });
     }
-    const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${patientUuid}`;
+    const base = `${window.getOpenmrsSpaBase()}home/mortuary/patient/${patientUuid}`;
     const to = hasBedInfo
       ? `${base}/compartment/${bedInfo.bedNumber}/${bedInfo.bedId}/mortuary-chart`
       : `${base}/mortuary-chart`;
@@ -405,7 +405,7 @@ const AdmittedBedLineListView: React.FC<AdmittedBedLineListViewProps> = ({
                                       <OverflowMenuItem
                                         onClick={() => {
                                           const hasBedInfo = rowData.bedNumber && rowData.bedId;
-                                          const base = `${window.getOpenmrsSpaBase()}home/morgue/patient/${
+                                          const base = `${window.getOpenmrsSpaBase()}home/mortuary/patient/${
                                             rowData.patientUuid
                                           }`;
                                           const to = hasBedInfo

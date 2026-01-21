@@ -41,7 +41,7 @@
     {
       "component": "root",
       "name": "morgue-dashboard-root",
-      "slot": "morgue-dashboard-slot",
+      "slot": "mortuary-dashboard-slot",
       "meta": {
         "privileges": [
           "o3 : View Mortuary Dashboard"
@@ -57,11 +57,6 @@
         "slot": "mortuary-dashboard-slot",
         "title": "Mortuary"
       }
-    },
-    {
-      "name": "morgue-dashboard",
-      "component": "morgueDashboard",
-      "slot": "mortuary-dashboard-slot"
     }
   ],
   "workspaces": [
