@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-pharmacy-app",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "description": "pharmacy app for KenyaEMR",
   "keywords": [
     "openmrs"

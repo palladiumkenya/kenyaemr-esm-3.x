@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-admin-app",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "description": "Facilitates the management of ETL tables",
   "keywords": [
     "openmrs"
