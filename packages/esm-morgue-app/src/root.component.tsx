@@ -5,7 +5,7 @@ import MainComponent from './home/home.component';
 import DeceasedDetailsView from './view-details/main/main.component';
 
 const Root: React.FC = () => {
-  const baseName = window.getOpenmrsSpaBase() + 'home/morgue';
+  const baseName = window.getOpenmrsSpaBase() + 'home/mortuary';
 
   return (
     <BrowserRouter basename={baseName}>
