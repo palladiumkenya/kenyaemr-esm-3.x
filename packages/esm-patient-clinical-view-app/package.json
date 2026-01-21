@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-patient-clinical-view-app",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "description": "Patient clinical view microfrontend for the OpenMRS SPA",
   "keywords": [
     "openmrs"

@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-adr-app",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "description": "ADR App for KenyaEMR",
   "keywords": [
     "openmrs"

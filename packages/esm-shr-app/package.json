@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-shr-app",
-  "version": "5.4.1",
+  "version": "5.4.2",
   "description": "Patient care panels microfrontend for the OpenMRS SPA",
   "keywords": [
     "openmrs"
