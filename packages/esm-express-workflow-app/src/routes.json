@@ -123,9 +123,10 @@
       "slot": "triage-dashboard-slot"
     },
     {
-            "name": "custom-visit-form-queue-fields",
+      "name": "custom-visit-form-queue-fields",
       "component": "checkinFormExtraExtension",
-      "slot":"visit-form-bottom-slot"
+      "slot":"visit-form-bottom-slot",
+      "order": 0
     },
     {
       "component": "reportsDashboardLink",
