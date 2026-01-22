@@ -88,8 +88,9 @@
     },
     {
       "name": "billing-check-in-form",
-      "slot": "extra-visit-attribute-slot",
-      "component": "billingCheckInForm"
+      "slot": "visit-form-bottom-slot",
+      "component": "billingCheckInForm",
+      "order": 1
     },
     
     {
