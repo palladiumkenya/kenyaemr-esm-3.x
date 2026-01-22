@@ -123,7 +123,7 @@ export const useModuleLinks = () => {
     },
     {
       label: t('legacyAdmin', 'Legacy Admin'),
-      url: `/openmrs/admin`,
+      url: `/openmrs/admin/index.htm`,
       icon: <IbmCloudGateKeeper size={24} />,
       privilege: 'o3: View Legacy Admin Dashboard',
     },
