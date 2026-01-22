@@ -25,7 +25,10 @@ const ProgramFormOverflowMenuItem: FC<ProgramFormOverflowMenuItemProps> = ({
     error,
     isLoading,
     mutate: mutateFormEncounters,
-  } = usePatientFormEncounter(patientUuid, form.formUuId);
+  } = usePatientFormEncounter(patientUuid, form.formUuId, {
+    scope: form.tags.includes('bound-to-current-visit') ? 'current-visit' : 'all-visits',
+    currentVisit: currentVisit,
+  });
   const { hideFilledProgramForm, peerCalendarOutreactForm } = useConfig<CarePanelConfig>();
   const { t } = useTranslation();
   const {

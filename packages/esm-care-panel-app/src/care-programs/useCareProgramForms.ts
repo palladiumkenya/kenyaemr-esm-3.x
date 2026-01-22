@@ -18,7 +18,7 @@ const useCareProgramForms = () => {
   const getProgramEnrollmentForm = useCallback(
     (programUuid: string) => {
       const forms = getProgramForms(programUuid);
-      return forms.find((form) => form.isEnrollment);
+      return forms.find((form) => form.tags.includes('enrollment'));
     },
     [getProgramForms],
   );

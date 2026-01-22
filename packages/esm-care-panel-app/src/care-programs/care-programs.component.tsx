@@ -93,7 +93,8 @@ const CarePrograms: React.FC<CareProgramsProps> = ({ patientUuid }) => {
   const rows = useMemo(
     () => [
       ...enrollments.map((enrollment) => {
-        const forms = getProgramForms(enrollment.program.uuid).filter((form) => !form.isEnrollment);
+        const forms = getProgramForms(enrollment.program.uuid).filter((form) => !form.tags.includes('enrollment'));
+
         return {
           id: enrollment.program.uuid,
           programName: enrollment.program.name,
