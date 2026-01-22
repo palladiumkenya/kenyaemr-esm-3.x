@@ -6,6 +6,7 @@ import {
   restBaseUrl,
   showModal,
   useConfig,
+  Visit,
 } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import useSWR, { mutate } from 'swr';
@@ -74,7 +75,9 @@ export const usePatientEnrolledPrograms = (patientUuid: string) => {
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<Enrollement> }>>(url, openmrsFetch);
   const enrollments = useMemo(() => {
     const allEnrollments = data?.data?.results ?? [];
-    return allEnrollments.filter((enrollment) => !excludedCarePrograms.includes(enrollment.program.uuid));
+    return allEnrollments.filter(
+      (enrollment) => !excludedCarePrograms.includes(enrollment.program.uuid) && !enrollment.dateCompleted,
+    );
   }, [data, excludedCarePrograms]);
   return {
     isLoading,
@@ -110,14 +113,23 @@ type FormEncounter = {
   };
 };
 
-export const usePatientFormEncounter = (patientUuid: string, formUuid: string) => {
+type UsePatientFormEncountersOptions = { scope: 'all-visits' } | { scope: 'current-visit'; currentVisit?: Visit };
+
+export const usePatientFormEncounter = (
+  patientUuid: string,
+  formUuid: string,
+  options: UsePatientFormEncountersOptions = { scope: 'all-visits' },
+) => {
   const url = `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuid}`;
   const { data, error, isLoading, mutate } = useSWR<FetchResponse<{ results: Array<FormEncounter> }>>(
-    url,
+    options?.scope === 'current-visit' ? null : url,
     openmrsFetch,
   );
-  return {
-    formEncounters: (data?.data?.results ?? [])
+  const formEncounters = useMemo(() => {
+    if (options.scope !== 'all-visits') {
+      return [];
+    }
+    return (data?.data?.results ?? [])
       .map((data) => ({
         ...data,
         encounter: {
@@ -125,7 +137,32 @@ export const usePatientFormEncounter = (patientUuid: string, formUuid: string) =
           encounterDatetime: parseDate(data.encounter.encounterDatetime),
         },
       }))
-      .sort((a, b) => dayjs(b.encounter.encounterDatetime).diff(dayjs(a.encounter.encounterDatetime))),
+      .sort((a, b) => dayjs(b.encounter.encounterDatetime).diff(dayjs(a.encounter.encounterDatetime)));
+  }, [data, options]);
+  const formEncountersInCurrentVisit = useMemo(() => {
+    if (options.scope !== 'current-visit') {
+      return [];
+    }
+    return (options.currentVisit?.encounters ?? [])
+      .filter((encounter) => encounter.form?.uuid === formUuid)
+      .map((encounter) => ({
+        encounter: {
+          encounterDatetime: parseDate(encounter.encounterDatetime),
+          uuid: encounter.uuid!,
+          id: encounter.id!,
+          encounterType: encounter.encounterType!.uuid,
+          dateCreated: encounter.dateCreated!,
+        },
+        form: {
+          uuid: encounter.form!.uuid,
+          name: encounter.form!.name,
+        },
+      }))
+      .sort((a, b) => dayjs(b.encounter.encounterDatetime).diff(dayjs(a.encounter.encounterDatetime)));
+  }, [options, formUuid]);
+
+  return {
+    formEncounters: options.scope === 'all-visits' ? formEncounters : formEncountersInCurrentVisit,
     error,
     isLoading,
     mutate,
@@ -133,23 +170,26 @@ export const usePatientFormEncounter = (patientUuid: string, formUuid: string) =
 };
 
 export const useFormsFilled = (patientUuid: string, formUuids: Array<string> = []) => {
-  const url = `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuids.join(
-    ',',
-  )}`;
+  const shouldFetch = patientUuid && formUuids.length > 0;
 
-  const { data, error, mutate, isLoading } = useSWR(url, async (uri) => {
-    const tasks = await Promise.allSettled(
-      formUuids.map((formUuid) =>
-        openmrsFetch<{ results: Array<FormEncounter> }>(
-          `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuid}`,
+  const { data, error, mutate, isLoading } = useSWR<boolean>(
+    shouldFetch ? ['forms-filled', patientUuid, formUuids] : null,
+    async () => {
+      const tasks = await Promise.allSettled(
+        formUuids.map((formUuid) =>
+          openmrsFetch<{ results: Array<FormEncounter> }>(
+            `${restBaseUrl}/kenyaemr/encountersByPatientAndForm?patientUuid=${patientUuid}&formUuid=${formUuid}`,
+          ),
         ),
-      ),
-    );
-    // Return true if all tasks are fullfilled and have related encounter (visit doesnt matter)
-    return tasks.every((task) => task.status === 'fulfilled' && task.value.data?.results?.length);
-  });
+      );
+
+      // true only if ALL forms have at least one encounter
+      return tasks.every((task) => task.status === 'fulfilled' && task.value.data?.results?.length > 0);
+    },
+  );
+
   return {
-    formsFilled: data,
+    formsFilled: data ?? false,
     isLoading,
     mutate,
     error,
