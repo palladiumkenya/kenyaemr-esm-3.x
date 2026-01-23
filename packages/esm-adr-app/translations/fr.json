@@ -1,0 +1,14 @@
+{
+  "adrAssessment": "Évaluation des effets indésirables (ADR)",
+  "adrAssessmentEncounters": "Consultations d’évaluation des effets indésirables (ADR)",
+  "adrReport": "Rapport ADR",
+  "encounters": "Consultations",
+  "endDate": "Date de fin",
+  "noAdrEncountersFound": "Aucune consultation d’évaluation ADR trouvée",
+  "noEncountersFoundTitle": "Aucune consultation trouvée",
+  "printReport": "Imprimer le rapport",
+  "review": "Réviser",
+  "startDate": "Date de début",
+  "summaryOfAdrAssessmentEncounters": "Résumé des consultations d’évaluation ADR",
+  "totalAdrAssessment": "Total des évaluations ADR"
+}
