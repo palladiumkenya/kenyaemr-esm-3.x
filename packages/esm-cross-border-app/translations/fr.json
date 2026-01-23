@@ -1,0 +1,18 @@
+{
+  "clearSearch": "Effacer la recherche",
+  "crossBorder": "Transfrontalier",
+  "crossBorderEncounters": "Consultations transfrontalières",
+  "encounters": "Consultations",
+  "endDate": "Date de fin",
+  "mpiSearch": "Recherche MPI",
+  "noEncountersFound": "Aucune consultation transfrontalière trouvée",
+  "noEncountersFoundTitle": "Aucune consultation trouvée",
+  "referral": "Orientation",
+  "screening": "Dépistage",
+  "searchLabel": "Rechercher",
+  "searchPlaceholder": "Rechercher par nom du patient ou identifiant",
+  "startDate": "Date de début",
+  "summaryOfCrossBorderEncounters": "Résumé des consultations transfrontalières",
+  "totalCrossBorderReferral": "Total des orientations transfrontalières",
+  "totalCrossBorderScreening": "Total des dépistages transfrontaliers"
+}
