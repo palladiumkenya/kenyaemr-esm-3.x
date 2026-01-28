@@ -2,6 +2,7 @@ import React from 'react';
 import { ScaleTypes, SimpleBarChart } from '@carbon/charts-react';
 import '@carbon/charts/styles.css';
 import './top-diseases-barcharts.scss';
+import { useTranslation } from 'react-i18next';
 
 interface TopDiseasesBarChartsProps {
   data?: Array<{ day: string; group: string; value: number; ageGroup: 'under5' | 'over5' }>;
@@ -13,6 +14,7 @@ const AGE_GROUPS = {
 } as const;
 
 export function TopDiseasesBarCharts({ data: topDiseases }: TopDiseasesBarChartsProps) {
+  const { t } = useTranslation();
   const under5Data =
     topDiseases
       ?.filter((item) => item.ageGroup === AGE_GROUPS.UNDER_5)
@@ -31,14 +33,14 @@ export function TopDiseasesBarCharts({ data: topDiseases }: TopDiseasesBarCharts
     axes: {
       left: {
         mapsTo: 'value',
-        title: 'No. of Patients',
+        title: t('noOfPatients', 'No. of Patients'),
         ticks: {
           formatter: (tick) => (Number.isInteger(tick) ? tick : null),
         },
       },
       bottom: {
         mapsTo: 'group',
-        title: 'Diseases',
+        title: t('diseases', 'Diseases'),
         scaleType: ScaleTypes.LABELS,
       },
     },
@@ -56,7 +58,7 @@ export function TopDiseasesBarCharts({ data: topDiseases }: TopDiseasesBarCharts
           data={under5Data}
           options={{
             ...chartOptions,
-            title: 'Top 10 Diseases under 5',
+            title: t('top10DiseasesUnder5', 'Top 10 Diseases under 5'),
           }}
         />
       </div>
@@ -65,7 +67,7 @@ export function TopDiseasesBarCharts({ data: topDiseases }: TopDiseasesBarCharts
           data={over5Data}
           options={{
             ...chartOptions,
-            title: 'Top 10 Diseases over 5',
+            title: t('top10DiseasesOver5', 'Top 10 Diseases over 5'),
           }}
         />
       </div>

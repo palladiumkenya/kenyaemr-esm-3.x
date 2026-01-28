@@ -1,8 +1,8 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import Registration from './registration.component';
 import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
+import Registration from './registration.component';
 
 const options = {
   featureName: 'express-workflow',
@@ -10,9 +10,10 @@ const options = {
 };
 
 export const registrationDashboard = getSyncLifecycle(Registration, options);
+// t('registration', 'Registration')
 export const registrationLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
-    title: 'Registration',
+    title: 'registration',
     name: 'registration',
   }),
   options,

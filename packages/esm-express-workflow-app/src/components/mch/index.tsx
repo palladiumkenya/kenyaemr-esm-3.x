@@ -10,9 +10,10 @@ const options = {
 };
 
 export const mchDashboard = getSyncLifecycle(MCHDashboard, options);
+// t('mch', 'MCH')
 export const mchLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
-    title: 'MCH',
+    title: 'mch',
     name: 'mch',
   }),
   options,
