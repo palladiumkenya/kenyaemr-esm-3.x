@@ -1,8 +1,8 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import TriageDashboard from './dashboard.component';
 import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
+import TriageDashboard from './dashboard.component';
 
 const options = {
   featureName: 'express-workflow',
@@ -10,11 +10,11 @@ const options = {
 };
 
 export const triageDashboard = getSyncLifecycle(TriageDashboard, options);
-// t('Triage', 'Triage')
+// t('triage', 'Triage')
 export const triageLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'triage',
-    title: 'Triage',
+    name: 'Triage',
+    title: 'triage',
   }),
   options,
 );

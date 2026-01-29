@@ -7,10 +7,11 @@ const options = {
 };
 
 export const appointmentsDashboard = getAsyncLifecycle(() => import('./dashboard.component'), options);
+// t('appointments', 'Appointments')
 export const appointmentsDashboardLink = getSyncLifecycle(
   createDashboardLink({
     path: `appointments`,
-    title: 'Appointments',
+    title: 'appointments',
     icon: 'omrs-icon-calendar',
   }),
   options,

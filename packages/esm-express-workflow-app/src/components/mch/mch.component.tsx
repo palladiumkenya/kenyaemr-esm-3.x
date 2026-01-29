@@ -1,13 +1,11 @@
-import React from 'react';
-import Triage from '../triage/triage.component';
-import { ExtensionSlot, HomePictogram, PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
-import capitalize from 'lodash-es/capitalize';
-import styles from './mch.scss';
 import { Tab, TabList, TabPanel, TabPanels, Tabs } from '@carbon/react';
-import MCHTriage from './mch.triage.component';
-import MCHConsultation from './mch.consultation.component';
+import { ExtensionSlot, HomePictogram, PageHeader, PageHeaderContent } from '@openmrs/esm-framework';
 import toUpper from 'lodash/toUpper';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import MCHConsultation from './mch.consultation.component';
+import styles from './mch.scss';
+import MCHTriage from './mch.triage.component';
 
 type MchProps = {
   dashboardTitle: string;
@@ -20,7 +18,9 @@ const MCH: React.FC<MchProps> = ({ dashboardTitle }) => {
     <div>
       <PageHeader className={styles.pageHeader}>
         <PageHeaderContent
-          title={`${toUpper(dashboardTitle)} ${selectedIndex === 0 ? 'Triage' : 'Consultation'}`}
+          title={`${toUpper(dashboardTitle)} ${
+            selectedIndex === 0 ? t('triage', 'Triage') : t('consultation', 'Consultation')
+          }`}
           illustration={<HomePictogram />}
         />
 
