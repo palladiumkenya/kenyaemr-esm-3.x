@@ -57,6 +57,13 @@
         "slot": "mortuary-dashboard-slot",
         "title": "Mortuary"
       }
+    },
+     {
+      "name": "mortuary-mark-patient-deceased-button",
+      "slot": "patient-actions-slot",
+      "component": "markPatientDeceasedActionButton",
+      "online": true,
+      "offline": true
     }
   ],
   "workspaces": [
@@ -66,6 +73,12 @@
       "title": "add more details",
       "type": "other-form"
     },
+     {
+      "name": "mortuary-mark-patient-deceased-workspace-form",
+      "component": "markPatientDeceasedForm",
+      "title": "Mark Patient Deceased",
+      "type": "other-form"
+      },
     {
       "name": "discharge-body-form",
       "component": "dischargeBodyForm",
@@ -107,7 +120,12 @@
     {
       "name": "autopsy-report-modal",
       "component": "autopsyReportModal"
+    },{
+      "name": "delete-confirmation-modal",
+      "component": "confirmationModal"
     }
+
+
   ],
   "pages": [
     {

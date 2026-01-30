@@ -1,5 +1,6 @@
 import { Type } from '@openmrs/esm-framework';
 import _default from 'react-hook-form/dist/utils/createSubject';
+import { queue } from 'rxjs';
 
 export const configSchema = {
   mortuaryLocationTagUuid: {
@@ -240,6 +241,56 @@ export const configSchema = {
     _description: 'UUID for autopsy permission concept',
     _default: '1707AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  nameOfReceivingMortuaryUuid: {
+    _type: Type.String,
+    _description: 'UUID for facility receiving mortuary concept',
+    _default: '7dd18ca4-a060-4f2c-b1dc-473d39d6488b',
+  },
+  otherFacilityMortuaryUuid: {
+    _type: Type.String,
+    _description: 'UUID for other facility receiving mortuary concept',
+    _default: '0d3ef415-c537-4ec8-ae7b-dd44bac03482',
+  },
+  currentMortuaryUuid: {
+    _type: Type.String,
+    _description: 'UUID for current mortuary concept',
+    _default: '38a6f2a8-c698-4519-9f46-3b3564d35a53',
+  },
+  transferToQuestionUuid: {
+    _type: Type.String,
+    _description: 'UUID for transfer to question concept',
+    _default: 'eeae72dc-a7e6-44af-bf20-a39d441353b6',
+  },
+  icd11DataSourceUuid: {
+    _type: Type.String,
+    _description: 'UUID for ICD-11 data source',
+    _default: '39ADDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD',
+  },
+  mortuaryQueueUuid: {
+    _type: Type.String,
+    _description: 'UUID for mortuary queue',
+    _default: 'eea71500-f41f-474d-aca1-529af6083914',
+  },
+  mortuaryQueueStatusUuid: {
+    _type: Type.String,
+    _description: 'UUID for queue status',
+    _default: '167407AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  mortuaryNotUrgentPriorityUuid: {
+    _type: Type.String,
+    _description: 'UUID for queue priority',
+    _default: '80cd8f8c-5d82-4cdc-b96e-a6addeb94b7f',
+  },
+  mortalityEncounterTypeUuid: {
+    _type: Type.String,
+    _description: 'UUID for mortality encounter type',
+    _default: 'd5a9963b-5656-4c20-9b6b-1a195650c8d8',
+  },
+  patientIdentifierTypeUuid: {
+    _type: Type.UUID,
+    _default: 'dfacd928-0370-4315-99d7-6ec1c9f7ae76',
+    _description: 'UUID for the patient Opennmrs identifier type to display',
+  },
 };
 
 export interface BillingConfig {
@@ -303,4 +354,14 @@ export type ConfigObject = {
   deadBodyPreservationQuestionUuid: string;
   bodyEmbalmmentTypesUuid: Array<{ concept: string; label: string }>;
   autopsyPermissionUuid: string;
+  nameOfReceivingMortuaryUuid: string;
+  otherFacilityMortuaryUuid: string;
+  currentMortuaryUuid: string;
+  transferToQuestionUuid: string;
+  icd11DataSourceUuid: string;
+  mortuaryQueueUuid: string;
+  mortuaryQueueStatusUuid: string;
+  mortuaryNotUrgentPriorityUuid: string;
+  mortalityEncounterTypeUuid: string;
+  patientIdentifierTypeUuid: string;
 };

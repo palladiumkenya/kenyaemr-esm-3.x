@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
-  InlineLoading,
   Table,
   TableBody,
   TableCell,
@@ -10,23 +9,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  Button,
   Pagination,
   OverflowMenu,
   OverflowMenuItem,
   DataTableSkeleton,
   Search,
-  Tile,
+  Tag,
 } from '@carbon/react';
 import styles from '../bed-linelist-view.scss';
 import { formatDateTime } from '../../utils/utils';
-import { type MortuaryLocationResponse, type MortuaryPatient } from '../../types';
-import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { useAwaitingPatients } from '../../home/home.resource';
+import { type MortuaryLocationResponse, type EnhancedPatient } from '../../types';
+import { launchWorkspace, showModal, showSnackbar, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
+import { ConfigObject } from '../../config-schema';
+import { removeFromMortuaryQueue } from '../../home/home.resource';
 
 interface AwaitingBedLineListViewProps {
-  awaitingQueueDeceasedPatients: Array<MortuaryPatient>;
+  awaitingQueuePatients: Array<EnhancedPatient>;
   mortuaryLocation: MortuaryLocationResponse;
   isLoading: boolean;
   paginated?: boolean;
@@ -36,7 +35,7 @@ interface AwaitingBedLineListViewProps {
 }
 
 const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
-  awaitingQueueDeceasedPatients,
+  awaitingQueuePatients,
   isLoading,
   mortuaryLocation,
   paginated = true,
@@ -51,64 +50,62 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [currPageSize, setCurrPageSize] = useState(initialPageSize);
   const [searchTerm, setSearchTerm] = useState('');
-
-  const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
+  const config = useConfig<ConfigObject>();
 
   const headers = [
-    { key: 'admissionDate', header: t('dateQueued', 'Date Queued') },
+    { key: 'queuedDate', header: t('dateQueued', 'Date Queued') },
     { key: 'idNumber', header: t('idNumber', 'ID Number') },
     { key: 'name', header: t('name', 'Name') },
     { key: 'gender', header: t('gender', 'Gender') },
     { key: 'age', header: t('age', 'Age') },
-    { key: 'bedNumber', header: t('compartmentNumber', 'Compartment Number') },
-    { key: 'daysAdmitted', header: t('durationOnWard', 'Days In Queue') },
+    { key: 'causeOfDeath', header: t('causeOfDeath', 'Cause of Death') },
+    { key: 'daysInQueue', header: t('daysInQueue', 'Days In Queue') },
     { key: 'action', header: t('action', 'Action') },
   ];
 
-  const calculateDaysInQueue = (dateOfDeath: string): number => {
-    if (!dateOfDeath) {
+  const calculateDaysInQueue = (queuedDate: string): number => {
+    if (!queuedDate) {
       return 0;
     }
-    const deathDate = new Date(dateOfDeath);
+    const startDate = new Date(queuedDate);
     const currentDate = new Date();
-    const timeDiff = currentDate.getTime() - deathDate.getTime();
+    const timeDiff = currentDate.getTime() - startDate.getTime();
     return Math.floor(timeDiff / (1000 * 3600 * 24));
   };
 
   const allRows = useMemo(() => {
-    if (!trulyAwaitingPatients || trulyAwaitingPatients.length === 0) {
+    if (!awaitingQueuePatients || awaitingQueuePatients.length === 0) {
       return [];
     }
 
-    const rows = trulyAwaitingPatients.map((mortuaryPatient, index) => {
-      const patientUuid = mortuaryPatient?.person?.person?.uuid || `patient-${index}`;
-      const patientName = mortuaryPatient?.person?.person?.display || '-';
-      const gender = mortuaryPatient?.person?.person?.gender || '-';
-      const age = mortuaryPatient?.person?.person?.age || '-';
-      const dateOfDeath = mortuaryPatient?.person?.person?.deathDate;
-      const daysInQueue = calculateDaysInQueue(dateOfDeath);
-      const idNumber =
-        mortuaryPatient?.person?.identifiers
-          ?.find((id) => id.display?.includes('OpenMRS ID'))
-          ?.display?.split('=')?.[1]
-          ?.trim() || '-';
+    const rows = awaitingQueuePatients.map((patient, index) => {
+      const patientUuid = patient?.uuid || `patient-${index}`;
+      const patientName = patient?.person?.display || '-';
+      const gender = patient?.person?.gender || '-';
+      const age = patient?.person?.age || '-';
+      const causeOfDeath = patient?.person?.causeOfDeath?.display || '-';
+      const queuedDate = patient?.queueInfo?.startedAt;
+      const daysInQueue = calculateDaysInQueue(queuedDate);
 
+      const idNumber =
+        patient?.identifiers?.find((id) => id.identifierType?.uuid === config.patientIdentifierTypeUuid)?.identifier ||
+        '-';
       return {
         id: patientUuid,
-        admissionDate: formatDateTime(dateOfDeath),
+        queuedDate: formatDateTime(queuedDate),
         idNumber,
         name: patientName,
         gender: gender,
         age: age.toString(),
-        bedNumber: '-',
-        daysAdmitted: daysInQueue.toString(),
+        causeOfDeath: causeOfDeath,
+        daysInQueue: daysInQueue.toString(),
         action: patientUuid,
-        searchableText: `${patientName} ${idNumber} ${gender}`.toLowerCase(),
+        searchableText: `${patientName} ${idNumber} ${gender} ${causeOfDeath}.toLowerCase()`,
       };
     });
 
     return rows;
-  }, [trulyAwaitingPatients]);
+  }, [awaitingQueuePatients]);
 
   const filteredRows = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -121,7 +118,8 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
         row.searchableText.includes(searchLower) ||
         row.name.toLowerCase().includes(searchLower) ||
         row.idNumber.toLowerCase().includes(searchLower) ||
-        row.gender.toLowerCase().includes(searchLower),
+        row.gender.toLowerCase().includes(searchLower) ||
+        row.causeOfDeath.toLowerCase().includes(searchLower),
     );
   }, [allRows, searchTerm]);
 
@@ -133,17 +131,53 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
   const endIndex = startIndex + currPageSize;
   const paginatedRows = paginated ? filteredRows.slice(startIndex, endIndex) : filteredRows;
 
-  const handleAdmit = (patientData: MortuaryPatient) => {
+  const handleAdmit = (patient: EnhancedPatient) => {
     launchWorkspace('admit-deceased-person-form', {
       workspaceTitle: t('admissionForm', 'Admission form'),
-      patientData,
+      patient,
+      queueEntryUuid: patient.queueInfo?.queueEntryUuid,
       mortuaryLocation,
       mutated,
     });
   };
 
-  const handleCancel = () => {
-    // TODO: Implement cancel functionality
+  const handleRemoveFromQueue = (patient: EnhancedPatient) => {
+    const dispose = showModal('delete-confirmation-modal', {
+      close: () => dispose(),
+      onConfirm: async () => {
+        try {
+          await removeFromMortuaryQueue(patient.queueInfo?.queueEntryUuid);
+
+          showSnackbar({
+            kind: 'success',
+            isLowContrast: true,
+            title: t('removedFromQueue', 'Removed from queue'),
+            subtitle: t('patientRemovedSuccess', '{{patientName}} has been removed from the mortuary queue', {
+              patientName: patient.person.display,
+            }),
+          });
+
+          mutated?.();
+        } catch (error) {
+          showSnackbar({
+            kind: 'error',
+            isLowContrast: false,
+            title: t('errorRemovingFromQueue', 'Error removing from queue'),
+            subtitle: error?.message || t('unexpectedError', 'An unexpected error occurred'),
+          });
+        }
+      },
+      modalHeading: t('removeFromQueueConfirmation', 'Remove from mortuary queue?'),
+      modalBody: t(
+        'removeFromQueueWarning',
+        'Are you sure you want to remove {{patientName}} from the mortuary queue? This action cannot be undone.',
+        {
+          patientName: patient.person.display,
+        },
+      ),
+      primaryButtonText: t('remove', 'Remove'),
+      danger: true,
+    });
   };
 
   const goTo = (page: number) => {
@@ -173,10 +207,10 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
     );
   }
 
-  if (!trulyAwaitingPatients || trulyAwaitingPatients.length === 0) {
+  if (!awaitingQueuePatients || awaitingQueuePatients.length === 0) {
     return (
       <div>
-        <EmptyMorgueAdmission title={t('noDeceasedPatients', 'No deceased patients awaiting admission found')} />
+        <EmptyMorgueAdmission title={t('noQueuePatients', 'No patients in mortuary queue')} />
       </div>
     );
   }
@@ -184,20 +218,20 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
   return (
     <div className={styles.bedLayoutWrapper}>
       <Search
-        labelText={t('noSearchDeceasedPatients', 'Search deceased patients')}
-        placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, or gender...')}
+        labelText={t('searchQueuePatients', 'Search queue patients')}
+        placeholder={t('searchPlaceholder', 'Search by name, ID, gender, cause of death, or priority...')}
         value={searchTerm}
         onChange={handleSearchChange}
         size={controlSize}
       />
       {hasNoSearchResults ? (
-        <EmptyMorgueAdmission title={t('noSearchResults', 'We couldn’t find anything')} />
+        <EmptyMorgueAdmission title={t('noSearchResults', 'No matching patients found')} />
       ) : (
         <>
           <DataTable rows={paginatedRows} headers={headers} isSortable useZebraStyles>
             {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getCellProps }) => (
               <TableContainer>
-                <Table {...getTableProps()} aria-label="deceased patients table">
+                <Table {...getTableProps()} aria-label="mortuary queue table">
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (
@@ -213,10 +247,7 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => {
-                      const patientData = trulyAwaitingPatients.find(
-                        (patient) => patient?.person?.person?.uuid === row.id,
-                      );
-                      const patientName = patientData?.person?.person?.display || '';
+                      const patient = awaitingQueuePatients.find((p) => p?.uuid === row.id);
 
                       return (
                         <TableRow key={row.id} {...getRowProps({ row })}>
@@ -226,11 +257,15 @@ const AwaitingBedLineListView: React.FC<AwaitingBedLineListViewProps> = ({
                                 <div className={styles.actionButtons}>
                                   <OverflowMenu flipped>
                                     <OverflowMenuItem
-                                      onClick={() => handleAdmit(patientData)}
+                                      onClick={() => handleAdmit(patient)}
                                       itemText={t('admit', 'Admit')}
-                                      disabled={!patientData}
+                                      disabled={!patient}
                                     />
-                                    <OverflowMenuItem onClick={() => handleCancel()} itemText={t('cancel', 'Cancel')} />
+                                    <OverflowMenuItem
+                                      onClick={() => handleRemoveFromQueue(patient)}
+                                      itemText={t('releaseBody', 'Release body')}
+                                      disabled={!patient}
+                                    />
                                   </OverflowMenu>
                                 </div>
                               ) : (

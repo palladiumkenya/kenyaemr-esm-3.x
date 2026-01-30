@@ -11,7 +11,9 @@ export interface BaseEntity {
 }
 
 export interface Identifier extends BaseEntity {
-  identifierType: string;
+  identifierType: {
+    uuid: string;
+  };
   identifier: string;
 }
 
@@ -201,6 +203,7 @@ export interface Observation extends OpenmrsResourceStrict {
   encounter: Encounter;
   voided: boolean;
 }
+
 export interface EncounterProvider extends OpenmrsResourceStrict {
   provider?: OpenmrsResource;
   encounterRole?: EncounterRole;
@@ -295,6 +298,7 @@ export interface Queue {
   allowedPriorities: Array<Concept>;
   allowedStatuses: Array<Concept>;
 }
+
 export interface MappedVisitQueueEntry {
   id: string;
   name: string;
@@ -315,6 +319,7 @@ export type DispositionType = 'ADMIT' | 'DISCHARGE' | 'TRANSFER';
 export interface LocationTag extends OpenmrsResource {
   name: string;
 }
+
 export interface EmrApiConfigurationResponse {
   admissionEncounterType: OpenmrsResource;
   clinicianEncounterRole: OpenmrsResource;
@@ -379,6 +384,7 @@ export interface VisitQueueEntry {
   uuid: string;
   visit: Visit;
 }
+
 export interface VisitQueueEntry {
   display: string;
   endedAt: null;
@@ -404,13 +410,6 @@ export interface VisitQueueEntry {
   };
   uuid: string;
   visit: Visit;
-}
-
-export interface Patient {
-  uuid: string;
-  display: string;
-  identifiers: Identifier[];
-  person: Person;
 }
 
 export interface ConceptName {
@@ -551,9 +550,7 @@ export interface OpenmrsEncounter extends OpenmrsResource {
     display?: string;
   }>;
   obs: Array<OpenmrsResource>;
-
   form?: { name: string; uuid: string };
-
   visit?: {
     visitType: {
       uuid: string;
@@ -605,6 +602,7 @@ interface CashPoint extends BaseEntity {
 }
 
 export interface LineItem extends BaseEntity {}
+
 export interface Payment {
   uuid: string;
   instanceType: PaymentInstanceType;
@@ -619,6 +617,14 @@ export interface Payment {
 interface PaymentInstanceType extends BaseEntity {
   name: string;
 }
+export interface QueueInfo {
+  queueEntryUuid: string;
+  queueName: string;
+  status: string;
+  priority?: string;
+  priorityComment?: string | null;
+  startedAt: string;
+}
 export interface EnhancedPatient {
   uuid: string;
   person: {
@@ -630,6 +636,9 @@ export interface EnhancedPatient {
       display: string;
     };
   };
+  identifiers?: Array<Identifier>;
+
+  queueInfo?: QueueInfo;
   bedInfo?: {
     bedNumber: string;
     bedId: number;
@@ -654,5 +663,49 @@ export interface PatientCardProps {
     swapCompartment?: boolean;
     printGatePass?: boolean;
     viewDetails?: boolean;
+    removeFromQueue?: boolean;
   };
+}
+
+export interface QueueEntry {
+  uuid: string;
+  display: string;
+  patient: {
+    uuid: string;
+    display: string;
+    identifiers?: Array<Identifier>;
+    person: {
+      uuid: string;
+      display: string;
+      gender: string;
+      age: number;
+      birthdate: string;
+      dead: boolean;
+      deathDate: string;
+      causeOfDeath?: {
+        uuid: string;
+        display: string;
+      };
+    };
+  };
+  queue: {
+    uuid: string;
+    display: string;
+    name: string;
+  };
+  status: {
+    uuid: string;
+    display: string;
+  };
+  priority: {
+    uuid: string;
+    display: string;
+  } | null;
+  priorityComment: string | null;
+  startedAt: string;
+  endedAt: string | null;
+}
+
+export interface QueueEntriesResponse {
+  results: Array<QueueEntry>;
 }
