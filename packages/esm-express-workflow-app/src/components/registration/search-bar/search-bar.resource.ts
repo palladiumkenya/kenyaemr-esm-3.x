@@ -53,28 +53,10 @@ export const useSHAEligibility = (nationalId: string) => {
       ? `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?nationalId=${nationalId}`
       : null;
 
-  const { data, error, isLoading, mutate } = useSWR<{ data: Array<HIEEligibilityResponse> }>(url, openmrsFetch);
-
-  const processedData = useMemo(() => {
-    if (!data?.data?.length) {
-      return undefined;
-    }
-
-    const eligibilityResponse = data.data[0]?.eligibility_response;
-
-    if (typeof eligibilityResponse === 'string') {
-      try {
-        return JSON.parse(eligibilityResponse) as EligibilityResponse;
-      } catch (e) {
-        return undefined;
-      }
-    }
-
-    return eligibilityResponse as EligibilityResponse;
-  }, [data]);
+  const { data, error, isLoading, mutate } = useSWR<{ data: EligibilityResponse }>(url, openmrsFetch);
 
   return {
-    data: processedData,
+    eligibilityData: data?.data,
     isLoading,
     error,
     mutate,
