@@ -19,7 +19,7 @@ import styles from './content-switcher.scss';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import AwaitingBedLayout from '../bed-layout/awaiting/awaiting-bed-layout.component';
 import BedLayout from '../bed-layout/admitted/admitted-bed-layout.component';
-import { MortuaryLocationResponse, MortuaryPatient } from '../types';
+import { EnhancedPatient, MortuaryLocationResponse, MortuaryPatient } from '../types';
 import AwaitingBedLineListView from '../bed-linelist-view/awaiting/awaiting-bed-linelist-view.component';
 import AdmittedBedLineListView from '../bed-linelist-view/admitted/admitted-bed-linelist-view.component';
 import DischargedBedLayout from '../bed-layout/discharged/discharged-bed-layout.component';
@@ -41,14 +41,12 @@ interface TabConfig {
   labelKey: string;
   defaultLabel: string;
 }
-
 interface CustomContentSwitcherProps {
-  awaitingQueueDeceasedPatients: Array<MortuaryPatient>;
-  isLoading: boolean;
+  awaitingQueuePatients: Array<EnhancedPatient>;
+  isLoadingQueue: boolean;
   locationItems: Array<{
     id: string;
     text: string;
-    [key: string]: any;
   }>;
   selectedLocation: string;
   admissionLocation: MortuaryLocationResponse | null;
@@ -56,15 +54,17 @@ interface CustomContentSwitcherProps {
   isLoadingAdmission: boolean;
   locationError: Error;
   admissionError: Error;
+  queueError: Error;
   onLocationChange: (data: { selectedItem: { id: string; text: string } }) => void;
   mutate: () => void;
-  dischargedPatients?: any[];
-  isLoadingDischarge?: boolean;
+  dischargedPatients: any[];
+  dischargedPatientsCount: number;
+  isLoadingDischarge: boolean;
 }
 
 const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
-  awaitingQueueDeceasedPatients,
-  isLoading,
+  awaitingQueuePatients,
+  isLoadingQueue,
   locationItems,
   selectedLocation,
   admissionLocation,
@@ -72,10 +72,12 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
   isLoadingAdmission,
   locationError,
   admissionError,
+  queueError,
   onLocationChange,
   mutate,
-  dischargedPatients = [],
-  isLoadingDischarge = false,
+  dischargedPatients,
+  dischargedPatientsCount,
+  isLoadingDischarge,
 }) => {
   const { t } = useTranslation();
   const [selectedView, setSelectedView] = React.useState<ViewType>(ViewType.LIST);
@@ -99,7 +101,11 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     (tabIndex: TabType) => {
       const isListView = selectedView === ViewType.LIST;
 
-      if (isLoading || isLoadingAdmission || (tabIndex === TabType.DISCHARGE && isLoadingDischarge)) {
+      if (
+        (tabIndex === TabType.AWAITING_ADMISSION && isLoadingQueue) ||
+        (tabIndex === TabType.ADMITTED && isLoadingAdmission) ||
+        (tabIndex === TabType.DISCHARGE && isLoadingDischarge)
+      ) {
         return (
           <div className={styles.loadingContainer}>
             <DataTableSkeleton showHeader={false} showToolbar={false} />
@@ -112,21 +118,19 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
           return isListView ? (
             <div className={styles.listContainer}>
               <AwaitingBedLineListView
-                awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
+                awaitingQueuePatients={awaitingQueuePatients}
                 mortuaryLocation={admissionLocation}
-                isLoading={isLoading}
+                isLoading={isLoadingQueue}
                 mutated={mutate}
               />
             </div>
           ) : (
-            <>
-              <AwaitingBedLayout
-                mortuaryLocation={admissionLocation}
-                awaitingQueueDeceasedPatients={awaitingQueueDeceasedPatients}
-                isLoading={isLoading}
-                mutated={mutate}
-              />
-            </>
+            <AwaitingBedLayout
+              mortuaryLocation={admissionLocation}
+              awaitingQueuePatients={awaitingQueuePatients}
+              isLoading={isLoadingQueue}
+              mutated={mutate}
+            />
           );
 
         case TabType.ADMITTED:
@@ -139,9 +143,7 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
               />
             </div>
           ) : (
-            <>
-              <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={isLoadingAdmission} mutate={mutate} />
-            </>
+            <BedLayout AdmittedDeceasedPatient={admissionLocation} isLoading={isLoadingAdmission} mutate={mutate} />
           );
 
         case TabType.DISCHARGE:
@@ -154,13 +156,11 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
               />
             </div>
           ) : (
-            <>
-              <DischargedBedLayout
-                AdmittedDeceasedPatient={admissionLocation}
-                isLoading={isLoadingDischarge}
-                mutate={mutate}
-              />
-            </>
+            <DischargedBedLayout
+              AdmittedDeceasedPatient={admissionLocation}
+              isLoading={isLoadingDischarge}
+              mutate={mutate}
+            />
           );
 
         default:
@@ -169,10 +169,10 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
     },
     [
       selectedView,
-      isLoading,
+      isLoadingQueue,
       isLoadingAdmission,
       isLoadingDischarge,
-      awaitingQueueDeceasedPatients,
+      awaitingQueuePatients,
       admissionLocation,
       dischargedPatients,
       mutate,
@@ -181,7 +181,7 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
 
   return (
     <div className={styles.switcherContainer}>
-      <CardHeader title={isLoading ? t('loading', 'Loading...') : t('mortuaryOperations', 'Mortuary operations')}>
+      <CardHeader title={isLoadingQueue ? t('loading', 'Loading...') : t('mortuaryOperations', 'Mortuary operations')}>
         {locationItems.length > 1 &&
           (isLoadingLocation ? (
             <RadioButtonSkeleton />
@@ -197,14 +197,14 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
           ))}
 
         <ContentSwitcher size="sm" className={styles.switcher} selectedIndex={selectedView} onChange={handleViewChange}>
-          <Switch>{isLoading ? <RadioButtonSkeleton /> : t('listView', 'List')}</Switch>
-          <Switch>{isLoading ? <RadioButtonSkeleton /> : t('cardView', 'Card')}</Switch>
+          <Switch>{isLoadingQueue ? <RadioButtonSkeleton /> : t('listView', 'List')}</Switch>
+          <Switch>{isLoadingQueue ? <RadioButtonSkeleton /> : t('cardView', 'Card')}</Switch>
         </ContentSwitcher>
       </CardHeader>
 
       <div className={styles.tabsContainer}>
         <Tabs selectedIndex={selectedTab} onChange={handleTabChange}>
-          {isLoading || isLoadingAdmission || isLoadingDischarge ? (
+          {isLoadingQueue || isLoadingAdmission || isLoadingDischarge ? (
             <div className={styles.tabSkeletonContainer}>
               <div className={styles.tabListSkeleton}>
                 {[1, 2, 3].map((i) => (
@@ -218,13 +218,13 @@ const CustomContentSwitcher: React.FC<CustomContentSwitcherProps> = ({
                 {tabs.map((tab) => (
                   <Tab key={tab.id}>
                     {t(tab.labelKey, tab.defaultLabel)}
-                    {tab.id === 'awaiting-admission' && ` (${awaitingQueueDeceasedPatients?.length || 0})`}
+                    {tab.id === 'awaiting-admission' && ` (${awaitingQueuePatients?.length || 0})`}
                     {tab.id === 'admitted' &&
                       ` (${
                         admissionLocation?.bedLayouts?.reduce((total, bed) => total + (bed.patients?.length || 0), 0) ||
                         0
                       })`}
-                    {tab.id === 'discharge' && ` (${dischargedPatients?.length || 0})`}
+                    {tab.id === 'discharge' && ` (${dischargedPatientsCount || 0})`}
                   </Tab>
                 ))}
               </TabList>

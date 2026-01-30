@@ -2,31 +2,28 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InlineLoading, Search, SkeletonText } from '@carbon/react';
 import styles from '../bed-layout.scss';
-import { MortuaryPatient, MortuaryLocationResponse, EnhancedPatient } from '../../types';
-import { useAwaitingPatients } from '../../home/home.resource';
-import { launchWorkspace, useLayoutType } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib/src';
+import { EnhancedPatient, MortuaryLocationResponse } from '../../types';
+import { launchWorkspace, showModal, showSnackbar, useLayoutType } from '@openmrs/esm-framework';
 import EmptyMorgueAdmission from '../../empty-state/empty-morgue-admission.component';
-import { getOriginalPatient, transformMortuaryPatient } from '../../helpers/expression-helper';
 import { PatientProvider } from '../../context/deceased-person-context';
 import BedCard from '../../bed/bed.component';
+import { removeFromMortuaryQueue } from '../../home/home.resource';
 
 interface BedLayoutProps {
-  awaitingQueueDeceasedPatients: MortuaryPatient[];
+  awaitingQueuePatients: EnhancedPatient[];
   mortuaryLocation: MortuaryLocationResponse;
   isLoading: boolean;
   mutated?: () => void;
 }
 
 const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
-  awaitingQueueDeceasedPatients,
+  awaitingQueuePatients,
   mortuaryLocation,
   isLoading,
   mutated,
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
-  const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
   const isTablet = useLayoutType() === 'tablet';
   const controlSize = isTablet ? 'md' : 'sm';
 
@@ -35,36 +32,77 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
   };
 
   const filteredPatients = useMemo(() => {
-    if (!trulyAwaitingPatients || !searchTerm.trim()) {
-      return trulyAwaitingPatients || [];
+    if (!awaitingQueuePatients || !searchTerm.trim()) {
+      return awaitingQueuePatients || [];
     }
 
     const lowerSearchTerm = searchTerm.toLowerCase().trim();
-    return trulyAwaitingPatients.filter((mortuaryPatient) => {
-      const patientName = mortuaryPatient?.person?.person?.display?.toLowerCase() || '';
-      const gender = mortuaryPatient?.person?.person?.gender?.toLowerCase() || '';
-      const patientId = mortuaryPatient?.person?.person?.uuid?.toLowerCase() || '';
-      const causeOfDeath = mortuaryPatient?.person?.person?.causeOfDeath?.display?.toLowerCase() || '';
+    return awaitingQueuePatients.filter((patient) => {
+      const patientName = patient?.person?.display?.toLowerCase() || '';
+      const gender = patient?.person?.gender?.toLowerCase() || '';
+      const patientId = patient?.uuid?.toLowerCase() || '';
+      const causeOfDeath = patient?.person?.causeOfDeath?.display?.toLowerCase() || '';
+      const priority = patient?.queueInfo?.priority?.toLowerCase() || '';
+      const priorityComment = patient?.queueInfo?.priorityComment?.toLowerCase() || '';
 
       return (
         patientName.includes(lowerSearchTerm) ||
         gender.includes(lowerSearchTerm) ||
         patientId.includes(lowerSearchTerm) ||
-        causeOfDeath.includes(lowerSearchTerm)
+        causeOfDeath.includes(lowerSearchTerm) ||
+        priority.includes(lowerSearchTerm) ||
+        priorityComment.includes(lowerSearchTerm)
       );
     });
-  }, [trulyAwaitingPatients, searchTerm]);
+  }, [awaitingQueuePatients, searchTerm]);
 
-  const handleAdmit = (enhancedPatient: EnhancedPatient) => {
-    const originalPatient = getOriginalPatient(enhancedPatient);
-    if (originalPatient && 'patient' in originalPatient) {
-      launchWorkspace('admit-deceased-person-form', {
-        workspaceTitle: t('admissionForm', 'Admission form'),
-        patientData: originalPatient,
-        mortuaryLocation,
-        mutated,
-      });
-    }
+  const handleAdmit = (patient: EnhancedPatient) => {
+    launchWorkspace('admit-deceased-person-form', {
+      workspaceTitle: t('admissionForm', 'Admission form'),
+      patient,
+      queueEntryUuid: patient.queueInfo?.queueEntryUuid,
+      mortuaryLocation,
+      mutated,
+    });
+  };
+
+  const handleRemoveFromQueue = (patient: EnhancedPatient) => {
+    const dispose = showModal('delete-confirmation-modal', {
+      close: () => dispose(),
+      onConfirm: async () => {
+        try {
+          await removeFromMortuaryQueue(patient.queueInfo?.queueEntryUuid);
+
+          showSnackbar({
+            kind: 'success',
+            isLowContrast: true,
+            title: t('removedFromQueue', 'Removed from queue'),
+            subtitle: t('patientRemovedSuccess', '{{patientName}} has been removed from the mortuary queue', {
+              patientName: patient.person.display,
+            }),
+          });
+
+          mutated?.();
+        } catch (error) {
+          showSnackbar({
+            kind: 'error',
+            isLowContrast: false,
+            title: t('errorRemovingFromQueue', 'Error removing from queue'),
+            subtitle: error?.message || t('unexpectedError', 'An unexpected error occurred'),
+          });
+        }
+      },
+      modalHeading: t('removeFromQueueConfirmation', 'Remove from mortuary queue?'),
+      modalBody: t(
+        'removeFromQueueWarning',
+        'Are you sure you want to remove {{patientName}} from the mortuary queue? This action cannot be undone.',
+        {
+          patientName: patient.person.display,
+        },
+      ),
+      primaryButtonText: t('remove', 'Remove'),
+      danger: true,
+    });
   };
 
   const patientContextValue = {
@@ -72,21 +110,22 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
     isLoading,
     mutate: mutated,
     onAdmit: handleAdmit,
+    onRemoveFromQueue: handleRemoveFromQueue,
   };
 
   if (isLoading) {
     return (
       <div className={styles.emptyState}>
         <SkeletonText />
-        <InlineLoading description={t('loadingPatients', 'Loading patients...')} />
+        <InlineLoading description={t('loadingQueuePatients', 'Loading queue patients...')} />
       </div>
     );
   }
 
-  if (trulyAwaitingPatients.length) {
+  if (!awaitingQueuePatients || awaitingQueuePatients.length === 0) {
     return (
       <div>
-        <EmptyMorgueAdmission title={t('noAwaitingPatients', 'No awaiting patients found')} />
+        <EmptyMorgueAdmission title={t('noAwaitingPatients', 'No patients in mortuary queue')} />
       </div>
     );
   }
@@ -98,17 +137,14 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
       <>
         <div className={styles.searchContainer}>
           <Search
-            labelText={t('searchDeceasedPatients', 'Search deceased patients')}
-            placeholder={t(
-              'searchPatientsPlaceholder',
-              'Search by name, ID number, gender, compartment, or bed type...',
-            )}
+            labelText={t('searchQueuePatients', 'Search queue patients')}
+            placeholder={t('searchPlaceholder', 'Search by name, ID, gender, cause of death, or priority...')}
             value={searchTerm}
             onChange={handleSearchChange}
             size={controlSize}
           />
         </div>
-        <EmptyMorgueAdmission title={t('noMatchingAwaitingPatients', 'No matching awaiting patients found')} />
+        <EmptyMorgueAdmission title={t('noMatchingPatients', 'No matching patients found')} />
       </>
     );
   }
@@ -117,8 +153,8 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
     <PatientProvider value={patientContextValue}>
       <div className={styles.searchContainer}>
         <Search
-          labelText={t('searchDeceasedPatients', 'Search deceased patients')}
-          placeholder={t('searchPatientsPlaceholder', 'Search by name, ID number, gender, compartment, or bed type...')}
+          labelText={t('searchQueuePatients', 'Search queue patients')}
+          placeholder={t('searchPlaceholder', 'Search by name, ID, gender, cause of death, or priority...')}
           value={searchTerm}
           onChange={handleSearchChange}
           size="sm"
@@ -126,12 +162,8 @@ const AwaitingBedLayout: React.FC<BedLayoutProps> = ({
       </div>
       <div className={styles.bedLayoutWrapper}>
         <div className={styles.bedLayoutContainer}>
-          {patientsToShow.map((mortuaryPatient) => (
-            <BedCard
-              key={mortuaryPatient.person?.person?.uuid}
-              patient={transformMortuaryPatient(mortuaryPatient)}
-              showActions={{ admit: true }}
-            />
+          {patientsToShow.map((patient) => (
+            <BedCard key={patient.uuid} patient={patient} showActions={{ admit: true, removeFromQueue: true }} />
           ))}
         </div>
       </div>

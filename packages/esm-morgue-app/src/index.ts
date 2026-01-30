@@ -10,6 +10,8 @@ import { createLeftPanelLink } from './left-panel/morgue-left-panel-link.compone
 import FormEntryWorkspace from './forms/form-entry-workspace/form-entry-workspace.workspace';
 import PrintPostMortemOverflowMenuItem from './extension/overflow-menu-item-postmortem/print-postmorterm-report.component';
 import { mortuaryDashboardMeta } from './dashboard.meta';
+import markPatientDeceasedActionButtonComponent from './mark-patient-deceased-extension/overflow-menu-item/mark-patient-deceased-overflow.extension';
+
 const moduleName = '@kenyaemr/esm-morgue-app';
 
 const options = {
@@ -69,4 +71,21 @@ export const autopsyReportModal = getAsyncLifecycle(
   options,
 );
 
+export const markPatientDeceasedActionButton = getSyncLifecycle(markPatientDeceasedActionButtonComponent, {
+  featureName: 'patient-actions-slot-deceased-button',
+  moduleName,
+});
+
+export const markPatientDeceasedForm = getAsyncLifecycle(
+  () => import('./mark-patient-deceased-extension/mark-patient-deceased-workspace/mark-patient-deceased.workspace'),
+  {
+    featureName: 'mark-patient-deceased-form',
+    moduleName,
+  },
+);
+
+export const confirmationModal = getAsyncLifecycle(() => import('./modal/operation-confirmation-modal.component'), {
+  featureName: 'mortuary-operation-confirmation-modal',
+  moduleName,
+});
 export const printPostMortemOverflowMenuItem = getSyncLifecycle(PrintPostMortemOverflowMenuItem, options);

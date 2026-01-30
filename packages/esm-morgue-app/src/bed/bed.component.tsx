@@ -10,6 +10,7 @@ import DeceasedPatientCardHeader from './components/deceased-patient-card-header
 import DeceasedPatientInfo from './components/deceased-patient-info.component';
 import DeceasedPatientStatusFooter from './components/deceased-patient-status-footer.component';
 import { getOriginalPatient } from '../helpers/expression-helper';
+
 const BedCard: React.FC<PatientCardProps> = ({
   patient,
   showActions = {
@@ -19,11 +20,13 @@ const BedCard: React.FC<PatientCardProps> = ({
     swapCompartment: false,
     printGatePass: false,
     viewDetails: false,
+    removeFromQueue: false,
   },
 }) => {
   const { t } = useTranslation();
   const { activeVisit } = useVisit(patient.uuid);
-  const { onAdmit, onPostmortem, onDischarge, onSwapCompartment, onPrintGatePass, onViewDetails } = usePatientContext();
+  const { onAdmit, onPostmortem, onDischarge, onSwapCompartment, onPrintGatePass, onViewDetails, onRemoveFromQueue } =
+    usePatientContext();
 
   const lengthOfStay = activeVisit?.startDatetime
     ? convertDateToDays(activeVisit.startDatetime)
@@ -46,7 +49,6 @@ const BedCard: React.FC<PatientCardProps> = ({
   const handleAction = (actionType: string) => {
     switch (actionType) {
       case 'admit':
-        // For admit action, we need to pass the original MortuaryPatient if available
         const originalPatient = getOriginalPatient(patient);
         if (originalPatient) {
           onAdmit?.(originalPatient);
@@ -68,6 +70,11 @@ const BedCard: React.FC<PatientCardProps> = ({
         break;
       case 'viewDetails':
         onViewDetails?.(patient.uuid, patient.bedInfo);
+        break;
+      case 'removeFromQueue':
+        onRemoveFromQueue?.(patient);
+        break;
+      default:
         break;
     }
   };

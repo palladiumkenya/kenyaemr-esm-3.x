@@ -11,6 +11,7 @@ interface PatientContextValue {
   onSwapCompartment?: (patientUuid: string, bedId?: number) => void;
   onPrintGatePass?: (patient: EnhancedPatient | Patient, encounterDate?: string) => void;
   onViewDetails?: (patientUuid: string, bedInfo?: { bedNumber: string; bedId: number }) => void;
+  onRemoveFromQueue?: (patient: EnhancedPatient | Patient) => void;
 }
 
 const PatientContext = createContext<PatientContextValue | undefined>(undefined);
