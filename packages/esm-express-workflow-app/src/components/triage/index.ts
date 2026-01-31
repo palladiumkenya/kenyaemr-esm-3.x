@@ -13,7 +13,7 @@ export const triageDashboard = getSyncLifecycle(TriageDashboard, options);
 // t('triage', 'Triage')
 export const triageLeftPanelLink = getSyncLifecycle(
   createLeftPanelLink({
-    name: 'Triage',
+    name: 'triage',
     title: 'triage',
   }),
   options,
