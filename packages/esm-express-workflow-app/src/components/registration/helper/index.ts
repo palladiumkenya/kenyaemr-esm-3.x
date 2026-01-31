@@ -2,12 +2,14 @@ import { openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
 import {
   type HIEBundleResponse,
   type EligibilityResponse,
+  type Scheme,
   HIEContact,
   InputDependent,
   DependentPayload,
   HIEPatient,
 } from '../type';
 import { birthCertificateUuid, nationalIdUuid, passportUuid, shaNumberUuid, shaIdNumberUuid } from '../constant';
+import { isWithinInterval, parseISO, format } from 'date-fns';
 
 /**
  * Extracts eligibility data from the EligibilityResponse structure.
@@ -25,39 +27,94 @@ export const parseEligibilityResponse = (eligibilityData?: EligibilityResponse) 
 };
 
 /**
- * Extracts relevant eligibility status from the EligibilityResponse.
+ * Checks if a scheme is eligible and currently active
+ */
+const isSchemeEligibleAndActive = (scheme: Scheme): boolean => {
+  if (scheme.coverage.status !== '1') {
+    return false;
+  }
+
+  try {
+    const now = new Date();
+    const startDate = parseISO(scheme.coverage.startDate);
+    const endDate = parseISO(scheme.coverage.endDate);
+    return isWithinInterval(now, { start: startDate, end: endDate });
+  } catch (error) {
+    console.error('Error parsing dates:', error);
+    return false;
+  }
+};
+
+/**
+ * Get eligibility for a specific scheme (checks both PRIMARY and BENEFICIARY)
+ */
+const getSchemeEligibility = (
+  schemes: Scheme[],
+  schemeName: string,
+): { eligible: boolean; memberType: string | null; scheme: Scheme | null } => {
+  const schemeMatches = schemes.filter((s) => s.schemeName.toUpperCase() === schemeName.toUpperCase());
+
+  if (schemeMatches.length === 0) {
+    return { eligible: false, memberType: null, scheme: null };
+  }
+
+  // Check PRIMARY first
+  const primaryScheme = schemeMatches.find((s) => s.memberType === 'PRIMARY');
+  if (primaryScheme && isSchemeEligibleAndActive(primaryScheme)) {
+    return { eligible: true, memberType: 'PRIMARY', scheme: primaryScheme };
+  }
+
+  // Check BENEFICIARY
+  const beneficiaryScheme = schemeMatches.find((s) => s.memberType === 'BENEFICIARY');
+  if (beneficiaryScheme && isSchemeEligibleAndActive(beneficiaryScheme)) {
+    return { eligible: true, memberType: 'BENEFICIARY', scheme: beneficiaryScheme };
+  }
+
+  return { eligible: false, memberType: null, scheme: schemeMatches[0] };
+};
+
+/**
+ * Extracts relevant eligibility status from the new EligibilityResponse structure.
  *
  * @param {EligibilityResponse} [eligibilityData] - The eligibility response data.
  * @returns {null | {
- *   isPHCEligible: boolean,
+ *   isUHCEligible: boolean,
  *   isSHIFEligible: boolean,
- *   isECCIFEligible: boolean,
- *   isCivilServantEligible: boolean,
- *   coverageType: string,
- *   status: number,
- *   message: string,
- *   reason: string,
+ *   isTSCEligible: boolean,
+ *   isPOMSFEligible: boolean,
+ *   memberCrNumber: string,
+ *   fullName: string,
+ *   schemes: Scheme[],
+ *   uhcMemberType: string | null,
+ *   shifMemberType: string | null,
+ *   tscMemberType: string | null,
+ *   pomsfMemberType: string | null,
  * }}
  */
 export const getEligibilityStatus = (eligibilityData?: EligibilityResponse) => {
   const parsedData = parseEligibilityResponse(eligibilityData);
 
-  if (!parsedData) {
+  if (!parsedData || !parsedData.schemes) {
     return null;
   }
 
+  const uhcEligibility = getSchemeEligibility(parsedData.schemes, 'UHC');
+  const shifEligibility = getSchemeEligibility(parsedData.schemes, 'SHIF');
+  const tscEligibility = getSchemeEligibility(parsedData.schemes, 'TSC');
+  const pomsfEligibility = getSchemeEligibility(parsedData.schemes, 'POMSF');
+
   return {
-    isPHCEligible:
-      parsedData.status === 1 ||
-      parsedData.memberCrNumber?.startsWith('CR') ||
-      parsedData.memberCrNumber?.startsWith('SHA'),
-    isSHIFEligible: parsedData.status === 1,
-    isECCIFEligible: parsedData.status === 1,
-    isCivilServantEligible: parsedData.status === 1 && parsedData.coverageType === 'CIVIL_SERVANT',
-    coverageType: parsedData.coverageType,
-    status: parsedData.status,
-    message: parsedData.message,
-    reason: parsedData.reason,
+    isUHCEligible: uhcEligibility.eligible,
+    isSHIFEligible: shifEligibility.eligible,
+    isTSCEligible: tscEligibility.eligible,
+    isPOMSFEligible: pomsfEligibility.eligible,
+    memberCrNumber: parsedData.memberCrNumber,
+    fullName: parsedData.fullName,
+    schemes: parsedData.schemes,
+    uhcMemberType: uhcEligibility.memberType,
+    shifMemberType: shifEligibility.memberType,
+    tscMemberType: tscEligibility.memberType,
+    pomsfMemberType: pomsfEligibility.memberType,
   };
 };
 
@@ -95,7 +152,7 @@ export const getPulledPatientCount = (hieResults: Array<HIEBundleResponse> | nul
  * @param {string} fullName - The full name to mask.
  * @returns {string} The masked full name.
  */
-export function maskName(fullName) {
+export function maskName(fullName: string) {
   const maskedParts = fullName
     .trim()
     .split(' ')
@@ -549,7 +606,7 @@ export const convertLocalPatientToFHIR = (localPatient: any): fhir.Patient => {
 
 /**
  * Checks if the given patient has an identifier with type 'sha-number' or 'SHA Number'
- * or if the identifier value starts with 'CR' or 'SHA'.
+ * or if the identifier value starts with 'CR', 'SHA', or 'BY'.
  *
  * @param {fhir.Patient} patient - The patient to check
  * @returns {boolean} true if the patient has a CR or SHA number, false otherwise
@@ -560,26 +617,24 @@ export const hasCROrSHANumber = (patient: fhir.Patient): boolean => {
       (identifier) =>
         identifier.type?.coding?.[0]?.code === 'sha-number' ||
         identifier.type?.coding?.[0]?.display === 'SHA Number' ||
+        identifier.type?.coding?.[0]?.code === 'sha-id-number' ||
         identifier.value?.startsWith('CR') ||
-        identifier.value?.startsWith('SHA'),
+        identifier.value?.startsWith('SHA') ||
+        identifier.value?.startsWith('BY'),
     ) || false
   );
 };
 
 /**
  * Returns an array of tags indicating the patient's eligibility status for various insurance schemes.
- * Now includes coverage type and reason information when available.
+ * Format: scheme(name) | eligibility status | eligibility end date | eligibility type flag
  *
- * The tags are in the format of { text: string, type: 'red' | 'green' | 'blue' | 'purple' | 'teal' }.
- *
- * The following tags can be returned:
- * - 'Eligible for PHC': green (patient is eligible for PHC)
- * - 'Not eligible for PHC': red (patient is not eligible for PHC)
- * - 'Eligible for SHIF': blue (patient is eligible for SHIF)
- * - 'Eligible for ECCIF': blue (patient is eligible for ECCIF)
- * - 'Eligible for Civil Servants Scheme': purple (patient is eligible for the Civil Servants Scheme)
- * - Coverage type tag: teal (shows the coverage type)
- * - Reason tag: red (shows the reason for ineligibility, if present)
+ * Display Rules:
+ * - scheme: UHC, SHIF, TSC, POMSF
+ * - eligibility status: Eligible or Not Eligible (based on coverage.status and date validation)
+ * - eligibility end date: coverage.endDate formatted as "dd MMM yyyy"
+ * - eligibility type flag: Primary or Beneficiary (based on memberType)
+ * - If coverage.status = "0" for both PRIMARY and BENEFICIARY → Not Eligible
  *
  * @param {fhir.Patient} patient - The patient to check eligibility status for
  * @param {EligibilityResponse} [eligibilityData] - The eligibility response data from the HIE API
@@ -588,50 +643,95 @@ export const hasCROrSHANumber = (patient: fhir.Patient): boolean => {
 export const getEligibilityTags = (patient: fhir.Patient, eligibilityData?: EligibilityResponse) => {
   const tags: Array<{ text: string; type: 'red' | 'green' | 'blue' | 'purple' | 'teal' }> = [];
 
-  const hasValidCRSHA = hasCROrSHANumber(patient);
-  const parsedEligibilityData = parseEligibilityResponse(eligibilityData);
+  const eligibilityStatus = getEligibilityStatus(eligibilityData);
 
-  if (hasValidCRSHA) {
-    tags.push({ text: 'Eligible for PHC', type: 'green' });
+  if (!eligibilityStatus) {
+    return tags;
   }
 
-  if (parsedEligibilityData) {
-    const { status, coverageType, reason } = parsedEligibilityData;
+  const { schemes } = eligibilityStatus;
 
-    if (coverageType) {
-      const formatCoverageType = (type: string) => {
-        return type.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
-      };
-      tags.push({
-        text: `Coverage: ${formatCoverageType(coverageType)}`,
-        type: 'teal',
-      });
+  if (!schemes || schemes.length === 0) {
+    return tags;
+  }
+
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = parseISO(dateString);
+      return format(date, 'dd MMM yyyy');
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  const getSchemeDisplayInfo = (
+    schemeName: string,
+  ): { scheme: Scheme | null; eligible: boolean; memberType: string } => {
+    const schemeMatches = schemes.filter((s: Scheme) => s.schemeName.toUpperCase() === schemeName.toUpperCase());
+
+    if (schemeMatches.length === 0) {
+      return { scheme: null, eligible: false, memberType: 'N/A' };
     }
 
-    if (status === 1) {
-      if (!hasValidCRSHA) {
-        tags.push({ text: 'Eligible for PHC', type: 'green' });
-      }
-      tags.push({ text: 'Eligible for SHIF', type: 'blue' });
-      tags.push({ text: 'Eligible for ECCIF', type: 'blue' });
-
-      if (coverageType === 'CIVIL_SERVANT') {
-        tags.push({ text: 'Eligible for Civil Servants Scheme', type: 'purple' });
-      }
-    } else {
-      if (!hasValidCRSHA) {
-        tags.push({ text: 'Not eligible for PHC', type: 'red' });
-      }
-
-      if (reason && reason.trim()) {
-        tags.push({
-          text: `${reason}`,
-          type: 'red',
-        });
-      }
+    const primaryScheme = schemeMatches.find((s: Scheme) => s.memberType === 'PRIMARY');
+    if (primaryScheme && isSchemeEligibleAndActive(primaryScheme)) {
+      return { scheme: primaryScheme, eligible: true, memberType: 'Primary' };
     }
-  } else if (!hasValidCRSHA) {
-    tags.push({ text: 'Not eligible for PHC', type: 'red' });
+
+    const beneficiaryScheme = schemeMatches.find((s: Scheme) => s.memberType === 'BENEFICIARY');
+    if (beneficiaryScheme && isSchemeEligibleAndActive(beneficiaryScheme)) {
+      return { scheme: beneficiaryScheme, eligible: true, memberType: 'Beneficiary' };
+    }
+
+    return { scheme: schemeMatches[0], eligible: false, memberType: 'N/A' };
+  };
+
+  const uhcInfo = getSchemeDisplayInfo('UHC');
+  if (uhcInfo.scheme) {
+    const status = uhcInfo.eligible ? 'Eligible' : 'Not Eligible';
+    const endDate = uhcInfo.scheme.coverage.endDate ? formatDate(uhcInfo.scheme.coverage.endDate) : 'N/A';
+    const typeFlag = uhcInfo.memberType;
+
+    tags.push({
+      text: `UHC | ${status} | ${endDate} | ${typeFlag}`,
+      type: uhcInfo.eligible ? 'green' : 'red',
+    });
+  }
+
+  const shifInfo = getSchemeDisplayInfo('SHIF');
+  if (shifInfo.scheme) {
+    const status = shifInfo.eligible ? 'Eligible' : 'Not Eligible';
+    const endDate = shifInfo.scheme.coverage.endDate ? formatDate(shifInfo.scheme.coverage.endDate) : 'N/A';
+    const typeFlag = shifInfo.memberType;
+
+    tags.push({
+      text: `SHIF | ${status} | ${endDate} | ${typeFlag}`,
+      type: shifInfo.eligible ? 'blue' : 'red',
+    });
+  }
+
+  const tscInfo = getSchemeDisplayInfo('TSC');
+  if (tscInfo.scheme) {
+    const status = tscInfo.eligible ? 'Eligible' : 'Not Eligible';
+    const endDate = tscInfo.scheme.coverage.endDate ? formatDate(tscInfo.scheme.coverage.endDate) : 'N/A';
+    const typeFlag = tscInfo.memberType;
+
+    tags.push({
+      text: `TSC | ${status} | ${endDate} | ${typeFlag}`,
+      type: tscInfo.eligible ? 'purple' : 'red',
+    });
+  }
+
+  const pomsfInfo = getSchemeDisplayInfo('POMSF');
+  if (pomsfInfo.scheme) {
+    const status = pomsfInfo.eligible ? 'Eligible' : 'Not Eligible';
+    const endDate = pomsfInfo.scheme.coverage.endDate ? formatDate(pomsfInfo.scheme.coverage.endDate) : 'N/A';
+    const typeFlag = pomsfInfo.memberType;
+
+    tags.push({
+      text: `POMSF | ${status} | ${endDate} | ${typeFlag}`,
+      type: pomsfInfo.eligible ? 'purple' : 'red',
+    });
   }
 
   return tags;

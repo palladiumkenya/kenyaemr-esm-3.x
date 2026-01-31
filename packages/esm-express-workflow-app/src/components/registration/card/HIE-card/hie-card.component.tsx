@@ -22,6 +22,7 @@ interface HIEDisplayCardProps {
   otpExpiryMinutes?: number;
   localSearchResults?: LocalResponse | null;
   eligibilityResponse?: EligibilityResponse;
+  isEligibilityLoading?: boolean;
 }
 
 const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
@@ -31,6 +32,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
   otpExpiryMinutes = 5,
   localSearchResults = null,
   eligibilityResponse,
+  isEligibilityLoading = false,
 }) => {
   const { t } = useTranslation();
   const [showDependentsForPatient, setShowDependentsForPatient] = useState<Set<string>>(new Set());
@@ -251,7 +253,7 @@ const HIEDisplayCard: React.FC<HIEDisplayCardProps> = ({
                   patient={patient}
                   renderedFrom="hie-search"
                   eligibilityData={eligibilityResponse}
-                  isEligibilityLoading={false}
+                  isEligibilityLoading={isEligibilityLoading}
                 />
               </div>
 

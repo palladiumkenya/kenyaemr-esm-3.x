@@ -114,6 +114,7 @@
   font-size: inherit !important;
   margin: 0 !important;
 }
+
 .eligibilityTags {
   @include type.type-style('body-compact-02');
   color: $text-02;
@@ -121,6 +122,30 @@
   flex-wrap: wrap;
   align-items: center;
   gap: layout.$spacing-02;
+
+  :global(.cds--tag) {
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
+  }
+
+  :global(.cds--tag__label) {
+    white-space: normal;
+    word-break: break-word;
+    max-width: 100%;
+  }
+}
+
+.eligibilityTag {
+  white-space: normal !important;
+  word-break: break-word !important;
+  max-width: 300px;
+
+  :global(.cds--tag__label) {
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
 }
 
 .tooltipPadding {
@@ -136,7 +161,6 @@
   color: $interactive-01;
 }
 
-// Overriding styles for RTL support
 html[dir='rtl'] {
   .demographics {
     display: flex;
@@ -151,11 +175,4 @@ html[dir='rtl'] {
     margin-right: unset;
     margin-left: layout.$spacing-02;
   }
-}
-
-.identifiers {
-  @include type.type-style('body-compact-02');
-  color: $ui-04;
-  margin-top: layout.$spacing-02;
-  text-align: left;
 }

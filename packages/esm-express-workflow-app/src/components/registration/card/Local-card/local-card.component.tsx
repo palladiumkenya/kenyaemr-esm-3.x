@@ -21,6 +21,7 @@ interface LocalPatientCardProps {
   otpExpiryMinutes?: number;
   hieSearchResults?: Array<HIEBundleResponse> | null;
   eligibilityResponse?: EligibilityResponse;
+  isEligibilityLoading?: boolean;
 }
 
 const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
@@ -30,6 +31,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
   otpExpiryMinutes = 5,
   hieSearchResults = null,
   eligibilityResponse,
+  isEligibilityLoading = false,
 }) => {
   const { t } = useTranslation();
   const [verifiedPatients, setVerifiedPatients] = useState<Set<string>>(new Set());
@@ -233,7 +235,7 @@ const LocalPatientCard: React.FC<LocalPatientCardProps> = ({
                   patient={fhirPatient}
                   renderedFrom="local-search"
                   eligibilityData={eligibilityResponse}
-                  isEligibilityLoading={false}
+                  isEligibilityLoading={isEligibilityLoading}
                   crNumber={hiePatientData?.id}
                 />
               </div>
