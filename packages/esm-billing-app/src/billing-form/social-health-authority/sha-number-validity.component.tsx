@@ -47,10 +47,18 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     const pomsf = getSchemeEligibility(data.schemes, SchemeName.POMSF);
 
     const activeSchemes = [];
-    if (uhc.eligible) activeSchemes.push('PHC');
-    if (shif.eligible) activeSchemes.push(SchemeName.SHIF);
-    if (tsc.eligible) activeSchemes.push(SchemeName.TSC);
-    if (pomsf.eligible) activeSchemes.push(SchemeName.POMSF);
+    if (uhc.eligible) {
+      activeSchemes.push('PHC');
+    }
+    if (shif.eligible) {
+      activeSchemes.push(SchemeName.SHIF);
+    }
+    if (tsc.eligible) {
+      activeSchemes.push(SchemeName.TSC);
+    }
+    if (pomsf.eligible) {
+      activeSchemes.push(SchemeName.POMSF);
+    }
 
     const activeSchemesList = [uhc.scheme, shif.scheme, tsc.scheme, pomsf.scheme].filter(
       (s) => s && getSchemeEligibility(data.schemes, s.schemeName).eligible,
