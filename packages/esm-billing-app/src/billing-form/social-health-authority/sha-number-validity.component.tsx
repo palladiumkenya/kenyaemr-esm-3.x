@@ -1,13 +1,15 @@
 import { ActionableNotification, Form, InlineLoading, InlineNotification, Tooltip } from '@carbon/react';
 import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
 import { formatDate, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
-import { isWithinInterval, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BillingConfig } from '../../config-schema';
-import { type Scheme, useSHAEligibility } from '../hie.resource';
 import styles from './sha-number-validity.scss';
+import { getSchemeEligibility } from './helper';
+import { useSHAEligibility } from '../hie.resource';
+import { EligibilityStatusCode, SchemeName } from './constant';
 
 type SHANumberValidityProps = {
   paymentMethod: any;
@@ -26,49 +28,6 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
 
   const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
 
-  const isSchemeEligibleAndActive = (scheme: Scheme): boolean => {
-    if (!scheme?.coverage) {
-      return false;
-    }
-
-    if (scheme.coverage.status !== '1') {
-      return false;
-    }
-
-    try {
-      const now = new Date();
-      const startDate = parseISO(scheme.coverage.startDate);
-      const endDate = parseISO(scheme.coverage.endDate);
-      return isWithinInterval(now, { start: startDate, end: endDate });
-    } catch (error) {
-      console.error('Error parsing dates:', error);
-      return false;
-    }
-  };
-
-  const getSchemeEligibility = (
-    schemes: Scheme[],
-    schemeName: string,
-  ): { eligible: boolean; scheme: Scheme | null } => {
-    const schemeMatches = schemes.filter((s) => s.schemeName.toUpperCase() === schemeName.toUpperCase());
-
-    if (schemeMatches.length === 0) {
-      return { eligible: false, scheme: null };
-    }
-
-    const primaryScheme = schemeMatches.find((s) => s.memberType === 'PRIMARY');
-    if (primaryScheme && isSchemeEligibleAndActive(primaryScheme)) {
-      return { eligible: true, scheme: primaryScheme };
-    }
-
-    const beneficiaryScheme = schemeMatches.find((s) => s.memberType === 'BENEFICIARY');
-    if (beneficiaryScheme && isSchemeEligibleAndActive(beneficiaryScheme)) {
-      return { eligible: true, scheme: beneficiaryScheme };
-    }
-
-    return { eligible: false, scheme: schemeMatches[0] };
-  };
-
   const eligibilityInfo = useMemo(() => {
     if (!data?.schemes || data.schemes.length === 0) {
       return {
@@ -82,27 +41,19 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
       };
     }
 
-    const uhc = getSchemeEligibility(data.schemes, 'UHC');
-    const shif = getSchemeEligibility(data.schemes, 'SHIF');
-    const tsc = getSchemeEligibility(data.schemes, 'TSC');
-    const pomsf = getSchemeEligibility(data.schemes, 'POMSF');
+    const uhc = getSchemeEligibility(data.schemes, SchemeName.UHC);
+    const shif = getSchemeEligibility(data.schemes, SchemeName.SHIF);
+    const tsc = getSchemeEligibility(data.schemes, SchemeName.TSC);
+    const pomsf = getSchemeEligibility(data.schemes, SchemeName.POMSF);
 
     const activeSchemes = [];
-    if (uhc.eligible) {
-      activeSchemes.push('PHC');
-    }
-    if (shif.eligible) {
-      activeSchemes.push('SHIF');
-    }
-    if (tsc.eligible) {
-      activeSchemes.push('TSC');
-    }
-    if (pomsf.eligible) {
-      activeSchemes.push('POMSF');
-    }
+    if (uhc.eligible) activeSchemes.push('PHC');
+    if (shif.eligible) activeSchemes.push(SchemeName.SHIF);
+    if (tsc.eligible) activeSchemes.push(SchemeName.TSC);
+    if (pomsf.eligible) activeSchemes.push(SchemeName.POMSF);
 
     const activeSchemesList = [uhc.scheme, shif.scheme, tsc.scheme, pomsf.scheme].filter(
-      (s) => s && isSchemeEligibleAndActive(s),
+      (s) => s && getSchemeEligibility(data.schemes, s.schemeName).eligible,
     );
 
     let coverageStartDate = null;
@@ -117,7 +68,7 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
 
     const hasCrNumber = !!data.memberCrNumber && data.memberCrNumber.length > 0;
     const isActive = activeSchemes.length > 0;
-    const isRegisteredOnSHA = data.statusCode === '10'; // Member found
+    const isRegisteredOnSHA = data.statusCode === EligibilityStatusCode.MEMBER_FOUND;
 
     return {
       isRegisteredOnSHA,

@@ -3,10 +3,12 @@ import { InlineLoading, InlineNotification, Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import { isWithinInterval, parseISO, format } from 'date-fns';
-import { Scheme, useSHAEligibility } from '../hie.resource';
+import { useSHAEligibility } from '../hie.resource';
 import { BillingConfig } from '../../config-schema';
 import styles from './patient-banner-sha-status.scss';
+import { getSchemeEligibility } from './helper';
+import { EligibilityStatusCode, SchemeName } from './constant';
+import SchemeTag from './scheme-tag.component';
 
 interface PatientBannerShaStatusProps {
   patientUuid: string;
@@ -24,58 +26,6 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
 
   const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
 
-  const isSchemeEligibleAndActive = (scheme: Scheme): boolean => {
-    if (!scheme?.coverage) {
-      return false;
-    }
-
-    if (scheme.coverage.status !== '1') {
-      return false;
-    }
-
-    try {
-      const now = new Date();
-      const startDate = parseISO(scheme.coverage.startDate);
-      const endDate = parseISO(scheme.coverage.endDate);
-      return isWithinInterval(now, { start: startDate, end: endDate });
-    } catch (error) {
-      console.error('Error parsing dates:', error);
-      return false;
-    }
-  };
-
-  const formatDate = (dateString: string): string => {
-    try {
-      const date = parseISO(dateString);
-      return format(date, 'dd MMM yyyy');
-    } catch (error) {
-      return dateString;
-    }
-  };
-
-  const getSchemeDisplayInfo = (
-    schemes: Scheme[],
-    schemeName: string,
-  ): { scheme: Scheme | null; eligible: boolean; memberType: string } => {
-    const schemeMatches = schemes.filter((s) => s.schemeName.toUpperCase() === schemeName.toUpperCase());
-
-    if (schemeMatches.length === 0) {
-      return { scheme: null, eligible: false, memberType: 'N/A' };
-    }
-
-    const primaryScheme = schemeMatches.find((s) => s.memberType === 'PRIMARY');
-    if (primaryScheme && isSchemeEligibleAndActive(primaryScheme)) {
-      return { scheme: primaryScheme, eligible: true, memberType: 'Primary' };
-    }
-
-    const beneficiaryScheme = schemeMatches.find((s) => s.memberType === 'BENEFICIARY');
-    if (beneficiaryScheme && isSchemeEligibleAndActive(beneficiaryScheme)) {
-      return { scheme: beneficiaryScheme, eligible: true, memberType: 'Beneficiary' };
-    }
-
-    return { scheme: schemeMatches[0], eligible: false, memberType: 'N/A' };
-  };
-
   const schemesData = useMemo(() => {
     if (!data?.schemes || data.schemes.length === 0) {
       return {
@@ -87,10 +37,10 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
       };
     }
 
-    const uhc = getSchemeDisplayInfo(data.schemes, 'UHC');
-    const shif = getSchemeDisplayInfo(data.schemes, 'SHIF');
-    const tsc = getSchemeDisplayInfo(data.schemes, 'TSC');
-    const pomsf = getSchemeDisplayInfo(data.schemes, 'POMSF');
+    const uhc = getSchemeEligibility(data.schemes, SchemeName.UHC);
+    const shif = getSchemeEligibility(data.schemes, SchemeName.SHIF);
+    const tsc = getSchemeEligibility(data.schemes, SchemeName.TSC);
+    const pomsf = getSchemeEligibility(data.schemes, SchemeName.POMSF);
 
     return {
       uhc: uhc.scheme ? uhc : null,
@@ -124,7 +74,7 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
     );
   }
 
-  if (!data || data.statusCode !== '10') {
+  if (!data || data.statusCode !== EligibilityStatusCode.MEMBER_FOUND) {
     return (
       <div>
         <span className={styles.separator}>&middot;</span>
@@ -135,27 +85,6 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
       </div>
     );
   }
-
-  const renderSchemeTag = (
-    schemeInfo: { scheme: Scheme; eligible: boolean; memberType: string } | null,
-    displayName: string,
-  ) => {
-    if (!schemeInfo || !schemeInfo.scheme) {
-      return null;
-    }
-
-    const { scheme, eligible, memberType } = schemeInfo;
-    const status = eligible ? t('eligible', 'Eligible') : t('notEligible', 'Not Eligible');
-    const endDate = scheme.coverage?.endDate ? formatDate(scheme.coverage.endDate) : 'N/A';
-
-    const tagText = `${displayName} | ${status} | ${endDate} | ${memberType}`;
-
-    return (
-      <Tag className={classNames(styles.tag, eligible ? styles.activeTag : styles.inactiveTag)} title={tagText}>
-        {tagText}
-      </Tag>
-    );
-  };
 
   if (!schemesData.uhc && !schemesData.shif && !schemesData.tsc && !schemesData.pomsf) {
     return (
@@ -174,28 +103,28 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
       {schemesData.uhc && (
         <>
           <span className={styles.separator}>&middot;</span>
-          {renderSchemeTag(schemesData.uhc, 'UHC')}
+          <SchemeTag schemeInfo={schemesData.uhc} displayName={SchemeName.UHC} />
         </>
       )}
 
       {schemesData.shif && (
         <>
           <span className={styles.separator}>&middot;</span>
-          {renderSchemeTag(schemesData.shif, 'SHIF')}
+          <SchemeTag schemeInfo={schemesData.shif} displayName={SchemeName.SHIF} />
         </>
       )}
 
       {schemesData.tsc && (
         <>
           <span className={styles.separator}>&middot;</span>
-          {renderSchemeTag(schemesData.tsc, 'TSC')}
+          <SchemeTag schemeInfo={schemesData.tsc} displayName={SchemeName.TSC} />
         </>
       )}
 
       {schemesData.pomsf && (
         <>
           <span className={styles.separator}>&middot;</span>
-          {renderSchemeTag(schemesData.pomsf, 'POMSF')}
+          <SchemeTag schemeInfo={schemesData.pomsf} displayName={SchemeName.POMSF} />
         </>
       )}
     </div>
