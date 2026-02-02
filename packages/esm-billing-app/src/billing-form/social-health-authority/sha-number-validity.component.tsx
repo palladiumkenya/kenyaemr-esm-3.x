@@ -1,12 +1,12 @@
 import { ActionableNotification, Form, InlineLoading, InlineNotification, Tooltip } from '@carbon/react';
 import { CheckboxCheckedFilled, Information } from '@carbon/react/icons';
 import { formatDate, navigate, useConfig, usePatient } from '@openmrs/esm-framework';
-import { isWithinInterval } from 'date-fns';
-import React from 'react';
+import { isWithinInterval, parseISO } from 'date-fns';
+import React, { useMemo } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { BillingConfig } from '../../config-schema';
-import { useSHAEligibility } from '../hie.resource';
+import { type Scheme, useSHAEligibility } from '../hie.resource';
 import styles from './sha-number-validity.scss';
 
 type SHANumberValidityProps = {
@@ -26,15 +26,109 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
 
   const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
 
-  const isRegisteredOnSHA = data?.status === 1;
-  const hasCrNumber = !!data?.memberCrNumber && data.memberCrNumber.length > 0;
+  const isSchemeEligibleAndActive = (scheme: Scheme): boolean => {
+    if (!scheme?.coverage) {
+      return false;
+    }
 
-  const isActive = isRegisteredOnSHA
-    ? isWithinInterval(new Date(), {
-        start: new Date(data?.coverageStartDate),
-        end: new Date(data?.coverageEndDate),
-      })
-    : false;
+    if (scheme.coverage.status !== '1') {
+      return false;
+    }
+
+    try {
+      const now = new Date();
+      const startDate = parseISO(scheme.coverage.startDate);
+      const endDate = parseISO(scheme.coverage.endDate);
+      return isWithinInterval(now, { start: startDate, end: endDate });
+    } catch (error) {
+      console.error('Error parsing dates:', error);
+      return false;
+    }
+  };
+
+  const getSchemeEligibility = (
+    schemes: Scheme[],
+    schemeName: string,
+  ): { eligible: boolean; scheme: Scheme | null } => {
+    const schemeMatches = schemes.filter((s) => s.schemeName.toUpperCase() === schemeName.toUpperCase());
+
+    if (schemeMatches.length === 0) {
+      return { eligible: false, scheme: null };
+    }
+
+    const primaryScheme = schemeMatches.find((s) => s.memberType === 'PRIMARY');
+    if (primaryScheme && isSchemeEligibleAndActive(primaryScheme)) {
+      return { eligible: true, scheme: primaryScheme };
+    }
+
+    const beneficiaryScheme = schemeMatches.find((s) => s.memberType === 'BENEFICIARY');
+    if (beneficiaryScheme && isSchemeEligibleAndActive(beneficiaryScheme)) {
+      return { eligible: true, scheme: beneficiaryScheme };
+    }
+
+    return { eligible: false, scheme: schemeMatches[0] };
+  };
+
+  const eligibilityInfo = useMemo(() => {
+    if (!data?.schemes || data.schemes.length === 0) {
+      return {
+        isRegisteredOnSHA: false,
+        hasCrNumber: false,
+        isActive: false,
+        activeSchemes: [],
+        coverageStartDate: null,
+        coverageEndDate: null,
+        message: data?.statusDesc || '',
+      };
+    }
+
+    const uhc = getSchemeEligibility(data.schemes, 'UHC');
+    const shif = getSchemeEligibility(data.schemes, 'SHIF');
+    const tsc = getSchemeEligibility(data.schemes, 'TSC');
+    const pomsf = getSchemeEligibility(data.schemes, 'POMSF');
+
+    const activeSchemes = [];
+    if (uhc.eligible) {
+      activeSchemes.push('PHC');
+    }
+    if (shif.eligible) {
+      activeSchemes.push('SHIF');
+    }
+    if (tsc.eligible) {
+      activeSchemes.push('TSC');
+    }
+    if (pomsf.eligible) {
+      activeSchemes.push('POMSF');
+    }
+
+    const activeSchemesList = [uhc.scheme, shif.scheme, tsc.scheme, pomsf.scheme].filter(
+      (s) => s && isSchemeEligibleAndActive(s),
+    );
+
+    let coverageStartDate = null;
+    let coverageEndDate = null;
+
+    if (activeSchemesList.length > 0) {
+      const startDates = activeSchemesList.map((s) => parseISO(s.coverage.startDate));
+      const endDates = activeSchemesList.map((s) => parseISO(s.coverage.endDate));
+      coverageStartDate = new Date(Math.min(...startDates.map((d) => d.getTime())));
+      coverageEndDate = new Date(Math.max(...endDates.map((d) => d.getTime())));
+    }
+
+    const hasCrNumber = !!data.memberCrNumber && data.memberCrNumber.length > 0;
+    const isActive = activeSchemes.length > 0;
+    const isRegisteredOnSHA = data.statusCode === '10'; // Member found
+
+    return {
+      isRegisteredOnSHA,
+      hasCrNumber,
+      isActive,
+      activeSchemes,
+      coverageStartDate,
+      coverageEndDate,
+      message: data.statusDesc || '',
+    };
+  }, [data]);
 
   if (!isSHA) {
     return null;
@@ -76,50 +170,55 @@ const SHANumberValidity: React.FC<SHANumberValidityProps> = ({ paymentMethod, pa
     );
   }
 
-  if (!hasCrNumber) {
+  if (!eligibilityInfo.hasCrNumber) {
     return (
       <InlineNotification
         title={t('hieVerificationFailure', 'HIE verification failure')}
-        subtitle={`${data?.message ?? ''}.${data?.possibleSolution ?? ''}`}
+        subtitle={eligibilityInfo.message}
         className={styles.missingSHANumber}
       />
     );
   }
 
-  const renderInsurerCard = (insurerValue: string, cardClass: string) => (
+  const renderSchemeCard = (schemeValue: string, cardClass: string) => (
     <Form className={styles.formContainer}>
       <div className={cardClass}>
-        <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
-          <span className={styles.hieInsurerTitle}>{t('insurer', 'Insurer:')}</span>{' '}
-          <span className={styles.hieInsurerValue}>{insurerValue}</span>
-          {isActive && (
+        <div className={eligibilityInfo.isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+          <span className={styles.hieInsurerTitle}>
+            {eligibilityInfo.isActive ? t('activeSchemes', 'Active Schemes:') : t('scheme', 'Scheme:')}
+          </span>{' '}
+          <span className={styles.hieInsurerValue}>{schemeValue}</span>
+          {eligibilityInfo.isActive && eligibilityInfo.coverageStartDate && (
             <Tooltip
               className={styles.tooltip}
               align="bottom"
-              label={`Active from ${formatDate(new Date(data?.coverageStartDate))}`}>
+              label={`${t('activeFrom', 'Active from')} ${formatDate(eligibilityInfo.coverageStartDate)}`}>
               <button className="sb-tooltip-trigger" type="button">
                 <Information />
               </button>
             </Tooltip>
           )}
         </div>
-        <div className={isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
+        <div className={eligibilityInfo.isActive ? styles.hieCardItemActive : styles.hieCardItemInActive}>
           <CheckboxCheckedFilled />
-          <span className={isActive ? styles.activeSubscription : styles.inActiveSubscription}>
-            {isActive ? t('active', 'Active') : t('inactive', 'Inactive')}
+          <span className={eligibilityInfo.isActive ? styles.activeSubscription : styles.inActiveSubscription}>
+            {eligibilityInfo.isActive ? t('active', 'Active') : t('inactive', 'Inactive')}
           </span>
         </div>
       </div>
     </Form>
   );
 
-  if (hasCrNumber) {
-    if (isRegisteredOnSHA) {
-      return renderInsurerCard('PHC | SHIF | ECCIF', styles.hieCard);
+  if (eligibilityInfo.hasCrNumber) {
+    if (eligibilityInfo.isRegisteredOnSHA && eligibilityInfo.activeSchemes.length > 0) {
+      const schemeValue = eligibilityInfo.activeSchemes.join(' | ');
+      return renderSchemeCard(schemeValue, styles.hieCard);
     } else {
-      return renderInsurerCard('PHC', styles.hieCardPHC);
+      return renderSchemeCard('PHC', styles.hieCardPHC);
     }
   }
+
+  return null;
 };
 
 export default SHANumberValidity;
