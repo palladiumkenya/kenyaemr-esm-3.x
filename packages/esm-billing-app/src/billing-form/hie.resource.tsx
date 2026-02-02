@@ -7,63 +7,85 @@ export interface EligibilityResponse {
   requestIdNumber: string;
   memberCrNumber: string;
   fullName: string;
-  memberType: string;
-  coverageStartDate: Date;
-  coverageEndDate: Date;
-  status: number;
-  message: string;
-  reason: string;
-  possibleSolution: null;
-  coverageType: string;
-  primaryContributor: null;
-  employerDetails: EmployerDetails;
-  dependants: Array<unknown>;
-  active: boolean;
-}
-
-export interface EmployerDetails {
-  employerName: string;
-  jobGroup: string;
-  scheme: Scheme;
+  statusCode: string;
+  statusDesc: string;
+  schemes: Array<Scheme>;
 }
 
 export interface Scheme {
-  schemeCode: string;
   schemeName: string;
-  schemeCategoryCode: string;
-  schemeCategoryName: string;
-  memberPolicyStartDate: string;
-  memberPolicyEndDate: string;
-  joinDate: string;
-  leaveDate: string;
+  schemeId: number;
+  memberType: 'PRIMARY' | 'BENEFICIARY';
+  policy: {
+    startDate: string;
+    endDate: string;
+    number: string;
+  };
+  coverage: {
+    startDate: string;
+    endDate: string;
+    message: string;
+    reason: string;
+    possibleSolution: string | null;
+    status: string;
+  };
+  principalContributor: {
+    idNumber: string;
+    idType: string;
+    crNumber: string;
+    name: string;
+    relationship: string | null;
+    employmentType: string;
+    employerDetails: {
+      name: string;
+      jobGroup: string | null;
+    };
+  };
+  beneficiaryOf: Array<Beneficiary>;
 }
 
-type HIEEligibilityResponse = {
-  insurer: string;
-  inforce: boolean;
-  start: string;
-  eligibility_response: EligibilityResponse;
-};
+export interface Beneficiary {
+  idNumber: string;
+  idType: string;
+  crNumber: string;
+  name: string;
+  relationship: string;
+}
+
+export const SCHEME_IDS = {
+  UHC: 1,
+  SHIF: 2,
+  TSC: 3,
+  POMSF: 4,
+} as const;
+
+export const SCHEME_NAMES = {
+  1: 'UHC',
+  2: 'SHIF',
+  3: 'TSC',
+  4: 'POMSF',
+} as const;
 
 export const useSHAEligibility = (patientUuid: string, shaIdentificationNumber?: fhir.Identifier[]) => {
   const { patient } = usePatient(patientUuid);
   const { nationalIdUUID } = useConfig<BillingConfig>();
+
   const nationalId = patient?.identifier
     ?.filter((identifier) => identifier)
     .filter((identifier) => identifier?.type?.coding?.some((coding) => coding?.code === nationalIdUUID))
     ?.at(0)?.value;
 
   const url =
-    shaIdentificationNumber?.length > 0
-      ? `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?patientUuid=${patientUuid}&nationalId=${nationalId}`
-      : undefined; // this is to avoid making the request if the patient does not have a SHA Id.
-  const { data, error, isLoading, mutate } = useSWR<{ data: Array<HIEEligibilityResponse> }>(url, openmrsFetch, {
+    shaIdentificationNumber?.length > 0 && nationalId
+      ? `${restBaseUrl}/insuranceclaims/CoverageEligibilityRequest?nationalId=${nationalId}`
+      : undefined;
+
+  const { data, error, isLoading, mutate } = useSWR<{ data: EligibilityResponse }>(url, openmrsFetch, {
     errorRetryCount: 0,
   });
+
   return {
-    data: data?.data?.[0]?.eligibility_response
-      ? { ...(JSON.parse(data.data[0].eligibility_response as unknown as string) as EligibilityResponse) }
-      : undefined,
+    data: data?.data,
     isLoading,
     error,
     mutate,

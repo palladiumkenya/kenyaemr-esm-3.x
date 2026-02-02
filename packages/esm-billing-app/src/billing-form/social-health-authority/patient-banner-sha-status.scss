@@ -7,6 +7,7 @@
   display: flex;
   align-items: center;
   gap: layout.$spacing-02;
+  flex-wrap: wrap;
 }
 
 .navDivider {
@@ -17,8 +18,14 @@
 
 .tag {
   margin: layout.$spacing-02 0;
-  white-space: nowrap;
-  min-width: fit-content;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 400px;
+
+  :global(.cds--tag__label) {
+    white-space: normal;
+    word-break: break-word;
+  }
 }
 
 .statusTag {
