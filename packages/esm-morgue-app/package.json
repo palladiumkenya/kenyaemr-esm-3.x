@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-morgue-app",
-  "version": "5.4.2",
+  "version": "5.4.3",
   "description": "morgue app for KenyaEMR",
   "keywords": [
     "openmrs"

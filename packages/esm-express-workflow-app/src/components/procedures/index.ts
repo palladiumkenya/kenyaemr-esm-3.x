@@ -1,7 +1,7 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
-import { moduleName } from '../../constants';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { moduleName } from '../../constants';
 import ProceduresTabs from './procedures-tabs.component';
 
 const options = {
@@ -10,11 +10,11 @@ const options = {
 };
 
 export const proceduresDashboard = getSyncLifecycle(ProceduresTabs, options);
-// t('Procedures', 'Procedures')
+// t('procedures', 'Procedures')
 export const proceduresLeftPanelLink = getSyncLifecycle(
   createDashboardLink({
     path: 'procedures',
-    title: 'Procedures',
+    title: 'procedures',
     icon: 'omrs-icon-movement',
   }),
   options,

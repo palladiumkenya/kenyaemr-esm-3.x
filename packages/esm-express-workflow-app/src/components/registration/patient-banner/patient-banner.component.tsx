@@ -1,10 +1,9 @@
 import React, { useMemo } from 'react';
 import classNames from 'classnames';
-import { getCoreTranslation } from '@openmrs/esm-translations';
 import { GenderFemale, GenderMale } from '@carbon/react/icons';
 import { age, ExtensionSlot, formatDate, getPatientName, parseDate } from '@openmrs/esm-framework';
 import styles from './patient-banner.scss';
-import { Tag } from '@carbon/react';
+import { InlineLoading, Tag } from '@carbon/react';
 import { EligibilityResponse } from '../type';
 import { getEligibilityTags, maskName } from '../helper';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +47,7 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
   patient,
   renderedFrom,
   eligibilityData,
-  isEligibilityLoading,
+  isEligibilityLoading = false,
   crNumber,
 }) => {
   const { t } = useTranslation();
@@ -61,8 +60,13 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
     if (isEligibilityLoading) {
       return [];
     }
+    if (!eligibilityData) {
+      return [];
+    }
     return getEligibilityTags(patient, eligibilityData);
   }, [patient, eligibilityData, isEligibilityLoading]);
+
+  const shouldShowEligibilitySection = isEligibilityLoading || eligibilityTags.length > 0;
 
   return (
     <div className={styles.patientInfo}>
@@ -89,27 +93,31 @@ export const EnhancedPatientBannerPatientInfo: React.FC<EnhancedPatientBannerPat
             <span className={styles.separator}>&middot;</span>
           </>
         )}
+
         <div className={styles.identifiers}>
           <span>
-            {t('CRNumber', 'CR Number')}: {crNumber}
+            {t('CRNumber', 'CR Number')}: {crNumber || '--'}
           </span>
         </div>
-        {(crNumber !== '--' || eligibilityTags.length > 0 || isEligibilityLoading) && (
+
+        {((crNumber && crNumber !== '--') || shouldShowEligibilitySection) && (
           <span className={styles.separator}>&middot;</span>
         )}
-        <div className={styles.eligibilityTags}>
-          {isEligibilityLoading ? (
-            <Tag type="blue" size="md">
-              {t('checkingEligibility', 'Checking eligibility' + '...')}
-            </Tag>
-          ) : (
-            eligibilityTags.map((tag, index) => (
-              <Tag key={index} type={tag.type} size="md" title={tag.text}>
-                {tag.text}
-              </Tag>
-            ))
-          )}
-        </div>
+
+        {shouldShowEligibilitySection && (
+          <div className={styles.eligibilityTags}>
+            {isEligibilityLoading ? (
+              <InlineLoading description={t('checkingEligibility', 'Checking eligibility...')} />
+            ) : (
+              eligibilityTags.map((tag, index) => (
+                <Tag key={index} type={tag.type} size="md" title={tag.text} className={styles.eligibilityTag}>
+                  {tag.text}
+                </Tag>
+              ))
+            )}
+          </div>
+        )}
+
         <ExtensionSlot className={styles.extensionSlot} name="patient-banner-bottom-slot" state={extensionState} />
       </div>
     </div>

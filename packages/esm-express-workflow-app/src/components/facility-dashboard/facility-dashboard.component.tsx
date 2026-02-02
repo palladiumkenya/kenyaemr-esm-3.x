@@ -8,6 +8,7 @@ import AdmittedOPDLineChart from './components/admitted-opd-line-chart.component
 import { DashboardConfig } from '../../types/index';
 import { useFacilityDashboardData } from './hooks/useFacilityDashboardData';
 import styles from './facility-dashboard.scss';
+import { useTranslation } from 'react-i18next';
 
 const FacilityDashboard: React.FC = () => {
   const params = useParams();
@@ -15,6 +16,7 @@ const FacilityDashboard: React.FC = () => {
   const today = useMemo(() => new Date().toISOString().split('T')[0], []);
   const [dateRange, setDateRange] = useState({ startDate: today, endDate: today });
   const { data: dashboardData, error, isLoading } = useFacilityDashboardData(dateRange.startDate, dateRange.endDate);
+  const { t } = useTranslation();
 
   const dashboards = useMemo(() => {
     const ungrouped = assignedExtensions
@@ -38,7 +40,7 @@ const FacilityDashboard: React.FC = () => {
     <div>
       <div className={styles.homePageWrapper}>
         <section style={{ width: '100%' }}>
-          <HomeHeader title="Dashboard" onDateChange={handleDateChange} />
+          <HomeHeader title={t('dashboard', 'Dashboard')} onDateChange={handleDateChange} />
 
           {!dashboards.length ? (
             <div className={styles.dashboardView}>No dashboards available.</div>
@@ -57,19 +59,19 @@ const FacilityDashboard: React.FC = () => {
               <div className={styles.secondRow}>
                 <div className={styles.metricTile}>
                   <DashboardMetric
-                    title="General OPD Attendance <5 years"
+                    title={t('generalOpdAttendanceUnder5', 'General OPD Attendance <5 years')}
                     value={dashboardData?.metrics.opdUnder5 ?? 0}
                   />
                 </div>
                 <div className={styles.metricTile}>
                   <DashboardMetric
-                    title="General OPD Attendance >5 years"
+                    title={t('generalOpdAttendanceOver5', 'General OPD Attendance >5 years')}
                     value={dashboardData?.metrics.opdOver5 ?? 0}
                   />
                 </div>
                 <div className={styles.metricTile}>
                   <DashboardMetric
-                    title="Number of Emergency Cases Seen"
+                    title={t('emergencyCases', 'Number of Emergency Cases Seen')}
                     value={dashboardData?.metrics.emergencyCases ?? 0}
                   />
                 </div>
@@ -80,13 +82,13 @@ const FacilityDashboard: React.FC = () => {
                 <div className={styles.leftSection}>
                   <div className={styles.verticalMetricTile}>
                     <DashboardMetric
-                      title="Total Number of Referrals - IN"
+                      title={t('totalReferralsIn', 'Total Number of Referrals - IN')}
                       value={dashboardData?.metrics.referralsIn ?? 0}
                     />
                   </div>
                   <div className={styles.verticalMetricTile}>
                     <DashboardMetric
-                      title="Total Number of Referrals - OUT"
+                      title={t('totalReferralsOut', 'Total Number of Referrals - OUT')}
                       value={dashboardData?.metrics.referralsOut ?? 0}
                     />
                   </div>

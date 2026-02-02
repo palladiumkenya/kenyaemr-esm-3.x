@@ -1,8 +1,8 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import TriageDashboard from './dashboard.component';
 import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
+import TriageDashboard from './dashboard.component';
 
 const options = {
   featureName: 'express-workflow',

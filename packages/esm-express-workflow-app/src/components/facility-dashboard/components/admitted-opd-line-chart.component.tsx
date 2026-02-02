@@ -28,7 +28,7 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
   const opdData = Array.from(opdByDay.entries())
     .sort(([a], [b]) => new Date(a).getTime() - new Date(b).getTime())
     .map(([day, value]) => ({
-      group: 'OPD Visits',
+      group: t('opdVisits', 'OPD Visits'),
       key: day,
       value,
     }));
@@ -38,7 +38,7 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
     admissions
       ?.sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime())
       ?.map((item) => ({
-        group: 'Admissions',
+        group: t('admissions', 'Admissions'),
         key: item.day,
         value: item.value,
       })) ?? [];
@@ -50,7 +50,7 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
     axes: {
       left: {
         mapsTo: 'value',
-        title: 'No. of Patients',
+        title: t('noOfPatients', 'No. of Patients'),
       },
       bottom: {
         scaleType: ScaleTypes.TIME,
@@ -71,8 +71,8 @@ function AdmittedOPDLineChart({ opd: opd, admissions }: DashboardChartProps) {
     },
     color: {
       scale: {
-        Admissions: red60, // Red for critical/urgent admissions
-        'OPD Visits': blue60, // Blue for regular outpatient visits
+        [t('admissions', 'Admissions')]: red60, // Red for critical/urgent admissions
+        [t('opdVisits', 'OPD Visits')]: blue60, // Blue for regular outpatient visits
       },
     },
     height: '200px',

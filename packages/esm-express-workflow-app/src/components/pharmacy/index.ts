@@ -1,20 +1,21 @@
 import { getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 
-import Pharmacy from './pharmacy.component';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { moduleName } from '../../constants';
 import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
 import PharmacyTabs from './pharmacy-tabs.component';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import Pharmacy from './pharmacy.component';
 
 const options = {
   featureName: 'express-workflow',
   moduleName,
 };
 
+// t('pharmacy', 'Pharmacy')
 export const pharmacyLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'pharmacy',
-    title: 'Pharmacy',
+    title: 'pharmacy',
   }),
   options,
 );
@@ -25,7 +26,7 @@ export const pharmacyTabs = getSyncLifecycle(PharmacyTabs, options);
 export const pharmacyPatientChartDashboardLink = getSyncLifecycle(
   createDashboardLink({
     path: 'pharmacy',
-    title: 'Prescription',
+    title: 'prescription',
     icon: 'omrs-icon-medication',
   }),
   options,

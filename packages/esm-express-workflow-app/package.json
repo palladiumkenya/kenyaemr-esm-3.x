@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-express-workflow-app",
-  "version": "5.4.2",
+  "version": "5.4.3",
   "description": "Express workflow app for OpenMRS 3",
   "keywords": [
     "openmrs",

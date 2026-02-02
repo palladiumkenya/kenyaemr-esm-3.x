@@ -1,6 +1,6 @@
 {
   "name": "@kenyaemr/esm-lab-manifest-app",
-  "version": "5.4.2",
+  "version": "5.4.3",
   "description": "lab-manifest app for KenyaEMR",
   "keywords": [
     "openmrs"

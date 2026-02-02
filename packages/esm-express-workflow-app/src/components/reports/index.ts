@@ -1,8 +1,8 @@
 import { getSyncLifecycle } from '@openmrs/esm-framework';
 
 import { moduleName } from '../../constants';
-import ReportsDashboard from './dashboard.component';
 import { createLeftPanelLink } from '../../shared/dashboard-link/dashboard-link.component';
+import ReportsDashboard from './dashboard.component';
 
 const options = {
   featureName: 'express-workflow',
@@ -10,11 +10,11 @@ const options = {
 };
 
 export const reportsDashboard = getSyncLifecycle(ReportsDashboard, options);
-// t('Reports', 'Reports')
+// t('reports', 'Reports')
 export const reportsDashboardLink = getSyncLifecycle(
   createLeftPanelLink({
     name: 'reports',
-    title: 'Reports',
+    title: 'reports',
   }),
   options,
 );
