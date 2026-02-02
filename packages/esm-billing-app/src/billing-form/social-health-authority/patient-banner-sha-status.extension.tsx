@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { InlineLoading, InlineNotification, Tag } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useConfig, usePatient } from '@openmrs/esm-framework';
 import classNames from 'classnames';
-import { isWithinInterval } from 'date-fns';
 import { useSHAEligibility } from '../hie.resource';
 import { BillingConfig } from '../../config-schema';
 import styles from './patient-banner-sha-status.scss';
+import { getSchemeEligibility } from './helper';
+import { EligibilityStatusCode, SchemeName } from './constant';
+import SchemeTag from './scheme-tag.component';
 
 interface PatientBannerShaStatusProps {
   patientUuid: string;
@@ -23,15 +25,31 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
   );
 
   const { data, isLoading: isLoadingHIEEligibility, error } = useSHAEligibility(patientUuid, shaIdentificationNumber);
-  const isRegisteredOnSHA = data?.status === 1;
-  const isActive = isRegisteredOnSHA
-    ? isWithinInterval(new Date(), {
-        start: new Date(data?.coverageStartDate),
-        end: new Date(data?.coverageEndDate),
-      })
-    : false;
-  const civilServantScheme = data?.coverageType === 'CIVIL_SERVANT' && data?.status === 1;
-  const hasCrNumber = !!data?.memberCrNumber && data.memberCrNumber.length > 0;
+
+  const schemesData = useMemo(() => {
+    if (!data?.schemes || data.schemes.length === 0) {
+      return {
+        uhc: null,
+        shif: null,
+        tsc: null,
+        pomsf: null,
+        hasCrNumber: false,
+      };
+    }
+
+    const uhc = getSchemeEligibility(data.schemes, SchemeName.UHC);
+    const shif = getSchemeEligibility(data.schemes, SchemeName.SHIF);
+    const tsc = getSchemeEligibility(data.schemes, SchemeName.TSC);
+    const pomsf = getSchemeEligibility(data.schemes, SchemeName.POMSF);
+
+    return {
+      uhc: uhc.scheme ? uhc : null,
+      shif: shif.scheme ? shif : null,
+      tsc: tsc.scheme ? tsc : null,
+      pomsf: pomsf.scheme ? pomsf : null,
+      hasCrNumber: !!data.memberCrNumber && data.memberCrNumber.length > 0,
+    };
+  }, [data]);
 
   const isPatientChart = renderedFrom === 'patient-chart';
 
@@ -56,36 +74,59 @@ const PatientBannerShaStatus: React.FC<PatientBannerShaStatusProps> = ({ patient
     );
   }
 
-  const renderStatusTag = (isActiveStatus: boolean, schemeName: string) => (
-    <Tag className={classNames(styles.tag, isActiveStatus ? styles.activeTag : styles.inactiveTag)}>
-      <span className={styles.schemeName}>{schemeName}</span>
-      <span>{isActiveStatus ? t('active', 'Active') : t('inactive', 'Inactive')}</span>
-    </Tag>
-  );
+  if (!data || data.statusCode !== EligibilityStatusCode.MEMBER_FOUND) {
+    return (
+      <div>
+        <span className={styles.separator}>&middot;</span>
+        <Tag className={classNames(styles.tag, styles.inactiveTag)}>
+          <span className={styles.schemeName}>{t('sha', 'SHA')}</span>
+          <span>{t('notRegistered', 'Not Registered')}</span>
+        </Tag>
+      </div>
+    );
+  }
 
-  const renderCivilServantTag = (isEligible: boolean, schemeName: string) => (
-    <Tag className={classNames(styles.tag, isEligible ? styles.activeTag : styles.inactiveTag)}>
-      <span className={styles.schemeName}>{schemeName}</span>
-      <span>{isEligible ? t('eligible', 'Eligible') : t('notEligible', 'Not Eligible')}</span>
-    </Tag>
-  );
+  if (!schemesData.uhc && !schemesData.shif && !schemesData.tsc && !schemesData.pomsf) {
+    return (
+      <div>
+        <span className={styles.separator}>&middot;</span>
+        <Tag className={classNames(styles.tag, styles.inactiveTag)}>
+          <span className={styles.schemeName}>{t('sha', 'SHA')}</span>
+          <span>{t('noSchemesFound', 'No Schemes Found')}</span>
+        </Tag>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <span className={styles.separator}>&middot;</span>
+      {schemesData.uhc && (
+        <>
+          <span className={styles.separator}>&middot;</span>
+          <SchemeTag schemeInfo={schemesData.uhc} displayName={SchemeName.UHC} />
+        </>
+      )}
 
-      {renderStatusTag(isActive || hasCrNumber, t('phc', 'PHC'))}
+      {schemesData.shif && (
+        <>
+          <span className={styles.separator}>&middot;</span>
+          <SchemeTag schemeInfo={schemesData.shif} displayName={SchemeName.SHIF} />
+        </>
+      )}
 
-      <span className={styles.separator}>&middot;</span>
+      {schemesData.tsc && (
+        <>
+          <span className={styles.separator}>&middot;</span>
+          <SchemeTag schemeInfo={schemesData.tsc} displayName={SchemeName.TSC} />
+        </>
+      )}
 
-      {renderStatusTag(isActive, t('shif', 'SHIF'))}
-
-      <span className={styles.separator}>&middot;</span>
-
-      {renderStatusTag(isActive, t('eccif', 'ECCIF'))}
-
-      <span className={styles.separator}>&middot;</span>
-      {renderCivilServantTag(civilServantScheme, t('civilServantScheme', 'CIVIL SERVANT SCHEME'))}
+      {schemesData.pomsf && (
+        <>
+          <span className={styles.separator}>&middot;</span>
+          <SchemeTag schemeInfo={schemesData.pomsf} displayName={SchemeName.POMSF} />
+        </>
+      )}
     </div>
   );
 };
