@@ -43,7 +43,7 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
   const isTablet = useLayoutType() === 'tablet';
   const { userRoleScopeFormSchema } = UserRoleScopeFormSchema();
   const { stockOperations, loadingStock } = useStockOperationTypes();
-  const { stockLocations } = useStockTagLocations();
+  const { stockLocations, isLoading: loadinglocation } = useStockTagLocations();
   const { rolesConfig, error } = useSystemUserRoleConfigSetting();
   const { items, loadingRoleScope } = useUserRoleScopes();
 
@@ -266,7 +266,7 @@ const UserRoleScopeWorkspace: React.FC<UserRoleScopeWorkspaceProps> = ({
                     hasInventoryRole={hasInventoryRole}
                     stockOperations={stockOperations}
                     stockLocations={stockLocations}
-                    loadingStock={loadingStock}
+                    loadingStock={loadingStock || loadinglocation}
                     roleScopeformMethods={roleScopeformMethods}
                     userRoleScopeInitialValues={userRoleScopeInitialValues}
                   />
