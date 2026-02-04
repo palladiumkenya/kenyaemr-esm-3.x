@@ -1,6 +1,7 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @use '@carbon/styles/scss/colors';
+@use '@carbon/layout';
 
 .main {
   display: flex;
@@ -12,6 +13,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .container {
@@ -21,28 +23,69 @@
   flex-direction: column;
   align-items: center;
   border: 0.5px solid colors.$gray-30;
-  width: 23rem;
+  width: 60rem;
+  padding: layout.$spacing-05;
 }
 
 .title {
   display: flex;
-  align-items: center;
-  padding-bottom: 0.25rem;
-  margin-bottom: 0.25rem;
+  padding-bottom: layout.$spacing-03;
+  margin-bottom: layout.$spacing-03;
   border-bottom: 0.5px solid colors.$gray-30;
   width: 100%;
   justify-content: center;
+  flex-direction: column;
+  align-items: center;
 
   h3 {
-    @include type.type-style('body-compact-02');
-  }
-
-  h4 {
-    @include type.type-style('body-compact-01');
+    @include type.type-style('heading-compact-01');
+    text-align: center;
+    margin: 0 0 layout.$spacing-02;
   }
 
   img {
-    margin-left: 0.25rem;
+    margin-bottom: layout.$spacing-03;
+    object-fit: contain;
+  }
+}
+
+.tagline {
+  @include type.type-style('body-compact-01');
+  text-align: center;
+  color: colors.$gray-70;
+  margin: 0;
+  max-width: 28rem;
+}
+
+.contacts {
+  display: flex;
+  flex-direction: column;
+  gap: layout.$spacing-02;
+  width: 100%;
+  padding: layout.$spacing-03 0;
+  margin-bottom: layout.$spacing-03;
+  border-bottom: 0.5px solid colors.$gray-30;
+  align-items: center;
+
+  a {
+    color: colors.$blue-60;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.contactItem {
+  display: flex;
+  align-items: center;
+  gap: layout.$spacing-02;
+  @include type.type-style('body-compact-01');
+
+  svg {
+    flex-shrink: 0;
+    color: colors.$gray-70;
   }
 }
 
@@ -55,4 +98,9 @@
     @include type.type-style('label-01');
     margin-bottom: 0.25rem;
   }
+}
+
+.frontendModules {
+  width: 100%;
+  padding: layout.$spacing-05;
 }
