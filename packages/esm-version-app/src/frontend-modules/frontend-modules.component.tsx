@@ -19,7 +19,7 @@ const FrontendModule: React.FC = () => {
         name: module.name,
         version: module.version ?? t('noVersionFound', 'No version found'),
       })),
-    [installedModules],
+    [installedModules, t],
   );
 
   return (
