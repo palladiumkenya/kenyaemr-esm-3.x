@@ -38,13 +38,13 @@ const SearchBar: React.FC = () => {
   const [searchedNationalId, setSearchedNationalId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [syncedPatients, setSyncedPatients] = useState<Set<string>>(new Set());
-  const [isEligibilityReady, setIsEligibilityReady] = useState(false);
 
   const [selectedIdentifierItem, setSelectedIdentifierItem] = useState<IdentifierTypeItem | null>(
     defaultIdentifierType || null,
   );
 
-  const { data: eligibilityResponse, isLoading: isEligibilityLoading } = useSHAEligibility(searchedNationalId);
+  const { eligibilityData: eligibilityResponse, isLoading: isEligibilityLoading } =
+    useSHAEligibility(searchedNationalId);
   const { patient: localPatientData, isLoading: isLocalSearching } = usePatient(searchQuery);
 
   useEffect(() => {
@@ -56,14 +56,6 @@ const SearchBar: React.FC = () => {
     }
   }, [localPatientData, searchQuery, isLocalSearching]);
 
-  useEffect(() => {
-    if (searchedNationalId && !isEligibilityLoading) {
-      setIsEligibilityReady(true);
-    } else if (!searchedNationalId) {
-      setIsEligibilityReady(false);
-    }
-  }, [searchedNationalId, isEligibilityLoading]);
-
   const handleIdentifierTypeChange = (selectedItem: IdentifierTypeItem | null): void => {
     if (selectedItem) {
       setIdentifierType(selectedItem.key);
@@ -73,6 +65,7 @@ const SearchBar: React.FC = () => {
       setSelectedIdentifierItem(null);
     }
   };
+
   const getLocalPatientNationalIds = (results: LocalResponse | null): Set<string> => {
     const nationalIds = new Set<string>();
 
@@ -141,7 +134,6 @@ const SearchBar: React.FC = () => {
     setSearchedNationalId('');
     setShowDependentsForPatient(new Set());
     setSearchQuery('');
-    setIsEligibilityReady(false);
     setSelectedIdentifierItem(defaultIdentifierType || null);
     setIdentifierType(defaultIdentifierType?.key || '');
   };
@@ -190,6 +182,7 @@ const SearchBar: React.FC = () => {
                 otpExpiryMinutes={otpExpirationDurationInminutes}
                 hieSearchResults={searchResults}
                 eligibilityResponse={eligibilityResponse}
+                isEligibilityLoading={isEligibilityLoading}
               />
             </div>
           </div>
@@ -214,6 +207,7 @@ const SearchBar: React.FC = () => {
                   otpExpiryMinutes={otpExpirationDurationInminutes}
                   localSearchResults={localSearchResults}
                   eligibilityResponse={eligibilityResponse}
+                  isEligibilityLoading={isEligibilityLoading}
                 />
               ))}
             </div>
@@ -240,7 +234,6 @@ const SearchBar: React.FC = () => {
     setSyncedPatients(new Set());
     setSearchedNationalId('');
     setShowDependentsForPatient(new Set());
-    setIsEligibilityReady(false);
 
     try {
       setSearchQuery(identifier.trim());

@@ -120,41 +120,54 @@ export interface IdentifierTypeItem {
   name: string;
   text: string;
 }
-
 export interface EligibilityResponse {
   requestIdType: number;
   requestIdNumber: string;
   memberCrNumber: string;
   fullName: string;
-  memberType: string;
-  coverageStartDate: Date;
-  coverageEndDate: Date;
-  status: number;
-  message: string;
-  reason: string;
-  possibleSolution: null;
-  coverageType: string;
-  primaryContributor: null;
-  employerDetails: EmployerDetails;
-  dependants: Array<unknown>;
-  active: boolean;
-}
-
-export interface EmployerDetails {
-  employerName: string;
-  jobGroup: string;
-  scheme: Scheme;
+  statusCode: string;
+  statusDesc: string;
+  schemes: Scheme[];
 }
 
 export interface Scheme {
-  schemeCode: string;
   schemeName: string;
-  schemeCategoryCode: string;
-  schemeCategoryName: string;
-  memberPolicyStartDate: string;
-  memberPolicyEndDate: string;
-  joinDate: string;
-  leaveDate: string;
+  schemeId: number;
+  memberType: 'PRIMARY' | 'BENEFICIARY';
+  policy: Policy;
+  coverage: Coverage;
+  principalContributor: PrincipalContributor;
+  beneficiaryOf: any[];
+}
+
+export interface Policy {
+  startDate: string;
+  endDate: string;
+  number: string;
+}
+
+export interface Coverage {
+  startDate: string;
+  endDate: string;
+  message: string;
+  reason: string;
+  possibleSolution: string | null;
+  status: string;
+}
+
+export interface PrincipalContributor {
+  idNumber: string;
+  idType: string;
+  crNumber: string;
+  name: string;
+  relationship: string | null;
+  employmentType: string;
+  employerDetails: EmployerDetails;
+}
+
+export interface EmployerDetails {
+  name: string;
+  jobGroup: string | null;
 }
 
 export type HIEEligibilityResponse = {
@@ -164,6 +177,31 @@ export type HIEEligibilityResponse = {
   eligibility_response: EligibilityResponse | string;
   end: string;
 };
+
+export const SCHEME_IDS = {
+  UHC: 1,
+  SHIF: 2,
+  TSC: 3,
+  POMSF: 4,
+} as const;
+
+export const SCHEME_NAMES = {
+  1: 'UHC',
+  2: 'SHIF',
+  3: 'TSC',
+  4: 'POMSF',
+} as const;
+
+export const ELIGIBILITY_STATUS = {
+  NOT_ELIGIBLE: '0',
+  ELIGIBLE: '1',
+} as const;
+
+export const MEMBER_TYPE = {
+  PRIMARY: 'PRIMARY',
+  BENEFICIARY: 'BENEFICIARY',
+} as const;
+
 export interface HIEBundleResponse {
   resourceType: string;
   id: string;
