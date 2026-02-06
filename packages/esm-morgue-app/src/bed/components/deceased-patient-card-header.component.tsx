@@ -64,6 +64,9 @@ const DeceasedPatientCardHeader: React.FC<PatientCardHeaderProps> = ({ patient, 
           {showActions.printGatePass && (
             <OverflowMenuItem onClick={() => onAction('printGatePass')} itemText={t('printGatePass', 'Gate Pass')} />
           )}
+          {showActions.removeFromQueue && (
+            <OverflowMenuItem onClick={() => onAction('removeFromQueue')} itemText={t('releaseBody', 'Release body')} />
+          )}
         </OverflowMenu>
       </div>
     </div>
