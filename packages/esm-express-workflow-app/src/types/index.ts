@@ -1,4 +1,5 @@
 import { type OpenmrsResource, type OpenmrsResourceStrict, type Visit } from '@openmrs/esm-framework';
+import { MutableRefObject } from 'react';
 
 export interface DashboardConfig {
   name: string;
@@ -11,8 +12,8 @@ export type Queue = {
   name: string;
   location: OpenmrsResource;
   service: OpenmrsResource;
-  allowedPriorities: Array<OpenmrsResource>;
-  allowedStatuses: Array<OpenmrsResource>;
+  allowedPriorities?: Array<OpenmrsResource>;
+  allowedStatuses?: Array<OpenmrsResource>;
   queueRooms: Array<OpenmrsResource>;
 };
 
@@ -94,4 +95,17 @@ export type QueueFilter = {
   key: 'status' | 'priority' | 'service_awaiting' | 'service_completed';
   value: string;
   label: string;
+};
+
+export type QueueEntriesPagination = {
+  totalPages: number;
+  totalCount: number;
+  currentPage: number;
+  currentPageSize: MutableRefObject<number>;
+  paginated: boolean;
+  showNextButton: boolean;
+  showPreviousButton: boolean;
+  goTo: (page: number) => void;
+  goToNext: () => void;
+  goToPrevious: () => void;
 };

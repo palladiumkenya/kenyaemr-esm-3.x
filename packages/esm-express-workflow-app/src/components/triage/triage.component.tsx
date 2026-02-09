@@ -13,6 +13,7 @@ import { InlineLoading } from '@carbon/react';
 
 import { useQueues } from '../../hooks/useServiceQueues';
 import QueueTab from '../../shared/queue/queue-tab.component';
+import QueueSummaryCards, { QueueSummaryCard } from '../../shared/queue/queue-summary-cards.component';
 import styles from './triage.scss';
 import { Queue, QueueFilter } from '../../types';
 import { useTriageQueuesMetrics } from './triage.resource';
@@ -38,13 +39,19 @@ export default Triage;
 
 const TriageQueueTab: React.FC = () => {
   const { t } = useTranslation();
-  const [currQueue, setCurrQueue] = useState<Queue>();
-  const { queues, isLoading, error } = useQueues();
-  const [filters, setFilters] = useState<Array<QueueFilter>>([]);
   const {
     queueStatusConceptUuids: { finishedStatus, waitingStatus, inServiceStatus },
     queueServiceConceptUuids,
   } = useConfig<ExpressWorkflowConfig>();
+  const [currQueue, setCurrQueue] = useState<Queue>();
+  const [filters, setFilters] = useState<Array<QueueFilter>>([]);
+
+  const {
+    queues,
+    isLoading: isLoadingQueues,
+    error: errorLoadingQueues,
+    isValidating: isValidatingQueues,
+  } = useQueues();
 
   const triageQueues = queues
     .filter(
@@ -60,17 +67,25 @@ const TriageQueueTab: React.FC = () => {
     error: metricsError,
     isLoading: isLoadingMetrics,
     waitingEntries,
-    attendedtoEntries,
+    attendedToEntries,
+    isValidating: isValidatingMetrics,
   } = useTriageQueuesMetrics(activeQueue);
 
-  if (isLoadingMetrics) {
+  const isLoading = (isLoadingQueues || isLoadingMetrics) && !isValidatingQueues && !isValidatingMetrics;
+
+  if (isLoading) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
 
-  if (metricsError) {
-    return <ErrorState error={metricsError} headerTitle={t('errorLoadingQueues', 'Error loading queues')} />;
+  if (metricsError || errorLoadingQueues) {
+    return (
+      <ErrorState
+        error={metricsError ?? errorLoadingQueues}
+        headerTitle={t('errorLoadingQueues', 'Error loading queues')}
+      />
+    );
   }
-  const cards = [
+  const cards: Array<QueueSummaryCard> = [
     {
       title: t('clientsPatientsWaiting', 'Clients/Patients waiting'),
       value: waitingEntries.length.toString(),
@@ -83,7 +98,7 @@ const TriageQueueTab: React.FC = () => {
     },
     {
       title: t('clientsPatientsAttendedTo', 'Clients/Patients attended to'),
-      value: attendedtoEntries.length.toString(),
+      value: attendedToEntries.length.toString(),
       onClick: () => {
         setFilters((prevFilters) => [
           ...prevFilters.filter((f) => f.key !== 'status'),
@@ -94,14 +109,16 @@ const TriageQueueTab: React.FC = () => {
   ];
 
   return (
-    <QueueTab
-      queues={triageQueues}
-      navigatePath="triage"
-      usePatientChart
-      cards={cards}
-      onTabChanged={setCurrQueue}
-      filters={filters}
-      onFiltersChanged={setFilters}
-    />
+    <>
+      <QueueSummaryCards cards={cards} />
+      <QueueTab
+        queues={triageQueues}
+        navigatePath="triage"
+        usePatientChart
+        onTabChanged={setCurrQueue}
+        filters={filters}
+        onFiltersChanged={setFilters}
+      />
+    </>
   );
 };
