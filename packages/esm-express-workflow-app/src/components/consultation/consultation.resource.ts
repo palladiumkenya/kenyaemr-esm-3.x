@@ -2,7 +2,7 @@ import { openmrsFetch, restBaseUrl, useConfig, Visit } from '@openmrs/esm-framew
 import { FulfillerStatus, Order } from '@openmrs/esm-patient-common-lib';
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useEffect, useState } from 'react';
 import { Queue, QueueEntry } from '../../types';
 import { ExpressWorkflowConfig } from '../../config-schema';
 import { useQueueEntries } from '../../hooks/useServiceQueues';
@@ -25,17 +25,22 @@ export const useTotalVisits = () => {
     'YYYY-MM-DD',
   )}`;
 
-  const { data, error, isLoading, mutate } = useSWR<{ data: { results: Array<Visit> } }>(visitsUrl, openmrsFetch, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    dedupingInterval: 60000,
-  });
+  const { data, error, isLoading, mutate, isValidating } = useSWR<{ data: { results: Array<Visit> } }>(
+    visitsUrl,
+    openmrsFetch,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 60000,
+    },
+  );
 
   return {
     data: data?.data?.results,
     error,
     isLoading,
     mutate,
+    isValidating,
   };
 };
 
@@ -199,7 +204,7 @@ function useProcedureOrders(fulfillerStatus?: string) {
 }
 
 export const useInvestigationStats = (queue?: Queue) => {
-  const { isLoading: isLoadingQueueMetrics, waitingEntries } = useConsultationQueueMetrics(queue);
+  const { isLoading: isLoadingQueueMetrics, waitingEntries, isValidating } = useConsultationQueueMetrics(queue);
 
   // Fetch all investigation orders
   const {
@@ -381,6 +386,7 @@ export const useInvestigationStats = (queue?: Queue) => {
     isLoading,
     refresh,
     investigationCategorizedEntries,
+    isValidating,
   };
 };
 
@@ -389,21 +395,25 @@ export const useConsultationQueueMetrics = (queue?: Queue) => {
   const {
     queueEntries: waitingEntries,
     isLoading: isLoadingWaiting,
+    isValidating: isValidatingWaiting,
     error: waitingError,
   } = useQueueEntries({
     service: [queueServiceConceptUuids.consultationService],
     statuses: [queueStatusConceptUuids.waitingStatus, queueStatusConceptUuids.inServiceStatus],
     location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
+    startedOnOrAfter: dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ss'),
   });
 
   const _waitingEntries = useMemo(
     () => waitingEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
     [waitingEntries, queue],
   );
+
   return {
     isLoading: isLoadingWaiting,
     error: waitingError,
     waitingEntries: _waitingEntries,
+    isValidating: isValidatingWaiting,
     emergencyEntries: useMemo(
       () => _waitingEntries.filter((entry) => entry.priority.uuid === priorities?.emergencyPriorityConceptUuid),
       [_waitingEntries, priorities?.emergencyPriorityConceptUuid],

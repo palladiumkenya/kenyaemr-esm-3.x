@@ -1,62 +1,68 @@
-import { useConfig } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
-import { ExpressWorkflowConfig } from '../../config-schema';
+import dayjs from 'dayjs';
+import { useConfig } from '@openmrs/esm-framework';
+
+import { type ExpressWorkflowConfig } from '../../config-schema';
 import { useQueueEntries } from '../../hooks/useServiceQueues';
-import { Queue } from '../../types';
+import { type Queue } from '../../types';
 
 export const useTriageQueuesMetrics = (queue?: Queue) => {
-  const { queueServiceConceptUuids, queueStatusConceptUuids } = useConfig<ExpressWorkflowConfig>();
+  const { queueStatusConceptUuids } = useConfig<ExpressWorkflowConfig>();
+
   const {
-    queueEntries: waitingEntries,
-    isLoading: isLoadingWaiting,
-    error: waitingError,
+    queueEntries: allTriageEntries,
+    isLoading,
+    error,
+    isValidating: isValidatingQueueEntries,
   } = useQueueEntries({
-    service: [queueServiceConceptUuids.triageService],
-    statuses: [queueStatusConceptUuids.waitingStatus],
     location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
-  });
-  const {
-    queueEntries: inServiceEntries,
-    isLoading: isLoadingInService,
-    error: inServiceError,
-  } = useQueueEntries({
-    service: [queueServiceConceptUuids.triageService],
-    statuses: [queueStatusConceptUuids.inServiceStatus],
-    location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
-  });
-  const {
-    queueEntries: finishedEntries,
-    isLoading: isLoadingFinished,
-    error: finishedError,
-  } = useQueueEntries({
-    service: [queueServiceConceptUuids.triageService],
-    statuses: [queueStatusConceptUuids.finishedStatus],
-    location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
-  });
-  const { queueEntries: attendedtoEntries } = useQueueEntries({
-    service: [queueServiceConceptUuids.triageService],
-    statuses: [queueStatusConceptUuids.inServiceStatus, queueStatusConceptUuids.finishedStatus],
-    location: queue?.location?.uuid ? [queue.location.uuid] : undefined,
+    startedOnOrAfter: dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ss'),
   });
 
+  const queueUuid = queue?.uuid;
+
+  const waitingEntries = useMemo(
+    () =>
+      allTriageEntries.filter(
+        (entry) => entry?.queue?.uuid === queueUuid && entry?.status?.uuid === queueStatusConceptUuids.waitingStatus,
+      ),
+    [allTriageEntries, queueUuid, queueStatusConceptUuids.waitingStatus],
+  );
+
+  const inServiceEntries = useMemo(
+    () =>
+      allTriageEntries.filter(
+        (entry) => entry?.queue?.uuid === queueUuid && entry?.status?.uuid === queueStatusConceptUuids.inServiceStatus,
+      ),
+    [allTriageEntries, queueUuid, queueStatusConceptUuids.inServiceStatus],
+  );
+
+  const finishedEntries = useMemo(
+    () =>
+      allTriageEntries.filter(
+        (entry) => entry?.queue?.uuid === queueUuid && entry?.status?.uuid === queueStatusConceptUuids.finishedStatus,
+      ),
+    [allTriageEntries, queueUuid, queueStatusConceptUuids.finishedStatus],
+  );
+
+  const attendedToEntries = useMemo(
+    () =>
+      allTriageEntries.filter(
+        (entry) =>
+          entry?.queue?.uuid === queueUuid &&
+          (entry?.status?.uuid === queueStatusConceptUuids.inServiceStatus ||
+            entry?.status?.uuid === queueStatusConceptUuids.finishedStatus),
+      ),
+    [allTriageEntries, queueUuid, queueStatusConceptUuids.inServiceStatus, queueStatusConceptUuids.finishedStatus],
+  );
+
   return {
-    isLoading: isLoadingFinished || isLoadingInService || isLoadingWaiting,
-    waitingEntries: useMemo(
-      () => waitingEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
-      [waitingEntries, queue],
-    ),
-    inServiceEntries: useMemo(
-      () => inServiceEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
-      [inServiceEntries, queue],
-    ),
-    finishedEntries: useMemo(
-      () => finishedEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
-      [finishedEntries, queue],
-    ),
-    attendedtoEntries: useMemo(
-      () => attendedtoEntries.filter((entry) => entry?.queue?.uuid === queue?.uuid),
-      [attendedtoEntries, queue],
-    ),
-    error: finishedError ?? inServiceError ?? waitingError,
+    isLoading,
+    waitingEntries,
+    inServiceEntries,
+    finishedEntries,
+    attendedToEntries,
+    error,
+    isValidating: isValidatingQueueEntries,
   };
 };
