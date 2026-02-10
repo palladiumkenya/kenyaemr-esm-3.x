@@ -51,22 +51,25 @@ import {
   useVisitType,
 } from './admit-deceased-person.resource';
 import classNames from 'classnames';
-import { type MortuaryLocationResponse, type MortuaryPatient } from '../../types';
+import { EnhancedPatient, type MortuaryLocationResponse, type MortuaryPatient } from '../../types';
+import { removeFromMortuaryQueue } from '../../home/home.resource';
 
 interface AdmitDeceasedPersonProps {
   closeWorkspace: () => void;
-  patientData: MortuaryPatient;
+  patient: EnhancedPatient;
   mortuaryLocation: MortuaryLocationResponse;
   mutated: () => void;
   deceasedPatientUuid?: string;
+  queueEntryUuid: string;
 }
 
 const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
   closeWorkspace,
-  patientData,
+  patient,
   mortuaryLocation,
   mutated,
   deceasedPatientUuid,
+  queueEntryUuid,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -80,7 +83,7 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
 
   const { cashPoints } = useCashPoint();
   const cashPointUuid = cashPoints?.[0]?.uuid ?? '';
-  const patientUuid = patientData?.patient?.uuid || deceasedPatientUuid;
+  const patientUuid = patient?.uuid || deceasedPatientUuid;
   const { insuranceSchemes } = useConfig({ externalModuleName: '@kenyaemr/esm-billing-app' });
   const { paymentModes, isLoading: isLoadingPaymentModes } = usePaymentModes();
   const { currentProvider } = useSession();
@@ -123,7 +126,7 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
       deathNotificationNumber: '',
       attendingClinician: '',
       doctorsRemarks: '',
-      causeOfDeath: patientData?.person?.person?.causeOfDeath?.display || '',
+      causeOfDeath: patient?.person?.causeOfDeath?.display || '',
       autopsyPermission: deathConfirmationTypes.find((type) => type.label === 'No')?.concept || '',
       deadBodyPreservation: '',
       bodyEmbalmentType: '',
@@ -198,6 +201,7 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
           kind: 'success',
         });
       }
+      await removeFromMortuaryQueue(queueEntryUuid);
 
       const billPayload = {
         lineItems: billableItems,
@@ -228,7 +232,7 @@ const AdmitDeceasedPerson: React.FC<AdmitDeceasedPersonProps> = ({
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
       <div className={styles.formContainer}>
         <Stack gap={3}>
-          <DeceasedPatientHeader patientData={patientData} />
+          <DeceasedPatientHeader patient={patient} />
 
           <ResponsiveWrapper>
             <FormGroup legendText="">

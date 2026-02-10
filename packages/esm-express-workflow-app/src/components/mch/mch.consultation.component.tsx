@@ -1,12 +1,14 @@
+import React, { useCallback, useMemo, useState } from 'react';
 import { IconButton, InlineLoading } from '@carbon/react';
 import { Renew } from '@carbon/react/icons';
 import { useConfig } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { ExpressWorkflowConfig } from '../../config-schema';
 import { useQueues } from '../../hooks/useServiceQueues';
 import QueueTab from '../../shared/queue/queue-tab.component';
+import QueueSummaryCards, { QueueSummaryCard } from '../../shared/queue/queue-summary-cards.component';
 import { Queue, QueueFilter } from '../../types';
 import {
   useConsultationQueueMetrics,
@@ -17,7 +19,7 @@ import styles from '../consultation/consultation.scss';
 
 const MCHConsultation: React.FC = () => {
   const { t } = useTranslation();
-  const { queues, isLoading, error } = useQueues();
+  const { queues, isLoading: isLoadingQueues } = useQueues();
   const [currQueue, setCurrQueue] = useState<Queue>();
   const [filters, setFilters] = useState<Array<QueueFilter>>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -26,7 +28,12 @@ const MCHConsultation: React.FC = () => {
     priorities: { emergencyPriorityConceptUuid, urgentPriorityConceptUuid, notUrgentPriorityConceptUuid },
     queueServiceConceptUuids,
   } = useConfig<ExpressWorkflowConfig>();
-  const { data: totalVisits, isLoading: isLoadingTotalVisits } = useTotalVisits();
+  const {
+    data: totalVisits,
+    isLoading: isLoadingTotalVisits,
+    isValidating: isValidatingTotalVisits,
+  } = useTotalVisits();
+
   const consultationQueues = queues.filter(
     (queue) =>
       queue.service.uuid === queueServiceConceptUuids.consultationService &&
@@ -38,21 +45,21 @@ const MCHConsultation: React.FC = () => {
   const {
     waitingEntries,
     isLoading: isLoadingQueueMetrics,
-    error: waitingError,
     emergencyEntries,
     urgentEntries,
     notUrgentEntries,
+    isValidating: isValidatingQueueMetrics,
   } = useConsultationQueueMetrics(activeQueue);
   const {
     awaitingCount,
     completedCount,
-    totalCount,
     lab,
     radiology,
     procedures,
     isLoading: isLoadingInvestigations,
     refresh: refreshInvestigations,
     investigationCategorizedEntries,
+    isValidating: isValidatingInvestigations,
   } = useInvestigationStats(activeQueue);
   // Single refresh handler for all investigations
   const handleRefresh = useCallback(async () => {
@@ -66,7 +73,7 @@ const MCHConsultation: React.FC = () => {
     }
   }, [refreshInvestigations]);
 
-  const cards = useMemo(
+  const cards: Array<QueueSummaryCard> = useMemo(
     () => [
       {
         title: t('awaitingConsultation', 'Awaiting consultation'),
@@ -258,7 +265,10 @@ const MCHConsultation: React.FC = () => {
     ],
   );
 
-  if (isLoading || isLoadingTotalVisits || isLoadingInvestigations || isLoadingQueueMetrics) {
+  const isLoading = isLoadingQueues || isLoadingTotalVisits || isLoadingInvestigations || isLoadingQueueMetrics;
+  const isValidating = isValidatingTotalVisits || isValidatingInvestigations || isValidatingQueueMetrics;
+
+  if (isLoading && !isValidating) {
     return <InlineLoading description={t('loadingQueues', 'Loading queues...')} />;
   }
 
@@ -271,14 +281,16 @@ const MCHConsultation: React.FC = () => {
     );
   }
   return (
-    <QueueTab
-      queues={consultationQueues}
-      navigatePath="mch"
-      cards={cards}
-      usePatientChart
-      filters={filters}
-      onFiltersChanged={setFilters}
-    />
+    <>
+      <QueueSummaryCards cards={cards} />
+      <QueueTab
+        queues={consultationQueues}
+        navigatePath="mch"
+        usePatientChart
+        filters={filters}
+        onFiltersChanged={setFilters}
+      />
+    </>
   );
 };
 

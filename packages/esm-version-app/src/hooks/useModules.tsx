@@ -14,3 +14,12 @@ export function useModules() {
 
   return { modules: data?.data?.results ?? [], isLoading };
 }
+
+export function useGlobalProperty(property: string) {
+  const { data, isLoading } = useSWRImmutable<{ data: { results: Array<OpenmrsResource> } }>(
+    `/ws/rest/v1/systemsetting?q=${property}&v=full`,
+    openmrsFetch,
+  );
+
+  return { data: data?.data?.results?.[0] ?? [], isLoading };
+}

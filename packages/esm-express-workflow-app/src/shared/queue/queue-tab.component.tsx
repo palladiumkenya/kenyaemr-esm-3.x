@@ -1,23 +1,17 @@
-import { Tabs, TabList, Tab, TabPanels, TabPanel, InlineLoading, TabsSkeleton } from '@carbon/react';
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { Tabs, TabList, Tab, TabPanels, TabPanel, InlineLoading, TabsSkeleton } from '@carbon/react';
 import startCase from 'lodash-es/startCase';
-import Card from '../cards/card.component';
-import { Queue, QueueFilter } from '../../types/index';
-import QueueEntryTable from './queue-entry/queue-entry-table.component';
-import { useQueueEntries } from '../../hooks/useServiceQueues';
-import styles from './queue-tab.scss';
+
 import FiltersHeader from './filters-header.component';
+import { type Queue, type QueueFilter } from '../../types/index';
+import { useQueueEntries } from '../../hooks/useServiceQueues';
+import QueueEntryTable from './queue-entry/queue-entry-table.component';
+import styles from './queue-tab.scss';
 
 type QueueTabProps = {
   queues: Array<Queue>;
-  cards?: Array<{
-    title: string;
-    value: string;
-    categories?: Array<{ label: string; value: number; onClick?: () => void }>;
-    onClick?: () => void;
-    refreshButton?: React.ReactNode; // Add this property
-  }>;
   navigatePath: string;
   onTabChanged?: (queue: Queue) => void;
   usePatientChart?: boolean;
@@ -25,9 +19,10 @@ type QueueTabProps = {
   onFiltersChanged?: (filters: Array<QueueFilter>) => void;
 };
 
+const startedOnOrAfter = dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ss');
+
 const QueueTab: React.FC<QueueTabProps> = ({
   queues,
-  cards,
   navigatePath,
   onTabChanged,
   usePatientChart,
@@ -37,43 +32,49 @@ const QueueTab: React.FC<QueueTabProps> = ({
   const { t } = useTranslation();
 
   // Filter queues with rooms first
+  const [pageSize, setPageSize] = useState(100);
   const validQueues = useMemo(() => queues.filter((queue) => queue?.queueRooms?.length > 0), [queues]);
 
   // Set initial selected queue to first valid queue
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const selectedQueue = validQueues[selectedTabIndex];
 
-  const { queueEntries, isLoading, error } = useQueueEntries({
-    location: selectedQueue?.location?.uuid ? [selectedQueue.location.uuid] : undefined,
-    statuses: filters?.filter((filter) => filter.key === 'status')?.flatMap((filter) => filter.value.split(',')),
-  });
-
-  useEffect(() => {
-    if (!isLoading && isInitialLoad) {
-      setIsInitialLoad(false);
-    }
-  }, [isLoading, isInitialLoad]);
+  const {
+    queueEntries,
+    isLoading: isLoadingQueueEntries,
+    isValidating: isValidatingQueueEntries,
+    error,
+    pagination,
+  } = useQueueEntries(
+    {
+      location: selectedQueue?.location?.uuid ? [selectedQueue.location.uuid] : undefined,
+      startedOnOrAfter: startedOnOrAfter,
+    },
+    pageSize,
+  );
 
   const queueEntriesByService = useMemo(() => {
     if (!queueEntries?.length || !selectedQueue?.uuid) {
       return [];
     }
     const priorityFilter = filters?.find((filter) => filter.key === 'priority')?.value;
+    const statusFilter =
+      filters?.filter((filter) => filter.key === 'status')?.flatMap((filter) => filter.value.split(',')) ?? [];
     const serviceAwaitingFilter = filters?.find((filter) => filter.key === 'service_awaiting')?.value?.split(',') ?? []; // Patient UUIDs
     const serviceCompletedFilter =
       filters?.find((filter) => filter.key === 'service_completed')?.value?.split(',') ?? []; // Patient UUIDs
     const filtered = queueEntries.filter((entry) => {
       return (
         entry?.queue?.uuid === selectedQueue?.uuid &&
+        (statusFilter.length > 0 ? statusFilter.includes(entry?.status?.uuid) : true) &&
         (priorityFilter ? entry?.priority?.uuid === priorityFilter : true) &&
         (serviceAwaitingFilter.length > 0 ? serviceAwaitingFilter.includes(entry?.patient?.uuid) : true) &&
         (serviceCompletedFilter.length > 0 ? serviceCompletedFilter.includes(entry?.patient?.uuid) : true)
       );
     });
     return filtered;
-  }, [filters, queueEntries, selectedQueue?.uuid]);
+  }, [filters, queueEntries?.length, selectedQueue?.uuid]);
 
   const handleTabChange = useCallback(
     (evt: { selectedIndex: number }) => {
@@ -86,7 +87,9 @@ const QueueTab: React.FC<QueueTabProps> = ({
     [validQueues, onTabChanged],
   );
 
-  if (isInitialLoad && isLoading) {
+  const isLoading = isLoadingQueueEntries && !isValidatingQueueEntries;
+
+  if (isLoading) {
     return <TabsSkeleton />;
   }
 
@@ -112,18 +115,6 @@ const QueueTab: React.FC<QueueTabProps> = ({
 
   return (
     <div className={styles.queueTab}>
-      <div className={styles.cards}>
-        {cards?.map((card) => (
-          <Card
-            key={card.title}
-            title={card.title}
-            total={card.value}
-            categories={card.categories}
-            onClick={card.onClick}
-            refreshButton={card.refreshButton}
-          />
-        ))}
-      </div>
       <FiltersHeader filters={filters} onFiltersChanged={onFiltersChanged} />
       <div className={styles.tabsContainer}>
         <Tabs selectedIndex={selectedTabIndex} onChange={handleTabChange}>
@@ -135,7 +126,7 @@ const QueueTab: React.FC<QueueTabProps> = ({
           <TabPanels>
             {validQueues.map((queue, index) => (
               <TabPanel key={queue?.uuid}>
-                {isLoading && !isInitialLoad && (
+                {isLoading && (
                   <div className={styles.loadingOverlay}>
                     <InlineLoading description={t('loadingQueueEntries', 'Loading queue entries...')} />
                   </div>
@@ -144,6 +135,10 @@ const QueueTab: React.FC<QueueTabProps> = ({
                   queueEntries={queueEntriesByService}
                   navigatePath={navigatePath}
                   usePatientChart={usePatientChart}
+                  pagination={pagination}
+                  onPageSizeChange={(pageSize) => {
+                    setPageSize(pageSize as number);
+                  }}
                 />
               </TabPanel>
             ))}

@@ -11,8 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { ConfigurableLink, showModal, useConfig, useDebounce, usePagination } from '@openmrs/esm-framework';
-import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
+import { ConfigurableLink, showModal, useConfig, useDebounce } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import startCase from 'lodash-es/startCase';
@@ -24,8 +23,9 @@ import lowerCase from 'lodash-es/lowerCase';
 import { type ExpressWorkflowConfig } from '../../../config-schema';
 import { spaBasePath } from '../../../constants';
 import { serveQueueEntry } from '../../../hooks/useServiceQueues';
-import { type QueueEntry } from '../../../types/index';
+import { type QueueEntriesPagination, type QueueEntry } from '../../../types/index';
 import styles from './queue-entry-table.scss';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib/src';
 
 // Extend dayjs with the relativeTime plugin
 dayjs.extend(relativeTime);
@@ -34,16 +34,19 @@ type QueueEntryTableProps = {
   navigatePath?: string;
   queueEntries: Array<QueueEntry>;
   usePatientChart?: boolean;
+  pagination?: QueueEntriesPagination;
+  onPageSizeChange?: (pageSize: number) => void;
 };
 
 const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
   navigatePath = 'triage',
   queueEntries,
   usePatientChart,
+  pagination,
+  onPageSizeChange,
 }) => {
   const { visitQueueNumberAttributeUuid } = useConfig<ExpressWorkflowConfig>();
   const [searchString, setSearchString] = useState('');
-  const pageSize = 10;
   const { t } = useTranslation();
   const debouncedSearchString = useDebounce(searchString, 500);
   const filteredQueueEntries = useMemo(() => {
@@ -51,48 +54,32 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
       return queueEntry.patient.person.display.toLowerCase().includes(debouncedSearchString.toLowerCase());
     });
   }, [queueEntries, debouncedSearchString]);
-  const { currentPage, goTo, results } = usePagination(filteredQueueEntries, pageSize);
-  const { pageSizes } = usePaginationInfo(pageSize, queueEntries.length, currentPage, results.length);
 
-  const headers = [
-    {
-      header: t('name', 'Name'),
-      key: 'patientName',
-    },
-    {
-      header: t('queueNumber', 'Queue Number'),
-      key: 'queueNumber',
-    },
-    {
-      header: t('comingFrom', 'Coming from'),
-      key: 'previousQueue',
-    },
-    {
-      header: t('priority', 'Priority'),
-      key: 'priority',
-    },
-    {
-      header: t('priorityComment', 'Priority Comment'),
-      key: 'priorityComment',
-    },
-    {
-      header: t('status', 'status'),
-      key: 'status',
-    },
-    {
-      header: t('queue', 'Queue'),
-      key: 'queue',
-    },
-    {
-      header: t('waitTime', 'Wait time'),
-      key: 'waitTime',
-    },
-  ];
+  const { pageSizes } = usePaginationInfo(
+    pagination.currentPageSize.current,
+    pagination.totalCount,
+    pagination.currentPage,
+    filteredQueueEntries.length,
+  );
+
+  const headers = useMemo(
+    () => [
+      { header: t('name', 'Name'), key: 'patientName' },
+      { header: t('queueNumber', 'Queue Number'), key: 'queueNumber' },
+      { header: t('comingFrom', 'Coming from'), key: 'previousQueue' },
+      { header: t('priority', 'Priority'), key: 'priority' },
+      { header: t('priorityComment', 'Priority Comment'), key: 'priorityComment' },
+      { header: t('status', 'status'), key: 'status' },
+      { header: t('queue', 'Queue'), key: 'queue' },
+      { header: t('waitTime', 'Wait time'), key: 'waitTime' },
+    ],
+    [t],
+  );
 
   const handleCallQueueEntry = async (queueEntry: QueueEntry) => {
-    const queueNumber = queueEntry.visit.attributes?.filter(
+    const queueNumber = queueEntry.visit.attributes?.find(
       (attr) => attr['attributeType']?.uuid === visitQueueNumberAttributeUuid,
-    )?.[0];
+    );
     const response = await serveQueueEntry(
       queueEntry.queue.name,
       queueNumber.value,
@@ -108,35 +95,37 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
     }
   };
 
-  const rows = results?.map((queueEntry) => {
-    const visitNumber = queueEntry?.visit?.attributes?.find(
-      (attr) => attr?.attributeType?.uuid === visitQueueNumberAttributeUuid,
-    );
+  const rows = useMemo(() => {
+    return filteredQueueEntries?.map((queueEntry) => {
+      const visitNumber = queueEntry?.visit?.attributes?.find(
+        (attr) => attr?.attributeType?.uuid === visitQueueNumberAttributeUuid,
+      );
 
-    const patientChartUrl = usePatientChart
-      ? `${window.spaBase}/patient/${queueEntry.patient.uuid}/chart/Patient Summary?path=${navigatePath}`
-      : `${spaBasePath}/${navigatePath}/${queueEntry.patient.uuid}`;
+      const patientChartUrl = usePatientChart
+        ? `${globalThis.spaBase}/patient/${queueEntry.patient.uuid}/chart/Patient Summary?path=${navigatePath}`
+        : `${spaBasePath}/${navigatePath}/${queueEntry.patient.uuid}`;
 
-    return {
-      id: queueEntry.uuid,
-      queueNumber: visitNumber?.value ?? '--',
-      previousQueue: startCase(queueEntry.previousQueueEntry?.queue?.display?.toLowerCase() ?? '--'),
-      patientName: (
-        <ConfigurableLink className={styles.link} to={patientChartUrl}>
-          {startCase(queueEntry.patient.person.display.toLowerCase())}
-        </ConfigurableLink>
-      ),
-      priority: (
-        <div className={styles.priorityPill} data-priority={lowerCase(queueEntry?.priority?.display)}>
-          {t(queueEntry?.priority?.display, capitalize(queueEntry?.priority?.display.replace('_', ' ')))}
-        </div>
-      ),
-      priorityComment: startCase(queueEntry.priorityComment?.toLowerCase() ?? '--'),
-      status: queueEntry?.status?.display ?? '--',
-      queue: startCase(queueEntry?.queue?.display?.toLowerCase() ?? '--'),
-      waitTime: dayjs(queueEntry.startedAt).fromNow(),
-    };
-  });
+      return {
+        id: queueEntry.uuid,
+        queueNumber: visitNumber?.value ?? '--',
+        previousQueue: startCase(queueEntry.previousQueueEntry?.queue?.display?.toLowerCase() ?? '--'),
+        patientName: (
+          <ConfigurableLink className={styles.link} to={patientChartUrl}>
+            {startCase(queueEntry.patient.person.display.toLowerCase())}
+          </ConfigurableLink>
+        ),
+        priority: (
+          <div className={styles.priorityPill} data-priority={lowerCase(queueEntry?.priority?.display)}>
+            {t(queueEntry?.priority?.display, capitalize(queueEntry?.priority?.display.replace('_', ' ')))}
+          </div>
+        ),
+        priorityComment: startCase(queueEntry.priorityComment?.toLowerCase() ?? '--'),
+        status: queueEntry?.status?.display ?? '--',
+        queue: startCase(queueEntry?.queue?.display?.toLowerCase() ?? '--'),
+        waitTime: dayjs(queueEntry.startedAt).fromNow(),
+      };
+    });
+  }, [filteredQueueEntries, visitQueueNumberAttributeUuid, navigatePath, usePatientChart, t]);
 
   if (queueEntries.length === 0) {
     return <div>{t('noPatientsAwaiting', 'No patients awaiting service')}</div>;
@@ -172,7 +161,7 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
                   <TableCell className="cds--table-column-menu">
                     <OverflowMenu size="sm" aria-label="overflow-menu" flipped align="right">
                       <OverflowMenuItem
-                        onClick={() => handleCallQueueEntry(results[index])}
+                        onClick={() => handleCallQueueEntry(filteredQueueEntries[index])}
                         itemText={t('call', 'Call')}
                       />
                     </OverflowMenu>
@@ -183,17 +172,20 @@ const QueueEntryTable: React.FC<QueueEntryTableProps> = ({
           </Table>
         )}
       </DataTable>
-      <Pagination
-        pageSizes={pageSizes}
-        forwardText={t('nextPage', 'Next page')}
-        backwardText={t('previousPage', 'Previous page')}
-        page={currentPage}
-        pageSize={pageSize}
-        totalItems={filteredQueueEntries.length}
-        onChange={({ page }) => {
-          goTo(page);
-        }}
-      />
+      {pagination && (
+        <Pagination
+          pageSizes={pageSizes}
+          forwardText={t('nextPage', 'Next page')}
+          backwardText={t('previousPage', 'Previous page')}
+          page={pagination.currentPage}
+          pageSize={pagination.currentPageSize.current}
+          totalItems={pagination.totalCount}
+          onChange={({ page, pageSize }) => {
+            pagination.goTo(page);
+            onPageSizeChange?.(pageSize as number);
+          }}
+        />
+      )}
     </div>
   );
 };

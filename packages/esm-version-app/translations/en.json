@@ -1,3 +1,13 @@
 {
-  "systemInfo": "System Info"
+  "buildDateTime": "Build date time",
+  "emergency": "Emergency",
+  "facilityLogo": "Facility logo",
+  "frontendModules": "Frontend modules",
+  "loadingFacilityInformation": "Loading facility information...",
+  "mainModuleVersion": "Main Module Version",
+  "moduleName": "Module name",
+  "noVersionFound": "No version found",
+  "spaVersion": "SPA Version",
+  "systemInfo": "System Info",
+  "version": "Version"
 }

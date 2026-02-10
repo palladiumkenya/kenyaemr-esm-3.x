@@ -1,11 +1,10 @@
-import { fhirBaseUrl, openmrsFetch, restBaseUrl } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, restBaseUrl, useFhirFetchAll } from '@openmrs/esm-framework';
+import uniqBy from 'lodash-es/uniqBy';
 import useSWR, { mutate } from 'swr';
 import {
   AttributeType,
-  FHIRResponse,
   PageableResult,
   Provider,
-  ProviderAttributes,
   ProviderLocation,
   ProviderResponse,
   Role,
@@ -13,8 +12,6 @@ import {
   User,
   UserRoleScope,
 } from './types';
-import uniqBy from 'lodash-es/uniqBy';
-import { useMemo } from 'react';
 
 export const useUser = () => {
   const url = `${restBaseUrl}/user?v=custom:(uuid,username,display,systemId,retired,person:(uuid,display,gender,names:(givenName,familyName,middleName),attributes:(uuid,display)),roles:(uuid,description,display,name))`;
@@ -169,13 +166,10 @@ export function useStockOperationTypes() {
 
 export function useStockTagLocations() {
   const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=main store,main pharmacy,dispensary,sub store `;
-  const { data, error, isLoading } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
-  const stockLocations = useMemo(
-    () => data?.data?.entry?.map((response) => response.resource) ?? [],
-    [data?.data?.entry],
-  );
+  const { data, error, isLoading } = useFhirFetchAll<fhir.Location>(apiUrl);
+
   return {
-    stockLocations: uniqBy(stockLocations, 'id') ?? [],
+    stockLocations: uniqBy(data, 'id') ?? [],
     isLoading,
     error,
   };

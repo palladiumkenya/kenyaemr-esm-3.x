@@ -1,63 +1,48 @@
-import React from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Header from '../header/header.component';
 import styles from './home.scss';
 import Summary from '../summary/summary.component';
 import CustomContentSwitcher from '../switcher/content-switcher.component';
-import { useAwaitingPatients, useAwaitingQueuePatients } from './home.resource';
 import { useLocation, useMortuaryAdmissionLocation } from '../bed-layout/bed-layout.resource';
-import { DataTableSkeleton } from '@carbon/react';
+import { transformQueueEntryToPatient, useDischargedPatients, useMortuaryQueueEntries } from './home.resource';
 
 const HomeViewComponent: React.FC = () => {
   const { t } = useTranslation();
-  const [selectedLocation, setSelectedLocation] = React.useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [hasInitialDataLoaded, setHasInitialDataLoaded] = useState(false);
 
   const { locations, isLoading: isLoadingLocation, error: locationError } = useLocation();
+
+  const { queueEntries, isLoading: isLoadingQueue, error: queueError, mutate: mutateQueue } = useMortuaryQueueEntries();
 
   const {
     admissionLocation,
     isLoading: isLoadingAdmission,
     error: admissionError,
-    mutate: mutateAdmissionLocation,
+    mutate: mutateAdmission,
   } = useMortuaryAdmissionLocation(selectedLocation);
 
   const {
-    awaitingQueueDeceasedPatients,
-    admittedPatients,
     dischargedPatients,
     dischargedPatientsCount,
-    isLoadingAwaitingQueuePatients,
-    isLoadingDischarge,
-    isLoadingAll,
-    errorFetchingAwaitingQueuePatients,
-    mutateAwaitingQueuePatients,
-    mutateAll,
-  } = useAwaitingQueuePatients(admissionLocation);
+    isLoading: isLoadingDischarge,
+    error: dischargeError,
+    mutate: mutateDischarge,
+  } = useDischargedPatients(admissionLocation);
 
-  const isInitialDataLoading = React.useMemo(() => {
-    return (
-      isLoadingLocation ||
-      isLoadingAdmission ||
-      isLoadingAwaitingQueuePatients ||
-      isLoadingDischarge ||
-      (!selectedLocation && locationItems?.length === 0)
-    );
-  }, [isLoadingLocation, isLoadingAdmission, isLoadingAwaitingQueuePatients, isLoadingDischarge, selectedLocation]);
+  const awaitingQueuePatients = useMemo(() => {
+    return queueEntries.map(transformQueueEntryToPatient);
+  }, [queueEntries]);
 
-  const [hasInitialDataLoaded, setHasInitialDataLoaded] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!isInitialDataLoading && selectedLocation) {
-      setHasInitialDataLoaded(true);
+  const admittedCount = useMemo(() => {
+    if (!admissionLocation?.bedLayouts) {
+      return 0;
     }
-  }, [isInitialDataLoading, selectedLocation]);
+    return admissionLocation.bedLayouts.reduce((total, bed) => total + (bed.patients?.length || 0), 0);
+  }, [admissionLocation]);
 
-  const mutateAllData = React.useCallback(() => {
-    mutateAdmissionLocation();
-    mutateAll();
-  }, [mutateAdmissionLocation, mutateAll]);
-
-  const locationItems = React.useMemo(() => {
+  const locationItems = useMemo(() => {
     return locations.map((location) => ({
       id: location.ward.uuid,
       text: location.ward.display,
@@ -65,33 +50,53 @@ const HomeViewComponent: React.FC = () => {
     }));
   }, [locations]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (locationItems?.length === 1 && !selectedLocation) {
       setSelectedLocation(locationItems[0].id);
     }
   }, [locationItems, selectedLocation]);
 
-  const trulyAwaitingPatients = useAwaitingPatients(awaitingQueueDeceasedPatients);
+  const isInitialDataLoading = useMemo(() => {
+    return (
+      isLoadingLocation ||
+      isLoadingQueue ||
+      isLoadingAdmission ||
+      isLoadingDischarge ||
+      (!selectedLocation && locationItems?.length === 0)
+    );
+  }, [isLoadingLocation, isLoadingQueue, isLoadingAdmission, isLoadingDischarge, selectedLocation, locationItems]);
 
-  const handleLocationChange = React.useCallback((data: { selectedItem: { id: string; text: string } }) => {
+  useEffect(() => {
+    if (!isInitialDataLoading && selectedLocation) {
+      setHasInitialDataLoaded(true);
+    }
+  }, [isInitialDataLoading, selectedLocation]);
+
+  const handleLocationChange = useCallback((data: { selectedItem: { id: string; text: string } }) => {
     if (data.selectedItem) {
       setSelectedLocation(data.selectedItem.id);
       setHasInitialDataLoaded(false);
     }
   }, []);
 
+  const mutateAllData = useCallback(() => {
+    mutateQueue();
+    mutateAdmission();
+    mutateDischarge();
+  }, [mutateQueue, mutateAdmission, mutateDischarge]);
+
   return (
     <section className={styles.section}>
       <Header title={t('mortuary', 'Mortuary')} />
       <Summary
-        awaitingQueueCount={trulyAwaitingPatients.length}
-        admittedCount={admittedPatients.length}
+        awaitingQueueCount={awaitingQueuePatients.length}
+        admittedCount={admittedCount}
         dischargedCount={dischargedPatientsCount}
         isLoading={isInitialDataLoading && !hasInitialDataLoaded}
       />
       <CustomContentSwitcher
-        awaitingQueueDeceasedPatients={trulyAwaitingPatients}
-        isLoading={isInitialDataLoading && !hasInitialDataLoaded}
+        awaitingQueuePatients={awaitingQueuePatients}
+        isLoadingQueue={isLoadingQueue}
         locationItems={locationItems}
         selectedLocation={selectedLocation}
         admissionLocation={admissionLocation}
@@ -99,9 +104,11 @@ const HomeViewComponent: React.FC = () => {
         isLoadingAdmission={isLoadingAdmission}
         locationError={locationError}
         admissionError={admissionError}
+        queueError={queueError}
         onLocationChange={handleLocationChange}
         mutate={mutateAllData}
         dischargedPatients={dischargedPatients}
+        dischargedPatientsCount={dischargedPatientsCount}
         isLoadingDischarge={isLoadingDischarge}
       />
     </section>

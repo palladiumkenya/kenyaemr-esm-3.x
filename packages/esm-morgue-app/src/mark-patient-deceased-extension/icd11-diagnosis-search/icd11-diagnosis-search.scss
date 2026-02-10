@@ -1,0 +1,79 @@
+@use '@carbon/layout';
+@use '@carbon/type';
+@use '@carbon/colors';
+@use '~@openmrs/esm-styleguide/src/vars' as *;
+
+.searchWrapper {
+  position: relative;
+}
+
+.searchResults {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.25rem;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid $ui-03;
+  border-radius: 4px;
+  background-color: $ui-01;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.loadingState {
+  padding: layout.$spacing-05;
+  text-align: center;
+}
+
+.resultsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.resultItem {
+  padding: layout.$spacing-04 layout.$spacing-05;
+  cursor: pointer;
+  border-bottom: 1px solid $ui-03;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: $ui-02;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.selected {
+    background-color: $ui-03;
+    font-weight: 600;
+  }
+
+  &:focus {
+    outline-offset: -2px;
+  }
+}
+
+.noResults {
+  padding: layout.$spacing-05;
+  text-align: center;
+  color: $text-02;
+  font-style: italic;
+}
+
+.hint {
+  margin-top: layout.$spacing-03;
+  padding: layout.$spacing-03;
+  color: $text-02;
+  font-size: 0.875rem;
+  font-style: italic;
+}
+
+.errorMessage {
+  margin-top: layout.$spacing-03;
+  font-size: 0.875rem;
+  color: colors.$red-70;
+}
